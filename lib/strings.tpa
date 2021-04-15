@@ -1,0 +1,88 @@
+/* --------------------------------------------------------------- *
+ * Récupération des textes déjà existant des types de compétences. *
+ * --------------------------------------------------------------- */
+COPY_EXISTING ~weapprof.2da~  ~override~
+	COUNT_2DA_ROWS ~3~ ~rows~
+	FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
+		READ_2DA_ENTRY row 2 22 strref
+		READ_2DA_ENTRY row 1 22 offset
+
+		PATCH_IF NOT ~%strref%~ STRING_EQUAL ~4294967296~ BEGIN
+			GET_STRREF  strref text
+			SPRINT $tra_proficiencies(~%offset%~) ~%text%~
+		END
+	END
+    BUT_ONLY_IF_IT_CHANGES
+
+/* -------------------------------------------------------- *
+ * Récupération des textes déjà existant des noms des kits. *
+ * -------------------------------------------------------- */
+COPY_EXISTING ~kitlist.2da~  ~override~
+	COUNT_2DA_ROWS ~3~ ~rows~
+	FOR (row = 2 ; row < rows ; row = row + 1) BEGIN
+		READ_2DA_ENTRY row 1 8 name
+		READ_2DA_ENTRY row 3 8 strref
+
+		PATCH_IF NOT ~%strref%~ STRING_EQUAL ~4294967296~ BEGIN
+			GET_STRREF  strref text
+			SPRINT $translations(~%name%~) ~%text%~
+		END
+	END
+    BUT_ONLY_IF_IT_CHANGES
+
+/* ---------------------------------------------------------------- *
+ * Récupération des textes déjà existant des infobulles des objets. *
+ * ---------------------------------------------------------------- */
+COPY_EXISTING ~tooltip.2da~ ~override~
+	COUNT_2DA_ROWS ~4~ ~rows~
+	FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
+		READ_2DA_ENTRY row 0 4 itemId
+		READ_2DA_ENTRY row 1 4 strref0
+		READ_2DA_ENTRY row 2 4 strref1
+		READ_2DA_ENTRY row 3 4 strref2
+
+		PATCH_DEFINE_ARRAY $tra_tooltips(~%itemId%~) BEGIN ~%strref0%~ ~%strref1%~ ~%strref2%~ END
+	END
+    BUT_ONLY_IF_IT_CHANGES
+
+/* ----------------------------------------------------------------- *
+ * D'autres chaînes utilisées dans la partie "(Non) Utilisable par". *
+ * Je n'ai pas trouvé le moyen de récupérer les textes               *
+ * déjà existant.                                                    *
+ * ----------------------------------------------------------------- */
+// Pas trouvé comment récupérer les chaînes déjà existantes des ces éléments
+OUTER_SPRINT $translations(~CHAOTIC~) @101000
+OUTER_SPRINT $translations(~EVIL~) @101001
+OUTER_SPRINT $translations(~GOOD~) @101002
+OUTER_SPRINT $translations(~NEUTRAL~) @101003
+//OUTER_SPRINT $translations(~NEUTRAL~) @101004
+OUTER_SPRINT $translations(~LOYAL~) @101005
+OUTER_SPRINT $translations(~BARD~) @101006
+OUTER_SPRINT $translations(~CLERIC~) @101007
+OUTER_SPRINT $translations(~CLERIC_MAGE~) @101008
+OUTER_SPRINT $translations(~CLERIC_THIEF~) @101009
+OUTER_SPRINT $translations(~CLERIC_RANGER~) @101010
+OUTER_SPRINT $translations(~FIGHTER~) @101011
+OUTER_SPRINT $translations(~FIGHTER_DRUID~) @101012
+OUTER_SPRINT $translations(~FIGHTER_MAGE~) @101013
+OUTER_SPRINT $translations(~FIGHTER_CLERIC~) @101014
+OUTER_SPRINT $translations(~FIGHTER_MAGE_CLERIC~) @101015
+OUTER_SPRINT $translations(~FIGHTER_MAGE_THIEF~) @101016
+OUTER_SPRINT $translations(~FIGHTER_THIEF~) @101017
+OUTER_SPRINT $translations(~MAGE~) @101018
+OUTER_SPRINT $translations(~MAGE_THIEF~) @101019
+OUTER_SPRINT $translations(~PALADIN~) @101020
+OUTER_SPRINT $translations(~RANGER~) @101021
+OUTER_SPRINT $translations(~THIEF~) @101022
+OUTER_SPRINT $translations(~ELF~) @101023
+OUTER_SPRINT $translations(~DWARF~) @101024
+OUTER_SPRINT $translations(~HALF_ELF~) @101025
+OUTER_SPRINT $translations(~HALFLING~) @101026
+OUTER_SPRINT $translations(~HUMAN~) @101027
+OUTER_SPRINT $translations(~GNOME~) @101028
+OUTER_SPRINT $translations(~MONK~) @101029
+OUTER_SPRINT $translations(~DRUID~) @101030
+OUTER_SPRINT $translations(~HALFORC~) @101031
+
+OUTER_SPRINT crlf  @10000
+OUTER_SPRINT colon @10001  // ~ : ~

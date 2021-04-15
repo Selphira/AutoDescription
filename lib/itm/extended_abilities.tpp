@@ -1,0 +1,249 @@
+/* ====================================================================================== *
+ * Gestion des sections "Capacités de charge" et "Capacités de combat" de la description. *
+ * ====================================================================================== */
+
+DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
+	READ_LONG  ITM_extended_headers_offset headerOffset
+	READ_SHORT ITM_extended_headers_count  headerCount
+
+	PATCH_IF headerCount > 0 BEGIN
+		SET chargeCount = 0
+		SET combatCount = 0
+
+		PATCH_DEFINE_ARRAY chargeAbilities BEGIN END
+		PATCH_DEFINE_ARRAY combat_abilities BEGIN END
+
+	    FOR (headerIndex = 0; headerIndex < headerCount; headerIndex += 1) BEGIN
+	        SET offset = headerOffset + 0x38 * headerIndex
+			READ_ASCII (offset + ITM_HEAD_use_icon) icon
+			READ_BYTE  (offset + ITM_HEAD_location) location
+			READ_SHORT (offset + ITM_HEAD_charges) charges
+
+			PATCH_IF charges > 0 BEGIN
+				LPM ~add_charge_abilitie~
+			END
+			ELSE PATCH_IF location == 1 BEGIN
+
+				SET $combatAbilitiesCount(~%combatCount%~) = 0
+				PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%icon%~ END
+
+				PATCH_IF isWeapon == 1 BEGIN
+					LPM ~add_combat_abilitie~
+					LPM ~add_weapon_statistics~
+				END
+				ELSE BEGIN
+					LPM ~add_combat_abilitie~
+				END
+				SET combatCount += 1
+			END
+			ELSE BEGIN
+				PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' pas encore gere~
+			END
+			PATCH_IF location == 1 AND charges > 0 BEGIN
+                PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' a une charge ET se trouve dans l'emplacement des armes~
+            END
+		END
+
+		// Trier les tableau de capacités
+		FOR (index = 0; index < combatCount; index += 1) BEGIN
+			PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
+				PATCH_PHP_EACH ~combat_abilities_%index%~ AS k => v BEGIN
+					PATCH_IF NOT IS_AN_INT ~%k_0%~ BEGIN
+						PATCH_WARN ~WARNING: La valeur pour le tri n'est pas definie dans $sort_opcodes pour %k_0%~
+					END
+				END
+				// Si WARNING : to be sorted numerically was not of the expcted form
+				// C'est que la valeur pour le tri du opcode n'est pas présente dans le tableau $sort_opcodes
+                SORT_ARRAY_INDICES ~combat_abilities_%index%~ NUMERICALLY
+			END
+        END
+
+		PATCH_IF chargeCount > 0 BEGIN LPM ~add_charge_abilities_to_description~ END
+		PATCH_IF combatCount > 0 BEGIN LPM ~add_combat_abilities_to_description~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
+	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
+	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
+		READ_SHORT blockOffset opcode
+
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			LPF ~get_description_effect~ RET desc = description END
+			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+				SPRINT chargeStr @102094 // ~%charges% fois par jour~
+				SPRINT desc ~%desc% %chargeStr%~
+				SET $charge_abilities($sort_opcodes(~%opcode%~) ~%chargeCount%~ ~%desc%~) = 1
+				SET chargeCount += 1
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
+	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
+	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
+		READ_SHORT blockOffset opcode
+
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			LPF ~get_description_effect~ RET desc = description END
+			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+				SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+				SET $combatAbilities(~%combatCount%~ 0) += 1
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_weapon_statistics~ BEGIN
+	READ_BYTE  (offset + ITM_HEAD_speed) speedFactor
+	READ_SHORT (offset + ITM_HEAD_thac0_bonus) tac0
+	READ_BYTE  (offset + ITM_HEAD_dice_sides) diceSides
+	READ_BYTE  (offset + ITM_HEAD_dice_thrown) diceThrown
+	READ_SHORT (offset + ITM_HEAD_damage_bonus) damageBonus
+	READ_SHORT (offset + ITM_HEAD_damage_type) damageType
+
+	SPRINT damage ~~
+	/*  TODO: Cas limites à gérer
+		- If Dice thrown, Dice size, and Damage bonus are all 0: Always deals zero damage (ignores all modifiers, like Weapon Proficiency).
+	      If you want zero base damage + modifiers, you can use 1d1 - 1.
+	    - Dice thrown d Dice size + Damage bonus = Xd0 + 0: Deals X damage, regardless of other modifiers.
+	    - Dice thrown d Dice size + Damage bonus = 0d0 + X: Deals X + modifiers damage.
+	    - Dice thrown d Dice size + Damage bonus = 0dX + 0: Also deals 0 damage.
+	*/
+	PATCH_IF diceThrown > 0 AND diceSides > 0 BEGIN
+		SPRINT damage ~%damage%%diceThrown%d%diceSides% ~
+	END
+	PATCH_IF damageBonus > 0 BEGIN
+		SPRINT damage ~%damage%+%damageBonus%~
+	END
+
+    SET $EVAL ~weapon_statistics_%combatCount%~(~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~) = 1
+END
+
+DEFINE_PATCH_MACRO ~add_charge_abilities_to_description~ BEGIN
+	LPF ~appendSection~ INT_VAR strref = 100012 RET description END // ~Capacités de charge~
+
+    PATCH_PHP_EACH ~charge_abilities~ AS data => value BEGIN
+		LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+    END
+END
+
+DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
+	LPF ~weapon_modes_has_same_statistics~ RET hasSameStatistics END
+
+	// TODO: Si les statistiques de l'arme ET les capacités de combat associées sont les mêmes, afficher comme si on n'avait qu'un seul effet étendu (Ex: U#STAF01.itm)
+
+	PATCH_IF combatCount == 1 BEGIN
+		LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+		PATCH_IF $combatAbilities(0 0) > 0 BEGIN
+	        PATCH_PHP_EACH ~combat_abilities_0~ AS data => value BEGIN
+				LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+	        END
+		END
+		PATCH_PHP_EACH weapon_statistics_0 AS stats => v BEGIN
+			LPF ~appendLine~ RET description END
+			LPM ~add_weapon_statistics_to_description~
+		END
+	END
+	ELSE BEGIN
+		PATCH_IF hasSameStatistics == 1 BEGIN // On affiche une seule fois les statistiques de l'arme
+			PATCH_PHP_EACH weapon_statistics_0 AS stats => v BEGIN
+				FOR (index = 0; index < combatCount; index += 1) BEGIN
+					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
+						SPRINT itemRef $combatAbilities(~%index%~ 1)
+						LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
+
+	                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+							LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+	                    END
+					END
+				END
+				LPF ~appendLine~ RET description END
+				LPM ~add_weapon_statistics_to_description~
+			END
+		END
+		ELSE BEGIN // On affiche les statistiques de l'arme pour chaque utilisation différentes (jeté, melée, etc...)
+			FOR (index = 0; index < combatCount; index += 1) BEGIN
+				SPRINT itemRef $combatAbilities(~%index%~ 1)
+				LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
+
+				PATCH_IF $combatAbilities(~%index%~ 0)  > 0 BEGIN
+                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+						LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+                    END
+				END
+				PATCH_PHP_EACH ~weapon_statistics_%index%~ AS stats => value BEGIN
+					LPF ~appendLine~    RET description END
+					LPM ~add_weapon_statistics_to_description~
+				END
+			END
+			LPF ~appendLine~ RET description END
+		END
+	END
+END
+
+
+DEFINE_PATCH_FUNCTION ~add_combat_section_to_description~ STR_VAR itemRef = ~~ RET description BEGIN
+	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%itemRef%~ RET strref_0 strref_1 strref_2 END
+	SPRINT strref EVAL ~%strref_%index%%~
+	PATCH_IF EVAL ~%strref%~ > 0 BEGIN
+		SPRINT section @100011 // ~Capacités de combat~
+		GET_STRREF strref sectionType
+		SPRINT string @10013   // ~%section% (%sectionType%)~
+		LPF ~appendSection~ STR_VAR string RET description END
+	END
+	ELSE BEGIN
+		LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
+	LOCAL_SET strref = 0
+	// ~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~
+    PATCH_IF ~%stats_0%~ != 0 BEGIN
+		LPF ~signed_value~ INT_VAR value = stats_0 RET value END
+		LPF ~appendValue~ INT_VAR strref = 102000 STR_VAR value RET description END // ~TAC0~
+    END
+	PATCH_IF ~%stats_1%~ STRING_EQUAL ~~ = 0 BEGIN
+		LPF ~appendValue~ INT_VAR strref = 102001 STR_VAR value = EVAL ~%stats_1%~ RET description END // ~Dégâts~
+	END
+	PATCH_IF ~%stats_2%~ > 0 BEGIN
+		SET strref = 102010 + damageType
+		SPRINT value (AT ~%strref%~)
+
+		LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+	END
+    PATCH_IF ~%stats_3%~ != 0 BEGIN
+		LPF ~appendValue~ INT_VAR strref = 102002 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
+    END
+END
+
+DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_statistics~ RET hasSameStatistics BEGIN
+	SET hasSameStatistics = 1
+
+	PATCH_IF combatCount > 1 BEGIN
+		PATCH_PHP_EACH weapon_statistics_0 AS base => value BEGIN
+			FOR (index = 1; index < combatCount; index += 1) BEGIN
+				PATCH_PHP_EACH ~weapon_statistics_%index%~ AS data => value2 BEGIN
+					PATCH_IF ~%base_0%~ != ~%data_0%~ OR (~%base_1%~ STRING_EQUAL ~%data_1%~) == 0 OR ~%base_2%~ != ~%data_2%~ OR ~%base_3%~ != ~%data_3%~ BEGIN
+						SET hasSameStatistics = 0
+					END
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_strrefs_from_tooltip~ STR_VAR id = ~~ RET strref_0 strref_1 strref_2 BEGIN
+	SET strref_0 = 0
+	SET strref_1 = 0
+	SET strref_2 = 0
+
+	PATCH_FOR_EACH idx IN 0 1 2 BEGIN
+		SPRINT strref $tra_tooltips(~%id%~ ~%idx%~)
+		PATCH_IF IS_AN_INT strref BEGIN
+			SPRINT EVAL ~strref_%idx%~ ~%strref%~
+		END
+	END
+END
