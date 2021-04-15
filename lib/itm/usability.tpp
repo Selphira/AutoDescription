@@ -53,19 +53,6 @@ DEFINE_PATCH_MACRO ~classes~ BEGIN
 		DRUID,               "BIT30" => 1 // ~Druide~
 	END
 
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY multi_classes BEGIN
-		EVAL "%BIT8%", EVAL "%BIT7%"  => 2
-		EVAL "%BIT9%", EVAL "%BIT7%" => 2
-		EVAL "%BIT10%", EVAL "%BIT7%" => 2
-		EVAL "%BIT12%", EVAL "%BIT11%" => 2
-		EVAL "%BIT13%", EVAL "%BIT11%" => 2
-		EVAL "%BIT14%", EVAL "%BIT11%" => 2
-		EVAL "%BIT15%", EVAL "%BIT11%" => 3
-		EVAL "%BIT16%", EVAL "%BIT11%" => 3
-		EVAL "%BIT17%", EVAL "%BIT11%" => 2
-		EVAL "%BIT19%", EVAL "%BIT18%" => 2
-	END
-
 	// Les groupes ne contiennent pas le bit de la classe de base
 	PATCH_DEFINE_ARRAY class_group_clerc BEGIN
 		"BIT8" "BIT9" "BIT10" "BIT14" "BIT15"
@@ -374,26 +361,16 @@ DEFINE_PATCH_MACRO ~usability_class~ BEGIN
 			SET unuseClassCount = 0
 
 			LPM ~classes~
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT11 baseRef = 101011 STR_VAR array_name = "class_group_figther" useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass multi_classes use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT7  baseRef = 101007 STR_VAR array_name = "class_group_clerc"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass multi_classes use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT18 baseRef = 101018 STR_VAR array_name = "class_group_mage"    useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass multi_classes use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT22 baseRef = 101022 STR_VAR array_name = "class_group_thief"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass multi_classes use unuse END
+			LPF ~usability_class_compress~ INT_VAR baseClass = BIT11 baseRef = 101011 STR_VAR array_name = "class_group_figther" useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
+			LPF ~usability_class_compress~ INT_VAR baseClass = BIT7  baseRef = 101007 STR_VAR array_name = "class_group_clerc"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
+			LPF ~usability_class_compress~ INT_VAR baseClass = BIT18 baseRef = 101018 STR_VAR array_name = "class_group_mage"    useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
+			LPF ~usability_class_compress~ INT_VAR baseClass = BIT22 baseRef = 101022 STR_VAR array_name = "class_group_thief"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
 
 			PATCH_PHP_EACH "%smallest%" AS data => value BEGIN
 				PATCH_IF value = 1 BEGIN
-					SET ignored = 0
-
-					PATCH_PHP_EACH multi_classes AS uData => uValue BEGIN
-						PATCH_IF uValue == 0 BEGIN
-							ignored = 1
-						END
-					END
-
-					PATCH_IF ignored == 0 BEGIN
-						SET EVAL "%smallest%ClassCount" += 1
-						SPRINT key EVAL "%%smallest%ClassCount%"
-						SPRINT $useClass("%smallest%-%key%") "%data_1%"
-					END
+					SET EVAL "%smallest%ClassCount" += 1
+					SPRINT key EVAL "%%smallest%ClassCount%"
+					SPRINT $useClass("%smallest%-%key%") "%data_1%"
 				END
 			END
 
@@ -415,7 +392,7 @@ END
  * - [classname] monoclassé                                                            *
  * - [classname] multiclassé                                                           *
  * ----------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~usability_class_compress~ INT_VAR baseClass = 0 baseRef = 0 STR_VAR array_name = "" useArray = "" RET useClassCount unuseClassCount RET_ARRAY useClass multi_classes use unuse BEGIN
+DEFINE_PATCH_FUNCTION ~usability_class_compress~ INT_VAR baseClass = 0 baseRef = 0 STR_VAR array_name = "" useArray = "" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse BEGIN
 	SET none = 1 // Est-ce qu'aucun élément est présent ?
 	SET base = 0 // Est-ce que la classe de base est présente ?
 	SET count = 0
@@ -467,10 +444,12 @@ DEFINE_PATCH_FUNCTION ~usability_class_compress~ INT_VAR baseClass = 0 baseRef =
 	END
 
 	PATCH_IF count == total BEGIN
-		// Toutes les multiclasses de la classe de base peuvent être ignoré pour la suite
-		PATCH_PHP_EACH multi_classes AS key => value BEGIN
-			PATCH_IF key_1 == baseClass BEGIN
-				SET $multi_classes("%key_0%" "%key_1%") = 0
+		PATCH_PHP_EACH "%array_name%" AS key => class BEGIN
+			PATCH_PHP_EACH "%useArray%" AS useData => useValue BEGIN
+				SET class = EVAL "%class%"
+				PATCH_IF useData_0 == class BEGIN
+					SET $EVAL "%useArray%"("%useData_0%" "%useData_1%") = 0
+				END
 			END
 		END
 	END
