@@ -3,22 +3,23 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 
 	SPRINT description ~~
 
-	// Cas à gérer par chaque opcode
 	PATCH_IF probability == 100 BEGIN
-		//TODO: Propriété : [xxx]
-		//TODO: Immunité contre [xxx]
+		PATCH_TRY
+			LPM ~opcode_%opcode%~
+		WITH
+			DEFAULT
+				SPRINT description ~Opcode "%opcode%" pas encore gere~
+				PATCH_WARN "%SOURCE_FILE% : opcode_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+		END
 	END
 	ELSE BEGIN
-		//TODO: xx% de chance de [xxx]
-	END
-
-	PATCH_TRY
-		// Chaque fonction va simplement retourner la description de l'effet
-		LPM ~opcode_%opcode%~
-	WITH
-		DEFAULT
-			SPRINT description ~Opcode "%opcode%" pas encore gere~
-			PATCH_WARN "%SOURCE_FILE% : Opcode '%opcode%' non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+		PATCH_TRY
+			LPM ~opcode_probability_%opcode%~
+		WITH
+			DEFAULT
+				SPRINT description ~Opcode "%opcode%" pas encore gere~
+				PATCH_WARN "%SOURCE_FILE% : opcode_probability_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+		END
 	END
 END
 
