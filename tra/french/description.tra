@@ -111,6 +111,8 @@
 @102118 = ~Immunité contre les sorts de niveau %spellLevel%~
 @102119 = ~Champ de vision~
 @102120 = ~%probability% de chances d'étourdir la cible~
+@102121 = ~jet de sauvegarde %saveType% pour annuler~
+@102122 = ~jet de sauvegarde à %saveBonus% %saveType% pour annuler~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -171,6 +173,12 @@
 @100004 = ~ou~
 @100005 = ~mètre~
 @100006 = ~mètres~
+@100040 = ~pendant 1 seconde~
+@100041 = ~pendant %duration% secondes~
+@100042 = ~pendant 1 tour~
+@100043 = ~pendant %turns% tours~
+@100044 = ~pendant 1 round~
+@100045 = ~pendant %rounds% rounds~
 @101054 = ~Classe de base~
 // @101052 = ~%strSocial% %strMoral%~
 @101069 = ~Tous~
