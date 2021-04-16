@@ -23,7 +23,6 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 				LPM ~add_charge_abilitie~
 			END
 			ELSE PATCH_IF location == 1 BEGIN
-
 				SET $combatAbilitiesCount(~%combatCount%~) = 0
 				PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%icon%~ END
 
@@ -135,7 +134,11 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics~ BEGIN
 		SPRINT damage ~%damage%%diceThrown%d%diceSides% ~
 	END
 	PATCH_IF damageBonus > 0 BEGIN
-		SPRINT damage ~%damage%+%damageBonus%~
+		PATCH_IF damageBonus > 32768 BEGIN
+			SET damageBonus = damageBonus - 65536
+		END
+		LPF ~signed_value~ INT_VAR value = damageBonus RET damageBonus = value END
+		SPRINT damage ~%damage%%damageBonus%~
 	END
 
     SET $EVAL ~weapon_statistics_%combatCount%~(~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~) = 1
