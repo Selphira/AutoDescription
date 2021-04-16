@@ -85,4 +85,6 @@ OUTER_SPRINT $translations(~DRUID~) @101030
 OUTER_SPRINT $translations(~HALFORC~) @101031
 
 OUTER_SPRINT crlf  @10000
-OUTER_SPRINT colon @10001  // ~ : ~
+OUTER_SPRINT colon @10001   // ~ : ~
+OUTER_SPRINT meter @100005  // ~mètre~
+OUTER_SPRINT meters @100006 // ~mètres~

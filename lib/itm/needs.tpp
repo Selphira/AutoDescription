@@ -24,7 +24,7 @@ DEFINE_PATCH_FUNCTION ~needs~ RET description BEGIN
  	LPF ~needs_attribute~ INT_VAR value = minCharisma strref = 101081 RET countNeeds RET_ARRAY needs END
 
  	PATCH_IF countNeeds > 0 BEGIN
-		LPF ~appendSection~ INT_VAR strref = 101075 RET description END
+		LPF ~appendSection~ INT_VAR strref = 101032 RET description END
 		PATCH_PHP_EACH needs AS name => value BEGIN
 			LPF ~appendProperty~ STR_VAR name value RET description END
 		END

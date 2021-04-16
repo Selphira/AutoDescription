@@ -5,9 +5,9 @@
 @100011 = ~Capacités de combat~
 @100012 = ~Capacités de charge~
 @100013 = ~Au corps à corps~
+@101032 = ~Nécessite~
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
-@101075 = ~Nécessite~
 
 /*
  * Liste des attributs d'une description
@@ -46,6 +46,10 @@
 @102035 = ~Immunité à %spellName%~
 @102036 = ~Chances de toucher~
 @102037 = ~Immunité aux attaques sournoises~
+@102038 = ~Immunité à la peur~
+@102039 = ~Immunité à l'horreur~
+@102056 = ~Résistance au feu~
+@102057 = ~Résistance à l'électricité~
 @102058 = ~Résistance au poison~
 @102059 = ~Résistance au froid~
 @102060 = ~Résistance à la magie~
@@ -53,6 +57,9 @@
 @102062 = ~Résistance aux dégâts contondants~
 @102063 = ~Résistance aux dégâts perforants~
 @102064 = ~Résistance aux dégâts de projectiles~
+@102065 = ~Résistance aux dégâts magiques~
+@102066 = ~Résistance aux dégâts de feu magiques~
+@102067 = ~Résistance aux dégâts de froid magiques~
 @102070 = ~Vol à la tire~
 @102071 = ~Crochetage de serrures~
 @102072 = ~Détection/désamorçage des pièges~
@@ -60,6 +67,9 @@
 @102074 = ~Camouflage dans l'ombre~
 @102075 = ~Détection des illusions~
 @102076 = ~Pose des pièges~
+@102077 = ~Infravision permanente~
+@102078 = ~Flou permanent~
+@102079 = ~Hiatus entropique~
 @102080 = ~Mémorisation d'un sort divin supplémentaire de niveau %level%~
 @102081 = ~Mémorisation de %amount% sorts divins supplémentaires de niveau %level%~
 @102082 = ~Oubli d'un sort divin de niveau %level%~
@@ -73,9 +83,34 @@
 @102090 = ~%probability% de chances d'infliger 1 %damageType% supplémentaire~
 @102091 = ~%probability% de chances d'infliger %damage% %damageType% supplémentaires~
 @102092 = ~Inflige %damage% %damageType% supplémentaires~
-@102093 = ~%probability% de chance d'infliger un coup critique~
+@102093 = ~%probability% de chances d'infliger un coup critique~
 @102094 = ~%charges% fois par jour~
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
+@102096 = ~%description% à chaque attaque réussie~
+@102097 = ~Rend un point de vie au porteur~
+@102098 = ~Rend %value% points de vie au porteur~
+@102099 = ~Inflige un point de vie au porteur~
+@102100 = ~Inflige %value% points de vie au porteur~
+@102101 = ~Régénère 1 point de vie par seconde~
+@102102 = ~Régénère %value% points de vie par seconde~
+@102103 = ~Régénère 1 point de vie tous les %value% secondes~
+@102104 = ~Régénère %value% des points de vie~
+@102105 = ~Régénère 3 point1 de vie tous les %value% secondes~
+@102106 = ~Permet de lancer n'importe quel sort de son livre de sorts~
+@102107 = ~Le prochain sort lancé déclenche automatiquement un hiatus entropique~
+@102108 = ~Tous sorts lancés déclenchent automatiquement un hiatus entropique~
+@102109 = ~Les points de vie ne peuvent passer en dessous de %value%~
+@102110 = ~Moral~
+@102111 = ~Invisibilité permanente~
+@102112 = ~Invisibilité améliorée permanente~
+@102113 = ~Draine un niveau~
+@102114 = ~Draine %amount% niveaux~
+@102115 = ~Capacité de mouvement~
+@102116 = ~Le porteur voit son alignement modifié à %alignment%~
+@102117 = ~Non-détection permanente~
+@102118 = ~Immunité contre les sorts de niveau %spellLevel%~
+@102119 = ~Champ de vision~
+@102120 = ~%probability% de chances d'étourdir la cible~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -134,6 +169,8 @@
 @100002 = ~Poids~
 @100003 = ~PARAMÈTRES~
 @100004 = ~ou~
+@100005 = ~mètre~
+@100006 = ~mètres~
 @101054 = ~Classe de base~
 // @101052 = ~%strSocial% %strMoral%~
 @101069 = ~Tous~
