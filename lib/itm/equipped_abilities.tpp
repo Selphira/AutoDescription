@@ -26,6 +26,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
 	READ_LONG  ITM_feature_blocks_offset blockOffset
     READ_SHORT ITM_feature_blocks_count  blockCount
+    READ_SHORT ITM_flags                 flags
 
     SET count = 0
 
@@ -89,6 +90,11 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
     */
 
     // PATCH_PHP_EACH ~abilities~ AS data => value BEGIN PATCH_PRINT "%data_0% %data_1% %value%" END
+
+	PATCH_IF (flags BAND BIT4) != 0 BEGIN
+		SPRINT desc @102126 // ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
+		SET $abilities(~0~ ~0~ ~%desc%~) = 1
+	END
 
     SORT_ARRAY_INDICES abilities NUMERICALLY
 
