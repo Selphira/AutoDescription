@@ -64,16 +64,35 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
+	LOCAL_SET chargeStrref = 0
+	LOCAL_SET hasTitle = 0
+	LOCAL_SET sort = ( headerIndex + 1 ) * 10000
+
+	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
+	SPRINT chargeStrref EVAL ~%strref_%headerIndex%%~
+
+	PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
+		GET_STRREF chargeStrref chargeTitle
+		SPRINT chargeStr @102094 // ~%charges% fois par jour~
+		SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
+		SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%chargeTitle%~) = 1
+		SET hasTitle = 1
+	END
+
 	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
 	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
 		READ_SHORT blockOffset opcode
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET abilityType = AbilityType_Charge
 			LPF ~get_description_effect~ RET desc = description END
 			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-				SPRINT chargeStr @102094 // ~%charges% fois par jour~
-				SPRINT desc ~%desc% %chargeStr%~
-				SET $charge_abilities($sort_opcodes(~%opcode%~) ~%chargeCount%~ ~%desc%~) = 1
+				PATCH_IF hasTitle == 0 BEGIN
+					SPRINT chargeStr @102094 // ~%charges% fois par jour~
+					SPRINT desc ~%desc% (%chargeStr%)~
+				END
+				SET sort = ( headerIndex + 1 ) * 10000 + $sort_opcodes(~%opcode%~)
+				SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%desc%~) = 1 + hasTitle
 				SET chargeCount += 1
 			END
 		END
@@ -86,6 +105,7 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 		READ_SHORT blockOffset opcode
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET abilityType = AbilityType_Combat
 			LPF ~get_description_effect~ RET desc = description END
 			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 				SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
@@ -124,8 +144,15 @@ END
 DEFINE_PATCH_MACRO ~add_charge_abilities_to_description~ BEGIN
 	LPF ~appendSection~ INT_VAR strref = 100012 RET description END // ~Capacités de charge~
 
+	SORT_ARRAY_INDICES ~charge_abilities~ NUMERICALLY
+
     PATCH_PHP_EACH ~charge_abilities~ AS data => value BEGIN
-		LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+        PATCH_IF value == 1 BEGIN
+			LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+		END
+		ELSE BEGIN
+			LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+		END
     END
 END
 

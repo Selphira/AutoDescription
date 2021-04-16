@@ -47,6 +47,17 @@ DEFINE_PATCH_FUNCTION ~appendProperty~ INT_VAR strref = 0 STR_VAR name = "" valu
     SPRINT description "%description%%crlf%- %name%"
 END
 
+DEFINE_PATCH_FUNCTION ~appendSubProperty~ INT_VAR strref = 0 STR_VAR name = "" value = "" RET description BEGIN
+	PATCH_IF strref > 0 BEGIN
+		SPRINT name (AT %strref%)
+	END
+
+	PATCH_IF NOT "%value%" STRING_EQUAL "" BEGIN
+		SPRINT name @100001 // %name% : %value%
+	END
+    SPRINT description "%description%%crlf%  %name%"
+END
+
 DEFINE_PATCH_FUNCTION ~signed_value~ INT_VAR value = 0 RET value BEGIN
 	PATCH_IF value > 0 BEGIN
 		SPRINT value @10003

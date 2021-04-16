@@ -39,6 +39,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 		PATCH_IF !VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			PATCH_IF timing == TIMING_while_equipped BEGIN // while equiped
 				PATCH_IF (probability1 - probability2) == 100 BEGIN
+					SET abilityType = AbilityType_Equipped
 					LPF ~get_description_effect~ RET desc = description END
 					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 						SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
@@ -67,6 +68,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
     SET $abilities_groups_166_10(opcodeb parameter1b parameter2b etcb) = 1
     SET $abilities_groups_62_0 (opcodec parameter1c parameter2c etcc) = 1
     PATCH_PHP_EACH abilities_groups AS group => count BEGIN
+		SET abilityType = AbilityType_Equipped
         PATCH_PRINT "%group_0% %group_1% => %count%"
         PATCH_IF count == 1 BEGIN
             PATCH_PRINT "1 seul element"
