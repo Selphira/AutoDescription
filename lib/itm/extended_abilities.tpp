@@ -64,19 +64,9 @@ END
 
 DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 	LOCAL_SET chargeStrref = 0
-	LOCAL_SET hasTitle = 0
 	LOCAL_SET sort = ( headerIndex + 1 ) * 10000
-
-	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
-	SPRINT chargeStrref EVAL ~%strref_%headerIndex%%~
-
-	PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
-		GET_STRREF chargeStrref chargeTitle
-		SPRINT chargeStr @102094 // ~%charges% fois par jour~
-		SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
-		SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%chargeTitle%~) = 1
-		SET hasTitle = 1
-	END
+	LOCAL_SET chargeAbilityCount = 0
+	LOCAL_SPRINT chargeTitle ~~
 
 	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
 	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
@@ -86,16 +76,33 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 			SET abilityType = AbilityType_Charge
 			LPF ~get_description_effect~ RET desc = description END
 			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF hasTitle == 0 BEGIN
+				/*PATCH_IF hasTitle == 0 BEGIN
 					SPRINT chargeStr @102094 // ~%charges% fois par jour~
 					SPRINT desc ~%desc% (%chargeStr%)~
-				END
-				SET sort = ( headerIndex + 1 ) * 10000 + $sort_opcodes(~%opcode%~)
-				SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%desc%~) = 1 + hasTitle
+				END*/
+				SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+				SET $charge_abilities(~%abilitySort%~ ~%chargeCount%~ ~%desc%~) = 2
 				SET chargeCount += 1
+				SET chargeAbilityCount += 1
 			END
 		END
 	END
+
+	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
+	SPRINT chargeStrref EVAL ~%strref_%headerIndex%%~
+
+	PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
+		GET_STRREF chargeStrref chargeTitle
+	END
+
+	PATCH_IF chargeAbilityCount > 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
+		SET abilityNumber = headerIndex + 1
+		SPRINT chargeTitle @101104 // ~Capacité %abilityNumber%~
+	END
+
+	SPRINT chargeStr @102094 // ~%charges% fois par jour~
+	SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
+	SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%chargeTitle%~) = 1
 END
 
 DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
