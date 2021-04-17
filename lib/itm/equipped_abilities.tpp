@@ -91,16 +91,43 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
     // PATCH_PHP_EACH ~abilities~ AS data => value BEGIN PATCH_PRINT "%data_0% %data_1% %value%" END
 
+    LPF ~get_unique_equipped_abilities~ STR_VAR array_name = "abilities" RET count RET_ARRAY newAbilities END
+
 	PATCH_IF (flags BAND BIT4) != 0 BEGIN
 		SPRINT desc @102126 // ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-		SET $abilities(~0~ ~0~ ~%desc%~) = 1
+		SET $newAbilities(~0~ ~0~ ~%desc%~) = 1
 	END
 
-    SORT_ARRAY_INDICES abilities NUMERICALLY
+    SORT_ARRAY_INDICES newAbilities NUMERICALLY
 
 	PATCH_IF count > 0 BEGIN LPF ~appendSection~ INT_VAR strref = 100010 RET description END END // ~Capacités d'équipement~
 
-    PATCH_PHP_EACH ~abilities~ AS data => value BEGIN
+    PATCH_PHP_EACH ~newAbilities~ AS data => value BEGIN
 		LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
     END
+END
+
+/* -------------------------------------------------------------------- *
+ * Supprime les entrées en double, en se basant sur le nom en lowercase *
+ * -------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~get_unique_equipped_abilities~ STR_VAR array_name = "" RET count RET_ARRAY newAbilities BEGIN
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~newAbilities~ BEGIN END
+    SET count = 0
+
+	PATCH_PHP_EACH ~%array_name%~ AS data => value BEGIN
+		SET found = 0
+		PATCH_PHP_EACH newAbilities AS ability => v BEGIN
+			SPRINT tmp1 ~%data_2%~
+			SPRINT tmp2 ~%ability_2%~
+			TO_LOWER tmp1
+			TO_LOWER tmp2
+			PATCH_IF ~%tmp1%~ STRING_EQUAL ~%tmp2%~ BEGIN
+				SET found = 1
+			END
+		END
+		PATCH_IF found == 0 BEGIN
+			SET $newAbilities(~%data_0%~ ~%count%~ ~%data_2%~) = 1
+			SET count += 1
+		END
+	END
 END
