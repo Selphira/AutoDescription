@@ -18,6 +18,7 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 			READ_ASCII (offset + ITM_HEAD_use_icon) icon
 			READ_BYTE  (offset + ITM_HEAD_location) location
 			READ_SHORT (offset + ITM_HEAD_charges) charges
+			READ_SHORT (offset + ITM_HEAD_depletion) depletion
 
 			PATCH_IF charges > 0 BEGIN
 				LPM ~add_charge_abilitie~
@@ -76,10 +77,6 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 			SET abilityType = AbilityType_Charge
 			LPF ~get_description_effect~ RET desc = description END
 			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-				/*PATCH_IF hasTitle == 0 BEGIN
-					SPRINT chargeStr @102094 // ~%charges% fois par jour~
-					SPRINT desc ~%desc% (%chargeStr%)~
-				END*/
 				SET abilitySort = sort + $sort_opcodes(~%opcode%~)
 				SET $charge_abilities(~%abilitySort%~ ~%chargeCount%~ ~%desc%~) = 2
 				SET chargeCount += 1
@@ -100,7 +97,13 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 		SPRINT chargeTitle @101104 // ~Capacité %abilityNumber%~
 	END
 
-	SPRINT chargeStr @102094 // ~%charges% fois par jour~
+    PATCH_IF depletion == 1 BEGIN
+		SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
+    END
+    ELSE BEGIN
+		SPRINT chargeStr @102094 // ~%charges% fois par jour~
+    END
+
 	SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
 	SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%chargeTitle%~) = 1
 END
