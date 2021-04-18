@@ -2,23 +2,30 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 	LPM ~block_to_vars~
 
 	SPRINT description ~~
+	SPRINT opcode_target ~~
+
+	PATCH_IF target == TARGET_FX_self BEGIN SPRINT opcode_target ~_self~ END
+	ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none BEGIN SPRINT opcode_target ~_target~ END
+	ELSE PATCH_IF target == TARGET_FX_party BEGIN SPRINT opcode_target ~_party~ END
 
 	PATCH_IF probability == 100 BEGIN
 		PATCH_TRY
-			LPM ~opcode_%opcode%~
+			LPM ~opcode%opcode_target%_%opcode%~
 		WITH
 			DEFAULT
 				SPRINT description ~Opcode "%opcode%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
 		END
 	END
 	ELSE BEGIN
 		PATCH_TRY
-			LPM ~opcode_probability_%opcode%~
+			SET probability += 1
+			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+			LPM ~opcode%opcode_target%_probability_%opcode%~
 		WITH
 			DEFAULT
 				SPRINT description ~Opcode "%opcode%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode_probability_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_probability_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
 		END
 	END
 
@@ -31,30 +38,47 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 	END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
-        PATCH_IF saveType == FLAG_SAVINGTHROW_spell BEGIN
-            SPRINT saveType @102033 // ~contre les sorts~
+		SPRINT saveTypeStr ~~
+        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
+            SPRINT saveTypeStr @102033 // ~contre les sorts~
         END
-        ELSE PATCH_IF saveType == FLAG_SAVINGTHROW_breath BEGIN
-            SPRINT saveType @102032 // ~contre les souffles~
+        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_breath) == FLAG_SAVINGTHROW_breath BEGIN
+            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+				SPRINT strOr @100004 // ~ou~
+                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
+            END
+            SPRINT saveTypeStr @102032 // ~contre les souffles~
         END
-        ELSE PATCH_IF saveType == FLAG_SAVINGTHROW_death BEGIN
-            SPRINT saveType @102029 // ~contre la paralysie, la mort et les poisons~
+        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_death) == FLAG_SAVINGTHROW_death BEGIN
+            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+				SPRINT strOr @100004 // ~ou~
+                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
+            END
+            SPRINT saveTypeStr @102029 // ~contre la paralysie, la mort et les poisons~
         END
-        ELSE PATCH_IF saveType == FLAG_SAVINGTHROW_wand BEGIN
-            SPRINT saveType @102030 // ~contre les baguettes, les sceptres et les bâtons~
+        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_wand) == FLAG_SAVINGTHROW_wand BEGIN
+            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+				SPRINT strOr @100004 // ~ou~
+                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
+            END
+            SPRINT saveTypeStr @102030 // ~contre les baguettes, les sceptres et les bâtons~
         END
-        ELSE PATCH_IF saveType == FLAG_SAVINGTHROW_polymorph BEGIN
-            SPRINT saveType @102031 // ~contre la pétrification et la métamorphose~
+        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_polymorph) == FLAG_SAVINGTHROW_polymorph BEGIN
+            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+				SPRINT strOr @100004 // ~ou~
+                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
+            END
+            SPRINT saveTypeStr @102031 // ~contre la pétrification et la métamorphose~
         END
 
 		// TODO: Toujours pour annuler ??
 
         PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveType% pour annuler~
+			SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
         END
         ELSE BEGIN
-			SPRINT saveStr @102121 // ~jet de sauvegarde %saveType% pour annuler~
+			SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour annuler~
         END
 
 		SPRINT description ~%description% (%saveStr%)~
@@ -124,7 +148,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	PATCH_IF duration > 0 BEGIN
         LPF ~convert_duration~ INT_VAR duration RET turns rounds seconds END
 
-	    PATCH_IF (turns > 0 AND (rounds > 0 OR seconds > 0)) OR (rounds > 0 AND (turns > 0 AND seconds > 0)) BEGIN
+	    PATCH_IF (turns > 0 AND (rounds > 0 OR seconds > 0)) OR (rounds > 0 AND (turns > 0 OR seconds > 0)) BEGIN
 	        PATCH_IF duration == 1 BEGIN
 	            SPRINT value @100040 // ~pendant 1 seconde~
 	        END

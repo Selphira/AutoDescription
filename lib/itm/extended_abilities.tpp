@@ -103,7 +103,7 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 	END
 	ELSE PATCH_IF chargeAbilityCount > 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
 		SET abilityNumber = headerIndex + 1
-		SPRINT chargeTitle @101104 // ~Capacité %abilityNumber%~
+		SPRINT chargeTitle @101124 // ~Capacité %abilityNumber%~
 	END
 
     PATCH_IF depletion == 1 BEGIN
@@ -236,6 +236,9 @@ END
 DEFINE_PATCH_FUNCTION ~add_combat_section_to_description~ STR_VAR itemRef = ~~ RET description BEGIN
 	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%itemRef%~ RET strref_0 strref_1 strref_2 END
 	SPRINT strref EVAL ~%strref_%index%%~
+
+	// TODO: Si pas de tooltip, utiliser A distance / Melée
+
 	PATCH_IF EVAL ~%strref%~ > 0 BEGIN
 		SPRINT section @100011 // ~Capacités de combat~
 		GET_STRREF strref sectionType
