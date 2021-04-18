@@ -92,7 +92,16 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 		GET_STRREF chargeStrref chargeTitle
 	END
 
-	PATCH_IF chargeAbilityCount > 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF chargeAbilityCount == 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
+		PATCH_PHP_EACH charge_abilities AS data => v BEGIN
+			PATCH_IF data_0 == abilitySort AND data_1 == 0 BEGIN
+				SPRINT chargeTitle "%data_2%"
+				// Mise à 0 pour ne pas que la sous-propriété ne soit affichée (je ne sais pas comment supprimer une seule entrée dans un ARRAY)
+				SET $charge_abilities(~%data_0%~ ~%data_1%~ ~%data_2%~) = 0
+			END
+		END
+	END
+	ELSE PATCH_IF chargeAbilityCount > 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
 		SET abilityNumber = headerIndex + 1
 		SPRINT chargeTitle @101104 // ~Capacité %abilityNumber%~
 	END
@@ -163,7 +172,7 @@ DEFINE_PATCH_MACRO ~add_charge_abilities_to_description~ BEGIN
         PATCH_IF value == 1 BEGIN
 			LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF value == 2 BEGIN
 			LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
 		END
     END
