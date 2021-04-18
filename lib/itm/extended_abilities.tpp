@@ -258,7 +258,7 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 		LPF ~appendValue~ INT_VAR strref = 102001 STR_VAR value = EVAL ~%stats_1%~ RET description END // ~Dégâts~
 	END
 	PATCH_IF ~%stats_2%~ > 0 BEGIN
-		SET strref = 102010 + damageType
+		SET strref = 102010 + stats_2
 		SPRINT value (AT ~%strref%~)
 
 		LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
