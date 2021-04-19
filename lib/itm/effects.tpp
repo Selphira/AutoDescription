@@ -134,7 +134,7 @@ DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 dam
 	END
 	PATCH_IF damageAmount > 0 BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%damageAmount%~ RET damageAmount = value END
-		PATCH_IF ~damage~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 			SPRINT ~damage~ ~%damageAmount%~
 		END
 		ELSE BEGIN
