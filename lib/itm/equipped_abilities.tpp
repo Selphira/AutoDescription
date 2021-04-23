@@ -41,10 +41,23 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 			PATCH_IF timing == TIMING_while_equipped BEGIN // while equiped
 				PATCH_IF (probability1 - probability2) == 100 BEGIN
 					SET abilityType = AbilityType_Equipped
-					LPF ~get_description_effect~ RET desc = description END
-					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-						SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
-						SET count += 1
+					PATCH_IF opcode == 219 BEGIN
+						SET opcodeBase = opcode
+						PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+							SET opcode = opcodeBase * 1000 + subOpcode
+							LPF ~get_description_effect~ RET desc = description END
+							PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+								SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
+								SET count += 1
+							END
+						END
+					END
+					ELSE BEGIN
+						LPF ~get_description_effect~ RET desc = description END
+						PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+							SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
+							SET count += 1
+						END
 					END
 				END
 				ELSE BEGIN
@@ -94,6 +107,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
     LPF ~get_unique_equipped_abilities~ STR_VAR array_name = "abilities" RET count RET_ARRAY newAbilities END
 
 	PATCH_IF (flags BAND BIT4) != 0 BEGIN
+		SET count += 1
 		SPRINT desc @102126 // ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
 		SET $newAbilities(~0~ ~0~ ~%desc%~) = 1
 	END

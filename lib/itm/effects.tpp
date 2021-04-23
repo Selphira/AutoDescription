@@ -1,35 +1,46 @@
 DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
+	SET opcode_n = opcode
+
 	LPM ~block_to_vars~
 
 	SPRINT description ~~
 	SPRINT opcode_target ~~
 
-	PATCH_IF target == TARGET_FX_self BEGIN SPRINT opcode_target ~_self~ END
-	ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none BEGIN SPRINT opcode_target ~_target~ END
-	ELSE PATCH_IF target == TARGET_FX_party BEGIN SPRINT opcode_target ~_party~ END
+	PATCH_IF abilityType == AbilityType_Equipped BEGIN
+		SPRINT opcode_target ~_self~
+	END
+	ELSE BEGIN
+		// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
+		// Serait ajouté dans une variable qu'il suffira d'utiliser
+		// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
+		PATCH_IF target == TARGET_FX_self BEGIN SPRINT opcode_target ~_self~ END
+		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN SPRINT opcode_target ~_target~ END
+		ELSE PATCH_IF target == TARGET_FX_party BEGIN SPRINT opcode_target ~_party~ END
+	END
 
 	PATCH_IF probability == 100 BEGIN
 		PATCH_TRY
-			LPM ~opcode%opcode_target%_%opcode%~
+			LPM ~opcode%opcode_target%_%opcode_n%~
 		WITH
 			DEFAULT
-				SPRINT description ~Opcode "%opcode%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+				SPRINT description ~Opcode "%opcode_n%" pas encore gere~
+				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_%opcode_n% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
 		END
 	END
 	ELSE BEGIN
 		PATCH_TRY
 			SET probability += 1
 			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-			LPM ~opcode%opcode_target%_probability_%opcode%~
+			LPM ~opcode%opcode_target%_probability_%opcode_n%~
+			SPRINT description @101125 // ~%probability% de chance %description%~
 		WITH
 			DEFAULT
-				SPRINT description ~Opcode "%opcode%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_probability_%opcode% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
+				SPRINT description ~Opcode "%opcode_n%" pas encore gere~
+				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_probability_%opcode_n% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
 		END
 	END
 
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND timingMode == TIMING_duration AND duration > 0 BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
@@ -145,7 +156,11 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
-	PATCH_IF duration > 0 BEGIN
+	PATCH_IF timingMode == TIMING_permanent BEGIN
+		// TODO: A gérer mieux que ça
+		// SPRINT value @100046 // ~de manière permanente~
+	END
+	ELSE PATCH_IF timingMode == TIMING_duration AND duration > 0 BEGIN
         LPF ~convert_duration~ INT_VAR duration RET turns rounds seconds END
 
 	    PATCH_IF (turns > 0 AND (rounds > 0 OR seconds > 0)) OR (rounds > 0 AND (turns > 0 OR seconds > 0)) BEGIN

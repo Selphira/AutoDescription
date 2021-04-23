@@ -35,6 +35,7 @@
 @102020 = ~~
 @102021 = ~contre les armes contondantes~
 @102022 = ~contre les projectiles~
+@102023 = ~contre les projectiles et les armes contondantes~
 @102024 = ~contre les armes perforantes~
 @102028 = ~contre les armes tranchantes~
 @102029 = ~contre la paralysie, la mort et les poisons~
@@ -73,30 +74,30 @@
 @102079 = ~Hiatus entropique~
 @102080 = ~Mémorisation d'un sort divin supplémentaire de niveau %levelStr%~
 @102081 = ~Mémorisation de %amount% sorts divins supplémentaires de niveau %levelStr%~
-@102082 = ~Oubli d'un sort divin de niveau %levelStr%~
-@102083 = ~Oubli de %amount% sorts divins de niveau %levelStr%~
+@102082 = ~Suppression d'un sort divin de niveau %levelStr%~
+@102083 = ~Suppression de %amount% sorts divins de niveau %levelStr%~
 @102084 = ~Double le nombre de sorts divins de niveau %levelStr% que le personnage peut mémoriser~
 @102085 = ~Mémorisation d'un sort profane supplémentaire de niveau %levelStr%~
 @102086 = ~Mémorisation de %amount% sorts profanes supplémentaires de niveau %levelStr%~
-@102087 = ~Oubli d'un sort profane de niveau %levelStr%~
-@102088 = ~Oubli de %amount% sorts profanes de niveau %levelStr%~
+@102087 = ~Suppression d'un sort profane de niveau %levelStr%~
+@102088 = ~Suppression de %amount% sorts profanes de niveau %levelStr%~
 @102089 = ~Double le nombre de sorts profanes de niveau %levelStr% que le personnage peut mémoriser~
-@102090 = ~%probability% de chance d'infliger 1 %damageType% supplémentaire~
-@102091 = ~%probability% de chance d'infliger %damage% %damageType% supplémentaires~
+@102090 = ~d'infliger 1 %damageType% supplémentaire~
+@102091 = ~d'infliger %damage% %damageType% supplémentaires~
 @102092 = ~Inflige %damage% %damageType% supplémentaires~
-@102093 = ~%probability% de chance d'infliger un coup critique~
+@102093 = ~Un coup critique est déclenché à partir d'un score de %score%~
 @102094 = ~%charges% fois par jour~
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
 @102096 = ~%description% à chaque attaque réussie~
-@102097 = ~Rend un point de vie au porteur~
-@102098 = ~Rend %value% points de vie au porteur~
-@102099 = ~Inflige un point de vie au porteur~
-@102100 = ~Inflige %value% points de vie au porteur~
+@102097 = ~Soigne un point de vie au porteur~
+@102098 = ~Soigne %value% points de vie au porteur~
+@102099 = ~Inflige un point de dégâts au porteur~
+@102100 = ~Inflige %value% points de dégâts au porteur~
 @102101 = ~Régénère 1 point de vie par seconde~
 @102102 = ~Régénère %value% points de vie par seconde~
-@102103 = ~Régénère 1 point de vie tous les %value% secondes~
+@102103 = ~Régénère 1 point de vie toutes les %value% secondes~
 @102104 = ~Régénère %value% des points de vie~
-@102105 = ~Régénère 3 point1 de vie tous les %value% secondes~
+@102105 = ~Régénère 3 points de vie toutes les %value% secondes~
 @102106 = ~Permet de lancer n'importe quel sort de son livre de sorts~
 @102107 = ~Le prochain sort lancé déclenche automatiquement un hiatus entropique~
 @102108 = ~Tous sorts lancés déclenchent automatiquement un hiatus entropique~
@@ -104,40 +105,40 @@
 @102110 = ~Moral~
 @102111 = ~Invisibilité permanente~
 @102112 = ~Invisibilité améliorée permanente~
-@102113 = ~Chaque attaque réussie draine un niveau à la cible~
-@102114 = ~Chaque attaque réussie draine %amount% niveaux à la cible~
+@102113 = ~Draîne un niveau à la cible~
+@102114 = ~Draîne %amount% niveaux à la cible~
 @102115 = ~Capacité de mouvement~
 @102116 = ~Le porteur voit son alignement modifié à %alignment%~
 @102117 = ~Non-détection permanente~
 @102118 = ~Immunité contre les sorts de niveau %spellLevel%~
 @102119 = ~Champ de vision~
-@102120 = ~%probability% de chance d'étourdir la cible~
+@102120 = ~d'étourdir la cible~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour annuler~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
-@102123 = ~Chaque attaque réussie étourdi la cible~
-@102124 = ~%probability% de chance de tuer instantanément la cible~
+@102123 = ~Étourdi la cible~
+@102124 = ~de tuer instantanément la cible~
 @102125 = ~Immunité aux attaques de regard~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-@102127 = ~Empêche de lancer des sorts profanes~
-@102128 = ~Empêche de lancer des sorts divins~
-@102129 = ~Empêche de lancer des sorts innés~
-@102130 = ~Rend un point de vie à la cible~
-@102131 = ~Rend %value% points de vie à la cible~
-@102132 = ~Inflige un point de vie à la cible~
-@102133 = ~Inflige %value% points de vie à la cible~
-@102134 = ~%probability% de chance de modifier la classe d'armure de la cible de %value%~
-@102135 = ~%probability% de chance d'assommer la cible~
+@102127 = ~Échec systématique des sorts profanes lancés~
+@102128 = ~Échec systématique des sorts divins lancés~
+@102129 = ~Échec systématique des sorts innés lancés~
+@102130 = ~Soigne un point de vie à la cible~
+@102131 = ~Soigne %value% points de vie à la cible~
+@102132 = ~Inflige un point de dégâts à la cible~
+@102133 = ~Inflige %value% points de dégâts à la cible~
+@102134 = ~de modifier la classe d'armure de la cible de %value%~
+@102135 = ~d'assommer la cible~
 @102136 = ~Fatigue~
-@102137 = ~Chaque attaque réussie aveugle la cible~
+@102137 = ~Aveugle la cible~
 @102138 = ~Inverse l'alignement du porteur~
 @102139 = ~Assome la cible~
 @102140 = ~Zone d'air pur~
-@102141 = ~%probability% de chance de draîner un niveau au porteur~
-@102142 = ~%probability% de chance de draîner %amount% niveaux au porteur~
+@102141 = ~de draîner un niveau au porteur~
+@102142 = ~de draîner %amount% niveaux au porteur~
 @102143 = ~Guérison des maladies~
 @102144 = ~Guérison de la cécité~
 @102145 = ~Guérison de la surdité~
-@102146 = ~Guérison de la faiblesse mentale~
+@102146 = ~Guérison de la Débilité mentale~
 @102147 = ~Réfléchit les attaques de regard~
 @102148 = ~Inflige Horreur à la cible~
 @102150 = ~~
@@ -153,18 +154,18 @@
 @102160 = ~Empoisonne la cible et lui inflige 1 point de dégât par seconde~
 @102161 = ~Empoisonne la cible et lui inflige %amount% points de dégâts par seconde~
 @102162 = ~Empoisonne la cible et lui inflige 1 point de dégât toutes les %amount% secondes~
-@102163 = ~Empêche la cible de lancer des sorts profanes~
-@102164 = ~Empêche la cible de lancer des sorts divins~
-@102165 = ~Empêche la cible de lancer des sorts innés~
-@102166 = ~%probability% de chance de provoquer Rage berserk chez le porteur~
-@102167 = ~%probability% de chance d'infliger Horreur à la cible~
-@102168 = ~Points de vie~
+@102163 = ~Échec systématique des sorts profanes lancés par la cible~
+@102164 = ~Échec systématique des sorts divins lancés par la cible~
+@102165 = ~Échec systématique des sorts innés lancés par la cible~
+@102166 = ~de provoquer Rage berserk chez le porteur~
+@102167 = ~d'infliger Horreur à la cible~
+@102168 = ~Points de vie maximum~
 @102169 = ~Vitesse d'incantation~
 @102170 = ~Niveau de lanceur de sorts profanes~
 @102171 = ~Niveau de lanceur de sorts divins~
 @102172 = ~Connaissance~
 @102173 = ~Invoque une créature (%creatureName%)~
-@102174 = ~%probability% de chance de renverser et sonner la cible~
+@102174 = ~de renverser et sonner la cible~
 @102175 = ~Inflige Lenteur à la cible~
 @102176 = ~Immunité contre les %weaponType% %enchantment%~
 @102177 = ~Immunité contre les %weaponType%~
@@ -175,20 +176,19 @@
 @102182 = ~armes de mêlée à 1 main~
 @102183 = ~armes de mêlée maudites~
 @102184 = ~armes de mêlée non-maudites~
-@102185 = ~%probability% de chance de lancer le sort %spellName%~
-@102186 = ~%probability% de chance de draîner un niveau à la cible~
-@102187 = ~%probability% de chance de draîner %amount% niveaux à la cible~
+@102185 = ~de lancer le sort %spellName%~
+@102186 = ~de draîner un niveau à la cible~
+@102187 = ~de draîner %amount% niveaux à la cible~
 @102188 = ~%probability% de passer la compétence martiale de la cible à %value%~
-@102189 = ~%probability% de chance d'infliger Lenteur à la cible~
-@102190 = ~%probability% de chance d'empoisonner la cible et de lui infliger 1 point de dégât par seconde~
-@102191 = ~%probability% de chance d'empoisonner la cible et de lui infliger %amount% points de dégâts par seconde~
-@102192 = ~%probability% de chance d'empoisonner la cible et de lui infliger 1 point de dégât toutes les %amount% secondes~
-@102193 = ~%probability% de chance de lancer le sort %spellName% sur le porteur~
-@102194 = ~%probability% de chance de désintégrer la cible~
+@102189 = ~d'infliger Lenteur à la cible~
+@102190 = ~d'empoisonner la cible et de lui infliger 1 point de dégât par seconde~
+@102191 = ~d'empoisonner la cible et de lui infliger %amount% points de dégâts par seconde~
+@102192 = ~d'empoisonner la cible et de lui infliger 1 point de dégât toutes les %amount% secondes~
+@102193 = ~de lancer le sort %spellName% sur le porteur~
+@102194 = ~de désintégrer la cible~
 @102195 = ~Change le sexe du porteur~
 @102196 = ~Bénédiction permanente~
 @102197 = ~Rage berserk permanente~
-@102197 = ~Rend malade la cible et lui inflige 1 point de dégât par seconde~
 @102198 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde à la cible~
 @102199 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde à la cible~
 @102200 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %amount% secondes à la cible~
@@ -206,19 +206,19 @@
 @102212 = ~Inocule une maladie qui augmente la sagesse de la cible de %amount%~
 @102213 = ~Inocule une maladie qui augmente le charisme de la cible de %amount%~
 @102214 = ~Hâte permanente~
-@102215 = ~Rend un point de vie au groupe~
-@102216 = ~Rend %value% points de vie au groupe~
-@102217 = ~Inflige un point de vie au groupe~
-@102218 = ~Inflige %value% points de vie au groupe~
-@102219 = ~%probability% de chance de modifier le TAC0 de la cible de %value%~
-@102220 = ~%probability% de chance de passer le TAC0 de la cible à %value%~
-@102221 = ~%probability% de chance de multiplier le TAC0 de la cible par %value%~
+@102215 = ~Soigne un point de vie au groupe~
+@102216 = ~Soigne %value% points de vie au groupe~
+@102217 = ~Inflige un point de dégâts au groupe~
+@102218 = ~Inflige %value% points de dégâts au groupe~
+@102219 = ~de modifier le TAC0 de la cible de %value%~
+@102220 = ~de passer le TAC0 de la cible à %value%~
+@102221 = ~de multiplier le TAC0 de la cible par %value%~
 @102222 = ~Tue instantanément la cible~
 @102223 = ~Dissipe toutes formes d'invisibilité~
-@102224 = ~%probability% de chance d'infliger %damage% %damageType% au porteur~
-@102225 = ~%probability% de chance de modifier la dextérité de la cible de %value%~
-@102226 = ~%probability% de chance de passer la dextérité de la cible à %value%~
-@102227 = ~%probability% de chance de multiplier la dextérité de la cible par %value%~
+@102224 = ~d'infliger %damage% %damageType% au porteur~
+@102225 = ~de modifier la dextérité de la cible de %value%~
+@102226 = ~de passer la dextérité de la cible à %value%~
+@102227 = ~de multiplier la dextérité de la cible par %value%~
 @102228 = ~Empêche de lancer des sorts profanes~
 @102229 = ~Empêche de lancer des sorts divins~
 @102230 = ~Empêche de lancer des sorts innés~
@@ -233,6 +233,216 @@
 @102239 = ~TAC0 des poings~
 @102240 = ~Dégâts des poings~
 @102241 = ~Enchevêtre la cible~
+@102242 = ~Immunité au silence~
+@102243 = ~Dissipation de la magie~
+@102244 = ~Globe mineur d'invulnérabilité permanent~
+@102245 = ~Protection contre les projectiles non-magiques~
+@102246 = ~d'infliger Confusion à la cible~
+@102247 = ~d'aveugler la cible~
+@102248 = ~Réduit la cible au silence~
+@102249 = ~Charme une créature (%creatureType%)~
+@102250 = ~Régénère 1 point de vie par seconde à la cible~
+@102251 = ~Régénère %value% points de vie par seconde à la cible~
+@102252 = ~Régénère 1 point de vie toutes les %value% secondes à la cible~
+@102253 = ~Régénère %value% des points de vie de la cible~
+@102254 = ~Régénère 3 points de vie toutes les %value% secondes à la cible~
+@102255 = ~Étourdi le porteur~
+@102256 = ~d'invoquer une créature (%creatureName%)~
+@102257 = ~Permet de voir au loin~
+@102258 = ~Immunité à l'arrêt du temps~
+@102259 = ~Peau de pierre (1 peau)~
+@102260 = ~Peau de pierre (%amount% peaux)~
+@102261 = ~Hâte améliorée permanente~
+@102262 = ~Hâte permanente (sans bonus d'attaque par round)~
+@102263 = ~Crée un objet (%itemName%)~
+@102264 = ~Renverse et sonne la cible~
+@102265 = ~Crée une arme magique (%itemName%)~
+@102266 = ~Crée %amount% objets (%itemName%)~
+@102267 = ~de modifier les points de vie maximum du porteur de %value%~
+@102268 = ~de passer les points de vie maximum du porteur à %value%~
+@102269 = ~de multiplier les points de vie maximum du porteur par %value%~
+@102270 = ~Dégâts minimum~
+@102271 = ~de modifier la force du porteur de %value%~
+@102272 = ~de passer la force du porteur à %value%~
+@102273 = ~de multiplier la force du porteur par %value%~
+@102274 = ~de modifier la dextérité du porteur de %value%~
+@102275 = ~de passer la dextérité du porteur à %value%~
+@102276 = ~de multiplier la dextérité du porteur par %value%~
+@102277 = ~de modifier le charisme du porteur de %value%~
+@102278 = ~de passer le charisme du porteur à %value%~
+@102279 = ~de multiplier le charisme du porteur par %value%~
+@102280 = ~de modifier la constitution du porteur de %value%~
+@102281 = ~de passer la constitution du porteur à %value%~
+@102282 = ~de multiplier la constitution du porteur par %value%~
+@102283 = ~de modifier l'intelligence du porteur de %value%~
+@102284 = ~de passer l'intelligence du porteur à %value%~
+@102285 = ~de multiplier l'intelligence du porteur par %value%~
+@102286 = ~de modifier la sagesse du porteur de %value%~
+@102287 = ~de passer la sagesse du porteur à %value%~
+@102288 = ~de multiplier la sagesse du porteur par %value%~
+@102289 = ~d'immuniser au sort %spellName%~
+@102290 = ~Lenteur permanente~
+@102291 = ~Draîne un niveau au porteur~
+@102292 = ~Draîne %amount% niveaux au porteur~
+@102293 = ~Échec de %percent% des sorts profanes lancés par la cible~
+@102294 = ~Échec de %percent% des sorts divins lancés par la cible~
+@102295 = ~Échec de %percent% des sorts innés lancés par la cible~
+@102296 = ~Échec de %percent% des sorts profanes lancés~
+@102297 = ~Échec de %percent% des sorts divins lancés~
+@102298 = ~Échec de %percent% des sorts innés lancés~
+@102299 = ~que la cible devienne floue~
+@102300 = ~de tuer instantanément le porteur~
+@102301 = ~de soigner un point de vie au porteur~
+@102302 = ~de soigner %value% points de vie au porteur~
+@102303 = ~d'infliger un point de dégâts au porteur~
+@102304 = ~d'infliger %value% points de dégâts au porteur~
+@102305 = ~Renvoi les sorts de niveau %spellLevel%~
+@102306 = ~d'empoisonner le porteur et lui infliger 1 point de dégât par seconde~
+@102307 = ~d'empoisonner le porteur et lui infliger %amount% points de dégâts par seconde~
+@102308 = ~d'empoisonner le porteur et lui infliger 1 point de dégât  toutes les %amount% secondes~
+@102309 = ~de modifier la constitution de la cible de %value%~
+@102310 = ~de passer la constitution de la cible à %value%~
+@102311 = ~de multiplier la constitution de la cible par %value%~
+@102312 = ~de modifier la force de la cible de %value%~
+@102313 = ~de passer la force de la cible à %value%~
+@102314 = ~de multiplier la force de la cible par %value%~
+@102315 = ~de lancer Invisibilité sur le porteur~
+@102316 = ~de lancer Invisibilité améliorée sur le porteur~
+@102317 = ~Renvoi le sort %spellName%~
+@102318 = ~Immunité aux maladies~
+@102319 = ~Immunité aux poisons~
+@102320 = ~de provoquer Rage berserk chez la cible~
+@102321 = ~Entoile la cible~
+@102322 = ~Déverrouille la serrure ciblée~
+@102323 = ~de réduire la cible au silence~
+@102324 = ~d'enchevêtrer la cible~
+@102325 = ~de renvoyer la cible (si c'est une créature invoquée)~
+@102326 = ~Empoisonne le porteur et lui inflige 1 point de dégât par seconde~
+@102327 = ~Empoisonne le porteur et lui inflige %amount% points de dégâts par seconde~
+@102328 = ~Empoisonne le porteur et lui inflige 1 point de dégât toutes les %amount% secondes~
+@102329 = ~Remémorise un sort profane de niveau %spellLevel%~
+@102330 = ~Remémorise un sort divin de niveau %spellLevel%~
+@102331 = ~de dissiper la magie~
+@102332 = ~Transforme la cible en %creatureName%~
+@102333 = ~de modifier la résistance à la magie de la cible de %value%~
+@102334 = ~de passer la résistance à la magie de la cible à %value%~
+@102335 = ~de multiplier la résistance à la magie de la cible par %value%~
+@102336 = ~Sanctuaire~
+@102337 = ~Inflige Débilité mentale à la cible~
+@102338 = ~Fait oublier 1 sort à la cible~
+@102339 = ~Fait oublier %amount% sorts à la cible~
+@102340 = ~de modifier le facteur de vitesse du porteur de %value%~
+@102341 = ~de passer le facteur de vitesse du porteur à %value%~
+@102342 = ~de multiplier le facteur de vitesse du porteur par %value%~
+@102343 = ~de modifier l'attaque par round du porteur de %value%~
+@102344 = ~de passer l'attaque par round du porteur à %value%~
+@102345 = ~de multiplier l'attaque par round du porteur par %value%~
+@102346 = ~Absorbe 1 sort de niveau %spellLevel%~
+@102347 = ~Absorbe %amount% sorts de niveau %spellLevel%~
+@102348 = ~de lancer Hâte sur le porteur~
+@102349 = ~de lancer Hâte améliorée sur le porteur~
+@102350 = ~de lancer Hâte (sans bonus d'attaque par round) sur le porteur~
+@102351 = ~de reposer la cible~
+@102352 = ~Neutralisation du poison~
+@102353 = ~de remémoriser un sort profane de niveau %spellLevel%~
+@102354 = ~de remémoriser un sort divin de niveau %spellLevel%~
+@102355 = ~de modifier la résistance à la magie du porteur de %value%~
+@102356 = ~de passer la résistance à la magie du porteur à %value%~
+@102357 = ~de multiplier la résistance à la magie du porteur par %value%~
+@102358 = ~Transforme le porteur en %creatureName%~
+@102359 = ~Inflige %damage% %damageType% au porteur~
+@102360 = ~de modifier la capacité de mouvement de la cible de %value%~
+@102361 = ~de passer la capacité de mouvement de la cible à %value%~
+@102362 = ~de multiplier la capacité de mouvement de la cible par %value%~
+@102363 = ~Les sorts profanes n'ont plus aucune durée~
+@102364 = ~Les sorts profanes durent %duration% moins longtemps~
+@102365 = ~Les sorts profanes durent %duration% plus longtemps~
+@102366 = ~Les sorts divins n'ont plus aucune durée~
+@102367 = ~Les sorts divins durent %duration% moins longtemps~
+@102368 = ~Les sorts divins durent %duration% plus longtemps~
+@102369 = ~Immunité à l'aveuglement~
+@102370 = ~de modifier la classe d'armure du porteur de %value%~
+@102371 = ~Permet d'utiliser n'importe quel objet (si les statistiques sont suffisantes)~
+@102372 = ~Renvoi jusque %amount% sorts de niveau %spellLevel%~
+@102373 = ~Aide sur la cible~
+@102374 = ~Dissipe un sort de protection de niveau inférieur ou égal à %maxLevel%~
+@102375 = ~Force, dextérité et constitution : %value% (non cumulable)~
+@102376 = ~Force, dextérité et constitution : Passe à 25~
+@102377 = ~Expérience gagnée~
+@102378 = ~d'ôter la possibilité de lancer des sorts profanes à la cible~
+@102379 = ~d'ôter la possibilité de lancer des sorts divins à la cible~
+@102380 = ~d'ôter la possibilité de lancer des sorts innés à la cible~
+@102381 = ~Emprisonne jusque %amount% niveaux de sorts de niveau %spellLevel%~
+@102382 = ~de dissiper un sort de protection de niveau inférieur ou égal à %maxLevel%~
+@102383 = ~Désintègre la cible~
+@102384 = ~Débilité mentale permanente~
+@102385 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+@102386 = ~Inflige Confusion à la cible~
+@102387 = ~Charme extrême~
+@102388 = ~de charmer la cible~
+@102389 = ~de charmer la cible si c'est une créature (%creatureType%)~
+//@102390 = ~~
+//@102391 = ~~
+//@102392 = ~~
+//@102393 = ~~
+//@102394 = ~~
+@102395 = ~Immunité aux sorts de divination qui annulent l'invisibilité~
+//@102396 = ~~
+//@102397 = ~~
+//@102398 = ~~
+//@102399 = ~~
+//@102400 = ~~
+//@102401 = ~~
+//@102402 = ~~
+//@102403 = ~~
+@102404 = ~Guérison à la paralysie~
+@102405 = ~Image miroir~
+@102406 = ~de modifier les chances de toucher du porteur de %value%~
+@102407 = ~de passer les chances de toucher du porteur à %value%~
+@102408 = ~de multiplier les chances de toucher du porteur par %value%~
+@102409 = ~de modifier la capacité de mouvement du porteur de %value%~
+@102410 = ~de passer la capacité de mouvement du porteur à %value%~
+@102411 = ~de multiplier la capacité de mouvement du porteur par %value%~
+@102412 = ~de guérir la Débilité mentale~
+@102413 = ~de soigner un point de vie à la cible~
+@102414 = ~de soigner %value% points de vie à la cible~
+@102415 = ~d'infliger un point de dégâts à la cible~
+@102416 = ~d'infliger %value% points de dégâts à la cible~
+@102417 = ~de modifier les points de vie maximum de la cible de %value%~
+@102418 = ~de passer les points de vie maximum de la cible à %value%~
+@102419 = ~de multiplier les points de vie maximum de la cible par %value%~
+@102420 = ~d'étourdir le porteur~
+@102421 = ~d'aveugler le porteur~
+@102422 = ~Immunité à l'étourdissement~
+@102423 = ~d'entoiler la cible~
+@102424 = ~Résurrection~
+@102425 = ~Immunité au gel~
+@102426 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde à la cible~
+@102427 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde à la cible~
+@102428 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %amount% secondes à la cible~
+@102429 = ~d'inoculer une maladie qui diminue la force de la cible de %amount%~
+@102430 = ~d'inoculer une maladie qui diminue la dextérité de la cible de %amount%~
+@102431 = ~d'inoculer une maladie qui diminue la constitution de la cible de %amount%~
+@102432 = ~d'inoculer une maladie qui diminue l'intelligence de la cible de %amount%~
+@102433 = ~d'inoculer une maladie qui diminue la sagesse de la cible de %amount%~
+@102434 = ~d'inoculer une maladie qui diminue le charisme de la cible de %amount%~
+@102435 = ~d'inoculer une maladie qui ralenti la cible~
+@102436 = ~d'inoculer une maladie qui augmente la force de la cible de %amount%~
+@102437 = ~d'inoculer une maladie qui augmente la dextérité de la cible de %amount%~
+@102438 = ~d'inoculer une maladie qui augmente la constitution de la cible de %amount%~
+@102439 = ~d'inoculer une maladie qui augmente l'intelligence de la cible de %amount%~
+@102440 = ~d'inoculer une maladie qui augmente la sagesse de la cible de %amount%~
+@102441 = ~d'inoculer une maladie qui augmente le charisme de la cible de %amount%~
+@102442 = ~de causer la surdité au porteur~
+@102443 = ~de faire oublier 1 sort à la cible~
+@102444 = ~de faire %amount% sorts à la cible~
+@102445 = ~de modifier l'attaque par round de la cible de %value%~
+@102446 = ~de passer l'attaque par round de la cible à %value%~
+@102447 = ~de multiplier l'attaque par round de la cible par %value%~
+@102448 = ~d'enfermer la cible dans un labyrinthe~
+@102449 = ~Immunité à Rage berserk~
+@102450 = ~Immunité à la Débilité mentale~
+@102451 = ~de reposer le porteur~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -278,8 +488,8 @@
 @10003 = ~+%value%~
 @10004 = ~Fixé à %value%~
 @10005 = ~Fixée à %value%~
-@10006 = ~Multiplié par %value%~
-@10007 = ~Multipliée par %value%~
+//@10006 = ~Multiplié par %value%~
+//@10007 = ~Multipliée par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
 @10010 = ~Passe à %value%~
@@ -300,6 +510,7 @@
 @100043 = ~pendant %turns% tours~
 @100044 = ~pendant 1 round~
 @100045 = ~pendant %rounds% rounds~
+@100046 = ~de manière permanente~
 @101054 = ~Classe de base~
 // @101052 = ~%strSocial% %strMoral%~
 @101069 = ~Tous~
@@ -319,6 +530,7 @@
 @101085 = ~de la cible~
 @101086 = ~du porteur~
 @101087 = ~Force exceptionnelle~
+@101088 = ~du groupe~
 @101090 = ~Personnage d'alignement~
 @101091 = ~neutre strict~
 @101092 = ~points de dégâts~
@@ -327,12 +539,101 @@
 @101095 = ~points de dégâts de froid~
 @101096 = ~points de dégâts d'acide~
 @101097 = ~points de dégâts de poison~
-@101098 = ~points de dégâts de contondants~
-@101099 = ~points de dégâts de tranchants~
-@101100 = ~points de dégâts de perforants~
+@101098 = ~points de dégâts contondants~
+@101099 = ~points de dégâts tranchants~
+@101100 = ~points de dégâts perforants~
 @101101 = ~points de dégâts magiques~
 @101102 = ~points de dégâts de projectiles~
-@101103 = ~points de dégâts tranchants~
-@101104 = ~points de dégâts contondants~
+@101103 = ~points de dégâts non mortels~
+@101104 = ~points de dégâts de froid magique~
+@101105 = ~points de dégâts de feu magique~
 @101123 = ~%name% (du groupe)%colon%%value%~
 @101124 = ~Capacité %abilityNumber%~
+@101125 = ~%probability% de chance %description%~
+@101126 = ~contre les %name%~
+
+/* ------ *
+ * Ea.ids *
+ * ------ */
+@202006 = ~créatures charmées~
+
+/* ----------- *
+ * General.ids *
+ * ----------- */
+@203000 = ~toutes~
+@203001 = ~humanoïdes~
+@203002 = ~animaux~
+@203003 = ~morts~
+@203004 = ~morts-vivants~
+@203005 = ~géants~
+@203008 = ~~ // Ne correspond à aucune entrée mais utilisée par HELMLIFE.ITM
+@203255 = ~monstres~
+
+/* -------- *
+ * Race.ids *
+ * -------- */
+@204001 = ~humains~
+@204002 = ~elfes~
+@204102 = ~basilics~
+@204116 = ~araignées~
+@204121 = ~démons~
+@204122 = ~loups-garous~
+@204123 = ~tyrannœils~
+@204124 = ~flagelleurs mentaux~
+@204125 = ~vampires~
+@204133 = ~spectres~
+@204134 = ~âmes-en-peine~
+@204146 = ~dragons~
+@204152 = ~githyankis~
+@204157 = ~devas déchues~
+@204159 = ~planétaires déchus~
+
+/* --------- *
+ * Class.ids *
+ * --------- */
+
+/* ------------ *
+ * Specific.ids *
+ * ------------ */
+
+/* --------- *
+ * Gender.ids *
+ * --------- */
+@207002 = ~femmes~
+@207006 = ~créatures convoquées~
+@207009 = ~démons convoqués~
+
+/* --------- *
+ * Align.ids *
+ * --------- */
+//
+// VERSUS
+//
+@208001 = ~créatures bonnes~
+@208003 = ~créatures mauvaises~
+@208048 = ~créatures d'alignement chaotique~
+
+/* ------- *
+ * Kit.ids *
+ * ------- */
+
+/*
+
+
+0x0 NONE
+0x11 LAWFUL_GOOD
+0x12 LAWFUL_NEUTRAL
+0x13 LAWFUL_EVIL
+0x21 NEUTRAL_GOOD
+0x22 NEUTRAL
+0x23 NEUTRAL_EVIL
+0x31 CHAOTIC_GOOD
+0x32 CHAOTIC_NEUTRAL
+0x33 CHAOTIC_EVIL
+0x1 MASK_GOOD
+0x2 MASK_GENEUTRAL
+0x3 MASK_EVIL
+0x10 MASK_LAWFUL
+0x20 MASK_LCNEUTRAL
+0x30 MASK_CHAOTIC
+*/

@@ -41,6 +41,8 @@ COPY_EXISTING ~tooltip.2da~ ~override~
 		READ_2DA_ENTRY row 2 4 strref1
 		READ_2DA_ENTRY row 3 4 strref2
 
+		TO_LOWER itemId
+
 		PATCH_DEFINE_ARRAY $tra_tooltips(~%itemId%~) BEGIN ~%strref0%~ ~%strref1%~ ~%strref2%~ END
 	END
     BUT_ONLY_IF_IT_CHANGES

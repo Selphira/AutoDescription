@@ -75,29 +75,58 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET abilityType = AbilityType_Charge
-			LPF ~get_description_effect~ RET desc = description END
-			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-				SET abilitySort = sort + $sort_opcodes(~%opcode%~)
-				SET $charge_abilities(~%abilitySort%~ ~%chargeCount%~ ~%desc%~) = 2
-				SET chargeCount += 1
-				SET chargeAbilityCount += 1
+			PATCH_IF opcode == 219 BEGIN
+				SET opcodeBase = opcode
+				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+					SET opcode = opcodeBase * 1000 + subOpcode
+					LPF ~get_description_effect~ RET desc = description END
+					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+						SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+						SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
+						SET chargeCount += 1
+						SET chargeAbilityCount += 1
+					END
+				END
+			END
+			ELSE BEGIN
+				LPF ~get_description_effect~ RET desc = description END
+				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+					SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+					SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
+					SET chargeCount += 1
+					SET chargeAbilityCount += 1
+				END
 			END
 		END
 	END
 
 	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
-	SPRINT chargeStrref EVAL ~%strref_%headerIndex%%~
 
-	PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
-		GET_STRREF chargeStrref chargeTitle
+	PATCH_IF headerIndex < 3 BEGIN // Max 3 tooltips par objet
+		SPRINT chargeStrref EVAL ~%strref_%headerIndex%%~
+
+		PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
+			GET_STRREF chargeStrref chargeTitle
+			// TODO: Si on trouve un tooltip, ne pas chercher à récupérer la description des effets ?
+			// Ou récupérer au moins la durée et les jets de sauvegarde ?? Mais si différent pour chaque sous effet ? :(
+			// On récupère la durée et JS) via les effets, si tous les effets (non ignorés) on la même durée
+			//       Pouvoir récupérer la durée de l'effet si nécessaire alors, pour ajouter cette donnée à la fin (C2STAF02 -> Invoquer tertre errant + Charme-animal)
+		END
 	END
 
-	PATCH_IF chargeAbilityCount == 1 AND ~%chargeTitle%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF chargeAbilityCount == 1 /*AND ~%chargeTitle%~ STRING_EQUAL ~~*/ BEGIN
 		PATCH_PHP_EACH charge_abilities AS data => v BEGIN
 			PATCH_IF data_0 == abilitySort AND data_1 == 0 BEGIN
-				SPRINT chargeTitle "%data_2%"
-				// Mise à 0 pour ne pas que la sous-propriété ne soit affichée (je ne sais pas comment supprimer une seule entrée dans un ARRAY)
-				SET $charge_abilities(~%data_0%~ ~%data_1%~ ~%data_2%~) = 0
+				SPRINT lowerChargeTitle ~%chargeTitle%~
+				SPRINT lowerData_2 ~%data_2%~
+				TO_LOWER lowerChargeTitle
+				TO_LOWER lowerData_2
+				// Si le titre est compris dans la description, on récupère la description qui possède généralement le niveau du lanceur de sorts
+				PATCH_IF (~%lowerData_2%~ STRING_MATCHES_REGEXP ~^%lowerChargeTitle%~) == 0 BEGIN
+					SPRINT chargeTitle "%data_2%"
+					// Mise à 0 pour ne pas que la² sous-propriété ne soit affichée (je ne sais pas comment supprimer une seule entrée dans un ARRAY)
+					SET $charge_abilities(~%data_0%~ ~%data_1%~ ~%data_2%~) = 0
+				END
 			END
 		END
 	END
@@ -114,7 +143,7 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
     END
 
 	SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
-	SET $charge_abilities(~%sort%~ ~%chargeCount%~ ~%chargeTitle%~) = 1
+	SET $charge_abilities(~%sort%~ ~%chargeAbilityCount%~ ~%chargeTitle%~) = 1
 END
 
 DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
@@ -124,10 +153,23 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET abilityType = AbilityType_Combat
-			LPF ~get_description_effect~ RET desc = description END
-			PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-				SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
-				SET $combatAbilities(~%combatCount%~ 0) += 1
+			PATCH_IF opcode == 219 BEGIN
+				SET opcodeBase = opcode
+				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+					SET opcode = opcodeBase * 1000 + subOpcode
+					LPF ~get_description_effect~ RET desc = description END
+					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+						SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+						SET $combatAbilities(~%combatCount%~ 0) += 1
+					END
+				END
+			END
+			ELSE BEGIN
+				LPF ~get_description_effect~ RET desc = description END
+				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+					SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+					SET $combatAbilities(~%combatCount%~ 0) += 1
+				END
 			END
 		END
 	END
@@ -184,8 +226,8 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 	// TODO: Si les statistiques de l'arme ET les capacités de combat associées sont les mêmes, afficher comme si on n'avait qu'un seul effet étendu (Ex: U#STAF01.itm)
 
 	PATCH_IF combatCount == 1 BEGIN
-		LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
 		PATCH_IF $combatAbilities(0 0) > 0 BEGIN
+			LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
 	        PATCH_PHP_EACH ~combat_abilities_0~ AS data => value BEGIN
 				LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
 	        END
@@ -266,9 +308,7 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 
 		LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
 	END
-    PATCH_IF ~%stats_3%~ != 0 BEGIN
-		LPF ~appendValue~ INT_VAR strref = 102002 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
-    END
+	LPF ~appendValue~ INT_VAR strref = 102002 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
 END
 
 DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_statistics~ RET hasSameStatistics BEGIN
@@ -291,6 +331,7 @@ DEFINE_PATCH_FUNCTION ~get_strrefs_from_tooltip~ STR_VAR id = ~~ RET strref_0 st
 	SET strref_0 = 0
 	SET strref_1 = 0
 	SET strref_2 = 0
+	TO_LOWER id
 
 	PATCH_FOR_EACH idx IN 0 1 2 BEGIN
 		SPRINT strref $tra_tooltips(~%id%~ ~%idx%~)
