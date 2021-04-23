@@ -443,6 +443,14 @@
 @102449 = ~Immunité à Rage berserk~
 @102450 = ~Immunité à la Débilité mentale~
 @102451 = ~de reposer le porteur~
+@102452 = ~Paralyse les %creatureType%~
+@102453 = ~Paralyse la cible~
+@102454 = ~Paralyse le porteur~
+@102455 = ~de paralyser la cible~
+@102456 = ~de paralyser les %creatureType%~
+@102457 = ~Immunité contre les attaques des %creatureType%~
+@102458 = ~de tuer instantanément les %creatureType%~
+@102459 = ~Immunité contre les attaques de toutes les créatures~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -504,6 +512,8 @@
 @100005 = ~mètre~
 @100006 = ~mètres~
 @100007 = ~%name% %target%%colon%%value%~
+@100008 = ~%name% %versus%~
+@100009 = ~%name%%colon%%value% %versus%~
 @100040 = ~pendant 1 seconde~
 @100041 = ~pendant %duration% secondes~
 @100042 = ~pendant 1 tour~
@@ -555,6 +565,7 @@
 /* ------ *
  * Ea.ids *
  * ------ */
+@202000 = ~~
 @202006 = ~créatures charmées~
 
 /* ----------- *
@@ -572,17 +583,23 @@
 /* -------- *
  * Race.ids *
  * -------- */
+@204000 = ~????~
 @204001 = ~humains~
 @204002 = ~elfes~
+@204003 = ~demi-elfes~
 @204102 = ~basilics~
+@204104 = ~vers charognards~
 @204116 = ~araignées~
+@204117 = ~loups~
 @204121 = ~démons~
 @204122 = ~loups-garous~
 @204123 = ~tyrannœils~
 @204124 = ~flagelleurs mentaux~
 @204125 = ~vampires~
+@204127 = ~otyughs~
 @204133 = ~spectres~
 @204134 = ~âmes-en-peine~
+@204140 = ~mimiques~
 @204146 = ~dragons~
 @204152 = ~githyankis~
 @204157 = ~devas déchues~
@@ -591,10 +608,12 @@
 /* --------- *
  * Class.ids *
  * --------- */
+@205000 = ~?????~
 
 /* ------------ *
  * Specific.ids *
  * ------------ */
+ @206000 = ~??????~
 
 /* --------- *
  * Gender.ids *
@@ -606,11 +625,9 @@
 /* --------- *
  * Align.ids *
  * --------- */
-//
-// VERSUS
-//
 @208001 = ~créatures bonnes~
 @208003 = ~créatures mauvaises~
+@208016 = ~créatures loyales~
 @208048 = ~créatures d'alignement chaotique~
 
 /* ------- *

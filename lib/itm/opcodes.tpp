@@ -100,7 +100,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 74 => 179 // State: Blindness [74]
 	 45 => 180 // State: Stun [45]
 	165 => 180 // Spell Effect: Pause Target [165]
-	 39 => 181 // State : Unconsciousness [39]
 	154 => 182 // State: Entangle [154]
 	 39 => 183 // State: Unconsciousness [39]
 	128 => 184 // State: Confusion [128]
@@ -1147,18 +1146,15 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_38~ BEGIN
 	SPRINT description @102323 // ~de réduire la cible au silence~
 END
 
-/* ------------------ *
- * Rendre inconscient *
- * ------------------ */
+/* --------------------------- *
+ * State: Unconsciousness [39] *
+ * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN
-	SPRINT description @102139 // ~Assome la cible~
-	/*PATCH_IF abilityType == AbilityType_Combat BEGIN
-		SPRINT description @102096 // ~%description% à chaque attaque réussie~
-	END*/
+	SPRINT description @102139 // ~Assome la cible~ // Endors la cible
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_39~ BEGIN
-	SPRINT description @102135 // ~d'assommer la cible~
+	SPRINT description @102135 // ~d'assommer la cible~ // d'endormir la cible
 END
 
 /* ---------------- *
@@ -1326,8 +1322,9 @@ DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
-	PATCH_WARN "%SOURCE_FILE%: opcode_target_probability_55 à gérer"
-	// de tuer instantanément les %creatureName%
+	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+
+	SPRINT description @102458 // ~de tuer instantanément les %creatureType%~
 END
 
 /* ---------------------- *
@@ -1876,23 +1873,15 @@ END
  * Protection contre un type de créature *
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_100~ BEGIN
-	//Parameter #1: IDS Entry
-    //Parameter #2: IDS File
-	//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-		2 => ~EA.ids~
-		3 => ~General.ids~
-		4 => ~Race.ids~
-		5 => ~Class.ids~
-		6 => ~Specific.ids~
-		7 => ~Gender.ids~
-		8 => ~Align.ids~
-		9 => ~Kit.ids~
+	// To be protected from any creature, leave IDS Entry at 0 (zero), and IDS File at 2.
+	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
+		SPRINT description @102459 // ~Immunité contre les attaques de toutes les créatures~
 	END
-	PATCH_PHP_EACH ids_files AS k => file BEGIN
+	ELSE BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+
+		SPRINT description @102457 // ~Immunité contre les attaques des %creatureType%~
 	END
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_WARN "%SOURCE_FILE%: opcode 100 à gérer %idsFile%(~%parameter1%~)"
 END
 
 /* -------------------------------------- *
@@ -1921,32 +1910,42 @@ END
  * Paralyse les créatures de type xx *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_109~ BEGIN
-	LPM ~opcode_target_109~
-END
+	SPRINT idsFile $ids_files(~%parameter2%~)
+	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
-	LPM ~opcode_target_109~
+	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+		SPRINT description @102452 // ~Paralyse les %creatureType%~
+	END
+	ELSE BEGIN
+		SPRINT description @102454 // ~Paralyse le porteur~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_109~ BEGIN
-	//Parameter #1: IDS Entry
-    //Parameter #2: IDS File
-	//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-		2 => ~EA.ids~
-		3 => ~General.ids~
-		4 => ~Race.ids~
-		5 => ~Class.ids~
-		6 => ~Specific.ids~
-		7 => ~Gender.ids~
-		8 => ~Align.ids~
-		9 => ~Kit.ids~
-	END
-	PATCH_PHP_EACH ids_files AS k => file BEGIN
-	END
 	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_WARN "%SOURCE_FILE%: opcode %opcode% à gérer %idsFile%(~%parameter1%~)"
-	// Paralyse les GOLEM (race) de xx dés de vie ou moins
+	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
+
+	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+		SPRINT description @102452 // ~Paralyse les %creatureType%~
+	END
+	ELSE BEGIN
+		SPRINT description @102453 // ~Paralyse la cible~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
+	SPRINT idsFile $ids_files(~%parameter2%~)
+	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
+
+	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+		SPRINT description @102456 // ~de paralyser les %creatureType%~
+	END
+	ELSE BEGIN
+		SPRINT description @102455 // ~de paralyser la cible~
+	END
 END
 
 /* --------------------------------- *
@@ -2443,24 +2442,11 @@ END
  * Spell Effect: THAC0 vs. Creature Type Modifier [178] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_178~ BEGIN
-	//Parameter #1: IDS Entry
-    //Parameter #2: IDS File
-	//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-		2 => ~EA.ids~
-		3 => ~General.ids~
-		4 => ~Race.ids~
-		5 => ~Class.ids~
-		6 => ~Specific.ids~
-		7 => ~Gender.ids~
-		8 => ~Align.ids~
-	END
-	PATCH_PHP_EACH ids_files AS k => file BEGIN
-	END
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_WARN "%SOURCE_FILE%: opcode 178 à gérer %idsFile% (~%parameter1%~)"
-	// TODO : Fonction qui va récupérer le nom de l'entrée IDS LPF get__ds_entry_name INT_VAR id = 0 STR_VAR idsFile = "" RET name END
-	// Applique un effet à une creature
+	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+
+	SPRINT name @102000 // TAC0
+	SET parameter2 = MOD_TYPE_cumulative
+	LPF ~opcode_mod~ INT_VAR strref = 100008 STR_VAR value = EVAL ~%power%~ RET description END
 END
 
 /* ----------------------------------------------------- *
@@ -2468,28 +2454,16 @@ END
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_179~ BEGIN
 	LPM ~opcode_target_179~
-	// TODO: Dégâts : +xx contre les xxx
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_179~ BEGIN
-	//Parameter #1: IDS Entry
-    //Parameter #2: IDS File
-	//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-		2 => ~EA.ids~
-		3 => ~General.ids~
-		4 => ~Race.ids~
-		5 => ~Class.ids~
-		6 => ~Specific.ids~
-		7 => ~Gender.ids~
-		8 => ~Align.ids~
-	END
-	PATCH_PHP_EACH ids_files AS k => file BEGIN
-	END
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_WARN "%SOURCE_FILE%: opcode 179 à gérer %idsFile%(~%parameter1%~)"
-	// TODO : Fonction qui va récupérer le nom de l'entrée IDS LPF get__ds_entry_name INT_VAR id = 0 STR_VAR idsFile = "" RET name END
-	// Applique un effet à une creature
+	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+
+	SET parameter2 = MOD_TYPE_cumulative
+	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = ~%power%~ RET value = damage END
+
+	SPRINT name @102001 // Dégâts
+	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
 END
 
 /* --------------------------------- *
@@ -3366,14 +3340,26 @@ END
 
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
-	SET strref = 200000 + (file * 1000) + entry
+	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
+		SET strref = 200000 + (file * 1000) + entry
 
-	SPRINT idName (AT ~%strref%~)
+		SPRINT idName (AT ~%strref%~)
+	END
+	ELSE BEGIN
+		SPRINT idName ~~
+		PATCH_WARN "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+	END
 END
 
 
 DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVersusName BEGIN
-	LPF ~get_ids_name~ INT_VAR entry file RET name = idName END
+	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
+		LPF ~get_ids_name~ INT_VAR entry file RET name = idName END
 
-	SPRINT idVersusName @101126 // ~contre les %name%~
+		SPRINT idVersusName @101126 // ~contre les %name%~
+	END
+	ELSE BEGIN
+		SPRINT idVersusName ~~
+		PATCH_WARN "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+	END
 END
