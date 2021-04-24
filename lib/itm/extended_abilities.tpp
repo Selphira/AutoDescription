@@ -23,7 +23,10 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 			PATCH_IF charges > 0 BEGIN
 				LPM ~add_charge_abilitie~
 				PATCH_IF isWeapon == 1 BEGIN
+					SET $combatAbilitiesCount(~%combatCount%~) = 0
+					PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%icon%~ END
 					LPM ~add_weapon_statistics~
+					SET combatCount += 1
 				END
 			END
 			ELSE PATCH_IF location == 1 BEGIN
@@ -42,9 +45,6 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 			ELSE BEGIN
 				PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' pas encore gere~
 			END
-			PATCH_IF location == 1 AND charges > 0 BEGIN
-                PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' a une charge ET se trouve dans l'emplacement des armes~
-            END
 		END
 
 		// Trier les tableau de capacités
@@ -262,7 +262,7 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 				SPRINT itemRef $combatAbilities(~%index%~ 1)
 				LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
 
-				PATCH_IF $combatAbilities(~%index%~ 0)  > 0 BEGIN
+				PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
                     PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
 						LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
                     END
@@ -281,17 +281,30 @@ END
 DEFINE_PATCH_FUNCTION ~add_combat_section_to_description~ STR_VAR itemRef = ~~ RET description BEGIN
 	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%itemRef%~ RET strref_0 strref_1 strref_2 END
 	SPRINT strref EVAL ~%strref_%index%%~
-
-	// TODO: Si pas de tooltip, utiliser A distance / Melée
+	SPRINT section @100011 // ~Capacités de combat~
 
 	PATCH_IF EVAL ~%strref%~ > 0 BEGIN
-		SPRINT section @100011 // ~Capacités de combat~
 		GET_STRREF strref sectionType
 		SPRINT string @10013   // ~%section% (%sectionType%)~
 		LPF ~appendSection~ STR_VAR string RET description END
 	END
 	ELSE BEGIN
-		LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+	    SET offset = headerOffset + 0x38 * index
+		READ_BYTE  (offset + ITM_HEAD_location) location
+		READ_BYTE  (offset + ITM_HEAD_attack_type) attackType
+		PATCH_IF location == 1 BEGIN
+			PATCH_IF attackType == 1 BEGIN
+				SPRINT sectionType @100013 // ~au corps à corps~
+			END
+			ELSE PATCH_IF attackType == 2 OR attackType == 4 BEGIN
+				SPRINT sectionType @100014 // ~à distance~
+			END
+			SPRINT string @10013   // ~%section% (%sectionType%)~
+			LPF ~appendSection~ STR_VAR string RET description END
+		END
+		ELSE BEGIN
+			LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+		END
 	END
 END
 

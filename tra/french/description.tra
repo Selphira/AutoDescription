@@ -2,9 +2,10 @@
  * Liste des sections d'une description
  */
 @100010 = ~Capacités d'équipement~
-@100011 = ~Capacités de combat (à chaque attaque réussie)~
+@100011 = ~Capacités de combat~
 @100012 = ~Capacités de charge~
-@100013 = ~Au corps à corps~
+@100013 = ~au corps à corps~
+@100014 = ~à distance~
 @101032 = ~Nécessite~
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
