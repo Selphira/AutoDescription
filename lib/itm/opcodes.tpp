@@ -3237,7 +3237,6 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 	SPRINT spellName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
-		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
 			COPY_EXISTING ~%file%.spl~ ~override~
 				READ_LONG SPL_unidentified_name spellNameRef
@@ -3252,7 +3251,6 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 		ELSE BEGIN
 			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
 		END
-        VERBOSE
     END
 END
 
@@ -3260,7 +3258,6 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 	SPRINT itemName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
-		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
 			COPY_EXISTING ~%file%.itm~ ~override~
 				READ_LONG SPL_unidentified_name itemNameRef
@@ -3275,7 +3272,6 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 		ELSE BEGIN
 			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
 		END
-        VERBOSE
     END
 END
 
@@ -3283,7 +3279,6 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 	SPRINT creatureName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
-		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
 			COPY_EXISTING ~%file%.cre~ ~override~
 				READ_LONG CRE_name spellNameRef
@@ -3298,7 +3293,6 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 		ELSE BEGIN
 			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
 		END
-        VERBOSE
     END
 END
 
