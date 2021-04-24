@@ -24,14 +24,14 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 				LPM ~add_charge_abilitie~
 				PATCH_IF isWeapon == 1 BEGIN
 					SET $combatAbilitiesCount(~%combatCount%~) = 0
-					PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%icon%~ END
+					PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%SOURCE_RES%~ END
 					LPM ~add_weapon_statistics~
 					SET combatCount += 1
 				END
 			END
 			ELSE PATCH_IF location == 1 BEGIN
 				SET $combatAbilitiesCount(~%combatCount%~) = 0
-				PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%icon%~ END
+				PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%SOURCE_RES%~ END
 
 				PATCH_IF isWeapon == 1 BEGIN
 					LPM ~add_combat_abilitie~
