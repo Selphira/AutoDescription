@@ -22,6 +22,9 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 
 			PATCH_IF charges > 0 BEGIN
 				LPM ~add_charge_abilitie~
+				PATCH_IF isWeapon == 1 BEGIN
+					LPM ~add_weapon_statistics~
+				END
 			END
 			ELSE PATCH_IF location == 1 BEGIN
 				SET $combatAbilitiesCount(~%combatCount%~) = 0
@@ -59,7 +62,7 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
         END
 
 		PATCH_IF chargeCount > 0 BEGIN LPM ~add_charge_abilities_to_description~ END
-		PATCH_IF combatCount > 0 BEGIN LPM ~add_combat_abilities_to_description~ END
+		LPM ~add_combat_abilities_to_description~
 	END
 END
 
