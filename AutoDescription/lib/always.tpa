@@ -1,0 +1,14 @@
+ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
+	OUTER_SET always_once_section = 1
+	SILENT
+
+    INCLUDE ~%MOD_FOLDER%/lib/description.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/strings.tpa~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/effects.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/equipped_abilities.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/extended_abilities.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/misc.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/needs.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/opcodes.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/itm/usability.tpp~
+END
