@@ -317,7 +317,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
-		PATCH_WARN "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure du porteur à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure du porteur à gérer"
 	END
 	ELSE BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
@@ -361,7 +361,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure de la cible [contre les] à yy [pendant ...]
-		PATCH_WARN "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
 	ELSE BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
@@ -498,7 +498,7 @@ END
  * Charm: Charm Specific Creature [5] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_5~ BEGIN
-	PATCH_WARN "%SOURCE_FILE%: opcode_self_5: valide comme configuration ??"
+	PATCH_FAIL "%SOURCE_FILE%: opcode_self_5: valide comme configuration ??"
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
@@ -621,10 +621,10 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	SPRINT description ~~
 
 	PATCH_IF special > 0 BEGIN
-		PATCH_WARN "%SOURCE_FILE% : Valeur spéciale '%special%' pour le opcode 12 pas encore geree"
+		PATCH_FAIL "%SOURCE_FILE% : Valeur spéciale '%special%' pour le opcode 12 pas encore geree"
 	END
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
-		PATCH_WARN "%SOURCE_FILE% : Type de degat '%type%' pour le opcode 12 pas encore gere"
+		PATCH_FAIL "%SOURCE_FILE% : Type de degat '%type%' pour le opcode 12 pas encore gere"
 	END
 
 	SET type = $damage_types(~%type%~)
@@ -644,11 +644,11 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	END
 	// Set to value
 	ELSE PATCH_IF subType == 1 BEGIN
-		PATCH_WARN "%SOURCE_FILE%: opcode_12_common: subType 1 à gérer"
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: subType 1 à gérer"
 	END
 	// Set to Percentage
 	ELSE PATCH_IF subType == 2 BEGIN
-		PATCH_WARN "%SOURCE_FILE%: opcode_12_common: subType 2 à gérer"
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: subType 2 à gérer"
 	END
 	// Reduce by Percentage
 	ELSE PATCH_IF subType == 3 BEGIN
@@ -1117,7 +1117,7 @@ DEFINE_PATCH_MACRO ~opcode_self_36~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_36~ BEGIN
-	PATCH_WARN "%SOURCE_FILE%: opcode_self_probability_36: a terminer"
+	PATCH_FAIL "%SOURCE_FILE%: opcode_self_probability_36: a terminer"
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
@@ -1316,7 +1316,7 @@ DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
 		PATCH_PHP_EACH ids_files AS k => file BEGIN
 		END
 		SPRINT idsFile $ids_files(~%parameter2%~)
-		PATCH_WARN "%SOURCE_FILE%: opcode 55 à gérer %idsFile%(~%parameter1%~)"
+		PATCH_FAIL "%SOURCE_FILE%: opcode 55 à gérer %idsFile%(~%parameter1%~)"
 		// Tue instantanément les GOLEM (race) de xx dés de vie ou moins
 	END
 END
@@ -1454,7 +1454,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_60~ BEGIN
 		END
 	END
 	ELSE BEGIN
-        PATCH_WARN "%SOURCE_FILE%: opcode_target_probability_60: gestion de value < 100"
+        PATCH_FAIL "%SOURCE_FILE%: opcode_target_probability_60: gestion de value < 100"
 	END
 END
 
@@ -1527,7 +1527,7 @@ DEFINE_PATCH_MACRO ~opcode_self_71~ BEGIN
 	ELSE BEGIN
 		/*1 MALE
 		2 FEMALE*/
-		PATCH_WARN "%SOURCE_FILE% : Fixation du genre à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : Fixation du genre à gérer"
 	END
 END
 
@@ -1686,7 +1686,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	PATCH_MATCH parameter2 WITH
 		~64~ BEGIN SPRINT description @102125 END // = ~Immunité aux attaques de regard~
-		DEFAULT PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Type de projectile '%parameter2%' à gérer"
+		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type de projectile '%parameter2%' à gérer"
     END
 END
 
@@ -1992,7 +1992,7 @@ DEFINE_PATCH_MACRO ~opcode_self_120~ BEGIN
 	ELSE PATCH_IF type == 8 BEGIN SPRINT weaponType @102183 END // ~armes de mêlée maudites~
 	ELSE PATCH_IF type == 98 BEGIN SPRINT weaponType @102184 END // ~armes de mêlée non-maudites~
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : Type d'arme %type% à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : Type d'arme %type% à gérer"
 	END
 
 	PATCH_IF type == 0 BEGIN
@@ -2024,7 +2024,7 @@ DEFINE_PATCH_MACRO ~opcode_target_122~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_122 nom de l'objet non trouvé : %resref%"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_122 nom de l'objet non trouvé : %resref%"
 	END
 END
 
@@ -2120,7 +2120,7 @@ DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
         SPRINT description @102358 // ~Transforme le porteur en %creatureName%~
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE%: opcode_self_135 : Nom de la créature introuvable"
+		PATCH_FAIL "%SOURCE_FILE%: opcode_self_135 : Nom de la créature introuvable"
 	END
 END
 
@@ -2134,7 +2134,7 @@ DEFINE_PATCH_MACRO ~opcode_self_143~ BEGIN
 		SPRINT description @102263 // ~Crée un objet (%itemName%)~
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_143 nom de l'objet non trouvé : %resref%"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_143 nom de l'objet non trouvé : %resref%"
 	END
 END
 
@@ -2153,7 +2153,14 @@ END
  * Lancer un sort *
  * -------------- */
 DEFINE_PATCH_MACRO ~opcode_self_146~ BEGIN
-	LPM ~opcode_target_146~
+	TO_LOWER resref
+
+	PATCH_IF ~%resref%~ STRING_EQUAL ~lcarmor~ BEGIN
+		SPRINT description @102460 // ~Permet de lancer des sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_target_146~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
@@ -2185,7 +2192,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_target_probability_146 nom du sort introuvable pour %resref%"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_146 nom du sort introuvable pour %resref%"
 	END
 END
 
@@ -2206,7 +2213,7 @@ DEFINE_PATCH_MACRO ~opcode_self_148~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_148 nom du sort introuvable pour %resref%"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_148 nom du sort introuvable pour %resref%"
 	END
 END
 
@@ -2228,7 +2235,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_148~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_probability_148 nom du sort introuvable pour %resref%"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_probability_148 nom du sort introuvable pour %resref%"
 	END
 END
 
@@ -2241,7 +2248,7 @@ DEFINE_PATCH_MACRO ~opcode_target_151~ BEGIN
 		SPRINT description @102332 // ~Transforme la cible en %creatureName%~
 	END
 	ELSE BEGIN
-		PATCH_WARN "%SOURCE_FILE%: opcode_target_151 : parameter2 != 0 à gerer"
+		PATCH_FAIL "%SOURCE_FILE%: opcode_target_151 : parameter2 != 0 à gerer"
 	END
 END
 
@@ -2434,7 +2441,7 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 	PATCH_PHP_EACH ids_files AS k => file BEGIN
 	END
 	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_WARN "%SOURCE_FILE%: opcode 177 à gérer %idsFile% (%parameter1%)"
+	PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer %idsFile% (%parameter1%)"
 	// Applique un effet à une creature
 END
 
@@ -2516,7 +2523,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
 		~64~ BEGIN SPRINT description @102147 END // = ~Réfléchit les attaques de regard~
-		DEFAULT PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
+		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
     END
 END
 
@@ -2561,7 +2568,7 @@ DEFINE_PATCH_MACRO ~opcode_self_204~ BEGIN
 	LOCAL_SET strref = 102150
 
 	PATCH_IF school == 0 BEGIN
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_204 école 0 à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_204 école 0 à gérer"
 	END
 	ELSE BEGIN
 		SET strref += school
@@ -2585,7 +2592,7 @@ DEFINE_PATCH_MACRO ~opcode_self_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
 	END
 	ELSE BEGIN
 		SPRINT description @102035 // ~Immunité à %spellName%~
@@ -2600,7 +2607,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
 	END
 	ELSE BEGIN
 		SPRINT description @102289 // ~d'immuniser au sort %spellName%~
@@ -2638,7 +2645,7 @@ DEFINE_PATCH_MACRO ~opcode_self_214~ BEGIN
 		SPRINT description @102106 //  ~Permet de lancer n'importe quel sort de son livre de sorts~
 	END
 	ELSE BEGIN
-		PATCH_WARN  ~%SOURCE_FILE% : Opcode %opcode% : Lire les sorts utilisables depuis le fichier 2da %resref%~
+		PATCH_FAIL  ~%SOURCE_FILE% : Opcode %opcode% : Lire les sorts utilisables depuis le fichier 2da %resref%~
 	END
 END
 
@@ -2655,7 +2662,7 @@ DEFINE_PATCH_MACRO ~opcode_self_216~ BEGIN
 		SPRINT description @102292 // ~Draîne %amount% niveaux au porteur~
 	END
 	ELSE BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
 
@@ -2669,7 +2676,7 @@ DEFINE_PATCH_MACRO ~opcode_target_216~ BEGIN
 		SPRINT description @102114 // ~Draîne %amount% niveaux à la cible~
 	END
 	ELSE BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
 
@@ -2683,7 +2690,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_216~ BEGIN
 		SPRINT description @102142 // ~de draîner %amount% niveaux à la cible~
 	END
 	ELSE BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
 
@@ -2697,7 +2704,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
 		SPRINT description @102187 // ~de draîner %amount% niveaux au porteur~
 	END
 	ELSE BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
 
@@ -2747,7 +2754,7 @@ DEFINE_PATCH_MACRO ~opcode_self_220~ BEGIN
 
 	PATCH_IF school > 0 BEGIN
 		// Dissipe tous les sorts de l'école de %school% de niveau %level% et moins
-		PATCH_WARN "%SOURCE_FILE% : opcode_self_220 à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_220 à gérer"
 	END
 END
 
@@ -2759,7 +2766,7 @@ DEFINE_PATCH_MACRO ~opcode_target_230~ BEGIN
 
 	PATCH_MATCH parameter2 WITH
 		1 BEGIN SPRINT description @102374 END // ~Dissipe un sort de protection de niveau inférieur ou égal à %maxLevel%~
-		DEFAULT PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Type d'effet à dissiper '%parameter2%' à gérer"
+		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type d'effet à dissiper '%parameter2%' à gérer"
     END
 END
 
@@ -2768,7 +2775,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_230~ BEGIN
 
 	PATCH_MATCH parameter2 WITH
 		1 BEGIN SPRINT description @102382 END // ~de dissiper un sort de protection de niveau inférieur ou égal à %maxLevel%~
-		DEFAULT PATCH_WARN "%SOURCE_FILE% : opcode_target_probability_230 : Type d'effet à dissiper '%parameter2%' à gérer"
+		DEFAULT PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_230 : Type d'effet à dissiper '%parameter2%' à gérer"
     END
 END
 
@@ -2921,7 +2928,7 @@ DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
 	LOCAL_SET value = ~%parameter1%~
 
 	PATCH_IF value < 0 BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Valeur negative pour le champ de vision a gerer~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Valeur negative pour le champ de vision a gerer~
 	END
 	ELSE BEGIN
 		SPRINT value $feets_to_meters(~%value%~)
@@ -3012,7 +3019,7 @@ DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 			SPRINT description @102107 // ~Le prochain sort lancé déclenche automatiquement un hiatus entropique~
 		END
 		ELSE BEGIN
-			PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : A gerer pour capacite de charge et parameter2 = %parameter2% (etrange)~
+			PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : A gerer pour capacite de charge et parameter2 = %parameter2% (etrange)~
 		END
 	END
 	ELSE BEGIN
@@ -3163,7 +3170,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 		SPRINT name (AT ~%strref%~)
 	END
 	ELSE BEGIN
-		PATCH_WARN ~%SOURCE_FILE% : Opcode %opcode% : Valeur du second parametre invalide (%parameter2%), l'effet est annule ~
+		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Valeur du second parametre invalide (%parameter2%), l'effet est annule ~
 	END
 END
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
@@ -3228,6 +3235,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 	SPRINT spellName ~~
+	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
 		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
@@ -3237,12 +3245,12 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 					READ_STRREF SPL_unidentified_name spellName
 				END
 				ELSE BEGIN
-					PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl"
+					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl"
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
+			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
 		END
         VERBOSE
     END
@@ -3250,6 +3258,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 	SPRINT itemName ~~
+	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
 		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
@@ -3259,12 +3268,12 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 					READ_STRREF ITM_identified_name itemName
 				END
 				ELSE BEGIN
-					PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm"
+					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm"
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
+			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
 		END
         VERBOSE
     END
@@ -3272,6 +3281,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEGIN
 	SPRINT creatureName ~~
+	SPRINT itemFilename ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
 		SILENT
 		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
@@ -3281,12 +3291,12 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 					READ_STRREF CRE_name creatureName
 				END
 				ELSE BEGIN
-					PATCH_WARN "%SOURCE_FILE% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre"
+					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre"
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
+			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
 		END
         VERBOSE
     END
@@ -3347,7 +3357,7 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 	END
 	ELSE BEGIN
 		SPRINT idName ~~
-		PATCH_WARN "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+		PATCH_FAIL "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
 	END
 END
 
@@ -3360,6 +3370,6 @@ DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVer
 	END
 	ELSE BEGIN
 		SPRINT idVersusName ~~
-		PATCH_WARN "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+		PATCH_FAIL "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
 	END
 END

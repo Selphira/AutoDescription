@@ -19,25 +19,13 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 	END
 
 	PATCH_IF probability == 100 BEGIN
-		PATCH_TRY
-			LPM ~opcode%opcode_target%_%opcode_n%~
-		WITH
-			DEFAULT
-				SPRINT description ~Opcode "%opcode_n%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_%opcode_n% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
-		END
+		LPM ~opcode%opcode_target%_%opcode_n%~
 	END
 	ELSE BEGIN
-		PATCH_TRY
-			SET probability += 1
-			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-			LPM ~opcode%opcode_target%_probability_%opcode_n%~
-			SPRINT description @101125 // ~%probability% de chance %description%~
-		WITH
-			DEFAULT
-				SPRINT description ~Opcode "%opcode_n%" pas encore gere~
-				PATCH_WARN "%SOURCE_FILE% : opcode%opcode_target%_probability_%opcode_n% non gere : %target% %power% %parameter1% %parameter2% %timingMode% %resistance% %duration% %probability1% %probability2% '%resref%' %diceCount% %diceSides% %saveType% %saveBonus% %special%"
-		END
+		SET probability += 1
+		LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+		LPM ~opcode%opcode_target%_probability_%opcode_n%~
+		SPRINT description @101125 // ~%probability% de chance %description%~
 	END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN

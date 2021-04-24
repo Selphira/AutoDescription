@@ -8,7 +8,7 @@ END
 DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET description BEGIN
 	// On ne garde que le texte roleplay
 	INNER_PATCH_SAVE description ~%description%~ BEGIN
-		SPRINT regex @10008     // ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+		SPRINT regex @10008     // ~^[ %TAB%]*\(CARACTÉRISTIQUES\|STATISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 		SPRINT replace @100003  // ~PARAMÈTRES~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~%regex%~ ~%replace%%colon%%crlf%~
 	END

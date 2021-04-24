@@ -451,6 +451,7 @@
 @102457 = ~Immunité contre les attaques des %creatureType%~
 @102458 = ~de tuer instantanément les %creatureType%~
 @102459 = ~Immunité contre les attaques de toutes les créatures~
+@102460 = ~Permet de lancer des sorts~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs

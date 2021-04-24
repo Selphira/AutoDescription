@@ -28,8 +28,6 @@ DEFINE_PATCH_MACRO ~description_potion~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~description~ BEGIN
-	PATCH_PRINT "----------- AUTRE : %SOURCE_FILE% -----------"
-
 	LPF ~equipped_abilities~ RET description END
 	LPF ~extended_abilities~ RET description END
 
@@ -44,54 +42,63 @@ DEFINE_PATCH_MACRO ~description~ BEGIN
 END
 
 OUTER_SET total = 0
+OUTER_SET totalWithoutDescription = 0
+OUTER_SET totalFailed = 0
+OUTER_SET totalSuccessful = 0
+OUTER_SET totalIgnored = 0
+
 
 COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+//COPY_EXISTING_REGEXP GLOB ~CBPLAYR1.itm~ ~override~
 	PATCH_IF (SOURCE_SIZE > 0x71) BEGIN // Evite un crash sur les objets vides
 		READ_SHORT  ITM_type itemType
 		READ_STRREF ITM_identified_desc description
+		READ_LONG ITM_identified_desc strref
+
+		SET total += 1
+        SET isWeapon = 0
 
         SPRINT oldDescription "%description%"
 
 		//LPF ~removeTechnicalDescription~ STR_VAR description RET description END
 
-        SET isWeapon = 0
-
-        PATCH_IF itemType > 0xe AND itemType < 0x1f BEGIN // Les armes
-            SET isWeapon = 1
-			LPM ~description~
-        END
-        ELSE BEGIN
-			PATCH_MATCH itemType
-			WITH
-				// Description de l'équipement
-				ITM_TYPE_armor ITM_TYPE_shield_not_in_iwd ITM_TYPE_necklace ITM_TYPE_amulet ITM_TYPE_belt ITM_TYPE_girdle ITM_TYPE_boots ITM_TYPE_bracers ITM_TYPE_gauntlets ITM_TYPE_helm ITM_TYPE_ring ITM_TYPE_cloak
-				BEGIN
+		PATCH_TRY
+		    PATCH_IF itemType > 0xe AND itemType < 0x1f BEGIN // Les armes
+		        SET isWeapon = 1
+				PATCH_IF ~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ BEGIN
+					SET totalWithoutDescription += 1
+				END
+				ELSE BEGIN
 					LPM ~description~
+					SET totalSuccessful += 1
 				END
-				// Description des consommables
-				ITM_TYPE_potion ITM_TYPE_wand ITM_TYPE_scroll
-				BEGIN
-					LPM ~description_potion~
+		    END
+		    ELSE BEGIN
+				PATCH_MATCH itemType
+				WITH
+					// Description de l'équipement
+					ITM_TYPE_armor ITM_TYPE_shield_not_in_iwd ITM_TYPE_necklace ITM_TYPE_amulet ITM_TYPE_belt ITM_TYPE_girdle ITM_TYPE_boots ITM_TYPE_bracers ITM_TYPE_gauntlets ITM_TYPE_helm ITM_TYPE_ring ITM_TYPE_cloak
+					BEGIN
+						LPM ~description~
+						SET totalSuccessful += 1
+					END
+					// Description des consommables
+					ITM_TYPE_potion ITM_TYPE_wand ITM_TYPE_scroll
+					BEGIN
+						// LPM ~description_potion~
+						SET totalIgnored += 1
+					END
+					// Description des munitions
+					ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
+					BEGIN
+						// LPM ~description_ammo~
+						SET totalIgnored += 1
+					END
+					DEFAULT
+						SET totalIgnored += 1
 				END
-				// Description des munitions
-				ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
-				BEGIN
-					LPM ~description_ammo~
-				END
-				DEFAULT
-			END
-        END
-
-        SET mustFail = !"%description%" STRING_CONTAINS_REGEXP "Opcode"
-
-		PATCH_IF mustFail == 1 BEGIN
-			//PATCH_PRINT "%oldDescription%"
-			PATCH_PRINT "---------------------------------------------"
-			PATCH_PRINT "%description%"
-			PATCH_ABORT ~%SOURCE_FILE% : Descriptions reussies : %total%~
-		END
-
-		SET total += 1
+		    END
+		WITH DEFAULT SET totalFailed += 1 END
 
 		/*
 		APPEND_OUTER ~standardisation-fr/log/description-before.log~ ~// "%SOURCE_FILE%"~
@@ -103,5 +110,11 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 		*/
 	END
 BUT_ONLY_IF_IT_CHANGES
+
+PRINT "Total : %total%"
+PRINT "Sans description : %totalWithoutDescription%"
+PRINT "Ignorés : %totalIgnored%"
+PRINT "Reussis : %totalSuccessful%"
+PRINT "Echoues : %totalFailed%"
 
 ABORT "REUSSITE !!!!"
