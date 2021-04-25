@@ -83,7 +83,7 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 
         PATCH_SILENT
 
-		PATCH_IF ~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ BEGIN
+		PATCH_IF ~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0 BEGIN
 			SET totalWithoutDescription += 1
 		END
 		ELSE BEGIN
