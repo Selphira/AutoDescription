@@ -47,6 +47,48 @@ COPY_EXISTING ~tooltip.2da~ ~override~
 	END
     BUT_ONLY_IF_IT_CHANGES
 
+
+DEFINE_ACTION_FUNCTION ~ucfirst~ STR_VAR value = ~~ RET string BEGIN
+	OUTER_SNPRINT 1 first ~%value%~
+	ACTION_TO_UPPER first
+
+	OUTER_PATCH_SAVE string ~%value%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^.?~ ~%first%~
+	END
+END
+
+/* ----------------------------------------------------------------------------------- *
+ * Des chaînes récupérées directement depuis leur référence dans le fichier dialog.tlk *
+ * Possible aussi pour les multi-classes, mais demande un traitement différent.        *
+ * ----------------------------------------------------------------------------------- */
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~string_from_strref~ BEGIN
+	// Races
+	~DWARF~    => 7182
+	~HUMAN~    => 7193
+	~ELF~      => 7194
+	~HALFLING~ => 7195
+	~GNOME~    => 7196
+	~HALF_ELF~ => 7197
+	~HALFORC~  => 53186
+	// Classes
+	~FIGHTER~  => 10086
+	~RANGER~   => 7200
+	~PALADIN~  => 7217
+	~CLERIC~   => 7204
+	~DRUID~    => 7210
+	~MAGE~     => 18039
+	~THIEF~    => 7202
+	~BARD~     => 7206
+	~MONK~     => 45851
+	~RANGER~   => 7200
+END
+
+ACTION_PHP_EACH string_from_strref AS name => strref BEGIN
+	ACTION_GET_STRREF strref value
+	LAF ~ucfirst~ STR_VAR value RET string END
+	OUTER_SPRINT $translations(~%name%~) ~%string%~
+END
+
 /* ----------------------------------------------------------------- *
  * D'autres chaînes utilisées dans la partie "(Non) Utilisable par". *
  * Je n'ai pas trouvé le moyen de récupérer les textes               *
@@ -57,10 +99,7 @@ OUTER_SPRINT $translations(~CHAOTIC~) @101000
 OUTER_SPRINT $translations(~EVIL~) @101001
 OUTER_SPRINT $translations(~GOOD~) @101002
 OUTER_SPRINT $translations(~NEUTRAL~) @101003
-//OUTER_SPRINT $translations(~NEUTRAL~) @101004
 OUTER_SPRINT $translations(~LOYAL~) @101005
-OUTER_SPRINT $translations(~BARD~) @101006
-OUTER_SPRINT $translations(~CLERIC~) @101007
 OUTER_SPRINT $translations(~CLERIC_MAGE~) @101008
 OUTER_SPRINT $translations(~CLERIC_THIEF~) @101009
 OUTER_SPRINT $translations(~CLERIC_RANGER~) @101010
@@ -71,20 +110,7 @@ OUTER_SPRINT $translations(~FIGHTER_CLERIC~) @101014
 OUTER_SPRINT $translations(~FIGHTER_MAGE_CLERIC~) @101015
 OUTER_SPRINT $translations(~FIGHTER_MAGE_THIEF~) @101016
 OUTER_SPRINT $translations(~FIGHTER_THIEF~) @101017
-OUTER_SPRINT $translations(~MAGE~) @101018
 OUTER_SPRINT $translations(~MAGE_THIEF~) @101019
-OUTER_SPRINT $translations(~PALADIN~) @101020
-OUTER_SPRINT $translations(~RANGER~) @101021
-OUTER_SPRINT $translations(~THIEF~) @101022
-OUTER_SPRINT $translations(~ELF~) @101023
-OUTER_SPRINT $translations(~DWARF~) @101024
-OUTER_SPRINT $translations(~HALF_ELF~) @101025
-OUTER_SPRINT $translations(~HALFLING~) @101026
-OUTER_SPRINT $translations(~HUMAN~) @101027
-OUTER_SPRINT $translations(~GNOME~) @101028
-OUTER_SPRINT $translations(~MONK~) @101029
-OUTER_SPRINT $translations(~DRUID~) @101030
-OUTER_SPRINT $translations(~HALFORC~) @101031
 
 OUTER_SPRINT crlf  @10000
 OUTER_SPRINT colon @10001   // ~ : ~

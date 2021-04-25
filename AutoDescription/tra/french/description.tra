@@ -116,7 +116,7 @@
 @102120 = ~d'étourdir la cible~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour annuler~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
-@102123 = ~Étourdi la cible~
+@102123 = ~Étourdit la cible~
 @102124 = ~de tuer instantanément la cible~
 @102125 = ~Immunité aux attaques de regard~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
@@ -247,7 +247,7 @@
 @102252 = ~Régénère 1 point de vie toutes les %value% secondes à la cible~
 @102253 = ~Régénère %value% des points de vie de la cible~
 @102254 = ~Régénère 3 points de vie toutes les %value% secondes à la cible~
-@102255 = ~Étourdi le porteur~
+@102255 = ~Étourdit le porteur~
 @102256 = ~d'invoquer une créature (%creatureName%)~
 @102257 = ~Permet de voir au loin~
 @102258 = ~Immunité à l'arrêt du temps~
@@ -464,8 +464,6 @@
 @101003 = ~neutre~
 @101004 = ~loyal~
 @101005 = ~neutre~
-@101006 = ~Barde~
-@101007 = ~Clerc~
 @101008 = ~Clerc / Mage~
 @101009 = ~Clerc / Voleur~
 @101010 = ~Clerc / Rôdeur~
@@ -476,20 +474,7 @@
 @101015 = ~Guerrier / Mage / Clerc~
 @101016 = ~Guerrier / Mage / Voleur~
 @101017 = ~Guerrier / Voleur~
-@101018 = ~Mage~
 @101019 = ~Mage / Voleur~
-@101020 = ~Paladin~
-@101021 = ~Rôdeur~
-@101022 = ~Voleur~
-@101023 = ~Elfe~
-@101024 = ~Nain~
-@101025 = ~Demi-elfe~
-@101026 = ~Petite-personne~
-@101027 = ~Humain~
-@101028 = ~Gnome~
-@101029 = ~Moine~
-@101030 = ~Druide~
-@101031 = ~Demi-orque~
 
 @10000 = ~
 ~
@@ -635,24 +620,3 @@
 /* ------- *
  * Kit.ids *
  * ------- */
-
-/*
-
-
-0x0 NONE
-0x11 LAWFUL_GOOD
-0x12 LAWFUL_NEUTRAL
-0x13 LAWFUL_EVIL
-0x21 NEUTRAL_GOOD
-0x22 NEUTRAL
-0x23 NEUTRAL_EVIL
-0x31 CHAOTIC_GOOD
-0x32 CHAOTIC_NEUTRAL
-0x33 CHAOTIC_EVIL
-0x1 MASK_GOOD
-0x2 MASK_GENEUTRAL
-0x3 MASK_EVIL
-0x10 MASK_LAWFUL
-0x20 MASK_LCNEUTRAL
-0x30 MASK_CHAOTIC
-*/
