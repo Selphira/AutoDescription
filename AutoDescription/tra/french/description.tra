@@ -464,6 +464,8 @@
 @101003 = ~neutre~
 @101004 = ~loyal~
 @101005 = ~neutre~
+@101006 = ~Barde~
+@101007 = ~Clerc~
 @101008 = ~Clerc / Mage~
 @101009 = ~Clerc / Voleur~
 @101010 = ~Clerc / Rôdeur~
@@ -474,7 +476,13 @@
 @101015 = ~Guerrier / Mage / Clerc~
 @101016 = ~Guerrier / Mage / Voleur~
 @101017 = ~Guerrier / Voleur~
+@101018 = ~Mage~
 @101019 = ~Mage / Voleur~
+@101020 = ~Paladin~
+@101021 = ~Rôdeur~
+@101022 = ~Voleur~
+@101029 = ~Moine~
+@101030 = ~Druide~
 
 @10000 = ~
 ~
