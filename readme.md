@@ -60,36 +60,59 @@ Deviendra
   Ex: Le groupe "mage" doit-il comporter les multi-classs du genre "guerrier/mage" (mage/voleur oui, car mage est la base)
 - Certains objets ont une description "non identifiée" mais aucune description "identifiée" (Ex: A!BCHAN1.ITM). Copier la version non identifiée dans la version identifiée et passer à la moulinette.
   Ceci n'est pas à faire pour les objets sans aucune description qui sont (normalement) des objets non accessibles au joueur.
-- Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm)
+- Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm, C2BLUN03) 
 - Gérer les potions et les munitions
 - Gérer les objets considérés comme ayant un enchantement plus haut (233 proeficient ??) (Ex: L#NINI2.ITM)
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01)
 - Bug: loyal transformé en neutre (Ex: WANDORC.ITM)
+- Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin
 - Bug: 26 % de chance de modifier la résistance à la magie du porteur de -10 pendant 20 secondes (WQXDA1.ITM). Le 10 devrait être un pourcentage.
+- Bug: usability (Ex: BHCLUB01)
+  > Utilisable par : 
+  > - Voleur monoclassé et multiclassé
+  > - Voleur
+- Bug: Corriger et uniformiser la façon de gérer les résistances 
+  opcode_target_probability_166: la valeur n'est pas exprimée en %
+  opcode_target_probability_166: gérer le timing "permanent"
+  opcode_target_probability_166: trouver une phrase permettant d'introduire "la cible", "les dragons", à la place de "de la cible" 
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
-- Gérer le timing "permanent", il affichera "de manière permanente" à la fin de la phrase, mais pas systématiquement. (les conditions restent à définir)
+- Gérer le timing "permanent", il affichera "de manière permanente" ou "définitivement" à la fin de la phrase, mais pas systématiquement. (les conditions restent à définir) (ex: L#NI6CQ)
   Exemple à éviter: 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente
 - Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
 - Gérer les opcodes suivants : 101, 144, 177, 180, 188, 248, 249, 251, 268, 272, 300, 318
 - Opcode 177  
-  Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.  
-  Tradurie en 
+  Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
+  Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
+- Améliorer le tri des effets en faisant en sorte que, pour un même opcode, ceux ayant 100% soient avant ceux < 100 (Ex: RR#TROL)
 
   > - Si la cible est un humain, un gnome, un nain ou une petite-personne :
   >  -  Endort la cible (jet de sauvegarde contre les sorts à +4 pour annuler)
 - Opcode 1  
   Améliorer les textes, mieux adapté aux situations et moins génériques.
+- Opcode 101 (Ex: BLUN25, immunité au drain de niveau)
 - Les opcodes de type "State: Sanctuary [153]" doivent avoir un texte différent en fonction de s'ils sont une capacité de charge, de combat ou d'équipement... (Ex: GTT#BO.ITM)  
   Charge : Sanctuaire x fois par jour  
   Combat : Sanctuaire sur le porteur  
   Equipement : "Sanctuaire permanent", "Sous l'effet de Sanctuaire", "Sanctuaire", autres ?
+- Opcode 206 (resref tb#preti) + opcode 146 (resref tb#depet)
+  // Fusionner en une seule ligne ! // Immunité au sort Pétrification
+- "Revient dans les mains du lanceur immédiatement après avoir été lancée" (Ex: AX1H10)
+- Sur une arme, si TAC0 de base est différent de l'enchantementn, alors afficher "Considérée comme une arme +xx pour toucher la cible"
+  Ou juste afficher "Enchantement : +xx juste au dessus du TAC0 / CA"
+
+- Grouper les charmes (Ex: A7RING02)
+  
 
 ### Capacités de combat
 
 - Préciser la cible de l'effet, uniquement si la cible est le porteur.
   La cible par défaut de l'effet d'une capacité de combat est la cible du personnage, il n'est pas nécessaire de toujours le mentionner, et cela diminuera un peu les lignes.
 - Si une résistance de la cible passe à 0 avec une capacité de combat, écrire "Ignore la résistance à xxx de la cible" à la place de "Résistance à xxx de la cible: Passe à 0"
-  
+- Reformuler
+  Points de vie maximum de la cible : -2 pendant 1 tour
+  Réduit|Augmente le maximum de points de vie de la cible de 2
+  Cette formulation peut s'adapter à tous les attributs basiques !!
+
 ### Capacités de charge
 
 - Trouver un nom qui ne soit pas générique pour les capacités de charge qui ont plusieurs effets affichés et qui n'ont aucun tooltip

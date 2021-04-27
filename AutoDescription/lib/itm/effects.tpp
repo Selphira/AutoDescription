@@ -1,5 +1,7 @@
 DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 	SET opcode_n = opcode
+	SET durationAdded = 0
+	SET saveAdded = 0
 
 	LPM ~block_to_vars~
 
@@ -8,14 +10,24 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 
 	PATCH_IF abilityType == AbilityType_Equipped BEGIN
 		SPRINT opcode_target ~_self~
+		SPRINT theTarget @102472 // ~le porteur~
 	END
 	ELSE BEGIN
 		// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
 		// Serait ajouté dans une variable qu'il suffira d'utiliser
 		// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-		PATCH_IF target == TARGET_FX_self BEGIN SPRINT opcode_target ~_self~ END
-		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN SPRINT opcode_target ~_target~ END
-		ELSE PATCH_IF target == TARGET_FX_party BEGIN SPRINT opcode_target ~_party~ END
+		PATCH_IF target == TARGET_FX_self BEGIN
+			SPRINT opcode_target ~_self~
+			SPRINT theTarget @102472 // ~le porteur~
+		END
+		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN
+			SPRINT opcode_target ~_target~
+			SPRINT theTarget @102471 // ~la cible~
+		END
+		ELSE PATCH_IF target == TARGET_FX_party BEGIN
+			SPRINT opcode_target ~_party~
+			SPRINT theTarget @102473 // ~le groupe~
+		END
 	END
 
 	PATCH_IF probability == 100 BEGIN
@@ -23,20 +35,66 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 	END
 	ELSE BEGIN
 		SET probability += 1
-		LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
 		LPM ~opcode%opcode_target%_probability_%opcode_n%~
-		SPRINT description @101125 // ~%probability% de chance %description%~
-	END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
-
-		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description ~%description% %duration%~
+		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+			SPRINT description @101125 // ~%probability% de chance %description%~
 		END
 	END
 
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
+	LPM ~add_duration_and_save~
+END
+
+DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durationAdded BEGIN
+	READ_SHORT EFF2_opcode opcode
+	READ_BYTE  EFF2_power power
+	READ_LONG  EFF2_parameter1 parameter1
+	READ_LONG  EFF2_parameter2 parameter2
+	READ_LONG  EFF2_duration duration
+	READ_BYTE  EFF2_probability1 probability1
+	READ_BYTE  EFF2_probability2 probability2
+	READ_ASCII EFF2_resource resref
+	READ_LONG  EFF2_dice_thrown diceCount
+	READ_LONG  EFF2_dice_sides diceSides
+	READ_LONG  EFF2_save_type saveType
+	READ_LONG  EFF2_save_bonus saveBonus
+	READ_LONG  EFF2_parameter3 parameter3
+	READ_LONG  EFF2_parameter4 parameter4
+
+	SET parentProbability = probability
+	SET probability = probability1 - probability2
+	SPRINT description ~~
+
+	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+		PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN
+			PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
+		END
+		PATCH_WARN ~%macro%%opcode%~
+		PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
+			LPM ~%macro%probability_%opcode%~
+			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
+				LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+				SPRINT description @101125 // ~%probability% de chance %description%~
+			END
+		END
+		ELSE BEGIN
+			LPM ~%macro%%opcode%~
+		END
+	END
+	LPM ~add_duration_and_save~
+END
+
+DEFINE_PATCH_MACRO ~add_duration_and_save~ BEGIN
+	PATCH_IF durationAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+
+		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description ~%description% %duration%~
+			SET durationAdded = 1
+		END
+	END
+
+	PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
 		SPRINT saveTypeStr ~~
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
             SPRINT saveTypeStr @102033 // ~contre les sorts~
@@ -81,6 +139,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
         END
 
 		SPRINT description ~%description% (%saveStr%)~
+		SET saveAdded = 1
 	END
 END
 

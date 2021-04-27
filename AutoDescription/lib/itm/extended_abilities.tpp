@@ -72,37 +72,6 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 	LOCAL_SET chargeAbilityCount = 0
 	LOCAL_SPRINT chargeTitle ~~
 
-	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
-	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
-		READ_SHORT blockOffset opcode
-
-		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-			SET abilityType = AbilityType_Charge
-			PATCH_IF opcode == 219 BEGIN
-				SET opcodeBase = opcode
-				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
-					SET opcode = opcodeBase * 1000 + subOpcode
-					LPF ~get_description_effect~ RET desc = description END
-					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-						SET abilitySort = sort + $sort_opcodes(~%opcode%~)
-						SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
-						SET chargeCount += 1
-						SET chargeAbilityCount += 1
-					END
-				END
-			END
-			ELSE BEGIN
-				LPF ~get_description_effect~ RET desc = description END
-				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-					SET abilitySort = sort + $sort_opcodes(~%opcode%~)
-					SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
-					SET chargeCount += 1
-					SET chargeAbilityCount += 1
-				END
-			END
-		END
-	END
-
 	LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
 
 	PATCH_IF headerIndex < 3 BEGIN // Max 3 tooltips par objet
@@ -110,10 +79,46 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 
 		PATCH_IF EVAL ~%chargeStrref%~ > 0 BEGIN
 			GET_STRREF chargeStrref chargeTitle
-			// TODO: Si on trouve un tooltip, ne pas chercher à récupérer la description des effets ?
-			// Ou récupérer au moins la durée et les jets de sauvegarde ?? Mais si différent pour chaque sous effet ? :(
-			// On récupère la durée et JS) via les effets, si tous les effets (non ignorés) on la même durée
-			//       Pouvoir récupérer la durée de l'effet si nécessaire alors, pour ajouter cette donnée à la fin (C2STAF02 -> Invoquer tertre errant + Charme-animal)
+			// TODO: Pour chaque effet non ignoré, récupérer la durée et les jets de sauvegarde (C2STAF02 -> Invoquer tertre errant + Charme-animal)
+			//       Si tous sont égaux, alors les utiliser
+			//       Sinon ne rien faire
+
+			SET abilitySort = sort + chargeCount
+			SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%chargeTitle%~) = 2
+			SET chargeCount += 1
+			SET chargeAbilityCount += 1
+		END
+		ELSE BEGIN
+			GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
+			PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
+				READ_SHORT blockOffset opcode
+
+				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+					SET abilityType = AbilityType_Charge
+					PATCH_IF opcode == 219 BEGIN
+						SET opcodeBase = opcode
+						PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+							SET opcode = opcodeBase * 1000 + subOpcode
+							LPF ~get_description_effect~ RET desc = description END
+							PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+								SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+								SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
+								SET chargeCount += 1
+								SET chargeAbilityCount += 1
+							END
+						END
+					END
+					ELSE BEGIN
+						LPF ~get_description_effect~ RET desc = description END
+						PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+							SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+							SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
+							SET chargeCount += 1
+							SET chargeAbilityCount += 1
+						END
+					END
+				END
+			END
 		END
 	END
 

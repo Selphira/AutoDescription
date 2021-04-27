@@ -200,6 +200,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	144 => 1 // Button: Disable Button [144] // TODO: A gérer ! Empêche le personnage de faire certaines actions !
 	158 => 1 // State: Grease [158] // Applique seulement un effet visuel
 	164 => 1 // Cure: Intoxication [164]
+	168 => 1 // Summon: Remove Creature [168]
 	169 => 1
 	170 => 1 // Graphics: Play Damage Animation [170]
 	172 => 1 // Spell: Remove Spell [172]
@@ -244,6 +245,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_piercing%~    => 101100 //   1048576 ~points de dégâts perforants~
 	~%DAMAGETYPE_poison%~      => 101097 //   2097152 ~points de dégâts de poison~
 	~%DAMAGETYPE_magic%~       => 101101 //   4194304 ~points de dégâts magiques~
+	~%DAMAGETYPE_missile%~     => 101102 //   8388608 ~points de dégâts de projectiles~
 	~%DAMAGETYPE_slashing%~    => 101099 //  16777216 ~points de dégâts tranchants~
 	~%DAMAGETYPE_magic_fire%~  => 101105 //  33554432 ~points de dégâts de feu magique~
 	~%DAMAGETYPE_magic_cold%~  => 101104 //  67108864 ~points de dégâts de froid magique~
@@ -277,6 +279,25 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
 	7 => ~gender~
 	8 => ~align~
 	9 => ~kit~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
+	~tb#petri~ => 102355 // ~Pétrification~
+	~tb#depet~ => 102356 // ~Transmutation de la pierre en chair~
+	~tb#impri~ => 102469 // ~Emprisonnement~
+	~x#kispr~  => 102468 // ~Enchevêtrement~
+	~dventgl~  => 102468 // ~Enchevêtrement~
+	~blakblad~ => 102470 // ~Lame noire du désastre~
+	// Ignorés car redondant avec les autres effets qui les accompagnent
+	~fl#glor2~ => 102150 // ~~
+	~fl#glord~ => 102150 // ~~
+	~fl#gmum~  => 102150 // ~~
+	~fl#gmumn~ => 102150 // ~~
+	~fl#mum~   => 102150 // ~~
+	~fl#mumfh~ => 102150 // ~~
+	~fl#mumfn~ => 102150 // ~~
+	~fl#zomsd~ => 102150 // ~~
+	~spwi604d~ => 102150 // ~~
 END
 
 ACTION_DEFINE_ARRAY ~opcode_1_values~ BEGIN 0 10 20 30 40 50 5 15 25 35 45 END
@@ -506,23 +527,31 @@ DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
 		SPRINT description @102387 // ~Charme extrême~
 	END
 	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET idName END
+		SPRINT theTargetBasic @102471 // ~la cible~
+		PATCH_IF ~%theTarget%~ STRING_EQUAL ~%theTargetBasic%~ BEGIN
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET targetType = idName END
+			SPRINT theTarget @102474 // ~les %targetType%~
+		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @102249 // ~Charme une créature (%creatureType%)~
+			SPRINT description @102249 // ~Charme %theTarget%~
 		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_5~ BEGIN
 	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @102388 // ~de charmer la cible~
+		SPRINT description @102388 // ~de charmer %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET idName END
+		SPRINT theTargetBasic @102471 // ~la cible~
+		PATCH_IF ~%theTarget%~ STRING_EQUAL ~%theTargetBasic%~ BEGIN
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET targetType = idName END
+			SPRINT theTarget @102474 // ~les %targetType%~
+		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @102389 // ~de charmer la cible si c'est une créature (%creatureType%)~
+			SPRINT description @102388 // ~de charmer %theTarget%~
 		END
 	END
 END
@@ -595,8 +624,14 @@ DEFINE_PATCH_MACRO ~opcode_self_12~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
-	// @102092 = ~Inflige %damage% %damageType% supplémentaires~
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 102092 RET description END
+	LOCAL_SET strref_0 = 102092 // ~Inflige %damage% %damageType% supplémentaires~
+
+	PATCH_IF VARIABLE_IS_SET versus BEGIN
+		SET strref_0 = 102477 // ~Inflige %damage% %damageType% supplémentaires %versus%~
+	END
+
+	LPF ~opcode_12_common~ INT_VAR strref_0 RET description END
+
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_12~ BEGIN
@@ -605,10 +640,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_12~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
-	// @102091 = ~d'infliger %damage% %damageType% supplémentaires~
-	// @102385 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+	LOCAL_SET strref_0 = 102091 // ~d'infliger %damage% %damageType% supplémentaires~
+	LOCAL_SET strref_3 = 102385 // ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
 
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 102091 strref_3 = 102385 RET description END
+	PATCH_IF VARIABLE_IS_SET versus BEGIN
+		SET strref_0 = 102476 // ~d'infliger %damage% %damageType% supplémentaires %versus%~
+	END
+
+	LPF ~opcode_12_common~ INT_VAR strref_0 strref_3 RET description END
 END
 
 /* -------------------------- *
@@ -662,7 +701,7 @@ END
  * Mort instantanée - Probabilité *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
-	SPRINT description @102222 // ~Tue instantanément la cible~
+	SPRINT description @102222 // ~Tue instantanément %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
@@ -670,7 +709,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
-	SPRINT description @102124 // ~de tuer instantanément la cible~
+	SPRINT description @102124 // ~de tuer instantanément %theTarget%~
 END
 
 /* ------------------------- *
@@ -1025,6 +1064,11 @@ DEFINE_PATCH_MACRO ~opcode_self_27~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102055 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'acide~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_27~ BEGIN
+	LOCAL_SPRINT resistName @102055 // ~Résistance à l'acide~
+	LPM ~opcode_self_probability_resist~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_27~ BEGIN
 	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102055 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'acide~
 END
@@ -1036,11 +1080,21 @@ DEFINE_PATCH_MACRO ~opcode_self_28~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102059 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au froid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_28~ BEGIN
+	LOCAL_SPRINT resistName @102059 // ~Résistance au froid~
+	LPM ~opcode_self_probability_resist~
+END
+
 /* -------------------------- *
  * Résistance à l'électricité *
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_29~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102057 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'électricité~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_29~ BEGIN
+	LOCAL_SPRINT resistName @102057 // ~Résistance à l'électricité~
+	LPM ~opcode_self_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_29~ BEGIN
@@ -1054,6 +1108,20 @@ DEFINE_PATCH_MACRO ~opcode_self_30~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102056 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au feu~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_30~ BEGIN
+	LOCAL_SPRINT resistName @102056 // ~Résistance au feu~
+	LPM ~opcode_self_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_resist~ BEGIN
+	TO_LOWER resistName
+	// @102465 = ~de modifier la %resistName% du porteur de %value%~
+	// @102466 = ~de passer la %resistName% du porteur à %value%~
+	// @102467 = ~de multiplier la %resistName% du porteur par %value%~
+
+	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102465 strrefFlat = 102466 strrefPercent = 102467 STR_VAR value = ~%parameter1%~ RET description END
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_30~ BEGIN
 	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102056 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au feu~
 END
@@ -1063,6 +1131,11 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_31~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102065 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts magiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_31~ BEGIN
+	LOCAL_SPRINT resistName @102065 // ~Résistance aux dégâts magiques~
+	LPM ~opcode_self_probability_resist~
 END
 
 /* ----------------------------- *
@@ -1150,11 +1223,11 @@ END
  * State: Unconsciousness [39] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN
-	SPRINT description @102139 // ~Assome la cible~ // Endors la cible
+	SPRINT description @102139 // ~Endort %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_39~ BEGIN
-	SPRINT description @102135 // ~d'assommer la cible~ // d'endormir la cible
+	SPRINT description @102135 // ~d'endormir %theTarget%~
 END
 
 /* ---------------- *
@@ -1232,7 +1305,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_45~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_45~ BEGIN
-	SPRINT description @102120 // ~d'étourdir la cible~
+	SPRINT description @102120 // ~d'étourdir %theTarget%~
 END
 
 /* ------------------------ *
@@ -2166,7 +2239,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
 
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET description = spellName END
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF abilityType == AbilityType_Charge BEGIN
+		SPRINT description ~%spellName%~
+	END
+	ELSE BEGIN
+		PATCH_IF VARIABLE_IS_SET versus BEGIN
+			SPRINT description @100017 // ~Lance %spellName% %versus%~
+		END
+		ELSE BEGIN
+			SPRINT description @100016 // ~Lance %spellName%~
+		END
+	END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
 		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
@@ -2179,6 +2264,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_146~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
+	// TODO les cas particuliers (ex: dvvorpal = de tuer instantanément la cible (jet de ...) )
 	LOCAL_SET castingLevel = ~%parameter1%~
 
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -2343,10 +2429,8 @@ DEFINE_PATCH_MACRO ~opcode_self_166~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_166~ BEGIN
-	// @102355 = ~de modifier la résistance à la magie du porteur de %value%~
-	// @102356 = ~de passer la résistance à la magie du porteur à %value%~
-	// @102357 = ~de multiplier la résistance à la magie du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102355 strrefFlat = 102356 strrefPercent = 102357 STR_VAR value = ~%parameter1%~ RET description END
+	LOCAL_SPRINT resistName @102060 // ~Résistance à la magie~
+	LPM ~opcode_self_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_166~ BEGIN
@@ -2406,7 +2490,12 @@ END
  * Applique un effet à une creature *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
-	LPM ~opcode_target_177~
+	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
+	END
+	ELSE BEGIN
+		PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_177~ BEGIN
@@ -2418,42 +2507,53 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_177~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
-	// TODO: Effect utilise aussi des opcodes, créer une fonction qui va générer une description pour chaque opcode de l'effet
-	// comme pour les autres tout simplement !
-	// Sauf que attention, le opcode 177 peut avoir un js, et l'effet avoir plusieurs opcode ayant chacun leur JS !!
-	// Un truc dans le genre dans les plus complexes ? (et si l'effet utilise un autre effet ? ce qui théoriquezment est possible...) Gérer une indentation ?
-	// - 13% de chance d'infliger effet 11 (JS contre xx pour annuler)
-	//   Inflige un truc à la cible (JS contre yy pour annuler)
-	//   50% d'enflammer
-	//Parameter #1: IDS Entry
-    //Parameter #2: IDS File
-	//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-		2 => ~EA.ids~
-		3 => ~General.ids~
-		4 => ~Race.ids~
-		5 => ~Class.ids~
-		6 => ~Specific.ids~
-		7 => ~Gender.ids~
-		8 => ~Align.ids~
-		9 => ~Kit.ids~
+	PATCH_IF NOT (parameter1 == 0 AND parameter2 == 2) BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		SPRINT theTarget @102474 // ~les %targetType%~
+		SPRINT versus @101126 // ~contre les %targetType%~
 	END
-	PATCH_PHP_EACH ids_files AS k => file BEGIN
-	END
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer %idsFile% (%parameter1%)"
-	// Applique un effet à une creature
+	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded END
+END
+
+DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded BEGIN
+	SPRINT item ~%SOURCE_FILE%~
+	INNER_ACTION BEGIN
+		COPY_EXISTING ~%resref%.eff~  ~override~
+			LPF ~get_description_effect2~ RET description saveAdded durationAdded END
+			//TODO: opcode 12 lancé depuis un 177 doit ajouter "contre %theTarget%" à la fin...
+	    BUT_ONLY_IF_IT_CHANGES
+    END
 END
 
 /* ---------------------------------------------------- *
  * Spell Effect: THAC0 vs. Creature Type Modifier [178] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_178~ BEGIN
+	LPM ~opcode_178_base~
+	SPRINT name @102000 // TAC0
+	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_178~ BEGIN
+	LPM ~opcode_178_base~
+
+	SPRINT target @101085 // ~de la cible~
+	SPRINT description @100015 // ~%name% %target%%colon%%value% %versus%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_178_base~ BEGIN
+	LOCAL_SET strref = 102000 // TAC0
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
-	SPRINT name @102000 // TAC0
+	PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+		SET value = ~%parameter3%~
+	END
+	ELSE BEGIN
+		SET value = ~%power%~
+	END
+
 	SET parameter2 = MOD_TYPE_cumulative
-	LPF ~opcode_mod~ INT_VAR strref = 100008 STR_VAR value = EVAL ~%power%~ RET description END
+	LPM ~opcode_mod_base~
 END
 
 /* ----------------------------------------------------- *
@@ -2466,11 +2566,18 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_179~ BEGIN
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
-	SET parameter2 = MOD_TYPE_cumulative
-	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = ~%power%~ RET value = damage END
+	PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+		SET damageAmount = ~%parameter3%~
+	END
+	ELSE BEGIN
+		SET damageAmount = ~%power%~
+	END
 
-	SPRINT name @102001 // Dégâts
-	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
+	SET parameter2 = MOD_TYPE_cumulative
+	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
+
+	SPRINT damageType @101092 // ~points de dégâts~
+	SPRINT description @102477 // ~Inflige %damage% %damageType% supplémentaires %versus%~
 END
 
 /* --------------------------------- *
@@ -2485,6 +2592,13 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102169 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse d'incantation~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_189~ BEGIN
+	// @102462 = ~de modifier la vitesse d'incantation du porteur de %value%~
+	// @102463 = ~de passer la vitesse d'incantation du porteur à %value%~
+	// @102464 = ~de multiplier la vitesse d'incantation du porteur par %value%~
+	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102462 strrefFlat = 102463 strrefPercent = 102464 STR_VAR value = ~%parameter1%~ RET description END
 END
 
 /* ------------------ *
@@ -2522,7 +2636,14 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~ BEGIN SPRINT description @102147 END // = ~Réfléchit les attaques de regard~
+		~64~ BEGIN SPRINT description @102147 END // ~Réfléchit les attaques de regard~
+		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
+    END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
+	PATCH_MATCH parameter2 WITH
+		~64~ BEGIN SPRINT description @102461 END // ~de réfléhir les attaques de regard~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
     END
 END
@@ -2591,11 +2712,8 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
-	END
-	ELSE BEGIN
-		SPRINT description @102035 // ~Immunité à %spellName%~
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @102035 // ~Immunité au sort %spellName%~
 	END
 END
 
@@ -2606,10 +2724,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Aucune chaine trouvee pour le sort '%resref%'~
-	END
-	ELSE BEGIN
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @102289 // ~d'immuniser au sort %spellName%~
 	END
 END
@@ -3234,24 +3349,31 @@ DEFINE_PATCH_FUNCTION ~opcode_self_probability~ INT_VAR strrefCumul = 0 strrefFl
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
-	SPRINT spellName ~~
-	SPRINT itemFilename ~%SOURCE_FILE%~
-	INNER_ACTION BEGIN
-		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
-			COPY_EXISTING ~%file%.spl~ ~override~
-				READ_LONG SPL_unidentified_name spellNameRef
-				PATCH_IF spellNameRef > 0 BEGIN
-					READ_STRREF SPL_unidentified_name spellName
-				END
-				ELSE BEGIN
-					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl"
-				END
-			BUT_ONLY_IF_IT_CHANGES
-		END
-		ELSE BEGIN
-			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
-		END
-    END
+	TO_LOWER file
+	PATCH_IF VARIABLE_IS_SET $spellnames(~%file%~) BEGIN
+		SET strref = $spellnames(~%file%~)
+		SPRINT spellName (AT ~%strref%~)
+	END
+	ELSE BEGIN
+		SPRINT spellName ~~
+		SPRINT itemFilename ~%SOURCE_FILE%~
+		INNER_ACTION BEGIN
+			ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+				COPY_EXISTING ~%file%.spl~ ~override~
+					READ_LONG SPL_unidentified_name spellNameRef
+					PATCH_IF spellNameRef > 0 BEGIN
+						READ_STRREF SPL_unidentified_name spellName
+					END
+					ELSE BEGIN
+						PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl"
+					END
+				BUT_ONLY_IF_IT_CHANGES
+			END
+			ELSE BEGIN
+				FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
+			END
+	    END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
@@ -3358,9 +3480,9 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVersusName BEGIN
 	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
-		LPF ~get_ids_name~ INT_VAR entry file RET name = idName END
+		LPF ~get_ids_name~ INT_VAR entry file RET targetType = idName END
 
-		SPRINT idVersusName @101126 // ~contre les %name%~
+		SPRINT idVersusName @101126 // ~contre les %targetType%~
 	END
 	ELSE BEGIN
 		SPRINT idVersusName ~~
