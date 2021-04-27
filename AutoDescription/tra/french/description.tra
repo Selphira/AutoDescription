@@ -470,6 +470,9 @@
 @102475= ~d'infliger 1 %damageType% supplémentaire %versus%~
 @102476 = ~d'infliger %damage% %damageType% supplémentaires %versus%~
 @102477 = ~Inflige %damage% %damageType% supplémentaires %versus%~
+@102478 = ~Vitesse d'incantation des sorts profanes~
+@102479 = ~Vitesse d'incantation des sorts divins~
+@102480 = ~excepté pour les bardes~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
