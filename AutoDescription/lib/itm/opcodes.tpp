@@ -659,9 +659,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	SET subType = type MODULO 4
 	SPRINT description ~~
 
-	PATCH_IF special > 0 BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : Valeur spéciale '%special%' pour le opcode 12 pas encore geree"
-	END
+	// Les flags "special" ne sont gérés que par BGEE
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
 		PATCH_FAIL "%SOURCE_FILE% : Type de degat '%type%' pour le opcode 12 pas encore gere"
 	END
