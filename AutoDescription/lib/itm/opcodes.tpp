@@ -3512,16 +3512,13 @@ DEFINE_PATCH_FUNCTION ~opcode_self_177_item_revision_casting_penality~ RET descr
 		LPF ~opcode_mod~ INT_VAR strref = 102478 STR_VAR value RET description END // ~Vitesse d'incantation des sorts profanes~
 		SET exceptBards = 1
 		INNER_ACTION BEGIN
-			PRINT "Test: %SOURCE_FILE%"
             COPY_EXISTING ~%SOURCE_FILE%~  ~override~
                 GET_OFFSET_ARRAY blockOffsets_177 ITM_V10_GEN_EFFECTS
                 PHP_EACH blockOffsets_177 AS int => blockOffset_177 BEGIN
                     READ_SHORT (blockOffset_177)                  opcode_177
                     READ_BYTE  (blockOffset_177 + EFF_parameter1) parameter1_177
                     READ_ASCII (blockOffset_177 + EFF_resref_key) resref_177
-                    PATCH_PRINT "Test: %opcode_177% - %resref_177% - %parameter1_177%"
                     PATCH_IF opcode_177 == 177 AND ~%resref_177%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 AND parameter1_177 == 5 BEGIN // Barde
-                        PATCH_PRINT "Les bardes sont compris !"
                         SET exceptBards = 0
                     END
                 END
