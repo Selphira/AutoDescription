@@ -89,6 +89,8 @@ Deviendra
   >  -  Endort la cible (jet de sauvegarde contre les sorts à +4 pour annuler)
 - Opcode 1  
   Améliorer les textes, mieux adapté aux situations et moins génériques.
+- Opcode 67
+  Gérer l'hostilité de la créature invoquée
 - Opcode 101 (Ex: BLUN25, immunité au drain de niveau)
 - Les opcodes de type "State: Sanctuary [153]" doivent avoir un texte différent en fonction de s'ils sont une capacité de charge, de combat ou d'équipement... (Ex: GTT#BO.ITM)  
   Charge : Sanctuaire x fois par jour  
