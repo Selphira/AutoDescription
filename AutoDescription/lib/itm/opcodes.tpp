@@ -1565,13 +1565,17 @@ DEFINE_PATCH_MACRO ~opcode_self_67~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_67~ BEGIN
-	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	SPRINT description @102256 // ~d'invoquer une créature (%creatureName%)~
+	LPM ~opcode_target_probability_67~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 	SPRINT description @102173 // ~Invoque une créature (%creatureName%)~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
+	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
+	SPRINT description @102256 // ~d'invoquer une créature (%creatureName%)~
 END
 
 /* ------------------------------ *
