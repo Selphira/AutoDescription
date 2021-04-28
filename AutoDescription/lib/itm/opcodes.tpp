@@ -2241,23 +2241,28 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
 
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	PATCH_IF abilityType == AbilityType_Charge BEGIN
-		SPRINT description ~%spellName%~
+	PATCH_IF ~%resref%~ STRING_EQUAL ~DVBONEBR~ BEGIN
+		SPRINT description @102482 // ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~
 	END
 	ELSE BEGIN
-		PATCH_IF VARIABLE_IS_SET versus BEGIN
-			SPRINT description @100017 // ~Lance %spellName% %versus%~
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+		PATCH_IF abilityType == AbilityType_Charge BEGIN
+			SPRINT description ~%spellName%~
 		END
 		ELSE BEGIN
-			SPRINT description @100016 // ~Lance %spellName%~
+			PATCH_IF VARIABLE_IS_SET versus BEGIN
+				SPRINT description @100017 // ~Lance %spellName% %versus%~
+			END
+			ELSE BEGIN
+				SPRINT description @100016 // ~Lance %spellName%~
+			END
 		END
-	END
 
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
-		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-		SPRINT description ~%description% (%castingLevelStr%)~
+		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
+			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+			SPRINT description ~%description% (%castingLevelStr%)~
+		END
 	END
 END
 
@@ -2499,7 +2504,11 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
 	END
 	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
+		//PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		SPRINT theTarget @102474 // ~les %targetType%~
+		SPRINT versus @101126 // ~contre les %targetType%~
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded END
 	END
 END
 

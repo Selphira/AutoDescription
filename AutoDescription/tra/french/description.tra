@@ -474,6 +474,7 @@
 @102479 = ~Vitesse d'incantation des sorts divins~
 @102480 = ~excepté pour les bardes~
 @102481 = ~Enchantement~
+@102482 = ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~ // Spécififque à Item Revision: DVBONEBR
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
