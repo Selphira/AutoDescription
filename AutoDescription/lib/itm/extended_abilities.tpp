@@ -316,6 +316,10 @@ END
 DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 	LOCAL_SET strref = 0
 	// ~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~
+	PATCH_IF enchantment > 0 BEGIN
+		LPF ~signed_value~ INT_VAR value = enchantment RET value END
+		LPF ~appendValue~ INT_VAR strref = 102481 STR_VAR value RET description END // ~Enchantement~
+	END
     PATCH_IF ~%stats_0%~ != 0 BEGIN
 		LPF ~signed_value~ INT_VAR value = stats_0 RET value END
 		LPF ~appendValue~ INT_VAR strref = 102000 STR_VAR value RET description END // ~TAC0~

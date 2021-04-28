@@ -473,6 +473,7 @@
 @102478 = ~Vitesse d'incantation des sorts profanes~
 @102479 = ~Vitesse d'incantation des sorts divins~
 @102480 = ~excepté pour les bardes~
+@102481 = ~Enchantement~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs

@@ -78,6 +78,7 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 		READ_STRREF ITM_identified_desc description
 		READ_LONG   ITM_identified_desc strref
         READ_SHORT  ITM_flags           flags
+        READ_SHORT  ITM_enchantment     enchantment
 
 		SET total += 1
         SET isWeapon = 0
