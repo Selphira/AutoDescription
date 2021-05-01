@@ -114,8 +114,8 @@
 @102118 = ~Immunité contre les sorts de niveau %spellLevel%~
 @102119 = ~Champ de vision~
 @102120 = ~d'étourdir %theTarget%~
-@102121 = ~jet de sauvegarde %saveTypeStr% pour annuler~
-@102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
+@102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
+@102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 @102123 = ~Étourdit %theTarget%~
 @102124 = ~de tuer instantanément %theTarget%~
 @102125 = ~Immunité aux attaques de regard~
@@ -330,8 +330,8 @@
 @102335 = ~de multiplier la résistance à la magie de la cible par %value%~
 @102336 = ~Sanctuaire~
 @102337 = ~Inflige Débilité mentale à la cible~
-@102338 = ~Fait oublier 1 sort à la cible~
-@102339 = ~Fait oublier %amount% sorts à la cible~
+@102338 = ~Fait oublier 1 sort profane à la cible~
+@102339 = ~Fait oublier %amount% sorts profanes à la cible~
 @102340 = ~de modifier le facteur de vitesse du porteur de %value%~
 @102341 = ~de passer le facteur de vitesse du porteur à %value%~
 @102342 = ~de multiplier le facteur de vitesse du porteur par %value%~
@@ -474,7 +474,60 @@
 @102479 = ~Vitesse d'incantation des sorts divins~
 @102480 = ~excepté pour les bardes~
 @102481 = ~Enchantement~
-@102482 = ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~ // Spécififque à Item Revision: DVBONEBR
+@102482 = ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~ // Spécifique à Item Revision : DVBONEBR
+@102483 = ~Détruit les créatures convoquées~ // Spécifique à Item Revision : DVBANISH
+@102484 = ~Emprisonne la cible dans les flammes pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVFLWHIP
+@102485 = ~Draîne 1d4 points de vie si la cible possède du sang et les transfère au porteur~ // Spécifique à Item Revision : DVVAMPIR
+@102486 = ~Réduit la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVSUNDER
+@102487 = ~Dissipation de la magie (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVDISPEL
+@102488 = ~d’immobiliser la cible pendant 1 round (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~ // Spécifique à Item Revision : DVFREEZE
+@102489 = ~d'infliger Horreur à la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVFEARSM
+@102490 = ~de ralentir la cible pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVCHILL
+@102491 = ~de décapiter la cible (jet de sauvegarde contre la paralysie, la mort et les poisons à -2 pour éviter)~ // Spécifique à Item Revision : DVVORPAL
+@102492 = ~Renverse et sonne la cible (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVKNBACK
+@102493 = ~d'endormir la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVSLEEP
+@102494 = ~Inflige 2d6 points de dégâts de feu supplémentaires aux adversaires dans un rayon d'un mètre et demi (jet de sauvegarde contre les souffles pour moitié)~ // Spécifique à Item Revision : DVFRBOLT
+@102495 = ~Ralentit et inflige 1 point de dégât toutes les 3 secondes pendants 4 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVAFFLIC
+@102496 = ~Fait oublier 1 sort profane à la cible tandis que le porteur se remémore 1 sort de niveau 4 maximum (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVSPABSR
+@102497 = ~d'infliger Débilité mentale à la cible (jet de sauvegarde contre les sorts à -4 pour éviter)~ // Spécifique à Item Revision : DVMINDBR
+@102498 = ~de paralyser la cible pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVPRLYZE
+@102499 = ~Réduit la force et la dextérité de 1 pendant 5 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVSHARP
+@102500 = ~Étourdit la cible durant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVBOOM
+@102501 = ~d'infliger 4d6 points de dégâts de feu supplémentaires à la cible ainsi qu'aux adversaires dans un rayon d'un mètre et demi~ // Spécifique à Item Revision : DVFLBRST
+@102502 = ~Inflige 2d6 points de dégâts contondants supplémentaires à la cible, la renverse et la sonne pendant 1 round (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVBRAM
+@102503 = ~Réduit les jets de sauvegarde, le TAC0 et les dégâts de la cible de 1 pendant 4 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVDOOM
+@102504 = ~de renverser, de sonner et d'infliger 4d6 points de dégâts contondants supplémentaires à la cible ainsi qu'aux adversaires dans un rayon d'un mètre et demi (jet de sauvegarde contre les souffles pour éviter d'être renversé et sonné)~ // Spécifique à Item Revision : DVSWAVE
+@102505 = ~Passe l'attaque par round de la cible à une demi et réduit sa vitesse d'incantation des sorts de 4 (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVSTAG
+@102506 = ~de réduire le TAC0 et la classe d'armure de la cible de 2 pendant 5 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHOPLES
+@102507 = ~Inflige 1 point de dégâts de poison à chaque round pendant 5 rounds~ // Spécifique à Item Revision : DVBLEED5
+@102508 = ~d'aveugler tous les adversaires dans un rayon de 1,50 mètre pendant 4 rounds (jet de sauvegarde contre les souffles à -4 pour éviter)~ // Spécifique à Item Revision : DVSTDUST
+@102509 = ~Inflige 1 point de dégâts de poison à chaque round pendant 2 rounds~ // Spécifique à Item Revision : DVBLEED2
+@102510 = ~d'entoiler la cible pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVWEB
+@102511 = ~de réduire de moitié la vitesse de déplacement de la cible pendant 4 rounds~ // Spécifique à Item Revision : DVCRIPPL
+@102512 = ~de dissiper les protections et les invocations illusoires~ // Spécifique à Item Revision : DVILLBAN
+@102513 = ~de tuer instantanément la cible (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVHSEEK
+@102514 = ~d'infliger 6d6 points de dégâts de feu à la cible et aux adversaires dans un rayon de 4,5 mètres~ // Spécifique à Item Revision : DVDETON
+@102515 = ~d'infliger 4d4 points de dégâts d'acide à la cible et aux adversaires dans un rayon de 1,50 mètre~ // Spécifique à Item Revision : DVVTRSPH
+@102516 = ~Ralentit et réduit le TAC0 et la classe d'armure de la cible de 1 pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVENFEBL
+@102517 = ~Augmente le TAC0, les dégâts et les jets de sauvegarde contre les sorts des alliés dans un rayon de 6 mètres de 1~ // Spécifique à Item Revision : DVSINGSW
+@102518 = ~Réduit le TAC0 de la cible de 1 et inflige 1 point de dégâts de feu supplémentaire à chaque round pendant 3 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVBRNWND
+@102519 = ~Inflige 1 point de dégâts de poison à chaque round pendant 1 tour~ // Spécifique à Item Revision : DVBLEED0
+@102520 = ~Réduit au silence la cible ainsi que les adversaires dans un rayon de 4,5 mètres pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVNAMARR
+@102521 = ~Fait oublier 1 sort profane à la cible tandis que les points de vie du porteur sont augmentés de 2 pendant 1 heure (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVSPDRNK
+@102522 = ~Réduit la classe d'armure de la cible de 2 et l'empêche de se cacher pendant 4 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVFFIRE
+@102523 = ~Réduit au silence et inflige 1 point de dégâts de poison toutes les 3 secondes à la cible pendant 3 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVCUTTHR
+@102524 = ~Immobilise les cibles mort-vivantes pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHOLDUN
+@102525 = ~de pétrifier la cible pendant 2 rounds (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~ // Spécifique à Item Revision : DVSTNHLD
+@102526 = ~d'infliger 1d6 +2 points de dégâts contondants aux adversaires dans un rayon d'1,50 mètre~ // Spécifique à Item Revision : DVWHIRLS
+@102527 = ~d'étourdir la cible et les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVTHCLAP
+@102528 = ~de renverser la cible et les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVSHAKE
+@102529 = ~Immobilise et inflige 1d4 +5 points de dégâts perforants supplémentaires à chaque round à la cible pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVPIN
+@102530 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres et de les étourdir pendant 1 round (jet de sauvegarde contre les sorts pour éviter d'être étourdi)~ // Spécifique à Item Revision : DVSBURST
+@102531 = ~Etourdit les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVTHCLAP
+@102532 = ~d'infliger 5d4 points de dégâts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHSMITE
+@102533 = ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVCORROS
+@102534 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres~ // Spécifique à Item Revision : DVRESON
+
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -586,6 +639,7 @@
  * Ea.ids *
  * ------ */
 @202000 = ~~
+@202002 = ~compagnons~
 @202004 = ~alliés~
 @202006 = ~créatures charmées~
 @202255 = ~ennemis~
@@ -677,7 +731,26 @@
  * Class.ids *
  * --------- */
 @205000 = ~?????~
+@205001 = ~mages~
+@205002 = ~guerriers~
+@205003 = ~clercs~
+@205004 = ~voleurs~
 @205005 = ~bardes~
+@205006 = ~paladins~
+@205007 = ~guerrier / mage~
+@205008 = ~guerrier / clerc~
+@205009 = ~guerrier / voleur~
+@205010 = ~guerrier / mage / voleur~
+@205011 = ~druides~
+@205012 = ~rôdeurs~
+@205013 = ~mage / voleur~
+@205014 = ~clerc / mage~
+@205015 = ~clerc / voleur~
+@205016 = ~guerrier / druide~
+@205017 = ~guerrier / mage / clerc~
+@205018 = ~clerc / rôdeur~
+@205019 = ~sorciers~
+@205020 = ~moines~
 @205146 = ~loups des glaces~
 @205160 = ~tanar'ris~
 @205167 = ~trolls~

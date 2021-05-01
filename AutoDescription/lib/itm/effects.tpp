@@ -69,7 +69,6 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 		PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN
 			PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
 		END
-		PATCH_WARN ~%macro%%opcode%~
 		PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
 			LPM ~%macro%probability_%opcode%~
 			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
@@ -128,14 +127,14 @@ DEFINE_PATCH_MACRO ~add_duration_and_save~ BEGIN
             SPRINT saveTypeStr @102031 // ~contre la pétrification et la métamorphose~
         END
 
-		// TODO: Toujours pour annuler ??
+		// TODO: Toujours pour éviter ??
 
         PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
+			SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
         END
         ELSE BEGIN
-			SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour annuler~
+			SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
         END
 
 		SPRINT description ~%description% (%saveStr%)~

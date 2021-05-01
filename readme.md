@@ -62,15 +62,14 @@ Deviendra
   Ceci n'est pas à faire pour les objets sans aucune description qui sont (normalement) des objets non accessibles au joueur.
 - Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm, C2BLUN03) 
 - Gérer les potions et les munitions
-- Gérer les objets considérés comme ayant un enchantement plus haut (233 proeficient ??) (Ex: L#NINI2.ITM)
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01)
 - Bug: loyal transformé en neutre (Ex: WANDORC.ITM)
 - Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin
-- Bug: 26 % de chance de modifier la résistance à la magie du porteur de -10 pendant 20 secondes (WQXDA1.ITM). Le 10 devrait être un pourcentage.
 - Bug: usability (Ex: BHCLUB01)
   > Utilisable par : 
   > - Voleur monoclassé et multiclassé
   > - Voleur
+- Bug: 26 % de chance de modifier la résistance à la magie du porteur de -10 pendant 20 secondes (WQXDA1.ITM). Le 10 devrait être un pourcentage.
 - Bug: Corriger et uniformiser la façon de gérer les résistances 
   opcode_target_probability_166: la valeur n'est pas exprimée en %
   opcode_target_probability_166: gérer le timing "permanent"
@@ -99,9 +98,9 @@ Deviendra
 - Opcode 206 (resref tb#preti) + opcode 146 (resref tb#depet)
   // Fusionner en une seule ligne ! // Immunité au sort Pétrification
 - "Revient dans les mains du lanceur immédiatement après avoir été lancée" (Ex: AX1H10)
-- Sur une arme, si TAC0 de base est différent de l'enchantementn, alors afficher "Considérée comme une arme +xx pour toucher la cible"
-  Ou juste afficher "Enchantement : +xx juste au dessus du TAC0 / CA"
-
+- Gérer "Permet de lancer des sorts" pour les armures (ce n'est pas lcarmor)
+  Ne pas toujours afficher la ligne, uniquement si l'armure ne permet pas, de base, de lancer des sorts
+  Vérifier s'il y a le opcode "Miscast Magic" ?
 - Grouper les charmes (Ex: A7RING02)
   
 

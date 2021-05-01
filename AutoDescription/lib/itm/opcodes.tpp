@@ -298,6 +298,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
 	~fl#mumfn~ => 102150 // ~~
 	~fl#zomsd~ => 102150 // ~~
 	~spwi604d~ => 102150 // ~~
+	// Ignorés car ne font rien de concret pour le gameplay
+	~lcarmor~ => 102150 // ~~
+	~lcrobe~ => 102150 // ~~
 END
 
 ACTION_DEFINE_ARRAY ~opcode_1_values~ BEGIN 0 10 20 30 40 50 5 15 25 35 45 END
@@ -2230,19 +2233,15 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_146~ BEGIN
 	TO_LOWER resref
 
-	PATCH_IF ~%resref%~ STRING_EQUAL ~lcarmor~ BEGIN
-		SPRINT description @102460 // ~Permet de lancer des sorts~
-	END
-	ELSE BEGIN
-		LPM ~opcode_target_146~
-	END
+	LPM ~opcode_target_146~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
-
-	PATCH_IF ~%resref%~ STRING_EQUAL ~DVBONEBR~ BEGIN
-		SPRINT description @102482 // ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~
+	TO_UPPER resref
+	PATCH_IF VARIABLE_IS_SET $opcode_target_146_item_revision(~%resref%~) BEGIN
+		SET strref = $opcode_target_146_item_revision(~%resref%~)
+		SPRINT description (AT ~%strref%~)
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -2271,21 +2270,26 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_146~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
-	// TODO les cas particuliers (ex: dvvorpal = de tuer instantanément la cible (jet de ...) )
 	LOCAL_SET castingLevel = ~%parameter1%~
-
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @102185 // ~de lancer le sort %spellName%~
-
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
-		END
+	TO_UPPER resref
+	PATCH_IF VARIABLE_IS_SET $opcode_target_probability_146_item_revision(~%resref%~) BEGIN
+		SET strref = $opcode_target_probability_146_item_revision(~%resref%~)
+		SPRINT description (AT ~%strref%~)
 	END
 	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_146 nom du sort introuvable pour %resref%"
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description @102185 // ~de lancer le sort %spellName%~
+
+			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
+				SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+				SPRINT description ~%description% (%castingLevelStr%)~
+			END
+		END
+		ELSE BEGIN
+			PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_146 nom du sort introuvable pour %resref%"
+		END
 	END
 END
 
@@ -2508,7 +2512,7 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
 		SPRINT theTarget @102474 // ~les %targetType%~
 		SPRINT versus @101126 // ~contre les %targetType%~
-		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded END
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
 	END
 END
 
@@ -2979,10 +2983,10 @@ DEFINE_PATCH_MACRO ~opcode_target_244~ BEGIN
 	LOCAL_SET amount = parameter1
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @102338 // ~Fait oublier 1 sort à la cible~
+		SPRINT description @102338 // ~Fait oublier 1 sort profane à la cible~
 	END
 	ELSE BEGIN
-		SPRINT description @102339 // ~Fait oublier %amount% sorts à la cible~
+		SPRINT description @102339 // ~Fait oublier %amount% sorts profanes à la cible~
 	END
 END
 
@@ -3070,13 +3074,6 @@ DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
 		SPRINT name @102119 // ~Champ de vision~
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
-END
-
-/* ---------------------------------- *
- * Multiplicateur d'attaque sournoise *
- * ---------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_263~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 102006 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Multiplicateur d'attaque sournoise~
 END
 
 /* ---------------------------------- *
@@ -3507,6 +3504,69 @@ END
 /* ========================================= *
  * Fonctions qui gèrent les cas particuliers *
  * ========================================= */
+
+/* ------------------------ *
+ * Item revision v4 beta 10 *
+ * ------------------------ */
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_146_item_revision~ BEGIN
+	DVAFFLIC => 102495 // ~Ralentit et inflige 1 point de dégât à la cible toutes les 3 secondes pendants 4 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVBANISH => 102483 // ~Détruit les créatures convoquées~
+	DVBLEED0 => 102519 // ~Inflige 1 point de dégâts de poison à la cible à chaque round pendant 1 tour~
+	DVBLEED2 => 102509 // ~Inflige 1 point de dégâts de poison à la cible à chaque round pendant 2 rounds~
+	DVBLEED5 => 102507 // ~Inflige 1 point de dégâts de poison à la cible à chaque round pendant 5 rounds~
+	DVBONEBR => 102482 // ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~
+	DVBOOM   => 102500 // ~Étourdit %theTarget% durant 1 round (jet de sauvegarde contre les sorts pour éviter)~
+	DVBRAM   => 102502 // ~Inflige 2d6 points de dégâts contondants supplémentaires à la cible, la renverse et la sonne pendant 1 round (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVBRNWND => 102518 // ~Réduit le TAC0 de la cible de 1 et inflige 1 point de dégâts de feu supplémentaire à chaque round pendant 3 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVCUTTHR => 102523 // ~Réduit au silence et inflige 1 point de dégâts de poison toutes les 3 secondes à la cible pendant 3 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVDISPEL => 102487 // ~Dissipation de la magie (jet de sauvegarde contre les sorts pour éviter)~
+	DVDOOM   => 102503 // ~Réduit les jets de sauvegarde, le TAC0 et les dégâts de la cible de 1 pendant 4 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVENFEBL => 102516 // ~Ralentit et réduit le TAC0 et la classe d'armure de la cible de 1 pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~
+	DVFFIRE  => 102522 // ~Réduit la classe d'armure de la cible de 2 et l'empêche de se cacher pendant 4 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVFLWHIP => 102484 // ~Emprisonne %theTarget% dans les flammes pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~
+	DVFRBOLT => 102494 // ~Inflige 2d6 points de dégâts de feu supplémentaires aux adversaires dans un rayon de 1,50 mètre (jet de sauvegarde contre les souffles pour moitié)~
+	DVHOLDUN => 102524 // ~Immobilise les cibles mort-vivantes pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVKNBACK => 102492 // ~Renverse et sonne %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVNAMARR => 102520 // ~Réduit au silence %theTarget% ainsi que les adversaires dans un rayon de 4,5 mètres pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVPIN    => 102529 // ~Immobilise et inflige 1d4 +5 points de dégâts perforants supplémentaires à chaque round à la cible pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVSHARP  => 102499 // ~Réduit la force et la dextérité de 1 pendant 5 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVSINGSW => 102517 // ~Augmente le TAC0, les dégâts et les jets de sauvegarde contre les sorts des alliés dans un rayon de 6 mètres de 1~ // !!! La définition dans l'objet semble erronée si on regarde le sort dans DLTC (range à 1) (à teser !)
+	DVSPABSR => 102496 // ~Fait oublier 1 sort profane à la cible tandis que le porteur se remémore 1 sort de niveau 4 maximum (jet de sauvegarde contre les sorts pour éviter)~
+	DVSPDRNK => 102521 // ~Fait oublier 1 sort profane à la cible tandis que les points de vie du porteur sont augmentés de 2 pendant 1 heure (jet de sauvegarde contre les sorts pour éviter)~
+	DVSTAG   => 102505 // ~Passe l'attaque par round de la cible à une demi et réduit sa vitesse d'incantation des sorts de 4 pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~
+	DVSTUN   => 102500 // ~Étourdit %theTarget% durant 1 round (jet de sauvegarde contre les sorts pour éviter)~
+	DVSUNDER => 102486 // ~Réduit la classe d'armure de la cible de 1 pendant 2 rounds~
+	DVTHCLAP => 102531 // ~Etourdit les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~
+	DVVAMPIR => 102485 // ~Draîne 1d4 points de vie si la cible possède du sang et les transfère au porteur~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_probability_146_item_revision~ BEGIN
+	DVCHILL  => 102490 // ~de ralentir %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVCORROS => 102533 // ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~
+	DVCRIPPL => 102511 // ~de réduire de moitié la vitesse de déplacement de la cible pendant 4 rounds~
+	DVDETON  => 102514 // ~d'infliger 6d6 points de dégâts de feu à la cible et aux adversaires dans un rayon de 1,50 mètre~
+	DVFEARSM => 102489 // ~d'infliger Horreur à la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVFLBRST => 102501 // ~d'infliger 4d6 points de dégâts de feu supplémentaires à la cible ainsi qu'aux adversaires dans un rayon de 1,50 mètre~
+	DVFREEZE => 102488 // ~d’immobiliser %theTarget% pendant 1 round (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~
+	DVHOPLES => 102506 // ~de réduire le TAC0 et la classe d'armure de la cible de 2 pendant 5 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVHSEEK  => 102513 // ~de tuer instantanément %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVHSMITE => 102532 // ~d'infliger 5d4 points de dégâts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~
+	DVILLBAN => 102512 // ~de dissiper les protections et les invocations illusoires~
+	DVMINDBR => 102497 // ~d'infliger Débilité mentale à la cible (jet de sauvegarde contre les sorts à -4 pour éviter)~
+	DVPRLYZE => 102498 // ~de paralyser %theTarget% pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	DVRESON  => 102534 // ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres~
+	DVSBURST => 102530 // ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres et de les étourdir pendant 1 round (jet de sauvegarde contre les sorts pour éviter d'être étourdi)~
+	DVSHAKE  => 102528 // ~de renverser %theTarget% et les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~
+	DVSLEEP  => 102493 // ~d'endormir %theTarget% pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~
+	DVSTDUST => 102508 // ~d'aveugler tous les adversaires dans un rayon de 1,50 mètre pendant 4 rounds (jet de sauvegarde contre les souffles à -4 pour éviter)~
+	DVSTNHLD => 102525 // ~de pétrifier %theTarget% pendant 2 rounds (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~
+	DVSWAVE  => 102504 // ~de renverser, de sonner et d'infliger 4d6 points de dégâts contondants supplémentaires à la cible ainsi qu'aux adversaires dans un rayon de 1,50 mètre (jet de sauvegarde contre les souffles pour éviter d'être renversé et sonné)~
+	DVTHCLAP => 102527 // ~d'étourdir %theTarget% et les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~
+	DVVORPAL => 102491 // ~de décapiter %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons à -2 pour éviter)~
+	DVVTRSPH => 102515 // ~d'infliger 4d4 points de dégâts d'acide à la cible et aux adversaires dans un rayon de 1,50 mètre~
+	DVWEB    => 102510 // ~d'entoiler %theTarget% pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~
+	DVWHIRLS => 102526 // ~d'infliger 1d6 +2 points de dégâts contondants aux adversaires dans un rayon d'1,50 mètre~
+END
 
 /* ----------------------------------------------------------------------------------- *
  * Gestion de la pénalité à la vitesse d'incantation sur les armures ajoutée par IR v4 *
