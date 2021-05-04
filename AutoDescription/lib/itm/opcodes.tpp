@@ -2201,21 +2201,23 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-		PATCH_IF abilityType == AbilityType_Charge BEGIN
-			SPRINT description ~%spellName%~
-		END
-		ELSE BEGIN
-			PATCH_IF VARIABLE_IS_SET versus BEGIN
-				SPRINT description @100017 // ~Lance %spellName% %versus%~
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF abilityType == AbilityType_Charge BEGIN
+				SPRINT description ~%spellName%~
 			END
 			ELSE BEGIN
-				SPRINT description @100016 // ~Lance %spellName%~
+				PATCH_IF VARIABLE_IS_SET versus BEGIN
+					SPRINT description @100017 // ~Lance %spellName% %versus%~
+				END
+				ELSE BEGIN
+					SPRINT description @100016 // ~Lance %spellName%~
+				END
 			END
-		END
 
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
+			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
+				SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+				SPRINT description ~%description% (%castingLevelStr%)~
+			END
 		END
 	END
 END
