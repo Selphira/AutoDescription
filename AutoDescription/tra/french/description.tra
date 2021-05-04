@@ -457,9 +457,9 @@
 @102462 = ~de modifier la vitesse d'incantation du porteur de %value%~
 @102463 = ~de passer la vitesse d'incantation du porteur à %value%~
 @102464 = ~de multiplier la vitesse d'incantation du porteur par %value%~
-@102465 = ~de modifier la %resistName% du porteur de %value%~
-@102466 = ~de passer la %resistName% du porteur à %value%~
-@102467 = ~de multiplier la %resistName% du porteur par %value%~
+// @102465 = ~de modifier la %resistName% du porteur de %value%~
+// @102466 = ~de passer la %resistName% du porteur à %value%~
+// @102467 = ~de multiplier la %resistName% du porteur par %value%~
 @102468 = ~Enchevêtrement~
 @102469 = ~Emprisonnement~
 @102470 = ~Lame noire du désastre~
@@ -527,6 +527,14 @@
 @102532 = ~d'infliger 5d4 points de dégâts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHSMITE
 @102533 = ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVCORROS
 @102534 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres~ // Spécifique à Item Revision : DVRESON
+@102535 = ~de la cible~
+@102536 = ~du porteur~
+@102537 = ~du groupe~
+@102538 = ~des %targetType%~
+@102539 = ~de réduire la %resistName% %ofTheTarget% de %value%~
+@102540 = ~d'augmenter la %resistName% %ofTheTarget% de %value%~
+@102541 = ~de passer la %resistName% %ofTheTarget% à %value%~
+@102542 = ~de multiplier la %resistName% %ofTheTarget% par %value%~
 
 
 /*
@@ -581,7 +589,7 @@
 @100004 = ~ou~
 @100005 = ~mètre~
 @100006 = ~mètres~
-@100007 = ~%name% %target%%colon%%value%~
+@100007 = ~%name% %ofTheTarget%%colon%%value%~
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
 @100015 = ~%name% %target%%colon%%value% %versus%~

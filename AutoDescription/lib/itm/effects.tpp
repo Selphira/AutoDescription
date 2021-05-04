@@ -10,7 +10,8 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 
 	PATCH_IF abilityType == AbilityType_Equipped BEGIN
 		SPRINT opcode_target ~_self~
-		SPRINT theTarget @102472 // ~le porteur~
+		SPRINT theTarget   @102472 // ~le porteur~
+		SPRINT ofTheTarget @102536 // ~du porteur~
 	END
 	ELSE BEGIN
 		// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
@@ -18,15 +19,18 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 		// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
 		PATCH_IF target == TARGET_FX_self BEGIN
 			SPRINT opcode_target ~_self~
-			SPRINT theTarget @102472 // ~le porteur~
+			SPRINT theTarget   @102472 // ~le porteur~
+			SPRINT ofTheTarget @102536 // ~du porteur~
 		END
 		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN
 			SPRINT opcode_target ~_target~
-			SPRINT theTarget @102471 // ~la cible~
+			SPRINT theTarget   @102471 // ~la cible~
+			SPRINT ofTheTarget @102535 // ~de la cible~
 		END
 		ELSE PATCH_IF target == TARGET_FX_party BEGIN
 			SPRINT opcode_target ~_party~
-			SPRINT theTarget @102473 // ~le groupe~
+			SPRINT theTarget   @102473 // ~le groupe~
+			SPRINT ofTheTarget @102537 // ~du groupe~
 		END
 	END
 

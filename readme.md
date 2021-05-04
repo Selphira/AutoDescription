@@ -69,11 +69,7 @@ Deviendra
   > Utilisable par : 
   > - Voleur monoclassé et multiclassé
   > - Voleur
-- Bug: 26 % de chance de modifier la résistance à la magie du porteur de -10 pendant 20 secondes (WQXDA1.ITM). Le 10 devrait être un pourcentage.
-- Bug: Corriger et uniformiser la façon de gérer les résistances 
-  opcode_target_probability_166: la valeur n'est pas exprimée en %
-  opcode_target_probability_166: gérer le timing "permanent"
-  opcode_target_probability_166: trouver une phrase permettant d'introduire "la cible", "les dragons", à la place de "de la cible" 
+- opcode_target_probability_166: gérer le timing "permanent"
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
 - Gérer le timing "permanent", il affichera "de manière permanente" ou "définitivement" à la fin de la phrase, mais pas systématiquement. (les conditions restent à définir) (ex: L#NI6CQ)
   Exemple à éviter: 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente

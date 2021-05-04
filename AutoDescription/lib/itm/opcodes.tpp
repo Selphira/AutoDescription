@@ -375,8 +375,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	END
 
 	SPRINT name @102008        // ~Classe d'armure~
-	SPRINT target @101085 // ~de la cible~
-	SPRINT description @100007 // ~%name% %target%%colon%%value%~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
@@ -533,7 +532,8 @@ DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
 		SPRINT theTargetBasic @102471 // ~la cible~
 		PATCH_IF ~%theTarget%~ STRING_EQUAL ~%theTargetBasic%~ BEGIN
 			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET targetType = idName END
-			SPRINT theTarget @102474 // ~les %targetType%~
+			SPRINT theTarget   @102474 // ~les %targetType%~
+			SPRINT ofTheTarget @102538 // ~des %targetType%~
 		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
@@ -550,7 +550,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_5~ BEGIN
 		SPRINT theTargetBasic @102471 // ~la cible~
 		PATCH_IF ~%theTarget%~ STRING_EQUAL ~%theTargetBasic%~ BEGIN
 			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~3~ RET targetType = idName END
-			SPRINT theTarget @102474 // ~les %targetType%~
+			SPRINT theTarget   @102474 // ~les %targetType%~
+			SPRINT ofTheTarget @102538 // ~des %targetType%~
 		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
@@ -874,8 +875,7 @@ DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
 
 	SPRINT name @102168 // ~Points de vie maximum~
-	SPRINT target @101085 // ~de la cible~
-	SPRINT description @100007 // ~%name% %target%%colon%%value%~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
@@ -1067,11 +1067,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_27~ BEGIN
 	LOCAL_SPRINT resistName @102055 // ~Résistance à l'acide~
-	LPM ~opcode_self_probability_resist~
+	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_27~ BEGIN
 	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102055 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'acide~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_27~ BEGIN
+	LPM ~opcode_self_probability_27~
 END
 
 /* ------------------- *
@@ -1083,7 +1087,11 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_28~ BEGIN
 	LOCAL_SPRINT resistName @102059 // ~Résistance au froid~
-	LPM ~opcode_self_probability_resist~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_28~ BEGIN
+	LPM ~opcode_self_probability_28~
 END
 
 /* -------------------------- *
@@ -1095,11 +1103,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_29~ BEGIN
 	LOCAL_SPRINT resistName @102057 // ~Résistance à l'électricité~
-	LPM ~opcode_self_probability_resist~
+	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_29~ BEGIN
 	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102057 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'électricité~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_29~ BEGIN
+	LPM ~opcode_self_probability_29~
 END
 
 /* ----------------- *
@@ -1111,20 +1123,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_30~ BEGIN
 	LOCAL_SPRINT resistName @102056 // ~Résistance au feu~
-	LPM ~opcode_self_probability_resist~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_resist~ BEGIN
-	TO_LOWER resistName
-	// @102465 = ~de modifier la %resistName% du porteur de %value%~
-	// @102466 = ~de passer la %resistName% du porteur à %value%~
-	// @102467 = ~de multiplier la %resistName% du porteur par %value%~
-
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102465 strrefFlat = 102466 strrefPercent = 102467 STR_VAR value = ~%parameter1%~ RET description END
+	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_30~ BEGIN
 	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102056 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au feu~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_30~ BEGIN
+	LPM ~opcode_self_probability_30~
 END
 
 /* ------------------------------ *
@@ -1136,7 +1143,11 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_31~ BEGIN
 	LOCAL_SPRINT resistName @102065 // ~Résistance aux dégâts magiques~
-	LPM ~opcode_self_probability_resist~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_31~ BEGIN
+	LPM ~opcode_self_probability_31~
 END
 
 /* ----------------------------- *
@@ -2185,8 +2196,7 @@ DEFINE_PATCH_MACRO ~opcode_target_133~ BEGIN
 
 	SPRINT value @10010        // ~Passe à %value%~
 	SPRINT name @101075        // ~Chance~
-	SPRINT target @101085      // ~de la cible~
-	SPRINT description @100007 // ~%name% %target%%colon%%value%~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 /* ----------------------------- *
@@ -2441,7 +2451,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_166~ BEGIN
 	LOCAL_SPRINT resistName @102060 // ~Résistance à la magie~
-	LPM ~opcode_self_probability_resist~
+	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_166~ BEGIN
@@ -2449,10 +2459,7 @@ DEFINE_PATCH_MACRO ~opcode_target_166~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_166~ BEGIN
-	// @102333 = ~de modifier la résistance à la magie de la cible de %value%~
-	// @102334 = ~de passer la résistance à la magie de la cible à %value%~
-	// @102335 = ~de multiplier la résistance à la magie de la cible par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102333 strrefFlat = 102334 strrefPercent = 102335 STR_VAR value = ~%parameter1%~ RET description END
+	LPM ~opcode_self_probability_166~
 END
 
 /* ------------------------------------- *
@@ -2474,6 +2481,15 @@ END
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_173~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102058 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au poison~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_173~ BEGIN
+	LOCAL_SPRINT resistName @102058 // ~Résistance au poison~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_173~ BEGIN
+	LPM ~opcode_self_probability_173~
 END
 
 /* --------------------------------- *
@@ -2510,8 +2526,9 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 	ELSE BEGIN
 		//PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		SPRINT theTarget @102474 // ~les %targetType%~
-		SPRINT versus @101126 // ~contre les %targetType%~
+		SPRINT theTarget   @102474 // ~les %targetType%~
+		SPRINT ofTheTarget @102538 // ~des %targetType%~
+		SPRINT versus      @101126 // ~contre les %targetType%~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
 	END
 END
@@ -2527,8 +2544,9 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 	PATCH_IF NOT (parameter1 == 0 AND parameter2 == 2) BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		SPRINT theTarget @102474 // ~les %targetType%~
-		SPRINT versus @101126 // ~contre les %targetType%~
+		SPRINT theTarget   @102474 // ~les %targetType%~
+		SPRINT ofTheTarget @102538 // ~des %targetType%~
+		SPRINT versus      @101126 // ~contre les %targetType%~
 	END
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded END
 END
@@ -3280,8 +3298,7 @@ END
 DEFINE_PATCH_FUNCTION ~opcode_target_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
 	LPM ~opcode_mod_base~
 
-	SPRINT target @101085 // ~de la cible~
-	SPRINT description @100007 // ~%name% %target%%colon%%value%~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
@@ -3308,8 +3325,7 @@ END
 DEFINE_PATCH_FUNCTION ~opcode_target_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
 	LPM ~opcode_mod_percent_base~
 
-	SPRINT target @101085 // ~de la cible~
-	SPRINT description @100007 // ~%name% %target%%colon%%value%~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 STR_VAR value = ~~ RET description BEGIN
@@ -3357,6 +3373,34 @@ DEFINE_PATCH_FUNCTION ~opcode_self_probability~ INT_VAR strrefCumul = 0 strrefFl
 		SPRINT value @10002 // ~%value% %~
 		SPRINT description (AT ~%strrefPercent%~) // ~de multiplier [a statistic] du porteur par %value%~
 	END
+END
+
+/* --------------------------------------------------------- *
+ * Gestion des modifications des résistances par probabilité *
+ * --------------------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
+	LOCAL_SET value = parameter1
+
+	TO_LOWER resistName
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF value > 0 BEGIN
+	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102540 // ~d'augmenter la %resistName% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102539 // ~de réduire la %resistName% %ofTheTarget% de %value%~
+        END
+    END
+    ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+        SPRINT description @102541 // ~de passer la %resistName% %ofTheTarget% à %value%~
+    END
+    ELSE BEGIN // percent
+        SPRINT value @10002 // ~%value% %~
+        SPRINT description @102542 // ~de multiplier la %resistName% %ofTheTarget% par %value%~
+    END
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
