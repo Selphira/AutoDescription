@@ -568,10 +568,11 @@ DEFINE_PATCH_MACRO ~opcode_self_6~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_6~ BEGIN
-	// @102277 = ~de modifier le charisme du porteur de %value%~
-	// @102278 = ~de passer le charisme du porteur à %value%~
-	// @102279 = ~de multiplier le charisme du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102277 strrefFlat = 102278 strrefPercent = 102279 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102276 RET description END // ~le charisme~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_6~ BEGIN
+	LPM ~opcode_self_probability_6~
 END
 
 /* ------------ *
@@ -586,26 +587,11 @@ DEFINE_PATCH_MACRO ~opcode_target_10~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_10~ BEGIN
-	// @102280 = ~de modifier la constitution du porteur de %value%~
-	// @102281 = ~de passer la constitution du porteur à %value%~
-	// @102282 = ~de multiplier la constitution du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102280 strrefFlat = 102281 strrefPercent = 102282 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102275 RET description END // ~la constitution~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_10~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT description @102309 // ~de modifier la constitution de la cible de %value%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @102310 // ~de passer la constitution de la cible à %value%~
-	END
-	ELSE BEGIN // percent
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102311 // ~de multiplier la constitution de la cible par %value%~
-	END
+	LPM ~opcode_self_probability_10~
 END
 
 /* ----------------- *
@@ -733,26 +719,11 @@ DEFINE_PATCH_MACRO ~opcode_target_15~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_15~ BEGIN
-	// @102274 = ~de modifier la dextérité du porteur de %value%~
-	// @102275 = ~de passer la dextérité du porteur à %value%~
-	// @102276 = ~de multiplier la dextérité du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102274 strrefFlat = 102275 strrefPercent = 102276 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102274 RET description END // ~la dextérité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_15~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT description @102225 // ~de modifier la dextérité de la cible de %value%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @102226 // ~de passer la dextérité de la cible à %value%~
-	END
-	ELSE BEGIN // percent
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102227 // ~de multiplier la dextérité de la cible par %value%~
-	END
+	LPM ~opcode_self_probability_15~
 END
 
 /* ----------------- *
@@ -864,13 +835,6 @@ DEFINE_PATCH_MACRO ~opcode_self_18~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
-	// @102267 = ~de modifier les points de vie maximum du porteur de %value%~
-	// @102268 = ~de passer les points de vie maximum du porteur à %value%~
-	// @102269 = ~de multiplier les points de vie maximum du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102267 strrefFlat = 102268 strrefPercent = 102269 STR_VAR value = ~%parameter1%~ RET description END
-END
-
 DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
 
@@ -878,11 +842,12 @@ DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 102267 RET description END // ~les points de vie maximume~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
-	// @102417 = ~de modifier les points de vie maximum de la cible de %value%~
-	// @102418 = ~de passer les points de vie maximum de la cible à %value%~
-	// @102419 = ~de multiplier les points de vie maximum de la cible par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102417 strrefFlat = 102418 strrefPercent = 102419 STR_VAR value = ~%parameter1%~ RET description END
+	LPM ~opcode_self_probability_18~
 END
 
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
@@ -913,10 +878,11 @@ DEFINE_PATCH_MACRO ~opcode_target_19~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_19~ BEGIN
-	// @102283 = ~de modifier l'intelligence du porteur de %value%~
-	// @102284 = ~de passer l'intelligence du porteur à %value%~
-	// @102285 = ~de multiplier l'intelligence du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102283 strrefFlat = 102284 strrefPercent = 102285 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102273 RET description END // ~l'intelligence~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_19~ BEGIN
+	LPM ~opcode_self_probability_19~
 END
 
 /* ----------------------- *
@@ -1279,26 +1245,11 @@ DEFINE_PATCH_MACRO ~opcode_target_44~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_44~ BEGIN
-	// @102271 = ~de modifier la force du porteur de %value%~
-	// @102272 = ~de passer la force du porteur à %value%~
-	// @102273 = ~de multiplier la force du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102271 strrefFlat = 102272 strrefPercent = 102273 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102272 RET description END // ~la force~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_44~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT description @102312 // ~de modifier la force de la cible de %value%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @102313 // ~de passer la force de la cible à %value%~
-	END
-	ELSE BEGIN // percent
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102314 // ~de multiplier la force de la cible par %value%~
-	END
+	LPM ~opcode_self_probability_44~
 END
 
 /* ---------------- *
@@ -1342,10 +1293,11 @@ DEFINE_PATCH_MACRO ~opcode_self_49~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_49~ BEGIN
-	// @102286 = ~de modifier la sagesse du porteur de %value%~
-	// @102287 = ~de passer la sagesse du porteur à %value%~
-	// @102288 = ~de multiplier la sagesse du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102286 strrefFlat = 102287 strrefPercent = 102288 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102271 RET description END // ~la sagesse~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_49~ BEGIN
+	LPM ~opcode_self_probability_49~
 END
 
 /* ---- *
@@ -1359,20 +1311,12 @@ DEFINE_PATCH_MACRO ~opcode_target_54~ BEGIN
 	LPF ~opcode_target_mod~ INT_VAR strref = 102000 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_54~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
+DEFINE_PATCH_MACRO ~opcode_self_probability_54~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 102268 RET description END // ~le TAC0~
+END
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT description @102219 // ~de modifier le TAC0 de la cible de %value%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @102220 // ~de passer le TAC0 de la cible à %value%~
-	END
-	ELSE BEGIN // percent
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102221 // ~de multiplier le TAC0 de la cible par %value%~
-	END
+DEFINE_PATCH_MACRO ~opcode_target_probability_54~ BEGIN
+	LPM ~opcode_self_probability_54~
 END
 
 /* ------------------------------ *
@@ -2135,11 +2079,12 @@ DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
 	LPF ~opcode_target_mod~ INT_VAR strref = 102115 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Capacité de mouvement~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
+	LPM ~opcode_self_probability_176~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
-	// @102360 = ~de modifier la capacité de mouvement de la cible de %value%~
-	// @102361 = ~de passer la capacité de mouvement de la cible à %value%~
-	// @102362 = ~de multiplier la capacité de mouvement de la cible par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102360 strrefFlat = 102361 strrefPercent = 102362 STR_VAR value = ~%parameter1%~ RET description END
+	LPM ~opcode_self_probability_176~
 END
 
 /* ---------------------- *
@@ -2507,10 +2452,11 @@ DEFINE_PATCH_MACRO ~opcode_self_176~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_176~ BEGIN
-	// @102409 = ~de modifier la capacité de mouvement du porteur de %value%~
-	// @102410 = ~de passer la capacité de mouvement du porteur à %value%~
-	// @102411 = ~de multiplier la capacité de mouvement du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102409 strrefFlat = 102410 strrefPercent = 102411 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102340 RET description END // ~la capacité de mouvement~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_176~ BEGIN
+	LPM ~opcode_self_probability_176~
 END
 
 /* -------------------------------- *
@@ -2631,10 +2577,11 @@ DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_189~ BEGIN
-	// @102462 = ~de modifier la vitesse d'incantation du porteur de %value%~
-	// @102463 = ~de passer la vitesse d'incantation du porteur à %value%~
-	// @102464 = ~de multiplier la vitesse d'incantation du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102462 strrefFlat = 102463 strrefPercent = 102464 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102467 RET description END // ~la vitesse d'incantation~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_189~ BEGIN
+	LPM ~opcode_self_probability_189~
 END
 
 /* ------------------ *
@@ -2647,10 +2594,11 @@ DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_190~ BEGIN
-	// @102340 = ~de modifier le facteur de vitesse du porteur de %value%~
-	// @102341 = ~de passer le facteur de vitesse du porteur à %value%~
-	// @102342 = ~de multiplier le facteur de vitesse du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102340 strrefFlat = 102341 strrefPercent = 102342 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102466 RET description END // ~le facteur de vitesse~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_190~ BEGIN
+	LPM ~opcode_self_probability_190~
 END
 
 /* ----------------------------------- *
@@ -3137,14 +3085,15 @@ DEFINE_PATCH_MACRO ~opcode_self_278~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_278~ BEGIN
-	// @102406 = ~de modifier les chances de toucher du porteur de %value%~
-	// @102407 = ~de passer les chances de toucher du porteur à %value%~
-	// @102408 = ~de multiplier les chances de toucher du porteur par %value%~
-	LPF ~opcode_self_probability~ INT_VAR strrefCumul = 102406 strrefFlat = 102407 strrefPercent = 102408 STR_VAR value = ~%parameter1%~ RET description END
+	LPF ~opcode_probability~ INT_VAR strref = 102465 RET description END // ~les chances de toucher~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_278~ BEGIN
 	LPF ~opcode_target_mod~ INT_VAR strref = 102036 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Chances de toucher~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_278~ BEGIN
+	LPM ~opcode_self_probability_278~
 END
 
 /* -------------------------------------------- *
@@ -3359,19 +3308,26 @@ DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 S
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_self_probability~ INT_VAR strrefCumul = 0 strrefFlat = 0 strrefPercent = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BEGIN
 	SET value = ~%parameter1%~
+	SPRINT theStatistic (AT ~%strref%~)
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT description (AT ~%strrefCumul%~) // ~de modifier [a statistic] du porteur de %value%~
+        PATCH_IF value > 0 BEGIN
+	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
+        END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description (AT ~%strrefFlat%~) // ~de passer [a statistic] du porteur à %value%~
+		SPRINT description @102545 // ~de passer %theStatistic% %ofTheTarget% à %value%~
 	END
 	ELSE BEGIN // percent
 		SPRINT value @10002 // ~%value% %~
-		SPRINT description (AT ~%strrefPercent%~) // ~de multiplier [a statistic] du porteur par %value%~
+		SPRINT description @102546 // ~de multiplier %theStatistic% %ofTheTarget% par %value%~
 	END
 END
 
@@ -3379,7 +3335,7 @@ END
  * Gestion des modifications des résistances par probabilité *
  * --------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = ~%parameter1%~
 
 	TO_LOWER resistName
 
