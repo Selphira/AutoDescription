@@ -217,7 +217,7 @@
 @102222 = ~Tue instantanément %theTarget%~
 @102223 = ~Dissipe toutes formes d'invisibilité~
 @102224 = ~d'infliger %damage% %damageType% au porteur~
-// @102225 = ~de modifier la dextérité de la cible de %value%~
+@102225 = ~Résistance aux dégâts physiques~
 // @102226 = ~de passer la dextérité de la cible à %value%~
 // @102227 = ~de multiplier la dextérité de la cible par %value%~
 @102228 = ~Empêche de lancer des sorts profanes~

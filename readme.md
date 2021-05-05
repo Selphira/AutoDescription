@@ -10,30 +10,6 @@ Cela apporte plusieurs avantages:
 
 ### Général
 
-- Grouper certaines caractéristiques pour générer moins de lignes lorsqu'elles sont TOUTES présentes ET ont la même valeur.
-
-Pour les résistances
-> - Résistance aux dégâts tranchants: +10%
-> - Résistance aux dégâts contondants: +10%
-> - Résistance aux dégâts perforants: +10%
-> - Résistance aux dégâts de projectiles: +10% 
-
-Deviendra
-
-> - Résistance aux dégâts physiques: +10%
-
-Pour les jets de sauvegarde
-
-> - Jets de sauvegarde contre la paralysie, la mort et les poisons: +2
-> - Jets de sauvegarde contre les baguettes, les sceptres et les bâtons: +2
-> - Jets de sauvegarde contre la pétrification et la métamorphose: +2
-> - Jets de sauvegarde contre les souffles: +2
-> - Jets de sauvegarde contre les sorts: +2
-
-Deviendra
-
-> - Jets de sauvegarde: +2
-
 - Grouper les effets ayant la même probabilité de se délencher (Ex: blun14) ?  
   Attention, 2 effets à 10% ne s'activeront pas forcément en mêem temps, il faut pour le cas qui nous intéresse, que probabilit1 et probability2 soient égaux dans les 2 effets !  
   Il y a risque d'y avoir des chaînes trop longues...  Mais il faut trouver une façon d'indiquer au joueur que plusieurs effets vont se déclencher en même temps !
@@ -63,6 +39,7 @@ Deviendra
 - Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm, C2BLUN03) 
 - Gérer les potions et les munitions
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01)
+- Bug: A7SKULL : La description technique de base ne s'efface pas.
 - Bug: loyal transformé en neutre (Ex: WANDORC.ITM)
 - Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin
 - Bug: usability (Ex: BHCLUB01)
@@ -74,7 +51,7 @@ Deviendra
 - Gérer le timing "permanent", il affichera "de manière permanente" ou "définitivement" à la fin de la phrase, mais pas systématiquement. (les conditions restent à définir) (ex: L#NI6CQ)
   Exemple à éviter: 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente
 - Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
-- Gérer les opcodes suivants : 101, 144, 177, 180, 188, 248, 249, 251, 268, 272, 300, 318
+- Gérer les opcodes suivants : 101, 144, 177, 180, 188, 232, 248, 249, 251, 268, 272, 300, 318
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)

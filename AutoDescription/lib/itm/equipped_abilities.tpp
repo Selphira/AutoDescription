@@ -119,6 +119,9 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
     PATCH_PHP_EACH ~newAbilities~ AS data => value BEGIN
 		LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
     END
+
+	LPF ~group_physical_resistances~ RET description END
+	LPF ~group_saves_throws~ RET description END
 END
 
 /* -------------------------------------------------------------------- *
@@ -144,4 +147,69 @@ DEFINE_PATCH_FUNCTION ~get_unique_equipped_abilities~ STR_VAR array_name = "" RE
 			SET count += 1
 		END
 	END
+END
+
+/* --------------------------------------------------------------------------------------------------------- *
+ * Groupement des résistances aux dégâts physiques, uniquement si les 4 sont présentes ET ont la même valeur *
+ * Les valeurs trouvées sont 5, 10, 15, 20 et 25 %
+ * --------------------------------------------------------------------------------------------------------- *
+ * - Résistance aux dégâts tranchants : +5 %                                                                 *
+ * - Résistance aux dégâts contondants : +5 %                                                                *
+ * - Résistance aux dégâts perforants : +5 %                                                                 *
+ * - Résistance aux dégâts de projectiles : +5 %                                                             *
+ * Devient                                                                                                   *
+ * - Résistance aux dégâts physiques : +5 %                                                                  *
+ * --------------------------------------------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~group_physical_resistances~ RET description BEGIN
+    SPRINT regexTemplate ~~
+    PATCH_FOR_EACH strref IN 102061 102062 102063 102064 BEGIN
+		SPRINT name (AT ~%strref%~)
+		SPRINT value ~value~
+		SPRINT value ~\%%value%%~
+		SPRINT name @100001 // %name% : %value%
+        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
+    END
+
+    PATCH_FOR_EACH value IN ~+5~ ~+10~ ~+15~ ~+20~ ~+25~ BEGIN
+        SPRINT value @10002 // ~%value% %~
+        SPRINT name @102225 // ~Résistance aux dégâts physiques~
+		SPRINT replace @100001 // %name% : %value%
+        SPRINT regex EVAL ~%regexTemplate%~
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
+		END
+    END
+END
+
+/* --------------------------------------------------------------------------------------------------------- *
+ * Groupement des jets de sauvegarde, uniquement si les 5 sont présentes ET ont la même valeur               *
+ * Les valeurs trouvées sont 1, 2, 3, 4 et 5                                                                 *
+ * --------------------------------------------------------------------------------------------------------- *
+ * - Jets de sauvegarde : +2 contre la paralysie, la mort et les poisons                                     *
+ * - Jets de sauvegarde : +2 contre les baguettes, les sceptres et les bâtons                                *
+ * - Jets de sauvegarde : +2 contre la pétrification et la métamorphose                                      *
+ * - Jets de sauvegarde : +2 contre les souffles                                                             *
+ * - Jets de sauvegarde : +2 contre les sorts                                                                *
+ * Devient                                                                                                   *
+ * - Jets de sauvegarde : +2                                                                                 *
+ * --------------------------------------------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~group_saves_throws~ RET description BEGIN
+    SPRINT regexTemplate ~~
+    PATCH_FOR_EACH strref IN 102029 102030 102031 102032 102033 BEGIN
+		SPRINT name @102034 // ~Jets de sauvegarde~
+		SPRINT versus (AT ~%strref%~)
+		SPRINT value ~value~
+		SPRINT value ~\%%value%% %versus%~
+		SPRINT name @100001 // %name% : %value%
+        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
+    END
+
+    PATCH_FOR_EACH value IN ~+1~ ~+2~ ~+3~ ~+4~ ~+5~ BEGIN
+        SPRINT name @102034 // ~Jets de sauvegarde~
+		SPRINT replace @100001 // %name% : %value%
+        SPRINT regex EVAL ~%regexTemplate%~
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
+		END
+    END
 END

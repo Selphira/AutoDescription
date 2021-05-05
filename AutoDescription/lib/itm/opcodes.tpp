@@ -212,7 +212,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	193 => 1 // Spell Effect: Invisible Detection by Script [193]
 	215 => 1
 	221 => 1 // Removal: Remove Secondary Type [221]
-	232 => 1 // Spell Effect: Cast Spell on Condition [232]
+	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: A gérer ! (Ex: L#NILA61)
 	240 => 1 // Graphics: Remove Special Effect Icon [240]
 	243 => 1 // Item: Drain Item Charges [243]
 	248 => 1 // Item: Set Melee Effect [248]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte (CBWTNI6A.ITM)
