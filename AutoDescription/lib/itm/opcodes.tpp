@@ -3475,6 +3475,38 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 		SET amount = amount - 65536
 	END
 
+	PATCH_IF level == 0 BEGIN
+		SET level = amount
+		LPM ~opcode_self_42_62_get_levelstr~
+		SET strref = startStrref + 4
+		SPRINT description (AT %strref%) //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
+	END
+	ELSE BEGIN
+		LPM ~opcode_self_42_62_get_levelstr~
+		PATCH_IF amount > 0 BEGIN // Mémorisation
+            PATCH_IF amount == 1 BEGIN
+    			SET strref = startStrref
+                SPRINT description (AT %strref%) // ~Mémorisation d'un sort [profane|divin] supplémentaire de niveau %levelStr%~
+            END
+            ELSE BEGIN
+    			SET strref = startStrref + 1
+                SPRINT description (AT %strref%) // ~Mémorisation de %amount% sorts [profanes|divins] supplémentaires de niveau %levelStr%~
+            END
+        END
+        ELSE PATCH_IF amount < 0 BEGIN // Oubli
+            PATCH_IF amount == ~-1~ BEGIN
+    			SET strref = startStrref + 2
+                SPRINT description (AT %strref%) // ~Suppression d'un sort [profane|divin] de niveau %levelStr%~
+            END
+            ELSE BEGIN
+    			SET strref = startStrref + 3
+                SPRINT description (AT %strref%) // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
+            END
+    	END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 	PATCH_FOR_EACH idx IN 0 1 2 3 4 5 6 7 8 BEGIN
 		SET bit = EVAL ~%BIT%idx%%~
 		PATCH_IF (level BAND bit) != 0 BEGIN
@@ -3485,35 +3517,9 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 
 	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ et \1~
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^, ~ ~~
-	END
-
-	PATCH_IF level == 0 BEGIN
-		SET strref = startStrref + 4
-		SPRINT description (AT %strref%) //~Double le nombre de sorts [profanes|divins] de niveau %levelStr% que le personnage peut mémoriser.~
-	END
-	ELSE PATCH_IF amount > 0 BEGIN // Mémorisation
-        PATCH_IF amount == 1 BEGIN
-			SET strref = startStrref
-            SPRINT description (AT %strref%) // ~Mémorisation d'un sort [profane|divin] supplémentaire de niveau %levelStr%~
-        END
-        ELSE BEGIN
-			SET strref = startStrref + 1
-            SPRINT description (AT %strref%) // ~Mémorisation de %amount% sorts [profanes|divins] supplémentaires de niveau %levelStr%~
-        END
-    END
-    ELSE PATCH_IF amount < 0 BEGIN // Oubli
-        PATCH_IF amount == ~-1~ BEGIN
-			SET strref = startStrref + 2
-            SPRINT description (AT %strref%) // ~Suppression d'un sort [profane|divin] de niveau %levelStr%~
-        END
-        ELSE BEGIN
-			SET strref = startStrref + 3
-            SPRINT description (AT %strref%) // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
-        END
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| et \)~ ~~
 	END
 END
-
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN

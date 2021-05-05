@@ -77,12 +77,12 @@
 @102081 = ~Mémorisation de %amount% sorts divins supplémentaires de niveau %levelStr%~
 @102082 = ~Suppression d'un sort divin de niveau %levelStr%~
 @102083 = ~Suppression de %amount% sorts divins de niveau %levelStr%~
-@102084 = ~Double le nombre de sorts divins de niveau %levelStr% que le personnage peut mémoriser~
+@102084 = ~Double le nombre de sorts divins mémorisables de niveau inférieur ou égal à %levelStr%~
 @102085 = ~Mémorisation d'un sort profane supplémentaire de niveau %levelStr%~
 @102086 = ~Mémorisation de %amount% sorts profanes supplémentaires de niveau %levelStr%~
 @102087 = ~Suppression d'un sort profane de niveau %levelStr%~
 @102088 = ~Suppression de %amount% sorts profanes de niveau %levelStr%~
-@102089 = ~Double le nombre de sorts profanes de niveau %levelStr% que le personnage peut mémoriser~
+@102089 = ~Double le nombre de sorts profanes mémorisables de niveau inférieur ou égal à %levelStr%~
 @102090 = ~d'infliger 1 %damageType% supplémentaire~
 @102091 = ~d'infliger %damage% %damageType% supplémentaires~
 @102092 = ~Inflige %damage% %damageType% supplémentaires~
@@ -580,7 +580,7 @@
 @10005 = ~Fixée à %value%~
 //@10006 = ~Multiplié par %value%~
 //@10007 = ~Multipliée par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
 @10010 = ~Passe à %value%~
 @10011 = ~une demi~
