@@ -100,6 +100,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 74 => 179 // State: Blindness [74]
 	 45 => 180 // State: Stun [45]
 	165 => 180 // Spell Effect: Pause Target [165]
+	 80 => 181 // Deafness [80]
 	154 => 182 // State: Entangle [154]
 	 39 => 183 // State: Unconsciousness [39]
 	128 => 184 // State: Confusion [128]
@@ -125,6 +126,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 32 => 211 // Cure: Death (Raise Dead) [32]
 	 14 => 212 // Cure: (Frozen state) [14]
 	  4 => 213 // Cure: Berserking [4]
+	 46 => 214 // Cure: Stun (Unstun) [46]
 	163 => 229 // Protection: Free Action [163]
 	204 => 230 // Spell: Protection from Spell (School) [204]
 	205 => 231 // Spell: Protection from Spell (Secondary Type) [205]
@@ -567,6 +569,10 @@ DEFINE_PATCH_MACRO ~opcode_self_6~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 101081 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Charisme~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_6~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 102276 RET description END // ~le charisme~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_6~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 102276 RET description END // ~le charisme~
 END
@@ -583,7 +589,7 @@ DEFINE_PATCH_MACRO ~opcode_self_10~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_10~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 101080 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Constitution~
+	LPF ~opcode_target~ INT_VAR strref = 102275 RET description END // ~la constitution~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_10~ BEGIN
@@ -715,7 +721,7 @@ DEFINE_PATCH_MACRO ~opcode_self_15~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_15~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 101078 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dextérité~
+	LPF ~opcode_target~ INT_VAR strref = 102274 RET description END // ~la dextérité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_15~ BEGIN
@@ -838,12 +844,14 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
 
-	SPRINT name @102168 // ~Points de vie maximum~
-	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+	PATCH_IF parameter2 == 3 BEGIN SET parameter2 = MOD_TYPE_cumulative END
+	PATCH_IF parameter2 == 4 BEGIN SET parameter2 = MOD_TYPE_flat END
+
+	LPF ~opcode_target~ INT_VAR strref = 102267 RET description END // ~les points de vie maximum~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 102267 RET description END // ~les points de vie maximume~
+	LPF ~opcode_probability~ INT_VAR strref = 102267 RET description END // ~les points de vie maximum~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
@@ -874,7 +882,7 @@ DEFINE_PATCH_MACRO ~opcode_self_19~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_19~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 101077 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Intelligence~
+	LPF ~opcode_target~ INT_VAR strref = 102273 RET description END // ~l'intelligence~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_19~ BEGIN
@@ -1241,7 +1249,7 @@ DEFINE_PATCH_MACRO ~opcode_self_44~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_44~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
+	LPF ~opcode_target~ INT_VAR strref = 102272 RET description END // ~la force~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_44~ BEGIN
@@ -1292,6 +1300,10 @@ DEFINE_PATCH_MACRO ~opcode_self_49~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 101079 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Sagesse~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_49~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 102271 RET description END // ~la sagesse~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_49~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 102271 RET description END // ~la sagesse~
 END
@@ -1308,7 +1320,7 @@ DEFINE_PATCH_MACRO ~opcode_self_54~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_54~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 102000 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
+	LPF ~opcode_target~ INT_VAR strref = 102268 RET description END // ~le TAC0~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_54~ BEGIN
@@ -1413,6 +1425,7 @@ DEFINE_PATCH_MACRO ~opcode_self_60~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET type = parameter2
 
+	// TODO: L'effet est cumulatif, un opcode +100% (échec systématique) et le même mais à -20%, fera que le lanceur aura 80% de chance de rater !
 	PATCH_IF value == 100 BEGIN
 		PATCH_IF type == 0 OR type== 3 BEGIN
 			SPRINT description @102228 // ~Échec systématique des sorts profanes lancés~
@@ -1572,7 +1585,7 @@ DEFINE_PATCH_MACRO ~opcode_self_73~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_73~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 102001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts~
+	LPF ~opcode_target~ INT_VAR strref = 102227 RET description END // ~les dégâts~
 END
 
 /* --------------------- *
@@ -1703,7 +1716,11 @@ END
  * Deafness [80] *
  * ------------- */
 DEFINE_PATCH_MACRO ~opcode_self_probability_80~ BEGIN
-	SPRINT description @102442 // ~de causer la surdité au porteur~
+	SPRINT description @102442 // @~d'assourdir %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_80~ BEGIN
+	SPRINT description @102442 // @~d'assourdir %theTarget%~
 END
 
 /* ------------------- *
@@ -1805,7 +1822,7 @@ END
  * Stat: Level Change [96] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_96~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 101082 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau~
+	LPF ~opcode_target~ INT_VAR strref = 102226 RET description END // ~le niveau~
 END
 
 /* ---------------------------------- *
@@ -2076,7 +2093,7 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 102115 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Capacité de mouvement~
+	LPF ~opcode_target~ INT_VAR strref = 102340 RET description END // ~la capacité de mouvement~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
@@ -2502,10 +2519,14 @@ END
 DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded BEGIN
 	SPRINT item ~%SOURCE_FILE%~
 	INNER_ACTION BEGIN
-		COPY_EXISTING ~%resref%.eff~  ~override~
-			LPF ~get_description_effect2~ RET description saveAdded durationAdded END
-			//TODO: opcode 12 lancé depuis un 177 doit ajouter "contre %theTarget%" à la fin...
-	    BUT_ONLY_IF_IT_CHANGES
+		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+			COPY_EXISTING ~%resref%.eff~  ~override~
+				LPF ~get_description_effect2~ RET description saveAdded durationAdded END
+		    BUT_ONLY_IF_IT_CHANGES
+		END
+		ELSE BEGIN
+			WARN "%item% : Opcode %opcode% : Le fichier de l'effet %resref%.eff n'existe pas."
+		END
     END
 END
 
@@ -3091,7 +3112,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_278~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_278~ BEGIN
-	LPF ~opcode_target_mod~ INT_VAR strref = 102036 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Chances de toucher~
+	LPF ~opcode_target~ INT_VAR strref = 102465 RET description END // ~les chances de toucher~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_278~ BEGIN
@@ -3246,12 +3267,6 @@ DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET des
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_target_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	LPM ~opcode_mod_base~
-
-	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
-END
-
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		LPF ~signed_value~ INT_VAR value RET value END
@@ -3310,13 +3325,35 @@ DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 S
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
 	SET value = ~%parameter1%~
 	SPRINT theStatistic (AT ~%strref%~)
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value > 0 BEGIN
 	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+        END
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+	END
+	ELSE BEGIN // percent
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BEGIN
+	SET value = ~%parameter1%~
+	SPRINT theStatistic (AT ~%strref%~)
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF value > 0 BEGIN
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -3383,7 +3420,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 				BUT_ONLY_IF_IT_CHANGES
 			END
 			ELSE BEGIN
-				FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
+				WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
 			END
 	    END
 	END
@@ -3405,7 +3442,7 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
+			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
 		END
     END
 END
@@ -3426,7 +3463,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			FAIL "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
+			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
 		END
     END
 END

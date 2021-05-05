@@ -218,8 +218,8 @@
 @102223 = ~Dissipe toutes formes d'invisibilité~
 @102224 = ~d'infliger %damage% %damageType% au porteur~
 @102225 = ~Résistance aux dégâts physiques~
-// @102226 = ~de passer la dextérité de la cible à %value%~
-// @102227 = ~de multiplier la dextérité de la cible par %value%~
+@102226 = ~le niveau~
+@102227 = ~les dégâts~
 @102228 = ~Empêche de lancer des sorts profanes~
 @102229 = ~Empêche de lancer des sorts divins~
 @102230 = ~Empêche de lancer des sorts innés~
@@ -277,10 +277,10 @@
 // @102282 = ~de multiplier la constitution du porteur par %value%~
 // @102283 = ~de modifier l'intelligence du porteur de %value%~
 // @102284 = ~de passer l'intelligence du porteur à %value%~
-// @102285 = ~de multiplier l'intelligence du porteur par %value%~
-// @102286 = ~de modifier la sagesse du porteur de %value%~
-// @102287 = ~de passer la sagesse du porteur à %value%~
-// @102288 = ~de multiplier la sagesse du porteur par %value%~
+@102285 = ~Réduit %theStatistic% %ofTheTarget% de %value%~
+@102286 = ~Augmente %theStatistic% %ofTheTarget% de %value%~
+@102287 = ~Passe %theStatistic% %ofTheTarget% à %value%~
+@102288 = ~Multiplie %theStatistic% %ofTheTarget% par %value%~
 @102289 = ~d'immuniser au sort %spellName%~
 @102290 = ~Lenteur permanente~
 @102291 = ~Draîne un niveau au porteur~
@@ -434,7 +434,7 @@
 @102439 = ~d'inoculer une maladie qui augmente l'intelligence de la cible de %amount%~
 @102440 = ~d'inoculer une maladie qui augmente la sagesse de la cible de %amount%~
 @102441 = ~d'inoculer une maladie qui augmente le charisme de la cible de %amount%~
-@102442 = ~de causer la surdité au porteur~
+@102442 = ~d'assourdir %theTarget%~
 @102443 = ~de faire oublier 1 sort à la cible~
 @102444 = ~de faire %amount% sorts à la cible~
 @102445 = ~de modifier l'attaque par round de la cible de %value%~

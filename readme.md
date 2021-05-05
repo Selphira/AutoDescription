@@ -71,9 +71,6 @@ Cela apporte plusieurs avantages:
 - Opcode 206 (resref tb#preti) + opcode 146 (resref tb#depet)
   // Fusionner en une seule ligne ! // Immunité au sort Pétrification
 - "Revient dans les mains du lanceur immédiatement après avoir été lancée" (Ex: AX1H10)
-- Gérer "Permet de lancer des sorts" pour les armures (ce n'est pas lcarmor)
-  Ne pas toujours afficher la ligne, uniquement si l'armure ne permet pas, de base, de lancer des sorts
-  Vérifier s'il y a le opcode "Miscast Magic" ?
 - Grouper les charmes (Ex: A7RING02)
   
 
@@ -82,10 +79,6 @@ Cela apporte plusieurs avantages:
 - Préciser la cible de l'effet, uniquement si la cible est le porteur.
   La cible par défaut de l'effet d'une capacité de combat est la cible du personnage, il n'est pas nécessaire de toujours le mentionner, et cela diminuera un peu les lignes.
 - Si une résistance de la cible passe à 0 avec une capacité de combat, écrire "Ignore la résistance à xxx de la cible" à la place de "Résistance à xxx de la cible: Passe à 0"
-- Reformuler
-  Points de vie maximum de la cible : -2 pendant 1 tour
-  Réduit|Augmente le maximum de points de vie de la cible de 2
-  Cette formulation peut s'adapter à tous les attributs basiques !!
 
 ### Capacités de charge
 
