@@ -580,7 +580,7 @@
 @10005 = ~Fixée à %value%~
 //@10006 = ~Multiplié par %value%~
 //@10007 = ~Multipliée par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
 @10010 = ~Passe à %value%~
 @10011 = ~une demi~

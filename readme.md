@@ -39,7 +39,6 @@ Cela apporte plusieurs avantages:
 - Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm, C2BLUN03) 
 - Gérer les potions et les munitions
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01)
-- Bug: A7SKULL : La description technique de base ne s'efface pas.
 - Bug: loyal transformé en neutre (Ex: WANDORC.ITM)
 - Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin
 - Bug: usability (Ex: BHCLUB01)
