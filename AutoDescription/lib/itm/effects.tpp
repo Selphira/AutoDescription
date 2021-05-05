@@ -1,4 +1,4 @@
-DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
+DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	SET opcode_n = opcode
 	SET durationAdded = 0
 	SET saveAdded = 0
@@ -36,17 +36,33 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description BEGIN
 
 	PATCH_IF probability == 100 BEGIN
 		LPM ~opcode%opcode_target%_%opcode_n%~
+		LPM ~set_opcode_sort~
 	END
 	ELSE BEGIN
 		SET probability += 1
 		LPM ~opcode%opcode_target%_probability_%opcode_n%~
+		LPM ~set_opcode_sort~
 		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
 			SPRINT description @101125 // ~%probability% de chance %description%~
 		END
 	END
 
+
 	LPM ~add_duration_and_save~
+END
+
+DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
+	PATCH_IF opcode == 219 BEGIN
+		SET opcode = opcode_n
+	END
+
+	PATCH_IF VARIABLE_IS_SET $sort_opcodes(~%opcode%~) BEGIN
+		SET sort = $sort_opcodes(~%opcode%~) + ((100 - probability) * 10000)
+	END
+	ELSE BEGIN
+		SET sort = 400 + ((100 - probability) * 10000)
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durationAdded BEGIN

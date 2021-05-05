@@ -2486,7 +2486,7 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~opcode_self_177_item_revision_casting_penality~ RET description END
 	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
-		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
 	END
 	ELSE BEGIN
 		//PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
@@ -2494,7 +2494,7 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		SPRINT theTarget   @102474 // ~les %targetType%~
 		SPRINT ofTheTarget @102538 // ~des %targetType%~
 		SPRINT versus      @101126 // ~contre les %targetType%~
-		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded END
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
 	END
 END
 
@@ -2513,14 +2513,16 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 		SPRINT ofTheTarget @102538 // ~des %targetType%~
 		SPRINT versus      @101126 // ~contre les %targetType%~
 	END
-	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded END
+	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded durationAdded opcode END
 END
 
-DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded BEGIN
+DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded opcode BEGIN
 	SPRINT item ~%SOURCE_FILE%~
+	SET opcode = 0
 	INNER_ACTION BEGIN
 		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
 			COPY_EXISTING ~%resref%.eff~  ~override~
+			READ_SHORT EFF2_opcode opcode
 				LPF ~get_description_effect2~ RET description saveAdded durationAdded END
 		    BUT_ONLY_IF_IT_CHANGES
 		END

@@ -45,17 +45,17 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 						SET opcodeBase = opcode
 						PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
 							SET opcode = opcodeBase * 1000 + subOpcode
-							LPF ~get_description_effect~ RET desc = description END
+							LPF ~get_description_effect~ RET desc = description sort END
 							PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-								SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
+								SET $abilities(~%sort%~ ~%count%~ ~%desc%~) = 1
 								SET count += 1
 							END
 						END
 					END
 					ELSE BEGIN
-						LPF ~get_description_effect~ RET desc = description END
+						LPF ~get_description_effect~ RET desc = description sort END
 						PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-							SET $abilities($sort_opcodes(~%opcode%~) ~%count%~ ~%desc%~) = 1
+							SET $abilities(~%sort%~ ~%count%~ ~%desc%~) = 1
 							SET count += 1
 						END
 					END
@@ -67,42 +67,6 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 			ELSE BEGIN PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' timing different de 2 ! (%timing%)~ END
 		END
     END
-    /*
-	// TODO: ~get_description_effect_group~ va simplement appeler LPM ~opcode_group_%opcode%~
-	// TODO: LPM ~opcode_group_%opcode%~ va utiliser data à sa façon ?
-	// TODO: Bien penser qu'il pourra grouper un nombre indéterminé d'entrées... entre 1 et 9 par exemple
-	// TODO: Penser aussi que pour un opcode déterminé, plusieurs groupes peuvent être créés, que ce qui détermine qu'on groupe ou non peut être différent d'un opcode à l'autre
-	//       Ex: - Mémorisation de 2 sorts divins supplémentaires de niveau 5, 6 et 7
-    //           - Mémorisation d'1 sort divin supplémentaire de niveau 2
-    // Un compteur par groupe
-    SET $abilities_groups(166 10) = 2 // compteur indiquant combien d'entrée à (tenter de) grouper (si possible)
-    SET $abilities_groups(62) = 1
-    // Une entrée par élément
-    SET $abilities_groups_166_10(opcodea parameter1a parameter2a etca) = 1
-    SET $abilities_groups_166_10(opcodeb parameter1b parameter2b etcb) = 1
-    SET $abilities_groups_62_0 (opcodec parameter1c parameter2c etcc) = 1
-    PATCH_PHP_EACH abilities_groups AS group => count BEGIN
-		SET abilityType = AbilityType_Equipped
-        PATCH_PRINT "%group_0% %group_1% => %count%"
-        PATCH_IF count == 1 BEGIN
-            PATCH_PRINT "1 seul element"
-            PATCH_PHP_EACH ~abilities_groups_%group_0%_%group_1%~ AS data => v BEGIN
-                LPM ~abilities_groups_to_vars~
-                LPF ~get_description_effect_group~ RET desc = description END
-            END
-        END
-        ELSE BEGIN
-            // LPF ~get_description_effect_group~ STR_VAR group = EVAL "%group_0%_%group_1%" RET desc = description END // LPM ~opcode_group_%opcode%~
-            // Code spécifique à chaque opcode qui décide comment grouper
-            PATCH_PHP_EACH ~abilities_groups_%group_0%_%group_1%~ AS data => v BEGIN
-                LPM ~abilities_groups_to_vars~
-                PATCH_PRINT "+- %data_0% %data_1% => %v%"
-            END
-        END
-    END
-    */
-
-    // PATCH_PHP_EACH ~abilities~ AS data => value BEGIN PATCH_PRINT "%data_0% %data_1% %value%" END
 
     LPF ~get_unique_equipped_abilities~ STR_VAR array_name = "abilities" RET count RET_ARRAY newAbilities END
 

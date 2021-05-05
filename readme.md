@@ -53,10 +53,6 @@ Cela apporte plusieurs avantages:
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
-- Améliorer le tri des effets en faisant en sorte que, pour un même opcode, ceux ayant 100% soient avant ceux < 100 (Ex: RR#TROL)
-
-  > - Si la cible est un humain, un gnome, un nain ou une petite-personne :
-  >  -  Endort la cible (jet de sauvegarde contre les sorts à +4 pour annuler)
 - Opcode 1  
   Améliorer les textes, mieux adapté aux situations et moins génériques.
 - Opcode 67
@@ -84,3 +80,10 @@ Cela apporte plusieurs avantages:
   - D'abord regarder en jeu ce qui est inscrit lorsqu'on passe la souris sur ce genre d'effet, et voir comment il serait possible de récupérer cette chaîne.
   - Si rien n'est inscrit, ou juste le nom de l'objet : créer un tooltip pour l'objet (travail au cas par cas) ?
 - Afficher la portée des capacités de charge ?
+
+### Objets à corriger
+
+Une liste d'objets sur lesquels je suis tombée et qui ont un bug évident.
+Ces objets seront corrigés dans un composant optionnel.
+
+- **BHCLUB01** (Secret of Bonehill) : Multiplicateur d'attaque sournoise +50 (vive les dégâts x 57 pour l'assassin :D)! Devrait être x 150% selon la description.

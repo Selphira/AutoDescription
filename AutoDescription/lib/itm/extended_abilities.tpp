@@ -68,7 +68,7 @@ END
 
 DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 	LOCAL_SET chargeStrref = 0
-	LOCAL_SET sort = ( headerIndex + 1 ) * 10000
+	LOCAL_SET sort = ( headerIndex + 1 ) * 1000000
 	LOCAL_SET chargeAbilityCount = 0
 	LOCAL_SPRINT chargeTitle ~~
 
@@ -99,9 +99,9 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 						SET opcodeBase = opcode
 						PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
 							SET opcode = opcodeBase * 1000 + subOpcode
-							LPF ~get_description_effect~ RET desc = description END
+							LPF ~get_description_effect~ RET desc = description descSort = sort END
 							PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-								SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+								SET abilitySort = sort + descSort
 								SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
 								SET chargeCount += 1
 								SET chargeAbilityCount += 1
@@ -109,9 +109,9 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 						END
 					END
 					ELSE BEGIN
-						LPF ~get_description_effect~ RET desc = description END
+						LPF ~get_description_effect~ RET desc = description descSort = sort END
 						PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-							SET abilitySort = sort + $sort_opcodes(~%opcode%~)
+							SET abilitySort = sort + descSort
 							SET $charge_abilities(~%abilitySort%~ ~%chargeAbilityCount%~ ~%desc%~) = 2
 							SET chargeCount += 1
 							SET chargeAbilityCount += 1
@@ -165,17 +165,17 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 				SET opcodeBase = opcode
 				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
 					SET opcode = opcodeBase * 1000 + subOpcode
-					LPF ~get_description_effect~ RET desc = description END
+					LPF ~get_description_effect~ RET desc = description descSort = sort END
 					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-						SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+						SET $EVAL ~combat_abilities_%combatCount%~(~%descSort%~ $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
 						SET $combatAbilities(~%combatCount%~ 0) += 1
 					END
 				END
 			END
 			ELSE BEGIN
-				LPF ~get_description_effect~ RET desc = description END
+				LPF ~get_description_effect~ RET desc = description descSort = sort END
 				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-					SET $EVAL ~combat_abilities_%combatCount%~($sort_opcodes(~%opcode%~) $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+					SET $EVAL ~combat_abilities_%combatCount%~(~%descSort%~ $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
 					SET $combatAbilities(~%combatCount%~ 0) += 1
 				END
 			END
