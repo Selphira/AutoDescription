@@ -261,7 +261,7 @@
 @102266 = ~Crée %amount% objets (%itemName%)~
 @102267 = ~les points de vie maximum~
 @102268 = ~le TAC0~
-// @102269 = ~de multiplier les points de vie maximum du porteur par %value%~
+@102269 = ~Revient dans la main du lanceur~
 @102270 = ~Dégâts minimum~
 @102271 = ~la sagesse~
 @102272 = ~la force~

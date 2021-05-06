@@ -155,6 +155,14 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
+	READ_BYTE  (offset + ITM_HEAD_attack_type) attackType
+
+	PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
+		SPRINT desc @102269 // ~Revient dans la main du lanceur~
+		SET $EVAL ~combat_abilities_%combatCount%~(0 $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
+		SET $combatAbilities(~%combatCount%~ 0) += 1
+	END
+
 	GET_OFFSET_ARRAY2 blockOffsets offset ITM_V10_HEAD_EFFECTS
 	PATCH_PHP_EACH blockOffsets AS int => blockOffset BEGIN
 		READ_SHORT blockOffset opcode
@@ -298,10 +306,10 @@ DEFINE_PATCH_FUNCTION ~add_combat_section_to_description~ STR_VAR itemRef = ~~ R
 		READ_BYTE  (offset + ITM_HEAD_location) location
 		READ_BYTE  (offset + ITM_HEAD_attack_type) attackType
 		PATCH_IF location == 1 BEGIN
-			PATCH_IF attackType == 1 BEGIN
+			PATCH_IF attackType == ITM_ATTACK_TYPE_melee BEGIN
 				SPRINT sectionType @100013 // ~au corps à corps~
 			END
-			ELSE PATCH_IF attackType == 2 OR attackType == 4 BEGIN
+			ELSE PATCH_IF attackType == ITM_ATTACK_TYPE_projectile OR attackType == ITM_ATTACK_TYPE_launcher BEGIN
 				SPRINT sectionType @100014 // ~à distance~
 			END
 			SPRINT string @10013   // ~%section% (%sectionType%)~

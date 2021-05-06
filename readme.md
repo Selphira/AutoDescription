@@ -64,7 +64,6 @@ Cela apporte plusieurs avantages:
   Equipement : "Sanctuaire permanent", "Sous l'effet de Sanctuaire", "Sanctuaire", autres ?
 - Opcode 206 (resref tb#preti) + opcode 146 (resref tb#depet)
   // Fusionner en une seule ligne ! // Immunité au sort Pétrification
-- "Revient dans les mains du lanceur immédiatement après avoir été lancée" (Ex: AX1H10)
 - Grouper les charmes (Ex: A7RING02)
   
 
@@ -84,6 +83,6 @@ Cela apporte plusieurs avantages:
 ### Objets à corriger
 
 Une liste d'objets sur lesquels je suis tombée et qui ont un bug évident.
-Ces objets seront corrigés dans un composant optionnel.
+Ces objets seront corrigés dans un composant optionnel qui devra s'exécuter avant le composant principal.
 
 - **BHCLUB01** (Secret of Bonehill) : Multiplicateur d'attaque sournoise +50 (vive les dégâts x 57 pour l'assassin :D)! Devrait être x 150% selon la description.
