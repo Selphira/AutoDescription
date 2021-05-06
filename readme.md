@@ -34,9 +34,6 @@ Cela apporte plusieurs avantages:
   - Si la classe de Mage n'est pas autoriseé ET que tous les kits de mage ne le sont pas non plus, juste laisser Mage ou préciser "Mage monoclassé et kittés" ?
   - Est-ce que le groupe d'une classe doit comporter les multi-classe où la classe en question n'est pas la base ?
   Ex: Le groupe "mage" doit-il comporter les multi-classs du genre "guerrier/mage" (mage/voleur oui, car mage est la base)
-- Certains objets ont une description "non identifiée" mais aucune description "identifiée" (Ex: A!BCHAN1.ITM). Copier la version non identifiée dans la version identifiée et passer à la moulinette.
-  Ceci n'est pas à faire pour les objets sans aucune description qui sont (normalement) des objets non accessibles au joueur.
-- Gestion du timing "delayed" dans tous les types de capacités (Ex: CLCKK2.ITM, STAF17.itm, C2BLUN03) 
 - Gérer les potions et les munitions
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01)
 - Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin

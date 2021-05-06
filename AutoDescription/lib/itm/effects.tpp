@@ -48,8 +48,8 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 		END
 	END
 
-
-	LPM ~add_duration_and_save~
+	LPM ~add_duration~
+	LPM ~add_save~
 END
 
 DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
@@ -100,10 +100,12 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 			LPM ~%macro%%opcode%~
 		END
 	END
-	LPM ~add_duration_and_save~
+
+	LPM ~add_duration~
+	LPM ~add_save~
 END
 
-DEFINE_PATCH_MACRO ~add_duration_and_save~ BEGIN
+DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	PATCH_IF durationAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
@@ -112,7 +114,9 @@ DEFINE_PATCH_MACRO ~add_duration_and_save~ BEGIN
 			SET durationAdded = 1
 		END
 	END
+END
 
+DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
 		SPRINT saveTypeStr ~~
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
@@ -231,49 +235,53 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 		// TODO: A gérer mieux que ça
 		// SPRINT value @100046 // ~de manière permanente~
 	END
-	ELSE PATCH_IF timingMode == TIMING_duration AND duration > 0 BEGIN
-        LPF ~convert_duration~ INT_VAR duration RET turns rounds seconds END
+	ELSE PATCH_IF timingMode != TIMING_while_equipped AND duration > 0 BEGIN
+        LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 
-	    PATCH_IF (turns > 0 AND (rounds > 0 OR seconds > 0)) OR (rounds > 0 AND (turns > 0 OR seconds > 0)) BEGIN
-	        PATCH_IF duration == 1 BEGIN
-	            SPRINT value @100040 // ~pendant 1 seconde~
-	        END
-	        ELSE BEGIN
-	            SPRINT value @100041 // ~pendant %duration% secondes~
-	        END
-	    END
-	    ELSE PATCH_IF turns > 0 BEGIN
-	        PATCH_IF turns == 1 BEGIN
-	            SPRINT value @100042 // ~pendant 1 tour~
-	        END
-	        ELSE BEGIN
-	            SPRINT value @100043 // ~pendant %turns% tours~
-	        END
-	    END
-	    ELSE PATCH_IF rounds > 0 BEGIN
-	        PATCH_IF rounds == 1 BEGIN
-	            SPRINT value @100044 // ~pendant 1 round~
-	        END
-	        ELSE BEGIN
-	            SPRINT value @100045 // ~pendant %round% rounds~
-	        END
-	    END
-	    ELSE PATCH_IF seconds > 0 BEGIN
-	        PATCH_IF seconds == 1 BEGIN
-	            SPRINT value @100040 // ~pendant 1 seconde~
-	        END
-	        ELSE BEGIN
-	            SET duration = seconds
-	            SPRINT value @100041 // ~pendant %duration% secondes~
-	        END
-	    END
+		PATCH_IF timingMode == TIMING_duration BEGIN
+			SPRINT value @100039 // ~pendant %duration%~
+		END
+		ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
+			SPRINT value @100038 // ~après %strDuration%~
+		END
+		ELSE BEGIN
+			PATCH_PRINT "%SOURCE_FILE%: timing %timingMode%"
+		END
     END
 END
 
-DEFINE_PATCH_FUNCTION ~convert_duration~ INT_VAR duration = 0 RET turns rounds seconds BEGIN
+DEFINE_PATCH_FUNCTION ~get_str_duration~ INT_VAR duration = 0 RET strDuration BEGIN
+    SET total = duration
     SET turns = duration / 60
     SET duration = duration MODULO 60
     SET rounds = duration / 6
-    SET duration = duration MODULO 6
-    SET seconds = duration
+    SET seconds = duration MODULO 6
+
+	SPRINT strDuration ~~
+
+    PATCH_IF seconds > 0 OR (turns > 0 AND rounds > 0) BEGIN
+        SET seconds = total
+        PATCH_IF seconds == 1 BEGIN
+            SPRINT strDuration @100040 // ~1 seconde~
+        END
+        ELSE BEGIN
+            SPRINT strDuration @100041 // ~%seconds% secondes~
+        END
+    END
+    ELSE PATCH_IF turns > 0 BEGIN
+        PATCH_IF turns == 1 BEGIN
+            SPRINT strDuration @100042 // ~1 tour~
+        END
+        ELSE BEGIN
+            SPRINT strDuration @100043 // ~%turns% tours~
+        END
+    END
+    ELSE PATCH_IF rounds > 0 BEGIN
+        PATCH_IF rounds == 1 BEGIN
+            SPRINT strDuration @100044 // ~1 round~
+        END
+        ELSE BEGIN
+            SPRINT strDuration @100045 // ~%round% rounds~
+        END
+    END
 END
