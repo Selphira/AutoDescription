@@ -214,7 +214,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	193 => 1 // Spell Effect: Invisible Detection by Script [193]
 	215 => 1
 	221 => 1 // Removal: Remove Secondary Type [221]
-	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: A gérer ! (Ex: L#NILA61)
+	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: A gérer ! (Ex: L#NILA61, SOLAK1)
 	240 => 1 // Graphics: Remove Special Effect Icon [240]
 	243 => 1 // Item: Drain Item Charges [243]
 	248 => 1 // Item: Set Melee Effect [248]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte (CBWTNI6A.ITM)
@@ -1045,7 +1045,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_27~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_27~ BEGIN
-	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102055 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'acide~
+	LOCAL_SPRINT resistName @102055 // ~Résistance à l'acide~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_27~ BEGIN
@@ -1062,6 +1063,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_28~ BEGIN
 	LOCAL_SPRINT resistName @102059 // ~Résistance au froid~
 	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_28~ BEGIN
+	LOCAL_SPRINT resistName @102059 // ~Résistance au froid~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_28~ BEGIN
@@ -1081,7 +1087,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_29~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_29~ BEGIN
-	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102057 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'électricité~
+	LOCAL_SPRINT resistName @102057 // ~Résistance à l'électricité~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_29~ BEGIN
@@ -1101,7 +1108,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_30~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_30~ BEGIN
-	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102056 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au feu~
+	LOCAL_SPRINT resistName @102056 // ~Résistance au feu~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_30~ BEGIN
@@ -1118,6 +1126,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_31~ BEGIN
 	LOCAL_SPRINT resistName @102065 // ~Résistance aux dégâts magiques~
 	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_31~ BEGIN
+	LOCAL_SPRINT resistName @102065 // ~Résistance aux dégâts magiques~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_31~ BEGIN
@@ -1735,7 +1748,8 @@ END
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~ BEGIN SPRINT description @102125 END // = ~Immunité aux attaques de regard~
+		~64~  BEGIN SPRINT description @102125 END // ~Immunité aux attaques de regard~
+		~102~ BEGIN SPRINT description @102277 END // ~Immunité aux flèches de flamme bleue~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type de projectile '%parameter2%' à gérer"
     END
 END
@@ -2419,7 +2433,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_166~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_166~ BEGIN
-	LPF ~opcode_target_mod_percent~ INT_VAR strref = 102060 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à la magie~
+	LOCAL_SPRINT resistName @102060 // ~Résistance à la magie~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_166~ BEGIN
@@ -2450,6 +2465,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_173~ BEGIN
 	LOCAL_SPRINT resistName @102058 // ~Résistance au poison~
 	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_173~ BEGIN
+	LOCAL_SPRINT resistName @102058 // ~Résistance au poison~
+	LPM ~opcode_target_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_173~ BEGIN
@@ -3372,6 +3392,35 @@ DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BE
 	END
 END
 
+/* ----------------------------------------- *
+ * Gestion des modifications des résistances *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
+	LOCAL_SET value = ~%parameter1%~
+
+	TO_LOWER resistName
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF value > 0 BEGIN
+	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102282 // ~Augmente la %resistName% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT value @10002 // ~%value% %~
+	        SPRINT description @102281 // ~Réduit la %resistName% %ofTheTarget% de %value%~
+        END
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+	    SPRINT value @10002 // ~%value% %~
+		SPRINT description @102283 // ~Passe la %resistName% %ofTheTarget% à %value%~
+	END
+	ELSE BEGIN // percent
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102284 // ~Multiplie la %resistName% %ofTheTarget% par %value%~
+	END
+END
+
 /* --------------------------------------------------------- *
  * Gestion des modifications des résistances par probabilité *
  * --------------------------------------------------------- */
@@ -3392,6 +3441,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
         END
     END
     ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+	    SPRINT value @10002 // ~%value% %~
         SPRINT description @102541 // ~de passer la %resistName% %ofTheTarget% à %value%~
     END
     ELSE BEGIN // percent
