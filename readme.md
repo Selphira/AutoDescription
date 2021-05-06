@@ -41,10 +41,7 @@ Cela apporte plusieurs avantages:
   > Utilisable par : 
   > - Voleur monoclassé et multiclassé
   > - Voleur
-- opcode_target_probability_166: gérer le timing "permanent"
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
-- Gérer le timing "permanent", il affichera "de manière permanente" ou "définitivement" à la fin de la phrase, mais pas systématiquement. (les conditions restent à définir) (ex: L#NI6CQ)
-  Exemple à éviter: 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente
 - Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
 - Gérer les opcodes suivants : 101, 144, 177, 180, 188, 232, 248, 249, 251, 268, 272, 300, 318
 - Opcode 177  

@@ -923,8 +923,6 @@ DEFINE_PATCH_MACRO ~opcode_target_20~ BEGIN
 	END
 END
 
-
-
 /* ------------------------ *
  * Stat: Lore Modifier [21] *
  * ------------------------ */

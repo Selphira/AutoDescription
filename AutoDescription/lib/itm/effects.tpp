@@ -232,8 +232,15 @@ END
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
 	PATCH_IF timingMode == TIMING_permanent BEGIN
-		// TODO: A gérer mieux que ça
-		// SPRINT value @100046 // ~de manière permanente~
+		SET found = 0
+		PATCH_FOR_EACH cOpcode IN 12 13 20 23 24 32 55 58 68 75 77 79 81 116 125 146 148 161 162 177 214 218 230 233 238 244 261 273 280 316 BEGIN
+			PATCH_IF opcode == cOpcode BEGIN
+				SET found = 1
+			END
+		END
+		PATCH_IF found == 0 BEGIN
+			SPRINT value @100046 // ~de manière permanente~
+		END
 	END
 	ELSE PATCH_IF timingMode != TIMING_while_equipped AND duration > 0 BEGIN
         LPF ~get_str_duration~ INT_VAR duration RET strDuration END
