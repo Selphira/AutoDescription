@@ -109,7 +109,7 @@
 @102113 = ~Draîne un niveau à la cible~
 @102114 = ~Draîne %amount% niveaux à la cible~
 @102115 = ~Capacité de mouvement~
-@102116 = ~Le porteur voit son alignement modifié à %alignment%~
+@102116 = ~Alignement modifié en %alignment%~
 @102117 = ~Non-détection permanente~
 @102118 = ~Immunité contre les sorts de niveau %spellLevel%~
 @102119 = ~Champ de vision~
@@ -140,7 +140,7 @@
 @102144 = ~Guérison de la cécité~
 @102145 = ~Guérison de la surdité~
 @102146 = ~Guérison de la Débilité mentale~
-@102147 = ~Réfléchit les attaques de regard~
+@102147 = ~Renvoie les attaques de regard~
 @102148 = ~Inflige Horreur à la cible~
 @102150 = ~~
 @102151 = ~Immunité aux sorts de l'école de l'Abjuration~
@@ -270,9 +270,9 @@
 @102275 = ~la constitution~
 @102276 = ~le charisme~
 @102277 = ~Immunité aux flèches de flamme bleue~
-// @102278 = ~de passer le charisme du porteur à %value%~
-// @102279 = ~de multiplier le charisme du porteur par %value%~
-// @102280 = ~de modifier la constitution du porteur de %value%~
+@102278 = ~les jets de sauvegarde %versus%~
+@102279 = ~de protéger contre l'arrêt du temps~
+@102280 = ~de modifier l'alignement %ofTheTarget% en %alignment%~
 @102281 = ~Réduit la %resistName% %ofTheTarget% de %value%~
 @102282 = ~Augmente la %resistName% %ofTheTarget% de %value%~
 @102283 = ~Passe la %resistName% %ofTheTarget% à %value%~
@@ -301,12 +301,12 @@
 @102306 = ~d'empoisonner le porteur et lui infliger 1 point de dégât par seconde~
 @102307 = ~d'empoisonner le porteur et lui infliger %amount% points de dégâts par seconde~
 @102308 = ~d'empoisonner le porteur et lui infliger 1 point de dégât  toutes les %amount% secondes~
-// @102309 = ~de modifier la constitution de la cible de %value%~
-// @102310 = ~de passer la constitution de la cible à %value%~
-// @102311 = ~de multiplier la constitution de la cible par %value%~
-// @102312 = ~de modifier la force de la cible de %value%~
-// @102313 = ~de passer la force de la cible à %value%~
-// @102314 = ~de multiplier la force de la cible par %value%~
+@102309 = ~la chance~
+@102310 = ~de protéger contre les attaques sournoises~
+@102311 = ~Immunité aux éclairs~
+@102312 = ~Immunité aux flèches~
+@102313 = ~Immunité aux flèches lourdes~
+@102314 = ~Renvoie les rayons des spectateurs~
 @102315 = ~de lancer Invisibilité sur le porteur~
 @102316 = ~de lancer Invisibilité améliorée sur le porteur~
 @102317 = ~Renvoi le sort %spellName%~
@@ -325,16 +325,16 @@
 @102330 = ~Remémorise un sort divin de niveau %spellLevel%~
 @102331 = ~de dissiper la magie~
 @102332 = ~Transforme %theTarget% en %creatureName%~
-// @102333 = ~de modifier la résistance à la magie de la cible de %value%~
-// @102334 = ~de passer la résistance à la magie de la cible à %value%~
-// @102335 = ~de multiplier la résistance à la magie de la cible par %value%~
+@102333 = ~de renvoyer les rayons des spectateurs~
+@102334 = ~Renvoie les dagues boomerang~
+@102335 = ~de renvoyer les dagues boomerang~
 @102336 = ~Sanctuaire~
 @102337 = ~Inflige Débilité mentale à la cible~
 @102338 = ~Fait oublier 1 sort profane à la cible~
 @102339 = ~Fait oublier %amount% sorts profanes à la cible~
 @102340 = ~la capacité de mouvement~
-// @102341 = ~de passer le facteur de vitesse du porteur à %value%~
-// @102342 = ~de multiplier le facteur de vitesse du porteur par %value%~
+@102341 = ~Immunité contre les missiles magiques~
+@102342 = ~de renvoyer les éclairs~
 @102343 = ~de modifier l'attaque par round du porteur de %value%~
 @102344 = ~de passer l'attaque par round du porteur à %value%~
 @102345 = ~de multiplier l'attaque par round du porteur par %value%~
@@ -352,9 +352,9 @@
 @102357 = ~Immunité %spellName%~
 @102358 = ~Transforme le porteur en %creatureName%~
 @102359 = ~Inflige %damage% %damageType% au porteur~
-// @102360 = ~de modifier la capacité de mouvement de la cible de %value%~
-// @102361 = ~de passer la capacité de mouvement de la cible à %value%~
-// @102362 = ~de multiplier la capacité de mouvement de la cible par %value%~
+@102360 = ~Renvoie les éclairs~
+@102361 = ~Immunité contre les haches de jet~
+@102362 = ~Immunité contre les attaques de regard~
 @102363 = ~Les sorts profanes n'ont plus aucune durée~
 @102364 = ~Les sorts profanes durent %duration% moins longtemps~
 @102365 = ~Les sorts profanes durent %duration% plus longtemps~
@@ -398,9 +398,9 @@
 //@102403 = ~~
 @102404 = ~Guérison à la paralysie~
 @102405 = ~Image miroir~
-// @102406 = ~de modifier les chances de toucher du porteur de %value%~
-// @102407 = ~de passer les chances de toucher du porteur à %value%~
-// @102408 = ~de multiplier les chances de toucher du porteur par %value%~
+@102406 = ~Immunité contre les billes~
+@102407 = ~Immunité contre les dagues de jet~
+@102408 = ~Immunité contre les flèchettes~
 // @102409 = ~de modifier la capacité de mouvement du porteur de %value%~
 // @102410 = ~de passer la capacité de mouvement du porteur à %value%~
 // @102411 = ~de multiplier la capacité de mouvement du porteur par %value%~
@@ -453,7 +453,7 @@
 @102458 = ~de tuer instantanément les %creatureType%~
 @102459 = ~Immunité contre les attaques de toutes les créatures~
 @102460 = ~Permet de lancer des sorts~
-@102461 = ~de réfléchir les attaques de regard~
+@102461 = ~de renvoyer les attaques de regard~
 // @102462 = ~de modifier la vitesse d'incantation du porteur de %value%~
 // @102463 = ~de passer la vitesse d'incantation du porteur à %value%~
 // @102464 = ~de multiplier la vitesse d'incantation du porteur par %value%~
@@ -784,6 +784,14 @@
 @205195 = ~efrits~
 @205196 = ~djinns nobles~
 @205197 = ~efrits nobles~
+@205202 = ~mages~
+@205203 = ~guerriers~
+@205204 = ~clercs~
+@205205 = ~voleurs~
+@205206 = ~bardes~
+@205207 = ~paladins~
+@205208 = ~druides~
+@205209 = ~rôdeurs~
 
 /* ------------ *
  * Specific.ids *

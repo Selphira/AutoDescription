@@ -39,20 +39,11 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
 		PATCH_IF !VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			PATCH_IF timing == TIMING_while_equipped OR timing == TIMING_permanent BEGIN // while equiped
-				PATCH_IF (probability1 - probability2) == 100 BEGIN
-					SET abilityType = AbilityType_Equipped
-					PATCH_IF opcode == 219 BEGIN
-						SET opcodeBase = opcode
-						PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
-							SET opcode = opcodeBase * 1000 + subOpcode
-							LPF ~get_description_effect~ RET desc = description sort END
-							PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-								SET $abilities(~%sort%~ ~%count%~ ~%desc%~) = 1
-								SET count += 1
-							END
-						END
-					END
-					ELSE BEGIN
+				SET abilityType = AbilityType_Equipped
+				PATCH_IF opcode == 219 BEGIN
+					SET opcodeBase = opcode
+					PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+						SET opcode = opcodeBase * 1000 + subOpcode
 						LPF ~get_description_effect~ RET desc = description sort END
 						PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 							SET $abilities(~%sort%~ ~%count%~ ~%desc%~) = 1
@@ -61,7 +52,11 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 					END
 				END
 				ELSE BEGIN
-					PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' a une probabilité inferieure a 100 !~
+					LPF ~get_description_effect~ RET desc = description sort END
+					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+						SET $abilities(~%sort%~ ~%count%~ ~%desc%~) = 1
+						SET count += 1
+					END
 				END
 			END
 			ELSE BEGIN PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' timing different de 2 ! (%timing%)~ END

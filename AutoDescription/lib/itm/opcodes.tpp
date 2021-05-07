@@ -937,6 +937,10 @@ DEFINE_PATCH_MACRO ~opcode_self_22~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 101075 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Chance~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_22~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 102309 RET description END // ~la chance~
+END
+
 /* -------------------- *
  * Immunité à l'horreur *
  * -------------------- */
@@ -1149,6 +1153,11 @@ DEFINE_PATCH_MACRO ~opcode_self_33~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 102029 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_33~ BEGIN
+	LOCAL_SPRINT versus @102029 // ~contre la paralysie, la mort et les poisons~
+	LPF ~opcode_probability~ INT_VAR strref = 102278 RET description END // ~les jets de sauvegarde %versus%~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 102033 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les sorts~
 END
@@ -1164,6 +1173,11 @@ DEFINE_PATCH_MACRO ~opcode_self_34~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 102030 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_34~ BEGIN
+	LOCAL_SPRINT versus @102030 // ~contre les baguettes, les sceptres et les bâtons~
+	LPF ~opcode_probability~ INT_VAR strref = 102278 RET description END // ~les jets de sauvegarde %versus%~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_34~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 102030 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les sorts~
 END
@@ -1173,6 +1187,11 @@ END
  * ------------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_35~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 102031 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la pétrification et la métamorphose~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_35~ BEGIN
+	LOCAL_SPRINT versus @102031 // ~contre la pétrification et la métamorphose~
+	LPF ~opcode_probability~ INT_VAR strref = 102278 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_35~ BEGIN
@@ -1187,7 +1206,8 @@ DEFINE_PATCH_MACRO ~opcode_self_36~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_36~ BEGIN
-	PATCH_FAIL "%SOURCE_FILE%: opcode_self_probability_36: a terminer"
+	LOCAL_SPRINT versus @102032 // ~contre les souffles~
+	LPF ~opcode_probability~ INT_VAR strref = 102278 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
@@ -1391,6 +1411,17 @@ END
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_57~ BEGIN
 	LOCAL_SET alignment = ~%parameter2%~
+	LPM ~opcode_57_base~
+	SPRINT description @102116 // ~Alignement modifié en %alignment%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_57~ BEGIN
+	LOCAL_SET alignment = ~%parameter2%~
+	LPM ~opcode_57_base~
+	SPRINT description @102280 // ~de modifier l'alignement %ofTheTarget% en %alignment%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_57_base~ BEGIN
 	LOCAL_SPRINT chaotic @101000
 	LOCAL_SPRINT lawful @101004
 	LOCAL_SPRINT neutral @101003
@@ -1407,8 +1438,6 @@ DEFINE_PATCH_MACRO ~opcode_self_57~ BEGIN
 	ELSE PATCH_IF alignment == 49 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
 	ELSE PATCH_IF alignment == 50 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
 	ELSE PATCH_IF alignment == 51 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
-
-	SPRINT description @102116 // ~Le porteur voit son alignement modifié à %alignment%~
 END
 
 /* --------------------------------------------- *
@@ -1746,8 +1775,17 @@ END
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~  BEGIN SPRINT description @102125 END // ~Immunité aux attaques de regard~
-		~102~ BEGIN SPRINT description @102277 END // ~Immunité aux flèches de flamme bleue~
+		  1 BEGIN SPRINT description @102312 END // ~Immunité contre les flèches~
+		  4 BEGIN SPRINT description @102313 END // ~Immunité contre les flèches lourdes~
+		  9 BEGIN SPRINT description @102361 END // ~Immunité contre les haches de jet~
+		 14 BEGIN SPRINT description @102362 END // ~Immunité contre les attaques de regard~
+		 19 BEGIN SPRINT description @102406 END // ~Immunité contre les billes~
+		 26 BEGIN SPRINT description @102407 END // ~Immunité contre les dagues de jet~
+		 34 BEGIN SPRINT description @102408 END // ~Immunité contre les flèchettes~
+		 64 BEGIN SPRINT description @102125 END // ~Immunité contre les attaques de regard~
+		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @102341 END // ~Immunité contre les missiles magiques~
+		102 BEGIN SPRINT description @102277 END // ~Immunité contre les flèches de flamme bleue~
+		 39 442 BEGIN SPRINT description @102311 END // ~Immunité contre les éclairs~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type de projectile '%parameter2%' à gérer"
     END
 END
@@ -2663,14 +2701,20 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~ BEGIN SPRINT description @102147 END // ~Réfléchit les attaques de regard~
+		 64 BEGIN SPRINT description @102147 END // ~Renvoie les attaques de regard~
+		208 BEGIN SPRINT description @102314 END // ~Renvoie les rayons des spectateurs~
+		312 BEGIN SPRINT description @102334 END // ~Renvoie les dagues boomerang~
+		39 442 BEGIN SPRINT description @102360 END // ~Renvoie les éclairs~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
     END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~ BEGIN SPRINT description @102461 END // ~de réfléchir les attaques de regard~
+		 64 BEGIN SPRINT description @102461 END // ~de renvoyer les attaques de regard~
+		208 BEGIN SPRINT description @102333 END // ~de renvoyer les rayons des spectateurs~
+		312 BEGIN SPRINT description @102335 END // ~de renvoyer les dagues boomerang~
+		39 442 BEGIN SPRINT description @102342 END // ~de renvoyer les éclairs~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
     END
 END
@@ -2744,16 +2788,20 @@ DEFINE_PATCH_MACRO ~opcode_self_206~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_206~ BEGIN
-	LPM ~opcode_self_206~ // TODO: Améliorer ?
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @102289 // ~d'immuniser au sort %spellName%~
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_206~ BEGIN
+	LPM ~opcode_self_206~ // TODO: Améliorer ?
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
+	LPM ~opcode_self_probability_206~ // TODO: Améliorer ?
 END
 
 /* ----------------------------------- *
@@ -2803,7 +2851,7 @@ DEFINE_PATCH_MACRO ~opcode_self_216~ BEGIN
 	ELSE PATCH_IF amount > 1 BEGIN
 		SPRINT description @102292 // ~Draîne %amount% niveaux au porteur~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
@@ -2817,7 +2865,7 @@ DEFINE_PATCH_MACRO ~opcode_target_216~ BEGIN
 	ELSE PATCH_IF amount > 1 BEGIN
 		SPRINT description @102114 // ~Draîne %amount% niveaux à la cible~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
@@ -2831,7 +2879,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_216~ BEGIN
 	ELSE PATCH_IF amount > 1 BEGIN
 		SPRINT description @102142 // ~de draîner %amount% niveaux à la cible~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
@@ -2845,7 +2893,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
 	ELSE PATCH_IF amount > 1 BEGIN
 		SPRINT description @102187 // ~de draîner %amount% niveaux au porteur~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
 	END
 END
@@ -3218,6 +3266,12 @@ DEFINE_PATCH_MACRO ~opcode_self_292~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_292~ BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
+		SPRINT description @102310 // ~de protéger contre les attaques sournoises~
+	END
+END
+
 /* ------------------------ *
  * Chances de coup critique *
  * ------------------------ */
@@ -3246,6 +3300,10 @@ END
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_310~ BEGIN
 	SPRINT description @102258 // ~Immunité à l'arrêt du temps~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_310~ BEGIN
+	SPRINT description @102279 // ~de protéger contre l'arrêt du temps~
 END
 
 /* ------------------------- *
