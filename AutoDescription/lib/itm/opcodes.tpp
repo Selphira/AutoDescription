@@ -2670,7 +2670,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		~64~ BEGIN SPRINT description @102461 END // ~de réfléhir les attaques de regard~
+		~64~ BEGIN SPRINT description @102461 END // ~de réfléchir les attaques de regard~
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
     END
 END
