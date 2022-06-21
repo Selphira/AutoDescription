@@ -193,9 +193,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	 66 => 1 // Graphics: Transparency Fade [66]
 	 72 => 1 // State: Set IDS State [72]
 	 82 => 1 // Set AI Script [82]
-	101 => 1 // Protection: from Opcode [101] // TODO: A gérer quand même ? Ne fait pas forcément doublon avec le 206 ?
+	101 => 1 // Protection: from Opcode [101] // TODO: A gérer quand même ? Ne fait pas forcément doublon avec le 206 ? (pas doublon pour RR#WEAR2)
 	110 => 1 // (Retreat From) [110]
 	112 => 1 // Item: Remove Item [112]
+	123 => 1 // Item: Remove Inventory Item
 	139 => 1
 	141 => 1
 	142 => 1
@@ -523,7 +524,7 @@ END
  * Charm: Charm Specific Creature [5] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_5~ BEGIN
-	PATCH_FAIL "%SOURCE_FILE%: opcode_self_5: valide comme configuration ??"
+	//PATCH_FAIL "%SOURCE_FILE%: opcode_self_5: valide comme configuration ??"
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
@@ -1370,26 +1371,12 @@ DEFINE_PATCH_MACRO ~opcode_self_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
-	// TODO: Fonctionne pour tous les lvl si diceCount == 0 ?!
+	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+
 	PATCH_IF diceCount > 0 BEGIN
-		//Parameter #1: IDS Entry
-	    //Parameter #2: IDS File
-		//LPF ~opcode_mod~ INT_VAR strref = 101076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
-		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
-			2 => ~EA.ids~
-			3 => ~General.ids~
-			4 => ~Race.ids~
-			5 => ~Class.ids~
-			6 => ~Specific.ids~
-			7 => ~Gender.ids~
-			8 => ~Align.ids~
-			9 => ~Kit.ids~
-		END
-		PATCH_PHP_EACH ids_files AS k => file BEGIN
-		END
-		SPRINT idsFile $ids_files(~%parameter2%~)
-		PATCH_FAIL "%SOURCE_FILE%: opcode 55 à gérer %idsFile%(~%parameter1%~)"
-		// Tue instantanément les GOLEM (race) de xx dés de vie ou moins
+		SPRINT description @102548 // ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
+	END ELSE BEGIN
+		SPRINT description @102547 // ~Tue instantanément les %creatureType%~
 	END
 END
 
@@ -1775,14 +1762,15 @@ END
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		  1 BEGIN SPRINT description @102312 END // ~Immunité contre les flèches~
-		  4 BEGIN SPRINT description @102313 END // ~Immunité contre les flèches lourdes~
-		  9 BEGIN SPRINT description @102361 END // ~Immunité contre les haches de jet~
+		  1 2 3 4 5 285 BEGIN SPRINT description @102312 END // ~Immunité contre les flèches~
+		  6 7 8 9 10 BEGIN SPRINT description @102361 END // ~Immunité contre les haches de jet~
 		 14 BEGIN SPRINT description @102362 END // ~Immunité contre les attaques de regard~
-		 19 BEGIN SPRINT description @102406 END // ~Immunité contre les billes~
-		 26 BEGIN SPRINT description @102407 END // ~Immunité contre les dagues de jet~
-		 34 BEGIN SPRINT description @102408 END // ~Immunité contre les flèchettes~
-		 64 BEGIN SPRINT description @102125 END // ~Immunité contre les attaques de regard~
+		 299 BEGIN SPRINT description @102553 END // ~Immunité contre les carreaux~
+		 16 17 18 19 BEGIN SPRINT description @102406 END // ~Immunité contre les billes~
+		 26 27 28 29 30 311 BEGIN SPRINT description @102407 END // ~Immunité contre les dagues de jet~
+		 31 32 33 34 35 315 BEGIN SPRINT description @102408 END // ~Immunité contre les flèchettes~
+		 55 56 57 58 59 BEGIN SPRINT description @102552 END // ~Immunité contre les lances de jet~
+		 64 208 274 BEGIN SPRINT description @102125 END // ~Immunité contre les attaques de regard~
 		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @102341 END // ~Immunité contre les missiles magiques~
 		102 BEGIN SPRINT description @102277 END // ~Immunité contre les flèches de flamme bleue~
 		 39 442 BEGIN SPRINT description @102311 END // ~Immunité contre les éclairs~
@@ -1999,11 +1987,19 @@ DEFINE_PATCH_MACRO ~opcode_self_104~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102377 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Expérience gagnée~
 END
 
-/* ----- *
- * Moral *
- * ----- */
+/* ------------ *
+ * Morale break *
+ * ------------ */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
+	SET parameter1 = 0 - parameter1
+	//FIXMe: renommer Moral en autre chose ? Moral break... (idem en dessous, et ne plus inverser la valeur)
 	LPF ~opcode_mod~ INT_VAR strref = 102110 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
+	SET parameter1 = 0 - parameter1
+	//TODO: xx% de chance d'être sous l'effet de la panique pendant yy temps // ? Si parameter1 est au dessus d'une certaine valeur ?
+	LPF ~opcode_probability~ INT_VAR strref = 102550 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le moral~
 END
 
 /* --------------------------------- *
@@ -2056,6 +2052,25 @@ DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @102265 // ~Crée une arme magique (%itemName%)~
+	END
+END
+
+/* ----------------------- *
+ * Detect: Alignment [115] *
+ * ----------------------- */
+DEFINE_PATCH_MACRO ~opcode_115~ BEGIN
+	PATCH_MATCH parameter2
+	WITH
+		~1~
+		BEGIN
+			SPRINT description @102651 // ~Détection du neutre~
+		END
+		~2~
+		BEGIN
+			SPRINT description @102652 // ~Détection du bien~
+		END
+		DEFAULT
+			SPRINT description @102650 // ~Détection du mal~
 	END
 END
 
@@ -2119,7 +2134,7 @@ DEFINE_PATCH_MACRO ~opcode_target_122~ BEGIN
 		PATCH_IF amount == 1 BEGIN
 			SPRINT description @102263 // ~Crée un objet (%itemName%)~
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF amount > 0 BEGIN
 			SPRINT description @102266 // ~Crée %amount% objets (%itemName%)~
 		END
 	END
@@ -2135,15 +2150,15 @@ DEFINE_PATCH_MACRO ~opcode_target_125~ BEGIN
 	SPRINT description @102322 // ~Déverrouille la serrure ciblée~
 END
 
-/* --------------------- *
- * Capacité de mouvement *
- * --------------------- */
+/* ----------------------------- *
+ * Stat: Movement Modifier [126] *
+ * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 102115 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Capacité de mouvement~
+	LPF ~opcode_mod~ INT_VAR strref = 102115 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse de déplacement~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	LPF ~opcode_target~ INT_VAR strref = 102340 RET description END // ~la capacité de mouvement~
+	LPF ~opcode_target~ INT_VAR strref = 102340 RET description END // ~la vitesse de déplacement~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
@@ -2519,15 +2534,15 @@ DEFINE_PATCH_MACRO ~opcode_target_175~ BEGIN
 	LPM ~opcode_target_109~
 END
 
-/* --------------------- *
- * Capacité de mouvement *
- * --------------------- */
+/* ---------------------------------- *
+ * Stat: Movement Modifier (II) [176] *
+ * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_176~ BEGIN
 	LPM ~opcode_self_126~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_176~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 102340 RET description END // ~la capacité de mouvement~
+	LPF ~opcode_probability~ INT_VAR strref = 102340 RET description END // ~la vitesse de déplacement~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_176~ BEGIN
@@ -2573,19 +2588,19 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded opcode BEGIN
-	SPRINT item ~%SOURCE_FILE%~
-	SET opcode = 0
+	SET oldOpcode = opcode
 	INNER_ACTION BEGIN
 		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
 			COPY_EXISTING ~%resref%.eff~  ~override~
-			READ_SHORT EFF2_opcode opcode
+				READ_SHORT EFF2_opcode opcode
 				LPF ~get_description_effect2~ RET description saveAdded durationAdded END
 		    BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%item% : Opcode %opcode% : Le fichier de l'effet %resref%.eff n'existe pas."
+			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %resref%.eff n'existe pas.~
 		END
     END
+	SET opcode = oldOpcode
 END
 
 /* ---------------------------------------------------- *
@@ -3033,6 +3048,17 @@ DEFINE_PATCH_MACRO ~opcode_self_239~ BEGIN
 	SPRINT description @102257 // ~Permet de voir au loin~
 END
 
+/* ----------------------------- *
+ * Charm: Control Creature [241] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_target_241~ BEGIN
+	LPM ~opcode_target_5~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_241~ BEGIN
+	LPM ~opcode_target_probability_5~
+END
+
 /* ------------------------------- *
  * Spell: Drain Wizard Spell [244] *
  * ------------------------------- */
@@ -3211,11 +3237,31 @@ DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 	END
 END
 
-/* ----------------- *
- * Hiatus entropique *
- * ----------------- */
+/* ----------------------- *
+ * Hiatus entropique [281] *
+ * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_281~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102079 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
+END
+
+/* --------------------------- *
+ * Use EFF File (Cursed) [283] *
+ * --------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_283~ BEGIN
+	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
+		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
+	END
+	ELSE BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		SPRINT theTarget   @102474 // ~les %targetType%~
+		SPRINT ofTheTarget @102538 // ~des %targetType%~
+		SPRINT versus      @101126 // ~contre les %targetType%~
+		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_res_description_283~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded opcode BEGIN
+	LPF ~get_res_description_177~ STR_VAR resref macro RET description saveAdded durationAdded opcode END
 END
 
 /* -------------------------------- *
@@ -3334,7 +3380,9 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	ELSE BEGIN // percent
 		SET value -= 100
 		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT value @10002 // ~%value% %~
+		PATCH_IF value != 0 BEGIN
+			SPRINT value @10002 // ~%value% %~
+		END
 	END
 	SPRINT name (AT ~%strref%~)
 END
@@ -3356,8 +3404,10 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 		SPRINT name (AT ~%strref%~)
 	END
-	ELSE BEGIN
-		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Valeur du second parametre invalide (%parameter2%), l'effet est annule ~
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+		SPRINT value @10002 // ~%value% %~
+		SPRINT value @10006 // ~Multiplié par %value%~
+		SPRINT name (AT ~%strref%~)
 	END
 END
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
@@ -3523,12 +3573,14 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 						READ_STRREF SPL_unidentified_name spellName
 					END
 					ELSE BEGIN
-						PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl"
+						INNER_ACTION BEGIN
+							APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl~
+						END
 					END
 				BUT_ONLY_IF_IT_CHANGES
 			END
 			ELSE BEGIN
-				WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.spl n'existe pas"
+				APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %resref%.eff n'existe pas.~
 			END
 	    END
 	END
@@ -3550,7 +3602,7 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas"
+			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas.~
 		END
     END
 END
@@ -3566,12 +3618,13 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 					READ_STRREF CRE_name creatureName
 				END
 				ELSE BEGIN
-					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre"
+					SPRINT creatureName (AT 102549)
+					PATCH_WARN "%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre"
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			WARN "%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas"
+			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas.~
 		END
     END
 END
@@ -3662,6 +3715,7 @@ END
  * Item revision v4 beta 10 *
  * ------------------------ */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_146_item_revision~ BEGIN
+	// Item revision
 	DVAFFLIC => 102495 // ~Ralentit et inflige 1 point de dégât à la cible toutes les 3 secondes pendants 4 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
 	DVBANISH => 102483 // ~Détruit les créatures convoquées~
 	DVBLEED0 => 102519 // ~Inflige 1 point de dégâts de poison à la cible à chaque round pendant 1 tour~
@@ -3691,9 +3745,12 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_146_item_revision~ BEGIN
 	DVSUNDER => 102486 // ~Réduit la classe d'armure de la cible de 1 pendant 2 rounds~
 	DVTHCLAP => 102531 // ~Etourdit les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~
 	DVVAMPIR => 102485 // ~Draîne 1d4 points de vie si la cible possède du sang et les transfère au porteur~
+	// Autres
+	DVFEARSM => 102604 //
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_probability_146_item_revision~ BEGIN
+	// Item revision
 	DVCHILL  => 102490 // ~de ralentir %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter)~
 	DVCORROS => 102533 // ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~
 	DVCRIPPL => 102511 // ~de réduire de moitié la vitesse de déplacement de la cible pendant 4 rounds~
@@ -3719,6 +3776,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_probability_146_item_revision~ BE
 	DVVTRSPH => 102515 // ~d'infliger 4d4 points de dégâts d'acide à la cible et aux adversaires dans un rayon de 1,50 mètre~
 	DVWEB    => 102510 // ~d'entoiler %theTarget% pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~
 	DVWHIRLS => 102526 // ~d'infliger 1d6 +2 points de dégâts contondants aux adversaires dans un rayon d'1,50 mètre~
+	// Autres
+	RR#WEAR  => 102601 // ~d'endormir %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
+	RR#BBOW  => 102602 // ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter, les spectateurs ont une pénalité de -5)~
+	RR#SCAXE => 102603 // ~d'étourdir la cible pendant 1 round~
 END
 
 /* ----------------------------------------------------------------------------------- *

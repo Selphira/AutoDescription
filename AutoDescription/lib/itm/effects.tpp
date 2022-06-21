@@ -35,12 +35,32 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	END
 
 	PATCH_IF probability == 100 BEGIN
-		LPM ~opcode%opcode_target%_%opcode_n%~
+		SPRINT method ~opcode%opcode_target%_%opcode_n%~
+		PATCH_TRY
+			LPM ~%method%~
+		WITH
+			~Failure("Unknown macro: \%method%")~
+			BEGIN
+				PATCH_FAIL ~Failure("Unknown macro: %method%")~
+			END
+			DEFAULT
+				PATCH_FAIL ~%ERROR_MESSAGE%~
+		END
 		LPM ~set_opcode_sort~
 	END
 	ELSE BEGIN
+		SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
 		SET probability += 1
-		LPM ~opcode%opcode_target%_probability_%opcode_n%~
+		PATCH_TRY
+			LPM ~%method%~
+		WITH
+			~Failure("Unknown macro: \%method%")~
+			BEGIN
+				PATCH_FAIL ~Failure("Unknown macro: %method%")~
+			END
+			DEFAULT
+				PATCH_FAIL ~%ERROR_MESSAGE%~
+		END
 		LPM ~set_opcode_sort~
 		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
@@ -106,7 +126,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
-	PATCH_IF durationAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF opcode != 177 AND opcode != 183 AND opcode != 283 AND durationAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
@@ -252,7 +272,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 			SPRINT value @100038 // ~après %strDuration%~
 		END
 		ELSE BEGIN
-			PATCH_PRINT "%SOURCE_FILE%: timing %timingMode%"
+			PATCH_PRINT "%SOURCE_FILE%: opcode %opcode% : timing %timingMode%"
 		END
     END
 END

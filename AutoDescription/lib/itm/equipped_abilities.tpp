@@ -30,6 +30,9 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
     SET count = 0
 
+    //TODO: Première boucle pour grouper certains effets (ex: opcode 83 (dévie) et 197 (renvoi) : S#SHLD01)
+    //      Pour éviter d'avoir de trop grosses descriptions !
+
     GET_OFFSET_ARRAY blockOffsets ITM_V10_GEN_EFFECTS
     PHP_EACH blockOffsets AS int => blockOffset BEGIN
 		READ_SHORT (blockOffset)                    opcode
@@ -38,7 +41,8 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 		READ_BYTE  (blockOffset + EFF_probability2) probability2
 
 		PATCH_IF !VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-			PATCH_IF timing == TIMING_while_equipped OR timing == TIMING_permanent BEGIN // while equiped
+		    // Timing est ignoré avec les opcodes 177, 183 et 283
+			PATCH_IF timing == TIMING_while_equipped OR timing == TIMING_permanent OR opcode == 177 OR opcode == 183 OR opcode == 206 OR opcode == 283 BEGIN // while equiped
 				SET abilityType = AbilityType_Equipped
 				PATCH_IF opcode == 219 BEGIN
 					SET opcodeBase = opcode

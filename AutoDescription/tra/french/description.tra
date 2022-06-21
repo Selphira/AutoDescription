@@ -108,7 +108,7 @@
 @102112 = ~Invisibilité améliorée permanente~
 @102113 = ~Draîne un niveau à la cible~
 @102114 = ~Draîne %amount% niveaux à la cible~
-@102115 = ~Capacité de mouvement~
+@102115 = ~Vitesse de déplacement~
 @102116 = ~Alignement modifié en %alignment%~
 @102117 = ~Non-détection permanente~
 @102118 = ~Immunité contre les sorts de niveau %spellLevel%~
@@ -305,7 +305,7 @@
 @102310 = ~de protéger contre les attaques sournoises~
 @102311 = ~Immunité aux éclairs~
 @102312 = ~Immunité aux flèches~
-@102313 = ~Immunité aux flèches lourdes~
+//@102313 = ~Immunité aux flèches lourdes~
 @102314 = ~Renvoie les rayons des spectateurs~
 @102315 = ~de lancer Invisibilité sur le porteur~
 @102316 = ~de lancer Invisibilité améliorée sur le porteur~
@@ -332,7 +332,7 @@
 @102337 = ~Inflige Débilité mentale à la cible~
 @102338 = ~Fait oublier 1 sort profane à la cible~
 @102339 = ~Fait oublier %amount% sorts profanes à la cible~
-@102340 = ~la capacité de mouvement~
+@102340 = ~la vitesse de déplacement~
 @102341 = ~Immunité contre les missiles magiques~
 @102342 = ~de renvoyer les éclairs~
 @102343 = ~de modifier l'attaque par round du porteur de %value%~
@@ -401,9 +401,9 @@
 @102406 = ~Immunité contre les billes~
 @102407 = ~Immunité contre les dagues de jet~
 @102408 = ~Immunité contre les flèchettes~
-// @102409 = ~de modifier la capacité de mouvement du porteur de %value%~
-// @102410 = ~de passer la capacité de mouvement du porteur à %value%~
-// @102411 = ~de multiplier la capacité de mouvement du porteur par %value%~
+// @102409 = ~de modifier la vitesse de déplacement du porteur de %value%~
+// @102410 = ~de passer la vitesse de déplacement du porteur à %value%~
+// @102411 = ~de multiplier la vitesse de déplacement du porteur par %value%~
 @102412 = ~de guérir la Débilité mentale~
 @102413 = ~de soigner un point de vie à la cible~
 @102414 = ~de soigner %value% points de vie à la cible~
@@ -539,6 +539,20 @@
 @102544 = ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
 @102545 = ~de passer %theStatistic% %ofTheTarget% à %value%~
 @102546 = ~de multiplier %theStatistic% %ofTheTarget% par %value%~
+@102547 = ~Tue instantanément les %creatureType%~
+@102548 = ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
+@102549 = ~Créature inconnue~
+@102550 = ~le moral~
+@102551 = ~Sort inconnu~
+@102552 = ~Immunité contre les lances de jet~
+@102553 = ~Immunité contre les carreaux~
+@102601 = ~d'endormir %theTarget%~ // Spécifique à Rogue Rebalancing : RR#WEAR
+@102602 = ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter, les spectateurs ont une pénalité de -5)~ // Spécifique à Rogue Rebalancing : RR#BBOW
+@102603 = ~d'étourdir la cible pendant 1 round~ // Spécifique à Rogue Rebalancing : RR#SCAXE
+@102604 = ~Inflige Horreur à la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique : DVFEARSM
+@102650 = ~Détection du mal~
+@102651 = ~Détection du neutre~
+@102652 = ~Détection du bien~
 
 
 /*
@@ -578,7 +592,7 @@
 @10003 = ~+%value%~
 @10004 = ~Fixé à %value%~
 @10005 = ~Fixée à %value%~
-//@10006 = ~Multiplié par %value%~
+@10006 = ~Multiplié par %value%~
 //@10007 = ~Multipliée par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
@@ -641,7 +655,7 @@
 @101100 = ~points de dégâts perforants~
 @101101 = ~points de dégâts magiques~
 @101102 = ~points de dégâts de projectiles~
-@101103 = ~points de dégâts non mortels~
+@101103 = ~points de dégâts non létal~
 @101104 = ~points de dégâts de froid magique~
 @101105 = ~points de dégâts de feu magique~
 @101123 = ~%name% (du groupe)%colon%%value%~
@@ -703,7 +717,7 @@
 @204120 = ~fées~
 @204121 = ~démons~
 @204122 = ~loups-garous~
-@204123 = ~tyrannœils~
+@204123 = ~spectateurs~
 @204124 = ~flagelleurs mentaux~
 @204125 = ~vampires~
 @204126 = ~vampires~
@@ -765,6 +779,10 @@
 @205018 = ~clerc / rôdeur~
 @205019 = ~sorciers~
 @205020 = ~moines~
+@205125 = ~ogres~
+@205126 = ~ogremages~
+@205127 = ~demi-ogres~
+@205128 = ~ogrillons~
 @205146 = ~loups des glaces~
 @205160 = ~tanar'ris~
 @205167 = ~trolls~
@@ -797,6 +815,7 @@
  * Specific.ids *
  * ------------ */
  @206000 = ~??????~
+ @206243 = ~ménestrels~
 
 /* --------- *
  * Gender.ids *

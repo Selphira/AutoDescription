@@ -49,20 +49,19 @@ END
 
 DEFINE_PATCH_MACRO ~log~ BEGIN
 	LOCAL_SPRINT filename ~%SOURCE_RES%~
+	READ_STRREF ITM_identified_name itemName
 	INNER_ACTION BEGIN
 		SILENT
-		<<<<<<<< .../AutoDescription/inlined/%filename%-before.log
-		>>>>>>>>
-		<<<<<<<< .../AutoDescription/inlined/%filename%-after.log
-		>>>>>>>>
-		COPY ~.../AutoDescription/inlined/%filename%-before.log~ ~AutoDescription/log~
-		COPY ~.../AutoDescription/inlined/%filename%-after.log~ ~AutoDescription/log~
-		APPEND_OUTER ~AutoDescription/log/%filename%-before.log~ ~// "%oldDescription%"~
-		APPEND_OUTER ~AutoDescription/log/%filename%-after.log~ ~// "%description%"~
+		APPEND_OUTER ~AutoDescription/log/diff.html~ ~<tr><th class="title">%filename%<br/>%itemName%</th><td class="description before"><pre>%oldDescription%</pre></td><td class="description after"><pre>%description%</pre></td></tr>~ KEEP_CRLF
 		VERBOSE
 	END
 END
 
+// Initialisation des fichiers de log
+<<<<<<<< .../AutoDescription/inlined/empty.log
+>>>>>>>>
+COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/warnings.log~
+COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/diff.html~
 
 OUTER_SET total = 0
 OUTER_SET totalPotion = 0
@@ -134,7 +133,10 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 								SET totalIgnored += 1
 						END
 				    END
-				WITH DEFAULT SET totalFailed += 1 END
+				WITH DEFAULT
+					PATCH_WARN ~%SOURCE_FILE% : %ERROR_MESSAGE%~
+					SET totalFailed += 1
+				END
 			END
 		END
 	END

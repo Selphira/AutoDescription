@@ -29,7 +29,7 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 					SET combatCount += 1
 				END
 			END
-			ELSE PATCH_IF location == 1 BEGIN
+			ELSE BEGIN
 				SET $combatAbilitiesCount(~%combatCount%~) = 0
 				PATCH_DEFINE_ARRAY $combatAbilities(~%combatCount%~) BEGIN 0 ~%SOURCE_RES%~ END
 
@@ -42,9 +42,9 @@ DEFINE_PATCH_FUNCTION ~extended_abilities~ RET description BEGIN
 				END
 				SET combatCount += 1
 			END
-			ELSE BEGIN
-				PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' pas encore gere~
-			END
+			//ELSE BEGIN
+			//	PATCH_WARN ~%SOURCE_FILE% : extended_abilities : effet numero '%headerIndex%' pas encore gere (%location%)~
+			//END
 		END
 
 		// Trier les tableau de capacités
@@ -239,7 +239,7 @@ END
 DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 	LPF ~weapon_modes_has_same_statistics~ RET hasSameStatistics END
 
-	// TODO: Si les statistiques de l'arme ET les capacités de combat associées sont les mêmes, afficher comme si on n'avait qu'un seul effet étendu (Ex: U#STAF01.itm)
+	// TODO: Si les statistiques de l'arme ET les capacités de combat associées sont les mêmes, afficher comme si on n'avait qu'un seul effet étendu (Ex: U#STAF01.itm, F_ICEAX5)
 
 	PATCH_IF combatCount == 1 BEGIN
 		PATCH_IF $combatAbilities(0 0) > 0 BEGIN

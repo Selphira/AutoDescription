@@ -174,6 +174,9 @@ DEFINE_PATCH_FUNCTION ~usability_add_to_description~ INT_VAR strref = 101070 all
 					PATCH_IF VARIABLE_IS_SET $translations("%name%") BEGIN
 						SPRINT name $translations("%name%")
 					END
+					ELSE PATCH_IF ("%name%" STRING_MATCHES_REGEXP "[0-9]+" = 0) BEGIN
+						SPRINT name (AT ~%name%~)
+					END
 					LPF ~appendProperty~ STR_VAR name RET description END
 				END
 			END
