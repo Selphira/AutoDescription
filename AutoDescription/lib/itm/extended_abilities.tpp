@@ -144,7 +144,12 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 	END
 
     PATCH_IF depletion == 1 BEGIN
-		SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
+        PATCH_IF charges == 1 BEGIN
+			SPRINT chargeStr @102677 // ~%charges% charge, l'objet est détruit quand la charge est utilisée~
+        END
+        ELSE BEGIN
+			SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
+        END
     END
     ELSE BEGIN
 		SPRINT chargeStr @102094 // ~%charges% fois par jour~

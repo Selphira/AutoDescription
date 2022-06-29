@@ -10,8 +10,9 @@ Cela apporte plusieurs avantages:
 
 ### Général
 
+- les points de vie maximum -> le maximum de points de vie
 - Grouper les effets ayant la même probabilité de se délencher (Ex: blun14) ?  
-  Attention, 2 effets à 10% ne s'activeront pas forcément en mêem temps, il faut pour le cas qui nous intéresse, que probabilit1 et probability2 soient égaux dans les 2 effets !  
+  Attention, 2 effets à 10% ne s'activeront pas forcément en même temps, il faut pour le cas qui nous intéresse, que probabilit1 et probability2 soient égaux dans les 2 effets !  
   Il y a risque d'y avoir des chaînes trop longues...  Mais il faut trouver une façon d'indiquer au joueur que plusieurs effets vont se déclencher en même temps !
 - Grouper les effets de dégâts (opcode 12) dans une section "Dagâts" qui contiendrait aussi les dégâts de l'arme ?
   Ex:
@@ -31,7 +32,7 @@ Cela apporte plusieurs avantages:
   Actuellement, on affiche "Multiplié par xx%"
   Changer en "+/- xx%" ?
 - Gérer les potions et les munitions
-- Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01 SHLD24)
+- Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01 SHLD24 U#AMUL02)
 
 - Mieux grouper les entrées dans la section "(Non) Utilisable par"  
   - Si la classe de Mage n'est pas autoriseé ET que tous les kits de mage ne le sont pas non plus, juste laisser Mage ou préciser "Mage monoclassé et kittés" ?
@@ -45,7 +46,7 @@ Cela apporte plusieurs avantages:
 
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
 - Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
-- Gérer les opcodes suivants : 101, 144, 177, 180, 188, 232, 248, 249, 251, 268, 272, 300, 318
+- Gérer les opcodes suivants : 180, 188, 232, 248, 249, 251, 268, 272, 300, 318
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
@@ -53,7 +54,6 @@ Cela apporte plusieurs avantages:
   Améliorer les textes, mieux adapté aux situations et moins génériques.
 - Opcode 67
   Gérer l'hostilité de la créature invoquée
-- Opcode 101 (Ex: BLUN25, immunité au drain de niveau)
 - Les opcodes de type "State: Sanctuary [153]" doivent avoir un texte différent en fonction de s'ils sont une capacité de charge, de combat ou d'équipement... (Ex: GTT#BO.ITM)  
   Charge : Sanctuaire x fois par jour  
   Combat : Sanctuaire sur le porteur  

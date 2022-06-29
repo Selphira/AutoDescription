@@ -6,6 +6,7 @@
 @100012 = ~Capacités de charge~
 @100013 = ~au corps à corps~
 @100014 = ~à distance~
+@100018 = ~à l'utilisation~
 @101032 = ~Nécessite~
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
@@ -50,6 +51,7 @@
 @102037 = ~Immunité aux attaques sournoises~
 @102038 = ~Immunité à la peur~
 @102039 = ~Immunité à l'horreur~
+@102040 = ~Classe d'armure de base~
 @102055 = ~Résistance à l'acide~
 @102056 = ~Résistance au feu~
 @102057 = ~Résistance à l'électricité~
@@ -77,16 +79,16 @@
 @102081 = ~Mémorisation de %amount% sorts divins supplémentaires de niveau %levelStr%~
 @102082 = ~Suppression d'un sort divin de niveau %levelStr%~
 @102083 = ~Suppression de %amount% sorts divins de niveau %levelStr%~
-@102084 = ~Double le nombre de sorts divins mémorisables de niveau inférieur ou égal à %levelStr%~
+@102084 = ~Double le nombre de sorts divins mémorisables de niveau %levelStr%~
 @102085 = ~Mémorisation d'un sort profane supplémentaire de niveau %levelStr%~
 @102086 = ~Mémorisation de %amount% sorts profanes supplémentaires de niveau %levelStr%~
 @102087 = ~Suppression d'un sort profane de niveau %levelStr%~
 @102088 = ~Suppression de %amount% sorts profanes de niveau %levelStr%~
-@102089 = ~Double le nombre de sorts profanes mémorisables de niveau inférieur ou égal à %levelStr%~
+@102089 = ~Double le nombre de sorts profanes mémorisables de niveau %levelStr%~
 @102090 = ~d'infliger 1 %damageType% supplémentaire~
 @102091 = ~d'infliger %damage% %damageType% supplémentaires~
 @102092 = ~Inflige %damage% %damageType% supplémentaires~
-@102093 = ~Un coup critique est déclenché à partir d'un score de %score%~
+@102093 = ~Chance d'infliger un coup critique~
 @102094 = ~%charges% fois par jour~
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
 @102096 = ~%description% à chaque attaque réussie~
@@ -158,7 +160,7 @@
 @102163 = ~Échec systématique des sorts profanes lancés par la cible~
 @102164 = ~Échec systématique des sorts divins lancés par la cible~
 @102165 = ~Échec systématique des sorts innés lancés par la cible~
-@102166 = ~de provoquer Rage berserk chez le porteur~
+@102166 = ~de provoquer rage berserk chez le porteur~
 @102167 = ~d'infliger Horreur à la cible~
 @102168 = ~Points de vie maximum~
 @102169 = ~Vitesse d'incantation~
@@ -167,7 +169,7 @@
 @102172 = ~Connaissance~
 @102173 = ~Invoque une créature (%creatureName%)~
 @102174 = ~de renverser et sonner %theTarget%~
-@102175 = ~Inflige Lenteur à la cible~
+@102175 = ~Inflige lenteur à la cible~
 @102176 = ~Immunité contre les %weaponType% %enchantment%~
 @102177 = ~Immunité contre les %weaponType%~
 @102178 = ~armes de mêlée magiques~
@@ -181,11 +183,11 @@
 @102186 = ~de draîner un niveau à la cible~
 @102187 = ~de draîner %amount% niveaux à la cible~
 @102188 = ~%probability% de passer la compétence martiale de la cible à %value%~
-@102189 = ~d'infliger Lenteur à la cible~
+@102189 = ~d'infliger lenteur à la cible~
 @102190 = ~d'empoisonner la cible et de lui infliger 1 point de dégât par seconde~
 @102191 = ~d'empoisonner la cible et de lui infliger %amount% points de dégâts par seconde~
 @102192 = ~d'empoisonner la cible et de lui infliger 1 point de dégât toutes les %amount% secondes~
-@102193 = ~de lancer le sort %spellName% sur le porteur~
+@102193 = ~de lancer le sort %spellName% sur %theTarget%~
 @102194 = ~de désintégrer %theTarget%~
 @102195 = ~Change le sexe du porteur~
 @102196 = ~Bénédiction permanente~
@@ -304,7 +306,7 @@
 @102309 = ~la chance~
 @102310 = ~de protéger contre les attaques sournoises~
 @102311 = ~Immunité aux éclairs~
-@102312 = ~Immunité aux flèches~
+@102312 = ~Immunité contre les flèches~
 //@102313 = ~Immunité aux flèches lourdes~
 @102314 = ~Renvoie les rayons des spectateurs~
 @102315 = ~de lancer Invisibilité sur le porteur~
@@ -312,7 +314,7 @@
 @102317 = ~Renvoi le sort %spellName%~
 @102318 = ~Immunité aux maladies~
 @102319 = ~Immunité aux poisons~
-@102320 = ~de provoquer Rage berserk chez la cible~
+@102320 = ~de provoquer rage berserk chez la cible~
 @102321 = ~Entoile %theTarget%~
 @102322 = ~Déverrouille la serrure ciblée~
 @102323 = ~de réduire %theTarget% au silence~
@@ -441,8 +443,8 @@
 @102446 = ~de passer l'attaque par round de la cible à %value%~
 @102447 = ~de multiplier l'attaque par round de la cible par %value%~
 @102448 = ~d'enfermer %theTarget% dans un labyrinthe~
-@102449 = ~Immunité à Rage berserk~
-@102450 = ~Immunité à la Débilité mentale~
+@102449 = ~Immunité à la rage berserk~
+@102450 = ~Immunité à la débilité mentale~
 @102451 = ~de reposer le porteur~
 @102452 = ~Paralyse les %creatureType%~
 @102453 = ~Paralyse %theTarget%~
@@ -527,9 +529,9 @@
 @102532 = ~d'infliger 5d4 points de dégâts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHSMITE
 @102533 = ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVCORROS
 @102534 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres~ // Spécifique à Item Revision : DVRESON
-// @102535 = ~de la cible~
-// @102536 = ~du porteur~
-// @102537 = ~du groupe~
+@102535 = ~l'adversaire le plus proche~
+@102536 = ~l'attaquant~
+@102537 = ~uniquement pour les %targetType%~
 @102538 = ~des %targetType%~
 @102539 = ~de réduire la %resistName% %ofTheTarget% de %value%~
 @102540 = ~d'augmenter la %resistName% %ofTheTarget% de %value%~
@@ -553,6 +555,105 @@
 @102650 = ~Détection du mal~
 @102651 = ~Détection du neutre~
 @102652 = ~Détection du bien~
+@102653 = ~la créature la plus proche~
+@102654 = ~Lance le sort %spellName% sur %theTarget%~
+@102660 = ~lorsque le porteur est touché~
+@102661 = ~lorsqu'un adversaire entre dans le champ de vision~
+@102662 = ~lorsque les points de vie du porteur passent sous les 50%~
+@102663 = ~lorsque les points de vie du porteur passent sous les 25%~
+@102664 = ~lorsque les points de vie du porteur passent sous les 10%~
+@102665 = ~lorsque le porteur est sans défense~
+@102666 = ~lorsque le porteur est empoisonné~
+@102667 = ~à chaque round où le porteur est attaqué~
+@102668 = ~lorsque la cible se trouve à moins de 2,5 mètres~
+@102669 = ~lorsque la cible se trouve à moins de 6 mètres~
+@102670 = ~à chaque round~
+@102671 = ~lorsque le porteur subit des dégâts~
+@102672 = ~Silence permanent~
+@102673 = ~Immunité à la transmutation de la pierre en chair~
+@102674 = ~Immunité à l'invisibilité~
+@102675 = ~Dissipation de la magie assurée~
+@102676 = ~de dissiper la magie assurément~
+@102677 = ~%charges% charge, l'objet est détruit quand la charge est utilisée~
+@102678 = ~Le porteur peut attaquer une créature cachée ou invisible~
+
+// Button: Disable Button [144]
+@102980 = ~Empêche l'utilisation du camouflage dans l'ombre~
+@102981 = ~Empêche l'utilisation des compétences de voleur~
+@102982 = ~Empêche l'utilisation des sorts~
+@102983 = ~Empêche l'utilisation du premier sort rapide~
+@102984 = ~Empêche l'utilisation du second sort rapide~
+@102985 = ~Empêche l'utilisation du troisième sort rapide~
+@102986 = ~Empêche l'utilisation de repousser les morts-vivants~
+@102987 = ~Empêche l'utilisation des discussions~
+@102988 = ~Empêche l'utilisation des objets~
+@102989 = ~Empêche l'utilisation du premier objet rapide~
+@102991 = ~Empêche l'utilisation du second objet rapide~
+@102992 = ~Empêche l'utilisation du troisième objet rapide~
+@102993 = ~Empêche l'utilisation des sorts innés~
+
+// Protection: from Opcode [101]
+@103000 = ~~
+@103003 = ~Immunité à l'état berserk~
+@103005 = ~Immunité aux charmes~
+@103010 = ~Immunité aux effets modifiant la constitution~
+@103012 = ~Immunité aux dégâts supplémentaires~ // TODO: KZNINJA.itm (est-ce bien le cas ?)
+@103013 = ~Immunité à la mort magique~
+@103015 = ~Immunité aux effets modifiant la dextérité~
+@103016 = ~Immunité à la hâte~
+@103019 = ~Immunité aux effets modifiant l'intelligence~
+@103023 = ~Immunité à la panique~
+@103024 = ~Immunité à l'horreur~
+@103025 = ~Immunité aux poisons~
+@103038 = ~Immunité au silence~
+@103039 = ~Immunité au sommeil~
+@103040 = ~Immunité à la lenteur~
+@103044 = ~Immunité aux effets modifiant la force~
+@103045 = ~Immunité à l'étourdissement~
+@103055 = ~Immunité à la mort magique~
+@103058 = ~Immunité à la dissipation~
+@103074 = ~Immunité à l'aveuglement~
+@103076 = ~Immunité à la débilité mentale~
+@103078 = ~Immunité à la maladie~
+@103080 = ~Immunité à la surdité~
+@103086 = ~Immunité aux effets modifiant la résistance aux dégâts tranchants~
+@103087 = ~Immunité aux effets modifiant la résistance aux dégâts contondants~
+@103088 = ~Immunité aux effets modifiant la résistance aux dégâts perforants~
+@103089 = ~Immunité aux effets modifiant la résistance aux dégâts de projectiles~
+@103093 = ~Immunité à la fatigue~
+@103097 = ~Immunité aux effets modifiant la force exceptionnelle~
+@103106 = ~Immunité à la peur~
+@103109 = ~Immunité à la paralysie~
+@103115 = ~Immunité à la détection de l'alignement~
+@103116 = ~Immunité à la dissipation de l'invisibilité~
+@103126 = ~Immunité aux effets affectant la mobilité~
+@103128 = ~Immunité à la confusion~
+@103145 = ~Immunité aux effets empêchant de lancer des sorts~
+@103154 = ~~ // Opcode visuel
+@103157 = ~Immunité aux toiles~
+@103158 = ~~ // Opcode visuel
+@103175 = ~Immunité à la paralysie~
+@103185 = ~Immunité à la paralysie~
+@103209 = ~Immunité à la mort magique~
+@103210 = ~Immunité à l'étourdissement~
+@103213 = ~Immunité à l'emprisonnement~
+@103216 = ~Immunité au drain de niveaux~
+@103217 = ~Immunité au sommeil~
+@103220 = ~Immunité à la dissipation des sorts~ // Removal: Remove School [220]
+@103221 = ~Immunité à la dissipation des sorts~ // Removal: Remove Secondary Type [221]
+@103222 = ~Immunité à la téléportation~
+@103230 = ~Immunité à la dissipation des sorts~ // Removal: Remove One Secondary Type [230]
+@103235 = ~Immunité au renversement~
+@103238 = ~Immunité à la désintégration~
+@103240 = ~~ // Opcode visuel
+@103241 = ~Immunité aux charmes~
+@103264 = ~Ne lache pas son arme en cas de panique~
+@103317 = ~Immunité à la hâte~
+
+// Probability : Protection: from Opcode [101]
+@103500 = ~~
+@103524 = ~de résister à l'horreur~
+@103525 = ~de résister au poison~
 
 
 /*
@@ -688,7 +789,7 @@
 /* -------- *
  * Race.ids *
  * -------- */
-@204000 = ~????~
+@204000 = ~~
 @204001 = ~humains~
 @204002 = ~elfes~
 @204003 = ~demi-elfes~
@@ -765,18 +866,18 @@
 @205004 = ~voleurs~
 @205005 = ~bardes~
 @205006 = ~paladins~
-@205007 = ~guerrier / mage~
-@205008 = ~guerrier / clerc~
-@205009 = ~guerrier / voleur~
-@205010 = ~guerrier / mage / voleur~
+@205007 = ~guerriers / mages~
+@205008 = ~guerriers / clercs~
+@205009 = ~guerriers / voleurs~
+@205010 = ~guerriers / mages / voleurs~
 @205011 = ~druides~
 @205012 = ~rôdeurs~
-@205013 = ~mage / voleur~
-@205014 = ~clerc / mage~
-@205015 = ~clerc / voleur~
-@205016 = ~guerrier / druide~
-@205017 = ~guerrier / mage / clerc~
-@205018 = ~clerc / rôdeur~
+@205013 = ~mages / voleurs~
+@205014 = ~clercs / mages~
+@205015 = ~clercs / voleurs~
+@205016 = ~guerriers / druides~
+@205017 = ~guerriers / mages / clercs~
+@205018 = ~clercs / rôdeurs~
 @205019 = ~sorciers~
 @205020 = ~moines~
 @205125 = ~ogres~

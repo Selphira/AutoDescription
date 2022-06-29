@@ -1,7 +1,7 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.html)~
 
-VERSION ~0.8.5 alpha~
+VERSION ~0.9.0~
 
 ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
@@ -71,6 +71,8 @@ OUTER_SET totalFailed = 0
 OUTER_SET totalSuccessful = 0
 OUTER_SET totalIgnored = 0
 
+//COPY_EXISTING_REGEXP GLOB ~selphira.itm$~ ~override~ // SOLAK1, L#NINI1
+//COPY_EXISTING_REGEXP GLOB ~C2DAGG01.itm$~ ~override~ // SOLAK1, L#NINI1
 COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 	PATCH_IF (SOURCE_SIZE > 0x71) BEGIN // Evite un crash sur les objets vides
 		READ_SHORT  ITM_type itemType

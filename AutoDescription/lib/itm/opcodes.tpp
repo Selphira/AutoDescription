@@ -127,6 +127,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 14 => 212 // Cure: (Frozen state) [14]
 	  4 => 213 // Cure: Berserking [4]
 	 46 => 214 // Cure: Stun (Unstun) [46]
+	 47 => 215 // Cure: Invisibility [47]
+	 43 => 216 // Cure: Stone to Flesh [43]
+	  2 => 217 // Cure: Sleep [2]
+    101 => 220 // Protection: from Opcode [101]
 	163 => 229 // Protection: Free Action [163]
 	204 => 230 // Spell: Protection from Spell (School) [204]
 	205 => 231 // Spell: Protection from Spell (Secondary Type) [205]
@@ -168,6 +172,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	135 => 270 // Polymorph into Specific [135]
 	135 => 271 // Item: Can Use Any Item [302]
 	230 => 272 // Removal: Remove One Secondary Type [230]
+	193 => 275 // Spell Effect: Invisible Detection by Script [193]
+	144 => 280 // Button: Disable Button [144]
 
 	 // Charge
 	146 => 274 // Spell: Cast Spell (at Target) [146]
@@ -193,14 +199,12 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	 66 => 1 // Graphics: Transparency Fade [66]
 	 72 => 1 // State: Set IDS State [72]
 	 82 => 1 // Set AI Script [82]
-	101 => 1 // Protection: from Opcode [101] // TODO: A gérer quand même ? Ne fait pas forcément doublon avec le 206 ? (pas doublon pour RR#WEAR2)
 	110 => 1 // (Retreat From) [110]
 	112 => 1 // Item: Remove Item [112]
 	123 => 1 // Item: Remove Inventory Item
 	139 => 1
 	141 => 1
 	142 => 1
-	144 => 1 // Button: Disable Button [144] // TODO: A gérer ! Empêche le personnage de faire certaines actions !
 	158 => 1 // State: Grease [158] // Applique seulement un effet visuel
 	164 => 1 // Cure: Intoxication [164]
 	168 => 1 // Summon: Remove Creature [168]
@@ -212,7 +216,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	184 => 1 // Graphics: Passwall (Don't Jump) [184]
 	186 => 1 // Script: MoveToArea [186] // A gérer ??
 	188 => 1 // Spell Effect: Aura Cleansing [188] // TODO: A gérer, je ne sais pas ce que cela fait pour le moent
-	193 => 1 // Spell Effect: Invisible Detection by Script [193]
 	215 => 1
 	221 => 1 // Removal: Remove Secondary Type [221]
 	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: A gérer ! (Ex: L#NILA61, SOLAK1)
@@ -320,12 +323,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
-	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		PATCH_IF %itemType% != ITM_TYPE_armor BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-		END
-	END
-	ELSE BEGIN
+	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 102020 + parameter2
@@ -334,7 +332,12 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 		END
 	END
 
-	SPRINT name @102008        // ~Classe d'armure~
+	SPRINT name @102008 // ~Classe d'armure~
+
+	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+		SPRINT name @102040  // ~Classe d'armure de base~
+	END
+
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
@@ -496,6 +499,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_1~ BEGIN
 		SPRINT value @10002 // ~%value% %~
 		SPRINT description @102447 // ~de multiplier l'attaque par round de la cible par %value%~
 	END
+END
+
+/* --------------- *
+ * Cure: Sleep [2] *
+ * --------------- */
+DEFINE_PATCH_MACRO ~opcode_self_2~ BEGIN
+	SPRINT description @103039 // ~Immunité au sommeil~
 END
 
 /* --------------------- *
@@ -1229,6 +1239,10 @@ END
 /* ------------------- *
  * State: Silence [38] *
  * ------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_38~ BEGIN
+	SPRINT description @102672 // ~Silence permanent~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_38~ BEGIN
 	SPRINT description @102248 // ~Réduit la cible au silence~
 END
@@ -1260,7 +1274,7 @@ DEFINE_PATCH_MACRO ~opcode_target_40~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_40~ BEGIN
-	SPRINT description @102189 // ~d'infliger Lenteur à la cible~
+	SPRINT description @102189 // ~d'infliger lenteur à la cible~
 END
 
 /* ----------------------------- *
@@ -1271,6 +1285,13 @@ DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 	LOCAL_SET level = parameter2
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 102085 RET description END
+END
+
+/* ------------------------- *
+ * Cure: Stone to Flesh [43] *
+ * ------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_43~ BEGIN
+	SPRINT description @102673 // ~Immunité à la transmutation de la pierre en chair~
 END
 
 /* ----- *
@@ -1316,6 +1337,13 @@ END
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_46~ BEGIN
 	SPRINT description @102422 // ~Immunité à l'étourdissement~
+END
+
+/* ------------------------ *
+ * Cure: Invisibility [47] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_47~ BEGIN
+	SPRINT description @102674 // ~Immunité à l'invisibilité~
 END
 
 /* ----------------------------- *
@@ -1431,11 +1459,34 @@ END
  * Cure: Dispellable Effects (Dispel Magic) [58] *
  * --------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_58~ BEGIN
+	LOCAL_SET castingLevel = parameter1
+	LOCAL_SET type = parameter2
+
 	SPRINT description @102243 // ~Dissipation de la magie~
+
+	PATCH_IF type == 0 BEGIN
+		SPRINT description @102675 // ~Dissipation de la magie assurée~
+	END
+	PATCH_IF type == 2 BEGIN
+		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+		SPRINT description ~%description% (%castingLevelStr%)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_58~ BEGIN
+	LOCAL_SET castingLevel = parameter1
+	LOCAL_SET type = parameter2
+
 	SPRINT description @102331 // ~de dissiper la magie~
+
+	PATCH_IF type == 0 BEGIN
+		SPRINT description @102676 // ~de dissiper la magie assurément~
+	END
+
+	PATCH_IF type == 2 BEGIN
+		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+		SPRINT description ~%description% (%castingLevelStr%)~
+	END
 END
 
 /* --------- *
@@ -1972,6 +2023,25 @@ DEFINE_PATCH_MACRO ~opcode_self_100~ BEGIN
 	END
 END
 
+/* ----------------------------- *
+ * Protection: from Opcode [101] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
+	LOCAL_SET cOpcode = parameter2
+	LOCAL_SET strref = 103000 + cOpcode
+	PATCH_VERBOSE
+	SPRINT description (AT ~%strref%~) // ~Immunité à xxx~
+	PATCH_SILENT
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
+	LOCAL_SET cOpcode = parameter2
+	LOCAL_SET strref = 103500 + cOpcode
+	PATCH_VERBOSE
+	SPRINT description (AT ~%strref%~) // ~de résister à xxx~
+	PATCH_SILENT
+END
+
 /* -------------------------------------- *
  * Immunité contre les sorts de niveau xx *
  * -------------------------------------- */
@@ -1992,7 +2062,7 @@ END
  * ------------ */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 	SET parameter1 = 0 - parameter1
-	//FIXMe: renommer Moral en autre chose ? Moral break... (idem en dessous, et ne plus inverser la valeur)
+	//FIXMe: renommer Moral en autre chose ? Moral break... (idem en dessous, et ne plus inverser la valeur) // Panique
 	LPF ~opcode_mod~ INT_VAR strref = 102110 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
 END
 
@@ -2254,6 +2324,16 @@ DEFINE_PATCH_MACRO ~opcode_self_143~ BEGIN
 END
 
 /* ---------------------------- *
+ * Button: Disable Button [144] *
+ * ---------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
+	LOCAL_SET strref = 102980 + parameter2
+	PATCH_VERBOSE
+	SPRINT description (AT ~%strref%~) // ~Empêche l'utilisation de xxx~
+	PATCH_SILENT
+END
+
+/* ---------------------------- *
  * Empêcher de lancer des sorts *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
@@ -2363,7 +2443,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_148~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @102193 // ~de lancer le sort %spellName% sur le porteur~
+		SPRINT description @102193 // ~de lancer le sort %spellName% sur %theTarget%~
 
 		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
 			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
@@ -2560,12 +2640,12 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
 	END
 	ELSE BEGIN
-		//PATCH_FAIL "%SOURCE_FILE%: opcode 177 à gérer pour une cible particulière %idsFile% (%parameter1%)"
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		SPRINT theTarget   @102474 // ~les %targetType%~
-		SPRINT ofTheTarget @102538 // ~des %targetType%~
-		SPRINT versus      @101126 // ~contre les %targetType%~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
+		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			SPRINT selfTarget @102537 // ~ uniquement pour les %targetType%~
+			SPRINT description ~%description% (%selfTarget%)~
+		END
 	END
 END
 
@@ -2709,6 +2789,13 @@ DEFINE_PATCH_MACRO ~opcode_self_191~ BEGIN
 	ELSE BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 102171 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de lanceur de sorts divins~
 	END
+END
+
+/* ------------------------------------------------- *
+ * Spell Effect: Invisible Detection by Script [193] *
+ * ------------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_193~ BEGIN
+	SPRINT description @102678 // ~Le porteur peut attaquer une créature cachée ou invisible~
 END
 
 /* ------------------------------ *
@@ -2983,6 +3070,39 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_230~ BEGIN
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_230 : Type d'effet à dissiper '%parameter2%' à gérer"
     END
 END
+/*
+/* ------------------------------------------- *
+ * Spell Effect: Cast Spell on Condition [232] *
+ * ------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_232~ BEGIN
+    SPRINT theTarget $op232Target("%parameter1%")
+    SPRINT condition $op232Condition("%parameter2%")
+
+	PATCH_IF parameter2 != 0 BEGIN
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_232 : A gerer: %parameter1%: %parameter2%"
+	END
+
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @102654 // ~Lance le sort %spellName% sur %theTarget%~
+	SPRINT description ~%description%, %condition%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_232~ BEGIN
+    SPRINT theTarget $op232Target("%parameter1%")
+    SPRINT condition $op232Condition("%parameter2%")
+
+	PATCH_IF parameter2 != 0 BEGIN
+		PATCH_FAIL "%SOURCE_FILE% : opcode_self_probability_232 : A gerer: %parameter1%: %parameter2%"
+	END
+
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @102193 // ~de lancer le sort %spellName% sur %theTarget%~
+	SPRINT description ~%description%, %condition%~
+END
+*/
 
 /* ------------------- *
  * Compétence martiale *
@@ -3322,9 +3442,11 @@ END
  * Chances de coup critique *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
-	LOCAL_SET score = 20 - parameter1
-
-	SPRINT description @102093 // ~Un coup critique est déclenché à partir d'un score de %score%~
+	LOCAL_SET value = 5 * parameter1
+	LPF ~signed_value~ INT_VAR value RET value END
+	SPRINT value @10002 // ~%value% %~
+	SPRINT name @102093
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 /* ---------------------------- *

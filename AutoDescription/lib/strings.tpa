@@ -89,6 +89,27 @@ ACTION_PHP_EACH string_from_strref AS name => strref BEGIN
 	OUTER_SPRINT $translations(~%name%~) ~%string%~
 END
 
+/* -------------------------------------- *
+ * Chaines utilisées dans le opcode 232 . *
+ * -------------------------------------- */
+OUTER_SPRINT $op232Target(~0~) @102472 // ~le porteur~
+OUTER_SPRINT $op232Target(~1~) @102536 // ~l'attaquant~
+OUTER_SPRINT $op232Target(~2~) @102535 // ~l'adversaire le plus proche~
+OUTER_SPRINT $op232Target(~3~) @102653 // ~la créature la plus proche~
+
+OUTER_SPRINT $op232Condition(~0~) @102660 // ~lorsque le porteur est touché~
+OUTER_SPRINT $op232Condition(~1~) @102661 // ~lorsqu'un adversaire entre dans le champ de vision~
+OUTER_SPRINT $op232Condition(~2~) @102662 // ~lorsque les points de vie du porteur passent sous les 50%~
+OUTER_SPRINT $op232Condition(~3~) @102663 // ~lorsque les points de vie du porteur passent sous les 25%~
+OUTER_SPRINT $op232Condition(~4~) @102664 // ~lorsque les points de vie du porteur passent sous les 10%~
+OUTER_SPRINT $op232Condition(~5~) @102665 // ~lorsque le porteur est sans défense~
+OUTER_SPRINT $op232Condition(~6~) @102666 // ~lorsque le porteur est empoisonné~
+OUTER_SPRINT $op232Condition(~7~) @102667 // ~à chaque round où le porteur est attaqué~
+OUTER_SPRINT $op232Condition(~8~) @102668 // ~lorsque la cible se trouve à moins de 2,5 mètres~
+OUTER_SPRINT $op232Condition(~9~) @102669 // ~lorsque la cible se trouve à moins de 6 mètres~
+OUTER_SPRINT $op232Condition(~10~) @102670 // ~à chaque round~
+OUTER_SPRINT $op232Condition(~11~) @102671 // ~lorsque le porteur subit des dégâts~
+
 /* ----------------------------------------------------------------- *
  * D'autres chaînes utilisées dans la partie "(Non) Utilisable par". *
  * Je n'ai pas trouvé le moyen de récupérer les textes               *
