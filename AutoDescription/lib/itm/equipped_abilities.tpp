@@ -26,7 +26,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
 	READ_LONG  ITM_feature_blocks_offset blockOffset
     READ_SHORT ITM_feature_blocks_count  blockCount
-    READ_SHORT ITM_flags                 flags
+    READ_LONG  ITM_flags                 flags
 
     SET count = 0
 
@@ -73,6 +73,14 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 		SET count += 1
 		SPRINT desc @102126 // ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
 		SET $newAbilities(~0~ ~0~ ~%desc%~) = 1
+	END
+
+	PATCH_IF itemType == ITM_TYPE_helm BEGIN
+		PATCH_IF ((flags BAND BIT25) == 0 AND itemType == ITM_TYPE_helm) OR ((flags BAND BIT25) == BIT25 AND itemType != ITM_TYPE_helm) BEGIN
+			SET count += 1
+			SPRINT desc @102679 // ~Protection contre les coups critiques~
+			SET $newAbilities(~0~ ~0~ ~%desc%~) = 1
+		END
 	END
 
     SORT_ARRAY_INDICES newAbilities NUMERICALLY
