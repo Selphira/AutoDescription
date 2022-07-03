@@ -41,8 +41,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 		READ_BYTE  (blockOffset + EFF_probability2) probability2
 
 		PATCH_IF !VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-		    // Timing est ignoré avec les opcodes 177, 183 et 283
-			PATCH_IF timing == TIMING_while_equipped OR timing == TIMING_permanent OR opcode == 177 OR opcode == 183 OR opcode == 206 OR opcode == 283 OR opcode == 44 BEGIN // while equiped
+			PATCH_IF timing == TIMING_while_equipped OR timing == TIMING_permanent OR TIMING_duration == 0 OR opcode == 177 OR opcode == 183 OR opcode == 206 OR opcode == 283 OR opcode == 44 BEGIN // while equiped
 				SET abilityType = AbilityType_Equipped
 				PATCH_IF opcode == 219 BEGIN
 					SET opcodeBase = opcode
@@ -63,7 +62,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 					END
 				END
 			END
-			ELSE BEGIN PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' timing different de 2 ! (%timing%)~ END
+			ELSE BEGIN PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' timing non gere ! (%timing%)~ END
 		END
     END
 

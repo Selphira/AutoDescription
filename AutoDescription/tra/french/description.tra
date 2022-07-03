@@ -283,7 +283,7 @@
 @102286 = ~Augmente %theStatistic% %ofTheTarget% de %value%~
 @102287 = ~Passe %theStatistic% %ofTheTarget% à %value%~
 @102288 = ~Multiplie %theStatistic% %ofTheTarget% par %value%~
-@102289 = ~d'immuniser au sort %spellName%~
+@102289 = ~de résister au sort %spellName%~
 @102290 = ~Lenteur permanente~
 @102291 = ~Draîne un niveau au porteur~
 @102292 = ~Draîne %amount% niveaux au porteur~
@@ -304,7 +304,7 @@
 @102307 = ~d'empoisonner le porteur et lui infliger %amount% points de dégâts par seconde~
 @102308 = ~d'empoisonner le porteur et lui infliger 1 point de dégât  toutes les %amount% secondes~
 @102309 = ~la chance~
-@102310 = ~de protéger contre les attaques sournoises~
+@102310 = ~de résister aux attaques sournoises~
 @102311 = ~Immunité aux éclairs~
 @102312 = ~Immunité contre les flèches~
 //@102313 = ~Immunité aux flèches lourdes~
@@ -577,6 +577,7 @@
 @102677 = ~%charges% charge, l'objet est détruit quand la charge est utilisée~
 @102678 = ~Le porteur peut attaquer une créature cachée ou invisible~
 @102679 = ~Protection contre les coups critiques~
+@102680 = ~Pétrifie %theTarget%~
 
 // Button: Disable Button [144]
 @102980 = ~Empêche l'utilisation du camouflage dans l'ombre~
@@ -629,6 +630,7 @@
 @103116 = ~Immunité à la dissipation de l'invisibilité~
 @103126 = ~Immunité aux effets affectant la mobilité~
 @103128 = ~Immunité à la confusion~
+@103134 = ~Immunité à la pétrification~
 @103145 = ~Immunité aux effets empêchant de lancer des sorts~
 @103154 = ~~ // Opcode visuel
 @103157 = ~Immunité aux toiles~
@@ -637,7 +639,8 @@
 @103185 = ~Immunité à la paralysie~
 @103209 = ~Immunité à la mort magique~
 @103210 = ~Immunité à l'étourdissement~
-@103213 = ~Immunité à l'emprisonnement~
+@103211 = ~Immunité à l'emprisonnement~
+@103213 = ~Immunité au labyrinthe~
 @103216 = ~Immunité au drain de niveaux~
 @103217 = ~Immunité au sommeil~
 @103220 = ~Immunité à la dissipation des sorts~ // Removal: Remove School [220]
@@ -655,6 +658,15 @@
 @103500 = ~~
 @103524 = ~de résister à l'horreur~
 @103525 = ~de résister au poison~
+
+// Target : Protection: from Opcode [101]
+@104000 = ~~
+
+// Probability target : Protection: from Opcode [101]
+@104500 = ~~
+@104505 = ~d'immuniser %theTarget% aux charmes~
+@104539 = ~d'immuniser %theTarget% au sommeil~
+@104717 = ~d'immuniser %theTarget% au sommeil~
 
 
 /*
@@ -696,7 +708,7 @@
 @10005 = ~Fixée à %value%~
 @10006 = ~Multiplié par %value%~
 //@10007 = ~Multipliée par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
 @10010 = ~Passe à %value%~
 @10011 = ~une demi~
@@ -764,6 +776,9 @@
 @101124 = ~Capacité %abilityNumber%~
 @101125 = ~%probability% de chance %description%~
 @101126 = ~contre les %targetType%~
+@101127 = ~%classname% monoclassé, multiclassé et ses kits~
+@101128 = ~%classname% et ses kits~
+@101129 = ~Sorcier~
 
 /* ------ *
  * Ea.ids *
@@ -856,6 +871,7 @@
 @204157 = ~devas déchues~
 @204158 = ~planétaires~
 @204159 = ~planétaires déchus~
+@204199 = ~ettins~
 
 /* --------- *
  * Class.ids *

@@ -2042,6 +2042,21 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
 	PATCH_SILENT
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
+	LOCAL_SET cOpcode = parameter2
+	LOCAL_SET strref = 104000 + cOpcode
+	PATCH_VERBOSE
+	SPRINT description (AT ~%strref%~) // ~Immunise %theTarget% à xxx~
+	PATCH_SILENT
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
+	LOCAL_SET cOpcode = parameter2
+	LOCAL_SET strref = 104500 + cOpcode
+	PATCH_VERBOSE
+	SPRINT description (AT ~%strref%~) // ~d'immuniser %theTarget% à xxx~
+	PATCH_SILENT
+END
 /* -------------------------------------- *
  * Immunité contre les sorts de niveau xx *
  * -------------------------------------- */
@@ -2294,6 +2309,13 @@ DEFINE_PATCH_MACRO ~opcode_target_133~ BEGIN
 	SPRINT value @10010        // ~Passe à %value%~
 	SPRINT name @101075        // ~Chance~
 	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+END
+
+/* -------------------------- *
+ * State: Petrification [134] *
+ * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_target_134~ BEGIN
+	SPRINT description @102680 // ~Pétrifie %theTarget%~
 END
 
 /* ----------------------------- *
@@ -2894,7 +2916,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @102289 // ~d'immuniser au sort %spellName%~
+		SPRINT description @102289 // ~de résister au sort %spellName%~
 	END
 END
 
@@ -3434,7 +3456,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_292~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @102310 // ~de protéger contre les attaques sournoises~
+		SPRINT description @102310 // ~de résister aux attaques sournoises~
 	END
 END
 
@@ -3808,7 +3830,9 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SET strref = 200000 + (file * 1000) + entry
 
+		PATCH_VERBOSE
 		SPRINT idName (AT ~%strref%~)
+		PATCH_SILENT
 	END
 	ELSE BEGIN
 		SPRINT idName ~~

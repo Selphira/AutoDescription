@@ -33,20 +33,11 @@ Cela apporte plusieurs avantages:
   Changer en "+/- xx%" ?
 - Gérer les potions et les munitions
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01 SHLD24 U#AMUL02)
-
-- Mieux grouper les entrées dans la section "(Non) Utilisable par"  
-  - Si la classe de Mage n'est pas autoriseé ET que tous les kits de mage ne le sont pas non plus, juste laisser Mage ou préciser "Mage monoclassé et kittés" ?
-  - Est-ce que le groupe d'une classe doit comporter les multi-classe où la classe en question n'est pas la base ?
-  Ex: Le groupe "mage" doit-il comporter les multi-classs du genre "guerrier/mage" (mage/voleur oui, car mage est la base)
-- Bug: si la classe mage pure est (non) utilisable par, "monoclassé" n'est pas ajouté à la fin
-- Bug: usability (Ex: BHCLUB01)
-  > Utilisable par : 
-  > - Voleur monoclassé et multiclassé
-  > - Voleur
-
+- Bug: usability (Ex: NPSW05)
+  "Utilisable" par et "Non utilisable par" affichés en même temps
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
 - Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
-- Gérer les opcodes suivants : 180, 188, 232, 248, 249, 251, 268, 272, 300, 318
+- Gérer les opcodes suivants : 180, 188, 248, 249, 251, 268, 272, 300, 318
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)

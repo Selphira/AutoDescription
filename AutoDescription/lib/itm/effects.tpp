@@ -112,15 +112,27 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 		PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN
 			PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
 		END
-		PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
-			LPM ~%macro%probability_%opcode%~
-			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
-				LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-				SPRINT description @101125 // ~%probability% de chance %description%~
+
+		PATCH_TRY
+			PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
+				SPRINT method ~%macro%probability_%opcode%~
+				LPM ~%method%~
+				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
+					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+					SPRINT description @101125 // ~%probability% de chance %description%~
+				END
 			END
-		END
-		ELSE BEGIN
-			LPM ~%macro%%opcode%~
+			ELSE BEGIN
+				SPRINT method ~%macro%%opcode%~
+				LPM ~%method%~
+			END
+		WITH
+			~Failure("Unknown macro: \%method%")~
+			BEGIN
+				PATCH_FAIL ~Failure("Unknown macro: %method%")~
+			END
+			DEFAULT
+				PATCH_FAIL ~%ERROR_MESSAGE%~
 		END
 	END
 

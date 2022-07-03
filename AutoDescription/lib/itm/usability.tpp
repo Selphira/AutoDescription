@@ -31,95 +31,134 @@ DEFINE_PATCH_MACRO ~races~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~classes~ BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
-	    BARD,                "BIT6"  => 1 // ~Barde~
-		CLERIC,              "BIT7"  => 1 // ~Clerc~
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY classes BEGIN
+	    BARD,    "BIT6",  0, 1 => 1 // ~Barde~
+		CLERIC,  "BIT7",  1, 1 => 1 // ~Clerc~
+		DRUID,   "BIT30", 1, 1 => 1 // ~Druide~
+		FIGHTER, "BIT11", 1, 1 => 1 // ~Guerrier~
+		MAGE,    "BIT18", 1, 1 => 1 // ~Mage~
+		101129,  "BIT18", 0, 0 => 1 // ~Sorcier~
+		MONK,    "BIT29", 0, 0 => 1 // ~Moine~
+		PALADIN, "BIT20", 0, 1 => 1 // ~Paladin~
+		RANGER,  "BIT21", 0, 1 => 1 // ~Rôdeur~
+		THIEF,   "BIT22", 1, 1 => 1 // ~Voleur~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY useMulticlasses BEGIN
+		CLERIC_MAGE         => 1 // ~Clerc / Mage~
+	    CLERIC_THIEF        => 1 // ~Clerc / Voleur~
+		CLERIC_RANGER       => 1 // ~Clerc / Rôdeur~
+		FIGHTER_DRUID       => 1 // ~Guerrier / Druide~
+		FIGHTER_MAGE        => 1 // ~Guerrier / Mage~
+		FIGHTER_CLERIC      => 1 // ~Guerrier / Clerc~
+		FIGHTER_MAGE_CLERIC => 1 // ~Guerrier / Mage / Clerc~
+		FIGHTER_MAGE_THIEF  => 1 // ~Guerrier / Mage / Voleur~
+		FIGHTER_THIEF       => 1 // ~Guerrier / Voleur~
+		MAGE_THIEF          => 1 // ~Mage / Voleur~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY unuseMulticlasses BEGIN
+		CLERIC_MAGE         => 1 // ~Clerc / Mage~
+	    CLERIC_THIEF        => 1 // ~Clerc / Voleur~
+		CLERIC_RANGER       => 1 // ~Clerc / Rôdeur~
+		FIGHTER_DRUID       => 1 // ~Guerrier / Druide~
+		FIGHTER_MAGE        => 1 // ~Guerrier / Mage~
+		FIGHTER_CLERIC      => 1 // ~Guerrier / Clerc~
+		FIGHTER_MAGE_CLERIC => 1 // ~Guerrier / Mage / Clerc~
+		FIGHTER_MAGE_THIEF  => 1 // ~Guerrier / Mage / Voleur~
+		FIGHTER_THIEF       => 1 // ~Guerrier / Voleur~
+		MAGE_THIEF          => 1 // ~Mage / Voleur~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY cleric_class_group BEGIN
 		CLERIC_MAGE,         "BIT8"  => 1 // ~Clerc / Mage~
 	    CLERIC_THIEF,        "BIT9"  => 1 // ~Clerc / Voleur~
 		CLERIC_RANGER,       "BIT10" => 1 // ~Clerc / Rôdeur~
-		FIGHTER,             "BIT11" => 1 // ~Guerrier~
+		FIGHTER_CLERIC,      "BIT14" => 1 // ~Guerrier / Clerc~
+		FIGHTER_MAGE_CLERIC, "BIT15" => 1 // ~Guerrier / Mage / Clerc~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY fighter_class_group BEGIN
 		FIGHTER_DRUID,       "BIT12" => 1 // ~Guerrier / Druide~
 		FIGHTER_MAGE,        "BIT13" => 1 // ~Guerrier / Mage~
 		FIGHTER_CLERIC,      "BIT14" => 1 // ~Guerrier / Clerc~
 		FIGHTER_MAGE_CLERIC, "BIT15" => 1 // ~Guerrier / Mage / Clerc~
 		FIGHTER_MAGE_THIEF,  "BIT16" => 1 // ~Guerrier / Mage / Voleur~
 		FIGHTER_THIEF,       "BIT17" => 1 // ~Guerrier / Voleur~
-		MAGE,                "BIT18" => 1 // ~Mage~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY mage_class_group BEGIN
+		FIGHTER_MAGE,        "BIT13" => 1 // ~Guerrier / Mage~
+		FIGHTER_MAGE_CLERIC, "BIT15" => 1 // ~Guerrier / Mage / Clerc~
+		FIGHTER_MAGE_THIEF,  "BIT16" => 1 // ~Guerrier / Mage / Voleur~
 		MAGE_THIEF,          "BIT19" => 1 // ~Mage / Voleur~
-		PALADIN,             "BIT20" => 1 // ~Paladin~
-		RANGER,              "BIT21" => 1 // ~Rôdeur~
-		THIEF,               "BIT22" => 1 // ~Voleur~
-		MONK,                "BIT29" => 1 // ~Moine~
-		DRUID,               "BIT30" => 1 // ~Druide~
 	END
 
-	// Les groupes ne contiennent pas le bit de la classe de base
-	PATCH_DEFINE_ARRAY class_group_clerc BEGIN
-		"BIT8" "BIT9" "BIT10" "BIT14" "BIT15"
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY thief_class_group BEGIN
+	    CLERIC_THIEF,       "BIT9"  => 1 // ~Clerc / Voleur~
+		FIGHTER_MAGE_THIEF, "BIT16" => 1 // ~Guerrier / Mage / Voleur~
+		FIGHTER_THIEF,      "BIT17" => 1 // ~Guerrier / Voleur~
+		MAGE_THIEF,         "BIT19" => 1 // ~Mage / Voleur~
 	END
 
-	PATCH_DEFINE_ARRAY class_group_figther BEGIN
-		"BIT12" "BIT13" "BIT14" "BIT15" "BIT16" "BIT17"
-	END
-
-	PATCH_DEFINE_ARRAY class_group_mage BEGIN
-		"BIT13" "BIT15" "BIT16" "BIT18" "BIT19"
-	END
-
-	PATCH_DEFINE_ARRAY class_group_thief BEGIN
-		"BIT9" "BIT16" "BIT17" "BIT19"
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY druid_class_group BEGIN
+		FIGHTER_DRUID, "BIT12" => 1 // ~Guerrier / Druide~
 	END
 END
 
-DEFINE_PATCH_MACRO ~kits1~ BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
-		TALOS,         "BIT0" => 1 // ~Prêtre de Talos~
-		HELM,          "BIT1" => 1 // ~Prêtre de Helm~
-		LATHANDER,     "BIT2" => 1 // ~Prêtre de Lathandre~
-		TOTEMIC_DRUID, "BIT3" => 1 // ~Chaman~
-		SHAPESHIFTER,  "BIT4" => 1 // ~Métamorphe~
-		BEAST_FRIEND,  "BIT5" => 1 // ~Justicier~
-		BARBARIAN,     "BIT6" => 1 // ~Barbare~
-		WILDMAGE,      "BIT7" => 1 // ~Entropiste~
+DEFINE_PATCH_MACRO ~kits~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY bard_kit_group BEGIN
+		BLADE,  2, "BIT5" => 1 // ~Maître-lames~
+		JESTER, 2, "BIT6" => 1 // ~Bouffon~
+		SKALD,  2, "BIT7" => 1 // ~Scalde~
 	END
-END
 
-DEFINE_PATCH_MACRO ~kits2~ BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
-		STALKER,       "BIT0" => 1 // ~Traqueur~
-		BEASTMASTER,   "BIT1" => 1 // ~Maîtres des bêtes~
-		ASSASIN,       "BIT2" => 1 // ~Assassin~
-		BOUNTY_HUNTER, "BIT3" => 1 // ~Chasseur de primes~
-		SWASHBUCKLER,  "BIT4" => 1 // ~Bretteur~
-		BLADE,         "BIT5" => 1 // ~Maître-lames~
-		JESTER,        "BIT6" => 1 // ~Bouffon~
-		SKALD,         "BIT7" => 1 // ~Scalde~
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY cleric_kit_group BEGIN
+		TALOS,     1, "BIT0" => 1 // ~Prêtre de Talos~
+		HELM,      1, "BIT1" => 1 // ~Prêtre de Helm~
+		LATHANDER, 1, "BIT2" => 1 // ~Prêtre de Lathandre~
 	END
-END
 
-DEFINE_PATCH_MACRO ~kits3~ BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
-		DIVINER,     "BIT0" => 1 // ~Devin~
-		ENCHANTER,   "BIT1" => 1 // ~Enchanteur~
-		ILLUSIONIST, "BIT2" => 1 // ~Illusionniste~
-		INVOKER,     "BIT3" => 1 // ~Invocateur~
-		NECROMANCER, "BIT4" => 1 // ~Nécromancien~
-		TRANSMUTER,  "BIT5" => 1 // ~Transmutateur~
-		101054,      "BIT6" => 1 // ~Tous (aucun kit)~
-		FERALAN,     "BIT7" => 1 // ~Archer~
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY thief_kit_group BEGIN
+		ASSASIN,       2, "BIT2" => 1 // ~Assassin~
+		BOUNTY_HUNTER, 2, "BIT3" => 1 // ~Chasseur de primes~
+		SWASHBUCKLER,  2, "BIT4" => 1 // ~Bretteur~
 	END
-END
 
-DEFINE_PATCH_MACRO ~kits4~ BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
-		BERSERKER,     "BIT0" => 1 // ~Berserker~
-		WIZARD_SLAYER, "BIT1" => 1 // ~Tueur de magiciens~
-		KENSAI,        "BIT2" => 1 // ~Kensai~
-		CAVALIER,      "BIT3" => 1 // ~Chevalier~
-		INQUISITOR,    "BIT4" => 1 // ~Inquisiteur~
-		UNDEAD_HUNTER, "BIT5" => 1 // ~Chasseur de morts-vivants~
-		ABJURER,       "BIT6" => 1 // ~Abjurateur~
-		CONJURER,      "BIT7" => 1 // ~Conjurateur~
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY mage_kit_group BEGIN
+		WILDMAGE,    1, "BIT7" => 1 // ~Entropiste~
+		DIVINER,     3, "BIT0" => 1 // ~Devin~
+		ENCHANTER,   3, "BIT1" => 1 // ~Enchanteur~
+		ILLUSIONIST, 3, "BIT2" => 1 // ~Illusionniste~
+		INVOKER,     3, "BIT3" => 1 // ~Invocateur~
+		NECROMANCER, 3, "BIT4" => 1 // ~Nécromancien~
+		TRANSMUTER,  3, "BIT5" => 1 // ~Transmutateur~
+		ABJURER,     4, "BIT6" => 1 // ~Abjurateur~
+		CONJURER,    4, "BIT7" => 1 // ~Conjurateur~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY fighter_kit_group BEGIN
+		BERSERKER,     4, "BIT0" => 1 // ~Berserker~
+		WIZARD_SLAYER, 4, "BIT1" => 1 // ~Tueur de magiciens~
+		KENSAI,        4, "BIT2" => 1 // ~Kensai~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY druid_kit_group BEGIN
+		TOTEMIC_DRUID, 1, "BIT3" => 1 // ~Chaman~
+		SHAPESHIFTER,  1, "BIT4" => 1 // ~Métamorphe~
+		BEAST_FRIEND,  1, "BIT5" => 1 // ~Justicier~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY paladin_kit_group BEGIN
+		CAVALIER,      4, "BIT3" => 1 // ~Chevalier~
+		INQUISITOR,    4, "BIT4" => 1 // ~Inquisiteur~
+		UNDEAD_HUNTER, 4, "BIT5" => 1 // ~Chasseur de morts-vivants~
+	END
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ranger_kit_group BEGIN
+		STALKER,     2, "BIT0" => 1 // ~Traqueur~
+		BEASTMASTER, 2, "BIT1" => 1 // ~Maîtres des bêtes~
+		FERALAN,     3, "BIT7" => 1 // ~Archer~
 	END
 END
 
@@ -136,6 +175,7 @@ END
  * - L'ordre est toujours Alignement > Race > Classe > Kit                                   *
  * ----------------------------------------------------------------------------------------- */
 DEFINE_PATCH_FUNCTION ~usability~ RET description BEGIN
+
 	SET usable         = 1
 	SET usableByAll    = 1
 	SET useListCount   = 0
@@ -151,8 +191,7 @@ DEFINE_PATCH_FUNCTION ~usability~ RET description BEGIN
 
 	LPM ~usability_alignment~
 	LPM ~usability_race~
-	LPM ~usability_class~
-	LPM ~usability_kit~
+	LPM ~usability_class_kit~
 
 	LPF ~usability_add_to_description~ INT_VAR strref = 101070 all = (usableByAll AND usable) RET description END                        // Utilisable par
 	LPF ~usability_add_to_description~ INT_VAR strref = 101071 all = (usable == 0) STR_VAR type = "unuse" RET description END // Non utilisable par
@@ -345,151 +384,292 @@ END
 /* ---------------------------------------------------------------------------- *
  * Génère la section "[Non] Utilisable par" relative à la classe du personnage. *
  * ---------------------------------------------------------------------------- */
-DEFINE_PATCH_MACRO ~usability_class~ BEGIN
-	PATCH_IF usable = 1 BEGIN
-		LPF usability_split INT_VAR useMask STR_VAR array_name = "classes" RET useCount unuseCount smallest RET_ARRAY use unuse END
+DEFINE_PATCH_MACRO ~usability_class_kit~ BEGIN
+	PATCH_DEFINE_ARRAY use BEGIN END
+	PATCH_DEFINE_ARRAY unuse BEGIN END
 
-		PATCH_IF useCount = 0 BEGIN
-			SET usable = 0
-		END
-		ELSE PATCH_IF unuseCount > 0 BEGIN
-			CLEAR_ARRAY useClass
-			CLEAR_ARRAY unuseClass
+	SET useCount = 0
+	SET unuseCount = 0
 
-			PATCH_DEFINE_ARRAY useClass BEGIN END
-			PATCH_DEFINE_ARRAY unuseClass BEGIN END
+	CLEAR_ARRAY use
+	CLEAR_ARRAY unuse
 
-			SET usableByAll = 0
-			SET useClassCount = 0
-			SET unuseClassCount = 0
+	//SET $use("-1") = 0
+	//SET $unuse("-1") = 0
 
-			LPM ~classes~
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT11 baseRef = 101011 STR_VAR array_name = "class_group_figther" useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT7  baseRef = 101007 STR_VAR array_name = "class_group_clerc"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT18 baseRef = 101018 STR_VAR array_name = "class_group_mage"    useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
-			LPF ~usability_class_compress~ INT_VAR baseClass = BIT22 baseRef = 101022 STR_VAR array_name = "class_group_thief"   useArray = EVAL "%smallest%" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse END
+	LPM ~classes~
+	LPM ~kits~
 
-			PATCH_PHP_EACH "%smallest%" AS data => value BEGIN
-				PATCH_IF value = 1 BEGIN
-					SET EVAL "%smallest%ClassCount" += 1
-					SPRINT key EVAL "%%smallest%ClassCount%"
-					SPRINT $useClass("%smallest%-%key%") "%data_1%"
-				END
-			END
-
-			// TODO: Trier par ordre alphabetique ?
-			PATCH_PHP_EACH useClass AS data => value BEGIN
-				SET EVAL "%smallest%ListCount" += 1
-				SPRINT key EVAL "%%smallest%ListCount%"
-				SPRINT $useList("%data_0%-%key%") "%value%"
-			END
-		END
-	END
-END
-
-/* ----------------------------------------------------------------------------------- *
- * Fusionne les entrées en une seule ligne si toutes les variantes multiclassées de la *
- * classe de base sont présentes.                                                      *
- * Selon le cas, on remplacera la liste par                                            *
- * - [classname]                                                                       *
- * - [classname] monoclassé                                                            *
- * - [classname] multiclassé                                                           *
- * ----------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~usability_class_compress~ INT_VAR baseClass = 0 baseRef = 0 STR_VAR array_name = "" useArray = "" RET useClassCount unuseClassCount RET_ARRAY useClass use unuse BEGIN
-	SET none = 1 // Est-ce qu'aucun élément est présent ?
-	SET base = 0 // Est-ce que la classe de base est présente ?
-	SET count = 0
-	SET total = 0
-
-	SPRINT classname (AT %baseRef%)
-
-	PATCH_PHP_EACH "%array_name%" AS data => value BEGIN
-		SET total += 1
-		PATCH_PHP_EACH "%useArray%" AS useData => useValue BEGIN
-			SET useBit = EVAL "%value%"
-			PATCH_IF useBit == useData_0 BEGIN
-				SET count += 1
-				none = 0
-			END
-			PATCH_IF useData_0 == baseClass BEGIN
-				SET base = 1
-			END
-		END
-	END
-	PATCH_IF count == total BEGIN
-		PATCH_IF base == 1 BEGIN // La classe et toutes se déclinaisons hors kit
-			SPRINT string @101074
-			SET EVAL "%useArray%ClassCount" += 1
-			SPRINT key EVAL "%%useArray%ClassCount%"
-			SPRINT $useClass("%useArray%" "%key%") "%string%"
-		END
-		ELSE BEGIN // La classe multiclassée
-			SPRINT string @101072
-			SET EVAL "%useArray%ClassCount" += 1
-			SPRINT key EVAL "%%useArray%ClassCount%"
-			SPRINT $useClass("%useArray%" "%key%") "%string%"
-		END
+	// Barbare
+	// Bien qu'étant considéré comme une classe à part, techniquement, le Barbare est bien un kit de guerrier !
+	// On le traite alors différemment pour afficher tel que le joueur s'y attendrait
+	PATCH_IF (useMask BAND %BIT11%) = 0 AND (kitUsability1 BAND %BIT6%) = 0 BEGIN
+		SET useCount += 1
+		SET useKey = useCount
+		SPRINT name $translations("BARBARIAN")
+		SPRINT $use(~%useKey%~ ~BARBARIAN~) ~%name%~
 	END
 	ELSE BEGIN
-		PATCH_IF none == 1 AND base == 1 BEGIN // La classe monoclassée
-			SPRINT string @101073
-			SET EVAL "%useArray%ClassCount" += 1
-			SPRINT key EVAL "%%useArray%ClassCount%"
-			SPRINT $useClass("%useArray%" "%key%") "%string%"
+		SET usableByAll = 0
+		SET unuseCount += 1
+		SET useKey = unuseCount
+		SPRINT name $translations("BARBARIAN")
+		SPRINT $unuse(~%useKey%~ ~BARBARIAN~) ~%name%~
+	END
 
-			// Désactivation de la classe de base dans la liste principale
-			PATCH_PHP_EACH "%useArray%" AS useData => useValue BEGIN
-				PATCH_IF useData_0 == baseClass BEGIN
-					SET $EVAL "%useArray%"("%useData_0%" "%useData_1%") = 0
+	PATCH_PHP_EACH classes AS data => value BEGIN
+		SPRINT classname EVAL ~%data_0%~
+		SET bitClass      = EVAL ~%data_1%~
+		SET hasMulticlass = EVAL ~%data_2%~
+		SET hasKits       = EVAL ~%data_3%~
+
+		LPM ~compress_class_kit~
+	END
+
+	// Filtre des multiclasses afin que la liste finale ne contienne pas de doublon
+	PATCH_PHP_EACH ~useMulticlasses~ AS data => value BEGIN
+		PATCH_IF value == 0 BEGIN
+			PATCH_PHP_EACH ~use~ AS uData => uValue BEGIN
+				PATCH_IF ~%data_0%~ STRING_EQUAL ~%uData_1%~ BEGIN
+					SPRINT $use(~%uData_0%~ ~%uData_1%~) ~~
+				END
+			END
+		END
+	END
+	PATCH_PHP_EACH ~unuseMulticlasses~ AS data => value BEGIN
+		PATCH_IF value == 0 BEGIN
+			PATCH_PHP_EACH ~unuse~ AS uData => uValue BEGIN
+				PATCH_IF ~%data_0%~ STRING_EQUAL ~%uData_1%~ BEGIN
+					SPRINT $unuse(~%uData_0%~ ~%uData_1%~) ~~
 				END
 			END
 		END
 	END
 
-	PATCH_IF count == total BEGIN
-		PATCH_PHP_EACH "%array_name%" AS key => class BEGIN
-			PATCH_PHP_EACH "%useArray%" AS useData => useValue BEGIN
-				SET class = EVAL "%class%"
-				PATCH_IF useData_0 == class BEGIN
-					SET $EVAL "%useArray%"("%useData_0%" "%useData_1%") = 0
-				END
-			END
+	SPRINT useArray ~use~
+
+	PATCH_PHP_EACH ~use~ AS data => value BEGIN
+		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+			SET useListCount += 1
+		END
+	END
+	PATCH_PHP_EACH ~unuse~ AS data => value BEGIN
+		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+			SET unuseListCount += 1
+		END
+	END
+
+	PATCH_IF unuseListCount < useListCount BEGIN
+		SPRINT useArray ~unuse~
+		SET useListCount = 0
+	END
+	ELSE BEGIN
+		SET unuseListCount = 0
+	END
+
+	SORT_ARRAY_INDICES ~%useArray%~ NUMERICALLY
+
+	PATCH_PHP_EACH ~%useArray%~ AS data => value BEGIN
+		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT $useList("%useArray%%data_1%") "%value%"
 		END
 	END
 END
 
-DEFINE_PATCH_MACRO ~usability_kit~ BEGIN
-	PATCH_IF usable = 1 BEGIN
-		LPF usability_split INT_VAR useMask = kitUsability1 STR_VAR array_name = "kits1" RET useCountKit1 = useCount unuseCountKit1 = unuseCount smallest RET_ARRAY useKit1 = use unuseKit1 = unuse END
-		LPF usability_split INT_VAR useMask = kitUsability2 STR_VAR array_name = "kits2" RET useCountKit2 = useCount unuseCountKit2 = unuseCount smallest RET_ARRAY useKit2 = use unuseKit2 = unuse END
-		LPF usability_split INT_VAR useMask = kitUsability3 STR_VAR array_name = "kits3" RET useCountKit3 = useCount unuseCountKit3 = unuseCount smallest RET_ARRAY useKit3 = use unuseKit3 = unuse END
-		LPF usability_split INT_VAR useMask = kitUsability4 STR_VAR array_name = "kits4" RET useCountKit4 = useCount unuseCountKit4 = unuseCount smallest RET_ARRAY useKit4 = use unuseKit4 = unuse END
+DEFINE_PATCH_MACRO ~compress_class_kit~ BEGIN
+	SPRINT lowerClassname ~%classname%~
+	TO_LOWER lowerClassname
 
-		SET useCount   = useCountKit1 + useCountKit2 + useCountKit3 + useCountKit4
-		SET unuseCount = unuseCountKit1 + unuseCountKit2 + unuseCountKit3 + unuseCountKit4
+	SPRINT classgroup ~%lowerClassname%_class_group~
+	SPRINT kitgroup   ~%lowerClassname%_kit_group~
 
-		PATCH_IF useCount = 0 BEGIN
-			SET usable = 0
+	PATCH_IF ("%classname%" STRING_MATCHES_REGEXP "[0-9]+" = 0) BEGIN
+		SPRINT classname (AT ~%classname%~)
+	END
+	ELSE BEGIN
+		SPRINT classname  $translations("%classname%")
+	END
+
+	SET baseClassCan = 0
+	SET allMulticlassesCan = 1
+	SET allMulticlassesCanNot = 1
+	SET allKitsCan = 1
+	SET allKitsCanNot = 1
+
+	PATCH_IF (useMask BAND %bitClass%) = 0 BEGIN
+		SET baseClassCan = 1
+	END
+	ELSE BEGIN
+		SET usableByAll = 0
+		SET allKitsCan = 0
+	END
+
+	PATCH_IF hasMulticlass == 1 BEGIN
+		PATCH_PHP_EACH "%classgroup%" AS data => value BEGIN
+			SET bit = EVAL "%%data_1%%"
+
+			PATCH_IF (useMask BAND %bit%) = 0 BEGIN
+				SET allMulticlassesCanNot = 0
+			END
+			ELSE BEGIN
+				SET allMulticlassesCan = 0
+				SET usableByAll = 0
+			END
 		END
-		ELSE PATCH_IF unuseCount > 0 BEGIN
-			SET usableByAll = 0
+	END
+	PATCH_IF baseClassCan == 1 AND hasKits == 1 BEGIN
+		PATCH_PHP_EACH "%kitgroup%" AS data => value BEGIN
+			SET bit = EVAL "%%data_2%%"
 
-			SPRINT smallest "use"
-			PATCH_IF useCount > unuseCount BEGIN
-				SPRINT smallest "unuse"
+			PATCH_IF (EVAL ~kitUsability%data_1%~ BAND %bit%) = 0 BEGIN
+				SET allKitsCanNot = 0
 			END
+			ELSE BEGIN
+				SET allKitsCan = 0
+				SET usableByAll = 0
+			END
+		END
+	END
 
-            PATCH_DEFINE_ARRAY ~numbers~ BEGIN 1 2 3 4 END
-			// TODO: Trier par ordre alphabetique ?
-			PATCH_PHP_EACH numbers AS key => number BEGIN
-				PATCH_PHP_EACH "%smallest%Kit%number%" AS data => value BEGIN
-					PATCH_IF value == 1 BEGIN
-						SET EVAL "%smallest%ListCount" += 1
-						SPRINT key EVAL "%%smallest%ListCount%"
-						SPRINT $useList("%smallest%-%key%") "%data_1%"
-					END
-				END
-			END
+	PATCH_IF allMulticlassesCan == 1 BEGIN
+		PATCH_PHP_EACH "%classgroup%" AS data => value BEGIN
+			SET $useMulticlasses("%data_0%") = 0
+		END
+	END
+	PATCH_IF allMulticlassesCanNot == 1 BEGIN
+		PATCH_PHP_EACH "%classgroup%" AS data => value BEGIN
+			SET $unuseMulticlasses("%data_0%") = 0
+		END
+	END
+
+	PATCH_IF baseClassCan == 1 AND hasMulticlass == 1 AND allMulticlassesCan == 1 AND hasKits == 1 AND allKitsCan == 1 BEGIN
+		SPRINT useName @101127 // ~%classname% monoclassé, multiclassé et ses kits~
+		SET useCount += 1
+		SPRINT $use(~%useCount%~ ~%data_0%-mc-k~) ~%useName%~
+	END
+	ELSE PATCH_IF baseClassCan == 1 AND hasMulticlass == 0 AND hasKits == 1 AND allKitsCan == 1 BEGIN
+		SPRINT useName @101128 // ~%classname% et ses kits~
+		SET useCount += 1
+		SPRINT $use(~%useCount%~ ~%data_0%-k~) ~%useName%~
+	END
+	ELSE PATCH_IF baseClassCan == 1 AND hasMulticlass == 1 AND allMulticlassesCan == 1 AND hasKits == 0 BEGIN
+		SPRINT useName @101074 // ~%classname% monoclassé et multiclassé~
+		SET useCount += 1
+		SPRINT $use(~%useCount%~ ~%data_0%-mc~) ~%useName%~
+	END
+	ELSE PATCH_IF baseClassCan == 0 AND hasMulticlass == 1 AND allMulticlassesCanNot == 1 AND hasKits == 1 AND allKitsCanNot == 1 BEGIN
+		SPRINT useName @101127 // ~%classname% monoclassé, multiclassé et ses kits~
+		SET unuseCount += 1
+		SPRINT $unuse(~%unuseCount%~ ~%data_0%-mc-k~) ~%useName%~
+    END
+    ELSE PATCH_IF baseClassCan == 0 AND hasMulticlass == 0 AND hasKits == 1 AND allKitsCanNot == 1 BEGIN
+		SPRINT useName @101128 // ~%classname% et ses kits~
+		SET unuseCount += 1
+		SPRINT $unuse(~%unuseCount%~ ~%data_0%-k~) ~%useName%~
+    END
+    ELSE PATCH_IF baseClassCan == 0 AND hasMulticlass == 1 AND allMulticlassesCanNot == 1 AND hasKits == 0 BEGIN
+		SPRINT useName @101074 // ~%classname% monoclassé et multiclassé~
+		SET unuseCount += 1
+		SPRINT $unuse(~%unuseCount%~ ~%data_0%-mc~) ~%useName%~
+    END
+    ELSE BEGIN
+        PATCH_IF hasMulticlass == 1 AND hasKits == 1 BEGIN
+			SET listKits = 1
+			SET listMulticlasses = 1
+
+            PATCH_IF baseClassCan == 0 AND allKitsCanNot == 1 BEGIN
+				SPRINT useName @101128 // ~%classname% et ses kits~
+				SET unuseCount += 1
+				SET listKits = 0
+				SPRINT $unuse(~%unuseCount%~ ~%data_0%-k~) ~%useName%~
+            END
+            ELSE PATCH_IF baseClassCan == 0 AND allMulticlassesCanNot == 1 BEGIN
+				SPRINT useName @101074 // ~%classname% monoclassé et multiclassé~
+				SET unuseCount += 1
+				SET listMulticlasses = 0
+				SPRINT $unuse(~%unuseCount%~ ~%data_0%-mc~) ~%useName%~
+            END
+            ELSE PATCH_IF baseClassCan == 1 AND allMulticlassesCan == 1 BEGIN
+				SPRINT useName @101074 // ~%classname% monoclassé et multiclassé~
+				SET useCount += 1
+				SET listMulticlasses = 0
+				SPRINT $use(~%useCount%~ ~%data_0%-mc~) ~%useName%~
+            END
+            ELSE PATCH_IF baseClassCan == 1 AND allKitsCan == 1 BEGIN
+				SPRINT useName @101128 // ~%classname% et ses kits~
+				SET useCount += 1
+				SET listKits = 0
+				SPRINT $use(~%useCount%~ ~%data_0%-k~) ~%useName%~
+            END
+            ELSE BEGIN
+                LPM ~list_baseclass~
+            END
+
+            PATCH_IF listMulticlasses == 1 BEGIN
+				LPM ~list_multiclasses~
+            END
+
+            PATCH_IF listKits == 1 BEGIN
+				LPM ~list_kits~
+            END
+        END
+        ELSE PATCH_IF hasMulticlass == 1 BEGIN
+            LPM ~list_baseclass~
+            LPM ~list_multiclasses~
+        END
+        ELSE PATCH_IF hasKits == 1 BEGIN
+            LPM ~list_baseclass~
+            LPM ~list_kits~
+        END
+        ELSE BEGIN
+            LPM ~list_baseclass~
+        END
+    END
+END
+
+DEFINE_PATCH_MACRO ~list_baseclass~ BEGIN
+	PATCH_IF baseClassCan == 1 BEGIN
+		SET useCount += 1
+		SPRINT $use(~%useCount%~ ~%data_0%~) ~%classname%~
+	END
+	ELSE BEGIN
+		SET unuseCount += 1
+		SPRINT $unuse(~%unuseCount%~ ~%data_0%~) ~%classname%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~list_multiclasses~ BEGIN
+	PATCH_PHP_EACH "%classgroup%" AS data => value BEGIN
+		SET bit = EVAL "%%data_1%%"
+
+		PATCH_IF (useMask BAND %bit%) = 0 BEGIN
+			SET useCount += 1
+			SPRINT name $translations("%data_0%")
+			SPRINT $use(~%useCount%~ ~%data_0%~) ~%name%~
+		END
+		ELSE BEGIN
+			SET unuseCount += 1
+			SPRINT name $translations("%data_0%")
+			SPRINT $unuse(~%unuseCount%~ ~%data_0%~) ~%name%~
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~list_kits~ BEGIN
+	PATCH_PHP_EACH "%kitgroup%" AS data => value BEGIN
+		SET bit = EVAL "%%data_2%%"
+
+		PATCH_IF (EVAL ~kitUsability%data_1%~ BAND %bit%) = 0 BEGIN
+			SET useCount += 1
+			SET useKey = 100 + useCount
+			SPRINT name $translations("%data_0%")
+			SPRINT $use(~%useKey%~ ~%data_0%~) ~%name%~
+		END
+		ELSE BEGIN
+			SET unuseCount += 1
+			SET useKey = 100 + unuseCount
+			SPRINT name $translations("%data_0%")
+			SPRINT $unuse(~%useKey%~ ~%data_0%~) ~%name%~
 		END
 	END
 END
