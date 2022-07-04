@@ -192,10 +192,12 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	  7 => 1
 	  8 => 1 // Colour: Change by RGB [8]
 	  9 => 1
+	 41 => 1 // Graphics: Sparkle [41]
 	 50 => 1
 	 51 => 1 // Colour: Strong/Dark by RGB [51]
 	 52 => 1 // Colour: Very Bright by RGB [52]
 	 53 => 1 // Graphics: Animation Change [53]
+	 61 => 1 // Creature RGB color fade [61]
 	 66 => 1 // Graphics: Transparency Fade [66]
 	 72 => 1 // State: Set IDS State [72]
 	 82 => 1 // Set AI Script [82]
@@ -239,7 +241,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	300 => 1 // NPC Bump [300] // TODO: A gérer ? Vérifier les objets qui l'utilisent
 	309 => 1 // Script: Set/Modify Local Variable [309]
 	318 => 1 // Protection: Immunity Spell [318] // TODO: A gérer quand même ? Stat: Set Stat (TobEx)
-	319 => 1 // Item Usability [319] // EE only
+	// EE only
+	319 => 1 // Item Usability [319]
+	327 => 1 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
+	330 => 1 // Text: Float Text [330]
+	336 => 1 // Graphics: Display Eyes Overlay [336]
+	339 => 1 // Alter Animation [339]
+	342 => 1 // Animation: Override Data [342]
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
@@ -1170,7 +1178,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_33~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
-	LPF ~opcode_save_vs~ INT_VAR strref = 102033 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les sorts~
+	LPF ~opcode_save_vs~ INT_VAR strref = 102029 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_33~ BEGIN
@@ -1222,7 +1230,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_36~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
-	LPF ~opcode_save_vs~ INT_VAR strref = 102032 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les sorts~
+	LPF ~opcode_save_vs~ INT_VAR strref = 102032 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les souffles~
 END
 
 /* ----------------------------------- *
@@ -1585,6 +1593,8 @@ DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
 
+	//TODO: Vérifier si un seul effet peut effectivement ajouter des sorts à plusieurs niveaux différent (3 = niveau 1 et 2 ??)
+
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 102080 RET description END
 END
 
@@ -1806,6 +1816,10 @@ END
  * ------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_81~ BEGIN
 	SPRINT description @102145 // ~Guérison de la surdité~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_81~ BEGIN
+	SPRINT description @102681 // ~de guérir la surdité %theTarget%~
 END
 
 /* ------------------------------------- *
@@ -2277,6 +2291,15 @@ END
  * ------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_130~ BEGIN
     SPRINT description @102196 // ~Bénédiction permanente~
+END
+
+/* --------------------------- *
+ * State: Positive Chant [131] *
+ * --------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_131~ BEGIN
+    LPM ~opcode_self_22~ // ~Chance~
+    SPRINT notCumulative @102682 // ~non cumulable~
+    SPRINT description ~%description% (%notCumulative%)~
 END
 
 /* --------------------------------------------------------------------- *
@@ -3467,7 +3490,7 @@ DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	SPRINT name @102093
+	SPRINT name @102093 // ~Chance d'infliger un coup critique~
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
@@ -3512,6 +3535,53 @@ END
  * ------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_317~ BEGIN
 	LPM ~opcode_self_16~
+END
+
+/* ----------------------------- *
+ * Stat: Turn Undead Level [323] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
+	LPF ~opcode_mod~ INT_VAR strref = 102683 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de repousser les morts-vivants~
+END
+
+/* ------------------------ *
+ * Stat: Save vs. all [325] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_325~ BEGIN
+	LPF ~opcode_mod~ INT_VAR strref = 102034 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Jets de sauvegarde~
+END
+
+/* ------------------------------- *
+ * Spell Effect: Slow Poison [329] *
+ * ------------------------------- */
+//TODO: Les poisons infligent des dégâts toutes les xx secondes
+
+
+/* ------------------------------------ *
+ * Stat: Specific Damage Modifier [332] *
+ * ------------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
+	LOCAL_SET strref = 102690 + parameter2
+	LPF ~opcode_mod_percent~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts de xxx~
+END
+
+/* --------------------------- *
+ * Save vs. school bonus [346] *
+ * --------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_346~ BEGIN
+	LOCAL_SET strref = 102710 + special
+	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts de l'école xxx~
+END
+
+/* ------------------------ *
+ * Critical miss bonus [362] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
+	LOCAL_SET value = 5 * parameter1
+	LPF ~signed_value~ INT_VAR value RET value END
+	SPRINT value @10002 // ~%value% %~
+	SPRINT name @102684 // ~Chance d'effectuer un échec critique~
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN

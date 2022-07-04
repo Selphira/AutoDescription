@@ -122,9 +122,9 @@
 @102124 = ~de tuer instantanément %theTarget%~
 @102125 = ~Immunité aux attaques de regard~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-@102127 = ~Échec systématique des sorts profanes lancés~
-@102128 = ~Échec systématique des sorts divins lancés~
-@102129 = ~Échec systématique des sorts innés lancés~
+@102127 = ~Provoque l'échec systématique des sorts profanes~
+@102128 = ~Provoque l'échec systématique des sorts divins~
+@102129 = ~Provoque l'échec systématique des sorts innés~
 @102130 = ~Soigne un point de vie à la cible~
 @102131 = ~Soigne %value% points de vie à la cible~
 @102132 = ~Inflige un point de dégâts à la cible~
@@ -157,9 +157,9 @@
 @102160 = ~Empoisonne la cible et lui inflige 1 point de dégât par seconde~
 @102161 = ~Empoisonne la cible et lui inflige %amount% points de dégâts par seconde~
 @102162 = ~Empoisonne la cible et lui inflige 1 point de dégât toutes les %amount% secondes~
-@102163 = ~Échec systématique des sorts profanes lancés par la cible~
-@102164 = ~Échec systématique des sorts divins lancés par la cible~
-@102165 = ~Échec systématique des sorts innés lancés par la cible~
+@102163 = ~Provoque l'échec systématique des sorts profanes lancés par la cible~
+@102164 = ~Provoque l'échec systématique des sorts divins lancés par la cible~
+@102165 = ~Provoque l'échec systématique des sorts innés lancés par la cible~
 @102166 = ~de provoquer rage berserk chez le porteur~
 @102167 = ~d'infliger Horreur à la cible~
 @102168 = ~Points de vie maximum~
@@ -287,12 +287,12 @@
 @102290 = ~Lenteur permanente~
 @102291 = ~Draîne un niveau au porteur~
 @102292 = ~Draîne %amount% niveaux au porteur~
-@102293 = ~Échec de %percent% des sorts profanes lancés par la cible~
-@102294 = ~Échec de %percent% des sorts divins lancés par la cible~
-@102295 = ~Échec de %percent% des sorts innés lancés par la cible~
-@102296 = ~Échec de %percent% des sorts profanes lancés~
-@102297 = ~Échec de %percent% des sorts divins lancés~
-@102298 = ~Échec de %percent% des sorts innés lancés~
+@102293 = ~Provoque l'échec de %percent% des sorts profanes lancés par la cible~
+@102294 = ~Provoque l'échec de %percent% des sorts divins lancés par la cible~
+@102295 = ~Provoque l'échec de %percent% des sorts innés lancés par la cible~
+@102296 = ~Provoque l'échec de %percent% des sorts profanes~
+@102297 = ~Provoque l'échec de %percent% des sorts divins~
+@102298 = ~Provoque l'échec de %percent% des sorts innés~
 @102299 = ~que la cible devienne floue~
 @102300 = ~de tuer instantanément le porteur~
 @102301 = ~de soigner un point de vie au porteur~
@@ -578,6 +578,35 @@
 @102678 = ~Le porteur peut attaquer une créature cachée ou invisible~
 @102679 = ~Protection contre les coups critiques~
 @102680 = ~Pétrifie %theTarget%~
+@102681 = ~de guérir la surdité %theTarget%~
+@102682 = ~non cumulable~
+@102683 = ~Niveau de repousser les morts-vivants~
+@102684 = ~Chance d'effectuer un échec critique~
+@102690 = ~Dégâts~
+@102691 = ~Dégâts de feu~
+@102692 = ~Dégâts de froid~
+@102693 = ~Dégâts d'électricité~
+@102694 = ~Dégâts d'acide~
+@102695 = ~Dégâts magique~
+@102696 = ~Dégâts de poison~
+@102697 = ~Dégâts tranchants~
+@102698 = ~Dégâts perforants~
+@102699 = ~Dégâts contondants~
+@102700 = ~Dégâts de projectiles~
+
+// Save vs. school bonus [346]
+@102710 = ~~
+@102711 = ~contre les sorts de l'école de l'Abjuration~
+@102712 = ~contre les sorts de l'école de la Conjuration~
+@102713 = ~contre les sorts de l'école de la Divination~
+@102714 = ~contre les sorts de l'école de l'Enchantement~
+@102715 = ~contre les sorts de l'école de l'Illusion~
+@102716 = ~contre les sorts de l'école de l'Invocation~
+@102717 = ~contre les sorts de l'école de la Nécromancie~
+@102718 = ~contre les sorts de l'école de l'Altération~
+@102719 = ~~
+@102720 = ~~
+@102721 = ~~
 
 // Button: Disable Button [144]
 @102980 = ~Empêche l'utilisation du camouflage dans l'ombre~
@@ -590,9 +619,12 @@
 @102987 = ~Empêche l'utilisation des discussions~
 @102988 = ~Empêche l'utilisation des objets~
 @102989 = ~Empêche l'utilisation du premier objet rapide~
+@102990 = ~Empêche l'utilisation des chants de barde~
 @102991 = ~Empêche l'utilisation du second objet rapide~
 @102992 = ~Empêche l'utilisation du troisième objet rapide~
 @102993 = ~Empêche l'utilisation des sorts innés~
+@102994 = ~Empêche l'utilisation de la détection de pièges~
+@102995 = ~Empêche l'utilisation de l'inventaire~
 
 // Protection: from Opcode [101]
 @103000 = ~~
@@ -614,6 +646,7 @@
 @103045 = ~Immunité à l'étourdissement~
 @103055 = ~Immunité à la mort magique~
 @103058 = ~Immunité à la dissipation~
+@103060 = ~Immunité à l'échec d'incantation des sorts~
 @103074 = ~Immunité à l'aveuglement~
 @103076 = ~Immunité à la débilité mentale~
 @103078 = ~Immunité à la maladie~
@@ -708,7 +741,7 @@
 @10005 = ~Fixée à %value%~
 @10006 = ~Multiplié par %value%~
 //@10007 = ~Multipliée par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\|Statistics\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~%value%~
 @10010 = ~Passe à %value%~
 @10011 = ~une demi~
@@ -786,6 +819,7 @@
 @202000 = ~~
 @202002 = ~compagnons~
 @202004 = ~alliés~
+@202005 = ~créatures contrôlées~
 @202006 = ~créatures charmées~
 @202255 = ~ennemis~
 
@@ -871,6 +905,7 @@
 @204157 = ~devas déchues~
 @204158 = ~planétaires~
 @204159 = ~planétaires déchus~
+@204161 = ~gobelins~
 @204199 = ~ettins~
 
 /* --------- *

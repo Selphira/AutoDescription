@@ -1,7 +1,7 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.html)~
 
-VERSION ~0.9.2~
+VERSION ~0.9.3~
 
 ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
@@ -45,6 +45,8 @@ DEFINE_PATCH_MACRO ~description~ BEGIN
 		// Supprime les lignes vides consécutives
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
 	END
+
+	//SAY DESC ~%description%~
 END
 
 DEFINE_PATCH_MACRO ~log~ BEGIN

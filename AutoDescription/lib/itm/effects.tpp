@@ -6,72 +6,64 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 
 	LPM ~block_to_vars~
 
+	SPRINT method ~~
 	SPRINT description ~~
 	SPRINT opcode_target ~~
 
-	PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
-		PATCH_IF abilityType == AbilityType_Equipped BEGIN
-			SPRINT opcode_target ~_self~
-			SPRINT theTarget   @102472 // ~le porteur~
-			SPRINT ofTheTarget @101086 // ~du porteur~
-		END
-		ELSE BEGIN
-			// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
-			// Serait ajouté dans une variable qu'il suffira d'utiliser
-			// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-			PATCH_IF target == TARGET_FX_self BEGIN
+	PATCH_TRY
+		PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
+			PATCH_IF abilityType == AbilityType_Equipped BEGIN
 				SPRINT opcode_target ~_self~
 				SPRINT theTarget   @102472 // ~le porteur~
 				SPRINT ofTheTarget @101086 // ~du porteur~
 			END
-			ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN
-				SPRINT opcode_target ~_target~
-				SPRINT theTarget   @102471 // ~la cible~
-				SPRINT ofTheTarget @101085 // ~de la cible~
-			END
-			ELSE PATCH_IF target == TARGET_FX_party BEGIN
-				SPRINT opcode_target ~_party~
-				SPRINT theTarget   @102473 // ~le groupe~
-				SPRINT ofTheTarget @101088 // ~du groupe~
-			END
-		END
-
-		PATCH_IF probability == 100 BEGIN
-			SPRINT method ~opcode%opcode_target%_%opcode_n%~
-			PATCH_TRY
-				LPM ~%method%~
-			WITH
-				~Failure("Unknown macro: \%method%")~
-				BEGIN
-					PATCH_FAIL ~Failure("Unknown macro: %method%")~
+			ELSE BEGIN
+				// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
+				// Serait ajouté dans une variable qu'il suffira d'utiliser
+				// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
+				PATCH_IF target == TARGET_FX_self BEGIN
+					SPRINT opcode_target ~_self~
+					SPRINT theTarget   @102472 // ~le porteur~
+					SPRINT ofTheTarget @101086 // ~du porteur~
 				END
-				DEFAULT
-					PATCH_FAIL ~%ERROR_MESSAGE%~
-			END
-			LPM ~set_opcode_sort~
-		END
-		ELSE BEGIN
-			SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
-			SET probability += 1
-			PATCH_TRY
-				LPM ~%method%~
-			WITH
-				~Failure("Unknown macro: \%method%")~
-				BEGIN
-					PATCH_FAIL ~Failure("Unknown macro: %method%")~
+				ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN
+					SPRINT opcode_target ~_target~
+					SPRINT theTarget   @102471 // ~la cible~
+					SPRINT ofTheTarget @101085 // ~de la cible~
 				END
-				DEFAULT
-					PATCH_FAIL ~%ERROR_MESSAGE%~
+				ELSE PATCH_IF target == TARGET_FX_party BEGIN
+					SPRINT opcode_target ~_party~
+					SPRINT theTarget   @102473 // ~le groupe~
+					SPRINT ofTheTarget @101088 // ~du groupe~
+				END
 			END
-			LPM ~set_opcode_sort~
-			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-				LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-				SPRINT description @101125 // ~%probability% de chance %description%~
-			END
-		END
 
-		LPM ~add_duration~
-		LPM ~add_save~
+			PATCH_IF probability == 100 BEGIN
+				SPRINT method ~opcode%opcode_target%_%opcode_n%~
+				LPM ~%method%~
+				LPM ~set_opcode_sort~
+			END
+			ELSE BEGIN
+				SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
+				SET probability += 1
+				LPM ~%method%~
+				LPM ~set_opcode_sort~
+				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+					SPRINT description @101125 // ~%probability% de chance %description%~
+				END
+			END
+
+			LPM ~add_duration~
+			LPM ~add_save~
+		END
+	WITH
+		~Failure("Unknown macro: \%method%")~
+		BEGIN
+			PATCH_FAIL ~Unknown macro: %method%~
+		END
+		DEFAULT
+			PATCH_FAIL ~Opcode %opcode_n%: %ERROR_MESSAGE%~
 	END
 END
 
