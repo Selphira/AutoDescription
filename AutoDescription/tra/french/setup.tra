@@ -1,1 +1,8 @@
-@10 = ~Uniformisation des descriptions~
+@10  = ~Uniformisation des descriptions~
+@20  = ~Uniformisation des descriptions d'un mod~
+@201 = ~Veuillez indiquer le nom du dossier du mod pour lequel vous desirez uniformiser les descriptions.
+
+Nom du dossier (ou 0 pour annuler)~
+@202 = ~Le dossier "%directory%" n'existe pas
+
+Nom du dossier (ou 0 pour annuler)~
