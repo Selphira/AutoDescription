@@ -4,14 +4,28 @@ AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.ht
 VERSION ~0.9.3~
 
 ALWAYS
+    ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END
+    ACTION_DEFINE_ARRAY arrayReload BEGIN ~description~ END
+
+    LAF HANDLE_CHARSETS
+        INT_VAR
+            infer_charsets = 1
+        STR_VAR
+            default_language = ~french~
+            tra_path = EVAL ~%MOD_FOLDER%/tra~
+            out_path = EVAL ~weidu_external/Lang/%MOD_FOLDER%~
+            noconvert_array = arrayNoConvert
+            reload_array = arrayReload
+    END
+
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
 END
 
 LANGUAGE ~Francais~ ~french~
-         ~AutoDescription/tra/french/setup.tra~
-         ~AutoDescription/tra/french/description.tra~
+         ~%MOD_FOLDER%/tra/french/setup.tra~
+         ~%MOD_FOLDER%/tra/french/description.tra~
 
 BEGIN @10 DESIGNATED 10
 
