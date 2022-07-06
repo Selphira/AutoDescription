@@ -175,26 +175,27 @@ END
  * - L'ordre est toujours Alignement > Race > Classe > Kit                                   *
  * ----------------------------------------------------------------------------------------- */
 DEFINE_PATCH_FUNCTION ~usability~ RET description BEGIN
+	PATCH_IF NOT is_ee BEGIN
+		SET usable         = 1
+		SET usableByAll    = 1
+		SET useListCount   = 0
+		SET unuseListCount = 0
 
-	SET usable         = 1
-	SET usableByAll    = 1
-	SET useListCount   = 0
-	SET unuseListCount = 0
+		READ_LONG  ITM_usability_flags useMask
+		READ_BYTE  ITM_kit_usability1  kitUsability1
+		READ_BYTE  ITM_kit_usability2  kitUsability2
+		READ_BYTE  ITM_kit_usability3  kitUsability3
+		READ_BYTE  ITM_kit_usability4  kitUsability4
 
-	READ_LONG  ITM_usability_flags useMask
-	READ_BYTE  ITM_kit_usability1  kitUsability1
-	READ_BYTE  ITM_kit_usability2  kitUsability2
-	READ_BYTE  ITM_kit_usability3  kitUsability3
-	READ_BYTE  ITM_kit_usability4  kitUsability4
+		PATCH_DEFINE_ARRAY useList BEGIN END
 
-	PATCH_DEFINE_ARRAY useList BEGIN END
+		LPM ~usability_alignment~
+		LPM ~usability_race~
+		LPM ~usability_class_kit~
 
-	LPM ~usability_alignment~
-	LPM ~usability_race~
-	LPM ~usability_class_kit~
-
-	LPF ~usability_add_to_description~ INT_VAR strref = 101070 all = (usableByAll AND usable) RET description END                        // Utilisable par
-	LPF ~usability_add_to_description~ INT_VAR strref = 101071 all = (usable == 0) STR_VAR type = "unuse" RET description END // Non utilisable par
+		LPF ~usability_add_to_description~ INT_VAR strref = 101070 all = (usableByAll AND usable) RET description END                        // Utilisable par
+		LPF ~usability_add_to_description~ INT_VAR strref = 101071 all = (usable == 0) STR_VAR type = "unuse" RET description END // Non utilisable par
+	END
 END
 
 /* -------------------------------------------------------------------------- *

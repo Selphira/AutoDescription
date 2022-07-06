@@ -4,6 +4,8 @@ AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.ht
 VERSION ~0.9.3~
 
 ALWAYS
+	OUTER_SET is_ee = (GAME_IS ~bg2ee eet~) ? 1 : 0
+
     ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END
     ACTION_DEFINE_ARRAY arrayReload BEGIN ~description~ END
 
