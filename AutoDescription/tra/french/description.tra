@@ -102,8 +102,8 @@
 @102104 = ~Régénère %value% des points de vie~
 @102105 = ~Régénère 3 points de vie toutes les %value% secondes~
 @102106 = ~Permet de lancer n'importe quel sort de son livre de sorts~
-@102107 = ~Le prochain sort lancé déclenche automatiquement un hiatus entropique~
-@102108 = ~Tous sorts lancés déclenchent automatiquement un hiatus entropique~
+@102107 = ~Le prochain sort lancé par %theTarget% déclenche automatiquement un hiatus entropique~
+@102108 = ~Tous sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
 @102109 = ~Les points de vie ne peuvent passer en dessous de %value%~
 @102110 = ~Moral~
 @102111 = ~Invisibilité permanente~
@@ -384,6 +384,9 @@
 @102387 = ~Charme extrême~
 @102388 = ~de charmer %theTarget%~
 //@102389 = ~de charmer les %creatureType%~
+
+// Spell: Protection (by Secondary Type) [205]
+
 //@102390 = ~~
 //@102391 = ~~
 //@102392 = ~~
@@ -394,10 +397,11 @@
 //@102397 = ~~
 //@102398 = ~~
 //@102399 = ~~
-//@102400 = ~~
+@102400 = ~Immunité aux sorts de dégâts offensifs~
 //@102401 = ~~
 //@102402 = ~~
 //@102403 = ~~
+
 @102404 = ~Guérison à la paralysie~
 @102405 = ~Image miroir~
 @102406 = ~Immunité contre les billes~
@@ -650,6 +654,7 @@
 @103044 = ~Immunité aux effets modifiant la force~
 @103045 = ~Immunité à l'étourdissement~
 @103055 = ~Immunité à la mort magique~
+@103056 = ~Immunité à l'inversion d'alignement~
 @103058 = ~Immunité à la dissipation~
 @103060 = ~Immunité à l'échec d'incantation des sorts~
 @103074 = ~Immunité à l'aveuglement~
@@ -664,11 +669,13 @@
 @103097 = ~Immunité aux effets modifiant la force exceptionnelle~
 @103106 = ~Immunité à la peur~
 @103109 = ~Immunité à la paralysie~
+@103096 = ~Immunité au changement de niveau~
 @103115 = ~Immunité à la détection de l'alignement~
 @103116 = ~Immunité à la dissipation de l'invisibilité~
 @103126 = ~Immunité aux effets affectant la mobilité~
 @103128 = ~Immunité à la confusion~
 @103134 = ~Immunité à la pétrification~
+@103135 = ~~ // Opcode visuel
 @103145 = ~Immunité aux effets empêchant de lancer des sorts~
 @103154 = ~~ // Opcode visuel
 @103157 = ~Immunité aux toiles~
@@ -841,6 +848,9 @@
 @101151 = ~TAC0 de la main principale~
 @101152 = ~Force la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
 @101153 = ~de forcer la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
+@101154 = ~de pétrifier %theTarget%~
+@101155 = ~de créer un objet (%itemName%)~
+@101156 = ~de créer %amount% objets (%itemName%)~
 
 /* ------ *
  * Ea.ids *
@@ -961,11 +971,13 @@
 @205018 = ~clercs / rôdeurs~
 @205019 = ~sorciers~
 @205020 = ~moines~
+@205111 = ~dopplegangers~
 @205125 = ~ogres~
 @205126 = ~ogremages~
 @205127 = ~demi-ogres~
 @205128 = ~ogrillons~
 @205146 = ~loups des glaces~
+@205159 = ~chevaliers de la mort~
 @205160 = ~tanar'ris~
 @205167 = ~trolls~
 @205177 = ~méphites~

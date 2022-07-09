@@ -2273,12 +2273,25 @@ END
 /* ---------------- *
  * Stat: Gold [105] *
  * ---------------- */
-DEFINE_PATCH_MACRO ~opcode_target_105~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_105~ BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+		SET parameter1 = 0 - parameter1
+	END
 	LPF ~opcode_target~ INT_VAR strref = 101134 RET description END // ~l'or~
+END
+DEFINE_PATCH_MACRO ~opcode_target_105~ BEGIN
+	LPM ~opcode_self_105~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_105~ BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+		SET parameter1 = 0 - parameter1
+	END
+	LPF ~opcode_probability~ INT_VAR strref = 101134 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~l'or~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_105~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 101134 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~l'or~
+	LPM ~opcode_self_probability_105~
 END
 
 /* --------------------------- *
@@ -2449,6 +2462,10 @@ DEFINE_PATCH_MACRO ~opcode_self_122~ BEGIN
 	LPM ~opcode_target_122~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_122~ BEGIN
+	LPM ~opcode_target_probability_122~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_122~ BEGIN
 	LOCAL_SET amount = parameter1
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET description = itemName END
@@ -2462,7 +2479,24 @@ DEFINE_PATCH_MACRO ~opcode_target_122~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_122 nom de l'objet non trouvé : %resref%"
+		PATCH_FAIL "opcode 122 : nom de l'objet introuvable : %resref%"
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_122~ BEGIN
+	LOCAL_SET amount = parameter1
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET description = itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF amount == 1 BEGIN
+			SPRINT description @101155 // ~de créer un objet (%itemName%)~
+		END
+		ELSE PATCH_IF amount > 0 BEGIN
+			SPRINT description @101156 // ~de créer %amount% objets (%itemName%)~
+		END
+	END
+	ELSE BEGIN
+		PATCH_FAIL "opcode 122 : nom de l'objet introuvable : %resref%"
 	END
 END
 
@@ -2563,6 +2597,10 @@ END
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_134~ BEGIN
 	SPRINT description @102680 // ~Pétrifie %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_134~ BEGIN
+	SPRINT description @101154 // ~de pétrifier %theTarget%~
 END
 
 /* ----------------------------- *
@@ -2889,6 +2927,10 @@ END
 /* --------------------------------- *
  * Paralyse les créatures de type xx *
  * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_175~ BEGIN
+	LPM ~opcode_self_109~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_175~ BEGIN
 	LPM ~opcode_target_109~
 END
@@ -3755,15 +3797,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 	PATCH_IF abilityType == AbilityType_Charge BEGIN
 		PATCH_IF parameter2 == 1 BEGIN
-			SPRINT description @102107 // ~Le prochain sort lancé déclenche automatiquement un hiatus entropique~
+			SPRINT description @102107 // ~Le prochain sort lancé par %theTarget% déclenche automatiquement un hiatus entropique~
 		END
 		ELSE BEGIN
 			PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : A gerer pour capacite de charge et parameter2 = %parameter2% (etrange)~
 		END
 	END
 	ELSE BEGIN
-		SPRINT description @102108 // ~Tous sorts lancés déclenchent automatiquement un hiatus entropique~
+		SPRINT description @102108 // ~Tous sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_280~ BEGIN
+	LPM ~opcode_self_280~
 END
 
 /* ----------------------- *
