@@ -33,9 +33,16 @@ ALWAYS
 		OUTER_SET totalFailed = 0
 		OUTER_SET totalSuccessful = 0
 		OUTER_SET totalIgnored = 0
+		OUTER_SET opcodeTodo = 0
 	END
 
 	DEFINE_ACTION_MACRO ~show_statistics~ BEGIN
+		ACTION_PHP_EACH ignored_opcodes AS opcode => value BEGIN
+			ACTION_IF value == 1 BEGIN
+				OUTER_SET opcodeTodo += 1
+			END
+		END
+
 		PRINT "Total : %total%"
 		PRINT "Sans description : %totalWithoutDescription%"
 		PRINT "Ignores : %totalIgnored%"
@@ -43,6 +50,7 @@ ALWAYS
 		PRINT "Echoues : %totalFailed%"
 		PRINT "Potions (TODO): %totalPotion%"
 		PRINT "Munitions (TODO) : %totalAmmo%"
+		PRINT "Opcodes a coder : %opcodeTodo%"
 	END
 END
 
