@@ -60,9 +60,11 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	WITH
 		~Failure("Unknown macro: \%method%")~
 		BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
 			PATCH_FAIL ~Unknown macro: %method%~
 		END
 		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode_n%: %ERROR_MESSAGE%~ END
 			PATCH_FAIL ~Opcode %opcode_n%: %ERROR_MESSAGE%~
 	END
 END
@@ -126,6 +128,9 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 			DEFAULT
 				PATCH_FAIL ~%ERROR_MESSAGE%~
 		END
+	END
+	ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 	END
 
 	LPM ~add_duration~

@@ -20,6 +20,7 @@ ALWAYS
             reload_array = arrayReload
     END
 
+	OUTER_SPRINT log_filename ~all~
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
@@ -51,6 +52,7 @@ LANGUAGE ~Francais~ ~french~
 
 BEGIN @10 DESIGNATED 10
 
+LAM ~init_log_file~
 LAM ~init_statistics~
 COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 	LPM ~update_description~
@@ -68,8 +70,10 @@ OUTER_WHILE NOT(DIRECTORY_EXISTS ~%directory%~) BEGIN
 	PRINT @202
 	ACTION_READLN directory
 END
+OUTER_SPRINT log_filename ~%directory%~
 ACTION_DEFINE_ARRAY ~itemFiles~ BEGIN END
 LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFiles END
+LAM ~init_log_file~
 LAM ~init_statistics~
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN

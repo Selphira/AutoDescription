@@ -4,22 +4,28 @@
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	216 => 1   // Spell Effect: Level Drain [216]
+	344 => 1   // Enchantment vs. creature type [344]
 	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
  219000 => 3   // Stat: AC vs. Creature Type Modifier [219]
 	 54 => 4   // Stat: THAC0 Modifier [54]
 	178 => 5   // Spell Effect: THAC0 vs. Creature Type Modifier [178]
-	284 => 6   // Stat: Melee THAC0 Modifier [284]
-	305 => 7   // Stat: THAC0 Modifier (Off-Hand) [305]
+	306 => 6   // Stat: THAC0 Modifier (On-Hand) [306]
+	305 => 6   // Stat: THAC0 Modifier (Off-Hand) [305]
+	284 => 7   // Stat: Melee THAC0 Modifier [284]
+	167 => 8   // Stat: THAC0 Modifier with Missile Weapons [167]
 	288 => 8   // Stat: Fist THAC0 Modifier [288]
 	278 => 9   // Stat: To Hit Modifier [278]
  219001 => 10  // Stat: AC vs. Creature Type Modifier [219]
+	325 => 11  // Stat: Save vs. all [325]
 	 33 => 11  // Stat: Save vs. Death Modifier [33]
 	 34 => 12  // Stat: Save vs. Wands Modifier [34]
 	 35 => 13  // Stat: Save vs. Petrification/Polymorph Modifier [35]
 	 36 => 14  // Stat: Save vs. Breath Weapons Modifier [36]
 	 37 => 15  // Stat: Save vs. Spells Modifier [37]
+	346 => 16  // Save vs. school bonus [346]
 	 12 => 16  // HP: Damage [12]
 	 73 => 17  // Stat: Extra Damage Modifier [73]
+	332 => 17  // Stat: Specific Damage Modifier [332] : EE only
 	179 => 18  // Spell Effect: Damage vs. Creature Type Modifier [179]
 	250 => 19  // Spell Effect: Damage Luck Modifier [250]
 	285 => 20  // Stat: Melee Weapon Damage Modifier [285]
@@ -78,12 +84,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 88 => 138 // Stat: Reduced Damage from Piercing Modifier [88]
 	 89 => 139 // Stat: Reduced Damage from Missiles Modifier [89]
 	 17 => 145 // Stat: Current HP Modifier [17]
+	323 => 146 // Stat: Turn Undead Level [323]
 	106 => 150 // Stat: Morale Break [106]
 	 21 => 155 // Stat: Lore Modifier [21]
-	262 => 160 // Stat: Visual Range [262]
+	262 => 157 // Stat: Visual Range [262]
 	 93 => 160 // Stat: Fatigue Modifier [93]
 	104 => 161 // Stat: Experience Points [104]
-	 69 => 162 // Protection: From Detection (Non-Detection) [69]
+	108 => 165 // Stat: Reputation [108]
+	 94 => 163 // Stat: Drunkenness Modifier [94]
+	 95 => 164 // Stat: Tracking Skill Modifier [95]
+	105 => 165 // Stat: Gold [105]
 	156 => 167 // State: Protection from Normal Missiles Cylinder [156]
 	153 => 168 // State: Sanctuary [153]
 	 16 => 169 // State: Haste [16]
@@ -94,24 +104,33 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 20 => 173 // State: Invisibility [20]
 	 65 => 174 // State: Blur [65]
 	 63 => 175 // State: Infravision [63]
+	 64 => 175 // State: Remove Infravision [64]
 	 40 => 176 // State: Slow [40]
 	  3 => 177 // State: Berserking [3]
+	246 => 177 // Spell Effect: Berserking [246]
 	 24 => 178 // State: Horror [24]
 	 74 => 179 // State: Blindness [74]
 	 45 => 180 // State: Stun [45]
+	210 => 180 // Spell Effect: Stun 90HP [210]
 	165 => 180 // Spell Effect: Pause Target [165]
 	 80 => 181 // Deafness [80]
 	154 => 182 // State: Entangle [154]
 	 39 => 183 // State: Unconsciousness [39]
+	217 => 183 // Spell Effect: Unconsciousness 20HP [217]
 	128 => 184 // State: Confusion [128]
 	 38 => 185 // State: Silence [38]
+	134 => 186 // State: Petrification [134]
 	109 => 188 // State: Hold Creature I [109]
 	175 => 188 // State: Hold Creature II [175]
 	185 => 188 // State: Hold Creature III [185]
 	157 => 189 // State: Web Effect [157]
 	 76 => 190 // State: Feeblemindedness [76]
 	 55 => 191 // Death: Kill Creature Type [55]
-	206 => 192 // Spell: Protection from Spell [206]
+	209 => 192 // Death: Kill 60HP [209]
+	 13 => 193 // Death: Instant Death [13]
+	238 => 194 // Death: Disintegrate [238]
+	206 => 197 // Spell: Protection from Spell [206]
+	224 => 199 // Cure: Level Drain (Restoration) [224]
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
 	162 => 201 // Cure: Hold [162]
 	161 => 202 // Cure: Fear [161]
@@ -130,6 +149,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 47 => 215 // Cure: Invisibility [47]
 	 43 => 216 // Cure: Stone to Flesh [43]
 	  2 => 217 // Cure: Sleep [2]
+	242 => 218 // Cure: Confusion [242]
+	 70 => 219 // Cure: Non-Detection [2]
     101 => 220 // Protection: from Opcode [101]
 	163 => 229 // Protection: Free Action [163]
 	204 => 230 // Spell: Protection from Spell (School) [204]
@@ -142,38 +163,44 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 83 => 237 // Protection: From Projectile (Any) [83]
 	310 => 238 // Protection: from Timestop [310]
 	218 => 239 // Protection: Stoneskin [218]
-	 13 => 240 // Death: Instant Death [13]
-	238 => 241 // Death: Disintegrate [238]
-	148 => 246 // Spell: Cast Spell (at Point) [148]
-	201 => 247 // Spell: Decrementing Spell Immunity [201]
-	199 => 248 // Spell: Bounce Spells [199]
-	200 => 249 // Spell: Decrementing Bounce Spells [200]
-	200 => 249 // Spell: Decrementing Bounce Spells [200]
-	207 => 250 // Spell: Bounce Specified Spell [207]
-	197 => 251 // Spell: Bounce Projectile [197]
-	119 => 252 // Spell Effect: Mirror Image [119]
-	280 => 253 // Spell Effect: Wild Magic [280]
-	235 => 254 // Spell Effect: Wing Buffet [235]
-	239 => 255 // Spell Effect: Farsight [239]
-	125 => 256 // Spell Effect: Unlock (Knock) [125]
-	213 => 257 // Spell Effect: Maze [213]
-	316 => 258 // Spell: Magical Rest [316]
-	133 => 259 // Spell Effect: Luck Non-Cumulative [133]
-	  5 => 260 // Charm: Charm Specific Creature [5]
-	 57 => 261 // Alignment: Change [57]
-	 56 => 262 // Alignment: Invert [56]
-	 71 => 263 // Sex Change [71]
-	111 => 264 // Item: Create Magical Weapon [111]
-	143 => 265 // Item: Create Item in Slot [143]
-	122 => 266 // Item: Create Inventory Item [122]
-	255 => 267 // Item: Create Inventory Item (days) [255]
-	 68 => 268 // Summon: Unsummon Creature [68]
-	151 => 269 // Summon: Replace Creature [151]
-	135 => 270 // Polymorph into Specific [135]
-	135 => 271 // Item: Can Use Any Item [302]
-	230 => 272 // Removal: Remove One Secondary Type [230]
-	193 => 275 // Spell Effect: Invisible Detection by Script [193]
-	144 => 280 // Button: Disable Button [144]
+	 69 => 240 // Protection: From Detection (Non-Detection) [69]
+	212 => 241 // Protection: Freedom [212]
+	148 => 245 // Spell: Cast Spell (at Point) [148]
+	201 => 246 // Spell: Decrementing Spell Immunity [201]
+	199 => 247 // Spell: Bounce Spells [199]
+	200 => 248 // Spell: Decrementing Bounce Spells [200]
+	207 => 249 // Spell: Bounce Specified Spell [207]
+	197 => 250 // Spell: Bounce Projectile [197]
+	119 => 251 // Spell Effect: Mirror Image [119]
+	280 => 252 // Spell Effect: Wild Magic [280]
+	235 => 253 // Spell Effect: Wing Buffet [235]
+	239 => 254 // Spell Effect: Farsight [239]
+	125 => 255 // Spell Effect: Unlock (Knock) [125]
+	213 => 256 // Spell Effect: Maze [213]
+	211 => 257 // Spell Effect: Imprisonment [211]
+	329 => 258 // Spell Effect: Slow Poison [329] : EE only
+	316 => 275 // Spell: Magical Rest [316]
+	131 => 276 // State: Positive Chant [131]
+	137 => 277 // State: Negative Chant [137]
+	133 => 278 // Spell Effect: Luck Non-Cumulative [133]
+	  5 => 279 // Charm: Charm Specific Creature [5]
+	241 => 280 // Charm: Control Creature [241]
+	115 => 281 // Detect: Alignment [115]
+	 57 => 282 // Alignment: Change [57]
+	 56 => 283 // Alignment: Invert [56]
+	 71 => 284 // Sex Change [71]
+	111 => 285 // Item: Create Magical Weapon [111]
+	143 => 286 // Item: Create Item in Slot [143]
+	122 => 287 // Item: Create Inventory Item [122]
+	255 => 288 // Item: Create Inventory Item (days) [255]
+	302 => 289 // Item: Can Use Any Item [302]
+	 26 => 290 // Item: Remove Curse [26]
+	 68 => 295 // Summon: Unsummon Creature [68]
+	151 => 296 // Summon: Replace Creature [151]
+	135 => 297 // Polymorph into Specific [135]
+	230 => 298 // Removal: Remove One Secondary Type [230]
+	193 => 299 // Spell Effect: Invisible Detection by Script [193]
+	144 => 300 // Button: Disable Button [144]
 
 	 // Charge
 	146 => 274 // Spell: Cast Spell (at Target) [146]
@@ -189,65 +216,153 @@ END
  * Liste des opcodes ignorés. La plupart du temps car ils n'ont rien à proposer à la description.
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
-	  7 => 1
-	  8 => 1 // Colour: Change by RGB [8]
-	  9 => 1
-	 41 => 1 // Graphics: Sparkle [41]
-	 50 => 1
-	 51 => 1 // Colour: Strong/Dark by RGB [51]
-	 52 => 1 // Colour: Very Bright by RGB [52]
-	 53 => 1 // Graphics: Animation Change [53]
-	 61 => 1 // Creature RGB color fade [61]
-	 66 => 1 // Graphics: Transparency Fade [66]
-	 72 => 1 // State: Set IDS State [72]
-	 82 => 1 // Set AI Script [82]
-	110 => 1 // (Retreat From) [110]
-	112 => 1 // Item: Remove Item [112]
-	123 => 1 // Item: Remove Inventory Item
-	139 => 1
-	141 => 1
-	142 => 1
-	158 => 1 // State: Grease [158] // Applique seulement un effet visuel
-	164 => 1 // Cure: Intoxication [164]
-	168 => 1 // Summon: Remove Creature [168]
-	169 => 1
-	170 => 1 // Graphics: Play Damage Animation [170]
-	172 => 1 // Spell: Remove Spell [172]
-	174 => 1 // Spell Effect: Play Sound Effect [174]
-	180 => 1 // Item: Can't Use Item [180] // TODO: A gérer, et grouper (BOW15...)
-	184 => 1 // Graphics: Passwall (Don't Jump) [184]
-	186 => 1 // Script: MoveToArea [186] // A gérer ??
-	188 => 1 // Spell Effect: Aura Cleansing [188] // TODO: A gérer, je ne sais pas ce que cela fait pour le moent
-	215 => 1
-	221 => 1 // Removal: Remove Secondary Type [221]
-	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: A gérer ! (Ex: L#NILA61, SOLAK1)
-	240 => 1 // Graphics: Remove Special Effect Icon [240]
+	  7 => 0
+	  8 => 0 // Colour: Change by RGB [8]
+	  9 => 0
+	 41 => 0 // Graphics: Sparkle [41]
+	 50 => 0
+	 51 => 0 // Colour: Strong/Dark by RGB [51]
+	 52 => 0 // Colour: Very Bright by RGB [52]
+	 53 => 0 // Graphics: Animation Change [53]
+	 61 => 0 // Creature RGB color fade [61]
+	 66 => 0 // Graphics: Transparency Fade [66]
+	 72 => 0 // State: Set IDS State [72]
+	 82 => 0 // Set AI Script [82]
+	103 => 0 // Text: Change Name [103]
+	107 => 0 // Portrait Change [107]
+	110 => 0 // (Retreat From) [110]
+	112 => 0 // Item: Remove Item [112]
+	114 => 0 // Graphics: Dither [114]
+	117 => 1 // Spell Effect: Reveal Area [117]
+	123 => 0 // Item: Remove Inventory Item
+	124 => 1 // Spell Effect: Teleport (Dimension Door) [124]
+	127 => 1 // Summon: Monster Summoning [127]
+	136 => 1 // State: Force Visible [136]
+	138 => 0 // Graphics: Character Animation Change [138]
+	139 => 0
+	140 => 0 // Graphics: Casting Glow [140]
+	141 => 0
+	142 => 0
+	147 => 1 // Spell: Learn Spell [147]
+	150 => 1 // Spell Effect: Find Traps [150]
+	152 => 0 // Spell Effect: Play Movie [152]
+	159 => 1 // Spell Effect: Mirror Image (Exact Number) [159]
+	158 => 0 // State: Grease [158]
+	160 => 1 // Remove Sanctuary [160]
+	164 => 0 // Cure: Drunkeness [164]
+	168 => 0 // Summon: Remove Creature [168]
+	169 => 0
+	170 => 0 // Graphics: Play Damage Animation [170]
+	172 => 0 // Spell: Remove Spell [172]
+	174 => 0 // Spell Effect: Play Sound Effect [174]
+	180 => 1 // Item: Can't Use Item [180] // TODO: (BOW15...)
+	181 => 1 // Item: Can't Use Itemtype [181]
+	182 => 0 // Item: Apply Effect Item [182]
+	183 => 0 // Item: Apply Effect Itemtype [183]
+	184 => 0 // Graphics: Passwall (Don't Jump) [184]
+	186 => 0 // Script: MoveToArea [186] // A gérer ??
+	187 => 0 // Script: Store Local Variable [187]
+	188 => 1 // Spell Effect: Aura Cleansing [188]
+	192 => 1 // Spell Effect: Find Familiar [192]
+	194 => 0 // Ignore Dialog Pause [194]
+	195 => 1 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
+	196 => 1 // Spell Effect: Familiar Block [196]
+	198 => 1 // Spell: Bounce (by Opcode) [198]
+	202 => 1 // Spell: Bounce (by School) [202]
+	203 => 1 // Spell: Bounce (by Secondary Type) [203]
+	215 => 0
+	220 => 1 // Removal: Remove School [220]
+	221 => 0 // Removal: Remove Secondary Type [221]
+	222 => 1 // Spell Effect: Teleport Field [222]
+	223 => 1 // Spell: Immunity (by School, decrementing [223]
+	225 => 0 // Spell: Reveal Magic [225]
+	226 => 1 // Spell: Immunity (by Secondary Type, decrementing) [226]
+	227 => 1 // Spell: Bounce (by School, decrementing) [227]
+	228 => 1 // Spell: Bounce (by Secondary Type, decrementing) [228]
+	229 => 1 // Removal: Remove One School [229]
+	231 => 1 // Spell Effect: Time Stop [231]
+	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: (Ex: L#NILA61, SOLAK1)
+	234 => 0 // Spell Effect: Contingency Creation [234]
+	236 => 1 // Spell Effect: Image Projection [236]
+	237 => 0 // Spell Effect: Puppet ID [237]
+	240 => 0 // Graphics: Remove Special Effect Icon [240]
 	243 => 1 // Item: Drain Item Charges [243]
+	245 => 1 // Check For Berserk [245]
+	247 => 1 // Spell Effect: Attack Nearest Creature [247]
 	248 => 1 // Item: Set Melee Effect [248]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte (CBWTNI6A.ITM)
 	249 => 1 // Item: Set Ranged Effect [249]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte
-	251 => 1 // Spell Effect: Change Bard Song Effect [251] // TODO: A gérer !
-	265 => 1 // Script: Set Global Variable [265]
-	267 => 1
-	268 => 1 // Spell Effect: Explore (Wizard Eye) [268] // TODO: A gérer ?
-	272 => 1 // Spell: Apply Effect on Condition [272] // TODO: A gérer !
-	282 => 1 // Script: Scripting State Modifier [282]
-	287 => 1 // Graphics: Selection Circle Removal [287]
-	291 => 1 // Graphics: Disable Visual Effect [291]
-	293 => 1 // Script: Enable Offscreen AI [293]
-	294 => 1 // Existance Delay Override [294]
-	295 => 1
-	296 => 1
-	297 => 1 // Text: Protection from Display Specific String [267]
-	300 => 1 // NPC Bump [300] // TODO: A gérer ? Vérifier les objets qui l'utilisent
-	309 => 1 // Script: Set/Modify Local Variable [309]
-	318 => 1 // Protection: Immunity Spell [318] // TODO: A gérer quand même ? Stat: Set Stat (TobEx)
+	251 => 1 // Spell Effect: Change Bard Song Effect [251]
+	252 => 1 // Spell Effect: Set Trap [252]
+	253 => 0 // Spell Effect: Add Map Marker [253]
+	254 => 0 // Spell Effect: Remove Map Marker [254]
+	256 => 0 // Spell: Spell Sequencer Active [256]
+	257 => 0 // Spell: Spell Sequencer Creation [257]
+	258 => 0 // Spell: Spell Sequencer Activation [258]
+	260 => 0 //
+	264 => 1 // Spell Effect: Drop Weapons in Panic [264]
+	265 => 0 // Script: Set Global Variable [265]
+	266 => 1 // Spell: Remove Protection from Spell [266]
+	267 => 0
+	268 => 1 // Spell Effect: Explore (Wizard Eye) [268]
+	269 => 0 // Spell Effect: Shake Window [269]
+	270 => 0 // Cure: Unpause Target [270]
+	271 => 0 // Graphics: Avatar Removal [271]
+	272 => 1 // Spell: Apply Effect on Condition [272]
+	274 => 1 // Spell Effect: Teleport to Target [274]
+	279 => 1 // Button: Enable Button [279]
+	282 => 0 // Script: Scripting State Modifier [282]
+	283 => 1 // Use EFF File (Cursed) [283]
+	287 => 0 // Graphics: Selection Circle Removal [287]
+	290 => 0 // Text: Change Title [290]
+	291 => 0 // Graphics: Disable Visual Effect [291]
+	293 => 0 // Script: Enable Offscreen AI [293]
+	294 => 0 // Existance Delay Override [294]
+	295 => 0
+	296 => 0
+	297 => 0 // Text: Protection from Display Specific String [297]
+	298 => 0 // Spell Effect: Execute Script cut250a [298]
+	299 => 1 // Spell Effect: Chaos Shield [299]
+	300 => 1 // NPC Bump [300] // TODO: Vérifier les objets qui l'utilisent
+	303 => 1 // Spell Effect: Backstab Every Hit [303]
+	304 => 1 // Mass Raise Dead [304]
+	307 => 0 // Ranger Tracking Ability [307]
+	308 => 0 // Protection: From Tracking [308]
+	309 => 0 // Script: Set/Modify Local Variable [309]
+	311 => 1 // Spell: Random Wish Spell [311]
+	312 => 0
+	313 => 0 // High-Level Ability Denotation [313]
+	314 => 1 // Spell: Golem Stoneskin [314]
+	315 => 1 // Graphics: Animation Removal [315]
+	318 => 1 // Protection: Immunity Spell [318] // TODO: A gérer quand même ? Stat: Set Stat (TobEx) + différent effet dans BGEE
 	// EE only
 	319 => 1 // Item Usability [319]
-	327 => 1 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
-	330 => 1 // Text: Float Text [330]
-	336 => 1 // Graphics: Display Eyes Overlay [336]
-	339 => 1 // Alter Animation [339]
-	342 => 1 // Animation: Override Data [342]
+	320 => 0 // Change Weather [320]
+	321 => 1 // Removal: Effects specified by Resource [321]
+	324 => 1 // Protection: Immunity to Resource and Message [324]
+	326 => 1 // Apply Effects List [326]
+	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
+	328 => 0 // State: Set State [328]
+	330 => 0 // Text: Float Text [330]
+	331 => 1 // Summon: Random Monster Summoning [331]
+	333 => 1 // Spell Effect: Static Charge [333]
+	334 => 0 // Spell Effect: Turn Undead [334]
+	335 => 1 // Spell Effect: Seven Eyes [335]
+	336 => 0 // Graphics: Display Eyes Overlay [336]
+	337 => 1 // Remove: Opcode [337]
+	338 => 0 // Disable Rest [338]
+	339 => 0 // Alter Animation [339]
+	340 => 1 // Spell Effect: Change Backstab Effect [340]
+	341 => 1 // Spell Effect: Change Critical Hit Effect [341]
+	342 => 0 // Animation: Override Data [342]
+	343 => 1 // HP Swap [343]
+	345 => 1 // Enchantment bonus [345]
+	360 => 1 // Stat: Ignore Reputation Breaking Point [360]
+	361 => 1 // Cast spell on critical miss [361]
+	362 => 1 // Critical miss bonus [362]
+	363 => 0 // Modal state check [363]
+	365 => 0 // Make unselectable [365]
+	366 => 0 // Spell: Apply Spell On Move [366]
+	367 => 0 // Minimum base stats [367]
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
@@ -718,7 +833,7 @@ DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
-	SPRINT description @102300 // ~de tuer instantanément le porteur~
+	LPM ~opcode_target_probability_13~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
@@ -1053,6 +1168,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_25~ BEGIN
 	END
 END
 
+/* ----------------------- *
+ * Item: Remove Curse [26] *
+ * ----------------------- */
+DEFINE_PATCH_MACRO ~opcode_target_26~ BEGIN
+	SPRINT description @102685 // ~Délivre %theTarget% de ses malédictions~
+END
+
 /* ----------------------------------- *
  * Stat: Acid Resistance Modifier [27] *
  * ----------------------------------- */
@@ -1263,7 +1385,7 @@ END
  * State: Unconsciousness [39] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN
-	SPRINT description @102139 // ~Endort %theTarget%~
+	SPRINT description @102139 // ~Endors %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_39~ BEGIN
@@ -1325,19 +1447,19 @@ END
  * State: Stun [45] *
  * ---------------- */
 DEFINE_PATCH_MACRO ~opcode_self_45~ BEGIN
-	SPRINT description @102255 // ~Étourdi le porteur~
+	SPRINT description @102123 // ~Étourdis %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_45~ BEGIN
-	SPRINT description @102123 // ~Étourdi la cible~
+	LPM ~opcode_self_45~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_45~ BEGIN
-	SPRINT description @102420 // ~d'étourdir le porteur~
+	SPRINT description @102120 // ~d'étourdir %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_45~ BEGIN
-	SPRINT description @102120 // ~d'étourdir %theTarget%~
+	LPM ~opcode_self_probability_45~
 END
 
 /* ------------------------ *
@@ -1605,6 +1727,17 @@ DEFINE_PATCH_MACRO ~opcode_self_63~ BEGIN
 	SPRINT description @102077 // ~Infravision permanente~
 END
 
+/* ------------------------------ *
+ * State: Remove Infravision [64] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_64~ BEGIN
+	SPRINT description @102686 // ~Dissipe l'infravision~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_64~ BEGIN
+	SPRINT description @102687 // ~Dissipe l'infravision %ofTheTarget%~
+END
+
 /* -------------- *
  * Flou permanent *
  * -------------- */
@@ -1629,12 +1762,26 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	SPRINT description @102173 // ~Invoque une créature (%creatureName%)~
+	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
+
+	PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
+		SPRINT description @101140 // ~Invoque une créature hostile (%creatureName%)~
+    END
+    ELSE BEGIN
+		SPRINT description @102173 // ~Invoque une créature (%creatureName%)~
+    END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	SPRINT description @102256 // ~d'invoquer une créature (%creatureName%)~
+	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
+
+	PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
+		SPRINT description @101141 // ~d'invoquer une créature hostile (%creatureName%)~
+    END
+    ELSE BEGIN
+		SPRINT description @102256 // ~d'invoquer une créature (%creatureName%)~
+    END
 END
 
 /* ------------------------------ *
@@ -1649,6 +1796,17 @@ END
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_69~ BEGIN
 	SPRINT description @102117 // ~Non-détection permanente~
+END
+
+/* ------------------------ *
+ * Cure: Non-Detection [70] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_70~ BEGIN
+	SPRINT description @102688 // ~Immunité à la non-détection~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_70~ BEGIN
+	SPRINT description @102689 // ~Dissipe la non-détection %ofTheTarget%~
 END
 
 /* --------------- *
@@ -1679,6 +1837,10 @@ END
 /* --------------------- *
  * State: Blindness [74] *
  * --------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_74~ BEGIN
+	SPRINT description @101139 // ~Aveugle le porteur~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_74~ BEGIN
 	SPRINT description @102421 // ~d'aveugler le porteur~
 END
@@ -1921,6 +2083,28 @@ DEFINE_PATCH_MACRO ~opcode_self_93~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102136 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Fatigue~
 END
 
+/* ------------------------------- *
+ * Stat: Drunkenness Modifier [94] *
+ * ------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_94~ BEGIN
+	LPF ~opcode_mod~ INT_VAR strref = 101130 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Ivresse~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_94~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 101131 RET description END // ~l'ivresse~
+END
+
+/* ---------------------------- *
+ * Tracking Skill Modifier [95] *
+ * ---------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_94~ BEGIN
+	LPF ~opcode_mod~ INT_VAR strref = 101132 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Pistage~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_94~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 101133 RET description END // ~le pistage~
+END
+
 /* ----------------------- *
  * Stat: Level Change [96] *
  * ----------------------- */
@@ -2022,9 +2206,9 @@ DEFINE_PATCH_MACRO ~opcode_self_99~ BEGIN
 	END
 END
 
-/* ------------------------------------- *
- * Protection contre un type de créature *
- * ------------------------------------- */
+/* ------------------------------------ *
+ * Protection: from Creature Type [100] *
+ * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_100~ BEGIN
 	// To be protected from any creature, leave IDS Entry at 0 (zero), and IDS File at 2.
 	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
@@ -2086,9 +2270,20 @@ DEFINE_PATCH_MACRO ~opcode_self_104~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102377 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Expérience gagnée~
 END
 
-/* ------------ *
- * Morale break *
- * ------------ */
+/* ---------------- *
+ * Stat: Gold [105] *
+ * ---------------- */
+DEFINE_PATCH_MACRO ~opcode_target_105~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 101134 RET description END // ~l'or~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_105~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 101134 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~l'or~
+END
+
+/* --------------------------- *
+ * Stat: Morale Break Modifier *
+ * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 	SET parameter1 = 0 - parameter1
 	//FIXMe: renommer Moral en autre chose ? Moral break... (idem en dessous, et ne plus inverser la valeur) // Panique
@@ -2100,6 +2295,35 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 	//TODO: xx% de chance d'être sous l'effet de la panique pendant yy temps // ? Si parameter1 est au dessus d'une certaine valeur ?
 	LPF ~opcode_probability~ INT_VAR strref = 102550 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le moral~
 END
+
+/* ---------------------- *
+ * Stat: Reputation [108] *
+ * ---------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_108~ BEGIN
+    LPM ~opcode_108_common~
+    LPF ~opcode_mod~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Réputation du personnage~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_108~ BEGIN
+    LPM ~opcode_108_common~
+    LPF ~opcode_target~ INT_VAR strref = EVAL ~%strref%~ RET description END
+END
+
+DEFINE_PATCH_MACRO ~opcode_108_common~ BEGIN
+	SET strref = 101135 // ~Réputation du personnage~
+    PATCH_IF is_ee == 0 AND (parameter2 == 3 OR parameter2 == 4) BEGIN
+		SET strref = 101137 // ~Réputation du groupe~
+		PATCH_IF type == 3 BEGIN
+			SET parameter1 = parameter1 * 10
+			SET parameter2 = MOD_TYPE_cumulative
+		END
+		ELSE BEGIN
+			SET parameter1 = 100
+			SET parameter2 = MOD_TYPE_flat
+		END
+    END
+END
+
 
 /* --------------------------------- *
  * Paralyse les créatures de type xx *
@@ -2297,7 +2521,7 @@ END
  * State: Positive Chant [131] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_131~ BEGIN
-    LPM ~opcode_self_22~ // ~Chance~
+    LPM ~opcode_self_133~ // ~Chance~
     SPRINT notCumulative @102682 // ~non cumulable~
     SPRINT description ~%description% (%notCumulative%)~
 END
@@ -2352,6 +2576,16 @@ DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
 	ELSE BEGIN
 		PATCH_FAIL "%SOURCE_FILE%: opcode_self_135 : Nom de la créature introuvable"
 	END
+END
+
+/* --------------------------- *
+ * State: Negative Chant [137] *
+ * --------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_137~ BEGIN
+	SET parameter1 = 0 - parameter1
+    LPM ~opcode_self_131~ // ~Chance~
+    SPRINT notCumulative @102682 // ~non cumulable~
+    SPRINT description ~%description% (%notCumulative%)~
 END
 
 /* ------------------------------- *
@@ -2722,7 +2956,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ R
 		    BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %resref%.eff n'existe pas.~
+			LAF ~log_warning~ STR_VAR message = EVAL ~La ressource %resref%.eff n'existe pas.~ END
 		END
     END
 	SET opcode = oldOpcode
@@ -2967,6 +3201,70 @@ DEFINE_PATCH_MACRO ~opcode_self_208~ BEGIN
 	SPRINT description @102109 // ~Les points de vie ne peuvent passer en dessous de %value%~
 END
 
+/* ---------------------- *
+ * Death: Kill 60HP [209] *
+ * ---------------------- */
+DEFINE_PATCH_MACRO ~opcode_target_209~ BEGIN
+	SPRINT description @101142 // ~Tue instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_209~ BEGIN
+	LPM ~opcode_target_probability_209~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_209~ BEGIN
+	SPRINT description @102300 // ~de tuer instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+END
+
+/* ----------------------------- *
+ * Spell Effect: Stun 90HP [210] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_210~ BEGIN
+	SPRINT description @102255 // ~Étourdis %theTarget% lorsque ses points de vie sont inférieurs à 90, la durée varie selon les points de vie restant~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_210~ BEGIN
+	LPM ~opcode_self_210~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_210~ BEGIN
+	SPRINT description @102420 // ~d'étourdir %theTarget% lorsque ses points de vie sont inférieurs à 90, la durée varie selon les points de vie restant~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_210~ BEGIN
+	LPM ~opcode_self_probability_210~
+END
+
+/* -------------------------------- *
+ * Spell Effect: Imprisonment [211] *
+ * -------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_211~ BEGIN
+	SPRINT description @101143 // ~Emprisonne %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_211~ BEGIN
+	LPM ~opcode_self_211~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_211~ BEGIN
+	SPRINT description @101144 // ~d'emprisonner %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_211~ BEGIN
+	LPM ~opcode_self_probability_211~
+END
+
+/* ------------------------ *
+ * Protection: Freedom [212] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_target_212~ BEGIN
+	SPRINT description @101145 // ~Libère %theTarget% des effets de l'emprisonnement et du labyrinthe~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_212~ BEGIN
+	SPRINT description @101146 // ~de libérer %theTarget% des effets de l'emprisonnement et du labyrinthe~
+END
+
 /* ------------------------ *
  * Spell Effect: Maze [213] *
  * ------------------------ */
@@ -3045,6 +3343,31 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
 	END
 END
 
+/* ---------------------------------------- *
+ * Spell Effect: Unconsciousness 20HP [217] *
+ * ---------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_217~ BEGIN
+	// Durée forcée à 5 rounds
+	SET duration = 30
+	SET timingMode = TIMING_duration
+	SPRINT description @101147 // ~Endors %theTarget% si ses points de vie sont inférieurs à 20~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_217~ BEGIN
+	LPM ~opcode_self_217~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_217~ BEGIN
+	// Durée forcée à 5 rounds
+	SET duration = 30 // 5 rounds
+	SET timingMode = TIMING_duration
+	SPRINT description @101148 // ~d'endormir %theTarget% si ses points de vie sont inférieurs à 20~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_217~ BEGIN
+	LPM ~opcode_self_probability_217~
+END
+
 /* --------------------------- *
  * Protection: Stoneskin [218] *
  * --------------------------- */
@@ -3095,6 +3418,25 @@ DEFINE_PATCH_MACRO ~opcode_self_220~ BEGIN
 	END
 END
 
+/* ------------------------------------- *
+ * Cure: Level Drain (Restoration) [224] *
+ * ------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_224~ BEGIN
+	SPRINT description @101149 // ~Restaure les niveaux draînés %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_224~ BEGIN
+	LPM ~opcode_self_224~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_224~ BEGIN
+	SPRINT description @101150 // ~de restaurer les niveaux draînés %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_224~ BEGIN
+	LPM ~opcode_self_probability_224~
+END
+
 /* ---------------------------------------- *
  * Removal: Remove One Secondary Type [230] *
  * ---------------------------------------- */
@@ -3115,11 +3457,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_230~ BEGIN
 		DEFAULT PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_230 : Type d'effet à dissiper '%parameter2%' à gérer"
     END
 END
-/*
+
 /* ------------------------------------------- *
  * Spell Effect: Cast Spell on Condition [232] *
  * ------------------------------------------- */
-
+/*
 DEFINE_PATCH_MACRO ~opcode_self_232~ BEGIN
     SPRINT theTarget $op232Target("%parameter1%")
     SPRINT condition $op232Condition("%parameter2%")
@@ -3149,9 +3491,9 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_232~ BEGIN
 END
 */
 
-/* ------------------- *
- * Compétence martiale *
- * ------------------- */
+/* -------------------------------- *
+ * Stat: Proficiency Modifier [233] *
+ * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
 	LOCAL_SET value = ~%parameter1%~
 	LOCAL_SPRINT proficiency ~~
@@ -3224,6 +3566,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_241~ BEGIN
 	LPM ~opcode_target_probability_5~
 END
 
+/* --------------------- *
+ * Cure: Confusion [242] *
+ * --------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_242~ BEGIN
+	SPRINT description @103128 // ~Immunité à la confusion~
+END
+
 /* ------------------------------- *
  * Spell: Drain Wizard Spell [244] *
  * ------------------------------- */
@@ -3247,6 +3596,21 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_244~ BEGIN
 	ELSE BEGIN
 		SPRINT description @102444 // ~de faire %amount% sorts à la cible~
 	END
+END
+
+/* ------------------------------ *
+ * Spell Effect: Berserking [246] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_246~ BEGIN
+	LPM ~opcode_self_3~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_246~ BEGIN
+	LPM ~opcode_self_probability_3~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_246~ BEGIN
+	LPM ~opcode_target_probability_3~
 END
 
 /* ---------------------------------------- *
@@ -3508,6 +3872,13 @@ DEFINE_PATCH_MACRO ~opcode_self_305~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102010 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main secondaire~
 END
 
+/* ------------------------------------- *
+ * Stat: THAC0 Modifier (On-Hand) [306] *
+ * ------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_306~ BEGIN
+	LPF ~opcode_mod~ INT_VAR strref = 101151 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main principale~
+END
+
 /* ------------------------------- *
  * Protection: from Timestop [310] *
  * ------------------------------- */
@@ -3554,8 +3925,23 @@ END
 /* ------------------------------- *
  * Spell Effect: Slow Poison [329] *
  * ------------------------------- */
-//TODO: Les poisons infligent des dégâts toutes les xx secondes
+DEFINE_PATCH_MACRO ~opcode_self_329~ BEGIN
+	LOCAL_SET seconds = parameter1
+	SPRINT description @101152 // ~Force la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
+END
 
+DEFINE_PATCH_MACRO ~opcode_target_329~ BEGIN
+	LPM ~opcode_self_329~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
+	LOCAL_SET seconds = parameter1
+	SPRINT description @101153 // ~de forcer la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
+	LPM ~opcode_self_probability_329~
+END
 
 /* ------------------------------------ *
  * Stat: Specific Damage Modifier [332] *
@@ -3563,6 +3949,18 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 	LOCAL_SET strref = 102690 + parameter2
 	LPF ~opcode_mod_percent~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts de xxx~
+END
+
+/* ----------------------------------- *
+ * Enchantment vs. creature type [344] *
+ * ----------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
+	LOCAL_SET strref = 102481 // ~Enchantement~
+	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	SET value = special
+	SET parameter2 = MOD_TYPE_cumulative
+	LPM ~opcode_mod_base~
+	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
 END
 
 /* --------------------------- *
@@ -3673,7 +4071,6 @@ DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value > 0 BEGIN
-	        SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -3787,14 +4184,12 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 						READ_STRREF SPL_unidentified_name spellName
 					END
 					ELSE BEGIN
-						INNER_ACTION BEGIN
-							APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl~
-						END
+						LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
 					END
 				BUT_ONLY_IF_IT_CHANGES
 			END
 			ELSE BEGIN
-				APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %resref%.eff n'existe pas.~
+				LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 			END
 	    END
 	END
@@ -3811,12 +4206,12 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 					READ_STRREF ITM_identified_name itemName
 				END
 				ELSE BEGIN
-					PATCH_FAIL "%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm"
+					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.itm n'existe pas.~
+			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
 		END
     END
 END
@@ -3833,12 +4228,28 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 				END
 				ELSE BEGIN
 					SPRINT creatureName (AT 102549)
-					PATCH_WARN "%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre"
+					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 				END
 			BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			APPEND_OUTER ~AutoDescription/log/warnings.log~ ~%SOURCE_FILE% : Opcode %opcode% : La ressource %file%.cre n'existe pas.~
+			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		END
+    END
+END
+
+DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance BEGIN
+	SPRINT creatureName ~~
+	SPRINT itemFilename ~%SOURCE_FILE%~
+	INNER_ACTION BEGIN
+		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+			COPY_EXISTING ~%file%.cre~ ~override~
+				READ_BYTE CRE_allegiance allegiance
+				LOOKUP_IDS_SYMBOL_OF_INT allegiance EA allegiance
+			BUT_ONLY_IF_IT_CHANGES
+		END
+		ELSE BEGIN
+			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
 		END
     END
 END
@@ -3900,9 +4311,11 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SET strref = 200000 + (file * 1000) + entry
 
-		PATCH_VERBOSE
+		PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~ ~AutoDescription/tra/french/description.tra~)) BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~opcode %opcode%: Traduction %strref% manquante~ END
+		END
+
 		SPRINT idName (AT ~%strref%~)
-		PATCH_SILENT
 	END
 	ELSE BEGIN
 		SPRINT idName ~~

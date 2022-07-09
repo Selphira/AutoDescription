@@ -118,6 +118,9 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 						END
 					END
 				END
+				ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+					LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+				END
 			END
 		END
 	END
@@ -192,6 +195,9 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 					SET $combatAbilities(~%combatCount%~ 0) += 1
 				END
 			END
+		END
+		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 		END
 	END
 END

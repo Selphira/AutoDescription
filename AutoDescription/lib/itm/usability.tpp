@@ -13,8 +13,8 @@ END
 DEFINE_PATCH_MACRO ~social_alignments~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY array_usabilities BEGIN
 		CHAOTIC, "BIT0" => 1 // ~chaotique~
-		NEUTRAL, "BIT4" => 1 // ~neutre~
-		LOYAL,   "BIT5" => 1 // ~loyal~
+		NEUTRAL, "BIT5" => 1 // ~neutre~
+		LOYAL,   "BIT4" => 1 // ~loyal~
 	END
 END
 
@@ -308,11 +308,9 @@ DEFINE_PATCH_MACRO ~usability_alignment~ BEGIN
 
 			PATCH_IF useCountSocial = 3 BEGIN
 				SPRINT useArray "%useOrUnuse%sMoral"
-				LPM ~usability_alignment_compress~
 			END
 			ELSE PATCH_IF useCountMoral = 3 BEGIN
 				SPRINT useArray "%useOrUnuse%sSocial"
-				LPM ~usability_alignment_compress~
 			END
 			ELSE BEGIN
 				PATCH_PHP_EACH "%useOrUnuse%sSocial" AS keySocial => sValue BEGIN
@@ -326,8 +324,8 @@ DEFINE_PATCH_MACRO ~usability_alignment~ BEGIN
 					END
 				END
 				SPRINT useArray "usesSocialMoral"
-				LPM ~usability_alignment_compress~
 			END
+			LPM ~usability_alignment_compress~
 		END
 	END
 END

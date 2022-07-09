@@ -12,15 +12,4 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
     INCLUDE ~%MOD_FOLDER%/lib/itm/needs.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/itm/opcodes.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/itm/usability.tpp~
-
-	// Initialisation des fichiers de log
-	<<<<<<<< .../AutoDescription/inlined/empty.log
-	>>>>>>>>
-	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/warnings.log~
-	ACTION_IF is_ee BEGIN
-		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/diff.html~
-	END
-	ELSE BEGIN
-		COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/diff.html~
-	END
 END

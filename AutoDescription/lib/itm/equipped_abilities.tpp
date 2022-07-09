@@ -64,6 +64,9 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 			END
 			ELSE BEGIN PATCH_WARN ~%SOURCE_FILE% : equipped_abilities : Opcode '%opcode%' timing non gere ! (%timing%)~ END
 		END
+		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+		END
     END
 
     LPF ~get_unique_equipped_abilities~ STR_VAR array_name = "abilities" RET count RET_ARRAY newAbilities END

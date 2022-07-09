@@ -43,8 +43,6 @@ Cela apporte plusieurs avantages:
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
 - Opcode 1  
   Améliorer les textes, mieux adapté aux situations et moins génériques.
-- Opcode 67
-  Gérer l'hostilité de la créature invoquée
 - Les opcodes de type "State: Sanctuary [153]" doivent avoir un texte différent en fonction de s'ils sont une capacité de charge, de combat ou d'équipement... (Ex: GTT#BO.ITM)  
   Charge : Sanctuaire x fois par jour  
   Combat : Sanctuaire sur le porteur  
