@@ -3,6 +3,8 @@
  * Vu qu'ils ne sont généralement pas
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
+	318 => 0   // Protection: Immunity Spell [318]
+	324 => 0   // Protection: Immunity to Resource and Message [324]
 	216 => 1   // Spell Effect: Level Drain [216]
 	344 => 1   // Enchantment vs. creature type [344]
 	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
@@ -171,6 +173,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	200 => 248 // Spell: Decrementing Bounce Spells [200]
 	207 => 249 // Spell: Bounce Specified Spell [207]
 	197 => 250 // Spell: Bounce Projectile [197]
+	188 => 250 // Spell Effect: Aura Cleansing [188]
 	119 => 251 // Spell Effect: Mirror Image [119]
 	280 => 252 // Spell Effect: Wild Magic [280]
 	235 => 253 // Spell Effect: Wing Buffet [235]
@@ -195,6 +198,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	255 => 288 // Item: Create Inventory Item (days) [255]
 	302 => 289 // Item: Can Use Any Item [302]
 	 26 => 290 // Item: Remove Curse [26]
+	248 => 291 // Item: Set Melee Effect [248]
+	249 => 292 // Item: Set Ranged Effect [249]
+	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
 	135 => 297 // Polymorph into Specific [135]
@@ -262,7 +268,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
 	186 => 0 // Script: MoveToArea [186] // A gérer ??
 	187 => 0 // Script: Store Local Variable [187]
-	188 => 1 // Spell Effect: Aura Cleansing [188]
 	192 => 1 // Spell Effect: Find Familiar [192]
 	194 => 0 // Ignore Dialog Pause [194]
 	195 => 1 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
@@ -289,8 +294,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	243 => 1 // Item: Drain Item Charges [243]
 	245 => 1 // Check For Berserk [245]
 	247 => 1 // Spell Effect: Attack Nearest Creature [247]
-	248 => 1 // Item: Set Melee Effect [248]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte (CBWTNI6A.ITM)
-	249 => 1 // Item: Set Ranged Effect [249]  // TODO: A gérer ! Attention, un effet a d'autres variables à prendre en compte
 	251 => 1 // Spell Effect: Change Bard Song Effect [251]
 	252 => 1 // Spell Effect: Set Trap [252]
 	253 => 0 // Spell Effect: Add Map Marker [253]
@@ -333,12 +336,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	313 => 0 // High-Level Ability Denotation [313]
 	314 => 1 // Spell: Golem Stoneskin [314]
 	315 => 1 // Graphics: Animation Removal [315]
-	318 => 1 // Protection: Immunity Spell [318] // TODO: A gérer quand même ? Stat: Set Stat (TobEx) + différent effet dans BGEE
 	// EE only
 	319 => 1 // Item Usability [319]
 	320 => 0 // Change Weather [320]
 	321 => 1 // Removal: Effects specified by Resource [321]
-	324 => 1 // Protection: Immunity to Resource and Message [324]
 	326 => 1 // Apply Effects List [326]
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
@@ -352,7 +353,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
 	340 => 1 // Spell Effect: Change Backstab Effect [340]
-	341 => 1 // Spell Effect: Change Critical Hit Effect [341]
 	342 => 0 // Animation: Override Data [342]
 	343 => 1 // HP Swap [343]
 	345 => 1 // Enchantment bonus [345]
@@ -1588,6 +1588,10 @@ END
 /* --------------------------------------------- *
  * Cure: Dispellable Effects (Dispel Magic) [58] *
  * --------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_58~ BEGIN
+	LPM ~opcode_target_58~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_58~ BEGIN
 	LOCAL_SET castingLevel = parameter1
 	LOCAL_SET type = parameter2
@@ -3066,6 +3070,13 @@ DEFINE_PATCH_MACRO ~opcode_target_185~ BEGIN
 	LPM ~opcode_target_109~
 END
 
+/* ---------------------------------- *
+ * Spell Effect: Aura Cleansing [188] *
+ * ---------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_188~ BEGIN
+	SPRINT description @101159 // ~Permet de lancer plusieurs sorts par round~
+END
+
 /* --------------------------------- *
  * Stat: Casting Time Modifier [189] *
  * --------------------------------- */
@@ -3655,6 +3666,28 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_246~ BEGIN
 	LPM ~opcode_target_probability_3~
 END
 
+/* ---------------------------- *
+ * Item: Set Melee Effect [248] *
+ * ---------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
+	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded durationAdded opcode END
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @101158 // ~À chaque attaque de mêlée réussie: %description%~
+	END
+END
+
+/* ----------------------------- *
+ * Item: Set Ranged Effect [249] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
+	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded durationAdded opcode END
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @101157 // ~À chaque attaque à distance réussie: %description%~
+	END
+END
+
 /* ---------------------------------------- *
  * Spell Effect: Damage Luck Modifier [250] *
  * ---------------------------------------- */
@@ -3954,11 +3987,69 @@ DEFINE_PATCH_MACRO ~opcode_self_317~ BEGIN
 	LPM ~opcode_self_16~
 END
 
+/* ----------------------------------------------------------- *
+ * Stat: Set Stat (TobEx) [318] // Ignoré en version classique *
+ * EE: Protection from Resource [318]                          *
+ * ----------------------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_318~ BEGIN
+	LPM ~opcode_self_324~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_318~ BEGIN
+	LPM ~opcode_self_probability_324~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_318~ BEGIN
+	LPM ~opcode_target_324~
+END
+
 /* ----------------------------- *
  * Stat: Turn Undead Level [323] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 102683 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de repousser les morts-vivants~
+END
+
+/* -------------------------------------------------- *
+ * Protection: Immunity to Resource and Message [324] *
+ * -------------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
+	PATCH_IF is_ee == 1 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self à gérer~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
+	PATCH_IF is_ee == 1 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self probability à gérer~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
+	LOCAL_SET value = parameter1
+	LOCAL_SET statType = parameter2
+	LOCAL_SET idsId = 0
+	LOCAL_SET strref = 0
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF ~%resref%~ STRING_EQUAL ~SOURCE_RES~ BEGIN
+			PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
+				SET idsId = statType - 100
+				SET strref = 105301 // ~Inefficace contre les %creatureType%~
+				PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
+					SET idsId = statType - 110
+					SET strref = 105302 // ~Effectif contre les %creatureType%~
+				END
+				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+			END
+			ELSE BEGIN
+				SET strref = 105000 + statType
+			END
+			SPRINT description (AT %strref%)
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
+		END
+	END
 END
 
 /* ------------------------ *
@@ -3995,6 +4086,17 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 	LOCAL_SET strref = 102690 + parameter2
 	LPF ~opcode_mod_percent~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts de xxx~
+END
+
+/* ---------------------------------------------- *
+ * Spell Effect: Change Critical Hit Effect [341] *
+ * ---------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_341~ BEGIN
+	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded durationAdded opcode END
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @101160 // ~À chaque coup critique: %description%~
+	END
 END
 
 /* ----------------------------------- *

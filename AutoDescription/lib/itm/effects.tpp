@@ -11,6 +11,11 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	SPRINT opcode_target ~~
 
 	PATCH_TRY
+		// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
+		PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
+			SET target = TARGET_FX_self
+		END
+
 		PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
 			PATCH_IF abilityType == AbilityType_Equipped BEGIN
 				SPRINT opcode_target ~_self~
@@ -26,7 +31,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 					SPRINT theTarget   @102472 // ~le porteur~
 					SPRINT ofTheTarget @101086 // ~du porteur~
 				END
-				ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_none OR target == TARGET_FX_everyone_except_self BEGIN
+				ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
 					SPRINT opcode_target ~_target~
 					SPRINT theTarget   @102471 // ~la cible~
 					SPRINT ofTheTarget @101085 // ~de la cible~
@@ -57,6 +62,9 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 			LPM ~add_duration~
 			LPM ~add_save~
 		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Target est none~ END
+		END
 	WITH
 		~Failure("Unknown macro: \%method%")~
 		BEGIN
@@ -84,6 +92,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durationAdded BEGIN
 	READ_SHORT EFF2_opcode opcode
+	READ_BYTE  EFF2_target target
 	READ_BYTE  EFF2_power power
 	READ_LONG  EFF2_parameter1 parameter1
 	READ_LONG  EFF2_parameter2 parameter2
@@ -101,6 +110,16 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 	SET parentProbability = probability
 	SET probability = probability1 - probability2
 	SPRINT description ~~
+
+	PATCH_IF target == TARGET_FX_self BEGIN
+        SPRINT macro ~opcode_self_~
+    END
+    ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+        SPRINT macro ~opcode_target_~
+    END
+    ELSE PATCH_IF target == TARGET_FX_party BEGIN
+        SPRINT macro ~opcode_party_~
+    END
 
 	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 		PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN

@@ -713,6 +713,117 @@
 @104539 = ~d'immuniser %theTarget% au sommeil~
 @104717 = ~d'immuniser %theTarget% au sommeil~
 
+/* -------------------------------------------------- *
+ * Protection: Immunity to Resource and Message [324] *
+ * @105000 à @105300                                  *
+ * -------------------------------------------------- */
+@105000 = ~~
+@105001 = ~Inefficace contre les morts-vivants~
+@105002 = ~Effectif contre les morts-vivants~
+@105003 = ~Inefficace contre les cibles immunisées au feu~
+@105004 = ~Inefficace contre les cibles sensibles au feu~
+@105005 = ~Inefficace contre les humanoïdes~
+@105006 = ~Effectif contre les humanoïdes~
+@105007 = ~Inefficace contre les animaux~
+@105008 = ~Effectif contre les animaux~
+@105009 = ~Inefficace contre les élémentaires~
+@105010 = ~Effectif contre les élémentaires~
+@105011 = ~Inefficace contre les myconides~
+@105012 = ~Effectif contre les myconides~
+@105013 = ~Inefficace contre les créatures gigantesques~
+@105014 = ~Effectif contre les créatures gigantesques~
+@105015 = ~Inefficace contre les elfes~
+@105016 = ~Effectif contre les elfes~
+@105017 = ~Inefficace contre les ombres des roches~
+@105018 = ~Effectif contre les ombres des roches~
+@105019 = ~Inefficace contre les demi-elfes~
+@105020 = ~Effectif contre les demi-elfes~
+@105021 = ~Inefficace contre les humanoïdes et les animaux~
+@105022 = ~Effectif contre les humanoïdes et les animaux~
+@105023 = ~Inefficace contre les cibles aveuglées~
+@105024 = ~Effectif contre les cibles aveuglées~
+@105025 = ~Inefficace contre les cibles immunisées au froid~
+@105026 = ~Inefficace contre les cibles sensibles au froid~
+@105027 = ~Inefficace contre les golems~
+@105028 = ~Effectif contre les golems~
+@105029 = ~Inefficace contre les minotaures~
+@105030 = ~Effectif contre les minotaures~
+@105031 = ~Inefficace contre les morts-vivants et les myconides~
+@105032 = ~Effectif contre les morts-vivants et les myconides~
+@105033 = ~Inefficace contre les créatures neutres~
+@105034 = ~Inefficace contre les créatures bonnes ou mauvaises~
+@105035 = ~Inefficace contre les créatures bonnes~
+@105036 = ~Inefficace contre les créatures neutres ou mauvaises~
+@105037 = ~Inefficace contre les créatures mauvaises~
+@105038 = ~Inefficace contre les créatures neutres ou bonnes~
+@105039 = ~Inefficace contre les paladins~
+@105040 = ~Effectif contre les paladins~
+@105041 = ~Inefficace contre les créatures du même alignement que le porteur~
+@105042 = ~Inefficace contre les créatures d'un alignement différent du porteur~
+@105043 = ~Inefficace contre le porteur~
+@105044 = ~Inefficace contre les cibles autre que le porteur~
+@105047 = ~Inefficace contre les golems, les morts-vivants et les myconides~
+@105048 = ~Effectif contre les golems, les morts-vivants et les myconides~
+@105049 = ~Inefficace contre les créatures alliées~
+@105050 = ~Effectif contre les créatures alliées~
+@105051 = ~Inefficace contre les créatures enemies~
+@105052 = ~Effectif contre les créatures enemies~
+@105053 = ~Inefficace contre les cibles immunisées au feu ou au froid~
+@105054 = ~Inefficace contre les cibles sensibles au feu ou au froid~
+@105055 = ~Inefficace contre les morts-vivants et les golems~
+@105056 = ~Effectif contre les morts-vivants et les golems~
+@105057 = ~Inefficace contre les hommes~
+@105058 = ~Inefficace contre les femmes~
+@105064 = ~Inefficace contre les orques~
+@105065 = ~Effectif contre les orques~
+@105066 = ~Inefficace contre les créatures sourdes~
+@105067 = ~Effectif contre les créatures sourdes~
+@105074 = ~Inefficace contre les créatures mortes~
+@105075 = ~Inefficace contre les créatures vivantes~
+@105077 = ~Inefficace contre les cibles immunisées au poison~
+@105078 = ~Inefficace contre les cibles sensibles au poison~
+@105079 = ~Inefficace contre les cibles immunisées à l'acide~
+@105080 = ~Inefficace contre les cibles sensibles à l'acide~
+@105081 = ~Inefficace contre les cibles immunisées à l'électricité~
+@105082 = ~Inefficace contre les cibles sensibles à l'électricité~
+@105083 = ~Inefficace contre les cibles immunisées aux dégâts magiques~
+@105084 = ~Inefficace contre les cibles sensibles aux dégâts magiques~
+@105085 = ~Inefficace contre les ankheg~
+@105086 = ~Effectif contre les ankheg~
+@105087 = ~Inefficace contre les liches~
+@105088 = ~Effectif contre les liches~
+@105089 = ~Inefficace entre 6h et 20h~
+@105090 = ~Inefficace entre 21h et 5h~
+@105091 = ~Inefficace contre les créatures paniquées~
+@105092 = ~Effectif contre les créatures paniquées~
+@105119 = ~Inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
+@105120 = ~Inefficace contre les créatures protégées contre les morts-vivants~
+@105122 = ~Inefficace contre les créatures possédant une dextérité plus grande ou égale à %value%~
+@105123 = ~Inefficace contre les créatures possédant une dextérité inférieure à %value%~
+@105124 = ~Inefficace contre les créatures possédant une force plus grande ou égale à %value%~
+@105125 = ~Inefficace contre les créatures possédant une force inférieure à %value%~
+@105126 = ~Inefficace contre les créatures possédant une constitution plus grande ou égale à %value%~
+@105127 = ~Inefficace contre les créatures possédant une constitution inférieure à %value%~
+@105128 = ~Inefficace contre les créatures possédant une intelligence plus grande ou égale à %value%~
+@105129 = ~Inefficace contre les créatures possédant une intelligence inférieure à %value%~
+@105130 = ~Inefficace contre les créatures possédant une sagesse plus grande ou égale à %value%~
+@105131 = ~Inefficace contre les créatures possédant une sagesse inférieure à %value%~
+@105132 = ~Inefficace contre les créatures possédant un charisme plus grand ou égal à %value%~
+@105133 = ~Inefficace contre les créatures possédant un charisme inférieur à %value%~
+@105134 = ~Inefficace si le nombre de créatures invoquées est plus grand ou égal à %value%~
+@105135 = ~Inefficace si le nombre de créatures invoquées est inférieur à %value%~
+@105136 = ~Inefficace si le chapitre en cours est plus grand ou égal au %value%~
+@105137 = ~Inefficace si le chapitre en cours est plus petit que %value%~
+@105140 = ~Inefficace contre les créatures sous l'effet d'une invisibilité invisibles~
+@105141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
+@105142 = ~Inefficace contre les créatures invisibles~
+@105143 = ~Effectif contre les créatures invisibles~
+@105144 = ~Inefficace contre les créatures dont les points de vie sont plus grands ou égaux à %value%~
+@105145 = ~Inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
+@105300 = ~~
+@105301 = ~Inefficace contre les %creatureType%~
+@105302 = ~Effectif contre les %creatureType%~
+
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -851,11 +962,15 @@
 @101154 = ~de pétrifier %theTarget%~
 @101155 = ~de créer un objet (%itemName%)~
 @101156 = ~de créer %amount% objets (%itemName%)~
+@101157 = ~À chaque attaque à distance réussie: %description%~
+@101158 = ~À chaque attaque de mêlée réussie: %description%~
+@101159 = ~Permet de lancer plusieurs sorts par round~
+@101160 = ~À chaque coup critique: %description%~
 
 /* ------ *
  * Ea.ids *
  * ------ */
-@202000 = ~~
+@202000 = ~créatures~
 @202002 = ~compagnons~
 @202004 = ~alliés~
 @202005 = ~créatures contrôlées~
