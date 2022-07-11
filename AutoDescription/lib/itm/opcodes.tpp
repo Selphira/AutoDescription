@@ -450,7 +450,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 102020 + parameter2
-			SPRINT versus (AT ~strref~) // ~contre les xxx~
+			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
 		END
 	END
@@ -476,7 +476,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 102020 + parameter2
-			SPRINT versus (AT ~strref~) // ~contre les xxx~
+			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
 		END
 	END
@@ -498,7 +498,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 102020 + parameter2
-			SPRINT versus (AT ~strref~) // ~contre les xxx~
+			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
 		END
 	END
@@ -519,7 +519,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 102020 + parameter2
-			SPRINT versus (AT ~strref~) // ~contre les xxx~
+			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END
 			SPRINT value ~%value% %versus%~
 		END
 	END
@@ -795,7 +795,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	END
 
 	SET type = $damage_types(~%type%~)
-	SPRINT damageType (AT ~%type%~)
+	LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 
 	// Dégâts basiques
 	PATCH_IF subType == 0 BEGIN
@@ -806,7 +806,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		END
 
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description (AT ~%strref_0%~ )
+			LPF ~getTranslation~ INT_VAR strref = strref_0 opcode RET description = string END
 		END
 	END
 	// Set to value
@@ -821,7 +821,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	ELSE PATCH_IF subType == 3 BEGIN
 		SET value = damageAmount
 		SPRINT value @10002 // ~%value% %~
-		SPRINT description (AT ~%strref_3%~ )
+		LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END
 	END
 END
 
@@ -948,19 +948,19 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 	PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
 		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF ~%value%~ STRING_EQUAL ~1~ BEGIN
-				SPRINT description (AT ~%strref_1%~) // ~Soigne un point de vie~
+				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne un point de vie~
 			END
 			ELSE BEGIN
-				SPRINT description (AT ~%strref_2%~) // ~Soigne %value% points de vie~
+				LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END // ~Soigne %value% points de vie~
 			END
 		END
 	END
 	ELSE BEGIN
 		PATCH_IF ~%value%~ STRING_EQUAL ~-1~ BEGIN
-			SPRINT description (AT ~%strref_3%~) // ~Inflige un point de vie~
+			LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige un point de vie~
 		END
 		ELSE BEGIN
-			SPRINT description (AT ~%strref_4%~) // ~Inflige %value% points de vie~
+			LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
 		END
 	END
 END
@@ -1818,19 +1818,24 @@ END
  * --------------- */
 DEFINE_PATCH_MACRO ~opcode_self_71~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @102195 // ~Change le sexe du porteur~
-	END PATCH_IF parameter2 == 1 BEGIN
+		SPRINT description @102195 // ~Change le sexe %ofTheTarget%~
+	END
+	ELSE PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @101161 // ~Change %theTarget% en homme~
-	END ELSE BEGIN
+	END
+	ELSE BEGIN
 		SPRINT description @101162 // ~Change %theTarget% en femme~
 	END
 END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_71~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @101163 // ~de changer le sexe du porteur~
-	END PATCH_IF parameter2 == 1 BEGIN
+		SPRINT description @101163 // ~de changer le sexe %ofTheTarget%~
+	END
+	ELSE PATCH_IF parameter2 == 1 BEGIN
         SPRINT description @101164 // ~de changer %theTarget% en homme~
-    END ELSE BEGIN
+    END
+    ELSE BEGIN
         SPRINT description @101165 // ~de changer %theTarget% en femme~
     END
 END
@@ -1912,12 +1917,12 @@ DEFINE_PATCH_MACRO ~opcode_target_78~ BEGIN
 	PATCH_IF type >= 4 AND type <= 9 BEGIN
 		PATCH_IF amount > 0 BEGIN
 			SET strref = 102197 + type
-			SPRINT description (AT ~%strref%~) //  ~Inocule une maladie qui diminue [la caractéristique] de la cible de %amount%~
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //  ~Inocule une maladie qui diminue [la caractéristique] de la cible de %amount%~
 		END
 		ELSE BEGIN
 			SET amount *= ~-1~
 			SET strref = 102204 + type
-			SPRINT description (AT ~%strref%~) //  ~Inocule une maladie qui augmente [la caractéristique] de la cible de %amount%~
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //  ~Inocule une maladie qui augmente [la caractéristique] de la cible de %amount%~
 		END
 	END
 	ELSE PATCH_IF type == 0 OR type == 1 OR (type == 3 AND amount == 1) BEGIN
@@ -1941,12 +1946,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_78~ BEGIN
 	PATCH_IF type >= 4 AND type <= 9 BEGIN
 		PATCH_IF amount > 0 BEGIN
 			SET strref = 102428 + type
-			SPRINT description (AT ~%strref%~) //  ~d'inoculer une maladie qui diminue [la caractéristique] de la cible de %amount%~
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~d'inoculer une maladie qui diminue [la caractéristique] de la cible de %amount%~
 		END
 		ELSE BEGIN
 			SET amount *= ~-1~
 			SET strref = 102435 + type
-			SPRINT description (AT ~%strref%~) //  ~d'inoculer une maladie qui augmente [la caractéristique] de la cible de %amount%~
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~d'inoculer une maladie qui augmente [la caractéristique] de la cible de %amount%~
 		END
 	END
 	ELSE PATCH_IF type == 0 OR type == 1 OR (type == 3 AND amount == 1) BEGIN
@@ -2239,33 +2244,25 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
 	LOCAL_SET cOpcode = parameter2
 	LOCAL_SET strref = 103000 + cOpcode
-	PATCH_VERBOSE
-	SPRINT description (AT ~%strref%~) // ~Immunité à xxx~
-	PATCH_SILENT
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunité à xxx~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
 	LOCAL_SET cOpcode = parameter2
 	LOCAL_SET strref = 103500 + cOpcode
-	PATCH_VERBOSE
-	SPRINT description (AT ~%strref%~) // ~de résister à xxx~
-	PATCH_SILENT
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~de résister à xxx~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
 	LOCAL_SET cOpcode = parameter2
 	LOCAL_SET strref = 104000 + cOpcode
-	PATCH_VERBOSE
-	SPRINT description (AT ~%strref%~) // ~Immunise %theTarget% à xxx~
-	PATCH_SILENT
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunise %theTarget% à xxx~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	LOCAL_SET cOpcode = parameter2
 	LOCAL_SET strref = 104500 + cOpcode
-	PATCH_VERBOSE
-	SPRINT description (AT ~%strref%~) // ~d'immuniser %theTarget% à xxx~
-	PATCH_SILENT
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~d'immuniser %theTarget% à xxx~
 END
 /* -------------------------------------- *
  * Immunité contre les sorts de niveau xx *
@@ -2657,9 +2654,7 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LOCAL_SET strref = 102980 + parameter2
-	PATCH_VERBOSE
-	SPRINT description (AT ~%strref%~) // ~Empêche l'utilisation de xxx~
-	PATCH_SILENT
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche l'utilisation de xxx~
 END
 
 /* ---------------------------- *
@@ -2687,7 +2682,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	TO_UPPER resref
 	PATCH_IF VARIABLE_IS_SET $opcode_target_146_item_revision(~%resref%~) BEGIN
 		SET strref = $opcode_target_146_item_revision(~%resref%~)
-		SPRINT description (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -2722,7 +2717,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 	TO_UPPER resref
 	PATCH_IF VARIABLE_IS_SET $opcode_target_probability_146_item_revision(~%resref%~) BEGIN
 		SET strref = $opcode_target_probability_146_item_revision(~%resref%~)
-		SPRINT description (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -3210,7 +3205,7 @@ DEFINE_PATCH_MACRO ~opcode_self_204~ BEGIN
 	END
 	ELSE BEGIN
 		SET strref += school
-		SPRINT description (AT ~%strref%~) //  ~Immunité aux sorts de l'école de xxxx~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunité aux sorts de l'école de xxxx~
 	END
 END
 
@@ -3220,7 +3215,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_205~ BEGIN
 	LOCAL_SET strref = 102390 + parameter2
 
-	SPRINT description (AT ~%strref%~)
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 /* ------------------ *
@@ -4068,7 +4063,7 @@ DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 			ELSE BEGIN
 				SET strref = 105000 + statType
 			END
-			SPRINT description (AT %strref%)
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 		END
 		ELSE BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
@@ -4174,7 +4169,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 		END
 	END
-	SPRINT name (AT ~%strref%~)
+	LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
@@ -4187,17 +4182,17 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		LPF ~signed_value~ INT_VAR value RET value END
 		SPRINT value @10002 // ~%value% %~
-		SPRINT name (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT value @10002 // ~%value% %~
 		SPRINT value @10010 // ~Passe à %value%~
-		SPRINT name (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
 		SPRINT value @10002 // ~%value% %~
 		SPRINT value @10006 // ~Multiplié par %value%~
-		SPRINT name (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 	END
 END
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
@@ -4214,7 +4209,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 STR_VAR value = ~~ RET description BEGIN
 	SPRINT name @102034 // ~Jets de sauvegarde~
-	SPRINT strSave (AT ~%strref%~)
+	LPF ~getTranslation~ INT_VAR strref opcode RET strSave = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		LPF ~signed_value~ INT_VAR value RET value END
@@ -4245,7 +4240,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
 	SET value = ~%parameter1%~
-	SPRINT theStatistic (AT ~%strref%~)
+	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value > 0 BEGIN
@@ -4267,7 +4262,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BEGIN
 	SET value = ~%parameter1%~
-	SPRINT theStatistic (AT ~%strref%~)
+	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value > 0 BEGIN
@@ -4349,7 +4344,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 	TO_LOWER file
 	PATCH_IF VARIABLE_IS_SET $spellnames(~%file%~) BEGIN
 		SET strref = $spellnames(~%file%~)
-		SPRINT spellName (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET spellName = string END
 	END
 	ELSE BEGIN
 		SPRINT spellName ~~
@@ -4405,7 +4400,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 					READ_STRREF CRE_name creatureName
 				END
 				ELSE BEGIN
-					SPRINT creatureName (AT 102549)
+					SPRINT creatureName @102549 // ~Créature inconnue~
 					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 				END
 			BUT_ONLY_IF_IT_CHANGES
@@ -4443,28 +4438,28 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 		SET level = amount
 		LPM ~opcode_self_42_62_get_levelstr~
 		SET strref = startStrref + 4
-		SPRINT description (AT %strref%) //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 	END
 	ELSE BEGIN
 		LPM ~opcode_self_42_62_get_levelstr~
 		PATCH_IF amount > 0 BEGIN // Mémorisation
             PATCH_IF amount == 1 BEGIN
     			SET strref = startStrref
-                SPRINT description (AT %strref%) // ~Mémorisation d'un sort [profane|divin] supplémentaire de niveau %levelStr%~
+                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Mémorisation d'un sort [profane|divin] supplémentaire de niveau %levelStr%~
             END
             ELSE BEGIN
     			SET strref = startStrref + 1
-                SPRINT description (AT %strref%) // ~Mémorisation de %amount% sorts [profanes|divins] supplémentaires de niveau %levelStr%~
+                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Mémorisation de %amount% sorts [profanes|divins] supplémentaires de niveau %levelStr%~
             END
         END
         ELSE PATCH_IF amount < 0 BEGIN // Oubli
             PATCH_IF amount == ~-1~ BEGIN
     			SET strref = startStrref + 2
-                SPRINT description (AT %strref%) // ~Suppression d'un sort [profane|divin] de niveau %levelStr%~
+                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression d'un sort [profane|divin] de niveau %levelStr%~
             END
             ELSE BEGIN
     			SET strref = startStrref + 3
-                SPRINT description (AT %strref%) // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
+                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
             END
     	END
 	END
@@ -4486,14 +4481,12 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
-	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
+	PATCH_IF file == 9 AND VARIABLE_IS_SET $kits(~%strref%~) BEGIN
+		SPRINT idName $kits(~%strref%~)
+	END
+	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SET strref = 200000 + (file * 1000) + entry
-
-		PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~ ~AutoDescription/tra/french/description.tra~)) BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~opcode %opcode%: Traduction %strref% manquante~ END
-		END
-
-		SPRINT idName (AT ~%strref%~)
+		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
 		SPRINT idName ~~

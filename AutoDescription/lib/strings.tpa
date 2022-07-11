@@ -22,10 +22,16 @@ COPY_EXISTING ~kitlist.2da~  ~override~
 	FOR (row = 2 ; row < rows ; row = row + 1) BEGIN
 		READ_2DA_ENTRY row 1 8 name
 		READ_2DA_ENTRY row 3 8 strref
+		PATCH_IF is_ee BEGIN
+			READ_2DA_ENTRY row 9 8 kitIds
+		END
 
 		PATCH_IF NOT ~%strref%~ STRING_EQUAL ~4294967296~ BEGIN
 			GET_STRREF  strref text
 			SPRINT $translations(~%name%~) ~%text%~
+			PATCH_IF is_ee BEGIN
+				SPRINT $kits(~%kitIds%~) ~%text%~
+			END
 		END
 	END
     BUT_ONLY_IF_IT_CHANGES
