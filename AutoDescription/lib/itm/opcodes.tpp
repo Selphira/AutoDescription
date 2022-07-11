@@ -4024,7 +4024,7 @@ DEFINE_PATCH_MACRO ~opcode_target_318~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_318~ BEGIN
-	LPM ~opcode_target_probability_324
+	LPM ~opcode_target_probability_324~
 END
 
 /* ----------------------------- *
