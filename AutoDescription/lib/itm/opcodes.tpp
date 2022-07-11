@@ -635,7 +635,7 @@ END
  * State: Berserking [3] *
  * --------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_3~ BEGIN
-	SPRINT description @102197 // ~Rage berserk permanente~
+	SPRINT description @102197 // ~Rage du berserker~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_3~ BEGIN
@@ -933,10 +933,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_17~ BEGIN
-	LOCAL_SET strref_1 = 102215 // ~Soigne un point de vie au groupe~
-	LOCAL_SET strref_2 = 102216 // ~Soigne %value% points de vie au groupe~
-	LOCAL_SET strref_3 = 102217 // ~Inflige un point de dégâts au groupe~
-	LOCAL_SET strref_4 = 102218 // ~Inflige %value% points de dégâts au groupe~
+	LOCAL_SET strref_1 = 102215 // ~Soigne un point de vie à chaque membre du groupe~
+	LOCAL_SET strref_2 = 102216 // ~Soigne %value% points de vie à chaque membre du groupe~
+	LOCAL_SET strref_3 = 102217 // ~Inflige un point de dégâts à chaque membre du groupe~
+	LOCAL_SET strref_4 = 102218 // ~Inflige %value% points de dégâts à chaque membre du groupe~
 
 	LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 END
@@ -1447,7 +1447,7 @@ END
  * State: Stun [45] *
  * ---------------- */
 DEFINE_PATCH_MACRO ~opcode_self_45~ BEGIN
-	SPRINT description @102123 // ~Étourdis %theTarget%~
+	SPRINT description @102123 // ~Étourdit %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_45~ BEGIN
@@ -1819,12 +1819,20 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_71~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT description @102195 // ~Change le sexe du porteur~
+	END PATCH_IF parameter2 == 1 BEGIN
+		SPRINT description @101161 // ~Change %theTarget% en homme~
+	END ELSE BEGIN
+		SPRINT description @101162 // ~Change %theTarget% en femme~
 	END
-	ELSE BEGIN
-		/*1 MALE
-		2 FEMALE*/
-		PATCH_FAIL "%SOURCE_FILE% : Fixation du genre à gérer"
-	END
+END
+DEFINE_PATCH_MACRO ~opcode_self_probability_71~ BEGIN
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @101163 // ~de changer le sexe du porteur~
+	END PATCH_IF parameter2 == 1 BEGIN
+        SPRINT description @101164 // ~de changer %theTarget% en homme~
+    END ELSE BEGIN
+        SPRINT description @101165 // ~de changer %theTarget% en femme~
+    END
 END
 
 /* ------ *
@@ -1922,7 +1930,7 @@ DEFINE_PATCH_MACRO ~opcode_target_78~ BEGIN
 		SPRINT description @102200 // ~Inocule une maladie qui inflige 1 point de dégâts toutes les %amount% secondes à la cible~
 	END
 	ELSE PATCH_IF type == 10 BEGIN
-		SPRINT description @102207 // ~Inocule une maladie qui ralenti la cible~
+		SPRINT description @102207 // ~Inocule une maladie qui ralentit la cible~
 	END
 END
 
@@ -2911,16 +2919,16 @@ END
  * Résistance au poison *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_173~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 102058 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au poison~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 102058 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_173~ BEGIN
-	LOCAL_SPRINT resistName @102058 // ~Résistance au poison~
+	LOCAL_SPRINT resistName @102058 // ~Résistance aux poisons~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_173~ BEGIN
-	LOCAL_SPRINT resistName @102058 // ~Résistance au poison~
+	LOCAL_SPRINT resistName @102058 // ~Résistance aux poisons~
 	LPM ~opcode_target_resist~
 END
 
@@ -2937,6 +2945,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_175~ BEGIN
 	LPM ~opcode_target_109~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_175~ BEGIN
+	LPM ~opcode_target_probability_109~
 END
 
 /* ---------------------------------- *
@@ -3321,8 +3333,12 @@ END
 /* ------------------------ *
  * Spell Effect: Maze [213] *
  * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_probability_213~ BEGIN
+	LPM ~opcode_target_probability_213~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_213~ BEGIN
-	SPRINT description @102448 // ~d'enfermer la cible dans un labyrinthe~
+	SPRINT description @102448 // ~d'enfermer %theTarget% dans un labyrinthe~
 END
 
 /* ----------------------------------- *
@@ -3358,10 +3374,10 @@ DEFINE_PATCH_MACRO ~opcode_target_216~ BEGIN
 	LOCAL_SET amount = ~%parameter1%~
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @102113 // ~Draîne un niveau à la cible~
+		SPRINT description @102113 // ~Draine un niveau à la cible~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @102114 // ~Draîne %amount% niveaux à la cible~
+		SPRINT description @102114 // ~Draine %amount% niveaux à la cible~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
@@ -3372,10 +3388,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_216~ BEGIN
 	LOCAL_SET amount = ~%parameter1%~
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @102141 // ~de draîner un niveau à la cible~
+		SPRINT description @102141 // ~de drainer un niveau à la cible~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @102142 // ~de draîner %amount% niveaux à la cible~
+		SPRINT description @102142 // ~de drainer %amount% niveaux à la cible~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
@@ -3386,10 +3402,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
 	LOCAL_SET amount = ~%parameter1%~
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @102186 // ~de draîner un niveau au porteur~
+		SPRINT description @102186 // ~de drainer un niveau au porteur~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @102187 // ~de draîner %amount% niveaux au porteur~
+		SPRINT description @102187 // ~de drainer %amount% niveaux au porteur~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
@@ -3475,7 +3491,7 @@ END
  * Cure: Level Drain (Restoration) [224] *
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_224~ BEGIN
-	SPRINT description @101149 // ~Restaure les niveaux draînés %ofTheTarget%~
+	SPRINT description @101149 // ~Restaure les niveaux drainés %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_224~ BEGIN
@@ -3483,7 +3499,7 @@ DEFINE_PATCH_MACRO ~opcode_target_224~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_224~ BEGIN
-	SPRINT description @101150 // ~de restaurer les niveaux draînés %ofTheTarget%~
+	SPRINT description @101150 // ~de restaurer les niveaux drainés %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_224~ BEGIN
@@ -3677,6 +3693,10 @@ DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
+	LPM ~opcode_self_248~
+END
+
 /* ----------------------------- *
  * Item: Set Ranged Effect [249] *
  * ----------------------------- */
@@ -3795,7 +3815,7 @@ END
  * Stat: Set Traps Modifier [277] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_277~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 102076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Pose des pièges~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 102076 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Pose de pièges~
 END
 
 /* -------------------------------------------- *
@@ -3833,7 +3853,7 @@ DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 			SPRINT description @102107 // ~Le prochain sort lancé par %theTarget% déclenche automatiquement un hiatus entropique~
 		END
 		ELSE BEGIN
-			PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : A gerer pour capacite de charge et parameter2 = %parameter2% (etrange)~
+			SPRINT description @101166 // ~Les sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
 		END
 	END
 	ELSE BEGIN
@@ -4003,6 +4023,10 @@ DEFINE_PATCH_MACRO ~opcode_target_318~ BEGIN
 	LPM ~opcode_target_324~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_318~ BEGIN
+	LPM ~opcode_target_probability_324
+END
+
 /* ----------------------------- *
  * Stat: Turn Undead Level [323] *
  * ----------------------------- */
@@ -4049,6 +4073,12 @@ DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 		ELSE BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
+	PATCH_IF is_ee == 1 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% target probability à gérer~ END
 	END
 END
 

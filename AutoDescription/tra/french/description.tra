@@ -33,7 +33,7 @@
 @102016 = ~Perforant / Contondant~
 @102017 = ~Perforant / Tranchant~
 @102018 = ~Contondant / Tranchant~
-@102019 = ~Blunt missile~
+@102019 = ~Projectile écrasant~
 @102020 = ~~
 @102021 = ~contre les armes contondantes~
 @102022 = ~contre les projectiles~
@@ -55,7 +55,7 @@
 @102055 = ~Résistance à l'acide~
 @102056 = ~Résistance au feu~
 @102057 = ~Résistance à l'électricité~
-@102058 = ~Résistance au poison~
+@102058 = ~Résistance aux poisons~
 @102059 = ~Résistance au froid~
 @102060 = ~Résistance à la magie~
 @102061 = ~Résistance aux dégâts tranchants~
@@ -71,7 +71,7 @@
 @102073 = ~Furtivité~
 @102074 = ~Camouflage dans l'ombre~
 @102075 = ~Détection des illusions~
-@102076 = ~Pose des pièges~
+@102076 = ~Pose de pièges~
 @102077 = ~Infravision permanente~
 @102078 = ~Flou permanent~
 @102079 = ~Hiatus entropique~
@@ -108,8 +108,8 @@
 @102110 = ~Moral~
 @102111 = ~Invisibilité permanente~
 @102112 = ~Invisibilité améliorée permanente~
-@102113 = ~Draîne un niveau à la cible~
-@102114 = ~Draîne %amount% niveaux à la cible~
+@102113 = ~Draine un niveau à la cible~
+@102114 = ~Draine %amount% niveaux à la cible~
 @102115 = ~Vitesse de déplacement~
 @102116 = ~Alignement modifié en %alignment%~
 @102117 = ~Non-détection permanente~
@@ -118,7 +118,7 @@
 @102120 = ~d'étourdir %theTarget%~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
-@102123 = ~Étourdis %theTarget%~
+@102123 = ~Étourdit %theTarget%~
 @102124 = ~de tuer instantanément %theTarget%~
 @102125 = ~Immunité aux attaques de regard~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
@@ -136,8 +136,8 @@
 @102138 = ~Inverse l'alignement du porteur~
 @102139 = ~Endors %theTarget%~
 @102140 = ~Zone d'air pur~
-@102141 = ~de draîner un niveau au porteur~
-@102142 = ~de draîner %amount% niveaux au porteur~
+@102141 = ~de drainer un niveau au porteur~
+@102142 = ~de drainer %amount% niveaux au porteur~
 @102143 = ~Guérison des maladies~
 @102144 = ~Guérison de la cécité~
 @102145 = ~Guérison de la surdité~
@@ -180,8 +180,8 @@
 @102183 = ~armes de mêlée maudites~
 @102184 = ~armes de mêlée non-maudites~
 @102185 = ~de lancer le sort %spellName%~
-@102186 = ~de draîner un niveau à la cible~
-@102187 = ~de draîner %amount% niveaux à la cible~
+@102186 = ~de drainer un niveau à la cible~
+@102187 = ~de drainer %amount% niveaux à la cible~
 @102188 = ~%probability% de passer la compétence martiale de la cible à %value%~
 @102189 = ~d'infliger lenteur à la cible~
 @102190 = ~d'empoisonner la cible et de lui infliger 1 point de dégât par seconde~
@@ -191,7 +191,7 @@
 @102194 = ~de désintégrer %theTarget%~
 @102195 = ~Change le sexe du porteur~
 @102196 = ~Bénédiction permanente~
-@102197 = ~Rage berserk permanente~
+@102197 = ~Rage du berserker~
 @102198 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde à la cible~
 @102199 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde à la cible~
 @102200 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %amount% secondes à la cible~
@@ -201,7 +201,7 @@
 @102204 = ~Inocule une maladie qui diminue l'intelligence de la cible de %amount%~
 @102205 = ~Inocule une maladie qui diminue la sagesse de la cible de %amount%~
 @102206 = ~Inocule une maladie qui diminue le charisme de la cible de %amount%~
-@102207 = ~Inocule une maladie qui ralenti la cible~
+@102207 = ~Inocule une maladie qui ralentit la cible~
 @102208 = ~Inocule une maladie qui augmente la force de la cible de %amount%~
 @102209 = ~Inocule une maladie qui augmente la dextérité de la cible de %amount%~
 @102210 = ~Inocule une maladie qui augmente la constitution de la cible de %amount%~
@@ -209,10 +209,10 @@
 @102212 = ~Inocule une maladie qui augmente la sagesse de la cible de %amount%~
 @102213 = ~Inocule une maladie qui augmente le charisme de la cible de %amount%~
 @102214 = ~Hâte permanente~
-@102215 = ~Soigne un point de vie au groupe~
-@102216 = ~Soigne %value% points de vie au groupe~
-@102217 = ~Inflige un point de dégâts au groupe~
-@102218 = ~Inflige %value% points de dégâts au groupe~
+@102215 = ~Soigne un point de vie à chaque membre du groupe~
+@102216 = ~Soigne %value% points de vie à chaque membre du groupe~
+@102217 = ~Inflige un point de dégâts à chaque membre du groupe~
+@102218 = ~Inflige %value% points de dégâts à chaque membre du groupe~
 @102219 = ~de modifier le TAC0 de la cible de %value%~
 @102220 = ~de passer le TAC0 de la cible à %value%~
 @102221 = ~de multiplier le TAC0 de la cible par %value%~
@@ -222,9 +222,9 @@
 @102225 = ~Résistance aux dégâts physiques~
 @102226 = ~le niveau~
 @102227 = ~les dégâts~
-@102228 = ~Empêche de lancer des sorts profanes~
-@102229 = ~Empêche de lancer des sorts divins~
-@102230 = ~Empêche de lancer des sorts innés~
+@102228 = ~Empêche l'incantation des sorts profanes~
+@102229 = ~Empêche l'incantation des sorts divins~
+@102230 = ~Empêche l'incantation des sorts innés~
 @102231 = ~Invisibilité~
 @102232 = ~Invisibilité améliorée~
 @102233 = ~Immunité à la paralysie~
@@ -954,8 +954,8 @@
 @101146 = ~de libérer %theTarget% des effets de l'emprisonnement et du labyrinthe~
 @101147 = ~Endors %theTarget% si ses points de vie sont inférieurs à 20~
 @101148 = ~d'endormir %theTarget% si ses points de vie sont inférieurs à 20~
-@101149 = ~Restaure les niveaux draînés %ofTheTarget%~
-@101150 = ~de restaurer les niveaux draînés %ofTheTarget%~
+@101149 = ~Restaure les niveaux drainés %ofTheTarget%~
+@101150 = ~de restaurer les niveaux drainés %ofTheTarget%~
 @101151 = ~TAC0 de la main principale~
 @101152 = ~Force la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
 @101153 = ~de forcer la fréquence de la plupart des poisons sur %theTarget% à toutes les %seconds% secondes~
@@ -966,12 +966,19 @@
 @101158 = ~À chaque attaque de mêlée réussie: %description%~
 @101159 = ~Permet de lancer plusieurs sorts par round~
 @101160 = ~À chaque coup critique: %description%~
+@101161 = ~Change %theTarget% en homme~
+@101162 = ~Change %theTarget% en femme~
+@101163 = ~de changer le sexe du porteur~
+@101164 = ~de changer %theTarget% en homme~
+@101165 = ~de changer %theTarget% en femme~
+@101166 = ~Les sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
 
 /* ------ *
  * Ea.ids *
  * ------ */
 @202000 = ~créatures~
 @202002 = ~compagnons~
+@202003 = ~familiers~
 @202004 = ~alliés~
 @202005 = ~créatures contrôlées~
 @202006 = ~créatures charmées~
@@ -1060,6 +1067,7 @@
 @204158 = ~planétaires~
 @204159 = ~planétaires déchus~
 @204161 = ~gobelins~
+@204175 = ~morts-vivants spectraux~
 @204199 = ~ettins~
 
 /* --------- *
@@ -1086,12 +1094,16 @@
 @205018 = ~clercs / rôdeurs~
 @205019 = ~sorciers~
 @205020 = ~moines~
+@205021 = ~chamans~
+@205101 = ~ankhegs~
 @205111 = ~dopplegangers~
+@205112 = ~grands dopplegangers~
 @205125 = ~ogres~
 @205126 = ~ogremages~
 @205127 = ~demi-ogres~
 @205128 = ~ogrillons~
 @205146 = ~loups des glaces~
+@205147 = ~loups vampiriques~
 @205159 = ~chevaliers de la mort~
 @205160 = ~tanar'ris~
 @205167 = ~trolls~
@@ -1119,11 +1131,13 @@
 @205207 = ~paladins~
 @205208 = ~druides~
 @205209 = ~rôdeurs~
+@205219 = ~élémentaires d'eau~
 
 /* ------------ *
  * Specific.ids *
  * ------------ */
  @206000 = ~??????~
+ @206005 = ~~
  @206243 = ~ménestrels~
 
 /* --------- *

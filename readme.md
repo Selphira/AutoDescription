@@ -36,7 +36,6 @@ Cela apporte plusieurs avantages:
 - Bug: usability (Ex: NPSW05)
   "Utilisable" par et "Non utilisable par" affichés en même temps
 - Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
-- Meilleure gestion des targetType "target". Si targetType du extended header est "self" et que l'effet qu'il actionne est target "target", ça doit rester un self ? (CLCKK2.ITM : 116)
 - Gérer les opcodes suivants : 180, 248, 251, 268, 272, 300
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
