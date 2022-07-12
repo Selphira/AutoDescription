@@ -277,7 +277,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	203 => 1 // Spell: Bounce (by Secondary Type) [203]
 	215 => 0
 	220 => 1 // Removal: Remove School [220]
-	221 => 0 // Removal: Remove Secondary Type [221]
+	221 => 1 // Removal: Remove Secondary Type [221]
 	222 => 1 // Spell Effect: Teleport Field [222]
 	223 => 1 // Spell: Immunity (by School, decrementing [223]
 	225 => 0 // Spell: Reveal Magic [225]
@@ -635,15 +635,19 @@ END
  * State: Berserking [3] *
  * --------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_3~ BEGIN
-	SPRINT description @102197 // ~Rage du berserker~
+	SPRINT description @102197 // ~Provoque la rage du berserker chez %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_3~ BEGIN
+	LPM ~opcode_self_3~ // ~Provoque la rage du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_3~ BEGIN
-	SPRINT description @102166 // ~de provoquer Rage berserk chez le porteur~
+	SPRINT description @102166 // ~de provoquer la rage du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_3~ BEGIN
-	SPRINT description @102320 // ~de provoquer Rage berserk chez la cible~
+	LPM ~opcode_self_probability_3~ // ~de provoquer la rage du berserker chez %theTarget%~
 END
 
 /* -------------------- *
@@ -657,7 +661,7 @@ END
  * Charm: Charm Specific Creature [5] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_5~ BEGIN
-	//PATCH_FAIL "%SOURCE_FILE%: opcode_self_5: valide comme configuration ??"
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Configuration valide ?~ END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
@@ -1027,9 +1031,9 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_19~ BEGIN
 	LPM ~opcode_self_probability_19~
 END
 
-/* ----------------------- *
- * Invisibilité permanente *
- * ----------------------- */
+/* ------------------------ *
+ * State: Invisibility [20] *
+ * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_20~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT description @102111 // ~Invisibilité permanente~
@@ -1057,6 +1061,10 @@ DEFINE_PATCH_MACRO ~opcode_target_20~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_20~ BEGIN
+	LPM ~opcode_self_probability_20~
+END
+
 /* ------------------------ *
  * Stat: Lore Modifier [21] *
  * ------------------------ */
@@ -1073,6 +1081,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_22~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 102309 RET description END // ~la chance~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_22~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 102309 RET description END // ~la chance~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_22~ BEGIN
+	LPM ~opcode_self_probability_22~ // ~la chance~
 END
 
 /* -------------------- *
@@ -1892,6 +1908,10 @@ DEFINE_PATCH_MACRO ~opcode_target_76~ BEGIN
 	SPRINT description @102337 // ~Inflige Débilité mentale à la cible~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_76~ BEGIN
+	SPRINT description @102320 // ~d'infliger Débilité mentale à la cible~
+END
+
 /* --------------------------- *
  * Cure: Feeblemindedness [77] *
  * --------------------------- */
@@ -2018,7 +2038,8 @@ DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @102341 END // ~Immunité contre les missiles magiques~
 		102 BEGIN SPRINT description @102277 END // ~Immunité contre les flèches de flamme bleue~
 		 39 442 BEGIN SPRINT description @102311 END // ~Immunité contre les éclairs~
-		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type de projectile '%parameter2%' à gérer"
+		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type de projectile '%parameter2%'~ END
     END
 END
 
@@ -2100,6 +2121,18 @@ DEFINE_PATCH_MACRO ~opcode_self_93~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 102136 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Fatigue~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_93~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 101169 RET description END // ~la fatigue~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_93~ BEGIN
+	LPF ~opcode_target~ INT_VAR strref = 101169 RET description END // ~la fatigue~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_93~ BEGIN
+	LPM ~opcode_self_probability_93~ // ~la fatigue~
+END
+
 /* ------------------------------- *
  * Stat: Drunkenness Modifier [94] *
  * ------------------------------- */
@@ -2107,8 +2140,16 @@ DEFINE_PATCH_MACRO ~opcode_self_94~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 101130 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Ivresse~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_94~ BEGIN
+	LPF ~opcode_probability~ INT_VAR strref = 101131 RET description END // ~l'ivresse~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_94~ BEGIN
 	LPF ~opcode_target~ INT_VAR strref = 101131 RET description END // ~l'ivresse~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_94~ BEGIN
+	LPM ~opcode_self_probability_94~ // ~l'ivresse~
 END
 
 /* ---------------------------- *
@@ -2487,9 +2528,6 @@ DEFINE_PATCH_MACRO ~opcode_target_122~ BEGIN
 			SPRINT description @102266 // ~Crée %amount% objets (%itemName%)~
 		END
 	END
-	ELSE BEGIN
-		PATCH_FAIL "opcode 122 : nom de l'objet introuvable : %resref%"
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_122~ BEGIN
@@ -2503,9 +2541,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_122~ BEGIN
 		ELSE PATCH_IF amount > 0 BEGIN
 			SPRINT description @101156 // ~de créer %amount% objets (%itemName%)~
 		END
-	END
-	ELSE BEGIN
-		PATCH_FAIL "opcode 122 : nom de l'objet introuvable : %resref%"
 	END
 END
 
@@ -2549,8 +2584,16 @@ END
 /* ---------------- *
  * State: Aid [129] *
  * ---------------- */
+DEFINE_PATCH_MACRO ~opcode_self_129~ BEGIN
+	//TODO: Si dans un fichier .eff, parameter2 = nombre exact de PV
+	LPF ~signed_value~ INT_VAR value = EVAL ~%parameter1%~ RET value END
+    SPRINT description @101170 // ~Aide (%value%)~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_129~ BEGIN
-    SPRINT description @102373 // ~Aide sur la cible~
+	//TODO: Si dans un fichier .eff, parameter2 = nombre exact de PV
+	LPF ~signed_value~ INT_VAR value = EVAL ~%parameter1%~ RET value END
+    SPRINT description @102373 // ~Aide (%value%) sur %theTarget%~
 END
 
 /* ------------------ *
@@ -2621,7 +2664,7 @@ DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
         SPRINT description @102358 // ~Transforme le porteur en %creatureName%~
 	END
 	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_self_135 : Nom de la créature introuvable"
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
 	END
 END
 
@@ -2643,9 +2686,6 @@ DEFINE_PATCH_MACRO ~opcode_self_143~ BEGIN
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @102263 // ~Crée un objet (%itemName%)~
-	END
-	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_143 nom de l'objet non trouvé : %resref%"
 	END
 END
 
@@ -2730,9 +2770,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				SPRINT description ~%description% (%castingLevelStr%)~
 			END
 		END
-		ELSE BEGIN
-			PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_146 nom du sort introuvable pour %resref%"
-		END
 	END
 END
 
@@ -2752,9 +2789,6 @@ DEFINE_PATCH_MACRO ~opcode_self_148~ BEGIN
 			SPRINT description ~%description% (%castingLevelStr%)~
 		END
 	END
-	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_148 nom du sort introuvable pour %resref%"
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_148~ BEGIN
@@ -2773,9 +2807,6 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_148~ BEGIN
 			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
 			SPRINT description ~%description% (%castingLevelStr%)~
 		END
-	END
-	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_probability_148 nom du sort introuvable pour %resref%"
 	END
 END
 
@@ -3039,7 +3070,7 @@ DEFINE_PATCH_MACRO ~opcode_178_base~ BEGIN
 		SET value = ~%parameter3%~
 	END
 	ELSE BEGIN
-		SET value = ~%power%~
+		SET value = ~%power%~ // La valeur ne devrait pas se trouver dans la variable "special" ?
 	END
 
 	SET parameter2 = MOD_TYPE_cumulative
@@ -3054,13 +3085,14 @@ DEFINE_PATCH_MACRO ~opcode_self_179~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_179~ BEGIN
+	//TODO: Multiple opcode #179 effects only allow additional targeting, they do not stack their damage bonus.
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
 	PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
 		SET damageAmount = ~%parameter3%~
 	END
 	ELSE BEGIN
-		SET damageAmount = ~%power%~
+		SET damageAmount = ~%power%~ // La valeur ne devrait pas se trouver dans la variable "special" ?
 	END
 
 	SET parameter2 = MOD_TYPE_cumulative
@@ -3142,21 +3174,25 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
+		 36 BEGIN SPRINT description @101167 END // ~Renvoie les projectiles magiques~
 		 64 BEGIN SPRINT description @102147 END // ~Renvoie les attaques de regard~
 		208 BEGIN SPRINT description @102314 END // ~Renvoie les rayons des spectateurs~
 		312 BEGIN SPRINT description @102334 END // ~Renvoie les dagues boomerang~
 		39 442 BEGIN SPRINT description @102360 END // ~Renvoie les éclairs~
-		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
+		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
     END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
 	PATCH_MATCH parameter2 WITH
+		 36 BEGIN SPRINT description @101168 END // ~de renvoyer les projectiles magiques~
 		 64 BEGIN SPRINT description @102461 END // ~de renvoyer les attaques de regard~
 		208 BEGIN SPRINT description @102333 END // ~de renvoyer les rayons des spectateurs~
 		312 BEGIN SPRINT description @102335 END // ~de renvoyer les dagues boomerang~
 		39 442 BEGIN SPRINT description @102342 END // ~de renvoyer les éclairs~
-		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Réflection du Type de projectile '%parameter2%' à gérer"
+		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
     END
 END
 
@@ -3200,10 +3236,7 @@ DEFINE_PATCH_MACRO ~opcode_self_204~ BEGIN
 	LOCAL_SET school = parameter2
 	LOCAL_SET strref = 102150
 
-	PATCH_IF school == 0 BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_204 école 0 à gérer"
-	END
-	ELSE BEGIN
+	PATCH_IF school > 0 BEGIN
 		SET strref += school
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunité aux sorts de l'école de xxxx~
 	END
@@ -3509,7 +3542,8 @@ DEFINE_PATCH_MACRO ~opcode_target_230~ BEGIN
 
 	PATCH_MATCH parameter2 WITH
 		1 BEGIN SPRINT description @102374 END // ~Dissipe un sort de protection de niveau inférieur ou égal à %maxLevel%~
-		DEFAULT PATCH_FAIL "%SOURCE_FILE% : Opcode %opcode% : Type d'effet à dissiper '%parameter2%' à gérer"
+		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type d'effet à dissiper : %parameter2%~ END
     END
 END
 
@@ -3518,7 +3552,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_230~ BEGIN
 
 	PATCH_MATCH parameter2 WITH
 		1 BEGIN SPRINT description @102382 END // ~de dissiper un sort de protection de niveau inférieur ou égal à %maxLevel%~
-		DEFAULT PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_230 : Type d'effet à dissiper '%parameter2%' à gérer"
+		DEFAULT
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Type d'effet à dissiper : %parameter2%~ END
     END
 END
 
@@ -4045,35 +4080,38 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
+	LOCAL_SET strref = 105000
+	LPM ~opcode_common_324~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
+	LOCAL_SET strref = 105150
+	LPM ~opcode_common_324~
+END
+
+DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
-	LOCAL_SET strref = 0
 	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF ~%resref%~ STRING_EQUAL ~SOURCE_RES~ BEGIN
+		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
 			PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
 				SET idsId = statType - 100
-				SET strref = 105301 // ~Inefficace contre les %creatureType%~
+				SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
 				PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
 					SET idsId = statType - 110
-					SET strref = 105302 // ~Effectif contre les %creatureType%~
+					SET strref = strref + 147 // ~Effectif contre les %creatureType%~
 				END
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 			END
 			ELSE BEGIN
-				SET strref = 105000 + statType
+				SET strref = strref + statType
 			END
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 		END
 		ELSE BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
 		END
-	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% target probability à gérer~ END
 	END
 END
 
@@ -4357,7 +4395,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 						READ_STRREF SPL_unidentified_name spellName
 					END
 					ELSE BEGIN
-						LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
+						LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
 					END
 				BUT_ONLY_IF_IT_CHANGES
 			END

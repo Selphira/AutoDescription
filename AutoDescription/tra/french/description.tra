@@ -160,7 +160,7 @@
 @102163 = ~Provoque l'échec systématique des sorts profanes lancés par la cible~
 @102164 = ~Provoque l'échec systématique des sorts divins lancés par la cible~
 @102165 = ~Provoque l'échec systématique des sorts innés lancés par la cible~
-@102166 = ~de provoquer rage berserk chez le porteur~
+@102166 = ~de provoquer la rage du berserker chez %theTarget%~
 @102167 = ~d'infliger Horreur à la cible~
 @102168 = ~Points de vie maximum~
 @102169 = ~Vitesse d'incantation~
@@ -189,9 +189,9 @@
 @102192 = ~d'empoisonner la cible et de lui infliger 1 point de dégât toutes les %amount% secondes~
 @102193 = ~de lancer le sort %spellName% sur %theTarget%~
 @102194 = ~de désintégrer %theTarget%~
-@102195 = ~Change le sexe du porteur~
+@102195 = ~Change le sexe %ofTheTarget%~
 @102196 = ~Bénédiction permanente~
-@102197 = ~Rage du berserker~
+@102197 = ~Provoque la rage du berserker chez %theTarget%~
 @102198 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde à la cible~
 @102199 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde à la cible~
 @102200 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %amount% secondes à la cible~
@@ -309,12 +309,12 @@
 @102312 = ~Immunité contre les flèches~
 //@102313 = ~Immunité aux flèches lourdes~
 @102314 = ~Renvoie les rayons des spectateurs~
-@102315 = ~de lancer Invisibilité sur le porteur~
-@102316 = ~de lancer Invisibilité améliorée sur le porteur~
+@102315 = ~de lancer Invisibilité sur %theTarget%~
+@102316 = ~de lancer Invisibilité améliorée sur %theTarget%~
 @102317 = ~Renvoi le sort %spellName%~
 @102318 = ~Immunité aux maladies~
 @102319 = ~Immunité aux poisons~
-@102320 = ~de provoquer rage berserk chez la cible~
+@102320 = ~d'infliger Débilité mentale à la cible~
 @102321 = ~Entoile %theTarget%~
 @102322 = ~Déverrouille la serrure ciblée~
 @102323 = ~de réduire %theTarget% au silence~
@@ -367,7 +367,7 @@
 @102370 = ~de modifier la classe d'armure du porteur de %value%~
 @102371 = ~Permet d'utiliser n'importe quel objet (si les statistiques sont suffisantes)~
 @102372 = ~Renvoi jusque %amount% sorts de niveau %spellLevel%~
-@102373 = ~Aide sur %theTarget%~
+@102373 = ~Aide (%value%) sur %theTarget%~
 @102374 = ~Dissipe un sort de protection de niveau inférieur ou égal à %maxLevel%~
 @102375 = ~Force, dextérité et constitution : %value% (non cumulable)~
 @102376 = ~Force, dextérité et constitution : Passe à 25~
@@ -820,9 +820,116 @@
 @105143 = ~Effectif contre les créatures invisibles~
 @105144 = ~Inefficace contre les créatures dont les points de vie sont plus grands ou égaux à %value%~
 @105145 = ~Inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
+@105146 = ~Inefficace contre les %creatureType%~
+@105147 = ~Effectif contre les %creatureType%~
+
+@105151 = ~d'être inefficace contre les morts-vivants~
+@105152 = ~d'être effectif contre les morts-vivants~
+@105153 = ~d'être inefficace contre les cibles immunisées au feu~
+@105154 = ~d'être inefficace contre les cibles sensibles au feu~
+@105155 = ~d'être inefficace contre les humanoïdes~
+@105156 = ~d'être effectif contre les humanoïdes~
+@105157 = ~d'être inefficace contre les animaux~
+@105158 = ~d'être effectif contre les animaux~
+@105159 = ~d'être inefficace contre les élémentaires~
+@105160 = ~d'être effectif contre les élémentaires~
+@105161 = ~d'être inefficace contre les myconides~
+@105162 = ~d'être effectif contre les myconides~
+@105163 = ~d'être inefficace contre les créatures gigantesques~
+@105164 = ~d'être effectif contre les créatures gigantesques~
+@105165 = ~d'être inefficace contre les elfes~
+@105166 = ~d'être effectif contre les elfes~
+@105167 = ~d'être inefficace contre les ombres des roches~
+@105168 = ~d'être effectif contre les ombres des roches~
+@105169 = ~d'être inefficace contre les demi-elfes~
+@105170 = ~d'être effectif contre les demi-elfes~
+@105171 = ~d'être inefficace contre les humanoïdes et les animaux~
+@105172 = ~d'être effectif contre les humanoïdes et les animaux~
+@105173 = ~d'être inefficace contre les cibles aveuglées~
+@105174 = ~d'être effectif contre les cibles aveuglées~
+@105175 = ~d'être inefficace contre les cibles immunisées au froid~
+@105176 = ~d'être inefficace contre les cibles sensibles au froid~
+@105177 = ~d'être inefficace contre les golems~
+@105178 = ~d'être effectif contre les golems~
+@105179 = ~d'être inefficace contre les minotaures~
+@105180 = ~d'être effectif contre les minotaures~
+@105181 = ~d'être inefficace contre les morts-vivants et les myconides~
+@105182 = ~d'être effectif contre les morts-vivants et les myconides~
+@105183 = ~d'être inefficace contre les créatures neutres~
+@105184 = ~d'être inefficace contre les créatures bonnes ou mauvaises~
+@105185 = ~d'être inefficace contre les créatures bonnes~
+@105186 = ~d'être inefficace contre les créatures neutres ou mauvaises~
+@105187 = ~d'être inefficace contre les créatures mauvaises~
+@105188 = ~d'être inefficace contre les créatures neutres ou bonnes~
+@105189 = ~d'être inefficace contre les paladins~
+@105190 = ~d'être effectif contre les paladins~
+@105191 = ~d'être inefficace contre les créatures du même alignement que le porteur~
+@105192 = ~d'être inefficace contre les créatures d'un alignement différent du porteur~
+@105193 = ~d'être inefficace contre le porteur~
+@105194 = ~d'être inefficace contre les cibles autre que le porteur~
+@105197 = ~d'être inefficace contre les golems, les morts-vivants et les myconides~
+@105198 = ~d'être effectif contre les golems, les morts-vivants et les myconides~
+@105199 = ~d'être inefficace contre les créatures alliées~
+@105200 = ~d'être effectif contre les créatures alliées~
+@105201 = ~d'être inefficace contre les créatures enemies~
+@105202 = ~d'être effectif contre les créatures enemies~
+@105203 = ~d'être inefficace contre les cibles immunisées au feu ou au froid~
+@105204 = ~d'être inefficace contre les cibles sensibles au feu ou au froid~
+@105205 = ~d'être inefficace contre les morts-vivants et les golems~
+@105206 = ~d'être effectif contre les morts-vivants et les golems~
+@105207 = ~d'être inefficace contre les hommes~
+@105208 = ~d'être inefficace contre les femmes~
+@105214 = ~d'être inefficace contre les orques~
+@105215 = ~d'être effectif contre les orques~
+@105216 = ~d'être inefficace contre les créatures sourdes~
+@105217 = ~d'être effectif contre les créatures sourdes~
+@105224 = ~d'être inefficace contre les créatures mortes~
+@105225 = ~d'être inefficace contre les créatures vivantes~
+@105227 = ~d'être inefficace contre les cibles immunisées au poison~
+@105228 = ~d'être inefficace contre les cibles sensibles au poison~
+@105229 = ~d'être inefficace contre les cibles immunisées à l'acide~
+@105230 = ~d'être inefficace contre les cibles sensibles à l'acide~
+@105231 = ~d'être inefficace contre les cibles immunisées à l'électricité~
+@105232 = ~d'être inefficace contre les cibles sensibles à l'électricité~
+@105233 = ~d'être inefficace contre les cibles immunisées aux dégâts magiques~
+@105234 = ~d'être inefficace contre les cibles sensibles aux dégâts magiques~
+@105235 = ~d'être inefficace contre les ankheg~
+@105236 = ~d'être effectif contre les ankheg~
+@105237 = ~d'être inefficace contre les liches~
+@105238 = ~d'être effectif contre les liches~
+@105239 = ~d'être inefficace entre 6h et 20h~
+@105240 = ~d'être inefficace entre 21h et 5h~
+@105241 = ~d'être inefficace contre les créatures paniquées~
+@105242 = ~d'être effectif contre les créatures paniquées~
+@105369 = ~d'être inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
+@105370 = ~d'être inefficace contre les créatures protégées contre les morts-vivants~
+@105372 = ~d'être inefficace contre les créatures possédant une dextérité plus grande ou égale à %value%~
+@105373 = ~d'être inefficace contre les créatures possédant une dextérité inférieure à %value%~
+@105374 = ~d'être inefficace contre les créatures possédant une force plus grande ou égale à %value%~
+@105375 = ~d'être inefficace contre les créatures possédant une force inférieure à %value%~
+@105376 = ~d'être inefficace contre les créatures possédant une constitution plus grande ou égale à %value%~
+@105377 = ~d'être inefficace contre les créatures possédant une constitution inférieure à %value%~
+@105378 = ~d'être inefficace contre les créatures possédant une intelligence plus grande ou égale à %value%~
+@105379 = ~d'être inefficace contre les créatures possédant une intelligence inférieure à %value%~
+@105380 = ~d'être inefficace contre les créatures possédant une sagesse plus grande ou égale à %value%~
+@105381 = ~d'être inefficace contre les créatures possédant une sagesse inférieure à %value%~
+@105382 = ~d'être inefficace contre les créatures possédant un charisme plus grand ou égal à %value%~
+@105383 = ~d'être inefficace contre les créatures possédant un charisme inférieur à %value%~
+@105384 = ~d'être inefficace si le nombre de créatures invoquées est plus grand ou égal à %value%~
+@105385 = ~d'être inefficace si le nombre de créatures invoquées est inférieur à %value%~
+@105386 = ~d'être inefficace si le chapitre en cours est plus grand ou égal au %value%~
+@105387 = ~d'être inefficace si le chapitre en cours est plus petit que %value%~
+@105390 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité invisibles~
+@105391 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
+@105392 = ~d'être inefficace contre les créatures invisibles~
+@105393 = ~d'être effectif contre les créatures invisibles~
+@105394 = ~d'être inefficace contre les créatures dont les points de vie sont plus grands ou égaux à %value%~
+@105395 = ~d'être inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
+@105396 = ~d'être inefficace contre les %creatureType%~
+@105397 = ~d'être effectif contre les %creatureType%~
+
+
 @105300 = ~~
-@105301 = ~Inefficace contre les %creatureType%~
-@105302 = ~Effectif contre les %creatureType%~
 
 
 /*
@@ -968,20 +1075,37 @@
 @101160 = ~À chaque coup critique: %description%~
 @101161 = ~Change %theTarget% en homme~
 @101162 = ~Change %theTarget% en femme~
-@101163 = ~de changer le sexe du porteur~
+@101163 = ~de changer le sexe %ofTheTarget%~
 @101164 = ~de changer %theTarget% en homme~
 @101165 = ~de changer %theTarget% en femme~
 @101166 = ~Les sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
+@101167 = ~Renvoie les projectiles magiques~
+@101168 = ~de renvoyer les projectiles magiques~
+@101169 = ~la fatigue~
+@101170 = ~Aide (%value%)~
 
 /* ------ *
  * Ea.ids *
  * ------ */
 @202000 = ~créatures~
+@202001 = ~créatures inanimées~
 @202002 = ~compagnons~
 @202003 = ~familiers~
 @202004 = ~alliés~
 @202005 = ~créatures contrôlées~
 @202006 = ~créatures charmées~
+@202007 = ~créatures totalement charmées~
+@202008 = ~~ // Ne correspond à aucune entrée mais utilisée par CM1H07.ITM (The Undying)
+@202028 = ~créatures alliées~
+@202029 = ~créatures alliées~
+@202030 = ~créatures alliées~
+@202031 = ~créatures hostiles ou neutres~
+@202128 = ~créatures neutres~
+@202198 = ~créatures hostiles ou alliées~
+@202199 = ~créatures neutres ou alliées~
+@202200 = ~créatures hostiles~
+@202201 = ~créatures hostiles~
+@202202 = ~créatures hostiles~
 @202255 = ~ennemis~
 
 /* ----------- *
@@ -994,6 +1118,7 @@
 @203004 = ~morts-vivants~
 @203005 = ~géants~
 @203006 = ~gelés~
+@203007 = ~plantes~
 @203008 = ~~ // Ne correspond à aucune entrée mais utilisée par HELMLIFE.ITM
 @203255 = ~monstres~
 
@@ -1123,6 +1248,7 @@
 @205195 = ~efrits~
 @205196 = ~djinns nobles~
 @205197 = ~efrits nobles~
+@205201 = ~épées longues~
 @205202 = ~mages~
 @205203 = ~guerriers~
 @205204 = ~clercs~
@@ -1154,6 +1280,7 @@
  * --------- */
 @208000 = ~créatures de tout alignement~
 @208001 = ~créatures bonnes~
+@208002 = ~créatures neutres~
 @208003 = ~créatures mauvaises~
 @208016 = ~créatures loyales~
 @208017 = ~créatures loyales bonnes~

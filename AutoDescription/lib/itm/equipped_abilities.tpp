@@ -143,7 +143,7 @@ DEFINE_PATCH_FUNCTION ~group_physical_resistances~ RET description BEGIN
         SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
     END
 
-    PATCH_FOR_EACH value IN ~+5~ ~+10~ ~+15~ ~+20~ ~+25~ BEGIN
+    PATCH_FOR_EACH value IN ~+5~ ~+10~ ~+15~ ~+20~ ~+25~ ~+50~ BEGIN
         SPRINT value @10002 // ~%value% %~
         SPRINT name @102225 // ~Résistance aux dégâts physiques~
 		SPRINT replace @100001 // %name% : %value%

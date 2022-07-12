@@ -1,10 +1,10 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.html)~
 
-VERSION ~0.9.6a~
+VERSION ~0.9.7~
 
 ALWAYS
-	OUTER_SET is_ee = (GAME_IS ~bg2ee eet~) ? 1 : 0
+	OUTER_SET is_ee = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
 
     ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END
     ACTION_DEFINE_ARRAY arrayReload BEGIN ~description~ END
