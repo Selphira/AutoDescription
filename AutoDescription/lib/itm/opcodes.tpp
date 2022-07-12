@@ -3908,14 +3908,14 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_283~ BEGIN
 	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
 		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
-	END
+END
 	ELSE BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
 		SPRINT theTarget   @102474 // ~les %targetType%~
 		SPRINT ofTheTarget @102538 // ~des %targetType%~
 		SPRINT versus      @101126 // ~contre les %targetType%~
 		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
-	END
+END
 END
 
 DEFINE_PATCH_FUNCTION ~get_res_description_283~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded opcode BEGIN
@@ -4519,8 +4519,8 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
-	PATCH_IF file == 9 AND VARIABLE_IS_SET $kits(~%strref%~) BEGIN
-		SPRINT idName $kits(~%strref%~)
+	PATCH_IF file == 9 AND VARIABLE_IS_SET $kits(~%entry%~) BEGIN
+		SPRINT idName $kits(~%entry%~)
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SET strref = 200000 + (file * 1000) + entry
