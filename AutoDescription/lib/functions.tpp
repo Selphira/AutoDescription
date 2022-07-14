@@ -40,3 +40,65 @@ BEGIN
 	END
 	SPRINT string (AT %strref%)
 END
+
+/**
+ * @see https://www.gibberlings3.net/forums/topic/28835-toss-your-semi-useful-weidu-macros-here/page/2/#comment-254894
+ * Patch function. Converts any decimal number into a hexadecimal number.
+ * INT_VAR value      The decimal number to convert.
+ * INT_VAR minDigits  Minimum number of digits for the returned hex value. (default: 1)
+ * INT_VAR prefix     A flag that indicates whether the returned number will be prefixed with "0x". (default: 0)
+ * RET hexNumber      The converted hexadecimal number as string.
+ */
+DEFINE_PATCH_FUNCTION TO_HEX_NUMBER
+	INT_VAR
+		value     = 0
+		minDigits = 1
+		prefix    = 0
+	RET
+		hexNumber
+BEGIN
+	SET minDigits = (minDigits < 1) ? 1 : minDigits
+	SET minDigits = (minDigits > 8) ? 8 : minDigits
+	TEXT_SPRINT hexNumber ~~
+	PATCH_DEFINE_ARRAY digit BEGIN ~0~ ~1~ ~2~ ~3~ ~4~ ~5~ ~6~ ~7~ ~8~ ~9~ ~a~ ~b~ ~c~ ~d~ ~e~ ~f~ END
+
+	PATCH_IF (value < 0) BEGIN
+		SET signed = 1
+		SET value = 0 - value
+	END ELSE BEGIN
+		SET signed = 0
+	END
+
+	WHILE (value != 0) BEGIN
+		SET curDigit = value BAND 0xf
+		SET value = value BLSR 4
+		TEXT_SPRINT hexDigit $EVAL digit(~%curDigit%~)
+		TEXT_SPRINT hexNumber ~%hexDigit%%hexNumber%~
+	END
+
+	WHILE (STRING_LENGTH ~%hexNumber%~ < minDigits) BEGIN
+		TEXT_SPRINT hexNumber ~0%hexNumber%~
+	END
+
+	PATCH_IF (prefix) BEGIN
+		TEXT_SPRINT hexNumber ~0x%hexNumber%~
+	END
+
+	PATCH_IF (signed) BEGIN
+		TEXT_SPRINT hexNumber ~-%hexNumber%~
+	END
+END
+
+// Action version of TO_HEX_NUMBER
+DEFINE_ACTION_FUNCTION TO_HEX_NUMBER
+	INT_VAR
+		value     = 0
+		minDigits = 1
+		prefix    = 0
+	RET
+		hexNumber
+BEGIN
+	OUTER_PATCH ~~ BEGIN
+		LPF TO_HEX_NUMBER INT_VAR value = value minDigits = minDigits prefix = prefix RET hexNumber END
+	END
+END

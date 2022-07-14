@@ -3040,7 +3040,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ R
 		    BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
-			LAF ~log_warning~ STR_VAR message = EVAL ~La ressource %resref%.eff n'existe pas.~ END
+			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 		END
     END
 	SET opcode = oldOpcode
@@ -4597,23 +4597,22 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
-	//TODO: Supprimer ces logs dès que le problème sera corrigé
-	PATCH_IF file == 9 AND NOT VARIABLE_IS_SET $kits(~%entry%~) BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : File = %file% : entry = %entry%~ END
-		PATCH_PHP_EACH kits AS kitId => kitText BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~%kitId% : %kitText%~ END
-		END
-	END
+	SPRINT idName ~~
 
-	PATCH_IF file == 9 AND VARIABLE_IS_SET $kits(~%entry%~) BEGIN
-		SPRINT idName $kits(~%entry%~)
+	PATCH_IF file == 9 BEGIN
+		LPF ~TO_HEX_NUMBER~ INT_VAR value = entry prefix = 1 minDigits = 8 RET entryHex = hexNumber END
+		PATCH_IF VARIABLE_IS_SET $kits(~%entryHex%~) BEGIN
+			SPRINT idName $kits(~%entryHex%~)
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Kit utilisé n'existe pas : %entry% : %entryHex%~ END
+		END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SET strref = 200000 + (file * 1000) + entry
 		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
-		SPRINT idName ~~
 		PATCH_FAIL "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
 	END
 END

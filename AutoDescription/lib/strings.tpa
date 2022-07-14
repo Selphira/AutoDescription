@@ -32,9 +32,6 @@ COPY_EXISTING ~kitlist.2da~  ~override~
 			PATCH_IF is_ee == 1 BEGIN
 				SPRINT $kits(~%kitIds%~) ~%text%~
 			END
-			ELSE BEGIN
-				SPRINT $kits(~%name%~) ~%text%~
-			END
 		END
 	END
     BUT_ONLY_IF_IT_CHANGES
