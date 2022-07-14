@@ -182,7 +182,7 @@
 @102185 = ~de lancer le sort %spellName%~
 @102186 = ~de drainer un niveau à la cible~
 @102187 = ~de drainer %amount% niveaux à la cible~
-@102188 = ~%probability% de passer la compétence martiale de la cible à %value%~
+@102188 = ~%probability% de passer la compétence martiale %proficiency% %ofTheTarget% à %value%~
 @102189 = ~d'infliger lenteur à la cible~
 @102190 = ~d'empoisonner la cible et de lui infliger 1 point de dégât par seconde~
 @102191 = ~d'empoisonner la cible et de lui infliger %amount% points de dégâts par seconde~
@@ -928,10 +928,76 @@
 @105295 = ~d'être inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
 @105296 = ~d'être inefficace contre les %creatureType%~
 @105297 = ~d'être effectif contre les %creatureType%~
-
-
 @105300 = ~~
 
+// Item: Can't Use Itemtype [181]
+// ItemType...
+@105399 = ~Empêche d'utiliser les %itemType%~
+@105400 = ~livres~
+@105401 = ~amulettes et les colliers~
+@105402 = ~armures~
+@105403 = ~ceintures~
+@105404 = ~bottes~
+@105405 = ~flèches~
+@105406 = ~bracelets et les gantelets~
+@105407 = ~casques~
+@105408 = ~clés~
+@105409 = ~potions~
+@105410 = ~anneaux~
+@105411 = ~parchemins~
+@105412 = ~boucliers~
+@105413 = ~nourritures~
+@105414 = ~balles~
+@105415 = ~arcs~
+@105416 = ~dagues~
+@105417 = ~masses~
+@105418 = ~frondes~
+@105419 = ~épées courtes~
+@105420 = ~épées longues~
+@105421 = ~marteaux~
+@105422 = ~étoiles du matin~
+@105423 = ~fléaux~
+@105424 = ~fléchettes~
+@105425 = ~haches~
+@105427 = ~arbalètes~
+//@105428 = ~???~ ITM_TYPE_hand_to_hand_hth = 0x1c
+@105429 = ~lances~
+@105430 = ~hallebardes~
+@105431 = ~carreaux~
+@105432 = ~capes~
+@105433 = ~pièces d'or~
+@105434 = ~gemmes~
+@105435 = ~baguettes~
+@105436 = ~conteneurs, yeux et armures cassées~
+@105437 = ~boucliers cassés et les bracelets~
+@105438 = ~familiers, épées cassées et boucles d'oreilles~
+@105439 = ~tatouages~
+@105440 = ~lentilles~
+@105441 = ~boucliers et les dents~
+@105442 = ~bougies~
+@105443 = ~clubs~
+@105447 = ~grands boucliers~
+@105449 = ~boucliers moyens~
+@105450 = ~notes~
+@105453 = ~petits boucliers~
+@105455 = ~téléscopes~
+@105456 = ~boissons~
+@105457 = ~épées longues~
+@105458 = ~conteneurs~
+@105459 = ~peaux et les fourrures~
+@105460 = ~armures de cuir~
+@105461 = ~armures de cuir clouté~
+@105462 = ~armures de mailles~
+//@105463 = ~???~ ITM_TYPE_splint_mail = 0x3f
+@105464 = ~armures de plate~
+@105465 = ~armures de plate complète~
+@105466 = ~armures de peau~
+@105467 = ~robes~
+@105469 = ~épées bâtardes~
+@105470 = ~écharpes~
+@105471 = ~nourritures~
+@105472 = ~chapeaux~
+@105473 = ~gantelets~
 
 /*
  * Liste contenant l'ensemble des éléments ""(Non) Utilisable par" hormis les Kits pour qui on récupère les valeurs
@@ -1084,6 +1150,15 @@
 @101168 = ~de renvoyer les projectiles magiques~
 @101169 = ~la fatigue~
 @101170 = ~Aide (%value%)~
+@101171 = ~Unique : Un seul exemple peut être équipé~
+@101172 = ~Empêche d'utiliser %itemName%~
+@101173 = ~Malédiction~
+@101174 = ~de maudir %theTarget% et~
+@101175 = ~Maudit %theTarget% et~
+@101176 = ~Échange les points de vie du porteur et de la cible~
+@101177 = ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+@101178 = ~d'échanger les points de vie du porteur et de la cible~
+@101179 = ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
 
 /* ------ *
  * Ea.ids *

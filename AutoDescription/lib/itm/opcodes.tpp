@@ -3,6 +3,7 @@
  * Vu qu'ils ne sont généralement pas
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
+	283 => 0   // Use EFF File (Cursed) [283]
 	318 => 0   // Protection: Immunity Spell [318]
 	324 => 0   // Protection: Immunity to Resource and Message [324]
 	216 => 1   // Spell Effect: Level Drain [216]
@@ -85,6 +86,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 87 => 137 // Stat: Reduced Damage from Crushing Modifier [87]
 	 88 => 138 // Stat: Reduced Damage from Piercing Modifier [88]
 	 89 => 139 // Stat: Reduced Damage from Missiles Modifier [89]
+	343 => 140 // HP Swap [343]
 	 17 => 145 // Stat: Current HP Modifier [17]
 	323 => 146 // Stat: Turn Undead Level [323]
 	106 => 150 // Stat: Morale Break [106]
@@ -197,6 +199,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	122 => 287 // Item: Create Inventory Item [122]
 	255 => 288 // Item: Create Inventory Item (days) [255]
 	302 => 289 // Item: Can Use Any Item [302]
+	180 => 289 // Item: Can't Use Item [180]
+	181 => 289 // Item: Can't Use Itemtype [181]
 	 26 => 290 // Item: Remove Curse [26]
 	248 => 291 // Item: Set Melee Effect [248]
 	249 => 292 // Item: Set Ranged Effect [249]
@@ -261,8 +265,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	170 => 0 // Graphics: Play Damage Animation [170]
 	172 => 0 // Spell: Remove Spell [172]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
-	180 => 1 // Item: Can't Use Item [180] // TODO: (BOW15...)
-	181 => 1 // Item: Can't Use Itemtype [181]
 	182 => 0 // Item: Apply Effect Item [182]
 	183 => 0 // Item: Apply Effect Itemtype [183]
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
@@ -314,7 +316,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	274 => 1 // Spell Effect: Teleport to Target [274]
 	279 => 1 // Button: Enable Button [279]
 	282 => 0 // Script: Scripting State Modifier [282]
-	283 => 1 // Use EFF File (Cursed) [283]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
 	291 => 0 // Graphics: Disable Visual Effect [291]
@@ -354,7 +355,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	339 => 0 // Alter Animation [339]
 	340 => 1 // Spell Effect: Change Backstab Effect [340]
 	342 => 0 // Animation: Override Data [342]
-	343 => 1 // HP Swap [343]
 	345 => 1 // Enchantment bonus [345]
 	360 => 1 // Stat: Ignore Reputation Breaking Point [360]
 	361 => 1 // Cast spell on critical miss [361]
@@ -661,7 +661,7 @@ END
  * Charm: Charm Specific Creature [5] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_5~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Configuration valide ?~ END
+	SPRINT description @102249 // ~Charme %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
@@ -3102,9 +3102,44 @@ DEFINE_PATCH_MACRO ~opcode_target_179~ BEGIN
 	SPRINT description @102477 // ~Inflige %damage% %damageType% supplémentaires %versus%~
 END
 
-/* --------------------------------- *
- * Paralyse les créatures de type xx *
- * --------------------------------- */
+/* -------------------------- *
+ * Item: Can't Use Item [180] *
+ * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+		SET forceSort = 1
+		SET sort = 0
+		SPRINT description @101171 // ~Unique : Un seul exemple peut être équipé~
+	END
+	ELSE BEGIN
+		LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+		PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description @101172 // ~Empêche d'utiliser %itemName%~
+		END
+	END
+END
+
+/* ------------------------------ *
+ * Item: Can't Use Itemtype [181] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_181~ BEGIN
+	LOCAL_SET strref = 105400
+
+	PATCH_IF is_ee == 1 BEGIN
+		SET strref = strref + parameter1
+	END
+	ELSE BEGIN
+		SET strref = strref + parameter2
+	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET itemType = string END
+	SPRINT description @105399 // ~Empêche d'utiliser les %itemType%~
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% version classic à gérer.~ END
+END
+
+/* ---------------- *
+ * State: Hold (II) *
+ * ---------------- */
 DEFINE_PATCH_MACRO ~opcode_target_185~ BEGIN
 	LPM ~opcode_target_109~
 END
@@ -3617,11 +3652,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_233~ BEGIN
 	SPRINT description ~~
 
 	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~)  BEGIN
-		SPRINT value @10010 // ~Passe à %value%~
-		TO_LOWER value
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
-		SPRINT value ~%proficiency% %value%~
-		SPRINT description @102188 // ~%probability% de passer la compétence martiale de la cible à %value%~
+		SPRINT description @102188 // ~%probability% de passer la compétence martiale %proficiency% %ofTheTarget% à %value%~
 	END
 END
 
@@ -3906,20 +3938,43 @@ END
  * Use EFF File (Cursed) [283] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_283~ BEGIN
-	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
-		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
-END
-	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		SPRINT theTarget   @102474 // ~les %targetType%~
-		SPRINT ofTheTarget @102538 // ~des %targetType%~
-		SPRINT versus      @101126 // ~contre les %targetType%~
-		LPF ~get_res_description_283~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded durationAdded opcode END
-END
+	LPM ~opcode_self_177~
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @101173 // ~Malédiction~
+		SPRINT description ~%name%%colon%%description%~
+	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_res_description_283~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded durationAdded opcode BEGIN
-	LPF ~get_res_description_177~ STR_VAR resref macro RET description saveAdded durationAdded opcode END
+DEFINE_PATCH_MACRO ~opcode_self_probability_283~ BEGIN
+	SET forceSort = 1
+	SET sort = 0
+	LPM ~opcode_self_probability_177~
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @101174 // ~de maudir %theTarget% et~
+		SPRINT description ~%name% %description%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_283~ BEGIN
+	LPM ~opcode_target_177~
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @101175 // ~Maudit %theTarget% et~
+		SPRINT description ~%name% %description%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_283~ BEGIN
+	SET forceSort = 1
+	SET sort = 0
+	LPM ~opcode_target_probability_177~
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @101174 // ~de maudir %theTarget% et~
+		SPRINT description ~%name%%colon%%description%~
+	END
 END
 
 /* -------------------------------- *
@@ -4159,6 +4214,29 @@ DEFINE_PATCH_MACRO ~opcode_self_341~ BEGIN
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @101160 // ~À chaque coup critique: %description%~
+	END
+END
+
+/* ------------- *
+ * HP Swap [343] *
+ * ------------- */
+DEFINE_PATCH_MACRO ~opcode_self_343~ BEGIN
+	LOCAL_SET mode = parameter2
+	PATCH_IF mode == 0 BEGIN
+		SPRINT description @101177 // ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	END
+	ELSE BEGIN
+		SPRINT description @101176 // ~Échange les points de vie du porteur et de la cible~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_343~ BEGIN
+	LOCAL_SET mode = parameter2
+	PATCH_IF mode == 0 BEGIN
+		SPRINT description @101179 // ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	END
+	ELSE BEGIN
+		SPRINT description @101178 // ~d'échanger les points de vie du porteur et de la cible~
 	END
 END
 
@@ -4519,6 +4597,14 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
+	//TODO: Supprimer ces logs dès que le problème sera corrigé
+	PATCH_IF file == 9 AND NOT VARIABLE_IS_SET $kits(~%entry%~) BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : File = %file% : entry = %entry%~ END
+		PATCH_PHP_EACH kits AS kitId => kitText BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~%kitId% : %kitText%~ END
+		END
+	END
+
 	PATCH_IF file == 9 AND VARIABLE_IS_SET $kits(~%entry%~) BEGIN
 		SPRINT idName $kits(~%entry%~)
 	END

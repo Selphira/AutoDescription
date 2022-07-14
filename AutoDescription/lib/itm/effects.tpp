@@ -3,6 +3,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	SET durationAdded = 0
 	SET saveAdded = 0
 	SET sort = 0
+	SET forceSort = 0
 
 	LPM ~block_to_vars~
 
@@ -82,11 +83,13 @@ DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
 		SET opcode = opcode_n
 	END
 
-	PATCH_IF VARIABLE_IS_SET $sort_opcodes(~%opcode%~) BEGIN
-		SET sort = $sort_opcodes(~%opcode%~) + ((100 - probability) * 10000)
-	END
-	ELSE BEGIN
-		SET sort = 400 + ((100 - probability) * 10000)
+	PATCH_IF forceSort == 0 BEGIN
+		PATCH_IF VARIABLE_IS_SET $sort_opcodes(~%opcode%~) BEGIN
+			SET sort = $sort_opcodes(~%opcode%~) + ((100 - probability) * 10000)
+		END
+		ELSE BEGIN
+			SET sort = 400 + ((100 - probability) * 10000)
+		END
 	END
 END
 

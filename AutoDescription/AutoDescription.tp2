@@ -1,7 +1,7 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.html)~
 
-VERSION ~0.9.7a~
+VERSION ~0.9.8~
 
 ALWAYS
 	OUTER_SET is_ee = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
