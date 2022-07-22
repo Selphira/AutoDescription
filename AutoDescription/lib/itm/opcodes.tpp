@@ -2314,16 +2314,16 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 		END
 
 		PATCH_IF amount == 1 AND frequency == 1 BEGIN
-			SET strref = 10780020
+			SET strref += 20
 		END
 		ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-			SET strref = 10780021
+			SET strref += 21
 		END
 		ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
-			SET strref = 10780022
+			SET strref += 22
 		END
 		ELSE BEGIN
-			SET strref = 10780023
+			SET strref += 23
 		END
 
 		PATCH_IF is_ee == 1 BEGIN
