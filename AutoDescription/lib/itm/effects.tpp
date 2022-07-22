@@ -1,7 +1,8 @@
 DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	SET opcode_n = opcode
-	SET durationAdded = 0
+	SET ignoreDuration = 0
 	SET saveAdded = 0
+	SET saveForHalf = 0
 	SET sort = 0
 	SET forceSort = 0
 
@@ -18,50 +19,59 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 		END
 
 		PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
-			PATCH_IF abilityType == AbilityType_Equipped BEGIN
-				SPRINT opcode_target ~_self~
-				SPRINT theTarget   @102472 // ~le porteur~
-				SPRINT ofTheTarget @101086 // ~du porteur~
+			PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
 			END
 			ELSE BEGIN
-				// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
-				// Serait ajouté dans une variable qu'il suffira d'utiliser
-				// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-				PATCH_IF target == TARGET_FX_self BEGIN
+				PATCH_IF abilityType == AbilityType_Equipped BEGIN
 					SPRINT opcode_target ~_self~
 					SPRINT theTarget   @102472 // ~le porteur~
 					SPRINT ofTheTarget @101086 // ~du porteur~
+					SPRINT toTheTarget @101180 // ~au porteur~
 				END
-				ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
-					SPRINT opcode_target ~_target~
-					SPRINT theTarget   @102471 // ~la cible~
-					SPRINT ofTheTarget @101085 // ~de la cible~
+				ELSE BEGIN
+					// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
+					// Serait ajouté dans une variable qu'il suffira d'utiliser
+					// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
+					PATCH_IF target == TARGET_FX_self BEGIN
+						SPRINT opcode_target ~_self~
+						SPRINT theTarget   @102472 // ~le porteur~
+						SPRINT ofTheTarget @101086 // ~du porteur~
+						SPRINT toTheTarget @101180 // ~au porteur~
+					END
+					ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+						SPRINT opcode_target ~_target~
+						SPRINT theTarget   @102471 // ~la cible~
+						SPRINT ofTheTarget @101085 // ~de la cible~
+						SPRINT toTheTarget @101181 // ~à la cible~
+					END
+					ELSE PATCH_IF target == TARGET_FX_party BEGIN
+						SPRINT opcode_target ~_party~
+						SPRINT theTarget   @102473 // ~les membres du groupe~
+						SPRINT ofTheTarget @101088 // ~des membres du groupe~
+						SPRINT toTheTarget @101182 // ~aux membres du groupe~
+					END
 				END
-				ELSE PATCH_IF target == TARGET_FX_party BEGIN
-					SPRINT opcode_target ~_party~
-					SPRINT theTarget   @102473 // ~le groupe~
-					SPRINT ofTheTarget @101088 // ~du groupe~
-				END
-			END
 
-			PATCH_IF probability == 100 BEGIN
-				SPRINT method ~opcode%opcode_target%_%opcode_n%~
-				LPM ~%method%~
-				LPM ~set_opcode_sort~
-			END
-			ELSE BEGIN
-				SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
-				SET probability += 1
-				LPM ~%method%~
-				LPM ~set_opcode_sort~
-				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-					SPRINT description @101125 // ~%probability% de chance %description%~
+				PATCH_IF probability == 100 BEGIN
+					SPRINT method ~opcode%opcode_target%_%opcode_n%~
+					LPM ~%method%~
+					LPM ~set_opcode_sort~
 				END
-			END
+				ELSE BEGIN
+					SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
+					SET probability += 1
+					LPM ~%method%~
+					LPM ~set_opcode_sort~
+					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+						LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+						SPRINT description @101125 // ~%probability% de chance %description%~
+					END
+				END
 
-			LPM ~add_duration~
-			LPM ~add_save~
+				LPM ~add_duration~
+				LPM ~add_save~
+			END
 		END
 		ELSE BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Target est none~ END
@@ -93,7 +103,7 @@ DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durationAdded BEGIN
+DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded ignoreDuration BEGIN
 	READ_SHORT EFF2_opcode opcode
 	READ_BYTE  EFF2_target target
 	READ_BYTE  EFF2_power power
@@ -107,14 +117,17 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 	READ_LONG  EFF2_dice_sides diceSides
 	READ_LONG  EFF2_save_type saveType
 	READ_LONG  EFF2_save_bonus saveBonus
+	READ_LONG  EFF2_stacking_id_tobex specialEE
 	READ_LONG  EFF2_parameter3 parameter3
 	READ_LONG  EFF2_parameter4 parameter4
+	READ_ASCII EFF2_resource2 resref2
+	READ_ASCII EFF2_resource3 resref3
 
 	SET parentProbability = probability
 	SET probability = probability1 - probability2
 	SPRINT description ~~
 
-	PATCH_IF target == TARGET_FX_self BEGIN
+	PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
         SPRINT macro ~opcode_self_~
     END
     ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
@@ -129,27 +142,32 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 			PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
 		END
 
-		PATCH_TRY
-			PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
-				SPRINT method ~%macro%probability_%opcode%~
-				LPM ~%method%~
-				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
-					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-					SPRINT description @101125 // ~%probability% de chance %description%~
+		PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+            LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
+        END
+        ELSE BEGIN
+			PATCH_TRY
+				PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
+					SPRINT method ~%macro%probability_%opcode%~
+					LPM ~%method%~
+					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
+						LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+						SPRINT description @101125 // ~%probability% de chance %description%~
+					END
 				END
+				ELSE BEGIN
+					SPRINT method ~%macro%%opcode%~
+					LPM ~%method%~
+				END
+			WITH
+				~Failure("Unknown macro: \%method%")~
+				BEGIN
+					PATCH_FAIL ~Failure("Unknown macro: %method%")~
+				END
+				DEFAULT
+					PATCH_FAIL ~%ERROR_MESSAGE%~
 			END
-			ELSE BEGIN
-				SPRINT method ~%macro%%opcode%~
-				LPM ~%method%~
-			END
-		WITH
-			~Failure("Unknown macro: \%method%")~
-			BEGIN
-				PATCH_FAIL ~Failure("Unknown macro: %method%")~
-			END
-			DEFAULT
-				PATCH_FAIL ~%ERROR_MESSAGE%~
-		END
+        END
 	END
 	ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
@@ -160,12 +178,12 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded durati
 END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
-	PATCH_IF opcode != 177 AND opcode != 183 AND opcode != 283 AND durationAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) AND opcode != 177 AND opcode != 183 AND opcode != 283 AND ignoreDuration == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% %duration%~
-			SET durationAdded = 1
+			SET ignoreDuration = 1
 		END
 	END
 END
@@ -174,45 +192,53 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
 		SPRINT saveTypeStr ~~
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
-            SPRINT saveTypeStr @102033 // ~contre les sorts~
+            SPRINT saveTypeStr @10370001 // ~contre les sorts~
         END
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_breath) == FLAG_SAVINGTHROW_breath BEGIN
             PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
 				SPRINT strOr @100004 // ~ou~
                 SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
             END
-            SPRINT saveTypeStr @102032 // ~contre les souffles~
+            SPRINT saveTypeStr @10360001 // ~contre les souffles~
         END
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_death) == FLAG_SAVINGTHROW_death BEGIN
             PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
 				SPRINT strOr @100004 // ~ou~
                 SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
             END
-            SPRINT saveTypeStr @102029 // ~contre la paralysie, la mort et les poisons~
+            SPRINT saveTypeStr @10330001 // ~contre la paralysie, la mort et les poisons~
         END
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_wand) == FLAG_SAVINGTHROW_wand BEGIN
             PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
 				SPRINT strOr @100004 // ~ou~
                 SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
             END
-            SPRINT saveTypeStr @102030 // ~contre les baguettes, les sceptres et les bâtons~
+            SPRINT saveTypeStr @10340001 // ~contre les baguettes, les sceptres et les bâtons~
         END
         PATCH_IF (saveType BAND FLAG_SAVINGTHROW_polymorph) == FLAG_SAVINGTHROW_polymorph BEGIN
             PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
 				SPRINT strOr @100004 // ~ou~
                 SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
             END
-            SPRINT saveTypeStr @102031 // ~contre la pétrification et la métamorphose~
+            SPRINT saveTypeStr @10350001 // ~contre la pétrification et la métamorphose~
         END
-
-		// TODO: Toujours pour éviter ??
 
         PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			PATCH_IF saveForHalf == 1 BEGIN
+				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour moitié~
+			END
+			ELSE BEGIN
+				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			END
         END
         ELSE BEGIN
-			SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
+			PATCH_IF saveForHalf == 1 BEGIN
+				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour moitié~
+			END
+			ELSE BEGIN
+				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
+			END
         END
 
 		SPRINT description ~%description% (%saveStr%)~

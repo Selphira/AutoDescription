@@ -139,6 +139,8 @@ OUTER_SPRINT $translations(~FIGHTER_MAGE_THIEF~) @101016
 OUTER_SPRINT $translations(~FIGHTER_THIEF~) @101017
 OUTER_SPRINT $translations(~MAGE_THIEF~) @101019
 
+//SPRINT $tra_proficiencies(~108~) ~%text%~
+
 OUTER_SPRINT crlf  @10000
 OUTER_SPRINT colon @10001   // ~ : ~
 OUTER_SPRINT meter @100005  // ~mètre~

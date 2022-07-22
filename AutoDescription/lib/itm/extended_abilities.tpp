@@ -135,7 +135,7 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 				// Si le titre est compris dans la description, on récupère la description qui possède généralement le niveau du lanceur de sorts
 				PATCH_IF (~%lowerData_2%~ STRING_MATCHES_REGEXP ~^%lowerChargeTitle%~) == 0 BEGIN
 					SPRINT chargeTitle "%data_2%"
-					// Mise à 0 pour ne pas que la² sous-propriété ne soit affichée (je ne sais pas comment supprimer une seule entrée dans un ARRAY)
+					// Mise à 0 pour ne pas que la sous-propriété ne soit affichée (je ne sais pas comment supprimer une seule entrée dans un ARRAY)
 					SET $charge_abilities(~%data_0%~ ~%data_1%~ ~%data_2%~) = 0
 				END
 			END
@@ -145,6 +145,8 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 		SET abilityNumber = headerIndex + 1
 		SPRINT chargeTitle @101124 // ~Capacité %abilityNumber%~
 	END
+
+    LPF ~get_unique_charged_abilities~ STR_VAR array_name = "charge_abilities" RET chargeAbilityCount = count RET_ARRAY charge_abilities = newAbilities END
 
     PATCH_IF depletion == 1 BEGIN
         PATCH_IF charges == 1 BEGIN
@@ -160,6 +162,31 @@ DEFINE_PATCH_MACRO ~add_charge_abilitie~ BEGIN
 
 	SPRINT chargeTitle ~%chargeTitle% (%chargeStr%)~
 	SET $charge_abilities(~%sort%~ ~%chargeAbilityCount%~ ~%chargeTitle%~) = 1
+END
+
+/* -------------------------------------------------------------------- *
+ * Supprime les entrées en double, en se basant sur le nom en lowercase *
+ * -------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~get_unique_charged_abilities~ STR_VAR array_name = "" RET count RET_ARRAY newAbilities BEGIN
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~newAbilities~ BEGIN END
+    SET count = 0
+
+	PATCH_PHP_EACH ~%array_name%~ AS data => value BEGIN
+		SET found = 0
+		PATCH_PHP_EACH newAbilities AS ability => v BEGIN
+			SPRINT tmp1 ~%data_2%~
+			SPRINT tmp2 ~%ability_2%~
+			TO_LOWER tmp1
+			TO_LOWER tmp2
+			PATCH_IF ~%tmp1%~ STRING_EQUAL ~%tmp2%~ BEGIN
+				SET found = 1
+			END
+		END
+		PATCH_IF found == 0 BEGIN
+			SET $newAbilities(~%data_0%~ ~%data_1%~ ~%data_2%~) = value
+			SET count += 1
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
@@ -337,14 +364,14 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 	// ~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~
 	PATCH_IF enchantment > 0 BEGIN
 		LPF ~signed_value~ INT_VAR value = enchantment RET value END
-		LPF ~appendValue~ INT_VAR strref = 102481 STR_VAR value RET description END // ~Enchantement~
+		LPF ~appendValue~ INT_VAR strref = 13440001 STR_VAR value RET description END // ~Enchantement~
 	END
     PATCH_IF ~%stats_0%~ != 0 BEGIN //  AND enchantment != stats_0 // Pour ne l'afficher que si différent du TAC0 ?
 		LPF ~signed_value~ INT_VAR value = stats_0 RET value END
-		LPF ~appendValue~ INT_VAR strref = 102000 STR_VAR value RET description END // ~TAC0~
+		LPF ~appendValue~ INT_VAR strref = 10540001 STR_VAR value RET description END // ~TAC0~
     END
 	PATCH_IF ~%stats_1%~ STRING_EQUAL ~~ = 0 BEGIN
-		LPF ~appendValue~ INT_VAR strref = 102001 STR_VAR value = EVAL ~%stats_1%~ RET description END // ~Dégâts~
+		LPF ~appendValue~ INT_VAR strref = 10730001 STR_VAR value = EVAL ~%stats_1%~ RET description END // ~Dégâts~
 	END
 	PATCH_IF ~%stats_2%~ > 0 BEGIN
 		SET strref = 102010 + stats_2
@@ -352,7 +379,7 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 
 		LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
 	END
-	LPF ~appendValue~ INT_VAR strref = 102002 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
+	LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
 END
 
 DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_statistics~ RET hasSameStatistics BEGIN

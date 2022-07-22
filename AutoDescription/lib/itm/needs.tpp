@@ -15,13 +15,13 @@ DEFINE_PATCH_FUNCTION ~needs~ RET description BEGIN
 	PATCH_DEFINE_ARRAY ~needs~ BEGIN END
 	SET countNeeds = 0
 
- 	LPF ~needs_attribute~ INT_VAR value = minLevel strref = 101082 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minStrength bonus = minStrengthBonus strref = 101076 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minIntelligence strref = 101077 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minDexterite strref = 101078 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minWisdom strref = 101079 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minConstitution strref = 101080 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minCharisma strref = 101081 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minLevel strref = 10960001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minStrength bonus = minStrengthBonus strref = 10440001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minIntelligence strref = 10190001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minDexterite strref = 10150001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minWisdom strref = 10490001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minConstitution strref = 10100001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minCharisma strref = 10060001 RET countNeeds RET_ARRAY needs END
 
  	PATCH_IF countNeeds > 0 BEGIN
 		LPF ~appendSection~ INT_VAR strref = 101032 RET description END

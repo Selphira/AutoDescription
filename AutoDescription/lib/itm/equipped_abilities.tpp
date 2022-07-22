@@ -135,7 +135,7 @@ END
  * --------------------------------------------------------------------------------------------------------- */
 DEFINE_PATCH_FUNCTION ~group_physical_resistances~ RET description BEGIN
     SPRINT regexTemplate ~~
-    PATCH_FOR_EACH strref IN 102061 102062 102063 102064 BEGIN
+    PATCH_FOR_EACH strref IN 10860001 10870001 10880001 10890001 BEGIN
 		SPRINT name (AT ~%strref%~)
 		SPRINT value ~value~
 		SPRINT value ~\%%value%%~
@@ -168,7 +168,7 @@ END
  * --------------------------------------------------------------------------------------------------------- */
 DEFINE_PATCH_FUNCTION ~group_saves_throws~ RET description BEGIN
     SPRINT regexTemplate ~~
-    PATCH_FOR_EACH strref IN 102029 102030 102031 102032 102033 BEGIN
+    PATCH_FOR_EACH strref IN 10330001 10340001 10350001 10360001 10370001 BEGIN
 		SPRINT name @102034 // ~Jets de sauvegarde~
 		SPRINT versus (AT ~%strref%~)
 		SPRINT value ~value~
