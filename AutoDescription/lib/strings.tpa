@@ -30,6 +30,7 @@ COPY_EXISTING ~kitlist.2da~  ~override~
 			GET_STRREF  strref text
 			SPRINT $translations(~%name%~) ~%text%~
 			PATCH_IF is_ee == 1 BEGIN
+				TO_LOWER kitIds
 				SPRINT $kits(~%kitIds%~) ~%text%~
 			END
 		END
