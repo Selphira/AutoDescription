@@ -4,6 +4,10 @@ AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.ht
 VERSION ~0.9.9~
 
 ALWAYS
+	OUTER_PATCH ~~ BEGIN
+		PATCH_INCLUDE ~%MOD_FOLDER%/settings.ini~
+	END
+
 	OUTER_SET is_ee = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
 
     ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END

@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ~update_description~ BEGIN
 
         PATCH_SILENT
 
-		PATCH_IF ~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0 BEGIN
+		PATCH_IF NOT include_items_without_description AND (~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0) BEGIN
 			SET totalWithoutDescription += 1
 			SET totalIgnored += 1
 		END
@@ -21,7 +21,7 @@ DEFINE_PATCH_MACRO ~update_description~ BEGIN
 			LPF ~removeTechnicalDescription~ STR_VAR description RET description END
 
 			// Si l'objet ne peut être déplacé, il n'est pas accessible au joueur
-			PATCH_IF (flags BAND BIT2) == 0 BEGIN
+			PATCH_IF NOT include_non_moveable_items AND (flags BAND BIT2) == 0 BEGIN
 				SET totalIgnored += 1
 			END
 			ELSE BEGIN
@@ -103,7 +103,9 @@ DEFINE_PATCH_MACRO ~description~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
 	END
 
-	//SAY DESC ~%description%~
+	PATCH_IF alter_item_files BEGIN
+		SAY DESC ~%description%~
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~log_warning~ STR_VAR message = ~~ BEGIN
