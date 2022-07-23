@@ -319,17 +319,17 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 			END
 		END
 		PATCH_IF found == 0 BEGIN
-			SPRINT value @100046 // ~de manière permanente~
+			SPRINT value @100312 // ~de manière permanente~
 		END
 	END
 	ELSE PATCH_IF timingMode != TIMING_while_equipped AND duration > 0 BEGIN
         LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 
 		PATCH_IF timingMode == TIMING_duration BEGIN
-			SPRINT value @100039 // ~pendant %duration%~
+			SPRINT value @100311 // ~pendant %duration%~
 		END
 		ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
-			SPRINT value @100038 // ~après %strDuration%~
+			SPRINT value @100310 // ~après %strDuration%~
 		END
 		ELSE BEGIN
 			PATCH_PRINT "%SOURCE_FILE%: opcode %opcode% : timing %timingMode%"
@@ -337,38 +337,38 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
     END
 END
 
-DEFINE_PATCH_FUNCTION ~get_str_duration~ INT_VAR duration = 0 RET strDuration BEGIN
-    SET total = duration
-    SET turns = duration / 60
-    SET duration = duration MODULO 60
-    SET rounds = duration / 6
-    SET seconds = duration MODULO 6
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~durations~ BEGIN
+	7200 => 100308 // jour
+	 300 => 100306 // heure
+	  60 => 100304 // tour
+	   6 => 100302 // round
+END
 
+DEFINE_PATCH_FUNCTION ~get_str_duration~ INT_VAR duration = 0 RET strDuration BEGIN
+	SET total = duration
 	SPRINT strDuration ~~
 
-    PATCH_IF seconds > 0 OR (turns > 0 AND rounds > 0) BEGIN
-        SET seconds = total
-        PATCH_IF seconds == 1 BEGIN
-            SPRINT strDuration @100040 // ~1 seconde~
-        END
-        ELSE BEGIN
-            SPRINT strDuration @100041 // ~%seconds% secondes~
-        END
-    END
-    ELSE PATCH_IF turns > 0 BEGIN
-        PATCH_IF turns == 1 BEGIN
-            SPRINT strDuration @100042 // ~1 tour~
-        END
-        ELSE BEGIN
-            SPRINT strDuration @100043 // ~%turns% tours~
-        END
-    END
-    ELSE PATCH_IF rounds > 0 BEGIN
-        PATCH_IF rounds == 1 BEGIN
-            SPRINT strDuration @100044 // ~1 round~
-        END
-        ELSE BEGIN
-            SPRINT strDuration @100045 // ~%round% rounds~
-        END
-    END
+	PATCH_PHP_EACH durations AS divisor => strref BEGIN
+		SET amount = duration / divisor
+		SET duration = duration MODULO divisor
+
+		PATCH_IF duration == 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF amount > 1 BEGIN
+				SET strref += 1
+			END
+
+            SPRINT strDuration (AT strref)
+		END
+	END
+
+	PATCH_IF duration > 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+		SET amount = total
+		SET strref = 100300 // seconde
+
+		PATCH_IF amount > 1 BEGIN
+			SET strref += 1
+		END
+
+        SPRINT strDuration (AT strref)
+	END
 END

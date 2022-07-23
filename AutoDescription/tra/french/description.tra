@@ -460,15 +460,6 @@
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
 @100015 = ~%name% %target%%colon%%value% %versus%~
-@100038 = ~après %strDuration%~
-@100039 = ~pendant %strDuration%~
-@100040 = ~1 seconde~
-@100041 = ~%seconds% secondes~
-@100042 = ~1 tour~
-@100043 = ~%turns% tours~
-@100044 = ~1 round~
-@100045 = ~%rounds% rounds~
-@100046 = ~de manière permanente~
 @101054 = ~Classe de base~
 // @101052 = ~%strSocial% %strMoral%~
 @101069 = ~Tous~
@@ -523,6 +514,21 @@
 @100211 = ~désactivé~
 @100212 = ~de combinaison~
 @100213 = ~de non combat~
+
+// duration
+@100300 = ~1 seconde~
+@100301 = ~%amount% secondes~
+@100302 = ~1 round~
+@100303 = ~%amount% rounds~
+@100304 = ~1 tour~
+@100305 = ~%amount% tours~
+@100306 = ~1 heure~
+@100307 = ~%amount% heures~
+@100308 = ~1 jour~
+@100309 = ~%amount% jours~
+@100310 = ~après %strDuration%~
+@100311 = ~pendant %strDuration%~
+@100312 = ~de manière permanente~
 
 /* ------ *
  * Ea.ids *
