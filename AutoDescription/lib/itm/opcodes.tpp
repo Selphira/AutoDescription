@@ -500,7 +500,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 
 	LPM ~opcode_0_common~
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
-		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
+		LPM ~opcode_0_get_value~
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -524,10 +524,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
-		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure du porteur à gérer"
+		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
 	ELSE BEGIN
-		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
+		LPM ~opcode_0_get_value~
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -535,7 +535,13 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		END
 	END
 
-	SPRINT description @102370 // ~de modifier la classe d'armure du porteur de %value%~
+	PATCH_IF armor_class_show_bonus_malus BEGIN
+		TO_LOWER value
+		SPRINT description @10000104 // ~de modifier la classe d'armure de la cible d'un %value%~
+	END
+	ELSE BEGIN
+		SPRINT description @10000103 // ~de modifier la classe d'armure de la cible de %value%~
+	END
 END
 
 
@@ -550,7 +556,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
+		LPM ~opcode_0_get_value~
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -563,29 +569,27 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
-	LOCAL_SPRINT versus ~~
-	LOCAL_SET value = ~%parameter1%~
-
-	LPM ~opcode_0_common~
-	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		// xx% de chance de faire passer la classe d'armure de la cible [contre les] à yy [pendant ...]
-		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
-	END
-	ELSE BEGIN
-		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
-			SET strref = 10000000 + parameter2
-			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END
-			SPRINT value ~%value% %versus%~
-		END
-	END
-
-	SPRINT description @102134 // ~de modifier la classe d'armure de la cible de %value%~
+	LPM ~opcode_self_probability_0~
 END
 
 DEFINE_PATCH_MACRO ~opcode_0_common~ BEGIN
 	PATCH_IF parameter2 == 15 BEGIN
 		SET parameter2 = AC_MOD_TYPE_all
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
+	PATCH_IF armor_class_show_bonus_malus BEGIN
+		PATCH_IF value > 0 BEGIN
+			SPRINT value @10000101 // ~Bonus de %value%~
+		END
+		ELSE BEGIN
+			SET value = ABS value
+			SPRINT value @10000102 // ~Malus de %value%~
+		END
+	END
+	ELSE BEGIN
+		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 	END
 END
 

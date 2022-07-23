@@ -38,7 +38,6 @@
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-@102134 = ~de modifier la classe d'armure de la cible de %value%~
 @102150 = ~~
 @102159 = ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
 
@@ -877,6 +876,11 @@
 @10000012 = ~contre les armes tranchantes et perforantes~
 @10000013 = ~contre les armes contondantes, tranchantes et perforantes~
 @10000014 = ~contre les armes perforantes, tranchantes et les projectile~
+
+@10000101 = ~Bonus de %value%~
+@10000102 = ~Malus de %value%~
+@10000103 = ~de modifier la classe d'armure de la cible de %value%~
+@10000104 = ~de modifier la classe d'armure de la cible d'un %value%~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
