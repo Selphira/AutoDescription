@@ -3,6 +3,7 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
 	SILENT
 
     INCLUDE ~%MOD_FOLDER%/lib/functions.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/log.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/description.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/strings.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/itm/effects.tpp~

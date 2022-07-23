@@ -2735,7 +2735,7 @@ DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
 	SET frequency = 1
 
 	PATCH_IF parameter2 >= 5 BEGIN
-        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: parameter2 >= 5 == crash the game~ END
+        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Invalid value for parameter2 : %parameter2% >= 5 == crash the game~ END
     END
 
 	PATCH_IF is_ee == 1 BEGIN
@@ -2746,10 +2746,10 @@ DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
 
 		PATCH_IF parameter2 == 0 OR parameter2 == 1 BEGIN
 			PATCH_IF parameter2 == 0 AND amount1 == 0 BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Amount1 needs to be non-zero~ END
+				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: parameter1 needs to be non-zero : %parameter1%~ END
 			END
 			PATCH_IF parameter2 == 1 AND (amount1 < 1 OR amount1 > 101) BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Amount1 between 1 and 101~ END
+				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: parameter1 between 1 and 101 : %parameter1%~ END
 			END
 			SET amount = 1
 		END
@@ -3124,7 +3124,7 @@ DEFINE_PATCH_MACRO ~opcode_115~ BEGIN
 	LOCAL_SET strref = 11150001 + parameter2
 
 	PATCH_IF parameter2 > 2 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Wrong parameter2 value : %parameter2% (0, 1 or 2 expected)~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2% (0, 1 or 2 expected)~ END
 	END
 	ELSE BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Détection du xxx~
@@ -3787,7 +3787,7 @@ DEFINE_PATCH_MACRO ~opcode_self_159~ BEGIN
 		SPRINT description @11590002 // ~Crée %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
 	END
 END
 
@@ -3800,7 +3800,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_159~ BEGIN
 		SPRINT description @11590004 // ~de créer %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
 	END
 END
 
@@ -4800,7 +4800,7 @@ DEFINE_PATCH_MACRO ~opcode_self_221~ BEGIN
 
 		SPRINT description @12210001 // ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 	WITH DEFAULT
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
 	END
 END
 
@@ -4812,7 +4812,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_221~ BEGIN
 
 		SPRINT description @12210002 // ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 	WITH DEFAULT
-        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
+        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
     END
 END
 
@@ -6304,7 +6304,7 @@ DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET des
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type incorrect : %parameter2%~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
 	END
 END
 
@@ -6331,7 +6331,7 @@ DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type incorrect : %parameter2%~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
 	END
 END
 

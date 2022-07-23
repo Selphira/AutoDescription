@@ -143,7 +143,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded ignore
 		END
 
 		PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
-            LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
+            LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
         END
         ELSE BEGIN
 			PATCH_TRY

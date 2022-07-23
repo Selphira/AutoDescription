@@ -1645,6 +1645,8 @@
 
 @11260001 = ~Vitesse de déplacement~
 @11260002 = ~la vitesse de déplacement~
+@11260003 = ~Immobilise %theTarget%~
+@11260004 = ~d'immobiliser %theTarget%~
 
 // Opcode 128: State: Confusion [128]
 
