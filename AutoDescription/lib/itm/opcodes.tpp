@@ -1241,17 +1241,34 @@ END
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_23~ BEGIN
 	LPM ~opcode_23_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
+
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
+		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+	END
+	ELSE BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 10230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_23~ BEGIN
 	LPM ~opcode_23_common~
-	LPF ~opcode_probability~ INT_VAR strref = 10230002 RET description END // ~le moral~
+
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
+		SPRINT description @10230004 // ~de garder le moral %ofTheTarget% au plus haut~
+	END
+	ELSE BEGIN
+		LPF ~opcode_probability~ INT_VAR strref = 10230002 RET description END // ~le moral~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_23~ BEGIN
 	LPM ~opcode_23_common~
-	LPF ~opcode_target~ INT_VAR strref = 10230002 RET description END // ~le moral~
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
+		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+	END
+	ELSE BEGIN
+		LPF ~opcode_target~ INT_VAR strref = 10230002 RET description END // ~le moral~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_23~ BEGIN
@@ -3003,35 +3020,44 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 < 1 BEGIN
-		SPRINT description @11060003 // ~Immunité aux échecs moraux~
+	PATCH_IF parameter1 <= 1 AND parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @11060001 // ~Le moral %ofTheTarget% ne peut flancher~
 	END
 	ELSE BEGIN
-		SET parameter1 = 0 - parameter1
-		LPF ~opcode_mod~ INT_VAR strref = 11060001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Seuil de tolérance aux échecs moraux~
-	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_106~ BEGIN
-	SET ignoreDuration = 1
-	PATCH_IF parameter1 < 1 BEGIN
-		SPRINT description @11060004 // ~Immunise %theTarget% aux échecs moraux~
-	END
-	ELSE BEGIN
-		SET parameter1 = 0 - parameter1
-		LPF ~opcode_target~ INT_VAR strref = 11060002 RET description END // ~le seuil de tolérance aux échecs moraux~
+		SET value = ABS parameter1
+		PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+			LPF ~percent_value~ INT_VAR value RET value END
+		END
+		PATCH_IF parameter1 < 0 BEGIN
+			SPRINT description @11060002 // ~Le moral %ofTheTarget% est renforcé de %value%~
+		END
+		ELSE BEGIN
+			SPRINT description @11060003 // ~Le moral %ofTheTarget% est affaibli de %value%~
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 < 1 BEGIN
-		SPRINT description @11060005 // ~d'immuniser %theTarget% aux échecs moraux~
+	PATCH_IF parameter1 <= 1 AND parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @11060004 // ~de garder le moral %ofTheTarget% au plus haut~
 	END
 	ELSE BEGIN
-		SET parameter1 = 0 - parameter1
-		LPF ~opcode_probability~ INT_VAR strref = 11060002 RET description END // ~le seuil de tolérance aux échecs moraux~
+		SET value = ABS parameter1
+		PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+			LPF ~percent_value~ INT_VAR value RET value END
+		END
+		PATCH_IF parameter1 < 0 BEGIN
+			SPRINT description @11060005 // ~de renforcer le moral %ofTheTarget% de %value%~
+		END
+		ELSE BEGIN
+			SPRINT description @11060006 // ~d'affaiblir le moral %ofTheTarget% de %value%~
+		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_106~ BEGIN
+	LPM ~opcode_self_106~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_106~ BEGIN

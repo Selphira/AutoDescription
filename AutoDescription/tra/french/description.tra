@@ -1026,6 +1026,8 @@
 
 @10230001 = ~Moral~
 @10230002 = ~le moral~
+@10230003 = ~Le moral %ofTheTarget% reste au plus haut~
+@10230004 = ~de garder le moral %ofTheTarget% au plus haut~
 
 // Opcode 24: State: Horror [24]
 
@@ -1624,11 +1626,12 @@
 
 // Opcode 106: Stat: Morale Break Modifier [106]
 
-@11060001 = ~Seuil de tolérance aux échecs moraux~
-@11060002 = ~le seuil de tolérance aux échecs moraux~
-@11060003 = ~Immunité aux échecs moraux~
-@11060004 = ~Immunise %theTarget% aux échecs moraux~
-@11060005 = ~d'immuniser %theTarget% aux échecs moraux~
+@11060001 = ~Le moral %ofTheTarget% reste au plus haut~
+@11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
+@11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
+@11060004 = ~de garder le moral %ofTheTarget% au plus haut~
+@11060005 = ~de renforcer le moral %ofTheTarget% de %value%~
+@11060006 = ~d'affaiblir le moral %ofTheTarget% de %value%~
 
 // Opcode 108: Stat: Reputation [108]
 
