@@ -858,9 +858,18 @@
 @10000000 = ~~
 @10000001 = ~contre les armes contondantes~
 @10000002 = ~contre les projectiles~
-@10000003 = ~contre les projectiles et les armes contondantes~
+@10000003 = ~contre les armes contondantes et les projectiles~
 @10000004 = ~contre les armes perforantes~
+@10000005 = ~contre les armes contondantes et perforantes~
+@10000006 = ~contre les armes contondantes et les projectiles~
+@10000007 = ~contre les armes contondantes, perforantes et les projectiles~
 @10000008 = ~contre les armes tranchantes~
+@10000009 = ~contre les armes contondantes et tranchantes~
+@10000010 = ~contre les armes tranchantes et les projectile~
+@10000011 = ~contre les armes contondantes, tranchantes et les projectile~
+@10000012 = ~contre les armes tranchantes et perforantes~
+@10000013 = ~contre les armes contondantes, tranchantes et perforantes~
+@10000014 = ~contre les armes perforantes, tranchantes et les projectile~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 

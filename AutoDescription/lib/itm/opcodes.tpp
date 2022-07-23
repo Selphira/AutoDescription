@@ -498,6 +498,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
+	LPM ~opcode_0_common~
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%value%~ RET value END
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
@@ -520,6 +521,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
+	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure du porteur à gérer"
@@ -541,6 +543,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
+	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		PATCH_IF %itemType% != ITM_TYPE_armor BEGIN
 			SPRINT value @10010 // ~Passe à %value%~
@@ -563,6 +566,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
+	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure de la cible [contre les] à yy [pendant ...]
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
@@ -577,6 +581,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 	END
 
 	SPRINT description @102134 // ~de modifier la classe d'armure de la cible de %value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_0_common~ BEGIN
+	PATCH_IF parameter2 == 15 BEGIN
+		SET parameter2 = AC_MOD_TYPE_all
+	END
 END
 
 /* ------------------------------------ *
