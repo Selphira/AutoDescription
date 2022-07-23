@@ -1490,14 +1490,19 @@
 
 // Self
 @11010000 = ~~
+@11010002 = ~Immunité au sommeil~
 @11010003 = ~Immunité à la folie du berserker~
 @11010005 = ~Immunité aux charmes~
+@11010006 = ~Immunité aux effets modifiant le charisme~
+@11010009 = ~~ // Opcode visuel
 @11010010 = ~Immunité aux effets modifiant la constitution~
 @11010012 = ~Immunité aux dégâts supplémentaires~ // TODO: KZNINJA.itm (est-ce bien le cas ?)
 @11010013 = ~Immunité à la mort magique~
 @11010015 = ~Immunité aux effets modifiant la dextérité~
 @11010016 = ~Immunité à la hâte~
 @11010019 = ~Immunité aux effets modifiant l'intelligence~
+@11010020 = ~Immunité à l'invisibilité~
+@11010021 = ~Immunité aux effets modifiant la connaissance~
 @11010023 = ~Immunité à la panique~
 @11010024 = ~Immunité à l'horreur~
 @11010025 = ~Immunité aux poisons~
@@ -1505,13 +1510,17 @@
 @11010038 = ~Immunité au silence~
 @11010039 = ~Immunité au sommeil~
 @11010040 = ~Immunité à la lenteur~
+@11010042 = ~Immunité à la mémorisation supplémentaire de sorts profanes~
+@11010043 = ~Immunité à la dépétrification~
 @11010044 = ~Immunité aux effets modifiant la force~
 @11010045 = ~Immunité à l'étourdissement~
+@11010049 = ~Immunité aux effets modifiant la sagesse~
 @11010055 = ~Immunité à la mort magique~
 @11010056 = ~Immunité à l'inversion d'alignement~
 @11010057 = ~Immunité au changement d'alignement~
 @11010058 = ~Immunité à la dissipation~
 @11010060 = ~Immunité à l'échec d'incantation des sorts~
+@11010069 = ~Immunité à la non-détection~
 @11010074 = ~Immunité à l'aveuglement~
 @11010076 = ~Immunité à la débilité mentale~
 @11010078 = ~Immunité à la maladie~
@@ -1521,38 +1530,60 @@
 @11010088 = ~Immunité aux effets modifiant la résistance aux dégâts perforants~
 @11010089 = ~Immunité aux effets modifiant la résistance aux dégâts de projectiles~
 @11010093 = ~Immunité à la fatigue~
+@11010094 = ~Immunité à l'ivresse~
 @11010097 = ~Immunité aux effets modifiant la force exceptionnelle~
 @11010096 = ~Immunité au changement de niveau~
+@11010104 = ~N'accumule plus d'expérience~
 @11010106 = ~Immunité à la peur~
 @11010109 = ~Immunité à la paralysie~
 @11010115 = ~Immunité à la détection de l'alignement~
 @11010116 = ~Immunité à la dissipation de l'invisibilité~
+@11010122 = ~Immunité à la création d'objets magiques~
 @11010126 = ~Immunité aux effets affectant la mobilité~
 @11010128 = ~Immunité à la confusion~
 @11010134 = ~Immunité à la pétrification~
 @11010135 = ~~ // Opcode visuel
+@11010136 = ~Immunité aux effets qui rendent partiellement visible~
 @11010137 = ~Immunité aux effets des chants négatifs~
+@11010139 = ~~ // Opcode textuel
+@11010141 = ~~ // Opcode visuel
 @11010145 = ~Immunité aux effets empêchant de lancer des sorts~
 @11010154 = ~~ // Opcode visuel
 @11010157 = ~Immunité aux toiles~
 @11010158 = ~~ // Opcode visuel
+@11010165 = ~Immunité à la pause~
+@11010168 = ~Immunité à la dissipation des créatures invoquées~
 @11010175 = ~Immunité à la paralysie~
 @11010185 = ~Immunité à la paralysie~
+@11010193 = ~Immunité à la détection des invisibles~
 @11010209 = ~Immunité à la mort magique~
 @11010210 = ~Immunité à l'étourdissement~
 @11010211 = ~Immunité à l'emprisonnement~
 @11010213 = ~Immunité au labyrinthe~
+@11010215 = ~~ // Opcode visuel
 @11010216 = ~Immunité au drain de niveaux~
 @11010217 = ~Immunité au sommeil~
+@11010218 = ~Immunité à la peau de pierre~
+@11010219 = ~Immunité à la classe d'armure contre un type de créature~
 @11010220 = ~Immunité à la dissipation des sorts~ // Removal: Remove School [220]
 @11010221 = ~Immunité à la dissipation des sorts~ // Removal: Remove Secondary Type [221]
 @11010222 = ~Immunité à la téléportation~
+@11010223 = ~Immunité à l'immunité contre une école de magie~
 @11010230 = ~Immunité à la dissipation des sorts~ // Removal: Remove One Secondary Type [230]
+@11010231 = ~Immunité à l'arrêt du temps~
 @11010235 = ~Immunité au renversement~
+@11010236 = ~Immunité à la projection d'image~
 @11010238 = ~Immunité à la désintégration~
 @11010240 = ~~ // Opcode visuel
 @11010241 = ~Immunité aux charmes~
+@11010244 = ~Immunité à l'oubli de sorts profanes~
+@11010246 = ~Immunité à la folie du berserker~
+@11010247 = ~Immunité à la folie du berserker~
+@11010263 = ~Immunité aux attaques sournoises~
 @11010264 = ~Ne lache pas son arme en cas de panique~
+@11010274 = ~Immunité à la téléportation~
+@11010280 = ~Immunité aux hiatus entropiques~
+@11010283 = ~Immunité aux malédictions~
 @11010317 = ~Immunité à la hâte~
 
 // Probability
@@ -1566,6 +1597,9 @@
 // Target
 @11012000 = ~~
 @11012005 = ~Immunise %theTarget% aux charmes~
+@11012012 = ~Immunise %theTarget% aux dégâts supplémentaires~
+@11012144 = ~Immunise %theTarget% à la désactivation des boutons d'interface~ // Pas top...
+@11012146 = ~Immunise %theTarget% aux lancement de sort~ // Pas top...
 
 // Opcode 102: Spell: Immunity (by Power Level) [102]
 
@@ -1633,14 +1667,16 @@
 @11200005 = ~d'immuniser %theTarget% contre les %weaponType% %enchantment%~
 @11200006 = ~d'immuniser %theTarget% contre les %weaponType%~
 
-@11200010 = ~armes de mêlée enchantées~
-@11200011 = ~armes de mêlée magiques~
-@11200012 = ~armes de mêlée non-magiques~
-@11200013 = ~armes de mêlée en argent~
-@11200016 = ~armes de mêlée à 2 mains~
-@11200017 = ~armes de mêlée à 1 main~
-@11200018 = ~armes de mêlée maudites~
-@11200019 = ~armes de mêlée non-maudites~
+@11200010 = ~armes enchantées~
+@11200011 = ~armes magiques~
+@11200012 = ~armes non-magiques~
+@11200013 = ~armes en argent~
+@11200016 = ~armes à 2 mains~
+@11200017 = ~armes à 1 main~
+@11200018 = ~armes maudites~
+@11200019 = ~armes non-maudites~
+@11200020 = ~armes en fer froid~
+@11200021 = ~armes qui ne sont pas en fer froid~
 
 // Opcode 122: Item: Create Inventory Item [122]
 

@@ -20,7 +20,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 
 		PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
 			PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
+				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
 			END
 			ELSE BEGIN
 				PATCH_IF abilityType == AbilityType_Equipped BEGIN

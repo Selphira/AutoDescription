@@ -945,12 +945,16 @@ END
 /* ------------------------- *
  * Death: Instant Death [13] *
  * ------------------------- */
-DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_13~ BEGIN
 	SPRINT description @10130001 // ~Tue instantanément %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
 	LPM ~opcode_target_probability_13~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
+	LPM ~opcode_self_13~ // ~Tue instantanément %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
@@ -1613,12 +1617,16 @@ END
 /* --------------------------- *
  * State: Unconsciousness [39] *
  * --------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
+	SPRINT description @10390001 // ~Endort %theTarget%~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_39~ BEGIN
 	SPRINT description @10390002 // ~d'endormir %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN
-	SPRINT description @10390001 // ~Endort %theTarget%~
+	LPM ~opcode_self_39~ // ~Endort %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_39~ BEGIN
@@ -5573,8 +5581,12 @@ END
 /* ---------------------------------------- *
  * Spell Effect: Explore (Wizard Eye) [268] *
  * ---------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_target_273~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_268~ BEGIN
 	SPRINT description @12680001 // ~Permet %toTheTarget% d'explorer la carte~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_268~ BEGIN
+	LPM ~opcode_self_268~ // ~Permet %toTheTarget% d'explorer la carte~
 END
 
 /* ----------------------------------------------------- *
@@ -5927,21 +5939,21 @@ END
 /* -------------------------------------- *
  * Spell Effect: Backstab Every Hit [303] *
  * -------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_302~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_303~ BEGIN
 	//TODO:si parameter2 == 0, désactive l'effet sur la cible si elle l'avait déjà par un autre moyen
 	SPRINT description @13030001 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_302~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_probability_303~ BEGIN
 	SPRINT description @13030003 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_302~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_303~ BEGIN
 	SPRINT description @13030002 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_302~ BEGIN
-	LPM ~opcode_self_probability_302~ // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+DEFINE_PATCH_MACRO ~opcode_target_probability_303~ BEGIN
+	LPM ~opcode_self_probability_303~ // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 END
 
 /* ------------------------------------- *
@@ -6707,20 +6719,20 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Wrong ids file : %file%~ END
 	END
 END
 
 
 DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVersusName BEGIN
+	SPRINT idVersusName ~~
 	PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		LPF ~get_ids_name~ INT_VAR entry file RET targetType = idName END
 
 		SPRINT idVersusName @102387 // ~contre les %targetType%~
 	END
 	ELSE BEGIN
-		SPRINT idVersusName ~~
-		PATCH_FAIL "%SOURCE_FILE%: opcode %opcode%: Fichier ids numero '%file%' n'existe pas. Objet corrompu ?"
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Wrong ids file : %file%~ END
 	END
 END
 
