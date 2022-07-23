@@ -3284,21 +3284,36 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
-	LPF ~opcode_mod~ INT_VAR strref = 11260001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse de déplacement~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+		SPRINT description @11260003 // ~Immobilise %theTarget%~
 	END
-	LPF ~opcode_target~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+	ELSE BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 11260001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse de déplacement~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
 	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
-	LPF ~opcode_probability~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+		SPRINT description @11260004 // ~d'immobiliser %theTarget%~
+	END
+	ELSE BEGIN
+		LPF ~opcode_probability~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
+		SET parameter2 = MOD_TYPE_percentage
+	END
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+		SPRINT description @11260003 // ~Immobilise %theTarget%~
+	END
+	ELSE BEGIN
+		LPF ~opcode_target~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
@@ -6276,14 +6291,17 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 		END
 	END
-	LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
+	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
 	PATCH_IF parameter2 >= 0 AND parameter2 <= 3 BEGIN
 		LPM ~opcode_mod_base~
-
-		SPRINT description @100001 // ~%name%%colon%%value%~
+		PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
+			SPRINT description @100001 // ~%name%%colon%%value%~
+		END
 	END
 	ELSE BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type incorrect : %parameter2%~ END
