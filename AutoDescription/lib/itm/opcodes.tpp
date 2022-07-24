@@ -339,7 +339,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	314 => 1 // Spell: Golem Stoneskin [314]
 	315 => 1 // Graphics: Animation Removal [315]
 	// EE only
-	319 => 1 // Item Usability [319]
+	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
 	321 => 1 // Removal: Effects specified by Resource [321]
 	326 => 1 // Apply Effects List [326]
