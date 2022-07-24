@@ -511,7 +511,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	SPRINT name @102008 // ~Classe d'armure~
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		SPRINT name @102040  // ~Classe d'armure de base~
+		SPRINT name @10000100  // ~Classe d'armure de base~
 	END
 
 	SPRINT description @100001 // ~%name%%colon%%value%~
@@ -6128,7 +6128,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
-	LOCAL_SET strref = 105000
+	LOCAL_SET strref = 13240000
 	LPM ~opcode_common_324~
 END
 
@@ -6216,7 +6216,7 @@ END
  * Stat: Specific Damage Modifier [332] *
  * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
-	LOCAL_SET strref = 102690 + parameter2
+	LOCAL_SET strref = 13320000 + parameter2
 	LOCAL_SET value = parameter1
 
 	LPF ~signed_value~ INT_VAR value RET value END
