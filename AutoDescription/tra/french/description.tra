@@ -47,6 +47,7 @@
 @102225 = ~Résistance aux dégâts physiques~
 @102245 = ~Protection contre les projectiles non-magiques~
 @102269 = ~Revient dans la main du lanceur~
+@102270 = ~Ne nécessite pas de munitions~
 @102281 = ~Réduit la %resistName% %ofTheTarget% de %value%~
 @102282 = ~Augmente la %resistName% %ofTheTarget% de %value%~
 @102283 = ~Passe la %resistName% %ofTheTarget% à %value%~

@@ -193,7 +193,12 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 	READ_BYTE  (offset + ITM_HEAD_attack_type) attackType
 
 	PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
-		SPRINT desc @102269 // ~Revient dans la main du lanceur~
+		PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
+			SPRINT desc@102270 // ~Ne nécessite pas de munitions~
+		END
+		ELSE BEGIN
+			SPRINT desc @102269 // ~Revient dans la main du lanceur~
+		END
 		SET $EVAL ~combat_abilities_%combatCount%~(0 $combatAbilities(~%combatCount%~ 0) ~%desc%~) = 1
 		SET $combatAbilities(~%combatCount%~ 0) += 1
 	END
