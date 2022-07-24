@@ -232,6 +232,8 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 		END
 	END
+
+    LPF ~get_unique_charged_abilities~ STR_VAR array_name = EVAL ~combat_abilities_%combatCount%~ RET chargeAbilityCount = count RET_ARRAY ~combat_abilities_%combatCount%~ = newAbilities END
 END
 
 DEFINE_PATCH_MACRO ~add_weapon_statistics~ BEGIN
