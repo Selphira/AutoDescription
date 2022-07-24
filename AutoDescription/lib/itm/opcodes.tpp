@@ -6133,7 +6133,7 @@ DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
-	LOCAL_SET strref = 105150
+	LOCAL_SET strref = 13240151
 	LPM ~opcode_common_324~
 END
 
