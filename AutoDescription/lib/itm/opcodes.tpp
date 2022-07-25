@@ -4152,19 +4152,25 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
-	SPRINT description @11780001 // ~%description% %versus%~
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11780001 // ~%description% %versus%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_target~ INT_VAR strref = 10540002 RET description END // ~le TAC0~
-	SPRINT description @11780001 // ~%description% %versus%~
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11780001 // ~%description% %versus%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_probability~ INT_VAR strref = 10540002 RET description END // ~le TAC0~
-	SPRINT description @11780001 // ~%description% %versus%~
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11780001 // ~%description% %versus%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_178~ BEGIN
