@@ -193,7 +193,7 @@ DEFINE_PATCH_FUNCTION ~usability~ RET description BEGIN
 		LPM ~usability_race~
 		LPM ~usability_class_kit~
 
-		LPF ~usability_add_to_description~ INT_VAR strref = 101070 all = (usableByAll AND usable) RET description END                        // Utilisable par
+		LPF ~usability_add_to_description~ INT_VAR strref = 101070 all = (usableByAll AND usable) RET description END             // Utilisable par
 		LPF ~usability_add_to_description~ INT_VAR strref = 101071 all = (usable == 0) STR_VAR type = "unuse" RET description END // Non utilisable par
 	END
 END

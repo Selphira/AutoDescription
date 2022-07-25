@@ -527,7 +527,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
 	ELSE BEGIN
-		LPM ~opcode_0_get_value~
+		//LPM ~opcode_0_get_value~
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -535,12 +535,12 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		END
 	END
 
-	PATCH_IF armor_class_show_bonus_malus BEGIN
-		TO_LOWER value
-		SPRINT description @10000104 // ~de modifier la classe d'armure de la cible d'un %value%~
+	PATCH_IF value > 0 BEGIN
+		SPRINT description @10000103 // ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
 	END
 	ELSE BEGIN
-		SPRINT description @10000103 // ~de modifier la classe d'armure de la cible de %value%~
+		SET value = ABS value
+		SPRINT description @10000104 // ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
 	END
 END
 
@@ -610,7 +610,9 @@ DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
 			SPRINT value @10010 // ~Passe à %value%~
 		END
 		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-			SPRINT value @10005 // ~Fixée à %value%~
+			SPRINT value @10010008 // ~Fixée à %value%~
+		END PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
+			SPRINT value @10010007 // ~une demi supplémentaire~
 		END
 	END
 
@@ -648,6 +650,8 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 		SET parameter1 = ABS parameter1
 	END
 
+	SPRINT oneHalf @10010005 // ~une demi~
+	SPRINT andHalf @10010006 // ~\1 et demi~
 	// Weidu ne gérant pas les nombres flottants, une solution est de passer par des nombres 10 fois plus grand.
 	SET value = $opcode_1_values(~%parameter1%~)
 
@@ -656,11 +660,9 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
     END
 
 	INNER_PATCH_SAVE value ~%value%~ BEGIN
-		SPRINT oneHalf @10011
-		SPRINT andHalf @10012
 		REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
 		REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
-		REPLACE_TEXTUALLY ~5$~ ~ %oneHalf%~          // 5  => une demi
+		REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
 	END
 END
 

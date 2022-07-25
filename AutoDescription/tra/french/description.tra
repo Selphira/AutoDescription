@@ -19,8 +19,6 @@
 @10006 = ~Multiplié par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10010 = ~Passe à %value%~
-@10011 = ~une demi~
-@10012 = ~\1 et demi~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
 @100001 = ~%name%%colon%%value%~
@@ -537,7 +535,8 @@
 @10000102 = ~Malus de %value%~
 @10000103 = ~de modifier la classe d'armure %ofTheTarget% de %value%~
 @10000104 = ~de modifier la classe d'armure %ofTheTarget% d'un %value%~
-@10000104 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~
+@10000103 = ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
+@10000104 = ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
@@ -545,6 +544,10 @@
 @10010002 = ~de passer l'attaque par round %ofTheTarget% à %value%~
 @10010003 = ~de multiplier l'attaque par round %ofTheTarget% par %value%~
 @10010004 = ~de fixer l'attaque par round %ofTheTarget% à %value%~
+@10010005 = ~une demi~
+@10010006 = ~\1 et demi~
+@10010007 = ~une demi supplémentaire~
+@10010008 = ~Fixée à %value%~
 
 // Opcode 2: Cure: Sleep [2]
 
@@ -2034,7 +2037,6 @@
 
 // Opcode 324: Protection: Immunity to Resource and Message [324]
 
-@13240000 = ~~
 @13240000 = ~~
 @13240001 = ~Inefficace contre les morts-vivants~
 @13240002 = ~Effectif contre les morts-vivants~

@@ -8,8 +8,8 @@ END
 
 DEFINE_PATCH_FUNCTION ~format_flatted_attack_per_round~ INT_VAR strref = 0 STR_VAR value = ~~ RET value BEGIN
 	INNER_PATCH_SAVE value ~%value%~ BEGIN
-		SPRINT oneHalf @10011
-		SPRINT andHalf @10012
+		SPRINT oneHalf @10010005
+		SPRINT andHalf @10010006
 		REPLACE_TEXTUALLY ~^5$~ ~%oneHalf%~           // 5  => une demi
 		REPLACE_TEXTUALLY ~^\([0-9]\)?5$~ ~%andHalf%~ // 25 => 2 et demi
 	END
