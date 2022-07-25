@@ -1097,13 +1097,51 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
-	LPF ~opcode_target~ INT_VAR strref = 10180002 RET description END // ~les points de vie maximum~
+
+	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF parameter1 > 0 BEGIN
+	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+        END
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
+	END
+
 	LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 	LPM ~opcode_18_common~
-	LPF ~opcode_probability~ INT_VAR strref = 10180002 RET description END // ~les points de vie maximum~
+
+	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF parameter1 > 0 BEGIN
+	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
+        END
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @102545 // ~de passer %theStatistic% %ofTheTarget% à %value%~
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102546 // ~de multiplier %theStatistic% %ofTheTarget% par %value%~
+	END
+
 	LPM ~opcode_18_not_cumulative~
 END
 
@@ -1114,7 +1152,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	SET isCumulative = 1
 	SET damageAmount = parameter1
-	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET parameter1 = damage END
+	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 
 	PATCH_IF parameter2 == 6 BEGIN
 		SET isCumulative = 0
