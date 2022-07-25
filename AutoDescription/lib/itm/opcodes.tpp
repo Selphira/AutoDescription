@@ -315,7 +315,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	269 => 0 // Spell Effect: Shake Window [269]
 	270 => 0 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
-	272 => 1 // Spell: Apply Effect on Condition [272]
+	272 => 1 // Spell: Apply Repeating EFF [272]
 	279 => 1 // Button: Enable Button [279]
 	282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
@@ -4524,13 +4524,17 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_202~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
 
-	SPRINT description @12020001 // ~Renvoie les sorts de l'école %spellSchoolName%~
+	PATCH_IF NOT ~%spellSchoolName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12020001 // ~Renvoie les sorts de l'école %spellSchoolName%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_202~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
 
-	SPRINT description @12020002 // ~de renvoyer les sorts de l'école %spellSchoolName%~
+	PATCH_IF NOT ~%spellSchoolName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12020002 // ~de renvoyer les sorts de l'école %spellSchoolName%~
+	END
 END
 
 /* --------------------------------------- *
