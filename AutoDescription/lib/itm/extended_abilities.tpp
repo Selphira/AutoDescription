@@ -284,8 +284,6 @@ END
 DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 	LPF ~weapon_modes_has_same_statistics~ RET hasSameStatistics END
 
-	// TODO: Si les statistiques de l'arme ET les capacités de combat associées sont les mêmes, afficher comme si on n'avait qu'un seul effet étendu (Ex: U#STAF01.itm, F_ICEAX5)
-
 	PATCH_IF combatCount == 1 BEGIN
 		PATCH_IF $combatAbilities(0 0) > 0 BEGIN
 			LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
@@ -300,6 +298,37 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 	END
 	ELSE BEGIN
 		PATCH_IF hasSameStatistics == 1 BEGIN // On affiche une seule fois les statistiques de l'arme
+			PATCH_IF combatCount > 0 BEGIN
+				SPRINT newTac0 ~~
+				SPRINT newDamage ~~
+				SPRINT newDamageType ~~
+				SPRINT newSpeedFactor ~~
+				SPRINT damageTypes ~~
+
+				FOR (index = 0; index < combatCount; index += 1) BEGIN
+					PATCH_PHP_EACH ~weapon_statistics_%index%~ AS stats => value BEGIN
+						SPRINT newTac0 ~%stats_0%~
+						SPRINT newDamage ~%stats_1%~
+						SPRINT newDamageType ~%stats_2%~
+						SPRINT newSpeedFactor ~%stats_3%~
+
+						LPF ~get_strrefs_from_tooltip~ STR_VAR id = EVAL ~%SOURCE_RES%~ RET strref_0 strref_1 strref_2 END
+						SPRINT strref EVAL ~%strref_%index%%~
+						SPRINT section @100011 // ~Capacités de combat~
+
+						PATCH_IF EVAL ~%strref%~ > 0 BEGIN
+							GET_STRREF strref sectionType
+							SPRINT damageTypes ~%stats_2% %sectionType%;%damageTypes%~
+						END
+					END
+				END
+				SPRINT newDamageType ~%damageTypes%~
+				PATCH_IF NOT ~%newDamageType%~ STRING_EQUAL ~~ BEGIN
+					CLEAR_ARRAY weapon_statistics_0
+	                SET $weapon_statistics_0(~%newTac0%~ ~%newDamage%~ ~%newDamageType%~ ~%newSpeedFactor%~) = 1
+				END
+			END
+
 			PATCH_PHP_EACH weapon_statistics_0 AS stats => v BEGIN
 				FOR (index = 0; index < combatCount; index += 1) BEGIN
 					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
@@ -380,23 +409,45 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics_to_description~ BEGIN
 	PATCH_IF ~%stats_1%~ STRING_EQUAL ~~ = 0 BEGIN
 		LPF ~appendValue~ INT_VAR strref = 10730001 STR_VAR value = EVAL ~%stats_1%~ RET description END // ~Dégâts~
 	END
-	PATCH_IF ~%stats_2%~ > 0 BEGIN
-		SET strref = 102010 + stats_2
-		SPRINT value (AT ~%strref%~)
 
-		LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+	PATCH_IF NOT ~%stats_2%~ STRING_EQUAL ~~ BEGIN
+		INNER_PATCH_SAVE stats_2 ~%stats_2%~ BEGIN
+			REPLACE_TEXTUALLY ~;~ ~
+~
+		END
+		INNER_PATCH ~%stats_2%~ BEGIN
+	        COUNT_2DA_ROWS 2 rowcount
+			FOR (i=0;i<rowcount;i+=1) BEGIN
+				READ_2DA_ENTRY i 0 2 key
+				READ_2DA_ENTRY i 1 2 type
+
+				PATCH_IF ~%key%~ > 0 BEGIN
+					SET strref = 102010 + key
+					SPRINT value (AT ~%strref%~)
+					SPRINT value ~%value% (%type%)~
+					LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+				END
+			END
+			PATCH_IF rowcount == 0 AND ~%stats_2%~ > 0 BEGIN
+	            SET strref = 102010 + stats_2
+	            SPRINT value (AT ~%strref%~)
+
+	            LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+	        END
+		END
 	END
 	LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = EVAL ~%stats_3%~ RET description END // ~Facteur de vitesse~
 END
 
 DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_statistics~ RET hasSameStatistics BEGIN
 	SET hasSameStatistics = 1
-
+	// ~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~
+	// Ignore damageType
 	PATCH_IF combatCount > 1 BEGIN
 		PATCH_PHP_EACH weapon_statistics_0 AS base => value BEGIN
 			FOR (index = 1; index < combatCount; index += 1) BEGIN
 				PATCH_PHP_EACH ~weapon_statistics_%index%~ AS data => value2 BEGIN
-					PATCH_IF ~%base_0%~ != ~%data_0%~ OR (~%base_1%~ STRING_EQUAL ~%data_1%~) == 0 OR ~%base_2%~ != ~%data_2%~ OR ~%base_3%~ != ~%data_3%~ BEGIN
+					PATCH_IF ~%base_0%~ != ~%data_0%~ OR (~%base_1%~ STRING_EQUAL ~%data_1%~) == 0 OR ~%base_3%~ != ~%data_3%~ BEGIN
 						SET hasSameStatistics = 0
 					END
 				END

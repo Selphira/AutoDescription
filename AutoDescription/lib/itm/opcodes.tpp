@@ -519,7 +519,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LOCAL_SPRINT versus ~~
-	LOCAL_SET value = ~%parameter1%~
+	LOCAL_SET value = ABS ~%parameter1%~
 
 	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
@@ -535,11 +535,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		END
 	END
 
-	PATCH_IF value > 0 BEGIN
+	PATCH_IF parameter1 > 0 BEGIN
 		SPRINT description @10000103 // ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
 	END
 	ELSE BEGIN
-		SET value = ABS value
 		SPRINT description @10000104 // ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
 	END
 END
