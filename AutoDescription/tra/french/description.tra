@@ -41,8 +41,8 @@
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
-@101183 = ~jet de sauvegarde %saveTypeStr% pour moitié~
-@101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour moitié~
+@101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
+@101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 @101185 = ~%description% (non cumulable)~

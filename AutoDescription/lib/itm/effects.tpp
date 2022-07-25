@@ -226,7 +226,7 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
         PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
 			PATCH_IF saveForHalf == 1 BEGIN
-				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour moitié~
+				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
@@ -234,7 +234,7 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
         END
         ELSE BEGIN
 			PATCH_IF saveForHalf == 1 BEGIN
-				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour moitié~
+				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
