@@ -741,6 +741,7 @@ DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
 			SPRINT theTarget   @102384 // ~les %targetType%~
 			SPRINT ofTheTarget @102385 // ~des %targetType%~
 			SPRINT toTheTarget @102386 // ~aux %targetType%~
+			LPM ~add_target_level~
 		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
@@ -760,6 +761,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_5~ BEGIN
 			SPRINT theTarget   @102384 // ~les %targetType%~
 			SPRINT ofTheTarget @102385 // ~des %targetType%~
 			SPRINT toTheTarget @102386 // ~aux %targetType%~
+			LPM ~add_target_level~
 		END
 
 		PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
@@ -4168,6 +4170,7 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 		SPRINT ofTheTarget @102385 // ~des %targetType%~
 		SPRINT toTheTarget @102386 // ~aux %targetType%~
 		SPRINT versus      @102387 // ~contre les %targetType%~
+		LPM ~add_target_level~
 	END
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded ignoreDuration opcode END
 END

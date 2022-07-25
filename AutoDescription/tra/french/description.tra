@@ -110,6 +110,10 @@
 @101182 = ~aux membres du groupe~
 @102386 = ~aux %targetType%~
 @102387 = ~contre les %targetType%~
+@101186 = ~%target% (de niveau %levelMin%)~
+@101187 = ~%target% (de niveau %levelMax% ou moins)~
+@101188 = ~%target% (de niveau %levelMin% ou plus)~
+@101189 = ~%target% (de niveau %levelMin% à %levelMax%)~
 
 // (Non) Utilisable par
 @101000 = ~chaotique~

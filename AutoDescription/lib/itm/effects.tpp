@@ -53,6 +53,8 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 					END
 				END
 
+				LPM ~add_target_level~
+
 				PATCH_IF probability == 100 BEGIN
 					SPRINT method ~opcode%opcode_target%_%opcode_n%~
 					LPM ~%method%~
@@ -246,6 +248,33 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
+	LOCAL_SET levelMin = diceSides
+	LOCAL_SET levelMax = diceCount
+	LOCAL_SET strref   = 0
+	PATCH_IF (diceCount > 0 OR diceSides > 0) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 OR (opcode == 218 AND is_ee ==1 AND parameter2 == 1)) BEGIN
+		PATCH_IF diceSides == diceCount BEGIN
+			SET strref = 101186
+		END
+		ELSE PATCH_IF diceSides == 0 AND diceCount > 0 BEGIN
+			SET strref = 101187
+		END
+		ELSE PATCH_IF diceSides > 1 AND diceCount == 0 BEGIN
+			SET strref = 101188
+		END
+		ELSE PATCH_IF diceSides > 1 AND diceCount > 0 BEGIN
+			SET strref = 101189
+		END
+
+		PATCH_IF strref != 0 BEGIN
+		    PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
+		        SPRINT target EVAL ~%%vTarget%%~
+		        SPRINT EVAL ~%vTarget%~ (AT strref)
+		    END
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ~block_to_vars~ BEGIN
 	READ_SHORT (blockOffset) opcode
 	READ_BYTE  (blockOffset + EFF_target) target
@@ -298,7 +327,7 @@ DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 dam
 			SPRINT ~damage~ @10014 // ~%diceCount%d%diceSides%~
 		END
 	END
-	PATCH_IF damageAmount > 0 BEGIN
+	PATCH_IF damageAmount != 0 BEGIN
 		LPF ~signed_value~ INT_VAR value = EVAL ~%damageAmount%~ RET damageAmount = value END
 		PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 			SPRINT ~damage~ ~%damageAmount%~
