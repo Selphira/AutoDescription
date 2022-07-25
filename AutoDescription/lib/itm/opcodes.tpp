@@ -1113,6 +1113,8 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	SET isCumulative = 1
+	SET damageAmount = parameter1
+	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET parameter1 = damage END
 
 	PATCH_IF parameter2 == 6 BEGIN
 		SET isCumulative = 0
