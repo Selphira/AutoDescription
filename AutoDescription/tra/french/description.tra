@@ -1125,9 +1125,9 @@
 @10990004 = ~Réduit la durée des sorts profanes de %duration%~
 @10990005 = ~Réduit la durée des sorts divins de %duration%~
 @10990006 = ~Réduit la durée des chants de barde de %duration%~
-@10990007 = ~Augmente la durée des sorts profanes de %duration%~
-@10990008 = ~Augmente la durée des sorts divins de %duration%~
-@10990009 = ~Augmente la durée des chants de barde de %duration%~
+@10990007 = ~Allonge la durée des sorts profanes de %duration%~
+@10990008 = ~Allonge la durée des sorts divins de %duration%~
+@10990009 = ~Allonge la durée des chants de barde de %duration%~
 
 @10990011 = ~Réduit à néant la durée des sorts profanes %ofTheTarget%~
 @10990012 = ~Réduit à néant la durée des sorts divins %ofTheTarget%~
@@ -1135,9 +1135,9 @@
 @10990014 = ~Réduit la durée des sorts profanes %ofTheTarget% de %duration%~
 @10990015 = ~Réduit la durée des sorts divins %ofTheTarget% de %duration%~
 @10990016 = ~Réduit la durée des chants de barde %ofTheTarget% de %duration%~
-@10990017 = ~Augmente la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990018 = ~Augmente la durée des sorts divins %ofTheTarget% de %duration%~
-@10990019 = ~Augmente la durée des chants de barde %ofTheTarget% de %duration%~
+@10990017 = ~Allonge la durée des sorts profanes %ofTheTarget% de %duration%~
+@10990018 = ~Allonge la durée des sorts divins %ofTheTarget% de %duration%~
+@10990019 = ~Allonge la durée des chants de barde %ofTheTarget% de %duration%~
 
 @10990021 = ~de réduire à néant la durée des sorts profanes %ofTheTarget%~
 @10990022 = ~de réduire à néant la durée des sorts divins %ofTheTarget%~
@@ -1145,9 +1145,9 @@
 @10990024 = ~de réduire la durée des sorts profanes %ofTheTarget% de %duration%~
 @10990025 = ~de réduire la durée des sorts divins %ofTheTarget% de %duration%~
 @10990026 = ~de réduire la durée des chants de barde %ofTheTarget% de %duration%~
-@10990027 = ~d'augmenter la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990028 = ~d'augmenter la durée des sorts divins %ofTheTarget% de %duration%~
-@10990029 = ~d'augmenter la durée des chants de barde %ofTheTarget% de %duration%~
+@10990027 = ~d'allonger la durée des sorts profanes %ofTheTarget% de %duration%~
+@10990028 = ~d'allonger la durée des sorts divins %ofTheTarget% de %duration%~
+@10990029 = ~d'allonger la durée des chants de barde %ofTheTarget% de %duration%~
 
 // Opcode 100: Protection: from Creature Type [100]
 
