@@ -56,7 +56,7 @@
 @102011 = ~Perforant~
 @102012 = ~Contondant~
 @102013 = ~Tranchant~
-@102014 = ~Projectile (perforant)~
+@102014 = ~Projectile~
 @102015 = ~Poing~
 @102016 = ~Perforant / Contondant~
 @102017 = ~Perforant / Tranchant~
@@ -111,8 +111,8 @@
 @102386 = ~aux %targetType%~
 @102387 = ~contre les %targetType%~
 @101186 = ~%target% (de niveau %levelMin%)~
-@101187 = ~%target% (de niveau %levelMax% ou moins)~
-@101188 = ~%target% (de niveau %levelMin% ou plus)~
+@101187 = ~%target% (de niveau %levelMax% ou inférieur)~
+@101188 = ~%target% (de niveau %levelMin% ou supérieur)~
 @101189 = ~%target% (de niveau %levelMin% à %levelMax%)~
 
 // (Non) Utilisable par
@@ -296,6 +296,9 @@
 @204159 = ~planétaires déchus~
 @204161 = ~gobelins~
 @204175 = ~morts-vivants spectraux~
+@204177 = ~chimères~
+@204178 = ~demi-dragons~
+@204179 = ~yétis~
 @204199 = ~ettins~
 
 /* --------- *
@@ -338,7 +341,7 @@
 @205116 = ~goules~
 @205117 = ~revenants~
 @205118 = ~blêmes~
-//@205119 = ~GIBBERLING ???~
+@205119 = ~grouilleux~
 @205120 = ~gnolls~
 @205121 = ~hobgobelins~
 @205122 = ~kobolds~
@@ -354,7 +357,7 @@
 @205133 = ~nymphes~
 @205134 = ~squelettes~
 @205135 = ~combattants squelettes~
-//@205136 = ~SKELETON_BANEGUARD ???~
+@205136 = ~Garde funeste~
 @205137 = ~araignées géantes~
 @205138 = ~araignées colossales~
 @205139 = ~araignées éclipsantes~
@@ -1218,6 +1221,7 @@
 @11010141 = ~~ // Opcode visuel
 @11010145 = ~Immunité aux effets empêchant de lancer des sorts~
 @11010154 = ~~ // Opcode visuel
+@11010156 = ~~ // Opcode visuel
 @11010157 = ~Immunité aux toiles~
 @11010158 = ~~ // Opcode visuel
 @11010165 = ~Immunité à la pause~
@@ -1533,7 +1537,7 @@
 
 // Opcode 180: Item: Can't Use Item [180]
 
-@11800001 = ~Unique : Un seul exemple peut être équipé~
+@11800001 = ~Unique : Un seul exemplaire peut être équipé~
 @11800002 = ~Empêche d'utiliser %itemName%~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
