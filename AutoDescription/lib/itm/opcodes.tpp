@@ -5537,24 +5537,30 @@ END
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_261~ BEGIN
 	LOCAL_SET spellLevel = parameter1
+	LOCAL_SET strref = 12610001
 
-	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @12610001 // ~Fait remémoriser 1 sort profane de niveau %spellLevel% ou moins %toTheTarget%~
+	PATCH_IF spellLevel > 1 BEGIN
+		SET strref += 1
 	END
-	ELSE BEGIN
-		SPRINT description @12610002 // ~Fait remémoriser 1 sort divin de niveau %spellLevel% ou moins %toTheTarget%~
+	PATCH_IF parameter2 != 0 BEGIN
+		SET strref += 2
 	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_261~ BEGIN
 	LOCAL_SET spellLevel = parameter1
+	LOCAL_SET strref = 12610005
 
-	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @12610003 // ~de faire remémoriser 1 sort profane de niveau %spellLevel% ou moins %toTheTarget%~
+	PATCH_IF spellLevel > 1 BEGIN
+		SET strref += 1
 	END
-	ELSE BEGIN
-		SPRINT description @12610004 // ~de faire remémoriser 1 sort divin de niveau %spellLevel% ou moins %toTheTarget%~
+	PATCH_IF parameter2 != 0 BEGIN
+		SET strref += 2
 	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_261~ BEGIN
