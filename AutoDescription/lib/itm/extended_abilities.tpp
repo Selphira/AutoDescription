@@ -378,8 +378,7 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 			END
 			ELSE BEGIN
 				FOR (index = 0; index < combatCount; index += 1) BEGIN
-					SPRINT itemRef $combatAbilities(~%index%~ 1)
-					LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
+					LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
 
 					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
 						PATCH_IF keyAbilities == index BEGIN
@@ -508,21 +507,23 @@ DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_abilities~ RET hasSameAbilities key
 		PATCH_PHP_EACH ~combat_abilities_0~ AS base => value BEGIN
             PATCH_IF NOT ~%base_2%~ STRING_EQUAL ~%ignored%~ BEGIN
 				FOR (index = 1; index < combatCount; index += 1) BEGIN
-					SET hasSameAbility = 0
-	                PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value2 BEGIN
-	                    PATCH_IF NOT ~%data_2%~ STRING_EQUAL ~%ignored%~ BEGIN
-							PATCH_IF ~%base_2%~ STRING_EQUAL ~%data_2%~ BEGIN
+					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
+						SET hasSameAbility = 0
+		                PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value2 BEGIN
+		                    PATCH_IF NOT ~%data_2%~ STRING_EQUAL ~%ignored%~ BEGIN
+								PATCH_IF ~%base_2%~ STRING_EQUAL ~%data_2%~ BEGIN
+									SET hasSameAbility = 1
+								END
+		                    END
+		                    ELSE BEGIN
 								SET hasSameAbility = 1
-							END
-	                    END
-	                    ELSE BEGIN
-							SET hasSameAbility = 1
-	                        SET keyAbilities = index
-	                    END
-	                END
-	                PATCH_IF hasSameAbility == 0 BEGIN
-	                    SET hasSameAbilities = 0
-	                END
+		                        SET keyAbilities = index
+		                    END
+		                END
+		                PATCH_IF hasSameAbility == 0 BEGIN
+		                    SET hasSameAbilities = 0
+		                END
+					END
 				END
             END
             ELSE BEGIN
