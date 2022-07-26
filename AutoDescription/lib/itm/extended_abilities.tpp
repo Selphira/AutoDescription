@@ -282,8 +282,6 @@ DEFINE_PATCH_MACRO ~add_charge_abilities_to_description~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
-	LPF ~weapon_modes_has_same_statistics~ RET hasSameStatistics END
-
 	PATCH_IF combatCount == 1 BEGIN
 		PATCH_IF $combatAbilities(0 0) > 0 BEGIN
 			LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
@@ -297,7 +295,11 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 		END
 	END
 	ELSE BEGIN
+		LPF ~weapon_modes_has_same_statistics~ RET hasSameStatistics END
+		LPF ~weapon_modes_has_same_abilities~ RET hasSameAbilities keyAbilities END
+
 		PATCH_IF hasSameStatistics == 1 BEGIN // On affiche une seule fois les statistiques de l'arme
+			// On regroupe les types de dégâts en un seul point de l'entrée 0, entrée qui sert à l'affichage
 			PATCH_IF combatCount > 0 BEGIN
 				SPRINT newTac0 ~~
 				SPRINT newDamage ~~
@@ -330,12 +332,22 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 			END
 
 			PATCH_PHP_EACH weapon_statistics_0 AS stats => v BEGIN
-				FOR (index = 0; index < combatCount; index += 1) BEGIN
-					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
-						SPRINT itemRef $combatAbilities(~%index%~ 1)
-						LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
+				PATCH_IF hasSameAbilities == 0 BEGIN
+					FOR (index = 0; index < combatCount; index += 1) BEGIN
+						PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
+							SPRINT itemRef $combatAbilities(~%index%~ 1)
+							LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
 
-	                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+		                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+								LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+		                    END
+						END
+					END
+				END
+				ELSE BEGIN
+					PATCH_IF $combatAbilities(~%keyAbilities%~ 0) > 0 BEGIN
+						LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+	                    PATCH_PHP_EACH ~combat_abilities_%keyAbilities%~ AS data => value BEGIN
 							LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
 	                    END
 					END
@@ -345,18 +357,36 @@ DEFINE_PATCH_MACRO ~add_combat_abilities_to_description~ BEGIN
 			END
 		END
 		ELSE BEGIN // On affiche les statistiques de l'arme pour chaque utilisation différentes (jeté, melée, etc...)
-			FOR (index = 0; index < combatCount; index += 1) BEGIN
-				SPRINT itemRef $combatAbilities(~%index%~ 1)
+			PATCH_IF hasSameAbilities == 0 BEGIN
+				FOR (index = 0; index < combatCount; index += 1) BEGIN
+					LPF ~appendSection~ INT_VAR strref = 100011 RET description END // ~Capacités de combat~
+
+					PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
+	                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+							LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
+	                    END
+					END
+					PATCH_PHP_EACH ~weapon_statistics_%index%~ AS stats => value BEGIN
+						LPF ~appendLine~    RET description END
+						LPM ~add_weapon_statistics_to_description~
+					END
+				END
+			END
+			ELSE BEGIN
+				SPRINT itemRef $combatAbilities(~%keyAbilities%~ 1)
 				LPF ~add_combat_section_to_description~ STR_VAR itemRef RET description END
 
-				PATCH_IF $combatAbilities(~%index%~ 0) > 0 BEGIN
-                    PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value BEGIN
+				PATCH_IF $combatAbilities(0 0) > 0 BEGIN
+                    PATCH_PHP_EACH ~combat_abilities_%keyAbilities%~ AS data => value BEGIN
 						LPF ~appendProperty~ STR_VAR name = EVAL ~%data_2%~ RET description END
                     END
 				END
-				PATCH_PHP_EACH ~weapon_statistics_%index%~ AS stats => value BEGIN
-					LPF ~appendLine~    RET description END
-					LPM ~add_weapon_statistics_to_description~
+
+				FOR (index = 0; index < combatCount; index += 1) BEGIN
+					PATCH_PHP_EACH ~weapon_statistics_%index%~ AS stats => value BEGIN
+						LPF ~appendLine~    RET description END
+						LPM ~add_weapon_statistics_to_description~
+					END
 				END
 			END
 			LPF ~appendLine~ RET description END
@@ -453,6 +483,49 @@ DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_statistics~ RET hasSameStatistics B
 				END
 			END
 		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~weapon_modes_has_same_abilities~ RET hasSameAbilities keyAbilities BEGIN
+	SET hasSameAbilities = 1
+	SET keyAbilities = ~-1~
+	SPRINT ignored @102269 // ~Revient dans la main du lanceur~
+
+	PATCH_IF combatCount > 1 BEGIN
+		FOR (index = 1; index < combatCount; index += 1) BEGIN
+			PATCH_IF keyAbilities == ~-1~ AND $combatAbilities(~%index%~ 0) > 0 BEGIN
+				SET keyAbilities = index
+				SET index = combatCount
+			END
+		END
+
+		PATCH_PHP_EACH ~combat_abilities_0~ AS base => value BEGIN
+            PATCH_IF NOT ~%base_2%~ STRING_EQUAL ~%ignored%~ BEGIN
+				FOR (index = 1; index < combatCount; index += 1) BEGIN
+					SET hasSameAbility = 0
+	                PATCH_PHP_EACH ~combat_abilities_%index%~ AS data => value2 BEGIN
+	                    PATCH_IF NOT ~%data_2%~ STRING_EQUAL ~%ignored%~ BEGIN
+							PATCH_IF ~%base_2%~ STRING_EQUAL ~%data_2%~ BEGIN
+								SET hasSameAbility = 1
+							END
+	                    END
+	                    ELSE BEGIN
+							SET hasSameAbility = 1
+	                        SET keyAbilities = index
+	                    END
+	                END
+	                PATCH_IF hasSameAbility == 0 BEGIN
+	                    SET hasSameAbilities = 0
+	                END
+				END
+            END
+            ELSE BEGIN
+                SET keyAbilities = 0
+            END
+		END
+	END
+	PATCH_IF keyAbilities == ~-1~ BEGIN
+		SET keyAbilities = 0
 	END
 END
 
