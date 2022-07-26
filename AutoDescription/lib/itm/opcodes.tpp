@@ -2733,7 +2733,7 @@ END
 /* ---------------------------- *
  * Tracking Skill Modifier [95] *
  * ---------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_94~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_95~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 10950001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Pistage~
 END
 
@@ -2741,7 +2741,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_95~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 10950002 RET description END // ~le pistage~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_94~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_95~ BEGIN
 	LPF ~opcode_target~ INT_VAR strref = 10950002 RET description END // ~le pistage~
 END
 
