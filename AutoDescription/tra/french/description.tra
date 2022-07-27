@@ -17,7 +17,7 @@
 @10002 = ~%value% %~
 @10003 = ~+%value%~
 @10006 = ~Multiplié par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
@@ -294,11 +294,31 @@
 @204157 = ~devas déchues~
 @204158 = ~planétaires~
 @204159 = ~planétaires déchus~
+@204160 = ~scarabées~
 @204161 = ~gobelins~
+@204162 = ~hommes-lézard~
+@204164 = ~myconides~
+@204165 = ~oursons~
+@204166 = ~feyr~ //TODO: A traduire
+@204167 = ~hook horror~ //TODO: A traduire
+@204168 = ~hurleurs~
+@204169 = ~salamandres~
+@204170 = ~oiseaux~
+@204171 = ~minotaures~
+@204172 = ~driders~
+@204173 = ~simulacres~
+@204174 = ~harpies~
 @204175 = ~morts-vivants spectraux~
+@204176 = ~tertres errants~
 @204177 = ~chimères~
 @204178 = ~demi-dragons~
 @204179 = ~yétis~
+@204180 = ~barrils~
+@204181 = ~feu follets~
+@204182 = ~mammifères~
+@204183 = ~reptiles~
+@204184 = ~tréants~
+@204185 = ~aasimars~
 @204199 = ~ettins~
 
 /* --------- *
