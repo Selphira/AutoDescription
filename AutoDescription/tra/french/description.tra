@@ -1949,6 +1949,13 @@
 
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~
 
+// Opcode 272: Spell: Apply Repeating EFF [272]
+
+@12720000 = ~%description%, à chaque seconde~
+@12720002 = ~%description%, %frequency% fois par seconde~
+@12720003 = ~%description%, toutes les %frequency% secondes~
+@12720004 = ~%description%, tous les %frequency% rounds~
+
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
 @12730001 = ~Zone d'air pur~

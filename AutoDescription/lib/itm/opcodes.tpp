@@ -171,6 +171,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 69 => 240 // Protection: From Detection (Non-Detection) [69]
 	212 => 241 // Protection: Freedom [212]
 	172 => 244 // Spell: Remove Spell [172]
+	272 => 245 // Spell: Apply Repeating EFF [272]
 	148 => 245 // Spell: Cast Spell (at Point) [148]
 	201 => 246 // Spell: Decrementing Spell Immunity [201]
 	199 => 247 // Spell: Bounce Spells [199]
@@ -315,7 +316,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	269 => 0 // Spell Effect: Shake Window [269]
 	270 => 0 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
-	272 => 1 // Spell: Apply Repeating EFF [272]
 	279 => 1 // Button: Enable Button [279]
 	282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
@@ -5701,6 +5701,37 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_268~ BEGIN
 	LPM ~opcode_self_268~ // ~Permet %toTheTarget% d'explorer la carte~
+END
+
+/* -------------------------------- *
+ * Spell: Apply Repeating EFF [272] *
+ * -------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
+	LOCAL_SET strref = 12720000 + parameter2
+	LOCAL_SET frequency = parameter1
+
+	PATCH_IF parameter1 <= 0 BEGIN
+        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid value for parameter1 : %parameter2%~ END
+	END
+	PATCH_IF parameter2 == 1 OR parameter2 >= 5 BEGIN
+        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 OR %parameter2% == 2 => crash the game~ END
+	END
+	ELSE BEGIN
+		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_272~ BEGIN
+	LPM ~opcode_self_272~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_272~ BEGIN
+	LPM ~opcode_self_272~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
+	LPM ~opcode_self_probability_272~
 END
 
 /* ----------------------------------------------------- *
