@@ -4,14 +4,7 @@ BLUN30.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 BLUN30.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 BOOT08.ITM : Opcode 272 à gérer.
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '274'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '80'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '81'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '82'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '83'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '84'
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '205'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '206'
-CLCK24.ITM : Opcode 197 : Réflection du type de projectile '212'
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '219'
 cftroll.eff : Opcode 123 à gérer.
 JWSUPER.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
@@ -29,43 +22,6 @@ RING09.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 ROSSRING.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 ROSSRING.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 ROSSRING.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '1'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '4'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '2'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '5'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '3'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '11'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '12'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '13'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '14'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '15'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '26'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '27'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '28'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '29'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '30'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '31'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '32'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '33'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '34'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '35'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '6'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '8'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '7'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '9'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '10'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '30'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '55'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '56'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '57'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '58'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '59'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '18'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '19'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '10'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '16'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '17'
-SHLD24.ITM : Opcode 197 : Réflection du type de projectile '102'
 SPER12.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SPER12.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 SPER12.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.

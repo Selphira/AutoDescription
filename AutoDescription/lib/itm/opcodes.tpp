@@ -4439,27 +4439,50 @@ END
  * Spell: Bounce Projectile [197] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
-	PATCH_MATCH parameter2 WITH
-		 36 BEGIN SPRINT description @11970001 END // ~Renvoie les projectiles magiques~
-		 64 BEGIN SPRINT description @11970002 END // ~Renvoie les attaques de regard~
-		208 BEGIN SPRINT description @11970003 END // ~Renvoie les rayons des spectateurs~
-		312 BEGIN SPRINT description @11970004 END // ~Renvoie les dagues boomerang~
-		39 442 BEGIN SPRINT description @11970005 END // ~Renvoie les éclairs~
-		DEFAULT
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
-    END
+	LOCAL_SET strref = 11970001 // ~Renvoie les %projectiles%~
+	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
+	LOCAL_SET strref = 11970002 // ~de renvoyer les %projectiles%~
+	LPM ~opcode_197_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
+	LOCAL_SET projref = 0
 	PATCH_MATCH parameter2 WITH
-		 36 BEGIN SPRINT description @11970501 END // ~de renvoyer les projectiles magiques~
-		 64 BEGIN SPRINT description @11970502 END // ~de renvoyer les attaques de regard~
-		208 BEGIN SPRINT description @11970503 END // ~de renvoyer les rayons des spectateurs~
-		312 BEGIN SPRINT description @11970504 END // ~de renvoyer les dagues boomerang~
-		39 442 BEGIN SPRINT description @11970505 END // ~de renvoyer les éclairs~
+		1 2 3 4 5 101 102 187 283 284 285 286 287 288 289 290 291
+			BEGIN SET projref = 11971001 END // ~flèches~
+		6 7 8 9 10 292 293 294 295 296
+			BEGIN SET projref = 11971006 END // ~haches~
+		11 12 13 14 15 225 240 297 298 299 300 301 302 303
+			BEGIN SET projref = 11971011 END // ~carreaux~
+		16 17 18 19 20 263 304 305 306 307 308
+			BEGIN SET projref = 11971016 END // ~billes~
+		23
+			BEGIN SET projref = 11971023 END // ~orbes chromatiques~
+		26 27 28 29 30 309 310 311 312
+			BEGIN SET projref = 11971026 END // ~dagues~
+		31 32 33 34 35 244 313 314 315 316 317 318
+			BEGIN SET projref = 11971031 END // ~fléchettes~
+		36 67 68 69 70 71 72 73 74 75 76 77
+			BEGIN SET projref = 11971036 END // ~projectiles magiques~
+		39 80 81 82 83 84 85 86 87 88 89 90 91 206 212 442
+			BEGIN SET projref = 11971039 END // ~éclairs~
+		55 56 57 58 59
+			BEGIN SET projref = 11971055 END // ~lances~
+		64
+			BEGIN SET projref = 11971064 END // ~attaques de regard~
+		208
+			BEGIN SET projref = 11971208 END // ~rayons des spectateurs~
 		DEFAULT
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
     END
+
+	PATCH_IF projref > 0 BEGIN
+		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
 END
 
 /* ------------------------------------- *

@@ -1659,17 +1659,21 @@
 
 // Opcode 197: Spell: Bounce Projectile [197]
 
-@11970001 = ~Renvoie les projectiles magiques~
-@11970002 = ~Renvoie les attaques de regard~
-@11970003 = ~Renvoie les rayons des spectateurs~
-@11970004 = ~Renvoie les dagues boomerang~
-@11970005 = ~Renvoie les éclairs~
+@11970001 = ~Renvoie les %projectiles%~
+@11970002 = ~de renvoyer les %projectiles%~
 
-@11970501 = ~de renvoyer les projectiles magiques~
-@11970502 = ~de renvoyer les attaques de regard~
-@11970503 = ~de renvoyer les rayons des spectateurs~
-@11970504 = ~de renvoyer les dagues boomerang~
-@11970505 = ~de renvoyer les éclairs~
+@11971001 = ~flèches~
+@11971006 = ~haches~
+@11971011 = ~carreaux~
+@11971016 = ~billes~
+@11971023 = ~orbes chromatiques~
+@11971026 = ~dagues~
+@11971031 = ~fléchettes~
+@11971036 = ~projectiles magiques~
+@11971039 = ~éclairs~
+@11971055 = ~lances~
+@11971064 = ~attaques de regard~
+@11971208 = ~rayons des spectateurs~
 
 // Opcode 199: Spell: Bounce (by Power Level) [199]
 
