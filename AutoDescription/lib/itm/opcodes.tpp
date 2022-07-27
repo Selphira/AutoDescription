@@ -4413,6 +4413,7 @@ DEFINE_PATCH_MACRO ~opcode_191_common~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
 		SET strref += 1 // ~le niveau de lanceur de sorts divins~
 	END
+	SET parameter2 = MOD_TYPE_cumulative
 END
 
 /* ------------------------------------------------- *
