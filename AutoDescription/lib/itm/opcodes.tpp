@@ -6232,24 +6232,59 @@ END
  * -------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
 	PATCH_IF is_ee == 1 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self à gérer~ END
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
+				SPRINT description @13240501 // ~Immunité au sort %spellName%~
+			END
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self avec parameter1 et parameter2 différent de 0~ END
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
 	PATCH_IF is_ee == 1 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self probability à gérer~ END
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
+				SPRINT description @13240503 // ~d'immuniser %theTarget% au sort %spellName%~
+			END
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self_probability avec parameter1 et parameter2 différent de 0~ END
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 	LOCAL_SET strref = 13240000
-	LPM ~opcode_common_324~
+
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
+				SPRINT description @13240502 // ~Immunise %theTarget% au sort %spellName%~
+			END
+		END
+		ELSE BEGIN
+			LPM ~opcode_common_324~
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
 	LOCAL_SET strref = 13240151
-	LPM ~opcode_common_324~
+
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
+			LPM ~opcode_self_probability_324~
+		END
+		ELSE BEGIN
+			LPM ~opcode_common_324~
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN

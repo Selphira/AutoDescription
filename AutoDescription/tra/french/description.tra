@@ -2290,6 +2290,10 @@
 @13240297 = ~d'être effectif contre les %creatureType%~
 @13240300 = ~~
 
+@13240501 = ~Immunité au sort %spellName%~
+@13240502 = ~Immunise %theTarget% au sort %spellName%~
+@13240503 = ~d'immuniser %theTarget% au sort %spellName%~
+
 // Opcode 325: Stat: Save vs. all [325]
 
 @13250002 = ~les jets de sauvegarde~
