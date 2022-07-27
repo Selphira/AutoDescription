@@ -35,7 +35,6 @@ Cela apporte plusieurs avantages:
 - Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01 SHLD24 U#AMUL02)
 - Bug: usability (Ex: NPSW05)
   "Utilisable" par et "Non utilisable par" affichés en même temps
-- Piège à sorts, pouvoir récupérer le nombre de niveaux maximum qu peuvent être piégés pour l'ajouter dans le nom de la capacité, plutot que d'avoir la liste de chaque niveau de sort. (Ex: PXL7087.ITM)
 - Opcode 177  
   Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
   Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
