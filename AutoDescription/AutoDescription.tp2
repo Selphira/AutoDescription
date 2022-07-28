@@ -1,7 +1,7 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.html)~
 
-VERSION ~0.9.13a~
+VERSION ~0.9.14~
 
 ALWAYS
 	OUTER_PATCH ~~ BEGIN
