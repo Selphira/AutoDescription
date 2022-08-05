@@ -17,7 +17,7 @@
 @10002 = ~%value% %~
 @10003 = ~+%value%~
 @10006 = ~Multiplié par %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacités spéciales\|Capacité d'équipement\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
@@ -1210,7 +1210,7 @@
 @11010055 = ~Immunité à la mort magique~
 @11010056 = ~Immunité à l'inversion d'alignement~
 @11010057 = ~Immunité au changement d'alignement~
-@11010058 = ~Immunité à la dissipation~
+@11010058 = ~Immunité à la dissipation des sorts~
 @11010060 = ~Immunité à l'échec d'incantation des sorts~
 @11010069 = ~Immunité à la non-détection~
 @11010074 = ~Immunité à l'aveuglement~
@@ -1231,7 +1231,7 @@
 @11010115 = ~Immunité à la détection de l'alignement~
 @11010116 = ~Immunité à la dissipation de l'invisibilité~
 @11010122 = ~Immunité à la création d'objets magiques~
-@11010126 = ~Immunité aux effets affectant la mobilité~
+@11010126 = ~Immunité aux effets affectant la vitesse de déplacement~
 @11010128 = ~Immunité à la confusion~
 @11010134 = ~Immunité à la pétrification~
 @11010135 = ~~ // Opcode visuel
@@ -1239,7 +1239,7 @@
 @11010137 = ~Immunité aux effets des chants négatifs~
 @11010139 = ~~ // Opcode textuel
 @11010141 = ~~ // Opcode visuel
-@11010145 = ~Immunité aux effets empêchant de lancer des sorts~
+@11010145 = ~Immunité à l'effet empêchant de lancer des sorts~
 @11010154 = ~~ // Opcode visuel
 @11010156 = ~~ // Opcode visuel
 @11010157 = ~Immunité aux toiles~
@@ -1964,8 +1964,8 @@
 
 // Opcode 274: Spell Effect: Teleport to Target [274]
 
-@12740001 = ~Téléporte %theTarget% sur un ennemi aléatoire~
-@12740002 = ~de téléporter %theTarget% sur un ennemi aléatoire~
+@12740001 = ~Téléporte aléatoirement %theTarget% auprès d'un ennemi à portée de vue~
+@12740002 = ~de téléporter aléatoirement %theTarget% auprès d'un ennemi à portée de vue~
 
 // Opcode 275: Stat: Hide in Shadows Modifier [275]
 
@@ -1984,8 +1984,8 @@
 
 // Opcodre 278: Stat: To Hit Modifier [278]
 
-@12780001 = ~Chances de toucher~
-@12780002 = ~les chances de toucher~
+@12780001 = ~Jets de toucher~
+@12780002 = ~les jets de toucher~
 
 // Opcode 280: Spell Effect: Wild Magic [280]
 
