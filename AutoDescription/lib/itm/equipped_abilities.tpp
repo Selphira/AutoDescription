@@ -255,7 +255,7 @@ BEGIN
 
 	PATCH_PHP_EACH ~%group%~ AS _ => strref BEGIN
 		SPRINT name (AT ~%strref%~)
-		SPRINT value ~\(.*\)%crlf%~
+		SPRINT value ~\(.*\)\(%crlf%\)*~
 		SPRINT regex @100001 // ~%name%%colon%%value%~
 		SPRINT regex ~- %regex%~
 		INNER_PATCH ~%description%~ BEGIN
