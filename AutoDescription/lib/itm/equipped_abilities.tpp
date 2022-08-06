@@ -155,7 +155,6 @@ DEFINE_PATCH_FUNCTION ~shrink_resistances~ RET description BEGIN
 		LPF ~shrink_find_values~ STR_VAR group = ~g102227~ RET_ARRAY values matches END
 
 		PATCH_PHP_EACH ~groups~ AS _ => group BEGIN
-			PATCH_WARN "GROUP: %group%"
 			LPF ~shrink_replace_values~ INT_VAR strref = EVAL ~%group%~ STR_VAR description group = EVAL ~g%group%~ RET description END
 		END
 	END
@@ -312,8 +311,6 @@ BEGIN
 		        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
 			END
 	        SPRINT value ~%match%~
-
-			PATCH_WARN "BEFORE AT: %strref%"
 	        SPRINT name (AT ~%strref%~)
 			SPRINT replace @100001 // %name%%colon%%value%~
 	        SPRINT regex EVAL ~%regexTemplate%~
