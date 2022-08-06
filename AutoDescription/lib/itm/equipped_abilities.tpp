@@ -97,6 +97,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 		LPF ~shrink_resistances~ RET description END
 		LPF ~shrink_saves_throws~ RET description END
 		LPF ~shrink_abilities~ RET description END
+		LPF ~shrink_thief_skills~ RET description END
 	END
 END
 
@@ -180,6 +181,30 @@ DEFINE_PATCH_FUNCTION ~shrink_abilities~ RET description BEGIN
 
 		LPF ~shrink_find_values~ STR_VAR group RET_ARRAY values matches END
 		LPF ~shrink_replace_values~ INT_VAR strref = 102228 STR_VAR description group RET description END // ~Caractéristiques~
+	END
+END
+
+/* --------------------------------------------------------------------------------------------------------- *
+ * Groupement des compétences de voleur du personnage.                                                       *
+ * --------------------------------------------------------------------------------------------------------- *
+ * - Vol à la tire : +15 %                                                                                   *
+ * - Crochetage de serrures : +15 %                                                                          *
+ * - Détection des illusions : +15 %                                                                         *
+ * - Détection/désamorçage des pièges : +15 %                                                                *
+ * - Pose de pièges : +15 %                                                                                  *
+ * - Camouflage dans l'ombre : +15 %                                                                         *
+ * - Furtivité : +15 %                                                                                       *
+ * Devient                                                                                                   *
+ * - Compétences de voleur : +3                                                                                   *
+ * --------------------------------------------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~shrink_thief_skills~ RET description BEGIN
+	PATCH_IF shrink_thief_skills BEGIN
+		PATCH_DEFINE_ARRAY ~group~ BEGIN // ~Résistance aux dégâts~
+			10920001 10900001 12760001 10910001 12770001 12750001 10590001
+		END
+
+		LPF ~shrink_find_values~ STR_VAR group RET_ARRAY values matches END
+		LPF ~shrink_replace_values~ INT_VAR strref = 102229 STR_VAR description group RET description END // ~Compétences de voleur~
 	END
 END
 
@@ -275,6 +300,8 @@ BEGIN
 				END
 			END
 		END
+		//FIXME: Possible problème si un même effet est présent 2 fois avec la même valeur
+		//FIXME: Possible problème si un effet est présent 2 fois, empêchant la regex de bien fonctionner
 		PATCH_IF allFound == 1 BEGIN
 			SPRINT regexTemplate ~~
 			PATCH_PHP_EACH ~%group%~ AS _ => groupStrref BEGIN
