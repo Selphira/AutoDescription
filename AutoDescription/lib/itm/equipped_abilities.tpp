@@ -95,7 +95,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 
 	PATCH_IF enable_shrinkage BEGIN
 		LPF ~shrink_resistances~ RET description END
-		LPF ~group_saves_throws~ RET description END
+		LPF ~shrink_saves_throws~ RET description END
 	END
 END
 
@@ -223,23 +223,25 @@ END
  * Devient                                                                                                   *
  * - Jets de sauvegarde : +2                                                                                 *
  * --------------------------------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~group_saves_throws~ RET description BEGIN
-    SPRINT regexTemplate ~~
-    PATCH_FOR_EACH strref IN 10330001 10340001 10350001 10360001 10370001 BEGIN
-		SPRINT name @102034 // ~Jets de sauvegarde~
-		SPRINT versus (AT ~%strref%~)
-		SPRINT value ~value~
-		SPRINT value ~\%%value%% %versus%~
-		SPRINT name @100001 // %name% : %value%
-        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
-    END
+DEFINE_PATCH_FUNCTION ~shrink_saves_throws~ RET description BEGIN
+	PATCH_IF shrink_saves_throws BEGIN
+	    SPRINT regexTemplate ~~
+	    PATCH_FOR_EACH strref IN 10330001 10340001 10350001 10360001 10370001 BEGIN
+			SPRINT name @102034 // ~Jets de sauvegarde~
+			SPRINT versus (AT ~%strref%~)
+			SPRINT value ~value~
+			SPRINT value ~\%%value%% %versus%~
+			SPRINT name @100001 // %name% : %value%
+	        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
+	    END
 
-    PATCH_FOR_EACH value IN ~+1~ ~+2~ ~+3~ ~+4~ ~+5~ BEGIN
-        SPRINT name @102034 // ~Jets de sauvegarde~
-		SPRINT replace @100001 // %name% : %value%
-        SPRINT regex EVAL ~%regexTemplate%~
-		INNER_PATCH_SAVE description ~%description%~ BEGIN
-			REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
-		END
+	    PATCH_FOR_EACH value IN ~+1~ ~+2~ ~+3~ ~+4~ ~+5~ BEGIN
+	        SPRINT name @102034 // ~Jets de sauvegarde~
+			SPRINT replace @100001 // %name% : %value%
+	        SPRINT regex EVAL ~%regexTemplate%~
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
+			END
+	    END
     END
 END
