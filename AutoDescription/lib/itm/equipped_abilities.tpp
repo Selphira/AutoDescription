@@ -96,6 +96,7 @@ DEFINE_PATCH_FUNCTION ~equipped_abilities~ RET description BEGIN
 	PATCH_IF enable_shrinkage BEGIN
 		LPF ~shrink_resistances~ RET description END
 		LPF ~shrink_saves_throws~ RET description END
+		LPF ~shrink_abilities~ RET description END
 	END
 END
 
@@ -137,11 +138,8 @@ END
  * --------------------------------------------------------------------------------------------------------- */
 DEFINE_PATCH_FUNCTION ~shrink_resistances~ RET description BEGIN
 	PATCH_IF shrink_resistances BEGIN
-		SET indexValues = 0
-
 		// Contient les différentes valeurs trouvées des résistances
 		// Pour chaque valeur, un tableau du même nom est créé dynamiquement, contenant la liste de toutes les résistances ayant cette même valeur
-		PATCH_DEFINE_ARRAY ~values~ BEGIN END
 		PATCH_DEFINE_ARRAY ~groups~ BEGIN 102227 102225 102226 END
 		PATCH_DEFINE_ARRAY ~g102227~ BEGIN // ~Résistance aux dégâts~
 			10300001 10280001 10290001 10270001 10310001 10840001 10850001 10860001 10870001 10880001 10890001
@@ -153,61 +151,35 @@ DEFINE_PATCH_FUNCTION ~shrink_resistances~ RET description BEGIN
 			10300001 10280001 10290001 10270001
 		END
 
-		PATCH_PHP_EACH g102227 AS _ => strref BEGIN
-			SPRINT name (AT ~%strref%~)
-			SPRINT value ~\(.*\)%crlf%~
-			SPRINT regex @100001 // ~%name%%colon%%value%~
-			SPRINT regex ~- %regex%~
-			INNER_PATCH ~%description%~ BEGIN
-                REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
-			        PATCH_IF NOT VARIABLE_IS_SET $EVAL ~%MATCH1%~(0) BEGIN
-			            SPRINT $values(~%indexValues%~) ~%MATCH1%~
-				        SET indexValues += 1
-						PATCH_DEFINE_ARRAY EVAL ~%MATCH1%~ BEGIN END
-						SET EVAL ~index%MATCH1%~ = 0
-			        END
-			        SET idxMatch = EVAL ~index%MATCH1%~
-				    SPRINT $EVAL ~%MATCH1%~(~%idxMatch%~) ~%strref%~
-				    SET EVAL ~index%MATCH1%~ += 1
-			    END ~%MATCH1%~
-			END
-	    END
+		LPF ~shrink_find_values~ STR_VAR group = ~g102227~ RET_ARRAY values matches END
 
-		PATCH_PHP_EACH values AS _ => match BEGIN
-			PATCH_PHP_EACH ~groups~ AS _ => group BEGIN
-				SET allFound = 1
-				PATCH_PHP_EACH ~g%group%~ AS _ => resistance BEGIN
-					SET found = 0
-					PATCH_IF allFound == 1 BEGIN
-						PATCH_PHP_EACH ~%match%~ AS _ => value BEGIN
-							PATCH_IF value == resistance BEGIN
-								SET found = 1
-							END
-						END
-						PATCH_IF found == 0 BEGIN
-							SET allFound = 0
-						END
-					END
-				END
-				PATCH_IF allFound == 1 BEGIN
-					SPRINT regexTemplate ~~
-					PATCH_PHP_EACH ~g%group%~ AS _ => strref BEGIN
-						SPRINT name (AT ~%strref%~)
-						SPRINT value ~value~
-						SPRINT value ~\%%value%%~
-						SPRINT name @100001 // ~%name%%colon%%value%~
-				        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
-					END
-			        SPRINT value ~%match%~
-			        SPRINT name (AT ~%group%~)
-					SPRINT replace @100001 // %name%%colon%%value%~
-			        SPRINT regex EVAL ~%regexTemplate%~
-					INNER_PATCH_SAVE description ~%description%~ BEGIN
-						REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
-					END
-				END
-			END
+		PATCH_PHP_EACH ~groups~ AS _ => group BEGIN
+			PATCH_WARN "GROUP: %group%"
+			LPF ~shrink_replace_values~ INT_VAR strref = EVAL ~%group%~ STR_VAR description group = EVAL ~g%group%~ RET description END
 		END
+	END
+END
+
+/* --------------------------------------------------------------------------------------------------------- *
+ * Groupement des caractéristiques du personnage                                                             *
+ * --------------------------------------------------------------------------------------------------------- *
+ * - Force : +3                                                                                              *
+ * - Dextérité : +3                                                                                          *
+ * - Constitution : +3                                                                                       *
+ * - Intelligence : +3                                                                                       *
+ * - Sagesse : +3                                                                                            *
+ * - Charisme : +3                                                                                           *
+ * Devient                                                                                                   *
+ * - Caractéristiques : +3                                                                                   *
+ * --------------------------------------------------------------------------------------------------------- */
+DEFINE_PATCH_FUNCTION ~shrink_abilities~ RET description BEGIN
+	PATCH_IF shrink_abilities BEGIN
+		PATCH_DEFINE_ARRAY ~group~ BEGIN // ~Résistance aux dégâts~
+			10440001 10150001 10100001 10190001 10490001 10060001
+		END
+
+		LPF ~shrink_find_values~ STR_VAR group RET_ARRAY values matches END
+		LPF ~shrink_replace_values~ INT_VAR strref = 102228 STR_VAR description group RET description END // ~Caractéristiques~
 	END
 END
 
@@ -244,4 +216,83 @@ DEFINE_PATCH_FUNCTION ~shrink_saves_throws~ RET description BEGIN
 			END
 	    END
     END
+END
+
+DEFINE_PATCH_FUNCTION ~shrink_find_values~
+	STR_VAR
+		group = ~~
+	RET_ARRAY
+		values
+		matches
+BEGIN
+	SET indexValues = 0
+	PATCH_DEFINE_ARRAY ~values~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~matches~ BEGIN END
+
+	PATCH_PHP_EACH ~%group%~ AS _ => strref BEGIN
+		SPRINT name (AT ~%strref%~)
+		SPRINT value ~\(.*\)%crlf%~
+		SPRINT regex @100001 // ~%name%%colon%%value%~
+		SPRINT regex ~- %regex%~
+		INNER_PATCH ~%description%~ BEGIN
+            REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
+		        PATCH_IF NOT VARIABLE_IS_SET $matches(~%MATCH1%~ ~0~) BEGIN
+		            SPRINT $values(~%indexValues%~) ~%MATCH1%~
+			        SET indexValues += 1
+					PATCH_DEFINE_ARRAY EVAL ~%MATCH1%~ BEGIN END
+					SET EVAL ~index%MATCH1%~ = 0
+		        END
+		        SET idxMatch = EVAL ~index%MATCH1%~
+			    SPRINT $matches(~%MATCH1%~ ~%idxMatch%~) ~%strref%~
+			    SET EVAL ~index%MATCH1%~ += 1
+		    END ~%MATCH1%~
+		END
+    END
+END
+
+
+DEFINE_PATCH_FUNCTION ~shrink_replace_values~
+	INT_VAR
+		strref = 0
+	STR_VAR
+		description = ~~
+		group = ~~
+	RET
+		description
+BEGIN
+	PATCH_PHP_EACH values AS _ => match BEGIN
+		SET allFound = 1
+		PATCH_PHP_EACH ~%group%~ AS _ => resistance BEGIN
+			SET found = 0
+			PATCH_IF allFound == 1 BEGIN
+				PATCH_PHP_EACH ~matches~ AS data => value BEGIN
+					PATCH_IF ~%data_0%~ STRING_EQUAL ~%match%~ AND value == resistance BEGIN
+						SET found = 1
+					END
+				END
+				PATCH_IF found == 0 BEGIN
+					SET allFound = 0
+				END
+			END
+		END
+		PATCH_IF allFound == 1 BEGIN
+			SPRINT regexTemplate ~~
+			PATCH_PHP_EACH ~%group%~ AS _ => groupStrref BEGIN
+				SPRINT name (AT ~%groupStrref%~)
+				SPRINT value ~value~
+				SPRINT value ~\%%value%%~
+				SPRINT name @100001 // ~%name%%colon%%value%~
+		        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
+			END
+	        SPRINT value ~%match%~
+
+			PATCH_WARN "BEFORE AT: %strref%"
+	        SPRINT name (AT ~%strref%~)
+			SPRINT replace @100001 // %name%%colon%%value%~
+	        SPRINT regex EVAL ~%regexTemplate%~
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				REPLACE_TEXTUALLY CASE_INSENSITIVE ~%regex%~ ~%crlf%- %replace%~
+			END
+		END
+	END
 END
