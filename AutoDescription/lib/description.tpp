@@ -11,7 +11,10 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 
         PATCH_SILENT
 
-		PATCH_IF NOT include_items_without_description AND (~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0) BEGIN
+		PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) != 0 BEGIN
+			SET totalIgnored += 1
+		END
+		ELSE PATCH_IF NOT include_items_without_description AND (~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0) BEGIN
 			SET totalWithoutDescription += 1
 			SET totalIgnored += 1
 		END
