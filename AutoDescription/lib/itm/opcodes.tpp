@@ -4187,7 +4187,16 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ R
 		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
 			COPY_EXISTING ~%resref%.eff~  ~override~
 				READ_SHORT EFF2_opcode opcode
+
+		        SPRINT oldTheTarget   ~%theTarget%~
+		        SPRINT oldOfTheTarget ~%ofTheTarget%~
+		        SPRINT oldToTheTarget ~%toTheTarget%~
+
 				LPF ~get_description_effect2~ RET description saveAdded ignoreDuration END
+
+		        SPRINT theTarget   ~%oldTheTarget%~
+		        SPRINT ofTheTarget ~%oldOfTheTarget%~
+		        SPRINT toTheTarget ~%oldToTheTarget%~
 		    BUT_ONLY_IF_IT_CHANGES
 		END
 		ELSE BEGIN
@@ -5529,6 +5538,7 @@ END
  * Item: Set Melee Effect [248] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -5542,6 +5552,7 @@ DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -5555,6 +5566,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -5575,6 +5587,7 @@ END
  * Item: Set Ranged Effect [249] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -5583,6 +5596,7 @@ DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_249~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -5591,6 +5605,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_249~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_249~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN

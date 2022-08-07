@@ -163,12 +163,21 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ RET description saveAdded ignore
 
 	PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
         SPRINT macro ~opcode_self_~
+        SPRINT theTarget   @102472 // ~le porteur~
+        SPRINT ofTheTarget @101086 // ~du porteur~
+        SPRINT toTheTarget @101180 // ~au porteur~
     END
     ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
         SPRINT macro ~opcode_target_~
+        SPRINT theTarget   @102471 // ~la cible~
+        SPRINT ofTheTarget @101085 // ~de la cible~
+        SPRINT toTheTarget @101181 // ~à la cible~
     END
     ELSE PATCH_IF target == TARGET_FX_party BEGIN
         SPRINT macro ~opcode_party_~
+        SPRINT theTarget   @102473 // ~les membres du groupe~
+        SPRINT ofTheTarget @101088 // ~des membres du groupe~
+        SPRINT toTheTarget @101182 // ~aux membres du groupe~
     END
 
 	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
