@@ -4182,7 +4182,7 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded ignoreDuration opcode END
 END
 
-DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
+DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
 	INNER_ACTION BEGIN
 		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
 			COPY_EXISTING ~%resref%.eff~  ~override~
@@ -4192,7 +4192,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ STR_VAR resref = ~~ macro = ~~ R
 		        SPRINT oldOfTheTarget ~%ofTheTarget%~
 		        SPRINT oldToTheTarget ~%toTheTarget%~
 
-				LPF ~get_description_effect2~ RET description saveAdded ignoreDuration END
+				LPF ~get_description_effect2~ INT_VAR resetTarget RET description saveAdded ignoreDuration END
 
 		        SPRINT theTarget   ~%oldTheTarget%~
 		        SPRINT ofTheTarget ~%oldOfTheTarget%~
@@ -5539,7 +5539,7 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -5553,7 +5553,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -5567,7 +5567,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -5588,7 +5588,7 @@ END
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490001 // ~À chaque attaque à distance réussie: %description%~
@@ -5597,7 +5597,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490003 // ~par attaque à distance réussie par %theTarget%: %description%~
@@ -5606,7 +5606,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490002 // ~À chaque attaque à distance réussie par %theTarget%: %description%~
