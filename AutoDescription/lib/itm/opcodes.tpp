@@ -4279,6 +4279,10 @@ DEFINE_PATCH_MACRO ~opcode_179_common~ BEGIN
 	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
 
+	INNER_PATCH_SAVE damage ~%damage%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+	END
+
 	SPRINT damageType @101092 // ~points de dégâts~
 	SPRINT description @10120003 // ~Inflige %damage% %damageType% supplémentaires %versus%~
 END
