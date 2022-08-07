@@ -324,6 +324,21 @@
 @204184 = ~tréants~
 @204185 = ~aasimars~
 @204199 = ~ettins~
+@204201 = ~épées~
+@204202 = ~arcs~
+@204203 = ~arcs~
+@204204 = ~bâtons~
+@204205 = ~frondes~
+@204206 = ~masses~
+@204207 = ~dagues~
+@204208 = ~lances~
+@204209 = ~poings~
+@204210 = ~marteaux~
+@204211 = ~etoiles du matin~
+@204212 = ~robes~
+@204213 = ~armures de cuir~
+@204214 = ~armures de mailles~
+@204215 = ~armures de plate~
 
 /* --------- *
  * Class.ids *
@@ -620,14 +635,14 @@
 // Opcode 12: HP: Damage [12]
 
 @10120001 = ~Inflige %damage% %damageType% %toTheTarget%~
-@10120002 = ~Inflige %damage% %damageType% supplémentaires~
-@10120003 = ~Inflige %damage% %damageType% supplémentaires %versus%~
+@10120002 = ~Inflige %damage% %damageType% %toTheTarget%~
+@10120003 = ~Inflige %damage% %damageType% %versus%~
 @10120004 = ~Draine %damage% %damageType% %toTheTarget%~
 @10120005 = ~Transfert %damage% %damageType% %toTheTarget%~
 
 @10120011 = ~d'infliger %damage% %damageType% %toTheTarget%~
-@10120012 = ~d'infliger %damage% %damageType% supplémentaires~
-@10120013 = ~d'infliger %damage% %damageType% supplémentaires %versus%~
+@10120012 = ~d'infliger %damage% %damageType% %toTheTarget%~
+@10120013 = ~d'infliger %damage% %damageType% %versus%~
 @10120014 = ~de drainer %damage% %damageType% %toTheTarget%~
 @10120015 = ~de transférer %damage% %damageType% %toTheTarget%~
 @10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
@@ -1291,6 +1306,7 @@
 @11011024 = ~d'immuniser %theTarget% à l'horreur~
 @11011025 = ~d'immuniser %theTarget% au poison~
 @11011039 = ~d'immuniser %theTarget% au sommeil~
+@11011039 = ~d'immuniser %theTarget% à l'étourdissement~
 @11011217 = ~d'immuniser %theTarget% au sommeil~
 
 // Target
@@ -1842,22 +1858,79 @@
 
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
-@102535 = ~l'adversaire le plus proche~
-@102536 = ~l'attaquant~
-@102653 = ~la créature la plus proche~
-@102654 = ~Lance le sort %spellName% sur %theTarget%~
-@102660 = ~lorsque le porteur est touché~
-@102661 = ~lorsqu'un adversaire entre dans le champ de vision~
-@102662 = ~lorsque les points de vie du porteur passent sous les 50%~
-@102663 = ~lorsque les points de vie du porteur passent sous les 25%~
-@102664 = ~lorsque les points de vie du porteur passent sous les 10%~
-@102665 = ~lorsque le porteur est sans défense~
-@102666 = ~lorsque le porteur est empoisonné~
-@102667 = ~à chaque round où le porteur est attaqué~
-@102668 = ~lorsque la cible se trouve à moins de 2,5 mètres~
-@102669 = ~lorsque la cible se trouve à moins de 6 mètres~
-@102670 = ~à chaque round~
-@102671 = ~lorsque le porteur subit des dégâts~
+@12320001 = ~lance le sort %spellName% sur %theTarget%~
+@12320002 = ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+@12320003 = ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320004 = ~lance un sort sur %theTarget%~
+@12320010 = ~Lorsque le porteur est touché~
+@12320011 = ~Lorsqu'un adversaire entre dans le champ de vision~
+@12320012 = ~~ // @12320120
+@12320013 = ~~ // @12320120
+@12320014 = ~~ // @12320120
+@12320015 = ~Lorsque le porteur est sans défense~
+@12320016 = ~Lorsque le porteur est empoisonné~
+@12320017 = ~À chaque round où le porteur est attaqué~
+@12320018 = ~~ // @12320024
+@12320019 = ~~ // @12320024
+@12320020 = ~À chaque round~
+@12320021 = ~Lorsque le porteur subit des dégâts~
+@12320022 = ~Lorsque le porteur tue la cible~
+@12320023 = ~~ // Cas particulier, moment de la journée
+@12320024 = ~Lorsque la cible se trouve à moins de %range%~
+@12320025 = ~~ // TODO ~Lorsque le porteur est %state%~
+@12320026 = ~Lorsque le porteur meurt~
+@12320027 = ~Lorsqu'une créature meurt~
+@12320028 = ~~ //TODO: TurnedBy ???
+@12320029 = ~Lorsque les points de vie du porteur passent sous %value%~
+@12320030 = ~Lorsque les points de vie du porteur passent sous les %percent%~
+@12320031 = ~~
+
+@12320101 = ~de lancer le sort %spellName% sur %theTarget%~
+@12320102 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
+@12320103 = ~de lancer les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320104 = ~de lancer un sort sur %theTarget%~
+@12320110 = ~lorsque le porteur est touché~
+@12320111 = ~lorsqu'un adversaire entre dans le champ de vision~
+@12320112 = ~~ // @12320120
+@12320113 = ~~ // @12320120
+@12320114 = ~~ // @12320120
+@12320115 = ~lorsque le porteur est sans défense~
+@12320116 = ~lorsque le porteur est empoisonné~
+@12320117 = ~à chaque round où le porteur est attaqué~
+@12320118 = ~~ // @12320124
+@12320119 = ~~ // @12320124
+@12320120 = ~à chaque round~
+@12320121 = ~lorsque le porteur subit des dégâts~
+@12320122 = ~lorsque le porteur tue la cible~
+@12320123 = ~~ // Cas particulier, moment de la journée
+@12320124 = ~lorsque la cible se trouve à moins de %range%~
+@12320125 = ~~ // TODO ~Lorsque le porteur est %state%~
+@12320126 = ~lorsque le porteur meurt~
+@12320127 = ~lorsqu'une créature meurt~
+@12320128 = ~~ //TODO: TurnedBy ???
+@12320129 = ~lorsque les points de vie du porteur passent sous %value%~
+@12320130 = ~lorsque les points de vie du porteur passent sous les %percent%~
+@12320131 = ~~
+
+@12320200 = ~le porteur~
+@12320201 = ~l'attaquant~
+@12320202 = ~l'adversaire le plus proche~
+@12320203 = ~la créature la plus proche~
+@12320210 = ~du porteur~
+@12320211 = ~de l'attaquant~
+@12320212 = ~de l'adversaire le plus proche~
+@12320213 = ~de la créature la plus proche~
+@12320220 = ~au porteur~
+@12320221 = ~à l'attaquant~
+@12320222 = ~à l'adversaire le plus proche~
+@12320223 = ~à la créature la plus proche~
+
+@12320300 = ~Durant la journée~
+@12320301 = ~Au crépuscule~
+@12320302 = ~Durant la nuit~
+@12320303 = ~Au matin~
+
+@12320400 = ~À partir du niveau %requiredLevel%~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 

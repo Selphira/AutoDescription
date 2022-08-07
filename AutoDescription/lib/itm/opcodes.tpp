@@ -182,6 +182,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	200 => 248 // Spell: Decrementing Bounce Spells [200]
 	207 => 249 // Spell: Bounce Specified Spell [207]
 	197 => 250 // Spell: Bounce Projectile [197]
+	232 => 250 // Spell Effect: Cast Spell on Condition [232]
 	303 => 250 // Spell Effect: Backstab Every Hit [303]
 	231 => 250 // Spell Effect: Time Stop [231]
 	188 => 250 // Spell Effect: Aura Cleansing [188]
@@ -295,7 +296,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	215 => 0
 	222 => 1 // Spell Effect: Teleport Field [222]
 	225 => 0 // Spell: Reveal Magic [225]
-	232 => 1 // Spell Effect: Cast Spell on Condition [232] // TODO: (Ex: L#NILA61, SOLAK1)
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	236 => 1 // Spell Effect: Image Projection [236]
 	237 => 0 // Spell Effect: Puppet ID [237]
@@ -835,7 +835,7 @@ DEFINE_PATCH_MACRO ~opcode_self_12~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
-	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %damageType% supplémentaires~
+	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %damageType% %toTheTarget%~
 
 	LPM ~opcode_12_flags~
 
@@ -2505,8 +2505,16 @@ DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
     END
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_83~ BEGIN
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: self_probability~ END
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_83~ BEGIN
 	LPM ~opcode_self_83~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
 END
 
 /* ------------------------------------------- *
@@ -5161,35 +5169,136 @@ END
 /* ------------------------------------------- *
  * Spell Effect: Cast Spell on Condition [232] *
  * ------------------------------------------- */
-/*
 DEFINE_PATCH_MACRO ~opcode_self_232~ BEGIN
-    SPRINT theTarget $op232Target("%parameter1%")
-    SPRINT condition $op232Condition("%parameter2%")
-
-	PATCH_IF parameter2 != 0 BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_232 : A gerer: %parameter1%: %parameter2%"
-	END
-
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	SPRINT description @102654 // ~Lance le sort %spellName% sur %theTarget%~
-	SPRINT description ~%description%, %condition%~
+	SET strref = 12320001
+	LPM ~opcode_232_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_232~ BEGIN
-    SPRINT theTarget $op232Target("%parameter1%")
-    SPRINT condition $op232Condition("%parameter2%")
+	SET strref = 12320101
+	LPM ~opcode_232_common~
+    SPRINT description ~, %description%~
+END
 
-	PATCH_IF parameter2 != 0 BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : opcode_self_probability_232 : A gerer: %parameter1%: %parameter2%"
-	END
+DEFINE_PATCH_MACRO ~opcode_target_232~ BEGIN
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target~ END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_232~ BEGIN
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
+END
+
+DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
+	SET featureCount   = 0
+	SET theTargetRef   = 12320200 + parameter1
+	SET ofTheTargetRef = 12320210 + parameter1
+	SET toTheTargetRef = 12320220 + parameter1
+
+	SPRINT spellName2 ~~
+	SPRINT spellName3 ~~
+	SPRINT theTarget   (AT ~%theTargetRef%~)
+	SPRINT ofTheTarget (AT ~%ofTheTargetRef%~)
+	SPRINT toTheTarget (AT ~%toTheTargetRef%~)
+
+	LPM ~opcode_232_condition~
 
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	PATCH_IF VARIABLE_IS_SET resref2 AND NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref2%~ RET spellName2 = spellName END
+	END
+	PATCH_IF VARIABLE_IS_SET resref3 AND NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref3%~ RET spellName3 = spellName END
+	END
 
-	SPRINT description @102193 // ~de lancer le sort %spellName% sur %theTarget%~
-	SPRINT description ~%description%, %condition%~
+	LPF ~get_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+
+	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+	END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
+		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+	    SPRINT description (AT ~%strref%~)
+	    SPRINT description ~%condition%, %description%~
+    END
+    ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
+        SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+	    SPRINT description (AT ~%strref%~)
+	    SPRINT description ~%condition%, %description%~
+    END
+    ELSE BEGIN
+		PATCH_IF count == 1 AND featureCount == 1 BEGIN
+			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+
+			INNER_PATCH_SAVE effectDescription ~%effectDescription%~ BEGIN
+		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower
+		            TO_LOWER MATCH1
+		        END ~%MATCH1%~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^[0-9]+ % de chance ~ ~~
+			END
+			SPRINT description ~%condition%, %effectDescription%~
+		END
+		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+	        SET strref += 3 // ~lance un sort sur %theTarget%~
+		    SPRINT description (AT ~%strref%~)
+		    SPRINT description ~%condition%, %description%~
+			SPRINT description ~%description%%spellDescription%~
+	    END
+	    ELSE BEGIN
+		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
+		    SPRINT description ~%condition%, %description%~
+	    END
+    END
 END
-*/
+
+DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
+	SET conditionRef = strref + 9 + parameter2
+	SPRINT condition (AT ~%conditionRef%~)
+
+	PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 OR parameter2 == 20 BEGIN
+		PATCH_IF parameter2 == 2 BEGIN
+			SET value = 50
+		END
+		ELSE PATCH_IF parameter2 == 3 BEGIN
+			SET value = 25
+		END
+		ELSE PATCH_IF parameter2 == 4 BEGIN
+			SET value = 10
+		END
+		ELSE BEGIN
+			SET value = special
+		END
+		LPF ~percent_value~ INT_VAR value RET percent = value END
+		SPRINT condition @12320120 // ~Lorsque les points de vie du porteur passent sous les %percent%~
+	END
+	ELSE PATCH_IF parameter2 == 19 BEGIN
+		SET value = special
+		SPRINT condition @12320119 // ~Lorsque les points de vie du porteur passent sous %value%~
+	END
+	ELSE PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
+		PATCH_IF parameter2 == 8 BEGIN
+			SET value = 4
+		END
+		ELSE PATCH_IF parameter2 == 9 BEGIN
+            SET value = 10
+        END
+		ELSE BEGIN
+            SET value = special
+        END
+		SPRINT range $feets_to_meters(~%value%~)
+		SPRINT condition @12320114 // ~Lorsque la cible se trouve à moins de %range%~
+	END
+	ELSE PATCH_IF parameter2 == 13 BEGIN
+		PATCH_IF parameter1 != 0 BEGIN
+            LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
+		END
+		SET timeofdayRef = 12320300 + special
+		LPF ~getTranslation~ INT_VAR strref = timeofdayRef opcode RET condition = string END
+	END
+	ELSE PATCH_IF parameter2 == 15 OR parameter2 == 18 OR parameter2 == 21 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO parameter2 : %parameter2% : %parameter1% : %special%~ END
+	END
+END
 
 /* -------------------------------- *
  * Stat: Proficiency Modifier [233] *
@@ -6758,7 +6867,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 				BUT_ONLY_IF_IT_CHANGES
 			END
 			ELSE BEGIN
-				LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.spl n'existe pas.~ END
+				LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
 			END
 	    END
 	END
@@ -6906,8 +7015,15 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
-		SET strref = 200000 + (file * 1000) + entry
-		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
+		SPRINT idsFile $ids_files(~%file%~)
+		LOOKUP_IDS_SYMBOL_OF_INT idsEntry ~%idsFile%~ ~%entry%~
+		PATCH_IF ~%entry%~ STRING_EQUAL ~%idsEntry%~ BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
+		END
+		ELSE BEGIN
+			SET strref = 200000 + (file * 1000) + entry
+			LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
+		END
 	END
 	ELSE BEGIN
 		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Wrong ids file : %file%~ END

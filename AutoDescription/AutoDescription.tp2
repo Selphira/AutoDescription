@@ -73,7 +73,7 @@ BEGIN @10 DESIGNATED 10
 LAM ~init_log_file~
 LAM ~init_statistics~
 COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-	LPM ~update_description~
+	LPM ~update_item_description~
 BUT_ONLY_IF_IT_CHANGES
 LAM ~show_statistics~
 
@@ -96,7 +96,7 @@ LAM ~init_statistics~
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
 		COPY_EXISTING ~%itemFile%~ ~override~
-			LPM ~update_description~
+			LPM ~update_item_description~
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END

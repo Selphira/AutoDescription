@@ -9,11 +9,9 @@ cftroll.eff : Opcode 123 à gérer.
 JWSUPER.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 JWSUPER.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 JWSUPER.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-LEAT23.ITM : Opcode 232 à gérer.
 NPPLAT.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 NPPLAT.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 NPPLAT.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-NPSW03.ITM : Opcode 232 à gérer.
 RING03.ITM : Opcode 177 : La ressource cdcc600.eff n'existe pas.
 RING09.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 RING09.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.

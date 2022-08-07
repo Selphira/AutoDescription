@@ -1,4 +1,4 @@
-DEFINE_PATCH_MACRO ~update_description~ BEGIN
+DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 	PATCH_IF (SOURCE_SIZE > 0x71) BEGIN // Evite un crash sur les objets vides
 		READ_SHORT  ITM_type itemType
 		READ_STRREF ITM_identified_desc description

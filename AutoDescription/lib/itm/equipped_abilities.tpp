@@ -228,7 +228,7 @@ DEFINE_PATCH_FUNCTION ~shrink_saves_throws~ RET description BEGIN
 			SPRINT value ~value~
 			SPRINT value ~\%%value%% %versus%~
 			SPRINT name @100001 // %name% : %value%
-	        SPRINT regexTemplate ~%regexTemplate%%crlf%- %name%~
+	        SPRINT regexTemplate ~%regexTemplate%%crlf%[ ]*- %name%~
 	    END
 
 	    PATCH_FOR_EACH value IN ~+1~ ~+2~ ~+3~ ~+4~ ~+5~ BEGIN

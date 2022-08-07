@@ -1,4 +1,16 @@
-DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
+DEFINE_PATCH_FUNCTION ~get_description_effect~
+	INT_VAR
+		forceTarget = 0
+		forceProbability = 0
+		forcedProbability = 100
+	STR_VAR
+		theTarget = ~~
+		ofTheTarget = ~~
+		toTheTarget = ~~
+	RET
+		description
+		sort
+BEGIN
 	SET opcode_n = opcode
 	SET ignoreDuration = 0
 	SET saveAdded = 0
@@ -12,22 +24,31 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 	SPRINT description ~~
 	SPRINT opcode_target ~~
 
+	PATCH_IF forceProbability == 1 BEGIN
+		SET probability = forcedProbability
+	END
+
 	PATCH_TRY
 		// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
 		PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
 			SET target = TARGET_FX_self
 		END
 
-		PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
+		PATCH_IF target > 9 BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Invalid target : %target%~ END
+		END
+		ELSE PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
 			PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
 			END
 			ELSE BEGIN
 				PATCH_IF abilityType == AbilityType_Equipped BEGIN
 					SPRINT opcode_target ~_self~
-					SPRINT theTarget   @102472 // ~le porteur~
-					SPRINT ofTheTarget @101086 // ~du porteur~
-					SPRINT toTheTarget @101180 // ~au porteur~
+					PATCH_IF forceTarget == 0 BEGIN
+						SPRINT theTarget   @102472 // ~le porteur~
+						SPRINT ofTheTarget @101086 // ~du porteur~
+						SPRINT toTheTarget @101180 // ~au porteur~
+					END
 				END
 				ELSE BEGIN
 					// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
@@ -35,44 +56,55 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~ RET description sort BEGIN
 					// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
 					PATCH_IF target == TARGET_FX_self BEGIN
 						SPRINT opcode_target ~_self~
-						SPRINT theTarget   @102472 // ~le porteur~
-						SPRINT ofTheTarget @101086 // ~du porteur~
-						SPRINT toTheTarget @101180 // ~au porteur~
+						PATCH_IF forceTarget == 0 BEGIN
+							SPRINT theTarget   @102472 // ~le porteur~
+							SPRINT ofTheTarget @101086 // ~du porteur~
+							SPRINT toTheTarget @101180 // ~au porteur~
+						END
 					END
 					ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
 						SPRINT opcode_target ~_target~
-						SPRINT theTarget   @102471 // ~la cible~
-						SPRINT ofTheTarget @101085 // ~de la cible~
-						SPRINT toTheTarget @101181 // ~à la cible~
+						PATCH_IF forceTarget == 0 BEGIN
+							SPRINT theTarget   @102471 // ~la cible~
+							SPRINT ofTheTarget @101085 // ~de la cible~
+							SPRINT toTheTarget @101181 // ~à la cible~
+						END
 					END
 					ELSE PATCH_IF target == TARGET_FX_party BEGIN
 						SPRINT opcode_target ~_party~
-						SPRINT theTarget   @102473 // ~les membres du groupe~
-						SPRINT ofTheTarget @101088 // ~des membres du groupe~
-						SPRINT toTheTarget @101182 // ~aux membres du groupe~
+						PATCH_IF forceTarget == 0 BEGIN
+							SPRINT theTarget   @102473 // ~les membres du groupe~
+							SPRINT ofTheTarget @101088 // ~des membres du groupe~
+							SPRINT toTheTarget @101182 // ~aux membres du groupe~
+						END
 					END
 				END
 
 				LPM ~add_target_level~
 
-				PATCH_IF probability == 100 BEGIN
-					SPRINT method ~opcode%opcode_target%_%opcode_n%~
-					LPM ~%method%~
-					LPM ~set_opcode_sort~
+				PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
+					PATCH_IF probability == 100 BEGIN
+						SPRINT method ~opcode%opcode_target%_%opcode_n%~
+						LPM ~%method%~
+						LPM ~set_opcode_sort~
+					END
+					ELSE BEGIN
+						SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
+						SET probability += 1
+						LPM ~%method%~
+						LPM ~set_opcode_sort~
+						PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+							LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+							SPRINT description @101125 // ~%probability% de chance %description%~
+						END
+					END
+
+					LPM ~add_duration~
+					LPM ~add_save~
 				END
 				ELSE BEGIN
-					SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
-					SET probability += 1
-					LPM ~%method%~
-					LPM ~set_opcode_sort~
-					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-						LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-						SPRINT description @101125 // ~%probability% de chance %description%~
-					END
+					LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Unknow target : %target% ~ END
 				END
-
-				LPM ~add_duration~
-				LPM ~add_save~
 			END
 		END
 		ELSE BEGIN
