@@ -16,8 +16,10 @@
 @10001 = ~ : ~
 @10002 = ~%value% %~
 @10003 = ~+%value%~
+@10004 = ~ ; ~
 @10006 = ~Multiplié par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10009 = ~^[0-9]+ % de chance ~
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
@@ -1862,14 +1864,20 @@
 @12320002 = ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
 @12320003 = ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
 @12320004 = ~lance un sort sur %theTarget%~
+
+@12320005 = ~de lancer le sort %spellName% sur %theTarget%~
+@12320006 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
+@12320007 = ~de lancer les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320008 = ~de lancer un sort sur %theTarget%~
+
 @12320010 = ~Lorsque le porteur est touché~
 @12320011 = ~Lorsqu'un adversaire entre dans le champ de vision~
-@12320012 = ~~ // @12320120
-@12320013 = ~~ // @12320120
-@12320014 = ~~ // @12320120
+@12320012 = ~~ // @12320030
+@12320013 = ~~ // @12320030
+@12320014 = ~~ // @12320030
 @12320015 = ~Lorsque le porteur est sans défense~
 @12320016 = ~Lorsque le porteur est empoisonné~
-@12320017 = ~À chaque round où le porteur est attaqué~
+@12320017 = ~Lorsque le porteur est attaqué~
 @12320018 = ~~ // @12320024
 @12320019 = ~~ // @12320024
 @12320020 = ~À chaque round~
@@ -1885,33 +1893,6 @@
 @12320030 = ~Lorsque les points de vie du porteur passent sous les %percent%~
 @12320031 = ~~
 
-@12320101 = ~de lancer le sort %spellName% sur %theTarget%~
-@12320102 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
-@12320103 = ~de lancer les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
-@12320104 = ~de lancer un sort sur %theTarget%~
-@12320110 = ~lorsque le porteur est touché~
-@12320111 = ~lorsqu'un adversaire entre dans le champ de vision~
-@12320112 = ~~ // @12320120
-@12320113 = ~~ // @12320120
-@12320114 = ~~ // @12320120
-@12320115 = ~lorsque le porteur est sans défense~
-@12320116 = ~lorsque le porteur est empoisonné~
-@12320117 = ~à chaque round où le porteur est attaqué~
-@12320118 = ~~ // @12320124
-@12320119 = ~~ // @12320124
-@12320120 = ~à chaque round~
-@12320121 = ~lorsque le porteur subit des dégâts~
-@12320122 = ~lorsque le porteur tue la cible~
-@12320123 = ~~ // Cas particulier, moment de la journée
-@12320124 = ~lorsque la cible se trouve à moins de %range%~
-@12320125 = ~~ // TODO ~Lorsque le porteur est %state%~
-@12320126 = ~lorsque le porteur meurt~
-@12320127 = ~lorsqu'une créature meurt~
-@12320128 = ~~ //TODO: TurnedBy ???
-@12320129 = ~lorsque les points de vie du porteur passent sous %value%~
-@12320130 = ~lorsque les points de vie du porteur passent sous les %percent%~
-@12320131 = ~~
-
 @12320200 = ~le porteur~
 @12320201 = ~l'attaquant~
 @12320202 = ~l'adversaire le plus proche~
@@ -1926,9 +1907,9 @@
 @12320223 = ~à la créature la plus proche~
 
 @12320300 = ~Durant la journée~
-@12320301 = ~Au crépuscule~
-@12320302 = ~Durant la nuit~
-@12320303 = ~Au matin~
+@12320301 = ~À la tombée de la nuit~
+@12320302 = ~À la nuit tombée~
+@12320303 = ~Au lever du jour~
 
 @12320400 = ~À partir du niveau %requiredLevel%~
 

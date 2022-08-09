@@ -5188,9 +5188,8 @@ DEFINE_PATCH_MACRO ~opcode_self_232~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_232~ BEGIN
-	SET strref = 12320101
+	SET strref = 12320005
 	LPM ~opcode_232_common~
-    SPRINT description ~, %description%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_232~ BEGIN
@@ -5232,40 +5231,36 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
 	    SPRINT description (AT ~%strref%~)
-	    SPRINT description ~%condition%, %description%~
     END
     ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
         SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
 	    SPRINT description (AT ~%strref%~)
-	    SPRINT description ~%condition%, %description%~
     END
     ELSE BEGIN
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
 			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
-			INNER_PATCH_SAVE effectDescription ~%effectDescription%~ BEGIN
+			INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
 		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower
 		            TO_LOWER MATCH1
 		        END ~%MATCH1%~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^[0-9]+ % de chance ~ ~~
+		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
-			SPRINT description ~%condition%, %effectDescription%~
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 	        SET strref += 3 // ~lance un sort sur %theTarget%~
 		    SPRINT description (AT ~%strref%~)
-		    SPRINT description ~%condition%, %description%~
 			SPRINT description ~%description%%spellDescription%~
 	    END
 	    ELSE BEGIN
 		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
-		    SPRINT description ~%condition%, %description%~
 	    END
     END
 END
 
 DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
-	SET conditionRef = strref + 9 + parameter2
+	SET conditionRef = 12320010 + parameter2
 	SPRINT condition (AT ~%conditionRef%~)
 
 	PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 OR parameter2 == 20 BEGIN
@@ -5282,11 +5277,11 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 			SET value = special
 		END
 		LPF ~percent_value~ INT_VAR value RET percent = value END
-		SPRINT condition @12320120 // ~Lorsque les points de vie du porteur passent sous les %percent%~
+		SPRINT condition @12320030 // ~Lorsque les points de vie du porteur passent sous les %percent%~
 	END
 	ELSE PATCH_IF parameter2 == 19 BEGIN
 		SET value = special
-		SPRINT condition @12320119 // ~Lorsque les points de vie du porteur passent sous %value%~
+		SPRINT condition @12320029 // ~Lorsque les points de vie du porteur passent sous %value%~
 	END
 	ELSE PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
 		PATCH_IF parameter2 == 8 BEGIN
@@ -5299,7 +5294,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
             SET value = special
         END
 		SPRINT range $feets_to_meters(~%value%~)
-		SPRINT condition @12320114 // ~Lorsque la cible se trouve à moins de %range%~
+		SPRINT condition @12320024 // ~Lorsque la cible se trouve à moins de %range%~
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
 		PATCH_IF parameter1 != 0 BEGIN

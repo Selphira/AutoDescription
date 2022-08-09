@@ -20,6 +20,7 @@ BEGIN
 
 	LPM ~block_to_vars~
 
+	SPRINT condition ~~
 	SPRINT method ~~
 	SPRINT description ~~
 	SPRINT opcode_target ~~
@@ -99,6 +100,7 @@ BEGIN
 						END
 					END
 
+					LPM ~add_condition~
 					LPM ~add_duration~
 					LPM ~add_save~
 				END
@@ -159,6 +161,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 
 	SET parentProbability = probability
 	SET probability = probability1 - probability2
+	SPRINT condition ~~
 	SPRINT description ~~
 
 	PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
@@ -222,8 +225,15 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 	END
 
+	LPM ~add_condition~
 	LPM ~add_duration~
 	LPM ~add_save~
+END
+
+DEFINE_PATCH_MACRO ~add_condition~ BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description ~%condition%%semicolon%%description%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
