@@ -398,6 +398,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
 	12 => ~7,5 %meters%~
 	13 => ~8 %meters%~
 	15 => ~9 %meters%~
+	16 => ~9,5 %meters%~
+	17 => ~10 %meters%~
+	18 => ~11 %meters%~
+	19 => ~11,5 %meters%~
+	20 => ~12 %meters%~
+	21 => ~13 %meters%~
+	22 => ~13,5 %meters%~
+	23 => ~14 %meters%~
+	24 => ~14,5 %meters%~
+	25 => ~15 %meters%~
+	26 => ~16 %meters%~
+	27 => ~16,5 %meters%~
+	28 => ~17 %meters%~
+	29 => ~17,5 %meters%~
+	30 => ~18 %meters%~
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
