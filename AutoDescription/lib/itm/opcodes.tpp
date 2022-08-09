@@ -538,10 +538,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 
 
 		PATCH_IF parameter1 > 0 BEGIN
-			SPRINT description @10000103 // ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
+			SPRINT description @10000103 // ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
 		END
 		ELSE BEGIN
-			SPRINT description @10000104 // ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
+			SPRINT description @10000104 // ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~
 		END
 	END
 END

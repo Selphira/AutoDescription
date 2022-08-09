@@ -581,8 +581,8 @@
 @10000100 = ~Classe d'armure de base~
 @10000101 = ~Bonus de %value%~
 @10000102 = ~Malus de %value%~
-@10000103 = ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
-@10000104 = ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
+@10000103 = ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
+@10000104 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
