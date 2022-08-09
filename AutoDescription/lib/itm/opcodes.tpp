@@ -508,13 +508,15 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 		END
 	END
 
-	SPRINT name @102008 // ~Classe d'armure~
+	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @102008 // ~Classe d'armure~
 
-	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		SPRINT name @10000100  // ~Classe d'armure de base~
+		PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+			SPRINT name @10000100  // ~Classe d'armure de base~
+		END
+
+		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
-
-	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
@@ -526,20 +528,21 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
-	ELSE BEGIN
-		//LPM ~opcode_0_get_value~
+
+	PATCH_IF parameter1 != 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
 		END
-	END
 
-	PATCH_IF parameter1 > 0 BEGIN
-		SPRINT description @10000103 // ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
-	END
-	ELSE BEGIN
-		SPRINT description @10000104 // ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
+
+		PATCH_IF parameter1 > 0 BEGIN
+			SPRINT description @10000103 // ~d'accorder %toTheTarget% un bonus à la classe d'armure de %value%~
+		END
+		ELSE BEGIN
+			SPRINT description @10000104 // ~d'infliger %toTheTarget% un malus à la classe d'armure de %value%~
+		END
 	END
 END
 
@@ -563,8 +566,10 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 		END
 	END
 
-	SPRINT name @102008        // ~Classe d'armure~
-	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT name @102008        // ~Classe d'armure~
+		SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
@@ -575,10 +580,17 @@ DEFINE_PATCH_MACRO ~opcode_0_common~ BEGIN
 	PATCH_IF parameter2 == 15 BEGIN
 		SET parameter2 = AC_MOD_TYPE_all
 	END
+
+	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
-	PATCH_IF armor_class_show_bonus_malus BEGIN
+	PATCH_IF value == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
+		SPRINT value ~~
+	END
+	ELSE PATCH_IF armor_class_show_bonus_malus BEGIN
 		PATCH_IF value > 0 BEGIN
 			SPRINT value @10000101 // ~Bonus de %value%~
 		END
