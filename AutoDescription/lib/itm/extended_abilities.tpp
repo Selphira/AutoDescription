@@ -245,6 +245,13 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics~ BEGIN
 	READ_SHORT (offset + ITM_HEAD_damage_bonus) damageBonus
 	READ_SHORT (offset + ITM_HEAD_damage_type) damageType
 
+	PATCH_IF damageBonus > 32768 BEGIN
+		SET damageBonus = damageBonus - 65536
+	END
+	PATCH_IF tac0 > 32767 BEGIN
+		SET tac0 -= 65536
+	END
+
 	SPRINT damage ~~
 	/*  TODO: Cas limites à gérer
 		- If Dice thrown, Dice size, and Damage bonus are all 0: Always deals zero damage (ignores all modifiers, like Weapon Proficiency).
@@ -256,10 +263,7 @@ DEFINE_PATCH_MACRO ~add_weapon_statistics~ BEGIN
 	PATCH_IF diceThrown > 0 AND diceSides > 0 BEGIN
 		SPRINT damage ~%damage%%diceThrown%d%diceSides% ~
 	END
-	PATCH_IF damageBonus > 0 BEGIN
-		PATCH_IF damageBonus > 32768 BEGIN
-			SET damageBonus = damageBonus - 65536
-		END
+	PATCH_IF damageBonus != 0 BEGIN
 		LPF ~signed_value~ INT_VAR value = damageBonus RET damageBonus = value END
 		SPRINT damage ~%damage%%damageBonus%~
 	END
