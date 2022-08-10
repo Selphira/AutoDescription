@@ -44,7 +44,6 @@ BEGIN
 
 			PATCH_IF headerCount > 0 BEGIN
 			    FOR (headerIndex = 0; headerIndex < headerCount; headerIndex += 1) BEGIN
-					SET featureCount = 0
 					SET count += 1
 	                SET offset = headerOffset + 0x28 * headerIndex
 					READ_SHORT (offset + SPL_HEAD_level_required) requiredLevel
@@ -69,6 +68,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_level_effects~
 		effects
 		levels
 BEGIN
+	SET featureCount = 0
     PHP_EACH blockOffsets AS _ => blockOffset BEGIN
 		READ_SHORT blockOffset opcode
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
@@ -164,6 +164,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_description~
 BEGIN
 	LPF ~get_spell_effects~ INT_VAR forceTarget = 1 STR_VAR file theTarget ofTheTarget toTheTarget RET count RET_ARRAY effects levels END
 
+	SET featureCount = 0
 	SPRINT spellDescription ~~
 	SPRINT indentation ~~
 
