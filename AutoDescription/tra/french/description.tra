@@ -2011,8 +2011,14 @@
 
 @12720000 = ~%description%, à chaque seconde~
 @12720002 = ~%description%, %frequency% fois par seconde~
-@12720003 = ~%description%, toutes les %frequency% secondes~
-@12720004 = ~%description%, tous les %frequency% rounds~
+@12720003 = ~%description%, toutes les %strDuration%~ //heures et secondes
+@12720004 = ~%description%, tous les %strDuration%~ //jours, tours et rounds
+@12720005 = ~%description%, à chaque %strDuration%~
+@12720006 = ~%description%, %amount% fois tous les %frequency% rounds~
+@12720007 = ~%description%, %amount% fois par round~
+@12720008 = ~%description%, %amount% fois toutes les %strDuration%~
+@12720009 = ~%description%, %amount% fois tous les %strDuration%~
+@12720010 = ~%description%, %amount% fois par %strDuration%~
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
