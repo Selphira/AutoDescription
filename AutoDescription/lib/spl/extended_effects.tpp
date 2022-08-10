@@ -14,6 +14,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects~
 		levels
 BEGIN
 	SET count = 0
+	SET requiredLevel = 0
 
 	CLEAR_ARRAY tmpEffects
 	CLEAR_ARRAY effects
@@ -24,8 +25,22 @@ BEGIN
 
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
-			READ_LONG  SPL_extended_headers_offset headerOffset
-			READ_SHORT SPL_extended_headers_count  headerCount
+			READ_LONG  SPL_HEAD_target                   spellTarget
+			READ_LONG  SPL_extended_headers_offset       headerOffset
+			READ_SHORT SPL_extended_headers_count        headerCount
+			READ_SHORT SPL_casting_feature_blocks_count  featureCount
+
+			PATCH_IF spellTarget == 5 OR spellTarget == 7 BEGIN
+				forceTarget = TARGET_FX_self
+			END
+
+			PATCH_IF featureCount > 0 BEGIN
+				CLEAR_ARRAY features
+                PATCH_DEFINE_ASSOCIATIVE_ARRAY ~features~ BEGIN END
+				GET_OFFSET_ARRAY blockOffsets SPL_V10_GEN_EFFECTS
+
+				LPF ~get_spell_level_effects~ RET_ARRAY effects levels END
+		    END
 
 			PATCH_IF headerCount > 0 BEGIN
 			    FOR (headerIndex = 0; headerIndex < headerCount; headerIndex += 1) BEGIN
@@ -38,43 +53,8 @@ BEGIN
                     PATCH_DEFINE_ASSOCIATIVE_ARRAY ~features~ BEGIN END
 
 					GET_OFFSET_ARRAY2 blockOffsets offset SPL_V10_HEAD_EFFECTS
-					PATCH_PHP_EACH blockOffsets AS _ => blockOffset BEGIN
-						READ_SHORT blockOffset opcode
-						PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-							SET abilityType = AbilityType_Charge
-							PATCH_IF opcode == 219 BEGIN
-								SET opcodeBase = opcode
-								PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
-									SET opcode = opcodeBase * 1000 + subOpcode
-									LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
-									PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-										SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
-										SET featureCount += 1
-									END
-								END
-							END
-							ELSE BEGIN
-								LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
-								PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-									SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
-									SET featureCount += 1
-								END
-							END
-						END
-						ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
-							LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
-						END
-					END
 
-					LPF ~get_unique_spell_effects~ INT_VAR requiredLevel STR_VAR array_name = "tmpEffects" RET featureCount = count RET_ARRAY features = newAbilities END
-
-					SORT_ARRAY_INDICES features NUMERICALLY
-
-					PATCH_PHP_EACH features AS data => value BEGIN
-						SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~) = value
-					END
-
-					SET $levels(~%requiredLevel%~) = featureCount
+					LPF ~get_spell_level_effects~ RET_ARRAY effects levels END
 			    END
 			END
 		END
@@ -82,6 +62,50 @@ BEGIN
 	ELSE BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
 	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_level_effects~
+	RET_ARRAY
+		effects
+		levels
+BEGIN
+    PHP_EACH blockOffsets AS _ => blockOffset BEGIN
+		READ_SHORT blockOffset opcode
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET abilityType = AbilityType_Charge
+			PATCH_IF opcode == 219 BEGIN
+				SET opcodeBase = opcode
+				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
+					SET opcode = opcodeBase * 1000 + subOpcode
+					LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
+					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+						SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
+						SET featureCount += 1
+					END
+				END
+			END
+			ELSE BEGIN
+				LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
+				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
+					SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
+					SET featureCount += 1
+				END
+			END
+		END
+		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+		END
+	END
+
+	LPF ~get_unique_spell_effects~ INT_VAR requiredLevel STR_VAR array_name = "tmpEffects" RET featureCount = count RET_ARRAY features = newAbilities END
+
+	SORT_ARRAY_INDICES features NUMERICALLY
+
+	PATCH_PHP_EACH features AS data => value BEGIN
+		SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~) = value
+	END
+
+	SET $levels(~%requiredLevel%~) = featureCount
 END
 
 DEFINE_PATCH_FUNCTION ~get_single_spell_effect~
@@ -99,8 +123,13 @@ BEGIN
 	SPRINT effectDescription ~~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
+			READ_LONG  SPL_HEAD_target             spellTarget
 			READ_LONG  SPL_extended_headers_offset headerOffset
 			READ_SHORT SPL_extended_headers_count  headerCount
+
+			PATCH_IF spellTarget == 5 OR spellTarget == 7 BEGIN
+				forceTarget = TARGET_FX_self
+			END
 
 			PATCH_IF headerCount == 1 BEGIN
                 SET offset = headerOffset
@@ -142,15 +171,15 @@ BEGIN
 		SPRINT indentation ~  ~
 	END
 
-	PATCH_PHP_EACH levels AS requiredLevel => count BEGIN
+	PATCH_PHP_EACH levels AS requiredLevel => levelCount BEGIN
 		PATCH_PHP_EACH effects AS data => feature BEGIN
 			SET featureCount += 1
 		END
 	END
 
-	PATCH_PHP_EACH levels AS requiredLevel => count BEGIN
+	PATCH_PHP_EACH levels AS requiredLevel => levelCount BEGIN
 		SPRINT levelSpellDescription ~~
-		PATCH_IF count > 1 BEGIN
+		PATCH_IF requiredLevel != 0 AND (count > 1 OR requiredLevel > 1) BEGIN
 			SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
 			SPRINT levelSpellDescription ~%levelSpellDescription%%crlf%%levelDescription%~
 		END
