@@ -5268,9 +5268,6 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
 			INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
-		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower
-		            TO_LOWER MATCH1
-		        END ~%MATCH1%~
 		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
