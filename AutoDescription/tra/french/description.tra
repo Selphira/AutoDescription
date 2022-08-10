@@ -1906,10 +1906,10 @@
 @12320222 = ~à l'adversaire le plus proche~
 @12320223 = ~à la créature la plus proche~
 
-@12320300 = ~Durant la journée~
-@12320301 = ~À la tombée de la nuit~
-@12320302 = ~À la nuit tombée~
-@12320303 = ~Au lever du jour~
+@12320300 = ~Durant la journée, à chaque round~
+@12320301 = ~À la tombée de la nuit, à chaque round~
+@12320302 = ~À la nuit tombée, à chaque round~
+@12320303 = ~Au lever du jour, à chaque round~
 
 @12320400 = ~À partir du niveau %requiredLevel%~
 
