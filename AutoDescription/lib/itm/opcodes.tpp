@@ -3699,6 +3699,11 @@ DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche l'utilisation de xxx~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_144~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche %theTarget% d'utiliser xxx~
+END
+
 /* -------------------------------------------- *
  * Spell: Disable Spell Casting Abilities [145] *
  * -------------------------------------------- */
@@ -6612,31 +6617,46 @@ END
  * Spell Effect: Change Critical Hit Effect [341] *
  * ---------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_341~ BEGIN
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13410001 // ~À chaque coup critique: %description%~
-	END
+	SPRINT condition @13410001 // ~À chaque coup critique~
+	LPM ~opcode_341_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_341~ BEGIN
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13410003 // ~par coup critique %ofTheTarget%: %description%~
-	END
+	LPM ~opcode_self_341~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_341~ BEGIN
-	LPF ~get_res_description_177~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13410002 // ~À chaque coup critique %ofTheTarget%: %description%~
-	END
+	SPRINT condition @13410002 // ~À chaque coup critique %ofTheTarget%~
+	LPM ~opcode_341_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_341~ BEGIN
-	LPM ~opcode_self_probability_341~
+	LPM ~opcode_target_341~
+END
+
+DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	LPF ~get_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+
+	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+	END
+
+	PATCH_IF count == 1 AND featureCount == 1 BEGIN
+		LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+
+		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
+	        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+		END
+	END
+	ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+	    SPRINT description @12320004
+		SPRINT description ~%description%%spellDescription%~
+    END
+    ELSE BEGIN
+	    SPRINT description @12320001 // ~Lance le sort %spellName% sur %theTarget%~
+    END
 END
 
 /* ------------- *

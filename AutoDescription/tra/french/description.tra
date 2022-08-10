@@ -1315,6 +1315,7 @@
 @11012000 = ~~
 @11012005 = ~Immunise %theTarget% aux charmes~
 @11012012 = ~Immunise %theTarget% aux dégâts supplémentaires~
+@11012074 = ~Immunise %theTarget% à l'aveuglement~
 @11012144 = ~Immunise %theTarget% à la désactivation des boutons d'interface~ // Pas top...
 @11012146 = ~Immunise %theTarget% aux lancement de sort~ // Pas top...
 
@@ -1478,6 +1479,23 @@
 @11440014 = ~Empêche l'utilisation des sorts innés~
 @11440015 = ~Empêche l'utilisation de la détection de pièges~
 @11440016 = ~Empêche l'utilisation de l'inventaire~
+
+@11440021 = ~Empêche %theTarget% d'utiliser le camouflage dans l'ombre~
+@11440022 = ~Empêche %theTarget% d'utiliser les compétences de voleur~
+@11440023 = ~Empêche %theTarget% d'utiliser les sorts~
+@11440024 = ~Empêche %theTarget% d'utiliser le premier sort rapide~
+@11440025 = ~Empêche %theTarget% d'utiliser le second sort rapide~
+@11440026 = ~Empêche %theTarget% d'utiliser le troisième sort rapide~
+@11440027 = ~Empêche %theTarget% d'utiliser repousser les morts-vivants~
+@11440028 = ~Empêche %theTarget% d'utiliser les discussions~
+@11440029 = ~Empêche %theTarget% d'utiliser les objets~
+@11440030 = ~Empêche %theTarget% d'utiliser les premier objet rapide~
+@11440031 = ~Empêche %theTarget% d'utiliser les chants de barde~
+@11440032 = ~Empêche %theTarget% d'utiliser le second objet rapide~
+@11440033 = ~Empêche %theTarget% d'utiliser le troisième objet rapide~
+@11440034 = ~Empêche %theTarget% d'utiliser les sorts innés~
+@11440035 = ~Empêche %theTarget% d'utiliser la détection de pièges~
+@11440036 = ~Empêche %theTarget% d'utiliser l'inventaire~
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
@@ -1860,10 +1878,10 @@
 
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
-@12320001 = ~lance le sort %spellName% sur %theTarget%~
-@12320002 = ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
-@12320003 = ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
-@12320004 = ~lance un sort sur %theTarget%~
+@12320001 = ~Lance le sort %spellName% sur %theTarget%~
+@12320002 = ~Lance les sorts %spellName% et %spellName2% sur %theTarget%~
+@12320003 = ~Lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320004 = ~Lance un sort sur %theTarget%~
 
 @12320005 = ~de lancer le sort %spellName% sur %theTarget%~
 @12320006 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
@@ -2383,9 +2401,8 @@
 
 // Opcode 341: Spell Effect: Change Critical Hit Effect [341]
 
-@13410001 = ~À chaque coup critique: %description%~
-@13410002 = ~À chaque coup critique %ofTheTarget%: %description%~
-@13410003 = ~par coup critique %ofTheTarget%: %description%~
+@13410001 = ~À chaque coup critique~
+@13410002 = ~À chaque coup critique %ofTheTarget%~
 
 // Opcode 343: HP Swap [343]
 
