@@ -516,7 +516,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LPM ~opcode_0_common~
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 != AC_MOD_TYPE_all AND NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -574,7 +574,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	END
 	ELSE BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 != AC_MOD_TYPE_all AND NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
