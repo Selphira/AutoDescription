@@ -2399,10 +2399,16 @@
 @13320009 = ~Dégâts contondants~
 @13320010 = ~Dégâts de projectiles~
 
+// Opcode 340: Spell Effect: Change Backstab Effect [340]
+
+@13400001 = ~À chaque attaque sournoise~
+@13400002 = ~À chaque attaque sournoise %ofTheTarget%~
+
 // Opcode 341: Spell Effect: Change Critical Hit Effect [341]
 
 @13410001 = ~À chaque coup critique~
 @13410002 = ~À chaque coup critique %ofTheTarget%~
+@13410003 = ~À chaque coup critique provoqué avec cette arme~
 
 // Opcode 343: HP Swap [343]
 

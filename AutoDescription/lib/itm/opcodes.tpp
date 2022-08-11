@@ -218,6 +218,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	248 => 291 // Item: Set Melee Effect [248]
 	249 => 292 // Item: Set Ranged Effect [249]
 	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
+	340 => 294 // Spell Effect: Change Backstab Effect [340]
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
 	135 => 297 // Polymorph into Specific [135]
@@ -354,7 +355,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	337 => 1 // Remove: Opcode [337]
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
-	340 => 1 // Spell Effect: Change Backstab Effect [340]
 	342 => 0 // Animation: Override Data [342]
 	345 => 1 // Enchantment bonus [345]
 	360 => 1 // Stat: Ignore Reputation Breaking Point [360]
@@ -6614,10 +6614,39 @@ DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 END
 
 /* ---------------------------------------------- *
+ * Spell Effect: Change Backstab Effect [340]     *
+ * ---------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_340~ BEGIN
+	SPRINT condition @13400001 // ~À chaque attaque sournoise~
+	LPM ~opcode_341_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_340~ BEGIN
+	LPM ~opcode_self_340~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_340~ BEGIN
+	SPRINT condition @13400002 // ~À chaque attaque sournoise %ofTheTarget%~
+	LPM ~opcode_341_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_340~ BEGIN
+	LPM ~opcode_target_340~
+END
+
+/* ---------------------------------------------- *
  * Spell Effect: Change Critical Hit Effect [341] *
  * ---------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_341~ BEGIN
-	SPRINT condition @13410001 // ~À chaque coup critique~
+	//TODO: Gérer Weapon category ~À chaque coup critique provoqué avec des [épées]~
+	//TODO: Gérer attack type ~À chaque coup critique [de mélée] provoqué avec des [épées]~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT condition @13410001 // ~À chaque coup critique~
+	END
+	ELSE BEGIN
+		SPRINT condition @13410003 // ~À chaque coup critique provoqué avec cette arme~
+	END
+
 	LPM ~opcode_341_common~
 END
 
