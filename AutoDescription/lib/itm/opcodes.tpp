@@ -199,6 +199,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	211 => 257 // Spell Effect: Imprisonment [211]
 	329 => 258 // Spell Effect: Slow Poison [329] : EE only
 	274 => 259 // Spell Effect: Teleport to Target [274]
+	222 => 259 // Spell Effect: Teleport Field [222]
 	268 => 260 // Spell Effect: Explore (Wizard Eye) [268]
 	316 => 275 // Spell: Magical Rest [316]
 	131 => 276 // State: Positive Chant [131]
@@ -299,7 +300,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	196 => 1 // Spell Effect: Familiar Block [196]
 	198 => 1 // Spell: Bounce (by Opcode) [198]
 	215 => 0
-	222 => 1 // Spell Effect: Teleport Field [222]
 	225 => 0 // Spell: Reveal Magic [225]
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	236 => 1 // Spell Effect: Image Projection [236]
@@ -5005,6 +5005,31 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_221~ BEGIN
 	LPM ~opcode_self_probability_221~
+END
+
+/* ---------------------------------- *
+ * Spell Effect: Teleport Field [222] *
+ * ---------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_222~ BEGIN
+	LOCAL_SET value = parameter1
+	SPRINT range $feets_to_meters(~%value%~)
+
+	SPRINT description @12220001 // ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_222~ BEGIN
+	LOCAL_SET value = parameter1
+	SPRINT range $feets_to_meters(~%value%~)
+
+	SPRINT description @12220002 // ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_222~ BEGIN
+	LPM ~opcode_self_222~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_222~ BEGIN
+	LPM ~opcode_self_probability_222~
 END
 
 /* ---------------------------------------------- *

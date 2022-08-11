@@ -1827,6 +1827,11 @@
 @12210001 = ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 @12210002 = ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 
+// Opcode 222: Spell Effect: Teleport Field [222]
+
+@12220001 = ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~
+@12220002 = ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~
+
 // Opcode 223: Spell: Immunity (by School, decrementing [223]
 
 @12230001 = ~Absorbe 1 sort de l'école %spellSchoolName%~
