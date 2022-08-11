@@ -2030,42 +2030,41 @@ DEFINE_PATCH_MACRO ~opcode_self_58~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_58~ BEGIN
-	LOCAL_SET castingLevel = parameter1
-	LOCAL_SET type = parameter2
-
-	PATCH_IF type > 2 BEGIN
-        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO EE : Dissipation des armes magiques à gerer : %type%~ END
-	END
-	ELSE BEGIN
-		SPRINT description @10580001 // ~Dissipation de la magie~
-
-		PATCH_IF type == 0 BEGIN
-			SPRINT description @10580002 // ~Dissipation de la magie assurée~
-		END
-		PATCH_IF type == 2 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
-		END
-	END
+	LOCAL_SET strref = 10580001 // ~Dissipation de la magie sur %theTarget%~
+	LPM ~opcode_58_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_58~ BEGIN
+	LOCAL_SET strref = 10580003 // ~de dissiper la magie sur %theTarget%~
+	LPM ~opcode_58_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_58_common~ BEGIN
 	LOCAL_SET castingLevel = parameter1
 	LOCAL_SET type = parameter2
+	LOCAL_SET mwType = type BLSR 16
 
-	PATCH_IF type > 2 BEGIN
-        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO EE : Dissipation des armes magiques à gerer : %type%~ END
+	SET type = type BAND 255
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+
+	PATCH_IF type == 0 BEGIN
+		SET strref += 1
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
-	ELSE BEGIN
-		SPRINT description @10580003 // ~de dissiper la magie~
+	ELSE PATCH_IF type == 2 BEGIN
+		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+		SPRINT description ~%description% (%castingLevelStr%)~
+	END
 
-		PATCH_IF type == 0 BEGIN
-			SPRINT description @10580004 // ~de dissiper la magie assurément~
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF mwType == 0 BEGIN
+			SPRINT weaponStr @10580006 // ~les armes invoquées sont toujours dissipées~
+			SPRINT description ~%description% (%weaponStr%)~
 		END
-
-		PATCH_IF type == 2 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
+		ELSE PATCH_IF mwType == 1 BEGIN
+			SPRINT weaponStr @10580005 // ~les armes invoquées ne sont pas affectées~
+			SPRINT description ~%description% (%weaponStr%)~
 		END
 	END
 END

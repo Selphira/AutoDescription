@@ -896,6 +896,8 @@
 @10580002 = ~Dissipation de la magie assurée sur %theTarget%~ // TODO: Trouver autre chose que "assurée"
 @10580003 = ~de dissiper la magie sur %theTarget%~
 @10580004 = ~de dissiper la magie assurément sur %theTarget%~ // TODO: Trouver autre chose que "assurément"
+@10580005 = ~les armes invoquées ne sont pas affectées~
+@10580006 = ~les armes invoquées sont toujours dissipées~
 
 // Opcode 59: Stat: Stealth Modifier [59]
 
