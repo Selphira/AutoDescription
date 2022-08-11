@@ -2150,6 +2150,11 @@
 @13100002 = ~Immunise %theTarget% à l'arrêt du temps~
 @13100003 = ~d'immuniser %theTarget% à l'arrêt du temps~
 
+// Opcode 311: Spell: Random Wish Spell [311]
+
+@13110001 = ~Lance un souhait aléatoire sur %theTarget%~
+@13110002 = ~de lancer un souhait aléatoire sur %theTarget%~
+
 // Opcode 316: Spell: Magical Rest [316]
 
 @13160001 = ~de reposer %theTarget%~

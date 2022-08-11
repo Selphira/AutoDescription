@@ -175,6 +175,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	172 => 244 // Spell: Remove Spell [172]
 	272 => 245 // Spell: Apply Repeating EFF [272]
 	148 => 245 // Spell: Cast Spell (at Point) [148]
+	311 => 245 // Spell: Random Wish Spell [311]
 	201 => 246 // Spell: Decrementing Spell Immunity [201]
 	199 => 247 // Spell: Bounce Spells [199]
 	202 => 247 // Spell: Bounce (by School) [202]
@@ -337,11 +338,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	307 => 0 // Ranger Tracking Ability [307]
 	308 => 0 // Protection: From Tracking [308]
 	309 => 0 // Script: Set/Modify Local Variable [309]
-	311 => 1 // Spell: Random Wish Spell [311]
 	312 => 0
 	313 => 0 // High-Level Ability Denotation [313]
 	314 => 1 // Spell: Golem Stoneskin [314]
-	315 => 1 // Graphics: Animation Removal [315]
+	315 => 0 // Graphics: Animation Removal [315]
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
@@ -3861,6 +3861,10 @@ END
 /* ------------------------------ *
  * Summon: Replace Creature [151] *
  * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_151~ BEGIN
+	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Version self à gérer.~ END
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_151~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 	PATCH_IF parameter2 == 0 BEGIN
@@ -6397,6 +6401,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_310~ BEGIN
 	LPM ~opcode_self_probability_310~ // ~d'immuniser %theTarget% à l'arrêt du temps~
+END
+
+/* ------------------------------ *
+ * Spell: Random Wish Spell [311] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_311~ BEGIN
+	SPRINT description @13110001 // ~Lance un souhait aléatoire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_311~ BEGIN
+	SPRINT description @13110002 // ~de lancer un souhait aléatoire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_311~ BEGIN
+	LPM ~opcode_self_311~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_311~ BEGIN
+	LPM ~opcode_self_probability_311~
 END
 
 /* ------------------------- *
