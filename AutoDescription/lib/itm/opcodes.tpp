@@ -5436,7 +5436,14 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 		SET timeofdayRef = 12320300 + special
 		LPF ~getTranslation~ INT_VAR strref = timeofdayRef opcode RET condition = string END
 	END
-	ELSE PATCH_IF parameter2 == 15 OR parameter2 == 18 OR parameter2 == 21 BEGIN
+	ELSE PATCH_IF parameter2 == 21 BEGIN
+		SET stateRef = 12320500 + special
+		LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+		PATCH_IF NOT ~%splstate%~ STRING_EQUAL ~~ BEGIN
+			SPRINT condition @12320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
+		END
+	END
+	ELSE PATCH_IF parameter2 == 15 OR parameter2 == 18 BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO parameter2 : %parameter2% : %parameter1% : %special%~ END
 	END
 END

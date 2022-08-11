@@ -1953,7 +1953,7 @@
 @12320028 = ~~ //TODO: TurnedBy ???
 @12320029 = ~Lorsque les points de vie du porteur passent sous %value%~
 @12320030 = ~Lorsque les points de vie du porteur passent sous les %percent%~
-@12320031 = ~~
+@12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~ // TODO: Ne s'adapte pas aux cibles autres que le porteur...
 
 @12320200 = ~le porteur~
 @12320201 = ~l'attaquant~
@@ -1974,6 +1974,9 @@
 @12320303 = ~Au lever du jour, à chaque round~
 
 @12320400 = ~À partir du niveau %requiredLevel%~
+
+//@12320500 = ~~
+@12320604 = ~la rage du berserker~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 
