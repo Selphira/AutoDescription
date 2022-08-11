@@ -2438,6 +2438,10 @@
 @13460020 = ~~
 @13460021 = ~~
 
+// Opcode 360: Stat: Ignore Reputation Breaking Point [360]
+
+@13600001 = ~Ne quitte plus le groupe si la réputation ne convient pas %toTheTarget%~
+
 // Opcode 361: Cast spell on critical miss [361]
 
 @13610001 = ~À chaque échec critique~
