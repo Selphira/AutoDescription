@@ -7024,31 +7024,45 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 STR_VAR value = ~~ RET description BEGIN
 	SPRINT name @102034 // ~Jets de sauvegarde~
-	LPF ~getTranslation~ INT_VAR strref opcode RET strSave = string END
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative OR parameter2 == 3 BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT value ~%value% %strSave%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value @10010 // ~Passe à %value%~
-		SPRINT name ~%name% %strSave%~
-	END
-	ELSE BEGIN // percent
-		SET value -= 100
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT value @10002 // ~%value% %~
-		SPRINT name ~%name% %strSave%~
-	END
+	PATCH_IF target == 1 OR group == 1 BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END
+		SPRINT theStatistic @10330002 // ~les jets de sauvegarde %versus%~
 
-	PATCH_IF target == 1 BEGIN
-		SPRINT target @101085 // ~de la cible~
-		SPRINT description @101123 // ~%name% %target%%colon%%value%~
-	END ELSE PATCH_IF group == 1 BEGIN
-		SPRINT target @101088 // ~des membres du groupe~
-		SPRINT description @101123 // ~%name% %target%%colon%%value%~
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+	        PATCH_IF value > 0 BEGIN
+		        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+	        END
+	        ELSE BEGIN
+	            value = ABS value
+		        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+	        END
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
+		END
 	END
 	ELSE BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET strSave = string END
+		PATCH_IF parameter2 == MOD_TYPE_cumulative OR parameter2 == 3 BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+			SPRINT value ~%value% %strSave%~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT value @10010 // ~Passe à %value%~
+			SPRINT name ~%name% %strSave%~
+		END
+		ELSE BEGIN // percent
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			SPRINT value @10002 // ~%value% %~
+			SPRINT name ~%name% %strSave%~
+		END
+
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 END
