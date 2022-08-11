@@ -7326,6 +7326,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance BEGIN
 	SPRINT creatureName ~~
+	SPRINT allegiance ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
 		INNER_PATCH_FILE ~%file%.cre~ BEGIN
