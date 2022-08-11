@@ -102,3 +102,10 @@ BEGIN
 		LPF TO_HEX_NUMBER INT_VAR value = value minDigits = minDigits prefix = prefix RET hexNumber END
 	END
 END
+
+//TODO: lowerFirst
+/*
+		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower
+		            TO_LOWER MATCH1
+		        END ~%MATCH1%~
+*/

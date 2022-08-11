@@ -1418,6 +1418,42 @@
 @11260003 = ~Immobilise %theTarget%~
 @11260004 = ~d'immobiliser %theTarget%~
 
+// Opcode 127: Summon: Monster Summoning [127]
+
+@11270001 = ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
+@11270002 = ~Invoque des animaux pour un total de %amount% niveaux (%creatures%)~
+@11270003 = ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270004 = ~Invoque des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270005 = ~Invoque 1 monstre (%creatures%)~
+@11270006 = ~Invoque 1 animal (%creatures%)~
+@11270007 = ~Invoque %amount% monstres (%creatures%)~
+@11270008 = ~Invoque %amount% animaux (%creatures%)~
+@11270009 = ~Invoque des monstres hostiles pour un total de %amount% niveaux (%creatures%)~
+@11270010 = ~Invoque des animaux hostiles pour un total de %amount% niveaux (%creatures%)~
+@11270011 = ~Invoque des monstres hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270012 = ~Invoque des animaux hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270013 = ~Invoque 1 monstre hostile (%creatures%)~
+@11270014 = ~Invoque 1 animal hostile (%creatures%)~
+@11270015 = ~Invoque %amount% monstres hostiles (%creatures%)~
+@11270016 = ~Invoque %amount% animaux hostiles (%creatures%)~
+
+@11270021 = ~d'invoquer des monstres pour un total de %amount% niveaux (%creatures%)~
+@11270022 = ~d'invoquer des animaux pour un total de %amount% niveaux (%creatures%)~
+@11270023 = ~d'invoquer des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270024 = ~d'invoquer des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270025 = ~d'invoquer 1 monstre (%creatures%)~
+@11270026 = ~d'invoquer 1 animal (%creatures%)~
+@11270027 = ~d'invoquer %amount% monstres (%creatures%)~
+@11270028 = ~d'invoquer %amount% animaux (%creatures%)~
+@11270029 = ~d'invoquer des monstres hostiles pour un total de %amount% niveaux (%creatures%)~
+@11270030 = ~d'invoquer des animaux hostiles pour un total de %amount% niveaux (%creatures%)~
+@11270031 = ~d'invoquer des monstres hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270032 = ~d'invoquer des animaux hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270033 = ~d'invoquer 1 monstre hostile (%creatures%)~
+@11270034 = ~d'invoquer 1 animal hostile (%creatures%)~
+@11270035 = ~d'invoquer %amount% monstres hostiles (%creatures%)~
+@11270036 = ~d'invoquer %amount% animaux hostiles (%creatures%)~
+
 // Opcode 128: State: Confusion [128]
 
 @11280001 = ~Confusion~

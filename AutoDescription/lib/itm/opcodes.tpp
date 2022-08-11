@@ -224,6 +224,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
 	361 => 293 // Cast spell on critical miss [361]
 	340 => 294 // Spell Effect: Change Backstab Effect [340]
+	127 => 295 // Summon: Monster Summoning [127]
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
 	135 => 297 // Polymorph into Specific [135]
@@ -270,7 +271,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	117 => 1 // Spell Effect: Reveal Area [117]
 	123 => 1 // Item: Remove Inventory Item
 	124 => 1 // Spell Effect: Teleport (Dimension Door) [124]
-	127 => 1 // Summon: Monster Summoning [127]
 	138 => 0 // Graphics: Character Animation Change [138]
 	139 => 0
 	140 => 0 // Graphics: Casting Glow [140]
@@ -500,6 +500,19 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
 END
 
 ACTION_DEFINE_ARRAY ~opcode_1_values~ BEGIN 0 10 20 30 40 50 5 15 25 35 45 END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_127_files~ BEGIN
+	0 => ~MONSUM01~
+	1 => ~MONSUM02~
+	2 => ~MONSUM03~
+	3 => ~ANISUM01~
+	4 => ~ANISUM02~
+	5 => ~MONSUM01~
+	6 => ~MONSUM02~
+	7 => ~MONSUM03~
+    8 => ~ANISUM01~
+    9 => ~ANISUM02~
+END
 
 OUTER_SET AbilityType_Charge = 1
 OUTER_SET AbilityType_Combat = 2
@@ -3446,6 +3459,57 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
 	LPM ~opcode_self_probability_126~
 END
 
+/* ------------------------------- *
+ * Summon: Monster Summoning [127] *
+ * ------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_127~ BEGIN
+	LOCAL_SET strref = 11270001
+	LPM ~opcode_127_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_127~ BEGIN
+	LOCAL_SET strref = 11270021
+	LPM ~opcode_127_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
+	LOCAL_SET amount    = parameter1
+	LOCAL_SET type      = parameter2
+	LOCAL_SET mode      = special
+	LOCAL_SET isMonster = 1
+	LOCAL_SET isHostile = type >= 5 ? 1 : 0
+
+	PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
+		SET isMonster = 0
+	END
+
+	PATCH_IF mode <= 1 BEGIN
+		SET strref += isMonster == 1 ? 0 : 1 // ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
+	END
+	ELSE PATCH_IF mode == 3 BEGIN
+		SET strref += isMonster == 1 ? 2 : 3 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+	END
+	ELSE PATCH_IF mode == 2 BEGIN
+		PATCH_IF mode == 2 AND VARIABLE_IS_SET parameter3 BEGIN
+			LPF ~get_damage_value~ INT_VAR diceCount diceSides amount RET amount = damage END
+		END
+		ELSE BEGIN
+			SET strref += amount == 1 ? 4 : 6
+			SET strref += isMonster == 1 ? 0 : 1
+		END
+	END
+
+	PATCH_IF isHostile == 1 BEGIN
+		SET strref += 8
+	END
+
+	SPRINT file $opcode_127_files(~%type%~)
+	//FIXME: resref qui ne serait pas vide
+
+	LPF ~get_creatures_names~ STR_VAR file RET creatures END
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
 /* ---------------------- *
  * State: Confusion [128] *
  * ---------------------- */
@@ -4219,26 +4283,24 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
-	INNER_ACTION BEGIN
-		ACTION_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
-			COPY_EXISTING ~%resref%.eff~  ~override~
-				READ_SHORT EFF2_opcode opcode
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+			READ_SHORT EFF2_opcode opcode
 
-		        SPRINT oldTheTarget   ~%theTarget%~
-		        SPRINT oldOfTheTarget ~%ofTheTarget%~
-		        SPRINT oldToTheTarget ~%toTheTarget%~
+	        SPRINT oldTheTarget   ~%theTarget%~
+	        SPRINT oldOfTheTarget ~%ofTheTarget%~
+	        SPRINT oldToTheTarget ~%toTheTarget%~
 
-				LPF ~get_description_effect2~ INT_VAR resetTarget RET description saveAdded ignoreDuration END
+			LPF ~get_description_effect2~ INT_VAR resetTarget RET description saveAdded ignoreDuration END
 
-		        SPRINT theTarget   ~%oldTheTarget%~
-		        SPRINT ofTheTarget ~%oldOfTheTarget%~
-		        SPRINT toTheTarget ~%oldToTheTarget%~
-		    BUT_ONLY_IF_IT_CHANGES
-		END
-		ELSE BEGIN
-			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
-		END
-    END
+	        SPRINT theTarget   ~%oldTheTarget%~
+	        SPRINT ofTheTarget ~%oldOfTheTarget%~
+	        SPRINT toTheTarget ~%oldToTheTarget%~
+	    END
+	END
+	ELSE BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+	END
 END
 
 /* ---------------------------------------------------- *
@@ -7107,33 +7169,31 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 	ELSE BEGIN
 		SPRINT spellName ~~
 		SPRINT itemFilename ~%SOURCE_FILE%~
-		INNER_ACTION BEGIN
-			ACTION_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
-				COPY_EXISTING ~%file%.spl~ ~override~
-					READ_LONG SPL_unidentified_name spellNameRef
-					PATCH_IF spellNameRef > 0 BEGIN
-						READ_STRREF SPL_unidentified_name spellName
-					END
-					ELSE BEGIN
-						READ_LONG SPL_unidentified_description spellDescriptionRef
-						PATCH_IF spellDescriptionRef > 0 BEGIN
-							READ_STRREF SPL_unidentified_description spellDescription
+		PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+			INNER_PATCH_FILE ~%file%.spl~ BEGIN
+				READ_LONG SPL_unidentified_name spellNameRef
+				PATCH_IF spellNameRef > 0 BEGIN
+					READ_STRREF SPL_unidentified_name spellName
+				END
+				ELSE BEGIN
+					READ_LONG SPL_unidentified_description spellDescriptionRef
+					PATCH_IF spellDescriptionRef > 0 BEGIN
+						READ_STRREF SPL_unidentified_description spellDescription
 
-							INNER_PATCH_SAVE spellName ~%spellDescription%~ BEGIN
-								REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\([ ]*%crlf%+.*\)~ ~~
-								REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~[ ]*(.*)*~ ~~
-							END
+						INNER_PATCH_SAVE spellName ~%spellDescription%~ BEGIN
+							REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\([ ]*%crlf%+.*\)~ ~~
+							REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~[ ]*(.*)*~ ~~
 						END
 					END
-					PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-						LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
-					END
-				BUT_ONLY_IF_IT_CHANGES
+				END
+				PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
+				END
 			END
-			ELSE BEGIN
-				LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
-			END
-	    END
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
+		END
 	END
 END
 
@@ -7150,60 +7210,84 @@ END
 DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 	SPRINT itemName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
-	INNER_ACTION BEGIN
-		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
-			COPY_EXISTING ~%file%.itm~ ~override~
-				READ_LONG SPL_unidentified_name itemNameRef
-				PATCH_IF itemNameRef > 0 BEGIN
-					READ_STRREF ITM_identified_name itemName
-				END
-				ELSE BEGIN
-					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
-				END
-			BUT_ONLY_IF_IT_CHANGES
+	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+		INNER_PATCH_FILE ~%file%.itm~ BEGIN
+			READ_LONG SPL_unidentified_name itemNameRef
+			PATCH_IF itemNameRef > 0 BEGIN
+				READ_STRREF ITM_identified_name itemName
+			END
+			ELSE BEGIN
+				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
+			END
 		END
-		ELSE BEGIN
-			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
-		END
-    END
+	END
+	ELSE BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEGIN
 	SPRINT creatureName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
-	INNER_ACTION BEGIN
-		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
-			COPY_EXISTING ~%file%.cre~ ~override~
-				READ_LONG CRE_name spellNameRef
-				PATCH_IF spellNameRef > 0 BEGIN
-					READ_STRREF CRE_name creatureName
-				END
-				ELSE BEGIN
-					SPRINT creatureName @102549 // ~Créature inconnue~
-					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
-				END
-			BUT_ONLY_IF_IT_CHANGES
+	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+		INNER_PATCH_FILE ~%file%.cre~ BEGIN
+			READ_LONG CRE_name spellNameRef
+			PATCH_IF spellNameRef > 0 BEGIN
+				READ_STRREF CRE_name creatureName
+			END
+			ELSE BEGIN
+				SPRINT creatureName @102549 // ~Créature inconnue~
+				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
+			END
 		END
-		ELSE BEGIN
-			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+	END
+	ELSE BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_creatures_names~
+	STR_VAR
+		file = ~~
+	RET
+		creatures
+BEGIN
+	SPRINT creatures  ~~
+
+	INNER_PATCH_FILE ~%file%.2da~ BEGIN
+		COUNT_2DA_ROWS ~2~ ~rows~
+		FOR (row = 1 ; row < rows ; row = row + 1) BEGIN
+			READ_2DA_ENTRY row 0 2 id
+			READ_2DA_ENTRY row 1 2 resref
+
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
+				LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
+				PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+					SPRINT creatures ~%creatures%, %creatureName%~
+				END
+			END
 		END
-    END
+	END
+
+	INNER_PATCH_SAVE creatures ~%creatures%~ BEGIN
+		SPRINT strOr @100004 // ~ou~
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([^,]+\)$~ ~ %strOr% \1~
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| %strOr% \)~ ~~
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance BEGIN
 	SPRINT creatureName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
-	INNER_ACTION BEGIN
-		ACTION_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
-			COPY_EXISTING ~%file%.cre~ ~override~
-				READ_BYTE CRE_allegiance allegiance
-				LOOKUP_IDS_SYMBOL_OF_INT allegiance EA allegiance
-			BUT_ONLY_IF_IT_CHANGES
+	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
+		INNER_PATCH_FILE ~%file%.cre~ BEGIN
+			READ_BYTE CRE_allegiance allegiance
+			LOOKUP_IDS_SYMBOL_OF_INT allegiance EA allegiance
 		END
-		ELSE BEGIN
-			LAF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
-		END
-    END
+	END
+	ELSE BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrref = 0 RET description BEGIN
@@ -7398,18 +7482,16 @@ DEFINE_PATCH_FUNCTION ~opcode_self_177_item_revision_casting_penality~ RET descr
 		SET parameter2 = MOD_TYPE_cumulative
 		LPF ~opcode_mod~ INT_VAR strref = 102478 STR_VAR value RET description END // ~Vitesse d'incantation des sorts profanes~
 		SET exceptBards = 1
-		INNER_ACTION BEGIN
-            COPY_EXISTING ~%SOURCE_FILE%~  ~override~
-                GET_OFFSET_ARRAY blockOffsets_177 ITM_V10_GEN_EFFECTS
-                PHP_EACH blockOffsets_177 AS int => blockOffset_177 BEGIN
-                    READ_SHORT (blockOffset_177)                  opcode_177
-                    READ_BYTE  (blockOffset_177 + EFF_parameter1) parameter1_177
-                    READ_ASCII (blockOffset_177 + EFF_resref_key) resref_177
-                    PATCH_IF opcode_177 == 177 AND ~%resref_177%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 AND parameter1_177 == 5 BEGIN // Barde
-                        SET exceptBards = 0
-                    END
+        INNER_PATCH_FILE ~%SOURCE_FILE%~ BEGIN
+            GET_OFFSET_ARRAY blockOffsets_177 ITM_V10_GEN_EFFECTS
+            PHP_EACH blockOffsets_177 AS int => blockOffset_177 BEGIN
+                READ_SHORT (blockOffset_177)                  opcode_177
+                READ_BYTE  (blockOffset_177 + EFF_parameter1) parameter1_177
+                READ_ASCII (blockOffset_177 + EFF_resref_key) resref_177
+                PATCH_IF opcode_177 == 177 AND ~%resref_177%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 AND parameter1_177 == 5 BEGIN // Barde
+                    SET exceptBards = 0
                 END
-            BUT_ONLY_IF_IT_CHANGES
+            END
         END
         PATCH_IF exceptBards == 1 BEGIN
             SPRINT except @102480 // ~excepté pour les bardes~
