@@ -2121,7 +2121,8 @@
 
 // Opcode 301: Stat: Critical Hit Modifier
 
-@13010001 = ~Chance d'infliger un coup critique~
+@13010001 = ~Chance de coup critique~
+@13010002 = ~Chance de coup critique avec cette arme~
 
 // Opcode 302: Item: Can Use Any Item [302]
 
@@ -2445,8 +2446,8 @@
 
 // Opcode 362: Critical miss bonus [362]
 
-@13620010 = ~Chance d'effectuer un échec critique~
-
+@13620001 = ~Chance d'échec critique~
+@13620002 = ~Chance d'échec critique avec cette arme~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

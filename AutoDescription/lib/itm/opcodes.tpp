@@ -62,6 +62,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 22 => 48  // Stat: Luck Modifier [22]
 	281 => 60  // Stat: Wild Magic [281]
 	301 => 90  // Stat: Critical Hit Modifier [301]
+	362 => 91  // Critical miss bonus [362]
 	 92 => 98  // Stat: Pick Pockets Modifier [92]
 	 90 => 99  // Stat: Open Locks Modifier [90]
 	276 => 100 // Stat: Detect Illusion Modifier [276]
@@ -359,7 +360,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	342 => 0 // Animation: Override Data [342]
 	345 => 1 // Enchantment bonus [345]
 	360 => 1 // Stat: Ignore Reputation Breaking Point [360]
-	362 => 1 // Critical miss bonus [362]
 	363 => 0 // Modal state check [363]
 	365 => 0 // Make unselectable [365]
 	366 => 0 // Spell: Apply Spell On Move [366]
@@ -6303,11 +6303,14 @@ END
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
-	// TODO: Gérer les particularités de EE
+	// TODO: Gérer attack type de EE
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	SPRINT name @13010001 // ~Chance d'infliger un coup critique~
+	SPRINT name @13010001 // ~Chance de coup critique~
+	PATCH_IF is_ee == 1 AND parameter2 == 1 BEGIN
+		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
+	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
@@ -6781,10 +6784,16 @@ END
  * Critical miss bonus [362] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
+	//TODO: Gérer attack type
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	SPRINT name @13620010 // ~Chance d'effectuer un échec critique~
+	PATCH_IF parameter2 == 1 BEGIN
+		SPRINT name @13620002 // ~Chance d'échec critique avec cette arme~
+	END
+	ELSE BEGIN
+		SPRINT name @13620001 // ~Chance d'échec critique~
+	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
