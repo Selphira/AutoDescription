@@ -234,6 +234,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	230 => 298 // Removal: Remove One Secondary Type [230]
 	193 => 299 // Spell Effect: Invisible Detection by Script [193]
 	144 => 300 // Button: Disable Button [144]
+	300 => 301 // NPC Bump [300]
 
 	 // Charge
 	146 => 274 // Spell: Cast Spell (at Target) [146]
@@ -333,7 +334,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	297 => 0 // Text: Protection from Display Specific String [297]
 	298 => 0 // Spell Effect: Execute Script cut250a [298]
 	299 => 1 // Spell Effect: Chaos Shield [299]
-	300 => 1 // NPC Bump [300] // TODO: Vérifier les objets qui l'utilisent
 	304 => 1 // Mass Raise Dead [304]
 	307 => 0 // Ranger Tracking Ability [307]
 	308 => 0 // Protection: From Tracking [308]
@@ -6397,6 +6397,20 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920004 // ~d'immuniser %theTarget% aux attaques sournoises~
 	END
+END
+
+/* -------------- *
+ * NPC Bump [300] *
+ * -------------- */
+DEFINE_PATCH_MACRO ~opcode_self_300~ BEGIN
+	PATCH_IF parameter2 > 0 BEGIN
+		SET strref = 13000000 + parameter2
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_300~ BEGIN
+	LPM ~opcode_self_300~
 END
 
 /* --------------------------------- *
