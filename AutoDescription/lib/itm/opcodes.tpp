@@ -4765,6 +4765,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
 	LPM ~opcode_self_probability_206~ // ~de résister au sort %spellName%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_party_206~ BEGIN
+	LPM ~opcode_target_206~
+END
+
 /* ----------------------------------- *
  * Spell: Bounce Specified Spell [207] *
  * ----------------------------------- */
