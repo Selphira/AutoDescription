@@ -4884,11 +4884,43 @@ END
  * Spell Effect: Select Spell [214] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_214~ BEGIN
-	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @12140001 //  ~Permet de lancer n'importe quel sort de son livre de sorts~
+	LOCAL_SET type = parameter2
+
+	PATCH_IF type == 0 BEGIN
+		LPF ~opcode_214_get_spells~ STR_VAR file = EVAL ~%resref%~ RET spells END
+		PATCH_IF NOT ~%spells%~ STRING_EQUAL ~~ BEGIN
+            SPRINT description @12140002 // ~Permet de lancer l'un des sorts de cette liste%colon%%spells%~
+		END
 	END
 	ELSE BEGIN
-		PATCH_FAIL  ~%SOURCE_FILE% : Opcode %opcode% : Lire les sorts utilisables depuis le fichier 2da %resref%~
+		//TODO: IF ee ajouter sauf SPWI110 et SPWI124 ?
+        SPRINT description @12140001 // ~Permet de lancer un sort du livre de sorts~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_214_get_spells~
+	STR_VAR
+		file = ~~
+	RET
+		spells
+BEGIN
+	SPRINT spells ~~
+
+	INNER_PATCH_FILE ~%file%.2da~ BEGIN
+		COUNT_2DA_ROWS ~3~ ~rows~
+		FOR (row = 1 ; row < rows ; row = row + 1) BEGIN
+			READ_2DA_ENTRY row 1 3 resref
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+				LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+				PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+					SPRINT spells ~%spells%%crlf%%spellName%~
+				END
+			END
+		END
+	END
+
+	INNER_PATCH_SAVE spells ~%spells%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  * ~ // Indentation de la liste des sorts
 	END
 END
 

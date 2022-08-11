@@ -1835,7 +1835,8 @@
 
 // Opcode 214: Spell Effect: Select Spell [214]
 
-@12140001 = ~Permet de lancer n'importe quel sort de son livre de sorts~
+@12140001 = ~Permet de lancer un sort du livre de sorts~
+@12140002 = ~Permet de lancer un sort de cette liste%colon%%spells%~
 
 // Opcode 216: Spell Effect: Level Drain [216]
 
