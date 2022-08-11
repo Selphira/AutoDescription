@@ -218,6 +218,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	248 => 291 // Item: Set Melee Effect [248]
 	249 => 292 // Item: Set Ranged Effect [249]
 	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
+	361 => 293 // Cast spell on critical miss [361]
 	340 => 294 // Spell Effect: Change Backstab Effect [340]
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
@@ -358,7 +359,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	342 => 0 // Animation: Override Data [342]
 	345 => 1 // Enchantment bonus [345]
 	360 => 1 // Stat: Ignore Reputation Breaking Point [360]
-	361 => 1 // Cast spell on critical miss [361]
 	362 => 1 // Critical miss bonus [362]
 	363 => 0 // Modal state check [363]
 	365 => 0 // Make unselectable [365]
@@ -6748,6 +6748,33 @@ END
 DEFINE_PATCH_MACRO ~opcode_party_346~ BEGIN
 	LOCAL_SET strref = 13460010 + special
 	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
+END
+
+/* --------------------------------- *
+ * Cast spell on critical miss [361] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_361~ BEGIN
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT condition @13610001 // ~À chaque échec critique~
+	END
+	ELSE BEGIN
+		SPRINT condition @13610003 // ~À chaque échec critique provoqué avec cette arme~
+	END
+
+	LPM ~opcode_341_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_361~ BEGIN
+	LPM ~opcode_self_361~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_361~ BEGIN
+	SPRINT condition @13610002 // ~À chaque échec critique %ofTheTarget%~
+	LPM ~opcode_341_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_361~ BEGIN
+	LPM ~opcode_target_361~
 END
 
 /* ------------------------- *

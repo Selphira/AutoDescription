@@ -2437,6 +2437,12 @@
 @13460020 = ~~
 @13460021 = ~~
 
+// Opcode 361: Cast spell on critical miss [361]
+
+@13610001 = ~À chaque échec critique~
+@13610002 = ~À chaque échec critique %ofTheTarget%~
+@13610003 = ~À chaque échec critique provoqué avec cette arme~
+
 // Opcode 362: Critical miss bonus [362]
 
 @13620010 = ~Chance d'effectuer un échec critique~
