@@ -858,8 +858,8 @@
 // Opcode 48: Cure: Silence (Vocalize) [48]
 
 @10480001 = ~Immunité au silence~
-@10470002 = ~de rendre la parole %toTheTarget%~
-@10470003 = ~Rend la parole %ofTheTarget%~
+@10480002 = ~de rendre la parole %toTheTarget%~
+@10480003 = ~Rend la parole %ofTheTarget%~
 
 // Opcode 49: Stat: Wisdom Modifier [49]
 
