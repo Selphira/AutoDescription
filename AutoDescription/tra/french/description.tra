@@ -779,7 +779,7 @@
 // Opcode 32: Cure: Death (Raise Dead) [32]
 
 @10320001 = ~Ressuscite %theTarget%~
-@10320002 = ~de ressuscite %theTarget%~
+@10320002 = ~de ressusciter %theTarget%~
 
 // Opcode 33: Stat: Save vs. Death Modifier [33]
 
@@ -1075,6 +1075,7 @@
 @10830009 = ~Immunité contre les missiles magiques~
 @10830010 = ~Immunité contre les flèches de flamme bleue~
 @10830011 = ~Immunité contre les éclairs~
+@10830012 = ~Immunité contre les toiles d'araignées~
 
 // Opcode 84: Stat: Magical Fire Resistance Modifier [84]
 
@@ -1300,6 +1301,7 @@
 @11010274 = ~Immunité à la téléportation~
 @11010280 = ~Immunité aux hiatus entropiques~
 @11010283 = ~Immunité aux malédictions~
+@11010299 = ~Immunité au Bouclier du chaos~
 @11010317 = ~Immunité à la hâte~
 
 // Probability
@@ -1309,6 +1311,7 @@
 @11011025 = ~d'immuniser %theTarget% au poison~
 @11011039 = ~d'immuniser %theTarget% au sommeil~
 @11011039 = ~d'immuniser %theTarget% à l'étourdissement~
+@11011135 = ~~ // Opcode visuel
 @11011217 = ~d'immuniser %theTarget% au sommeil~
 
 // Target
@@ -2304,6 +2307,7 @@
 @13240135 = ~Inefficace si le nombre de créatures invoquées est inférieur à %value%~
 @13240136 = ~Inefficace si le chapitre en cours est plus grand ou égal au %value%~
 @13240137 = ~Inefficace si le chapitre en cours est plus petit que %value%~
+@13240138 = ~Inefficace contre les créatures affectées par Vision véritable~
 @13240140 = ~Inefficace contre les créatures sous l'effet d'une invisibilité invisibles~
 @13240141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
 @13240142 = ~Inefficace contre les créatures invisibles~

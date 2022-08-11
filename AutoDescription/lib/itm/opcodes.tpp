@@ -1591,12 +1591,20 @@ END
 /* ----------------------------- *
  * Cure: Death (Raise Dead) [32] *
  * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_32~ BEGIN
+	LPM ~opcode_target_32~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_32~ BEGIN
+	LPM ~opcode_target_probability_32~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_32~ BEGIN
 	SPRINT description @10320001 // ~Ressuscite %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_32~ BEGIN
-	SPRINT description @10320002 // ~de ressuscite %theTarget%~
+	SPRINT description @10320002 // ~de ressusciter %theTarget%~
 END
 
 /* ---------------------------------- *
@@ -2529,17 +2537,18 @@ END
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	PATCH_MATCH parameter2 WITH
-		  1 2 3 4 5 285 BEGIN SPRINT description @10830001 END // ~Immunité contre les flèches~
-		  6 7 8 9 10 BEGIN SPRINT description @10830002 END // ~Immunité contre les haches de jet~
-		 299 BEGIN SPRINT description @10830004 END // ~Immunité contre les carreaux~
-		 16 17 18 19 BEGIN SPRINT description @10830005 END // ~Immunité contre les billes~
-		 26 27 28 29 30 311 BEGIN SPRINT description @10830006 END // ~Immunité contre les dagues de jet~
-		 31 32 33 34 35 315 BEGIN SPRINT description @10830007 END // ~Immunité contre les flèchettes~
+		  1 2 3 4 5 283 284 285 286 287 288 289 290 291 BEGIN SPRINT description @10830001 END // ~Immunité contre les flèches~
+		  6 7 8 9 10 292 293 294 295 296 BEGIN SPRINT description @10830002 END // ~Immunité contre les haches de jet~
+		 297 298 299 300 301 302 303 BEGIN SPRINT description @10830004 END // ~Immunité contre les carreaux~
+		 16 17 18 19 304 305 306 307 308 BEGIN SPRINT description @10830005 END // ~Immunité contre les billes~
+		 26 27 28 29 30 309 310 311 313 BEGIN SPRINT description @10830006 END // ~Immunité contre les dagues de jet~
+		 31 32 33 34 35 313 314 315 316 317 318 BEGIN SPRINT description @10830007 END // ~Immunité contre les flèchettes~
 		 55 56 57 58 59 BEGIN SPRINT description @10830008 END // ~Immunité contre les lances de jet~
 		 14 64 208 274 BEGIN SPRINT description @10830003 END // ~Immunité contre les attaques de regard~
 		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @10830009 END // ~Immunité contre les missiles magiques~
 		 102 BEGIN SPRINT description @10830010 END // ~Immunité contre les flèches de flamme bleue~
 		 39 442 BEGIN SPRINT description @10830011 END // ~Immunité contre les éclairs~
+		 62 63 259 319 BEGIN SPRINT description @10830012 END // ~Immunité contre les toiles d'araignées~
 		DEFAULT
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type de projectile '%parameter2%'~ END
     END
