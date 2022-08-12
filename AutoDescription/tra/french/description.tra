@@ -1376,6 +1376,11 @@
 @11150002 = ~Détection du neutre~
 @11150003 = ~Détection du bien~
 
+// Opcode 117: Spell Effect: Reveal Area [117]
+
+@11170001 = ~Révèle l'entièreté de la carte~
+@11170002 = ~de révéler l'entièreté de la carte~
+
 // Opcode 119: Spell Effect: Mirror Image [119]
 
 @11190001 = ~Image miroir~

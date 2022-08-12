@@ -202,6 +202,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	274 => 259 // Spell Effect: Teleport to Target [274]
 	222 => 259 // Spell Effect: Teleport Field [222]
 	268 => 260 // Spell Effect: Explore (Wizard Eye) [268]
+	117 => 261 // Spell Effect: Reveal Area [117]
 	316 => 275 // Spell: Magical Rest [316]
 	131 => 276 // State: Positive Chant [131]
 	137 => 277 // State: Negative Chant [137]
@@ -270,7 +271,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	110 => 0 // (Retreat From) [110]
 	112 => 1 // Item: Remove Item [112]
 	114 => 0 // Graphics: Dither [114]
-	117 => 1 // Spell Effect: Reveal Area [117]
 	123 => 1 // Item: Remove Inventory Item
 	124 => 1 // Spell Effect: Teleport (Dimension Door) [124]
 	138 => 0 // Graphics: Character Animation Change [138]
@@ -3300,11 +3300,29 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_116~ BEGIN
 	LPM ~opcode_self_probability_116~ // ~de dissiper l'invisibilité %ofTheTarget%~
 END
 
+/* ------------------------------- *
+ * Spell Effect: Reveal Area [117] *
+ * ------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_117~ BEGIN
+	SPRINT description @11170001 // ~Révèle l'entièreté de la carte~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_117~ BEGIN
+	SPRINT description @11170002 // ~de révéler l'entièreté de la carte~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_117~ BEGIN
+	LPM ~opcode_self_117~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_117~ BEGIN
+	LPM ~opcode_self_probability_117~
+END
+
 /* -------------------------------- *
  * Spell Effect: Mirror Image [119] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_119~ BEGIN
-	SPRINT description @11190001 // ~Image miroir~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_119~ BEGIN
