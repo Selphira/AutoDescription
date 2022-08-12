@@ -1589,6 +1589,11 @@
 @11480003 = ~de lancer le sort %spellName% sur %theTarget%~
 @11480003 = ~de lancer instantanément le sort %spellName% sur %theTarget%~
 
+// Opcode 150: Spell Effect: Find Traps [150]
+
+@11500001 = ~Détecte les pièges~
+@11500002 = ~de détecter les pièges~
+
 // Opcode 151: Summon: Replace Creature [151]
 
 @11510001 = ~Remplace %theTarget% par %creatureName%~

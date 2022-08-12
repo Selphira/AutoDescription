@@ -203,8 +203,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	124 => 264 // Spell Effect: Teleport (Dimension Door) [124]
 	274 => 267 // Spell Effect: Teleport to Target [274]
 	222 => 268 // Spell Effect: Teleport Field [222]
-	268 => 269 // Spell Effect: Explore (Wizard Eye) [268]
-	117 => 270 // Spell Effect: Reveal Area [117]
+	150 => 269 // Spell Effect: Find Traps [150]
+	268 => 270 // Spell Effect: Explore (Wizard Eye) [268]
+	117 => 271 // Spell Effect: Reveal Area [117]
 	316 => 275 // Spell: Magical Rest [316]
 	131 => 276 // State: Positive Chant [131]
 	137 => 277 // State: Negative Chant [137]
@@ -279,7 +280,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	140 => 0 // Graphics: Casting Glow [140]
 	141 => 0
 	142 => 0
-	150 => 1 // Spell Effect: Find Traps [150]
 	152 => 0 // Spell Effect: Play Movie [152]
 	153 => 0 // Overlay: Sanctuary [153]
 	154 => 0 // Overlay: Entangle [154]
@@ -4015,6 +4015,17 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_148~ BEGIN
 	LPM ~opcode_self_probability_148~
+END
+
+/* ------------------------------ *
+ * Spell Effect: Find Traps [150] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_150~ BEGIN
+	SPRINT description @11500001 // ~Détecte les pièges~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_150~ BEGIN
+	SPRINT description @11500002 // ~de détecter les pièges~
 END
 
 /* ------------------------------ *
