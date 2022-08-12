@@ -132,6 +132,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	157 => 189 // State: Web Effect [157]
 	 76 => 190 // State: Feeblemindedness [76]
 	136 => 190 // State: Force Visible [136]
+	153 => 190 // Overlay: Sanctuary [153]
 	 55 => 191 // Death: Kill Creature Type [55]
 	209 => 192 // Death: Kill 60HP [209]
 	 13 => 193 // Death: Instant Death [13]
@@ -282,7 +283,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	141 => 0
 	142 => 0
 	152 => 0 // Spell Effect: Play Movie [152]
-	153 => 1 // Overlay: Sanctuary [153]
 	154 => 0 // Overlay: Entangle [154]
 	155 => 0 // Overlay: Minor Globe [155]
 	156 => 0 // Overlay: Protection from Normal Missiles Cylinder [156]
@@ -4057,6 +4057,25 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_151~ BEGIN
 	ELSE PATCH_IF parameter2 ==3 BEGIN
 		SPRINT description @11510006 // ~d'invoquer %creatureName% sur %theTarget%~
 	END
+END
+
+/* ----------------------- *
+ * Overlay: Sanctuary [153] *
+ * ----------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_153~ BEGIN
+	SPRINT description @11530001 // ~Sanctuaire~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_153~ BEGIN
+	SPRINT description @11530002 // ~de lancer Sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_153~ BEGIN
+	SPRINT description @11530003 // ~Lance Sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_153~ BEGIN
+	LPM ~opcode_self_probability_153~ // ~de lancer Sanctuaire sur %theTarget%~
 END
 
 /* ----------------------- *

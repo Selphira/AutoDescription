@@ -1603,6 +1603,12 @@
 @11510005 = ~de tuer et remplacer %theTarget% par %creatureName%~
 @11510006 = ~d'invoquer %creatureName% sur %theTarget%~
 
+// Opcode 153: Overlay: Sanctuary [153]
+
+@11530001 = ~Sanctuaire~
+@11530002 = ~de lancer Sanctuaire sur %theTarget%~
+@11530003 = ~Lance Sanctuaire sur %theTarget%~
+
 // Opcode 157: State: Web Effect [157]
 
 @11570001 = ~Entoile %theTarget%~
