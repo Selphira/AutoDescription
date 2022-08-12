@@ -1416,6 +1416,22 @@
 @11220005 = ~de créer aléatoirement %amount% "%itemName%" ou %amount2% "%itemName2%"~
 @11220006 = ~de créer aléatoirement %amount% "%itemName%", %amount2% "%itemName2%" ou %amount3% "%itemName3%"~
 
+// Opcode 124: Spell Effect: Teleport (Dimension Door) [124]
+
+@11240001 = ~Téléporte %theTarget%~
+@11240002 = ~Téléporte %theTarget% vers sa cible~
+@11240003 = ~Téléporte %theTarget% vers un endroit sûr~
+@11240004 = ~Échange la place %ofTheTarget% avec sa cible~
+@11240005 = ~Téléporte %theTarget% vers le porteur~
+@11240006 = ~Échange la place %ofTheTarget% avec le porteur~
+
+@11240011 = ~de téléporter %theTarget%~
+@11240012 = ~de téléporter %theTarget% vers sa cible~
+@11240013 = ~de téléporter %theTarget% vers un endroit sûr~
+@11240014 = ~d'échanger la place %ofTheTarget% avec sa cible~
+@11240015 = ~de téléporter %theTarget% vers le porteur~
+@11240016 = ~d'échanger la place %ofTheTarget% avec le porteur~
+
 // Opcode 125: Spell Effect: Unlock (Knock) [125]
 
 @11250001 = ~Déverrouille la serrure ciblée~

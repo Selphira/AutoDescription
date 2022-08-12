@@ -186,23 +186,24 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	207 => 249 // Spell: Bounce Specified Spell [207]
 	197 => 250 // Spell: Bounce Projectile [197]
 	232 => 250 // Spell Effect: Cast Spell on Condition [232]
-	326 => 250 // Apply Effects List [326]
-	303 => 250 // Spell Effect: Backstab Every Hit [303]
-	231 => 250 // Spell Effect: Time Stop [231]
-	188 => 250 // Spell Effect: Aura Cleansing [188]
-	119 => 251 // Spell Effect: Mirror Image [119]
-	159 => 251 // Spell Effect: Mirror Image (Exact Number) [159]
-	280 => 252 // Spell Effect: Wild Magic [280]
-	235 => 253 // Spell Effect: Wing Buffet [235]
-	239 => 254 // Spell Effect: Farsight [239]
-	125 => 255 // Spell Effect: Unlock (Knock) [125]
-	213 => 256 // Spell Effect: Maze [213]
-	211 => 257 // Spell Effect: Imprisonment [211]
-	329 => 258 // Spell Effect: Slow Poison [329] : EE only
-	274 => 259 // Spell Effect: Teleport to Target [274]
-	222 => 259 // Spell Effect: Teleport Field [222]
-	268 => 260 // Spell Effect: Explore (Wizard Eye) [268]
-	117 => 261 // Spell Effect: Reveal Area [117]
+	326 => 251 // Apply Effects List [326]
+	303 => 252 // Spell Effect: Backstab Every Hit [303]
+	231 => 253 // Spell Effect: Time Stop [231]
+	188 => 254 // Spell Effect: Aura Cleansing [188]
+	119 => 255 // Spell Effect: Mirror Image [119]
+	159 => 256 // Spell Effect: Mirror Image (Exact Number) [159]
+	280 => 257 // Spell Effect: Wild Magic [280]
+	235 => 258 // Spell Effect: Wing Buffet [235]
+	239 => 259 // Spell Effect: Farsight [239]
+	125 => 260 // Spell Effect: Unlock (Knock) [125]
+	213 => 261 // Spell Effect: Maze [213]
+	211 => 262 // Spell Effect: Imprisonment [211]
+	329 => 263 // Spell Effect: Slow Poison [329] : EE only
+	124 => 264 // Spell Effect: Teleport (Dimension Door) [124]
+	274 => 267 // Spell Effect: Teleport to Target [274]
+	222 => 268 // Spell Effect: Teleport Field [222]
+	268 => 269 // Spell Effect: Explore (Wizard Eye) [268]
+	117 => 270 // Spell Effect: Reveal Area [117]
 	316 => 275 // Spell: Magical Rest [316]
 	131 => 276 // State: Positive Chant [131]
 	137 => 277 // State: Negative Chant [137]
@@ -272,7 +273,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	112 => 1 // Item: Remove Item [112]
 	114 => 0 // Graphics: Dither [114]
 	123 => 1 // Item: Remove Inventory Item
-	124 => 1 // Spell Effect: Teleport (Dimension Door) [124]
 	138 => 0 // Graphics: Character Animation Change [138]
 	139 => 0
 	140 => 0 // Graphics: Casting Glow [140]
@@ -3432,6 +3432,47 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ AND amount > 0 BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Crée %amount% "%itemName%" dans l'inventaire %ofTheTarget%~
 	END
+END
+
+/* --------------------------------------------- *
+ * Spell Effect: Teleport (Dimension Door) [124] *
+ * --------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_124~ BEGIN
+	LOCAL_SET strref = 11240001 + parameter2
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_124~ BEGIN
+	LOCAL_SET strref = 11240011 + parameter2
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_124~ BEGIN
+	LOCAL_SET strref = 11240001 + parameter2
+
+	PATCH_IF parameter2 == 1 BEGIN
+		SET strref = 11240005 // ~Téléporte %theTarget% vers le porteur~
+	END
+	ELSE PATCH_IF parameter2 == 3 BEGIN
+		SET strref = 11240006 // ~Échange la place %ofTheTarget% avec le porteur~
+	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_124~ BEGIN
+	LOCAL_SET strref = 11240011 + parameter2
+
+	PATCH_IF parameter2 == 1 BEGIN
+		SET strref = 11240015 // ~de téléporter %theTarget% vers le porteur~
+	END
+	ELSE PATCH_IF parameter2 == 3 BEGIN
+		SET strref = 11240016 // ~d'échanger la place %ofTheTarget% avec le porteur~
+	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 /* ---------------------------------- *
