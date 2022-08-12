@@ -186,6 +186,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	207 => 249 // Spell: Bounce Specified Spell [207]
 	197 => 250 // Spell: Bounce Projectile [197]
 	232 => 250 // Spell Effect: Cast Spell on Condition [232]
+	326 => 250 // Apply Effects List [326]
 	303 => 250 // Spell Effect: Backstab Every Hit [303]
 	231 => 250 // Spell Effect: Time Stop [231]
 	188 => 250 // Spell Effect: Aura Cleansing [188]
@@ -346,7 +347,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
 	321 => 1 // Removal: Effects specified by Resource [321]
-	326 => 1 // Apply Effects List [326]
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
@@ -5443,8 +5443,13 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 		ELSE BEGIN
 			SET value = special
 		END
-		LPF ~percent_value~ INT_VAR value RET percent = value END
-		SPRINT condition @12320030 // ~Lorsque les points de vie du porteur passent sous les %percent%~
+		PATCH_IF value >= 100 BEGIN
+			SPRINT condition @12320020 // ~À chaque round~
+		END
+		ELSE BEGIN
+			LPF ~percent_value~ INT_VAR value RET percent = value END
+			SPRINT condition @12320030 // ~Lorsque les points de vie du porteur passent sous les %percent%~
+		END
 	END
 	ELSE PATCH_IF parameter2 == 19 BEGIN
 		SET value = special
@@ -6760,6 +6765,52 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_325~ BEGIN
 	LPM ~opcode_self_probability_325~
 END
 
+/* ------------------------ *
+ * Apply Effects List [326] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
+	SET ignoreDuration = 1
+	LPM ~opcode_326_condition~
+
+	LPF ~get_spell_description~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+
+	PATCH_IF count == 1 AND featureCount == 1 BEGIN
+		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+
+		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
+		END
+	END
+    ELSE BEGIN
+		INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+		END
+	    SPRINT description ~%spellDescription%~
+    END
+END
+
+DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
+	LOCAL_SET strref = 13260000
+	LOCAL_SET value = parameter1
+	LOCAL_SET statType = parameter2
+	LOCAL_SET idsId = 0
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
+			SET idsId = statType - 100
+			SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
+			PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
+				SET idsId = statType - 110
+				SET strref = strref + 147 // ~Effectif contre les %creatureType%~
+			END
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+		END
+		ELSE BEGIN
+			SET strref = strref + statType
+		END
+		LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+	END
+END
+
 /* ------------------------------- *
  * Spell Effect: Slow Poison [329] *
  * ------------------------------- */
@@ -7268,9 +7319,11 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 						END
 					END
 				END
+				/*
 				PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
 				END
+				*/
 			END
 		END
 		ELSE BEGIN
@@ -7298,9 +7351,11 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 			PATCH_IF itemNameRef > 0 BEGIN
 				READ_STRREF ITM_identified_name itemName
 			END
+			/*
 			ELSE BEGIN
 				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
 			END
+			*/
 		END
 	END
 	ELSE BEGIN
@@ -7317,10 +7372,12 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 			PATCH_IF spellNameRef > 0 BEGIN
 				READ_STRREF CRE_name creatureName
 			END
+			/*
 			ELSE BEGIN
 				SPRINT creatureName @102549 // ~Créature inconnue~
 				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 			END
+			*/
 		END
 	END
 	ELSE BEGIN
