@@ -2032,6 +2032,17 @@
 @12350001 = ~Renverse et sonne %theTarget%~ // TODO: Trouver une autre tournure pour "Wing buffet" ?
 @12350002 = ~de renverser et sonner %theTarget%~
 
+// Opcode 236: Spell Effect: Image Projection [236]
+
+@12360001 = ~Crée un clône %ofTheTarget% possédant le même nombre de points de vie (Utilisable après une rechargement du jeu dû à un bug)~
+@12360002 = ~Crée une image %ofTheTarget% qui ne peut attaquer ou lancer de sorts~
+@12360003 = ~Crée une projection %ofTheTarget% possédant le même nombre de points de vie qui peut attaquer mais pas lancer de sorts~
+@12360004 = ~Crée un simulacre %ofTheTarget% possédant le même nombre de points de vie qui peut attaquer et lancer des sorts~
+@12360005 = ~de créer un clône %ofTheTarget% possédant le même nombre de points de vie (Utilisable après une rechargement du jeu dû à un bug)~
+@12360006 = ~de créer une image %ofTheTarget% qui ne peut attaquer ou lancer de sorts~
+@12360007 = ~de créer une projection %ofTheTarget% possédant le même nombre de points de vie qui peut attaquer mais pas lancer de sorts~
+@12360008 = ~de créer un simulacre %ofTheTarget% possédant le même nombre de points de vie qui peut attaquer et lancer des sorts~
+
 // Opcode 238: Death: Disintegrate [238]
 
 @12380001 = ~Désintègre %theTarget%~

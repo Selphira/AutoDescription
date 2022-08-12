@@ -208,6 +208,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	150 => 269 // Spell Effect: Find Traps [150]
 	268 => 270 // Spell Effect: Explore (Wizard Eye) [268]
 	117 => 271 // Spell Effect: Reveal Area [117]
+	236 => 272 // Spell Effect: Image Projection [236]
 	316 => 275 // Spell: Magical Rest [316]
 	131 => 276 // State: Positive Chant [131]
 	137 => 277 // State: Negative Chant [137]
@@ -304,7 +305,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	215 => 0
 	225 => 0 // Spell: Reveal Magic [225]
 	234 => 0 // Spell Effect: Contingency Creation [234]
-	236 => 1 // Spell Effect: Image Projection [236]
 	237 => 0 // Spell Effect: Puppet ID [237]
 	240 => 0 // Graphics: Remove Special Effect Icon [240]
 	243 => 1 // Item: Drain Item Charges [243]
@@ -5673,6 +5673,38 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_235~ BEGIN
 	LPM ~opcode_self_probability_235~ // ~de renverser et sonner %theTarget%~
+END
+
+/* ------------------------------------ *
+ * Spell Effect: Image Projection [236] *
+ * ------------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_236~ BEGIN
+	LOCAL_SET strref = 12360001 // ~Crée un clône %ofTheTarget% possédant le même nombre de points de vie (Utilisable après une rechargement du jeu dû à un bug)~
+	LPM ~opcode_236_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_236~ BEGIN
+	LOCAL_SET strref = 12360005 // ~de créer un clône %ofTheTarget% possédant le même nombre de points de vie (Utilisable après une rechargement du jeu dû à un bug)~
+	LPM ~opcode_236_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_236~ BEGIN
+	LPM ~opcode_self_236~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_236~ BEGIN
+	LPM ~opcode_self_probability_236~
+END
+
+DEFINE_PATCH_MACRO ~opcode_236_common~ BEGIN
+	LOCAL_SET type = parameter2
+
+	PATCH_IF type > 4 BEGIN
+		SET type = 0
+	END
+	SET strref += type
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 /* ------------------------- *
