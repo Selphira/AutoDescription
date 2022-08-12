@@ -2060,6 +2060,16 @@
 @12420002 = ~Dissipe la confusion %ofTheTarget%~
 @12420003 = ~de dissiper la confusion %ofTheTarget%~
 
+// Opcode 243: Item: Drain Item Charges [243]
+
+@12430001 = ~Draine une charge aux objets magiques %ofTheTarget%~
+@12430002 = ~Draine %amount% charges aux objets magiques %ofTheTarget%~
+@12430003 = ~Draine les charges des objets magiques %ofTheTarget%~
+@12430004 = ~de drainer une charge aux objets magiques %ofTheTarget%~
+@12430005 = ~de drainer %amount% charges aux objets magiques %ofTheTarget%~
+@12430006 = ~de drainer les charges des objets magiques %ofTheTarget%~
+@12430007 = ~excepté les armes~
+
 // Opcode 244: Spell: Drain Wizard Spell [244]
 
 @12440001 = ~Supprime 1 sort profane de la mémoire %ofTheTarget%~

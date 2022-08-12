@@ -229,6 +229,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 26 => 290 // Item: Remove Curse [26]
 	248 => 291 // Item: Set Melee Effect [248]
 	249 => 292 // Item: Set Ranged Effect [249]
+	243 => 292 // Item: Drain Item Charges [243]
 	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
 	361 => 293 // Cast spell on critical miss [361]
 	340 => 294 // Spell Effect: Change Backstab Effect [340]
@@ -307,7 +308,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	237 => 0 // Spell Effect: Puppet ID [237]
 	240 => 0 // Graphics: Remove Special Effect Icon [240]
-	243 => 1 // Item: Drain Item Charges [243]
 	251 => 1 // Spell Effect: Change Bard Song Effect [251]
 	252 => 1 // Spell Effect: Set Trap [252]
 	253 => 0 // Spell Effect: Add Map Marker [253]
@@ -5779,6 +5779,48 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_242~ BEGIN
 	LPM ~opcode_self_probability_242~
+END
+
+/* ------------------------------ *
+ * Item: Drain Item Charges [243] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_243~ BEGIN
+	LOCAL_SET strref = 12430001 // ~Draine une charge aux objets magiques %ofTheTarget%~
+	LPM ~opcode_243_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_243~ BEGIN
+	LOCAL_SET strref = 12430004 // ~de drainer une charge aux objets magiques %ofTheTarget%~
+	LPM ~opcode_243_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_243~ BEGIN
+	LPM ~opcode_self_243~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_243~ BEGIN
+	LPM ~opcode_self_probability_243~
+END
+
+DEFINE_PATCH_MACRO ~opcode_243_common~ BEGIN
+	LOCAL_SET amount = parameter1
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF amount != 1 BEGIN
+			SET strref += 1 // ~Draine %amount% charges aux objets magiques %ofTheTarget%~
+		END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+	ELSE PATCH_IF NOT GAME_IS ~tob~ BEGIN
+		SET strref += 2 // ~Draine les charges des objets magiques %ofTheTarget%~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+		PATCH_IF amount == 0 BEGIN
+			SPRINT exception @12430007 // ~excepté les armes~
+			SPRINT description ~%description%, %exception%~
+		END
+	END
+	ELSE BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: This effect not works in ToB~ END
+	END
 END
 
 /* ------------------------------- *
