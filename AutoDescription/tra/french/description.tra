@@ -1578,6 +1578,11 @@
 @11460004 = ~de lancer instantanément le sort %spellName% sur %theTarget%~
 @11460005 = ~%spellName% (instantané)~
 
+// Opcode 147: Spell: Learn Spell [147]
+
+@11470001 = ~Fait apprendre le sort %spellName% %toTheTarget%~
+@11470002 = ~de faire apprendre le sort %spellName% %toTheTarget%~
+
 // Opcode 148: Spell: Cast Spell (at Point) [148]
 
 @11480001 = ~Lance %spellName% sur %theTarget%~

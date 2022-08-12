@@ -3,6 +3,7 @@
  * Vu qu'ils ne sont généralement pas
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
+	147 => 0   // Spell: Learn Spell [147]
 	360 => 0   // Stat: Ignore Reputation Breaking Point [360]
 	283 => 0   // Use EFF File (Cursed) [283]
 	318 => 0   // Protection: Immunity Spell [318]
@@ -278,7 +279,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	140 => 0 // Graphics: Casting Glow [140]
 	141 => 0
 	142 => 0
-	147 => 1 // Spell: Learn Spell [147]
 	150 => 1 // Spell Effect: Find Traps [150]
 	152 => 0 // Spell Effect: Play Movie [152]
 	153 => 0 // Overlay: Sanctuary [153]
@@ -3937,6 +3937,31 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 			END
 		END
 	END
+END
+
+/* ------------------------ *
+ * Spell: Learn Spell [147] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_147~ BEGIN
+	SET ignoreDuration = 1
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_147~ BEGIN
+	SET ignoreDuration = 1
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_147~ BEGIN
+	LPM ~opcode_self_147~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_147~ BEGIN
+	LPM ~opcode_self_probability_147~
 END
 
 /* ---------------------------------- *
