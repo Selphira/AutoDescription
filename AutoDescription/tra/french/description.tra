@@ -85,22 +85,22 @@
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
 
-@102281 = ~Réduit la %resistName% %ofTheTarget% de %value%~
-@102282 = ~Augmente la %resistName% %ofTheTarget% de %value%~
-@102283 = ~Porte la %resistName% %ofTheTarget% à %value%~
-@102284 = ~Multiplie la %resistName% %ofTheTarget% par %value%~
-@102539 = ~de réduire la %resistName% %ofTheTarget% de %value%~
-@102540 = ~d'augmenter la %resistName% %ofTheTarget% de %value%~
-@102541 = ~de passer la %resistName% %ofTheTarget% à %value%~
-@102542 = ~de multiplier la %resistName% %ofTheTarget% par %value%~
-@102285 = ~Réduit %theStatistic% %ofTheTarget% de %value%~
-@102286 = ~Augmente %theStatistic% %ofTheTarget% de %value%~
-@102287 = ~Porte %theStatistic% %ofTheTarget% à %value%~
-@102288 = ~Multiplie %theStatistic% %ofTheTarget% par %value%~
-@102543 = ~de réduire %theStatistic% %ofTheTarget% de %value%~
-@102544 = ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
-@102545 = ~de passer %theStatistic% %ofTheTarget% à %value%~
-@102546 = ~de multiplier %theStatistic% %ofTheTarget% par %value%~
+@102281 = ~Réduit de %value% la %resistName% %ofTheTarget%~
+@102282 = ~Augmente de %value% la %resistName% %ofTheTarget%~
+@102283 = ~Porte à %value% la %resistName% %ofTheTarget%~
+@102284 = ~Multiplie par %value% la %resistName% %ofTheTarget%~
+@102539 = ~de réduire de %value% la %resistName% %ofTheTarget%~
+@102540 = ~d'augmenter de %value% la %resistName% %ofTheTarget%~
+@102541 = ~de passer à %value% la %resistName% %ofTheTarget%~
+@102542 = ~de multiplier par %value% la %resistName% %ofTheTarget%~
+@102285 = ~Réduit de %value% %theStatistic% %ofTheTarget%~
+@102286 = ~Augmente de %value% %theStatistic% %ofTheTarget%~
+@102287 = ~Porte à %value% %theStatistic% %ofTheTarget%~
+@102288 = ~Multiplie par %value% %theStatistic% %ofTheTarget%~
+@102543 = ~de réduire de %value% %theStatistic% %ofTheTarget%~
+@102544 = ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
+@102545 = ~de passer à %value% %theStatistic% %ofTheTarget%~
+@102546 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~
 
 // Les différentes cibles
 @102471 = ~la cible~
@@ -191,7 +191,7 @@
 @100310 = ~après %strDuration%~
 @100311 = ~pendant %strDuration%~
 @100312 = ~de manière permanente~
-@100313 = ~de manière permanente et persiste après la mort~
+@100313 = ~de manière permanente, persiste après la mort~
 
 /* ------ *
  * Ea.ids *
@@ -1928,12 +1928,12 @@
 @12320001 = ~Lance le sort %spellName% sur %theTarget%~
 @12320002 = ~Lance les sorts %spellName% et %spellName2% sur %theTarget%~
 @12320003 = ~Lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
-@12320004 = ~Lance un sort sur %theTarget%~
+@12320004 = ~Lance un sortilège~
 
 @12320005 = ~de lancer le sort %spellName% sur %theTarget%~
 @12320006 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
 @12320007 = ~de lancer les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
-@12320008 = ~de lancer un sort sur %theTarget%~
+@12320008 = ~de lancer un sortilège~
 
 @12320010 = ~Lorsque le porteur est touché~
 @12320011 = ~Lorsqu'un adversaire entre dans le champ de vision~
@@ -1954,8 +1954,8 @@
 @12320026 = ~Lorsque le porteur meurt~
 @12320027 = ~Lorsqu'une créature meurt~
 @12320028 = ~~ //TODO: TurnedBy ???
-@12320029 = ~Lorsque les points de vie du porteur passent sous %value%~
-@12320030 = ~Lorsque les points de vie du porteur passent sous les %percent%~
+@12320029 = ~Lorsque les points de vie du porteur tombent en dessous de %value%~
+@12320030 = ~Lorsque les points de vie du porteur tombent sous les %percent%~
 @12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~ // TODO: Ne s'adapte pas aux cibles autres que le porteur...
 
 @12320200 = ~le porteur~
