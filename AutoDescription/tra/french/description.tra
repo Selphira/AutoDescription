@@ -1615,6 +1615,11 @@
 @11590003 = ~de créer 1 image miroir sur %theTarget%~
 @11590004 = ~de créer %amount% images miroir sur %theTarget%~
 
+// Opcode 160: Remove Sanctuary [160]
+
+@11600001 = ~Dissipe le sanctuaire sur %theTarget%~
+@11600002 = ~de dissiper le sanctuaire sur %theTarget%~
+
 // Opcode 161: Cure: Horror [161]
 
 @11610001 = ~Immunité à l'horreur~

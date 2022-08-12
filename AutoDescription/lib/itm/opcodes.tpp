@@ -139,6 +139,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	206 => 197 // Spell: Protection from Spell [206]
 	224 => 199 // Cure: Level Drain (Restoration) [224]
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
+	160 => 200 // Remove Sanctuary [160]
 	162 => 201 // Cure: Hold [162]
 	161 => 202 // Cure: Fear [161]
 	 48 => 204 // Cure: Silence (Vocalize) [48]
@@ -281,12 +282,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	141 => 0
 	142 => 0
 	152 => 0 // Spell Effect: Play Movie [152]
-	153 => 0 // Overlay: Sanctuary [153]
+	153 => 1 // Overlay: Sanctuary [153]
 	154 => 0 // Overlay: Entangle [154]
 	155 => 0 // Overlay: Minor Globe [155]
 	156 => 0 // Overlay: Protection from Normal Missiles Cylinder [156]
 	158 => 0 // State: Grease [158]
-	160 => 1 // Remove Sanctuary [160]
 	168 => 0 // Summon: Remove Creature [168]
 	169 => 0
 	170 => 0 // Graphics: Play Damage Animation [170]
@@ -3943,14 +3943,12 @@ END
  * Spell: Learn Spell [147] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_147~ BEGIN
-	SET ignoreDuration = 1
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	SPRINT description @11470001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_147~ BEGIN
-	SET ignoreDuration = 1
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	SPRINT description @11470002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
@@ -4134,6 +4132,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_161~ BEGIN
 	LPM ~opcode_self_probability_161~ // ~de dissiper l'horreur %ofTheTarget%~
+END
+
+/* ---------------------- *
+ * Remove Sanctuary [160] *
+ * ---------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_160~ BEGIN
+	SPRINT description @11600001 // ~Dissipe le sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_160~ BEGIN
+	SPRINT description @11600002 // ~de dissiper le sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_160~ BEGIN
+	LPM ~opcode_self_160~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_160~ BEGIN
+	LPM ~opcode_self_probability_160~
 END
 
 /* ---------------- *
