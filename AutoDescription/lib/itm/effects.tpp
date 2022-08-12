@@ -159,6 +159,10 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 	READ_ASCII EFF2_resource2 resref2
 	READ_ASCII EFF2_resource3 resref3
 
+	PATCH_IF is_ee == 1 BEGIN
+		SET special = specialEE
+	END
+
 	SET parentProbability = probability
 	SET probability = probability1 - probability2
 	SPRINT condition ~~

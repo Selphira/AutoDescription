@@ -924,10 +924,6 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET flagDontWake = 0
 
 	PATCH_IF is_ee == 1 BEGIN
-		// In .eff file
-		PATCH_IF VARIABLE_IS_SET specialEE BEGIN
-			SET special = specialEE
-		END
 		SET flagDrain = (((special BAND BIT0) == BIT0 AND (special BAND BIT1) == 0) OR ((special BAND BIT3) == BIT3 AND (special BAND BIT4) == 0))
 		SET flagTransfert = (((special BAND BIT1) == BIT1 AND (special BAND BIT0) == 0) OR ((special BAND BIT4) == BIT4 AND (special BAND BIT3) == 0))
 		SET flagFistDamage = (special BAND BIT2) == BIT2
@@ -1107,22 +1103,28 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 	SET damageAmount = parameter1
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 
-	PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
-		PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
 			PATCH_IF ~%value%~ STRING_EQUAL ~1~ BEGIN
 				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne 1 point de vie~
 			END
 			ELSE BEGIN
+				INNER_PATCH_SAVE value ~%value%~ BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+				END
 				LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END // ~Soigne %value% points de vie~
 			END
 		END
-	END
-	ELSE BEGIN
-		PATCH_IF ~%value%~ STRING_EQUAL ~-1~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige 1 point de vie~
-		END
 		ELSE BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
+			PATCH_IF ~%value%~ STRING_EQUAL ~-1~ BEGIN
+				LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige 1 point de vie~
+			END
+			ELSE BEGIN
+				INNER_PATCH_SAVE value ~%value%~ BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+				END
+				LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
+			END
 		END
 	END
 END
@@ -1359,9 +1361,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_23~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
-	PATCH_IF is_ee == 1 AND VARIABLE_IS_SET specialEE BEGIN
-		SET special = specialEE
-	END
 	PATCH_IF is_ee == 0 OR (is_ee == 1 AND special == 0) BEGIN
 		//TODO: Pour ce cas, plutot avoir une phrase du genre: Le moral est à son maximum
 		SET parameter1 = 10
@@ -2058,7 +2057,7 @@ DEFINE_PATCH_MACRO ~opcode_58_common~ BEGIN
 	END
 
 	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF mwType == 0 BEGIN
+		PATCH_IF mwType == 0 AND type != 0 BEGIN
 			SPRINT weaponStr @10580006 // ~les armes invoquées sont toujours dissipées~
 			SPRINT description ~%description% (%weaponStr%)~
 		END
@@ -2198,23 +2197,27 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 
-	PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
-		SPRINT description @10670002 // ~Invoque une créature hostile (%creatureName%)~
-    END
-    ELSE BEGIN
-		SPRINT description @10670001 // ~Invoque une créature (%creatureName%)~
-    END
+	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
+			SPRINT description @10670002 // ~Invoque une créature hostile (%creatureName%)~
+	    END
+	    ELSE BEGIN
+			SPRINT description @10670001 // ~Invoque une créature (%creatureName%)~
+	    END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 
-	PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
-		SPRINT description @10670004 // ~d'invoquer une créature hostile (%creatureName%)~
-    END
-    ELSE BEGIN
-		SPRINT description @10670003 // ~d'invoquer une créature (%creatureName%)~
+	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
+			SPRINT description @10670004 // ~d'invoquer une créature hostile (%creatureName%)~
+	    END
+	    ELSE BEGIN
+			SPRINT description @10670003 // ~d'invoquer une créature (%creatureName%)~
+	    END
     END
 END
 
