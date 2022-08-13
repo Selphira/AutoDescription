@@ -3549,32 +3549,37 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 	LOCAL_SET isMonster = 1
 	LOCAL_SET isHostile = type >= 5 ? 1 : 0
 
-	PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
-		SET isMonster = 0
-	END
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SPRINT file $opcode_127_files(~%type%~)
 
-	PATCH_IF mode <= 1 BEGIN
-		SET strref += isMonster == 1 ? 0 : 1 // ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
-	END
-	ELSE PATCH_IF mode == 3 BEGIN
-		SET strref += isMonster == 1 ? 2 : 3 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-	END
-	ELSE PATCH_IF mode == 2 BEGIN
-		PATCH_IF mode == 2 AND VARIABLE_IS_SET parameter3 BEGIN
-			LPF ~get_damage_value~ INT_VAR diceCount diceSides amount RET amount = damage END
+		PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
+			SET isMonster = 0
 		END
-		ELSE BEGIN
-			SET strref += amount == 1 ? 4 : 6
-			SET strref += isMonster == 1 ? 0 : 1
+
+		PATCH_IF mode <= 1 BEGIN
+			SET strref += isMonster == 1 ? 0 : 1 // ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
+		END
+		ELSE PATCH_IF mode == 3 BEGIN
+			SET strref += isMonster == 1 ? 2 : 3 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+		END
+		ELSE PATCH_IF mode == 2 BEGIN
+			PATCH_IF mode == 2 AND VARIABLE_IS_SET parameter3 BEGIN
+				LPF ~get_damage_value~ INT_VAR diceCount diceSides amount RET amount = damage END
+			END
+			ELSE BEGIN
+				SET strref += amount == 1 ? 4 : 6
+				SET strref += isMonster == 1 ? 0 : 1
+			END
+		END
+
+		PATCH_IF isHostile == 1 BEGIN
+			SET strref += 8
 		END
 	END
-
-	PATCH_IF isHostile == 1 BEGIN
-		SET strref += 8
+	ELSE BEGIN
+		SPRINT file ~%resref%~
+		SET strref += 16 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 	END
-
-	SPRINT file $opcode_127_files(~%type%~)
-	//FIXME: resref qui ne serait pas vide
 
 	LPF ~get_creatures_names~ STR_VAR file RET creatures END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
