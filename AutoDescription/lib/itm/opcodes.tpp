@@ -234,6 +234,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	361 => 293 // Cast spell on critical miss [361]
 	340 => 294 // Spell Effect: Change Backstab Effect [340]
 	127 => 295 // Summon: Monster Summoning [127]
+	331 => 295 // Summon: Random Monster Summoning [331]
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
 	135 => 297 // Polymorph into Specific [135]
@@ -350,7 +351,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
-	331 => 1 // Summon: Random Monster Summoning [331]
 	333 => 1 // Spell Effect: Static Charge [333]
 	334 => 0 // Spell Effect: Turn Undead [334]
 	335 => 1 // Spell Effect: Seven Eyes [335]
@@ -3533,7 +3533,7 @@ END
  * Summon: Monster Summoning [127] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_127~ BEGIN
-	LOCAL_SET strref = 11270001
+	LOCAL_SET strref = 11270001 // ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
 	LPM ~opcode_127_common~
 END
 
@@ -3556,21 +3556,23 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 			SET isMonster = 0
 		END
 
-		PATCH_IF mode <= 1 BEGIN
-			SET strref += isMonster == 1 ? 0 : 1 // ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
+		PATCH_IF mode == 2 BEGIN
+			SET strref += 2 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
 		END
-		ELSE PATCH_IF mode == 3 BEGIN
-			SET strref += isMonster == 1 ? 2 : 3 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-		END
-		ELSE PATCH_IF mode == 2 BEGIN
-			PATCH_IF mode == 2 AND VARIABLE_IS_SET parameter3 BEGIN
-				LPF ~get_damage_value~ INT_VAR diceCount diceSides amount RET amount = damage END
+		ELSE PATCH_IF mode == 1 BEGIN
+			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
+				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+				END
+				SET strref += ~%amount%~ STRING_EQUAL ~1~ ? 4 : 6
 			END
 			ELSE BEGIN
 				SET strref += amount == 1 ? 4 : 6
-				SET strref += isMonster == 1 ? 0 : 1
 			END
 		END
+
+		SET strref += isMonster == 1 ? 0 : 1
 
 		PATCH_IF isHostile == 1 BEGIN
 			SET strref += 8
@@ -3578,7 +3580,25 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 	END
 	ELSE BEGIN
 		SPRINT file ~%resref%~
-		SET strref += 16 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+
+		PATCH_IF mode == 0 BEGIN
+			SET strref += 16 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+		END
+		ELSE PATCH_IF mode == 2 BEGIN
+			SET strref += 17 // ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+		END
+		ELSE PATCH_IF mode == 1 BEGIN
+			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
+				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+				END
+				SET strref += ~%amount%~ STRING_EQUAL ~1~ ? 18 : 19
+			END
+			ELSE BEGIN
+				SET strref += amount == 1 ? 18 : 19
+			END
+		END
 	END
 
 	LPF ~get_creatures_names~ STR_VAR file RET creatures END
@@ -7029,17 +7049,62 @@ DEFINE_PATCH_MACRO ~opcode_self_329~ BEGIN
 	SPRINT description @13290001 // ~Force la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_329~ BEGIN
-	LPM ~opcode_self_329~
-END
-
 DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
 	LOCAL_SET seconds = parameter1
 	SPRINT description @13290002 // ~de forcer la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_329~ BEGIN
+	LPM ~opcode_self_329~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_329~ BEGIN
 	LPM ~opcode_self_probability_329~
+END
+
+/* -------------------------------------- *
+ * Summon: Random Monster Summoning [331] *
+ * -------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_331~ BEGIN
+	LOCAL_SET strref = 13310001 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+	LPM ~opcode_331_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_331~ BEGIN
+	LOCAL_SET strref = 13310005 // ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~
+	LPM ~opcode_331_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_331_common~ BEGIN
+	LOCAL_SET amount    = parameter1
+	LOCAL_SET type      = parameter2
+	LOCAL_SET mode      = special
+	LOCAL_SET isMonster = 1
+
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		INNER_PATCH_FILE ~smtables.2da~ BEGIN
+			SET row = 1 + type
+			READ_2DA_ENTRY row 0 2 id
+			READ_2DA_ENTRY row 1 2 file
+		END
+	END
+	ELSE BEGIN
+		SPRINT file ~%resref%~
+	END
+
+	PATCH_IF (NOT VARIABLE_IS_SET parameter3 AND mode == 0) OR mode == 1 BEGIN
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
+		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+		END
+		SET strref += ~%amount%~ STRING_EQUAL ~1~ ? 2 : 3 // ~Invoque 1 créature (%creatures%)~
+	END
+	ELSE PATCH_IF mode == 2 BEGIN
+		SET strref += 1 // ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+	END
+
+	LPF ~get_creatures_names~ STR_VAR file RET creatures END
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 /* ------------------------------------ *

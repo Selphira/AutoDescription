@@ -1463,6 +1463,9 @@
 @11270015 = ~Invoque %amount% monstres hostiles (%creatures%)~
 @11270016 = ~Invoque %amount% animaux hostiles (%creatures%)~
 @11270017 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+@11270018 = ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270019 = ~Invoque 1 créature (%creatures%)~
+@11270020 = ~Invoque %amount% créatures (%creatures%)~
 
 @11270021 = ~d'invoquer des monstres pour un total de %amount% niveaux (%creatures%)~
 @11270022 = ~d'invoquer des animaux pour un total de %amount% niveaux (%creatures%)~
@@ -1481,6 +1484,9 @@
 @11270035 = ~d'invoquer %amount% monstres hostiles (%creatures%)~
 @11270036 = ~d'invoquer %amount% animaux hostiles (%creatures%)~
 @11270037 = ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~
+@11270038 = ~d'invoquer des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270039 = ~d'invoquer 1 créature (%creatures%)~
+@11270040 = ~d'invoquer %amount% créatures (%creatures%)~
 
 // Opcode 128: State: Confusion [128]
 
@@ -2621,6 +2627,17 @@
 
 @13290001 = ~Force la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
 @13290002 = ~de forcer la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+
+// Opcode 331: Summon: Random Monster Summoning [331]
+
+@13310001 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+@13310002 = ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@13310003 = ~Invoque 1 créature (%creatures%)~
+@13310004 = ~Invoque %amount% créatures (%creatures%)~
+@13310005 = ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~
+@13310006 = ~d'invoquer des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@13310007 = ~d'invoquer 1 créature (%creatures%)~
+@13310008 = ~d'invoquer %amount% créatures (%creatures%)~
 
 // Opcode 332: Stat: Specific Damage Modifier [332]
 
