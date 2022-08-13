@@ -1,82 +1,62 @@
 # AutoDescription
 
-AutoDescription génère et remplace automatiquement la description "technique" des objets.  
-Cela apporte plusieurs avantages:
+AutoDescription est un mod, pour BG2, BGT, BGEE, BG2EE et EET, qui génère et remplace automatiquement la description "technique" des objets.  
+
+Cela comporte plusieurs avantages:
 - Les descriptions sont normalisées, ce qui les rend plus facile à lire
-- La description s'adapte aux éventuelles modifications réalisées par les mods
-- En comparant les descriptions avant/après, on peut détecter d'éventuels bugs.
+- La description s'adapte aux éventuelles modifications réalisées par les mods et les harmonise avec le reste du jeu
+- En comparant les descriptions avant/après, on peut détecter d'éventuels bugs, erreurs ou incompatibilités entre mods 
+  et sur le jeu de base.
+- Si des mods non-traduits sont installés, les statistiques des objets de ces mods seront automatiquement traduites et 
+  harmonisées.
 
-## Todolist
+À l'origine, ce mod a été pensé pour être utilisé par les joueurs, en étant installé après tous les mods ajoutant ou 
+altérant des objets.  
+En effet, AutoDescription s'adapte à tous les mods installés par l'utilisateur, si les capacités de certains objets sont
+altérées, celles-ci seront mises à jour afin que leur description corresponde à la réalité et dans votre langue 
+d'origine.
 
-### Général
+En pratique, il s'avère que AutoDescription peut aussi être utilisé dans le développement de mods, à divers niveaux...
 
-- les points de vie maximum -> le maximum de points de vie
-- Grouper les effets ayant la même probabilité de se délencher (Ex: blun14) ?  
-  Attention, 2 effets à 10% ne s'activeront pas forcément en même temps, il faut pour le cas qui nous intéresse, que probabilit1 et probability2 soient égaux dans les 2 effets !  
-  Il y a risque d'y avoir des chaînes trop longues...  Mais il faut trouver une façon d'indiquer au joueur que plusieurs effets vont se déclencher en même temps !
-- Grouper les effets de dégâts (opcode 12) dans une section "Dagâts" qui contiendrait aussi les dégâts de l'arme ?
-  Ex:
-  > Capacités de combat :
-  > - Dégâts: +6 points de dégâts de feu supplémentaires
-  > - 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente
-  > 
-  > Dégâts: 1d6 +3
-  
-  Deviendrait
-  
-  > Dégâts: 
-  > - 1d6 +3
-  > - +6 points de dégâts de feu supplémentaires
-  > - 21 % de chance d'infliger 2 points de dégâts de froid supplémentaires de manière permanente
-- Modifier la gestion des modifications par pourcentage d'une valeur ?  
-  Actuellement, on affiche "Multiplié par xx%"
-  Changer en "+/- xx%" ?
-- Gérer les potions et les munitions
-- Ignorer certains objets ou les traiter d'une manière spécifique ? (Ex: RING42.ITM S#SHLD01 SHLD24 U#AMUL02)
-- Bug: usability (Ex: NPSW05)
-  "Utilisable" par et "Non utilisable par" affichés en même temps
-- Opcode 177  
-  Grouper si l'effet est le même ! (Ex: U#BLUN01). L'objet possède 4 opcode 177 ayant le même effet, selon une condition sur la cible.
-  Gérer les dés de vie ! Certains effets ne s'applique que si la cible a un certain niveau de dé de vie (Ex: SW1H64)
-- Opcode 1  
-  Améliorer les textes, mieux adapté aux situations et moins génériques.
-- Les opcodes de type "State: Sanctuary [153]" doivent avoir un texte différent en fonction de s'ils sont une capacité de charge, de combat ou d'équipement... (Ex: GTT#BO.ITM)  
-  Charge : Sanctuaire x fois par jour  
-  Combat : Sanctuaire sur le porteur  
-  Equipement : "Sanctuaire permanent", "Sous l'effet de Sanctuaire", "Sanctuaire", autres ?
-- Opcode 206 (resref tb#preti) + opcode 146 (resref tb#depet)
-  // Fusionner en une seule ligne ! // Immunité au sort Pétrification
-- Grouper les charmes (Ex: A7RING02)
-- Les effets de zone ?
-  
+Côté traducteurs, il permet de traduire automatiquement les statistiques contenues dans les descriptions de la plupart 
+des objets, évitant ainsi une tâche souvent pénible et redondante.
 
-### Capacités de combat
+Côté développeurs, il peut mettre en évidence certains problèmes, incohérences ou bugs dans les objets en traduisant les 
+effets avec fiabilité.
+A cet effet, quelques erreurs sont remontées dans un fichier de log.
+Le mod n'étant pas destiné à cela à la base, la liste des erreurs remontées par ce biais est encore faible, mais elle 
+s'étoffera au fil du temps.
 
-- Préciser la cible de l'effet, uniquement si la cible est le porteur.
-  La cible par défaut de l'effet d'une capacité de combat est la cible du personnage, il n'est pas nécessaire de toujours le mentionner, et cela diminuera un peu les lignes.
-- Si une résistance de la cible passe à 0 avec une capacité de combat, écrire "Ignore la résistance à xxx de la cible" à la place de "Résistance à xxx de la cible: Passe à 0"
+## Comment ça fonctionne ?
 
-### Capacités de charge
+AutoDescription va lire toutes les caractéristiques des objets et des effets qui leurs sont associés afin de
+les traduire sous une forme d'un texte. Créant de ce fait, une ligne de description pour chaque effet présent sur l'objet.  
+Si certains de ces effets sont d'une même categorie, ils seront regroupés en une seule ligne dans le but de réduire la 
+longueur des descriptions.  
+Cette description "technique" va alors remplacer celle présente dans la description originale, tout en conservant la 
+partie texte "RP" de l'objet.
 
-- Trouver un nom qui ne soit pas générique pour les capacités de charge qui ont plusieurs effets affichés et qui n'ont aucun tooltip
-  - D'abord regarder en jeu ce qui est inscrit lorsqu'on passe la souris sur ce genre d'effet, et voir comment il serait possible de récupérer cette chaîne.
-  - Si rien n'est inscrit, ou juste le nom de l'objet : créer un tooltip pour l'objet (travail au cas par cas) ?
-- Afficher la portée des capacités de charge ?
+Pendant la phase de développement, aucun fichier du jeu n'est altéré, mais le mod va générer un fichier présentant les 
+différences avant / après ; afin de comparer les descriptions originales des nouvealles descriptions générées par 
+Autodescription.
+Il produira aussi deux fichiers de log permettant de remonter certaines erreurs ou alertes, pour les opcodes pas encore 
+integrés ou érronés.
+	
+Il est dors et déjà possible de remplacer les descriptions du jeu, en activant une option dans le fichier 
+"settings-default.ini".
+Ce fichier "settings-default.ini" contient d'autres options pour essayer de s'adapter à certaines préférences des joueurs.
 
-### Objets à corriger
+Un composant supplémentaire (20), plutot destiné aux développeurs et traducteurs, permet de générer uniquement les 
+descriptions des objets d'un mod en particulier, facilitant ainsi la verification d'objets spécifiques.
 
-Une liste d'objets sur lesquels je suis tombée et qui ont un bug évident.
-Ces objets seront corrigés dans un composant optionnel qui devra s'exécuter avant le composant principal.
+## Personnalisation
 
-#### Capacités d'équipement : 
-- **AMASWD.ITM** (??) : Possède un opcode 189 avec 1% de chance, non présent dans la description
-- **BHCLUB01.ITM** (Secret of Bonehill) : Multiplicateur d'attaque sournoise +50 (vive les dégâts x 57 pour l'assassin :D)! Devrait être x 150% selon la description.
-- **C-CS.ITM** (??) : Le opcode 30 a 1% de chance de multiplier la résistance en feu de 60%, au lieu d'augmenter la résistance au feu de 60 %.
-- **C2STAF02.ITM** (Item Upgrade) : Possède des bonus aux jets de sauvegarde non décrits
-- **JKVAHL.ITM** (Tsujatha) : Probabilité de l'effet de modification d'alignement pas à 100% 
-- **LOTHARMO.ITM** (??) : Le bonus de chance est de +2 dans la description, mais +3 et avec une mauvaise probabilité dans le code
-- **NAMUL.ITM** (??) : Un des 2 opcode 173 à 1% de chance, et il devrait être supprimé
-- **RING42.ITM** (??) : 3 opcodes (292, et 2 206) ont une probabilité de 1% au lieu de 100%
+Plusieurs options sont disponibles dans le fichier "settings-default.ini" pour s'adapter à certaines préférérences des joueurs.    
+Pour modifier une option, il est conseillé de ne pas modifier le fichier "settings-default.ini", mais de le copier dans un fichier "settings.ini" sau même endroit.
+Libre à vous ensuite de modifier les options sans crainte de perdre votre configuration suite à une mise à jour du mod.
 
-#### Capacités de charge : 
-- **J#JANSHU.ITM** (??) : Le second opcode 135 pointe vers une ressource vide ! (à supprimer)
+## Et la suite ?
+
+Le mod est encore en développement et n'est pour l'instant disponible qu'en Français, si des traducteurs désirent 
+entreprendre sa traduction, ce sera avec plaisir que je l'ajouterais au mod.
+Il est aussi prévu de prendre en compte les munitions, les potions, et peut-être les sortilèges !
