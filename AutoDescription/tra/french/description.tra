@@ -59,7 +59,7 @@
 @102012 = ~Contondant~
 @102013 = ~Tranchant~
 @102014 = ~Projectile~
-@102015 = ~Poing~
+@102015 = ~Mains nues~
 @102016 = ~Perforant / Contondant~
 @102017 = ~Perforant / Tranchant~
 @102018 = ~Contondant / Tranchant~
@@ -175,7 +175,7 @@
 @100210 = ~de dégâts offensif~
 @100211 = ~désactivé~
 @100212 = ~de combinaison~
-@100213 = ~de non combat~
+@100213 = ~non offensif~
 
 // duration
 @100300 = ~1 seconde~
@@ -203,7 +203,7 @@
 @202004 = ~alliés~
 @202005 = ~créatures contrôlées~
 @202006 = ~créatures charmées~
-@202007 = ~créatures totalement charmées~
+@202007 = ~créatures envoutées~
 //@202008 = ~~ // Ne correspond à aucune entrée mais utilisée par CM1H07.ITM (The Undying)
 @202028 = ~créatures alliées~
 @202029 = ~créatures alliées~
@@ -226,7 +226,7 @@
 @203003 = ~morts~
 @203004 = ~morts-vivants~
 @203005 = ~géants~
-@203006 = ~gelés~
+@203006 = ~gelées~
 @203007 = ~plantes~
 @203008 = ~~ // Ne correspond à aucune entrée mais utilisée par HELMLIFE.ITM
 @203255 = ~monstres~
@@ -305,8 +305,8 @@
 @204162 = ~hommes-lézard~
 @204164 = ~myconides~
 @204165 = ~oursons~
-@204166 = ~feyr~ //TODO: A traduire
-@204167 = ~hook horror~ //TODO: A traduire
+@204166 = ~freyeur~
+@204167 = ~crochorreur~
 @204168 = ~hurleurs~
 @204169 = ~salamandres~
 @204170 = ~oiseaux~
@@ -339,7 +339,7 @@
 @204211 = ~etoiles du matin~
 @204212 = ~robes~
 @204213 = ~armures de cuir~
-@204214 = ~armures de mailles~
+@204214 = ~cottes de mailles~
 @204215 = ~armures de plate~
 
 /* --------- *
@@ -386,8 +386,8 @@
 @205120 = ~gnolls~
 @205121 = ~hobgobelins~
 @205122 = ~kobolds~
-@205123 = ~Tasloi~
-@205124 = ~Xvart~
+@205123 = ~taslois~
+@205124 = ~xvarts~
 @205125 = ~ogres~
 @205126 = ~ogremages~
 @205127 = ~demi-ogres~
@@ -398,7 +398,7 @@
 @205133 = ~nymphes~
 @205134 = ~squelettes~
 @205135 = ~combattants squelettes~
-@205136 = ~Garde funeste~
+@205136 = ~gardes funestes~
 @205137 = ~araignées géantes~
 @205138 = ~araignées colossales~
 @205139 = ~araignées éclipsantes~
@@ -420,7 +420,7 @@
 @205155 = ~innocents~
 @205156 = ~poings enflammés~
 @205157 = ~loups-garou~
-//@205158 = ~wolfwere ?????~
+@205158 = ~muloups~
 @205159 = ~chevaliers de la mort~
 @205160 = ~tanar'ris~
 @205161 = ~spectateurs~
@@ -436,7 +436,7 @@
 @205171 = ~spectres~
 @205172 = ~nécrophages~
 @205173 = ~kuo-toas~
-//@205174 = ~MIST ???~
+@205174 = ~brumes~
 @205175 = ~chats~
 @205176 = ~duergars~
 @205177 = ~méphites~
@@ -662,7 +662,7 @@
 @10120030 = ~points de dégâts de feu magique~
 @10120031 = ~points de dégâts de froid magique~
 @10120032 = ~points de dégâts non létal~
-@10120033 = ~points de dégâts de poing~
+@10120033 = ~points de dégâts à mains nues~
 
 @10120040 = ~ne réveille pas la cible~
 
@@ -1210,6 +1210,7 @@
 @11010003 = ~Immunité à la folie du berserker~
 @11010005 = ~Immunité aux charmes~
 @11010006 = ~Immunité aux effets modifiant le charisme~
+@11010007 = ~~ // Opcode visuel
 @11010009 = ~~ // Opcode visuel
 @11010010 = ~Immunité aux effets modifiant la constitution~
 @11010012 = ~Immunité aux dégâts supplémentaires~ // TODO: KZNINJA.itm (est-ce bien le cas ?)
@@ -1264,6 +1265,7 @@
 @11010139 = ~~ // Opcode textuel
 @11010141 = ~~ // Opcode visuel
 @11010145 = ~Immunité à l'effet empêchant de lancer des sorts~
+@11010151 = ~Immunité au remplacement de créature~
 @11010154 = ~~ // Opcode visuel
 @11010156 = ~~ // Opcode visuel
 @11010157 = ~Immunité aux toiles~
@@ -2098,11 +2100,11 @@
 // Opcode 248: Item: Set Melee Effect [248]
 
 @12480001 = ~À chaque attaque de mêlée réussie: %description%~
-@12480002 = ~À chaque attaque au poing réussie: %description%~
+@12480002 = ~À chaque attaque à mains nues réussie: %description%~
 @12480003 = ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
-@12480004 = ~À chaque attaque au poing réussie par %theTarget%: %description%~
+@12480004 = ~À chaque attaque à mains nues réussie par %theTarget%: %description%~
 @12480003 = ~par attaque de mêlée réussie par %theTarget%: %description%~
-@12480004 = ~par attaque au poing réussie par %theTarget%: %description%~
+@12480004 = ~par attaque à mains nues réussie par %theTarget%: %description%~
 
 // Opcode 249: Item: Set Ranged Effect [249]
 
@@ -2225,13 +2227,13 @@
 
 // Opcode 288: Stat: Fist THAC0 Modifier [288]
 
-@12880001 = ~TAC0 des poings~
-@12880002 = ~le TAC0 des poings~
+@12880001 = ~TAC0 à mains nues~
+@12880002 = ~le TAC0 à mains nues~
 
 // Opcode 289: Stat: Fist Damage Modifier [289]
 
-@12890001 = ~Dégâts des poings~
-@12890002 = ~les dégâts des poings~
+@12890001 = ~Dégâts à mains nues~
+@12890002 = ~les dégâts à mains nues~
 
 // Opcode 292: Protection: Backstab [292]
 
