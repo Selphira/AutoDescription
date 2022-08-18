@@ -4466,7 +4466,12 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 	    END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+		PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+		END
 	END
 END
 
@@ -7019,6 +7024,10 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
     END
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_326~ BEGIN
+	LPM ~opcode_self_326~
+END
+
 DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET strref = 13260000
 	LOCAL_SET value = parameter1
@@ -7614,6 +7623,9 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
 	SET strref = 100200 + secondaryType
+	PATCH_IF secondaryType > 13 OR secondaryType < 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: secondary type must be between 0 and 13 inclusive~ END
+	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
 END
 
