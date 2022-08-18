@@ -55,7 +55,7 @@ BEGIN
 					// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
 					// Serait ajouté dans une variable qu'il suffira d'utiliser
 					// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-					PATCH_IF target == TARGET_FX_self BEGIN
+					PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
 						SPRINT opcode_target ~_self~
 						PATCH_IF forceTarget == 0 BEGIN
 							SPRINT theTarget   @102472 // ~le porteur~
