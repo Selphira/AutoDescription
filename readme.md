@@ -1,6 +1,10 @@
+[![Github Releases](https://img.shields.io/github/v/release/Selphira/AutoDescription?include_prereleases&color=blue)](https://github.com/Selphira/AutoDescription/releases/latest)
+![Langues](https://img.shields.io/static/v1?label=Langues&message=Français&color=limegreen)
+![Jeux supportés](https://img.shields.io/static/v1?label=Jeux%20supportés&message=BG2%20%7C%20BGT%20%7C%20BGEE%20%7C%20BG2EE%20%7C%20EET&color=dodgerblue)
+
 # AutoDescription
 
-AutoDescription est un mod, pour BG2, BGT, BGEE, BG2EE et EET, qui génère et remplace automatiquement la description "technique" des objets.  
+AutoDescription est un mod, pour BG2, BGT, BGEE, BG2EE et EET, développé sur <a href="https://www.baldursgateworld.fr/lacouronne/la-correct-zone/33168-uniformisation-des-descriptions.html">La Couronne de Cuivre</a>, qui génère et remplace automatiquement la description "technique" des objets.  
 
 Cela comporte plusieurs avantages:
 - Les descriptions sont normalisées, ce qui les rend plus facile à lire
@@ -60,3 +64,10 @@ Libre à vous ensuite de modifier les options sans crainte de perdre votre confi
 Le mod est encore en développement et n'est pour l'instant disponible qu'en Français, si des traducteurs désirent 
 entreprendre sa traduction, ce sera avec plaisir que je l'ajouterais au mod.
 Il est aussi prévu de prendre en compte les munitions, les potions, et peut-être les sortilèges !
+
+## Remerciements
+
+Un grand merci à toutes ces personnes pour leur aide dans l'amélioration du mod !
+
+- [JohnBob](https://www.baldursgateworld.fr/lacouronne/members/johnbob.html)
+- [Deratiseur](https://www.baldursgateworld.fr/lacouronne/members/deratiseur.html)
