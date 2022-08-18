@@ -550,11 +550,11 @@
 @220031 = ~divers (17)~
 @220032 = ~divers (18)~
 @220033 = ~divers (19)~
-@220034 = ~d'arme magique~
-@220035 = ~d'arme (1)~
-@220036 = ~d'arme (2)~
-@220037 = ~d'arme (3)~
-@220038 = ~d'arme (4)~
+@220034 = ~d'armes magiques~
+@220035 = ~d'armes (1)~
+@220036 = ~d'armes (2)~
+@220037 = ~d'armes (3)~
+@220038 = ~d'armes (4)~
 
 /* ------------------------------ *
  * Spécifiques à certains opcodes *
@@ -2035,7 +2035,8 @@
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 
-@12330001 = ~%probability% de passer la compétence martiale %proficiency% %ofTheTarget% à %value%~
+@12330001 = ~Compétence martiale %proficiency%~
+@12330002 = ~la compétence martiale %proficiency%~
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 

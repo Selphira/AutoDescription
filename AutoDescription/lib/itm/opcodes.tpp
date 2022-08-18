@@ -5652,18 +5652,21 @@ END
  * Stat: Proficiency Modifier [233] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
 	LOCAL_SPRINT proficiency ~~
 
-	SPRINT description ~~
+	LPM ~opcode_233_common~
 
 	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~)  BEGIN
-		SPRINT value @10010 // ~Passe à %value%~
-		TO_LOWER value
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
-		SPRINT value ~%proficiency% %value%~
+		SPRINT name @12330001 // ~Compétence martiale %proficiency%~
 
-		SPRINT name @102009
+		PATCH_IF type == 1 BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+		END
+		ELSE BEGIN
+			SPRINT value @10010 // ~Passe à %value%~
+		END
+
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 	ELSE PATCH_IF parameter2 != 109 BEGIN
@@ -5671,18 +5674,42 @@ DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_233~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
+DEFINE_PATCH_MACRO ~opcode_self_probability_233~ BEGIN
 	LOCAL_SPRINT proficiency ~~
 
-	SPRINT description ~~
+	LPM ~opcode_233_common~
 
 	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~)  BEGIN
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
-		SPRINT description @12330001 // ~%probability% de passer la compétence martiale %proficiency% %ofTheTarget% à %value%~
+		SPRINT theStatistic @12330002 // ~la compétence martiale %proficiency%~
+		PATCH_IF type == 1 BEGIN
+			PATCH_IF value > 0 BEGIN
+	            SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
+			END
+			ELSE BEGIN
+				SET value = ABS value
+				SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
+			END
+		END
+		ELSE BEGIN
+			SPRINT description @102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
+		END
 	END
 	ELSE PATCH_IF parameter2 != 109 BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_233~ BEGIN
+	LPM ~opcode_self_probability_233~
+END
+
+DEFINE_PATCH_MACRO ~opcode_233_common~ BEGIN
+	SET value = parameter1
+	SET type = 0
+	PATCH_IF is_ee == 1 BEGIN
+		SET type = parameter2 BLSR 16
+		SET parameter2 = parameter2 BAND 255
 	END
 END
 
