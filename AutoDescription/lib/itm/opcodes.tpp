@@ -3270,7 +3270,7 @@ END
 /* ----------------------- *
  * Detect: Alignment [115] *
  * ----------------------- */
-DEFINE_PATCH_MACRO ~opcode_115~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_115~ BEGIN
 	LOCAL_SET strref = 11150001 + parameter2
 
 	PATCH_IF parameter2 > 2 BEGIN
