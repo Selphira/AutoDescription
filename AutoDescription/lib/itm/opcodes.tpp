@@ -2281,6 +2281,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_71~ BEGIN
 	LPM ~opcode_71_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_71~ BEGIN
+	LPM ~opcode_self_71~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_71~ BEGIN
+	LPM ~opcode_self_probability_71~
+END
+
 DEFINE_PATCH_MACRO ~opcode_71_common~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
 		PATCH_IF parameter1 >= 1 AND parameter1 <= 2 BEGIN
