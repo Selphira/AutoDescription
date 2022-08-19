@@ -2295,6 +2295,16 @@
 
 @13160001 = ~de reposer %theTarget%~
 
+// Opcode 321: Removal: Effects specified by Resource [321]
+
+@13210001 = ~Dissipe les effets du sort %spellName% sur %theTarget%~
+@13210002 = ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
+@13210003 = ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210004 = ~de dissiper les effets du sort %spellName% sur %theTarget%~
+@13210005 = ~de dissiper les effets de l'objet %itemName% sur %theTarget%~
+@13210006 = ~de dissiper les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210007 = ~Les effets ne se cumulent pas~
+
 // Opcode 323: Stat: Turn Undead Level [323]
 
 @13230001 = ~Niveau de repousser les morts-vivants~

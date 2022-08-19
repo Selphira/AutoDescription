@@ -238,6 +238,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 68 => 295 // Summon: Unsummon Creature [68]
 	151 => 296 // Summon: Replace Creature [151]
 	135 => 297 // Polymorph into Specific [135]
+	321 => 298 // Removal: Effects specified by Resource [321]
 	220 => 298 // Removal: Remove School [220]
 	221 => 298 // Removal: Remove Secondary Type [221]
 	229 => 298 // Removal: Remove One School [229]
@@ -347,7 +348,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
-	321 => 1 // Removal: Effects specified by Resource [321]
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
@@ -3417,10 +3417,10 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 		SET amount2 = parameter3
 		SET amount3 = parameter4
 		PATCH_IF NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 END
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 = itemName END
 		END
 		PATCH_IF NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 END
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 = itemName END
 		END
 		PATCH_IF amount2 == 0 AND amount3 > 0 BEGIN
 			SET amount2 = amount3
@@ -6900,6 +6900,56 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_318~ BEGIN
 	LPM ~opcode_target_probability_324~
+END
+
+/* -------------------------------------------- *
+ * Removal: Effects specified by Resource [321] *
+ * -------------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_321~ BEGIN
+	LOCAL_SET strref = 13210001
+	LPM ~opcode_321_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_321~ BEGIN
+	LOCAL_SET strref = 13210004
+	LPM ~opcode_321_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_321~ BEGIN
+	LPM ~opcode_self_321~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
+	LPM ~opcode_self_probability_321~
+END
+
+DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
+	// TODO: Gérer le type = parameter2
+	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ BEGIN
+		SET ignoreDuration = 1
+		SET forceSort = 1
+		SET sort = 0
+		SPRINT description @13210007 // ~Les effets ne se cumulent pas~
+	END
+	ELSE BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+			SET strref += 2
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+		END
+		ELSE PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+			SET strref += 1
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
+		END
+		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% sur %theTarget%~
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no names of spells or items found~ END
+		END
+	END
 END
 
 /* ----------------------------- *
