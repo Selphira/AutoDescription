@@ -7266,15 +7266,16 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_341~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
+	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	LPF ~get_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
 	END
 
 	PATCH_IF count == 1 AND featureCount == 1 BEGIN
-		LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ RET effectDescription END
 
 		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
 	        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
@@ -7282,7 +7283,6 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 		END
 	END
 	ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-	    SPRINT description @12320004
 		SPRINT description ~%description%%spellDescription%~
     END
     ELSE BEGIN

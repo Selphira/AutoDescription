@@ -25,7 +25,7 @@ BEGIN
 
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
-			READ_LONG  SPL_HEAD_target                   spellTarget
+			READ_BYTE  SPL_HEAD_target                   spellTarget
 			READ_LONG  SPL_extended_headers_offset       headerOffset
 			READ_SHORT SPL_extended_headers_count        headerCount
 			READ_SHORT SPL_casting_feature_blocks_count  featureCount
@@ -101,15 +101,17 @@ BEGIN
 		END
 	END
 
-	LPF ~get_unique_spell_effects~ INT_VAR requiredLevel STR_VAR array_name = "tmpEffects" RET featureCount = count RET_ARRAY features = newAbilities END
+	PATCH_IF featureCount > 0 BEGIN
+		LPF ~get_unique_spell_effects~ INT_VAR requiredLevel STR_VAR array_name = "tmpEffects" RET featureCount = count RET_ARRAY features = newAbilities END
 
-	SORT_ARRAY_INDICES features NUMERICALLY
+		SORT_ARRAY_INDICES features NUMERICALLY
 
-	PATCH_PHP_EACH features AS data => value BEGIN
-		SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~) = value
+		PATCH_PHP_EACH features AS data => value BEGIN
+			SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~) = value
+		END
+
+		SET $levels(~%requiredLevel%~) = featureCount
 	END
-
-	SET $levels(~%requiredLevel%~) = featureCount
 END
 
 DEFINE_PATCH_FUNCTION ~get_single_spell_effect~
@@ -127,7 +129,7 @@ BEGIN
 	SPRINT effectDescription ~~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
-			READ_LONG  SPL_HEAD_target             spellTarget
+			READ_BYTE  SPL_HEAD_target             spellTarget
 			READ_LONG  SPL_extended_headers_offset headerOffset
 			READ_SHORT SPL_extended_headers_count  headerCount
 
