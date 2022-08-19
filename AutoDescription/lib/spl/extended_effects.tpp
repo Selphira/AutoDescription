@@ -81,7 +81,7 @@ BEGIN
 				SET opcodeBase = opcode
 				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
 					SET opcode = opcodeBase * 1000 + subOpcode
-					LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
+					LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 						SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
 						SET featureCount += 1
@@ -89,7 +89,7 @@ BEGIN
 				END
 			END
 			ELSE BEGIN
-				LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description descSort = sort END
+				LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 					SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
 					SET featureCount += 1
