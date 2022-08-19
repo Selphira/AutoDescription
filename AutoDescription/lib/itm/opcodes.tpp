@@ -5524,11 +5524,11 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_232~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_232~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target~ END
+	LPM ~opcode_self_232~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_232~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
+	LPM ~opcode_self_probability_232~
 END
 
 DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
