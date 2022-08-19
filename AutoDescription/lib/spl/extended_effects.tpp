@@ -30,6 +30,9 @@ BEGIN
 			READ_SHORT SPL_extended_headers_count        headerCount
 			READ_SHORT SPL_casting_feature_blocks_count  featureCount
 
+			SPRINT OLD_SOURCE_RES ~%SOURCE_RES%~
+			SPRINT SOURCE_RES ~%file%~
+
 			PATCH_IF spellTarget == 5 OR spellTarget == 7 BEGIN
 				forceTarget = TARGET_FX_self
 			END
@@ -56,6 +59,7 @@ BEGIN
 					LPF ~get_spell_level_effects~ RET_ARRAY effects levels END
 			    END
 			END
+			SPRINT SOURCE_RES ~%OLD_SOURCE_RES%~
 		END
 	END
 	ELSE BEGIN

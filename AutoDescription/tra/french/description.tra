@@ -480,6 +480,7 @@
  @206000 = ~??????~
  @206005 = ~~
  @206243 = ~ménestrels~
+ @206250 = ~esprits~
 
 /* --------- *
  * Gender.ids *
@@ -1270,9 +1271,12 @@
 @11010156 = ~~ // Opcode visuel
 @11010157 = ~Immunité aux toiles~
 @11010158 = ~~ // Opcode visuel
+@11010163 = ~Immunité à l'action libre~
 @11010165 = ~Immunité à la pause~
 @11010168 = ~Immunité à la dissipation des créatures invoquées~
+@11010170 = ~~ // Opcode visuel
 @11010175 = ~Immunité à la paralysie~
+@11010177 = ~~ // ??? Immunité à tous les effets lancés depuis l'opcode 177...
 @11010185 = ~Immunité à la paralysie~
 @11010193 = ~Immunité à la détection des invisibles~
 @11010209 = ~Immunité à la mort magique~
@@ -1288,6 +1292,7 @@
 @11010221 = ~Immunité à la dissipation des sorts~ // Removal: Remove Secondary Type [221]
 @11010222 = ~Immunité à la téléportation~
 @11010223 = ~Immunité à l'immunité contre une école de magie~
+@11010224 = ~Immunité à la restauration des niveaux drainés~
 @11010225 = ~Immunité à la révélation de la magie~
 @11010230 = ~Immunité à la dissipation des sorts~ // Removal: Remove One Secondary Type [230]
 @11010231 = ~Immunité à l'arrêt du temps~
@@ -1323,6 +1328,7 @@
 @11012005 = ~Immunise %theTarget% aux charmes~
 @11012012 = ~Immunise %theTarget% aux dégâts supplémentaires~
 @11012074 = ~Immunise %theTarget% à l'aveuglement~
+@11012131 = ~Immunise %theTarget% à la pétrification~
 @11012144 = ~Immunise %theTarget% à la désactivation des boutons d'interface~ // Pas top...
 @11012146 = ~Immunise %theTarget% aux lancement de sort~ // Pas top...
 

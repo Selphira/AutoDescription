@@ -6985,6 +6985,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
+	SET ignoreDuration = 1
 	PATCH_IF is_ee == 1 BEGIN
 		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
 			PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
