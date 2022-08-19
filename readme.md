@@ -34,14 +34,14 @@ s'étoffera au fil du temps.
 ## Comment ça fonctionne ?
 
 AutoDescription va lire toutes les caractéristiques des objets et des effets qui leurs sont associés afin de
-les traduire sous une forme d'un texte. Créant de ce fait, une ligne de description pour chaque effet présent sur l'objet.  
+les traduire sous la forme d'un texte. Créant de ce fait, une ligne de description pour chaque effet présent sur l'objet.  
 Si certains de ces effets sont d'une même categorie, ils seront regroupés en une seule ligne dans le but de réduire la 
 longueur des descriptions.  
 Cette description "technique" va alors remplacer celle présente dans la description originale, tout en conservant la 
 partie texte "RP" de l'objet.
 
 Pendant la phase de développement, aucun fichier du jeu n'est altéré, mais le mod va générer un fichier présentant les 
-différences avant / après ; afin de comparer les descriptions originales des nouvealles descriptions générées par 
+différences avant / après ; afin de comparer les descriptions originales des nouvelles descriptions générées par 
 Autodescription.
 Il produira aussi deux fichiers de log permettant de remonter certaines erreurs ou alertes, pour les opcodes pas encore 
 integrés ou érronés.
