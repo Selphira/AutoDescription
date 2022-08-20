@@ -84,14 +84,13 @@ BEGIN
 				LPM ~add_target_level~
 
 				PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
-					PATCH_IF probability == 100 BEGIN
+					PATCH_IF probability >= 100 BEGIN
 						SPRINT method ~opcode%opcode_target%_%opcode_n%~
 						LPM ~%method%~
 						LPM ~set_opcode_sort~
 					END
 					ELSE BEGIN
 						SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
-						SET probability += 1
 						LPM ~%method%~
 						LPM ~set_opcode_sort~
 						PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -164,7 +163,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 	END
 
 	SET parentProbability = probability
-	SET probability = probability1 - probability2
+	LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 	SPRINT condition ~~
 	SPRINT description ~~
 
@@ -354,7 +353,7 @@ DEFINE_PATCH_MACRO ~block_to_vars~ BEGIN
 	READ_LONG  (blockOffset + EFF_save_bonus) saveBonus
 	READ_LONG  (blockOffset + 0x2c) special
 
-	SET probability = probability1 - probability2
+	LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 END
 
 DEFINE_PATCH_MACRO ~abilities_groups_to_vars~ BEGIN
@@ -374,6 +373,23 @@ DEFINE_PATCH_MACRO ~abilities_groups_to_vars~ BEGIN
 	SPRINT saveType "%data_13%"
 	SPRINT saveBonus "%data_14%"
 	SPRINT special "%data_15%"
+END
+
+
+DEFINE_PATCH_FUNCTION ~get_probability~ INT_VAR probability1 = 0 probability2 = 0 RET probability BEGIN
+	PATCH_IF probability1 > 99 OR probability1 < 0 BEGIN
+	    probability1 = 99
+	END
+
+	SET probability = probability1 - probability2 + 1
+
+	PATCH_IF probability2 > probability1 OR probability2 < 0 BEGIN
+        SET probability = 0
+    END
+
+	PATCH_IF probability <= 0 BEGIN
+        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
+    END
 END
 
 
