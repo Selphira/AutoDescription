@@ -380,8 +380,8 @@ END
 DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 damageAmount = 0 RET damage BEGIN
 	SPRINT ~damage~ ~~
 
-	PATCH_IF diceCount > 0 AND diceSides > 0 BEGIN
-		PATCH_IF diceSides == 1 BEGIN
+	PATCH_IF diceCount > 0 BEGIN
+		PATCH_IF diceSides <= 1 BEGIN
 			SET damageAmount += diceCount
 		END
 		ELSE BEGIN
