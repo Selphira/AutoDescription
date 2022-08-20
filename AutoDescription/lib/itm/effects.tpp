@@ -313,18 +313,18 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 	LOCAL_SET levelMin = diceSides
 	LOCAL_SET levelMax = diceCount
 	LOCAL_SET strref   = 0
-	PATCH_IF (diceCount > 0 OR diceSides > 0) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 OR (opcode == 218 AND is_ee ==1 AND parameter2 == 1)) BEGIN
+	PATCH_IF (diceCount > 0 OR diceSides > 0) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0)) BEGIN
 		PATCH_IF diceSides == diceCount BEGIN
-			SET strref = 101186
+			SET strref = 101186 // ~%target% (de niveau %levelMin%)~
 		END
 		ELSE PATCH_IF diceSides == 0 AND diceCount > 0 BEGIN
-			SET strref = 101187
+			SET strref = 101187 // ~%target% (de niveau %levelMax% ou inférieur)~
 		END
 		ELSE PATCH_IF diceSides > 1 AND diceCount == 0 BEGIN
-			SET strref = 101188
+			SET strref = 101188 // ~%target% (de niveau %levelMin% ou supérieur)~
 		END
 		ELSE PATCH_IF diceSides > 1 AND diceCount > 0 BEGIN
-			SET strref = 101189
+			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
 		END
 
 		PATCH_IF strref != 0 BEGIN
