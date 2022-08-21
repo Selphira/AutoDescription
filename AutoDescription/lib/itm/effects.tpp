@@ -13,6 +13,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~
 BEGIN
 	SET opcode_n = opcode
 	SET ignoreDuration = 0
+	SET isValid = 1
 	SET saveAdded = 0
 	SET saveForHalf = 0
 	SET sort = 0
@@ -84,18 +85,22 @@ BEGIN
 				LPM ~add_target_level~
 
 				PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
-					PATCH_IF probability >= 100 BEGIN
-						SPRINT method ~opcode%opcode_target%_%opcode_n%~
-						LPM ~%method%~
-						LPM ~set_opcode_sort~
-					END
-					ELSE BEGIN
-						SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
-						LPM ~%method%~
-						LPM ~set_opcode_sort~
-						PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-							LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-							SPRINT description @101125 // ~%probability% de chance %description%~
+					// Si la macro n'existe pas, on considère l'effet comme valide
+					PATCH_TRY LPM ~opcode_%opcode_n%_is_valid~ WITH DEFAULT SET isValid = 1 END
+					PATCH_IF isValid == 1 BEGIN
+						PATCH_IF probability >= 100 BEGIN
+							SPRINT method ~opcode%opcode_target%_%opcode_n%~
+							LPM ~%method%~
+							LPM ~set_opcode_sort~
+						END
+						ELSE BEGIN
+							SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
+							LPM ~%method%~
+							LPM ~set_opcode_sort~
+							PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+								LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+								SPRINT description @101125 // ~%probability% de chance %description%~
+							END
 						END
 					END
 
@@ -162,6 +167,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 		SET special = specialEE
 	END
 
+	SET isValid = 1
 	SET parentProbability = probability
 	LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 	SPRINT condition ~~
@@ -202,17 +208,21 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
         END
         ELSE BEGIN
 			PATCH_TRY
-				PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
-					SPRINT method ~%macro%probability_%opcode%~
-					LPM ~%method%~
-					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
-						LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-						SPRINT description @101125 // ~%probability% de chance %description%~
+				// Si la macro n'existe pas, on considère comme valide
+				PATCH_TRY LPM ~opcode_%opcode_n%_is_valid~ WITH DEFAULT SET isValid = 1 END
+				PATCH_IF isValid == 1 BEGIN
+					PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
+						SPRINT method ~%macro%probability_%opcode%~
+						LPM ~%method%~
+						PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND parentProbability == 100 BEGIN
+							LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+							SPRINT description @101125 // ~%probability% de chance %description%~
+						END
 					END
-				END
-				ELSE BEGIN
-					SPRINT method ~%macro%%opcode%~
-					LPM ~%method%~
+					ELSE BEGIN
+						SPRINT method ~%macro%%opcode%~
+						LPM ~%method%~
+					END
 				END
 			WITH
 				~Failure("Unknown macro: \%method%")~

@@ -564,7 +564,6 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 			SPRINT value ~%value% %versus%~
 		END
 
-
 		PATCH_IF parameter1 > 0 BEGIN
 			SPRINT description @10000103 // ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
 		END
@@ -605,8 +604,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_0_common~ BEGIN
-	PATCH_IF parameter2 == 15 BEGIN
-		SET parameter2 = AC_MOD_TYPE_all
+	PATCH_IF parameter2 != 0 AND parameter2 != 1 AND parameter2 != 2 AND parameter2 != 4 AND parameter2 != 8 AND parameter2 != 16 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter2 value (0 1 2 4 8 16 expected).~ END
 	END
 
 	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
@@ -636,23 +635,24 @@ END
  * Stat: Attacks Per Round Modifier [1] *
  * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
-	PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+	LPM ~opcode_1_common~
+
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT value @10010 // ~Passe à %value%~
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+		//FIXME: Le cas où parameter1 == 100 => 0 => aucun changement => is_valid = 0
 		SET value = ~%parameter1%~
 		SET value -= 100
 		LPF ~signed_value~ INT_VAR value RET value END
 		SPRINT value @10002 // ~%value% %~
 	END
-	ELSE BEGIN
-		LPM ~opcode_1_common~
+	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
+		SPRINT value @10010008 // ~Fixée à %value%~
+	END
 
-		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-		END
-		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-			SPRINT value @10010008 // ~Fixée à %value%~
-		END PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
-			SPRINT value @10010007 // ~une demi supplémentaire~
-		END
+	PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
+		SPRINT value @10010007 // ~une demi supplémentaire~
 	END
 
 	SPRINT name @102007 // ~Attaque par round~
@@ -660,23 +660,21 @@ DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
-	PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+	LPM ~opcode_1_common~
+
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @10010002 // ~de passer l'attaque par round %ofTheTarget% à %value%~
+	END
+	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
+		SPRINT description @10010004 // ~de fixer l'attaque par round %ofTheTarget% à %value%~
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
 		SET value = ~%parameter1%~
 		SPRINT value @10002 // ~%value% %~
 		SPRINT description @10010003 // ~de multiplier l'attaque par round %ofTheTarget% par %value%~
 	END
 	ELSE BEGIN
-		LPM ~opcode_1_common~
-
-		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT description @10010002 // ~de passer l'attaque par round %ofTheTarget% à %value%~
-		END
-		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-			SPRINT description @10010004 // ~de fixer l'attaque par round %ofTheTarget% à %value%~
-		END
-		ELSE BEGIN
-			SPRINT description @10010001 // ~de modifier l'attaque par round %ofTheTarget% de %value%~
-		END
+		SPRINT description @10010001 // ~de modifier l'attaque par round %ofTheTarget% de %value%~
 	END
 END
 
@@ -685,23 +683,57 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_1~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		SET parameter1 = ABS parameter1
+	LOCAL_SET is_negative = parameter1 < 0 ? 1 : 0
+	SET value = ABS parameter1
+
+	// P2 = 1 ou P2 = 3: si P1 > 10 ou < 0 => P1 = 10
+	PATCH_IF (parameter2 == MOD_TYPE_flat OR parameter2 == 3) AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
+		SET value = 10
 	END
 
-	SPRINT oneHalf @10010005 // ~une demi~
-	SPRINT andHalf @10010006 // ~\1 et demi~
-	// Weidu ne gérant pas les nombres flottants, une solution est de passer par des nombres 10 fois plus grand.
-	SET value = $opcode_1_values(~%parameter1%~)
+	PATCH_IF parameter2 != MOD_TYPE_percentage BEGIN
+		SPRINT oneHalf @10010005 // ~une demi~
+		SPRINT andHalf @10010006 // ~\1 et demi~
+		// Weidu ne gérant pas les nombres flottants, une solution est de passer par des nombres 10 fois plus grand.
+		SET value = $opcode_1_values(~%value%~)
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        LPF ~signed_value~ INT_VAR value RET value END
-    END
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			PATCH_IF is_negative == 1 BEGIN
+				SET value = 0 - value
+			END
+	        LPF ~signed_value~ INT_VAR value RET value END
+	    END
 
-	INNER_PATCH_SAVE value ~%value%~ BEGIN
-		REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
-		REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
-		REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
+		INNER_PATCH_SAVE value ~%value%~ BEGIN
+			REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
+			REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
+			REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
+	LOCAL_SET value = ABS parameter1
+
+	PATCH_IF parameter2 != MOD_TYPE_percentage AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			SET isValid = 0
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
+		END
+	END
+
+	PATCH_IF parameter2 == 3
+		AND NOT VARIABLE_IS_SET parameter3 // Si on n'est pas dans un fichier .eff
+		AND (
+			timingMode == TIMING_duration
+			OR timingMode == TIMING_delayed_duration
+			OR timingMode == 6
+			OR timingMode == TIMING_permanent_after_death
+			OR timingMode == TIMING_duration_ticks
+		)
+	BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
 	END
 END
 
