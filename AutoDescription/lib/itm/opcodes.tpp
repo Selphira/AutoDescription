@@ -522,42 +522,38 @@ OUTER_SET AbilityType_Equipped = 3
 /* ------------------------------------- *
  * Stat: AC vs. Damage Type Modifier [0] *
  * ------------------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
-	LPM ~opcode_0_common~
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all AND NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
 		END
 	END
 
-	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @102008 // ~Classe d'armure~
+	SPRINT name @102008 // ~Classe d'armure~
 
-		PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-			SPRINT name @10000100  // ~Classe d'armure de base~
-		END
-
-		SPRINT description @100001 // ~%name%%colon%%value%~
+	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+		SPRINT name @10000100  // ~Classe d'armure de base~
 	END
+
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ABS ~%parameter1%~
 
-	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
-
-	PATCH_IF parameter1 != 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
+	ELSE BEGIN
 		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -578,15 +574,15 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
-	LPM ~opcode_0_common~
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+		// FIXME ? Pas compris la condition
 		PATCH_IF %itemType% != ITM_TYPE_armor BEGIN
 			SPRINT value @10010 // ~Passe à %value%~
 		END
 	END
 	ELSE BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all AND NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -603,21 +599,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 	LPM ~opcode_self_probability_0~
 END
 
-DEFINE_PATCH_MACRO ~opcode_0_common~ BEGIN
-	PATCH_IF parameter2 != 0 AND parameter2 != 1 AND parameter2 != 2 AND parameter2 != 4 AND parameter2 != 8 AND parameter2 != 16 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter2 value (0 1 2 4 8 16 expected).~ END
-	END
-
-	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
-	END
-END
-
 DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
-	PATCH_IF value == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
-		SPRINT value ~~
-	END
-	ELSE PATCH_IF armor_class_show_bonus_malus BEGIN
+	PATCH_IF armor_class_show_bonus_malus BEGIN
 		PATCH_IF value > 0 BEGIN
 			SPRINT value @10000101 // ~Bonus de %value%~
 		END
@@ -631,9 +614,28 @@ DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
+	// Armure non reconnue
+	PATCH_IF parameter2 != AC_MOD_TYPE_all AND
+			 parameter2 != AC_MOD_TYPE_crushing AND
+			 parameter2 != AC_MOD_TYPE_missile AND
+			 parameter2 != AC_MOD_TYPE_piercing AND
+			 parameter2 != AC_MOD_TYPE_slashing AND
+			 parameter2 != AC_MOD_TYPE_set_base BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter2 value (0 1 2 4 8 16 expected).~ END
+		SET isValid = 0
+	END
+	// Valeur = valeur + 0
+	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
+		SET isValid = 0
+	END
+END
+
 /* ------------------------------------ *
  * Stat: Attacks Per Round Modifier [1] *
  * ------------------------------------ */
+
 DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
 	LPM ~opcode_1_common~
 
@@ -641,7 +643,6 @@ DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-		//FIXME: Le cas où parameter1 == 100 => 0 => aucun changement => is_valid = 0
 		SET value = ~%parameter1%~
 		SET value -= 100
 		LPF ~signed_value~ INT_VAR value RET value END
@@ -715,11 +716,15 @@ END
 DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 	LOCAL_SET value = ABS parameter1
 
-	PATCH_IF parameter2 != MOD_TYPE_percentage AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
-		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-			SET isValid = 0
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
-		END
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < 0 OR parameter2 > 4 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
+	END
+
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
 	END
 
 	PATCH_IF parameter2 == 3
@@ -797,6 +802,7 @@ END
 /* ---------------------------------- *
  * Charm: Charm Specific Creature [5] *
  * ---------------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_5~ BEGIN
 	SPRINT description @10050001 // ~Charme %theTarget%~
 END
@@ -841,9 +847,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_5~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_5_is_valid~ BEGIN
+	PATCH_IF NOT (paramater2 >= 0 AND parameter2 <= 5 OR paramater2 >= 1000 AND parameter2 <= 1005) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter1%.~ END
+	END
+END
+
 /* --------------------------- *
  * Stat: Charisma Modifier [6] *
  * --------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_6~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 10060001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Charisme~
 END
@@ -858,6 +872,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_6~ BEGIN
 	LPM ~opcode_self_probability_6~
+END
+
+DEFINE_PATCH_MACRO ~opcode_6_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* -------------------------------- *
@@ -877,6 +895,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_10~ BEGIN
 	LPM ~opcode_self_probability_10~
+END
+
+DEFINE_PATCH_MACRO ~opcode_10_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ----------------- *
@@ -8048,5 +8070,34 @@ DEFINE_PATCH_FUNCTION ~opcode_self_177_item_revision_casting_penality~ RET descr
 		SET sort = 35
 		SET parameter2 = MOD_TYPE_cumulative
 		LPF ~opcode_mod~ INT_VAR strref = 102479 STR_VAR value RET description END // ~Vitesse d'incantation des sorts divins~
+	END
+END
+
+
+// Macro pour opcode de modificateur de caractéristiques
+DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+	END
+	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter1%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter1%.~ END
 	END
 END
