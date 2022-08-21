@@ -30,33 +30,24 @@ BEGIN
 		SET probability = forcedProbability
 	END
 
-	PATCH_TRY
-		// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
-		PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
-			SET target = TARGET_FX_self
-		END
-
-		PATCH_IF target > 9 BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Invalid target : %target%~ END
-		END
-		ELSE PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
-			PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
+	// Si la macro n'existe pas, on considère l'effet comme valide
+	PATCH_TRY LPM ~opcode_%opcode_n%_is_valid~ WITH DEFAULT SET isValid = 1 END
+	PATCH_IF isValid == 1 BEGIN
+		PATCH_TRY
+			// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
+			PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
+				SET target = TARGET_FX_self
 			END
-			ELSE BEGIN
-				PATCH_IF abilityType == AbilityType_Equipped BEGIN
-					SPRINT opcode_target ~_self~
-					PATCH_IF forceTarget == 0 BEGIN
-						SPRINT theTarget   @102472 // ~le porteur~
-						SPRINT ofTheTarget @101086 // ~du porteur~
-						SPRINT toTheTarget @101180 // ~au porteur~
-					END
+
+			PATCH_IF target > 9 BEGIN
+				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Invalid target : %target%~ END
+			END
+			ELSE PATCH_IF target != TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
+				PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+					LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
 				END
 				ELSE BEGIN
-					// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
-					// Serait ajouté dans une variable qu'il suffira d'utiliser
-					// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-					PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
+					PATCH_IF abilityType == AbilityType_Equipped BEGIN
 						SPRINT opcode_target ~_self~
 						PATCH_IF forceTarget == 0 BEGIN
 							SPRINT theTarget   @102472 // ~le porteur~
@@ -64,30 +55,39 @@ BEGIN
 							SPRINT toTheTarget @101180 // ~au porteur~
 						END
 					END
-					ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
-						SPRINT opcode_target ~_target~
-						PATCH_IF forceTarget == 0 BEGIN
-							SPRINT theTarget   @102471 // ~la cible~
-							SPRINT ofTheTarget @101085 // ~de la cible~
-							SPRINT toTheTarget @101181 // ~à la cible~
+					ELSE BEGIN
+						// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
+						// Serait ajouté dans une variable qu'il suffira d'utiliser
+						// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
+						PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
+							SPRINT opcode_target ~_self~
+							PATCH_IF forceTarget == 0 BEGIN
+								SPRINT theTarget   @102472 // ~le porteur~
+								SPRINT ofTheTarget @101086 // ~du porteur~
+								SPRINT toTheTarget @101180 // ~au porteur~
+							END
+						END
+						ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+							SPRINT opcode_target ~_target~
+							PATCH_IF forceTarget == 0 BEGIN
+								SPRINT theTarget   @102471 // ~la cible~
+								SPRINT ofTheTarget @101085 // ~de la cible~
+								SPRINT toTheTarget @101181 // ~à la cible~
+							END
+						END
+						ELSE PATCH_IF target == TARGET_FX_party BEGIN
+							SPRINT opcode_target ~_party~
+							PATCH_IF forceTarget == 0 BEGIN
+								SPRINT theTarget   @102473 // ~les membres du groupe~
+								SPRINT ofTheTarget @101088 // ~des membres du groupe~
+								SPRINT toTheTarget @101182 // ~aux membres du groupe~
+							END
 						END
 					END
-					ELSE PATCH_IF target == TARGET_FX_party BEGIN
-						SPRINT opcode_target ~_party~
-						PATCH_IF forceTarget == 0 BEGIN
-							SPRINT theTarget   @102473 // ~les membres du groupe~
-							SPRINT ofTheTarget @101088 // ~des membres du groupe~
-							SPRINT toTheTarget @101182 // ~aux membres du groupe~
-						END
-					END
-				END
 
-				LPM ~add_target_level~
+					LPM ~add_target_level~
 
-				PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
-					// Si la macro n'existe pas, on considère l'effet comme valide
-					PATCH_TRY LPM ~opcode_%opcode_n%_is_valid~ WITH DEFAULT SET isValid = 1 END
-					PATCH_IF isValid == 1 BEGIN
+					PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
 						PATCH_IF probability >= 100 BEGIN
 							SPRINT method ~opcode%opcode_target%_%opcode_n%~
 							LPM ~%method%~
@@ -102,29 +102,29 @@ BEGIN
 								SPRINT description @101125 // ~%probability% de chance %description%~
 							END
 						END
-					END
 
-					LPM ~add_condition~
-					LPM ~add_duration~
-					LPM ~add_save~
-				END
-				ELSE BEGIN
-					LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Unknow target : %target% ~ END
+						LPM ~add_condition~
+						LPM ~add_duration~
+						LPM ~add_save~
+					END
+					ELSE BEGIN
+						LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Unknow target : %target% ~ END
+					END
 				END
 			END
+			ELSE BEGIN
+				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Target est none~ END
+			END
+		WITH
+			~Failure("Unknown macro: \%method%")~
+			BEGIN
+				LPF ~log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
+				PATCH_FAIL ~Unknown macro: %method%~
+			END
+			DEFAULT
+				LPF ~log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode_n%: %ERROR_MESSAGE%~ END
+				PATCH_FAIL ~Opcode %opcode_n%: %ERROR_MESSAGE%~
 		END
-		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Target est none~ END
-		END
-	WITH
-		~Failure("Unknown macro: \%method%")~
-		BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
-			PATCH_FAIL ~Unknown macro: %method%~
-		END
-		DEFAULT
-			LPF ~log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode_n%: %ERROR_MESSAGE%~ END
-			PATCH_FAIL ~Opcode %opcode_n%: %ERROR_MESSAGE%~
 	END
 END
 
@@ -173,44 +173,44 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 	SPRINT condition ~~
 	SPRINT description ~~
 
-	PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
-        SPRINT macro ~opcode_self_~
-        PATCH_IF resetTarget == 1 BEGIN
-	        SPRINT theTarget   @102472 // ~le porteur~
-	        SPRINT ofTheTarget @101086 // ~du porteur~
-	        SPRINT toTheTarget @101180 // ~au porteur~
-        END
-    END
-    ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
-        SPRINT macro ~opcode_target_~
-        PATCH_IF resetTarget == 1 BEGIN
-	        SPRINT theTarget   @102471 // ~la cible~
-	        SPRINT ofTheTarget @101085 // ~de la cible~
-	        SPRINT toTheTarget @101181 // ~à la cible~
-        END
-    END
-    ELSE PATCH_IF target == TARGET_FX_party BEGIN
-        SPRINT macro ~opcode_party_~
-        PATCH_IF resetTarget == 1 BEGIN
-	        SPRINT theTarget   @102473 // ~les membres du groupe~
-	        SPRINT ofTheTarget @101088 // ~des membres du groupe~
-	        SPRINT toTheTarget @101182 // ~aux membres du groupe~
-        END
-    END
+	// Si la macro n'existe pas, on considère comme valide
+	PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
+	PATCH_IF isValid == 1 BEGIN
+		PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
+	        SPRINT macro ~opcode_self_~
+	        PATCH_IF resetTarget == 1 BEGIN
+		        SPRINT theTarget   @102472 // ~le porteur~
+		        SPRINT ofTheTarget @101086 // ~du porteur~
+		        SPRINT toTheTarget @101180 // ~au porteur~
+	        END
+	    END
+	    ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+	        SPRINT macro ~opcode_target_~
+	        PATCH_IF resetTarget == 1 BEGIN
+		        SPRINT theTarget   @102471 // ~la cible~
+		        SPRINT ofTheTarget @101085 // ~de la cible~
+		        SPRINT toTheTarget @101181 // ~à la cible~
+	        END
+	    END
+	    ELSE PATCH_IF target == TARGET_FX_party BEGIN
+	        SPRINT macro ~opcode_party_~
+	        PATCH_IF resetTarget == 1 BEGIN
+		        SPRINT theTarget   @102473 // ~les membres du groupe~
+		        SPRINT ofTheTarget @101088 // ~des membres du groupe~
+		        SPRINT toTheTarget @101182 // ~aux membres du groupe~
+	        END
+	    END
 
-	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-		PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN
-			PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
-		END
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			PATCH_IF probability == 100 AND (~%macro%~ STRING_MATCHES_REGEXP ~_probability$~) == 0 BEGIN
+				PATCH_FAIL "%item%: %SOURCE_FILE%: probabilite differentes du 177 et de l'effet pointe."
+			END
 
-		PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
-            LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
-        END
-        ELSE BEGIN
-			PATCH_TRY
-				// Si la macro n'existe pas, on considère comme valide
-				PATCH_TRY LPM ~opcode_%opcode_n%_is_valid~ WITH DEFAULT SET isValid = 1 END
-				PATCH_IF isValid == 1 BEGIN
+			PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+	            LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Les 2 parametres doivent avoir la valeur 0~ END
+	        END
+	        ELSE BEGIN
+				PATCH_TRY
 					PATCH_IF probability < 100 OR parentProbability < 100 BEGIN
 						SPRINT method ~%macro%probability_%opcode%~
 						LPM ~%method%~
@@ -223,24 +223,24 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 						SPRINT method ~%macro%%opcode%~
 						LPM ~%method%~
 					END
+				WITH
+					~Failure("Unknown macro: \%method%")~
+					BEGIN
+						PATCH_FAIL ~Failure("Unknown macro: %method%")~
+					END
+					DEFAULT
+						PATCH_FAIL ~%ERROR_MESSAGE%~
 				END
-			WITH
-				~Failure("Unknown macro: \%method%")~
-				BEGIN
-					PATCH_FAIL ~Failure("Unknown macro: %method%")~
-				END
-				DEFAULT
-					PATCH_FAIL ~%ERROR_MESSAGE%~
-			END
-        END
-	END
-	ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
-	END
+	        END
+		END
+		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+		END
 
-	LPM ~add_condition~
-	LPM ~add_duration~
-	LPM ~add_save~
+		LPM ~add_condition~
+		LPM ~add_duration~
+		LPM ~add_save~
+	END
 END
 
 DEFINE_PATCH_MACRO ~add_condition~ BEGIN
