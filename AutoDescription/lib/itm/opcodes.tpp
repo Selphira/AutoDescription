@@ -975,29 +975,32 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET flagTransfert = 0
 	SET flagFistDamage = 0
 	SET flagSaveForHalf = 0
+	SET flagFailForHalf = 0
 	SET flagDontWake = 0
+	SET isCumulative = 0
 
 	PATCH_IF is_ee == 1 BEGIN
-		SET flagDrain = (((special BAND BIT0) == BIT0 AND (special BAND BIT1) == 0) OR ((special BAND BIT3) == BIT3 AND (special BAND BIT4) == 0))
-		SET flagTransfert = (((special BAND BIT1) == BIT1 AND (special BAND BIT0) == 0) OR ((special BAND BIT4) == BIT4 AND (special BAND BIT3) == 0))
-		SET flagFistDamage = (special BAND BIT2) == BIT2
-		SET flagSaveForHalf = (special BAND BIT8) == BIT8
-		SET flagDontWake = (special BAND BIT10) == BIT10
-		//TODO: BIT9: Pas compris l'utilité
+		SET flagDrain = special == BIT0 OR special == BIT3
+		SET flagTransfert = special == BIT1 OR special == BIT4
+		// FIXME
+		SET flagFistDamage = (special BAND BIT2) > 0
+		SET flagSaveForHalf = (special BAND BIT8) > 0
+		// TODO
+		SET flagFailForHalf = (special BAND BIT9) > 0
+		SET flagDontWake = (special BAND BIT10) > 0
+		// TODO
+		SET isCumulative = special == BIT0 OR special == BIT1
 	END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strref_2 = 0 strref_3 = 0 RET description BEGIN
 	SET damageAmount = %parameter1%
-	SET type = %parameter2%
-	SET subType = type MODULO 4
+	SET mode = parameter2 BAND 65535
+	SET type = parameter2 - mode
 	SET saveForHalf = flagSaveForHalf
 	SPRINT description ~~
 
-	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
-		PATCH_FAIL "%SOURCE_FILE% : Type de degat '%type%' pour le opcode 12 pas encore gere"
-	END
-
+	// FIXME : pas du tout des dégâts de poing, explication dans la conv'
 	PATCH_IF flagFistDamage == 1 BEGIN
 		SPRINT damageType @10120033 // ~points de dégâts de poing~
 	END
@@ -1007,7 +1010,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	END
 
 	// Dégâts basiques
-	PATCH_IF subType == 0 BEGIN
+	PATCH_IF mode == 0 BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
 
 		INNER_PATCH_SAVE damage ~%damage%~ BEGIN
@@ -1019,15 +1022,15 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		END
 	END
 	// Set to value
-	ELSE PATCH_IF subType == 1 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: subType 1 à gérer"
+	ELSE PATCH_IF mode == 1 BEGIN
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 1 a gerer"
 	END
 	// Set to Percentage
-	ELSE PATCH_IF subType == 2 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: subType 2 à gérer"
+	ELSE PATCH_IF mode == 2 BEGIN
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 2 a gerer"
 	END
 	// Reduce by Percentage
-	ELSE PATCH_IF subType == 3 BEGIN
+	ELSE PATCH_IF mode == 3 BEGIN
 		SET value = damageAmount
 		SPRINT value @10002 // ~%value% %~
 		LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END
@@ -1036,6 +1039,22 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	PATCH_IF flagDontWake == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT dontWakeUp @10120040 // ~Ne réveille pas la cible~
 		SPRINT description ~%description% (%dontWakeUp%)~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
+	// On scinde paramater2 en deux blocs
+	// On pourrait mettre des SET pour les utiliser ailleurs mais je considère que ce bloc est facultatif
+	LOCAL_SET mode = parameter2 BAND 65535
+	LOCAL_SET damage_type = parameter2 - mode
+
+	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %parameter1%.~ END
+	END
+	PATCH_IF mode > 3 OR mode < 0 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %parameter1%.~ END
 	END
 END
 
