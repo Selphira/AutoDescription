@@ -473,9 +473,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	217 => 1
 END
 
-ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_with_timing_permanent~ BEGIN
-END
-
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
 	  4 => 1
 	 43 => 1
@@ -1203,12 +1200,17 @@ DEFINE_PATCH_MACRO ~opcode_party_17~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
+	// TODO
+	PATCH_IF parameter2 > 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %parameter2%.~ END
+	END
+
 	SET damageAmount = parameter1
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 
 	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
-			PATCH_IF ~%value%~ STRING_EQUAL ~1~ BEGIN
+			PATCH_IF ~%value%~ STRING_EQUAL ~+1~ BEGIN
 				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne 1 point de vie~
 			END
 			ELSE BEGIN
@@ -1229,6 +1231,13 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 				LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
 			END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter2%.~ END
 	END
 END
 
@@ -8139,7 +8148,7 @@ DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter2%.~ END
 	END
 END
 
@@ -8147,6 +8156,6 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown method %parameter2%.~ END
 	END
 END
