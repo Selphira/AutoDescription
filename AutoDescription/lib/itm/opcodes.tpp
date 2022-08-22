@@ -453,6 +453,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	  2 => 1
 	  4 => 1
 	 11 => 1
+	 12 => 1
+	 13 => 1
+	 17 => 1
 	 32 => 1
 	 46 => 1
 	 47 => 1
@@ -468,6 +471,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	161 => 1
 	210 => 1
 	217 => 1
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_with_timing_permanent~ BEGIN
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
@@ -1086,14 +1092,17 @@ END
  * Stat: Dexterity Modifier [15] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_15~ BEGIN
+	LPM ~opcode_15_common~
 	LPF ~opcode_mod~ INT_VAR strref = 10150001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dextérité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_15~ BEGIN
+	LPM ~opcode_15_common~
 	LPF ~opcode_target~ INT_VAR strref = 10150002 RET description END // ~la dextérité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_15~ BEGIN
+	LPM ~opcode_15_common~
 	LPF ~opcode_probability~ INT_VAR strref = 10150002 RET description END // ~la dextérité~
 END
 
@@ -1101,42 +1110,58 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_15~ BEGIN
 	LPM ~opcode_self_probability_15~
 END
 
+DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
+	PATCH_IF parameter2 == 3 BEGIN
+		SET parameter2 = 0
+		PATCH_IF is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 BEGIN
+			// TODO? efficace que si dextérité de base < 20
+			// peut être différent de 1 selon la présence de CLSSPLAB.2da
+			SET parameter1 = 1
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_15_is_valid~ BEGIN
+	LPM ~opcode_modstat3_is_valid~
+END
+
 /* ----------------- *
  * State: Haste [16] *
  * ----------------- */
+// TODO : parameter2 == 1 : l'APR est arrondie au supérieur, 1 => 1, 3/2 => 2
 DEFINE_PATCH_MACRO ~opcode_self_16~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @10160001 // ~Hâte~
-	END
-	ELSE PATCH_IF parameter2 == 1 BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @10160002 // ~Hâte améliorée~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF parameter2 == 2 BEGIN
 		SPRINT description @10160003 // ~Hâte (sans bonus d'attaque par round)~
+	END
+	ELSE BEGIN
+		SPRINT description @10160001 // ~Hâte~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_16~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @10160004 // ~de lancer Hâte sur %theTarget%~
-	END
-	ELSE PATCH_IF parameter2 == 1 BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @10160005 // ~de lancer Hâte améliorée sur %theTarget%~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF parameter2 == 2 BEGIN
 		SPRINT description @10160006 // ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10160004 // ~de lancer Hâte sur %theTarget%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_16~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @10160007 // ~Lance Hâte sur %theTarget%~
-	END
-	ELSE PATCH_IF parameter2 == 1 BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @10160008 // ~Lance Hâte améliorée sur %theTarget%~
 	END
-	ELSE BEGIN
+	PATCH_IF parameter2 == 2 BEGIN
 		SPRINT description @10160009 // ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10160007 // ~Lance Hâte sur %theTarget%~
 	END
 END
 
