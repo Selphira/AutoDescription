@@ -850,7 +850,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_5_is_valid~ BEGIN
 	PATCH_IF NOT (paramater2 >= 0 AND parameter2 <= 5 OR paramater2 >= 1000 AND parameter2 <= 1005) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
 	END
 END
 
@@ -978,15 +978,16 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET flagFailForHalf = 0
 	SET flagDontWake = 0
 	SET isCumulative = 0
+	SET mode = parameter2 BAND 65535
 
 	PATCH_IF is_ee == 1 BEGIN
 		SET flagDrain = special == BIT0 OR special == BIT3
 		SET flagTransfert = special == BIT1 OR special == BIT4
 		// FIXME
 		SET flagFistDamage = (special BAND BIT2) > 0
-		SET flagSaveForHalf = (special BAND BIT8) > 0
+		SET flagSaveForHalf = (special BAND BIT8) > 0 AND mode == 0
 		// TODO
-		SET flagFailForHalf = (special BAND BIT9) > 0
+		SET flagFailForHalf = (special BAND BIT9) > 0 AND mode == 0
 		SET flagDontWake = (special BAND BIT10) > 0
 		// TODO
 		SET isCumulative = special == BIT0 OR special == BIT1
@@ -1000,22 +1001,20 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	SET saveForHalf = flagSaveForHalf
 	SPRINT description ~~
 
-	// FIXME : pas du tout des dégâts de poing, explication dans la conv'
-	PATCH_IF flagFistDamage == 1 BEGIN
-		SPRINT damageType @10120033 // ~points de dégâts de poing~
-	END
-	ELSE BEGIN
-		SET type = $damage_types(~%type%~)
-		LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
+	// Les dés influencent tous les modes
+	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
+	INNER_PATCH_SAVE damage ~%damage%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 	END
 
 	// Dégâts basiques
 	PATCH_IF mode == 0 BEGIN
-		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
-
-		INNER_PATCH_SAVE damage ~%damage%~ BEGIN
-			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-		END
+		// aucune influence des types de dégâts pour le mode 1, 2 et 3
+		// ni dans les logs, ni dans les résistances, ni dans l'opcode 332
+		// il faudrait donc rendre la partie %damageType% facultative
+		// pourrait également être utile pour le mode 0 avec un type de dégâts inconnu
+		SET type = $damage_types(~%type%~)
+		LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref = strref_0 opcode RET description = string END
@@ -1023,22 +1022,28 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	END
 	// Set to value
 	ELSE PATCH_IF mode == 1 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 1 a gerer"
+		PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
+			SET damage = ~0~
+		END
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 1 a gerer : les points de vie de la cible passent a %damage%"
 	END
 	// Set to Percentage
 	ELSE PATCH_IF mode == 2 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 2 a gerer"
+		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
+			PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 2 a gerer : les points de vie de la cible passent à %damage% % de ses pv max"
+		END
 	END
 	// Reduce by Percentage
 	ELSE PATCH_IF mode == 3 BEGIN
-		SET value = damageAmount
-		SPRINT value @10002 // ~%value% %~
-		LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 3 a gerer : la cible perd %damage% % de ses pv max"
 	END
 
 	PATCH_IF flagDontWake == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT dontWakeUp @10120040 // ~Ne réveille pas la cible~
 		SPRINT description ~%description% (%dontWakeUp%)~
+	END
+	PATCH_IF flagFistDamage == 1 BEGIN
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est efficace que si la source est désarmée"
 	END
 END
 
@@ -1050,11 +1055,11 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %mode%.~ END
 	END
 END
 
