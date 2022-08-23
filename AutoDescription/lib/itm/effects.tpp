@@ -264,7 +264,8 @@ DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
-	PATCH_IF NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) AND opcode != 177 AND opcode != 183 AND opcode != 283 AND ignoreDuration == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	// durée ou pas, un effet peut avoir un délai avant fonctionnement
+	PATCH_IF (timingMode == TIMING_delayed OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND opcode != 177 AND opcode != 183 AND opcode != 283 AND ignoreDuration == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
@@ -435,9 +436,27 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
+	// TODO timingMode == 3 => ~ pendant et après X secondes
+	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration BEGIN
+		SET timingMode = TIMING_permanent
+	END
+	ELSE PATCH_IF timingMode == 6 BEGIN
+		SET timingMode = TIMING_duration
+		SET duration = duration * 16 / 15
+	END
+	ELSE PATCH_IF timingMode == 7 BEGIN
+		SET timingMode = TIMING_delayed
+		SET duration = duration / 15
+	END
+	// TODO ~ TIMING_while_equipped + delay
+	ELSE PATCH_IF timingMode == 8 BEGIN
+		SET timingMode = 5
+		SET duration = duration / 15
+	END
+
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_permanent_after_death BEGIN
 		SET found = 0
-		PATCH_FOR_EACH cOpcode IN 12 13 20 23 24 32 55 58 68 75 77 79 81 116 125 146 148 161 162 177 214 218 230 233 238 244 261 273 280 316 BEGIN
+		PATCH_FOR_EACH cOpcode IN 20 23 24 32 55 58 68 75 77 79 81 116 125 146 148 161 162 177 214 218 230 233 238 244 261 273 280 316 BEGIN
 			PATCH_IF opcode == cOpcode BEGIN
 				SET found = 1
 			END
