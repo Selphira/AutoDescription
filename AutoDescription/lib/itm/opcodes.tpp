@@ -984,8 +984,8 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET mode = parameter2 BAND 65535
 
 	PATCH_IF is_ee == 1 BEGIN
-		SET flagDrain = special == BIT0 OR special == BIT3
-		SET flagTransfert = special == BIT1 OR special == BIT4
+		SET flagDrain = ((special BAND 0b11011) == BIT0 OR (special BAND 0b11011) == BIT3)
+		SET flagTransfert = ((special BAND 0b11011) == BIT1 OR (special BAND 0b11011) == BIT4)
 		// FIXME
 		SET flagFistDamage = (special BAND BIT2) > 0
 		SET flagSaveForHalf = (special BAND BIT8) > 0 AND mode == 0
@@ -993,7 +993,7 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 		SET flagFailForHalf = (special BAND BIT9) > 0 AND mode == 0
 		SET flagDontWake = (special BAND BIT10) > 0
 		// TODO
-		SET isCumulative = special == BIT0 OR special == BIT1
+		SET isCumulative = ((special BAND 0b11011) == BIT0 OR (special BAND 0b11011) == BIT1)
 	END
 END
 
