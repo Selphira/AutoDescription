@@ -1,0 +1,33 @@
+	
+AMUL17.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
+AMUL17.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
+AX1H19.ITM : Opcode 81: Les 2 parametres doivent avoir la valeur 0
+AX1H19.ITM : Opcode 112 à gérer.
+CHALCY3.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
+CHALCY3.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
+CLCK04.ITM : Opcode 172 : La ressource spinhum.spl n'existe pas.
+CLCK24.ITM : Opcode 197 : Réflection du type de projectile '205'
+CLCK24.ITM : Opcode 197 : Réflection du type de projectile '320'
+HELM35.ITM : Opcode 83: TODO: self_probability
+JWSUPER.ITM : Opcode 206 : La ressource spin572.spl n'existe pas.
+JWSUPER.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
+JWSUPER.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
+JWSUPER.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
+RING09.ITM : Opcode 206 : La ressource spin572.spl n'existe pas.
+RING09.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
+RING09.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
+RING09.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
+SHLD08P.ITM : Opcode 206 : La ressource spwish27.spl n'existe pas.
+SHLD08P.ITM : Opcode 206 : La ressource spwish32.spl n'existe pas.
+SHLD08P.ITM : Opcode 206 : La ressource spwish35.spl n'existe pas.
+SHLD08P.ITM : Opcode 206 : La ressource sppr725d.spl n'existe pas.
+SHLD08P.ITM : Unknown macro: opcode_target_1
+SHLD08P.ITM : FAILURE: opcode 326: Failure("Unknown macro: opcode_target_1")
+SHLD08P.ITM : FAILURE: opcode 232: Failure("Opcode 326: Failure(\"Unknown macro: opcode_target_1\")")
+SW1P01.ITM : Unknown macro: opcode_target_233
+SW1P01.ITM : FAILURE: opcode 232: Failure("Unknown macro: opcode_target_233")
+SW2H06.ITM : Opcode 206 : La ressource spin572.spl n'existe pas.
+SW2H06.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
+SW2H06.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
+SW2H06.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
+SW2HD1.ITM : opcode 221: Traduction 100214 manquante
