@@ -672,6 +672,13 @@
 @10130001 = ~Tue instantanément %theTarget%~
 @10130002 = ~de tuer instantanément %theTarget%~
 
+// Opcode 14: Graphics: Defrost [14]
+
+// TODO
+@10140001 = ~Dissipation de la congélation~
+@10140002 = ~de décongeler %theTarget%~
+@10140003 = ~Décongèle %theTarget%~
+
 // Opcode 15: Stat: Dexterity Modifier [15]
 
 @10150001 = ~Dextérité~

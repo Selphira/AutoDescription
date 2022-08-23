@@ -264,7 +264,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	  7 => 0 // Colour: Set Character colours by Palette
 	  8 => 0 // Colour: Change by RGB [8]
 	  9 => 0 // Colour: Glow Pulse
-	 14 => 0 // Graphics: Defrost [14]
 	 41 => 0 // Graphics: Sparkle [41]
 	 50 => 0 // Colour: Glow by RGB (Brief)
 	 51 => 0 // Colour: Strong/Dark by RGB [51]
@@ -380,7 +379,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_magic_fire%~  => 10120030 //  33554432 ~points de dégâts de feu magique~
 	~%DAMAGETYPE_magic_cold%~  => 10120031 //  67108864 ~points de dégâts de froid magique~
 	~%DAMAGETYPE_stunning%~    => 10120032 // 134217728 ~points de dégâts non létal~
-	~%DAMAGETYPE_piercing_reduce_by_percentage%~ => 10120025 //   1048579 ~points de dégâts perforants~
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
@@ -455,6 +453,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 11 => 1
 	 12 => 1
 	 13 => 1
+	 14 => 1
 	 17 => 1
 	 32 => 1
 	 46 => 1
@@ -1083,6 +1082,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
 	SPRINT description @10130002 // ~de tuer instantanément %theTarget%~
+END
+
+/* ----------------------------- *
+ * Graphics: Defrost [14] *
+ * ----------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_14~ BEGIN
+	SPRINT description @10140001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_14~ BEGIN
+	SPRINT description @10140002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_14~ BEGIN
+	SPRINT description @10140003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_14~ BEGIN
+	LPM ~opcode_self_probability_14~
 END
 
 /* ----------------------------- *
@@ -8084,78 +8102,4 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_probability_146_item_revision~ BE
 	DVVORPAL => 102491 // ~de décapiter %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons à -2 pour éviter)~
 	DVVTRSPH => 102515 // ~d'infliger 4d4 points de dégâts d'acide à la cible et aux adversaires dans un rayon de 1,50 mètre~
 	DVWEB    => 102510 // ~d'entoiler %theTarget% pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~
-	DVWHIRLS => 102526 // ~d'infliger 1d6 +2 points de dégâts contondants aux adversaires dans un rayon d'1,50 mètre~
-	// Autres
-	RR#WEAR  => 10020001 // ~d'endormir %theTarget% (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~
-	RR#BBOW  => 102602 // ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter, les spectateurs ont une pénalité de -5)~
-	RR#SCAXE => 102603 // ~d'étourdir la cible pendant 1 round~
-END
-
-/* ----------------------------------------------------------------------------------- *
- * Gestion de la pénalité à la vitesse d'incantation sur les armures ajoutée par IR v4 *
- * ----------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~opcode_self_177_item_revision_casting_penality~ RET description forceSort sort BEGIN
-	SET forceSort = 0
-	SET sort = 0
-	SPRINT description ~~
-	INNER_PATCH_SAVE value ~%resref%~ BEGIN
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(.*\)\([0-9]+\)$~ ~-\2~
-	END
-	PATCH_IF parameter1 == 1 BEGIN // mage
-		SET forceSort = 1
-		SET sort = $sort_opcodes(~189~) // Après Stat: Casting Time Modifier [189]
-		SET parameter2 = MOD_TYPE_cumulative
-		LPF ~opcode_mod~ INT_VAR strref = 102478 STR_VAR value RET description END // ~Vitesse d'incantation des sorts profanes~
-		SET exceptBards = 1
-        INNER_PATCH_FILE ~%SOURCE_FILE%~ BEGIN
-            GET_OFFSET_ARRAY blockOffsets_177 ITM_V10_GEN_EFFECTS
-            PHP_EACH blockOffsets_177 AS int => blockOffset_177 BEGIN
-                READ_SHORT (blockOffset_177)                  opcode_177
-                READ_BYTE  (blockOffset_177 + EFF_parameter1) parameter1_177
-                READ_ASCII (blockOffset_177 + EFF_resref_key) resref_177
-                PATCH_IF opcode_177 == 177 AND ~%resref_177%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 AND parameter1_177 == 5 BEGIN // Barde
-                    SET exceptBards = 0
-                END
-            END
-        END
-        PATCH_IF exceptBards == 1 BEGIN
-            SPRINT except @102480 // ~excepté pour les bardes~
-            SPRINT description ~%description% (%except%)~
-        END
-	END
-	ELSE PATCH_IF parameter1 == 3 BEGIN // clerc
-		SET forceSort = 1
-		SET sort = 35
-		SET parameter2 = MOD_TYPE_cumulative
-		LPF ~opcode_mod~ INT_VAR strref = 102479 STR_VAR value RET description END // ~Vitesse d'incantation des sorts divins~
-	END
-END
-
-
-// Macro pour opcode de modificateur de caractéristiques
-DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
-	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
-		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
-	END
-	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
-		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
-	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
-	LPM ~opcode_modstat_is_valid~
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
-		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
-	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
-	LPM ~opcode_modstat_is_valid~
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
-		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
-	END
-END
+	DVWHIRLS => 102526 // ~d'infliger 1d6 +2 points de dégâts contondants
