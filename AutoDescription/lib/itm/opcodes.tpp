@@ -1220,8 +1220,19 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
 	// TODO
-	PATCH_IF parameter2 > 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %parameter2%.~ END
+	SET type = parameter2 BAND 65535
+	SET subType = parameter2 / 65535
+	// Ramène la cible à la vie (avec 1 pv) puis la soigne
+	SET isRez = healType BAND BIT0 > 0
+	// Dissipe tous les effets non permanent_after_death puis la soigne
+	SET purgeEff = healType BAND BIT1 > 0
+	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
+
+	PATCH_IF type > 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: type non gere : %type%.~ END
+	END
+	PATCH_IF isRez OR purgeEff BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
 	SET damageAmount = parameter1
@@ -1254,9 +1265,10 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
+	SET type = parameter2 BAND 65535
+	PATCH_IF type < MOD_TYPE_cumulative OR type > MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
