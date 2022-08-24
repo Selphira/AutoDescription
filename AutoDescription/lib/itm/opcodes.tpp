@@ -1468,7 +1468,7 @@ DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
 	// Les timings 4 et 7 ajoutent un délai entre le moment où l'effet est lancé et le moment où l'effet s'active
 	// Une fois le délai écoulé, l'effet est appliqué avec un timing 1, donc...
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
-		isValid = 0
+		SET isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
@@ -1589,43 +1589,42 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_25~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
-	SET amount1 = parameter1
-	SET amount2 = 0
-	SET frequencyMultiplier = 1
 	SET amount = 0
+	SET frequencyMultiplier = 1
 	SET frequency = 1
+	SET p4IsActive = VARIABLE_IS_SET parameter4 AND parameter4 != 0
+	SET type = parameter2
 
-	PATCH_IF (parameter2 == 0 AND amount != 0) OR (parameter2 == 1 AND amount > 1) OR parameter2 == 3 BEGIN
+	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
+	// Compliqué de faire une phrase simple
+	PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) OR
+			 (type == 1 AND (parameter1 > 1 OR p4IsActive)) BEGIN
 		SET amount = 1
 	END
-	ELSE PATCH_IF parameter2 == 2 BEGIN
-		SET amount = amount1
+	ELSE PATCH_IF type == 2 AND parameter1 > 0 BEGIN
+		SET amount = parameter1
 	END
-	ELSE PATCH_IF parameter2 == 4 BEGIN
-		SET amount = 3
+	ELSE PATCH_IF type == 3 BEGIN
+		SET amount = 1
+		SET frequency = parameter1
+	END
+	ELSE PATCH_IF type == 4 AND VARIABLE_IS_SET parameter3 BEGIN
+		SET amount = parameter3
+		SET frequency = parameter1
 	END
 
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
-			SET amount2 = parameter3
-			SET frequencyMultiplier = parameter4
-		END
-
-		PATCH_IF parameter2 == 4 BEGIN
-			SET amount = amount2
-		END
-
-		PATCH_IF parameter2 == 2 BEGIN
-			SET frequency = frequencyMultiplier
-		END
-		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1 * frequencyMultiplier
+	PATCH_IF p4IsActive AND type >= 2 BEGIN
+		SET frequency = frequency * parameter4
+		// P4 divise également les dégâts si P2 == 2, avec un minimum à 1
+		PATCH_IF type == 2 BEGIN
+			SET amount = amount / parameter4
+			PATCH_IF amount < 1 BEGIN
+				amount = 1
+			END
 		END
 	END
-	ELSE BEGIN
-		PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1
-		END
+	PATCH_IF frequency < 1 BEGIN
+		SET frequency = 1
 	END
 
 	PATCH_IF amount == 1 AND frequency == 1 BEGIN
@@ -1642,6 +1641,23 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
 		SET strref += 3
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts toutes les %frequency% secondes~
+	END
+	ELSE PATCH_IF amount < 0 BEGIN
+		// TODO: Dans le cas où P2 == 4 et & P3 < 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
+	PATCH_IF timingMode == TIMING_permanent OR
+			 timingMode == TIMING_delayed OR
+			 timingMode == 7 OR
+			 timingMode == TIMING_permanent_after_death BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+	END
+	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
 	END
 END
 
