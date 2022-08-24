@@ -437,6 +437,8 @@ END
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
 	// TODO timingMode == 3 => ~ pendant et après X secondes
+	// FIXME, il peut avoir certaines subtilités entre un vrai timing 1 et un timing X
+	// Il faudrait considérer un nouveau timing dont l'effet à mi-chemin entre le 1 et le 9
 	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration BEGIN
 		SET timingMode = TIMING_permanent
 	END
