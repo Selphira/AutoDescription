@@ -412,6 +412,7 @@ DEFINE_PATCH_FUNCTION ~get_probability~ INT_VAR probability1 = 0 probability2 = 
 END
 
 
+// FIXME : étrange de d'avoir une méthode qui peut renvoyer un int ou un str
 DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 damageAmount = 0 RET damage BEGIN
 	SPRINT ~damage~ ~~
 

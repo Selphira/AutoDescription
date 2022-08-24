@@ -1223,9 +1223,9 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 	SET type = parameter2 BAND 65535
 	SET subType = parameter2 / 65535
 	// Ramène la cible à la vie (avec 1 pv) puis la soigne
-	SET isRez = healType BAND BIT0 > 0
+	SET isRez = subType BAND BIT0 > 0
 	// Dissipe tous les effets non permanent_after_death puis la soigne
-	SET purgeEff = healType BAND BIT1 > 0
+	SET purgeEff = subType BAND BIT1 > 0
 	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
 
 	PATCH_IF type > 0 BEGIN
@@ -1277,17 +1277,40 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_18~ BEGIN
 	LPM ~opcode_18_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
-	LPM ~opcode_18_not_cumulative~
+	// TODO opcode_mod mais pour les valeurs type xDy+z
+	PATCH_IF diceCount > 0 BEGIN
+		PATCH_IF healOnlyMaxPV == 1 BEGIN
+			SPRINT sentence @10180001
+		END
+		ELSE BEGIN
+			SPRINT sentence @10180003
+		END
+		// Non maintenable ?
+		SPRINTF description "%s %s" (~%sentence%~ ~%value%~)
+	END
+	ELSE BEGIN
+		PATCH_IF healOnlyMaxPV == 1 BEGIN
+			LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+		END
+		ELSE BEGIN
+			LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+		END
+	END
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
 
-	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	END
+	ELSE BEGIN
+		SPRINT theStatistic @10180004 // ~les points de vie actuel et maximum~
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 > 0 BEGIN
+        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -1303,16 +1326,21 @@ DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 		SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
 	END
 
-	LPM ~opcode_18_not_cumulative~
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 	LPM ~opcode_18_common~
 
-	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	END
+	ELSE BEGIN
+		SPRINT theStatistic @10180004 // ~les points de vie actuel et maximum~
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 > 0 BEGIN
+        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -1328,7 +1356,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 		SPRINT description @102546 // ~de multiplier %theStatistic% %ofTheTarget% par %value%~
 	END
 
-	LPM ~opcode_18_not_cumulative~
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
@@ -1336,28 +1364,25 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
-	SET isCumulative = 1
+	// SET isCumulative = parameter2 != 6
 	SET damageAmount = parameter1
+	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5
+	SET parameter2 = parameter2 MODULO 3
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-
-	PATCH_IF parameter2 == 6 BEGIN
-		SET isCumulative = 0
-	END
-
-	PATCH_IF parameter2 == 3 OR parameter2 == 6 BEGIN
-		SET parameter2 = MOD_TYPE_cumulative
-	END
-	ELSE PATCH_IF parameter2 == 4 BEGIN
-		SET parameter2 = MOD_TYPE_flat
-	END
-	ELSE PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
 END
 
+/*
 DEFINE_PATCH_MACRO ~opcode_18_not_cumulative~ BEGIN
 	PATCH_IF isCumulative == 0 AND is_ee == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @101185 // ~%description% (non cumulable)~
+	END
+END
+*/
+
+DEFINE_PATCH_MACRO ~opcode_18_is_valid~ BEGIN
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR (parameter2 > 5 AND is_ee == 0 OR parameter2 > 6) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
