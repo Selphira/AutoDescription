@@ -698,12 +698,12 @@
 
 // Opcode 17: HP: Current HP Modifier [17]
 
-@10170001 = ~Soigne 1 point de vie %toTheTarget%~
-@10170002 = ~Soigne %value% points de vie %toTheTarget%~
+@10170001 = ~Soigne 1 point de vie %ofTheTarget%~
+@10170002 = ~Soigne %value% points de vie %ofTheTarget%~
 @10170003 = ~Inflige 1 point de dégâts %toTheTarget%~
 @10170004 = ~Inflige %value% points de dégâts %toTheTarget%~
-@10170005 = ~de soigner 1 point de vie %toTheTarget%~
-@10170006 = ~de soigner %value% points de vie %toTheTarget%~
+@10170005 = ~de soigner 1 point de vie %ofTheTarget%~
+@10170006 = ~de soigner %value% points de vie %ofTheTarget%~
 @10170007 = ~d'infliger 1 point de dégâts %toTheTarget%~
 @10170008 = ~d'infliger %value% points de dégâts %toTheTarget%~
 

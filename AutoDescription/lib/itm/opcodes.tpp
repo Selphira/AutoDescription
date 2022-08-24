@@ -1266,7 +1266,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
 	SET type = parameter2 BAND 65535
-	PATCH_IF type < MOD_TYPE_cumulative OR type > MOD_TYPE_percentage BEGIN
+	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
@@ -1447,30 +1447,26 @@ END
  * Stat: Lore Modifier [21] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Connaissance~
-	END
+	LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Connaissance~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_target~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
-	END
+	LPF ~opcode_target~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_probability~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
-	END
+	LPF ~opcode_probability~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPM ~opcode_self_probability_21~
+	LPM ~opcode_self_probability_21~
+END
+
+DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
+		isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
