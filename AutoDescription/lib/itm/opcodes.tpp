@@ -1464,6 +1464,9 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+	// L'effet ne fonctionne pas avec un timing ==  1
+	// Les timings 4 et 7 ajoutent un délai entre le moment où l'effet est lancé et le moment où l'effet s'active
+	// Une fois le délai écoulé, l'effet est appliqué avec un timing 1, donc...
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
 		isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
@@ -1533,12 +1536,19 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_23~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
-	PATCH_IF is_ee == 0 OR (is_ee == 1 AND special == 0) BEGIN
+	PATCH_IF is_ee == 0 OR special == 0 BEGIN
 		//TODO: Pour ce cas, plutot avoir une phrase du genre: Le moral est à son maximum
 		SET parameter1 = 10
 		SET parameter2 = MOD_TYPE_flat
 	END
 END
+
+DEFINE_PATCH_MACRO ~opcode_23_is_valid~ BEGIN
+	PATCH_IF is_ee == 1 BEGIN
+		LPM ~opcode_modstat2_is_valid~
+	END
+END
+
 
 /* ------------------ *
  * State: Horror [24] *
