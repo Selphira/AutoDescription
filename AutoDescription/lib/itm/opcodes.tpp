@@ -1544,7 +1544,7 @@ DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_23_is_valid~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
+	PATCH_IF is_ee == 1 AND special != 0 BEGIN
 		LPM ~opcode_modstat2_is_valid~
 	END
 END
