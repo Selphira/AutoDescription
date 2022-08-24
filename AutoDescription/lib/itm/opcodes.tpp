@@ -1405,6 +1405,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_19~ BEGIN
 	LPM ~opcode_self_probability_19~
 END
 
+DEFINE_PATCH_MACRO ~opcode_19_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------ *
  * State: Invisibility [20] *
  * ------------------------ */
