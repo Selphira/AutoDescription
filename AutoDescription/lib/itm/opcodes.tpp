@@ -1990,12 +1990,23 @@ END
 /* --------------------------- *
  * State: Unconsciousness [39] *
  * --------------------------- */
+// TODO: P2 == 1: endort profondemment la cible (ne se réveille si subit des dégâts)
 DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
-	SPRINT description @10390001 // ~Endort %theTarget%~
+	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+		SPRINT description @10390001 // ~Endort %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10390003 // ~Endort profondément %theTarget%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_39~ BEGIN
-	SPRINT description @10390002 // ~d'endormir %theTarget%~
+	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+		SPRINT description @10390002 // ~d'endormir %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10390004 // ~d'endormir profondément %theTarget%%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN

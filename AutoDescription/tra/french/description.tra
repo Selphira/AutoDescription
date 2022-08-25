@@ -823,6 +823,8 @@
 
 @10390001 = ~Endort %theTarget%~
 @10390002 = ~d'endormir %theTarget%~
+@10390003 = ~Endort profondément %theTarget%~
+@10390004 = ~d'endormir profondément %theTarget%~
 
 // Opcode 40: State: Slow [40]
 
