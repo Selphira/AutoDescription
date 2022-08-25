@@ -155,6 +155,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 46 => 214 // Cure: Stun (Unstun) [46]
 	 47 => 215 // Cure: Invisibility [47]
 	 43 => 216 // Cure: Stone to Flesh [43]
+	 14 => 216 // Graphics: Defrost [14]
 	  2 => 217 // Cure: Sleep [2]
 	242 => 218 // Cure: Confusion [242]
 	 70 => 219 // Cure: Non-Detection [2]
@@ -1701,6 +1702,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_27~ BEGIN
 	LPM ~opcode_self_probability_27~
 END
 
+DEFINE_PATCH_MACRO ~opcode_27_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ----------------------------------- *
  * Stat: Cold Resistance Modifier [28] *
  * ----------------------------------- */
@@ -1720,6 +1725,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_28~ BEGIN
 	LPM ~opcode_self_probability_28~
+END
+
+DEFINE_PATCH_MACRO ~opcode_28_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------------------ *
@@ -1743,6 +1752,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_29~ BEGIN
 	LPM ~opcode_self_probability_29~
 END
 
+DEFINE_PATCH_MACRO ~opcode_29_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ----------------------------------- *
  * Stat: Fire Resistance Modifier [30] *
  * ----------------------------------- */
@@ -1764,6 +1777,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_30~ BEGIN
 	LPM ~opcode_self_probability_30~
 END
 
+DEFINE_PATCH_MACRO ~opcode_30_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------------- *
  * Stat: Magic Damage Resistance Modifier [31] *
  * ------------------------------------------- */
@@ -1783,6 +1800,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_31~ BEGIN
 	LPM ~opcode_self_probability_31~
+END
+
+DEFINE_PATCH_MACRO ~opcode_31_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ----------------------------- *
