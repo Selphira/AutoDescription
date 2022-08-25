@@ -1829,100 +1829,143 @@ END
  * Stat: Save vs. Death Modifier [33] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_33~ BEGIN
 	LOCAL_SPRINT versus @10330001 // ~contre la paralysie, la mort et les poisons~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la paralysie, la mort et les poisons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
+	LPM ~opcode_modstat3_is_valid~
+	PATCH_IF parameter2 > 2 AND is_ee = 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
 END
 
 /* ---------------------------------- *
  * Stat: Save vs. Wands Modifier [34] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_34~ BEGIN
 	LOCAL_SPRINT versus @10340001 // ~contre les baguettes, les sceptres et les bâtons~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_34_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ---------------------------------------------------- *
  * Stat: Save vs. Petrification/Polymorph Modifier [35] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la pétrification et la métamorphose~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_35~ BEGIN
 	LOCAL_SPRINT versus @10350001 // ~contre la pétrification et la métamorphose~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la pétrification et la métamorphose~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la pétrification et la métamorphose~
+END
+
+DEFINE_PATCH_MACRO ~opcode_35_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------------------------------- *
  * Stat: Save vs. Breath Weapons Modifier [36] *
  * ------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les souffles~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_36~ BEGIN
 	LOCAL_SPRINT versus @10360001 // ~contre les souffles~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les souffles~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les souffles~
+END
+
+DEFINE_PATCH_MACRO ~opcode_36_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ----------------------------------- *
  * Stat: Save vs. Spells Modifier [37] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_37~ BEGIN
 	LOCAL_SPRINT versus @10370001 // ~contre les sorts~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 target = 1 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les sorts~
+END
+
+DEFINE_PATCH_MACRO ~opcode_37_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------- *
