@@ -315,6 +315,11 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 			PATCH_IF saveForHalf == 1 BEGIN
 				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 			END
+			ELSE PATCH_IF flagFailForHalf == 1 BEGIN
+				// FIXME
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
+				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			END
 			ELSE BEGIN
 				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
@@ -322,6 +327,11 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
         ELSE BEGIN
 			PATCH_IF saveForHalf == 1 BEGIN
 				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
+			END
+			ELSE PATCH_IF flagFailForHalf == 1 BEGIN
+				// FIXME
+				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
+				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~

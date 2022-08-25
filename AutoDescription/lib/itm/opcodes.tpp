@@ -981,20 +981,20 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET flagSaveForHalf = 0
 	SET flagFailForHalf = 0
 	SET flagDontWake = 0
-	SET isCumulative = 0
+	SET isNotCumulative = 0
+	SET upMaxHp = 0
 	SET mode = parameter2 BAND 65535
 
 	PATCH_IF is_ee == 1 BEGIN
-		SET flagDrain = special == BIT0 OR special == BIT3
-		SET flagTransfert = special == BIT1 OR special == BIT4
-		// FIXME
+		SET flagDrain = ((special BAND 0b11011) == BIT0 OR (special BAND 0b11011) == BIT3)
+		SET flagTransfert = ((special BAND 0b11011) == BIT1 OR (special BAND 0b11011) == BIT4)
 		SET flagFistDamage = (special BAND BIT2) > 0
 		SET flagSaveForHalf = (special BAND BIT8) > 0 AND mode == 0
-		// TODO
 		SET flagFailForHalf = (special BAND BIT9) > 0 AND mode == 0
 		SET flagDontWake = (special BAND BIT10) > 0
-		// TODO
-		SET isCumulative = special == BIT0 OR special == BIT1
+		// TODO : manque l'affichage : augmente les pv max
+		SET upMaxHp = (flagDrain OR flagTransfert) AND duration > 0
+		SET isNotCumulative = (special BAND BIT3) > 0 OR (special BAND BIT4) > 0
 	END
 END
 
@@ -1013,11 +1013,13 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 
 	// Dégâts basiques
 	PATCH_IF mode == 0 BEGIN
-		// aucune influence des types de dégâts pour le mode 1, 2 et 3
-		// ni dans les logs, ni dans les résistances, ni dans l'opcode 332
-		// il faudrait donc rendre la partie %damageType% facultative
-		// pourrait également être utile pour le mode 0 avec un type de dégâts inconnu
-		SET type = $damage_types(~%type%~)
+		// Type de dégâts inconnus
+		PATCH_IF VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
+			SET type = $damage_types(~%type%~)
+		END
+		ELSE BEGIN
+			SET type = 101092 // ~points de dégâts~
+		END
 		LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
@@ -1042,11 +1044,25 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 3 a gerer : la cible perd %damage% % de ses pv max"
 	END
 
+	// Hack pour forcer l'affichage de la durée de l'augmentation des points de vie maximum
+	PATCH_IF upMaxHp BEGIN
+		SET timingMode = TIMING_duration
+		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+
+		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description ~%description% %duration%~
+			SET ignoreDuration = 1
+			PATCH_IF isNotCumulative BEGIN
+				LPM ~opcode_not_cumulative~
+			END
+		END
+	END
 	PATCH_IF flagDontWake == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT dontWakeUp @10120040 // ~Ne réveille pas la cible~
 		SPRINT description ~%description% (%dontWakeUp%)~
 	END
 	PATCH_IF flagFistDamage == 1 BEGIN
+		// FIXME : formulation
 		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est efficace que si la source est désarmée"
 	END
 END
@@ -1058,8 +1074,9 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 	LOCAL_SET damage_type = parameter2 - mode
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
-		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
+		// Passage en warning car l'effet est valide mais la valeur reste suspecte
+		// 	SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
 		SET isValid = 0
