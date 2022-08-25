@@ -1278,24 +1278,11 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_18~ BEGIN
 	LPM ~opcode_18_common~
-	// TODO opcode_mod mais pour les valeurs type xDy+z
-	PATCH_IF diceCount > 0 BEGIN
-		PATCH_IF healOnlyMaxPV == 1 BEGIN
-			SPRINT sentence @10180001
-		END
-		ELSE BEGIN
-			SPRINT sentence @10180003
-		END
-		// Non maintenable ?
-		SPRINTF description "%s %s" (~%sentence%~ ~%value%~)
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
 	END
 	ELSE BEGIN
-		PATCH_IF healOnlyMaxPV == 1 BEGIN
-			LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
-		END
-		ELSE BEGIN
-			LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
-		END
+		LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
 	END
 	// LPM ~opcode_18_not_cumulative~
 END
@@ -1367,7 +1354,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	// SET isCumulative = parameter2 != 6
 	SET damageAmount = parameter1
-	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5
+	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND special != 0
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 END
@@ -7678,16 +7665,24 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+		END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN // percent
-		SET value -= 100
-		LPF ~signed_value~ INT_VAR value RET value END
-		PATCH_IF value != 0 BEGIN
-			SPRINT value @10002 // ~%value% %~
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			PATCH_IF value != 0 BEGIN
+				SPRINT value @10002 // ~%value% %~
+			END
+		END
+		ELSE BEGIN
+			// TODO !
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
 		END
 	END
 	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
@@ -7709,7 +7704,9 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+		END
 		SPRINT value @10002 // ~%value% %~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
@@ -7724,7 +7721,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	PATCH_IF parameter2 >= 0 AND parameter2 <= 3 BEGIN
+	PATCH_IF parameter2 >= 0 AND parameter2 <= 2 BEGIN
 		LPM ~opcode_mod_percent_base~
 
 		SPRINT description @100001 // ~%name%%colon%%value%~
@@ -7739,7 +7736,7 @@ DEFINE_PATCH_FUNCTION ~opcode_target_percent~ INT_VAR strref = 0 STR_VAR value =
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
@@ -7764,7 +7761,7 @@ DEFINE_PATCH_FUNCTION ~opcode_probability_percent~ INT_VAR strref = 0 RET descri
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
