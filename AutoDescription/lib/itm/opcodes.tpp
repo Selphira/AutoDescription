@@ -2105,9 +2105,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_44~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_44_common~ BEGIN
-	PATCH_IF parameter2 == 3 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : TODO EE : Bull's Strength (EE only)~ END
-	END
+	// parameter2 == 3 efficace si Force <= 18
+	LPM ~opcode_15_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_44_is_valid~ BEGIN
+	LPM ~opcode_15_is_valid~
 END
 
 /* ---------------- *
