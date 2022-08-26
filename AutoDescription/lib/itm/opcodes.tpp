@@ -2208,6 +2208,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_49~ BEGIN
 	LPM ~opcode_self_probability_49~
 END
 
+DEFINE_PATCH_MACRO ~opcode_49_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------- *
  * Stat: THAC0 Modifier [54] *
  * ------------------------- */
