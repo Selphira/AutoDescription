@@ -458,6 +458,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 17 => 1
 	 26 => 1
 	 32 => 1
+	 43 => 1
 	 46 => 1
 	 47 => 1
 	 48 => 1
