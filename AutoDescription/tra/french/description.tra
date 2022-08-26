@@ -709,10 +709,10 @@
 
 // Opcode 18: Stat: Maximum HP Modifier [18]
 
-@10180001 = ~Points de vie maximum~
-@10180002 = ~les points de vie maximum~
-@10180003 = ~Points de vie actuel et maximum~
-@10180004 = ~les points de vie actuel et maximum~
+@10180001 = ~Points de vie maximums~
+@10180002 = ~les points de vie maximums~
+@10180003 = ~Points de vie actuels et maximums~
+@10180004 = ~les points de vie actuels et maximums~
 
 
 // Opcode 19: Stat: Intelligence Modifier [19]

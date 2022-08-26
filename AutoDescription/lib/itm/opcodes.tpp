@@ -723,7 +723,7 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 0 OR parameter2 > 4 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
@@ -742,7 +742,7 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 		)
 	BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
 	END
 END
 
@@ -854,7 +854,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_5_is_valid~ BEGIN
 	PATCH_IF NOT (paramater2 >= 0 AND parameter2 <= 5 OR paramater2 >= 1000 AND parameter2 <= 1005) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
 	END
 END
 
@@ -1063,7 +1063,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	END
 	PATCH_IF flagFistDamage == 1 BEGIN
 		// FIXME : formulation
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est efficace que si la source est désarmée"
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est n'efficace que si la source est désarmée"
 	END
 END
 
@@ -1074,9 +1074,8 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 	LOCAL_SET damage_type = parameter2 - mode
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
-		// Passage en warning car l'effet est valide mais la valeur reste suspecte
 		// 	SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
 		SET isValid = 0
@@ -1146,17 +1145,30 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
 	PATCH_IF parameter2 == 3 BEGIN
-		SET parameter2 = 0
-		PATCH_IF is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 BEGIN
-			// TODO? efficace que si dextérité de base < 20
-			// peut être différent de 1 selon la présence de CLSSPLAB.2da
-			SET parameter1 = 1
+		// TODO? efficace que si dextérité de base < 20
+		SET parameter2 = MOD_TYPE_cumulative
+		PATCH_IF NOT VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF NOT FILE_EXISTS_IN_GAME ~CLSSPLAB.2da~ BEGIN
+				SET parameter1 = 1
+			END
+			ELSE BEGIN
+				LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
+			END
+		END
+		// issu d'un EFF et paramater1 == 0: sans effet
+		ELSE PATCH_IF parameter1 == 0 BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect detected : Valeur = Valeur + 0.~ END
 		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_15_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
+	PATCH_IF is_ee == 1 BEGIN
+		LPM ~opcode_modstat3_is_valid~
+	END
+	ELSE BEGIN
+		LPM ~opcode_modstat2_is_valid~
+	END
 END
 
 /* ----------------- *
@@ -1286,7 +1298,7 @@ DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
 	SET type = parameter2 BAND 65535
 	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -1387,7 +1399,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_18_is_valid~ BEGIN
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR (parameter2 > 5 AND is_ee == 0 OR parameter2 > 6) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -1474,7 +1486,7 @@ DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
 	// Une fois le délai écoulé, l'effet est appliqué avec un timing 1, donc...
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -1649,7 +1661,7 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		// TODO: Dans le cas où P2 == 4 et & P3 < 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
 	END
 END
 
@@ -1855,8 +1867,8 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	LPM ~opcode_modstat3_is_valid~
-	PATCH_IF parameter2 > 2 AND is_ee = 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -8311,11 +8323,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
 	END
 	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
 	END
 END
 
@@ -8323,7 +8335,7 @@ DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -8331,6 +8343,6 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
