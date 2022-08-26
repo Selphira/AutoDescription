@@ -456,6 +456,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 13 => 1
 	 14 => 1
 	 17 => 1
+	 26 => 1
 	 32 => 1
 	 46 => 1
 	 47 => 1
@@ -1429,6 +1430,7 @@ END
 /* ------------------------ *
  * State: Invisibility [20] *
  * ------------------------ */
+ // TODO: parameter2 == 2 (EE)
 DEFINE_PATCH_MACRO ~opcode_self_20~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT description @10200001 // ~Invisibilité~
@@ -2058,6 +2060,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
+	LOCAL_SET spellLevelMax = 9
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10420001 RET description END
 END
@@ -2441,6 +2444,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
+	LOCAL_SET spellLevelMax = 7
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620001 RET description END
 END
@@ -8110,33 +8114,36 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 	END
 
 	PATCH_IF level == 0 BEGIN
-		// Double le nombre de sorts de niveau level et moins (pas de binaire ici !)
-		LPM ~opcode_self_42_62_get_levelstr~
-		SET strref = startStrref + 4
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
+		// Double le nombre de sorts de niveau amount et moins (pas de binaire ici !)
+		PATCH_IF amount > 0 AND amount <= spellLevelMax BEGIN
+			LPM ~opcode_self_42_62_get_levelstr~
+			SET strref = startStrref + 4
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid paramater1/parameter2 %amount%/%level%~ END
+		END
+	END
+	ELSE PATCH_IF level == 512 BEGIN
+		// Double le niveau de sorts de niveau amount
+		PATCH_IF amount > 0 AND amount <= spellLevelMax BEGIN
+			SPRINT levelStr ~%amount%~
+			SET strref = startStrref + 4
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid paramater1/parameter2 %amount%/%level%~ END
+		END
 	END
 	ELSE BEGIN
 		LPM ~opcode_self_42_62_get_levelstr~
 		PATCH_IF amount > 0 BEGIN // Mémorisation
-            PATCH_IF amount == 1 BEGIN
-    			SET strref = startStrref
-                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Mémorisation d'un sort [profane|divin] supplémentaire de niveau %levelStr%~
-            END
-            ELSE BEGIN
-    			SET strref = startStrref + 1
-                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Mémorisation de %amount% sorts [profanes|divins] supplémentaires de niveau %levelStr%~
-            END
+			SET strref = amount == 1 ? startStrref: (startStrref+1)
         END
         ELSE PATCH_IF amount < 0 BEGIN // Oubli
-            PATCH_IF amount == ~-1~ BEGIN
-    			SET strref = startStrref + 2
-                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression d'un sort [profane|divin] de niveau %levelStr%~
-            END
-            ELSE BEGIN
-    			SET strref = startStrref + 3
-                LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
-            END
+			SET strref = amount == ~-1~ ? (startStrref + 2): (startStrref + 3)
     	END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
 	END
 END
 
@@ -8147,7 +8154,7 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_FOR_EACH idx IN 0 1 2 3 4 5 6 7 8 BEGIN
+		FOR (idx = 0 ; idx < spellLevelMax ; ++idx) BEGIN
 			SET bit = EVAL ~%BIT%idx%%~
 			PATCH_IF (level BAND bit) != 0 BEGIN
 				SET spellLevel = idx + 1
