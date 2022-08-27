@@ -1,3 +1,13 @@
+/*
+ * Règles pour la génération de cette section
+ * - Si le premier header est de type "projectile"
+ *   - Ajout la chaîne "Ne nécessite pas de munition" ou "Revient dans la main du lanceur" (selon le type d'arme)
+ *   - Ignorer les autres headers de type "projectile" et "launcher"
+ * - Si le premier header est de type "launcher"
+ *   - Ignorer les autres headers de type "projectile" et "launcher"
+ * - Les headers de type "melee" sont toujours pris en compte
+ * - Si les effets des sections restantes sont tous les mêmes, les regrouper en une seule section "Capacités de combat"
+ */
 DEFINE_PATCH_FUNCTION ~add_combat_abilities~
 	STR_VAR
 		description = ~~
@@ -7,50 +17,170 @@ BEGIN
     READ_LONG ITM_flags flags
 
 	SET abilityType = AbilityType_Equipped
-	SET countLines = 0
 	SET countHeaders = 0
+	SET hasProjectile = 0
+	SET hasLauncher = 0
+	SET selectedHeader = 0
+
+	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
+	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
+		READ_BYTE  (headerOffset + ITM_HEAD_location) location
+		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
+
+		PATCH_IF charges == 0
+			AND NOT (attackType == ITM_ATTACK_TYPE_projectile AND (hasProjectile == 1 OR hasLauncher == 1))
+			AND NOT (attackType == ITM_ATTACK_TYPE_launcher AND (hasLauncher == 1 OR hasProjectile == 1))
+		BEGIN
+			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
+				SET hasProjectile = 1
+			END
+			ELSE PATCH_IF attackType == ITM_ATTACK_TYPE_launcher BEGIN
+				SET hasLauncher = 1
+			END
+
+			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%SOURCE_RES%~) = 1
+
+			SET countHeaders += 1
+		END
+	END
+
+	LPF ~has_same_combat_abilities~ INT_VAR countHeaders RET hasSame END
+
+	// Ajout de l'effet spécifique si l'arme a un header projectile
+	FOR (headerIndex = 0; headerIndex < countHeaders; headerIndex += 1) BEGIN
+		PATCH_PHP_EACH ~headers%headerIndex%~ AS data => _ BEGIN
+			SET attackType = ~%data_0%~
+
+			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
+				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
+					SPRINT effectDescription @102270 // ~Ne nécessite pas de munitions~
+				END
+				ELSE BEGIN
+					SPRINT effectDescription @102269 // ~Revient dans la main du lanceur~
+				END
+
+				SET $EVAL ~lines%headerIndex%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+				SET ~countLines%headerIndex%~ += 1
+			END
+		END
+		SORT_ARRAY_INDICES ~lines%headerIndex%~ NUMERICALLY
+
+		PATCH_IF ~countLines%headerIndex%~ > ~countLines%selectedHeader%~ BEGIN
+			SET selectedHeader = headerIndex
+		END
+	END
+
+	PATCH_IF hasSame == 1 OR countHeaders == 1 BEGIN
+		SPRINT title @100011 // ~Capacités de combat~
+		LPF ~add_section_to_description~ INT_VAR count = ~countLines%selectedHeader%~ STR_VAR title arrayName = ~lines%selectedHeader%~ RET description END
+	END
+	ELSE BEGIN
+		FOR (headerIndex = 0; headerIndex < countHeaders; headerIndex += 1) BEGIN
+			PATCH_PHP_EACH ~headers%headerIndex%~ AS data => _ BEGIN
+				SET attackType = ~%data_0%~
+				SET location = ~%data_1%~
+				SPRINT resource ~%data_2%~
+
+				LPF ~get_combat_section_title~ INT_VAR headerIndex attackType location RET title END
+				LPF ~add_section_to_description~ INT_VAR count = ~countLines%headerIndex%~ STR_VAR title arrayName = ~lines%headerIndex%~ RET description END
+			END
+		END
+	END
+END
+
+
+DEFINE_PATCH_FUNCTION ~load_combat_abilities~
+	INT_VAR
+		headerOffset = 0
+	RET
+		countLines
+	RET_ARRAY
+		lines
+BEGIN
+	SET countLines = 0
+
+	CLEAR_ARRAY lines
+	CLEAR_ARRAY opcodes
 
     PATCH_DEFINE_ASSOCIATIVE_ARRAY lines BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
-	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
-	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
-		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
+	LPM ~load_extended_effects~
+	LPM ~replace_effects~
+	LPM ~filter_effects~
+	LPM ~group_effects~
 
-		PATCH_IF charges == 0 BEGIN
-			SET countHeaders += 1
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 0 BEGIN
+		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		        LPM ~data_to_vars~
 
-			CLEAR_ARRAY lines
-			CLEAR_ARRAY opcodes
+				LPF ~get_effect_description~ RET effectDescription = description sort END
+				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
+					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+					SET countLines += 1
+				END
+		    END
+	    END
+	END
 
-			LPM ~load_extended_effects~
-			LPM ~filter_effects~
-			LPM ~group_effects~
+	//TODO: Supprimer les lignes en doublon
+	//      ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi
+	//      ATTENTION ! Certains effets peuvent être en doublon ! 2 effets qui ajoutent un bonus de caractéristique peuvent se cumuler...
+END
 
-			PATCH_PHP_EACH opcodes AS opcode => count BEGIN
-				PATCH_IF count > 0 BEGIN
-				    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
-				        LPM ~data_to_vars~
 
-						LPF ~get_effect_description~ RET effectDescription = description sort END
-						PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
-							SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
-							SET countLines += 1
+DEFINE_PATCH_FUNCTION ~has_same_combat_abilities~
+	INT_VAR
+		countHeaders = 0
+	RET
+		hasSame
+BEGIN
+	SET hasSame = 1
+
+	PATCH_IF countHeaders > 1 BEGIN
+		PATCH_PHP_EACH ~lines0~ AS base => _ BEGIN
+			FOR (index = 1; index < countHeaders; index += 1) BEGIN
+				PATCH_IF EVAL ~countLines%index%~ > 0 BEGIN
+	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+						PATCH_IF NOT ~%base_5%~ STRING_EQUAL ~%data_5%~ BEGIN
+	                        SET hasSame = 0
+	                        SET index = countHeaders
 						END
-				    END
-			    END
+	                END
+				END
 			END
+		END
+	END
+END
 
-			//TODO: Ne garder que les effets uniques  : ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi
-			//TODO: Tout placer dans un tableau spécifique à l'en-tête
-			//En fonction du nombre de ces tableaux, on saura combien de sections "Capacités de combat [(En mêlée|A distance|Etc.)]" générer
 
+DEFINE_PATCH_FUNCTION ~get_combat_section_title~
+	INT_VAR
+		headerIndex = 0
+		attackType = 0
+		location = 0
+	RET
+		title
+BEGIN
+	SPRINT title @100011 // ~Capacités de combat~
+
+	LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource RET sectionType = tooltip END
+
+	PATCH_IF ~%sectionType%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF location == 1 BEGIN
+			PATCH_IF attackType == ITM_ATTACK_TYPE_melee BEGIN
+				SPRINT sectionType @100013 // ~au corps à corps~
+			END
+			ELSE PATCH_IF attackType == ITM_ATTACK_TYPE_projectile OR attackType == ITM_ATTACK_TYPE_launcher BEGIN
+				SPRINT sectionType @100014 // ~à distance~
+			END
 		END
 	END
 
-	//TODO: Pour chaque en-tête, vérifier si certaines ont les mêmes capacités afin de les regrouper
-	//TODO: Si plusieurs et non regroupées, ne pas oublier d'ajouter le type d'attaque à côté du nom de la section
-
-
+	PATCH_IF NOT ~%sectionType%~ STRING_EQUAL ~~ BEGIN
+		SPRINT title ~%title% (%sectionType%)~
+	END
 END
-

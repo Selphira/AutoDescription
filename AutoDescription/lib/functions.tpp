@@ -43,6 +43,19 @@ BEGIN
 	END
 END
 
+
+DEFINE_PATCH_FUNCTION ~get_tooltip~ INT_VAR index = 0 STR_VAR resource = ~~ RET tooltip BEGIN
+	TO_LOWER resource
+
+	SPRINT tooltip ~~
+	SPRINT strref $tra_tooltips(~%resource%~ ~%index%~)
+
+	PATCH_IF IS_AN_INT strref  BEGIN
+		GET_STRREF strref tooltip
+	END
+END
+
+
 /**
  * @see https://www.gibberlings3.net/forums/topic/28835-toss-your-semi-useful-weidu-macros-here/page/2/#comment-254894
  * Patch function. Converts any decimal number into a hexadecimal number.

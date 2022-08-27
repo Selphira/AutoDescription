@@ -194,7 +194,7 @@ DEFINE_PATCH_MACRO ~add_combat_abilitie~ BEGIN
 
 	PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
 		PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
-			SPRINT desc@102270 // ~Ne nécessite pas de munitions~
+			SPRINT desc @102270 // ~Ne nécessite pas de munitions~
 		END
 		ELSE BEGIN
 			SPRINT desc @102269 // ~Revient dans la main du lanceur~
