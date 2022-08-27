@@ -2231,6 +2231,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_54~ BEGIN
 	LPM ~opcode_self_probability_54~
 END
 
+DEFINE_PATCH_MACRO ~opcode_54_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------ *
  * Death: Kill Creature Type [55] *
  * ------------------------------ */
