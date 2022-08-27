@@ -155,6 +155,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 46 => 214 // Cure: Stun (Unstun) [46]
 	 47 => 215 // Cure: Invisibility [47]
 	 43 => 216 // Cure: Stone to Flesh [43]
+	 14 => 216 // Graphics: Defrost [14]
 	  2 => 217 // Cure: Sleep [2]
 	242 => 218 // Cure: Confusion [242]
 	 70 => 219 // Cure: Non-Detection [2]
@@ -264,7 +265,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	  7 => 0 // Colour: Set Character colours by Palette
 	  8 => 0 // Colour: Change by RGB [8]
 	  9 => 0 // Colour: Glow Pulse
-	 14 => 0 // Graphics: Defrost [14]
 	 41 => 0 // Graphics: Sparkle [41]
 	 50 => 0 // Colour: Glow by RGB (Brief)
 	 51 => 0 // Colour: Strong/Dark by RGB [51]
@@ -380,7 +380,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_magic_fire%~  => 10120030 //  33554432 ~points de dégâts de feu magique~
 	~%DAMAGETYPE_magic_cold%~  => 10120031 //  67108864 ~points de dégâts de froid magique~
 	~%DAMAGETYPE_stunning%~    => 10120032 // 134217728 ~points de dégâts non létal~
-	~%DAMAGETYPE_piercing_reduce_by_percentage%~ => 10120025 //   1048579 ~points de dégâts perforants~
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
@@ -455,6 +454,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 11 => 1
 	 12 => 1
 	 13 => 1
+	 14 => 1
 	 17 => 1
 	 32 => 1
 	 46 => 1
@@ -666,19 +666,20 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
 	LPM ~opcode_1_common~
 
-	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @10010002 // ~de passer l'attaque par round %ofTheTarget% à %value%~
-	END
-	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-		SPRINT description @10010004 // ~de fixer l'attaque par round %ofTheTarget% à %value%~
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+		SPRINT description @10010001 // ~de modifier l'attaque par round %ofTheTarget% de %value%~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
 		SET value = ~%parameter1%~
 		SPRINT value @10002 // ~%value% %~
 		SPRINT description @10010003 // ~de multiplier l'attaque par round %ofTheTarget% par %value%~
 	END
+	// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
+	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
+		SPRINT description @10010004 // ~de fixer l'attaque par round %ofTheTarget% à %value%~
+	END
 	ELSE BEGIN
-		SPRINT description @10010001 // ~de modifier l'attaque par round %ofTheTarget% de %value%~
+		SPRINT description @10010002 // ~de passer l'attaque par round %ofTheTarget% à %value%~
 	END
 END
 
@@ -722,7 +723,7 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 0 OR parameter2 > 4 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
@@ -741,7 +742,7 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 		)
 	BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
 	END
 END
 
@@ -853,7 +854,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_5_is_valid~ BEGIN
 	PATCH_IF NOT (paramater2 >= 0 AND parameter2 <= 5 OR paramater2 >= 1000 AND parameter2 <= 1005) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
 	END
 END
 
@@ -980,20 +981,20 @@ DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
 	SET flagSaveForHalf = 0
 	SET flagFailForHalf = 0
 	SET flagDontWake = 0
-	SET isCumulative = 0
+	SET isNotCumulative = 0
+	SET upMaxHp = 0
 	SET mode = parameter2 BAND 65535
 
 	PATCH_IF is_ee == 1 BEGIN
 		SET flagDrain = ((special BAND 0b11011) == BIT0 OR (special BAND 0b11011) == BIT3)
 		SET flagTransfert = ((special BAND 0b11011) == BIT1 OR (special BAND 0b11011) == BIT4)
-		// FIXME
 		SET flagFistDamage = (special BAND BIT2) > 0
 		SET flagSaveForHalf = (special BAND BIT8) > 0 AND mode == 0
-		// TODO
 		SET flagFailForHalf = (special BAND BIT9) > 0 AND mode == 0
 		SET flagDontWake = (special BAND BIT10) > 0
-		// TODO
-		SET isCumulative = ((special BAND 0b11011) == BIT0 OR (special BAND 0b11011) == BIT1)
+		// TODO : manque l'affichage : augmente les pv max
+		SET upMaxHp = (flagDrain OR flagTransfert) AND duration > 0
+		SET isNotCumulative = (special BAND BIT3) > 0 OR (special BAND BIT4) > 0
 	END
 END
 
@@ -1012,11 +1013,13 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 
 	// Dégâts basiques
 	PATCH_IF mode == 0 BEGIN
-		// aucune influence des types de dégâts pour le mode 1, 2 et 3
-		// ni dans les logs, ni dans les résistances, ni dans l'opcode 332
-		// il faudrait donc rendre la partie %damageType% facultative
-		// pourrait également être utile pour le mode 0 avec un type de dégâts inconnu
-		SET type = $damage_types(~%type%~)
+		// Type de dégâts inconnus
+		PATCH_IF VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
+			SET type = $damage_types(~%type%~)
+		END
+		ELSE BEGIN
+			SET type = 101092 // ~points de dégâts~
+		END
 		LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
@@ -1041,12 +1044,26 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 3 a gerer : la cible perd %damage% % de ses pv max"
 	END
 
+	// Hack pour forcer l'affichage de la durée de l'augmentation des points de vie maximum
+	PATCH_IF upMaxHp BEGIN
+		SET timingMode = TIMING_duration
+		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+
+		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description ~%description% %duration%~
+			SET ignoreDuration = 1
+			PATCH_IF isNotCumulative BEGIN
+				LPM ~opcode_not_cumulative~
+			END
+		END
+	END
 	PATCH_IF flagDontWake == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT dontWakeUp @10120040 // ~Ne réveille pas la cible~
 		SPRINT description ~%description% (%dontWakeUp%)~
 	END
 	PATCH_IF flagFistDamage == 1 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est efficace que si la source est désarmée"
+		// FIXME : formulation
+		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est n'efficace que si la source est désarmée"
 	END
 END
 
@@ -1057,7 +1074,7 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 	LOCAL_SET damage_type = parameter2 - mode
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
-		SET isValid = 0
+		// 	SET isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
@@ -1086,6 +1103,25 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
 END
 
 /* ----------------------------- *
+ * Graphics: Defrost [14] *
+ * ----------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_14~ BEGIN
+	SPRINT description @10140001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_14~ BEGIN
+	SPRINT description @10140002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_14~ BEGIN
+	SPRINT description @10140003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_14~ BEGIN
+	LPM ~opcode_self_probability_14~
+END
+
+/* ----------------------------- *
  * Stat: Dexterity Modifier [15] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_15~ BEGIN
@@ -1109,17 +1145,30 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
 	PATCH_IF parameter2 == 3 BEGIN
-		SET parameter2 = 0
-		PATCH_IF is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 BEGIN
-			// TODO? efficace que si dextérité de base < 20
-			// peut être différent de 1 selon la présence de CLSSPLAB.2da
-			SET parameter1 = 1
+		// TODO? efficace que si dextérité de base < 20
+		SET parameter2 = MOD_TYPE_cumulative
+		PATCH_IF NOT VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF NOT FILE_EXISTS_IN_GAME ~CLSSPLAB.2da~ BEGIN
+				SET parameter1 = 1
+			END
+			ELSE BEGIN
+				LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
+			END
+		END
+		// issu d'un EFF et paramater1 == 0: sans effet
+		ELSE PATCH_IF parameter1 == 0 BEGIN
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect detected : Valeur = Valeur + 0.~ END
 		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_15_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
+	PATCH_IF is_ee == 1 BEGIN
+		LPM ~opcode_modstat3_is_valid~
+	END
+	ELSE BEGIN
+		LPM ~opcode_modstat2_is_valid~
+	END
 END
 
 /* ----------------- *
@@ -1201,8 +1250,19 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
 	// TODO
-	PATCH_IF parameter2 > 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %parameter2%.~ END
+	SET type = parameter2 BAND 65535
+	SET subType = parameter2 / 65535
+	// Ramène la cible à la vie (avec 1 pv) puis la soigne
+	SET isRez = subType BAND BIT0 > 0
+	// Dissipe tous les effets non permanent_after_death puis la soigne
+	SET purgeEff = subType BAND BIT1 > 0
+	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
+
+	PATCH_IF type > 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: type non gere : %type%.~ END
+	END
+	PATCH_IF isRez OR purgeEff BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
 	SET damageAmount = parameter1
@@ -1235,9 +1295,10 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
+	SET type = parameter2 BAND 65535
+	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -1246,17 +1307,27 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_18~ BEGIN
 	LPM ~opcode_18_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
-	LPM ~opcode_18_not_cumulative~
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+	END
+	ELSE BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+	END
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	LPM ~opcode_18_common~
 
-	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	END
+	ELSE BEGIN
+		SPRINT theStatistic @10180004 // ~les points de vie actuel et maximum~
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 > 0 BEGIN
+        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -1272,16 +1343,21 @@ DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 		SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
 	END
 
-	LPM ~opcode_18_not_cumulative~
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 	LPM ~opcode_18_common~
 
-	SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	PATCH_IF healOnlyMaxPV == 1 BEGIN
+		SPRINT theStatistic @10180002 // ~les points de vie maximum~
+	END
+	ELSE BEGIN
+		SPRINT theStatistic @10180004 // ~les points de vie actuel et maximum~
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 > 0 BEGIN
+        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -1297,7 +1373,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 		SPRINT description @102546 // ~de multiplier %theStatistic% %ofTheTarget% par %value%~
 	END
 
-	LPM ~opcode_18_not_cumulative~
+	// LPM ~opcode_18_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
@@ -1305,28 +1381,25 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_18~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
-	SET isCumulative = 1
+	// SET isCumulative = parameter2 != 6
 	SET damageAmount = parameter1
+	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND special != 0
+	SET parameter2 = parameter2 MODULO 3
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-
-	PATCH_IF parameter2 == 6 BEGIN
-		SET isCumulative = 0
-	END
-
-	PATCH_IF parameter2 == 3 OR parameter2 == 6 BEGIN
-		SET parameter2 = MOD_TYPE_cumulative
-	END
-	ELSE PATCH_IF parameter2 == 4 BEGIN
-		SET parameter2 = MOD_TYPE_flat
-	END
-	ELSE PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
 END
 
+/*
 DEFINE_PATCH_MACRO ~opcode_18_not_cumulative~ BEGIN
 	PATCH_IF isCumulative == 0 AND is_ee == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @101185 // ~%description% (non cumulable)~
+	END
+END
+*/
+
+DEFINE_PATCH_MACRO ~opcode_18_is_valid~ BEGIN
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR (parameter2 > 5 AND is_ee == 0 OR parameter2 > 6) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -1347,6 +1420,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_19~ BEGIN
 	LPM ~opcode_self_probability_19~
+END
+
+DEFINE_PATCH_MACRO ~opcode_19_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------ *
@@ -1387,30 +1464,29 @@ END
  * Stat: Lore Modifier [21] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Connaissance~
-	END
+	LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Connaissance~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_target~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
-	END
+	LPF ~opcode_target~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPF ~opcode_probability~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
-	END
+	LPF ~opcode_probability~ INT_VAR strref = 10210002 RET description END // ~les connaissances~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_21~ BEGIN
-	// This effect does not work with Timing Mode 1
-	PATCH_IF timingMode != 1 BEGIN
-		LPM ~opcode_self_probability_21~
+	LPM ~opcode_self_probability_21~
+END
+
+DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+	// L'effet ne fonctionne pas avec un timing ==  1
+	// Les timings 4 et 7 ajoutent un délai entre le moment où l'effet est lancé et le moment où l'effet s'active
+	// Une fois le délai écoulé, l'effet est appliqué avec un timing 1, donc...
+	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -1431,6 +1507,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_22~ BEGIN
 	LPM ~opcode_self_probability_22~ // ~la chance~
+END
+
+DEFINE_PATCH_MACRO ~opcode_22_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* -------------------------- *
@@ -1473,12 +1553,19 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_23~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
-	PATCH_IF is_ee == 0 OR (is_ee == 1 AND special == 0) BEGIN
+	PATCH_IF is_ee == 0 OR special == 0 BEGIN
 		//TODO: Pour ce cas, plutot avoir une phrase du genre: Le moral est à son maximum
 		SET parameter1 = 10
 		SET parameter2 = MOD_TYPE_flat
 	END
 END
+
+DEFINE_PATCH_MACRO ~opcode_23_is_valid~ BEGIN
+	PATCH_IF is_ee == 1 AND special != 0 BEGIN
+		LPM ~opcode_modstat2_is_valid~
+	END
+END
+
 
 /* ------------------ *
  * State: Horror [24] *
@@ -1519,43 +1606,42 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_25~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
-	SET amount1 = parameter1
-	SET amount2 = 0
-	SET frequencyMultiplier = 1
 	SET amount = 0
+	SET frequencyMultiplier = 1
 	SET frequency = 1
+	SET p4IsActive = VARIABLE_IS_SET parameter4 AND parameter4 != 0
+	SET type = parameter2
 
-	PATCH_IF (parameter2 == 0 AND amount != 0) OR (parameter2 == 1 AND amount > 1) OR parameter2 == 3 BEGIN
+	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
+	// Compliqué de faire une phrase simple
+	PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) OR
+			 (type == 1 AND (parameter1 > 1 OR p4IsActive)) BEGIN
 		SET amount = 1
 	END
-	ELSE PATCH_IF parameter2 == 2 BEGIN
-		SET amount = amount1
+	ELSE PATCH_IF type == 2 AND parameter1 > 0 BEGIN
+		SET amount = parameter1
 	END
-	ELSE PATCH_IF parameter2 == 4 BEGIN
-		SET amount = 3
+	ELSE PATCH_IF type == 3 BEGIN
+		SET amount = 1
+		SET frequency = parameter1
+	END
+	ELSE PATCH_IF type == 4 AND VARIABLE_IS_SET parameter3 BEGIN
+		SET amount = parameter3
+		SET frequency = parameter1
 	END
 
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
-			SET amount2 = parameter3
-			SET frequencyMultiplier = parameter4
-		END
-
-		PATCH_IF parameter2 == 4 BEGIN
-			SET amount = amount2
-		END
-
-		PATCH_IF parameter2 == 2 BEGIN
-			SET frequency = frequencyMultiplier
-		END
-		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1 * frequencyMultiplier
+	PATCH_IF p4IsActive AND type >= 2 BEGIN
+		SET frequency = frequency * parameter4
+		// P4 divise également les dégâts si P2 == 2, avec un minimum à 1
+		PATCH_IF type == 2 BEGIN
+			SET amount = amount / parameter4
+			PATCH_IF amount < 1 BEGIN
+				amount = 1
+			END
 		END
 	END
-	ELSE BEGIN
-		PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1
-		END
+	PATCH_IF frequency < 1 BEGIN
+		SET frequency = 1
 	END
 
 	PATCH_IF amount == 1 AND frequency == 1 BEGIN
@@ -1572,6 +1658,23 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
 		SET strref += 3
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts toutes les %frequency% secondes~
+	END
+	ELSE PATCH_IF amount < 0 BEGIN
+		// TODO: Dans le cas où P2 == 4 et & P3 < 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
+	PATCH_IF timingMode == TIMING_permanent OR
+			 timingMode == TIMING_delayed OR
+			 timingMode == 7 OR
+			 timingMode == TIMING_permanent_after_death BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+	END
+	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
 	END
 END
 
@@ -1615,6 +1718,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_27~ BEGIN
 	LPM ~opcode_self_probability_27~
 END
 
+DEFINE_PATCH_MACRO ~opcode_27_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ----------------------------------- *
  * Stat: Cold Resistance Modifier [28] *
  * ----------------------------------- */
@@ -1634,6 +1741,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_28~ BEGIN
 	LPM ~opcode_self_probability_28~
+END
+
+DEFINE_PATCH_MACRO ~opcode_28_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------------------ *
@@ -1657,6 +1768,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_29~ BEGIN
 	LPM ~opcode_self_probability_29~
 END
 
+DEFINE_PATCH_MACRO ~opcode_29_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ----------------------------------- *
  * Stat: Fire Resistance Modifier [30] *
  * ----------------------------------- */
@@ -1678,6 +1793,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_30~ BEGIN
 	LPM ~opcode_self_probability_30~
 END
 
+DEFINE_PATCH_MACRO ~opcode_30_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------------- *
  * Stat: Magic Damage Resistance Modifier [31] *
  * ------------------------------------------- */
@@ -1697,6 +1816,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_31~ BEGIN
 	LPM ~opcode_self_probability_31~
+END
+
+DEFINE_PATCH_MACRO ~opcode_31_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ----------------------------- *
@@ -1722,100 +1845,143 @@ END
  * Stat: Save vs. Death Modifier [33] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_33~ BEGIN
 	LOCAL_SPRINT versus @10330001 // ~contre la paralysie, la mort et les poisons~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_33~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la paralysie, la mort et les poisons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
+	LPM ~opcode_modstat3_is_valid~
+	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
 END
 
 /* ---------------------------------- *
  * Stat: Save vs. Wands Modifier [34] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_34~ BEGIN
 	LOCAL_SPRINT versus @10340001 // ~contre les baguettes, les sceptres et les bâtons~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_34~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_34_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ---------------------------------------------------- *
  * Stat: Save vs. Petrification/Polymorph Modifier [35] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre la pétrification et la métamorphose~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_35~ BEGIN
 	LOCAL_SPRINT versus @10350001 // ~contre la pétrification et la métamorphose~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la pétrification et la métamorphose~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_35~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la pétrification et la métamorphose~
+END
+
+DEFINE_PATCH_MACRO ~opcode_35_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------------------------------- *
  * Stat: Save vs. Breath Weapons Modifier [36] *
  * ------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les souffles~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_36~ BEGIN
 	LOCAL_SPRINT versus @10360001 // ~contre les souffles~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les souffles~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_36~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les souffles~
+END
+
+DEFINE_PATCH_MACRO ~opcode_36_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ----------------------------------- *
  * Stat: Save vs. Spells Modifier [37] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_37~ BEGIN
 	LOCAL_SPRINT versus @10370001 // ~contre les sorts~
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_probability~ INT_VAR strref = 10330002 RET description END // ~les jets de sauvegarde %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 target = 1 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_party_37~ BEGIN
+	SET paramater2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les sorts~
+END
+
+DEFINE_PATCH_MACRO ~opcode_37_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------- *
@@ -1840,12 +2006,23 @@ END
 /* --------------------------- *
  * State: Unconsciousness [39] *
  * --------------------------- */
+// TODO: P2 == 1: endort profondemment la cible (ne se réveille si subit des dégâts)
 DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
-	SPRINT description @10390001 // ~Endort %theTarget%~
+	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+		SPRINT description @10390001 // ~Endort %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10390003 // ~Endort profondément %theTarget%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_39~ BEGIN
-	SPRINT description @10390002 // ~d'endormir %theTarget%~
+	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+		SPRINT description @10390002 // ~d'endormir %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10390004 // ~d'endormir profondément %theTarget%%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_39~ BEGIN
@@ -7517,16 +7694,24 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+		END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN // percent
-		SET value -= 100
-		LPF ~signed_value~ INT_VAR value RET value END
-		PATCH_IF value != 0 BEGIN
-			SPRINT value @10002 // ~%value% %~
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			PATCH_IF value != 0 BEGIN
+				SPRINT value @10002 // ~%value% %~
+			END
+		END
+		ELSE BEGIN
+			// TODO !
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
 		END
 	END
 	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
@@ -7548,7 +7733,9 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		LPF ~signed_value~ INT_VAR value RET value END
+		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+			LPF ~signed_value~ INT_VAR value RET value END
+		END
 		SPRINT value @10002 // ~%value% %~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
@@ -7563,7 +7750,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	PATCH_IF parameter2 >= 0 AND parameter2 <= 3 BEGIN
+	PATCH_IF parameter2 >= 0 AND parameter2 <= 2 BEGIN
 		LPM ~opcode_mod_percent_base~
 
 		SPRINT description @100001 // ~%name%%colon%%value%~
@@ -7578,7 +7765,7 @@ DEFINE_PATCH_FUNCTION ~opcode_target_percent~ INT_VAR strref = 0 STR_VAR value =
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
@@ -7603,7 +7790,7 @@ DEFINE_PATCH_FUNCTION ~opcode_probability_percent~ INT_VAR strref = 0 RET descri
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
@@ -8136,11 +8323,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
 	END
 	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
 	END
 END
 
@@ -8148,7 +8335,7 @@ DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -8156,6 +8343,6 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END

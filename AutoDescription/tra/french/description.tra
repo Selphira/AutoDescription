@@ -672,6 +672,13 @@
 @10130001 = ~Tue instantanément %theTarget%~
 @10130002 = ~de tuer instantanément %theTarget%~
 
+// Opcode 14: Graphics: Defrost [14]
+
+// TODO
+@10140001 = ~Dissipation de la congélation~
+@10140002 = ~de décongeler %theTarget%~
+@10140003 = ~Décongèle %theTarget%~
+
 // Opcode 15: Stat: Dexterity Modifier [15]
 
 @10150001 = ~Dextérité~
@@ -691,19 +698,22 @@
 
 // Opcode 17: HP: Current HP Modifier [17]
 
-@10170001 = ~Soigne 1 point de vie %toTheTarget%~
-@10170002 = ~Soigne %value% points de vie %toTheTarget%~
+@10170001 = ~Soigne 1 point de vie %ofTheTarget%~
+@10170002 = ~Soigne %value% points de vie %ofTheTarget%~
 @10170003 = ~Inflige 1 point de dégâts %toTheTarget%~
 @10170004 = ~Inflige %value% points de dégâts %toTheTarget%~
-@10170005 = ~de soigner 1 point de vie %toTheTarget%~
-@10170006 = ~de soigner %value% points de vie %toTheTarget%~
+@10170005 = ~de soigner 1 point de vie %ofTheTarget%~
+@10170006 = ~de soigner %value% points de vie %ofTheTarget%~
 @10170007 = ~d'infliger 1 point de dégâts %toTheTarget%~
 @10170008 = ~d'infliger %value% points de dégâts %toTheTarget%~
 
 // Opcode 18: Stat: Maximum HP Modifier [18]
 
-@10180001 = ~Points de vie maximum~
-@10180002 = ~les points de vie maximum~
+@10180001 = ~Points de vie maximums~
+@10180002 = ~les points de vie maximums~
+@10180003 = ~Points de vie actuels et maximums~
+@10180004 = ~les points de vie actuels et maximums~
+
 
 // Opcode 19: Stat: Intelligence Modifier [19]
 
@@ -813,6 +823,8 @@
 
 @10390001 = ~Endort %theTarget%~
 @10390002 = ~d'endormir %theTarget%~
+@10390003 = ~Endort profondément %theTarget%~
+@10390004 = ~d'endormir profondément %theTarget%~
 
 // Opcode 40: State: Slow [40]
 
