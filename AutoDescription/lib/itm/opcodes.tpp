@@ -1186,7 +1186,7 @@ DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
 				LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
 			END
 		END
-		// issu d'un EFF et paramater1 == 0: sans effet
+		// issu d'un EFF et parameter1 == 0: sans effet
 		ELSE PATCH_IF parameter1 == 0 BEGIN
 			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect detected : Valeur = Valeur + 0.~ END
 		END
@@ -8163,7 +8163,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid paramater1/parameter2 %amount%/%level%~ END
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE PATCH_IF level == 512 BEGIN
@@ -8174,7 +8174,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid paramater1/parameter2 %amount%/%level%~ END
+			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE BEGIN

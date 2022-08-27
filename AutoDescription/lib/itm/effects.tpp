@@ -357,7 +357,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 	LOCAL_SET levelMax = diceCount
 	LOCAL_SET strref   = 0
 	PATCH_IF (levelMax > 0 OR levelMin > 0) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
-		PATCH_IF levelMin == diceCount BEGIN
+		PATCH_IF levelMin == levelMax BEGIN
 			SET strref = 101186 // ~%target% (de niveau %levelMin%)~
 		END
 		ELSE PATCH_IF levelMin == 0 AND levelMax > 0 BEGIN
@@ -366,8 +366,11 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		ELSE PATCH_IF levelMin > 0 AND levelMax == 0 BEGIN
 			SET strref = 101188 // ~%target% (de niveau %levelMin% ou supérieur)~
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF levelMax > levelMin BEGIN
 			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 		END
 
 		PATCH_IF strref != 0 BEGIN
