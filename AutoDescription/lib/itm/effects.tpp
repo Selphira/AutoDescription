@@ -315,6 +315,11 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 			PATCH_IF saveForHalf == 1 BEGIN
 				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 			END
+			ELSE PATCH_IF VARIABLE_IS_SET flagFailForHalf AND flagFailForHalf == 1 BEGIN
+				// FIXME
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
+				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			END
 			ELSE BEGIN
 				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
@@ -322,6 +327,11 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
         ELSE BEGIN
 			PATCH_IF saveForHalf == 1 BEGIN
 				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
+			END
+			ELSE PATCH_IF VARIABLE_IS_SET flagFailForHalf AND flagFailForHalf == 1 BEGIN
+				// FIXME
+				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
+				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
@@ -352,10 +362,12 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		END
 
 		PATCH_IF strref != 0 BEGIN
+			SET oldTarget = target
 		    PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
 		        SPRINT target EVAL ~%%vTarget%%~
 		        SPRINT EVAL ~%vTarget%~ (AT strref)
 		    END
+		    SET target = oldTarget
 		END
 	END
 END
@@ -437,6 +449,8 @@ END
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
 	// TODO timingMode == 3 => ~ pendant et après X secondes
+	// FIXME, il peut avoir certaines subtilités entre un vrai timing 1 et un timing X
+	// Il faudrait considérer un nouveau timing dont l'effet à mi-chemin entre le 1 et le 9
 	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration BEGIN
 		SET timingMode = TIMING_permanent
 	END
