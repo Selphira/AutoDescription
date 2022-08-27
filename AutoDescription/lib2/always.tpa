@@ -1,0 +1,21 @@
+ACTION_IF !VARIABLE_IS_SET always_once_section2 BEGIN
+	OUTER_SET always_once_section2 = 1
+	SILENT
+
+    INCLUDE ~%MOD_FOLDER%/lib2/description.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/log.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/effect.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/itm.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/itm/charged_abilities.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/itm/combat_abilities.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/itm/equipped_abilities.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/itm/weapon_attributes.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib2/spl.tpp~
+
+    INCLUDE ~%MOD_FOLDER%/lib2/lib_ini.tpa~
+
+	OUTER_SPRINT ini_to_read "%MOD_FOLDER%/settings-default.ini"
+	LAF SFO_read_ini_file STR_VAR ini_to_read RET_ARRAY SFO_reserved_ini_hash END
+
+    INCLUDE ~%MOD_FOLDER%/sfo/install_sfo.tpa~
+END

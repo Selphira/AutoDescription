@@ -3,6 +3,8 @@ AUTHOR ~Selphira (https://www.baldursgateworld.fr/lacouronne/members/selphira.ht
 
 VERSION ~0.9.18a~
 
+AUTO_EVAL_STRINGS
+
 ALWAYS
 	OUTER_PATCH ~~ BEGIN
 		PATCH_INCLUDE ~%MOD_FOLDER%/settings-default.ini~
@@ -34,6 +36,7 @@ ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
+    INCLUDE ~%MOD_FOLDER%/lib2/always.tpa~
 
 	DEFINE_ACTION_MACRO ~init_statistics~ BEGIN
 		OUTER_SET total = 0
@@ -100,4 +103,11 @@ ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
+LAM ~show_statistics~
+
+BEGIN @10 DESIGNATED 30
+
+LAM ~init_log_file~
+LAM ~init_statistics~
+LAM ~update_descriptions~
 LAM ~show_statistics~
