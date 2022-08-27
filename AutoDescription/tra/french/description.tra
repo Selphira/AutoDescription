@@ -741,8 +741,8 @@
 
 @10230001 = ~Moral~
 @10230002 = ~le moral~
-@10230003 = ~Le moral %ofTheTarget% reste au plus haut~
-@10230004 = ~de garder le moral %ofTheTarget% au plus haut~
+@10230003 = ~Rétabli le moral %ofTheTarget%~
+@10230004 = ~de rétablir le moral %ofTheTarget%~
 
 // Opcode 24: State: Horror [24]
 
