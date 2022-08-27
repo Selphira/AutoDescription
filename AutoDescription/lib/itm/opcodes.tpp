@@ -667,19 +667,19 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
 	LPM ~opcode_1_common~
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		SPRINT description @10010001 // ~de modifier l'attaque par round %ofTheTarget% de %value%~
+		SPRINT description @10010001 // ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
 		SET value = ~%parameter1%~
 		SPRINT value @10002 // ~%value% %~
-		SPRINT description @10010003 // ~de multiplier l'attaque par round %ofTheTarget% par %value%~
+		SPRINT description @10010003 // ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
 	END
 	// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
 	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
-		SPRINT description @10010004 // ~de fixer l'attaque par round %ofTheTarget% à %value%~
+		SPRINT description @10010004 // ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
 	END
 	ELSE BEGIN
-		SPRINT description @10010002 // ~de passer l'attaque par round %ofTheTarget% à %value%~
+		SPRINT description @10010002 // ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
 	END
 END
 
@@ -750,15 +750,15 @@ END
  * Cure: Sleep [2] *
  * --------------- */
 DEFINE_PATCH_MACRO ~opcode_self_2~ BEGIN
-	SPRINT description @10020001 // ~Immunité au sommeil~
+	SPRINT description @10020001 // ~Réveille %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_2~ BEGIN
-	SPRINT description @10020003 // ~de réveiller %theTarget%~
+	SPRINT description @10020002 // ~de réveiller %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_2~ BEGIN
-	SPRINT description @10020002 // ~Réveille %theTarget%~
+	SPRINT description @10020001 // ~Réveille %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_2~ BEGIN
@@ -788,15 +788,15 @@ END
  * Cure: Berserking [4] *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_4~ BEGIN
-	SPRINT description @10040001 // ~Immunité à la rage du berserker~
+	SPRINT description @10040001 // ~Apaise %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_4~ BEGIN
-	SPRINT description @10040003 // ~d'apaiser %theTarget%~
+	SPRINT description @10040002 // ~d'apaiser %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_4~ BEGIN
-	SPRINT description @10040002 // ~Apaise %theTarget%~
+	SPRINT description @10040001 // ~Apaise %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_4~ BEGIN
@@ -813,7 +813,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_5~ BEGIN
 	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @10050003 // ~Charme extrême~
+		SPRINT description @10050003 // ~Charme universel sur %theTarget%~
 	END
 	ELSE BEGIN
 		SPRINT theTargetBasic @102471 // ~la cible~
@@ -909,7 +909,7 @@ END
  * Cure: Poison [11] *
  * ----------------- */
 DEFINE_PATCH_MACRO ~opcode_self_11~ BEGIN
-	SPRINT description @10110001 // ~Immunité aux poisons~
+	SPRINT description @10110001 // ~Neutralisation des poisons~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_11~ BEGIN
@@ -917,7 +917,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_11~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_11~ BEGIN
-	SPRINT description @10110002 // ~Neutralisation des poisons~
+	SPRINT description @10110002 // ~Neutralise les poisons %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_11~ BEGIN
@@ -1645,19 +1645,19 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	END
 
 	PATCH_IF amount == 1 AND frequency == 1 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige 1 point de dégât par seconde~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
 	END
 	ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
 		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts par seconde~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
 	END
 	ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
 		SET strref += 2
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige 1 point de dégât toutes les %frequency% secondes~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
 	END
 	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
 		SET strref += 3
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts toutes les %frequency% secondes~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		// TODO: Dans le cas où P2 == 4 et & P3 < 0
@@ -1682,19 +1682,19 @@ END
  * Item: Remove Curse [26] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_26~ BEGIN
-	SPRINT description @10260001 // ~Délivre %theTarget% de ses malédictions~
+	SPRINT description @10260001 // ~Délivre %theTarget% des malédictions~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_26~ BEGIN
-	LPM ~opcode_self_26~ // ~Délivre %theTarget% de ses malédictions~
+	LPM ~opcode_self_26~ // ~Délivre %theTarget% des malédictions~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_26~ BEGIN
-	SPRINT description @10260002 // ~de délivrer %theTarget% de ses malédictions~
+	SPRINT description @10260002 // ~de délivrer %theTarget% des malédictions~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_26~ BEGIN
-	LPM ~opcode_self_probability_26~ // ~de délivrer %theTarget% de ses malédictions~
+	LPM ~opcode_self_probability_26~ // ~de délivrer %theTarget% des malédictions~
 END
 
 /* ----------------------------------- *
@@ -2066,7 +2066,7 @@ END
  * Cure: Stone to Flesh [43] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_43~ BEGIN
-	SPRINT description @10430001 // ~Immunité à la pétrification~
+	SPRINT description @10430001 // ~Transmutation de la pierre en chair~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_43~ BEGIN
@@ -2133,15 +2133,15 @@ DEFINE_PATCH_MACRO ~opcode_self_46~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_46~ BEGIN
-	SPRINT description @10460002 // ~de désétourdir %theTarget%~
+	SPRINT description @10460002 // ~de ranimer %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_46~ BEGIN
-	SPRINT description @10460003 // ~Désétourdit %theTarget%~
+	SPRINT description @10460003 // ~Ranime %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_46~ BEGIN
-	LPM ~opcode_self_probability_46~ // ~de désétourdir %theTarget%~
+	LPM ~opcode_self_probability_46~ // ~de ranimer %theTarget%~
 END
 
 /* ----------------------- *
@@ -2456,19 +2456,19 @@ END
  * State: Remove Infravision [64] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_64~ BEGIN
-	SPRINT description @10640001 // ~Immunité l'infravision~
+	SPRINT description @10640001 // ~Neutralise l'infravision~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_64~ BEGIN
-	SPRINT description @10640003 // ~de dissiper l'infravision %ofTheTarget%~
+	SPRINT description @10640003 // ~de neutraliser l'infravision %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_64~ BEGIN
-	SPRINT description @10640002 // ~Dissipe l'infravision %ofTheTarget%~
+	SPRINT description @10640002 // ~Neutralise l'infravision %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_64~ BEGIN
-	LPM ~opcode_self_probability_64~ // ~de dissiper l'infravision %ofTheTarget%~
+	LPM ~opcode_self_probability_64~ // ~de neutraliser l'infravision %ofTheTarget%~
 END
 
 /* ------------------------------- *
@@ -2845,7 +2845,7 @@ DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 		 55 56 57 58 59 BEGIN SPRINT description @10830008 END // ~Immunité contre les lances de jet~
 		 14 64 208 274 BEGIN SPRINT description @10830003 END // ~Immunité contre les attaques de regard~
 		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @10830009 END // ~Immunité contre les missiles magiques~
-		 102 BEGIN SPRINT description @10830010 END // ~Immunité contre les flèches de flamme bleue~
+		 102 BEGIN SPRINT description @10830010 END // ~Immunité contre les flèches à flamme bleue~
 		 39 442 BEGIN SPRINT description @10830011 END // ~Immunité contre les éclairs~
 		 62 63 259 319 BEGIN SPRINT description @10830012 END // ~Immunité contre les toiles d'araignées~
 		DEFAULT
@@ -3014,15 +3014,15 @@ END
  * Stat: Find Traps Modifier [91] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_91~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10910001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Détection/désamorçage des pièges~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 10910001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Détection / désamorçage des pièges~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_91~ BEGIN
-	LPF ~opcode_probability_percent~ INT_VAR strref = 10910002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la détection/désamorçage des pièges~
+	LPF ~opcode_probability_percent~ INT_VAR strref = 10910002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la détection / désamorçage des pièges~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_91~ BEGIN
-	LPF ~opcode_target_percent~ INT_VAR strref = 10910002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la détection/désamorçage des pièges~
+	LPF ~opcode_target_percent~ INT_VAR strref = 10910002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la détection / désamorçage des pièges~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_91~ BEGIN
@@ -3292,7 +3292,7 @@ END
  * Protection: from Creature Type [100] *
  * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_100~ BEGIN
-	SET strref = 11000001 // ~Immunité contre les %creatureType%~
+	SET strref = 11000001 // ~Immunité aux attaques et aux sorts de %creatureType%~
 	LPM ~opcode_100_common~
 END
 
@@ -3302,7 +3302,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_100~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_100~ BEGIN
-	SET strref = 11000003 // ~Immunise %theTarget% des attaques et des sorts des %creatureType%~
+	SET strref = 11000003 // ~Immunise %theTarget% contre les attaques et les sorts des %creatureType%~
 	LPM ~opcode_100_common~
 END
 
@@ -3344,6 +3344,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	LPM ~opcode_self_probability_101~ // ~que %theTarget% résiste à xxx~
 END
+
 /* -------------------------------------- *
  * Spell: Immunity (by Power Level) [102] *
  * -------------------------------------- */
