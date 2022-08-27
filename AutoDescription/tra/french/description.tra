@@ -594,10 +594,10 @@
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
-@10010001 = ~de modifier l'attaque par round %ofTheTarget% de %value%~
-@10010002 = ~de passer l'attaque par round %ofTheTarget% à %value%~
-@10010003 = ~de multiplier l'attaque par round %ofTheTarget% par %value%~
-@10010004 = ~de fixer l'attaque par round %ofTheTarget% à %value%~
+@10010001 = ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
+@10010002 = ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
+@10010003 = ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
+@10010004 = ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
 @10010005 = ~une demi~
 @10010006 = ~\1 et demi~
 @10010007 = ~une demi supplémentaire~
@@ -605,9 +605,8 @@
 
 // Opcode 2: Cure: Sleep [2]
 
-@10020001 = ~Immunité au sommeil~
-@10020002 = ~Réveille %theTarget%~
-@10020003 = ~de réveiller %theTarget%~
+@10020001 = ~Réveille %theTarget%~
+@10020001 = ~de réveiller %theTarget%~
 
 // Opcode 3: State: Berserking [3]
 
@@ -616,15 +615,14 @@
 
 // Opcode 4: Cure: Berserking [4]
 
-@10040001 = ~Immunité à la folie du berserker~
-@10040002 = ~Apaise %theTarget%~
-@10040003 = ~d'apaiser %theTarget%~
+@10040001 = ~Apaise %theTarget%~
+@10040002 = ~d'apaiser %theTarget%~
 
 // Opcode 5: Charm: Charm Specific Creature [5]
 
 @10050001 = ~Charme %theTarget%~
 @10050002 = ~de charmer %theTarget%~
-@10050003 = ~Charme extrême~
+@10050003 = ~Charme universel sur %theTarget%~
 
 // Opcode 6: Stat: Charisma Modifier [6]
 
@@ -638,8 +636,8 @@
 
 // Opcode 11: Cure: Poison [11]
 
-@10110001 = ~Immunité aux poisons~
-@10110002 = ~Neutralisation des poisons~
+@10110001 = ~Neutralisation des poisons~
+@10110002 = ~Neutralise les poisons %ofTheTarget%~
 @10110003 = ~de neutraliser les poisons sur %theTarget%~
 
 // Opcode 12: HP: Damage [12]
@@ -750,8 +748,8 @@
 
 @10230001 = ~Moral~
 @10230002 = ~le moral~
-@10230003 = ~Le moral %ofTheTarget% reste au plus haut~
-@10230004 = ~de garder le moral %ofTheTarget% au plus haut~
+@10230003 = ~Rétabli le moral %ofTheTarget%~
+@10230004 = ~de rétablir le moral %ofTheTarget%~
 
 // Opcode 24: State: Horror [24]
 
@@ -760,19 +758,19 @@
 
 // Opcode 25: State: Poison [25]
 
-@10250001 = ~Empoisonne %theTarget% et lui inflige 1 point de dégâts par seconde~
-@10250002 = ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts par seconde~
-@10250003 = ~Empoisonne %theTarget% et lui inflige 1 point de dégâts toutes les %frequency% secondes~
-@10250004 = ~Empoisonne %theTarget% et lui inflige %amount% points de dégâts toutes les %frequency% secondes~
-@10250005 = ~d'empoisonner %theTarget% et de lui infliger 1 point de dégâts par seconde~
-@10250006 = ~d'empoisonner %theTarget% et de lui infliger %amount% points de dégâts par seconde~
-@10250007 = ~d'empoisonner %theTarget% et de lui infliger 1 point de dégâts toutes les %frequency% secondes~
-@10250008 = ~d'empoisonner %theTarget% et de lui infliger %amount% points de dégâts toutes les %frequency% secondes~
+@10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
+@10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
+@10250003 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+@10250004 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+@10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts par seconde~
+@10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts par seconde~
+@10250007 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+@10250008 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
 
 // Opcode 26: Item: Remove Curse [26]
 
-@10260001 = ~Délivre %theTarget% de ses malédictions~
-@10260002 = ~de délivrer %theTarget% de ses malédictions~
+@10260001 = ~Délivre %theTarget% des malédictions~
+@10260002 = ~de délivrer %theTarget% des malédictions~
 
 // Opcode 27: Stat: Acid Resistance Modifier [27]
 
@@ -849,7 +847,7 @@
 
 // Opcode 43: Cure: Stone to Flesh [43]
 
-@10430001 = ~Immunité à la pétrification~
+@10430001 = ~Transmutation de la pierre en chair~
 @10430002 = ~de dépétrifier %theTarget%~
 @10430003 = ~Dépétrifie %theTarget%~
 
@@ -866,8 +864,8 @@
 // Opcode 46: Cure: Stun (Unstun) [46]
 
 @10460001 = ~Immunité à l'étourdissement~
-@10460002 = ~de désétourdir %theTarget%~ // TODO: Trouver autre chose que "désétourdir"
-@10460003 = ~Désétourdit %theTarget%~ // TODO: Trouver autre chose que "Désétourdit"
+@10460002 = ~de ranimer %theTarget%~
+@10460003 = ~Ranime %theTarget%~
 
 // Opcode 47: Cure: Invisibility [47]
 
@@ -913,9 +911,9 @@
 // Opcode 58: Cure: Dispellable Effects (Dispel Magic) [58]
 
 @10580001 = ~Dissipation de la magie sur %theTarget%~
-@10580002 = ~Dissipation de la magie assurée sur %theTarget%~ // TODO: Trouver autre chose que "assurée"
+@10580002 = ~Dissipation de la magie inéluctable sur %theTarget%~
 @10580003 = ~de dissiper la magie sur %theTarget%~
-@10580004 = ~de dissiper la magie assurément sur %theTarget%~ // TODO: Trouver autre chose que "assurément"
+@10580004 = ~de dissiper la magie inéluctablement sur %theTarget%~
 @10580005 = ~les armes invoquées ne sont pas affectées~
 @10580006 = ~les armes invoquées sont toujours dissipées~
 
@@ -950,9 +948,9 @@
 
 // Opcode 64: State: Remove Infravision [64]
 
-@10640001 = ~Immunité l'infravision~
-@10640002 = ~Dissipe l'infravision %ofTheTarget%~
-@10640003 = ~de dissiper l'infravision %ofTheTarget%~
+@10640001 = ~Neutralise l'infravision~
+@10640002 = ~Neutralise l'infravision %ofTheTarget%~
+@10640003 = ~de neutraliser l'infravision %ofTheTarget%~
 
 // Opcode 67: Summon: Creature Summoning [67]
 
@@ -1017,21 +1015,21 @@
 
 // Opcode 78: State: Disease [78]
 
-@10780003 = ~Inocule une maladie qui ralentit %theTarget% et diminue sa force, sa dextérité et son charisme de %amount%~
-@10780004 = ~Inocule une maladie qui diminue la force %ofTheTarget% de %amount%~
-@10780005 = ~Inocule une maladie qui diminue la dextérité %ofTheTarget% de %amount%~
-@10780006 = ~Inocule une maladie qui diminue la constitution %ofTheTarget% de %amount%~
-@10780007 = ~Inocule une maladie qui diminue l'intelligence %ofTheTarget% de %amount%~
-@10780008 = ~Inocule une maladie qui diminue la sagesse %ofTheTarget% de %amount%~
-@10780009 = ~Inocule une maladie qui diminue le charisme %ofTheTarget% de %amount%~
+@10780003 = ~Inocule une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780004 = ~Inocule une maladie qui diminue de %amount% la force %ofTheTarget%~
+@10780005 = ~Inocule une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
+@10780006 = ~Inocule une maladie qui diminue de %amount% la constitution %ofTheTarget%~
+@10780007 = ~Inocule une maladie qui diminue de %amount% l'intelligence %ofTheTarget%~
+@10780008 = ~Inocule une maladie qui diminue de %amount% la sagesse %ofTheTarget%~
+@10780009 = ~Inocule une maladie qui diminue de %amount% le charisme %ofTheTarget%~
 @10780010 = ~Inocule une maladie qui ralentit %theTarget%~
-@10780013 = ~Inocule une maladie qui ralentit %theTarget% et augmente sa force, sa dextérité et son charisme de %amount%~
-@10780014 = ~Inocule une maladie qui augmente la force %ofTheTarget% de %amount%~
-@10780015 = ~Inocule une maladie qui augmente la dextérité %ofTheTarget% de %amount%~
-@10780016 = ~Inocule une maladie qui augmente la constitution %ofTheTarget% de %amount%~
-@10780017 = ~Inocule une maladie qui augmente l'intelligence %ofTheTarget% de %amount%~
-@10780018 = ~Inocule une maladie qui augmente la sagesse %ofTheTarget% de %amount%~
-@10780019 = ~Inocule une maladie qui augmente le charisme %ofTheTarget% de %amount%~
+@10780013 = ~Inocule une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780014 = ~Inocule une maladie qui augmente de %amount% la force %ofTheTarget%~
+@10780015 = ~Inocule une maladie qui augmente de %amount% la dextérité %ofTheTarget%~
+@10780016 = ~Inocule une maladie qui augmente de %amount% la constitution %ofTheTarget%~
+@10780017 = ~Inocule une maladie qui augmente de %amount% l'intelligence %ofTheTarget%~
+@10780018 = ~Inocule une maladie qui augmente de %amount% la sagesse %ofTheTarget%~
+@10780019 = ~Inocule une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780020 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
 @10780021 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
 @10780022 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
@@ -1041,21 +1039,21 @@
 @10780026 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
 @10780027 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
 
-@10780103 = ~d'inoculer une maladie qui ralentit %theTarget% et diminue sa force, sa dextérité et son charisme de %amount%~
-@10780104 = ~d'inoculer une maladie qui diminue la force %ofTheTarget% de %amount%~
-@10780105 = ~d'inoculer une maladie qui diminue la dextérité %ofTheTarget% de %amount%~
-@10780106 = ~d'inoculer une maladie qui diminue la constitution %ofTheTarget% de %amount%~
-@10780107 = ~d'inoculer une maladie qui diminue l'intelligence %ofTheTarget% de %amount%~
-@10780108 = ~d'inoculer une maladie qui diminue la sagesse %ofTheTarget% de %amount%~
-@10780109 = ~d'inoculer une maladie qui diminue le charisme %ofTheTarget% de %amount%~
+@10780103 = ~d'inoculer une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780104 = ~d'inoculer une maladie qui diminue de %amount% la force %ofTheTarget%~
+@10780105 = ~d'inoculer une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
+@10780106 = ~d'inoculer une maladie qui diminue de %amount% la constitution %ofTheTarget%~
+@10780107 = ~d'inoculer une maladie qui diminue de %amount% l'intelligence %ofTheTarget%~
+@10780108 = ~d'inoculer une maladie qui diminue de %amount% la sagesse %ofTheTarget%~
+@10780109 = ~d'inoculer une maladie qui diminue de %amount% le charisme %ofTheTarget%~
 @10780110 = ~d'inoculer une maladie qui ralentit %theTarget%~
-@10780113 = ~d'inoculer une maladie qui ralentit %theTarget% et augmente sa force, sa dextérité et son charisme de %amount%~
-@10780114 = ~d'inoculer une maladie qui augmente la force %ofTheTarget% de %amount%~
-@10780115 = ~d'inoculer une maladie qui augmente la dextérité %ofTheTarget% de %amount%~
-@10780116 = ~d'inoculer une maladie qui augmente la constitution %ofTheTarget% de %amount%~
-@10780117 = ~d'inoculer une maladie qui augmente l'intelligence %ofTheTarget% de %amount%~
-@10780118 = ~d'inoculer une maladie qui augmente la sagesse %ofTheTarget% de %amount%~
-@10780119 = ~d'inoculer une maladie qui augmente le charisme %ofTheTarget% de %amount%~
+@10780113 = ~d'inoculer une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780114 = ~d'inoculer une maladie qui augmente de %amount% la force %ofTheTarget%~
+@10780115 = ~d'inoculer une maladie qui augmente de %amount% la dextérité %ofTheTarget%~
+@10780116 = ~d'inoculer une maladie qui augmente de %amount% la constitution %ofTheTarget%~
+@10780117 = ~d'inoculer une maladie qui augmente de %amount% l'intelligence %ofTheTarget%~
+@10780118 = ~d'inoculer une maladie qui augmente de %amount% la sagesse %ofTheTarget%~
+@10780119 = ~d'inoculer une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780120 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
 @10780121 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
 @10780122 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
@@ -1095,7 +1093,7 @@
 @10830007 = ~Immunité contre les flèchettes~
 @10830008 = ~Immunité contre les lances de jet~
 @10830009 = ~Immunité contre les missiles magiques~
-@10830010 = ~Immunité contre les flèches de flamme bleue~
+@10830010 = ~Immunité contre les flèches à flamme bleue~
 @10830011 = ~Immunité contre les éclairs~
 @10830012 = ~Immunité contre les toiles d'araignées~
 
@@ -1130,8 +1128,8 @@
 
 // Opcode 91: Stat: Find Traps Modifier [91]
 
-@10910001 = ~Détection/désamorçage des pièges~
-@10910002 = ~la détection/désamorçage des pièges~
+@10910001 = ~Détection / désamorçage des pièges~
+@10910002 = ~la détection / désamorçage des pièges~
 
 // Opcode 92: Stat: Pick Pockets Modifier [92]
 
@@ -1186,39 +1184,39 @@
 @10990001 = ~Réduit à néant la durée des sorts profanes~
 @10990002 = ~Réduit à néant la durée des sorts divins~
 @10990003 = ~Réduit à néant la durée des chants de barde~
-@10990004 = ~Réduit la durée des sorts profanes de %duration%~
-@10990005 = ~Réduit la durée des sorts divins de %duration%~
-@10990006 = ~Réduit la durée des chants de barde de %duration%~
-@10990007 = ~Allonge la durée des sorts profanes de %duration%~
-@10990008 = ~Allonge la durée des sorts divins de %duration%~
-@10990009 = ~Allonge la durée des chants de barde de %duration%~
+@10990004 = ~Réduit de %duration% la durée des sorts profanes~
+@10990005 = ~Réduit de %duration% la durée des sorts divins~
+@10990006 = ~Réduit de %duration% la durée des chants de barde~
+@10990007 = ~Allonge de %duration% la durée des sorts profanes~
+@10990008 = ~Allonge de %duration% la durée des sorts divins~
+@10990009 = ~Allonge de %duration% la durée des chants de barde~
 
 @10990011 = ~Réduit à néant la durée des sorts profanes %ofTheTarget%~
 @10990012 = ~Réduit à néant la durée des sorts divins %ofTheTarget%~
 @10990013 = ~Réduit à néant la durée des chants de barde %ofTheTarget%~
-@10990014 = ~Réduit la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990015 = ~Réduit la durée des sorts divins %ofTheTarget% de %duration%~
-@10990016 = ~Réduit la durée des chants de barde %ofTheTarget% de %duration%~
-@10990017 = ~Allonge la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990018 = ~Allonge la durée des sorts divins %ofTheTarget% de %duration%~
-@10990019 = ~Allonge la durée des chants de barde %ofTheTarget% de %duration%~
+@10990014 = ~Réduit de %duration% la durée des sorts profanes %ofTheTarget%~
+@10990015 = ~Réduit de %duration% la durée des sorts divins %ofTheTarget%~
+@10990016 = ~Réduit de %duration% la durée des chants de barde %ofTheTarget%~
+@10990017 = ~Allonge de %duration% la durée des sorts profanes %ofTheTarget%~
+@10990018 = ~Allonge de %duration% la durée des sorts divins %ofTheTarget%~
+@10990019 = ~Allonge de %duration% la durée des chants de barde %ofTheTarget%~
 
 @10990021 = ~de réduire à néant la durée des sorts profanes %ofTheTarget%~
 @10990022 = ~de réduire à néant la durée des sorts divins %ofTheTarget%~
 @10990023 = ~de réduire à néant la durée des chants de barde %ofTheTarget%~
-@10990024 = ~de réduire la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990025 = ~de réduire la durée des sorts divins %ofTheTarget% de %duration%~
-@10990026 = ~de réduire la durée des chants de barde %ofTheTarget% de %duration%~
-@10990027 = ~d'allonger la durée des sorts profanes %ofTheTarget% de %duration%~
-@10990028 = ~d'allonger la durée des sorts divins %ofTheTarget% de %duration%~
-@10990029 = ~d'allonger la durée des chants de barde %ofTheTarget% de %duration%~
+@10990024 = ~de réduire de %duration% la durée des sorts profanes %ofTheTarget%~
+@10990025 = ~de réduire de %duration% la durée des sorts divins %ofTheTarget%~
+@10990026 = ~de réduire de %duration% la durée des chants de barde %ofTheTarget%~
+@10990027 = ~d'allonger de %duration% la durée des sorts profanes %ofTheTarget%~
+@10990028 = ~d'allonger de %duration% la durée des sorts divins %ofTheTarget%~
+@10990029 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~
 
 // Opcode 100: Protection: from Creature Type [100]
 
-@11000001 = ~Immunité contre les %creatureType%~
-@11000002 = ~Immunité contre toutes les créatures~
-@11000003 = ~Immunise %theTarget% des attaques et des sorts des %creatureType%~
-@11000004 = ~Immunise %theTarget% des attaques et des sorts de toutes les créatures~
+@11000001 = ~Immunité aux attaques et aux sorts de %creatureType%~
+@11000002 = ~Immunité aux attaques et aux sorts de toutes les créatures~
+@11000003 = ~Immunise %theTarget% contre les attaques et les sorts des %creatureType%~
+@11000004 = ~Immunise %theTarget% contre les attaques et les sorts de toutes les créatures~
 @11000005 = ~de résister aux attaques et aux sorts des %creatureType%~
 @11000006 = ~de résister aux attaques et aux sorts de toutes les créatures~
 
@@ -1239,7 +1237,7 @@
 @11010016 = ~Immunité à la hâte~
 @11010019 = ~Immunité aux effets modifiant l'intelligence~
 @11010020 = ~Immunité à l'invisibilité~
-@11010021 = ~Immunité aux effets modifiant la connaissance~
+@11010021 = ~Immunité aux effets modifiant le score de connaissances~
 @11010023 = ~Immunité à la panique~
 @11010024 = ~Immunité à l'horreur~
 @11010025 = ~Immunité aux poisons~
@@ -1248,7 +1246,7 @@
 @11010039 = ~Immunité au sommeil~
 @11010040 = ~Immunité à la lenteur~
 @11010042 = ~Immunité à la mémorisation supplémentaire de sorts profanes~
-@11010043 = ~Immunité à la dépétrification~
+@11010043 = ~Immunité à la transmutation de pierre en chair~
 @11010044 = ~Immunité aux effets modifiant la force~
 @11010045 = ~Immunité à l'étourdissement~
 @11010049 = ~Immunité aux effets modifiant la sagesse~
@@ -1280,7 +1278,7 @@
 @11010128 = ~Immunité à la confusion~
 @11010134 = ~Immunité à la pétrification~
 @11010135 = ~~ // Opcode visuel
-@11010136 = ~Immunité aux effets qui rendent partiellement visible~
+@11010136 = ~Immunité aux effets rendant partiellement visible~
 @11010137 = ~Immunité aux effets des chants négatifs~
 @11010139 = ~~ // Opcode textuel
 @11010141 = ~~ // Opcode visuel
@@ -1297,7 +1295,7 @@
 @11010175 = ~Immunité à la paralysie~
 @11010177 = ~~ // ??? Immunité à tous les effets lancés depuis l'opcode 177...
 @11010185 = ~Immunité à la paralysie~
-@11010193 = ~Immunité à la détection des invisibles~
+@11010193 = ~Immunité à la détection de l'invisibilité~
 @11010209 = ~Immunité à la mort magique~
 @11010210 = ~Immunité à l'étourdissement~
 @11010211 = ~Immunité à l'emprisonnement~
@@ -1305,14 +1303,14 @@
 @11010215 = ~~ // Opcode visuel
 @11010216 = ~Immunité au drain de niveaux~
 @11010217 = ~Immunité au sommeil~
-@11010218 = ~Immunité à la peau de pierre~
+@11010218 = ~Immunité aux peaux de pierre~
 @11010219 = ~Immunité à la classe d'armure contre un type de créature~
-@11010220 = ~Immunité à la dissipation des sorts~ // Removal: Remove School [220]
-@11010221 = ~Immunité à la dissipation des sorts~ // Removal: Remove Secondary Type [221]
+@11010220 = ~Immunité à la dissipation des sorts d'une école de magie spécifique~ // Removal: Remove School [220]
+@11010221 = ~Immunité à la dissipation des sorts d'un type secondaire~ // Removal: Remove Secondary Type [221]
 @11010222 = ~Immunité à la téléportation~
 @11010223 = ~Immunité à l'immunité contre une école de magie~
-@11010224 = ~Immunité à la restauration des niveaux drainés~
-@11010225 = ~Immunité à la révélation de la magie~
+@11010224 = ~Immunité à la restauration des niveaux~
+@11010225 = ~Immunité à la détection de la magie~
 @11010230 = ~Immunité à la dissipation des sorts~ // Removal: Remove One Secondary Type [230]
 @11010231 = ~Immunité à l'arrêt du temps~
 @11010235 = ~Immunité au renversement~
@@ -1325,7 +1323,7 @@
 @11010247 = ~Immunité à la folie du berserker~
 @11010262 = ~Immunité aux effets affectant le champ de vision~
 @11010263 = ~Immunité aux attaques sournoises~
-@11010264 = ~Ne lache pas son arme en cas de panique~
+@11010264 = ~N'abandonne pas son arme en cas de panique~
 @11010274 = ~Immunité à la téléportation~
 @11010280 = ~Immunité aux hiatus entropiques~
 @11010283 = ~Immunité aux malédictions~
