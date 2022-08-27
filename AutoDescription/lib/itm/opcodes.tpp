@@ -462,6 +462,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 46 => 1
 	 47 => 1
 	 48 => 1
+	 55 => 1
 	 64 => 1
 	 70 => 1
 	 75 => 1
@@ -473,6 +474,35 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	161 => 1
 	210 => 1
 	217 => 1
+END
+
+// opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
+	 20 => 1 // Invisibilité
+	 23 => 1 // Modification du moral
+	 24 => 1 // Panique
+	 58 => 1
+	 68 => 1
+	 75 => 1
+	 77 => 1
+	 79 => 1
+	 81 => 1
+	125 => 1
+	146 => 1
+	148 => 1
+	161 => 1
+	162 => 1
+	177 => 1
+	214 => 1
+	218 => 1
+	230 => 1
+	233 => 1
+	238 => 1
+	244 => 1
+	261 => 1
+	273 => 1
+	280 => 1
+	316 => 1
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
@@ -1004,7 +1034,6 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	SET damageAmount = %parameter1%
 	SET mode = parameter2 BAND 65535
 	SET type = parameter2 - mode
-	SET saveForHalf = flagSaveForHalf
 	SPRINT description ~~
 
 	// Les dés influencent tous les modes
