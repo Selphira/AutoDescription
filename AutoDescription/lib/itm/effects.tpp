@@ -362,10 +362,12 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		END
 
 		PATCH_IF strref != 0 BEGIN
+			SET oldTarget = target
 		    PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
 		        SPRINT target EVAL ~%%vTarget%%~
 		        SPRINT EVAL ~%vTarget%~ (AT strref)
 		    END
+		    SET target = oldTarget
 		END
 	END
 END
