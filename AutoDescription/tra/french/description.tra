@@ -47,6 +47,13 @@
 @101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
 @102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+// v0.9.19
+// en cas de jet de sauvegarde réussi, l'effet est annulé, en cas d'échec, les dégâts sont divisés par deux
+@102123 = ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+@102124 = ~jet de sauvegarde %saveTypeStr% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+// les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
+@102125 = ~réduits de moitié~
+//
 @101185 = ~%description% (non cumulable)~
 
 @102003 = ~Type de compétence~

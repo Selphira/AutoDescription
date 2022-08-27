@@ -274,63 +274,63 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	END
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~saveType_to_strref~ BEGIN
+	~%FLAG_SAVINGTHROW_spell%~ 		=> 10370001 // ~contre les sorts~
+	~%FLAG_SAVINGTHROW_breath%~ 	=> 10360001 // ~contre les souffles~
+	~%FLAG_SAVINGTHROW_death%~ 		=> 10330001 // ~contre la paralysie, la mort et les poisons~
+	~%FLAG_SAVINGTHROW_wand%~ 		=> 10340001 // ~contre les baguettes, les sceptres et les bâtons~
+	~%FLAG_SAVINGTHROW_polymorph%~  => 10350001 // ~contre la pétrification et la métamorphose~
+END
+
 DEFINE_PATCH_MACRO ~add_save~ BEGIN
-	PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
+	SET saveType = (saveType BAND 0b11111)
+	// FIXME
+	SET saveForHalf = 0
+	SET failForHalf = 0
+	PATCH_IF is_ee AND opcode_n == 12 AND (parameter2 BAND 65535) == 0 BEGIN
+		SET saveForHalf = (special BAND BIT8) > 0
+		SET failForHalf = (special BAND BIT9) > 0
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: %failForHalf% %saveForHalf% ~ END
+	END
+	//
+
+	// les dégâts sont réduits de moitié même si aucun JS n'est permis
+	// PATCH_IF saveForHalf AND failForHalf BEGIN
+	// 	SPRINT saveStr @102125 // ~réduits de moitié~
+	// END
+
+	// dégâts réduits de moitié si :
+	// pas de JS autorisés et failForHalf actif
+	// JS autorisés mais failForHalf et saveForHalf actifs
+	PATCH_IF failForHalf AND NOT ~%description%~ STRING_EQUAL ~~ AND (saveType == 0 OR saveForHalf) BEGIN
+		SPRINT saveStr @102125 // ~réduits de moitié~
+		SPRINT description ~%description% (%saveStr%)~
+	END
+	ELSE PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
+		// FIXME les js ne sont pas cumulés dans la description finale
 		SPRINT saveTypeStr ~~
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
-            SPRINT saveTypeStr @10370001 // ~contre les sorts~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_breath) == FLAG_SAVINGTHROW_breath BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10360001 // ~contre les souffles~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_death) == FLAG_SAVINGTHROW_death BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10330001 // ~contre la paralysie, la mort et les poisons~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_wand) == FLAG_SAVINGTHROW_wand BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10340001 // ~contre les baguettes, les sceptres et les bâtons~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_polymorph) == FLAG_SAVINGTHROW_polymorph BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10350001 // ~contre la pétrification et la métamorphose~
-        END
 
-		// FIXME
-		SET saveForHalf = 0
-		SET failForHalf = 0
-		PATCH_IF opcode == 12 AND mode == 0 BEGIN
-			SET saveForHalf = (special BAND BIT8)
-			SET failForHalf = (special BAND BIT9)
+		PHP_EACH saveType_to_strref AS saveBit => strref BEGIN
+			PATCH_IF (saveType BAND saveBit) BEGIN
+				SPRINT strOr ~~
+				SPRINT strref (AT strref)
+				PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+					SPRINT strOr @100004 // ~ou~
+					// FIXME le faire en une fois ?
+					SPRINT strOr ~ %strOr% ~
+				END
+				SPRINT saveTypeStr ~%saveTypeStr%%strOr%%strref%~
+			END
 		END
-		//
 
-        PATCH_IF saveBonus != 0 BEGIN
+		PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			PATCH_IF saveForHalf OR failForHalf BEGIN
-				PATCH_IF saveForHalf AND NOT failForHalf BEGIN
-					SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
-				END
-				ELSE PATCH_IF NOT failForHalf AND failForHalf BEGIN
-					// FIXME
-					LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% failForHalf non gere.~ END
-					SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
-				ELSE BEGIN
-					SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
-				END
+			PATCH_IF saveForHalf BEGIN
+				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
+			END
+			ELSE PATCH_IF failForHalf BEGIN
+				SPRINT saveStr @102124 // ~jet de sauvegarde %saveTypeStr% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+			END
 			ELSE BEGIN
 				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
@@ -340,9 +340,7 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 			END
 			ELSE PATCH_IF failForHalf BEGIN
-				// FIXME
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% failForHalf non gere.~ END
-				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
+				SPRINT saveStr @102123 // ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
