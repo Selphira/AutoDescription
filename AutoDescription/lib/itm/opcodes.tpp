@@ -2447,6 +2447,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_59~ BEGIN
 	LPM ~opcode_self_probability_59~
 END
 
+DEFINE_PATCH_MACRO ~opcode_59_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------ *
  * Stat: Miscast Magic [60] *
  * ------------------------ */
