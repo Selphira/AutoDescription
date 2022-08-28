@@ -44,28 +44,23 @@ BEGIN
 					SET countLines += 1
                 END
 
-				PATCH_IF ~countLines%index%~ == 1 BEGIN
-					// Ne pas afficher le titre, sauf s'il est nommé ?!
-	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
-	                    SET lineSort = sort + ~%data_0%~
-						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
-						SET countLines += 1
-	                END
-				END
-				ELSE PATCH_IF EVAL ~countLines%index%~ > 0 BEGIN
-					SET abilityNumber = index + 1
-					SPRINT title @101124 // ~Capacité %abilityNumber%~
+				PATCH_IF EVAL ~countLines%index%~ > 1 BEGIN
+					// On ajoute le titre générique que si on n'a pas trouvé le titre par tooltip
+					PATCH_IF ~%title%~ STRING_EQUAL ~~ BEGIN
+						SET abilityNumber = index + 1
+						SPRINT title @101124 // ~Capacité %abilityNumber%~
 
-                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
-					SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
+	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+						SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
+						SET countLines += 1
+					END
+				END
+
+                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+                    SET lineSort = sort + ~%data_0%~
+					SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
 					SET countLines += 1
-
-	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
-	                    SET lineSort = sort + ~%data_0%~
-						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
-						SET countLines += 1
-	                END
-				END
+                END
 			END
 		END
 
