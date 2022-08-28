@@ -2455,12 +2455,12 @@ END
  * Stat: Miscast Magic [60] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_60~ BEGIN
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = parameter1 BAND 255
 	LOCAL_SET type = parameter2
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value == 100 BEGIN
+	PATCH_IF value >= 100 BEGIN
 		SPRINT description @10600004 // ~Empêche l'incantation des sorts %spellType%~
 	END
 	ELSE BEGIN
@@ -2469,12 +2469,12 @@ DEFINE_PATCH_MACRO ~opcode_self_60~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_60~ BEGIN
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = parameter1 BAND 255
 	LOCAL_SET type = parameter2
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value == 100 BEGIN
+	PATCH_IF value >= 100 BEGIN
 		SPRINT description @10600006 // ~Provoque l'échec des sorts %spellType% incantés par %theTarget%~
 	END
 	ELSE BEGIN
@@ -2483,12 +2483,12 @@ DEFINE_PATCH_MACRO ~opcode_target_60~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_60~ BEGIN
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = parameter1 BAND 255
 	LOCAL_SET type = parameter2
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value == 100 BEGIN
+	PATCH_IF value >= 100 BEGIN
 		SPRINT description @10600008 // ~de provoquer l'échec des sorts %spellType% incantés par %theTarget%~
 	END
 	ELSE BEGIN
@@ -2507,6 +2507,17 @@ DEFINE_PATCH_MACRO ~opcode_60_common~ BEGIN
 	END
 	ELSE PATCH_IF type == 2 OR type== 5 BEGIN
 		SPRINT spellType @10600003 // ~innés~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_60_is_valid~ BEGIN
+	PATCH_IF (parameter1 BAND 255) == 0 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+	END
+	PATCH_IF parameter2 < 0 OR parameter2 > 5 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
