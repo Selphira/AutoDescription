@@ -32,6 +32,7 @@ BEGIN
 				SPRINT title ~~
 				SET depletion = ~%data_3%~
 				SET charges = ~%data_4%~
+				SET hasTitle = 0
 
 				SET sort = ( index + 1 ) * 1000000
 
@@ -42,6 +43,7 @@ BEGIN
                     LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%tooltip%~ RET title END
 					SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
 					SET countLines += 1
+					SET hasTitle = 1
                 END
 
 				PATCH_IF EVAL ~countLines%index%~ > 1 BEGIN
@@ -53,12 +55,19 @@ BEGIN
 	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
 						SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
 						SET countLines += 1
+						SET hasTitle = 1
 					END
 				END
 
                 PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
                     SET lineSort = sort + ~%data_0%~
-					SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
+                    PATCH_IF hasTitle == 0 BEGIN
+	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET title END
+						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%title%~) = 1
+                    END
+                    ELSE BEGIN
+						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
+                    END
 					SET countLines += 1
                 END
 			END
