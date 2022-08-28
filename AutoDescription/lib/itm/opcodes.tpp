@@ -2272,23 +2272,39 @@ DEFINE_PATCH_MACRO ~opcode_self_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
-	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-
-	PATCH_IF diceCount > 0 BEGIN
-		SPRINT description @10550002 // ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-	END ELSE BEGIN
-		SPRINT description @10550001 // ~Tue instantanément les %creatureType%~
+	// Ici pas besoin de calcul compliqué
+	// A partir du moment où le fichier ids est correct (checké dans opcode_x_is_valid)
+	// Si P1 == 0 => aucune restriction
+	PATCH_IF parameter1 == 0 BEGIN
+		SPRINT description @10550005 // ~Tue instantanément %theTarget%~
+	END
+	ELSE BEGIN
+		// FIXME : la restriction de niveau devrait être simplement géré par add_target_level
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+		 PATCH_IF diceCount > 0 BEGIN
+			SPRINT description @10550002 // ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
+		END ELSE BEGIN
+			SPRINT description @10550001 // ~Tue instantanément les %creatureType%~
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
-	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-
-	PATCH_IF diceCount > 0 BEGIN
-		SPRINT description @10550004 // ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-	END ELSE BEGIN
-		SPRINT description @10550003 // ~de tuer instantanément les %creatureType%~
+	PATCH_IF parameter1 == 0 BEGIN
+		SPRINT description @10550006 // ~de tuer instantanément %theTarget%~
 	END
+	ELSE BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+		PATCH_IF diceCount > 0 BEGIN
+			SPRINT description @10550004 // ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
+		END ELSE BEGIN
+			SPRINT description @10550003 // ~de tuer instantanément les %creatureType%~
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_55_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
 END
 
 /* ---------------------- *
@@ -8220,7 +8236,7 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 			SPRINT idName $kits(~%entryHex%~)
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Kit utilisé n'existe pas : %entry% : %entryHex%~ END
+			LPF ~log_warning~ STR_VAR message = EVAL ~Kit utilise n'existe pas : %entry% : %entryHex%~ END
 		END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
@@ -8393,5 +8409,13 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
 		SET isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
 	END
 END

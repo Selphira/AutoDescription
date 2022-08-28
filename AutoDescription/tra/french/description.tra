@@ -895,6 +895,8 @@
 @10550002 = ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
 @10550003 = ~de tuer instantanément les %creatureType%~
 @10550004 = ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
+@10550005 = ~Tue instantanément %theTarget%~
+@10550006 = ~de tuer instantanément %theTarget%~
 
 // Opcode 56: Alignment: Invert [56]
 
