@@ -146,12 +146,22 @@ BEGIN
 		PATCH_PHP_EACH ~lines0~ AS base => _ BEGIN
 			FOR (index = 1; index < countHeaders; index += 1) BEGIN
 				PATCH_IF EVAL ~countLines%index%~ > 0 BEGIN
-	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
-						PATCH_IF NOT ~%base_5%~ STRING_EQUAL ~%data_5%~ BEGIN
-	                        SET hasSame = 0
-	                        SET index = countHeaders
-						END
-	                END
+					PATCH_IF ~countLines0~ != ~countLines%index%~ BEGIN
+	                    SET hasSame = 0
+	                    SET index = countHeaders
+					END
+					ELSE BEGIN
+						SET hasSameAbility = 0
+		                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+							PATCH_IF ~%base_5%~ STRING_EQUAL ~%data_5%~ BEGIN
+		                        SET hasSameAbility = 1
+							END
+		                END
+		                PATCH_IF hasSameAbility == 0 BEGIN
+		                    SET hasSame = 0
+		                    SET index = countHeaders
+		                END
+					END
 				END
 			END
 		END
