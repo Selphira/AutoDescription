@@ -2411,7 +2411,7 @@ DEFINE_PATCH_MACRO ~opcode_58_common~ BEGIN
 		SET strref += 1
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
-	ELSE PATCH_IF type == 2 BEGIN
+	ELSE PATCH_IF type >= 2 BEGIN
 		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
 		SPRINT description ~%description% (%castingLevelStr%)~
 	END
@@ -2421,7 +2421,7 @@ DEFINE_PATCH_MACRO ~opcode_58_common~ BEGIN
 			SPRINT weaponStr @10580006 // ~les armes invoquées sont toujours dissipées~
 			SPRINT description ~%description% (%weaponStr%)~
 		END
-		ELSE PATCH_IF mwType == 1 BEGIN
+		ELSE PATCH_IF mwType != 0 AND mwType != 2 BEGIN
 			SPRINT weaponStr @10580005 // ~les armes invoquées ne sont pas affectées~
 			SPRINT description ~%description% (%weaponStr%)~
 		END
