@@ -290,7 +290,6 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	PATCH_IF is_ee AND opcode_n == 12 AND (parameter2 BAND 65535) == 0 BEGIN
 		SET saveForHalf = (special BAND BIT8) > 0
 		SET failForHalf = (special BAND BIT9) > 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: %failForHalf% %saveForHalf% ~ END
 	END
 	//
 

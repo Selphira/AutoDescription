@@ -466,6 +466,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 55 => 1 // Mort
 	 58 => 1 // Dissipation de la magie
 	 64 => 1 // Dissipation Infravision
+	 68 => 1 // Désinvocation
 	 70 => 1
 	 75 => 1
 	 77 => 1
@@ -482,7 +483,6 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	 24 => 1 // Panique
-	 68 => 1
 	 75 => 1
 	 77 => 1
 	 79 => 1
