@@ -7327,8 +7327,8 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 		SPRINT description @13210007 // ~Les effets ne se cumulent pas~
 	END
 	ELSE BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-		LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
+		LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 2
@@ -8068,7 +8068,8 @@ DEFINE_PATCH_MACRO ~opcode_not_cumulative~ BEGIN
     SPRINT description ~%description% (%notCumulative%)~
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
+// Rajout d'un paramètre pour bloquer l'affichage du warning (dans le cas où l'objet n'a pas besoin d'exister (opcode 321))
+DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = "" RET spellName BEGIN
 	TO_LOWER file
 	PATCH_IF VARIABLE_IS_SET $spellnames(~%file%~) BEGIN
 		SET strref = $spellnames(~%file%~)
@@ -8101,7 +8102,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ STR_VAR file = "" RET spellName BEGIN
 				*/
 			END
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF showWarning BEGIN
 			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
 		END
 	END
@@ -8120,7 +8121,8 @@ DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET s
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
 END
 
-DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
+// Rajout d'un paramètre pour bloquer l'affichage du warning (dans le cas où l'objet n'a pas besoin d'exister (opcode 321))
+DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" RET itemName BEGIN
 	SPRINT itemName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
@@ -8136,7 +8138,7 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ STR_VAR file = "" RET itemName BEGIN
 			*/
 		END
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF showWarning BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
 	END
 END

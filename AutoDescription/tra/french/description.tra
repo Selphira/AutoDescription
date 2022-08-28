@@ -199,6 +199,7 @@
 @100311 = ~pendant %strDuration%~
 @100312 = ~de manière permanente~
 @100313 = ~de manière permanente, persiste après la mort~
+@100314 = ~après %strDuration% et pendant %strDuration%~
 
 /* ------ *
  * Ea.ids *
