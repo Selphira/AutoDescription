@@ -606,7 +606,7 @@
 // Opcode 2: Cure: Sleep [2]
 
 @10020001 = ~Réveille %theTarget%~
-@10020001 = ~de réveiller %theTarget%~
+@10020002 = ~de réveiller %theTarget%~
 
 // Opcode 3: State: Berserking [3]
 

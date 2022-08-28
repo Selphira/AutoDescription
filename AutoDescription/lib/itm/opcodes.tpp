@@ -456,6 +456,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 13 => 1
 	 14 => 1
 	 17 => 1
+	 23 => 1 // Modification du moral
 	 26 => 1
 	 32 => 1
 	 43 => 1
@@ -479,7 +480,6 @@ END
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
-	 23 => 1 // Modification du moral
 	 24 => 1 // Panique
 	 58 => 1
 	 68 => 1
