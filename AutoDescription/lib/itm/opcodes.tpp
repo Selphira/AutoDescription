@@ -2365,10 +2365,21 @@ DEFINE_PATCH_MACRO ~opcode_57_common~ BEGIN
 	ELSE PATCH_IF alignment == 33 BEGIN SPRINT alignment ~%neutral% %good%~ END
 	ELSE PATCH_IF alignment == 34 BEGIN SPRINT alignment ~%trueNeutral%~ END
 	ELSE PATCH_IF alignment == 35 BEGIN SPRINT alignment ~%neutral% %evil%~ END
-	ELSE PATCH_IF alignment == 49 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
-	ELSE PATCH_IF alignment == 50 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
+	ELSE PATCH_IF alignment == 49 BEGIN SPRINT alignment ~%chaotic% %good%~ END
+	ELSE PATCH_IF alignment == 50 BEGIN SPRINT alignment ~%chaotic% %neutral%~ END
 	ELSE PATCH_IF alignment == 51 BEGIN SPRINT alignment ~%chaotic% %evil%~ END
 END
+
+DEFINE_PATCH_MACRO ~opcode_57_is_valid~ BEGIN
+	PATCH_IF parameter2 < 17 OR parameter2 > 51 OR
+			 parameter2 > 19 AND parameter2 < 33 OR
+			 parameter2 > 35 AND parameter2 < 49
+			 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown alignment %parameter2%.~ END
+	END
+END
+
 
 /* --------------------------------------------- *
  * Cure: Dispellable Effects (Dispel Magic) [58] *

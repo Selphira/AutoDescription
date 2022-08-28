@@ -360,7 +360,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		PATCH_IF levelMin == levelMax BEGIN
 			SET strref = 101186 // ~%target% (de niveau %levelMin%)~
 		END
-		ELSE PATCH_IF levelMin == 0 AND levelMax > 0 BEGIN
+		ELSE PATCH_IF levelMin <= 1 AND levelMax > 0 BEGIN
 			SET strref = 101187 // ~%target% (de niveau %levelMax% ou inférieur)~
 		END
 		ELSE PATCH_IF levelMin > 0 AND levelMax == 0 BEGIN
