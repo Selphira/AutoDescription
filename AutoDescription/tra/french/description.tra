@@ -960,6 +960,10 @@
 @10670002 = ~Invoque une créature hostile (%creatureName%)~
 @10670003 = ~d'invoquer une créature (%creatureName%)~
 @10670004 = ~d'invoquer une créature hostile (%creatureName%)~
+@10670005 = ~Invoque une créature alliée (%creatureName%)~
+@10670006 = ~Invoque une créature neutre (%creatureName%)~
+@10670007 = ~d'invoquer une créature alliée (%creatureName%)~
+@10670008 = ~d'invoquer une créature neutre (%creatureName%)~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 

@@ -451,9 +451,9 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	  2 => 1
 	  4 => 1
-	 11 => 1
-	 12 => 1
-	 13 => 1
+	 11 => 1 // Neutralisation du poison
+	 12 => 1 // Dégâts
+	 13 => 1 // Mort
 	 14 => 1
 	 17 => 1
 	 23 => 1 // Modification du moral
@@ -463,8 +463,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 46 => 1
 	 47 => 1
 	 48 => 1
-	 55 => 1
-	 64 => 1
+	 55 => 1 // Mort
+	 58 => 1 // Dissipation de la magie
+	 64 => 1 // Dissipation Infravision
 	 70 => 1
 	 75 => 1
 	 77 => 1
@@ -481,7 +482,6 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	 24 => 1 // Panique
-	 58 => 1
 	 68 => 1
 	 75 => 1
 	 77 => 1
@@ -2571,30 +2571,48 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
-			SPRINT description @10670002 // ~Invoque une créature hostile (%creatureName%)~
-	    END
-	    ELSE BEGIN
+		// Allégiance de la créature non modifiée, donc intéressant
+		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
+			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
+			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
+				SPRINT description @10670002 // ~Invoque une créature hostile (%creatureName%)~
+			END
+			ELSE PATCH_IF allegiance <= 30 BEGIN // GOODCUTOFF
+				SPRINT description @10670005 // ~Invoque une créature alliée (%creatureName%)~
+			END
+			ELSE BEGIN
+				SPRINT description @10670006 // ~Invoque une créature neutre (%creatureName%)~
+			END
+		END
+		// Allégiance variable selon celle de la cible, donc pas de précision
+		ELSE BEGIN
 			SPRINT description @10670001 // ~Invoque une créature (%creatureName%)~
-	    END
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF ~%allegiance%~ STRING_EQUAL_CASE ~enemy~ BEGIN
-			SPRINT description @10670004 // ~d'invoquer une créature hostile (%creatureName%)~
-	    END
-	    ELSE BEGIN
+		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
+			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
+			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
+				SPRINT description @10670004 // ~d'invoquer une créature hostile (%creatureName%)~
+			END
+			ELSE PATCH_IF allegiance <= 30 BEGIN // GOODCUTOFF
+				SPRINT description @10670007 // ~d'invoquer une créature alliée (%creatureName%)~
+			END
+			ELSE BEGIN
+				SPRINT description @10670008 // ~d'invoquer une créature neutre (%creatureName%)~
+			END
+		END
+		ELSE BEGIN
 			SPRINT description @10670003 // ~d'invoquer une créature (%creatureName%)~
-	    END
-    END
+		END
+	END
 END
 
 /* ------------------------------ *
@@ -8182,7 +8200,8 @@ DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
 		INNER_PATCH_FILE ~%file%.cre~ BEGIN
 			READ_BYTE CRE_allegiance allegiance
-			LOOKUP_IDS_SYMBOL_OF_INT allegiance EA allegiance
+			// Retiré car la valeur numérique est bien plus exploitable que son équivalent str
+			// LOOKUP_IDS_SYMBOL_OF_INT allegiance EA allegiance
 		END
 	END
 	ELSE BEGIN
