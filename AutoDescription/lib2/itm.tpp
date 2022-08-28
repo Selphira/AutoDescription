@@ -1,5 +1,7 @@
 DEFINE_PATCH_FUNCTION ~update_item_description~
 BEGIN
+	PATCH_SILENT
+
 	READ_SHORT  ITM_type            itemType
 	READ_STRREF ITM_identified_desc originalDescription
 	READ_LONG   ITM_identified_desc originalDescriptionRef
@@ -36,8 +38,8 @@ BEGIN
 	LPF ~is_weapon~ INT_VAR itemType RET isWeapon END
 
 	LPF ~add_equipped_abilities~ STR_VAR description RET description END
-	LPF ~add_combat_abilities~ STR_VAR description RET description END
 	LPF ~add_charged_abilities~ STR_VAR description RET description END
+	LPF ~add_combat_abilities~ STR_VAR description RET description END
 
 	PATCH_IF isWeapon == 1 BEGIN
 		LPF ~add_weapon_attributes~ STR_VAR description RET description END
@@ -53,7 +55,7 @@ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
 	END
 
-	PATCH_PRINT "%description%"
+	//PATCH_PRINT "%description%"
 END
 
 DEFINE_PATCH_FUNCTION ~is_weapon~

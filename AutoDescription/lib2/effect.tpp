@@ -1,11 +1,3 @@
-DEFINE_PATCH_FUNCTION ~get_effect_description~
-	RET
-		description
-BEGIN
-	INNER_PATCH_FILE ~%file%.eff~ BEGIN
-	END
-END
-
 DEFINE_PATCH_FUNCTION ~get_eff_effect_description~
 	STR_VAR
 		file = ~~
@@ -158,6 +150,8 @@ DEFINE_PATCH_MACRO ~replace_effects~ BEGIN
 	//TODO: Nécessiterait de pouvoir fournir d'une manière ou d'une autre une cible forcée, selon les paramètres de
 	//      l'opcode 177...
 	//TODO: Avoir les différentes chaînes de cible déjà dans le tableau "opcodes_xx" ??
+	//TODO: Si opcode 177 géré ici, ne pas oubier de multiplier les chances d'activation ! On ne doit pas écrire
+	//      des choses comme "10 % de chance d'avoir 50% de chance...", mais directement "5 % de chance"
 END
 
 /**
@@ -207,7 +201,7 @@ BEGIN
 	PATCH_DEFINE_ARRAY opcodes_xx BEGIN END
 
 	SET count = $opcodes(~%opcode%~)
-	PATCH_WARN "Coun: %count%"
+
 	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
 	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 	        LPM ~data_to_vars~
@@ -308,11 +302,9 @@ BEGIN
 	WITH
 		~Failure("Unknown macro: \%method%")~
 		BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
-			PATCH_FAIL ~Unknown macro: %method%~
+			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: Unknown macro: %method%~ END
 		END
 		DEFAULT
-			LPF ~log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
-			PATCH_FAIL ~Opcode %opcode%: %ERROR_MESSAGE%~
+			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
 	END
 END

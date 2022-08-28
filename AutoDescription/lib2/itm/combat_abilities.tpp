@@ -16,11 +16,12 @@ DEFINE_PATCH_FUNCTION ~add_combat_abilities~
 BEGIN
     READ_LONG ITM_flags flags
 
-	SET abilityType = AbilityType_Equipped
+	SET abilityType = AbilityType_Combat
 	SET countHeaders = 0
 	SET hasProjectile = 0
 	SET hasLauncher = 0
 	SET selectedHeader = 0
+	SET headerIndex = 0
 
 	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
@@ -40,17 +41,18 @@ BEGIN
 			END
 
 			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%SOURCE_RES%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~) = 1
 
 			SET countHeaders += 1
 		END
+		SET headerIndex += 1
 	END
 
 	LPF ~has_same_combat_abilities~ INT_VAR countHeaders RET hasSame END
 
 	// Ajout de l'effet spécifique si l'arme a un header projectile
-	FOR (headerIndex = 0; headerIndex < countHeaders; headerIndex += 1) BEGIN
-		PATCH_PHP_EACH ~headers%headerIndex%~ AS data => _ BEGIN
+	FOR (index = 0; index < countHeaders; index += 1) BEGIN
+		PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 			SET attackType = ~%data_0%~
 
 			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
@@ -61,30 +63,30 @@ BEGIN
 					SPRINT effectDescription @102269 // ~Revient dans la main du lanceur~
 				END
 
-				SET $EVAL ~lines%headerIndex%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
-				SET ~countLines%headerIndex%~ += 1
+				SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+				SET ~countLines%index%~ += 1
 			END
 		END
-		SORT_ARRAY_INDICES ~lines%headerIndex%~ NUMERICALLY
+		SORT_ARRAY_INDICES ~lines%index%~ NUMERICALLY
 
-		PATCH_IF ~countLines%headerIndex%~ > ~countLines%selectedHeader%~ BEGIN
-			SET selectedHeader = headerIndex
+		PATCH_IF ~countLines%index%~ > ~countLines%selectedHeader%~ BEGIN
+			SET selectedHeader = index
 		END
 	END
 
-	PATCH_IF hasSame == 1 OR countHeaders == 1 BEGIN
+	PATCH_IF (countHeaders > 0 AND hasSame == 1) OR countHeaders == 1 BEGIN
 		SPRINT title @100011 // ~Capacités de combat~
 		LPF ~add_section_to_description~ INT_VAR count = ~countLines%selectedHeader%~ STR_VAR title arrayName = ~lines%selectedHeader%~ RET description END
 	END
 	ELSE BEGIN
-		FOR (headerIndex = 0; headerIndex < countHeaders; headerIndex += 1) BEGIN
-			PATCH_PHP_EACH ~headers%headerIndex%~ AS data => _ BEGIN
+		FOR (index = 0; index < countHeaders; index += 1) BEGIN
+			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 				SET attackType = ~%data_0%~
 				SET location = ~%data_1%~
-				SPRINT resource ~%data_2%~
+				SET headerIndex = ~%data_2%~
 
 				LPF ~get_combat_section_title~ INT_VAR headerIndex attackType location RET title END
-				LPF ~add_section_to_description~ INT_VAR count = ~countLines%headerIndex%~ STR_VAR title arrayName = ~lines%headerIndex%~ RET description END
+				LPF ~add_section_to_description~ INT_VAR count = ~countLines%index%~ STR_VAR title arrayName = ~lines%index%~ RET description END
 			END
 		END
 	END
@@ -167,7 +169,7 @@ DEFINE_PATCH_FUNCTION ~get_combat_section_title~
 BEGIN
 	SPRINT title @100011 // ~Capacités de combat~
 
-	LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource RET sectionType = tooltip END
+	LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource = ~%SOURCE_RES%~ RET sectionType = tooltip END
 
 	PATCH_IF ~%sectionType%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF location == 1 BEGIN

@@ -4,7 +4,7 @@ DEFINE_ACTION_MACRO ~update_descriptions~ BEGIN
 END
 
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
-	COPY_EXISTING_REGEXP GLOB ~SW2H19.itm$~ ~override~
+	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 		LPF ~update_item_description~ END
 	BUT_ONLY_IF_IT_CHANGES
 END
@@ -32,7 +32,12 @@ BEGIN
         //TODO: Regrouper les éléments ayant la même probabilité: Nécessite une seconde boucle
 
 	    PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
-			LPF ~appendProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
+	        PATCH_IF value == 1 BEGIN
+				LPF ~appendProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
+			END
+			ELSE PATCH_IF value == 2 BEGIN
+				LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
+			END
 	    END
 	END
 END
