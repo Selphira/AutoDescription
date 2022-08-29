@@ -1265,7 +1265,7 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
-	ELSE PATCH_IF rtype == 0 BEGIN
+	ELSE PATCH_IF rtype == 0 OR rtype == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
 	END
 
@@ -1292,14 +1292,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	SET rtype = parameter2 BAND 65535
 	SET subType = parameter2 / 65535
 	SET isRez = subType BAND BIT0 > 0
-	
-	PATCH_IF rtype == 1 BEGIN
+
+	PATCH_IF rtype == 0 OR rtype == 2 BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
+	END
+	ELSE PATCH_IF rtype == 1 BEGIN
 		SET damageAmount = parameter1
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
-	END
-	ELSE PATCH_IF rtype == 0 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
 	END
 END
 
@@ -1321,10 +1321,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 	SET purgeEff = subType BAND BIT1 > 0
 	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
 
-	PATCH_IF rtype == 2 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: type non gere : %rtype%.~ END
-	END
-	PATCH_IF purgeEff BEGIN
+	PATCH_IF isRez OR purgeEff BEGIN
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
@@ -1333,24 +1330,32 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 
 	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
-			PATCH_IF ~%value%~ STRING_EQUAL ~+1~ BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne 1 point de vie~
+			INNER_PATCH_SAVE value ~%value%~ BEGIN
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+				PATCH_IF rtype == 2 BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
+				END
+			END
+
+			PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne %value% point de vie~
 			END
 			ELSE BEGIN
-				INNER_PATCH_SAVE value ~%value%~ BEGIN
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-				END
 				LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END // ~Soigne %value% points de vie~
 			END
 		END
 		ELSE BEGIN
-			PATCH_IF ~%value%~ STRING_EQUAL ~-1~ BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige 1 point de vie~
+			INNER_PATCH_SAVE value ~%value%~ BEGIN
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+				PATCH_IF rtype == 2 BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
+				END
+			END
+
+			PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+				LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige %value% point de vie~
 			END
 			ELSE BEGIN
-				INNER_PATCH_SAVE value ~%value%~ BEGIN
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
-				END
 				LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
 			END
 		END
