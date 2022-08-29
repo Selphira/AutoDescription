@@ -42,7 +42,7 @@ BEGIN
 	LPF ~add_combat_abilities~ STR_VAR description RET description END
 
 	PATCH_IF isWeapon == 1 BEGIN
-		LPF ~add_weapon_attributes~ STR_VAR description RET description END
+		LPF ~proficiency~ RET description END
 	END
 
 	LPF ~appendLine~         RET description END

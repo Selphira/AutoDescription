@@ -9,7 +9,6 @@ ACTION_IF !VARIABLE_IS_SET always_once_section2 BEGIN
     INCLUDE ~%MOD_FOLDER%/lib2/itm/charged_abilities.tpp~
     INCLUDE ~%MOD_FOLDER%/lib2/itm/combat_abilities.tpp~
     INCLUDE ~%MOD_FOLDER%/lib2/itm/equipped_abilities.tpp~
-    INCLUDE ~%MOD_FOLDER%/lib2/itm/weapon_attributes.tpp~
     INCLUDE ~%MOD_FOLDER%/lib2/spl.tpp~
 
     INCLUDE ~%MOD_FOLDER%/lib2/lib_ini.tpa~
