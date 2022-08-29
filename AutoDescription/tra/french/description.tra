@@ -975,7 +975,8 @@
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
-@10680001 = ~de renvoyer %theTarget% si c'est une créature invoquée~
+@10680001 = ~Renvoie %theTarget% si c'est une créature invoquée~
+@10680002 = ~de renvoyer %theTarget% si c'est une créature invoquée~
 
 // Opcode 69: Protection: From Detection (Non-Detection) [69]
 

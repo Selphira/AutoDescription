@@ -2667,8 +2667,14 @@ END
 /* ------------------------------ *
  * Summon: Unsummon Creature [68] *
  * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_target_68~ BEGIN
+	//FIXME fonctionne aussi si la créature n'est pas invoquée...
+	SPRINT description @10680001 // ~Renvoie %theTarget% si c'est une créature invoquée~
+END
+
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_68~ BEGIN
-	SPRINT description @10680001 // ~de renvoyer %theTarget% si c'est une créature invoquée~
+	SPRINT description @10680002 // ~de renvoyer %theTarget% si c'est une créature invoquée~
 END
 
 /* ----------------------------------------------- *
