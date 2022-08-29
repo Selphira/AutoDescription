@@ -712,13 +712,20 @@
 @10170006 = ~de soigner %value% points de vie %ofTheTarget%~
 @10170007 = ~d'infliger 1 point de dégâts %toTheTarget%~
 @10170008 = ~d'infliger %value% points de dégâts %toTheTarget%~
+@10170009 = ~Ressuscite %theTarget%~
+@10170010 = ~de ressusciter %theTarget%~
+@10170011 = ~Ressuscite~
+@10170012 = ~de ressusciter~
+@10170020 = ~%effect% puis %description%~
+@10170021 = ~Points de vie actuels~
+@10170022 = ~les points de vie actuels~
 
 // Opcode 18: Stat: Maximum HP Modifier [18]
 
 @10180001 = ~Points de vie maximums~
 @10180002 = ~les points de vie maximums~
-@10180003 = ~Points de vie actuels et maximums~
-@10180004 = ~les points de vie actuels et maximums~
+@10180003 = ~Points de vie~
+@10180004 = ~les points de vie~
 
 
 // Opcode 19: Stat: Intelligence Modifier [19]

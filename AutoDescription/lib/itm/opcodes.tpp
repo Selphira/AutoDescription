@@ -1254,8 +1254,33 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie %toTheTarget%~
 	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts %toTheTarget%~
 	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts %toTheTarget%~
+	LOCAL_SET strref_5 = 10170009 // ~Ressuscite~
+	// fix: renommage en rtype pour éviter conflit avec le 'type' de log_warning
+	SET rtype = parameter2 BAND 65535
+	SET subType = parameter2 / 65535
+	SET isRez = subType BAND BIT0 > 0
 
-	LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	PATCH_IF rtype == 1 BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
+	END
+	ELSE PATCH_IF rtype == 0 BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
+	END
+
+	// FIXME v0.9.20 > afficher les effets sur plusieurs lignes
+	// PATCH_IF isRez BEGIN
+	// 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	// 		LPF ~getTranslation~ INT_VAR strref = strref_5+2 opcode RET effect = string END // ~sans %theTarget%~
+	// 		TO_LOWER description
+	// 		SPRINT description @10170020
+	// 	END
+	// 	ELSE BEGIN
+	// 		LPF ~getTranslation~ INT_VAR strref = strref_5 opcode RET effect = string END // ~avec %theTarget%~
+	// 		SPRINT description ~%description%%effect%~
+	// 	END
+	// END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
@@ -1263,8 +1288,19 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie %toTheTarget%~
 	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts %toTheTarget%~
 	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts %toTheTarget%
-
-	LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	LOCAL_SET strref_5 = 10170010 // ~de ressusciter~
+	SET rtype = parameter2 BAND 65535
+	SET subType = parameter2 / 65535
+	SET isRez = subType BAND BIT0 > 0
+	
+	PATCH_IF rtype == 1 BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
+	END
+	ELSE PATCH_IF rtype == 0 BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
@@ -1279,21 +1315,17 @@ DEFINE_PATCH_MACRO ~opcode_party_17~ BEGIN
 	LPM ~opcode_self_17~
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 strref_5 = 0 RET description BEGIN
 	// TODO
-	SET type = parameter2 BAND 65535
-	SET subType = parameter2 / 65535
-	// Ramène la cible à la vie (avec 1 pv) puis la soigne
-	SET isRez = subType BAND BIT0 > 0
 	// Dissipe tous les effets non permanent_after_death puis la soigne
 	SET purgeEff = subType BAND BIT1 > 0
 	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
 
-	PATCH_IF type > 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: type non gere : %type%.~ END
+	PATCH_IF rtype == 2 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: type non gere : %rtype%.~ END
 	END
-	PATCH_IF isRez OR purgeEff BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
+	PATCH_IF purgeEff BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
 	SET damageAmount = parameter1
@@ -1321,6 +1353,18 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 				END
 				LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
 			END
+		END
+	END
+
+	PATCH_IF isRez BEGIN
+		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			LPF ~getTranslation~ INT_VAR strref = strref_5+2 opcode RET effect = string END // ~sans %theTarget%~
+			TO_LOWER description
+			SPRINT description @10170020 // ~%effect% puis %description%~
+		END
+		ELSE BEGIN
+			LPF ~getTranslation~ INT_VAR strref = strref_5 opcode RET effect = string END // ~avec %theTarget%~
+			SPRINT description ~%effect%~
 		END
 	END
 END
@@ -7809,15 +7853,16 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	END
 	ELSE BEGIN // percent
 		PATCH_IF IS_AN_INT ~%value%~ BEGIN
-			SET value -= 100
-			LPF ~signed_value~ INT_VAR value RET value END
-			PATCH_IF value != 0 BEGIN
+			PATCH_IF value != 100 BEGIN
+				SET value -= 100
+				LPF ~signed_value~ INT_VAR value RET value END
 				SPRINT value @10002 // ~%value% %~
 			END
 		END
 		ELSE BEGIN
 			// TODO !
 			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
+			SPRINT value @10002 // ~%value% %~
 		END
 	END
 	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
@@ -7826,7 +7871,8 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	PATCH_IF parameter2 >= 0 AND parameter2 <= 3 BEGIN
+	parameter2 = parameter2 BAND 65535
+	PATCH_IF parameter2 >= MOD_TYPE_cumulative AND parameter2 <= 3 BEGIN
 		LPM ~opcode_mod_base~
 		PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
 			SPRINT description @100001 // ~%name%%colon%%value%~
@@ -7856,7 +7902,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	PATCH_IF parameter2 >= 0 AND parameter2 <= 2 BEGIN
+	PATCH_IF parameter2 >= MOD_TYPE_cumulative AND parameter2 <= MOD_TYPE_percentage BEGIN
 		LPM ~opcode_mod_percent_base~
 
 		SPRINT description @100001 // ~%name%%colon%%value%~
@@ -7924,7 +7970,7 @@ DEFINE_PATCH_FUNCTION ~opcode_save_vs~ INT_VAR strref = 0 group = 0 target = 0 S
 		SPRINT theStatistic @10330002 // ~les jets de sauvegarde %versus%~
 
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-	        PATCH_IF value > 0 BEGIN
+	        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 		        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
 	        END
 	        ELSE BEGIN
@@ -7966,7 +8012,7 @@ DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -7988,7 +8034,7 @@ DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BE
 	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
@@ -8014,7 +8060,7 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 	TO_LOWER resistName
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 	        SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102282 // ~Augmente la %resistName% %ofTheTarget% de %value%~
         END
@@ -8043,7 +8089,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 	TO_LOWER resistName
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 	        SPRINT value @10002 // ~%value% %~
 	        SPRINT description @102540 // ~d'augmenter la %resistName% %ofTheTarget% de %value%~
         END
