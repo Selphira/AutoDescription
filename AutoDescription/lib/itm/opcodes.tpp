@@ -3028,12 +3028,19 @@ END
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 	// Comment trouver les correspondances sans checker tous les sorts ??
+	// TODO une seule liste pour cet opcode et le 197
+
 	// Warning de Region of Terror + Auror kit
 	// 94 : Instant area effect : Tremblement de terre (SPPR720), Zone de magie entropique (SPIN778), Terreur de l'Ecorcheur (SPIN807)
 	// 226 : Fireseed : aucune correspondance
 	// 227 : convocation d'insecte SPPR319
 	// 229 : Nuée de météores SPWI911, Tempête de feu SPPR705
 	// 231 : Icewind Glyph hit : aucune correspondance
+
+	// ITEMS BG2EE
+	// 219 : Désintégration (SPWI616)
+	// 205 : Instant area small => Repousser les morts-vivants (SPPR515), Invisibilité sur 3 mètre (SPWI307)
+	// 320 : aucune correspondance
 	PATCH_MATCH parameter2 WITH
 		  1 2 3 4 5 283 284 285 286 287 288 289 290 291 BEGIN SPRINT description @10830001 END // ~Immunité contre les flèches~
 		  6 7 8 9 10 292 293 294 295 296 BEGIN SPRINT description @10830002 END // ~Immunité contre les haches de jet~
