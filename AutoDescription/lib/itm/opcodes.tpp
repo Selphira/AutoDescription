@@ -467,7 +467,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 58 => 1 // Dissipation de la magie
 	 64 => 1 // Dissipation Infravision
 	 68 => 1 // Désinvocation
-	 70 => 1
+	 70 => 1 // Dissipation non détection
 	 75 => 1
 	 77 => 1
 	 79 => 1
@@ -2767,6 +2767,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_73~ BEGIN
 	LPM ~opcode_self_probability_73~
+END
+
+DEFINE_PATCH_MACRO ~opcode_73_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------- *
