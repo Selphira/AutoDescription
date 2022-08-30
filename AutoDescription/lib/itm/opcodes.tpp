@@ -464,11 +464,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 47 => 1
 	 48 => 1
 	 55 => 1 // Mort
-	 58 => 1 // Dissipation de la magie
-	 64 => 1 // Dissipation Infravision
+	 58 => 1 // Dissipation : Magie
+	 64 => 1 // Dissipation : Infravision
 	 68 => 1 // Désinvocation
 	 70 => 1 // Dissipation non détection
-	 75 => 1
+	 75 => 1 // Dissipation : Aveuglement
 	 77 => 1
 	 79 => 1
 	 81 => 1
@@ -483,10 +483,6 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	 24 => 1 // Panique
-	 75 => 1
-	 77 => 1
-	 79 => 1
-	 81 => 1
 	125 => 1
 	146 => 1
 	148 => 1
@@ -513,6 +509,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
 	 63 => 1
 	 64 => 1
 	 65 => 1
+	 74 => 1 // Aveuglement, ne pas toucher
 	 75 => 1
 	 77 => 1
 	 79 => 1
@@ -1375,10 +1372,10 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
-	SET type = parameter2 BAND 65535
-	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
+	SET rtype = parameter2 BAND 65535
+	PATCH_IF rtype < CURRENT_HP_MOD_TYPE_cumulative OR rtype > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
+		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %rtype%.~ END
 	END
 END
 
@@ -2872,70 +2869,87 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	SET amount = parameter1
-	SET type = parameter2
 	SET frequencyMultiplier = 1
 	SET frequency = 1
+	SET p4IsActive = VARIABLE_IS_SET parameter4 AND parameter4 != 0 AND is_ee
+	SET type = parameter2
 
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF VARIABLE_IS_SET parameter4 BEGIN
-			SET frequencyMultiplier = parameter4
-			PATCH_IF frequencyMultiplier == 0 BEGIN
-				SET frequencyMultiplier = 1
+	PATCH_IF type >= 0 AND type <= 3 BEGIN
+		// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
+		// Compliqué de faire une phrase simple
+		// FIXME Ces 4 entrée sont identiques à celle de l'opcode 25 (poison)
+		PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) OR
+				(type == 1 AND (parameter1 > 1 OR p4IsActive)) BEGIN
+			SET amount = 1
+		END
+		ELSE PATCH_IF type == 2 AND parameter1 > 0 BEGIN
+			SET amount = parameter1
+		END
+		ELSE BEGIN
+			SET amount = 1
+			SET frequency = parameter1
+		END
+
+		PATCH_IF p4IsActive AND type >= 2 AND type <= 3 BEGIN
+			SET frequency = frequency * parameter4
+			// P4 divise également les dégâts si P2 == 2, avec un minimum à 1
+			PATCH_IF type == 2 BEGIN
+				SET amount = amount / parameter4
+				PATCH_IF amount < 1 BEGIN
+					amount = 1
+				END
 			END
 		END
-		PATCH_IF type == 2 BEGIN
-			SET frequency = frequencyMultiplier
+		PATCH_IF frequency < 1 BEGIN
+			SET frequency = 1
+		END
+
+		PATCH_IF amount == 1 AND frequency == 1 BEGIN
+			SET strref += 20
+		END
+		ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
+			SET strref += 22
+		END
+		ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
+			SET strref += 21
+		END
+		ELSE BEGIN
+			SET strref += 23
+		END
+		// En théorie toutes les versions infligent du dégâts de poison, je laisse dans le doute
+		PATCH_IF is_ee == 1 BEGIN
+			SET strref += 4
 		END
 	END
-
-	PATCH_IF type >= 4 AND type <= 9 BEGIN
+	ELSE PATCH_IF type >= 4 AND type <= 9 BEGIN
 		SET strref += type
 		PATCH_IF amount < 0 BEGIN
+			amount = ABS amount
 			SET strref += 10
 		END
 	END
 	ELSE PATCH_IF type == 10 BEGIN
 		SET strref += type
 	END
-	ELSE PATCH_IF type >= 0 AND type <= 3 BEGIN
-		PATCH_IF type == 3 BEGIN
-	        SET frequency = amount * frequencyMultiplier
-	    END
-
-		PATCH_IF type == 0 OR type == 1 OR type == 3 BEGIN
-			SET amount = 1
-		END
-
-		PATCH_IF amount == 1 AND frequency == 1 BEGIN
-			SET strref += 20
-		END
-		ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-			SET strref += 21
-		END
-		ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
-			SET strref += 22
-		END
-		ELSE BEGIN
-			SET strref += 23
-		END
-
-		PATCH_IF is_ee == 1 BEGIN
-			SET strref += 4
-		END
+	ELSE PATCH_IF type == 11 OR type == 12 BEGIN
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
 	END
-	ELSE PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF type == 11 OR type == 13 BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gérer : %amount% : %frequency% : %resref%~ END
-		END
-		ELSE PATCH_IF type == 13 BEGIN
-			SET strref = 10780003
-			PATCH_IF amount < 0 BEGIN
-				SET strref += 10
-			END
+	ELSE PATCH_IF type == 13 BEGIN
+		SET strref = 10780003
+		PATCH_IF amount < 0 BEGIN
+			amount = ABS amount
+			SET strref += 10
 		END
 	END
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 13 OR parameter2 > 10 AND NOT is_ee BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Unknown type : %parameter2%~ END
+	END
 END
 
 /* ------------------ *
