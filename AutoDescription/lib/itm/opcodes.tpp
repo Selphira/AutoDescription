@@ -712,6 +712,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
 	END
 END
 
+// TODO
+// DEFINE_PATCH_MACRO ~opcode_target_1~ BEGIN
+// END
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_1~ BEGIN
 	LPM ~opcode_self_probability_1~
 END
@@ -1744,10 +1748,10 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
-	PATCH_IF timingMode == TIMING_permanent OR
+	PATCH_IF (timingMode == TIMING_permanent OR
 			 timingMode == TIMING_delayed OR
 			 timingMode == 7 OR
-			 timingMode == TIMING_permanent_after_death BEGIN
+			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
 		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
@@ -2950,6 +2954,13 @@ DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Unknown type : %parameter2%~ END
 	END
+	PATCH_IF (timingMode == TIMING_permanent OR
+			 timingMode == TIMING_delayed OR
+			 timingMode == 7 OR
+			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
+		SET isValid = 0
+		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+	END
 END
 
 /* ------------------ *
@@ -3013,6 +3024,13 @@ END
  * Protection: From Projectile [83] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
+	// Comment trouver les correspondances sans checker tous les sorts ??
+	// Warning de Region of Terror + Auror kit
+	// 94 : Instant area effect : Tremblement de terre (SPPR720), Zone de magie entropique (SPIN778), Terreur de l'Ecorcheur (SPIN807)
+	// 226 : Fireseed : aucune correspondance
+	// 227 : convocation d'insecte SPPR319
+	// 229 : Nuée de météores SPWI911, Tempête de feu SPPR705
+	// 231 : Icewind Glyph hit : aucune correspondance
 	PATCH_MATCH parameter2 WITH
 		  1 2 3 4 5 283 284 285 286 287 288 289 290 291 BEGIN SPRINT description @10830001 END // ~Immunité contre les flèches~
 		  6 7 8 9 10 292 293 294 295 296 BEGIN SPRINT description @10830002 END // ~Immunité contre les haches de jet~
@@ -3064,6 +3082,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_84~ BEGIN
 	LPM ~opcode_self_probability_84~
 END
 
+DEFINE_PATCH_MACRO ~opcode_84_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------------- *
  * Stat: Magical Cold Resistance Modifier [85] *
  * ------------------------------------------- */
@@ -3083,6 +3105,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_85~ BEGIN
 	LPM ~opcode_self_probability_85~
+END
+
+DEFINE_PATCH_MACRO ~opcode_85_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------------------- *
@@ -3106,6 +3132,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_86~ BEGIN
 	LPM ~opcode_self_probability_86~
 END
 
+DEFINE_PATCH_MACRO ~opcode_86_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* --------------------------------------- *
  * Stat: Crushing Resistance Modifier [87] *
  * --------------------------------------- */
@@ -3125,6 +3155,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_87~ BEGIN
 	LPM ~opcode_self_probability_87~
+END
+
+DEFINE_PATCH_MACRO ~opcode_87_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------------------- *
@@ -3148,6 +3182,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_88~ BEGIN
 	LPM ~opcode_self_probability_88~
 END
 
+DEFINE_PATCH_MACRO ~opcode_88_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* --------------------------------------- *
  * Stat: Missiles Resistance Modifier [89] *
  * --------------------------------------- */
@@ -3167,6 +3205,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_89~ BEGIN
 	LPM ~opcode_self_probability_89~
+END
+
+DEFINE_PATCH_MACRO ~opcode_89_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------ *
@@ -3207,6 +3249,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_91~ BEGIN
 	LPM ~opcode_self_probability_91~
 END
 
+DEFINE_PATCH_MACRO ~opcode_91_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* -------------------------------- *
  * Stat: Pick Pockets Modifier [92] *
  * -------------------------------- */
@@ -3224,6 +3270,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_92~ BEGIN
 	LPM ~opcode_self_probability_92~
+END
+
+DEFINE_PATCH_MACRO ~opcode_92_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------- *
@@ -3245,6 +3295,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_93~ BEGIN
 	LPM ~opcode_self_probability_93~ // ~la fatigue~
 END
 
+DEFINE_PATCH_MACRO ~opcode_93_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------- *
  * Stat: Drunkenness Modifier [94] *
  * ------------------------------- */
@@ -3262,6 +3316,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_94~ BEGIN
 	LPM ~opcode_self_probability_94~ // ~l'ivresse~
+END
+
+DEFINE_PATCH_MACRO ~opcode_94_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ---------------------------- *
@@ -3283,6 +3341,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_95~ BEGIN
 	LPM ~opcode_self_probability_95~ // ~le pistage~
 END
 
+DEFINE_PATCH_MACRO ~opcode_95_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ----------------------- *
  * Stat: Level Change [96] *
  * ----------------------- */
@@ -3302,6 +3364,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_96~ BEGIN
 	LPM ~opcode_self_probability_96~ // ~le niveau~
 END
 
+DEFINE_PATCH_MACRO ~opcode_96_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ---------------------------------- *
  * Stat: Strength-Bonus Modifier [97] *
  * ---------------------------------- */
@@ -3319,6 +3385,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_97~ BEGIN
 	LPM ~opcode_self_probability_97~ // ~la force exceptionnelle~
+END
+
+DEFINE_PATCH_MACRO ~opcode_97_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------- *
@@ -3344,6 +3414,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_98~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
+	// TODO QUASI identique à opcode 25 et 78 => Mixin
 	SET amount1 = parameter1
 	SET amount2 = 0
 	SET frequencyMultiplier = 1
