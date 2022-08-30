@@ -65,7 +65,5 @@ BEGIN
 	    END
 	END
 
-	//TODO: Supprimer les lignes en doublon
-	//      ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi
-	//      ATTENTION ! Certains effets peuvent être en doublon ! 2 effets qui ajoutent un bonus de caractéristique peuvent se cumuler...
+	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
 END

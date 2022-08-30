@@ -131,6 +131,35 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
     END
 END
 
+/*
+ * Supprime les lignes en doublon
+ * ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi
+ * TODO: Certains effets peuvent être en doublon ! 2 effets qui ajoutent un bonus de caractéristique peuvent se cumuler...
+ * SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+ */
+DEFINE_PATCH_FUNCTION ~get_unique_effects~ RET count RET_ARRAY effects BEGIN
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~effects~ BEGIN END
+    SET count = 0
+
+	PATCH_PHP_EACH ~lines~ AS line => value BEGIN
+		SET found = 0
+		PATCH_PHP_EACH effects AS effect => _ BEGIN
+			SPRINT tmp1 ~%line_5%~
+			SPRINT tmp2 ~%effect_5%~
+			TO_LOWER tmp1
+			TO_LOWER tmp2
+
+			PATCH_IF ~%tmp1%~ STRING_EQUAL ~%tmp2%~ AND ~%line_3%~ == ~%effect_3%~ AND ~%line_4%~ == ~%effect_4%~ BEGIN
+				SET found = 1
+			END
+		END
+		PATCH_IF found == 0 BEGIN
+			SET $effects(~%line_0%~ ~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~) = value
+			SET count += 1
+		END
+	END
+END
+
 /**
  * Permettrait de remplacer certains effets par d'autres.
  * Typiquement, pour le cas de l'opcode 177, afin que l'effet vers lequel il pointe puisse être pris en compte dans la
