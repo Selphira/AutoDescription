@@ -1872,6 +1872,46 @@ DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_33_group~ BEGIN
+	LOCAL_SET group = 1
+	// Pour chaque opcode 33, y a-t-il un opcode 34, 35, 36 et 37 avec les mêmes valeurs ?
+	// Si oui, on désactive toutes ces entrées (1 de chaque) et on crée un simple opcode 325 avec les mêmes valeurs.
+	PATCH_PHP_EACH ~opcodes_33~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 1
+		CLEAR_ARRAY positions
+		// On ajoute l'opcode courant à ceux qui seront désactivés
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+			33 => ~%position%~
+		END
+
+		FOR (opcode = 34; opcode <= 37; opcode += 1) BEGIN
+			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %parameter2% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+
+			SET $positions(~%opcode%~) = opcodePosition
+
+			PATCH_IF opcodePosition < 0 BEGIN
+				SET group = 0
+				SET opcode = 38
+			END
+		END
+
+		PATCH_IF group == 1 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS opcode => position1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			SET opcode = 325
+            LPM ~add_opcode~
+		END
+	END
+END
+
 /* ---------------------------------- *
  * Stat: Save vs. Wands Modifier [34] *
  * ---------------------------------- */

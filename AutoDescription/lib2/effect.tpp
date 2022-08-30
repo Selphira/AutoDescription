@@ -126,19 +126,10 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		LPM ~opcode_is_valid~
 
         PATCH_IF isValid == 1 BEGIN
-			PATCH_IF NOT VARIABLE_IS_SET $opcodes(~%opcode%~) BEGIN
-				SET $opcodes(~%opcode%~) = 1
-			END
-			ELSE BEGIN
-				SET $opcodes(~%opcode%~) += 1
-			END
-
-			SET index = $opcodes(~%opcode%~) - 1
-		    SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~) = 1
+            LPM ~add_opcode~
         END
     END
 END
-
 
 /**
  * Permettrait de remplacer certains effets par d'autres.
@@ -185,7 +176,17 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~disable_opcode~
+DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $opcodes(~%opcode%~) BEGIN
+		SET $opcodes(~%opcode%~) = 1
+	END
+	ELSE BEGIN
+		SET $opcodes(~%opcode%~) += 1
+	END
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~) = 1
+END
+
+DEFINE_PATCH_FUNCTION ~delete_opcode~
 	INT_VAR
 		opcode = 0
 	STR_VAR
@@ -217,6 +218,31 @@ BEGIN
 	END
 
 	SET count = $opcodes(~%opcode%~)
+END
+
+DEFINE_PATCH_FUNCTION ~get_opcode_position~
+	INT_VAR
+		opcode = 0
+	STR_VAR
+		expression = ~~
+	RET
+		position
+BEGIN
+	SET found = 0
+	SET return = ~-1~
+	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
+	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+	        PATCH_IF found == 0 BEGIN
+		        LPM ~data_to_vars~
+		        LPF evaluate_expression STR_VAR expression RET value END
+		        PATCH_IF value == 1 BEGIN
+		            SET return = position
+		            SET found = 1
+		        END
+	        END
+	    END
+	END
+	SET position = return
 END
 
 DEFINE_PATCH_FUNCTION ~get_effect_description~
