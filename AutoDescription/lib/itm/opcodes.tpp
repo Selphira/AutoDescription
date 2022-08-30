@@ -1467,6 +1467,9 @@ DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND special != 0
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+	INNER_PATCH_SAVE value ~%value%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+	END
 END
 
 /*
