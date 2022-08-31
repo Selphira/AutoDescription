@@ -15,7 +15,6 @@ BEGIN
 	SET ignoreDuration = 0
 	SET isValid = 1
 	SET saveAdded = 0
-	SET saveForHalf = 0
 	SET sort = 0
 	SET forceSort = 0
 
@@ -275,63 +274,72 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~add_save~ BEGIN
-	PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
-		SPRINT saveTypeStr ~~
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_spell) == FLAG_SAVINGTHROW_spell BEGIN
-            SPRINT saveTypeStr @10370001 // ~contre les sorts~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_breath) == FLAG_SAVINGTHROW_breath BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10360001 // ~contre les souffles~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_death) == FLAG_SAVINGTHROW_death BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10330001 // ~contre la paralysie, la mort et les poisons~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_wand) == FLAG_SAVINGTHROW_wand BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10340001 // ~contre les baguettes, les sceptres et les bâtons~
-        END
-        PATCH_IF (saveType BAND FLAG_SAVINGTHROW_polymorph) == FLAG_SAVINGTHROW_polymorph BEGIN
-            PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-				SPRINT strOr @100004 // ~ou~
-                SPRINT saveTypeStr ~%saveTypeStr% %strOr% ~
-            END
-            SPRINT saveTypeStr @10350001 // ~contre la pétrification et la métamorphose~
-        END
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~saveType_to_strref~ BEGIN
+	~%FLAG_SAVINGTHROW_spell%~ 		=> 10370001 // ~contre les sorts~
+	~%FLAG_SAVINGTHROW_breath%~ 	=> 10360001 // ~contre les souffles~
+	~%FLAG_SAVINGTHROW_death%~ 		=> 10330001 // ~contre la paralysie, la mort et les poisons~
+	~%FLAG_SAVINGTHROW_wand%~ 		=> 10340001 // ~contre les baguettes, les sceptres et les bâtons~
+	~%FLAG_SAVINGTHROW_polymorph%~  => 10350001 // ~contre la pétrification et la métamorphose~
+END
 
-        PATCH_IF saveBonus != 0 BEGIN
+DEFINE_PATCH_MACRO ~add_save~ BEGIN
+	SET saveType = (saveType BAND 0b11111)
+	// FIXME
+	SET saveForHalf = 0
+	SET failForHalf = 0
+	PATCH_IF is_ee AND opcode_n == 12 AND (parameter2 BAND 65535) == 0 BEGIN
+		SET saveForHalf = (special BAND BIT8) > 0
+		SET failForHalf = (special BAND BIT9) > 0
+	END
+	//
+
+	// les dégâts sont réduits de moitié même si aucun JS n'est permis
+	// PATCH_IF saveForHalf AND failForHalf BEGIN
+	// 	SPRINT saveStr @102125 // ~réduits de moitié~
+	// END
+
+	// dégâts réduits de moitié si :
+	// pas de JS autorisés et failForHalf actif
+	// JS autorisés mais failForHalf et saveForHalf actifs
+	PATCH_IF failForHalf AND NOT ~%description%~ STRING_EQUAL ~~ AND (saveType == 0 OR saveForHalf) BEGIN
+		SPRINT saveStr @102125 // ~réduits de moitié~
+		SPRINT description ~%description% (%saveStr%)~
+	END
+	ELSE PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
+		// FIXME les js ne sont pas cumulés dans la description finale
+		SPRINT saveTypeStr ~~
+
+		PHP_EACH saveType_to_strref AS saveBit => strref BEGIN
+			PATCH_IF (saveType BAND saveBit) BEGIN
+				SPRINT strOr ~~
+				SPRINT strref (AT strref)
+				PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+					SPRINT strOr @100004 // ~ou~
+					// FIXME le faire en une fois ?
+					SPRINT strOr ~ %strOr% ~
+				END
+				SPRINT saveTypeStr ~%saveTypeStr%%strOr%%strref%~
+			END
+		END
+
+		PATCH_IF saveBonus != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			PATCH_IF saveForHalf == 1 BEGIN
+			PATCH_IF saveForHalf BEGIN
 				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 			END
-			ELSE PATCH_IF VARIABLE_IS_SET flagFailForHalf AND flagFailForHalf == 1 BEGIN
-				// FIXME
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
-				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			ELSE PATCH_IF failForHalf BEGIN
+				SPRINT saveStr @102124 // ~jet de sauvegarde %saveTypeStr% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
 			END
         END
         ELSE BEGIN
-			PATCH_IF saveForHalf == 1 BEGIN
+			PATCH_IF saveForHalf BEGIN
 				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 			END
-			ELSE PATCH_IF VARIABLE_IS_SET flagFailForHalf AND flagFailForHalf == 1 BEGIN
-				// FIXME
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% flagFailForHalf non gere.~ END
-				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+			ELSE PATCH_IF failForHalf BEGIN
+				SPRINT saveStr @102123 // ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
 			END
 			ELSE BEGIN
 				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
@@ -347,18 +355,21 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 	LOCAL_SET levelMin = diceSides
 	LOCAL_SET levelMax = diceCount
 	LOCAL_SET strref   = 0
-	PATCH_IF (diceCount > 0 OR diceSides > 0) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
-		PATCH_IF diceSides == diceCount BEGIN
+	PATCH_IF (levelMax > 0 OR levelMin > 1) AND (opcode != 12 AND opcode != 17 AND opcode != 18 AND opcode != 331 AND opcode != 333 AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
+		PATCH_IF levelMin == levelMax BEGIN
 			SET strref = 101186 // ~%target% (de niveau %levelMin%)~
 		END
-		ELSE PATCH_IF diceSides == 0 AND diceCount > 0 BEGIN
+		ELSE PATCH_IF levelMin <= 1 AND levelMax > 0 BEGIN
 			SET strref = 101187 // ~%target% (de niveau %levelMax% ou inférieur)~
 		END
-		ELSE PATCH_IF diceSides > 1 AND diceCount == 0 BEGIN
+		ELSE PATCH_IF levelMin > 1 AND levelMax == 0 BEGIN
 			SET strref = 101188 // ~%target% (de niveau %levelMin% ou supérieur)~
 		END
-		ELSE PATCH_IF diceSides > 1 AND diceCount > 0 BEGIN
+		ELSE PATCH_IF levelMax > levelMin BEGIN
 			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
+		END
+		ELSE BEGIN
+			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 		END
 
 		PATCH_IF strref != 0 BEGIN
@@ -446,9 +457,9 @@ DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 dam
 	END
 END
 
+
 DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
-	// TODO timingMode == 3 => ~ pendant et après X secondes
 	// FIXME, il peut avoir certaines subtilités entre un vrai timing 1 et un timing X
 	// Il faudrait considérer un nouveau timing dont l'effet à mi-chemin entre le 1 et le 9
 	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration BEGIN
@@ -469,13 +480,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	END
 
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_permanent_after_death BEGIN
-		SET found = 0
-		PATCH_FOR_EACH cOpcode IN 20 23 24 32 55 58 68 75 77 79 81 116 125 146 148 161 162 177 214 218 230 233 238 244 261 273 280 316 BEGIN
-			PATCH_IF opcode == cOpcode BEGIN
-				SET found = 1
-			END
-		END
-		PATCH_IF found == 0 BEGIN
+		PATCH_IF NOT VARIABLE_IS_SET $opcodes_cant_be_permanent(~%opcode%~) BEGIN
 			PATCH_IF timingMode == TIMING_permanent BEGIN
 				SPRINT value @100312 // ~de manière permanente~
 			END
@@ -488,10 +493,14 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
         LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 
 		PATCH_IF timingMode == TIMING_duration BEGIN
-			SPRINT value @100311 // ~pendant %duration%~
+			SPRINT value @100311 // ~pendant %strDuration%~
 		END
 		ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
 			SPRINT value @100310 // ~après %strDuration%~
+		END
+		ELSE PATCH_IF timingMode == TIMING_delayed_duration BEGIN
+			// TODO, meilleure tournure
+			SPRINT value @100314 // ~après %strDuration% et pendant %strDuration%~
 		END
 		ELSE BEGIN
 			PATCH_PRINT "%SOURCE_FILE%: opcode %opcode% : timing %timingMode%"
@@ -504,33 +513,20 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~durations~ BEGIN
 	 300 => 100306 // heure
 	  60 => 100304 // tour
 	   6 => 100302 // round
+	   1 => 100300 // seconde
 END
 
 DEFINE_PATCH_FUNCTION ~get_str_duration~ INT_VAR duration = 0 RET strDuration BEGIN
-	SET total = duration
 	SPRINT strDuration ~~
 
 	PATCH_PHP_EACH durations AS divisor => strref BEGIN
-		SET amount = duration / divisor
-		SET duration = duration MODULO divisor
-
-		PATCH_IF duration == 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF duration MODULO divisor == 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+			SET amount = duration / divisor
 			PATCH_IF amount > 1 BEGIN
 				SET strref += 1
 			END
 
             SPRINT strDuration (AT strref)
 		END
-	END
-
-	PATCH_IF duration > 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-		SET amount = total
-		SET strref = 100300 // seconde
-
-		PATCH_IF amount > 1 BEGIN
-			SET strref += 1
-		END
-
-        SPRINT strDuration (AT strref)
 	END
 END
