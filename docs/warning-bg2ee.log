@@ -1,11 +1,7 @@
 	
-AMUL17.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
-AMUL17.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
 BLUN30.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 BLUN30.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 BLUN30.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-CHALCY3.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
-CHALCY3.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '219'
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '205'
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '320'
@@ -36,8 +32,6 @@ SW2H13.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SW2H13.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 SW2H13.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 SW2H19.ITM : Opcode 81: Les 2 parametres doivent avoir la valeur 0
-SW2HD1.ITM : Opcode 321 : La ressource ohdsw1.itm n'existe pas.
 SW2HD1.ITM : Opcode 321 : no names of spells or items found
-SW2HD1.ITM : Opcode 321 : La ressource ohdsw1.itm n'existe pas.
 SW2HD1.ITM : Opcode 321 : no names of spells or items found
 WA2SHIEL.ITM : Opcode 197 : Réflection du type de projectile '320'
