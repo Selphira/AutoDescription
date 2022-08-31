@@ -1,10 +1,6 @@
 	
-AMUL17.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
-AMUL17.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
 AX1H19.ITM : Opcode 81: Les 2 parametres doivent avoir la valeur 0
 AX1H19.ITM : Opcode 112 à gérer.
-CHALCY3.ITM : Opcode 321 : La ressource spwi205.itm n'existe pas.
-CHALCY3.ITM : Opcode 321 : La ressource spin105.itm n'existe pas.
 CLCK04.ITM : Opcode 172 : La ressource spinhum.spl n'existe pas.
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '205'
 CLCK24.ITM : Opcode 197 : Réflection du type de projectile '320'
