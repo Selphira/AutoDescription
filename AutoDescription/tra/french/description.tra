@@ -64,6 +64,7 @@
 @102007 = ~Attaque par round~
 @102008 = ~Classe d'armure~
 @102009 = ~Compétence martiale~
+@102010 = ~Contondant~ // Deals Crushing damage, uses base AC (ignores all 4 specific AC)
 @102011 = ~Perforant~
 @102012 = ~Contondant~
 @102013 = ~Tranchant~

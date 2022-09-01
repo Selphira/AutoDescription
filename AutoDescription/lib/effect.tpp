@@ -131,12 +131,13 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
     END
 END
 
-/*
- * Supprime les lignes en doublon
- * ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi
- * TODO: Certains effets peuvent être en doublon ! 2 effets qui ajoutent un bonus de caractéristique peuvent se cumuler...
- * SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
- */
+/* ------------------------------------------------------------------------------------------------------------------ *
+ * Supprime les entrées en double.                                                                                    *
+ * ATTENTION ! Un effet est unique si la chaîne est la même ET que sa probabilité l'est aussi.                        *
+ * TODO: Certains effets peuvent être en doublon ! 2 effets qui ajoutent un bonus de caractéristique peuvent se       *
+ * cumuler...                                                                                                         *
+ * SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1    *
+ * ------------------------------------------------------------------------------------------------------------------ */
 DEFINE_PATCH_FUNCTION ~get_unique_effects~ RET count RET_ARRAY effects BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY ~effects~ BEGIN END
     SET count = 0
@@ -237,7 +238,6 @@ BEGIN
 	        LPM ~data_to_vars~
 	        LPF evaluate_expression STR_VAR expression RET value END
 	        PATCH_IF value == 1 BEGIN
-	            LPF ~add_log_error~ STR_VAR message = ~L'effet de l'opcode %opcode% en position %position% est annulé par un autre effet~ END
 	            SET $opcodes(~%opcode%~) -= 1
 	        END
 	        ELSE BEGIN
@@ -352,7 +352,7 @@ BEGIN
 			LPM ~add_save~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END
 		END
 	WITH
 		~Failure("Unknown macro: \%method%")~

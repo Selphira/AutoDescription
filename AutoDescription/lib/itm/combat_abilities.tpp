@@ -42,7 +42,7 @@ BEGIN
 
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
 			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~) = 1
 
 			SET countHeaders += 1
 		END
@@ -51,7 +51,7 @@ BEGIN
 			PATCH_DEFINE_ARRAY EVAL ~lines%countHeaders%~ BEGIN END
 			SET EVAL ~countLines%countHeaders%~ = 0
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~) = 1
 			SET countHeaders += 1
 		END
 
@@ -65,8 +65,9 @@ BEGIN
 	FOR (index = 0; index < countHeaders; index += 1) BEGIN
 		PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 			SET attackType = ~%data_0%~
+			SET charges = ~%data_3%~
 
-			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile BEGIN
+			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND charges == 0 BEGIN
 				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
 					SPRINT effectDescription @102270 // ~Ne nécessite pas de munitions~
 				END

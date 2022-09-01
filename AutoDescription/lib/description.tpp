@@ -1,121 +1,50 @@
-DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
-	PATCH_IF (SOURCE_SIZE > 0x71) BEGIN // Evite un crash sur les objets vides
-		READ_SHORT  ITM_type itemType
-		READ_STRREF ITM_identified_desc description
-		READ_LONG   ITM_identified_desc strref
-        READ_SHORT  ITM_flags           flags
-        READ_SHORT  ITM_enchantment     enchantment
+DEFINE_ACTION_MACRO ~update_descriptions~ BEGIN
+	LAM ~update_item_descriptions~
+	//LAM ~update_spell_descriptions~
+END
 
-		SET total += 1
-        SET isWeapon = 0
-
-        PATCH_SILENT
-
-		PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) != 0 BEGIN
-			SET totalIgnored += 1
+DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
+	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+		PATCH_TRY
+			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+		WITH DEFAULT
+			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
+			SET totalFailed += 1
 		END
-		ELSE PATCH_IF NOT include_items_without_description AND (~%description%~ STRING_EQUAL ~~ OR strref == ~-1~ OR strref == 0) BEGIN
-			SET totalWithoutDescription += 1
-			SET totalIgnored += 1
-		END
-		ELSE BEGIN
-	        SPRINT oldDescription "%description%"
+	BUT_ONLY_IF_IT_CHANGES
+END
 
-			LPF ~removeTechnicalDescription~ STR_VAR description RET description END
+DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
+	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
+		LPF ~update_spell_description~ END
+	BUT_ONLY_IF_IT_CHANGES
+END
 
-			// Si l'objet ne peut être déplacé, il n'est pas accessible au joueur
-			PATCH_IF NOT include_non_moveable_items AND (flags BAND BIT2) == 0 BEGIN
-				SET totalIgnored += 1
+
+DEFINE_PATCH_FUNCTION ~add_section_to_description~
+	INT_VAR
+		count = 0
+	STR_VAR
+		title = ~~
+		arrayName = ~~
+	RET
+		description
+BEGIN
+	PATCH_IF count > 0 BEGIN
+        SORT_ARRAY_INDICES ~%arrayName%~ NUMERICALLY
+		LPF ~appendSection~ STR_VAR string = ~%title%~ RET description END
+
+        //TODO: Regrouper les éléments ayant la même probabilité: Nécessite une seconde boucle
+
+	    PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
+	        PATCH_IF value == 1 BEGIN
+				LPF ~appendProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
 			END
-			ELSE BEGIN
-				PATCH_TRY
-				    PATCH_IF itemType > 0xe AND itemType < 0x1f BEGIN // Les armes
-				        SET isWeapon = 1
-						LPM ~description~
-						SET totalSuccessful += 1
-						LPM ~log~
-				    END
-				    ELSE BEGIN
-						PATCH_MATCH itemType
-						WITH
-							// Description de l'équipement
-							ITM_TYPE_armor ITM_TYPE_shield_not_in_iwd ITM_TYPE_necklace ITM_TYPE_amulet ITM_TYPE_belt ITM_TYPE_girdle ITM_TYPE_boots ITM_TYPE_bracers ITM_TYPE_gauntlets ITM_TYPE_helm ITM_TYPE_ring ITM_TYPE_cloak
-							BEGIN
-								LPM ~description~
-								SET totalSuccessful += 1
-								LPM ~log~
-							END
-							// Description des consommables
-							ITM_TYPE_potion ITM_TYPE_wand ITM_TYPE_scroll
-							BEGIN
-								// LPM ~description_potion~
-								SET totalPotion += 1
-								SET totalIgnored += 1
-							END
-							// Description des munitions
-							ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
-							BEGIN
-								// LPM ~description_ammo~
-								SET totalAmmo += 1
-								SET totalIgnored += 1
-							END
-							DEFAULT
-								SET totalIgnored += 1
-						END
-				    END
-				WITH DEFAULT
-					PATCH_WARN ~%SOURCE_FILE% : %ERROR_MESSAGE%~
-					SET totalFailed += 1
-				END
+			ELSE PATCH_IF value == 2 BEGIN
+				LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
 			END
-		END
+	    END
 	END
-	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = ~Fichier invalide.~ END
-	END
-END
-
-DEFINE_PATCH_MACRO ~description_ammo~ BEGIN
-	PATCH_PRINT "----------- MUNITION : %SOURCE_FILE% -----------"
-END
-
-DEFINE_PATCH_MACRO ~description_potion~ BEGIN
-	PATCH_PRINT "----------- POTION : %SOURCE_FILE% -----------"
-	READ_STRREF ITM_identified_desc description
-
-	// TODO: Supprimer le texte non roleplay si présent (pas toujours de "PARAMETRES" ici..)
-
-	LPF ~usability~ RET description END
-END
-
-DEFINE_PATCH_MACRO ~description~ BEGIN
-	LPF ~equipped_abilities~ RET description END
-	LPF ~extended_abilities~ RET description END
-
-	PATCH_IF isWeapon == 1 BEGIN
-		LPF ~proficiency~   RET description END
-	END
-
-	LPF ~appendLine~         RET description END
-	LPF ~weight~             RET description END
-	LPF ~needs~              RET description END
-	LPF ~usability~          RET description END
-
-	INNER_PATCH_SAVE description ~%description%~ BEGIN
-		// Supprime les lignes vides consécutives
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
-	END
-
-	PATCH_IF alter_item_files BEGIN
-		SAY DESC ~%description%~
-	END
-END
-
-DEFINE_PATCH_FUNCTION ~append~ INT_VAR strref = 0 STR_VAR string = "" RET description BEGIN
-	PATCH_IF strref > 0 BEGIN
-		SPRINT string (AT %strref%)
-	END
-    SPRINT description "%description%%crlf%%string%"
 END
 
 DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET description BEGIN

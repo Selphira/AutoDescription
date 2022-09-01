@@ -36,16 +36,16 @@ ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
-    INCLUDE ~%MOD_FOLDER%/lib2/always.tpa~
 
 	DEFINE_ACTION_MACRO ~init_statistics~ BEGIN
 		OUTER_SET total = 0
-		OUTER_SET totalPotion = 0
-		OUTER_SET totalAmmo = 0
-		OUTER_SET totalWithoutDescription = 0
 		OUTER_SET totalFailed = 0
 		OUTER_SET totalSuccessful = 0
 		OUTER_SET totalIgnored = 0
+		OUTER_SET totalIgnoredCursed = 0
+		OUTER_SET totalIgnoredWithoutDescription = 0
+		OUTER_SET totalIgnoredNotMoveable = 0
+		OUTER_SET totalIgnoredType = 0
 		OUTER_SET opcodeTodo = 0
 	END
 
@@ -56,14 +56,20 @@ ALWAYS
 			END
 		END
 
-		PRINT "Total : %total%"
-		PRINT "Sans description : %totalWithoutDescription%"
-		PRINT "Ignores : %totalIgnored%"
-		PRINT "Reussis : %totalSuccessful%"
-		PRINT "Echoues : %totalFailed%"
-		PRINT "Potions (TODO): %totalPotion%"
-		PRINT "Munitions (TODO) : %totalAmmo%"
-		PRINT "Opcodes a coder : %opcodeTodo%"
+		OUTER_SET totalIgnored = totalIgnoredCursed + totalIgnoredWithoutDescription + totalIgnoredNotMoveable + totalIgnoredType
+		OUTER_SET total = totalIgnored + totalSuccessful + totalFailed
+
+		PRINT "Reussis : %totalSuccessful%
+Echoues : %totalFailed%
+Ignores : %totalIgnored%
+   Maudits : %totalIgnoredCursed%
+   Sans description : %totalIgnoredWithoutDescription%
+   Non deplacables : %totalIgnoredNotMoveable%
+   Type non gere : %totalIgnoredType%
+
+Total : %total%
+
+Opcodes a coder : %opcodeTodo%"
 	END
 END
 
@@ -72,12 +78,10 @@ LANGUAGE ~Francais~ ~french~
          ~%MOD_FOLDER%/tra/french/description.tra~
 
 BEGIN @10 DESIGNATED 10
-
+SILENT
 LAM ~init_log_file~
 LAM ~init_statistics~
-COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-	LPM ~update_item_description~
-BUT_ONLY_IF_IT_CHANGES
+LAM ~update_descriptions~
 LAM ~show_statistics~
 
 BEGIN @20 DESIGNATED 20
@@ -94,20 +98,14 @@ END
 OUTER_SPRINT log_filename ~%directory%~
 ACTION_DEFINE_ARRAY ~itemFiles~ BEGIN END
 LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFiles END
+SILENT
 LAM ~init_log_file~
 LAM ~init_statistics~
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
 		COPY_EXISTING ~%itemFile%~ ~override~
-			LPM ~update_item_description~
+			LPF ~update_item_description~ END
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
-LAM ~show_statistics~
-
-BEGIN @10 DESIGNATED 30
-
-LAM ~init_log_file~
-LAM ~init_statistics~
-LAM ~update_descriptions~
 LAM ~show_statistics~

@@ -654,12 +654,12 @@ DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
 			 parameter2 != AC_MOD_TYPE_piercing AND
 			 parameter2 != AC_MOD_TYPE_slashing AND
 			 parameter2 != AC_MOD_TYPE_set_base BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter2 value (0 1 2 4 8 16 expected).~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter2 value (0 1 2 4 8 16 expected).~ END
 		SET isValid = 0
 	END
 	// Valeur = valeur + 0
 	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
 		SET isValid = 0
 	END
 END
@@ -704,7 +704,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
 		SPRINT description @10010003 // ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
 	END
 	// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
-	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT VARIABLE_IS_SET parameter3 AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
+	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT isExternal AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
 		SPRINT description @10010004 // ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
 	END
 	ELSE BEGIN
@@ -756,16 +756,16 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 0 OR parameter2 > 4 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
 	END
 
 	PATCH_IF parameter2 == 3
-		AND NOT VARIABLE_IS_SET parameter3 // Si on n'est pas dans un fichier .eff
+		AND NOT isExternal // Si on n'est pas dans un fichier .eff
 		AND (
 			timingMode == TIMING_duration
 			OR timingMode == TIMING_delayed_duration
@@ -775,7 +775,7 @@ DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 		)
 	BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No effect with this timing : %timingMode%.~ END
 	END
 END
 
@@ -887,7 +887,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_5_is_valid~ BEGIN
 	PATCH_IF NOT (parameter2 >= 0 AND parameter2 <= 5 OR parameter2 >= 1000 AND parameter2 <= 1005) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown Charm Type : %parameter2%.~ END
 	END
 END
 
@@ -1107,11 +1107,11 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
 		// 	SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown mode : %mode%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown mode : %mode%.~ END
 	END
 END
 
@@ -1179,17 +1179,17 @@ DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
 	PATCH_IF parameter2 == 3 BEGIN
 		// TODO? efficace que si dextérité de base < 20
 		SET parameter2 = MOD_TYPE_cumulative
-		PATCH_IF NOT VARIABLE_IS_SET parameter3 BEGIN
+		PATCH_IF NOT isExternal BEGIN
 			PATCH_IF NOT FILE_EXISTS_IN_GAME ~CLSSPLAB.2da~ BEGIN
 				SET parameter1 = 1
 			END
 			ELSE BEGIN
-				LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
+				LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
 			END
 		END
 		// issu d'un EFF et parameter1 == 0: sans effet
 		ELSE PATCH_IF parameter1 == 0 BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No effect detected : Valeur = Valeur + 0.~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No effect detected : Valeur = Valeur + 0.~ END
 		END
 	END
 END
@@ -1323,7 +1323,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
 
 	PATCH_IF isRez OR purgeEff BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
 	SET damageAmount = parameter1
@@ -1379,7 +1379,7 @@ DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
 	SET rtype = parameter2 BAND 65535
 	PATCH_IF rtype < CURRENT_HP_MOD_TYPE_cumulative OR rtype > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %rtype%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %rtype%.~ END
 	END
 END
 
@@ -1483,7 +1483,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_18_is_valid~ BEGIN
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR (parameter2 > 5 AND is_ee == 0 OR parameter2 > 6) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -1571,7 +1571,7 @@ DEFINE_PATCH_MACRO ~opcode_21_is_valid~ BEGIN
 	// Une fois le délai écoulé, l'effet est appliqué avec un timing 1, donc...
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_delayed OR timingMode == 7 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -1694,7 +1694,7 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	SET amount = 0
 	SET frequencyMultiplier = 1
 	SET frequency = 1
-	SET p4IsActive = VARIABLE_IS_SET parameter4 AND parameter4 != 0
+	SET p4IsActive = isExternal AND parameter4 != 0
 	SET type = parameter2
 
 	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
@@ -1710,7 +1710,7 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 		SET amount = 1
 		SET frequency = parameter1
 	END
-	ELSE PATCH_IF type == 4 AND VARIABLE_IS_SET parameter3 BEGIN
+	ELSE PATCH_IF type == 4 AND isExternal BEGIN
 		SET amount = parameter3
 		SET frequency = parameter1
 	END
@@ -1746,7 +1746,7 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		// TODO: Dans le cas où P2 == 4 et & P3 < 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Degats negatifs non geres.~ END
 	END
 END
 
@@ -1756,10 +1756,10 @@ DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
+		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
 	END
 END
 
@@ -1953,7 +1953,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	LPM ~opcode_modstat3_is_valid~
 	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -2469,7 +2469,7 @@ DEFINE_PATCH_MACRO ~opcode_57_is_valid~ BEGIN
 			 parameter2 > 35 AND parameter2 < 49
 			 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown alignment %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown alignment %parameter2%.~ END
 	END
 END
 
@@ -2606,11 +2606,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_60_is_valid~ BEGIN
 	PATCH_IF (parameter1 BAND 255) == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
 	END
 	PATCH_IF parameter2 < 0 OR parameter2 > 5 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -2788,7 +2788,7 @@ DEFINE_PATCH_MACRO ~opcode_71_common~ BEGIN
 			SET strref += parameter1
         END
         ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Sexe a gerer : %parameter1%~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Sexe a gerer : %parameter1%~ END
         END
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
@@ -2918,7 +2918,7 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	SET amount = parameter1
 	SET frequencyMultiplier = 1
 	SET frequency = 1
-	SET p4IsActive = VARIABLE_IS_SET parameter4 AND parameter4 != 0 AND is_ee
+	SET p4IsActive = isExternal AND parameter4 != 0 AND is_ee
 	SET type = parameter2
 
 	PATCH_IF type >= 0 AND type <= 3 BEGIN
@@ -2979,7 +2979,7 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 		SET strref += type
 	END
 	ELSE PATCH_IF type == 11 OR type == 12 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
 	END
 	ELSE PATCH_IF type == 13 BEGIN
 		SET strref = 10780003
@@ -2995,14 +2995,14 @@ END
 DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 13 OR parameter2 > 10 AND NOT is_ee BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Unknown type : %parameter2%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Unknown type : %parameter2%~ END
 	END
 	PATCH_IF (timingMode == TIMING_permanent OR
 			 timingMode == TIMING_delayed OR
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -3095,12 +3095,12 @@ DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
 		 39 442 BEGIN SPRINT description @10830011 END // ~Immunité contre les éclairs~
 		 62 63 259 319 BEGIN SPRINT description @10830012 END // ~Immunité contre les toiles d'araignées~
 		DEFAULT
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type de projectile '%parameter2%'~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type de projectile '%parameter2%'~ END
     END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_83~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: self_probability~ END
+	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: self_probability~ END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_83~ BEGIN
@@ -3108,7 +3108,7 @@ DEFINE_PATCH_MACRO ~opcode_target_83~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
+	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
 END
 
 /* ------------------------------------------- *
@@ -3472,21 +3472,21 @@ DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
 	SET frequency = 1
 
 	PATCH_IF parameter2 >= 5 BEGIN
-        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Invalid value for parameter2 : %parameter2% >= 5 == crash the game~ END
+        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 == crash the game~ END
     END
 
 	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+		PATCH_IF isExternal BEGIN
 			SET amount2 = parameter3
 			SET frequencyMultiplier = parameter4
 		END
 
 		PATCH_IF parameter2 == 0 OR parameter2 == 1 BEGIN
 			PATCH_IF parameter2 == 0 AND amount1 == 0 BEGIN
-				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: parameter1 needs to be non-zero : %parameter1%~ END
+				LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 needs to be non-zero : %parameter1%~ END
 			END
 			PATCH_IF parameter2 == 1 AND (amount1 < 1 OR amount1 > 101) BEGIN
-				LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: parameter1 between 1 and 101 : %parameter1%~ END
+				LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 between 1 and 101 : %parameter1%~ END
 			END
 			SET amount = 1
 		END
@@ -3513,12 +3513,12 @@ DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
 			SET frequency = amount1
 		END
 		ELSE PATCH_IF parameter2 == 4 BEGIN
-			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF isExternal BEGIN
 				SET amount = parameter3
 				SET frequency = amount1
 			END
 			ELSE BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Verifier le fonctionnement avec type == 4~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Verifier le fonctionnement avec type == 4~ END
 			END
 		END
 	END
@@ -3871,7 +3871,7 @@ DEFINE_PATCH_MACRO ~opcode_self_115~ BEGIN
 	LOCAL_SET strref = 11150001 + parameter2
 
 	PATCH_IF parameter2 > 2 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2% (0, 1 or 2 expected)~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2% (0, 1 or 2 expected)~ END
 	END
 	ELSE BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Détection du xxx~
@@ -4002,7 +4002,7 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
-	PATCH_IF is_ee == 1 AND VARIABLE_IS_SET parameter3 BEGIN
+	PATCH_IF is_ee == 1 AND isExternal BEGIN
 		SET amount2 = parameter3
 		SET amount3 = parameter4
 		PATCH_IF NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
@@ -4157,7 +4157,7 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 			SET strref += 2 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
 		END
 		ELSE PATCH_IF mode == 1 BEGIN
-			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF isExternal BEGIN
 				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
@@ -4185,7 +4185,7 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 			SET strref += 17 // ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
 		END
 		ELSE PATCH_IF mode == 1 BEGIN
-			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF isExternal BEGIN
 				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
@@ -4372,7 +4372,7 @@ DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
         SPRINT description @11350001 // ~Transforme le porteur en %creatureName%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
 	END
 END
 
@@ -4652,7 +4652,7 @@ END
  * Summon: Replace Creature [151] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_151~ BEGIN
-	LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Version self à gérer.~ END
+	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Version self à gérer.~ END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_151~ BEGIN
@@ -4731,7 +4731,7 @@ DEFINE_PATCH_MACRO ~opcode_self_159~ BEGIN
 		SPRINT description @11590002 // ~Crée %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
 	END
 END
 
@@ -4744,7 +4744,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_159~ BEGIN
 		SPRINT description @11590004 // ~de créer %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
 	END
 END
 
@@ -5064,10 +5064,10 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 	END
 	ELSE BEGIN
 		PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 		END
 	END
 END
@@ -5107,7 +5107,7 @@ DEFINE_PATCH_MACRO ~opcode_178_common~ BEGIN
 	LOCAL_SET strref = 10540001 // TAC0
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
-	PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+	PATCH_IF isExternal BEGIN
 		SET value = ~%parameter3%~
 	END
 	ELSE BEGIN
@@ -5144,7 +5144,7 @@ DEFINE_PATCH_MACRO ~opcode_179_common~ BEGIN
 	//TODO: Multiple opcode #179 effects only allow additional targeting, they do not stack their damage bonus.
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
-	PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+	PATCH_IF isExternal BEGIN
 		SET damageAmount = ~%parameter3%~
 	END
 	ELSE BEGIN
@@ -5364,7 +5364,7 @@ DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
 		208
 			BEGIN SET projref = 11971208 END // ~rayons des spectateurs~
 		DEFAULT
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
     END
 
 	PATCH_IF projref > 0 BEGIN
@@ -5850,7 +5850,7 @@ DEFINE_PATCH_MACRO ~opcode_self_221~ BEGIN
 
 		SPRINT description @12210001 // ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 	WITH DEFAULT
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
 	END
 END
 
@@ -5862,7 +5862,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_221~ BEGIN
 
 		SPRINT description @12210002 // ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou moins sur %theTarget%~
 	WITH DEFAULT
-        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
+        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
     END
 END
 
@@ -6142,12 +6142,12 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 
 	LPM ~opcode_232_condition~
 
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	PATCH_IF VARIABLE_IS_SET resref2 AND NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref2%~ RET spellName2 = spellName END
+	LPF ~get_spell_name~ STR_VAR file = ~%resref%~ RET spellName END
+	PATCH_IF isExternal AND NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = ~%resref2%~ RET spellName2 = spellName END
 	END
-	PATCH_IF VARIABLE_IS_SET resref3 AND NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref3%~ RET spellName3 = spellName END
+	PATCH_IF isExternal AND NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = ~%resref3%~ RET spellName3 = spellName END
 	END
 
 	LPF ~get_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
@@ -6166,7 +6166,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
     END
     ELSE BEGIN
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
-			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
 			INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
 		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
@@ -6228,7 +6228,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
 		PATCH_IF parameter1 != 0 BEGIN
-            LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
+            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
 		END
 		SET timeofdayRef = 12320300 + special
 		LPF ~getTranslation~ INT_VAR strref = timeofdayRef opcode RET condition = string END
@@ -6241,7 +6241,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 		END
 	END
 	ELSE PATCH_IF parameter2 == 15 OR parameter2 == 18 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO parameter2 : %parameter2% : %parameter1% : %special%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO parameter2 : %parameter2% : %parameter1% : %special%~ END
 	END
 END
 
@@ -6267,7 +6267,7 @@ DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 	ELSE PATCH_IF parameter2 != 109 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
 	END
 END
 
@@ -6293,7 +6293,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_233~ BEGIN
 		END
 	END
 	ELSE PATCH_IF parameter2 != 109 BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
 	END
 END
 
@@ -6473,7 +6473,7 @@ DEFINE_PATCH_MACRO ~opcode_243_common~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: This effect not works in ToB~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: This effect not works in ToB~ END
 	END
 END
 
@@ -6876,7 +6876,7 @@ DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
 	LOCAL_SET frequency = 1
 
 	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+		PATCH_IF isExternal BEGIN
 			SET amount2 = parameter3
 			SET frequencyMultiplier = parameter4
 		END
@@ -6945,21 +6945,21 @@ DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
 			END
 		END
 		ELSE PATCH_IF parameter2 == 4 BEGIN
-			PATCH_IF VARIABLE_IS_SET parameter3 BEGIN
+			PATCH_IF isExternal BEGIN
 				SET amount = parameter3
 				SET strref = frequency == 1 ? 12720007 : 12720006
 			END
 			ELSE BEGIN
 				SET strref = 0
-	            LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
+	            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
 			END
 		END
 	END
 	PATCH_IF parameter1 <= 0 BEGIN
-        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid value for parameter1 : %parameter2%~ END
+        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter1 : %parameter2%~ END
 	END
 	PATCH_IF parameter2 == 1 OR parameter2 >= 5 BEGIN
-        LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 OR %parameter2% == 2 => crash the game~ END
+        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 OR %parameter2% == 2 => crash the game~ END
 	END
 	ELSE PATCH_IF strref > 0 BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
@@ -7536,7 +7536,7 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% sur %theTarget%~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no names of spells or items found~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no names of spells or items found~ END
 		END
 	END
 END
@@ -7572,7 +7572,7 @@ DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
 			END
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self avec parameter1 et parameter2 différent de 0~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self avec parameter1 et parameter2 différent de 0~ END
 		END
 	END
 END
@@ -7586,7 +7586,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
 			END
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self_probability avec parameter1 et parameter2 différent de 0~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self_probability avec parameter1 et parameter2 différent de 0~ END
 		END
 	END
 END
@@ -7642,7 +7642,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
 		END
 	END
 END
@@ -7776,7 +7776,7 @@ DEFINE_PATCH_MACRO ~opcode_331_common~ BEGIN
 		SPRINT file ~%resref%~
 	END
 
-	PATCH_IF (NOT VARIABLE_IS_SET parameter3 AND mode == 0) OR mode == 1 BEGIN
+	PATCH_IF (NOT isExternal AND mode == 0) OR mode == 1 BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
@@ -8011,7 +8011,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 		END
 		ELSE BEGIN
 			// TODO !
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
 			SPRINT value @10002 // ~%value% %~
 		END
 	END
@@ -8029,7 +8029,7 @@ DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET des
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
 	END
 END
 
@@ -8058,7 +8058,7 @@ DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~
 		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
 	END
 END
 
@@ -8293,13 +8293,13 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 				END
 				/*
 				PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-					LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
+					LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
 				END
 				*/
 			END
 		END
 		ELSE PATCH_IF showWarning BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
 		END
 	END
 END
@@ -8312,7 +8312,7 @@ END
 DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
 	SET strref = 100200 + secondaryType
 	PATCH_IF secondaryType > 13 OR secondaryType < 0 BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: secondary type must be between 0 and 13 inclusive~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: secondary type must be between 0 and 13 inclusive~ END
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
 END
@@ -8329,13 +8329,13 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" 
 			END
 			/*
 			ELSE BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de l'objet introuvable pour %file%.itm.~ END
 			END
 			*/
 		END
 	END
 	ELSE PATCH_IF showWarning BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
 	END
 END
 
@@ -8351,13 +8351,13 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 			/*
 			ELSE BEGIN
 				SPRINT creatureName @102549 // ~Créature inconnue~
-				LPF ~log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 			END
 			*/
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
 	END
 END
 
@@ -8403,7 +8403,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
 	END
 END
 
@@ -8422,7 +8422,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE PATCH_IF level == 512 BEGIN
@@ -8433,7 +8433,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE BEGIN
@@ -8479,14 +8479,14 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 			SPRINT idName $kits(~%entryHex%~)
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Kit utilise n'existe pas : %entry% : %entryHex%~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Kit utilise n'existe pas : %entry% : %entryHex%~ END
 		END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $ids_files(~%file%~) BEGIN
 		SPRINT idsFile $ids_files(~%file%~)
 		LOOKUP_IDS_SYMBOL_OF_INT idsEntry ~%idsFile%~ ~%entry%~
 		PATCH_IF ~%entry%~ STRING_EQUAL ~%idsEntry%~ BEGIN
-			LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
 		END
 		ELSE BEGIN
 			SET strref = 200000 + (file * 1000) + entry
@@ -8494,7 +8494,7 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Wrong ids file : %file%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
 	END
 END
 
@@ -8507,7 +8507,7 @@ DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVer
 		SPRINT idVersusName @102387 // ~contre les %targetType%~
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode_n%: Wrong ids file : %file%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
 	END
 END
 
@@ -8631,11 +8631,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
 	END
 	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
 	END
 END
 
@@ -8643,7 +8643,7 @@ DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -8651,7 +8651,7 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 
@@ -8659,6 +8659,6 @@ DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR type = ~error~ message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
 	END
 END

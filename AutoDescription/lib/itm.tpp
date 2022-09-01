@@ -1,4 +1,10 @@
 DEFINE_PATCH_FUNCTION ~update_item_description~
+	RET
+		totalIgnoredCursed
+		totalIgnoredWithoutDescription
+		totalIgnoredNotMoveable
+		totalIgnoredType
+		totalSuccessful
 BEGIN
 	PATCH_SILENT
 
@@ -7,7 +13,11 @@ BEGIN
 	READ_LONG   ITM_identified_desc originalDescriptionRef
     READ_SHORT  ITM_flags           flags
 
-	LPF ~can_update_item~ INT_VAR itemType originalDescriptionRef flags STR_VAR originalDescription RET canUpdateItem END
+	LPF ~can_update_item~
+		INT_VAR itemType originalDescriptionRef flags
+		STR_VAR originalDescription
+		RET canUpdateItem totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType
+	END
 
 	PATCH_IF canUpdateItem BEGIN
 		LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
@@ -20,6 +30,8 @@ BEGIN
 		// Ecrire dans le fichier de comparaison
 		READ_STRREF ITM_identified_name itemName
 		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
+
+		SET totalSuccessful += 1
 	END
 END
 
@@ -79,6 +91,10 @@ DEFINE_PATCH_FUNCTION ~can_update_item~
 		originalDescription = ~~
 	RET
 		canUpdateItem
+		totalIgnoredCursed
+		totalIgnoredWithoutDescription
+		totalIgnoredNotMoveable
+		totalIgnoredType
 BEGIN
 	SET canUpdateItem = 1
 
@@ -87,14 +103,19 @@ BEGIN
 		SET canUpdateItem = 0
 		LPF ~add_log_error~ STR_VAR message = ~Fichier invalide.~ END
 	END
-	ELSE PATCH_IF
-		 // Si l'utilisateur ne veut pas modifier la description des objets maudits
-		(NOT include_cursed_items AND (flags BAND BIT4) == BIT4)
-		// Si l'utilisateur ne veut pas inclure les objets sans description
-		OR (NOT include_items_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0))
-		// Si l'utilisateur ne veut pas inclure les objets qui ne peuvent être déplacés (Ils ne sont pas accessibles au joueur)
-		OR (NOT include_non_moveable_items AND (flags BAND BIT2) == 0)
-	BEGIN
+	// Si l'utilisateur ne veut pas modifier la description des objets maudits
+	ELSE PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) == BIT4 BEGIN
+		SET totalIgnoredCursed += 1
+		SET canUpdateItem = 0
+	END
+	// Si l'utilisateur ne veut pas inclure les objets sans description
+	ELSE PATCH_IF NOT include_items_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) BEGIN
+		SET totalIgnoredWithoutDescription += 1
+		SET canUpdateItem = 0
+	END
+	// Si l'utilisateur ne veut pas inclure les objets qui ne peuvent être déplacés (Ils ne sont pas accessibles au joueur)
+	ELSE PATCH_IF NOT include_non_moveable_items AND (flags BAND BIT2) == 0 BEGIN
+		SET totalIgnoredNotMoveable += 1
 		SET canUpdateItem = 0
 	END
     ELSE BEGIN
@@ -115,6 +136,7 @@ BEGIN
 				SET canUpdateItem = 1
 			END
 			DEFAULT
+				SET totalIgnoredType += 1
 				SET canUpdateItem = 0
 		END
     END

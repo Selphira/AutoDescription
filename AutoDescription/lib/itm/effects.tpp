@@ -11,7 +11,6 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~
 		description
 		sort
 BEGIN
-	SET opcode_n = opcode
 	SET ignoreDuration = 0
 	SET isValid = 1
 	SET saveAdded = 0
@@ -81,12 +80,12 @@ BEGIN
 
 			PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF probability >= 100 BEGIN
-					SPRINT method ~opcode%opcode_target%_%opcode_n%~
+					SPRINT method ~opcode%opcode_target%_%opcode%~
 					LPM ~%method%~
 					LPM ~set_opcode_sort~
 				END
 				ELSE BEGIN
-					SPRINT method ~opcode%opcode_target%_probability_%opcode_n%~
+					SPRINT method ~opcode%opcode_target%_probability_%opcode%~
 					LPM ~%method%~
 					LPM ~set_opcode_sort~
 					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
@@ -100,17 +99,17 @@ BEGIN
 				LPM ~add_save~
 			END
 			ELSE BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: Unknow target : %target% ~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END
 			END
 		WITH
 			~Failure("Unknown macro: \%method%")~
 			BEGIN
-				LPF ~log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Unknown macro: %method%~ END
 				PATCH_FAIL ~Unknown macro: %method%~
 			END
 			DEFAULT
-				LPF ~log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode_n%: %ERROR_MESSAGE%~ END
-				PATCH_FAIL ~Opcode %opcode_n%: %ERROR_MESSAGE%~
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
+				PATCH_FAIL ~Opcode %opcode%: %ERROR_MESSAGE%~
 		END
 	END
 END
@@ -121,32 +120,28 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 
 	PATCH_IF probability <= 0 BEGIN
 		SET isValid = 0
-        LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
+        LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
     END
 
 	PATCH_IF target > 9 BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid target : %target%~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid target : %target%~ END
 	END
 
 	// OR abilityType == AbilityType_Equipped ?
 	// TODO: Cas particulier de l'opcode 177...
 	PATCH_IF target == TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Target est none~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Target est none~ END
 	END
 
 	PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 		SET isValid = 0
-		LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Les 2 parametres doivent avoir la valeur 0~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Les 2 parametres doivent avoir la valeur 0~ END
 	END
 END
 
 DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
-	PATCH_IF opcode == 219 BEGIN
-		SET opcode = opcode_n
-	END
-
 	PATCH_IF forceSort == 0 BEGIN
 		PATCH_IF VARIABLE_IS_SET $sort_opcodes(~%opcode%~) BEGIN
 			SET sort = $sort_opcodes(~%opcode%~) + ((100 - probability) * 10000)
@@ -158,35 +153,17 @@ DEFINE_PATCH_MACRO ~set_opcode_sort~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET description saveAdded ignoreDuration BEGIN
-	READ_SHORT EFF2_opcode opcode
-	PATCH_IF resetTarget == 1 BEGIN
+	SET oldTarget = target
+	SET parentProbability = probability
+	SET isExternal = 1
+    LPM ~read_external_effect_vars~
+
+	PATCH_IF resetTarget == 0 BEGIN
 		// resetTarget == 0 dans le cas où on demande la description depuis l'opcode 177
 		// TODO: Améliorer la gestion de ce comportement d'une façon moins tirée par les cheveux
-		READ_BYTE  EFF2_target target
-	END
-	READ_BYTE  EFF2_power power
-	READ_LONG  EFF2_parameter1 parameter1
-	READ_LONG  EFF2_parameter2 parameter2
-	READ_LONG  EFF2_duration duration
-	READ_BYTE  EFF2_probability1 probability1
-	READ_BYTE  EFF2_probability2 probability2
-	READ_ASCII EFF2_resource resref
-	READ_LONG  EFF2_dice_thrown diceCount
-	READ_LONG  EFF2_dice_sides diceSides
-	READ_LONG  EFF2_save_type saveType
-	READ_LONG  EFF2_save_bonus saveBonus
-	READ_LONG  EFF2_stacking_id_tobex specialEE
-	READ_LONG  EFF2_parameter3 parameter3
-	READ_LONG  EFF2_parameter4 parameter4
-	READ_ASCII EFF2_resource2 resref2
-	READ_ASCII EFF2_resource3 resref3
-
-	PATCH_IF is_ee == 1 BEGIN
-		SET special = specialEE
+		SET target = oldTarget
 	END
 
-	SET isValid = 1
-	SET parentProbability = probability
 	SPRINT condition ~~
 	SPRINT description ~~
 
@@ -247,7 +224,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 			END
 		END
 		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 		END
 
 		LPM ~add_condition~
@@ -287,7 +264,7 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	// FIXME
 	SET saveForHalf = 0
 	SET failForHalf = 0
-	PATCH_IF is_ee AND opcode_n == 12 AND (parameter2 BAND 65535) == 0 BEGIN
+	PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 BEGIN
 		SET saveForHalf = (special BAND BIT8) > 0
 		SET failForHalf = (special BAND BIT9) > 0
 	END
@@ -369,7 +346,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
 		END
 		ELSE BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode_n%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 		END
 
 		PATCH_IF strref != 0 BEGIN
@@ -400,25 +377,6 @@ DEFINE_PATCH_MACRO ~block_to_vars~ BEGIN
 	READ_LONG  (blockOffset + EFF_save_type) saveType
 	READ_LONG  (blockOffset + EFF_save_bonus) saveBonus
 	READ_LONG  (blockOffset + 0x2c) special
-END
-
-DEFINE_PATCH_MACRO ~abilities_groups_to_vars~ BEGIN
-	SPRINT opcode "%data_0%"
-	SPRINT target "%data_1%"
-	SPRINT power "%data_2%"
-	SPRINT parameter1 "%data_3%"
-	SPRINT parameter2 "%data_4%"
-	SPRINT timingMode "%data_5%"
-	SPRINT resistance "%data_6%"
-	SPRINT duration "%data_7%"
-	SPRINT probability1 "%data_8%"
-	SPRINT probability2 "%data_9%"
-	SPRINT resref "%data_10%"
-	SPRINT diceCount "%data_11%"
-	SPRINT diceSides "%data_12%"
-	SPRINT saveType "%data_13%"
-	SPRINT saveBonus "%data_14%"
-	SPRINT special "%data_15%"
 END
 
 

@@ -63,7 +63,7 @@ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
 	END
 END
 
@@ -97,7 +97,7 @@ BEGIN
 			END
 		END
 		ELSE PATCH_IF $ignored_opcodes(~%opcode%~) == 1 BEGIN
-			LPF ~log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% à gérer.~ END
 		END
 	END
 
@@ -150,7 +150,7 @@ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
 	END
 END
 
