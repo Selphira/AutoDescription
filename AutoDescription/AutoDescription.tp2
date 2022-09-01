@@ -104,7 +104,7 @@ LAM ~init_statistics~
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
 		COPY_EXISTING ~%itemFile%~ ~override~
-			LPF ~update_item_description~ END
+			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
