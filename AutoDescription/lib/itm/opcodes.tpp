@@ -54,6 +54,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 98 => 38  // Stat: Regeneration [98]
 	 18 => 39  // Stat: Maximum HP Modifier [18]
 	132 => 40  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
+	501 => 41  // Stat: Caractéristiques [501]
 	 44 => 41  // Stat: Strength Modifier [44]
 	 97 => 42  // Stat: Strength-Bonus Modifier [97]
 	 15 => 43  // Stat: Dexterity Modifier [15]
@@ -914,6 +915,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_6_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_6_group~ BEGIN
+	LOCAL_SET opcode = 6
+	LOCAL_SET newOpcode = 501
+
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 10 15 19 44 49 END
+
+	LPM ~group_opcode_with_same_parameters~
 END
 
 /* -------------------------------- *
@@ -1959,7 +1969,6 @@ DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_33_group~ BEGIN
-	LOCAL_SET group = 1
 	LOCAL_SET opcode = 33
 	LOCAL_SET newOpcode = 325
 
@@ -2516,7 +2525,6 @@ DEFINE_PATCH_MACRO ~opcode_59_is_valid~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_59_group~ BEGIN
-	LOCAL_SET group = 1
 	LOCAL_SET newOpcode = 500
 	LOCAL_SET opcode = 59
 
@@ -7973,9 +7981,9 @@ DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
-/* ------------------------------------ *
+/* --------------------------------- *
  * Stat: Compétences de voleur [500] *
- * ------------------------------------ */
+ * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_500~ BEGIN
 	LPF ~opcode_mod_percent~ INT_VAR strref = 15000001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Compétences de voleur~
 END
@@ -7990,6 +7998,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_500~ BEGIN
 	LPM ~opcode_self_probability_500~
+END
+
+/* ---------------------------- *
+ * Stat: Caractéristiques [501] *
+ * ---------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_501~ BEGIN
+	LPF ~opcode_mod_percent~ INT_VAR strref = 15010001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Caractéristiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_501~ BEGIN
+	LPF ~opcode_probability_percent~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_501~ BEGIN
+	LPF ~opcode_target_percent~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_501~ BEGIN
+	LPM ~opcode_self_probability_501~
 END
 
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
@@ -8701,5 +8728,7 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 			SET opcode = newOpcode
             LPM ~add_opcode~
 		END
+
+		CLEAR_ARRAY listOpcodes
 	END
 END

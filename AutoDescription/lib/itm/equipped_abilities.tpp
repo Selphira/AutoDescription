@@ -105,53 +105,6 @@ DEFINE_PATCH_FUNCTION ~shrink_resistances~ RET description BEGIN
 	END
 END
 
-/* --------------------------------------------------------------------------------------------------------- *
- * Groupement des caractéristiques du personnage                                                             *
- * --------------------------------------------------------------------------------------------------------- *
- * - Force : +3                                                                                              *
- * - Dextérité : +3                                                                                          *
- * - Constitution : +3                                                                                       *
- * - Intelligence : +3                                                                                       *
- * - Sagesse : +3                                                                                            *
- * - Charisme : +3                                                                                           *
- * Devient                                                                                                   *
- * - Caractéristiques : +3                                                                                   *
- * --------------------------------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~shrink_abilities~ RET description BEGIN
-	PATCH_IF shrink_abilities BEGIN
-		PATCH_DEFINE_ARRAY ~group~ BEGIN // ~Résistance aux dégâts~
-			10440001 10150001 10100001 10190001 10490001 10060001
-		END
-
-		LPF ~shrink_find_values~ STR_VAR group RET_ARRAY values matches END
-		LPF ~shrink_replace_values~ INT_VAR strref = 102228 STR_VAR description group RET description END // ~Caractéristiques~
-	END
-END
-
-/* --------------------------------------------------------------------------------------------------------- *
- * Groupement des compétences de voleur du personnage.                                                       *
- * --------------------------------------------------------------------------------------------------------- *
- * - Vol à la tire : +15 %                                                                                   *
- * - Crochetage de serrures : +15 %                                                                          *
- * - Détection des illusions : +15 %                                                                         *
- * - Détection/désamorçage des pièges : +15 %                                                                *
- * - Pose de pièges : +15 %                                                                                  *
- * - Camouflage dans l'ombre : +15 %                                                                         *
- * - Furtivité : +15 %                                                                                       *
- * Devient                                                                                                   *
- * - Compétences de voleur : +3                                                                                   *
- * --------------------------------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~shrink_thief_skills~ RET description BEGIN
-	PATCH_IF shrink_thief_skills BEGIN
-		PATCH_DEFINE_ARRAY ~group~ BEGIN // ~Résistance aux dégâts~
-			10920001 10900001 12760001 10910001 12770001 12750001 10590001
-		END
-
-		LPF ~shrink_find_values~ STR_VAR group RET_ARRAY values matches END
-		LPF ~shrink_replace_values~ INT_VAR strref = 102229 STR_VAR description group RET description END // ~Compétences de voleur~
-	END
-END
-
 DEFINE_PATCH_FUNCTION ~shrink_find_values~
 	STR_VAR
 		group = ~~

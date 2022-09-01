@@ -90,7 +90,6 @@
 @102225 = ~Résistance aux dégâts physiques~
 @102226 = ~Résistance aux dégâts élémentaires~
 @102227 = ~Résistance aux dégâts~
-@102228 = ~Caractéristiques~
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
 
@@ -2763,6 +2762,11 @@
 
 @15000001 = ~Compétences de voleur~
 @15000002 = ~les compétences de voleur~
+
+// Fake Opcode 501: Stat: Caractéristiques [501]
+
+@15010001 = ~Caractéristiques~
+@15010002 = ~les caractéristiques~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
