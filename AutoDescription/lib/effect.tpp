@@ -276,16 +276,12 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_effect_description~
 	INT_VAR
-		forceTarget = 0
-		forceProbability = 0
-		forcedProbability = 100
-	STR_VAR
-		theTarget = ~~
-		ofTheTarget = ~~
-		toTheTarget = ~~
+		resetTarget = 0
 	RET
 		description
 		sort
+		saveAdded
+		ignoreDuration
 BEGIN
 	SET ignoreDuration = 0
 	SET isValid = 1
@@ -299,14 +295,10 @@ BEGIN
 	SPRINT description ~~
 	SPRINT opcode_target ~~
 
-	PATCH_IF forceProbability == 1 BEGIN
-		SET probability = forcedProbability
-	END
-
 	PATCH_TRY
 		PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
 			SPRINT opcode_target ~_self~
-			PATCH_IF forceTarget == 0 BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102472 // ~le porteur~
 				SPRINT ofTheTarget @101086 // ~du porteur~
 				SPRINT toTheTarget @101180 // ~au porteur~
@@ -314,7 +306,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF forceTarget == 0 BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102471 // ~la cible~
 				SPRINT ofTheTarget @101085 // ~de la cible~
 				SPRINT toTheTarget @101181 // ~à la cible~
@@ -322,7 +314,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_party BEGIN
 			SPRINT opcode_target ~_party~
-			PATCH_IF forceTarget == 0 BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102473 // ~les membres du groupe~
 				SPRINT ofTheTarget @101088 // ~des membres du groupe~
 				SPRINT toTheTarget @101182 // ~aux membres du groupe~

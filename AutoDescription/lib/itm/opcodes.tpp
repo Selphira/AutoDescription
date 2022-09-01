@@ -5038,17 +5038,72 @@ END
 DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
 	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
 		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
-			READ_SHORT EFF2_opcode opcode
-
 	        SPRINT oldTheTarget   ~%theTarget%~
 	        SPRINT oldOfTheTarget ~%ofTheTarget%~
 	        SPRINT oldToTheTarget ~%toTheTarget%~
 
-			LPF ~get_description_effect2~ INT_VAR resetTarget RET description saveAdded ignoreDuration END
+	        SET timingMode177 = timingMode
+	        SET duration177 = duration
+	        SET target177 = target
+	        SET probability177 = probability
+			SET isExternal = 1
+
+	        LPM ~read_external_effect_vars~
+
+			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+				SET isValid = 1
+
+				LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+
+		        // Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
+		        SET timingMode = timingMode177
+		        SET duration = duration177
+		        SET target = target177
+				// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
+		        SET probability = probability177 * probability / 100
+
+				LPM ~opcode_is_valid~
+
+		        PATCH_IF isValid == 1 BEGIN
+	                LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
+
+					INNER_PATCH_SAVE description ~%description%~ BEGIN
+				        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+					END
+		        END
+			END
 
 	        SPRINT theTarget   ~%oldTheTarget%~
 	        SPRINT ofTheTarget ~%oldOfTheTarget%~
 	        SPRINT toTheTarget ~%oldToTheTarget%~
+	    END
+	END
+	ELSE BEGIN
+		PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
+		END
+		ELSE BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+			SET isExternal = 1
+	        LPM ~read_external_effect_vars~
+
+			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+				SET isValid = 1
+				LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+				LPM ~opcode_is_valid~
+
+		        PATCH_IF isValid == 1 BEGIN
+	                LPF ~get_effect_description~ INT_VAR resetTarget = 1 RET description saveAdded ignoreDuration END
+		        END
+			END
 	    END
 	END
 	ELSE BEGIN
@@ -6561,7 +6616,7 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -6575,7 +6630,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -6589,7 +6644,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
@@ -6610,7 +6665,7 @@ END
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490001 // ~À chaque attaque à distance réussie: %description%~
@@ -6619,7 +6674,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490003 // ~par attaque à distance réussie par %theTarget%: %description%~
@@ -6628,7 +6683,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_249~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_177~ INT_VAR resetTarget = 1 STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12490002 // ~À chaque attaque à distance réussie par %theTarget%: %description%~
