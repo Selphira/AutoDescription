@@ -38,7 +38,7 @@ BEGIN
 
 	PATCH_IF isValid == 1 BEGIN
 		PATCH_TRY
-			PATCH_IF abilityType == AbilityType_Equipped BEGIN
+			PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster OR abilityType == AbilityType_Equipped BEGIN
 				SPRINT opcode_target ~_self~
 				PATCH_IF forceTarget == 0 BEGIN
 					SPRINT theTarget   @102472 // ~le porteur~
@@ -46,33 +46,20 @@ BEGIN
 					SPRINT toTheTarget @101180 // ~au porteur~
 				END
 			END
-			ELSE BEGIN
-				// TODO: Si abilityType == AbilityType_Combat ou AbilityType_Charge, préciser qu'il faut ajouter "au porteur|du porteur|le porteur ou à la cible|de la cible|la cible"
-				// Serait ajouté dans une variable qu'il suffira d'utiliser
-				// Pas très i18n friendly par contre, car cela se base sur la construction des phrases en Français... mais bon, pas grave !
-				PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
-					SPRINT opcode_target ~_self~
-					PATCH_IF forceTarget == 0 BEGIN
-						SPRINT theTarget   @102472 // ~le porteur~
-						SPRINT ofTheTarget @101086 // ~du porteur~
-						SPRINT toTheTarget @101180 // ~au porteur~
-					END
+			ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+				SPRINT opcode_target ~_target~
+				PATCH_IF forceTarget == 0 BEGIN
+					SPRINT theTarget   @102471 // ~la cible~
+					SPRINT ofTheTarget @101085 // ~de la cible~
+					SPRINT toTheTarget @101181 // ~à la cible~
 				END
-				ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
-					SPRINT opcode_target ~_target~
-					PATCH_IF forceTarget == 0 BEGIN
-						SPRINT theTarget   @102471 // ~la cible~
-						SPRINT ofTheTarget @101085 // ~de la cible~
-						SPRINT toTheTarget @101181 // ~à la cible~
-					END
-				END
-				ELSE PATCH_IF target == TARGET_FX_party BEGIN
-					SPRINT opcode_target ~_party~
-					PATCH_IF forceTarget == 0 BEGIN
-						SPRINT theTarget   @102473 // ~les membres du groupe~
-						SPRINT ofTheTarget @101088 // ~des membres du groupe~
-						SPRINT toTheTarget @101182 // ~aux membres du groupe~
-					END
+			END
+			ELSE PATCH_IF target == TARGET_FX_party BEGIN
+				SPRINT opcode_target ~_party~
+				PATCH_IF forceTarget == 0 BEGIN
+					SPRINT theTarget   @102473 // ~les membres du groupe~
+					SPRINT ofTheTarget @101088 // ~des membres du groupe~
+					SPRINT toTheTarget @101182 // ~aux membres du groupe~
 				END
 			END
 
@@ -171,7 +158,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect2~ INT_VAR resetTarget = 0 RET desc
 	LPM ~opcode_is_valid~
 
 	PATCH_IF isValid == 1 BEGIN
-		PATCH_IF target == TARGET_FX_self OR abilityType == AbilityType_Equipped BEGIN
+		PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster OR abilityType == AbilityType_Equipped BEGIN
 	        SPRINT macro ~opcode_self_~
 	        PATCH_IF resetTarget == 1 BEGIN
 		        SPRINT theTarget   @102472 // ~le porteur~
