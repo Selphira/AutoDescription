@@ -331,30 +331,34 @@ BEGIN
 			LPF ~appendValue~ INT_VAR strref = 10730001 STR_VAR value = ~%damage%~ RET description END // ~Dégâts~
 		END
 
-		PATCH_IF countHeaders == 1 OR group = 0 BEGIN
-			SET strref = 102010 + damageType
-	        SPRINT value (AT ~%strref%~)
-			LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
-		END
-		ELSE BEGIN
-			FOR (index2 = 0; index2 < countHeaders; index2 += 1) BEGIN
-				PATCH_PHP_EACH ~weaponAttributes%index2%~ AS weaponData => _ BEGIN
-                    SET damageType  = ~%weaponData_2%~
-					SET strref = 102010 + damageType
-			        SPRINT value (AT ~%strref%~)
+		SPRINT damageNone @10015 // ~Aucun~
 
-					PATCH_PHP_EACH ~headers%index2%~ AS headerData => _ BEGIN
-						SET attackType = ~%headerData_0%~
-						SET location = ~%headerData_1%~
-                        SET headerIndex = ~%headerData_2%~
-                        LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
-                    END
+		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~%damageNone%~ BEGIN
+			PATCH_IF countHeaders == 1 OR group = 0 BEGIN
+				SET strref = 102010 + damageType
+		        SPRINT value (AT ~%strref%~)
+				LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+			END
+			ELSE BEGIN
+				FOR (index2 = 0; index2 < countHeaders; index2 += 1) BEGIN
+					PATCH_PHP_EACH ~weaponAttributes%index2%~ AS weaponData => _ BEGIN
+	                    SET damageType  = ~%weaponData_2%~
+						SET strref = 102010 + damageType
+				        SPRINT value (AT ~%strref%~)
 
-                    SPRINT value ~%value% (%sectionType%)~
+						PATCH_PHP_EACH ~headers%index2%~ AS headerData => _ BEGIN
+							SET attackType = ~%headerData_0%~
+							SET location = ~%headerData_1%~
+	                        SET headerIndex = ~%headerData_2%~
+	                        LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
+	                    END
 
-					LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
-				END
-            END
+	                    SPRINT value ~%value% (%sectionType%)~
+
+						LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+					END
+	            END
+			END
 		END
 
 		LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = ~%speedFactor%~ RET description END // ~Facteur de vitesse~
