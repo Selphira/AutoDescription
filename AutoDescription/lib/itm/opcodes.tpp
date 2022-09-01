@@ -65,6 +65,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	281 => 60  // Stat: Wild Magic [281]
 	301 => 90  // Stat: Critical Hit Modifier [301]
 	362 => 91  // Critical miss bonus [362]
+	500 => 98  // Stat: Compétences de voleur [500]
 	 92 => 98  // Stat: Pick Pockets Modifier [92]
 	 90 => 99  // Stat: Open Locks Modifier [90]
 	276 => 100 // Stat: Detect Illusion Modifier [276]
@@ -1959,42 +1960,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_33_group~ BEGIN
 	LOCAL_SET group = 1
-	// Pour chaque opcode 33, y a-t-il un opcode 34, 35, 36 et 37 avec les mêmes valeurs ?
-	// Si oui, on désactive toutes ces entrées (1 de chaque) et on crée un simple opcode 325 avec les mêmes valeurs.
-	PATCH_PHP_EACH ~opcodes_33~ AS data => _ BEGIN
-		LPM ~data_to_vars~
-		SET group = 1
-		CLEAR_ARRAY positions
-		// On ajoute l'opcode courant à ceux qui seront désactivés
-		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
-			33 => ~%position%~
-		END
+	LOCAL_SET opcode = 33
+	LOCAL_SET newOpcode = 325
 
-		FOR (opcode = 34; opcode <= 37; opcode += 1) BEGIN
-			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %parameter2% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 34 35 36 37 END
 
-			SET $positions(~%opcode%~) = opcodePosition
-
-			PATCH_IF opcodePosition < 0 BEGIN
-				SET group = 0
-				SET opcode = 38
-			END
-		END
-
-		PATCH_IF group == 1 BEGIN
-			// Suppression des effets similaires
-			PATCH_PHP_EACH positions AS opcode => position1 BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-			SET opcode = 325
-            LPM ~add_opcode~
-		END
-	END
+	LPM ~group_opcode_with_same_parameters~
 END
 
 /* ---------------------------------- *
@@ -2542,6 +2513,16 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_59_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_59_group~ BEGIN
+	LOCAL_SET group = 1
+	LOCAL_SET newOpcode = 500
+	LOCAL_SET opcode = 59
+
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 90 91 92 275 276 277 END
+
+	LPM ~group_opcode_with_same_parameters~
 END
 
 /* ------------------------ *
@@ -7992,6 +7973,25 @@ DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+/* ------------------------------------ *
+ * Stat: Compétences de voleur [500] *
+ * ------------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_500~ BEGIN
+	LPF ~opcode_mod_percent~ INT_VAR strref = 15000001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Compétences de voleur~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_500~ BEGIN
+	LPF ~opcode_probability_percent~ INT_VAR strref = 15000002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les compétences de voleur~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_500~ BEGIN
+	LPF ~opcode_target_percent~ INT_VAR strref = 15000002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les compétences de voleur~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_500~ BEGIN
+	LPM ~opcode_self_probability_500~
+END
+
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		PATCH_IF IS_AN_INT ~%value%~ BEGIN
@@ -8660,5 +8660,46 @@ DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
+	END
+END
+
+/**
+ * Si tous les effets contenus dans listOpcodes ont les mêmes paramètres, chacun de ces effets est supprimés, et un
+ * effet [newOpcode] est créé avec ces mêmes paramètres.
+ */
+DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
+	LOCAL_SET group = 1
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 1
+		CLEAR_ARRAY positions
+		// On ajoute l'opcode courant à ceux qui seront désactivés
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+			~%opcode%~ => ~%position%~
+		END
+
+		PATCH_PHP_EACH ~listOpcodes~ AS _ => opcode BEGIN
+			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %parameter2% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+
+			SET $positions(~%opcode%~) = opcodePosition
+
+			PATCH_IF opcodePosition < 0 BEGIN
+				SET group = 0
+			END
+		END
+
+		PATCH_IF group == 1 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS opcode => position1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			SET opcode = newOpcode
+            LPM ~add_opcode~
+		END
 	END
 END

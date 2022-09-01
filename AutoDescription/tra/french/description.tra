@@ -91,7 +91,6 @@
 @102226 = ~Résistance aux dégâts élémentaires~
 @102227 = ~Résistance aux dégâts~
 @102228 = ~Caractéristiques~
-@102229 = ~Compétences de voleur~
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
 
@@ -2759,6 +2758,11 @@
 
 @13620001 = ~Chance d'échec critique~
 @13620002 = ~Chance d'échec critique avec cette arme~
+
+// Fake Opcode 500: Stat: Compétences de voleur [500]
+
+@15000001 = ~Compétences de voleur~
+@15000002 = ~les compétences de voleur~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
