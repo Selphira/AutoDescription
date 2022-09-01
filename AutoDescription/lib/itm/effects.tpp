@@ -461,7 +461,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 			SPRINT value @100314 // ~après %strDuration% et pendant %strDuration%~
 		END
 		ELSE BEGIN
-			PATCH_PRINT "%SOURCE_FILE%: opcode %opcode% : timing %timingMode%"
+			LPF ~add_log_warning~ STR_VAR message = ~opcode %opcode% : timing %timingMode%~ END
 		END
     END
 END
