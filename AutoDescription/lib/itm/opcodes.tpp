@@ -5857,6 +5857,25 @@ DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~position = %position%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+
+		SET opcode = 219000
+		LPM ~add_opcode~
+
+		SET opcode = 219001
+		LPM ~add_opcode~
+	END
+END
+
 /* ---------------------------- *
  * Removal: Remove School [220] *
  * ---------------------------- */
