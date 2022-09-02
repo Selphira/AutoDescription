@@ -7676,7 +7676,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
 				PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
 					SET idsId = statType - 110
-					SET strref = strref + 147 // ~Effectif contre les %creatureType%~
+					SET strref = strref + 1 // ~Effectif contre les %creatureType%~
 				END
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 			END
