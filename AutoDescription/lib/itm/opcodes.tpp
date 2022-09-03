@@ -475,7 +475,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 79 => 1
 	 81 => 1
 	105 => 1 // Modification : or
-	107 => 1
+	108 => 1 // Modification Réputation
 	116 => 1
 	161 => 1
 	210 => 1
@@ -3587,6 +3587,7 @@ DEFINE_PATCH_MACRO ~opcode_self_105~ BEGIN
 	ELSE BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 > 0 BEGIN
 			SET parameter1 = 0 - parameter1
+		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 < 0 BEGIN
 			SET parameter1 = 0
 		END
@@ -3601,6 +3602,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_105~ BEGIN
 	ELSE BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 > 0 BEGIN
 			SET parameter1 = 0 - parameter1
+		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 < 0 BEGIN
 			SET parameter1 = 0
 		END
@@ -3626,8 +3628,8 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 <= 1 AND parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @11060001 // ~Le moral %ofTheTarget% ne peut flancher~
+	PATCH_IF parameter1 == 0 AND parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
 	END
 	ELSE BEGIN
 		SET value = ABS parameter1
@@ -3645,7 +3647,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 <= 1 AND parameter2 == MOD_TYPE_flat BEGIN
+	PATCH_IF parameter1 == 0 AND parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT description @11060004 // ~de garder le moral %ofTheTarget% au plus haut~
 	END
 	ELSE BEGIN
@@ -3668,6 +3670,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_106~ BEGIN
 	LPM ~opcode_self_probability_106~
+END
+
+DEFINE_PATCH_MACRO ~opcode_106_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ---------------------- *
@@ -3695,21 +3701,28 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_108~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_108_common~ BEGIN
-	SET strref = 11080001 // ~Réputation~
-    PATCH_IF is_ee == 1 BEGIN
-		SET strref = 11080003 // ~Réputation du personnage~
-		PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
+	SET strref = 11080003 // ~Réputation du personnage~
+	PATCH_IF is_ee == 1 BEGIN
+		PATCH_IF parameter2 >= 3 BEGIN
 			SET strref = 11080005 // ~Réputation du groupe~
-			PATCH_IF parameter2 == 3 BEGIN
-				SET parameter1 = parameter1 * 10
-				SET parameter2 = MOD_TYPE_cumulative
-			END
-			ELSE PATCH_IF parameter2 == 4 BEGIN
-				SET parameter1 = 100
-				SET parameter2 = MOD_TYPE_flat
-			END
+			SET parameter2 = parameter2 MODULO 3
 		END
     END
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 < 10 BEGIN
+		SET parameter1 = 10
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_108_is_valid~ BEGIN
+	PATCH_IF is_ee == 0 BEGIN
+		LPM ~opcode_modstat2_is_valid~
+	END
+	ELSE BEGIN
+		PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 5 BEGIN
+			SET isValid = 0
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		END	
+	END
 END
 
 /* ----------------- *
