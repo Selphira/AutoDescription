@@ -1378,8 +1378,9 @@
 
 // Opcode 105: Stat: Gold [105]
 
-@11050001 = ~l'or~
+@11050001 = ~la quantité de pièces d'or~
 @11050002 = ~Diminue le nombre de pièces d'or %ofTheTarget% à %amount%~
+@11050003 = ~Déleste %theTarget% de tout son or~
 
 // Opcode 106: Stat: Morale Break Modifier [106]
 

@@ -474,6 +474,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 77 => 1
 	 79 => 1
 	 81 => 1
+	105 => 1 // Modification : or
 	107 => 1
 	116 => 1
 	161 => 1
@@ -2914,6 +2915,7 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 		SET strref += type
 		PATCH_IF amount < 0 BEGIN
 			amount = ABS amount
+		END
 		ELSE BEGIN
 			SET strref += 10
 		END
@@ -3571,33 +3573,52 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_104~ BEGIN
 	LPM ~opcode_self_probability_104~
 END
 
+DEFINE_PATCH_MACRO ~opcode_104_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ---------------- *
  * Stat: Gold [105] *
  * ---------------- */
 DEFINE_PATCH_MACRO ~opcode_self_105~ BEGIN
-	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @11050002 // ~Diminue le nombre de pièces d'or %ofTheTarget% à %amount%~
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 < 0 BEGIN
+		SPRINT description @11050003 // ~Déleste %theTarget% de tout son or~
 	END
 	ELSE BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 > 0 BEGIN
+			SET parameter1 = 0 - parameter1
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 < 0 BEGIN
+			SET parameter1 = 0
+		END
 		LPF ~opcode_target~ INT_VAR strref = 11050001 RET description END // ~l'or~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_105~ BEGIN
-	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @11050002 // ~Diminue le nombre de pièces d'or %ofTheTarget% à %amount%~
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 < 0 BEGIN
+		SPRINT description @11050003 // ~Déleste %theTarget% de tout son or~
 	END
 	ELSE BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 > 0 BEGIN
+			SET parameter1 = 0 - parameter1
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 < 0 BEGIN
+			SET parameter1 = 0
+		END
 		LPF ~opcode_probability~ INT_VAR strref = 11050001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~l'or~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_105~ BEGIN
 	LPM ~opcode_self_105~
+	
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_105~ BEGIN
 	LPM ~opcode_self_probability_105~
+END
+
+DEFINE_PATCH_MACRO ~opcode_105_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------------- *
