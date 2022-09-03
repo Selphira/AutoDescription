@@ -21,7 +21,6 @@ ROSSRING.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 SPER12.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SPER12.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 SPER12.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-STAF11.ITM : FAILURE: Unknown macro: opcode_self_219
 SW1H34.ITM : Opcode 116: Unknow target : 4
 SW2H06.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SW2H06.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
@@ -29,5 +28,4 @@ SW2H06.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 SW2H13.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SW2H13.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 SW2H13.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-WA2AMU.ITM : FAILURE: Unknown macro: opcode_self_219
 WA2SHIEL.ITM : Opcode 197 : Réflection du type de projectile '274'

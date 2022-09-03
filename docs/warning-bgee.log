@@ -12,12 +12,6 @@ RING09.ITM : Opcode 206 : La ressource spin572.spl n'existe pas.
 RING09.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 RING09.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 RING09.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
-SHLD06P.ITM : FAILURE: Unknown macro: opcode_self_219
-SHLD06P.ITM : FAILURE: Unknown macro: opcode_self_219
-SHLD07P.ITM : FAILURE: Unknown macro: opcode_self_219
-SHLD07P.ITM : FAILURE: Unknown macro: opcode_self_219
-SHLD07P.ITM : FAILURE: Unknown macro: opcode_self_219
-SHLD07P.ITM : FAILURE: Unknown macro: opcode_self_219
 SHLD08P.ITM : Opcode 206 : La ressource spwish27.spl n'existe pas.
 SHLD08P.ITM : Opcode 206 : La ressource spwish32.spl n'existe pas.
 SHLD08P.ITM : Opcode 206 : La ressource spwish35.spl n'existe pas.
@@ -35,8 +29,13 @@ SHLD08P.ITM : FAILURE: opcode 232: Failure("Opcode 326: Failure(\"Unknown macro:
 SW1H34.ITM : Opcode 318: Unknow target : 4
 SW1H34.ITM : Opcode 318: Unknow target : 4
 SW1H34.ITM : Opcode 116: Unknow target : 4
-SW1P01.ITM : Unknown macro: opcode_target_233
-SW1P01.ITM : FAILURE: opcode 232: Failure("Unknown macro: opcode_target_233")
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
+SW1P01.ITM : Opcode 233: Proficiency not found : 124
 SW1P01.ITM : Opcode 180 : La ressource POTN55.itm n'existe pas.
 SW1P01.ITM : Opcode 134: Les 2 parametres doivent avoir la valeur 0
 SW1P01.ITM : Opcode 134: Les 2 parametres doivent avoir la valeur 0
@@ -45,4 +44,3 @@ SW2H06.ITM : Opcode 206 : La ressource cdsw1h58.spl n'existe pas.
 SW2H06.ITM : Opcode 206 : La ressource cdmound.spl n'existe pas.
 SW2H06.ITM : Opcode 206 : La ressource cdhgnya1.spl n'existe pas.
 SW2HD1.ITM : opcode 221: Traduction 100214 manquante
-WA2AMU.ITM : FAILURE: Unknown macro: opcode_self_219
