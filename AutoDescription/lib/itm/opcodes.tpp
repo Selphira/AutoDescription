@@ -3448,7 +3448,6 @@ DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
 	END
 END
-	
 
 /* ------------------------------------ *
  * Protection: from Creature Type [100] *
@@ -3473,7 +3472,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_100~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_100_common~ BEGIN
-	PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
 		SET strref += 1
 	END
 	ELSE BEGIN
@@ -3482,9 +3481,19 @@ DEFINE_PATCH_MACRO ~opcode_100_common~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
+DEFINE_PATCH_MACRO ~opcode_100_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF parameter2 == 9 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Kit.ids is not available, IDS file %parameter2%.~ END
+	END
+END
+
 /* ----------------------------- *
  * Protection: from Opcode [101] *
  * ----------------------------- */
+// TODO: trouver une solution rapide pour l'affichage des protections
+// l'améliorer quand on s'ennuiera
 DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
 	LOCAL_SET cOpcode = parameter2
 	LOCAL_SET strref = 11010000 + cOpcode
@@ -3507,6 +3516,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	LPM ~opcode_self_probability_101~ // ~que %theTarget% résiste à xxx~
 END
 
+DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%parameter2%~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Opcode %parameter2%.~ END
+	END
+END
+
 /* -------------------------------------- *
  * Spell: Immunity (by Power Level) [102] *
  * -------------------------------------- */
@@ -3527,6 +3543,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_102~ BEGIN
 	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_102_is_valid~ BEGIN
+	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level %parameter1%.~ END
+	END
 END
 
 /* ----------------------------- *
