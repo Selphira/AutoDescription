@@ -3729,42 +3729,41 @@ END
  * State: Hold [109] *
  * ----------------- */
 DEFINE_PATCH_MACRO ~opcode_self_109~ BEGIN
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
+	SPRINT description @11090002 // ~Paralyse %theTarget%~
+	PATCH_IF parameter1 != 0 BEGIN
+		SPRINT idsFile $ids_files(~%parameter2%~)
+		LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
 
-	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		SPRINT description @11090001 // ~Paralyse les %creatureType%~
+		PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+			SPRINT description @11090001 // ~Paralyse les %creatureType%~
+		END
 	END
-	ELSE BEGIN
-		SPRINT description @11090002 // ~Paralyse %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_109~ BEGIN
+	SPRINT description @11090004 // ~de paralyser %theTarget%~
+	PATCH_IF parameter1 != 0 BEGIN
+		SPRINT idsFile $ids_files(~%parameter2%~)
+		LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
+
+		PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+			SPRINT description @11090003 // ~de paralyser les %creatureType%~
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_109~ BEGIN
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
-
-	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		SPRINT description @11090001 // ~Paralyse les %creatureType%~
-	END
-	ELSE BEGIN
-		SPRINT description @11090002 // ~Paralyse %theTarget%~
-	END
+	LPM ~opcode_self_109~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
-	SPRINT idsFile $ids_files(~%parameter2%~)
-	LOOKUP_IDS_SYMBOL_OF_INT symbol ~%idsFile%~ ~%parameter1%~
+	LPM ~opcode_self_probability_109~
+END
 
-	PATCH_IF NOT ~%symbol%~ STRING_EQUAL ~0~ BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		SPRINT description @11090003 // ~de paralyser les %creatureType%~
-	END
-	ELSE BEGIN
-		SPRINT description @11090004 // ~de paralyser %theTarget%~
-	END
+DEFINE_PATCH_MACRO ~opcode_109_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
 END
 
 /* --------------------------------- *
