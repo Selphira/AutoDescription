@@ -1387,9 +1387,14 @@
 @11060001 = ~Le moral %ofTheTarget% reste au plus haut~
 @11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
 @11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
-@11060004 = ~de garder le moral %ofTheTarget% au plus haut~
-@11060005 = ~de renforcer le moral %ofTheTarget% de %value%~
-@11060006 = ~d'affaiblir le moral %ofTheTarget% de %value%~
+@11060004 = ~Immunité contre la rupture de moral~
+@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~
+
+@11060006 = ~de garder le moral %ofTheTarget% au plus haut~
+@11060007 = ~de renforcer le moral %ofTheTarget% de %value%~
+@11060008 = ~d'affaiblir le moral %ofTheTarget% de %value%~
+@11060009 = ~d'immuniser %theTarget% contre la rupture de moral~
+@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
 
 // Opcode 108: Stat: Reputation [108]
 

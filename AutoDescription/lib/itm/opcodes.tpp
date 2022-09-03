@@ -3518,12 +3518,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	LPM ~opcode_self_probability_101~ // ~que %theTarget% résiste à xxx~
 END
 
-DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
-	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%parameter2%~) BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Opcode %parameter2%.~ END
-	END
-END
+// DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
+// 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
+// 		SET isValid = 0
+// 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Opcode %parameter2%.~ END
+// 	END
+// END
 
 /* -------------------------------------- *
  * Spell: Immunity (by Power Level) [102] *
@@ -3628,8 +3628,19 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 == 0 AND parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		PATCH_IF parameter1 < 0 BEGIN
+			SET parameter1 = 0
+		END
+		PATCH_IF parameter1 == 0 BEGIN
+			SPRINT description @11060004 // ~Le moral %ofTheTarget% ne peut plus flancher~
+		END
+		ELSE PATCH_IF parameter1 == 1 BEGIN
+			SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
+		END
+		ELSE BEGIN
+			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %value%~
+		END
 	END
 	ELSE BEGIN
 		SET value = ABS parameter1
@@ -3647,8 +3658,19 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 	SET ignoreDuration = 1
-	PATCH_IF parameter1 == 0 AND parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT description @11060004 // ~de garder le moral %ofTheTarget% au plus haut~
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 <= 1 BEGIN
+		PATCH_IF parameter1 < 0 BEGIN
+			SET parameter1 = 0
+		END
+		PATCH_IF parameter1 == 0 BEGIN
+			SPRINT description @11060009 // ~d'immuniser %theTarget% contre la rupture de moral~ // Immunité contre la rupture de moral~
+		END
+		ELSE PATCH_IF parameter1 == 1 BEGIN
+			SPRINT description @11060006 // ~de garder le moral %ofTheTarget% au plus haut~
+		END
+		ELSE BEGIN
+			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
+		END
 	END
 	ELSE BEGIN
 		SET value = ABS parameter1
@@ -3656,10 +3678,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 			LPF ~percent_value~ INT_VAR value RET value END
 		END
 		PATCH_IF parameter1 < 0 BEGIN
-			SPRINT description @11060005 // ~de renforcer le moral %ofTheTarget% de %value%~
+			SPRINT description @11060007 // ~de renforcer le moral %ofTheTarget% de %value%~
 		END
 		ELSE BEGIN
-			SPRINT description @11060006 // ~d'affaiblir le moral %ofTheTarget% de %value%~
+			SPRINT description @11060008 // ~d'affaiblir le moral %ofTheTarget% de %value%~
 		END
 	END
 END
@@ -3763,7 +3785,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_109_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF parameter2 < 2 OR parameter2 > 9 BEGIN
+		SET parameter2 = 2
+		SET parameter1 = 0
+	END
 END
 
 /* --------------------------------- *
@@ -3774,7 +3799,7 @@ DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF amount == 1 BEGIN
+		PATCH_IF amount <= 1 BEGIN
 			SPRINT description @11110001 // ~Crée une arme magique (%itemName%)~
 		END
 		ELSE BEGIN
