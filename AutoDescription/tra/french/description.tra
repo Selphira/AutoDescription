@@ -1414,6 +1414,11 @@
 @11110001 = ~Crée une arme magique (%itemName%)~
 @11110002 = ~Crée %amount% armes magiques (%itemName%)~
 
+// Opcode 112: Item: Remove Item [112]
+
+@11120001 = ~Retire %itemName% de l'inventaire~
+@11120002 = ~Retire %itemName% de l'inventaire %ofTheTarget%~
+
 // Opcode 115: Detect: Alignment [115]
 
 @11150001 = ~Détection du mal~

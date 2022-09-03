@@ -8,6 +8,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	283 => 0   // Use EFF File (Cursed) [283]
 	318 => 0   // Protection: Immunity Spell [318]
 	324 => 0   // Protection: Immunity to Resource and Message [324]
+	112 => 0   // Item Remove [112]
 	216 => 1   // Spell Effect: Level Drain [216]
 	344 => 1   // Enchantment vs. creature type [344]
 	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
@@ -280,7 +281,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	103 => 0 // Text: Change Name [103]
 	107 => 0 // Portrait Change [107]
 	110 => 0 // (Retreat From) [110]
-	112 => 1 // Item: Remove Item [112]
 	114 => 0 // Graphics: Dither [114]
 	123 => 1 // Item: Remove Inventory Item
 	138 => 0 // Graphics: Character Animation Change [138]
@@ -476,6 +476,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 81 => 1
 	105 => 1 // Modification : or
 	108 => 1 // Modification Réputation
+	112 => 1 // Retrait item
 	116 => 1
 	161 => 1
 	210 => 1
@@ -3830,6 +3831,34 @@ DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
 			SPRINT description @11110002 // ~Crée %amount% armes magiques (%itemName%)~
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_111_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
+/* --------------------------------- *
+ * Item: Remove Item [112] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11120001 // ~Retire %itemName% de l'inventaire~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_112~ BEGIN
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11120002 // ~Retire %itemName% de l'inventaire %ofTheTarget%~
+	END
+END
+
+
+DEFINE_PATCH_MACRO ~opcode_112_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ----------------------- *
@@ -8844,6 +8873,13 @@ DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_resref_is_valid~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty.~ END
 	END
 END
 
