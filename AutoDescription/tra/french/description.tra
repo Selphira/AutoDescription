@@ -87,9 +87,6 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulable~
 
-@102225 = ~Résistance aux dégâts physiques~
-@102226 = ~Résistance aux dégâts élémentaires~
-@102227 = ~Résistance aux dégâts~
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
 
@@ -2773,6 +2770,18 @@
 
 @15010001 = ~Caractéristiques~
 @15010002 = ~les caractéristiques~
+
+// Fake Opcode 502: Stat: Résistance aux dégâts [502]
+
+@15020001 = ~Résistance aux dégâts~
+
+// Fake Opcode 503: Stat: Résistance aux dégâts élémentaires~ [503]
+
+@15030001 = ~Résistance aux dégâts élémentaires~
+
+// Fake Opcode 504: Stat: Résistance aux dégâts physiques~ [504]
+
+@15040001 = ~Résistance aux dégâts physiques~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
