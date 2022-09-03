@@ -1818,6 +1818,18 @@ DEFINE_PATCH_MACRO ~opcode_27_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_27_group~ BEGIN
+	LOCAL_SET opcode = 27
+	LOCAL_SET newOpcode = 503 // ~Résistance aux dégâts élémentaires~
+
+	LPM ~opcode_group_all_resistances~
+
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 28 29 30 END
+
+	SET opcode = 27
+	LPM ~group_opcode_with_same_parameters~
+END
+
 /* ----------------------------------- *
  * Stat: Cold Resistance Modifier [28] *
  * ----------------------------------- */
@@ -3173,6 +3185,18 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_86_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_86_group~ BEGIN
+	LOCAL_SET opcode = 86
+	LOCAL_SET newOpcode = 504 // ~Résistance aux dégâts physiques~
+
+	LPM ~opcode_group_all_resistances~
+
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 87 88 89 END
+
+	SET opcode = 86
+	LPM ~group_opcode_with_same_parameters~
 END
 
 /* --------------------------------------- *
@@ -8122,6 +8146,81 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_501~ BEGIN
 	LPM ~opcode_self_probability_501~
 END
 
+/* --------------------------------- *
+ * Stat: Résistance aux dégâts [502] *
+ * --------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_502~ BEGIN
+	LPF ~opcode_mod_percent~ INT_VAR strref = 15020001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_502~ BEGIN
+	LOCAL_SPRINT resistName @15020001 // ~Résistance aux dégâts~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_502~ BEGIN
+	LOCAL_SPRINT resistName @15020001 // ~Résistance aux dégâts~
+	LPM ~opcode_target_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_502~ BEGIN
+	LPM ~opcode_self_probability_502~
+END
+
+/* ----------------------------------------------- *
+ * Stat: Résistance aux dégâts élémentaires~ [503] *
+ * ----------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_503~ BEGIN
+	LPF ~opcode_mod_percent~ INT_VAR strref = 15030001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts élémentaires~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_503~ BEGIN
+	LOCAL_SPRINT resistName @15030001 // ~Résistance aux dégâts élémentaires~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_503~ BEGIN
+	LOCAL_SPRINT resistName @15030001 // ~Résistance aux dégâts élémentaires~
+	LPM ~opcode_target_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_503~ BEGIN
+	LPM ~opcode_self_probability_503~
+END
+
+/* ------------------------------------------- *
+ * Stat: Résistance aux dégâts physiques [504] *
+ * ------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_504~ BEGIN
+	LPF ~opcode_mod_percent~ INT_VAR strref = 15040001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts physiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_504~ BEGIN
+	LOCAL_SPRINT resistName @15040001 // ~Résistance aux dégâts physiquess~
+	LPM ~opcode_probability_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_504~ BEGIN
+	LOCAL_SPRINT resistName @15040001 // ~Résistance aux dégâts physiques~
+	LPM ~opcode_target_resist~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_504~ BEGIN
+	LPM ~opcode_self_probability_504~
+END
+
+DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
+	LOCAL_SET opcode = 84
+	LOCAL_SET newOpcode = 502 // ~Résistance aux dégâts~
+
+	PATCH_DEFINE_ARRAY listOpcodes BEGIN 27 28 29 30 31 85 86 87 88 89 END
+
+	LPM ~group_opcode_with_same_parameters~
+END
+
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		PATCH_IF IS_AN_INT ~%value%~ BEGIN
@@ -8832,9 +8931,9 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 			SET opcode = newOpcode
             LPM ~add_opcode~
 		END
-
-		CLEAR_ARRAY listOpcodes
-		// Nécessaire de remettre le numéro original pour les itérations suivantes
-		SET opcode = currentOpcode
 	END
+
+	CLEAR_ARRAY listOpcodes
+	// Nécessaire de remettre le numéro original pour les itérations suivantes
+	SET opcode = currentOpcode
 END
