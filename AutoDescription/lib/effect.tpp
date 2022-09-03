@@ -173,6 +173,11 @@ DEFINE_PATCH_MACRO ~replace_effects~ BEGIN
 	//TODO: Avoir les différentes chaînes de cible déjà dans le tableau "opcodes_xx" ??
 	//TODO: Si opcode 177 géré ici, ne pas oubier de multiplier les chances d'activation ! On ne doit pas écrire
 	//      des choses comme "10 % de chance d'avoir 50% de chance...", mais directement "5 % de chance"
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 0 BEGIN
+			PATCH_TRY LPM ~opcode_%opcode%_replace~ WITH DEFAULT END
+		END
+	END
 END
 
 /**
@@ -194,7 +199,6 @@ END
  * nouvelle entrée doit être créée, contenant les données qui seront traitées par les macros habituelles.
  * Si la chaîne générée est trop différente, il est tout à fait possible de faire en sorte d'appeler une macro d'un
  * opcode imaginaire, qui va se charger de générer la chaîne spécifiquement pour le regroupement.
- * Pour cela, utiliser cette règle : opcode d'origine * 100 + nombre entre 0 et 99
  * Si des paramètres spécifiques doivent être passé, il y a toute la place dans les variables présentes
  * Attention, seules les variables resref, resref2 et resref3 peuvent accueillir une chaîne.
  */

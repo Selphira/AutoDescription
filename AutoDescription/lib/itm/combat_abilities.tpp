@@ -340,6 +340,9 @@ BEGIN
 				LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
 			END
 			ELSE BEGIN
+				PATCH_DEFINE_ARRAY ~damageTypes~ BEGIN END
+				PATCH_DEFINE_ARRAY ~damageTypesTmp~ BEGIN END
+
 				FOR (index2 = 0; index2 < countHeaders; index2 += 1) BEGIN
 					PATCH_PHP_EACH ~weaponAttributes%index2%~ AS weaponData => _ BEGIN
 	                    SET damageType  = ~%weaponData_2%~
@@ -354,10 +357,26 @@ BEGIN
 	                    END
 
 	                    SPRINT value ~%value% (%sectionType%)~
-
-						LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
+						SPRINT name @102005 // ~Type de dégâts~
+						SPRINT $damageTypesTmp(~%index2%~) @100001 // %name% : %value%
 					END
 	            END
+
+				PATCH_PHP_EACH ~damageTypesTmp~ AS index3 => damageType BEGIN
+					SET found = 0
+					PATCH_PHP_EACH damageTypes AS _ => damageTypeTmp BEGIN
+						PATCH_IF ~%damageType%~ STRING_EQUAL ~%damageTypeTmp%~ BEGIN
+							SET found = 1
+						END
+					END
+					PATCH_IF found == 0 BEGIN
+						SPRINT $damageTypes(~%index3%~) ~%damageType%~
+					END
+				END
+
+				PATCH_PHP_EACH ~damageTypes~ AS _ => damageType BEGIN
+					LPF ~appendLine~ STR_VAR string = ~%damageType%~ RET description END
+				END
 			END
 		END
 

@@ -5852,6 +5852,27 @@ DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~position = %position%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+
+		SET opcode = 219000
+		LPM ~add_opcode~
+
+		SET opcode = 219001
+		LPM ~add_opcode~
+		// Nécessaire de remettre le numéro original pour les itérations suivantes
+		SET opcode = 219
+	END
+END
+
 /* ---------------------------- *
  * Removal: Remove School [220] *
  * ---------------------------- */
@@ -6329,6 +6350,33 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_233~ BEGIN
 		END
 		ELSE BEGIN
 			SPRINT description @102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
+		END
+	END
+	ELSE PATCH_IF parameter2 != 109 BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_233~ BEGIN
+	LOCAL_SPRINT proficiency ~~
+
+	LPM ~opcode_233_common~
+
+	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~)  BEGIN
+		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
+		SPRINT theStatistic @12330002 // ~la compétence martiale %proficiency%~
+
+		PATCH_IF type == 1 BEGIN
+			PATCH_IF value > 0 BEGIN
+	            SPRINT description @102286 // ~Augmente de %value% %theStatistic% %ofTheTarget%~
+			END
+			ELSE BEGIN
+				SET value = ABS value
+				SPRINT description @102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
+			END
+		END
+		ELSE BEGIN
+			SPRINT description @102287 // ~Porte à %value% %theStatistic% %ofTheTarget%~
 		END
 	END
 	ELSE PATCH_IF parameter2 != 109 BEGIN
@@ -8746,6 +8794,7 @@ END
  */
 DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 	LOCAL_SET group = 1
+	LOCAL_SET currentOpcode = opcode
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET group = 1
@@ -8780,5 +8829,7 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 		END
 
 		CLEAR_ARRAY listOpcodes
+		// Nécessaire de remettre le numéro original pour les itérations suivantes
+		SET opcode = currentOpcode
 	END
 END
