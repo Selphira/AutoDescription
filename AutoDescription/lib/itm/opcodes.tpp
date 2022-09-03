@@ -1266,11 +1266,9 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie %toTheTarget%~
 	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts %toTheTarget%~
 	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts %toTheTarget%~
-	LOCAL_SET strref_5 = 10170009 // ~Ressuscite~
 	// fix: renommage en rtype pour éviter conflit avec le 'type' de log_warning
 	SET rtype = parameter2 BAND 65535
 	SET subType = parameter2 / 65535
-	SET isRez = subType BAND BIT0 > 0
 
 	PATCH_IF rtype == 1 BEGIN
 		SET damageAmount = parameter1
@@ -1278,21 +1276,8 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
 	ELSE PATCH_IF rtype == 0 OR rtype == 2 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
-
-	// FIXME v0.9.20 > afficher les effets sur plusieurs lignes
-	// PATCH_IF isRez BEGIN
-	// 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-	// 		LPF ~getTranslation~ INT_VAR strref = strref_5+2 opcode RET effect = string END // ~sans %theTarget%~
-	// 		TO_LOWER description
-	// 		SPRINT description @10170020
-	// 	END
-	// 	ELSE BEGIN
-	// 		LPF ~getTranslation~ INT_VAR strref = strref_5 opcode RET effect = string END // ~avec %theTarget%~
-	// 		SPRINT description ~%description%%effect%~
-	// 	END
-	// END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
@@ -1300,13 +1285,11 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie %toTheTarget%~
 	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts %toTheTarget%~
 	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts %toTheTarget%
-	LOCAL_SET strref_5 = 10170010 // ~de ressusciter~
 	SET rtype = parameter2 BAND 65535
 	SET subType = parameter2 / 65535
-	SET isRez = subType BAND BIT0 > 0
 
 	PATCH_IF rtype == 0 OR rtype == 2 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 strref_5 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
 	ELSE PATCH_IF rtype == 1 BEGIN
 		SET damageAmount = parameter1
@@ -1327,13 +1310,13 @@ DEFINE_PATCH_MACRO ~opcode_party_17~ BEGIN
 	LPM ~opcode_self_17~
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 strref_5 = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
 	// TODO
 	// Dissipe tous les effets non permanent_after_death puis la soigne
 	SET purgeEff = subType BAND BIT1 > 0
 	// l'opcode s'exécute dans cet ordre (si flag actif) : rez => purge => soin
 
-	PATCH_IF isRez OR purgeEff BEGIN
+	PATCH_IF purgeEff BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: subType non gere : %subType%.~ END
 	END
 
@@ -1372,16 +1355,16 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 			END
 		END
 	END
+END
 
-	PATCH_IF isRez BEGIN
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref_5+2 opcode RET effect = string END // ~sans %theTarget%~
-			TO_LOWER description
-			SPRINT description @10170020 // ~%effect% puis %description%~
-		END
-		ELSE BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref_5 opcode RET effect = string END // ~avec %theTarget%~
-			SPRINT description ~%effect%~
+DEFINE_PATCH_MACRO ~opcode_17_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF (parameter2 / 65535) BAND BIT0 BEGIN
+			SET opcode = 32
+			SET parameter1 = 0
+			SET parameter2 = 0
+			LPM ~add_opcode~
 		END
 	END
 END
@@ -3535,6 +3518,10 @@ DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_98_is_valid~ BEGIN
+	LPM ~opcode_25_is_valid~
+END
+
 /* ------------------------------------ *
  * Spell Effect: Duration Modifier [99] *
  * ------------------------------------ */
@@ -3575,6 +3562,14 @@ DEFINE_PATCH_MACRO ~opcode_99_common~ BEGIN
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
+
+DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND is_ee BEGIN
+		isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
+	END
+END
+	
 
 /* ------------------------------------ *
  * Protection: from Creature Type [100] *
