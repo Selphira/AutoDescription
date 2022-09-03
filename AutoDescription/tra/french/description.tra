@@ -765,7 +765,7 @@
 @10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
 @10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
 @10250003 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-@10250004 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+@10250004 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
 @10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts par seconde~
 @10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts par seconde~
 @10250007 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
@@ -1026,7 +1026,11 @@
 
 // Opcode 78: State: Disease [78]
 
-@10780003 = ~Inocule une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780000 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
+@10780001 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
+@10780002 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780003 = ~Inocule une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+
 @10780004 = ~Inocule une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780005 = ~Inocule une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
 @10780006 = ~Inocule une maladie qui diminue de %amount% la constitution %ofTheTarget%~
@@ -1041,16 +1045,19 @@
 @10780017 = ~Inocule une maladie qui augmente de %amount% l'intelligence %ofTheTarget%~
 @10780018 = ~Inocule une maladie qui augmente de %amount% la sagesse %ofTheTarget%~
 @10780019 = ~Inocule une maladie qui augmente de %amount% le charisme %ofTheTarget%~
-@10780020 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780021 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780022 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780023 = ~Inocule une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780024 = ~Inocule une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780025 = ~Inocule une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780026 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780027 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780023 = ~Inocule une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 
-@10780103 = ~d'inoculer une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780030 = ~Inocule une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
+@10780031 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
+@10780032 = ~Inocule une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780033 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+
+
+@10780100 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
+@10780101 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
+@10780102 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780103 = ~d'inoculer une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+
 @10780104 = ~d'inoculer une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780105 = ~d'inoculer une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
 @10780106 = ~d'inoculer une maladie qui diminue de %amount% la constitution %ofTheTarget%~
@@ -1058,21 +1065,19 @@
 @10780108 = ~d'inoculer une maladie qui diminue de %amount% la sagesse %ofTheTarget%~
 @10780109 = ~d'inoculer une maladie qui diminue de %amount% le charisme %ofTheTarget%~
 @10780110 = ~d'inoculer une maladie qui ralentit %theTarget%~
-@10780113 = ~d'inoculer une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+@10780113 = ~d'inoculer une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 @10780114 = ~d'inoculer une maladie qui augmente de %amount% la force %ofTheTarget%~
 @10780115 = ~d'inoculer une maladie qui augmente de %amount% la dextérité %ofTheTarget%~
 @10780116 = ~d'inoculer une maladie qui augmente de %amount% la constitution %ofTheTarget%~
 @10780117 = ~d'inoculer une maladie qui augmente de %amount% l'intelligence %ofTheTarget%~
 @10780118 = ~d'inoculer une maladie qui augmente de %amount% la sagesse %ofTheTarget%~
 @10780119 = ~d'inoculer une maladie qui augmente de %amount% le charisme %ofTheTarget%~
-@10780120 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780121 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780122 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780123 = ~d'inoculer une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780124 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780125 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780126 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780127 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780123 = ~d'inoculer une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
+
+@10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
+@10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
+@10780132 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780133 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
 
 // Opcode 79: Cure: Disease [79]
 

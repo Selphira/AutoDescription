@@ -2888,57 +2888,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	SET amount = parameter1
-	SET frequencyMultiplier = 1
-	SET frequency = 1
-	SET p4IsActive = isExternal AND parameter4 != 0 AND is_ee
 	SET type = parameter2
 
 	PATCH_IF type >= 0 AND type <= 3 BEGIN
-		// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
-		// Compliqué de faire une phrase simple
-		// FIXME Ces 4 entrée sont identiques à celle de l'opcode 25 (poison)
-		PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) OR
-				(type == 1 AND (parameter1 > 1 OR p4IsActive)) BEGIN
-			SET amount = 1
-		END
-		ELSE PATCH_IF type == 2 AND parameter1 > 0 BEGIN
-			SET amount = parameter1
-		END
-		ELSE BEGIN
-			SET amount = 1
-			SET frequency = parameter1
-		END
-
-		PATCH_IF p4IsActive AND type >= 2 AND type <= 3 BEGIN
-			SET frequency = frequency * parameter4
-			// P4 divise également les dégâts si P2 == 2, avec un minimum à 1
-			PATCH_IF type == 2 BEGIN
-				SET amount = amount / parameter4
-				PATCH_IF amount < 1 BEGIN
-					amount = 1
-				END
-			END
-		END
-		PATCH_IF frequency < 1 BEGIN
-			SET frequency = 1
-		END
-
-		PATCH_IF amount == 1 AND frequency == 1 BEGIN
-			SET strref += 20
-		END
-		ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
-			SET strref += 22
-		END
-		ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-			SET strref += 21
-		END
-		ELSE BEGIN
-			SET strref += 23
-		END
 		// En théorie toutes les versions infligent du dégâts de poison, je laisse dans le doute
 		PATCH_IF is_ee == 1 BEGIN
-			SET strref += 4
+			SET strref += 30
 		END
+		LPM ~opcode_25_common~
 	END
 	ELSE PATCH_IF type >= 4 AND type <= 9 BEGIN
 		SET strref += type
@@ -2954,9 +2911,10 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
 	END
 	ELSE PATCH_IF type == 13 BEGIN
-		SET strref = 10780003
+		SET strref += type
 		PATCH_IF amount < 0 BEGIN
 			amount = ABS amount
+		ELSE BEGIN
 			SET strref += 10
 		END
 	END
@@ -3436,86 +3394,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_98~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_98_common~ BEGIN
-	// TODO QUASI identique à opcode 25 et 78 => Mixin
-	SET amount1 = parameter1
-	SET amount2 = 0
-	SET frequencyMultiplier = 1
-	SET amount = 0
-	SET frequency = 1
-
-	PATCH_IF parameter2 >= 5 BEGIN
-        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 == crash the game~ END
-    END
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF isExternal BEGIN
-			SET amount2 = parameter3
-			SET frequencyMultiplier = parameter4
-		END
-
-		PATCH_IF parameter2 == 0 OR parameter2 == 1 BEGIN
-			PATCH_IF parameter2 == 0 AND amount1 == 0 BEGIN
-				LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 needs to be non-zero : %parameter1%~ END
-			END
-			PATCH_IF parameter2 == 1 AND (amount1 < 1 OR amount1 > 101) BEGIN
-				LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 between 1 and 101 : %parameter1%~ END
-			END
-			SET amount = 1
-		END
-		ELSE PATCH_IF parameter2 == 2 BEGIN
-			SET amount = amount1
-			SET frequency = frequencyMultiplier
-		END
-		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1 * frequencyMultiplier
-			PATCH_IF parameter2 == 3 BEGIN
-				SET amount = 1
-			END
-			ELSE PATCH_IF parameter2 == 4 BEGIN
-				SET amount = amount2
-			END
-		END
-	END
-	ELSE BEGIN
-		PATCH_IF parameter2 == 0 OR parameter2 == 1 OR parameter2 == 2 BEGIN
-			SET amount = amount1
-		END
-		ELSE PATCH_IF parameter2 == 3 BEGIN
-			SET amount = 1
-			SET frequency = amount1
-		END
-		ELSE PATCH_IF parameter2 == 4 BEGIN
-			PATCH_IF isExternal BEGIN
-				SET amount = parameter3
-				SET frequency = amount1
-			END
-			ELSE BEGIN
-				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Verifier le fonctionnement avec type == 4~ END
-			END
-		END
-	END
-
-	PATCH_IF is_ee == 0 AND parameter2 == 2 BEGIN
-		SET value = amount
-		SPRINT amount @10002 // ~%value% %~
-		SET strref += 4
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Régénère %percent% des points de vie~
-	END
-	ELSE PATCH_IF amount == 1 AND frequency == 1 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Régénère 1 point de vie par seconde~
-	END
-	ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
-		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Régénère %amount% points de vie par seconde~
-	END
-	ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-		SET strref += 2
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Régénère 1 point de vie toutes les %frequency% secondes~
-	END
-	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
-		SET strref += 3
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Régénère %amount% points de vie toutes les %frequency% secondes~
-	END
+	LPM ~opcode_25_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_98_is_valid~ BEGIN
