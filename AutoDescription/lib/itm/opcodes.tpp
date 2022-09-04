@@ -480,6 +480,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	116 => 1 // Dissipation : invisibilité
 	123 => 1 // Item: Remove Inventory Item
 	124 => 1 // Spell Effect: Teleport (Dimension Door)
+	125 => 1 // Spell Effect: Unlock (Knock)
 	161 => 1
 	210 => 1
 	217 => 1
@@ -489,10 +490,8 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	 24 => 1 // Panique
-	125 => 1
 	146 => 1
 	148 => 1
-	161 => 1
 	162 => 1
 	177 => 1
 	214 => 1
@@ -4212,7 +4211,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_124_common~ BEGIN
 	PATCH_IF parameter2 > 3 OR parameter2 < 0 BEGIN
-		parameter2 = 0
+		SET parameter2 = 0
 	END
 END
 
@@ -4231,7 +4230,7 @@ END
  * Stat: Movement Modifier [126] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
+	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
 	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
@@ -4243,7 +4242,7 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
+	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
 	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
@@ -4255,7 +4254,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 == 5 BEGIN
+	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
 	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
@@ -4268,6 +4267,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
 	LPM ~opcode_self_probability_126~
+END
+
+DEFINE_PATCH_MACRO ~opcode_126_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < 0 OR (parameter2 > 2 AND (parameter2 != 5 OR is_ee == 0)) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%~ END
+	END
 END
 
 /* ------------------------------- *
@@ -5148,6 +5155,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_176~ BEGIN
 	LPM ~opcode_self_probability_176~
+END
+
+DEFINE_PATCH_MACRO ~opcode_176_is_valid~ BEGIN
+	LPM ~opcode_126_is_valid~
 END
 
 /* ------------------ *
