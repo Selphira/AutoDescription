@@ -479,6 +479,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	112 => 1 // Retrait item
 	116 => 1 // Dissipation : invisibilité
 	123 => 1 // Item: Remove Inventory Item
+	124 => 1 // Spell Effect: Teleport (Dimension Door)
 	161 => 1
 	210 => 1
 	217 => 1
@@ -4168,19 +4169,22 @@ END
  * Spell Effect: Teleport (Dimension Door) [124] *
  * --------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_124~ BEGIN
-	LOCAL_SET strref = 11240001 + parameter2
+	LPM ~opcode_124_common~
+	SET strref = 11240001 + parameter2
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_124~ BEGIN
-	LOCAL_SET strref = 11240011 + parameter2
+	LPM ~opcode_124_common~
+	SET strref = 11240011 + parameter2
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_124~ BEGIN
-	LOCAL_SET strref = 11240001 + parameter2
+	LPM ~opcode_124_common~
+	SET strref = 11240001 + parameter2
 
 	PATCH_IF parameter2 == 1 BEGIN
 		SET strref = 11240005 // ~Téléporte %theTarget% vers le porteur~
@@ -4193,7 +4197,8 @@ DEFINE_PATCH_MACRO ~opcode_target_124~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_124~ BEGIN
-	LOCAL_SET strref = 11240011 + parameter2
+	LPM ~opcode_124_common~
+	SET strref = 11240011 + parameter2
 
 	PATCH_IF parameter2 == 1 BEGIN
 		SET strref = 11240015 // ~de téléporter %theTarget% vers le porteur~
@@ -4203,6 +4208,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_124~ BEGIN
 	END
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_124_common~ BEGIN
+	PATCH_IF parameter2 > 3 OR parameter2 < 0 BEGIN
+		parameter2 = 0
+	END
 END
 
 /* ---------------------------------- *
