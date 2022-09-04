@@ -3856,6 +3856,69 @@ DEFINE_PATCH_MACRO ~opcode_target_112~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
+	LOCAL_SET searchOpcode = 111
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 0
+		SET currentOpcode = opcode
+		TEXT_SPRINT currentresref ~%resref%~
+		SET currentDuration = duration
+		SET currentPosition = position
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND timingMode == TIMING_delayed AND
+				 VARIABLE_IS_SET $opcodes(~%searchOpcode%~) AND
+				 $opcodes(~%searchOpcode%~) > 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%searchOpcode%~ AS data => _ BEGIN
+				PATCH_IF group == 0 BEGIN
+					LPM ~data_to_vars~
+					SET opcode = searchOpcode
+					PATCH_IF ~%resref%~ STRING_EQUAL ~%currentresref%~ BEGIN
+						PATCH_IF timingMode == TIMING_permanent OR
+								timingMode == TIMING_while_equipped OR
+								timingMode == TIMING_permanent_after_death OR
+								timingMode == TIMING_duration AND duration > currentDuration BEGIN
+							SET group = 1
+							SET oldDuration = duration
+							SET oldTimingMode = timingMode
+
+							// ajout de l'opcode 111 modifié
+							PATCH_IF timingMode != TIMING_duration OR duration > currentDuration BEGIN
+								SET duration = currentDuration
+							END
+							SET timingMode = TIMING_duration
+							LPM ~add_opcode~
+
+							// suppression de l'opcode 111 initial
+							// FIXME Marche pas en mettant le add_opcode après... raison ?
+							// La position n'est pas une condition suffisante
+							LPF ~delete_opcode~
+								INT_VAR opcode
+								STR_VAR expression = ~timingMode = %oldTimingMode% AND duration = %oldDuration%~
+								RET $opcodes(~%opcode%~) = count
+								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+							END
+						END
+						ELSE PATCH_IF timingMode == TIMING_duration AND duration <= currentDuration BEGIN
+							// le groupe est actif mais aucune modification de l'opcode 111 nécessaire
+							SET group = 1
+						END
+					END
+
+					PATCH_IF group == 1 BEGIN
+						// Suppression de l'opcode 112 devenu inutile
+						SET opcode = currentOpcode
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~position = %currentPosition%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+	END
+END
 
 DEFINE_PATCH_MACRO ~opcode_112_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
@@ -8531,14 +8594,21 @@ DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET s
 END
 
 // Rajout d'un paramètre pour bloquer l'affichage du warning (dans le cas où l'objet n'a pas besoin d'exister (opcode 321))
+// Va chercher le nom non identifié si le nom identifié n'existe pas
 DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" RET itemName BEGIN
 	SPRINT itemName ~~
 	SPRINT itemFilename ~%SOURCE_FILE%~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
 		INNER_PATCH_FILE ~%file%.itm~ BEGIN
-			READ_LONG SPL_unidentified_name itemNameRef
+			READ_LONG ITM_identified_name itemNameRef
 			PATCH_IF itemNameRef > 0 BEGIN
 				READ_STRREF ITM_identified_name itemName
+			END
+			ELSE BEGIN
+				READ_LONG ITM_unidentified_name itemNameRef
+				PATCH_IF itemNameRef > 0 BEGIN
+					READ_STRREF ITM_unidentified_name itemName
+				END
 			END
 			/*
 			ELSE BEGIN
