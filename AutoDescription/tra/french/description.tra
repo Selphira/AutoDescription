@@ -1545,6 +1545,7 @@
 @11270039 = ~d'invoquer 1 créature (%creatures%)~
 @11270040 = ~d'invoquer %amount% créatures (%creatures%)~
 
+
 // Opcode 128: State: Confusion [128]
 
 @11280001 = ~Confusion~

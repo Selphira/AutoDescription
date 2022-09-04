@@ -4295,36 +4295,18 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 	LOCAL_SET type      = parameter2
 	LOCAL_SET mode      = special
 	LOCAL_SET isMonster = 1
-	LOCAL_SET isHostile = type >= 5 ? 1 : 0
+	LOCAL_SET isHostile = type >= 5 AND type <= 9 ? 1 : 0
 
-	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF mode == 0 AND ~%resref%~ STRING_EQUAL ~~ BEGIN
+		// Ces fichiers ne sont chargés que si special == 0 et strref vide
 		SPRINT file $opcode_127_files(~%type%~)
 
 		PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
 			SET isMonster = 0
 		END
-
-		PATCH_IF mode == 2 BEGIN
-			SET strref += 2 // ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-		END
-		ELSE PATCH_IF mode == 1 BEGIN
-			PATCH_IF isExternal BEGIN
-				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
-				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-				END
-				SET strref += ~%amount%~ STRING_EQUAL ~1~ ? 4 : 6
-			END
-			ELSE BEGIN
-				SET strref += amount == 1 ? 4 : 6
-			END
-		END
-
+		SET strref += amount == 1 ? 4 : 6
 		SET strref += isMonster == 1 ? 0 : 1
-
-		PATCH_IF isHostile == 1 BEGIN
-			SET strref += 8
-		END
+		SET strref += isHostile == 1 ? 8 : 0
 	END
 	ELSE BEGIN
 		SPRINT file ~%resref%~
@@ -4332,10 +4314,10 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 		PATCH_IF mode == 0 BEGIN
 			SET strref += 16 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 		END
-		ELSE PATCH_IF mode == 2 BEGIN
+		ELSE PATCH_IF (mode BAND BIT1) > 0 BEGIN
 			SET strref += 17 // ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
 		END
-		ELSE PATCH_IF mode == 1 BEGIN
+		ELSE BEGIN
 			PATCH_IF isExternal BEGIN
 				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
@@ -4351,6 +4333,13 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 
 	LPF ~get_creatures_names~ STR_VAR file RET creatures END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_127_is_valid~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.2da~ AND (special != 0 OR NOT ~%resref%~ STRING_EQUAL ~~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File %resref%.2da does not exist, the game may crash.~ END
+	END
 END
 
 /* ---------------------- *
