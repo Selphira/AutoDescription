@@ -4102,33 +4102,48 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 	LOCAL_SPRINT itemName3 ~~
 
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+	LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref%~ RET canStack END
+	PATCH_IF canStack == 0 OR amount == 0 BEGIN
+		SET amount = 1
+	END
 
 	PATCH_IF is_ee == 1 AND isExternal BEGIN
 		SET amount2 = parameter3
 		SET amount3 = parameter4
 		PATCH_IF NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 = itemName END
+			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref2%~ RET canStack2 = canStack END
+			PATCH_IF canStack2 == 0 OR amount2 == 0 BEGIN
+				SET amount2 = 1
+			END
 		END
 		PATCH_IF NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 = itemName END
+			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref3%~ RET canStack3 = canStack END
+			PATCH_IF canStack3 == 0 OR amount3 == 0 BEGIN
+				SET amount3 = 1
+			END
 		END
-		PATCH_IF amount2 == 0 AND amount3 > 0 BEGIN
+		PATCH_IF amount2 == 0 AND amount3 != 0 BEGIN
 			SET amount2 = amount3
 			SET amount3 = 0
 			SPRINT itemName2 ~%itemName3%~
 		END
 	END
 
-	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ AND amount > 0 AND NOT ~%itemName2%~ STRING_EQUAL ~~ AND amount2 > 0 AND NOT ~%itemName3%~ STRING_EQUAL ~~ AND amount3 > 0 BEGIN
-		SET strref += 2
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Crée aléatoirement %amount% "%itemName%", %amount2% "%itemName2%" ou %amount3% "%itemName3%"~
+	PATCH_IF amount2 BEGIN
+		SET strref += 1 // ~Crée aléatoirement %amount% "%itemName%" ou %amount2% "%itemName2%"~
 	END
-	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ AND amount > 0 AND NOT ~%itemName2%~ STRING_EQUAL ~~ AND amount2 > 0 BEGIN
-		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Crée aléatoirement %amount% "%itemName%" ou %amount2% "%itemName2%"~
+	PATCH_IF amount3 BEGIN
+		SET strref += 1 // ~Crée aléatoirement %amount% "%itemName%", %amount2% "%itemName2%" ou %amount3% "%itemName3%"~
 	END
-	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ AND amount > 0 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Crée %amount% "%itemName%" dans l'inventaire %ofTheTarget%~
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Crée %amount% "%itemName%" dans l'inventaire %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource cannot be empty~ END
 	END
 END
 
@@ -8660,6 +8675,18 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" 
 	END
 	ELSE PATCH_IF showWarning BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~item_can_stack~ STR_VAR file = "" RET canStack BEGIN
+	SET canStack = 0
+	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.itm~ BEGIN
+		INNER_PATCH_FILE ~%file%.itm~ BEGIN
+			READ_BYTE ITM_stack_amount nb_stack
+			PATCH_IF nb_stack > 1 BEGIN
+				SET canStack = 1
+			END
+		END
 	END
 END
 
