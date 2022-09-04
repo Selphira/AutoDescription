@@ -3935,7 +3935,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_115_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 2 BEGIN
 		isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2% (0, 1 or 2 expected)~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for Alignment Mask : %parameter2% (0, 1 or 2 expected)~ END
 	END
 END
 
@@ -3956,6 +3956,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_116~ BEGIN
 	LPM ~opcode_self_probability_116~ // ~de dissiper l'invisibilité %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_116_is_valid~ BEGIN
+	LPM ~opcode_47_is_valid~
 END
 
 /* ------------------------------- *
