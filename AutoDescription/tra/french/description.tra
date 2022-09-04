@@ -87,6 +87,12 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulable~
 
+@102263 = ~Les bonus aux jets de toucher et aux dégâts en fonction de la force s'appliquent à cette arme~
+@102264 = ~Les bonus aux dégâts en fonction de la force s'appliquent à cette arme~
+@102265 = ~Les bonus aux jets de toucher en fonction de la force s'appliquent à cette arme~
+@102266 = ~Les bonus aux jets de toucher et aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
+@102267 = ~Les bonus aux jets de toucher en fonction de la force ne s'appliquent pas à cette arme~
+@102268 = ~Les bonus aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
 

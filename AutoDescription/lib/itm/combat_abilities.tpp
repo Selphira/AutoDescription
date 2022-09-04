@@ -28,6 +28,7 @@ BEGIN
 		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
 		READ_BYTE  (headerOffset + ITM_HEAD_location) location
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
+		READ_SHORT (headerOffset + ITM_HEAD_flags) flags
 
 		PATCH_IF charges == 0
 			AND NOT (attackType == ITM_ATTACK_TYPE_projectile AND (hasProjectile == 1 OR hasLauncher == 1))
@@ -42,7 +43,7 @@ BEGIN
 
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
 			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
 
 			SET countHeaders += 1
 		END
@@ -51,7 +52,7 @@ BEGIN
 			PATCH_DEFINE_ARRAY EVAL ~lines%countHeaders%~ BEGIN END
 			SET EVAL ~countLines%countHeaders%~ = 0
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
 			SET countHeaders += 1
 		END
 
@@ -83,6 +84,50 @@ BEGIN
 
 		PATCH_IF ~countLines%index%~ > ~countLines%selectedHeader%~ BEGIN
 			SET selectedHeader = index
+		END
+	END
+
+	// Ajoute la ligne indiquant si l'arme utilise ou non le bonus de force
+	// - Arcs et arbalètes : On affiche s'ils utilisent le bonus de force
+    // - Autres armes: On affiche s'ils n'utilisent pas le bonus de force
+    // Cas d'une cape et d'un anneau avec des capacités de combat à ne pas prendre en compte ici
+    // TODO: Pour le moment, on évite les armes qui peuvent être utilisées en mêlée et à distance, cela génère des
+    //       des lignes faisant croire que le bonus n'est pas actif quelle que soit la façon d'utliser l'arme.
+    PATCH_IF isWeapon AND countHeaders == 1 BEGIN
+		FOR (index = 0; index < countHeaders; index += 1) BEGIN
+			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
+				SET flags = ~%data_4%~
+				SET useStrengthBonus = (flags BAND BIT0) > 0
+				SET useEEStrengthBonus = (flags BAND BIT2) > 0
+				SET useEETac0Bonus = (flags BAND BIT3) > 0
+				SPRINT effectDescription ~~
+
+				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
+					PATCH_IF useStrengthBonus OR (is_ee AND useEEStrengthBonus AND useEETac0Bonus) BEGIN
+						SPRINT effectDescription @102263 // ~Les bonus aux jets de toucher et aux dégâts en fonction de la force s'appliquent à cette arme~
+					END
+					ELSE PATCH_IF NOT useStrengthBonus AND useStrengthBonus BEGIN
+						SPRINT effectDescription @102264 // ~Les bonus aux dégâts en fonction de la force s'appliquent à cette arme~
+					END
+					ELSE PATCH_IF NOT useStrengthBonus AND useEETac0Bonus BEGIN
+						SPRINT effectDescription @102265 // ~Les bonus aux jets de toucher en fonction de la force s'appliquent à cette arme~
+					END
+				END
+				ELSE PATCH_IF NOT useStrengthBonus AND NOT useEEStrengthBonus AND NOT useEETac0Bonus BEGIN
+					SPRINT effectDescription @102266 // ~Les bonus aux jets de toucher et aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
+				END
+				ELSE PATCH_IF NOT useStrengthBonus AND NOT useStrengthBonus BEGIN
+					SPRINT effectDescription @102267 // ~Les bonus aux jets de toucher en fonction de la force ne s'appliquent pas à cette arme~
+				END
+				ELSE PATCH_IF NOT useStrengthBonus AND NOT useEETac0Bonus BEGIN
+					SPRINT effectDescription @102268 // ~Les bonus aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
+				END
+
+				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
+					SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+					SET ~countLines%index%~ += 1
+				END
+			END
 		END
 	END
 
