@@ -8,7 +8,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	283 => 0   // Use EFF File (Cursed) [283]
 	318 => 0   // Protection: Immunity Spell [318]
 	324 => 0   // Protection: Immunity to Resource and Message [324]
-	112 => 0   // Item Remove [112]
+	112 => 0   // Item: Item Remove [112]
+	123 => 0   // Item: Remove Inventory Item [123]
 	216 => 1   // Spell Effect: Level Drain [216]
 	344 => 1   // Enchantment vs. creature type [344]
 	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
@@ -282,7 +283,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	107 => 0 // Portrait Change [107]
 	110 => 0 // (Retreat From) [110]
 	114 => 0 // Graphics: Dither [114]
-	123 => 1 // Item: Remove Inventory Item
 	138 => 0 // Graphics: Character Animation Change [138]
 	139 => 0
 	140 => 0 // Graphics: Casting Glow [140]
@@ -478,6 +478,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	108 => 1 // Modification Réputation
 	112 => 1 // Retrait item
 	116 => 1 // Dissipation : invisibilité
+	123 => 1 // Item: Remove Inventory Item
 	161 => 1
 	210 => 1
 	217 => 1
@@ -4146,6 +4147,22 @@ DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource cannot be empty~ END
 	END
 END
+
+/* --------------------------------- *
+ * Item: Remove Inventory Item [123] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_123~ BEGIN
+	LPM ~opcode_self_112~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_123~ BEGIN
+	LPM ~opcode_target_112~
+END
+
+DEFINE_PATCH_MACRO ~opcode_123_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 
 /* --------------------------------------------- *
  * Spell Effect: Teleport (Dimension Door) [124] *
