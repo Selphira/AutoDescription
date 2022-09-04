@@ -3844,7 +3844,7 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11120001 // ~Retire %itemName% de l'inventaire~
+		SPRINT description @11120001 // ~Retire "%itemName%" de l'inventaire~
 	END
 END
 
@@ -3852,7 +3852,7 @@ DEFINE_PATCH_MACRO ~opcode_target_112~ BEGIN
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11120002 // ~Retire %itemName% de l'inventaire %ofTheTarget%~
+		SPRINT description @11120002 // ~Retire "%itemName%" de l'inventaire %ofTheTarget%~
 	END
 END
 
@@ -3929,12 +3929,13 @@ END
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_115~ BEGIN
 	LOCAL_SET strref = 11150001 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Détection du xxx~
+END
 
-	PATCH_IF parameter2 > 2 BEGIN
+DEFINE_PATCH_MACRO ~opcode_115_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 2 BEGIN
+		isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2% (0, 1 or 2 expected)~ END
-	END
-	ELSE BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Détection du xxx~
 	END
 END
 
