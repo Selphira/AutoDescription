@@ -1438,17 +1438,19 @@
 
 // Opcode 120: Protection: from Melee Weapons [120]
 
-@11200001 = ~Immunité contre les %weaponType% %enchantment%~
+@11200001 = ~Immunité contre les %weaponType% %enchantment% et inférieures~
 @11200002 = ~Immunité contre les %weaponType%~
-@11200003 = ~Immunise %theTarget% contre les %weaponType% %enchantment%~
+@11200003 = ~Immunise %theTarget% contre les %weaponType% %enchantment% et inférieures~
 @11200004 = ~Immunise %theTarget% contre les %weaponType%~
-@11200005 = ~d'immuniser %theTarget% contre les %weaponType% %enchantment%~
+@11200005 = ~d'immuniser %theTarget% contre les %weaponType% %enchantment% et inférieures~
 @11200006 = ~d'immuniser %theTarget% contre les %weaponType%~
 
 @11200010 = ~armes enchantées~
 @11200011 = ~armes magiques~
 @11200012 = ~armes non-magiques~
 @11200013 = ~armes en argent~
+@11200014 = ~armes qui ne sont pas en argent~
+@11200015 = ~armes enchantées +0 exceptées celles en argent~
 @11200016 = ~armes à 2 mains~
 @11200017 = ~armes à 1 main~
 @11200018 = ~armes maudites~

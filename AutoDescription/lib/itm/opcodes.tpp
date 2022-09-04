@@ -1717,7 +1717,7 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 		PATCH_IF type == 2 BEGIN
 			SET amount = amount / parameter4
 			PATCH_IF amount < 1 BEGIN
-				amount = 1
+				SET amount = 1
 			END
 		END
 	END
@@ -2914,7 +2914,7 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	ELSE PATCH_IF type >= 4 AND type <= 9 BEGIN
 		SET strref += type
 		PATCH_IF amount < 0 BEGIN
-			amount = ABS amount
+			SET amount = ABS amount
 			SET strref += 10
 		END
 	END
@@ -2927,7 +2927,7 @@ DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	ELSE PATCH_IF type == 13 BEGIN
 		SET strref += type
 		PATCH_IF amount < 0 BEGIN
-			amount = ABS amount
+			SET amount = ABS amount
 		END
 		ELSE BEGIN
 			SET strref += 10
@@ -3471,7 +3471,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND is_ee BEGIN
-		isValid = 0
+		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
 	END
 END
@@ -3934,7 +3934,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_115_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 2 BEGIN
-		isValid = 0
+		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for Alignment Mask : %parameter2% (0, 1 or 2 expected)~ END
 	END
 END
@@ -4036,6 +4036,41 @@ DEFINE_PATCH_MACRO ~opcode_120_common~ BEGIN
 		SET strref += 1
     END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunité contre les %weaponType%~
+END
+
+// regroupement des opcodes avec parameter2 == 0
+DEFINE_PATCH_MACRO ~opcode_120_group~ BEGIN
+	LOCAL_SET maxEnchantment = ~-1~
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == 0 AND parameter1 > maxEnchantment BEGIN
+			SET maxEnchantment = parameter1
+		END
+	END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == 0 AND parameter1 <= maxEnchantment BEGIN
+			// Dans le cas où la protection maximale est présente en plusieurs exemplaires
+			PATCH_IF parameter1 == maxEnchantment BEGIN
+				SET maxEnchantment += 1
+			END
+			ELSE BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_120_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 11 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%~ END
+	END
 END
 
 /* --------------------------------- *
@@ -8303,7 +8338,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	parameter2 = parameter2 BAND 65535
+	SET parameter2 = parameter2 BAND 65535
 	PATCH_IF parameter2 >= MOD_TYPE_cumulative AND parameter2 <= 3 BEGIN
 		LPM ~opcode_mod_base~
 		PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
