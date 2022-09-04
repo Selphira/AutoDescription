@@ -463,7 +463,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 32 => 1
 	 43 => 1
 	 46 => 1
-	 47 => 1
+	 47 => 1 // Dissipation : invisibilité
 	 48 => 1
 	 55 => 1 // Mort
 	 58 => 1 // Dissipation : Magie
@@ -477,7 +477,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	105 => 1 // Modification : or
 	108 => 1 // Modification Réputation
 	112 => 1 // Retrait item
-	116 => 1
+	116 => 1 // Dissipation : invisibilité
 	161 => 1
 	210 => 1
 	217 => 1
@@ -3985,6 +3985,7 @@ END
  * Spell Effect: Mirror Image [119] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_119~ BEGIN
+	SPRINT description @11190001 // ~Image miroir~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_119~ BEGIN
