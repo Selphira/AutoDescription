@@ -3846,6 +3846,18 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11120001 // ~Retire "%itemName%" de l'inventaire~
+		// Hack pour forcer l'affichage de la durée / usage strictement interne
+		PATCH_IF special == 122 AND timingMode == TIMING_duration BEGIN
+			LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+
+			PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+				SPRINT description ~%description% %duration%~
+				SET ignoreDuration = 1
+				PATCH_IF isNotCumulative BEGIN
+					LPM ~opcode_not_cumulative~
+				END
+			END
+		END
 	END
 END
 
@@ -3859,13 +3871,20 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 	LOCAL_SET searchOpcode = 111
+	LOCAL_SET searchOpcode2 = 122
+
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET group = 0
 		SET currentOpcode = opcode
-		TEXT_SPRINT currentresref ~%resref%~
 		SET currentDuration = duration
 		SET currentPosition = position
+		TEXT_SPRINT currentresref ~%resref%~
+
+		// Group 111 - 112 (ajout d'une arme puis retrait)
+		// L'arme peut posséder une durée supérieure ou permanente mais vient à être retirée de l'inventaire avant ce terme
+		// La durée de l'opcode 111 est alors modifiée et l'opcode 112 est retiré
+		// Ex: Cape des égouts (CLCK27) - Gelée moutarde -> Arme permanente mais retirée au bout de 2 tours => Durée 2 tours
 		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND timingMode == TIMING_delayed AND
 				 VARIABLE_IS_SET $opcodes(~%searchOpcode%~) AND
 				 $opcodes(~%searchOpcode%~) > 0 BEGIN
@@ -3873,7 +3892,7 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 				PATCH_IF group == 0 BEGIN
 					LPM ~data_to_vars~
 					SET opcode = searchOpcode
-					PATCH_IF ~%resref%~ STRING_EQUAL ~%currentresref%~ BEGIN
+					PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%currentresref%~ BEGIN
 						PATCH_IF timingMode == TIMING_permanent OR
 								timingMode == TIMING_while_equipped OR
 								timingMode == TIMING_permanent_after_death OR
@@ -3913,6 +3932,50 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 							STR_VAR expression = ~position = %currentPosition%~
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+
+		// Group 112 - 122 (retrait d'unearme puis rajout)
+		// Dans le cas où l'utilisation d'une compétence de l'objet implique sa disparition temporaire de l'inventaire
+		// Ex : Ras +2 (SW1H33) : l'objet est retiré puis un effet delayed vient la rajouter par la suite
+		// dans ce cas, l'opcode 122 devient un effet à durée limitée (non prévu initialement)
+		ELSE PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND
+					  (timingMode <= TIMING_while_equipped OR timingMode >= TIMING_permanent_after_death) AND
+					  VARIABLE_IS_SET $opcodes(~%searchOpcode2%~) AND
+					  $opcodes(~%searchOpcode2%~) > 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%searchOpcode2%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%currentresref%~ AND
+						 timingMode == TIMING_delayed BEGIN
+					// Supression de l'opcode 122
+					SET opcode = searchOpcode2
+					SET searchDuration = duration
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~position = %position%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+					SET opcode = currentOpcode
+					PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+						LPM ~data_to_vars~
+						PATCH_IF position == currentPosition BEGIN
+							// Ajout du nouveau, le spécial permettra de force l'affichage de la durée
+							SET timingMode = TIMING_duration
+							SET duration = searchDuration
+							SET special = 122
+							LPM ~add_opcode~
+
+							// Suppression de l'opcode 112 actuel
+							LPF ~delete_opcode~
+								INT_VAR opcode
+								STR_VAR expression = ~position = %position% AND duration = %currentDuration% AND NOT special = 122~
+								RET $opcodes(~%opcode%~) = count
+								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+							END
 						END
 					END
 				END
@@ -4148,6 +4211,7 @@ DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
 	END
 END
 
+
 /* --------------------------------- *
  * Item: Remove Inventory Item [123] *
  * --------------------------------- */
@@ -4233,7 +4297,12 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
+	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
+	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
+		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
+	END
+	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
 	END
 	ELSE BEGIN
@@ -4245,7 +4314,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
 	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
+		SPRINT description @11260006 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
+	END
+	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260004 // ~d'immobiliser %theTarget%~
 	END
 	ELSE BEGIN
@@ -4257,7 +4329,10 @@ DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
 	PATCH_IF parameter2 == 5 BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) BEGIN
+	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
+		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
+	END_EXPLORE
+	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
 	END
 	ELSE BEGIN
@@ -4270,8 +4345,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_126_is_valid~ BEGIN
-	LPM ~opcode_modstat_is_valid~
-	PATCH_IF parameter2 < 0 OR (parameter2 > 2 AND (parameter2 != 5 OR is_ee == 0)) BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+	END
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR (parameter2 > MOD_TYPE_percentage AND (parameter2 != 5 OR is_ee == 0)) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%~ END
 	END

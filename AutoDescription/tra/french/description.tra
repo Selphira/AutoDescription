@@ -1424,6 +1424,7 @@
 
 @11120001 = ~Retire "%itemName%" de l'inventaire~
 @11120002 = ~Retire "%itemName%" de l'inventaire %ofTheTarget%~
+@11120003 = ~Retire "%itemName%" de l'inventaire %ofTheTarget% pendant %duration%~
 
 // Opcode 115: Detect: Alignment [115]
 
@@ -1500,6 +1501,8 @@
 @11260002 = ~la vitesse de déplacement~
 @11260003 = ~Immobilise %theTarget%~
 @11260004 = ~d'immobiliser %theTarget%~
+@11260005 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
+@11260006 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
 
 // Opcode 127: Summon: Monster Summoning [127]
 
