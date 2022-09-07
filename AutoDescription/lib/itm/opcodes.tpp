@@ -4718,17 +4718,13 @@ END
  * Spell: Disable Spell Casting Abilities [145] *
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN SPRINT description @11450001 END // ~Empêche %theTarget% de lancer des sorts profanes~
-	PATCH_IF parameter2 == 1 BEGIN SPRINT description @11450002 END // ~Empêche %theTarget% de lancer des sorts divins~
-	PATCH_IF parameter2 == 2 BEGIN SPRINT description @11450003 END // ~Empêche %theTarget% de lancer des sorts innés~
-	PATCH_IF parameter2 == 3 BEGIN SPRINT description @11450004 END // ~Empêche %theTarget% de lancer des sorts magiques~
+	LOCAL_SET strref = 11450001+parameter2
+	SPRINT description (AT ~%strref%~)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_145~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN SPRINT description @11450005 END // ~d'empêcher %theTarget% de lancer des sorts profanes~
-	PATCH_IF parameter2 == 1 BEGIN SPRINT description @11450006 END // ~d'empêcher %theTarget% de lancer des sorts divins~
-	PATCH_IF parameter2 == 2 BEGIN SPRINT description @11450007 END // ~d'empêcher %theTarget% de lancer des sorts innés~
-	PATCH_IF parameter2 == 3 BEGIN SPRINT description @11450008 END // ~d'empêcher %theTarget% de lancer des sorts magiques~
+	LOCAL_SET strref = 11450005+parameter2
+	SPRINT description (AT ~%strref%~)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_145~ BEGIN
@@ -4737,6 +4733,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_145~ BEGIN
 	LPM ~opcode_self_probability_145~
+END
+
+DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR paramater2 > 3 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
+	END
 END
 
 /* ------------------------------------- *
@@ -4750,6 +4753,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = parameter1
 	LOCAL_SET type = parameter2
 	TO_UPPER resref
+	// FIXME: Non maintenable
 	PATCH_IF VARIABLE_IS_SET $opcode_target_146_item_revision(~%resref%~) BEGIN
 		SET strref = $opcode_target_146_item_revision(~%resref%~)
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
@@ -4774,11 +4778,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 					SPRINT description @11460001 // ~Lance %spellName% sur %theTarget%~
 				END
 			END
-
-			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
-				SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-				SPRINT description ~%description% (%castingLevelStr%)~
-			END
+			LPM ~opcode_146_common~
 		END
 	END
 END
@@ -4806,12 +4806,15 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 			ELSE BEGIN
 				SPRINT description @11460003 // ~de lancer le sort %spellName% sur %theTarget%~
 			END
-
-			PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 BEGIN
-				SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-				SPRINT description ~%description% (%castingLevelStr%)~
-			END
+			LPM ~opcode_146_common~
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_146_common~ BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+		SPRINT description ~%description% (%castingLevelStr%)~
 	END
 END
 
