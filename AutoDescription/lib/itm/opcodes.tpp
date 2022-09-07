@@ -3853,9 +3853,6 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 			PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
 				SPRINT description ~%description% %duration%~
 				SET ignoreDuration = 1
-				PATCH_IF isNotCumulative BEGIN
-					LPM ~opcode_not_cumulative~
-				END
 			END
 		END
 	END
@@ -4331,7 +4328,7 @@ DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
 	END
 	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
 		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
-	END_EXPLORE
+	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
 	END
