@@ -357,5 +357,6 @@ BEGIN
 		END
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
+			PATCH_FAIL ~Opcode %opcode%: %ERROR_MESSAGE%~
 	END
 END
