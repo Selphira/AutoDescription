@@ -250,6 +250,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	230 => 298 // Removal: Remove One Secondary Type [230]
 	193 => 299 // Spell Effect: Invisible Detection by Script [193]
 	144 => 300 // Button: Disable Button [144]
+	279 => 300 // Button: Enable Button [279]
 	300 => 301 // NPC Bump [300]
 
 	 // Charge
@@ -327,7 +328,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	269 => 0 // Spell Effect: Shake Window [269]
 	270 => 0 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
-	279 => 1 // Button: Enable Button [279]
 	282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
@@ -481,6 +481,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	123 => 1 // Item: Remove Inventory Item
 	124 => 1 // Spell Effect: Teleport (Dimension Door)
 	125 => 1 // Spell Effect: Unlock (Knock)
+	134 => 1 // State: Petrification
+	136 => 1 // State: Force Visible
 	161 => 1
 	210 => 1
 	217 => 1
@@ -4331,7 +4333,7 @@ DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
 	END
 	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
 		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
-	END_EXPLORE
+	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
 	END
@@ -4442,6 +4444,7 @@ END
 /* ---------------- *
  * State: Aid [129] *
  * ---------------- */
+// TODO : split des effets
 DEFINE_PATCH_MACRO ~opcode_self_129~ BEGIN
 	LPM ~opcode_129_common~
     SPRINT description @11290001 // ~Aide (%value%)~
@@ -4472,6 +4475,7 @@ END
 /* ------------------ *
  * State: Bless [130] *
  * ------------------ */
+// TODO : split des effets
 DEFINE_PATCH_MACRO ~opcode_self_130~ BEGIN
     SPRINT description @11300001 // ~Bénédiction permanente~
 END
@@ -4542,8 +4546,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_132~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_132_common~ BEGIN
-	SET parameter1 = parameter1 BAND 255
-	PATCH_IF parameter1 < 0 BEGIN
+	// A negative value of Statistic Modifier sets the Strength, Constitution and Dexterity of the targeted creature(s) to 25.
+	// N'est pas à prendre au pied de la lettre : -1 est considéré comme 255, -10 comme 246, -255 comme 1...
+	SET parameter1 = parameter1 MODULO 256
+	PATCH_IF parameter1 >= 25 BEGIN
 		SET parameter2 = MOD_TYPE_flat
 		SET parameter1 = 25
 	END
@@ -4584,13 +4590,17 @@ END
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
 	//TODO: type == 0 => Gain Resistances/statistics (spell-casting disabled)
-	//TODO: If the resource key is empty, other Polymorph effects are removed, allowing for removal of permanent effects.
-	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
-        SPRINT description @11350001 // ~Transforme le porteur en %creatureName%~
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11350002 // ~%theTarget% retrouve sa forme naturelle~
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
+		LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
+		PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description @11350001 // ~Transforme le porteur en %creatureName%~
+		END
+		ELSE BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
+		END
 	END
 END
 
@@ -4665,18 +4675,44 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_143~ BEGIN
 	LPM ~opcode_self_probability_143~ // ~de créer 1 "%itemName%" à l'emplacement (%slotName%) %ofTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_143_is_valid~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Unknown resource %resref%.itm.~ END
+	END
+	PATCH_IF parameter1 < 0 OR parameter1 > 38 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid slot %parameter1%.~ END
+	END
+END
+
 /* ---------------------------- *
  * Button: Disable Button [144] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche l'utilisation de xxx~
+	SPRINT action @11440020
+	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_144~ BEGIN
 	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @11440040
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_144_common~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche %theTarget% d'utiliser xxx~
 END
+
+DEFINE_PATCH_MACRO ~opcode_144_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 15 OR
+			 NOT is_ee AND (parameter2 == 15 OR parameter2 == 10) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
+	END
+END
+
 
 /* -------------------------------------------- *
  * Spell: Disable Spell Casting Abilities [145] *
@@ -7418,6 +7454,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_278~ BEGIN
 	LPM ~opcode_self_probability_278~
+END
+
+/* ------------------------------ *
+ * Button: Enable Button [279] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_279~ BEGIN
+	LOCAL_SET strref = 11440001 + parameter2
+	SPRINT action @12790020
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_279~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @12790040
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_279_is_valid~ BEGIN
+	LPM ~opcode_144_is_valid~
 END
 
 /* ------------------------------ *

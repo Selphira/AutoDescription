@@ -1580,6 +1580,8 @@
 // Opcode 135: Polymorph into Specific [135]
 
 @11350001 = ~Transforme le porteur en %creatureName%~
+// TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
+@11350002 = ~%theTarget% retrouve sa forme naturelle~
 
 // Opcode 136: State: Force Visible [136]
 
@@ -1594,39 +1596,42 @@
 
 // Opcode 144: Button: Disable Button [144]
 
-@11440001 = ~Empêche l'utilisation du camouflage dans l'ombre~
-@11440002 = ~Empêche l'utilisation des compétences de voleur~
-@11440003 = ~Empêche l'utilisation des sorts~
-@11440004 = ~Empêche l'utilisation du premier sort rapide~
-@11440005 = ~Empêche l'utilisation du second sort rapide~
-@11440006 = ~Empêche l'utilisation du troisième sort rapide~
-@11440007 = ~Empêche l'utilisation de repousser les morts-vivants~
-@11440008 = ~Empêche l'utilisation des discussions~
-@11440009 = ~Empêche l'utilisation des objets~
-@11440010 = ~Empêche l'utilisation du premier objet rapide~
-@11440011 = ~Empêche l'utilisation des chants de barde~
-@11440012 = ~Empêche l'utilisation du second objet rapide~
-@11440013 = ~Empêche l'utilisation du troisième objet rapide~
-@11440014 = ~Empêche l'utilisation des sorts innés~
-@11440015 = ~Empêche l'utilisation de la détection de pièges~
-@11440016 = ~Empêche l'utilisation de l'inventaire~
+@11440001 = ~%action% l'utilisation du camouflage dans l'ombre~
+@11440002 = ~%action% l'utilisation des compétences de voleur~
+@11440003 = ~%action% l'utilisation des sorts~
+@11440004 = ~%action% l'utilisation du premier sort rapide~
+@11440005 = ~%action% l'utilisation du second sort rapide~
+@11440006 = ~%action% l'utilisation du troisième sort rapide~
+@11440007 = ~%action% l'utilisation de repousser les morts-vivants~
+@11440008 = ~%action% l'utilisation des discussions~
+@11440009 = ~%action% l'utilisation des objets~
+@11440010 = ~%action% l'utilisation du premier objet rapide~
+@11440011 = ~%action% l'utilisation des chants de barde et des danses de shaman~
+@11440012 = ~%action% l'utilisation du second objet rapide~
+@11440013 = ~%action% l'utilisation du troisième objet rapide~
+@11440014 = ~%action% l'utilisation des sorts innés~
+@11440015 = ~%action% l'utilisation de la détection des pièges et des illusions~
+@11440016 = ~%action% l'utilisation de l'inventaire~
+@11440020 = ~Empêche~ // Action
 
-@11440021 = ~Empêche %theTarget% d'utiliser le camouflage dans l'ombre~
-@11440022 = ~Empêche %theTarget% d'utiliser les compétences de voleur~
-@11440023 = ~Empêche %theTarget% d'utiliser les sorts~
-@11440024 = ~Empêche %theTarget% d'utiliser le premier sort rapide~
-@11440025 = ~Empêche %theTarget% d'utiliser le second sort rapide~
-@11440026 = ~Empêche %theTarget% d'utiliser le troisième sort rapide~
-@11440027 = ~Empêche %theTarget% d'utiliser repousser les morts-vivants~
-@11440028 = ~Empêche %theTarget% d'utiliser les discussions~
-@11440029 = ~Empêche %theTarget% d'utiliser les objets~
-@11440030 = ~Empêche %theTarget% d'utiliser les premier objet rapide~
-@11440031 = ~Empêche %theTarget% d'utiliser les chants de barde~
-@11440032 = ~Empêche %theTarget% d'utiliser le second objet rapide~
-@11440033 = ~Empêche %theTarget% d'utiliser le troisième objet rapide~
-@11440034 = ~Empêche %theTarget% d'utiliser les sorts innés~
-@11440035 = ~Empêche %theTarget% d'utiliser la détection de pièges~
-@11440036 = ~Empêche %theTarget% d'utiliser l'inventaire~
+@11440021 = ~%action% d'utiliser le camouflage dans l'ombre~
+@11440022 = ~%action% d'utiliser les compétences de voleur~
+@11440023 = ~%action% d'utiliser les sorts~
+@11440024 = ~%action% d'utiliser le premier sort rapide~
+@11440025 = ~%action% d'utiliser le second sort rapide~
+@11440026 = ~%action% d'utiliser le troisième sort rapide~
+@11440027 = ~%action% d'utiliser repousser les morts-vivants~
+@11440028 = ~%action% d'utiliser les discussions~
+@11440029 = ~%action% d'utiliser les objets~
+@11440030 = ~%action% d'utiliser les premier objet rapide~
+@11440031 = ~%action% d'utiliser les chants de barde et les danses de shaman~
+@11440032 = ~%action% d'utiliser le second objet rapide~
+@11440033 = ~%action% d'utiliser le troisième objet rapide~
+@11440034 = ~%action% d'utiliser les sorts innés~
+@11440035 = ~%action% d'utiliser la détection des pièges et des illusions~
+@11440036 = ~%action% d'utiliser l'inventaire~
+@11440040 = ~Empêche %theTarget%~ // Action
+
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
@@ -2251,6 +2256,11 @@
 
 @12780001 = ~Jets de toucher~
 @12780002 = ~les jets de toucher~
+
+// Opcode 279:  Button: Enable Button [279]
+
+@12790020 = ~Permet~ // action
+@12790040 = ~Permet %toTheTarget%~ // action
 
 // Opcode 280: Spell Effect: Wild Magic [280]
 
