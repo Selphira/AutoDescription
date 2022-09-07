@@ -3855,9 +3855,6 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 			PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
 				SPRINT description ~%description% %duration%~
 				SET ignoreDuration = 1
-				PATCH_IF isNotCumulative BEGIN
-					LPM ~opcode_not_cumulative~
-				END
 			END
 		END
 	END
