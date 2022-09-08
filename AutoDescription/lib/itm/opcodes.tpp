@@ -4848,17 +4848,14 @@ DEFINE_PATCH_MACRO ~opcode_self_148~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF type == 1 BEGIN
-			SPRINT description @11460005 // ~%spellName% (instantané)~
-		END
-		ELSE BEGIN
+		PATCH_IF type == 0 BEGIN
 			SPRINT description ~%spellName%~
 		END
-
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 AND type == 0 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
+		ELSE BEGIN
+			SET type = 1
+			SPRINT description @11460005 // ~%spellName% (instantané)~
 		END
+		LPM ~opcode_146_common~
 	END
 END
 
@@ -4869,17 +4866,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_148~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF type == 1 BEGIN
-			SPRINT description @11480003 // ~de lancer instantanément le sort %spellName% sur %theTarget%~
+		PATCH_IF type == 0 BEGIN
+			SPRINT description @11480002 // ~de lancer le sort %spellName% sur %theTarget%~
 		END
 		ELSE BEGIN
-			SPRINT description @11480003 // ~de lancer le sort %spellName% sur %theTarget%~
+			SET type = 1
+			SPRINT description @11480003 // ~de lancer instantanément le sort %spellName% sur %theTarget%~
 		END
-
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND castingLevel > 0 AND type == 0 BEGIN
-			SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-			SPRINT description ~%description% (%castingLevelStr%)~
-		END
+		LPM ~opcode_146_common~
 	END
 END
 
@@ -6951,10 +6945,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480004 // ~par attaque au poing réussie par %theTarget%: %description%~
+			SPRINT description @12480006 // ~par attaque au poing réussie par %theTarget%: %description%~
 		END
 		ELSE BEGIN
-			SPRINT description @12480003 // ~par attaque de mêlée réussie par %theTarget%: %description%~
+			SPRINT description @12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
 		END
 	END
 END

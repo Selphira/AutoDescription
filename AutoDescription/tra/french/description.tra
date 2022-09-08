@@ -1355,7 +1355,7 @@
 @11011024 = ~d'immuniser %theTarget% à l'horreur~
 @11011025 = ~d'immuniser %theTarget% au poison~
 @11011039 = ~d'immuniser %theTarget% au sommeil~
-@11011039 = ~d'immuniser %theTarget% à l'étourdissement~
+@11011045 = ~d'immuniser %theTarget% à l'étourdissement~
 @11011135 = ~~ // Opcode visuel
 @11011217 = ~d'immuniser %theTarget% au sommeil~
 
@@ -1660,7 +1660,7 @@
 // Opcode 148: Spell: Cast Spell (at Point) [148]
 
 @11480001 = ~Lance %spellName% sur %theTarget%~
-@11480003 = ~de lancer le sort %spellName% sur %theTarget%~
+@11480002 = ~de lancer le sort %spellName% sur %theTarget%~
 @11480003 = ~de lancer instantanément le sort %spellName% sur %theTarget%~
 
 // Opcode 150: Spell Effect: Find Traps [150]
@@ -2168,8 +2168,8 @@
 @12480002 = ~À chaque attaque à mains nues réussie: %description%~
 @12480003 = ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
 @12480004 = ~À chaque attaque à mains nues réussie par %theTarget%: %description%~
-@12480003 = ~par attaque de mêlée réussie par %theTarget%: %description%~
-@12480004 = ~par attaque à mains nues réussie par %theTarget%: %description%~
+@12480005 = ~par attaque de mêlée réussie par %theTarget%: %description%~
+@12480006 = ~par attaque à mains nues réussie par %theTarget%: %description%~
 
 // Opcode 249: Item: Set Ranged Effect [249]
 
