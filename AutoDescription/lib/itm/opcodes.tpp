@@ -4900,18 +4900,22 @@ END
  * Summon: Replace Creature [151] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_151~ BEGIN
-	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Version self à gérer.~ END
+	LPM ~opcode_target_151~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_151~ BEGIN
+	LPM ~opcode_target_probability_151~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_151~ BEGIN
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @11510001 // ~Remplace la cible par %creatureName%~
+		SPRINT description @11510001 // ~Remplace %theTarget% par %creatureName%~
 	END
 	ELSE PATCH_IF parameter2 == 1 OR parameter2 == 2 BEGIN
 		SPRINT description @11510002 // ~Tue et remplace %theTarget% par %creatureName%~
 	END
-	ELSE PATCH_IF parameter2 ==3 BEGIN
+	ELSE BEGIN
 		SPRINT description @11510003 // ~Invoque %creatureName% sur %theTarget%~
 	END
 END
@@ -4924,7 +4928,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_151~ BEGIN
 	ELSE PATCH_IF parameter2 == 1 OR parameter2 == 2 BEGIN
 		SPRINT description @11510005 // ~de tuer et remplacer %theTarget% par %creatureName%~
 	END
-	ELSE PATCH_IF parameter2 ==3 BEGIN
+	ELSE BEGIN
 		SPRINT description @11510006 // ~d'invoquer %creatureName% sur %theTarget%~
 	END
 END
