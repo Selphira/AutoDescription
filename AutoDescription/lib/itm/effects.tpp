@@ -288,7 +288,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_probability~ INT_VAR probability1 = 0 probability2 = 0 RET probability BEGIN
 	PATCH_IF probability1 > 99 OR probability1 < 0 BEGIN
-	    probability1 = 99
+	    SET probability1 = 99
 	END
 
 	SET probability = probability1 - probability2 + 1

@@ -483,6 +483,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	125 => 1 // Spell Effect: Unlock (Knock)
 	134 => 1 // State: Petrification
 	136 => 1 // State: Force Visible
+	150 => 1 // Spell Effect: Find Traps
+	151 => 1 // Summon: Replace Creature
 	161 => 1
 	210 => 1
 	217 => 1
@@ -492,8 +494,8 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	 24 => 1 // Panique
-	146 => 1
-	148 => 1
+	146 => 1 // Spell: Cast Spell (at Creature)
+	148 => 1 // Spell: Cast Spell (at Point)
 	162 => 1
 	177 => 1
 	214 => 1
@@ -4975,7 +4977,7 @@ END
  * Spell Effect: Mirror Image (Exact Number) [159] *
  * ----------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_159~ BEGIN
-	LOCAL_SET amount = parameter1
+	LOCAL_SET amount = parameter1 MODULO 65536
 	PATCH_IF amount == 1 BEGIN
 		SPRINT description @11590001 // ~Crée 1 image miroir sur %theTarget%~
 	END
@@ -4983,20 +4985,20 @@ DEFINE_PATCH_MACRO ~opcode_self_159~ BEGIN
 		SPRINT description @11590002 // ~Crée %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
+		SPRINT description @11590003 // ~Dissipe les images-miroir de %theTarget%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_159~ BEGIN
-	LOCAL_SET amount = parameter1
+	LOCAL_SET amount = parameter1 MODULO 65536
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @11590003 // ~de créer 1 image miroir sur %theTarget%~
+		SPRINT description @11590011 // ~de créer 1 image miroir sur %theTarget%~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @11590004 // ~de créer %amount% images miroir sur %theTarget%~
+		SPRINT description @11590012 // ~de créer %amount% images miroir sur %theTarget%~
 	END
 	ELSE BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~opcode %opcode%: parameter1 should be > 0 : %parameter1%~ END
+		SPRINT description @11590013 // ~de dissiper les images-miroir de %theTarget%~
 	END
 END
 

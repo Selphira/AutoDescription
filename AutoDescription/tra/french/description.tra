@@ -1692,8 +1692,11 @@
 
 @11590001 = ~Crée 1 image miroir sur %theTarget%~
 @11590002 = ~Crée %amount% images miroir sur %theTarget%~
-@11590003 = ~de créer 1 image miroir sur %theTarget%~
-@11590004 = ~de créer %amount% images miroir sur %theTarget%~
+@11590003 = ~Dissipe les images-miroir de %theTarget%~
+
+@11590011 = ~de créer 1 image miroir sur %theTarget%~
+@11590012 = ~de créer %amount% images miroir sur %theTarget%~
+@11590013 = ~de dissiper les images-miroir de %theTarget%~
 
 // Opcode 160: Remove Sanctuary [160]
 
