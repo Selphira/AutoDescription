@@ -1654,8 +1654,8 @@
 
 // Opcode 147: Spell: Learn Spell [147]
 
-@11470001 = ~Fait apprendre le sort %spellName% %toTheTarget%~
-@11470002 = ~de faire apprendre le sort %spellName% %toTheTarget%~
+@11470001 = ~Fait retranscrire le sort %spellName% %toTheTarget%~
+@11470002 = ~de retranscrire le sort %spellName% %toTheTarget%~
 
 // Opcode 148: Spell: Cast Spell (at Point) [148]
 
@@ -1736,6 +1736,11 @@
 
 @11670001 = ~TAC0 des armes à projectiles~
 @11670002 = ~le TAC0 des armes à projectiles~
+
+// Opcode 171: Give Ability [171]
+
+@11710001 = ~Fait apprendre le sort %spellName% %toTheTarget%~
+@11710002 = ~de faire apprendre le sort %spellName% %toTheTarget%~
 
 // Opcode 172: Spell: Remove Spell [172]
 

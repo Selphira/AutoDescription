@@ -5170,12 +5170,33 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_167~ BEGIN
 	LPM ~opcode_self_probability_167~
 END
 
+DEFINE_PATCH_MACRO ~opcode_167_is_valid~ BEGIN
+	LPM ~opcode_modstat3_is_valid~
+END
+
 /* -------------------------------- *
  * Spell: Give Innate Ability [171] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_171~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET description = spellName END
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11710001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
 END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_171~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11710002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_171~ BEGIN
+	LPM ~opcode_self_171~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_171~ BEGIN
+	LPM ~opcode_self_probability_171~
+END
+
 
 /* ------------------------- *
  * Spell: Remove Spell [172] *
