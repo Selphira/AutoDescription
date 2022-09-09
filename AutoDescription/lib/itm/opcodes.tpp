@@ -5140,6 +5140,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_166~ BEGIN
 	LPM ~opcode_self_probability_166~
 END
 
+DEFINE_PATCH_MACRO ~opcode_166_is_valid~ BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+	END
+	PATCH_IF parameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+END
+
 /* ----------------------------------------------- *
  * Stat: THAC0 Modifier with Missile Weapons [167] *
  * ----------------------------------------------- */
