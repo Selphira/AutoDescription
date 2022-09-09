@@ -870,19 +870,19 @@
 
 // Opcode 46: Cure: Stun (Unstun) [46]
 
-@10460001 = ~Immunité à l'étourdissement~
+@10460001 = ~Guérison de l'étourdissement~
 @10460002 = ~de ranimer %theTarget%~
 @10460003 = ~Ranime %theTarget%~
 
 // Opcode 47: Cure: Invisibility [47]
 
-@10470001 = ~Immunité à l'invisibilité~
+@10470001 = ~Dissipation de l'invisibilité~
 @10470002 = ~de dissiper l'invisibilité %ofTheTarget%~
 @10470003 = ~Dissipe l'invisibilité %ofTheTarget%~
 
 // Opcode 48: Cure: Silence (Vocalize) [48]
 
-@10480001 = ~Immunité au silence~
+@10480001 = ~Dissipation du silence~
 @10480002 = ~de rendre la parole %toTheTarget%~
 @10480003 = ~Rend la parole %ofTheTarget%~
 
@@ -985,7 +985,7 @@
 
 // Opcode 70: Cure: Non-Detection [70]
 
-@10700001 = ~Immunité à la non-détection~
+@10700001 = ~Dissipation de la non-détection~
 @10700002 = ~Dissipe la non-détection %ofTheTarget%~
 @10700003 = ~de dissiper la non-détection %ofTheTarget%~
 
@@ -1011,7 +1011,7 @@
 
 // Opcode 75: Cure: Blindness [75]
 
-@10750001 = ~Immunité à la cécité~
+@10750001 = ~Guérison à la cécité~
 @10750002 = ~Guérit la cécité %ofTheTarget%~
 @10750003 = ~de guérir la cécité %ofTheTarget%~
 
@@ -1023,7 +1023,7 @@
 
 // Opcode 77: Cure: Feeblemindedness [77]
 
-@10770001 = ~Immunité à la débilité mentale~
+@10770001 = ~Guérison de la débilité mentale~
 @10770002 = ~Guérit la Débilité mentale %ofTheTarget%~
 @10770003 = ~de guérir la Débilité mentale %ofTheTarget%~
 
@@ -1084,9 +1084,9 @@
 
 // Opcode 79: Cure: Disease [79]
 
-@10790001 = ~Immunité aux maladies~
-@10790002 = ~Guérit les maladies %ofTheTarget%~
-@10790003 = ~de guérir les maladies %ofTheTarget%~
+@10790001 = ~Guérison des maladies et de la débilité mentale~
+@10790002 = ~Guérit les maladies et la débilité mentale %ofTheTarget%~
+@10790003 = ~de guérir les maladies et la débilité mentale %ofTheTarget%~
 
 // Opcode 80: Deafness [80]
 
@@ -1097,7 +1097,7 @@
 
 // Opcode 81: Cure: Deafness [81]
 
-@10810001 = ~Immunité à la surdité~
+@10810001 = ~Guérison à la surdité~
 @10810002 = ~Guérit la surdité %ofTheTarget%~
 @10810003 = ~de guérir la surdité %ofTheTarget%~
 
@@ -1700,30 +1700,31 @@
 
 // Opcode 160: Remove Sanctuary [160]
 
-@11600001 = ~Dissipe le sanctuaire sur %theTarget%~
-@11600002 = ~de dissiper le sanctuaire sur %theTarget%~
+@11600001 = ~Dissipation de sanctuaire~
+@11600002 = ~Dissipe le sanctuaire sur %theTarget%~
+@11600003 = ~de dissiper le sanctuaire sur %theTarget%~
 
 // Opcode 161: Cure: Horror [161]
 
-@11610001 = ~Immunité à l'horreur~
+@11610001 = ~Dissipation de l'horreur~
 @11610002 = ~Dissipe l'horreur %ofTheTarget%~
 @11610003 = ~de dissiper l'horreur %ofTheTarget%~
 
 // Opcode 162: Cure: Hold [162]
 
-@11620001 = ~Immunité à la paralysie~
+@11620001 = ~Guérison de la paralysie~
 @11620002 = ~Guérison de la paralysie %ofTheTarget%~
 @11620003 = ~de guérir la paralysie %ofTheTarget%~
 
 // Opcode 163: Protection: Free Action [163]
 
-@11630001 = ~Action libre~
-@11630002 = ~Lance Action libre sur %theTarget%~
-@11630003 = ~de lancer Action libre sur %theTarget%~
+@11630001 = ~Rétablissement de la vitesse de déplacement~
+@11630002 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
+@11630003 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
 
 // Opcode 164: Cure: Drunkeness [164]
 
-@11640001 = ~Immunité à l'ivresse~
+@11640001 = ~Guérison de l'ivresse~
 @11640002 = ~Dessoûle %theTarget%~
 @11640003 = ~de dessoûler %theTarget%~
 
@@ -2134,7 +2135,7 @@
 
 // Opcode 242: Cure: Confusion [242]
 
-@12420001 = ~Immunité à la confusion~
+@12420001 = ~Dissipation de la confusion~
 @12420002 = ~Dissipe la confusion %ofTheTarget%~
 @12420003 = ~de dissiper la confusion %ofTheTarget%~
 

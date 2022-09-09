@@ -485,7 +485,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	136 => 1 // State: Force Visible
 	150 => 1 // Spell Effect: Find Traps
 	151 => 1 // Summon: Replace Creature
-	161 => 1
+	160 => 1 // Remove Sanctuary
+	161 => 1 // Cure: Horror
+	162 => 1 // Cure: Hold
+	163 => 1 // Protection: Free Action
+	164 => 1 // Cure: Drunkeness
 	210 => 1
 	217 => 1
 END
@@ -496,7 +500,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 24 => 1 // Panique
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
-	162 => 1
 	177 => 1
 	214 => 1
 	218 => 1
@@ -5010,11 +5013,30 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_159~ BEGIN
 	LPM ~opcode_self_probability_159~ // ~de créer %amount% images miroir sur %theTarget%~
 END
 
+/* ---------------------- *
+ * Remove Sanctuary [160] *
+ * ---------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_160~ BEGIN
+	SPRINT description @11600001 // ~Dissipation de sanctuaire~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_160~ BEGIN
+	SPRINT description @11600003 // ~de dissiper le sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_160~ BEGIN
+	SPRINT description @11600002 // ~Dissipe le sanctuaire sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_160~ BEGIN
+	LPM ~opcode_self_probability_160~
+END
+
 /* ------------------ *
  * Cure: Horror [161] *
  * ------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_161~ BEGIN
-	SPRINT description @11610001 // ~Immunité à l'horreur~
+	SPRINT description @11610001 // ~Dissipation de l'horreur~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_161~ BEGIN
@@ -5029,30 +5051,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_161~ BEGIN
 	LPM ~opcode_self_probability_161~ // ~de dissiper l'horreur %ofTheTarget%~
 END
 
-/* ---------------------- *
- * Remove Sanctuary [160] *
- * ---------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_160~ BEGIN
-	SPRINT description @11600001 // ~Dissipe le sanctuaire sur %theTarget%~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_160~ BEGIN
-	SPRINT description @11600002 // ~de dissiper le sanctuaire sur %theTarget%~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_160~ BEGIN
-	LPM ~opcode_self_160~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_probability_160~ BEGIN
-	LPM ~opcode_self_probability_160~
-END
-
 /* ---------------- *
  * Cure: Hold [162] *
  * ---------------- */
 DEFINE_PATCH_MACRO ~opcode_self_162~ BEGIN
-	SPRINT description @11620001 // ~Immunité à la paralysie~
+	SPRINT description @11620001 // ~Guérison de la paralysie~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_162~ BEGIN
@@ -5071,26 +5074,26 @@ END
  * Protection: Free Action [163] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_163~ BEGIN
-	SPRINT description @11630001 // ~Action libre~
+	SPRINT description @11630001 // ~Rétablissement de la vitesse de déplacement~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_163~ BEGIN
-	SPRINT description @11630003 // ~de lancer Action libre sur %theTarget%~
+	SPRINT description @11630003 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_163~ BEGIN
-	SPRINT description @11630002 // ~Lance Action libre sur %theTarget%~
+	SPRINT description @11630002 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_163~ BEGIN
-	LPM ~opcode_self_probability_163~ // ~de lancer Action libre sur %theTarget%~
+	LPM ~opcode_self_probability_163~ // ~de rétablir la vitesse de déplacement %ofTheTarget%~
 END
 
 /* ---------------------- *
  * Cure: Drunkeness [164] *
  * ---------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_164~ BEGIN
-	SPRINT description @11640001 // ~Immunité à l'ivresse~
+	SPRINT description @11640001 // ~Guérison de l'ivresse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_164~ BEGIN
