@@ -1011,21 +1011,21 @@
 
 // Opcode 75: Cure: Blindness [75]
 
-@10750001 = ~Guérison à la cécité~
+@10750001 = ~Guérison de la cécité~
 @10750002 = ~Guérit la cécité %ofTheTarget%~
 @10750003 = ~de guérir la cécité %ofTheTarget%~
 
 // Opcode 76: State: Feeblemindedness [76]
 
 @10760001 = ~Débilité mentale~
-@10760002 = ~Inflige Débilité mentale %toTheTarget%~
-@10760003 = ~d'infliger Débilité mentale %toTheTarget%~
+@10760002 = ~Inflige débilité mentale %toTheTarget%~
+@10760003 = ~d'infliger débilité mentale %toTheTarget%~
 
 // Opcode 77: Cure: Feeblemindedness [77]
 
 @10770001 = ~Guérison de la débilité mentale~
-@10770002 = ~Guérit la Débilité mentale %ofTheTarget%~
-@10770003 = ~de guérir la Débilité mentale %ofTheTarget%~
+@10770002 = ~Guérit la débilité mentale %ofTheTarget%~
+@10770003 = ~de guérir la débilité mentale %ofTheTarget%~
 
 // Opcode 78: State: Disease [78]
 
@@ -1084,9 +1084,9 @@
 
 // Opcode 79: Cure: Disease [79]
 
-@10790001 = ~Guérison des maladies et de la débilité mentale~
-@10790002 = ~Guérit les maladies et la débilité mentale %ofTheTarget%~
-@10790003 = ~de guérir les maladies et la débilité mentale %ofTheTarget%~
+@10790001 = ~Guérison des maladies~
+@10790002 = ~Guérit les maladies %ofTheTarget%~
+@10790003 = ~de guérir les maladies %ofTheTarget%~
 
 // Opcode 80: Deafness [80]
 
@@ -1097,7 +1097,7 @@
 
 // Opcode 81: Cure: Deafness [81]
 
-@10810001 = ~Guérison à la surdité~
+@10810001 = ~Guérison de la surdité~
 @10810002 = ~Guérit la surdité %ofTheTarget%~
 @10810003 = ~de guérir la surdité %ofTheTarget%~
 

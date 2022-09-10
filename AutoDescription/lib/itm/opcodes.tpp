@@ -2966,7 +2966,7 @@ END
  * Cure: Disease [79] *
  * ------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_79~ BEGIN
-	SPRINT description @10790001 // ~Immunité aux maladies~
+	SPRINT description @10790001 // ~Guérison des maladies~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_79~ BEGIN
@@ -2984,14 +2984,12 @@ END
 DEFINE_PATCH_MACRO ~opcode_79_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		// Suppression de l'opcode 77, redondant
+		// Ajout de l'opcode 77, dissipation de la débilité mentale
 		SET opcode = 77
-		LPF ~delete_opcode~
-			INT_VAR opcode // "Dissipation de la débilité mentale"
-			STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND parameter2 = %parameter2%~
-			RET $opcodes(~%opcode%~) = count
-			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		PATCH_IF NOT VARIABLE_IS_SET $opcodes(~%opcode%~) OR $opcodes(~%opcode%~) == 0 BEGIN
+			LPM ~add_opcode~
 		END
+		SET opcode = 79
 	END
 END
 
@@ -5214,12 +5212,14 @@ DEFINE_PATCH_MACRO ~opcode_self_171~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	SPRINT description @11710001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
+	LPM ~opcode_171_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_171~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	SPRINT description @11710002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+	LPM ~opcode_171_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_171~ BEGIN
@@ -5230,6 +5230,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_171~ BEGIN
 	LPM ~opcode_self_probability_171~
 END
 
+DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
+	// Hack pour forcer l'affichage de la durée / usage strictement interne
+	PATCH_IF special == 172 AND timingMode == TIMING_duration AND duration > 0 BEGIN
+		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+
+		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description ~%description% %duration%~
+			SET ignoreDuration = 1
+		END
+	END
+END
 
 /* ------------------------- *
  * Spell: Remove Spell [172] *
@@ -5239,6 +5250,7 @@ DEFINE_PATCH_MACRO ~opcode_self_172~ BEGIN
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		//TODO: If the key is not 8 characters long, all memorized copies will be removed.
 		//TODO: @11720002 = ~Supprime le sort %spellName% de la mémoire et du livre de sorts %ofTheTarget%~
+		//> Jamais observé IG : tous les sorts sont supprimés et oubliés
 		SPRINT description @11720001 // ~Supprime le sort %spellName% du livre de sorts %ofTheTarget%~
 	END
 END
@@ -5248,6 +5260,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_172~ BEGIN
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		//TODO: If the key is not 8 characters long, all memorized copies will be removed.
 		//TODO: @11720004 = ~de supprimer le sort %spellName% de la mémoire et du livre de sorts %ofTheTarget%~
+		//> Jamais observé IG : tous les sorts sont supprimés et oubliés
 		SPRINT description @11720003 // ~de supprimer le sort %spellName% du livre de sorts %ofTheTarget%~
 	END
 END
@@ -5258,6 +5271,65 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_172~ BEGIN
 	LPM ~opcode_self_probability_172~ // ~de supprimer le sort %spellName% de la mémoire et du livre de sorts %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_172_group~ BEGIN
+	LOCAL_SET searchOpcode = 171
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 0
+		SET currentOpcode = opcode
+		SET currentDuration = duration
+		SET currentPosition = position
+		TEXT_SPRINT currentresref ~%resref%~
+
+		// Group 171 - 172 (ajout d'un sort puis retrait)
+		// L'ajout possède une durée permanente mais vient à être retirée du livre
+		// La durée de l'opcode 171 est alors modifiée et l'opcode 172 est retiré
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND timingMode == TIMING_delayed AND
+				 VARIABLE_IS_SET $opcodes(~%searchOpcode%~) AND
+				 $opcodes(~%searchOpcode%~) > 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%searchOpcode%~ AS data => _ BEGIN
+				PATCH_IF group == 0 BEGIN
+					LPM ~data_to_vars~
+					SET opcode = searchOpcode
+					PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%currentresref%~ BEGIN
+						SET group = 1
+						SET oldDuration = duration
+						SET oldTimingMode = timingMode
+
+						// ajout de l'opcode 171 modifié
+						SET timingMode = TIMING_duration
+						SET duration = currentDuration
+						SET special = currentOpcode
+						LPM ~add_opcode~
+
+						// suppression de l'opcode 171 initial
+						// FIXME Marche pas en mettant le add_opcode après... raison ?
+						// La position n'est pas une condition suffisante
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~timingMode = %oldTimingMode% AND duration = %oldDuration%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+
+					PATCH_IF group == 1 BEGIN
+						// Suppression de l'opcode 172 devenu inutile
+						SET opcode = currentOpcode
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~position = %currentPosition%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+	END
 END
 
 /* -------------------------------------- *
@@ -5285,12 +5357,14 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_173~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_173_common~ BEGIN
-	PATCH_IF is_ee == 0 BEGIN
-		// Sets the Poison Resistance of the target creature(s) to the value specified by 'Statistic Modifier'.
-		SET parameter2 = MOD_TYPE_flat
-	END
-	ELSE BEGIN
-		SET parameter2 = MOD_TYPE_cumulative
+	// Sets the Poison Resistance of the target creature(s) to the value specified by 'Statistic Modifier'.
+	SET parameter2 = is_ee ? MOD_TYPE_cumulative : MOD_TYPE_flat
+END
+
+DEFINE_PATCH_MACRO ~opcode_173_is_valid~ BEGIN
+	PATCH_IF is_ee AND parameter1 == 0 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
 	END
 END
 
