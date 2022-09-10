@@ -5483,6 +5483,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 
 			// Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
+			// FIXME: le parameter6 également mais non configuré dans AutoComplétion (et probablement jamais utilisé)
 			// TODO: rajouter les restrictions de niveau (attention aux cas particuliers : 12, 17, 18 & co)
 			// Pour les cas particuliers il sera nécessaire de trouver un moyen alternatif d'afficher la restriction
 			SET timingMode = timingMode177
@@ -5554,25 +5555,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11780001 // ~%description% %versus%~
-	END
+	LPM ~opcode_178_end~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_target~ INT_VAR strref = 10540002 RET description END // ~le TAC0~
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11780001 // ~%description% %versus%~
-	END
+	LPM ~opcode_178_end~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_178~ BEGIN
 	LPM ~opcode_178_common~
 	LPF ~opcode_probability~ INT_VAR strref = 10540002 RET description END // ~le TAC0~
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11780001 // ~%description% %versus%~
-	END
+	LPM ~opcode_178_end~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_178~ BEGIN
@@ -5580,63 +5575,66 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_178~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_178_common~ BEGIN
-	LOCAL_SET strref = 10540001 // TAC0
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	TEXT_SPRINT versus ~~
 
-	PATCH_IF isExternal BEGIN
-		SET value = ~%parameter3%~
+	PATCH_IF parameter2 >= 2 AND parameter2 <= 8 AND parameter1 != 0 BEGIN
+		LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 	END
-	ELSE BEGIN
-		//TODO: Vérifier si la valeur ne devrait pas se trouver dans la variable "special" au lieu de "power"
-		SET value = ~%power%~
+
+	SET value = isExternal? parameter3 : 0
+	PATCH_IF is_ee AND value == 0 BEGIN
+		SET value = special
 	END
 
 	SET parameter2 = MOD_TYPE_cumulative
 	SET parameter1 = value
 END
 
+DEFINE_PATCH_MACRO ~opcode_178_end~ BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%versus%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11780001 // ~%description% %versus%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
+	LOCAL_SET value = isExternal? parameter3 : 0
+	PATCH_IF value == 0 AND (is_ee == 0 OR special == 0) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
+	END
+END
+
 /* ----------------------------------------------------- *
  * Spell Effect: Damage vs. Creature Type Modifier [179] *
  * ----------------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_179~ BEGIN
-	LOCAL_SET strref = 10120003 // ~Inflige %damage% %damageType% supplémentaires %versus%~
+ DEFINE_PATCH_MACRO ~opcode_self_179~ BEGIN
 	LPM ~opcode_179_common~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_179~ BEGIN
-	LOCAL_SET strref = 10120013 // ~d'infliger %damage% %damageType% supplémentaires %versus%~
-	LPM ~opcode_179_common~
+	LPF ~opcode_mod~ INT_VAR strref = 10730001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts~
+	LPM ~opcode_178_end~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_179~ BEGIN
-	LPM ~opcode_self_179~ // ~Inflige %damage% %damageType% supplémentaires %versus%~
+	LPM ~opcode_179_common~
+	LPF ~opcode_target~ INT_VAR strref = 10730002 RET description END // ~les dégâts~
+	LPM ~opcode_178_end~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_179~ BEGIN
+	LPM ~opcode_179_common~
+	LPF ~opcode_probability~ INT_VAR strref = 10730002 RET description END // ~les dégâts~
+	LPM ~opcode_178_end~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_179~ BEGIN
-	LPM ~opcode_self_probability_179~ // ~d'infliger %damage% %damageType% supplémentaires %versus%~
+	LPM ~opcode_self_probability_179~
 END
 
 DEFINE_PATCH_MACRO ~opcode_179_common~ BEGIN
-	//TODO: Multiple opcode #179 effects only allow additional targeting, they do not stack their damage bonus.
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	LPM ~opcode_178_common~
+END
 
-	PATCH_IF isExternal BEGIN
-		SET damageAmount = ~%parameter3%~
-	END
-	ELSE BEGIN
-		//TODO: Vérifier si la valeur ne devrait pas se trouver dans la variable "special" au lieu de "power"
-		SET damageAmount = ~%power%~
-	END
-
-	SET parameter2 = MOD_TYPE_cumulative
-	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET damage END
-
-	INNER_PATCH_SAVE damage ~%damage%~ BEGIN
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-	END
-
-	SPRINT damageType @101092 // ~points de dégâts~
-	SPRINT description @10120003 // ~Inflige %damage% %damageType% supplémentaires %versus%~
+DEFINE_PATCH_MACRO ~opcode_179_is_valid~ BEGIN
+	LPM ~opcode_178_is_valid~
 END
 
 /* -------------------------- *
