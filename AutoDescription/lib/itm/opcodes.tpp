@@ -326,7 +326,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
-	270 => 0 // Cure: Unpause Target [270]
+	270 => 1 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
 	282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
@@ -490,8 +490,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	162 => 1 // Cure: Hold
 	163 => 1 // Protection: Free Action
 	164 => 1 // Cure: Drunkeness
+	171 => 1 // Spell: Give Ability
+	172 => 1 // Spell: Remove Spell
 	210 => 1
 	217 => 1
+	242 => 1 // Cure: Confusion
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -2978,6 +2981,20 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_79~ BEGIN
 	LPM ~opcode_self_probability_79~ // ~de guérir les maladies %ofTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_79_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		// Suppression de l'opcode 77, redondant
+		SET opcode = 77
+		LPF ~delete_opcode~
+			INT_VAR opcode // "Dissipation de la débilité mentale"
+			STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND parameter2 = %parameter2%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+	END
+END
+
 /* ------------- *
  * Deafness [80] *
  * ------------- */
@@ -4304,7 +4321,7 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
 	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
 	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
+		SPRINT description @11260005 // ~Rétablissement de la vitesse de déplacement~
 	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
@@ -4319,7 +4336,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
 	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260006 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
+		SPRINT description @11260007 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
 	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260004 // ~d'immobiliser %theTarget%~
@@ -4334,7 +4351,7 @@ DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
 		SET parameter2 = MOD_TYPE_percentage
 	END
 	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260005 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
+		SPRINT description @11260006 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
 	END
 	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SPRINT description @11260003 // ~Immobilise %theTarget%~
@@ -4346,6 +4363,22 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_126~ BEGIN
 	LPM ~opcode_self_probability_126~
+END
+
+DEFINE_PATCH_MACRO ~opcode_126_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
+			// Suppression de l'opcode 163, redondant
+			SET opcode = 163
+			LPF ~delete_opcode~
+				INT_VAR opcode // "Free action"
+				STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_126_is_valid~ BEGIN
@@ -5297,6 +5330,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_176_is_valid~ BEGIN
 	LPM ~opcode_126_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_176_group~ BEGIN
+	LPM ~opcode_126_group~
 END
 
 /* ------------------ *
