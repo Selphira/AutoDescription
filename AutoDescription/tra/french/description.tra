@@ -1765,7 +1765,7 @@
 // Opcode 180: Item: Can't Use Item [180]
 
 @11800001 = ~Unique : Un seul exemplaire peut être équipé~
-@11800002 = ~Empêche d'utiliser %itemName%~
+@11800002 = ~Empêche d'équiper %itemName%~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
 
@@ -1797,7 +1797,7 @@
 @11810124 = ~fléchettes~
 @11810125 = ~haches~
 @11810127 = ~arbalètes~
-//@11810128 = ~???~ ITM_TYPE_hand_to_hand_hth = 0x1c
+@11810128 = ~poings~
 @11810129 = ~lances~
 @11810130 = ~hallebardes~
 @11810131 = ~carreaux~
@@ -1825,7 +1825,7 @@
 @11810160 = ~armures de cuir~
 @11810161 = ~armures de cuir clouté~
 @11810162 = ~armures de mailles~
-//@11810163 = ~???~ ITM_TYPE_splint_mail = 0x3f
+@11810163 = ~~ // ITM_TYPE_splint_mail = 0x3f
 @11810164 = ~armures de plate~
 @11810165 = ~armures de plate complète~
 @11810166 = ~armures de peau~
@@ -1841,6 +1841,11 @@
 @11880001 = ~Permet de lancer plusieurs sorts par round~
 @11880002 = ~Permet %toTheTarget% de lancer plusieurs sorts par round~
 @11880003 = ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
+
+@11880011 = ~Permet de ne lancer qu'un seul sort par round~
+@11880012 = ~Permet %toTheTarget% de ne lancer qu'un sort par round~
+@11880013 = ~de permettre %toTheTarget% de ne lancer qu'un seul sort par round~
+
 
 // Opcode 189: Stat: Casting Time Modifier [189]
 

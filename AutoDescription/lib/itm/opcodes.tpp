@@ -299,7 +299,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	170 => 0 // Graphics: Play Damage Animation [170]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
 	182 => 0 // Item: Apply Effect Item [182]
-	183 => 0 // Item: Apply Effect Itemtype [183]
+	183 => 1 // Item: Apply Effect Itemtype [183]
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
 	186 => 0 // Script: MoveToArea [186] // A gérer ??
 	187 => 0 // Script: Store Local Variable [187]
@@ -5649,8 +5649,16 @@ DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
 	ELSE BEGIN
 		LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 		PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @11800002 // ~Empêche d'utiliser %itemName%~
+			SPRINT description @11800002 // ~Empêche d'équiper %itemName%~
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_180_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+	PATCH_IF parameter2 != 0 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
 	END
 END
 
@@ -5659,22 +5667,24 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_181~ BEGIN
 	LOCAL_SET strref = 11810100
-
-	PATCH_IF is_ee == 1 BEGIN
-		SET strref = strref + parameter1
-	END
-	ELSE BEGIN
-		SET strref = strref + parameter2
-	END
+	SET strref += is_ee ? parameter1 : parameter2
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET itemType = string END
 	SPRINT description @11810001 // ~Empêche d'utiliser les %itemType%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_181_is_valid~ BEGIN
+	LOCAL_SET parameter = is_ee ? parameter1 : parameter2
+	PATCH_IF parameter < 0 OR parameter > 73 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
+	END
+END
+
 /* ---------------------- *
  * State: Hold (II) [185] *
  * ---------------------- */
- DEFINE_PATCH_MACRO ~opcode_self_185~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_185~ BEGIN
 	LPM ~opcode_self_175~
 END
 
@@ -5698,15 +5708,21 @@ END
  * Spell Effect: Aura Cleansing [188] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_188~ BEGIN
-	SPRINT description @11880001 // ~Permet de lancer plusieurs sorts par round~
+	SET strref = 11880001 // ~Permet de lancer plusieurs sorts par round~
+	SET strref += parameter2 != 0? 0 : 10 // ~Permet de ne lancer qu'un seul sort par round~
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_188~ BEGIN
-	SPRINT description @11880003 // ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
+	SET strref = 11880003 // ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
+	SET strref += parameter2 != 0? 0 : 10 // ~de permettre %toTheTarget% de ne lancer qu'un seul sort par round~
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_188~ BEGIN
-	SPRINT description @11880002 // ~Permet %toTheTarget% de lancer plusieurs sorts par round~
+	SET strref = 11880002 // ~Permet %toTheTarget% de lancer plusieurs sorts par round~
+	SET strref += parameter2 != 0? 0 : 10 // ~Permet %toTheTarget% de lancer qu'un seul sort par round~
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_188~ BEGIN
