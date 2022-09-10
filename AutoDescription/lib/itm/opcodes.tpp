@@ -5375,12 +5375,20 @@ DEFINE_PATCH_MACRO ~opcode_self_175~ BEGIN
 	LPM ~opcode_self_109~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_175~ BEGIN
+	LPM ~opcode_self_probability_109~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_175~ BEGIN
 	LPM ~opcode_target_109~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_175~ BEGIN
 	LPM ~opcode_target_probability_109~
+END
+
+DEFINE_PATCH_MACRO ~opcode_175_is_valid~ BEGIN
+	LPM ~opcode_109_is_valid~
 END
 
 /* ---------------------------------- *
@@ -5659,16 +5667,24 @@ END
 /* ---------------------- *
  * State: Hold (II) [185] *
  * ---------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_185~ BEGIN
-	LPM ~opcode_self_175~
+ DEFINE_PATCH_MACRO ~opcode_self_185~ BEGIN
+	LPM ~opcode_self_109~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_185~ BEGIN
+	LPM ~opcode_self_probability_109~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_185~ BEGIN
-	LPM ~opcode_target_175~
+	LPM ~opcode_target_109~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_185~ BEGIN
-	LPM ~opcode_target_probability_175~
+	LPM ~opcode_target_probability_109~
+END
+
+DEFINE_PATCH_MACRO ~opcode_185_is_valid~ BEGIN
+	LPM ~opcode_109_is_valid~
 END
 
 /* ---------------------------------- *
