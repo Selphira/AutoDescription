@@ -5852,6 +5852,14 @@ DEFINE_PATCH_MACRO ~opcode_191_common~ BEGIN
 		SET strref += 1 // ~le niveau de lanceur de sorts divins~
 	END
 	SET parameter2 = MOD_TYPE_cumulative
+	SET parameter1 = parameter1 BAND 255
+END
+
+DEFINE_PATCH_MACRO ~opcode_191_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 1 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2%.~ END
+	END
 END
 
 /* ------------------------------------------------- *
