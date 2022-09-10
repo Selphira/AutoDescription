@@ -586,9 +586,10 @@
 @300055 = ~lances de jet~
 @300062 = ~toiles d'araignées~
 @300064 = ~attaques de regard~
+@300094 = ~nuages puants~
 @300208 = ~rayons des spectateurs~
-@300219 = ~désintégrations~
-@300227 = ~convocations d'insectes~
+@300218 = ~désintégrations~
+@300227 = ~nuées d'insectes~
 
 
 /* ------------------------------ *

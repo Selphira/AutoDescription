@@ -5526,7 +5526,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 	LPM ~opcode_idscheck_is_valid~
 	LPM ~opcode_resref_is_valid~
-	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND ~%resref%~ NOT STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 	END
@@ -9454,10 +9454,6 @@ END
 
 // Comment trouver les correspondances sans checker tous les sorts ??
 
-// 94 : Instant area effect : Tremblement de terre (SPPR720), Zone de magie entropique (SPIN778), Terreur de l'Ecorcheur (SPIN807)
-// 205 : Instant area small => Repousser les morts-vivants (SPPR515), Invisibilité sur 3 mètre (SPWI307)
-// 229 : Nuée de météores SPWI911, Tempête de feu SPPR705
-// 231 : Icewind Glyph hit : aucune correspondance
 DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref BEGIN
 	SET projref = 0
 	PATCH_MATCH projectile WITH
@@ -9477,7 +9473,7 @@ DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref B
 			BEGIN SET projref = 300031 END // ~fléchettes~
 		36 67 68 69 70 71 72 73 74 75 76 77
 			BEGIN SET projref = 300036 END // ~projectiles magiques~
-		39 80 81 82 83 84 85 86 87 88 89 90 91 206 212 219 442
+		39 80 81 82 83 84 85 86 87 88 89 90 92 206 212 219 442
 			BEGIN SET projref = 300039 END // ~éclairs~
 		55 56 57 58 59
 			BEGIN SET projref = 300055 END // ~lances de jet~
@@ -9485,13 +9481,15 @@ DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref B
 			BEGIN SET projref = 300062 END // ~toiles d'araignées~
 		64 274
 			BEGIN SET projref = 300064 END // ~attaques de regard~
+		94
+			BEGIN SET projref = 300094 END // ~nuages puants~
 		208
 			BEGIN SET projref = 300208 END // ~rayons des spectateurs~
 		218
-			BEGIN SET projref = 300219 END // ~désintégrations~
-		227
-			BEGIN SET projref = 300219 END // ~convocations d'insectes~
-		226 320
+			BEGIN SET projref = 300218 END // ~désintégrations~
+		226 227 229 232
+			BEGIN SET projref = 300227 END // ~nuées d'insectes~
+		320
 			BEGIN SET projref = 0 END // Aucune correspondance connue
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%projectile%'~ END
