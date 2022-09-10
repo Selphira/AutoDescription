@@ -5428,7 +5428,7 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 	PATCH_IF ~%resref%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 BEGIN // Effet d'Item Revision v4
 		LPF ~opcode_self_177_item_revision_casting_penality~ RET description forceSort sort END
 	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 == 2 BEGIN
+	ELSE PATCH_IF parameter1 == 0 BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 	END
 	ELSE BEGIN
@@ -5450,7 +5450,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_177~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
-	PATCH_IF NOT (parameter1 == 0 AND parameter2 == 2) BEGIN
+	PATCH_IF parameter1 != 0 BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
 		SPRINT theTarget   @102384 // ~les %targetType%~
 		SPRINT ofTheTarget @102385 // ~des %targetType%~
@@ -5462,83 +5462,89 @@ DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
-	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
-		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
-	        SPRINT oldTheTarget   ~%theTarget%~
-	        SPRINT oldOfTheTarget ~%ofTheTarget%~
-	        SPRINT oldToTheTarget ~%toTheTarget%~
+	INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+		SPRINT oldTheTarget   ~%theTarget%~
+		SPRINT oldOfTheTarget ~%ofTheTarget%~
+		SPRINT oldToTheTarget ~%toTheTarget%~
 
-	        SET timingMode177 = timingMode
-	        SET duration177 = duration
-	        SET target177 = target
-	        SET probability177 = probability
-			SET isExternal = 1
+		SET timingMode177 = timingMode
+		SET duration177 = duration
+		SET target177 = target
+		SET probability177 = probability
+		SET saveType177 = saveType
+		SET saveBonus177 = saveBonus
+		SET isExternal = 1
 
-	        LPM ~read_external_effect_vars~
+		LPM ~read_external_effect_vars~
 
-			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-				SET isValid = 1
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET isValid = 1
 
-				LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 
-		        // Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
-		        SET timingMode = timingMode177
-		        SET duration = duration177
-		        SET target = target177
-				// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
-		        SET probability = probability177 * probability / 100
+			// Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
+			// TODO: rajouter les restrictions de niveau (attention aux cas particuliers : 12, 17, 18 & co)
+			// Pour les cas particuliers il sera nécessaire de trouver un moyen alternatif d'afficher la restriction
+			SET timingMode = timingMode177
+			SET duration = duration177
+			SET target = target177
 
-				LPM ~opcode_is_valid~
-
-		        PATCH_IF isValid == 1 BEGIN
-	                LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
-
-					INNER_PATCH_SAVE description ~%description%~ BEGIN
-				        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
-						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-					END
-		        END
+			// Si le JS du 177 est renseigné contrairement à celui de l'opcode appelé => transmission
+			// FIXME: en réalité les JS se cumulent, ne sont présents que les cas les plus simples
+			// FIXME: peut créer des conflits mineurs avec l'opcode 12 + special 256 ou 512
+			PATCH_IF saveType == 0 AND saveType177 != 0 BEGIN
+				SET saveType = saveType177
+				SET saveBonus = saveBonus177
 			END
+			// Si deux JS différents avec un saveBonus identiques sont présents, ils se cumulent
+			// FIXME: insuffisant, deux JS identiques doivent pouvoir aussi se cumuler
+			ELSE PATCH_IF saveBonus == saveBonus177 BEGIN
+				SET saveType = saveType | saveType177
+			END
+			// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
+			SET probability = probability177 * probability / 100
 
-	        SPRINT theTarget   ~%oldTheTarget%~
-	        SPRINT ofTheTarget ~%oldOfTheTarget%~
-	        SPRINT toTheTarget ~%oldToTheTarget%~
-	    END
-	END
-	ELSE BEGIN
-		PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
+			LPM ~opcode_is_valid~
+
+			PATCH_IF isValid == 1 BEGIN
+				LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
+
+				INNER_PATCH_SAVE description ~%description%~ BEGIN
+					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+				END
+			END
 		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
-		END
+
+		SPRINT theTarget   ~%oldTheTarget%~
+		SPRINT ofTheTarget ~%oldOfTheTarget%~
+		SPRINT toTheTarget ~%oldToTheTarget%~
 	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
-	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
-		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
-			SET isExternal = 1
-	        LPM ~read_external_effect_vars~
+	INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+		SET isExternal = 1
+		LPM ~read_external_effect_vars~
 
-			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-				SET isValid = 1
-				LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
-				LPM ~opcode_is_valid~
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET isValid = 1
+			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+			LPM ~opcode_is_valid~
 
-		        PATCH_IF isValid == 1 BEGIN
-	                LPF ~get_effect_description~ INT_VAR resetTarget = 1 RET description saveAdded ignoreDuration END
-		        END
+			PATCH_IF isValid == 1 BEGIN
+				LPF ~get_effect_description~ INT_VAR resetTarget = 1 RET description saveAdded ignoreDuration END
 			END
-	    END
+		END
 	END
-	ELSE BEGIN
-		PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: The resref parameter is empty~ END
-		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
-		END
+END
+
+DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_resref_is_valid~
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 	END
 END
 
