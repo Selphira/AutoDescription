@@ -5709,19 +5709,19 @@ END
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_188~ BEGIN
 	SET strref = 11880001 // ~Permet de lancer plusieurs sorts par round~
-	SET strref += parameter2 != 0? 0 : 10 // ~Permet de ne lancer qu'un seul sort par round~
+	SET strref += parameter2 == 0? 10 : 0 // ~Permet de ne lancer qu'un seul sort par round~
 	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_188~ BEGIN
 	SET strref = 11880003 // ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
-	SET strref += parameter2 != 0? 0 : 10 // ~de permettre %toTheTarget% de ne lancer qu'un seul sort par round~
+	SET strref += parameter2 == 0? 10 : 0 // ~de permettre %toTheTarget% de ne lancer qu'un seul sort par round~
 	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_188~ BEGIN
 	SET strref = 11880002 // ~Permet %toTheTarget% de lancer plusieurs sorts par round~
-	SET strref += parameter2 != 0? 0 : 10 // ~Permet %toTheTarget% de lancer qu'un seul sort par round~
+	SET strref += parameter2 == 0? 10 : 0 // ~Permet %toTheTarget% de lancer qu'un seul sort par round~
 	SPRINT description (AT strref)
 END
 
@@ -5733,19 +5733,60 @@ END
  * Stat: Casting Time Modifier [189] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 11890001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse d'incantation~
+	LPM ~opcode_189_common~
+	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = 11890001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Temps d'incantation~
+	END
+	ELSE BEGIN
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_mod~ INT_VAR strref = 11890003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Temps d'incantation maximal~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_189~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 11890002 RET description END // ~la vitesse d'incantation~
+	LPM ~opcode_189_common~
+	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
+		LPF ~opcode_probability~ INT_VAR strref = 11890002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation~
+	END
+	ELSE BEGIN
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_probability~ INT_VAR strref = 11890004 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation maximal~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_189~ BEGIN
-	LPF ~opcode_target~ INT_VAR strref = 11890002 RET description END // ~la vitesse d'incantation~
+	LPM ~opcode_189_common~
+	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
+		LPF ~opcode_target~ INT_VAR strref = 11890002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation~
+	END
+	ELSE BEGIN
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_target~ INT_VAR strref = 11890004 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation maximal~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_189~ BEGIN
 	LPM ~opcode_self_probability_189~
+END
+
+DEFINE_PATCH_MACRO ~opcode_189_common~ BEGIN
+	SET parameter1 = parameter1 BAND 255
+	PATCH_IF parameter2 > 2 OR parameter2 < MOD_TYPE_cumulative OR parameter2 == 2 AND NOT is_ee BEGIN
+		SET parameter2 = MOD_TYPE_cumulative
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+		SET parameter1 = 0 - parameter1
+	END
+	ELSE PATCH_IF parameter1 < 0 BEGIN
+		SET parameter1 = 0
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_189_is_valid~ BEGIN
+	PATCH_IF (parameter1 BAND 255) == 0 AND parameter2 == 0 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
+	END
 END
 
 /* ------------------------------- *

@@ -1849,8 +1849,10 @@
 
 // Opcode 189: Stat: Casting Time Modifier [189]
 
-@11890001 = ~Vitesse d'incantation~
-@11890002 = ~la vitesse d'incantation~
+@11890001 = ~Temps d'incantation~
+@11890002 = ~le temps d'incantation~
+@11890003 = ~Temps d'incantation maximal~
+@11890004 = ~le temps d'incantation maximal~
 
 // Opcode 190: Stat: Attack Speed Factor [190]
 
