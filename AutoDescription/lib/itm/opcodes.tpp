@@ -3035,49 +3035,32 @@ END
  * Protection: From Projectile [83] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
-	// Comment trouver les correspondances sans checker tous les sorts ??
-	// TODO une seule liste pour cet opcode et le 197
-
-	// Warning de Region of Terror + Auror kit
-	// 94 : Instant area effect : Tremblement de terre (SPPR720), Zone de magie entropique (SPIN778), Terreur de l'Ecorcheur (SPIN807)
-	// 226 : Fireseed : aucune correspondance
-	// 227 : convocation d'insecte SPPR319
-	// 229 : Nuée de météores SPWI911, Tempête de feu SPPR705
-	// 231 : Icewind Glyph hit : aucune correspondance
-
-	// ITEMS BG2EE
-	// 219 : Désintégration (SPWI616)
-	// 205 : Instant area small => Repousser les morts-vivants (SPPR515), Invisibilité sur 3 mètre (SPWI307)
-	// 320 : aucune correspondance
-	PATCH_MATCH parameter2 WITH
-		  1 2 3 4 5 283 284 285 286 287 288 289 290 291 BEGIN SPRINT description @10830001 END // ~Immunité contre les flèches~
-		  6 7 8 9 10 292 293 294 295 296 BEGIN SPRINT description @10830002 END // ~Immunité contre les haches de jet~
-		 297 298 299 300 301 302 303 BEGIN SPRINT description @10830004 END // ~Immunité contre les carreaux~
-		 16 17 18 19 304 305 306 307 308 BEGIN SPRINT description @10830005 END // ~Immunité contre les billes~
-		 26 27 28 29 30 309 310 311 313 BEGIN SPRINT description @10830006 END // ~Immunité contre les dagues de jet~
-		 31 32 33 34 35 313 314 315 316 317 318 BEGIN SPRINT description @10830007 END // ~Immunité contre les flèchettes~
-		 55 56 57 58 59 BEGIN SPRINT description @10830008 END // ~Immunité contre les lances de jet~
-		 14 64 208 274 BEGIN SPRINT description @10830003 END // ~Immunité contre les attaques de regard~
-		 36 67 68 69 70 71 72 73 74 75 76 77 BEGIN SPRINT description @10830009 END // ~Immunité contre les missiles magiques~
-		 102 BEGIN SPRINT description @10830010 END // ~Immunité contre les flèches à flamme bleue~
-		 39 442 BEGIN SPRINT description @10830011 END // ~Immunité contre les éclairs~
-		 62 63 259 319 BEGIN SPRINT description @10830012 END // ~Immunité contre les toiles d'araignées~
-		DEFAULT
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type de projectile '%parameter2%'~ END
-    END
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_83~ BEGIN
-	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: self_probability~ END
+	LOCAL_SET strref = 10830001 // ~Protection contre les %projectiles%~
+	LPM ~opcode_83_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_83~ BEGIN
 	LPM ~opcode_self_83~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
-	LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO: target_probability~ END
+DEFINE_PATCH_MACRO ~opcode_self_probability_83~ BEGIN
+	LOCAL_SET strref = 10830002 // ~d'être protégé contre les %projectiles%~
+	LPM ~opcode_83_common~
 END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
+	LPM ~opcode_self_probability_83~
+END
+
+DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
+	LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+
+	PATCH_IF projref > 0 BEGIN
+		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
 
 /* ------------------------------------------- *
  * Stat: Magical Fire Resistance Modifier [84] *
@@ -5543,7 +5526,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 	LPM ~opcode_idscheck_is_valid~
 	LPM ~opcode_resref_is_valid~
-	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND ~%resref%~ NOT STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
 	END
@@ -5866,11 +5849,13 @@ END
  * Spell Effect: Invisible Detection by Script [193] *
  * ------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_193~ BEGIN
-	SPRINT description @11930001 // ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~
+	SET strref = 11930001 // ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~
+	LPM ~opcode_193_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_193~ BEGIN
-	SPRINT description @11930002 // ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~
+	SET strref = 11930002 // ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~
+	LPM ~opcode_193_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_193~ BEGIN
@@ -5879,6 +5864,11 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_193~ BEGIN
 	LPM ~opcode_self_probability_193~ // ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~
+END
+
+DEFINE_PATCH_MACRO ~opcode_193_common~ BEGIN
+	SET strref += parameter2 == 0? 10 : 0
+	SPRINT description (AT strref)
 END
 
 /* ------------------------------ *
@@ -5894,36 +5884,16 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
 	LPM ~opcode_197_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
+	LPM ~opcode_self_197~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_197~ BEGIN
+	LPM ~opcode_target_197~
+END
+
 DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
-	LOCAL_SET projref = 0
-	PATCH_MATCH parameter2 WITH
-		1 2 3 4 5 101 102 187 283 284 285 286 287 288 289 290 291
-			BEGIN SET projref = 11971001 END // ~flèches~
-		6 7 8 9 10 292 293 294 295 296
-			BEGIN SET projref = 11971006 END // ~haches~
-		11 12 13 14 15 225 240 297 298 299 300 301 302 303
-			BEGIN SET projref = 11971011 END // ~carreaux~
-		16 17 18 19 20 263 304 305 306 307 308
-			BEGIN SET projref = 11971016 END // ~billes~
-		23
-			BEGIN SET projref = 11971023 END // ~orbes chromatiques~
-		26 27 28 29 30 309 310 311 312
-			BEGIN SET projref = 11971026 END // ~dagues~
-		31 32 33 34 35 244 313 314 315 316 317 318
-			BEGIN SET projref = 11971031 END // ~fléchettes~
-		36 67 68 69 70 71 72 73 74 75 76 77
-			BEGIN SET projref = 11971036 END // ~projectiles magiques~
-		39 80 81 82 83 84 85 86 87 88 89 90 91 206 212 442
-			BEGIN SET projref = 11971039 END // ~éclairs~
-		55 56 57 58 59
-			BEGIN SET projref = 11971055 END // ~lances~
-		64
-			BEGIN SET projref = 11971064 END // ~attaques de regard~
-		208
-			BEGIN SET projref = 11971208 END // ~rayons des spectateurs~
-		DEFAULT
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%parameter2%'~ END
-    END
+	LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
 
 	PATCH_IF projref > 0 BEGIN
 		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
@@ -5942,6 +5912,13 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_199~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 	SPRINT description @11990002 // ~de renvoyer les sorts de niveau %spellLevel%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_199_is_valid~ BEGIN
+	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter1%.~ END
+	END
 END
 
 /* -------------------------------------------------- *
@@ -9472,4 +9449,51 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 	CLEAR_ARRAY listOpcodes
 	// Nécessaire de remettre le numéro original pour les itérations suivantes
 	SET opcode = currentOpcode
+END
+
+
+// Comment trouver les correspondances sans checker tous les sorts ??
+
+// 94 : Instant area effect : Tremblement de terre (SPPR720), Zone de magie entropique (SPIN778), Terreur de l'Ecorcheur (SPIN807)
+// 205 : Instant area small => Repousser les morts-vivants (SPPR515), Invisibilité sur 3 mètre (SPWI307)
+// 229 : Nuée de météores SPWI911, Tempête de feu SPPR705
+// 231 : Icewind Glyph hit : aucune correspondance
+DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref BEGIN
+	SET projref = 0
+	PATCH_MATCH projectile WITH
+		1 2 3 4 5 101 102 187 283 284 285 286 287 288 289 290 291
+			BEGIN SET projref = 300001 END // ~flèches~
+		6 7 8 9 10 292 293 294 295 296
+			BEGIN SET projref = 300006 END // ~haches de jet~
+		11 12 13 14 15 225 240 297 298 299 300 301 302 303
+			BEGIN SET projref = 300011 END // ~carreaux~
+		16 17 18 19 20 263 304 305 306 307 308
+			BEGIN SET projref = 300016 END // ~billes~
+		23
+			BEGIN SET projref = 300023 END // ~orbes chromatiques~
+		26 27 28 29 30 309 310 311 312
+			BEGIN SET projref = 300026 END // ~dagues de jet~
+		31 32 33 34 35 244 313 314 315 316 317 318
+			BEGIN SET projref = 300031 END // ~fléchettes~
+		36 67 68 69 70 71 72 73 74 75 76 77
+			BEGIN SET projref = 300036 END // ~projectiles magiques~
+		39 80 81 82 83 84 85 86 87 88 89 90 91 206 212 219 442
+			BEGIN SET projref = 300039 END // ~éclairs~
+		55 56 57 58 59
+			BEGIN SET projref = 300055 END // ~lances de jet~
+		62 63 259 319
+			BEGIN SET projref = 300062 END // ~toiles d'araignées~
+		64 274
+			BEGIN SET projref = 300064 END // ~attaques de regard~
+		208
+			BEGIN SET projref = 300208 END // ~rayons des spectateurs~
+		218
+			BEGIN SET projref = 300219 END // ~désintégrations~
+		227
+			BEGIN SET projref = 300219 END // ~convocations d'insectes~
+		226 320
+			BEGIN SET projref = 0 END // Aucune correspondance connue
+		DEFAULT
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%projectile%'~ END
+	END
 END

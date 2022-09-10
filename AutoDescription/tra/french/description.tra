@@ -569,6 +569,28 @@
 @220037 = ~d'armes (3)~
 @220038 = ~d'armes (4)~
 
+
+/* ------------------------------ *
+ * Type de projectiles *
+ * ------------------------------ */
+
+@300001 = ~flèches~
+@300006 = ~haches de jet~
+@300011 = ~carreaux~
+@300016 = ~billes~
+@300023 = ~orbes chromatiques~
+@300026 = ~dagues de jet~
+@300031 = ~fléchettes~
+@300036 = ~projectiles magiques~
+@300039 = ~éclairs~
+@300055 = ~lances de jet~
+@300062 = ~toiles d'araignées~
+@300064 = ~attaques de regard~
+@300208 = ~rayons des spectateurs~
+@300219 = ~désintégrations~
+@300227 = ~convocations d'insectes~
+
+
 /* ------------------------------ *
  * Spécifiques à certains opcodes *
  * ------------------------------ */
@@ -1103,18 +1125,9 @@
 
 // Opcode 83: Protection: From Projectile [83]
 
-@10830001 = ~Immunité contre les flèches~
-@10830002 = ~Immunité contre les haches de jet~
-@10830003 = ~Immunité contre les attaques de regard~
-@10830004 = ~Immunité contre les carreaux~
-@10830005 = ~Immunité contre les billes~
-@10830006 = ~Immunité contre les dagues de jet~
-@10830007 = ~Immunité contre les flèchettes~
-@10830008 = ~Immunité contre les lances de jet~
-@10830009 = ~Immunité contre les missiles magiques~
-@10830010 = ~Immunité contre les flèches à flamme bleue~
-@10830011 = ~Immunité contre les éclairs~
-@10830012 = ~Immunité contre les toiles d'araignées~
+@10830001 = ~Immunité contre les %projectiles%~
+@10830002 = ~d'être immunisé contre les %projectiles%~
+
 
 // Opcode 84: Stat: Magical Fire Resistance Modifier [84]
 
@@ -1871,23 +1884,13 @@
 @11930001 = ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~
 @11930002 = ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~
 
+@11930011 = ~Empêche %theTarget% de pouvoir attaquer une créature cachée ou invisible~
+@11930012 = ~d'empêcher %theTarget% de pouvoir attaquer une créature cachée ou invisible~
+
 // Opcode 197: Spell: Bounce Projectile [197]
 
 @11970001 = ~Renvoie les %projectiles%~
 @11970002 = ~de renvoyer les %projectiles%~
-
-@11971001 = ~flèches~
-@11971006 = ~haches~
-@11971011 = ~carreaux~
-@11971016 = ~billes~
-@11971023 = ~orbes chromatiques~
-@11971026 = ~dagues~
-@11971031 = ~fléchettes~
-@11971036 = ~projectiles magiques~
-@11971039 = ~éclairs~
-@11971055 = ~lances~
-@11971064 = ~attaques de regard~
-@11971208 = ~rayons des spectateurs~
 
 // Opcode 199: Spell: Bounce (by Power Level) [199]
 
