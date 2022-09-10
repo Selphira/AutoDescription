@@ -3833,6 +3833,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_109_is_valid~ BEGIN
+	// Cas particulier propre à l'opcode 109, non valable pour les 175 et 185
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 BEGIN
 		SET parameter2 = 2
 		SET parameter1 = 0
@@ -5358,10 +5359,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_173_common~ BEGIN
 	// Sets the Poison Resistance of the target creature(s) to the value specified by 'Statistic Modifier'.
+	SET parameter1 = parameter1 BAND 255
 	SET parameter2 = is_ee ? MOD_TYPE_cumulative : MOD_TYPE_flat
 END
 
 DEFINE_PATCH_MACRO ~opcode_173_is_valid~ BEGIN
+	LOCAL_SET parameter1 = parameter1 BAND 255
 	PATCH_IF is_ee AND parameter1 == 0 BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
@@ -5388,7 +5391,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_175~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_175_is_valid~ BEGIN
-	LPM ~opcode_109_is_valid~
+	LPM ~opcode_idscheck_is_valid~
 END
 
 /* ---------------------------------- *
@@ -5668,23 +5671,23 @@ END
  * State: Hold (II) [185] *
  * ---------------------- */
  DEFINE_PATCH_MACRO ~opcode_self_185~ BEGIN
-	LPM ~opcode_self_109~
+	LPM ~opcode_self_175~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_185~ BEGIN
-	LPM ~opcode_self_probability_109~
+	LPM ~opcode_self_probability_175~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_185~ BEGIN
-	LPM ~opcode_target_109~
+	LPM ~opcode_target_175~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_185~ BEGIN
-	LPM ~opcode_target_probability_109~
+	LPM ~opcode_target_probability_175~
 END
 
 DEFINE_PATCH_MACRO ~opcode_185_is_valid~ BEGIN
-	LPM ~opcode_109_is_valid~
+	LPM ~opcode_175_is_valid~
 END
 
 /* ---------------------------------- *
@@ -8688,6 +8691,7 @@ DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET des
 	END
 END
 
+// TODO : MOD_TYPE_flat + parameter1 == 100 : immunité
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		PATCH_IF IS_AN_INT ~%value%~ BEGIN
