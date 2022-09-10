@@ -5793,19 +5793,30 @@ END
  * Stat: Attack Speed Factor [190] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
+	LPM ~opcode_190_common~
 	LPF ~opcode_mod~ INT_VAR strref = 11900001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_190~ BEGIN
+	LPM ~opcode_190_common~
 	LPF ~opcode_probability~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_190~ BEGIN
+	LPM ~opcode_190_common~
 	LPF ~opcode_target~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_190~ BEGIN
 	LPM ~opcode_self_probability_190~
+END
+
+DEFINE_PATCH_MACRO ~opcode_190_common~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	SET parameter1 = parameter1 BAND 255
+	SET parameter1 = parameter < 0? 0 : parameter1
+	SET parameter1 = parameter > 10? 10 : parameter1
+	SET parameter1 = 10 - parameter1
 END
 
 /* ----------------------------------- *
