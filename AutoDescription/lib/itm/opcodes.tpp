@@ -3535,27 +3535,39 @@ END
 // TODO: trouver une solution rapide pour l'affichage des protections
 // l'améliorer quand on s'ennuiera
 DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
-	LOCAL_SET cOpcode = parameter2
-	LOCAL_SET strref = 11010000 + cOpcode
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunité à xxx~
+	LOCAL_SET strref = 400000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11010001 // ~Immunité %opcodeStr%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
-	LOCAL_SET cOpcode = parameter2
-	LOCAL_SET strref = 11011000 + cOpcode
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~d'immuniser %theTarget% à xxx~
+	LOCAL_SET strref = 400000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11010003 // ~d'être immunisé %opcodeStr%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
-	LOCAL_SET cOpcode = parameter2
-	LOCAL_SET strref = 11012000 + cOpcode
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Immunise %theTarget% à xxx~
+	LOCAL_SET strref = 400000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11010002 // ~Immunise %theTarget% %opcodeStr%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
-	LPM ~opcode_self_probability_101~ // ~que %theTarget% résiste à xxx~
+	LOCAL_SET strref = 400000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11010004 // ~d'immuniser %theTarget% %opcodeStr%~
+	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_101_common~ BEGIN
+END
 // DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
 // 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
 // 		SET isValid = 0
@@ -4116,7 +4128,7 @@ END
 // Doute pour les non_ee : TODO: regroupement classique
 DEFINE_PATCH_MACRO ~opcode_120_group~ BEGIN
 	PATCH_IF is_ee BEGIN
-		SET maxEnchantment = 0-1
+		SET maxEnchantment = ~-1~
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 			PATCH_IF parameter2 == 0 AND parameter1 > maxEnchantment BEGIN
@@ -5131,11 +5143,19 @@ END
  * Spell Effect: Pause Target [165] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_165~ BEGIN
-	LPM ~opcode_self_45~
+	SPRINT description @11650001 // ~Combat mental~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_165~ BEGIN
-	LPM ~opcode_self_probability_45~
+	SPRINT description @11650003 // ~d'entrer dans un combat mental~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_165~ BEGIN
+	SPRINT description @11650002 // ~Combat mental %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_165~ BEGIN
+	SPRINT description @11650004 // ~de faire entrer %theTarget% dans un combat mental~
 END
 
 /* ------------------------------------- *
