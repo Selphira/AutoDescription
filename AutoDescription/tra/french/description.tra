@@ -598,7 +598,7 @@
 
 @400000 = ~à la modification de la classe d'armure~
 @400001 = ~à la modification de la vitesse d'attaque~
-@400002 = ~à la dissipation de le sommeil~
+@400002 = ~à la dissipation du sommeil~
 @400003 = ~à la folie du berserker~
 @400004 = ~à la dissipation de la folie du berserker~
 @400005 = ~aux charmes~
@@ -607,7 +607,7 @@
 @400008 = ~~ // Opcode visuel
 @400009 = ~~ // Opcode visuel
 @400010 = ~à la modification de la constitution~
-@400011 = ~à la dissipation les poisons~
+@400011 = ~à la dissipation des poisons~
 @400012 = ~aux dégâts supplémentaires~ // non-naturels ?
 @400013 = ~à la mort magique~
 @400014 = ~à la dissipation la congélation~
@@ -619,10 +619,10 @@
 @400020 = ~à l'invisibilité~
 @400021 = ~à la modification du score de connaissances~
 @400022 = ~à la modification de la chance~
-@400023 = ~à la modification du moral~
+@400023 = ~à la panique~ // modification du moral
 @400024 = ~à l'horreur~
 @400025 = ~aux poisons~
-@400026 = ~à la dissipationdes malédictions~
+@400026 = ~à la dissipation des malédictions~
 @400027 = ~à la modification de la résistance à l'acide~
 @400028 = ~à la modification de la résistance au froid~
 @400029 = ~à la modification de la résistance à l'électricité~
@@ -644,7 +644,7 @@
 @400045 = ~à l'étourdissement~
 @400046 = ~à la dissipation de l'étourdissement~
 @400047 = ~à la dissipation de l'invisibilité~
-@400048 = ~à la dissipation de le silence~
+@400048 = ~à la dissipation du silence~
 @400049 = ~à la modification de la sagesse~
 @400050 = ~~ // Opcode visuel
 @400051 = ~~ // Opcode visuel
@@ -667,7 +667,7 @@
 @400068 = ~à la désinvocation~ // pas assez clair
 @400069 = ~à la non-détection~
 @400070 = ~à la dissipation de la non-détection~
-@400071 = ~à la modification du sexe~
+@400071 = ~au changement de sexe~
 @400072 = ~à la modification des attributs~
 @400073 = ~à la modification des dégâts d'attaque~
 @400074 = ~à l'aveuglement~
@@ -675,7 +675,7 @@
 @400076 = ~à la débilité mentale~
 @400077 = ~à la dissipation de la débilité mentale~
 @400078 = ~aux maladies~ // par cohérence avec ~aux poisons~
-@400079 = ~à la dissipation des maladies et la débilité mentale~
+@400079 = ~à la dissipation des maladies et de la débilité mentale~
 @400080 = ~à la surdité~
 @400081 = ~à la dissipation de la surdité~
 @400082 = ~au changement de script~
@@ -689,7 +689,7 @@
 @400090 = ~à la modification du score de crochetage~
 @400091 = ~à la modification du score de détection des pièges~
 @400092 = ~à la modification du score de vol à la tire~
-@400093 = ~à la modification du score de fatigue~
+@400093 = ~à la fatigue~ // à la modification du score de fatigue
 @400094 = ~à la modification de l'ivresse~
 @400095 = ~à la modification du score de pistage~
 @400096 = ~à la modification du niveau~
@@ -702,7 +702,7 @@
 @400103 = ~~ // Opcode visuel
 @400104 = ~à la modification de l'expérience acquise~
 @400105 = ~à la modification de la quantité d'or possédée~
-@400106 = ~à la modification du score de rupture de moral~
+@400106 = ~~ // FIXME: Rupture de moral, à grouper avec Immunité à la panique qui peut se produire de deux façons : abaissement du moral ou hausse du niveau de rupture
 @400107 = ~~ // Opcode visuel
 @400108 = ~à la modification de la réputation~
 @400109 = ~à la paralysie~
@@ -767,8 +767,8 @@
 @400168 = ~à la dissipation des créatures invoquées~
 @400169 = ~~ // Opcode visuel
 @400170 = ~~ // Opcode visuel
-@400171 = ~à l'apprentissage de nouveaux sorts~
-@400172 = ~à l'oubli des sorts~
+@400171 = ~à l'apprentissage de sorts~
+@400172 = ~à l'oubli de sorts~
 @400173 = ~à la modification de la résistance aux poisons~
 @400174 = ~~ // Opcode sonore
 @400175 = ~à la paralysie~
@@ -844,10 +844,10 @@
 //@400245 = ~~ // TODO
 @400246 = ~aux bonus de la folie du berserker~
 @400247 = ~à la modification de l'état de la folie du berserker~
-@400248 = ~à la génération d'effet après une attaque de mêlée réussie~
-@400249 = ~à la génération d'effet après une attaque à distance réussie~
+@400248 = ~à la création d'effet après une attaque de mêlée~
+@400249 = ~à la création d'effet après une attaque à distance~
 @400250 = ~à la modification de dégâts de la Chance~
-@400251 = ~au remplacement du chant du barde~
+@400251 = ~au changement du chant de barde~
 @400252 = ~à la pose de pièges~
 @400253 = ~~ // Opcode visuel
 @400254 = ~~ // Opcode visuel
@@ -859,7 +859,7 @@
 //@400260 = ~~ // TODO
 @400261 = ~à la remémorisation des sorts~
 @400262 = ~à la modification du champ de vision~
-@400263 = ~à la modification du multiplicateur d'attaques sournoises~
+@400263 = ~à la modification du multiplicateur d'attaque sournoise~
 @400264 = ~à l'abandon de son équipement~
 @400265 = ~~ // Non pertinent
 @400266 = ~à la dissipation des protections contre un sort spécifique~
@@ -875,8 +875,8 @@
 @400276 = ~à la modification du score de détection des illusions~
 @400277 = ~à la modification du score de pose de pièges~
 @400278 = ~à la modification du TAC0~
-@400279 = ~au déblocage de l'utilisation des compétences actives~
-@400280 = ~à l'altération de la réalisation des hiatus entropiques~
+@400279 = ~au déblocage des compétences actives~
+@400280 = ~au changement de la réalisation des hiatus entropiques~ // -_-'
 @400281 = ~à la modification de la probabilité de réalisation des hiatus entropiques~
 @400282 = ~à la modification des caractéristiques~ // Pas clair : les effets modifiant les caractéristiques dans STATS.ids
 @400283 = ~aux effets maudits~
@@ -899,7 +899,7 @@
 @400300 = ~à la modification de la collision des personnages~
 @400301 = ~à la modification de la probabilité de porter un coup critique~
 @400302 = ~à la permission d'utiliser tous les objets~
-@400303 = ~à l'altération de la prise en compte du multiplicateur d'attaque sournoise~
+@400303 = ~au changement de la prise en compte du multiplicateur d'attaque sournoise~ // -_-"
 @400304 = ~~ // Non pertinent
 @400305 = ~à la modification du TAC0 de l'arme secondaire~
 @400306 = ~à la modification du TAC0 de l'arme principale~
@@ -2144,8 +2144,12 @@
 
 // Opcode 200: Spell: Bounce (by Power level, decrementing) [200]
 
-@12000001 = ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
-@12000002 = ~de renvoyer jusque %amount% sorts de niveau %spellLevel%~
+@12000001 = ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel%~
+@12000002 = ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
+@12000003 = ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12000004 = ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12000005 = ~Lance %spellName%~
+@12000006 = ~de lancer %spellName%~
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 

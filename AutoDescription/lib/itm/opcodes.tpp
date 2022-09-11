@@ -5950,18 +5950,50 @@ END
 /* -------------------------------------------------- *
  * Spell: Bounce (by Power level, decrementing) [200] *
  * -------------------------------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_200~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12000001 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	SET inc = 0
+	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_200~ BEGIN
+	SET inc = 1
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET spellLevel = parameter2
+	TEXT_SPRINT spellName ~~
+	SET strref = 12000001 + inc // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
 
-	SPRINT description @12000002 // ~de renvoyer jusque %amount% sorts de niveau %spellLevel%~
+	// TODO créer une méthode à part pour la rendre utilisable pour d'autres opcodes
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	END
+	ELSE BEGIN
+		SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+		PATCH_IF strLen < 8 BEGIN
+			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+		END
+	END
+
+	PATCH_IF parameter1 > 0 BEGIN
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			SET strref += 2 // ~Renvoie jusque %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+		END
+	END
+	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SET strref += 4 // ~Lance %spellName%~
+	END
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
+	PATCH_IF parameter1 > 0 AND (parameter2 < 0 OR parameter2 > 9) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
+	END
 END
 
 /* ---------------------------------------------------- *
