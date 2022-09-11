@@ -3040,21 +3040,23 @@ END
  * Protection: From Projectile [83] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_83~ BEGIN
-	LOCAL_SET strref = 10830001 // ~Protection contre les %projectiles%~
+	LOCAL_SET strref = 10830001 // ~Immunité contre les %projectiles%~
 	LPM ~opcode_83_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_83~ BEGIN
-	LPM ~opcode_self_83~
+	LOCAL_SET strref = 10830003 // ~Immunise %theTarget% contre les %projectiles%~
+	LPM ~opcode_83_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_83~ BEGIN
-	LOCAL_SET strref = 10830002 // ~d'être protégé contre les %projectiles%~
+	LOCAL_SET strref = 10830002 // ~d'être immunisé contre les %projectiles%~
 	LPM ~opcode_83_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
-	LPM ~opcode_self_probability_83~
+	LOCAL_SET strref = 10830004 // ~d'immuniser %theTarget% contre les %projectiles%~
+	LPM ~opcode_83_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
@@ -4111,22 +4113,19 @@ DEFINE_PATCH_MACRO ~opcode_120_common~ BEGIN
 END
 
 // regroupement des opcodes avec parameter2 == 0
+// Doute pour les non_ee : TODO: regroupement classique
 DEFINE_PATCH_MACRO ~opcode_120_group~ BEGIN
-	LOCAL_SET maxEnchantment = ~-1~
-	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
-		LPM ~data_to_vars~
-		PATCH_IF parameter2 == 0 AND parameter1 > maxEnchantment BEGIN
-			SET maxEnchantment = parameter1
-		END
-	END
-	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
-		LPM ~data_to_vars~
-		PATCH_IF parameter2 == 0 AND parameter1 <= maxEnchantment BEGIN
-			// Dans le cas où la protection maximale est présente en plusieurs exemplaires
-			PATCH_IF parameter1 == maxEnchantment BEGIN
-				SET maxEnchantment += 1
+	PATCH_IF is_ee BEGIN
+		SET maxEnchantment = 0-1
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter2 == 0 AND parameter1 > maxEnchantment BEGIN
+				SET maxEnchantment = parameter1
 			END
-			ELSE BEGIN
+		END
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter2 == 0 AND parameter1 < maxEnchantment BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~position = %position%~
@@ -5885,15 +5884,17 @@ DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
-	LOCAL_SET strref = 11970002 // ~de renvoyer les %projectiles%~
+	LOCAL_SET strref = 11970003 // ~de renvoyer les %projectiles%~
 	LPM ~opcode_197_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_197~ BEGIN
+	LOCAL_SET strref = 11970002 // ~Renvoie les %projectiles% visant %theTarget%~
 	LPM ~opcode_self_197~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_197~ BEGIN
+	LOCAL_SET strref = 11970004 // ~de renvoyer les %projectiles% visant %theTarget%~
 	LPM ~opcode_target_197~
 END
 

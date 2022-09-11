@@ -1128,6 +1128,8 @@ f
 
 @10830001 = ~Immunité contre les %projectiles%~
 @10830002 = ~d'être immunisé contre les %projectiles%~
+@10830003 = ~Immunise %theTarget% contre les %projectiles%~
+@10830004 = ~d'immuniser %theTarget% contre les %projectiles%~
 
 
 // Opcode 84: Stat: Magical Fire Resistance Modifier [84]
@@ -1891,7 +1893,9 @@ f
 // Opcode 197: Spell: Bounce Projectile [197]
 
 @11970001 = ~Renvoie les %projectiles%~
-@11970002 = ~de renvoyer les %projectiles%~
+@11970002 = ~Renvoie les %projectiles% visant %theTarget%~
+@11970003 = ~de renvoyer les %projectiles%~
+@11970004 = ~de renvoyer les %projectiles% visant %theTarget%~
 
 // Opcode 199: Spell: Bounce (by Power Level) [199]
 
