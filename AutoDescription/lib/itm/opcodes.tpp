@@ -524,7 +524,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
 	 63 => 1
 	 64 => 1
 	 65 => 1
-	 74 => 1 // Aveuglement, ne pas toucher
 	 75 => 1
 	 77 => 1
 	 79 => 1
@@ -2831,6 +2830,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_74~ BEGIN
 	LPM ~opcode_self_probability_74~ // ~d'aveugler %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_74_is_valid~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter 2 %parameter2% have strong impact on the duration.~ END
+	END
 END
 
 /* -------------------- *

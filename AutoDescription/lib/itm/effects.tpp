@@ -130,8 +130,8 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 	END
 	*/
 
-	PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
-		// SET isValid = 0
+	PATCH_IF is_ee == 0 AND VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Les 2 parametres doivent avoir la valeur 0~ END
 	END
 END
