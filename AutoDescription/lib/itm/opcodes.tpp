@@ -1318,10 +1318,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
 	LPM ~opcode_self_probability_17~
 END
 
-DEFINE_PATCH_MACRO ~opcode_party_17~ BEGIN
-	LPM ~opcode_self_17~
-END
-
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
 	// TODO
 	// Dissipe tous les effets non permanent_after_death puis la soigne
@@ -1963,11 +1959,6 @@ DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
-DEFINE_PATCH_MACRO ~opcode_party_33~ BEGIN
-	SET parameter2 = parameter2 MODULO 3
-	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la paralysie, la mort et les poisons~
-END
-
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	LPM ~opcode_modstat3_is_valid~
 	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
@@ -2003,11 +1994,6 @@ DEFINE_PATCH_MACRO ~opcode_target_34~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
-DEFINE_PATCH_MACRO ~opcode_party_34~ BEGIN
-	SET parameter2 = parameter2 MODULO 3
-	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
-END
-
 DEFINE_PATCH_MACRO ~opcode_34_is_valid~ BEGIN
 	LPM ~opcode_33_is_valid~
 END
@@ -2029,11 +2015,6 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_35~ BEGIN
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la pétrification et la métamorphose~
-END
-
-DEFINE_PATCH_MACRO ~opcode_party_35~ BEGIN
-	SET parameter2 = parameter2 MODULO 3
-	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre la pétrification et la métamorphose~
 END
 
 DEFINE_PATCH_MACRO ~opcode_35_is_valid~ BEGIN
@@ -2059,11 +2040,6 @@ DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les souffles~
 END
 
-DEFINE_PATCH_MACRO ~opcode_party_36~ BEGIN
-	SET parameter2 = parameter2 MODULO 3
-	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les souffles~
-END
-
 DEFINE_PATCH_MACRO ~opcode_36_is_valid~ BEGIN
 	LPM ~opcode_33_is_valid~
 END
@@ -2085,11 +2061,6 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_37~ BEGIN
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 target = 1 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
-END
-
-DEFINE_PATCH_MACRO ~opcode_party_37~ BEGIN
-	SET parameter2 = parameter2 MODULO 3
-	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les sorts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_37_is_valid~ BEGIN
@@ -6113,10 +6084,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
 	LPM ~opcode_self_probability_206~ // ~de résister au sort %spellName%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_party_206~ BEGIN
-	LPM ~opcode_target_206~
-END
-
 /* ----------------------------------- *
  * Spell: Bounce Specified Spell [207] *
  * ----------------------------------- */
@@ -8594,11 +8561,6 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_346~ BEGIN
 	LOCAL_SET strref = 13460010 + special
 	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
-END
-
-DEFINE_PATCH_MACRO ~opcode_party_346~ BEGIN
-	LOCAL_SET strref = 13460010 + special
-	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ group = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
 /* -------------------------------------------- *

@@ -55,7 +55,7 @@ BEGIN
 				END
 			END
 			ELSE PATCH_IF target == TARGET_FX_party BEGIN
-				SPRINT opcode_target ~_party~
+				SPRINT opcode_target ~_target~
 				PATCH_IF forceTarget == 0 BEGIN
 					SPRINT theTarget   @102473 // ~les membres du groupe~
 					SPRINT ofTheTarget @101088 // ~des membres du groupe~
