@@ -924,9 +924,11 @@ DEFINE_PATCH_MACRO ~opcode_6_group~ BEGIN
 	LOCAL_SET opcode = 6
 	LOCAL_SET newOpcode = 501
 
-	PATCH_DEFINE_ARRAY listOpcodes BEGIN 10 15 19 44 49 END
+	PATCH_IF enable_shrinkage AND shrink_abilities BEGIN
+		PATCH_DEFINE_ARRAY listOpcodes BEGIN 10 15 19 44 49 END
 
-	LPM ~group_opcode_with_same_parameters~
+		LPM ~group_opcode_with_same_parameters~
+	END
 END
 
 /* -------------------------------- *
@@ -1808,12 +1810,14 @@ DEFINE_PATCH_MACRO ~opcode_27_group~ BEGIN
 	LOCAL_SET opcode = 27
 	LOCAL_SET newOpcode = 503 // ~Résistance aux dégâts élémentaires~
 
-	LPM ~opcode_group_all_resistances~
+	PATCH_IF enable_shrinkage AND shrink_resistances BEGIN
+		LPM ~opcode_group_all_resistances~
 
-	PATCH_DEFINE_ARRAY listOpcodes BEGIN 28 29 30 END
+		PATCH_DEFINE_ARRAY listOpcodes BEGIN 28 29 30 END
 
-	SET opcode = 27
-	LPM ~group_opcode_with_same_parameters~
+		SET opcode = 27
+		LPM ~group_opcode_with_same_parameters~
+	END
 END
 
 /* ----------------------------------- *
@@ -1970,9 +1974,11 @@ DEFINE_PATCH_MACRO ~opcode_33_group~ BEGIN
 	LOCAL_SET opcode = 33
 	LOCAL_SET newOpcode = 325
 
-	PATCH_DEFINE_ARRAY listOpcodes BEGIN 34 35 36 37 END
+	PATCH_IF enable_shrinkage AND shrink_saves_throws BEGIN
+		PATCH_DEFINE_ARRAY listOpcodes BEGIN 34 35 36 37 END
 
-	LPM ~group_opcode_with_same_parameters~
+		LPM ~group_opcode_with_same_parameters~
+	END
 END
 
 /* ---------------------------------- *
@@ -2526,9 +2532,11 @@ DEFINE_PATCH_MACRO ~opcode_59_group~ BEGIN
 	LOCAL_SET newOpcode = 500
 	LOCAL_SET opcode = 59
 
-	PATCH_DEFINE_ARRAY listOpcodes BEGIN 90 91 92 275 276 277 END
+	PATCH_IF enable_shrinkage AND shrink_thief_skills BEGIN
+		PATCH_DEFINE_ARRAY listOpcodes BEGIN 90 91 92 275 276 277 END
 
-	LPM ~group_opcode_with_same_parameters~
+		LPM ~group_opcode_with_same_parameters~
+	END
 END
 
 /* ------------------------ *
@@ -3136,12 +3144,14 @@ DEFINE_PATCH_MACRO ~opcode_86_group~ BEGIN
 	LOCAL_SET opcode = 86
 	LOCAL_SET newOpcode = 504 // ~Résistance aux dégâts physiques~
 
-	LPM ~opcode_group_all_resistances~
+	PATCH_IF enable_shrinkage AND shrink_resistances BEGIN
+		LPM ~opcode_group_all_resistances~
 
-	PATCH_DEFINE_ARRAY listOpcodes BEGIN 87 88 89 END
+		PATCH_DEFINE_ARRAY listOpcodes BEGIN 87 88 89 END
 
-	SET opcode = 86
-	LPM ~group_opcode_with_same_parameters~
+		SET opcode = 86
+		LPM ~group_opcode_with_same_parameters~
+	END
 END
 
 /* --------------------------------------- *
