@@ -2153,10 +2153,12 @@
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
-@12010001 = ~Absorbe 1 sort de niveau %spellLevel%~
-@12010002 = ~Absorbe %amount% sorts de niveau %spellLevel%~
-@12010003 = ~d'absorber 1 sort de niveau %spellLevel%~
-@12010004 = ~d'absorber %amount% sorts de niveau %spellLevel%~
+@12000001 = ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel%~
+@12000002 = ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel%~
+@12000003 = ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12000004 = ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12010005 = ~Lance %spellName%~
+@12010006 = ~de lancer %spellName%~
 
 // Opcode 202: Spell: Bounce (by School) [202]
 

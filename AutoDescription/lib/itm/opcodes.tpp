@@ -5952,12 +5952,12 @@ END
  * -------------------------------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_200~ BEGIN
-	SET inc = 0
+	SET strref = 12000001 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_200~ BEGIN
-	SET inc = 1
+	SET strref = 12000002 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
 	LPM ~opcode_200_common~
 END
 
@@ -5965,16 +5965,17 @@ DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET spellLevel = parameter2
 	TEXT_SPRINT spellName ~~
-	SET strref = 12000001 + inc // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
 
 	// TODO créer une méthode à part pour la rendre utilisable pour d'autres opcodes
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	END
-	ELSE BEGIN
-		SET strLen = STRING_LENGTH ~%SOURCE_RES%~
-		PATCH_IF strLen < 8 BEGIN
-			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+	PATCH_IF is_ee BEGIN
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		END
+		ELSE BEGIN
+			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+			PATCH_IF strLen < 8 BEGIN
+				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+			END
 		END
 	END
 
@@ -5994,33 +5995,27 @@ DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
 	END
+	ELSE PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+	END
 END
 
 /* ---------------------------------------------------- *
  * Spell: Immunity (by Power Level, decrementing) [201] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_201~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12010001 // ~Absorbe 1 sort de niveau %spellLevel%~
-	END
-	ELSE BEGIN
-		SPRINT description @12010002 // ~Absorbe %amount% sorts de niveau %spellLevel%~
-	END
+	SET strref = 12010001 // ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel%~
+	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_201~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12010003 // ~d'absorber 1 sort de niveau %spellLevel%~
-	END
-	ELSE BEGIN
-		SPRINT description @12010004 // ~d'absorber %amount% sorts de niveau %spellLevel%~
-	END
+	SET strref = 12010002 // ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel%~
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_201_is_valid~ BEGIN
+	LPM ~opcode_200_is_valid~
 END
 
 /* ------------------------------- *
