@@ -210,6 +210,26 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~has_opcode~
+	INT_VAR
+		opcode = 0
+	STR_VAR
+		expression = ~~
+	RET
+		hasOpcode
+BEGIN
+	SET hasOpcode = 0
+	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
+	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+	        LPM ~data_to_vars~
+	        LPF evaluate_expression STR_VAR expression RET value END
+	        PATCH_IF value == 1 BEGIN
+	            SET hasOpcode = 1
+	        END
+	    END
+	END
+END
+
 DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	PATCH_IF NOT VARIABLE_IS_SET $opcodes(~%opcode%~) BEGIN
 		SET $opcodes(~%opcode%~) = 1

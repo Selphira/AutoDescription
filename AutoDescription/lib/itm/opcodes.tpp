@@ -4689,7 +4689,9 @@ END
  * Spell: Disable Spell Casting Abilities [145] *
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
-	PATCH_IF parameter2 == 0 BEGIN SPRINT description @11450001 END // ~Empêche %theTarget% de lancer des sorts profanes~
+	PATCH_IF parameter2 == 0 AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND isRobe)) BEGIN
+		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts profanes~
+	END
 	PATCH_IF parameter2 == 1 BEGIN SPRINT description @11450002 END // ~Empêche %theTarget% de lancer des sorts divins~
 	PATCH_IF parameter2 == 2 BEGIN SPRINT description @11450003 END // ~Empêche %theTarget% de lancer des sorts innés~
 	PATCH_IF parameter2 == 3 BEGIN SPRINT description @11450004 END // ~Empêche %theTarget% de lancer des sorts magiques~

@@ -48,6 +48,8 @@ BEGIN
 	// On supprime la description technique de la description originale
 	LPF ~removeTechnicalDescription~ STR_VAR description = EVAL ~%originalDescription%~ RET description END
 	LPF ~is_weapon~ INT_VAR itemType RET isWeapon END
+	LPF ~is_armor~ INT_VAR itemType RET isArmor END
+	LPF ~is_robe~ INT_VAR itemType RET isRobe END
 
 	LPF ~add_equipped_abilities~ STR_VAR description RET description END
 	LPF ~add_charged_abilities~ STR_VAR description RET description END
@@ -79,6 +81,31 @@ BEGIN
 	SET isWeapon = 0
 	PATCH_IF itemType > 0xe AND itemType < 0x1f BEGIN
 		SET isWeapon = 1
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~is_armor~
+	INT_VAR
+		itemType = 0
+	RET
+		isArmor
+BEGIN
+	SET isArmor = 0
+	PATCH_IF itemType == ITM_TYPE_armor BEGIN
+		SET isArmor = 1
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~is_robe~
+	INT_VAR
+		itemType = 0
+	RET
+		isRobe
+BEGIN
+	READ_ASCII ITM_animation animation (2)
+	SET isRobe = 0
+	PATCH_IF ~%animation%~ STRING_EQUAL ~2W~ OR ~%animation%~ STRING_EQUAL ~3W~ OR ~%animation%~ STRING_EQUAL ~4W~ BEGIN
+		SET isRobe = 1
 	END
 END
 
