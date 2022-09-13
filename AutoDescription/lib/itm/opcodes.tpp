@@ -3623,9 +3623,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_101_common~ BEGIN
-END
-
 DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 	// TODO: d'abord checker la présence de la protection contre les sorts avant d'activer l'immunité éventuelle
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -6246,6 +6243,54 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_206~ BEGIN
 	LPM ~opcode_self_probability_206~ // ~de résister au sort %spellName%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
+	// Immunité contre capacité psionique
+	// Pas d'opcode spécifique qui peut aider à déterminer ce cas
+	// TODO: vérifier que les durées et les JS correspondent
+	LOCAL_SET searchOpcode = 171
+	LOCAL_SET nbFound = 0
+	PATCH_DEFINE_ARRAY psionicCapacities BEGIN 
+		"SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975"
+	END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		FOR (i = 0 ; i < 10 ; ++i ) BEGIN
+			PATCH_IF $psionicCapacities(~%i%~) STRING_EQUAL_CASE ~%resref%~ BEGIN
+				SET nbFound += 1
+				PATCH_IF nbFound == 5 BEGIN
+					SET opcode = 101
+					SET parameter2 = 505
+					LPM ~add_opcode~
+				END
+			END
+		END
+	END
+	SET opcode = 206
+	// Solution : possède la protection contre plus de 2 capacités psioniques
+	PATCH_IF nbFound >= 5 BEGIN
+		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+			// Affichage warning car sort non trouvé
+			LPF ~get_opcode_position~
+				INT_VAR opcode
+				STR_VAR expression = ~resref = %resref%~
+				RET position
+			END
+			PATCH_IF position == ~-1~ BEGIN
+				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre capacite psionique detectee : Opcode 206 avec %resref% non trouve.~ END
+			END
+		END
+		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+			LPF ~delete_opcode~ 
+				INT_VAR opcode
+				STR_VAR expression = ~resref = %resref%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+		END
+	END
 END
 
 /* ----------------------------------- *
@@ -8886,6 +8931,14 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_504~ BEGIN
 	LPM ~opcode_self_probability_504~
 END
 
+/* ------------------------------------------- *
+ * Stat: Immunité aux capacités psioniques [505] *
+ * ------------------------------------------- */
+
+// Opcode vide, utilisé en couple avec l'opcode 101
+
+
+
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
 	LOCAL_SET newOpcode = 502 // ~Résistance aux dégâts~
@@ -9097,6 +9150,9 @@ END
  * ----------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
+	PATCH_IF value > 127 BEGIN
+		SET value -= 256
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
@@ -9127,6 +9183,9 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
+	PATCH_IF value > 127 BEGIN
+		SET value -= 256
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
@@ -9164,6 +9223,9 @@ END
  * --------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
+	PATCH_IF value > 127 BEGIN
+		SET value -= 256
+	END
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
