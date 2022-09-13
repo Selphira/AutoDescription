@@ -113,6 +113,10 @@
 @102545 = ~de passer à %value% %theStatistic% %ofTheTarget%~
 @102546 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~
 
+@102547 = ~Immunité %resistName%~
+@102548 = ~d'immuniser %resistName%~
+@102549 = ~d'immuniser %theTarget% %resistName%~
+
 // Les différentes cibles
 @102471 = ~la cible~
 @102472 = ~le porteur~
@@ -619,9 +623,9 @@
 @400020 = ~à l'invisibilité~
 @400021 = ~à la modification du score de connaissances~
 @400022 = ~à la modification de la chance~
-@400023 = ~à la panique~ // modification du moral
+@400023 = ~à la modification du moral~
 @400024 = ~à l'horreur~
-@400025 = ~aux poisons~
+@400025 = ~à l'empoisonnement~ // l'immunité aux poisons étant une résistance de 100% au poison
 @400026 = ~à la dissipation des malédictions~
 @400027 = ~à la modification de la résistance à l'acide~
 @400028 = ~à la modification de la résistance au froid~
@@ -674,7 +678,7 @@
 @400075 = ~à la dissipation de l'aveuglement~
 @400076 = ~à la débilité mentale~
 @400077 = ~à la dissipation de la débilité mentale~
-@400078 = ~aux maladies~ // par cohérence avec ~aux poisons~
+@400078 = ~à la maladie~
 @400079 = ~à la dissipation des maladies et de la débilité mentale~
 @400080 = ~à la surdité~
 @400081 = ~à la dissipation de la surdité~
@@ -690,7 +694,7 @@
 @400091 = ~à la modification du score de détection des pièges~
 @400092 = ~à la modification du score de vol à la tire~
 @400093 = ~à la fatigue~ // à la modification du score de fatigue
-@400094 = ~à la modification de l'ivresse~
+@400094 = ~à la modification du score d'ivresse~
 @400095 = ~à la modification du score de pistage~
 @400096 = ~à la modification du niveau~
 @400097 = ~à la modification de la force exceptionnelle~
@@ -727,13 +731,13 @@
 @400128 = ~à la confusion~
 @400129 = ~à l'Aide~
 @400130 = ~à la Bénédiction~
-@400131 = ~aux chants alliés~
+@400131 = ~aux cantiques alliés~
 @400132 = ~à la Puissance sacrée~
 @400133 = ~à la Chance~
 @400134 = ~à la pétrification~
 @400135 = ~à la polymorphie~
 @400136 = ~aux effets rendant partiellement visible~
-@400137 = ~aux chants adverses~
+@400137 = ~aux cantiques adverses~
 @400138 = ~~ // Opcode visuel
 @400139 = ~~ // Opcode textuel
 @400140 = ~~ // Opcode visuel
@@ -750,7 +754,7 @@
 @400151 = ~au remplacement de créature~
 @400152 = ~~ // Opcode visuel
 @400153 = ~au sanctuaire~
-@400154 = ~~ // Opcode visuel
+@400154 = ~à l'enchevêtrement~
 @400155 = ~~ // Opcode visuel
 @400156 = ~~ // Opcode visuel
 @400157 = ~aux toiles~
@@ -805,10 +809,10 @@
 @400206 = ~à la protection contre un sort spécifique~
 @400207 = ~au renvoi de sort spécifique~
 @400208 = ~à la modification du nombre de points de vie minimum~
-@400209 = ~à la mort magique~ //  Limité au Doigt de mort
-@400210 = ~à l'étourdissement~ //  Limité au Mot de pouvoir : Étoudissement
+@400209 = ~à la mort magique~ // Limité au Doigt de mort
+@400210 = ~à l'étourdissement~ // Limité au Mot de pouvoir : Étoudissement
 @400211 = ~à l'emprisonnement~
-@400212 = ~à la liberté~
+@400212 = ~~ // Non fonctionnel
 @400213 = ~au labyrinthe~
 @400214 = ~à la génération de sorts multiple~
 @400215 = ~~ // Opcode visuel
@@ -1159,22 +1163,27 @@
 // Opcode 27: Stat: Acid Resistance Modifier [27]
 
 @10270001 = ~Résistance à l'acide~
+@10270002 = ~à l'acide~
 
 // Opcode 28: Stat: Cold Resistance Modifier [28]
 
 @10280001 = ~Résistance au froid~
+@10280002 = ~au froid~
 
 // Opcode 29: Stat: Electricity Resistance Modifier [29]
 
 @10290001 = ~Résistance à l'électricité~
+@10290002 = ~à l'électricité~
 
 // Opcode 30: Stat: Fire Resistance Modifier [30]
 
 @10300001 = ~Résistance au feu~
+@10300002 = ~au feu~
 
 // Opcode 31: Stat: Magic Damage Resistance Modifier [31]
 
 @10310001 = ~Résistance aux dégâts magiques~
+@10310002 = ~aux dégâts magiques~
 
 // Opcode 32: Cure: Death (Raise Dead) [32]
 
@@ -1489,26 +1498,32 @@
 // Opcode 84: Stat: Magical Fire Resistance Modifier [84]
 
 @10840001 = ~Résistance aux dégâts de feu magiques~
+@10840002 = ~aux dégâts de feu magiques~
 
 // Opcode 85: Stat: Magical Cold Resistance Modifier [85]
 
 @10850001 = ~Résistance aux dégâts de froid magiques~
+@10850002 = ~aux dégâts de froid magiques~
 
 // Opcode 86: Stat: Slashing Resistance Modifier [86]
 
 @10860001 = ~Résistance aux dégâts tranchants~
+@10860002 = ~aux dégâts tranchants~
 
 // Opcode 87: Stat: Crushing Resistance Modifier [87]
 
 @10870001 = ~Résistance aux dégâts contondants~
+@10870002 = ~aux dégâts contondants~
 
 // Opcode 88: Stat: Piercing Resistance Modifier [88]
 
 @10880001 = ~Résistance aux dégâts perforants~
+@10880002 = ~aux dégâts perforants~
 
 // Opcode 89: Stat: Missiles Resistance Modifier [89]
 
 @10890001 = ~Résistance aux dégâts de projectiles~
+@10890002 = ~aux dégâts de projectiles~
 
 // Opcode 90: Stat: Open Locks Modifier [90]
 
@@ -1639,7 +1654,7 @@
 @11060001 = ~Le moral %ofTheTarget% reste au plus haut~
 @11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
 @11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
-@11060004 = ~Immunité contre la rupture de moral~
+@11060004 = ~Immunité à la panique~
 @11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~
 
 @11060006 = ~de garder le moral %ofTheTarget% au plus haut~
@@ -1988,6 +2003,7 @@
 // Opcode 166: Stat: Magic Resistance Modifier [166]
 
 @11660001 = ~Résistance à la magie~
+@11660002 = ~à la magie~
 
 // Opcode 167: Stat: THAC0 Modifier with Missile Weapons [167]
 
@@ -2009,6 +2025,7 @@
 // Opcode 173: Stat: Poison Resistance Modifier [173]
 
 @11730001 = ~Résistance aux poisons~
+@11730002 = ~aux poisons~
 
 // Opcode 177: Use EFF File [177]
 
@@ -3073,14 +3090,17 @@
 // Fake Opcode 502: Stat: Résistance aux dégâts [502]
 
 @15020001 = ~Résistance aux dégâts~
+@15020002 = ~aux dégâts~
 
 // Fake Opcode 503: Stat: Résistance aux dégâts élémentaires~ [503]
 
 @15030001 = ~Résistance aux dégâts élémentaires~
+@15030002 = ~aux dégâts élémentaires~
 
 // Fake Opcode 504: Stat: Résistance aux dégâts physiques~ [504]
 
 @15040001 = ~Résistance aux dégâts physiques~
+@15040002 = ~aux dégâts physiques~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

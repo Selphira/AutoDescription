@@ -1607,7 +1607,7 @@ DEFINE_PATCH_MACRO ~opcode_self_23~ BEGIN
 	LPM ~opcode_23_common~
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
-		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+		SPRINT description @10230003 // ~Rétabli le moral %ofTheTarget%~
 	END
 	ELSE BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 10230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
@@ -1618,7 +1618,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_23~ BEGIN
 	LPM ~opcode_23_common~
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
-		SPRINT description @10230004 // ~de garder le moral %ofTheTarget% au plus haut~
+		SPRINT description @10230004 // ~de rétablir le moral %ofTheTarget%~
 	END
 	ELSE BEGIN
 		LPF ~opcode_probability~ INT_VAR strref = 10230002 RET description END // ~le moral~
@@ -1644,6 +1644,84 @@ DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
 		//TODO: Pour ce cas, plutot avoir une phrase du genre: Le moral est à son maximum
 		SET parameter1 = 10
 		SET parameter2 = MOD_TYPE_flat
+	END
+
+	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
+		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+	END
+	ELSE BEGIN
+		LPF ~opcode_target~ INT_VAR strref = 10230002 RET description END // ~le moral~
+	END
+
+END
+
+DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
+	// Groupement Reset moral + Immunité contre la modification du moral +
+	// Immunité contre la modification du niveau de rupture de moral
+	LOCAL_SET searchOpcode = 101
+	LOCAL_SET found = 0b0
+	LOCAL_SET groupDuration = 0
+	LOCAL_SET position23 = 0
+	LOCAL_SET position106 = 0
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET currentPosition = position
+		PATCH_IF NOT is_ee OR special == 0 OR (parameter1 == 10 AND parameter2 == MOD_TYPE_flat) BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%searchOpcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				SET opcode = searchOpcode
+				PATCH_IF parameter2 == 23 AND (groupDuration == 0 OR groupDuration == duration) BEGIN
+					SET found |= 0b01
+					SET groupDuration = duration
+					SET position23 = position
+				END
+				ELSE PATCH_IF parameter2 == 106 AND (groupDuration == 0 OR groupDuration == duration) BEGIN
+					SET found |= 0b10
+					SET groupDuration = duration
+					SET position106 = position
+				END
+				PATCH_IF found == 0b11 BEGIN
+					SET found = 0b111 // ~ nouvelle entrée impossible
+
+					SET opcode = searchOpcode
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~parameter2 = 23 AND position = %position23%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~parameter2 = 106 AND duration = %position106%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+
+					SET opcode = 106
+					// rajout de l'effet d'immunité à la panique
+					SET parameter1 = 0
+					SET parameter2 = MOD_TYPE_flat
+					LPM ~add_opcode~
+
+					// retrait bonus : rupture de moral fixée à 1 (non nécessaire au groupe mais redondant)
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~parameter2 = 1 AND parameter1 = 1~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+					
+					// retrait de l'opcode actuel
+					SET opcode = 23
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~position = %currentPosition%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+			END
+		END
 	END
 END
 
@@ -1788,16 +1866,17 @@ END
  * Stat: Acid Resistance Modifier [27] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_27~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10270001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'acide~
+	SET resistName = 10270001 // ~Résistance à l'acide~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_27~ BEGIN
-	LOCAL_SPRINT resistName @10270001 // ~Résistance à l'acide~
+	SET resistName = 10270001 // ~Résistance à l'acide~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_27~ BEGIN
-	LOCAL_SPRINT resistName @10270001 // ~Résistance à l'acide~
+	SET resistName = 10270001 // ~Résistance à l'acide~
 	LPM ~opcode_target_resist~
 END
 
@@ -1825,16 +1904,17 @@ END
  * Stat: Cold Resistance Modifier [28] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_28~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10280001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au froid~
+	SET resistName = 10280001 // ~Résistance au froid~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_28~ BEGIN
-	LOCAL_SPRINT resistName @10280001 // ~Résistance au froid~
+	SET resistName = 10280001 // ~Résistance au froid~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_28~ BEGIN
-	LOCAL_SPRINT resistName @10280001 // ~Résistance au froid~
+	SET resistName = 10280001 // ~Résistance au froid~
 	LPM ~opcode_target_resist~
 END
 
@@ -1850,16 +1930,17 @@ END
  * Stat: Electricity Resistance Modifier [29] *
  * ------------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_29~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10290001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à l'électricité~
+	SET resistName = 10290001 // ~Résistance à l'électricité~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_29~ BEGIN
-	LOCAL_SPRINT resistName @10290001 // ~Résistance à l'électricité~
+	SET resistName = 10290001 // ~Résistance à l'électricité~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_29~ BEGIN
-	LOCAL_SPRINT resistName @10290001 // ~Résistance à l'électricité~
+	SET resistName = 10290001 // ~Résistance à l'électricité~
 	LPM ~opcode_target_resist~
 END
 
@@ -1875,16 +1956,17 @@ END
  * Stat: Fire Resistance Modifier [30] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_30~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10300001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance au feu~
+	SET resistName = 10300001 // ~Résistance au feu~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_30~ BEGIN
-	LOCAL_SPRINT resistName @10300001 // ~Résistance au feu~
+	SET resistName = 10300001 // ~Résistance au feu~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_30~ BEGIN
-	LOCAL_SPRINT resistName @10300001 // ~Résistance au feu~
+	SET resistName = 10300001 // ~Résistance au feu~
 	LPM ~opcode_target_resist~
 END
 
@@ -1899,17 +1981,18 @@ END
 /* ------------------------------------------- *
  * Stat: Magic Damage Resistance Modifier [31] *
  * ------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_31~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10310001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts magiques~
+ DEFINE_PATCH_MACRO ~opcode_self_31~ BEGIN
+	SET resistName = 10310001 // ~Résistance aux dégâts magiques~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_31~ BEGIN
-	LOCAL_SPRINT resistName @10310001 // ~Résistance aux dégâts magiques~
+	SET resistName = 10310001 // ~Résistance aux dégâts magiques~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_31~ BEGIN
-	LOCAL_SPRINT resistName @10310001 // ~Résistance aux dégâts magiques~
+	SET resistName = 10310001 // ~Résistance aux dégâts magiques~
 	LPM ~opcode_target_resist~
 END
 
@@ -2805,7 +2888,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_74_is_valid~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter 2 %parameter2% have strong impact on the duration.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter2 %parameter2% have strong impact on the duration.~ END
 	END
 END
 
@@ -3039,21 +3122,21 @@ DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
 	END
 END
 
-
 /* ------------------------------------------- *
  * Stat: Magical Fire Resistance Modifier [84] *
  * ------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_84~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10840001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts de feu magiques~
+	SET resistName = 10840001 // ~Résistance aux dégâts de feu magiques~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_84~ BEGIN
-	LOCAL_SPRINT resistName @10840001 // ~Résistance aux dégâts de feu magiques~
+	SET resistName = 10840001 // ~Résistance aux dégâts de feu magiques~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_84~ BEGIN
-	LOCAL_SPRINT resistName @10840001 // ~Résistance aux dégâts de feu magiques~
+	SET resistName = 10840001 // ~Résistance aux dégâts de feu magiques~
 	LPM ~opcode_target_resist~
 END
 
@@ -3069,16 +3152,17 @@ END
  * Stat: Magical Cold Resistance Modifier [85] *
  * ------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_85~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10850001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts de froid magiques~
+	SET resistName = 10850001 // ~Résistance aux dégâts de froid magiques~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_85~ BEGIN
-	LOCAL_SPRINT resistName @10850001 // ~Résistance aux dégâts de froid magiques~
+	SET resistName = 10850001 // ~Résistance aux dégâts de froid magiques~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_85~ BEGIN
-	LOCAL_SPRINT resistName @10850001 // ~Résistance aux dégâts de froid magiques~
+	SET resistName = 10850001 // ~Résistance aux dégâts de froid magiques~
 	LPM ~opcode_target_resist~
 END
 
@@ -3094,16 +3178,17 @@ END
  * Stat: Slashing Resistance Modifier [86] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_86~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10860001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts tranchants~
+	SET resistName = 10860001 // ~Résistance aux dégâts tranchants~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_86~ BEGIN
-	LOCAL_SPRINT resistName @10860001 // ~Résistance aux dégâts tranchants~
-	LPM ~opcode_probability_resist~
+	SET resistName = 10860001 // ~Résistance aux dégâts tranchants~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_86~ BEGIN
-	LOCAL_SPRINT resistName @10860001 // ~Résistance aux dégâts tranchants~
+	SET resistName = 10860001 // ~Résistance aux dégâts tranchants~
 	LPM ~opcode_target_resist~
 END
 
@@ -3131,16 +3216,17 @@ END
  * Stat: Crushing Resistance Modifier [87] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_87~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10870001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts contondants~
+	SET resistName = 10870001 // ~Résistance aux dégâts contondants~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_87~ BEGIN
-	LOCAL_SPRINT resistName @10870001 // ~Résistance aux dégâts contondants~
+	SET resistName = 10870001 // ~Résistance aux dégâts contondants~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_87~ BEGIN
-	LOCAL_SPRINT resistName @10870001 // ~Résistance aux dégâts contondants~
+	SET resistName = 10870001 // ~Résistance aux dégâts contondants~
 	LPM ~opcode_target_resist~
 END
 
@@ -3156,16 +3242,17 @@ END
  * Stat: Piercing Resistance Modifier [88] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_88~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10880001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts perforants~
+	SET resistName = 10880001 // ~Résistance aux dégâts perforants~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_88~ BEGIN
-	LOCAL_SPRINT resistName @10880001 // ~Résistance aux dégâts perforants~
+	SET resistName = 10880001 // ~Résistance aux dégâts perforants~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_88~ BEGIN
-	LOCAL_SPRINT resistName @10880001 // ~Résistance aux dégâts perforants~
+	SET resistName = 10880001 // ~Résistance aux dégâts perforants~
 	LPM ~opcode_target_resist~
 END
 
@@ -3181,16 +3268,17 @@ END
  * Stat: Missiles Resistance Modifier [89] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_89~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10890001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts de projectiles~
+	SET resistName = 10890001 // ~Résistance aux dégâts de projectiles~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_89~ BEGIN
-	LOCAL_SPRINT resistName @10890001 // ~Résistance aux dégâts de projectiles~
+	SET resistName = 10890001 // ~Résistance aux dégâts de projectiles~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_89~ BEGIN
-	LOCAL_SPRINT resistName @10890001 // ~Résistance aux dégâts de projectiles~
+	SET resistName = 10890001 // ~Résistance aux dégâts de projectiles~
 	LPM ~opcode_target_resist~
 END
 
@@ -3503,8 +3591,6 @@ END
 /* ----------------------------- *
  * Protection: from Opcode [101] *
  * ----------------------------- */
-// TODO: trouver une solution rapide pour l'affichage des protections
-// l'améliorer quand on s'ennuiera
 DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
 	LOCAL_SET strref = 400000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
@@ -3539,6 +3625,83 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_101_common~ BEGIN
 END
+
+DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
+	// TODO: d'abord checker la présence de la protection contre les sorts avant d'activer l'immunité éventuelle
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == 40 BEGIN // Lenteur
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
+				// Aucun retrait
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET position
+				END
+				PATCH_IF position == ~-1~ BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre la lenteur detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				END
+			END
+
+			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+		ELSE PATCH_IF parameter2 == 16 BEGIN // Hâte
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
+				// Aucun retrait
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET position
+				END
+				PATCH_IF position == ~-1~ BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre la hate detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				END
+			END
+
+			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+		ELSE PATCH_IF parameter2 == 154 BEGIN // Enchevêtrement
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
+				// Aucun retrait
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET position
+				END
+				PATCH_IF position == ~-1~ BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre l'enchevetrement detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+	END
+	SET opcode = 101
+END
+
 // DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
 // 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
 // 		SET isValid = 0
@@ -3648,7 +3811,7 @@ END
  * Stat: Morale Break Modifier [106] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
-	SET ignoreDuration = 1
+	// SET ignoreDuration = 1
 	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		PATCH_IF parameter1 < 0 BEGIN
 			SET parameter1 = 0
@@ -3678,7 +3841,7 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
-	SET ignoreDuration = 1
+	// SET ignoreDuration = 1
 	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 <= 1 BEGIN
 		PATCH_IF parameter1 < 0 BEGIN
 			SET parameter1 = 0
@@ -5133,16 +5296,17 @@ END
  * Stat: Magic Resistance Modifier [166] *
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_166~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 11660001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance à la magie~
+	SET resistName = 11660001 // ~Résistance à la magie~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_166~ BEGIN
-	LOCAL_SPRINT resistName @11660001 // ~Résistance à la magie~
+	SET resistName = 11660001 // ~Résistance à la magie~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_166~ BEGIN
-	LOCAL_SPRINT resistName @11660001 // ~Résistance à la magie~
+	SET resistName = 11660001 // ~Résistance à la magie~
 	LPM ~opcode_target_resist~
 END
 
@@ -5315,18 +5479,19 @@ END
  * Stat: Poison Resistance Modifier [173] *
  * -------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_173~ BEGIN
+	SET resistName = 11730001 // ~Résistance aux poisons~
 	LPM ~opcode_173_common~
-	LPF ~opcode_mod_percent~ INT_VAR strref = 11730001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux poisons~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_173~ BEGIN
-	LOCAL_SPRINT resistName @11730001 // ~Résistance aux poisons~
+	SET resistName = 11730001 // ~Résistance aux poisons~
 	LPM ~opcode_173_common~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_173~ BEGIN
-	LOCAL_SPRINT resistName @11730001 // ~Résistance aux poisons~
+	SET resistName = 11730001 // ~Résistance aux poisons~
 	LPM ~opcode_173_common~
 	LPM ~opcode_target_resist~
 END
@@ -5337,7 +5502,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_173_common~ BEGIN
 	// Sets the Poison Resistance of the target creature(s) to the value specified by 'Statistic Modifier'.
-	SET parameter1 = parameter1 BAND 255
 	SET parameter2 = is_ee ? MOD_TYPE_cumulative : MOD_TYPE_flat
 END
 
@@ -5945,7 +6109,7 @@ DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 		ELSE BEGIN
 			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
 			PATCH_IF strLen < 8 BEGIN
-				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+				// LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
 			END
 		END
 	END
@@ -8150,6 +8314,7 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 	ELSE BEGIN
 		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
 		LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
+		TO_LOWER resref
 
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 2
@@ -8162,8 +8327,9 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% sur %theTarget%~
 		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no names of spells or items found~ END
+		// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
+		ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		END
 	END
 END
@@ -8657,16 +8823,17 @@ END
  * --------------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_502~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 15020001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts~
+	SET resistName = 15020001 // ~Résistance aux dégâts~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_502~ BEGIN
-	LOCAL_SPRINT resistName @15020001 // ~Résistance aux dégâts~
+	SET resistName = 15020001 // ~Résistance aux dégâts~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_502~ BEGIN
-	LOCAL_SPRINT resistName @15020001 // ~Résistance aux dégâts~
+	SET resistName = 15020001 // ~Résistance aux dégâts~
 	LPM ~opcode_target_resist~
 END
 
@@ -8677,18 +8844,18 @@ END
 /* ----------------------------------------------- *
  * Stat: Résistance aux dégâts élémentaires~ [503] *
  * ----------------------------------------------- */
-
 DEFINE_PATCH_MACRO ~opcode_self_503~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 15030001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts élémentaires~
+	SET resistName = 15030001 // ~Résistance aux dégâts élémentaires~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_503~ BEGIN
-	LOCAL_SPRINT resistName @15030001 // ~Résistance aux dégâts élémentaires~
+	SET resistName = 15030001 // ~Résistance aux dégâts élémentaires~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_503~ BEGIN
-	LOCAL_SPRINT resistName @15030001 // ~Résistance aux dégâts élémentaires~
+	SET resistName = 15030001 // ~Résistance aux dégâts élémentaires~
 	LPM ~opcode_target_resist~
 END
 
@@ -8701,16 +8868,17 @@ END
  * ------------------------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_504~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 15040001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Résistance aux dégâts physiques~
+	SET resistName = 15040001 // ~Résistance aux dégâts physiques~
+	LPM ~opcode_self_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_504~ BEGIN
-	LOCAL_SPRINT resistName @15040001 // ~Résistance aux dégâts physiquess~
+	SET resistName = 15040001 // ~Résistance aux dégâts physiques~
 	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_504~ BEGIN
-	LOCAL_SPRINT resistName @15040001 // ~Résistance aux dégâts physiques~
+	SET resistName = 15040001 // ~Résistance aux dégâts physiques~
 	LPM ~opcode_target_resist~
 END
 
@@ -8746,7 +8914,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 		END
 		ELSE BEGIN
 			// TODO !
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : dice % non gere : %value%~ END
 			SPRINT value @10002 // ~%value% %~
 		END
 	END
@@ -8757,45 +8925,32 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
 	SET parameter2 = parameter2 BAND 65535
-	PATCH_IF parameter2 >= MOD_TYPE_cumulative AND parameter2 <= 3 BEGIN
-		LPM ~opcode_mod_base~
-		PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
-			SPRINT description @100001 // ~%name%%colon%%value%~
-		END
-	END
-	ELSE BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
+	LPM ~opcode_mod_base~
+	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
+		SPRINT description @100001 // ~%name%%colon%%value%~
 	END
 END
 
-// TODO : MOD_TYPE_flat + parameter1 == 100 : immunité
 DEFINE_PATCH_MACRO ~opcode_mod_percent_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 		PATCH_IF IS_AN_INT ~%value%~ BEGIN
 			LPF ~signed_value~ INT_VAR value RET value END
 		END
-		SPRINT value @10002 // ~%value% %~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value @10002 // ~%value% %~
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT value @10002 // ~%value% %~
 		SPRINT value @10006 // ~Multiplié par %value%~
 	END
+	SPRINT value @10002 // ~%value% %~
 	LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_mod_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
-	PATCH_IF parameter2 >= MOD_TYPE_cumulative AND parameter2 <= MOD_TYPE_percentage BEGIN
-		LPM ~opcode_mod_percent_base~
-
-		SPRINT description @100001 // ~%name%%colon%%value%~
-	END
-	ELSE BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid value for parameter2 : %parameter2%~ END
-	END
+	SET parameter2 = parameter2 BAND 65535
+	LPM ~opcode_mod_percent_base~
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_target_percent~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
@@ -8940,29 +9095,67 @@ END
 /* ----------------------------------------- *
  * Gestion des modifications des résistances *
  * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
+	LOCAL_SET value = parameter1 BAND 255
+
+	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
+		SET resistName += 1
+		SPRINT resistName (AT resistName)
+		SPRINT description @102547 // ~Immunité %resistName%~
+	END
+	ELSE BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			PATCH_IF value >= 0 BEGIN
+				LPF ~signed_value~ INT_VAR value RET value END
+			END
+			SPRINT value @10002 // ~%value% %~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT value @10010 // ~Passe à %value%~
+			SPRINT value @10002 // ~%value% %~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			SPRINT value @10002 // ~%value% %~
+		END
+		SPRINT name (AT resistName)
+		SPRINT description @100001 // ~%name%%colon%%value%~
+	END
+END
+
+
 DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
+	LOCAL_SET value = parameter1 BAND 255
 
-	TO_LOWER resistName
+	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
+		SET resistName += 1
+		SPRINT resistName (AT resistName)
+		SPRINT description @102548 // ~d'immuniser %theTarget% %resistName%~
+	END
+	ELSE BEGIN
+		SPRINT resistName (AT resistName)
+		TO_LOWER resistName
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
-	        SPRINT value @10002 // ~%value% %~
-	        SPRINT description @102282 // ~Augmente la %resistName% %ofTheTarget% de %value%~
-        END
-        ELSE BEGIN
-            value = ABS value
-	        SPRINT value @10002 // ~%value% %~
-	        SPRINT description @102281 // ~Réduit la %resistName% %ofTheTarget% de %value%~
-        END
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-	    SPRINT value @10002 // ~%value% %~
-		SPRINT description @102283 // ~Passe la %resistName% %ofTheTarget% à %value%~
-	END
-	ELSE BEGIN // percent
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102284 // ~Multiplie la %resistName% %ofTheTarget% par %value%~
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
+				SPRINT value @10002 // ~%value% %~
+				SPRINT description @102282 // ~Augmente la %resistName% %ofTheTarget% de %value%~
+			END
+			ELSE BEGIN
+				value = ABS value
+				SPRINT value @10002 // ~%value% %~
+				SPRINT description @102281 // ~Réduit la %resistName% %ofTheTarget% de %value%~
+			END
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @102283 // ~de passer la %resistName% %ofTheTarget% à %value%~
+		END
+		ELSE BEGIN // percent
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @102284 // ~Multiplie la %resistName% %ofTheTarget% par %value%~
+		END
 	END
 END
 
@@ -8970,29 +9163,37 @@ END
  * Gestion des modifications des résistances par probabilité *
  * --------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
+	LOCAL_SET value = parameter1 BAND 255
 
-	TO_LOWER resistName
+	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
+		SET resistName += 1
+		SPRINT resistName (AT resistName)
+		SPRINT description @102548 // ~d'immuniser %resistName%~
+	END
+	ELSE BEGIN
+		SPRINT resistName (AT resistName)
+		TO_LOWER resistName
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
-	        SPRINT value @10002 // ~%value% %~
-	        SPRINT description @102540 // ~d'augmenter la %resistName% %ofTheTarget% de %value%~
-        END
-        ELSE BEGIN
-            value = ABS value
-	        SPRINT value @10002 // ~%value% %~
-	        SPRINT description @102539 // ~de réduire la %resistName% %ofTheTarget% de %value%~
-        END
-    END
-    ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-	    SPRINT value @10002 // ~%value% %~
-        SPRINT description @102541 // ~de passer la %resistName% %ofTheTarget% à %value%~
-    END
-    ELSE BEGIN // percent
-        SPRINT value @10002 // ~%value% %~
-        SPRINT description @102542 // ~de multiplier la %resistName% %ofTheTarget% par %value%~
-    END
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			PATCH_IF value >= 0 BEGIN
+				SPRINT value @10002 // ~%value% %~
+				SPRINT description @102540 // ~d'augmenter la %resistName% %ofTheTarget% de %value%~
+			END
+			ELSE BEGIN
+				value = ABS value
+				SPRINT value @10002 // ~%value% %~
+				SPRINT description @102539 // ~de réduire la %resistName% %ofTheTarget% de %value%~
+			END
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @102541 // ~de passer la %resistName% %ofTheTarget% à %value%~
+		END
+		ELSE BEGIN // percent
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @102542 // ~de multiplier la %resistName% %ofTheTarget% par %value%~
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_not_cumulative~ BEGIN
@@ -9493,7 +9694,7 @@ DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref B
 			BEGIN SET projref = 300031 END // ~fléchettes~
 		36 67 68 69 70 71 72 73 74 75 76 77
 			BEGIN SET projref = 300036 END // ~projectiles magiques~
-		39 80 81 82 83 84 85 86 87 88 89 90 92 206 212 219 442
+		39 80 81 82 83 84 85 86 87 88 89 90 92 205 206 212 219 442
 			BEGIN SET projref = 300039 END // ~éclairs~
 		55 56 57 58 59
 			BEGIN SET projref = 300055 END // ~lances de jet~
