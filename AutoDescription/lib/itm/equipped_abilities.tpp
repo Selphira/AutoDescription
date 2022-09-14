@@ -68,5 +68,19 @@ BEGIN
 	    END
 	END
 
+	PATCH_IF isArmor AND NOT isRobe AND armor_show_allows_to_cast_spells BEGIN
+		LPF ~has_opcode~
+			INT_VAR opcode = 145
+			STR_VAR expression = ~probability = 100 AND parameter2 = 0~
+			RET hasOpcode
+		END
+		PATCH_IF NOT hasOpcode BEGIN
+			SPRINT effectDescription @102127 // ~Permet de lancer des sorts profanes~
+			SET sort = $sort_opcodes(~145~)
+			SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+			SET countLines += 1
+		END
+	END
+
 	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
 END
