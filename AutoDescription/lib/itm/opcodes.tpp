@@ -3635,19 +3635,20 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 	// TODO: d'abord checker la présence de la protection contre les sorts avant d'activer l'immunité éventuelle
+	// Méthode pour 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF parameter2 == 40 BEGIN // Lenteur
 			SET opcode = 206
 			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
 				// Aucun retrait
-				LPF ~get_opcode_position~
+				LPF ~has_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~resref = %resref%~
-					RET position
+					RET hasOpcode
 				END
-				PATCH_IF position == ~-1~ BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre la lenteur detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Slow: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
 
@@ -3664,13 +3665,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			SET opcode = 206
 			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
 				// Aucun retrait
-				LPF ~get_opcode_position~
+				LPF ~has_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~resref = %resref%~
-					RET position
+					RET hasOpcode
 				END
-				PATCH_IF position == ~-1~ BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre la hate detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Haste: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
 
@@ -3687,13 +3688,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			SET opcode = 206
 			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
 				// Aucun retrait
-				LPF ~get_opcode_position~
+				LPF ~has_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~resref = %resref%~
-					RET position
+					RET hasOpcode
 				END
-				PATCH_IF position == ~-1~ BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre l'enchevetrement detectee : Opcode 206 protection contre le fichier %resref% non trouve.~ END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Entangle: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
 			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
@@ -3705,9 +3706,32 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
+		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 	END
 	SET opcode = 101
 END
+
 
 // DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
 // 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
@@ -6118,15 +6142,15 @@ DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 		END
-		ELSE BEGIN
-			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
-			PATCH_IF strLen < 8 BEGIN
-				// LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
-			END
-		END
+		// ELSE BEGIN
+		// 	SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+		// 	PATCH_IF strLen < 8 BEGIN
+		// 		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+		// 	END
+		// END
 	END
 
-	PATCH_IF parameter1 > 0 BEGIN
+	PATCH_IF amount > 0 BEGIN
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 2 // ~Renvoie jusque %amount% sorts de niveau %spellLevel% puis lance %spellName%~
 		END
@@ -6288,12 +6312,12 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	PATCH_IF nbFound >= 5 BEGIN
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
 			// Affichage warning car sort non trouvé
-			LPF ~get_opcode_position~
+			LPF ~has_opcode~
 				INT_VAR opcode
 				STR_VAR expression = ~resref = %resref%~
-				RET position
+				RET hasOpcode
 			END
-			PATCH_IF position == ~-1~ BEGIN
+			PATCH_IF NOT hasOpcode BEGIN
 				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre capacite psionique detectee : Opcode 206 avec %resref% non trouve.~ END
 			END
 		END
