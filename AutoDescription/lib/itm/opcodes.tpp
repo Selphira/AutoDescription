@@ -507,7 +507,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
 	177 => 1
-	214 => 1
+	214 => 1 // Spell Effect: Select Spell
 	218 => 1
 	230 => 1
 	233 => 1
@@ -6445,7 +6445,7 @@ DEFINE_PATCH_MACRO ~opcode_self_213~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_213~ BEGIN
-	PATCH_IF parameter2 == 0 or NOT is_ee BEGIN
+	PATCH_IF parameter2 == 0 OR NOT is_ee BEGIN
 		SET ignoreDuration = 1
 		SPRINT description @12130002 // ~d'enfermer %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
 	END
@@ -6455,7 +6455,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_213~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_213~ BEGIN
-	PATCH_IF parameter2 == 0 or NOT is_ee BEGIN
+	PATCH_IF parameter2 == 0 OR NOT is_ee BEGIN
 		SET ignoreDuration = 1
 		SPRINT description @12130001 // ~Enferme %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
 	END
@@ -6512,35 +6512,23 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_214_is_valid~ BEGIN
+	PATCH_IF parameter2 == 0 BEGIN
+		LPM ~opcode_resref_is_valid~
+	END
+END
+
 /* ------------------------------- *
  * Spell Effect: Level Drain [216] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_216~ BEGIN
-	LOCAL_SET amount = ~%parameter1%~
-
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12160001 // ~Draîne 1 niveau %toTheTarget%~
-	END
-	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @12160002 // ~Draîne %amount% niveaux %toTheTarget%~
-	END
-	ELSE PATCH_IF amount < 0 BEGIN
-		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
-	END
+	SET strref = 12160001
+	LPM ~opcode_216_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_216~ BEGIN
-	LOCAL_SET amount = ~%parameter1%~
-
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12160003 // ~de drainer 1 niveau %toTheTarget%~
-	END
-	ELSE PATCH_IF amount > 1 BEGIN
-		SPRINT description @12160004 // ~de drainer %amount% niveaux %toTheTarget%~
-	END
-	ELSE PATCH_IF amount < 0 BEGIN
-		PATCH_FAIL ~%SOURCE_FILE% : Opcode %opcode% : Niveau draine negatif !!~
-	END
+	SET strref = 12160011
+	LPM ~opcode_216_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_216~ BEGIN
@@ -6550,6 +6538,23 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
 	LPM ~opcode_self_probability_216~ // ~de drainer 1 niveau %toTheTarget%~
 END
+
+DEFINE_PATCH_MACRO ~opcode_216_common~ BEGIN
+	LOCAL_SET amount = ~%parameter1%~
+
+	PATCH_IF amount > 1 BEGIN // ~Draine %amount% niveaux %toTheTarget%~
+		SET strref += 1
+	END
+	ELSE PATCH_IF amount == 0 BEGIN // ~Bloque le gain de niveau %toTheTarget%~
+		SET strref += 2
+	ELSE PATCH_IF amount == -1 BEGIN // TODO: description
+		SET strref += 3
+	ELSE PATCH_IF amount < -1 BEGIN
+		SET strref += 4
+	END
+	SPRINT description (AT strref) // ~de drainer %amount% niveaux %toTheTarget%~
+END
+	
 
 /* ---------------------------------------- *
  * Spell Effect: Unconsciousness 20HP [217] *

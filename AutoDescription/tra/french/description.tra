@@ -616,7 +616,7 @@
 @400011 = ~à la dissipation des poisons~
 @400012 = ~aux dégâts supplémentaires~ // non-naturels ?
 @400013 = ~à la mort magique~
-@400014 = ~à la dissipation la congélation~
+@400014 = ~à la dissipation de la congélation~
 @400015 = ~à la modification de la dextérité~
 @400016 = ~à la hâte~
 @400017 = ~aux soins~
@@ -714,7 +714,7 @@
 @400109 = ~à la paralysie~
 @400110 = ~~ // Sans effet
 @400111 = ~à l'invocation d'armes magiques~
-@400112 = ~aux effets qui retire des objets de l'équipement~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
+@400112 = ~aux effets qui retirent des objets de l'équipement~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
 @400113 = ~~ // Sans effet
 @400114 = ~à l'identification d'objet~
 @400115 = ~à la détection de l'alignement~
@@ -763,7 +763,7 @@
 @400158 = ~~ // Opcode visuel
 @400159 = ~à la modification de la quantité d'image-miroir~
 @400160 = ~à la dissipation de sanctuaire~
-@400161 = ~à la dissipation d'horreur~
+@400161 = ~à la dissipation de l'horreur~
 @400162 = ~à la dissipation de la paralysie~
 @400163 = ~à la modification de la vitesse de déplacement~
 @400164 = ~à la dissipation de l'ivresse~
@@ -2252,8 +2252,16 @@
 
 @12160001 = ~Draine 1 niveau %toTheTarget%~
 @12160002 = ~Draine %amount% niveaux %toTheTarget%~
-@12160003 = ~de drainer 1 niveau %toTheTarget%~
-@12160004 = ~de drainer %amount% niveaux %toTheTarget%~
+@12160003 = ~Bloque le gain de niveau %toTheTarget%~ // TODO: absorption de 0 niveau : levelup impossible
+@12160004 = ~Donne 1 niveau %toTheTarget%~ // TODO: totalement provisoire
+@12160005 = ~Donne %amount% niveaux %toTheTarget%~ // TODO
+
+@12160011 = ~de drainer 1 niveau %toTheTarget%~
+@12160012 = ~de drainer %amount% niveaux %toTheTarget%~
+@12160013 = ~de bloquer le gain de niveau %toTheTarget%~
+@12160014 = ~de donner 1 niveau %toTheTarget%~ // TODO
+@12160015 = ~de donner %amount% niveaux %toTheTarget%~ // TODO
+
 
 // Opcode 217: Spell Effect: Unconsciousness 20HP [217]
 
