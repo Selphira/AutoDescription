@@ -6545,16 +6545,20 @@ DEFINE_PATCH_MACRO ~opcode_216_common~ BEGIN
 	PATCH_IF amount > 1 BEGIN // ~Draine %amount% niveaux %toTheTarget%~
 		SET strref += 1
 	END
-	ELSE PATCH_IF amount == 0 BEGIN // ~Bloque le gain de niveau %toTheTarget%~
+	ELSE PATCH_IF amount == 0 BEGIN // ~Inhibe le passage au niveau supérieur %ofTheTarget%~
 		SET strref += 2
-	ELSE PATCH_IF amount == -1 BEGIN // TODO: description
+	END
+	ELSE PATCH_IF amount == ~-1~ BEGIN // ~Injecte 1 niveau %toTheTarget%~
+		SET amount = ABS amount
 		SET strref += 3
-	ELSE PATCH_IF amount < -1 BEGIN
+	END
+	ELSE PATCH_IF amount < ~-1~ BEGIN // ~Injecte %amount% niveaux %toTheTarget%~
+		SET amount = ABS amount
 		SET strref += 4
 	END
 	SPRINT description (AT strref) // ~de drainer %amount% niveaux %toTheTarget%~
 END
-	
+
 
 /* ---------------------------------------- *
  * Spell Effect: Unconsciousness 20HP [217] *
@@ -6563,22 +6567,32 @@ DEFINE_PATCH_MACRO ~opcode_self_217~ BEGIN
 	// Durée forcée à 5 rounds
 	SET duration = 30
 	SET timingMode = TIMING_duration
-	SPRINT description @12170001 // ~Endort %theTarget% si ses points de vie sont inférieurs à 20~
+	LPM ~opcode_self_39~
+	SPRINT description @12170001 // ~%description% si ses points de vie sont inférieurs à 20~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_217~ BEGIN
-	LPM ~opcode_self_217~
+	// Durée forcée à 5 rounds
+	SET duration = 30
+	SET timingMode = TIMING_duration
+	LPM ~opcode_target_39~
+	SPRINT description @12170001 // ~%description% si ses points de vie sont inférieurs à 20~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_217~ BEGIN
 	// Durée forcée à 5 rounds
-	SET duration = 30 // 5 rounds
+	SET duration = 30
 	SET timingMode = TIMING_duration
-	SPRINT description @12170002 // ~d'endormir %theTarget% si ses points de vie sont inférieurs à 20~
+	LPM ~opcode_self_probability_39~
+	SPRINT description @12170001 // ~%description% si ses points de vie sont inférieurs à 20~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_217~ BEGIN
-	LPM ~opcode_self_probability_217~
+	// Durée forcée à 5 rounds
+	SET duration = 30
+	SET timingMode = TIMING_duration
+	LPM ~opcode_target_probability_39~
+	SPRINT description @12170001 // ~%description% si ses points de vie sont inférieurs à 20~
 END
 
 /* --------------------------- *

@@ -2252,21 +2252,22 @@
 
 @12160001 = ~Draine 1 niveau %toTheTarget%~
 @12160002 = ~Draine %amount% niveaux %toTheTarget%~
-@12160003 = ~Bloque le gain de niveau %toTheTarget%~ // TODO: absorption de 0 niveau : levelup impossible
-@12160004 = ~Donne 1 niveau %toTheTarget%~ // TODO: totalement provisoire
-@12160005 = ~Donne %amount% niveaux %toTheTarget%~ // TODO
+@12160003 = ~Inhibe le passage au niveau supérieur %ofTheTarget%~
+@12160004 = ~Injecte 1 niveau %toTheTarget%~
+@12160005 = ~Injecte %amount% niveaux %toTheTarget%~
 
 @12160011 = ~de drainer 1 niveau %toTheTarget%~
 @12160012 = ~de drainer %amount% niveaux %toTheTarget%~
-@12160013 = ~de bloquer le gain de niveau %toTheTarget%~
-@12160014 = ~de donner 1 niveau %toTheTarget%~ // TODO
-@12160015 = ~de donner %amount% niveaux %toTheTarget%~ // TODO
+@12160013 = ~d'inhiber le passage au niveau supérieur %ofTheTarget%~
+@12160014 = ~d'injecter 1 niveau %toTheTarget%~
+@12160015 = ~d'injecter %amount% niveaux %toTheTarget%~
 
 
 // Opcode 217: Spell Effect: Unconsciousness 20HP [217]
 
-@12170001 = ~Endort %theTarget% si ses points de vie sont inférieurs à 20~
-@12170002 = ~d'endormir %theTarget% si ses points de vie sont inférieurs à 20~
+@12170001 = ~%description% si ses points de vie sont inférieurs à 20~
+//@12170001 = ~Endort %theTarget% si ses points de vie sont inférieurs à 20~
+//@12170002 = ~d'endormir %theTarget% si ses points de vie sont inférieurs à 20~
 
 // Opcode 218: Protection: Stoneskin [218]
 
