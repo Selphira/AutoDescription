@@ -2173,10 +2173,10 @@
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
-@12000001 = ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel%~
-@12000002 = ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel%~
-@12000003 = ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
-@12000004 = ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12010001 = ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+@12010002 = ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+@12010003 = ~Immunise jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+@12010004 = ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel% puis lance %spellName%~
 @12010005 = ~Lance %spellName%~
 @12010006 = ~de lancer %spellName%~
 
@@ -2295,10 +2295,12 @@
 
 // Opcode 223: Spell: Immunity (by School, decrementing [223]
 
-@12230001 = ~Absorbe 1 sort de l'école %spellSchoolName%~
-@12230002 = ~Absorbe %amount% sorts de l'école %spellSchoolName%~
-@12230003 = ~d'absorber 1 sort de l'école %spellSchoolName%~
-@12230004 = ~d'absorber %amount% sorts de l'école %spellSchoolName%~
+@12230001 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+@12230002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+@12230003 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
+@12230004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12230005 = ~Lance %spellName%~
+@12230006 = ~de lancer %spellName%~
 
 // Opcode 224: Cure: Level Drain (Restoration) [224]
 
@@ -2307,24 +2309,30 @@
 
 // Opcode 226: Spell: Immunity (by Secondary Type, decrementing) [226]
 
-@12260001 = ~Absorbe 1 sort %spellSecondaryTypeName%~
-@12260002 = ~Absorbe %amount% sorts %spellSecondaryTypeName%~
-@12260003 = ~d'absorber 1 sort %spellSecondaryTypeName%~
-@12260004 = ~d'absorber %amount% sorts %spellSecondaryTypeName%~
+@12260001 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+@12260002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+@12260003 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
+@12260004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12260005 = ~Lance %spellName%~
+@12260006 = ~de lancer %spellName%~
 
 // Opcode 227: Spell: Bounce (by School, decrementing) [227]
 
-@12270001 = ~Renvoie 1 sort de l'école %spellSchoolName%~
-@12270002 = ~Renvoie %amount% sorts de l'école %spellSchoolName%~
-@12270003 = ~de renvoyer 1 sort de l'école %spellSchoolName%~
-@12270004 = ~de renvoyer %amount% sorts de l'école %spellSchoolName%~
+@12270001 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+@12270002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+@12270003 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
+@12270004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12270005 = ~Lance %spellName%~
+@12270006 = ~de lancer %spellName%~
 
 // Opcode 228: Spell: Bounce (by Secondary Type, decrementing) [228]
 
-@12280001 = ~Renvoie 1 sort %spellSecondaryTypeName%~
-@12280002 = ~Renvoie %amount% sorts %spellSecondaryTypeName%~
-@12280003 = ~de renvoyer 1 sort %spellSecondaryTypeName%~
-@12280004 = ~de renvoyer %amount% sorts %spellSecondaryTypeName%~
+@12280001 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+@12280002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+@12280003 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
+@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12280005 = ~Lance %spellName%~
+@12280006 = ~de lancer %spellName%~
 
 // Opcode 229: Removal: Remove One School [229]
 

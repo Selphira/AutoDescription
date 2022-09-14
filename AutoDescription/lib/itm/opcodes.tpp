@@ -496,6 +496,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	210 => 1 // Spell Effect: Stun 90HP
 	211 => 1 // Spell Effect: Imprisonment
 	212 => 1 // Protection: Freedom
+	220 => 1 // Removal: Remove School
+	221 => 1 // Removal: Remove Secondary Type
+	222 => 1 // Spell Effect: Teleport Field
+	224 => 1 // Cure: Level Drain (Restoration)
 	242 => 1 // Cure: Confusion
 END
 
@@ -507,7 +511,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	148 => 1 // Spell: Cast Spell (at Point)
 	177 => 1
 	214 => 1 // Spell Effect: Select Spell
-	218 => 1
+	218 => 1 // Protection: Stoneskin
 	230 => 1
 	233 => 1
 	238 => 1
@@ -6137,29 +6141,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET spellLevel = parameter2
-	TEXT_SPRINT spellName ~~
-
-	// TODO créer une méthode à part pour la rendre utilisable pour d'autres opcodes
-	PATCH_IF is_ee BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-		END
-		// ELSE BEGIN
-		// 	SET strLen = STRING_LENGTH ~%SOURCE_RES%~
-		// 	PATCH_IF strLen < 8 BEGIN
-		// 		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
-		// 	END
-		// END
-	END
-
-	PATCH_IF amount > 0 BEGIN
-		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			SET strref += 2 // ~Renvoie jusque %amount% sorts de niveau %spellLevel% puis lance %spellName%~
-		END
-	END
-	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SET strref += 4 // ~Lance %spellName%~
-	END
+	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
 	SPRINT description (AT strref)
 END
 
@@ -6178,12 +6160,12 @@ END
  * Spell: Immunity (by Power Level, decrementing) [201] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_201~ BEGIN
-	SET strref = 12010001 // ~Absorbe jusqu'à %amount% sorts de niveau %spellLevel%~
+	SET strref = 12010001 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_201~ BEGIN
-	SET strref = 12010002 // ~d'absorber jusqu'à %amount% sorts de niveau %spellLevel%~
+	SET strref = 12010002 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
 	LPM ~opcode_200_common~
 END
 
@@ -6777,28 +6759,26 @@ END
  * Spell: Immunity (by School, decrementing [223] *
  * ---------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_223~ BEGIN
-	LOCAL_SET amount = parameter1
-
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12230001 // ~Absorbe 1 sort de l'école %spellSchoolName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12230002 // ~Absorbe %amount% sorts de l'école %spellSchoolName%~
-	END
+	SET strref = 12230001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_223_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_223~ BEGIN
-	LOCAL_SET amount = parameter1
+	SET strref = 12230002 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_223_common~
+END
 
+DEFINE_PATCH_MACRO ~opcode_223_common~ BEGIN
+	LOCAL_SET amount = parameter1
 	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12230003 // ~d'absorber 1 sort de l'école %spellSchoolName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12230004 // ~d'absorber %amount% sorts de l'école %spellSchoolName%~
+	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_223_is_valid~ BEGIN
+	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -6825,87 +6805,70 @@ END
  * Spell: Immunity (by Secondary Type, decrementing) [226] *
  * ------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_226~ BEGIN
-	LOCAL_SET amount = parameter1
-
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12260001 // ~Absorbe 1 sort %spellSecondaryTypeName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12260002 // ~Absorbe %amount% sorts %spellSecondaryTypeName%~
-	END
+	SET strref = 12260001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_226_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_226~ BEGIN
-	LOCAL_SET amount = parameter1
+	SET strref = 12260002 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_226_common~
+END
 
+DEFINE_PATCH_MACRO ~opcode_226_common~ BEGIN
+	LOCAL_SET amount = parameter1
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12260003 // ~d'absorber 1 sort %spellSecondaryTypeName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12260004 // ~d'absorber %amount% sorts %spellSecondaryTypeName%~
+	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
+	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
 /* --------------------------------------------- *
  * Spell: Bounce (by School, decrementing) [227] *
  * --------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_227~ BEGIN
-	LOCAL_SET amount = parameter1
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12270001 // ~Renvoie 1 sort de l'école %spellSchoolName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12270002 // ~Renvoie %amount% sorts de l'école %spellSchoolName%~
-	END
+DEFINE_PATCH_MACRO ~opcode_self_227~ BEGIN
+	SET strref = 12270001 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_227_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_227~ BEGIN
-	LOCAL_SET amount = parameter1
+	SET strref = 12270002 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_227_common~
+END
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12270003 // ~de renvoyer 1 sort de l'école %spellSchoolName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12270004 // ~de renvoyer %amount% sorts de l'école %spellSchoolName%~
-	END
+DEFINE_PATCH_MACRO ~opcode_227_common~ BEGIN
+	LPM ~opcode_223_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_227_is_valid~ BEGIN
+	LPM ~opcode_223_is_valid~
 END
 
 /* ----------------------------------------------------- *
  * Spell: Bounce (by Secondary Type, decrementing) [228] *
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_228~ BEGIN
-	LOCAL_SET amount = parameter1
-
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12280001 // ~Renvoie 1 sort %spellSecondaryTypeName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12280002 // ~Renvoie %amount% sorts %spellSecondaryTypeName%~
-	END
+	SET strref = 12280001 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_228_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_228~ BEGIN
-	LOCAL_SET amount = parameter1
+	SET strref = 12280002 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LPM ~opcode_228_common~
+END
 
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12280003 // ~de renvoyer 1 sort %spellSecondaryTypeName%~
-	END
-	ELSE BEGIN
-		SPRINT description @12280004 // ~de renvoyer %amount% sorts %spellSecondaryTypeName%~
-	END
+DEFINE_PATCH_MACRO ~opcode_228_common~ BEGIN
+	LPM ~opcopde_226_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
+	LPM ~opcopde_226_is_valid~
 END
 
 /* -------------------------------- *
@@ -9860,5 +9823,28 @@ DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref B
 			BEGIN SET projref = 0 END // Aucune correspondance connue
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Réflection du type de projectile '%projectile%'~ END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 amount = 0 RET strref spellName BEGIN
+	SPRINT spellName ~~
+	PATCH_IF is_ee BEGIN
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		END
+		ELSE BEGIN
+			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+			PATCH_IF strLen < 8 BEGIN
+				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+			END
+		END
+	END
+	PATCH_IF amount > 0 BEGIN
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			SET strref += 2 // ~Renvoie jusque %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+		END
+	END
+	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SET strref += 4 // ~Lance %spellName%~
 	END
 END
