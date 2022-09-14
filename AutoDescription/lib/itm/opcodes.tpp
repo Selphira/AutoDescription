@@ -500,6 +500,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	221 => 1 // Removal: Remove Secondary Type
 	222 => 1 // Spell Effect: Teleport Field
 	224 => 1 // Cure: Level Drain (Restoration)
+	229 => 1 // Removal: Remove One School
+	230 => 1 // Removal: Remove One Secondary Type
 	242 => 1 // Cure: Confusion
 END
 
@@ -512,7 +514,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	177 => 1
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
-	230 => 1
 	233 => 1
 	238 => 1
 	244 => 1
@@ -6929,14 +6930,18 @@ END
  * Spell Effect: Time Stop [231] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_231~ BEGIN
+	// The timestop effect lasts half as long as the Duration specified for the effect.
+	SET duration /= 2
 	SPRINT description @12310001 // ~Arrêt du temps~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_231~ BEGIN
+	SET duration /= 2
 	SPRINT description @12310003 // ~de lancer Arrêt du temps~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_231~ BEGIN
+	SET duration /= 2
 	SPRINT description @12310002 // ~Lance Arrêt du temps~
 END
 
