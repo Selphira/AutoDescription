@@ -6629,13 +6629,10 @@ DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 		END
 	END
 
-	PATCH_IF IS_AN_INT amount AND amount == 1 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-	END
-	ELSE BEGIN
+	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
 		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_218_is_valid~ BEGIN
@@ -6684,6 +6681,10 @@ DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
 		// Nécessaire de remettre le numéro original pour les itérations suivantes
 		SET opcode = 219
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_219_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
 END
 
 /* ---------------------------- *
