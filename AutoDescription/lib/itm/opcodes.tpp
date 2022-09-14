@@ -496,7 +496,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	210 => 1 // Spell Effect: Stun 90HP
 	211 => 1 // Spell Effect: Imprisonment
 	212 => 1 // Protection: Freedom
-	217 => 1
 	242 => 1 // Cure: Confusion
 END
 
@@ -6623,7 +6622,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF is_ee == 1 AND parameter2 == 1 BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
@@ -6636,6 +6635,13 @@ DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 	ELSE BEGIN
 		SET strref += 1
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_218_is_valid~ BEGIN
+	PATCH_IF parameter1 <= 0 AND (NOT is_ee OR parameter2 == 0 OR diceCount == 0) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
 	END
 END
 

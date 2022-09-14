@@ -2273,10 +2273,10 @@
 
 @12180001 = ~Peau de pierre (1 peau)~
 @12180002 = ~Peau de pierre (%amount% peaux)~
-@12180003 = ~de lancer Peau de pierre (1 peau) sur %theTarget%~
-@12180004 = ~de lancer Peau de pierre (%amount% peaux) sur %theTarget%~
-@12180005 = ~Lance Peau de pierre (1 peau) sur %theTarget%~
-@12180006 = ~Lance Peau de pierre (%amount% peaux) sur %theTarget%~
+@12180003 = ~de lancer 1 peau de pierre sur %theTarget%~
+@12180004 = ~de lancer %amount% peaux de pierre sur %theTarget%~
+@12180005 = ~Lance 1 peau de pierre sur %theTarget%~
+@12180006 = ~Lance %amount% peaux de pierre sur %theTarget%~
 
 // Opcode 220: Removal: Remove School [220]
 
