@@ -492,7 +492,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	164 => 1 // Cure: Drunkeness
 	171 => 1 // Spell: Give Ability
 	172 => 1 // Spell: Remove Spell
-	210 => 1
+	209 => 1 // Death: Kill 60HP
+	210 => 1 // Spell Effect: Stun 90HP
+	211 => 1 // Spell Effect: Imprisonment
+	212 => 1 // Protection: Freedom
 	217 => 1
 	242 => 1 // Cure: Confusion
 END
@@ -6437,12 +6440,28 @@ END
 /* ------------------------ *
  * Spell Effect: Maze [213] *
  * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_213~ BEGIN
+	LPM ~opcode_target_213~ // ~Enferme %theTarget% dans un labyrinthe~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_213~ BEGIN
-	SPRINT description @12130002 // ~d'enfermer %theTarget% dans un labyrinthe~
+	PATCH_IF parameter2 == 0 or NOT is_ee BEGIN
+		SET ignoreDuration = 1
+		SPRINT description @12130002 // ~d'enfermer %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
+	END
+	ELSE BEGIN
+		SPRINT description @12130004 // ~d'enfermer %theTarget% dans un labyrinthe~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_213~ BEGIN
-	SPRINT description @12130001 // ~Enferme %theTarget% dans un labyrinthe~
+	PATCH_IF parameter2 == 0 or NOT is_ee BEGIN
+		SET ignoreDuration = 1
+		SPRINT description @12130001 // ~Enferme %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
+	END
+	ELSE BEGIN
+		SPRINT description @12130003 // ~Enferme %theTarget% dans un labyrinthe~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_213~ BEGIN

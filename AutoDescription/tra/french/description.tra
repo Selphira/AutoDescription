@@ -176,6 +176,7 @@
 @100107 = ~de la Nécromancie~
 @100108 = ~de l'Altération~
 @100109 = ~généraliste~
+@100110 = ~de l'Entropie~
 
 // spellSecondaryTypeName
 @100200 = ~sans type secondaire~
@@ -189,9 +190,9 @@
 @100208 = ~de contingences~
 @100209 = ~de champ de bataille~
 @100210 = ~de dégâts offensif~
-@100211 = ~désactivé~
+@100211 = ~incapacitante~
 @100212 = ~de combinaison~
-@100213 = ~non offensif~
+@100213 = ~non offensive~
 
 // duration
 @100300 = ~1 seconde~
@@ -2237,8 +2238,10 @@
 
 // Opcode 213: Spell Effect: Maze [213]
 
-@12130001 = ~Enferme %theTarget% dans un labyrinthe~
-@12130002 = ~d'enfermer %theTarget% dans un labyrinthe~
+@12130001 = ~Enferme %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
+@12130002 = ~d'enfermer %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~
+@12130003 = ~Enferme %theTarget% dans un labyrinthe~
+@12130004 = ~d'enfermer %theTarget% dans un labyrinthe~
 
 // Opcode 214: Spell Effect: Select Spell [214]
 
