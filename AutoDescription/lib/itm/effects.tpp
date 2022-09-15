@@ -260,7 +260,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
 		END
 		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 		END
 
 		PATCH_IF strref != 0 BEGIN

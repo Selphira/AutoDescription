@@ -184,13 +184,13 @@
 @100202 = ~de protection spécifique~
 @100203 = ~de protection illusoire~
 @100204 = ~d'attaque magique~
-@100205 = ~d'attaque divinatoire~
+@100205 = ~d'attaque divinatrice~
 @100206 = ~de conjuration~
 @100207 = ~de protection de combat~
 @100208 = ~de contingences~
 @100209 = ~de champ de bataille~
 @100210 = ~de dégâts offensif~
-@100211 = ~incapacitante~
+@100211 = ~invalidante~
 @100212 = ~de combinaison~
 @100213 = ~non offensive~
 
@@ -1164,13 +1164,20 @@
 @10120003 = ~Inflige %damage% %damageType% %versus%~
 @10120004 = ~Draine %damage% %damageType% %toTheTarget%~
 @10120005 = ~Transfert %damage% %damageType% %toTheTarget%~
+@10120006 = ~Passe la santé de %theTarget% à %damage%~
+@10120007 = ~Passe la santé de %theTarget% à %damage% %~
+@10120008 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~
 
 @10120011 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120012 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120013 = ~d'infliger %damage% %damageType% %versus%~
 @10120014 = ~de drainer %damage% %damageType% %toTheTarget%~
 @10120015 = ~de transférer %damage% %damageType% %toTheTarget%~
-@10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+@10120016 = ~de faire passer la santé de %theTarget% à %damage%~
+@10120017 = ~de faire passer la santé de %theTarget% à %damage% %~
+@10120018 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~
+
+// @10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
 
 @10120020 = ~points de dégâts contondants~
 @10120021 = ~points de dégâts d'acide~
@@ -2009,6 +2016,7 @@
 @11440015 = ~%action% l'utilisation de la détection des pièges et des illusions~
 @11440016 = ~%action% l'utilisation de l'inventaire~
 @11440020 = ~Empêche~ // Action
+@11440021 = ~d'empêcher~ // Action
 
 @11440021 = ~%action% d'utiliser le camouflage dans l'ombre~
 @11440022 = ~%action% d'utiliser les compétences de voleur~
@@ -2027,6 +2035,7 @@
 @11440035 = ~%action% d'utiliser la détection des pièges et des illusions~
 @11440036 = ~%action% d'utiliser l'inventaire~
 @11440040 = ~Empêche %theTarget%~ // Action
+@11440041 = ~d'empêcher %theTarget%~ // Action
 
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
@@ -2702,7 +2711,9 @@
 // Opcode 279:  Button: Enable Button [279]
 
 @12790020 = ~Permet~ // action
+@12790021 = ~de permettre~ // action
 @12790040 = ~Permet %toTheTarget%~ // action
+@12790040 = ~de permettre %toTheTarget%~ // action
 
 // Opcode 280: Spell Effect: Wild Magic [280]
 

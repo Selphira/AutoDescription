@@ -996,11 +996,19 @@ END
  * --------------- */
 DEFINE_PATCH_MACRO ~opcode_self_12~ BEGIN
 	LPM ~opcode_12_flags~
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120001 RET description END // ~Inflige %damage% %damageType% %toTheTarget%~
+	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120001
+								   strref_1 = 10120006
+								   strref_2 = 10120007
+								   strref_3 = 10120008
+		RET description
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %damageType% %toTheTarget%~
+	LOCAL_SET strref_1 = 10120006 // ~Passe les points de vie de %theTarget% à %damage%~
+	LOCAL_SET strref_2 = 10120007 // ~Passe les points de vie de %theTarget% à %damage% %~
+	LOCAL_SET strref_3 = 10120008 // ~Inflige %damage% % des points de vie maximums %toTheTarget%~
 
 	LPM ~opcode_12_flags~
 
@@ -1014,17 +1022,24 @@ DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 		SET strref_0 = 10120005 // ~Transfert %damage% %damageType% %toTheTarget%~
 	END
 
-	LPF ~opcode_12_common~ INT_VAR strref_0 RET description END
+	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_12~ BEGIN
 	LPM ~opcode_12_flags~
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120011 RET description END // ~d'infliger %damage% %damageType% %toTheTarget%~
+	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120011
+								   strref_1 = 10120016
+								   strref_2 = 10120017
+								   strref_3 = 10120018
+		RET description
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 	LOCAL_SET strref_0 = 10120012 // ~d'infliger %damage% %damageType% supplémentaires~
-	LOCAL_SET strref_3 = 10120016 // ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+	LOCAL_SET strref_1 = 10120016 // ~de faire passer les points de vie de %theTarget% à %damage%~
+	LOCAL_SET strref_2 = 10120017 // ~de faire passer les points actuels de vie de %theTarget% à %damage% %~
+	LOCAL_SET strref_3 = 10120018 // ~d'infliger %damage% % des points de vie maximums %toTheTarget%~
 
 	LPM ~opcode_12_flags~
 
@@ -1038,7 +1053,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 		SET strref_0 = 10120015 // ~de transférer %damage% %damageType% %toTheTarget%~
 	END
 
-	LPF ~opcode_12_common~ INT_VAR strref_0 strref_3 RET description END
+	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
@@ -1097,17 +1112,17 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 			SET damage = ~0~
 		END
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 1 a gerer : les points de vie de la cible passent a %damage%"
+		LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END
 	END
 	// Set to Percentage
 	ELSE PATCH_IF mode == 2 BEGIN
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
-			PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 2 a gerer : les points de vie de la cible passent à %damage% % de ses pv max"
+			LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END
 		END
 	END
 	// Reduce by Percentage
 	ELSE PATCH_IF mode == 3 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 3 a gerer : la cible perd %damage% % de ses pv max"
+		LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END
 	END
 
 	// Hack pour forcer l'affichage de la durée de l'augmentation des points de vie maximum
@@ -3561,7 +3576,7 @@ DEFINE_PATCH_MACRO ~opcode_99_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
-	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND is_ee BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND NOT is_ee BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
 	END
@@ -4899,13 +4914,25 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @11440020
+	SPRINT action @11440020 // ~Empêche~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_144~ BEGIN
+	LOCAL_SET strref = 11440001 + parameter2
+	SPRINT action @11440021 // ~d'empêcher~
 	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_144~ BEGIN
 	LOCAL_SET strref = 11440021 + parameter2
-	SPRINT action @11440040
+	SPRINT action @11440040 // ~Empêche %theTarget%~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_144~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @11440041 //~d'empêcher %theTarget%~
 	LPM ~opcode_144_common~
 END
 
@@ -7488,19 +7515,19 @@ END
  * Spell Effect: Berserking [246] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_246~ BEGIN
-	LPM ~opcode_self_3~
+	SPRINT description @12460001 // ~Points de vie +15, dégâts +1, TAC0 +1~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_246~ BEGIN
-	LPM ~opcode_self_probability_3~
+	SPRINT description @12460002 // ~d'augmenter les caractéristiques %ofTheTarget% : Points de vie +15, dégâts +1, TAC0 +1~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_246~ BEGIN
-	LPM ~opcode_target_3~
+	LPM ~opcode_target_246~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_246~ BEGIN
-	LPM ~opcode_target_probability_3~
+	LPM ~opcode_target_probability_246~
 END
 
 /* ------------------------------------------- *
@@ -8065,13 +8092,25 @@ END
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_279~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @12790020
+	SPRINT action @12790020 // ~Permet~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_279~ BEGIN
+	LOCAL_SET strref = 11440001 + parameter2
+	SPRINT action @12790021 // ~de permettre~
 	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_279~ BEGIN
 	LOCAL_SET strref = 11440021 + parameter2
-	SPRINT action @12790040
+	SPRINT action @12790040 // ~Permet %toTheTarget%~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_279~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @12790041 // ~de permettre %toTheTarget%~
 	LPM ~opcode_144_common~
 END
 
@@ -9582,13 +9621,11 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 
 	PATCH_IF level == 0 BEGIN
 		// Double le nombre de sorts de niveau amount et moins (pas de binaire ici !)
-		PATCH_IF amount > 0 AND amount <= spellLevelMax BEGIN
+		SET amount = amount > spellLevelMax ? spellLevelMax : amount
+		PATCH_IF amount > 0 BEGIN
 			LPM ~opcode_self_42_62_get_levelstr~
 			SET strref = startStrref + 4
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
-		END
-		ELSE BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE PATCH_IF level == 512 BEGIN
