@@ -6977,6 +6977,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	SET ofTheTargetRef = 12320210 + parameter1
 	SET toTheTargetRef = 12320220 + parameter1
 
+	SPRINT spellName ~~
 	SPRINT spellName2 ~~
 	SPRINT spellName3 ~~
 	SPRINT theTarget   (AT ~%theTargetRef%~)
@@ -6985,7 +6986,9 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 
 	LPM ~opcode_232_condition~
 
-	LPF ~get_spell_name~ STR_VAR file = ~%resref%~ RET spellName END
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = ~%resref%~ RET spellName END
+	END
 	PATCH_IF isExternal AND NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = ~%resref2%~ RET spellName2 = spellName END
 	END
@@ -7135,7 +7138,7 @@ DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
 		SPRINT name @12330001 // ~Compétence martiale %proficiency%~
 
-		PATCH_IF type == 1 BEGIN
+		PATCH_IF type != 0 BEGIN
 			LPF ~signed_value~ INT_VAR value RET value END
 		END
 		ELSE BEGIN
@@ -7143,9 +7146,6 @@ DEFINE_PATCH_MACRO ~opcode_self_233~ BEGIN
 		END
 
 		SPRINT description @100001 // ~%name%%colon%%value%~
-	END
-	ELSE PATCH_IF parameter2 != 109 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
 	END
 END
 
@@ -7157,7 +7157,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_233~ BEGIN
 	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~)  BEGIN
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
 		SPRINT theStatistic @12330002 // ~la compétence martiale %proficiency%~
-		PATCH_IF type == 1 BEGIN
+		PATCH_IF type != 0 BEGIN
 			PATCH_IF value > 0 BEGIN
 	            SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
 			END
@@ -7170,9 +7170,6 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_233~ BEGIN
 			SPRINT description @102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
 		END
 	END
-	ELSE PATCH_IF parameter2 != 109 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_233~ BEGIN
@@ -7184,7 +7181,7 @@ DEFINE_PATCH_MACRO ~opcode_target_233~ BEGIN
 		SPRINT proficiency $tra_proficiencies(~%parameter2%~)
 		SPRINT theStatistic @12330002 // ~la compétence martiale %proficiency%~
 
-		PATCH_IF type == 1 BEGIN
+		PATCH_IF type != 0 BEGIN
 			PATCH_IF value > 0 BEGIN
 	            SPRINT description @102286 // ~Augmente de %value% %theStatistic% %ofTheTarget%~
 			END
@@ -7197,9 +7194,6 @@ DEFINE_PATCH_MACRO ~opcode_target_233~ BEGIN
 			SPRINT description @102287 // ~Porte à %value% %theStatistic% %ofTheTarget%~
 		END
 	END
-	ELSE PATCH_IF parameter2 != 109 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Proficiency not found : %parameter2%~ END
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_233~ BEGIN
@@ -7208,10 +7202,33 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_233_common~ BEGIN
 	SET value = parameter1
-	SET type = 0
-	PATCH_IF is_ee == 1 BEGIN
-		SET type = parameter2 BLSR 16
-		SET parameter2 = parameter2 BAND 255
+	SET type = is_ee ? parameter2 BLSR 16 : 0
+	SET parameter2 = parameter2 BAND 65535
+	PATCH_IF type != 0 AND special != 0 BEGIN
+		// Cas très très particulier
+		PATCH_IF parameter2 == 90 BEGIN
+			SET type = 0
+		END
+		ELSE BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Be careful. Special should be equal to 0.~ END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_233_is_valid~ BEGIN
+	LOCAL_SET stat = parameter2 BAND 65535
+	LOCAL_SET type = is_ee ? parameter2 BLSR 16 : 0
+	PATCH_IF stat < 89 OR stat > 134 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Type %stat% (89-134 expected)~ END
+	END
+	PATCH_IF stat == 99 AND type != 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Crash Warning: Opcode %opcode%: Invalid Mode %type% with Type %stat%~ END
+	END
+	PATCH_IF type != 0 AND parameter1 == 0 AND special == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected. Proficiency %stat% += 0~ END
 	END
 END
 
