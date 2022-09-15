@@ -7506,19 +7506,29 @@ END
 /* ------------------------------------------- *
  * Spell Effect: Attack Nearest Creature [247] *
  * ------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_247~ BEGIN
-	SPRINT description @12470001 // ~Provoque la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+ DEFINE_PATCH_MACRO ~opcode_self_247~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		LPM ~opcode_self_3~
+	END
+	ELSE BEGIN
+		SPRINT description @12470001 // ~Apaise %theTarget%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_247~ BEGIN
-	SPRINT description @12470002 // ~de provoquer la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+	PATCH_IF parameter2 != 0 BEGIN
+		LPM ~opcode_self_probability_3~
+	END
+	ELSE BEGIN
+		SPRINT description @12470002 // d'apaiser %theTarget%
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_247~ BEGIN
 	LPM ~opcode_self_247~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_245~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_probability_247~ BEGIN
 	LPM ~opcode_self_probability_247~
 END
 

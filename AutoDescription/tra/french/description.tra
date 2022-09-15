@@ -2594,10 +2594,15 @@
 @12450001 = ~Chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
 @12450002 = ~que chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
 
+// Opcode 246: Spell Effect: Berserking [246]
+
+@12460001 = ~Points de vie +15, dégâts +1, TAC0 +1~
+@12460002 = ~d'augmenter les caractéristiques %ofTheTarget% : Points de vie +15, dégâts +1, TAC0 +1~
+
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Provoque la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
-@12470002 = ~de provoquer la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+@12470001 = ~Apaise %theTarget%~
+@12470002 = ~d'apaiser %theTarget%~
 
 // Opcode 248: Item: Set Melee Effect [248]
 
