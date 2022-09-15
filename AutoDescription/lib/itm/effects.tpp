@@ -55,7 +55,7 @@ BEGIN
 				END
 			END
 			ELSE PATCH_IF target == TARGET_FX_party BEGIN
-				SPRINT opcode_target ~_party~
+				SPRINT opcode_target ~_target~
 				PATCH_IF forceTarget == 0 BEGIN
 					SPRINT theTarget   @102473 // ~les membres du groupe~
 					SPRINT ofTheTarget @101088 // ~des membres du groupe~
@@ -110,7 +110,7 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
         LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
     END
 
-	PATCH_IF target > 9 BEGIN
+	PATCH_IF target > 9 OR target < 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid target : %target%~ END
 	END
@@ -119,10 +119,18 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 	// TODO: Cas particulier de l'opcode 177...
 	PATCH_IF target == TARGET_FX_none BEGIN // On ignore les effets dont la cible est none (Ex: BARBEAXE.ITM qui ne passe pas la force du porteur à 20)
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Target est none~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Target is None~ END
 	END
 
-	PATCH_IF VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+	/*
+	// FIXME: à utiliser une fois la liste opcodes_ignore_duration complète
+	PATCH_IF timingMode == TIMING_duration AND duration <= 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Duration is 0~ END
+	END
+	*/
+
+	PATCH_IF is_ee == 0 AND VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Les 2 parametres doivent avoir la valeur 0~ END
 	END
@@ -288,7 +296,7 @@ END
 
 DEFINE_PATCH_FUNCTION ~get_probability~ INT_VAR probability1 = 0 probability2 = 0 RET probability BEGIN
 	PATCH_IF probability1 > 99 OR probability1 < 0 BEGIN
-	    probability1 = 99
+	    SET probability1 = 99
 	END
 
 	SET probability = probability1 - probability2 + 1
@@ -341,6 +349,17 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	ELSE PATCH_IF timingMode == 8 BEGIN
 		SET timingMode = 5
 		SET duration = duration / 15
+	END
+
+	PATCH_IF duration <= 0 BEGIN
+		PATCH_IF timingMode == TIMING_delayed BEGIN
+			SET timingMode = TIMING_permanent
+			SET duration = 0
+		END
+		ELSE PATCH_IF timingMode == 5 BEGIN
+			SET timingMode = TIMING_while_equipped
+			SET duration = 0
+		END
 	END
 
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_permanent_after_death BEGIN
