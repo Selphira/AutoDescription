@@ -3713,28 +3713,29 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
-		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
+		// Génère beaucoup de log, les sorts sont rarement bloqués
+		// ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
+		// 	SET opcode = 206
+		// 	PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+		// 		// Aucun retrait
+		// 		LPF ~has_opcode~
+		// 			INT_VAR opcode
+		// 			STR_VAR expression = ~resref = %resref%~
+		// 			RET hasOpcode
+		// 		END
+		// 		PATCH_IF NOT hasOpcode BEGIN
+		// 			LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
+		// 		END
+		// 	END
+		// 	PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+		// 		LPF ~delete_opcode~
+		// 			INT_VAR opcode
+		// 			STR_VAR expression = ~resref = %resref%~
+		// 			RET $opcodes(~%opcode%~) = count
+		// 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		// 		END
+		// 	END
+		// END
 	END
 	SET opcode = 101
 END
