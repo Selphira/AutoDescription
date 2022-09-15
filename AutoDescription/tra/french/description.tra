@@ -953,6 +953,134 @@
 @400505 = ~aux capacités psioniques~
 
 
+/* -------------- *
+ * State *
+ * ------------- */
+// Complète la phrase : Lorsque %theTarget% est...
+
+@410000 = ~normal~ // TODO: tous les states sont inactifs
+@410001 = ~endormi~
+@410002 = ~enragé~
+@410003 = ~paniqué~
+@410004 = ~étourdi~
+@410005 = ~invisible~
+@410006 = ~sans défense~
+@410007 = ~congelé~
+@410008 = ~pétrifié~
+@410009 = ~~
+@410010 = ~~
+@410011 = ~~
+@410012 = ~décédé~
+@410013 = ~sous silence~
+@410014 = ~charmé~
+@410015 = ~empoisonné~
+@410016 = ~hâté~
+@410017 = ~ralenti~
+@410018 = ~doté de l'infravision~
+@410019 = ~aveuglé~
+@410020 = ~malade~
+@410021 = ~débile mental~
+@410022 = ~indétectable~
+@410023 = ~parfaitement invisible~
+@410024 = ~bénie~
+@410025 = ~protégé par un cantique~
+@410026 = ~sous l'effet d'une puissance sacrée~
+@410027 = ~chanceux~
+@410028 = ~sous l'effet de Aide~
+@410029 = ~victime d'un cantique~
+@410030 = ~flou~
+@410031 = ~protégé par une image-miroir~
+@410032 = ~confus~
+
+@410100 = ~ou~ // Séparateur
+
+
+
+/* -------------- *
+ * SplState *
+ * ------------- */
+
+// Basé sur Vanilla, ne sont remplis que les SplState utilisés
+// Rien n'oblige à utiliser PROTECTION_FROM_EVIL pour une Protection contre le Mal
+// Ceux commençant par une Majuscule sont des SplState propre à un unique sort ou objet
+
+// Complète la phrase @12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~
+
+@420000 = ~Émotion~
+@420002 = ~Armure de la foi~
+@420005 = ~Bouclier de feu (rouge)~
+@420006 = ~Bouclier de feu (bleu)~
+@420008 = ~Protection contre la mort~
+@420009 = ~Puissance sacrée~
+@420021 = ~Sphère d'Otiluke~
+@420024 = ~Peau d'écorce~
+@420031 = ~Bouclier tempête~
+@420036 = ~un sommeil profond~
+@420038 = ~la surdité~
+@420040 = ~une protection contre les attaques sournoises~
+@420041 = ~Ordres chaotiques~
+@420042 = ~Fourvoiement magique~
+@420044 = ~Grande malédiction~
+@420046 = ~un toucher de la goule~ // Maladie, mode 11/12
+@420055 = ~Fatalité~
+@420056 = ~une immunité aux sorts d'Abjuration~ // Immunité aux sorts
+@420057 = ~une immunité aux sorts de Conjuration~
+@420058 = ~une immunité aux sorts de Divination~
+@420059 = ~une immunité aux sorts d'Enchantement~
+@420060 = ~une immunité aux sorts d'Illusion~
+@420061 = ~une immunité aux sorts d'Évocation~
+@420062 = ~une immunité aux sorts de Nécromancie~
+@420063 = ~une immunité aux sorts de Transmutation~
+@420064 = ~une protection contre les armes~
+@420065 = ~une protection contre les éléments~
+@420066 = ~une protection contre les sorts~
+@420067 = ~une protection contre les sorts incapacitants~
+@420068 = ~un stimulant de combat~
+@420071 = ~Poussière scintillante~
+@420072 = ~l'incapacité de devenir invisible~
+@420073 = ~la danse d'un Shaman~
+@420074 = ~Don de Lathandre~
+@420075 = ~la fatigue du berserker~
+@420076 = ~Rage du barbare~
+@420078 = ~Furie~ // Celle de Minsc
+@420079 = ~Arme empoisonée~
+@420080 = ~Kaï~
+@420081 = ~Position défensive~
+@420082 = ~Tir ciblé~
+@420083 = ~Bouclier du chaos~
+@420084 = ~Bouclier majeur du chaos~
+@420087 = ~le chant d'un Scalde~
+@420088 = ~le chant d'un Bouffon~
+@420089 = ~le chant amélioré d'un Barde~
+@420092 = ~Protection de l'esprit~
+@420093 = ~Arme enchantée~
+@420095 = ~Forme spirituelle~
+@420096 = ~Élu des esprits~
+@420097 = ~Lame critique~ // TODO?, sort sans nom : Coup critique +10%
+@420098 = ~Potion de blocage de la magie~
+@420099 = ~Potion de clarté~
+@420100 = ~Parchemin de protection contre la magie~
+@420101 = ~Parchemin de protection contre les morts-vivants~
+@420104 = ~la folie du berserker~ // concerne également la rage du Barbare, la rage Animale...
+@420106 = ~une protection contre la peur~
+@420107 = ~Protection contre la pétrification~
+@420108 = ~Bouclier de sort~
+@420109 = ~Protection contre les projectiles non magiques~
+@420110 = ~Spirale offensive~
+@420111 = ~Protection contre les armes non magiques~
+@420112 = ~Transformation de Tenser~
+@420113 = ~Spirale défensive~
+@420118 = ~Résistance d'acier~
+@420120 = ~Protection contre les armes magiques~
+@420121 = ~Manteau~
+@420122 = ~Manteau amélioré~
+@420123 = ~Immunité absolue~
+@420125 = ~le mode histoire~ // Mode de jeu facile ++
+@420126 = ~Bouclier~
+@420250 = ~la maladie~
+
+
+
 /* ------------------------------ *
  * Spécifiques à certains opcodes *
  * ------------------------------ */
@@ -2377,12 +2505,12 @@
 @12320022 = ~Lorsque le porteur tue la cible~
 @12320023 = ~~ // Cas particulier, moment de la journée
 @12320024 = ~Lorsque la cible se trouve à moins de %range%~
-@12320025 = ~~ // TODO ~Lorsque le porteur est %state%~
+@12320025 = ~Lorsque %theTarget% est %state%~
 @12320026 = ~Lorsque le porteur meurt~
 @12320027 = ~Lorsqu'une créature meurt~
-@12320028 = ~~ //TODO: TurnedBy ???
+@12320028 = ~Lorsque %theTarget% est repoussé par un clerc ou un paladin~
 @12320029 = ~Lorsque les points de vie du porteur tombent en dessous de %value%~
-@12320030 = ~Lorsque les points de vie du porteur tombent sous les %percent%~
+@12320030 = ~Lorsque les points de vie du porteur tombent sous les %percent% %~
 @12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~ // TODO: Ne s'adapte pas aux cibles autres que le porteur...
 
 @12320200 = ~le porteur~
@@ -2404,9 +2532,6 @@
 @12320303 = ~Au lever du jour, à chaque round~
 
 @12320400 = ~À partir du niveau %requiredLevel%~
-
-//@12320500 = ~~
-@12320604 = ~la rage du berserker~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 

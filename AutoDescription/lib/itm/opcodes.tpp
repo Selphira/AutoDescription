@@ -7006,7 +7006,26 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
         SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
 	    SPRINT description (AT ~%strref%~)
     END
-    ELSE BEGIN
+    ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
+		SPRINT spellName2 ~%spellName3%~
+        SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+	    SPRINT description (AT ~%strref%~)
+    END
+    ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
+		SPRINT spellName ~%spellName3%~
+        SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+	    SPRINT description (AT ~%strref%~)
+    END
+    ELSE BEGIN // Un seul sort
+		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
+			SPRINT spellName ~%spellName3%~
+			SPRINT resref ~%resref3%~
+		END
+		ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
+			SPRINT spellName ~%spellName2%~
+			SPRINT resref ~%resref2%~
+		END
+
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
 			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
@@ -7016,6 +7035,12 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 			END
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			// FIXME: spellName vaut ~~ même quand le sort possède un nom
+			// FIXME: le temps des deux effets s'affichent
+			// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
+			// Fix rapide qui cache la durée de l'effet secondaire:
+			SET ignoreDuration = 1
+			//
 	        SET strref += 3 // ~lance un sort sur %theTarget%~
 		    SPRINT description (AT ~%strref%~)
 			SPRINT description ~%description%%spellDescription%~
@@ -7030,19 +7055,8 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	SET conditionRef = 12320010 + parameter2
 	SPRINT condition (AT ~%conditionRef%~)
 
-	PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 OR parameter2 == 20 BEGIN
-		PATCH_IF parameter2 == 2 BEGIN
-			SET value = 50
-		END
-		ELSE PATCH_IF parameter2 == 3 BEGIN
-			SET value = 25
-		END
-		ELSE PATCH_IF parameter2 == 4 BEGIN
-			SET value = 10
-		END
-		ELSE BEGIN
-			SET value = special
-		END
+	PATCH_IF parameter2 >= 2 AND parameter2 <= 4 OR parameter2 == 20 BEGIN
+		SET value = parameter2 == 2 ? 50 : parameter2 == 3 ? 25 : parameter2 == 4 ? 10 : special
 		PATCH_IF value >= 100 BEGIN
 			SPRINT condition @12320020 // ~À chaque round~
 		END
@@ -7051,39 +7065,59 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 			SPRINT condition @12320030 // ~Lorsque les points de vie du porteur passent sous les %percent%~
 		END
 	END
+	ELSE PATCH_IF parameter2 == 5 OR parameter2 == 6 OR parameter2 == 15 BEGIN
+		PATCH_IF parameter2 == 5 BEGIN
+			SET state = 0x20 // sans défense
+			SET parameter1 = 1
+		END
+		ELSE PATCH_IF parameter2 == 6 BEGIN
+			SET state = 0x4000 // empoisonné
+			SET parameter1 = 1
+		END
+		ELSE BEGIN
+			SET state = special
+		END
+		LPF ~get_states_str~ INT_VAR state = state RET state = descriptionState END
+		SPRINT condition @12320025 // ~Lorsque %theTarget% est %state%~
+	END
 	ELSE PATCH_IF parameter2 == 19 BEGIN
 		SET value = special
 		SPRINT condition @12320029 // ~Lorsque les points de vie du porteur passent sous %value%~
 	END
 	ELSE PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
-		PATCH_IF parameter2 == 8 BEGIN
-			SET value = 4
-		END
-		ELSE PATCH_IF parameter2 == 9 BEGIN
-            SET value = 10
-        END
-		ELSE BEGIN
-            SET value = special
-        END
+		SET value = parameter2 == 8 ? 4 : parameter2 == 9 ? 10 : special
 		SPRINT range $feets_to_meters(~%value%~)
 		SPRINT condition @12320024 // ~Lorsque la cible se trouve à moins de %range%~
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
-		PATCH_IF parameter1 != 0 BEGIN
-            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
-		END
 		SET timeofdayRef = 12320300 + special
 		LPF ~getTranslation~ INT_VAR strref = timeofdayRef opcode RET condition = string END
 	END
 	ELSE PATCH_IF parameter2 == 21 BEGIN
-		SET stateRef = 12320500 + special
+		SET stateRef = 420000 + special
 		LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
 		PATCH_IF NOT ~%splstate%~ STRING_EQUAL ~~ BEGIN
 			SPRINT condition @12320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
 		END
 	END
-	ELSE PATCH_IF parameter2 == 15 OR parameter2 == 18 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: TODO parameter2 : %parameter2% : %parameter1% : %special%~ END
+END
+
+DEFINE_PATCH_MACRO ~opcode_232_is_valid~ BEGIN
+	PATCH_IF parameter1 < 0 OR parameter1 > 3 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Target: %parameter1% (0-3 expected)~ END
+	END
+	PATCH_IF parameter2 < 0 OR parameter2 > 21 OR parameter2 > 11 AND NOT is_ee BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Condition: %parameter2% (EE: 0-21 expected, non-EE: 0-11 expected)~ END
+	END
+	PATCH_IF parameter2 == 13 AND parameter1 != 0 BEGIN // TimeOfDay
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
+	END
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ AND (NOT isExternal OR ~%resref2%~ STRING_EQUAL ~~ AND ~%resref3%~ STRING_EQUAL ~~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: resource field are empty~ END
 	END
 END
 
@@ -9851,5 +9885,28 @@ DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 amount = 0 RET strref spel
 	END
 	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 4 // ~Lance %spellName%~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BEGIN
+	SPRINT descriptionState ~~
+	SET hexValue = 0b1
+	SET initRef = 410000
+	SPRINT sep @410100 // ~ou~
+	FOR (i = 1 ; i <= 32 ; ++i) BEGIN
+		PATCH_IF state BAND hexValue BEGIN
+			SET strref = initRef + i
+			LPF ~getTranslation~ INT_VAR strref RET stateRef = string END
+			PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
+				SPRINT descriptionState ~%stateRef%~
+			END
+			ELSE BEGIN
+				SPRINT descriptionState ~%descriptionState% %sep% %stateRef%~
+			END
+		END
+		SET hexValue <<= 1
+	END
+	PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
+		SPRINT descriptionState @410000 // ~normal~
 	END
 END
