@@ -7457,6 +7457,14 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_244~ BEGIN
 	LPM ~opcode_self_probability_244~
 END
 
+DEFINE_PATCH_MACRO ~opcode_243_is_valid~ BEGIN
+	PATCH_IF parameter1 <= 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No effect detected. 1 > Amount to Drain (%parameter1%)~ END
+	END
+END
+
+
 /* ----------------------- *
  * Check For Berserk [245] *
  * ----------------------- */
