@@ -4929,8 +4929,8 @@ DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
 	PATCH_IF parameter2 == 0 AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND isRobe)) BEGIN
 		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts profanes~
 	END
-	ELSE BEGIN
-		SET strref = 11450001+parameter2
+	ELSE PATCH_IF parameter2 != 0 BEGIN
+		SET strref = 11450001 + parameter2
 		SPRINT description (AT ~%strref%~)
 	END
 END
