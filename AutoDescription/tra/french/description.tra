@@ -2563,7 +2563,8 @@
 
 // Opcode 239: Spell Effect: Farsight [239]
 
-@12390001 = ~Permet de voir au loin~
+@12390001 = ~Permet d'observer une zone déjà reconnue~
+@12390002 = ~Permet d'observer une zone, même inconnue~
 
 // Opcode 242: Cure: Confusion [242]
 

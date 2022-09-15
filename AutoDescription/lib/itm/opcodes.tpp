@@ -502,7 +502,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	224 => 1 // Cure: Level Drain (Restoration)
 	229 => 1 // Removal: Remove One School
 	230 => 1 // Removal: Remove One Secondary Type
+	238 => 1 // Death: Disintegrate
 	242 => 1 // Cure: Confusion
+	243 => 1 // Item: Drain Item Charges
+	244 => 1 // Spell: Drain Wizard Spell
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -514,9 +517,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	177 => 1
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
-	233 => 1
-	238 => 1
-	244 => 1
+	233 => 1 // Stat: Proficiency Modifier
+	236 => 1 // Spell Effect: Image Projection
 	261 => 1
 	273 => 1
 	280 => 1
@@ -7289,7 +7291,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_238~ BEGIN
 	LOCAL_SET strref = 12380001 // ~Désintègre %theTarget%~
 
-	PATCH_IF NOT (parameter1 == 0 AND parameter2 == 2) BEGIN
+	PATCH_IF parameter1 != 0 BEGIN
 		SET strref += 1 // ~Désintègre les %creatureType%~
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
 	END
@@ -7300,7 +7302,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_238~ BEGIN
 	LOCAL_SET strref = 12380003 // ~de désintégrer %theTarget%~
 
-	PATCH_IF NOT (parameter1 == 0 AND parameter2 == 2) BEGIN
+	PATCH_IF parameter1 != 0 BEGIN
 		SET strref += 1 // ~de désintégrer les %creatureType%~
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
 	END
@@ -7316,11 +7318,20 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_238~ BEGIN
 	LPM ~opcode_self_probability_238~
 END
 
+DEFINE_PATCH_MACRO ~opcode_238_is_valid~ BEGIN
+	LPM ~opcode_idscheck_is_valid~
+END
+
 /* ---------------------------- *
  * Spell Effect: Farsight [239] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_239~ BEGIN
-	SPRINT description @12390001 // ~Permet de voir au loin~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @12390001 // ~Permet d'observer une zone déjà reconnue~
+	END
+	ELSE BEGIN
+		SPRINT description @12390002 // ~Permet d'observer une zone, même inconnue~
+	END
 END
 
 /* ----------------------------- *
@@ -7338,11 +7349,15 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_241~ BEGIN
 	LPM ~opcode_target_probability_5~
 END
 
+DEFINE_PATCH_MACRO ~opcode_241_is_valid~ BEGIN
+	LPM ~opcode_5_is_valid~
+END
+
 /* --------------------- *
  * Cure: Confusion [242] *
  * --------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_242~ BEGIN
-	SPRINT description @12420001 // ~Immunité à la confusion~
+	SPRINT description @12420001 // ~Dissipation de la confusion~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_242~ BEGIN
@@ -7381,12 +7396,14 @@ END
 DEFINE_PATCH_MACRO ~opcode_243_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	PATCH_IF is_ee == 1 BEGIN
+		// TODO: ? You can drain charges of a particular item if the resource field is used
+		// Inexistant en 2.5.16
 		PATCH_IF amount != 1 BEGIN
 			SET strref += 1 // ~Draine %amount% charges aux objets magiques %ofTheTarget%~
 		END
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
-	ELSE PATCH_IF NOT GAME_IS ~tob~ BEGIN
+	ELSE BEGIN
 		SET strref += 2 // ~Draine les charges des objets magiques %ofTheTarget%~
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 		PATCH_IF amount == 0 BEGIN
@@ -7394,7 +7411,15 @@ DEFINE_PATCH_MACRO ~opcode_243_common~ BEGIN
 			SPRINT description ~%description%, %exception%~
 		END
 	END
-	ELSE BEGIN
+END
+
+DEFINE_PATCH_MACRO ~opcode_243_is_valid~ BEGIN
+	PATCH_IF is_ee AND parameter1 <= 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No effect detected. 1 > Amount to Drain (%parameter1%)~ END
+	END
+	PATCH_IF NOT is_ee AND GAME_IS ~tob~ BEGIN
+		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: This effect not works in ToB~ END
 	END
 END
