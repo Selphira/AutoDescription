@@ -7001,11 +7001,11 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
-	    SPRINT description (AT ~%strref%~)
+		SPRINT description (AT ~%strref%~)
     END
     ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
-        SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
-	    SPRINT description (AT ~%strref%~)
+		SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+		SPRINT description (AT ~%strref%~)
     END
     ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SPRINT spellName2 ~%spellName3%~
@@ -7014,10 +7014,10 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
     END
     ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SPRINT spellName ~%spellName3%~
-        SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
-	    SPRINT description (AT ~%strref%~)
-    END
-    ELSE BEGIN // Un seul sort
+		SET strref += 1 // ~lance les sorts %spellName% et %spellName2% sur %theTarget%~
+		SPRINT description (AT ~%strref%~)
+	END
+	ELSE BEGIN // Un seul sort
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 			SPRINT spellName ~%spellName3%~
 			SPRINT resref ~%resref3%~
