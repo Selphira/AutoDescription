@@ -7275,7 +7275,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_236_common~ BEGIN
 	LOCAL_SET type = parameter2
 
-	PATCH_IF type > 4 BEGIN
+	PATCH_IF type > 3 OR type < 0 BEGIN
 		SET type = 0
 	END
 	SET strref += type
