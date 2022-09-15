@@ -2495,8 +2495,8 @@
 @12320012 = ~~ // @12320030
 @12320013 = ~~ // @12320030
 @12320014 = ~~ // @12320030
-@12320015 = ~Lorsque le porteur est sans défense~
-@12320016 = ~Lorsque le porteur est empoisonné~
+@12320015 = ~~ // @12320025
+@12320016 = ~~ // @12320025
 @12320017 = ~Lorsque le porteur est attaqué~
 @12320018 = ~~ // @12320024
 @12320019 = ~~ // @12320024
@@ -2510,7 +2510,7 @@
 @12320027 = ~Lorsqu'une créature meurt~
 @12320028 = ~Lorsque %theTarget% est repoussé par un clerc ou un paladin~
 @12320029 = ~Lorsque les points de vie du porteur tombent en dessous de %value%~
-@12320030 = ~Lorsque les points de vie du porteur tombent sous les %percent% %~
+@12320030 = ~Lorsque les points de vie du porteur tombent sous les %percent%~
 @12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~ // TODO: Ne s'adapte pas aux cibles autres que le porteur...
 
 @12320200 = ~le porteur~

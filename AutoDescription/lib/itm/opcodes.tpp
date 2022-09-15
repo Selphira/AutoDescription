@@ -7036,9 +7036,10 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 			END
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			// FIXME: spellName vaut ~~ même quand le sort possède un nom
 			// FIXME: le temps des deux effets s'affichent
 			// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
+			// Il faudrait revoir l'affichage, éventuellement mettre la durée en premier
+			// Pendant 5 rounds : A chaque round ; Lorsque que la cible se trouve à moins de 7 mètres ; Lance Emprisonnement
 			// Fix rapide qui cache la durée de l'effet secondaire:
 			SET ignoreDuration = 1
 			//
