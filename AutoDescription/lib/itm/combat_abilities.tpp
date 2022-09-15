@@ -401,8 +401,8 @@ BEGIN
 	                        LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
 	                    END
 
-	                    SPRINT value ~%value% (%sectionType%)~
 						SPRINT name @102005 // ~Type de dégâts~
+	                    SPRINT name ~%name% (%sectionType%)~
 						SPRINT $damageTypesTmp(~%index2%~) @100001 // %name% : %value%
 					END
 	            END
