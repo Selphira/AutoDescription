@@ -8223,19 +8223,27 @@ END
  * Stat: Backstab [263] *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_263~ BEGIN
+	// Spécificité de l'opcode
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_mod~ INT_VAR strref = 12630001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_263~ BEGIN
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_target~ INT_VAR strref = 12630002 RET description END // ~le multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_263~ BEGIN
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_probability~ INT_VAR strref = 12630002 RET description END // ~le multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_263~ BEGIN
 	LPM ~opcode_self_probability_263~
+END
+
+DEFINE_PATCH_MACRO ~opcode_263_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ---------------------------------------- *
