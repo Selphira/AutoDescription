@@ -8095,41 +8095,49 @@ END
  * Spell: Restore Lost Spells [261] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_261~ BEGIN
-	LOCAL_SET spellLevel = parameter1
-	LOCAL_SET strref = 12610001
-
-	PATCH_IF spellLevel > 1 BEGIN
-		SET strref += 1
-	END
-	PATCH_IF parameter2 != 0 BEGIN
-		SET strref += 2
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_261~ BEGIN
-	LOCAL_SET spellLevel = parameter1
-	LOCAL_SET strref = 12610005
-
-	PATCH_IF spellLevel > 1 BEGIN
-		SET strref += 1
-	END
-	PATCH_IF parameter2 != 0 BEGIN
-		SET strref += 2
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	SET strref = 12610001
+	LPM ~opcode_261_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_261~ BEGIN
-	LPM ~opcode_self_261~
+	SET strref = 12610002
+	LPM ~opcode_261_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_261~ BEGIN
+	SET strref = 12610003
+	LPM ~opcode_261_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_261~ BEGIN
-	LPM ~opcode_self_probability_261~
+	SET strref = 12610004
+	LPM ~opcode_261_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
+	LOCAL_SET spellLevel = parameter1
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT spellType @12610011 // ~profane~
+		SET spellLevel = spellLevel > 9 ? 9 : spellLevel
+	END
+	ELSE PATCH_IF parameter2 == 1 BEGIN
+		SPRINT spellType @12610012 // ~divin~
+		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
+	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_262_is_valid~ BEGIN
+	PATCH_IF parameter2 != 0 AND parameter2 != 1 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type: %parameter2% (0 or 1 expected)~ END
+	END
+	PATCH_IF parameter1 < 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level: %parameter1% (positive value expected)~ END
+	END
+END
 /* ------------------------ *
  * Stat: Visual Range [262] *
  * ------------------------ */

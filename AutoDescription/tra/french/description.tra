@@ -2659,14 +2659,13 @@
 
 // Opcode 261: Spell: Restore Lost Spells [261]
 
-@12610001 = ~Remet en mémoire 1 sort profane de niveau 1 %toTheTarget%~
-@12610002 = ~Remet en mémoire 1 sort profane de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610003 = ~Remet en mémoire 1 sort divin de niveau 1 %toTheTarget%~
-@12610004 = ~Remet en mémoire 1 sort divin de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610005 = ~de remettre en mémoire 1 sort profane de niveau 1 %toTheTarget%~
-@12610006 = ~de remettre en mémoire 1 sort profane de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610007 = ~de remettre en mémoire 1 sort divin de niveau 1 %toTheTarget%~
-@12610008 = ~de remettre en mémoire 1 sort divin de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610001 = ~Se remémore 1 sort %spellType% de niveau %spellLevel% ou inférieur~
+@12610002 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610003 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~
+@12610004 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+
+@12610010 = ~profane~ // ~%spellType%~
+@12610011 = ~divin~
 
 // Opcode 262: Stat: Visual Range [262]
 
