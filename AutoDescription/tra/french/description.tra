@@ -1202,8 +1202,32 @@
 
 // Opcode 13: Death: Instant Death [13]
 
-@10130001 = ~Tue instantanément %theTarget%~
-@10130002 = ~de tuer instantanément %theTarget%~
+@10130001 = ~Dissout %theTarget%~
+@10130002 = ~Carbonise %theTarget%~
+@10130003 = ~Explose %theTarget% en morceaux~
+@10130004 = ~Tue instantanément %theTarget%~
+@10130005 = ~Décapite %theTarget%~
+@10130006 = ~Pétrifie %theTarget%~
+@10130007 = ~Congèle %theTarget%~
+@10130008 = ~Tue instantanément %theTarget%~
+@10130009 = ~Tue instantanément %theTarget%~
+@10130010 = ~Électrocute mortellement %theTarget%~
+@10130011 = ~Désintègre %theTarget%~
+@10130012 = ~Détruit %theTarget%~
+
+@10130101 = ~de dissoudre %theTarget%~
+@10130102 = ~de carboniser %theTarget%~
+@10130103 = ~d'exploser %theTarget% en morceaux~
+@10130104 = ~de tuer instantanément %theTarget%~
+@10130105 = ~de décapiter %theTarget%~
+@10130106 = ~de pétrifier %theTarget%~
+@10130107 = ~de congeler %theTarget%~
+@10130108 = ~de tuer instantanément %theTarget%~
+@10130109 = ~de tuer instantanément %theTarget%~
+@10130110 = ~d'électrocuter mortellement %theTarget%~
+@10130111 = ~de désintégrer %theTarget%~
+@10130112 = ~de détruire %theTarget%~
+
 
 // Opcode 14: Graphics: Defrost [14]
 

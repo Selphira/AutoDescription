@@ -1493,7 +1493,8 @@ END
  * Death: Instant Death [13] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_13~ BEGIN
-	SPRINT description @10130001 // ~Tue instantanément %theTarget%~
+	SET strref = 10130001 // ~Tue instantanément %theTarget%~
+	LPM ~opcode_13_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
@@ -1505,7 +1506,26 @@ DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
-	SPRINT description @10130002 // ~de tuer instantanément %theTarget%~
+	SET strref = 10130101 // ~de tuer instantanément %theTarget%~
+	LPM ~opcode_13_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_13_common~ BEGIN
+	LOCAL_SET hexValue = 0b1
+	LOCAL_SET strrefInc = ~-1~
+	PATCH_IF parameter2 == 0 BEGIN
+		SET strrefInc = 0
+	END
+	ELSE BEGIN
+		FOR (i = 1 ; i <= 11 ; ++i) BEGIN
+			PATCH_IF strrefInc < 0 AND parameter2 BAND hexValue BEGIN
+				SET strrefInc = i
+			END
+			SET hexValue <<= 1
+		END
+		strref = strref + strrefInc
+	END
+	SPRINT description (AT strref)
 END
 
 /* ----------------------------- *
