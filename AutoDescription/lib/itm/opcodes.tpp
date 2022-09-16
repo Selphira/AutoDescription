@@ -287,12 +287,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	// Parfois les immunités protègent contre les effet donc...
 
 	146 => 465 // Spell: Cast Spell (at Target) [146]
-	272 => 466 // Spell: Apply Repeating EFF [272]
-	148 => 467 // Spell: Cast Spell (at Point) [148]
-	311 => 468 // Spell: Random Wish Spell [311]
-	232 => 469 // Spell Effect: Cast Spell on Condition [232]
-	326 => 470 // Apply Effects List [326]
-	177 => 471 // EFF File
+	148 => 466 // Spell: Cast Spell (at Point) [148]
+	272 => 467 // Spell: Apply Repeating EFF [272]
+	232 => 468 // Spell Effect: Cast Spell on Condition [232]
+	326 => 469 // Apply Effects List [326]
+	311 => 470 // Spell: Random Wish Spell [311]
+	252 => 471 // Spell Effect: Set Trap [252]
+	177 => 472 // EFF File
 	
 	// Effets au toucher
 
@@ -634,7 +635,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	237 => 0 // Spell Effect: Puppet ID [237]
 	240 => 0 // Graphics: Remove Special Effect Icon [240]
-	252 => 1 // Spell Effect: Set Trap [252]
 	253 => 0 // Spell Effect: Add Map Marker [253]
 	254 => 0 // Spell Effect: Remove Map Marker [254]
 	256 => 0 // Spell: Spell Sequencer Active [256]
@@ -827,6 +827,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	243 => 1 // Item: Drain Item Charges
 	244 => 1 // Spell: Drain Wizard Spell
 	251 => 1 // Spell Effect: Change Bard Song Effect
+	252 => 1 // Spell Effect: Set Trap
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -8006,6 +8007,34 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_251~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_251_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
+/* ---------------------------- *
+ * Spell Effect: Set Trap [252] *
+ * ---------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520004
+END
+
+DEFINE_PATCH_MACRO ~opcode_252_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
