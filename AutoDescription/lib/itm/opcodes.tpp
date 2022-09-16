@@ -316,6 +316,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	172 => 489 // Spell: Remove Spell [172]
 	147 => 490 // Spell: Learn Spell [147]
 	171 => 491 // Spell: Give Innate Ability [171]
+	251 => 492 // Spell Effect: Change Bard Song Effect [251]
 
 
 	145 => 492 // Spell: Disable Spell Casting Abilities [145]
@@ -633,14 +634,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	237 => 0 // Spell Effect: Puppet ID [237]
 	240 => 0 // Graphics: Remove Special Effect Icon [240]
-	251 => 1 // Spell Effect: Change Bard Song Effect [251]
 	252 => 1 // Spell Effect: Set Trap [252]
 	253 => 0 // Spell Effect: Add Map Marker [253]
 	254 => 0 // Spell Effect: Remove Map Marker [254]
 	256 => 0 // Spell: Spell Sequencer Active [256]
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
-	260 => 0 //
+	260 => 1 //
 	264 => 1 // Spell Effect: Drop Weapons in Panic [264]
 	265 => 0 // Script: Set Global Variable [265]
 	266 => 1 // Spell: Remove Protection from Spell [266]
@@ -826,6 +826,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	242 => 1 // Cure: Confusion
 	243 => 1 // Item: Drain Item Charges
 	244 => 1 // Spell: Drain Wizard Spell
+	251 => 1 // Spell Effect: Change Bard Song Effect
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -7978,6 +7979,34 @@ DEFINE_PATCH_MACRO ~opcode_250_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Damage Modifier == %parameter1%~ END
 	END
+END
+
+/* ------------------------------------------- *
+ * Spell Effect: Change Bard Song Effect [251] *
+ * ------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510004
+END
+
+DEFINE_PATCH_MACRO ~opcode_251_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------------- *

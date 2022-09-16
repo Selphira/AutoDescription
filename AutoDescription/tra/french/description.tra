@@ -2630,8 +2630,16 @@
 
 // Opcode 250: Spell Effect: Damage Modifier [250]
 
-@12500001 = ~Dégâts minimum~
-@12500002 = ~les dégâts minimum~
+@12500001 = ~Dégâts minimums~
+@12500002 = ~les dégâts minimums~
+
+
+// Opcode 251: Spell Effect: Change Bard Song Effect [251]
+
+@12510001 = ~Apprend un nouveau chant de barde (%spellName%)~
+@12510002 = ~de faire apprendre un nouveau chant de barde (%spellName%)~
+@12510003 = ~Apprend un nouveau chant de barde (%spellName%) %toTheTarget%~
+@12510004 = ~de faire apprendre un nouveau chant de barde (%spellName%) %toTheTarget%~
 
 // Opcode 259: Protection: Spell Trap [259]
 
