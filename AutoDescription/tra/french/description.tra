@@ -2738,8 +2738,8 @@
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Hiatus entropique~
-@12810002 = ~le hiatus entropique~
+@12810001 = ~Résultat des hiatus entropiques~
+@12810002 = ~le résultat des hiatus entropiques~
 
 // Opcode 283: Use EFF File (Cursed) [283]
 

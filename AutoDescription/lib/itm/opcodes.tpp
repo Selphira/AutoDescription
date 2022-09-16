@@ -8662,6 +8662,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_281~ BEGIN
 	LPM ~opcode_self_probability_281~
 END
 
+DEFINE_PATCH_MACRO ~opcode_281_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* --------------------------- *
  * Use EFF File (Cursed) [283] *
  * --------------------------- */
