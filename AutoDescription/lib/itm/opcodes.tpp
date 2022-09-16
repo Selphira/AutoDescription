@@ -8504,6 +8504,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_275~ BEGIN
 	LPM ~opcode_self_probability_275~
 END
 
+DEFINE_PATCH_MACRO ~opcode_275_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------ *
  * Stat: Detect Illusion Modifier [276] *
  * ------------------------------------ */
@@ -8523,6 +8527,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_276~ BEGIN
 	LPM ~opcode_self_probability_276~
 END
 
+DEFINE_PATCH_MACRO ~opcode_276_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------ *
  * Stat: Set Traps Modifier [277] *
  * ------------------------------ */
@@ -8540,6 +8548,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_277~ BEGIN
 	LPM ~opcode_self_probability_277~
+END
+
+DEFINE_PATCH_MACRO ~opcode_277_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------- *
