@@ -4734,10 +4734,7 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
-	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource cannot be empty~ END
-	END
+	LPM ~opcode_resref_is_valid~
 END
 
 
@@ -7985,48 +7982,53 @@ END
  * Item: Create Inventory Item (days) [255] *
  * ---------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_255~ BEGIN
-	// TODO: duration in days !
+	// Conversion en jour
+	SET duration *= 7200
 	LPM ~opcode_self_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_self_probability_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_target_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_target_probability_122~
+END
+
+DEFINE_PATCH_MACRO ~opcode_255_is_valid~ BEGIN
+	LPM ~opcode_122_is_valid~
 END
 
 /* ---------------------------- *
  * Protection: Spell Trap [259] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590001 // ~Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés)~
+	SET strref = 12590001 // ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LPM ~opcode_259_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590003 // ~de lancer Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+	SET strref = 12590002 // ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LPM ~opcode_259_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590002 // ~Lance Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+DEFINE_PATCH_MACRO ~opcode_259_common~ BEGIN
+	LPM ~opcode_223_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_259~ BEGIN
-	LPM ~opcode_self_probability_259~
+DEFINE_PATCH_MACRO ~opcode_259_is_valid~ BEGIN
+	LPM ~opcode_223_is_valid~
+	PATCH_IF parameter2 > 9 OR parameter2 < 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Power Level: %parameter2% (0-9 expected)~ END
+	END
 END
 
 /* -------------------------------- *

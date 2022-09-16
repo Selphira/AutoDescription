@@ -2435,7 +2435,7 @@
 @12230001 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12230002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12230003 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
-@12230004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12230004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
 @12230005 = ~Lance %spellName%~
 @12230006 = ~de lancer %spellName%~
 
@@ -2449,7 +2449,7 @@
 @12260001 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12260002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12260003 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
-@12260004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12260004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
 @12260005 = ~Lance %spellName%~
 @12260006 = ~de lancer %spellName%~
 
@@ -2458,7 +2458,7 @@
 @12270001 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12270002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12270003 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
-@12270004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12270004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
 @12270005 = ~Lance %spellName%~
 @12270006 = ~de lancer %spellName%~
 
@@ -2467,7 +2467,7 @@
 @12280001 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12280002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12280003 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
-@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
 @12280005 = ~Lance %spellName%~
 @12280006 = ~de lancer %spellName%~
 
@@ -2635,9 +2635,13 @@
 
 // Opcode 259: Protection: Spell Trap [259]
 
-@12590001 = ~Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés)~
-@12590002 = ~Lance Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
-@12590003 = ~de lancer Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+@12590001 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
+@12590002 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
+@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
+@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
+@12590005 = ~Lance %spellName%~
+@12590006 = ~de lancer %spellName%~
+
 
 // Opcode 261: Spell: Restore Lost Spells [261]
 
