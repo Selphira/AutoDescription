@@ -7974,6 +7974,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_250~ BEGIN
 	LPM ~opcode_self_probability_250~
 END
 
+DEFINE_PATCH_MACRO ~opcode_250_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Damage Modifier == %parameter1%~ END
+	END
+END
+
 /* ---------------------------------------- *
  * Item: Create Inventory Item (days) [255] *
  * ---------------------------------------- */
