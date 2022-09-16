@@ -2123,9 +2123,8 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	SET amount = 0
-	SET frequencyMultiplier = 1
 	SET frequency = 1
-	SET p4IsActive = isExternal AND parameter4 != 0
+	SET p4IsActive = isExternal AND parameter4 != 0 AND is_ee
 	SET type = parameter2
 
 	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
@@ -8438,19 +8437,33 @@ END
  * Remove: Specific Area Effect(Zone of Sweet Air) [273] *
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_273~ BEGIN
-	SPRINT description @12730001 // ~Zone d'air pur~
+	SET strref = 12730001 // ~Zone d'air pur~
+	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_273~ BEGIN
-	SPRINT description @12730003 // ~de lancer Zone d'air pur sur %theTarget%~
+	SET strref = 12730003 // ~de lancer Zone d'air pur~
+	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_273~ BEGIN
-	SPRINT description @12730002 // ~Lance Zone d'air pur sur %theTarget%~
+	SET strref = 12730002 // ~Lance Zone d'air pur sur %theTarget%~
+	LPM ~opcode_273_common~
+END
+			
+DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
+	SET strref = 12730004 // ~de lancer Zone d'air pur sur %theTarget%~
+	LPM ~opcode_273_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
-	LPM ~opcode_self_probability_273~
+DEFINE_PATCH_MACRO ~opcode_273_common~ BEGIN
+	PATCH_IF NOT is_ee OR ~%resref%~ STRING_EQUAL ~~ OR ~%resref%~ STRING_EQUAL_CASE ~CLEARAIR~ BEGIN
+		SPRINT description (AT strref)
+	END
+	ELSE BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : %resref%.2DA a gerer.~ END
+		SPRINT description ~~
+	END
 END
 
 /* -------------------------------------- *

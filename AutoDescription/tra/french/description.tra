@@ -2691,8 +2691,9 @@
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
 @12730001 = ~Zone d'air pur~
-@12730002 = ~Lance Zone d'air pur sur %theTarget%~
+@12730002 = ~Lance Zone d'air pur~
 @12730003 = ~de lancer Zone d'air pur sur %theTarget%~
+@12730002 = ~de lancer Zone d'air pur sur %theTarget%~
 
 // Opcode 274: Spell Effect: Teleport to Target [274]
 
