@@ -705,6 +705,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
+	0 => ~0 %meter%~
 	1 => ~0,6 %meter%~
 	2 => ~1,2 %meter%~
 	3 => ~1,8 %meter%~
@@ -718,6 +719,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
 	11 => ~7 %meters%~
 	12 => ~7,5 %meters%~
 	13 => ~8 %meters%~
+	14 => ~8,5 %meters%~
 	15 => ~9 %meters%~
 	16 => ~9,5 %meters%~
 	17 => ~10 %meters%~
@@ -8128,7 +8130,7 @@ DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
-DEFINE_PATCH_MACRO ~opcode_262_is_valid~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_261_is_valid~ BEGIN
 	PATCH_IF parameter2 != 0 AND parameter2 != 1 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type: %parameter2% (0 or 1 expected)~ END
@@ -8138,30 +8140,30 @@ DEFINE_PATCH_MACRO ~opcode_262_is_valid~ BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level: %parameter1% (positive value expected)~ END
 	END
 END
+
 /* ------------------------ *
  * Stat: Visual Range [262] *
  * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_262_common~ BEGIN
+	SET value = parameter2 == MOD_TYPE_flat AND parameter1 < 0 ? 0 : parameter1
+	SET isNegative = value < 0 ? 1 : 0
+	SET value = ABS value
+	// parameter seems to be in the 0–15 interval
+	SET value = value > 15 ? 15 : value
+	// Each unit of visible range equals 2ft
+	SET value *= 2
+	SPRINT value $feets_to_meters(~%value%~)
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-	LOCAL_SET isNegative = 0
-
-	PATCH_IF value < 0 BEGIN
-		SET isNegative = 1
-		SET value = ABS value
-	END
-
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		PATCH_IF value < 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-			SPRINT value ~-%value%~
-		END
-		ELSE BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-			SPRINT value ~+%value%~
-		END
+	LPM ~opcode_262_common~
+	PATCH_IF isNegative BEGIN
+		SPRINT value ~-%value%~
 	END
 	ELSE BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
+		SPRINT value ~+%value%~
+	END
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	SPRINT name @12620001 // ~Champ de vision~
@@ -8169,51 +8171,52 @@ DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
+	LPM ~opcode_262_common~
 	SPRINT theStatistic @12620002 // ~le champ de vision~
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
+        PATCH_IF isNegative BEGIN
+	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
+	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
 		SPRINT description @102545 // ~de passer %theStatistic% %ofTheTarget% à %value%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
+	LPM ~opcode_262_common~
 	SPRINT theStatistic @12620002 // ~le champ de vision~
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+        PATCH_IF isNegative BEGIN
+	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
 		SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_262~ BEGIN
 	LPM ~opcode_self_probability_262~
+END
+
+DEFINE_PATCH_MACRO ~opcode_262_is_valid~ BEGIN
+	PATCH_IF parameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type: %parameter2% (0 or 1 expected)~ END
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Visual range += 0~ END
+	END
 END
 
 /* -------------------- *
