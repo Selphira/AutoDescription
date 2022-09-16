@@ -9,9 +9,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
 	112 => 1   // Item: Item Remove [112]
 	123 => 1   // Item: Remove Inventory Item [123]
+	264 => 1   // Spell Effect: Drop Weapons in Panic [264]
 
 	// Modification des stats longue durée
-
 	283 => 2   // Use EFF File (Cursed) [283]
 	360 => 2   // Stat: Ignore Reputation Breaking Point [360]
     214 => 2   // Select Spell [214]
@@ -641,7 +641,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
 	260 => 1 //
-	264 => 1 // Spell Effect: Drop Weapons in Panic [264]
 	265 => 0 // Script: Set Global Variable [265]
 	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
@@ -830,6 +829,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	244 => 1 // Spell: Drain Wizard Spell
 	251 => 1 // Spell Effect: Change Bard Song Effect
 	252 => 1 // Spell Effect: Set Trap
+	261 => 1 // Spell: Restore Lost Spells
+	264 => 1 // Spell Effect: Drop Weapons in Panic
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -843,7 +844,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	218 => 1 // Protection: Stoneskin
 	233 => 1 // Stat: Proficiency Modifier
 	236 => 1 // Spell Effect: Image Projection
-	261 => 1
 	273 => 1
 	280 => 1
 	316 => 1
@@ -8244,6 +8244,38 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_263_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+/* ----------------------------------------- *
+ * Spell Effect: Drop Weapons in Panic [264] *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640001
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640002
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640004
+END
+
+DEFINE_PATCH_MACRO ~opcode_264_common~ BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
+		SPRINT objectType @12640011
+	END
+	ELSE BEGIN
+		SPRINT objectType @12640010
+	END
 END
 
 /* ---------------------------------------- *

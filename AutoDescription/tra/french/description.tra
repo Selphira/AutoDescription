@@ -2677,6 +2677,17 @@
 @12630001 = ~Multiplicateur d'attaque sournoise~
 @12630002 = ~le multiplicateur d'attaque sournoise~
 
+// Opcode 264: Spell Effect: Drop Weapons in Panic [264]
+
+@12640001 = ~Abandonne %objectType%~
+@12640002 = ~Fait abandonner %toTheTarget% %objectType%~
+@12640003 = ~d'abandonner %objectType%~
+@12640004 = ~de faire abandonner %toTheTarget% %objectType%~
+
+// En réalité il va jeter le premier objet trouvé, selon l'ordre défini dans SLOTS.ids (donc probablement une pièce de l'équipement) - aucun aléatoire
+@12640010 = ~un objet de son inventaire~ // %objectType%
+@12640011 = ~une arme équipée~
+
 // Opcode 268: Spell Effect: Explore (Wizard Eye) [268]
 
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~
