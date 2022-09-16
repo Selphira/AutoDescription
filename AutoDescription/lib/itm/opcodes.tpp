@@ -114,6 +114,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	// Dissipation
 
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
+	 32 => 201 // Cure: Death (Raise Dead) [32]
 	 43 => 201 // Cure: Stone to Flesh [43]
 	 14 => 202 // Graphics: Defrost [14]
     224 => 203 // Cure: Level Drain (Restoration) [224]
@@ -123,9 +124,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 79 => 207 // Cure: Disease [79]
 	 11 => 208 // Cure: Poison [11]
     242 => 209 // Cure: Confusion [242]
-	  4 => 210 // Cure: Berserking [4]
-	  2 => 211 // Cure: Sleep [2]
-    161 => 212 // Cure: Fear [161]
+	161 => 210 // Cure: Fear [161]
+	  4 => 211 // Cure: Berserking [4]
+	  2 => 212 // Cure: Sleep [2]
 	 48 => 213 // Cure: Silence (Vocalize) [48]
 	 75 => 214 // Cure: Blindness [75]
 	 81 => 215 // Cure: Deafness [81]
@@ -135,7 +136,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
     164 => 219 // Cure: Drunkeness [164]
 	 70 => 220 // Cure: Non-Detection [2]
 	 64 => 221 // State: Remove Infravision [64]
-	 32 => 222 // Cure: Death (Raise Dead) [32]
 	220 => 223 // Removal: Remove School [220]
 	221 => 224 // Removal: Remove Secondary Type [221]
 	229 => 225 // Removal: Remove One School [229]
@@ -1144,6 +1144,7 @@ END
 /* --------------------- *
  * State: Berserking [3] *
  * --------------------- */
+// TODO : timing != 1 AND (parameter2 != 1 OR NOT is_ee) : que durant les combats
 DEFINE_PATCH_MACRO ~opcode_self_3~ BEGIN
 	SPRINT description @10030001 // ~Provoque la rage du berserker chez %theTarget%~
 END
@@ -2182,10 +2183,11 @@ DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
 	END
 END
 
@@ -3240,7 +3242,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_74_is_valid~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter2 %parameter2% have strong impact on the duration.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter2 %parameter2% have strong impact on the duration.~ END
 	END
 END
 
@@ -3369,7 +3371,7 @@ DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -5222,7 +5224,7 @@ DEFINE_PATCH_MACRO ~opcode_143_is_valid~ BEGIN
 	END
 	PATCH_IF parameter1 < 0 OR parameter1 > 38 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid slot %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid slot %parameter1%.~ END
 	END
 END
 
@@ -5261,7 +5263,7 @@ DEFINE_PATCH_MACRO ~opcode_144_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 15 OR
 			 NOT is_ee AND (parameter2 == 15 OR parameter2 == 10) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
 	END
 END
 
@@ -5295,7 +5297,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR paramater2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
 	END
 END
 
@@ -5899,7 +5901,7 @@ DEFINE_PATCH_MACRO ~opcode_173_is_valid~ BEGIN
 	LOCAL_SET parameter1 = parameter1 BAND 255
 	PATCH_IF is_ee AND parameter1 == 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
 	END
 END
 
@@ -6132,7 +6134,7 @@ DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
 	LOCAL_SET value = isExternal? parameter3 : 0
 	PATCH_IF value == 0 AND (is_ee == 0 OR special == 0) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
 	END
 END
 
@@ -6190,7 +6192,7 @@ DEFINE_PATCH_MACRO ~opcode_180_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 	PATCH_IF parameter2 != 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
 	END
 END
 
@@ -6209,7 +6211,7 @@ DEFINE_PATCH_MACRO ~opcode_181_is_valid~ BEGIN
 	LOCAL_SET parameter = is_ee ? parameter1 : parameter2
 	PATCH_IF parameter < 0 OR parameter > 73 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
 	END
 END
 
@@ -6317,7 +6319,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_189_is_valid~ BEGIN
 	PATCH_IF (parameter1 BAND 255) == 0 AND parameter2 == 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
 	END
 END
 
@@ -6390,7 +6392,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_191_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 1 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2%.~ END
 	END
 END
 
@@ -6468,7 +6470,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_199_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter1%.~ END
 	END
 END
 
@@ -6496,11 +6498,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
 	PATCH_IF parameter1 > 0 AND (parameter2 < 0 OR parameter2 > 9) BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
 	END
 	ELSE PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -6968,7 +6970,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_218_is_valid~ BEGIN
 	PATCH_IF parameter1 <= 0 AND (NOT is_ee OR parameter2 == 0 OR diceCount == 0) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
 	END
 END
 
@@ -7126,7 +7128,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_223_is_valid~ BEGIN
 	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -7172,7 +7174,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
 	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -7974,7 +7976,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_250_is_valid~ BEGIN
 	PATCH_IF parameter1 == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Damage Modifier == %parameter1%~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Damage Modifier == %parameter1%~ END
 	END
 END
 
