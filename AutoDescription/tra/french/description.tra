@@ -2731,8 +2731,10 @@
 
 @12800001 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
 @12800002 = ~Les sorts lancés par %theTarget% déclenchent un hiatus entropique~
-@12800003 = ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
-@12800004 = ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+@12800003 = ~Dissipe les effets qui forcent le déclenchement des hiatus entropiques~
+@12800004 = ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+@12800005 = ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+@12800006 = ~de dissiper les effets qui forcent le déclenchement des hiatus entropiques~
 
 // Opcode 281: Stat: Wild Magic [281]
 

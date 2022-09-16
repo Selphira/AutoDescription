@@ -8615,17 +8615,23 @@ DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @12800001 // ~Le prochain sort lancé par %theTarget% déclenche automatiquement un hiatus entropique~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF parameter2 > 1 BEGIN
 		SPRINT description @12800002 // ~Les sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
+	END
+	ELSE BEGIN
+		SPRINT description @12800003 // ~Dissipe les effets qui forcent le déclenchement des hiatus entropiques~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_280~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @12800003 // ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+		SPRINT description @12800004 // ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+	END
+	ELSE PATCH_IF parameter2 > 1 BEGIN
+		SPRINT description @12800005 // ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
 	END
 	ELSE BEGIN
-		SPRINT description @12800004 // ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+		SPRINT description @12800006 // ~de dissiper les effets qui forcent le déclenchement des hiatus entropiques~
 	END
 END
 
