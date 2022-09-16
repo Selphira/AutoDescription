@@ -7883,49 +7883,38 @@ END
  * Item: Set Melee Effect [248] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480002 // ~À chaque attaque au poing réussie: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480001 // ~À chaque attaque de mêlée réussie: %description%~
-		END
-	END
+	SET strref = 12480001 // ~À chaque attaque de mêlée réussie: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480006 // ~par attaque au poing réussie par %theTarget%: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
-		END
-	END
+	SET strref = 12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480004 // ~À chaque attaque au poing réussie par %theTarget%: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480003 // ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
-		END
-	END
+	SET strref = 12480003 // ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_248~ BEGIN
 	LPM ~opcode_self_probability_248~
+END
+
+DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
+	SET abilityType = AbilityType_Combat
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF is_ee == 1 AND (parameter2 BAND 4) BEGIN // Attaque au poing
+			SET strref += 1
+		END
+		SPRINT description (AT strref)
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_248_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ----------------------------- *
@@ -7960,6 +7949,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_249~ BEGIN
 	LPM ~opcode_self_probability_249~
+END
+
+DEFINE_PATCH_MACRO ~opcode_249_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ----------------------------------- *
