@@ -8573,6 +8573,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_278~ BEGIN
 	LPM ~opcode_self_probability_278~
 END
 
+DEFINE_PATCH_MACRO ~opcode_278_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------ *
  * Button: Enable Button [279] *
  * ------------------------------ */
