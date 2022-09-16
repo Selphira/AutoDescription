@@ -2160,20 +2160,14 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 		SET frequency = 1
 	END
 
-	PATCH_IF amount == 1 AND frequency == 1 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
+	LPF ~get_frequency_duration~ INT_VAR duration = frequency RET strDuration = frequency END
+
+	PATCH_IF amount == 1 AND frequency >= 1 BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
 	END
-	ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
+	ELSE PATCH_IF amount > 1 AND frequency >= 1 BEGIN
 		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-	END
-	ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-		SET strref += 2
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-	END
-	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
-		SET strref += 3
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		// TODO: Dans le cas où P2 == 4 et & P3 < 0
@@ -2192,6 +2186,10 @@ DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
 	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
+	END
+	PATCH_IF NOT isExternal AND parameter2 == 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type 4 can only be used in external eff files.~ END
 	END
 END
 
@@ -8293,105 +8291,8 @@ END
  * Spell: Apply Repeating EFF [272] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
-	LOCAL_SET strref = 12720000 + parameter2
-	LOCAL_SET amount1 = parameter1
-	LOCAL_SET amount2 = 0
-	LOCAL_SET frequencyMultiplier = 1
-	LOCAL_SET amount = amount1
-	LOCAL_SET frequency = 1
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF isExternal BEGIN
-			SET amount2 = parameter3
-			SET frequencyMultiplier = parameter4
-		END
-		PATCH_IF parameter2 == 4 BEGIN
-			SET amount = amount2
-		END
-		PATCH_IF parameter2 == 2 BEGIN
-			SET frequency = frequencyMultiplier
-		END
-		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1 * frequencyMultiplier
-		END
-
-		PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 BEGIN
-			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
-
-			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
-				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
-					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
-				END
-				PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-					SET strref = 12720010 // ~%description%, %amount% fois par %strDuration%~
-				END
-				ELSE BEGIN
-					SET strref = 12720005 // ~%description%, à chaque %strDuration%~
-				END
-			END
-			ELSE BEGIN
-				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
-					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-						SET strref = 12720008 // ~%description%, %amount% fois toutes les %strDuration%~
-					END
-					ELSE BEGIN
-						SET strref = 12720003 // ~%description%, toutes les %strDuration%~
-					END
-				END
-				ELSE BEGIN
-					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-                        SET strref = 12720009 // ~%description%, %amount% fois tous les %strDuration%~
-                    END
-                    ELSE BEGIN
-						SET strref = 12720004 // ~%description%, tous les %strDuration%~
-                    END
-				END
-			END
-		END
-	END
-	ELSE BEGIN
-		SET frequency = amount1
-		PATCH_IF parameter2 == 3 BEGIN
-			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
-
-			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
-				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
-					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
-				END
-				SET strref = 12720005 // ~%description%, à chaque %strDuration%~
-			END
-			ELSE BEGIN
-				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
-					SET strref = 12720003 // ~%description%, toutes les %strDuration%~
-				END
-				ELSE BEGIN
-					SET strref = 12720004 // ~%description%, tous les %strDuration%~
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 4 BEGIN
-			PATCH_IF isExternal BEGIN
-				SET amount = parameter3
-				SET strref = frequency == 1 ? 12720007 : 12720006
-			END
-			ELSE BEGIN
-				SET strref = 0
-	            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
-			END
-		END
-	END
-	PATCH_IF parameter1 <= 0 BEGIN
-        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter1 : %parameter2%~ END
-	END
-	PATCH_IF parameter2 == 1 OR parameter2 >= 5 BEGIN
-        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 OR %parameter2% == 2 => crash the game~ END
-	END
-	ELSE PATCH_IF strref > 0 BEGIN
-		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-		END
-	END
+	SET strref = 12720001
+	LPM ~opcode_272_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_272~ BEGIN
@@ -8403,7 +8304,134 @@ DEFINE_PATCH_MACRO ~opcode_target_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
-	LPM ~opcode_self_probability_272~
+	LPM ~opcode_self_272~
+END
+
+DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
+	LPM ~opcode_25_common~
+	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+// DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
+// 	LOCAL_SET strref = 12720000 + parameter2
+// 	LOCAL_SET amount1 = parameter1
+// 	LOCAL_SET amount2 = 0
+// 	LOCAL_SET frequencyMultiplier = 1
+// 	LOCAL_SET amount = amount1
+// 	LOCAL_SET frequency = 1
+
+// 	PATCH_IF is_ee == 1 BEGIN
+// 		PATCH_IF isExternal BEGIN
+// 			SET amount2 = parameter3
+// 			SET frequencyMultiplier = parameter4
+// 		END
+// 		PATCH_IF parameter2 == 4 BEGIN
+// 			SET amount = amount2
+// 		END
+// 		PATCH_IF parameter2 == 2 BEGIN
+// 			SET frequency = frequencyMultiplier
+// 		END
+// 		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
+// 			SET frequency = amount1 * frequencyMultiplier
+// 		END
+
+// 		PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 BEGIN
+// 			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
+
+// 			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+// 				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+// 					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+// 				END
+// 				PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+// 					SET strref = 12720010 // ~%description%, %amount% fois par %strDuration%~
+// 				END
+// 				ELSE BEGIN
+// 					SET strref = 12720005 // ~%description%, à chaque %strDuration%~
+// 				END
+// 			END
+// 			ELSE BEGIN
+// 				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+// 					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+// 						SET strref = 12720008 // ~%description%, %amount% fois toutes les %strDuration%~
+// 					END
+// 					ELSE BEGIN
+// 						SET strref = 12720003 // ~%description%, toutes les %strDuration%~
+// 					END
+// 				END
+// 				ELSE BEGIN
+// 					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+//                         SET strref = 12720009 // ~%description%, %amount% fois tous les %strDuration%~
+//                     END
+//                     ELSE BEGIN
+// 						SET strref = 12720004 // ~%description%, tous les %strDuration%~
+//                     END
+// 				END
+// 			END
+// 		END
+// 	END
+// 	ELSE BEGIN
+// 		SET frequency = amount1
+// 		PATCH_IF parameter2 == 3 BEGIN
+// 			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
+
+// 			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+// 				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+// 					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+// 				END
+// 				SET strref = 12720005 // ~%description%, à chaque %strDuration%~
+// 			END
+// 			ELSE BEGIN
+// 				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+// 					SET strref = 12720003 // ~%description%, toutes les %strDuration%~
+// 				END
+// 				ELSE BEGIN
+// 					SET strref = 12720004 // ~%description%, tous les %strDuration%~
+// 				END
+// 			END
+// 		END
+// 		ELSE PATCH_IF parameter2 == 4 BEGIN
+// 			PATCH_IF isExternal BEGIN
+// 				SET amount = parameter3
+// 				SET strref = frequency == 1 ? 12720007 : 12720006
+// 			END
+// 			ELSE BEGIN
+// 				SET strref = 0
+// 	            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
+// 			END
+// 		END
+// 	END
+// 	PATCH_IF strref > 0 BEGIN
+// 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+// 		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+// 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+// 		END
+// 	END
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_self_probability_272~ BEGIN
+// 	LPM ~opcode_self_272~
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_target_272~ BEGIN
+// 	LPM ~opcode_self_272~
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
+// 	LPM ~opcode_self_probability_272~
+// END
+
+DEFINE_PATCH_MACRO ~opcode_272_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 == 1 OR parameter2 > 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Type: 0-2-3-4 expected.~ END
+	END
+	PATCH_IF NOT isExternal AND parameter2 == 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type 4 can only be used in external eff files.~ END
+	END
 END
 
 /* ----------------------------------------------------- *
@@ -10441,4 +10469,24 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
 		SPRINT descriptionState @410000 // ~normal~
 	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequency BEGIN
+	LPF ~get_str_duration~ INT_VAR duration = duration RET strDuration END
+	PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+		INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+		END
+		SET strref = 100320 // ~à chaque %strDuration%~
+	END
+	ELSE BEGIN
+		// FIXME: données en français et genrées => traduction impossible
+		PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+			SET strref = 100321 // ~toutes les %strDuration%~
+		END
+		ELSE BEGIN
+			SET strref = 100322 // ~tous les %strDuration%~
+		END
+	END
+	SPRINT frequency (AT strref)
 END

@@ -211,6 +211,10 @@
 @100313 = ~de manière permanente, persiste après la mort~
 @100314 = ~après %strDuration% et pendant %strDuration%~
 
+@100320 = ~par %strDuration%~
+@100321 = ~toutes les %strDuration%~
+@100322 = ~tous les %strDuration%~
+
 /* ------ *
  * Ea.ids *
  * ------ */
@@ -1284,14 +1288,10 @@
 
 // Opcode 25: State: Poison [25]
 
-@10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
-@10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-@10250003 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-@10250004 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
-@10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts par seconde~
-@10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-@10250007 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-@10250008 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
+@10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
+@10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
+@10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
+@10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
 
 // Opcode 26: Item: Remove Curse [26]
 
@@ -1553,10 +1553,8 @@
 
 // Opcode 78: State: Disease [78]
 
-@10780000 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780001 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780002 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780003 = ~Inocule une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780000 = ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
+@10780001 = ~Inocule une maladie qui inflige %amount% points de dégâts %strDuration% %toTheTarget%~
 
 @10780004 = ~Inocule une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780005 = ~Inocule une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
@@ -1574,16 +1572,14 @@
 @10780019 = ~Inocule une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780023 = ~Inocule une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 
-@10780030 = ~Inocule une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780031 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780032 = ~Inocule une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780033 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780030 = ~Inocule une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780031 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
+@10780032 = ~Inocule une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780033 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
 
 
-@10780100 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780101 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780102 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780103 = ~d'inoculer une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780100 = ~d'inoculer une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
+@10780101 = ~d'inoculer une maladie qui inflige %amount% points de dégâts %strDuration% %toTheTarget%~
 
 @10780104 = ~d'inoculer une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780105 = ~d'inoculer une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
@@ -1601,10 +1597,8 @@
 @10780119 = ~d'inoculer une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780123 = ~d'inoculer une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 
-@10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780132 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780133 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
 
 // Opcode 79: Cure: Disease [79]
 
@@ -1705,21 +1699,17 @@
 
 // Opcode 98: HP: Regeneration [98]
 
-@10980001 = ~Régénère 1 point de vie par seconde~
-@10980002 = ~Régénère %amount% points de vie par seconde~
-@10980003 = ~Régénère 1 point de vie toutes les %frequency% secondes~
-@10980004 = ~Régénère %amount% points de vie toutes les %frequency% secondes~
-@10980005 = ~Régénère %percent% des points de vie~
-@10980006 = ~Régénère 1 point de vie par seconde %toTheTarget%~
-@10980007 = ~Régénère %amount% points de vie par seconde %toTheTarget%~
-@10980008 = ~Régénère 1 point de vie toutes les %frequency% secondes %toTheTarget%~
-@10980009 = ~Régénère %amount% points de vie toutes les %frequency% secondes %toTheTarget%~
-@10980010 = ~Régénère %percent% des points de vie %ofTheTarget%~
-@10980011 = ~de régénérer 1 point de vie par seconde %toTheTarget%~
-@10980012 = ~de régénérer %amount% points de vie par seconde %toTheTarget%~
-@10980013 = ~de régénérer 1 point de vie toutes les %frequency% secondes %toTheTarget%~
-@10980014 = ~de régénérer %amount% points de vie toutes les %frequency% secondes %toTheTarget%~
-@10980015 = ~de régénérer %percent% des points de vie %ofTheTarget%~
+@10980001 = ~Régénère 1 point de vie %strDuration%~
+@10980002 = ~Régénère %amount% points de vie %strDuration%~
+@10980005 = ~Régénère %percent% des points de vie %strDuration%~
+
+@10980006 = ~Régénère 1 point de vie %strDuration% %toTheTarget%~
+@10980007 = ~Régénère %amount% points de vie %strDuration% %toTheTarget%~
+@10980010 = ~Régénère %percent% des points de vie %ofTheTarget% %strDuration%~
+
+@10980011 = ~de régénérer 1 point de vie %strDuration% %toTheTarget%~
+@10980012 = ~de régénérer %amount% points de vie %strDuration% %toTheTarget%~
+@10980015 = ~de régénérer %percent% des points de vie %ofTheTarget% %strDuration%~
 
 // Opcode 99: Spell Effect: Duration Modifier [99]
 
@@ -2694,16 +2684,9 @@
 
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
-@12720000 = ~%description%, à chaque seconde~
-@12720002 = ~%description%, %frequency% fois par seconde~
-@12720003 = ~%description%, toutes les %strDuration%~ //heures et secondes
-@12720004 = ~%description%, tous les %strDuration%~ //jours, tours et rounds
-@12720005 = ~%description%, à chaque %strDuration%~
-@12720006 = ~%description%, %amount% fois tous les %frequency% rounds~
-@12720007 = ~%description%, %amount% fois par round~
-@12720008 = ~%description%, %amount% fois toutes les %strDuration%~
-@12720009 = ~%description%, %amount% fois tous les %strDuration%~
-@12720010 = ~%description%, %amount% fois par %strDuration%~
+@12720001 = ~%description%, %strDuration%~
+@12720002 = ~%description%, %amount% fois %strDuration%~
+
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
