@@ -364,7 +364,8 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_permanent_after_death BEGIN
 		PATCH_IF NOT VARIABLE_IS_SET $opcodes_cant_be_permanent(~%opcode%~) BEGIN
-			PATCH_IF timingMode == TIMING_permanent BEGIN
+			PATCH_IF timingMode == TIMING_permanent OR
+					 VARIABLE_IS_SET $opcodes_cant_be_permanent_after_death(~%opcode%~) BEGIN
 				SPRINT value @100312 // ~de manière permanente~
 			END
 			ELSE BEGIN

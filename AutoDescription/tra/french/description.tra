@@ -1097,8 +1097,8 @@
 @500005 = ~Décapite %theTarget%~
 @500006 = ~Pétrifie %theTarget%~
 @500007 = ~Congèle %theTarget%~
-@500008 = ~Tue instantanément %theTarget%~
-@500009 = ~Tue instantanément %theTarget%~
+@500008 = ~~ // @500004
+@500009 = ~~ // @500004
 @500010 = ~Électrocute mortellement %theTarget%~
 @500011 = ~Désintègre %theTarget%~
 @500012 = ~Détruit %theTarget%~

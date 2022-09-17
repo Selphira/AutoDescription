@@ -856,7 +856,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
-	177 => 1
+	177 => 1 // Use EFF File
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
 	236 => 1 // Spell Effect: Image Projection
@@ -865,8 +865,14 @@ END
 
 // Opcodes qui sont dissipés par la mort (directement ou indirectement)
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent_after_death~ BEGIN
-	45 => 1 // State: Stun
-
+	24  => 1 // State: Horror
+	25  => 1 // State: Poison
+	45  => 1 // State: Stun
+	109 => 1 // State: Paralyze
+	157 => 1 // State: Web Effect
+	175 => 1 // State: Hold
+	185 => 1 // State: Hold (II)
+	210 => 1 // Spell Effect: Stun 90HP
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
@@ -911,6 +917,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_127_files~ BEGIN
 	7 => ~MONSUM03~
     8 => ~ANISUM01~
     9 => ~ANISUM02~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~death_to_strref~ BEGIN
+	0	 => 500001
+	1	 => 500002
+	2	 => 500003
+	4	 => 500004
+	8	 => 500005
+	16	 => 500006
+	32	 => 500007
+	64	 => 500004
+	128  => 500004
+	256  => 500010
+	512  => 500011
+	1024 => 500012
 END
 
 OUTER_SET AbilityType_Charge = 1
@@ -10569,19 +10590,4 @@ DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequenc
 		END
 	END
 	SPRINT frequency (AT strref)
-END
-
-ACTION_DEFINE_ASSOCIATIVE_ARRAY ~death_to_strref~ BEGIN
-	0	 => 500001
-	1	 => 500002
-	2	 => 500003
-	4	 => 500004
-	8	 => 500005
-	16	 => 500006
-	32	 => 500007
-	64	 => 500004
-	128  => 500004
-	256  => 500010
-	512  => 500011
-	1024 => 500012
 END
