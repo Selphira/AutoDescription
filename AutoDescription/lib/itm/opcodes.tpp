@@ -120,6 +120,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
     224 => 203 // Cure: Level Drain (Restoration) [224]
 	 46 => 204 // Cure: Stun (Unstun) [46]
     162 => 205 // Cure: Hold [162]
+	270 => 205 // Cure: Unpause Target [270]
 	 77 => 206 // Cure: Feeblemindedness [77]
 	 79 => 207 // Cure: Disease [79]
 	 11 => 208 // Cure: Poison [11]
@@ -645,9 +646,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
-	270 => 1 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
-	282 => 0 // Script: Scripting State Modifier [282]
+	282 => 1 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
 	291 => 0 // Graphics: Disable Visual Effect [291]
@@ -842,9 +842,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	243 => 9 // Item: Drain Item Charges
 	244 => 9 // Spell: Drain Wizard Spell
 	251 => 9 // Spell Effect: Change Bard Song Effect
-	252 => 9 // Spell Effect: Set Trap
+	252 => 9 // Spell Effect: Set Trap // durée : jusqu'à activation
 	261 => 9 // Spell: Restore Lost Spells
 	264 => 9 // Spell Effect: Drop Weapons in Panic
+	270 => 0 // Cure: Unpause Target
 	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
 	316 => 0 // Spell: Magical Rest
 END
@@ -852,6 +853,7 @@ END
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
 // Traduction : durée normale ou jusqu'à dissipation / utilisation
 // Conséquence : les durées permanentes et permanentes, persiste après la mort n'est pas affichée
+// TODO: à améliorer ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
 	146 => 1 // Spell: Cast Spell (at Creature)
@@ -8346,6 +8348,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_268~ BEGIN
 	LPM ~opcode_self_268~ // ~Permet %toTheTarget% d'explorer la carte~
+END
+
+/* -------------------------- *
+ * Cure: Unpause Target [270] *
+ * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_270~ BEGIN
+	LPM ~opcode_target_270~ // ~Libère des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_270~ BEGIN
+	SPRINT description @12700001 // ~Libère des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_270~ BEGIN
+	LPM ~opcode_target_probability_270~ // ~de libérer des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_270~ BEGIN
+	SPRINT description @12700002 // ~de libérer des combats mentaux~
 END
 
 /* -------------------------------- *

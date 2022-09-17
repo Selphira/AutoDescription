@@ -2701,6 +2701,12 @@
 
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~
 
+// Opcode 270: Cure: Unpause Target [270]
+
+// TODO: trouver mieux
+@11650001 = ~Libère %theTarget% de ses combats mentaux~
+@11650002 = ~de libérer %theTarget% de ses combats mentaux~
+
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
 @12720001 = ~%description%, %strDuration%~
