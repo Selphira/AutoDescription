@@ -8888,6 +8888,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_283~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_283_is_valid~ BEGIN
+	LPM ~opcode_177_is_valid~
+END
+
 /* -------------------------------- *
  * Stat: Melee THAC0 Modifier [284] *
  * -------------------------------- */
