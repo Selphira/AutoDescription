@@ -1136,7 +1136,7 @@
 @10000010 = ~contre les armes tranchantes et les projectiles~
 @10000011 = ~contre les armes contondantes, tranchantes et les projectiles~
 @10000012 = ~contre les armes tranchantes et perforantes~
-@10000013 = ~contre les armes contondantes, tranchantes et perforantes~
+@10000013 = ~contre les armes contondantes, tranchantes et perforantes~ // FIXME: contre les armes de mêlée ?
 @10000014 = ~contre les armes tranchantes, perforantes et les projectiles~
 
 @10000100 = ~Classe d'armure de base~

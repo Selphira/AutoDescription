@@ -30,15 +30,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
 	344 => 12  // Enchantment vs. creature type [344]
 	216 => 13  // Spell Effect: Level Drain [216]
-	246 => 14  // Spell Effect: Berserking [246]
-	  0 => 15  // Stat: AC vs. Damage Type Modifier [0]
- 219000 => 15  // Stat: AC vs. Creature Type Modifier [219]
+	246 => 13  // Spell Effect: Berserking [246]
+	  0 => 14  // Stat: AC vs. Damage Type Modifier [0]
+	506 => 15  // Stat: Classe d'armure cumulable
+ 219000 => 16  // Stat: AC vs. Creature Type Modifier [219]
 
-	  1 => 16  // Stat: Attacks Per Round Modifier [1]
+	  1 => 17  // Stat: Attacks Per Round Modifier [1]
 
-	301 => 17  // Stat: Critical Hit Modifier [301]
-	362 => 18  // Critical miss bonus [362]
-     73 => 19  // Stat: Extra Damage Modifier [73]
+	301 => 18  // Stat: Critical Hit Modifier [301]
+	362 => 19  // Critical miss bonus [362]
+     73 => 20  // Stat: Extra Damage Modifier [73]
 	179 => 21  // Spell Effect: Damage vs. Creature Type Modifier [179]
 	285 => 23  // Stat: Melee Weapon Damage Modifier [285]
 	286 => 24  // Stat: Missile Weapon Damage Modifier [286]
@@ -951,7 +952,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -976,7 +977,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
 	ELSE BEGIN
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -991,20 +992,16 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	END
 END
 
-
 DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		// FIXME ? Pas compris la condition
-		PATCH_IF %itemType% != ITM_TYPE_armor BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-		END
+		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -1023,7 +1020,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
 	PATCH_IF armor_class_show_bonus_malus BEGIN
-		PATCH_IF value > 0 BEGIN
+		PATCH_IF value >= 0 BEGIN
 			SPRINT value @10000101 // ~Bonus de %value%~
 		END
 		ELSE BEGIN
@@ -1051,6 +1048,56 @@ DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
 	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
 		SET isValid = 0
+	END
+END
+
+// Association des classes d'armure V1
+DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
+	SET group = 0
+	DEFINE_ASSOCIATIVE_ARRAY ~opcode_0_CA~ BEGIN END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_while_equipped AND (
+				parameter2 == AC_MOD_TYPE_crushing OR
+				parameter2 == AC_MOD_TYPE_missile OR
+				parameter2 == AC_MOD_TYPE_piercing OR
+				parameter2 == AC_MOD_TYPE_slashing) BEGIN
+			SET newValue = parameter2
+			PATCH_IF VARIABLE_IS_SET $opcode_0_CA(~%parameter1%~) BEGIN
+				SET currentValue = $opcode_0_CA(~%parameter1%~)
+				// PATCH_IF NOT currentValue BAND parameter2 BEGIN
+				// Que faire des doublons ?
+				SET newValue = currentValue | parameter2
+			END
+			SET $opcode_0_CA(~%parameter1%~) = newValue
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: %parameter1% %parameter2% %newValue%.~ END
+		END
+	END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_while_equipped AND (
+				parameter2 == AC_MOD_TYPE_crushing OR
+				parameter2 == AC_MOD_TYPE_missile OR
+				parameter2 == AC_MOD_TYPE_piercing OR
+				parameter2 == AC_MOD_TYPE_slashing) BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode
+				STR_VAR expression = ~position = %position%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+		END
+	END
+
+	PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~ADD Opcode %opcode%: %amount% %armorType%.~ END
+		SET opcode = 506
+		SET parameter1 = amount
+		SET parameter2 = armorType
+		SET timingMode = TIMING_while_equipped
+		SET target = TARGET_FX_self
+		SET probability2 = 100
+		LPM ~add_opcode~
 	END
 END
 
@@ -9707,6 +9754,24 @@ END
 
 // Opcode vide, utilisé en couple avec l'opcode 101
 
+/* ------------------------------------- *
+ * Stat: Classe d'armure cumulable [506] *
+ * ------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_506~ BEGIN
+	LPM ~opcode_self_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_506~ BEGIN
+	LPM ~opcode_self_probability_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_506~ BEGIN
+	LPM ~opcode_target_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_506~ BEGIN
+	LPM ~opcode_target_probability_0~
+END
 
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
