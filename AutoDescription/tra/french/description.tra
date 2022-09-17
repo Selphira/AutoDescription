@@ -1915,11 +1915,16 @@
 
 @11260001 = ~Vitesse de déplacement~
 @11260002 = ~la vitesse de déplacement~
-@11260003 = ~Immobilise %theTarget%~
-@11260004 = ~d'immobiliser %theTarget%~
-@11260005 = ~Rétablissement de la vitesse de déplacement~
-@11260006 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
-@11260007 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
+@11260003 = ~la vitesse de déplacement~
+
+@11260011 = ~Immobilisation~
+@11260012 = ~Immobilise %theTarget%~
+@11260013 = ~d'immobiliser %theTarget%~
+
+@11260021 = ~Rétablissement de la vitesse de déplacement~
+@11260022 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
+@11260023 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
+
 
 // Opcode 127: Summon: Monster Summoning [127]
 
@@ -2101,6 +2106,12 @@
 @11530001 = ~Sanctuaire~
 @11530002 = ~de lancer Sanctuaire sur %theTarget%~
 @11530003 = ~Lance Sanctuaire sur %theTarget%~
+
+// Opcode 154: Overlay: Entangle [154]
+
+@11540001 = ~Enchevêtrement~
+@11540002 = ~Enchevêtre %theTarget%~
+@11540003 = ~d'enchevêtrer %theTarget%~
 
 // Opcode 157: State: Web Effect [157]
 

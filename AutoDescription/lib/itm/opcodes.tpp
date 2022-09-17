@@ -222,7 +222,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	109 => 372 // State: Hold Creature I [109]
 	175 => 372 // State: Hold Creature II [175]
 	185 => 372 // State: Hold Creature III [185]
+	157 => 373 // State: Web Effect [157]
 	165 => 373 // Spell Effect: Pause Target [165]
+	154 => 374 // Overlay: Entangle [154]
 	244 => 376 // Spell: Drain Wizard Spell [244]
 	 39 => 377 // State: Unconsciousness [39]
 	217 => 378 // Spell Effect: Unconsciousness 20HP [217]
@@ -234,7 +236,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 16 => 384 // State: Haste [16]
 	317 => 385 // State: Haste2 [317]
 	 40 => 386 // State: Slow [40]
-	157 => 387 // State: Web Effect [157]
 	 20 => 388 // State: Invisibility [20]
 	130 => 389 // State: Bless [130]
 	129 => 390 // State: Aid [129]
@@ -614,7 +615,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	141 => 0
 	142 => 0
 	152 => 0 // Spell Effect: Play Movie [152]
-	154 => 0 // Overlay: Entangle [154]
 	155 => 0 // Overlay: Minor Globe [155]
 	156 => 0 // Overlay: Protection from Normal Missiles Cylinder [156]
 	158 => 0 // State: Grease [158]
@@ -1070,7 +1070,6 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				SET newValue = currentValue | parameter2
 			END
 			SET $opcode_0_CA(~%parameter1%~) = newValue
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: %parameter1% %parameter2% %newValue%.~ END
 		END
 	END
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -1090,7 +1089,6 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 	END
 
 	PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~ADD Opcode %opcode%: %amount% %armorType%.~ END
 		SET opcode = 506
 		SET parameter1 = amount
 		SET parameter2 = armorType
@@ -4922,50 +4920,37 @@ END
 /* ----------------------------- *
  * Stat: Movement Modifier [126] *
  * ----------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
-	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260005 // ~Rétablissement de la vitesse de déplacement~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260003 // ~Immobilise %theTarget%~
+	SET strref = 11260001 // ~Vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260001 BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 11260001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260007 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260004 // ~d'immobiliser %theTarget%~
+	SET strref = 11260003 // ~la vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260003 BEGIN
+		LPF ~opcode_probability~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_probability~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260006 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260003 // ~Immobilise %theTarget%~
+	SET strref = 11260002 // ~la vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260002 BEGIN
+		LPF ~opcode_target~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_target~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
@@ -4986,6 +4971,19 @@ DEFINE_PATCH_MACRO ~opcode_126_group~ BEGIN
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_126_common~ BEGIN
+	SET parameter2 = parameter2 == 5 ? MOD_TYPE_percentage : parameter2
+
+	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
+	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
+	PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
+		SET strref += 10
+	END
+	ELSE PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
+		SET strref += 20
 	END
 END
 
@@ -5613,6 +5611,57 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_153~ BEGIN
 	LPM ~opcode_self_probability_153~ // ~de lancer Sanctuaire sur %theTarget%~
+END
+
+/* ----------------------- *
+ * Overlay: Entangle [154] *
+ * ----------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_154~ BEGIN
+	SPRINT description @11540001 // ~Enchevêtrement~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_154~ BEGIN
+	SPRINT description @11540003 // ~d'enchevêtrer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_154~ BEGIN
+	SPRINT description @11540002 // ~Enchevêtre %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_154~ BEGIN
+	LPM ~opcode_self_probability_154~ // ~d'enchevêtrer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
+	LOCAL_SET searchOpcode = 126
+	PATCH_IF VARIABLE_IS_SET $opcodes(~%searchOpcode%~) BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+
+			SET opcode = searchOpcode
+			SET oldPosition = position
+			SET oldCount = $opcodes(~%opcode%~)
+			LPF ~delete_opcode~
+				INT_VAR opcode
+				STR_VAR expression = ~parameter1 = 0 AND parameter2 = 1 AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			PATCH_IF oldCount == $opcodes(~%opcode%~) BEGIN
+				SET opcode = 154
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %oldPosition%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+	END
+	ELSE BEGIN
+		CLEAR_ARRAY EVAL ~opcodes_%opcode%~
+		SET $opcodes(~%opcode%~) = 0
+	END
 END
 
 /* ----------------------- *
