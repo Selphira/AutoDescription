@@ -11,6 +11,7 @@
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
 
+@9999 = ~Schtroumpf~
 @10000 = ~
 ~
 @10001 = ~ : ~
@@ -505,7 +506,7 @@
  * Specific.ids *
  * ------------ */
  @206000 = ~??????~
- @206005 = ~~
+ @206005 = ~drows~
  @206243 = ~ménestrels~
  @206250 = ~esprits~
 
@@ -583,6 +584,77 @@
 @220036 = ~d'armes (2)~
 @220037 = ~d'armes (3)~
 @220038 = ~d'armes (4)~
+
+
+/* ---------------- *
+ * Itemcat.ids *
+ * ---------------- */
+
+@230000 = ~livres~
+@230001 = ~amulettes et les colliers~
+@230002 = ~armures~
+@230003 = ~ceintures~
+@230004 = ~bottes~
+@230005 = ~flèches~
+@230006 = ~bracelets et les gantelets~
+@230007 = ~casques~
+@230008 = ~clés~
+@230009 = ~potions~
+@230010 = ~anneaux~
+@230011 = ~parchemins~
+@230012 = ~boucliers~
+@230013 = ~nourritures~
+@230014 = ~balles~
+@230015 = ~arcs~
+@230016 = ~dagues~
+@230017 = ~masses~
+@230018 = ~frondes~
+@230019 = ~épées courtes~
+@230020 = ~épées longues~
+@230021 = ~marteaux~
+@230022 = ~étoiles du matin~
+@230023 = ~fléaux~
+@230024 = ~fléchettes~
+@230025 = ~haches~
+@230027 = ~arbalètes~
+@230028 = ~poings~
+@230029 = ~lances~
+@230030 = ~hallebardes~
+@230031 = ~carreaux~
+@230032 = ~capes~
+@230033 = ~pièces d'or~
+@230034 = ~gemmes~
+@230035 = ~baguettes~
+@230036 = ~conteneurs, yeux et armures cassées~
+@230037 = ~boucliers cassés et les bracelets~
+@230038 = ~familiers, épées cassées et boucles d'oreilles~
+@230039 = ~tatouages~
+@230040 = ~lentilles~
+@230041 = ~boucliers et les dents~
+@230042 = ~bougies~
+@230043 = ~clubs~
+@230047 = ~grands boucliers~
+@230049 = ~boucliers moyens~
+@230050 = ~notes~
+@230053 = ~petits boucliers~
+@230055 = ~téléscopes~
+@230056 = ~boissons~
+@230057 = ~épées longues~
+@230058 = ~conteneurs~
+@230059 = ~peaux et les fourrures~
+@230060 = ~armures de cuir~
+@230061 = ~armures de cuir clouté~
+@230062 = ~armures de mailles~
+@230063 = ~~ // ITM_TYPE_splint_mail = 0x3f
+@230064 = ~armures de plate~
+@230065 = ~armures de plate complète~
+@230066 = ~armures de peau~
+@230067 = ~robes~
+@230069 = ~épées bâtardes~
+@230070 = ~écharpes~
+@230071 = ~nourritures~
+@230072 = ~chapeaux~
+@230073 = ~gantelets~
 
 
 /* ------------------------------ *
@@ -891,8 +963,8 @@
 @400277 = ~à la modification du score de pose de pièges~
 @400278 = ~à la modification du TAC0~
 @400279 = ~au déblocage des compétences actives~
-@400280 = ~au changement de la réalisation des hiatus entropiques~ // -_-'
-@400281 = ~à la modification de la probabilité de réalisation des hiatus entropiques~
+@400280 = ~au changement du déclenchement des hiatus entropiques~ // -_-'
+@400281 = ~à la modification de la probabilité de déclenchement des hiatus entropiques~
 @400282 = ~à la modification des caractéristiques~ // Pas clair : les effets modifiant les caractéristiques dans STATS.ids
 @400283 = ~aux effets maudits~
 @400284 = ~à la modification du TAC0 de mêlée~
@@ -2208,71 +2280,7 @@
 // Opcode 181: Item: Can't Use Itemtype [181]
 
 @11810001 = ~Empêche d'utiliser les %itemType%~
-@11810100 = ~livres~
-@11810101 = ~amulettes et les colliers~
-@11810102 = ~armures~
-@11810103 = ~ceintures~
-@11810104 = ~bottes~
-@11810105 = ~flèches~
-@11810106 = ~bracelets et les gantelets~
-@11810107 = ~casques~
-@11810108 = ~clés~
-@11810109 = ~potions~
-@11810110 = ~anneaux~
-@11810111 = ~parchemins~
-@11810112 = ~boucliers~
-@11810113 = ~nourritures~
-@11810114 = ~balles~
-@11810115 = ~arcs~
-@11810116 = ~dagues~
-@11810117 = ~masses~
-@11810118 = ~frondes~
-@11810119 = ~épées courtes~
-@11810120 = ~épées longues~
-@11810121 = ~marteaux~
-@11810122 = ~étoiles du matin~
-@11810123 = ~fléaux~
-@11810124 = ~fléchettes~
-@11810125 = ~haches~
-@11810127 = ~arbalètes~
-@11810128 = ~poings~
-@11810129 = ~lances~
-@11810130 = ~hallebardes~
-@11810131 = ~carreaux~
-@11810132 = ~capes~
-@11810133 = ~pièces d'or~
-@11810134 = ~gemmes~
-@11810135 = ~baguettes~
-@11810136 = ~conteneurs, yeux et armures cassées~
-@11810137 = ~boucliers cassés et les bracelets~
-@11810138 = ~familiers, épées cassées et boucles d'oreilles~
-@11810139 = ~tatouages~
-@11810140 = ~lentilles~
-@11810141 = ~boucliers et les dents~
-@11810142 = ~bougies~
-@11810143 = ~clubs~
-@11810147 = ~grands boucliers~
-@11810149 = ~boucliers moyens~
-@11810150 = ~notes~
-@11810153 = ~petits boucliers~
-@11810155 = ~téléscopes~
-@11810156 = ~boissons~
-@11810157 = ~épées longues~
-@11810158 = ~conteneurs~
-@11810159 = ~peaux et les fourrures~
-@11810160 = ~armures de cuir~
-@11810161 = ~armures de cuir clouté~
-@11810162 = ~armures de mailles~
-@11810163 = ~~ // ITM_TYPE_splint_mail = 0x3f
-@11810164 = ~armures de plate~
-@11810165 = ~armures de plate complète~
-@11810166 = ~armures de peau~
-@11810167 = ~robes~
-@11810169 = ~épées bâtardes~
-@11810170 = ~écharpes~
-@11810171 = ~nourritures~
-@11810172 = ~chapeaux~
-@11810173 = ~gantelets~
+
 
 // Opcode 188: Spell Effect: Aura Cleansing [188]
 
@@ -2774,7 +2782,7 @@
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Chance de déclencher un hiatus entropique~
+@12810001 = ~Déclenchement de hiatus entropique~
 @12810002 = ~la chance de déclencher un hiatus entropique~
 
 // Opcode 283: Use EFF File (Cursed) [283]
@@ -2841,9 +2849,17 @@
 @13010001 = ~Chance de coup critique~
 @13010002 = ~Chance de coup critique avec cette arme~
 
+@130100010 = ~~
+@130100011 = ~en mêlée~
+@130100012 = ~à distance~
+@130100013 = ~magique~
+
+@130100020 = ~avec les %weaponType%~
+
+
 // Opcode 302: Item: Can Use Any Item [302]
 
-@13020001 = ~Permet d'utiliser n'importe quel objet (si les statistiques sont suffisantes)~
+@13020001 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
 
 // Opcode 303: Spell Effect: Backstab Every Hit [303]
 

@@ -6351,7 +6351,7 @@ END
  * Item: Can't Use Itemtype [181] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_181~ BEGIN
-	LOCAL_SET strref = 11810100
+	LOCAL_SET strref = 230000
 	SET strref += is_ee ? parameter1 : parameter2
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET itemType = string END
@@ -9072,6 +9072,7 @@ END
 /* -------------- *
  * NPC Bump [300] *
  * -------------- */
+// TODO: à vérifier
 DEFINE_PATCH_MACRO ~opcode_self_300~ BEGIN
 	PATCH_IF parameter2 > 0 BEGIN
 		SET strref = 13000000 + parameter2
@@ -9086,14 +9087,29 @@ END
 /* --------------------------------- *
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
+// TODO: tester les valeurs : special > 3
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
-	// TODO: Gérer attack type de EE
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
 	SPRINT name @13010001 // ~Chance de coup critique~
-	PATCH_IF is_ee == 1 AND parameter2 == 1 BEGIN
+	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @130100020 // ~avec les %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	ELSE PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
+		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		PATCH_IF isExternal AND parameter3 != 0 BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+		END
+	END
+	PATCH_IF is_ee AND special >= 1 BEGIN
+		SET strref = 130100010 + special // ~en mêlée~
+		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
+		TEXT_SPRINT name ~%name% %descriptionAdd%~
 	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
