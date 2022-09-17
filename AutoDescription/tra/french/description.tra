@@ -33,6 +33,7 @@
 @100007 = ~%name% %ofTheTarget%%colon%%value%~
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
+@100020 = ~les~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101083 = ~Arme à 1 main~
 @101084 = ~Arme à 2 mains~
@@ -44,6 +45,11 @@
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
+@101185 = ~%description% (non cumulable)~
+
+
+// JS
+// FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 @101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
@@ -54,8 +60,6 @@
 @102124 = ~jet de sauvegarde %saveTypeStr% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
 // les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
 @102125 = ~réduits de moitié~
-//
-@101185 = ~%description% (non cumulable)~
 
 @102003 = ~Type de compétence~
 @102004 = ~Type~
@@ -88,6 +92,7 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulable~
 
+// FIXME: à raccourcir
 @102263 = ~Les bonus aux jets de toucher et aux dégâts en fonction de la force s'appliquent à cette arme~
 @102264 = ~Les bonus aux dégâts en fonction de la force s'appliquent à cette arme~
 @102265 = ~Les bonus aux jets de toucher en fonction de la force s'appliquent à cette arme~
@@ -961,6 +966,7 @@
  * State *
  * ------------- */
 // Complète la phrase : Lorsque %theTarget% est...
+// FIXME: problème d'accord potentiel selon le genre de la target
 
 @410000 = ~normal~ // TODO: tous les states sont inactifs
 @410001 = ~endormi~
@@ -995,8 +1001,6 @@
 @410030 = ~flou~
 @410031 = ~protégé par une image-miroir~
 @410032 = ~confus~
-
-@410100 = ~ou~ // Séparateur
 
 
 
@@ -1083,6 +1087,34 @@
 @420126 = ~Bouclier~
 @420250 = ~la maladie~
 
+
+/* Type de mort */
+
+@500001 = ~Dissout %theTarget%~
+@500002 = ~Carbonise %theTarget%~
+@500003 = ~Explose %theTarget% en morceaux~
+@500004 = ~Tue instantanément %theTarget%~
+@500005 = ~Décapite %theTarget%~
+@500006 = ~Pétrifie %theTarget%~
+@500007 = ~Congèle %theTarget%~
+@500008 = ~Tue instantanément %theTarget%~
+@500009 = ~Tue instantanément %theTarget%~
+@500010 = ~Électrocute mortellement %theTarget%~
+@500011 = ~Désintègre %theTarget%~
+@500012 = ~Détruit %theTarget%~
+
+@500101 = ~de dissoudre %theTarget%~
+@500102 = ~de carboniser %theTarget%~
+@500103 = ~d'exploser %theTarget% en morceaux~
+@500104 = ~de tuer instantanément %theTarget%~
+@500105 = ~de décapiter %theTarget%~
+@500106 = ~de pétrifier %theTarget%~
+@500107 = ~de congeler %theTarget%~
+@500108 = ~de tuer instantanément %theTarget%~
+@500109 = ~de tuer instantanément %theTarget%~
+@500110 = ~d'électrocuter mortellement %theTarget%~
+@500111 = ~de désintégrer %theTarget%~
+@500112 = ~de détruire %theTarget%~
 
 
 /* ------------------------------ *
@@ -1201,32 +1233,6 @@
 @10120040 = ~ne réveille pas la cible~
 
 // Opcode 13: Death: Instant Death [13]
-
-@10130001 = ~Dissout %theTarget%~
-@10130002 = ~Carbonise %theTarget%~
-@10130003 = ~Explose %theTarget% en morceaux~
-@10130004 = ~Tue instantanément %theTarget%~
-@10130005 = ~Décapite %theTarget%~
-@10130006 = ~Pétrifie %theTarget%~
-@10130007 = ~Congèle %theTarget%~
-@10130008 = ~Tue instantanément %theTarget%~
-@10130009 = ~Tue instantanément %theTarget%~
-@10130010 = ~Électrocute mortellement %theTarget%~
-@10130011 = ~Désintègre %theTarget%~
-@10130012 = ~Détruit %theTarget%~
-
-@10130101 = ~de dissoudre %theTarget%~
-@10130102 = ~de carboniser %theTarget%~
-@10130103 = ~d'exploser %theTarget% en morceaux~
-@10130104 = ~de tuer instantanément %theTarget%~
-@10130105 = ~de décapiter %theTarget%~
-@10130106 = ~de pétrifier %theTarget%~
-@10130107 = ~de congeler %theTarget%~
-@10130108 = ~de tuer instantanément %theTarget%~
-@10130109 = ~de tuer instantanément %theTarget%~
-@10130110 = ~d'électrocuter mortellement %theTarget%~
-@10130111 = ~de désintégrer %theTarget%~
-@10130112 = ~de détruire %theTarget%~
 
 
 // Opcode 14: Graphics: Defrost [14]
@@ -1446,12 +1452,6 @@
 
 // Opcode 55: Death: Kill Creature Type [55]
 
-@10550001 = ~Tue instantanément les %creatureType%~
-@10550002 = ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-@10550003 = ~de tuer instantanément les %creatureType%~
-@10550004 = ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-@10550005 = ~Tue instantanément %theTarget%~
-@10550006 = ~de tuer instantanément %theTarget%~
 
 // Opcode 56: Alignment: Invert [56]
 
@@ -2369,8 +2369,7 @@
 
 // Opcode 209: Death: Kill 60HP [209]
 
-@12090001 = ~Tue instantanément %theTarget% si ses points de vie sont inférieurs à 60~
-@12090002 = ~de tuer instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+@12090001 = ~si ses points de vie sont inférieurs à 60~
 
 // Opcode 210: Spell Effect: Stun 90HP [210]
 
@@ -2579,10 +2578,6 @@
 
 // Opcode 238: Death: Disintegrate [238]
 
-@12380001 = ~Désintègre %theTarget%~
-@12380002 = ~Désintègre les %creatureType%~
-@12380003 = ~de désintégrer %theTarget%~
-@12380004 = ~de désintégrer les %creatureType%~
 
 // Opcode 239: Spell Effect: Farsight [239]
 

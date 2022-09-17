@@ -771,82 +771,102 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
 	~lcrobe~ => 102150 // ~~
 END
 
+/* 
+	Opcodes dont le champ Duration n'est pas impactant
+	Conséquence : La durée n'est pas écrire car considérée comme implicite
+	Trois cas :
+	0- l'effet est instantané et ne peut perdurer ou être dissipé
+		(dissipation, soin (dans le sens où on peut les reperdre peu de temps après))
+		~ duration 0
+	1- l'effet est instantané mais est dissipé en cas de mort/résurrection ()
+		~ permanent
+	3- l'effet est soit permanent soit permanent after death (selon le timing choisi)
+		~ à vérifier
+	9- l'effet est instantané, définitif et ne peut être dissipé (perte d'un objet, oubli d'un sort)
+		~ permanent after death
+*/
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
-	  2 => 1
-	  4 => 1
-	 11 => 1 // Neutralisation du poison
-	 12 => 1 // Dégâts
-	 13 => 1 // Mort
-	 14 => 1
-	 17 => 1
-	 23 => 1 // Modification du moral
-	 26 => 1
-	 32 => 1
-	 43 => 1
-	 46 => 1
-	 47 => 1 // Dissipation : invisibilité
-	 48 => 1
-	 55 => 1 // Mort
-	 58 => 1 // Dissipation : Magie
-	 64 => 1 // Dissipation : Infravision
-	 68 => 1 // Désinvocation
-	 70 => 1 // Dissipation non détection
-	 75 => 1 // Dissipation : Aveuglement
-	 77 => 1
-	 79 => 1
-	 81 => 1
-	105 => 1 // Modification : or
-	108 => 1 // Modification Réputation
-	112 => 1 // Retrait item
-	116 => 1 // Dissipation : invisibilité
-	123 => 1 // Item: Remove Inventory Item
-	124 => 1 // Spell Effect: Teleport (Dimension Door)
-	125 => 1 // Spell Effect: Unlock (Knock)
+	  2 => 0 // Cure: Sleep
+	  4 => 0 // Cure: Berserking
+	 11 => 0 // Cure: Poison
+	 12 => 0 // HP: Damage
+	 13 => 1 // Death: Instant Death
+	 14 => 0 // Graphics: Defrost
+	 17 => 0 // HP: Current HP Modifier
+	 23 => 0 // Stat: Morale Modifier
+	 26 => 0 // Item: Remove Curse
+	 32 => 0 // Cure: Death (Raise Dead)
+	 43 => 0 // Cure: Stone to Flesh
+	 46 => 0 // Cure: Stun (Unstun)
+	 47 => 0 // Cure: Invisibility
+	 48 => 0 // Cure: Silence (Vocalize)
+	 55 => 0 // Death: Kill Creature Type
+	 58 => 0 // Cure: Dispellable Effects (Dispel Magic)
+	 64 => 0 // State: Remove Infravision
+	 68 => 9 // Summon: Unsummon Creature
+	 70 => 0 // Cure: Non-Detection
+	 75 => 0 // Cure: Blindness
+	 77 => 0 // Cure: Feeblemindedness
+	 79 => 0 // Cure: Disease
+	 81 => 0 // Cure: Deafness 
+	105 => 0 // Stat: Gold
+	108 => 0 // Stat: Reputation
+	112 => 9 // Item: Remove Item
+	116 => 0 // State: Cure Invisibility
+	123 => 9 // Item: Remove Inventory Item
+	124 => 0 // Spell Effect: Teleport (Dimension Door)
+	125 => 9 // Spell Effect: Unlock (Knock)
 	134 => 1 // State: Petrification
-	136 => 1 // State: Force Visible
-	150 => 1 // Spell Effect: Find Traps
-	151 => 1 // Summon: Replace Creature
-	160 => 1 // Remove Sanctuary
-	161 => 1 // Cure: Horror
-	162 => 1 // Cure: Hold
-	163 => 1 // Protection: Free Action
-	164 => 1 // Cure: Drunkeness
-	171 => 1 // Spell: Give Ability
-	172 => 1 // Spell: Remove Spell
+	136 => 0 // State: Force Visible
+	150 => 0 // Spell Effect: Find Traps
+	151 => 3 // Summon: Replace Creature (FIXME: peut-être des nuances selon le mode)
+	160 => 0 // Remove Sanctuary
+	161 => 0 // Cure: Horror
+	162 => 0 // Cure: Hold
+	163 => 0 // Protection: Free Action
+	164 => 0 // Cure: Drunkeness
+	171 => 3 // Spell: Give Ability
+	172 => 9 // Spell: Remove Spell
 	209 => 1 // Death: Kill 60HP
-	210 => 1 // Spell Effect: Stun 90HP
-	211 => 1 // Spell Effect: Imprisonment
-	212 => 1 // Protection: Freedom
-	220 => 1 // Removal: Remove School
-	221 => 1 // Removal: Remove Secondary Type
-	222 => 1 // Spell Effect: Teleport Field
-	224 => 1 // Cure: Level Drain (Restoration)
-	229 => 1 // Removal: Remove One School
-	230 => 1 // Removal: Remove One Secondary Type
+	210 => 0 // Spell Effect: Stun 90HP
+	211 => 9 // Spell Effect: Imprisonment - bien qu'il puisse être dissipé sous une condition
+	212 => 0 // Protection: Freedom
+	220 => 0 // Removal: Remove School
+	221 => 0 // Removal: Remove Secondary Type
+	222 => 0 // Spell Effect: Teleport Field
+	224 => 0 // Cure: Level Drain (Restoration)
+	229 => 0 // Removal: Remove One School
+	230 => 0 // Removal: Remove One Secondary Type
 	238 => 1 // Death: Disintegrate
-	242 => 1 // Cure: Confusion
-	243 => 1 // Item: Drain Item Charges
-	244 => 1 // Spell: Drain Wizard Spell
-	251 => 1 // Spell Effect: Change Bard Song Effect
-	252 => 1 // Spell Effect: Set Trap
-	261 => 1 // Spell: Restore Lost Spells
-	264 => 1 // Spell Effect: Drop Weapons in Panic
+	242 => 0 // Cure: Confusion
+	243 => 9 // Item: Drain Item Charges
+	244 => 9 // Spell: Drain Wizard Spell
+	251 => 9 // Spell Effect: Change Bard Song Effect
+	252 => 9 // Spell Effect: Set Trap
+	261 => 9 // Spell: Restore Lost Spells
+	264 => 9 // Spell Effect: Drop Weapons in Panic
+	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
+	316 => 0 // Spell: Magical Rest
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
+// Traduction : durée normale ou jusqu'à dissipation / utilisation
+// Conséquence : les durées permanentes et permanentes, persiste après la mort n'est pas affichée
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
-	 24 => 1 // Panique
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
 	177 => 1
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
-	233 => 1 // Stat: Proficiency Modifier
 	236 => 1 // Spell Effect: Image Projection
-	273 => 1
-	280 => 1
-	316 => 1
+	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
+END
+
+// Opcodes qui sont dissipés par la mort (directement ou indirectement)
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent_after_death~ BEGIN
+	45 => 1 // State: Stun
+
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
@@ -1493,8 +1513,8 @@ END
  * Death: Instant Death [13] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_13~ BEGIN
-	SET strref = 10130001 // ~Tue instantanément %theTarget%~
-	LPM ~opcode_13_common~
+	SET strref = $death_to_strref(~%parameter2%~)
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
@@ -1502,30 +1522,20 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
-	LPM ~opcode_self_13~ // ~Tue instantanément %theTarget%~
+	LPM ~opcode_self_13~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
-	SET strref = 10130101 // ~de tuer instantanément %theTarget%~
-	LPM ~opcode_13_common~
+	SET strref = $death_to_strref(~%parameter2%~)
+	SET strref += 100
+	SPRINT description (AT strref)
 END
 
-DEFINE_PATCH_MACRO ~opcode_13_common~ BEGIN
-	LOCAL_SET hexValue = 0b1
-	LOCAL_SET strrefInc = ~-1~
-	PATCH_IF parameter2 == 0 BEGIN
-		SET strrefInc = 0
+DEFINE_PATCH_MACRO ~opcode_13_is_valid~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%parameter2%~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown Death Type %parameter2%.~ END
 	END
-	ELSE BEGIN
-		FOR (i = 1 ; i <= 11 ; ++i) BEGIN
-			PATCH_IF strrefInc < 0 AND parameter2 BAND hexValue BEGIN
-				SET strrefInc = i
-			END
-			SET hexValue <<= 1
-		END
-		strref = strref + strrefInc
-	END
-	SPRINT description (AT strref)
 END
 
 /* ----------------------------- *
@@ -2779,39 +2789,39 @@ DEFINE_PATCH_MACRO ~opcode_self_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
-	// Ici pas besoin de calcul compliqué
-	// A partir du moment où le fichier ids est correct (checké dans opcode_x_is_valid)
-	// Si P1 == 0 => aucune restriction
-	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @10550005 // ~Tue instantanément %theTarget%~
-	END
-	ELSE BEGIN
-		// FIXME : la restriction de niveau devrait être simplement géré par add_target_level
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		 PATCH_IF diceCount > 0 BEGIN
-			SPRINT description @10550002 // ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-		END ELSE BEGIN
-			SPRINT description @10550001 // ~Tue instantanément les %creatureType%~
-		END
-	END
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_55~ BEGIN
+	LPM ~opcode_target_probability_55~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
-	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @10550006 // ~de tuer instantanément %theTarget%~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_55_common~ BEGIN
+	PATCH_IF parameter1 != 0 BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET theTarget = idName END
+		SPRINT pluralPronoun @100020 // ~les~
+		SPRINT theTarget EVAL ~%pluralPronoun% %theTarget%~
+		LPM ~add_target_level~
 	END
-	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		PATCH_IF diceCount > 0 BEGIN
-			SPRINT description @10550004 // ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-		END ELSE BEGIN
-			SPRINT description @10550003 // ~de tuer instantanément les %creatureType%~
-		END
-	END
+	SPRINT description (AT description_strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_55_is_valid~ BEGIN
+	LOCAL_SET death_type = 0x4
 	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
+	END
 END
 
 /* ---------------------- *
@@ -6721,15 +6731,30 @@ DEFINE_PATCH_MACRO ~opcode_self_209~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_209~ BEGIN
-	SPRINT description @12090001 // ~Tue instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SPRINT descriptionAdd @12090001 // ~si ses points de vie sont inférieurs à 60~
+
+	SPRINT description (AT description_strref)
+	SPRINT description EVAL ~%description% %descriptionAdd%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_209~ BEGIN
-	SPRINT description @12090002 // ~de tuer instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	SPRINT descriptionAdd @12090001 // ~si ses points de vie sont inférieurs à 60~
+
+	SPRINT description (AT description_strref)
+	SPRINT description EVAL ~%description% %descriptionAdd%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_209~ BEGIN
 	LPM ~opcode_self_probability_209~
+END
+
+DEFINE_PATCH_MACRO ~opcode_209_is_valid~ BEGIN
+	LPM ~opcode_55_is_valid~
 END
 
 /* ----------------------------- *
@@ -7656,37 +7681,33 @@ END
  * Death: Disintegrate [238] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_238~ BEGIN
-	LOCAL_SET strref = 12380001 // ~Désintègre %theTarget%~
-
-	PATCH_IF parameter1 != 0 BEGIN
-		SET strref += 1 // ~Désintègre les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_238~ BEGIN
-	LOCAL_SET strref = 12380003 // ~de désintégrer %theTarget%~
-
-	PATCH_IF parameter1 != 0 BEGIN
-		SET strref += 1 // ~de désintégrer les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	LPM ~opcode_target_238~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_238~ BEGIN
-	LPM ~opcode_self_238~
+	SET death_type = 0x200
+	SET description_strref = $death_to_strref(~%death_type%~)
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_238~ BEGIN
+	LPM ~opcode_target_probability_238~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_238~ BEGIN
-	LPM ~opcode_self_probability_238~
+	SET death_type = 0x200
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	LPM ~opcode_55_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_238_is_valid~ BEGIN
+	LOCAL_SET death_type = 0x200
 	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
+	END
 END
 
 /* ---------------------------- *
@@ -10511,7 +10532,7 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	SPRINT descriptionState ~~
 	SET hexValue = 0b1
 	SET initRef = 410000
-	SPRINT sep @410100 // ~ou~
+	SPRINT sep @100004 // ~ou~
 	FOR (i = 1 ; i <= 32 ; ++i) BEGIN
 		PATCH_IF state BAND hexValue BEGIN
 			SET strref = initRef + i
@@ -10548,4 +10569,19 @@ DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequenc
 		END
 	END
 	SPRINT frequency (AT strref)
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~death_to_strref~ BEGIN
+	0	 => 500001
+	1	 => 500002
+	2	 => 500003
+	4	 => 500004
+	8	 => 500005
+	16	 => 500006
+	32	 => 500007
+	64	 => 500004
+	128  => 500004
+	256  => 500010
+	512  => 500011
+	1024 => 500012
 END
