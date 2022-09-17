@@ -75,6 +75,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	343 => 64  // HP Swap [343]
 	208 => 65  // Stat: Minimum HP Limit [208]
 
+	299 => 66  // Spell Effect: Chaos Shield [299]
+
 	 99 => 67  // Spell Effect: Duration Modifier [99]
 	 60 => 68  // Stat: Miscast Magic [60]
 	189 => 69  // Stat: Casting Time Modifier [189]
@@ -654,11 +656,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	291 => 0 // Graphics: Disable Visual Effect [291]
 	293 => 0 // Script: Enable Offscreen AI [293]
 	294 => 0 // Existance Delay Override [294]
-	295 => 0
-	296 => 0
+	295 => 1 // Graphics: Disable Permanent Death [295]
+	296 => 0 // Graphics: Protection from Specific Animation [296]
 	297 => 0 // Text: Protection from Display Specific String [297]
 	298 => 0 // Spell Effect: Execute Script cut250a [298]
-	299 => 1 // Spell Effect: Chaos Shield [299]
 	304 => 1 // Mass Raise Dead [304]
 	307 => 0 // Ranger Tracking Ability [307]
 	308 => 0 // Protection: From Tracking [308]
@@ -8826,15 +8827,15 @@ END
  *  Stat: Wild Magic [281] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_281~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12810001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 12810001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_281~ BEGIN
-	LPF ~opcode_target~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_target_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_281~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_probability_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_281~ BEGIN
@@ -9014,11 +9015,17 @@ DEFINE_PATCH_MACRO ~opcode_self_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920001 // ~Immunité aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920011 // ~Sensible aux attaques sournoises~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920003 // ~de résister aux attaques sournoises~
+	END
+	ELSE BEGIN
+		SPRINT description @12920013 // ~de rendre sensible aux attaques sournoises~
 	END
 END
 
@@ -9026,12 +9033,40 @@ DEFINE_PATCH_MACRO ~opcode_target_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920002 // ~Immunise %theTarget% aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920012 // ~rend %theTarget% sensible aux attaques sournoises~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920004 // ~d'immuniser %theTarget% aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920014 // ~de rendre %theTarget% sensible aux attaques sournoises~
+	END
+END
+
+/* --------------------------------- *
+ *  Spell Effect: Chaos Shield [299] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_mod~ INT_VAR strref = 12990001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_target~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_probability~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_299~ BEGIN
+	LPM ~opcode_self_probability_299~
 END
 
 /* -------------- *

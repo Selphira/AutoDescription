@@ -2774,8 +2774,8 @@
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Résultat des hiatus entropiques~
-@12810002 = ~le résultat des hiatus entropiques~
+@12810001 = ~Chance de déclencher un hiatus entropique~
+@12810002 = ~la chance de déclencher un hiatus entropique~
 
 // Opcode 283: Use EFF File (Cursed) [283]
 
@@ -2815,13 +2815,28 @@
 @12920003 = ~de résister aux attaques sournoises~
 @12920004 = ~d'immuniser %theTarget% aux attaques sournoises~
 
+@12920011 = ~Sensible aux attaques sournoises~
+@12920012 = ~rend %theTarget% sensible aux attaques sournoises~
+@12920013 = ~de rendre sensible aux attaques sournoises~
+@12920014 = ~de rendre %theTarget% sensible aux attaques sournoises~
+
+// Opcode 295: Graphics: Disable Permanent Death [295]
+
+// TODO : "protection" contre les morts violentes : la mort est toujours douce mais elle est toujours là
+
+
+// Opcode 299:  Spell Effect: Chaos Shield [299]
+
+@12990001 = ~Modificateur des hiatus entropiques~
+@12990002 = ~le modificateur des hiatus entropiques~
+
 // Opcode 300: NPC Bump [300]
 
 @13000001 = ~Permet %toTheTarget% de bousculer les créatures sur son passage~
 @13000002 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé~ // TODO: Trouver une autre tournure, la cible doit être accordée...
 @13000003 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé et de bousculer les créatures sur son passage~
 
-// Opcode 301: Stat: Critical Hit Modifier
+// Opcode 301: Stat: Critical Hit Modifier [301]
 
 @13010001 = ~Chance de coup critique~
 @13010002 = ~Chance de coup critique avec cette arme~
