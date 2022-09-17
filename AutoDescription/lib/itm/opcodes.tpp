@@ -8911,6 +8911,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_284~ BEGIN
 	LPM ~opcode_self_probability_584~
 END
 
+DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ---------------------------------------- *
  * Stat: Melee Weapon Damage Modifier [285] *
  * ---------------------------------------- */
@@ -8928,6 +8932,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_285~ BEGIN
 	LPM ~opcode_self_probability_285~
+END
+
+DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------------------ *
@@ -8949,6 +8957,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_286~ BEGIN
 	LPM ~opcode_self_probability_286~
 END
 
+DEFINE_PATCH_MACRO ~opcode_286_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------- *
  * Stat: Fist THAC0 Modifier [288] *
  * ------------------------------- */
@@ -8968,6 +8980,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_288~ BEGIN
 	LPM ~opcode_self_probability_288~
 END
 
+DEFINE_PATCH_MACRO ~opcode_288_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* -------------------------------- *
  * Stat: Fist Damage Modifier [289] *
  * -------------------------------- */
@@ -8985,6 +9001,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_289~ BEGIN
 	LPM ~opcode_self_probability_289~
+END
+
+DEFINE_PATCH_MACRO ~opcode_289_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* -------------------------- *
