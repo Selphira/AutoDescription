@@ -1,6 +1,9 @@
 	
 DWCHAN02.ITM : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
-OHBREW02.ITM : Opcode 177: The resref parameter is empty
+NPPLAT.ITM : Immunity to Haste: Opcode 206 with resref SPWI613 not found.
+OHBREW02.ITM : Opcode 177: Resource key is empty.
 OHBREW05.ITM : Opcode 344: Invalid ids entry : specific.ids (5)
 OHBREW05.ITM : Opcode 178: Invalid ids entry : specific.ids (5)
 OHBREW05.ITM : Opcode 177: Invalid ids entry : specific.ids (5)
+SW2H06.ITM : Immunity to Haste: Opcode 206 with resref SPWI613 not found.
+SW2H13.ITM : Immunity to Haste: Opcode 206 with resref SPWI613 not found.
