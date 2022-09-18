@@ -9469,61 +9469,48 @@ END
 /* -------------------------------------------------- *
  * Protection: Immunity to Resource and Message [324] *
  * -------------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240501 // ~Immunité au sort %spellName%~
-			END
+ DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
+	LOCAL_SET strref = 13240000
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter2 == 0 BEGIN
+		LPM ~opcode_324_against_who~
+		PATCH_IF isValid BEGIN
+			SPRINT description @13240901 // ~Immunité au sort %spellName%~
 		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self avec parameter1 et parameter2 différent de 0~ END
-		END
+	END
+	ELSE BEGIN
+		LPM ~opcode_common_324~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240503 // ~d'immuniser %theTarget% au sort %spellName%~
-			END
+	LOCAL_SET strref = 13240500
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter2 == 0 BEGIN
+		LPM ~opcode_324_against_who~
+		PATCH_IF isValid BEGIN
+			SPRINT description @13240903 // ~d'immuniser %theTarget% au sort %spellName%~
 		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self_probability avec parameter1 et parameter2 différent de 0~ END
-		END
+	END
+	ELSE BEGIN
+		LPM ~opcode_common_324~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 	LOCAL_SET strref = 13240000
 
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240502 // ~Immunise %theTarget% au sort %spellName%~
-			END
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter2 == 0 BEGIN
+		LPM ~opcode_324_against_who~
+		PATCH_IF isValid BEGIN
+			SPRINT description @13240902 // ~Immunise %theTarget% au sort %spellName%~
 		END
-		ELSE BEGIN
-			LPM ~opcode_common_324~
-		END
+	END
+	ELSE BEGIN
+		LPM ~opcode_common_324~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
-	LOCAL_SET strref = 13240151
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPM ~opcode_self_probability_324~
-		END
-		ELSE BEGIN
-			LPM ~opcode_common_324~
-		END
-	END
+	LPM ~opcode_self_probability_324~
 END
 
 DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
@@ -9531,28 +9518,64 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
 	SET ignoreDuration = 1
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
-			PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
-				SET idsId = statType - 100
-				SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
-				PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
-					SET idsId = statType - 110
-					SET strref = strref + 1 // ~Effectif contre les %creatureType%~
-				END
-				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-			END
-			ELSE BEGIN
-				SET strref = strref + statType
-			END
-			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+		PATCH_IF statType >= 102 AND statType <= 109 BEGIN
+			SET idsId = statType - 100
+			SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+		END
+		ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+			SET oldStrref = strref + statType
+			SET strref = 420000 + parameter1
+			LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+			SET strref = oldStrref
+		END
+		ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN
+			SET idsId = statType - 110
+			SET strref = strref + 302 // ~Effectif contre les %creatureType%~
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+		END
+		ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
+			LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
+			SET strref = strref + statType
 		END
 		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
+			SET strref = strref + statType
+		END
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+	ELSE BEGIN
+		LPM ~opcode_324_against_who~
+		PATCH_IF isValid BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à %againstWho% différente de l'objet : %resref%~ END
 		END
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
+	LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
+	LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
+	SET againstWhoStrref = 13240911
+	SET isValid = 1
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre le sort %spellName% et l'objet %itemName%~
+	END
+	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SET againstWhoStrref += 1
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre le sort %spellName%~
+	END
+	ELSE PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		SET againstWhoStrref += 2
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre l'objet %itemName%~
+	END
+	// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
+	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+		SET isValid = 0
+	END
+	SPRINT againstWho (AT againstWhoStrref)
+END
 /* ------------------------ *
  * Stat: Save vs. all [325] *
  * ------------------------ */

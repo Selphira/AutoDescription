@@ -102,9 +102,15 @@ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
-	// Si la macro n'existe pas, on considère comme valide
-	PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
-
+	PATCH_IF NOT is_ee AND opcode >= 319 AND opcode <= 367 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Opcode doesn't exist in this game~ END
+	END
+	ELSE BEGIN
+		// Si la macro n'existe pas, on considère comme valide
+		PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
+	END
+	
 	PATCH_IF probability <= 0 BEGIN
 		SET isValid = 0
         LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
