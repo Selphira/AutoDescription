@@ -2912,13 +2912,35 @@
 
 // Opcode 321: Removal: Effects specified by Resource [321]
 
-@13210001 = ~Dissipe les effets du sort %spellName% sur %theTarget%~
-@13210002 = ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
-@13210003 = ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
-@13210004 = ~de dissiper les effets du sort %spellName% sur %theTarget%~
-@13210005 = ~de dissiper les effets de l'objet %itemName% sur %theTarget%~
-@13210006 = ~de dissiper les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
-@13210007 = ~Les effets ne se cumulent pas~
+@13210001 = ~Dissipe les %effectType% du sort %spellName%~
+@13210002 = ~Dissipe les %effectType% de l'objet %itemName%~
+@13210003 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName%~
+
+@13210004 = ~Dissipe les %effectType% du sort %spellName% sur %theTarget%~
+@13210005 = ~Dissipe les %effectType% de l'objet %itemName% sur %theTarget%~
+@13210006 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210007 = ~de dissiper les %effectType% du sort %spellName% sur %theTarget%~
+@13210008 = ~de dissiper les %effectType% de l'objet %itemName% sur %theTarget%~
+@13210009 = ~de dissiper les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210011 = ~Dissipe et protège des %effectType% du sort %spellName%~
+@13210012 = ~Dissipe et protège des %effectType% de l'objet %itemName%~
+@13210013 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName%~
+
+@13210014 = ~Dissipe et protège des %effectType% du sort %spellName% sur %theTarget%~
+@13210015 = ~Dissipe et protège des %effectType% de l'objet %itemName% sur %theTarget%~
+@13210016 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210017 = ~de dissiper et protège des %effectType% du sort %spellName% sur %theTarget%~
+@13210018 = ~de dissiper et protège des %effectType% de l'objet %itemName% sur %theTarget%~
+@13210019 = ~de dissiper et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210020 = ~Les effets ne se cumulent pas~
+
+@13210100 = ~effets~ // %effectType%
+@13210101 = ~capacités d'équipement~
+@13210102 = ~effets non équipés~
 
 // Opcode 323: Stat: Turn Undead Level [323]
 

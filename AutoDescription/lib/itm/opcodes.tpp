@@ -9370,12 +9370,13 @@ DEFINE_PATCH_MACRO ~opcode_self_321~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_321~ BEGIN
-	LOCAL_SET strref = 13210004
+	LOCAL_SET strref = 13210007
 	LPM ~opcode_321_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_321~ BEGIN
-	LPM ~opcode_self_321~
+	LOCAL_SET strref = 13210004
+	LPM ~opcode_321_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
@@ -9383,33 +9384,52 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
-	// TODO: Gérer le type = parameter2
-	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ AND
+			(timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
 		SET ignoreDuration = 1
 		SET forceSort = 1
 		SET sort = 0
-		SPRINT description @13210007 // ~Les effets ne se cumulent pas~
+		SPRINT description @13210020 // ~Les effets ne se cumulent pas~
 	END
 	ELSE BEGIN
+		PATCH_IF timingMode != TIMING_duration OR duration != 0 BEGIN // Dissipe & protège
+			SET strref += 10
+		END
 		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
 		LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
 		TO_LOWER resref
 
+		SPRINT effectType @13210100 // ~effets~
+		PATCH_IF parameter2 == 1 BEGIN
+			SPRINT effectType @13210101 // ~capacités d'équipement~
+		END
+		ELSE PATCH_IF parameter2 == 2 BEGIN
+			SPRINT effectType @13210102 // ~effets non équipés~
+		END
+
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 2
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
 		END
 		ELSE PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 1
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% de l'objet %itemName% sur %theTarget%~
 		END
 		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% du sort %spellName% sur %theTarget%~
 		END
 		// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 		ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_321_is_valid~ BEGIN
+	// Leaving the resource field empty will remove any effect on the creature without a parent resource
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
 	END
 END
 
