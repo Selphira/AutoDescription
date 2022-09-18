@@ -9436,6 +9436,9 @@ END
 /* ----------------------------- *
  * Stat: Turn Undead Level [323] *
  * ----------------------------- */
+
+// TODO : à vérifier : pas de MOD_TYPE_percent dans 2.5.16
+// FIXME: special != 0 : P1 = P1 + niveau de la classe la plus élevée
 DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 13230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de repousser les morts-vivants~
 END
@@ -9450,6 +9453,17 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_323~ BEGIN
 	LPM ~opcode_self_probability_323~
+END
+
+DEFINE_PATCH_MACRO ~opcode_323_is_valid~ BEGIN
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 AND special == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
+	END
 END
 
 /* -------------------------------------------------- *
