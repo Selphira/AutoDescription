@@ -116,6 +116,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
 	// Dissipation
 
+	304 => 199 // Mass Raise Dead [304]
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
 	 32 => 201 // Cure: Death (Raise Dead) [32]
 	 43 => 201 // Cure: Stone to Flesh [43]
@@ -660,7 +661,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	296 => 0 // Graphics: Protection from Specific Animation [296]
 	297 => 0 // Text: Protection from Display Specific String [297]
 	298 => 0 // Spell Effect: Execute Script cut250a [298]
-	304 => 1 // Mass Raise Dead [304]
 	307 => 0 // Ranger Tracking Ability [307]
 	308 => 0 // Protection: From Tracking [308]
 	309 => 0 // Script: Set/Modify Local Variable [309]
@@ -9121,7 +9121,7 @@ DEFINE_PATCH_MACRO ~opcode_self_302~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT description @13020001 // ~Bloque la capacité d'utiliser n'importe quel objet~
 	END
-	ELSE
+	ELSE BEGIN
 		SPRINT description @13020002 // ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
 	END
 END
@@ -9158,6 +9158,32 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_303~ BEGIN
 	LPM ~opcode_self_probability_303~ // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+END
+
+/* --------------------- *
+ * Mass Raise Dead [304] *
+ * --------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_304~ BEGIN
+	LPM ~opcode_target_304~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_304~ BEGIN
+	LPM ~opcode_target_probability_304~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_304~ BEGIN
+	// TODO: rendre maintenable
+	SPRINT theTarget   @102473 // ~les membres du groupe~
+	SPRINT ofTheTarget @101088 // ~des membres du groupe~
+	SPRINT toTheTarget @101182 // ~aux membres du groupe~
+	LPM ~opcode_target_32~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_304~ BEGIN
+	SPRINT theTarget   @102473 // ~les membres du groupe~
+	SPRINT ofTheTarget @101088 // ~des membres du groupe~
+	SPRINT toTheTarget @101182 // ~aux membres du groupe~
+	LPM ~opcode_target_probability_32~
 END
 
 /* ------------------------------------- *
