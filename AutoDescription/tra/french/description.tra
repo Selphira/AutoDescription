@@ -2859,7 +2859,8 @@
 
 // Opcode 302: Item: Can Use Any Item [302]
 
-@13020001 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+@13020001 = ~Bloque la capacité d'utiliser n'importe quel objet~
+@13020002 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
 
 // Opcode 303: Spell Effect: Backstab Every Hit [303]
 

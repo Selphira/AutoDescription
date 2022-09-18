@@ -9118,8 +9118,12 @@ END
  * Item: Can Use Any Item [302] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_302~ BEGIN
-	//TODO:si parameter2 == 0, désactive l'effet sur la cible si elle l'avait déjà par un autre moyen
-	SPRINT description @13020001 // ~Permet d'utiliser n'importe quel objet~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13020001 // ~Bloque la capacité d'utiliser n'importe quel objet~
+	END
+	ELSE
+		SPRINT description @13020002 // ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+	END
 END
 
 /* -------------------------------------- *
