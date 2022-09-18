@@ -9193,16 +9193,20 @@ DEFINE_PATCH_MACRO ~opcode_self_305~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 13050001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_605~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_305~ BEGIN
 	LPF ~opcode_target~ INT_VAR strref = 13050002 RET description END // ~le TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_605~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_probability_305~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 13050002 RET description END // ~le TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_605~ BEGIN
-	LPM ~opcode_self_probability_605~
+DEFINE_PATCH_MACRO ~opcode_target_probability_305~ BEGIN
+	LPM ~opcode_self_probability_305~
+END
+
+DEFINE_PATCH_MACRO ~opcode_305_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------------ *
@@ -9222,6 +9226,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_306~ BEGIN
 	LPM ~opcode_self_probability_306~
+END
+
+DEFINE_PATCH_MACRO ~opcode_306_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------- *
