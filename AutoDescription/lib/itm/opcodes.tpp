@@ -9236,15 +9236,30 @@ END
  * Protection: from Timestop [310] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_310~ BEGIN
-	SPRINT description @13100001 // ~Immunité à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100001 // ~Bloque l'immunité à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100011 // ~Immunité à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_310~ BEGIN
-	SPRINT description @13100003 // ~d'immuniser %theTarget% à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100003 // ~de rendre sensible %theTarget% à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100013 // ~d'immuniser %theTarget% à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_310~ BEGIN
-	SPRINT description @13100002 // ~Immunise %theTarget% à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100002 // ~Rendre sensible %theTarget% à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100012 // ~Immunise %theTarget% à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_310~ BEGIN
