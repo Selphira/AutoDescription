@@ -259,6 +259,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	280 => 404 // Spell Effect: Wild Magic [280]
 	193 => 405 // Spell Effect: Invisible Detection by Script [193]
 	218 => 406 // Protection: Stoneskin [218]
+	314 => 407 // Spell: Golem Stoneskin [314]
 
 	281 => 420 // Stat: Wild Magic [281]
 	323 => 421 // Stat: Turn Undead Level [323]
@@ -666,7 +667,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	309 => 0 // Script: Set/Modify Local Variable [309]
 	312 => 0
 	313 => 0 // High-Level Ability Denotation [313]
-	314 => 1 // Spell: Golem Stoneskin [314]
 	315 => 0 // Graphics: Animation Removal [315]
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
@@ -7096,19 +7096,19 @@ END
  * Protection: Stoneskin [218] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_218~ BEGIN
-	LOCAL_SET strref = 12180001 // ~Peau de pierre (1 peau)~
+	LOCAL_SET strref = 12180001 // ~Crée %amount% %skinType%~
 
 	LPM ~opcode_218_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_218~ BEGIN
-	LOCAL_SET strref = 12180003 // ~de lancer Peau de pierre (1 peau) sur %theTarget%~
+	LOCAL_SET strref = 12180002 // ~de créer %amount% %skinType% sur %theTarget%~
 
 	LPM ~opcode_218_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_218~ BEGIN
-	LOCAL_SET strref = 12180005 // ~Lance Peau de pierre (1 peau) sur %theTarget%~
+	LOCAL_SET strref = 12180003 // ~Crée %amount% %skinType% sur %theTarget%~
 
 	LPM ~opcode_218_common~
 END
@@ -7117,19 +7117,26 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_218~ BEGIN
 	LPM ~opcode_self_probability_218~
 END
 
+// Commun aux opcodes 218 et 314
 DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 AND opcode == 218 BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 		END
 	END
-
-	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
-		SET strref += 1
+	// "Dissipation"
+	PATCH_IF IS_AN_INT amount AND amount == 0 BEGIN
+		SET strref += 10
 	END
+
+	SET skinTypeRef = 10000101 + opcode * 10000
+	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
+		SET skinTypeRef += 1 // ~peaux de pierre~
+	END
+	SPRINT skinType (AT skinTypeRef) // ~peau de pierre~
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
@@ -9283,6 +9290,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_311~ BEGIN
 	LPM ~opcode_self_probability_311~
+END
+
+/* ----------------------------- *
+ *  Spell: Golem Stoneskin [314] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_314~ BEGIN
+	LPM ~opcode_self_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_314~ BEGIN
+	LPM ~opcode_self_probability_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_314~ BEGIN
+	LPM ~opcode_target_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_314~ BEGIN
+	LPM ~opcode_self_probability_314~
 END
 
 /* ------------------------- *
