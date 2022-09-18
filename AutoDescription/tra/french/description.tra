@@ -2864,9 +2864,13 @@
 
 // Opcode 303: Spell Effect: Backstab Every Hit [303]
 
-@13030001 = ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
-@13030002 = ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
-@13030003 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+@13030001 = ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~
+@13030002 = ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+@13030003 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+
+@13030011 = ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+@13030012 = ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+@13030013 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 
 // Opcode 305: Stat: THAC0 Modifier (Off-Hand) [305]
 

@@ -9130,16 +9130,30 @@ END
  * Spell Effect: Backstab Every Hit [303] *
  * -------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_303~ BEGIN
-	//TODO:si parameter2 == 0, désactive l'effet sur la cible si elle l'avait déjà par un autre moyen
-	SPRINT description @13030001 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030001 // ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030011 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_303~ BEGIN
-	SPRINT description @13030003 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030003 // ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030013 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_303~ BEGIN
-	SPRINT description @13030002 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030002 // ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030012 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_303~ BEGIN
