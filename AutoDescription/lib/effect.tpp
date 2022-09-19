@@ -341,6 +341,14 @@ BEGIN
 				SPRINT toTheTarget @101182 // ~aux membres du groupe~
 			END
 		END
+		ELSE PATCH_IF target == TARGET_FX_everyone BEGIN
+			SPRINT opcode_target ~_target~
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+				SPRINT theTarget   @102474 // ~les créatures dans la zone d'effet~
+				SPRINT ofTheTarget @101089 // ~des créatures dans la zone d'effet~
+				SPRINT toTheTarget @101190 // ~aux créatures dans la zone d'effet~
+			END
+		END
 
 		LPM ~add_target_level~
 

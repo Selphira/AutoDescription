@@ -87,7 +87,7 @@
 @102127 = ~Permet de lancer des sorts profanes~
 @102159 = ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
 
-@102549 = ~Créature inconnue~
+@102550 = ~Créature inconnue~
 @102551 = ~Sort inconnu~
 @102677 = ~%charges% charge, l'objet est détruit quand la charge est utilisée~
 @102679 = ~Protection contre les coups critiques~
@@ -125,23 +125,28 @@
 @102549 = ~d'immuniser %theTarget% %resistName%~
 
 // Les différentes cibles
+// FIXME: mettre de l'ordre dans les n°
 @102471 = ~la cible~
 @102472 = ~le porteur~
 @102473 = ~les membres du groupe~
+@102474 = ~les créatures dans la zone d'effet~
 @102384 = ~les %targetType%~
 @101085 = ~de la cible~
 @101086 = ~du porteur~
 @101088 = ~des membres du groupe~
+@101089 = ~des créatures dans la zone d'effet~
 @102385 = ~des %targetType%~
 @101180 = ~au porteur~
 @101181 = ~à la cible~
 @101182 = ~aux membres du groupe~
+@101190 = ~aux créatures dans la zone d'effet~
 @102386 = ~aux %targetType%~
 @102387 = ~contre les %targetType%~
 @101186 = ~%target% (de niveau %levelMin%)~
 @101187 = ~%target% (de niveau %levelMax% ou inférieur)~
 @101188 = ~%target% (de niveau %levelMin% ou supérieur)~
 @101189 = ~%target% (de niveau %levelMin% à %levelMax%)~
+
 
 // (Non) Utilisable par
 @101000 = ~chaotique~
@@ -2729,8 +2734,8 @@
 // Opcode 270: Cure: Unpause Target [270]
 
 // TODO: trouver mieux
-@11650001 = ~Libère %theTarget% de ses combats mentaux~
-@11650002 = ~de libérer %theTarget% de ses combats mentaux~
+@12700001 = ~Libère %theTarget% de ses combats mentaux~
+@12700002 = ~de libérer %theTarget% de ses combats mentaux~
 
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
@@ -3027,6 +3032,7 @@
 //@13240073 SPLSTATE!=SHROUD_OF_FLAME > jamais vu
 @13240074 = ~Inefficace contre les créatures mortes~
 @13240075 = ~Inefficace contre les créatures vivantes~ // FIXME: tendancieux : les morts-vivants sont touchés
+@13240076 = ~~ // @13240110
 @13240077 = ~Inefficace contre les cibles immunisées au poison~
 @13240078 = ~Inefficace contre les cibles sensibles au poison~
 @13240079 = ~Inefficace contre les cibles immunisées à l'acide~
@@ -3148,6 +3154,7 @@
 //
 @13240574 = ~d'être inefficace contre les créatures mortes~
 @13240575 = ~d'être inefficace contre les créatures vivantes~
+@13240076 = ~~ // @13240610
 @13240577 = ~d'être inefficace contre les cibles immunisées au poison~
 @13240578 = ~d'être inefficace contre les cibles sensibles au poison~
 @13240579 = ~d'être inefficace contre les cibles immunisées à l'acide~
@@ -3260,8 +3267,8 @@
 @13260042 = ~Si %theTarget% est d'un alignement différent du porteur~
 @13260043 = ~~
 @13260044 = ~~
-@13240545 = ~Si %theTarget% est un githyanki~
-@13240546 = ~Si %theTarget% n'est pas un githyanki~
+@13260545 = ~Si %theTarget% est un githyanki~
+@13260546 = ~Si %theTarget% n'est pas un githyanki~
 @13260047 = ~Si %theTarget% est un golem, un mort-vivant ou un myconide~
 @13260048 = ~Si %theTarget% n'est ni un golem, ni un mort-vivant, ni un myconide~
 @13260049 = ~Si %theTarget% est une alliée~
@@ -3280,6 +3287,7 @@
 @13260067 = ~Si %theTarget% n'est pas sourd~
 @13260074 = ~Si %theTarget% est mort~
 @13260075 = ~Si %theTarget% est vivant~
+@13260076 = ~~ // @13260110
 @13260077 = ~Si %theTarget% est immunisé au poison~
 @13260078 = ~Si %theTarget% est sensible au poison~
 @13260079 = ~Si %theTarget% est immunisé à l'acide~

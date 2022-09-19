@@ -6232,7 +6232,7 @@ DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %resref%.eff doesn't exist.~ END
 	END
 END
 
@@ -8286,11 +8286,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT spellType @12610011 // ~profane~
+		SPRINT spellType @12610010 // ~profane~
 		SET spellLevel = spellLevel > 9 ? 9 : spellLevel
 	END
 	ELSE PATCH_IF parameter2 == 1 BEGIN
-		SPRINT spellType @12610012 // ~divin~
+		SPRINT spellType @12610011 // ~divin~
 		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
 	END
 
@@ -9423,7 +9423,7 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 		END
 		// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 		ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		END
 	END
 END
@@ -9432,7 +9432,7 @@ DEFINE_PATCH_MACRO ~opcode_321_is_valid~ BEGIN
 	// Leaving the resource field empty will remove any effect on the creature without a parent resource
 	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
 	END
 END
 
@@ -9514,7 +9514,8 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 			END
-			ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+			ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
+				SET statType = statType == 76 ? 110 : statType
 				SET oldStrref = strref + statType
 				SET strref = 420000 + parameter1
 				LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
@@ -9562,7 +9563,7 @@ DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
 	END
 	// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		SET isValid = 0
 	END
 	SPRINT againstWho (AT againstWhoStrref)
@@ -9571,7 +9572,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_324_is_valid~ BEGIN
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND timingMode == TIMING_duration AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
 	END
 END
 
@@ -9646,7 +9647,8 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 		SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 	END
-	ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+	ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
+		SET statType = statType == 76 ? 110 : statType
 		SET oldStrref = strref + statType
 		SET strref = 420000 + parameter1
 		LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
@@ -10490,7 +10492,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 			END
 			/*
 			ELSE BEGIN
-				SPRINT creatureName @102549 // ~Créature inconnue~
+				SPRINT creatureName @102550 // ~Créature inconnue~
 				LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 			END
 			*/
