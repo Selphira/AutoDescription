@@ -43,6 +43,7 @@
 @101123 = ~%name% %target%%colon%%value%~
 @101124 = ~Capacité %abilityNumber%~
 @101125 = ~%probability% de chance %description%~
+@101126 = ~%probability% de chance~
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
