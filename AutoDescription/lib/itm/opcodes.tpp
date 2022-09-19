@@ -9701,6 +9701,7 @@ END
 /* -------------------------------------- *
  * Summon: Random Monster Summoning [331] *
  * -------------------------------------- */
+// FIXME: pas de test possible en 2.5.16
 DEFINE_PATCH_MACRO ~opcode_self_331~ BEGIN
 	LOCAL_SET strref = 13310001 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 	LPM ~opcode_331_common~
@@ -9741,6 +9742,17 @@ DEFINE_PATCH_MACRO ~opcode_331_common~ BEGIN
 
 	LPF ~get_creatures_names~ STR_VAR file RET creatures END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_331_is_valid~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.2da~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File %resref%.2da does not exist, the game may crash.~ END
+	END
+	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~smtables.2da~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File smtables.2da does not exist, the game may crash.~ END
+	END
 END
 
 /* ------------------------------------ *
