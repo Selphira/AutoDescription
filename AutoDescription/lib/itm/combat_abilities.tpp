@@ -22,6 +22,7 @@ BEGIN
 	SET hasLauncher = 0
 	SET selectedHeader = 0
 	SET headerIndex = 0
+	SET hasSpecialProjectileAbility = 0
 
 	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
@@ -78,6 +79,7 @@ BEGIN
 
 				SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
 				SET ~countLines%index%~ += 1
+				SET hasSpecialProjectileAbility = 1
 			END
 		END
 		SORT_ARRAY_INDICES ~lines%index%~ NUMERICALLY
@@ -132,6 +134,10 @@ BEGIN
 	END
 
 	PATCH_IF countHeaders == 1 OR (countHeaders > 0 AND hasSameAbilities == 1 AND hasSameAttributes == 1) BEGIN
+		PATCH_IF hasSpecialProjectileAbility BEGIN
+			SET $EVAL ~lines%selectedHeader%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+			SET ~countLines%selectedHeader%~ += 1
+		END
 		SPRINT title @100011 // ~Capacités de combat~
 		LPF ~add_section_to_description~ INT_VAR count = ~countLines%selectedHeader%~ STR_VAR title arrayName = ~lines%selectedHeader%~ RET description END
 		LPF ~add_weapon_attributes_to_description~ INT_VAR index = 0 group = countHeaders != 1 RET description END
@@ -148,7 +154,7 @@ BEGIN
 		END
 		LPF ~add_weapon_attributes_to_description~ INT_VAR index = selectedHeader group = 1 RET description END
 	END
-	ELSE PATCH_IF( hasSameAbilities == 0 AND hasSameAttributes == 0) OR (hasSameAbilities == 1 AND hasSameAttributes == 0) BEGIN
+	ELSE PATCH_IF (hasSameAbilities == 0 AND hasSameAttributes == 0) OR (hasSameAbilities == 1 AND hasSameAttributes == 0) BEGIN
 		FOR (index = 0; index < countHeaders; index += 1) BEGIN
 			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 				SET attackType = ~%data_0%~
