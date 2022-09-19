@@ -1039,6 +1039,7 @@
  * State *
  * ------------- */
 // Complète la phrase : Lorsque %theTarget% est...
+// ou @13240639 = ~d'être effectif contre les créatures ...~
 // FIXME: problème d'accord potentiel selon le genre de la target
 
 @410000 = ~sous aucun effet~
@@ -3259,6 +3260,8 @@
 @13260042 = ~Si %theTarget% est d'un alignement différent du porteur~
 @13260043 = ~~
 @13260044 = ~~
+@13240545 = ~Si %theTarget% est un githyanki~
+@13240546 = ~Si %theTarget% n'est pas un githyanki~
 @13260047 = ~Si %theTarget% est un golem, un mort-vivant ou un myconide~
 @13260048 = ~Si %theTarget% n'est ni un golem, ni un mort-vivant, ni un myconide~
 @13260049 = ~Si %theTarget% est une alliée~
@@ -3293,6 +3296,10 @@
 @13260090 = ~Entre 21h et 5h~
 @13260091 = ~Si %theTarget% panique~
 @13260092 = ~Si %theTarget% ne panique pas~
+
+@13260110 = ~Si %theTarget% est sous l'effet de %splstateName%~
+@13260111 = ~Si %theTarget% n'est pas sous l'effet de %splstateName%~
+
 @13260119 = ~Si %theTarget% est un humanoïde ou un animal, mais pas un demi-elfe~
 @13260120 = ~Si %theTarget% est protégé contre les morts-vivants~
 @13260122 = ~Si la dextérité %ofTheTarget% est supérieure ou égale à %value%~
@@ -3311,7 +3318,8 @@
 @13260135 = ~Si le nombre de créatures invoquées est inférieur à %value%~
 @13260136 = ~Si le chapitre en cours est supérieur ou égal au %value%~
 @13260137 = ~Si le chapitre en cours est inférieur à %value%~
-@13260138 = ~Si %theTarget% est affecté par Vision véritable~
+@13260138 = ~Si %theTarget% est %descriptionState%~
+@13260139 = ~Si %theTarget% n'est pas %descriptionState%~
 @13260140 = ~Si %theTarget% est sous l'effet d'une invisibilité~
 @13260141 = ~Si %theTarget% est sous l'effet d'une invisibilité améliorée~
 @13260142 = ~Si %theTarget% est invisible~

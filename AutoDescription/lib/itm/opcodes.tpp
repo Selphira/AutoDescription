@@ -9610,6 +9610,7 @@ END
 /* ------------------------ *
  * Apply Effects List [326] *
  * ------------------------ */
+// TODO : gérer 326 avec 324
 DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
@@ -9640,21 +9641,30 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
-			SET idsId = statType - 100
-			SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
-			PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
-				SET idsId = statType - 110
-				SET strref = strref + 147 // ~Effectif contre les %creatureType%~
-			END
-			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-		END
-		ELSE BEGIN
-			SET strref = strref + statType
-		END
-		LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+	PATCH_IF statType >= 102 AND statType <= 109 BEGIN
+		SET idsId = statType - 100
+		SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 	END
+	ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+		SET oldStrref = strref + statType
+		SET strref = 420000 + parameter1
+		LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+		SET strref = oldStrref
+	END
+	ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN
+		SET idsId = statType - 110
+		SET strref = strref + 147 // ~Effectif contre les %creatureType%~
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+	END
+	ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
+		LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
+		SET strref = strref + statType
+	END
+	ELSE BEGIN
+		SET strref = strref + statType
+	END
+	LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
 END
 
 /* ------------------------------- *
