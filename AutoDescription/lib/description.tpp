@@ -34,13 +34,11 @@ BEGIN
         SORT_ARRAY_INDICES ~%arrayName%~ NUMERICALLY
 		LPF ~appendSection~ STR_VAR string = ~%title%~ RET description END
 
-        //TODO: Regrouper les éléments ayant la même probabilité: Nécessite une seconde boucle
-
 	    PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
-	        PATCH_IF value == 1 BEGIN
-				LPF ~appendProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
+	        PATCH_IF value MODULO 2 == 1 BEGIN
+				LPF ~appendProperty~ INT_VAR indentation_num = value / 2 STR_VAR name = EVAL ~%data_5%~ RET description END
 			END
-			ELSE PATCH_IF value == 2 BEGIN
+			ELSE PATCH_IF value MODULO 2 == 0 BEGIN
 				LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
 			END
 	    END
@@ -78,15 +76,22 @@ DEFINE_PATCH_FUNCTION ~appendValue~ INT_VAR strref = 0 STR_VAR name = "" value =
     SPRINT description "%description%%crlf%%string%"
 END
 
-DEFINE_PATCH_FUNCTION ~appendProperty~ INT_VAR strref = 0 STR_VAR name = "" value = "" RET description BEGIN
+DEFINE_PATCH_FUNCTION ~appendProperty~ INT_VAR strref = 0 indentation_num = 0 STR_VAR name = "" value = "" RET description BEGIN
 	PATCH_IF strref > 0 BEGIN
 		SPRINT name (AT %strref%)
 	END
 
-	PATCH_IF NOT "%value%" STRING_EQUAL "" BEGIN
+	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 		SPRINT name @100001 // %name% : %value%
 	END
-    SPRINT description "%description%%crlf%- %name%"
+
+	SPRINT indentation ~~
+
+	FOR (i = 0 ; i < indentation_num ; ++i ) BEGIN
+		SPRINT indentation ~%indentation%  ~
+	END
+
+    SPRINT description "%description%%crlf%%indentation%- %name%"
 END
 
 DEFINE_PATCH_FUNCTION ~appendSubProperty~ INT_VAR strref = 0 STR_VAR name = "" value = "" RET description BEGIN

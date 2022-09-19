@@ -83,4 +83,5 @@ BEGIN
 	END
 
 	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
+	LPF ~group_probability_effects~ RET countLines = count RET_ARRAY lines = effects END
 END
