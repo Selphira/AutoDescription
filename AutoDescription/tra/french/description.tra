@@ -11,6 +11,7 @@
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
 
+@9999 = ~Schtroumpf~
 @10000 = ~
 ~
 @10001 = ~ : ~
@@ -33,6 +34,7 @@
 @100007 = ~%name% %ofTheTarget%%colon%%value%~
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
+@100020 = ~les~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101083 = ~Arme à 1 main~
 @101084 = ~Arme à 2 mains~
@@ -45,6 +47,11 @@
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
+@101185 = ~%description% (non cumulable)~
+
+
+// JS
+// FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 @101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 @102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
@@ -55,8 +62,6 @@
 @102124 = ~jet de sauvegarde %saveTypeStr% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
 // les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
 @102125 = ~réduits de moitié~
-//
-@101185 = ~%description% (non cumulable)~
 
 @102003 = ~Type de compétence~
 @102004 = ~Type~
@@ -89,6 +94,7 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulable~
 
+// FIXME: à raccourcir
 @102263 = ~Les bonus aux jets de toucher et aux dégâts en fonction de la force s'appliquent à cette arme~
 @102264 = ~Les bonus aux dégâts en fonction de la force s'appliquent à cette arme~
 @102265 = ~Les bonus aux jets de toucher en fonction de la force s'appliquent à cette arme~
@@ -185,13 +191,13 @@
 @100202 = ~de protection spécifique~
 @100203 = ~de protection illusoire~
 @100204 = ~d'attaque magique~
-@100205 = ~d'attaque divinatoire~
+@100205 = ~d'attaque divinatrice~
 @100206 = ~de conjuration~
 @100207 = ~de protection de combat~
 @100208 = ~de contingences~
 @100209 = ~de champ de bataille~
 @100210 = ~de dégâts offensif~
-@100211 = ~incapacitante~
+@100211 = ~invalidante~
 @100212 = ~de combinaison~
 @100213 = ~non offensive~
 
@@ -211,6 +217,10 @@
 @100312 = ~de manière permanente~
 @100313 = ~de manière permanente, persiste après la mort~
 @100314 = ~après %strDuration% et pendant %strDuration%~
+
+@100320 = ~par %strDuration%~
+@100321 = ~toutes les %strDuration%~
+@100322 = ~tous les %strDuration%~
 
 /* ------ *
  * Ea.ids *
@@ -496,10 +506,11 @@
 /* ------------ *
  * Specific.ids *
  * ------------ */
- @206000 = ~??????~
- @206005 = ~~
- @206243 = ~ménestrels~
- @206250 = ~esprits~
+@206000 = ~??????~
+@206005 = ~drows~
+@206150 = ~githyankis~
+@206243 = ~ménestrels~
+@206250 = ~esprits~
 
 /* --------- *
  * Gender.ids *
@@ -575,6 +586,77 @@
 @220036 = ~d'armes (2)~
 @220037 = ~d'armes (3)~
 @220038 = ~d'armes (4)~
+
+
+/* ---------------- *
+ * Itemcat.ids *
+ * ---------------- */
+
+@230000 = ~livres~
+@230001 = ~amulettes et les colliers~
+@230002 = ~armures~
+@230003 = ~ceintures~
+@230004 = ~bottes~
+@230005 = ~flèches~
+@230006 = ~bracelets et les gantelets~
+@230007 = ~casques~
+@230008 = ~clés~
+@230009 = ~potions~
+@230010 = ~anneaux~
+@230011 = ~parchemins~
+@230012 = ~boucliers~
+@230013 = ~nourritures~
+@230014 = ~balles~
+@230015 = ~arcs~
+@230016 = ~dagues~
+@230017 = ~masses~
+@230018 = ~frondes~
+@230019 = ~épées courtes~
+@230020 = ~épées longues~
+@230021 = ~marteaux~
+@230022 = ~étoiles du matin~
+@230023 = ~fléaux~
+@230024 = ~fléchettes~
+@230025 = ~haches~
+@230027 = ~arbalètes~
+@230028 = ~poings~
+@230029 = ~lances~
+@230030 = ~hallebardes~
+@230031 = ~carreaux~
+@230032 = ~capes~
+@230033 = ~pièces d'or~
+@230034 = ~gemmes~
+@230035 = ~baguettes~
+@230036 = ~conteneurs, yeux et armures cassées~
+@230037 = ~boucliers cassés et les bracelets~
+@230038 = ~familiers, épées cassées et boucles d'oreilles~
+@230039 = ~tatouages~
+@230040 = ~lentilles~
+@230041 = ~boucliers et les dents~
+@230042 = ~bougies~
+@230043 = ~clubs~
+@230047 = ~grands boucliers~
+@230049 = ~boucliers moyens~
+@230050 = ~notes~
+@230053 = ~petits boucliers~
+@230055 = ~téléscopes~
+@230056 = ~boissons~
+@230057 = ~épées longues~
+@230058 = ~conteneurs~
+@230059 = ~peaux et les fourrures~
+@230060 = ~armures de cuir~
+@230061 = ~armures de cuir clouté~
+@230062 = ~armures de mailles~
+@230063 = ~~ // ITM_TYPE_splint_mail = 0x3f
+@230064 = ~armures de plate~
+@230065 = ~armures de plate complète~
+@230066 = ~armures de peau~
+@230067 = ~robes~
+@230069 = ~épées bâtardes~
+@230070 = ~écharpes~
+@230071 = ~nourritures~
+@230072 = ~chapeaux~
+@230073 = ~gantelets~
 
 
 /* ------------------------------ *
@@ -883,8 +965,8 @@
 @400277 = ~à la modification du score de pose de pièges~
 @400278 = ~à la modification du TAC0~
 @400279 = ~au déblocage des compétences actives~
-@400280 = ~au changement de la réalisation des hiatus entropiques~ // -_-'
-@400281 = ~à la modification de la probabilité de réalisation des hiatus entropiques~
+@400280 = ~au changement du déclenchement des hiatus entropiques~ // -_-'
+@400281 = ~à la modification de la probabilité de déclenchement des hiatus entropiques~
 @400282 = ~à la modification des caractéristiques~ // Pas clair : les effets modifiant les caractéristiques dans STATS.ids
 @400283 = ~aux effets maudits~
 @400284 = ~à la modification du TAC0 de mêlée~
@@ -958,42 +1040,41 @@
  * State *
  * ------------- */
 // Complète la phrase : Lorsque %theTarget% est...
+// FIXME: problème d'accord potentiel selon le genre de la target
 
-@410000 = ~normal~ // TODO: tous les states sont inactifs
-@410001 = ~endormi~
-@410002 = ~enragé~
-@410003 = ~paniqué~
-@410004 = ~étourdi~
-@410005 = ~invisible~
+@410000 = ~sous aucun effet~
+@410001 = ~sous l'effet de sommeil~
+@410002 = ~sous l'effet de folie du berserker~
+@410003 = ~sous l'effet de panique~
+@410004 = ~sous l'effet d'étourdissement~
+@410005 = ~sous l'effet d'invisibilité~
 @410006 = ~sans défense~
-@410007 = ~congelé~
-@410008 = ~pétrifié~
+@410007 = ~sous l'effet d'un gel~
+@410008 = ~sous l'effet d'une pétrification~
 @410009 = ~~
 @410010 = ~~
 @410011 = ~~
-@410012 = ~décédé~
-@410013 = ~sous silence~
-@410014 = ~charmé~
-@410015 = ~empoisonné~
-@410016 = ~hâté~
-@410017 = ~ralenti~
-@410018 = ~doté de l'infravision~
-@410019 = ~aveuglé~
-@410020 = ~malade~
-@410021 = ~débile mental~
-@410022 = ~indétectable~
-@410023 = ~parfaitement invisible~
-@410024 = ~bénie~
-@410025 = ~protégé par un cantique~
+@410012 = ~sous l'effet de la mort~ // FIXME
+@410013 = ~sous l'effet d'un silence~
+@410014 = ~sous l'effet d'un charme~
+@410015 = ~sous l'effet d'un poison~
+@410016 = ~sous l'effet de la hâte~
+@410017 = ~sous l'effet de lenteur~
+@410018 = ~sous l'effet de l'infravision~ // FIXME
+@410019 = ~sous l'effet de l'aveuglement~
+@410020 = ~sous l'effet de la maladie~
+@410021 = ~sous l'effet de la débilité mentale~
+@410022 = ~sous l'effet de non détection~
+@410023 = ~sous l'effet d'invisibilité améliorée~
+@410024 = ~sous l'effet de bénédiction~
+@410025 = ~sous l'effet d'un cantique allié~
 @410026 = ~sous l'effet d'une puissance sacrée~
-@410027 = ~chanceux~
-@410028 = ~sous l'effet de Aide~
-@410029 = ~victime d'un cantique~
-@410030 = ~flou~
-@410031 = ~protégé par une image-miroir~
-@410032 = ~confus~
-
-@410100 = ~ou~ // Séparateur
+@410027 = ~sous l'effet de chance~
+@410028 = ~sous l'effet d'aide~
+@410029 = ~sous l'effet d'un cantique adverse~
+@410030 = ~sous l'effet de flou~
+@410031 = ~sous l'effet de image-miroir~
+@410032 = ~sous l'effet de confusion~
 
 
 
@@ -1016,26 +1097,26 @@
 @420021 = ~Sphère d'Otiluke~
 @420024 = ~Peau d'écorce~
 @420031 = ~Bouclier tempête~
-@420036 = ~un sommeil profond~
+@420036 = ~le sommeil profond~
 @420038 = ~la surdité~
-@420040 = ~une protection contre les attaques sournoises~
+@420040 = ~la protection contre les attaques sournoises~
 @420041 = ~Ordres chaotiques~
 @420042 = ~Fourvoiement magique~
 @420044 = ~Grande malédiction~
-@420046 = ~un toucher de la goule~ // Maladie, mode 11/12
+@420046 = ~le toucher de la goule~ // Maladie, mode 11/12
 @420055 = ~Fatalité~
-@420056 = ~une immunité aux sorts d'Abjuration~ // Immunité aux sorts
-@420057 = ~une immunité aux sorts de Conjuration~
-@420058 = ~une immunité aux sorts de Divination~
-@420059 = ~une immunité aux sorts d'Enchantement~
-@420060 = ~une immunité aux sorts d'Illusion~
-@420061 = ~une immunité aux sorts d'Évocation~
-@420062 = ~une immunité aux sorts de Nécromancie~
-@420063 = ~une immunité aux sorts de Transmutation~
-@420064 = ~une protection contre les armes~
-@420065 = ~une protection contre les éléments~
-@420066 = ~une protection contre les sorts~
-@420067 = ~une protection contre les sorts incapacitants~
+@420056 = ~l'immunité aux sorts d'Abjuration~ // Immunité aux sorts
+@420057 = ~l'immunité aux sorts de Conjuration~
+@420058 = ~l'immunité aux sorts de Divination~
+@420059 = ~l'immunité aux sorts d'Enchantement~
+@420060 = ~l'immunité aux sorts d'Illusion~
+@420061 = ~l'immunité aux sorts d'Évocation~
+@420062 = ~l'immunité aux sorts de Nécromancie~
+@420063 = ~l'immunité aux sorts de Transmutation~
+@420064 = ~la protection contre les armes~
+@420065 = ~la protection contre les éléments~
+@420066 = ~la protection contre les sorts~
+@420067 = ~la protection contre les sorts incapacitants~
 @420068 = ~un stimulant de combat~
 @420071 = ~Poussière scintillante~
 @420072 = ~l'incapacité de devenir invisible~
@@ -1063,7 +1144,7 @@
 @420100 = ~Parchemin de protection contre la magie~
 @420101 = ~Parchemin de protection contre les morts-vivants~
 @420104 = ~la folie du berserker~ // concerne également la rage du Barbare, la rage Animale...
-@420106 = ~une protection contre la peur~
+@420106 = ~la protection contre la peur~
 @420107 = ~Protection contre la pétrification~
 @420108 = ~Bouclier de sort~
 @420109 = ~Protection contre les projectiles non magiques~
@@ -1080,6 +1161,34 @@
 @420126 = ~Bouclier~
 @420250 = ~la maladie~
 
+
+/* Type de mort */
+
+@500001 = ~Dissout %theTarget%~
+@500002 = ~Carbonise %theTarget%~
+@500003 = ~Explose %theTarget% en morceaux~
+@500004 = ~Tue instantanément %theTarget%~
+@500005 = ~Décapite %theTarget%~
+@500006 = ~Pétrifie %theTarget%~
+@500007 = ~Congèle %theTarget%~
+@500008 = ~~ // @500004
+@500009 = ~~ // @500004
+@500010 = ~Électrocute mortellement %theTarget%~
+@500011 = ~Désintègre %theTarget%~
+@500012 = ~Détruit %theTarget%~
+
+@500101 = ~de dissoudre %theTarget%~
+@500102 = ~de carboniser %theTarget%~
+@500103 = ~d'exploser %theTarget% en morceaux~
+@500104 = ~de tuer instantanément %theTarget%~
+@500105 = ~de décapiter %theTarget%~
+@500106 = ~de pétrifier %theTarget%~
+@500107 = ~de congeler %theTarget%~
+@500108 = ~de tuer instantanément %theTarget%~
+@500109 = ~de tuer instantanément %theTarget%~
+@500110 = ~d'électrocuter mortellement %theTarget%~
+@500111 = ~de désintégrer %theTarget%~
+@500112 = ~de détruire %theTarget%~
 
 
 /* ------------------------------ *
@@ -1101,7 +1210,7 @@
 @10000010 = ~contre les armes tranchantes et les projectiles~
 @10000011 = ~contre les armes contondantes, tranchantes et les projectiles~
 @10000012 = ~contre les armes tranchantes et perforantes~
-@10000013 = ~contre les armes contondantes, tranchantes et perforantes~
+@10000013 = ~contre les armes contondantes, tranchantes et perforantes~ // FIXME: contre les armes de mêlée ?
 @10000014 = ~contre les armes tranchantes, perforantes et les projectiles~
 
 @10000100 = ~Classe d'armure de base~
@@ -1165,13 +1274,20 @@
 @10120003 = ~Inflige %damage% %damageType% %versus%~
 @10120004 = ~Draine %damage% %damageType% %toTheTarget%~
 @10120005 = ~Transfert %damage% %damageType% %toTheTarget%~
+@10120006 = ~Passe la santé de %theTarget% à %damage%~
+@10120007 = ~Passe la santé de %theTarget% à %damage% %~
+@10120008 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~
 
 @10120011 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120012 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120013 = ~d'infliger %damage% %damageType% %versus%~
 @10120014 = ~de drainer %damage% %damageType% %toTheTarget%~
 @10120015 = ~de transférer %damage% %damageType% %toTheTarget%~
-@10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+@10120016 = ~de faire passer la santé de %theTarget% à %damage%~
+@10120017 = ~de faire passer la santé de %theTarget% à %damage% %~
+@10120018 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~
+
+// @10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
 
 @10120020 = ~points de dégâts contondants~
 @10120021 = ~points de dégâts d'acide~
@@ -1192,8 +1308,6 @@
 
 // Opcode 13: Death: Instant Death [13]
 
-@10130001 = ~Tue instantanément %theTarget%~
-@10130002 = ~de tuer instantanément %theTarget%~
 
 // Opcode 14: Graphics: Defrost [14]
 
@@ -1278,14 +1392,10 @@
 
 // Opcode 25: State: Poison [25]
 
-@10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
-@10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-@10250003 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-@10250004 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
-@10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts par seconde~
-@10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-@10250007 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-@10250008 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts toutes les %frequency% secondes~
+@10250001 = ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
+@10250002 = ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
+@10250005 = ~d'empoisonner %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
+@10250006 = ~d'empoisonner %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
 
 // Opcode 26: Item: Remove Curse [26]
 
@@ -1416,12 +1526,6 @@
 
 // Opcode 55: Death: Kill Creature Type [55]
 
-@10550001 = ~Tue instantanément les %creatureType%~
-@10550002 = ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-@10550003 = ~de tuer instantanément les %creatureType%~
-@10550004 = ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-@10550005 = ~Tue instantanément %theTarget%~
-@10550006 = ~de tuer instantanément %theTarget%~
 
 // Opcode 56: Alignment: Invert [56]
 
@@ -1547,10 +1651,8 @@
 
 // Opcode 78: State: Disease [78]
 
-@10780000 = ~Inocule une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780001 = ~Inocule une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780002 = ~Inocule une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780003 = ~Inocule une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780000 = ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
+@10780001 = ~Inocule une maladie qui inflige %amount% points de dégâts %strDuration% %toTheTarget%~
 
 @10780004 = ~Inocule une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780005 = ~Inocule une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
@@ -1568,16 +1670,14 @@
 @10780019 = ~Inocule une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780023 = ~Inocule une maladie qui ralentit et diminue de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 
-@10780030 = ~Inocule une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780031 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780032 = ~Inocule une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780033 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780030 = ~Inocule une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780031 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
+@10780032 = ~Inocule une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780033 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
 
 
-@10780100 = ~d'inoculer une maladie qui inflige 1 point de dégâts par seconde %toTheTarget%~
-@10780101 = ~d'inoculer une maladie qui inflige %amount% points de dégâts par seconde %toTheTarget%~
-@10780102 = ~d'inoculer une maladie qui inflige 1 point de dégâts toutes les %frequency% secondes %toTheTarget%~
-@10780103 = ~d'inoculer une maladie qui inflige %amount% points de dégâts toutes les %frequency% secondes %toTheTarget%~
+@10780100 = ~d'inoculer une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
+@10780101 = ~d'inoculer une maladie qui inflige %amount% points de dégâts %strDuration% %toTheTarget%~
 
 @10780104 = ~d'inoculer une maladie qui diminue de %amount% la force %ofTheTarget%~
 @10780105 = ~d'inoculer une maladie qui diminue de %amount% la dextérité %ofTheTarget%~
@@ -1595,10 +1695,8 @@
 @10780119 = ~d'inoculer une maladie qui augmente de %amount% le charisme %ofTheTarget%~
 @10780123 = ~d'inoculer une maladie qui ralentit et augmente de %amount% la force, la dextérité et le charisme %ofTheTarget%~
 
-@10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison par seconde %toTheTarget%~
-@10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison par seconde %toTheTarget%~
-@10780132 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
-@10780133 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison toutes les %frequency% secondes %toTheTarget%~
+@10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
+@10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
 
 // Opcode 79: Cure: Disease [79]
 
@@ -1699,21 +1797,17 @@
 
 // Opcode 98: HP: Regeneration [98]
 
-@10980001 = ~Régénère 1 point de vie par seconde~
-@10980002 = ~Régénère %amount% points de vie par seconde~
-@10980003 = ~Régénère 1 point de vie toutes les %frequency% secondes~
-@10980004 = ~Régénère %amount% points de vie toutes les %frequency% secondes~
-@10980005 = ~Régénère %percent% des points de vie~
-@10980006 = ~Régénère 1 point de vie par seconde %toTheTarget%~
-@10980007 = ~Régénère %amount% points de vie par seconde %toTheTarget%~
-@10980008 = ~Régénère 1 point de vie toutes les %frequency% secondes %toTheTarget%~
-@10980009 = ~Régénère %amount% points de vie toutes les %frequency% secondes %toTheTarget%~
-@10980010 = ~Régénère %percent% des points de vie %ofTheTarget%~
-@10980011 = ~de régénérer 1 point de vie par seconde %toTheTarget%~
-@10980012 = ~de régénérer %amount% points de vie par seconde %toTheTarget%~
-@10980013 = ~de régénérer 1 point de vie toutes les %frequency% secondes %toTheTarget%~
-@10980014 = ~de régénérer %amount% points de vie toutes les %frequency% secondes %toTheTarget%~
-@10980015 = ~de régénérer %percent% des points de vie %ofTheTarget%~
+@10980001 = ~Régénère 1 point de vie %strDuration%~
+@10980002 = ~Régénère %amount% points de vie %strDuration%~
+@10980005 = ~Régénère %percent% des points de vie %strDuration%~
+
+@10980006 = ~Régénère 1 point de vie %strDuration% %toTheTarget%~
+@10980007 = ~Régénère %amount% points de vie %strDuration% %toTheTarget%~
+@10980010 = ~Régénère %percent% des points de vie %ofTheTarget% %strDuration%~
+
+@10980011 = ~de régénérer 1 point de vie %strDuration% %toTheTarget%~
+@10980012 = ~de régénérer %amount% points de vie %strDuration% %toTheTarget%~
+@10980015 = ~de régénérer %percent% des points de vie %ofTheTarget% %strDuration%~
 
 // Opcode 99: Spell Effect: Duration Modifier [99]
 
@@ -1895,11 +1989,16 @@
 
 @11260001 = ~Vitesse de déplacement~
 @11260002 = ~la vitesse de déplacement~
-@11260003 = ~Immobilise %theTarget%~
-@11260004 = ~d'immobiliser %theTarget%~
-@11260005 = ~Rétablissement de la vitesse de déplacement~
-@11260006 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
-@11260007 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
+@11260003 = ~la vitesse de déplacement~
+
+@11260011 = ~Immobilisation~
+@11260012 = ~Immobilise %theTarget%~
+@11260013 = ~d'immobiliser %theTarget%~
+
+@11260021 = ~Rétablissement de la vitesse de déplacement~
+@11260022 = ~Rétabli la vitesse de déplacement %ofTheTarget%~
+@11260023 = ~de rétablir la vitesse de déplacement %ofTheTarget%~
+
 
 // Opcode 127: Summon: Monster Summoning [127]
 
@@ -2010,6 +2109,7 @@
 @11440015 = ~%action% l'utilisation de la détection des pièges et des illusions~
 @11440016 = ~%action% l'utilisation de l'inventaire~
 @11440020 = ~Empêche~ // Action
+@11440021 = ~d'empêcher~ // Action
 
 @11440021 = ~%action% d'utiliser le camouflage dans l'ombre~
 @11440022 = ~%action% d'utiliser les compétences de voleur~
@@ -2028,6 +2128,7 @@
 @11440035 = ~%action% d'utiliser la détection des pièges et des illusions~
 @11440036 = ~%action% d'utiliser l'inventaire~
 @11440040 = ~Empêche %theTarget%~ // Action
+@11440041 = ~d'empêcher %theTarget%~ // Action
 
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
@@ -2079,6 +2180,12 @@
 @11530001 = ~Sanctuaire~
 @11530002 = ~de lancer Sanctuaire sur %theTarget%~
 @11530003 = ~Lance Sanctuaire sur %theTarget%~
+
+// Opcode 154: Overlay: Entangle [154]
+
+@11540001 = ~Enchevêtrement~
+@11540002 = ~Enchevêtre %theTarget%~
+@11540003 = ~d'enchevêtrer %theTarget%~
 
 // Opcode 157: State: Web Effect [157]
 
@@ -2175,71 +2282,7 @@
 // Opcode 181: Item: Can't Use Itemtype [181]
 
 @11810001 = ~Empêche d'utiliser les %itemType%~
-@11810100 = ~livres~
-@11810101 = ~amulettes et les colliers~
-@11810102 = ~armures~
-@11810103 = ~ceintures~
-@11810104 = ~bottes~
-@11810105 = ~flèches~
-@11810106 = ~bracelets et les gantelets~
-@11810107 = ~casques~
-@11810108 = ~clés~
-@11810109 = ~potions~
-@11810110 = ~anneaux~
-@11810111 = ~parchemins~
-@11810112 = ~boucliers~
-@11810113 = ~nourritures~
-@11810114 = ~balles~
-@11810115 = ~arcs~
-@11810116 = ~dagues~
-@11810117 = ~masses~
-@11810118 = ~frondes~
-@11810119 = ~épées courtes~
-@11810120 = ~épées longues~
-@11810121 = ~marteaux~
-@11810122 = ~étoiles du matin~
-@11810123 = ~fléaux~
-@11810124 = ~fléchettes~
-@11810125 = ~haches~
-@11810127 = ~arbalètes~
-@11810128 = ~poings~
-@11810129 = ~lances~
-@11810130 = ~hallebardes~
-@11810131 = ~carreaux~
-@11810132 = ~capes~
-@11810133 = ~pièces d'or~
-@11810134 = ~gemmes~
-@11810135 = ~baguettes~
-@11810136 = ~conteneurs, yeux et armures cassées~
-@11810137 = ~boucliers cassés et les bracelets~
-@11810138 = ~familiers, épées cassées et boucles d'oreilles~
-@11810139 = ~tatouages~
-@11810140 = ~lentilles~
-@11810141 = ~boucliers et les dents~
-@11810142 = ~bougies~
-@11810143 = ~clubs~
-@11810147 = ~grands boucliers~
-@11810149 = ~boucliers moyens~
-@11810150 = ~notes~
-@11810153 = ~petits boucliers~
-@11810155 = ~téléscopes~
-@11810156 = ~boissons~
-@11810157 = ~épées longues~
-@11810158 = ~conteneurs~
-@11810159 = ~peaux et les fourrures~
-@11810160 = ~armures de cuir~
-@11810161 = ~armures de cuir clouté~
-@11810162 = ~armures de mailles~
-@11810163 = ~~ // ITM_TYPE_splint_mail = 0x3f
-@11810164 = ~armures de plate~
-@11810165 = ~armures de plate complète~
-@11810166 = ~armures de peau~
-@11810167 = ~robes~
-@11810169 = ~épées bâtardes~
-@11810170 = ~écharpes~
-@11810171 = ~nourritures~
-@11810172 = ~chapeaux~
-@11810173 = ~gantelets~
+
 
 // Opcode 188: Spell Effect: Aura Cleansing [188]
 
@@ -2347,8 +2390,7 @@
 
 // Opcode 209: Death: Kill 60HP [209]
 
-@12090001 = ~Tue instantanément %theTarget% si ses points de vie sont inférieurs à 60~
-@12090002 = ~de tuer instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+@12090001 = ~si ses points de vie sont inférieurs à 60~
 
 // Opcode 210: Spell Effect: Stun 90HP [210]
 
@@ -2400,12 +2442,16 @@
 
 // Opcode 218: Protection: Stoneskin [218]
 
-@12180001 = ~Peau de pierre (1 peau)~
-@12180002 = ~Peau de pierre (%amount% peaux)~
-@12180003 = ~de lancer 1 peau de pierre sur %theTarget%~
-@12180004 = ~de lancer %amount% peaux de pierre sur %theTarget%~
-@12180005 = ~Lance 1 peau de pierre sur %theTarget%~
-@12180006 = ~Lance %amount% peaux de pierre sur %theTarget%~
+@12180001 = ~Crée %amount% %skinType%~
+@12180002 = ~de créer %amount% %skinType% sur %theTarget%~
+@12180003 = ~Crée %amount% %skinType% sur %theTarget%~
+
+@12180011 = ~Dissipation des %skinType%~
+@12180012 = ~de dissiper les %skinType% sur %theTarget%~
+@12180013 = ~Dissipe les %skinType% sur %theTarget%~
+
+@12180101 = ~peau de pierre~ // skinType
+@12180102 = ~peaux de pierre~ // plural
 
 // Opcode 220: Removal: Remove School [220]
 
@@ -2427,7 +2473,7 @@
 @12230001 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12230002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12230003 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
-@12230004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12230004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
 @12230005 = ~Lance %spellName%~
 @12230006 = ~de lancer %spellName%~
 
@@ -2441,7 +2487,7 @@
 @12260001 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12260002 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12260003 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
-@12260004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12260004 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
 @12260005 = ~Lance %spellName%~
 @12260006 = ~de lancer %spellName%~
 
@@ -2450,7 +2496,7 @@
 @12270001 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12270002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
 @12270003 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
-@12270004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%% puis lance %spellName%~
+@12270004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% puis lance %spellName%~
 @12270005 = ~Lance %spellName%~
 @12270006 = ~de lancer %spellName%~
 
@@ -2459,7 +2505,7 @@
 @12280001 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12280002 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
 @12280003 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
-@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%% puis lance %spellName%~
+@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% puis lance %spellName%~
 @12280005 = ~Lance %spellName%~
 @12280006 = ~de lancer %spellName%~
 
@@ -2557,10 +2603,6 @@
 
 // Opcode 238: Death: Disintegrate [238]
 
-@12380001 = ~Désintègre %theTarget%~
-@12380002 = ~Désintègre les %creatureType%~
-@12380003 = ~de désintégrer %theTarget%~
-@12380004 = ~de désintégrer les %creatureType%~
 
 // Opcode 239: Spell Effect: Farsight [239]
 
@@ -2595,10 +2637,15 @@
 @12450001 = ~Chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
 @12450002 = ~que chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
 
+// Opcode 246: Spell Effect: Berserking [246]
+
+@12460001 = ~Points de vie +15, dégâts +1, TAC0 +1~
+@12460002 = ~d'augmenter les caractéristiques %ofTheTarget% : Points de vie +15, dégâts +1, TAC0 +1~
+
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Provoque la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
-@12470002 = ~de provoquer la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+@12470001 = ~Apaise %theTarget%~
+@12470002 = ~d'apaiser %theTarget%~
 
 // Opcode 248: Item: Set Melee Effect [248]
 
@@ -2617,25 +2664,42 @@
 
 // Opcode 250: Spell Effect: Damage Modifier [250]
 
-@12500001 = ~Dégâts minimum~
-@12500002 = ~les dégâts minimum~
+@12500001 = ~Dégâts minimums~
+@12500002 = ~les dégâts minimums~
+
+// Opcode 251: Spell Effect: Change Bard Song Effect [251]
+
+@12510001 = ~Apprend un nouveau chant de barde (%spellName%)~
+@12510002 = ~de faire apprendre un nouveau chant de barde (%spellName%)~
+@12510003 = ~Apprend un nouveau chant de barde (%spellName%) %toTheTarget%~
+@12510004 = ~de faire apprendre un nouveau chant de barde (%spellName%) %toTheTarget%~
+
+// Opcode 252: Spell Effect: Set Trap [252]
+
+@12520001 = ~Tente de poser un piège %spellName%~ // TODO: "tente" dans le sens où la probabilité dépend du talent pose de piège et peut donc échouer
+@12520002 = ~de poser un piège %spellName%~ // TODO : "tente" aussi mais formulation trop complexe
+@12520003 = ~Fait poser un piège %spellName% %toTheTarget%~
+@12520004 = ~de faire poser un piège %spellName% %toTheTarget%~
 
 // Opcode 259: Protection: Spell Trap [259]
 
-@12590001 = ~Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés)~
-@12590002 = ~Lance Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
-@12590003 = ~de lancer Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+@12590001 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
+@12590002 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
+@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
+@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
+@12590005 = ~Lance %spellName%~
+@12590006 = ~de lancer %spellName%~
+
 
 // Opcode 261: Spell: Restore Lost Spells [261]
 
-@12610001 = ~Remet en mémoire 1 sort profane de niveau 1 %toTheTarget%~
-@12610002 = ~Remet en mémoire 1 sort profane de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610003 = ~Remet en mémoire 1 sort divin de niveau 1 %toTheTarget%~
-@12610004 = ~Remet en mémoire 1 sort divin de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610005 = ~de remettre en mémoire 1 sort profane de niveau 1 %toTheTarget%~
-@12610006 = ~de remettre en mémoire 1 sort profane de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610007 = ~de remettre en mémoire 1 sort divin de niveau 1 %toTheTarget%~
-@12610008 = ~de remettre en mémoire 1 sort divin de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610001 = ~Se remémore 1 sort %spellType% de niveau %spellLevel% ou inférieur~
+@12610002 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610003 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~
+@12610004 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+
+@12610010 = ~profane~ // ~%spellType%~
+@12610011 = ~divin~
 
 // Opcode 262: Stat: Visual Range [262]
 
@@ -2647,28 +2711,39 @@
 @12630001 = ~Multiplicateur d'attaque sournoise~
 @12630002 = ~le multiplicateur d'attaque sournoise~
 
+// Opcode 264: Spell Effect: Drop Weapons in Panic [264]
+
+@12640001 = ~Abandonne %objectType%~
+@12640002 = ~Fait abandonner %toTheTarget% %objectType%~
+@12640003 = ~d'abandonner %objectType%~
+@12640004 = ~de faire abandonner %toTheTarget% %objectType%~
+
+// En réalité il va jeter le premier objet trouvé, selon l'ordre défini dans SLOTS.ids (donc probablement une pièce de l'équipement) - aucun aléatoire
+@12640010 = ~un objet de son inventaire~ // %objectType%
+@12640011 = ~une arme équipée~
+
 // Opcode 268: Spell Effect: Explore (Wizard Eye) [268]
 
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~
 
+// Opcode 270: Cure: Unpause Target [270]
+
+// TODO: trouver mieux
+@11650001 = ~Libère %theTarget% de ses combats mentaux~
+@11650002 = ~de libérer %theTarget% de ses combats mentaux~
+
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
-@12720000 = ~%description%, à chaque seconde~
-@12720002 = ~%description%, %frequency% fois par seconde~
-@12720003 = ~%description%, toutes les %strDuration%~ //heures et secondes
-@12720004 = ~%description%, tous les %strDuration%~ //jours, tours et rounds
-@12720005 = ~%description%, à chaque %strDuration%~
-@12720006 = ~%description%, %amount% fois tous les %frequency% rounds~
-@12720007 = ~%description%, %amount% fois par round~
-@12720008 = ~%description%, %amount% fois toutes les %strDuration%~
-@12720009 = ~%description%, %amount% fois tous les %strDuration%~
-@12720010 = ~%description%, %amount% fois par %strDuration%~
+@12720001 = ~%description%, %strDuration%~
+@12720002 = ~%description%, %amount% fois %strDuration%~
+
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
 @12730001 = ~Zone d'air pur~
-@12730002 = ~Lance Zone d'air pur sur %theTarget%~
-@12730003 = ~de lancer Zone d'air pur sur %theTarget%~
+@12730002 = ~Lance Zone d'air pur~
+@12730003 = ~de lancer Zone d'air pur~
+@12730004 = ~de lancer Zone d'air pur sur %theTarget%~
 
 // Opcode 274: Spell Effect: Teleport to Target [274]
 
@@ -2698,19 +2773,23 @@
 // Opcode 279:  Button: Enable Button [279]
 
 @12790020 = ~Permet~ // action
+@12790021 = ~de permettre~ // action
 @12790040 = ~Permet %toTheTarget%~ // action
+@12790040 = ~de permettre %toTheTarget%~ // action
 
 // Opcode 280: Spell Effect: Wild Magic [280]
 
 @12800001 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
 @12800002 = ~Les sorts lancés par %theTarget% déclenchent un hiatus entropique~
-@12800003 = ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
-@12800004 = ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+@12800003 = ~Dissipe les effets qui forcent le déclenchement des hiatus entropiques~
+@12800004 = ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+@12800005 = ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+@12800006 = ~de dissiper les effets qui forcent le déclenchement des hiatus entropiques~
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Hiatus entropique~
-@12810002 = ~le hiatus entropique~
+@12810001 = ~Déclenchement de hiatus entropique~
+@12810002 = ~la chance de déclencher un hiatus entropique~
 
 // Opcode 283: Use EFF File (Cursed) [283]
 
@@ -2750,26 +2829,54 @@
 @12920003 = ~de résister aux attaques sournoises~
 @12920004 = ~d'immuniser %theTarget% aux attaques sournoises~
 
+@12920011 = ~Sensible aux attaques sournoises~
+@12920012 = ~rend %theTarget% sensible aux attaques sournoises~
+@12920013 = ~de rendre sensible aux attaques sournoises~
+@12920014 = ~de rendre %theTarget% sensible aux attaques sournoises~
+
+// Opcode 295: Graphics: Disable Permanent Death [295]
+
+// TODO : "protection" contre les morts violentes : la mort est toujours douce mais elle est toujours là
+
+
+// Opcode 299:  Spell Effect: Chaos Shield [299]
+
+@12990001 = ~Modificateur des hiatus entropiques~
+@12990002 = ~le modificateur des hiatus entropiques~
+
 // Opcode 300: NPC Bump [300]
 
 @13000001 = ~Permet %toTheTarget% de bousculer les créatures sur son passage~
 @13000002 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé~ // TODO: Trouver une autre tournure, la cible doit être accordée...
 @13000003 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé et de bousculer les créatures sur son passage~
 
-// Opcode 301: Stat: Critical Hit Modifier
+// Opcode 301: Stat: Critical Hit Modifier [301]
 
 @13010001 = ~Chance de coup critique~
 @13010002 = ~Chance de coup critique avec cette arme~
 
+@130100010 = ~~
+@130100011 = ~en mêlée~
+@130100012 = ~à distance~
+@130100013 = ~magique~
+
+@130100020 = ~avec les %weaponType%~
+
+
 // Opcode 302: Item: Can Use Any Item [302]
 
-@13020001 = ~Permet d'utiliser n'importe quel objet (si les statistiques sont suffisantes)~
+@13020001 = ~Bloque la capacité d'utiliser n'importe quel objet~
+@13020002 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
 
 // Opcode 303: Spell Effect: Backstab Every Hit [303]
 
-@13030001 = ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
-@13030002 = ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
-@13030003 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+@13030001 = ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~
+@13030002 = ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+@13030003 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+
+@13030011 = ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+@13030012 = ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+@13030013 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 
 // Opcode 305: Stat: THAC0 Modifier (Off-Hand) [305]
 
@@ -2783,14 +2890,23 @@
 
 // Opcode 310: Protection: from Timestop [310]
 
-@13100001 = ~Immunité à l'arrêt du temps~
-@13100002 = ~Immunise %theTarget% à l'arrêt du temps~
-@13100003 = ~d'immuniser %theTarget% à l'arrêt du temps~
+@13100001 = ~Bloque l'immunité à l'arrêt du temps~
+@13100002 = ~Rendre sensible %theTarget% à l'arrêt du temps~
+@13100003 = ~de rendre sensible %theTarget% à l'arrêt du temps~
+
+@13100011 = ~Immunité à l'arrêt du temps~
+@13100012 = ~Immunise %theTarget% à l'arrêt du temps~
+@13100013 = ~d'immuniser %theTarget% à l'arrêt du temps~
 
 // Opcode 311: Spell: Random Wish Spell [311]
 
 @13110001 = ~Lance un souhait aléatoire sur %theTarget%~
 @13110002 = ~de lancer un souhait aléatoire sur %theTarget%~
+
+// Opcode 314:  Spell: Golem Stoneskin [314]
+
+@13140101 = ~peau de golem~ // skinType
+@13140102 = ~peaux de golem~ // plural
 
 // Opcode 316: Spell: Magical Rest [316]
 
@@ -2798,13 +2914,35 @@
 
 // Opcode 321: Removal: Effects specified by Resource [321]
 
-@13210001 = ~Dissipe les effets du sort %spellName% sur %theTarget%~
-@13210002 = ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
-@13210003 = ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
-@13210004 = ~de dissiper les effets du sort %spellName% sur %theTarget%~
-@13210005 = ~de dissiper les effets de l'objet %itemName% sur %theTarget%~
-@13210006 = ~de dissiper les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
-@13210007 = ~Les effets ne se cumulent pas~
+@13210001 = ~Dissipe les %effectType% du sort %spellName%~
+@13210002 = ~Dissipe les %effectType% de l'objet %itemName%~
+@13210003 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName%~
+
+@13210004 = ~Dissipe les %effectType% du sort %spellName% sur %theTarget%~
+@13210005 = ~Dissipe les %effectType% de l'objet %itemName% sur %theTarget%~
+@13210006 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210007 = ~de dissiper les %effectType% du sort %spellName% sur %theTarget%~
+@13210008 = ~de dissiper les %effectType% de l'objet %itemName% sur %theTarget%~
+@13210009 = ~de dissiper les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210011 = ~Dissipe et protège des %effectType% du sort %spellName%~
+@13210012 = ~Dissipe et protège des %effectType% de l'objet %itemName%~
+@13210013 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName%~
+
+@13210014 = ~Dissipe et protège des %effectType% du sort %spellName% sur %theTarget%~
+@13210015 = ~Dissipe et protège des %effectType% de l'objet %itemName% sur %theTarget%~
+@13210016 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210017 = ~de dissiper et protège des %effectType% du sort %spellName% sur %theTarget%~
+@13210018 = ~de dissiper et protège des %effectType% de l'objet %itemName% sur %theTarget%~
+@13210019 = ~de dissiper et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+
+@13210020 = ~Les effets ne se cumulent pas~
+
+@13210100 = ~effets~ // %effectType%
+@13210101 = ~capacités d'équipement~
+@13210102 = ~effets non équipés~
 
 // Opcode 323: Stat: Turn Undead Level [323]
 
@@ -2858,6 +2996,8 @@
 @13240042 = ~Inefficace contre les créatures d'un alignement différent du porteur~
 @13240043 = ~Inefficace contre le porteur~
 @13240044 = ~Inefficace contre les cibles autre que le porteur~
+@13240045 = ~Inefficace contre les githyankis~
+@13240046 = ~Effectif contre les githyankis~
 @13240047 = ~Inefficace contre les golems, les morts-vivants et les myconides~
 @13240048 = ~Effectif contre les golems, les morts-vivants et les myconides~
 @13240049 = ~Inefficace contre les créatures alliées~
@@ -2869,13 +3009,24 @@
 @13240055 = ~Inefficace contre les morts-vivants et les golems~
 @13240056 = ~Effectif contre les morts-vivants et les golems~
 @13240057 = ~Inefficace contre les hommes~
-@13240058 = ~Inefficace contre les femmes~
+@13240058 = ~Inefficace contre les femmes~ // FIXME : erroné : non-homme, donc les femmes, les illusions, les démons invoqués, les anges etc
+//@13240059 ALIGNMENTBITS=MASK_LCNEUTRAL
+//@13240060 ALIGNMENTBITS!=MASK_LCNEUTRAL
+//@13240061 ALIGNMENTBITS>=MASK_CHAOTIC
+//@13240062 ALIGNMENTBITS<MASK_CHAOTIC
+//@13240063 EVASIONCHECK
 @13240064 = ~Inefficace contre les orques~
 @13240065 = ~Effectif contre les orques~
 @13240066 = ~Inefficace contre les créatures sourdes~
 @13240067 = ~Effectif contre les créatures sourdes~
+@13240068 = ~Inefficace contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+@13240069 = ~Effectif contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+//@13240070 SPLSTATE=STATIC_CHARGE > jamais vu
+//@13240071 SPLSTATE!=STATIC_CHARGE > jamais vu
+//@13240072 SPLSTATE=SHROUD_OF_FLAME > jamais vu
+//@13240073 SPLSTATE!=SHROUD_OF_FLAME > jamais vu
 @13240074 = ~Inefficace contre les créatures mortes~
-@13240075 = ~Inefficace contre les créatures vivantes~
+@13240075 = ~Inefficace contre les créatures vivantes~ // FIXME: tendancieux : les morts-vivants sont touchés
 @13240077 = ~Inefficace contre les cibles immunisées au poison~
 @13240078 = ~Inefficace contre les cibles sensibles au poison~
 @13240079 = ~Inefficace contre les cibles immunisées à l'acide~
@@ -2892,8 +3043,13 @@
 @13240090 = ~Inefficace entre 21h et 5h~
 @13240091 = ~Inefficace contre les créatures paniquées~
 @13240092 = ~Effectif contre les créatures paniquées~
+
+@13240110 = ~Inefficace contre les créatures sous l'effet de %splstateName%~
+@13240111 = ~Effectif contre les créatures sous l'effet de %splstateName%~
+
 @13240119 = ~Inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
 @13240120 = ~Inefficace contre les créatures protégées contre les morts-vivants~
+//@13240121 = ~~ // TODO : splstate WILD_MAGIC_AREA actif > jamais vu
 @13240122 = ~Inefficace contre les créatures possédant une dextérité supérieure ou égale à %value%~
 @13240123 = ~Inefficace contre les créatures possédant une dextérité inférieure à %value%~
 @13240124 = ~Inefficace contre les créatures possédant une force supérieure ou égale à %value%~
@@ -2910,125 +3066,148 @@
 @13240135 = ~Inefficace si le nombre de créatures invoquées est inférieur à %value%~
 @13240136 = ~Inefficace si le chapitre en cours est supérieur ou égal au %value%~
 @13240137 = ~Inefficace si le chapitre en cours est inférieur à %value%~
-@13240138 = ~Inefficace contre les créatures affectées par Vision véritable~
+@13240138 = ~Inefficace contre les créatures %descriptionState%~
+@13240139 = ~Effectif contre les créatures %descriptionState%~
 @13240140 = ~Inefficace contre les créatures sous l'effet d'une invisibilité~
 @13240141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
 @13240142 = ~Inefficace contre les créatures invisibles~
 @13240143 = ~Effectif contre les créatures invisibles~
 @13240144 = ~Inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13240145 = ~Inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
-@13240146 = ~Inefficace contre les %creatureType%~
-@13240147 = ~Effectif contre les %creatureType%~
 
-@13240151 = ~d'être inefficace contre les morts-vivants~
-@13240152 = ~d'être effectif contre les morts-vivants~
-@13240153 = ~d'être inefficace contre les cibles immunisées au feu~
-@13240154 = ~d'être inefficace contre les cibles sensibles au feu~
-@13240155 = ~d'être inefficace contre les humanoïdes~
-@13240156 = ~d'être effectif contre les humanoïdes~
-@13240157 = ~d'être inefficace contre les animaux~
-@13240158 = ~d'être effectif contre les animaux~
-@13240159 = ~d'être inefficace contre les élémentaires~
-@13240160 = ~d'être effectif contre les élémentaires~
-@13240161 = ~d'être inefficace contre les myconides~
-@13240162 = ~d'être effectif contre les myconides~
-@13240163 = ~d'être inefficace contre les créatures gigantesques~
-@13240164 = ~d'être effectif contre les créatures gigantesques~
-@13240165 = ~d'être inefficace contre les elfes~
-@13240166 = ~d'être effectif contre les elfes~
-@13240167 = ~d'être inefficace contre les ombres des roches~
-@13240168 = ~d'être effectif contre les ombres des roches~
-@13240169 = ~d'être inefficace contre les demi-elfes~
-@13240170 = ~d'être effectif contre les demi-elfes~
-@13240171 = ~d'être inefficace contre les humanoïdes et les animaux~
-@13240172 = ~d'être effectif contre les humanoïdes et les animaux~
-@13240173 = ~d'être inefficace contre les cibles aveuglées~
-@13240174 = ~d'être effectif contre les cibles aveuglées~
-@13240175 = ~d'être inefficace contre les cibles immunisées au froid~
-@13240176 = ~d'être inefficace contre les cibles sensibles au froid~
-@13240177 = ~d'être inefficace contre les golems~
-@13240178 = ~d'être effectif contre les golems~
-@13240179 = ~d'être inefficace contre les minotaures~
-@13240180 = ~d'être effectif contre les minotaures~
-@13240181 = ~d'être inefficace contre les morts-vivants et les myconides~
-@13240182 = ~d'être effectif contre les morts-vivants et les myconides~
-@13240183 = ~d'être inefficace contre les créatures neutres~
-@13240184 = ~d'être inefficace contre les créatures bonnes ou mauvaises~
-@13240185 = ~d'être inefficace contre les créatures bonnes~
-@13240186 = ~d'être inefficace contre les créatures neutres ou mauvaises~
-@13240187 = ~d'être inefficace contre les créatures mauvaises~
-@13240188 = ~d'être inefficace contre les créatures neutres ou bonnes~
-@13240189 = ~d'être inefficace contre les paladins~
-@13240190 = ~d'être effectif contre les paladins~
-@13240191 = ~d'être inefficace contre les créatures du même alignement que le porteur~
-@13240192 = ~d'être inefficace contre les créatures d'un alignement différent du porteur~
-@13240193 = ~d'être inefficace contre le porteur~
-@13240194 = ~d'être inefficace contre les cibles autre que le porteur~
-@13240197 = ~d'être inefficace contre les golems, les morts-vivants et les myconides~
-@13240198 = ~d'être effectif contre les golems, les morts-vivants et les myconides~
-@13240199 = ~d'être inefficace contre les créatures alliées~
-@13240200 = ~d'être effectif contre les créatures alliées~
-@13240201 = ~d'être inefficace contre les créatures enemies~
-@13240202 = ~d'être effectif contre les créatures enemies~
-@13240203 = ~d'être inefficace contre les cibles immunisées au feu ou au froid~
-@13240204 = ~d'être inefficace contre les cibles sensibles au feu ou au froid~
-@13240205 = ~d'être inefficace contre les morts-vivants et les golems~
-@13240206 = ~d'être effectif contre les morts-vivants et les golems~
-@13240207 = ~d'être inefficace contre les hommes~
-@13240208 = ~d'être inefficace contre les femmes~
-@13240214 = ~d'être inefficace contre les orques~
-@13240215 = ~d'être effectif contre les orques~
-@13240216 = ~d'être inefficace contre les créatures sourdes~
-@13240217 = ~d'être effectif contre les créatures sourdes~
-@13240224 = ~d'être inefficace contre les créatures mortes~
-@13240225 = ~d'être inefficace contre les créatures vivantes~
-@13240227 = ~d'être inefficace contre les cibles immunisées au poison~
-@13240228 = ~d'être inefficace contre les cibles sensibles au poison~
-@13240229 = ~d'être inefficace contre les cibles immunisées à l'acide~
-@13240230 = ~d'être inefficace contre les cibles sensibles à l'acide~
-@13240231 = ~d'être inefficace contre les cibles immunisées à l'électricité~
-@13240232 = ~d'être inefficace contre les cibles sensibles à l'électricité~
-@13240233 = ~d'être inefficace contre les cibles immunisées aux dégâts magiques~
-@13240234 = ~d'être inefficace contre les cibles sensibles aux dégâts magiques~
-@13240235 = ~d'être inefficace contre les ankheg~
-@13240236 = ~d'être effectif contre les ankheg~
-@13240237 = ~d'être inefficace contre les liches~
-@13240238 = ~d'être effectif contre les liches~
-@13240239 = ~d'être inefficace entre 6h et 20h~
-@13240240 = ~d'être inefficace entre 21h et 5h~
-@13240241 = ~d'être inefficace contre les créatures paniquées~
-@13240242 = ~d'être effectif contre les créatures paniquées~
-@13240269 = ~d'être inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
-@13240270 = ~d'être inefficace contre les créatures protégées contre les morts-vivants~
-@13240272 = ~d'être inefficace contre les créatures possédant une dextérité supérieure ou égale à %value%~
-@13240273 = ~d'être inefficace contre les créatures possédant une dextérité inférieure à %value%~
-@13240274 = ~d'être inefficace contre les créatures possédant une force supérieure ou égale à %value%~
-@13240275 = ~d'être inefficace contre les créatures possédant une force inférieure à %value%~
-@13240276 = ~d'être inefficace contre les créatures possédant une constitution supérieure ou égale à %value%~
-@13240277 = ~d'être inefficace contre les créatures possédant une constitution inférieure à %value%~
-@13240278 = ~d'être inefficace contre les créatures possédant une intelligence supérieure ou égale à %value%~
-@13240279 = ~d'être inefficace contre les créatures possédant une intelligence inférieure à %value%~
-@13240280 = ~d'être inefficace contre les créatures possédant une sagesse supérieure ou égale à %value%~
-@13240281 = ~d'être inefficace contre les créatures possédant une sagesse inférieure à %value%~
-@13240282 = ~d'être inefficace contre les créatures possédant un charisme supérieur ou égal à %value%~
-@13240283 = ~d'être inefficace contre les créatures possédant un charisme inférieur à %value%~
-@13240284 = ~d'être inefficace si le nombre de créatures invoquées est supérieur ou égal à %value%~
-@13240285 = ~d'être inefficace si le nombre de créatures invoquées est inférieur à %value%~
-@13240286 = ~d'être inefficace si le chapitre en cours est supérieur ou égal au %value%~
-@13240287 = ~d'être inefficace si le chapitre en cours est inférieur à %value%~
-@13240290 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité~
-@13240291 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
-@13240292 = ~d'être inefficace contre les créatures invisibles~
-@13240293 = ~d'être effectif contre les créatures invisibles~
-@13240294 = ~d'être inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
-@13240295 = ~d'être inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
-@13240296 = ~d'être inefficace contre les %creatureType%~
-@13240297 = ~d'être effectif contre les %creatureType%~
-@13240300 = ~~
+@13240301 = ~Inefficace contre les %creatureType%~
+@13240302 = ~Effectif contre les %creatureType%~
 
-@13240501 = ~Immunité au sort %spellName%~
-@13240502 = ~Immunise %theTarget% au sort %spellName%~
-@13240503 = ~d'immuniser %theTarget% au sort %spellName%~
+
+@13240500 = ~~
+@13240501 = ~d'être inefficace contre les morts-vivants~
+@13240502 = ~d'être effectif contre les morts-vivants~
+@13240503 = ~d'être inefficace contre les cibles immunisées au feu~
+@13240504 = ~d'être inefficace contre les cibles sensibles au feu~
+@13240505 = ~d'être inefficace contre les humanoïdes~
+@13240506 = ~d'être effectif contre les humanoïdes~
+@13240507 = ~d'être inefficace contre les animaux~
+@13240508 = ~d'être effectif contre les animaux~
+@13240509 = ~d'être inefficace contre les élémentaires~
+@13240510 = ~d'être effectif contre les élémentaires~
+@13240511 = ~d'être inefficace contre les myconides~
+@13240512 = ~d'être effectif contre les myconides~
+@13240513 = ~d'être inefficace contre les créatures gigantesques~
+@13240514 = ~d'être effectif contre les créatures gigantesques~
+@13240515 = ~d'être inefficace contre les elfes~
+@13240516 = ~d'être effectif contre les elfes~
+@13240517 = ~d'être inefficace contre les ombres des roches~
+@13240518 = ~d'être effectif contre les ombres des roches~
+@13240519 = ~d'être inefficace contre les demi-elfes~
+@13240520 = ~d'être effectif contre les demi-elfes~
+@13240521 = ~d'être inefficace contre les humanoïdes et les animaux~
+@13240522 = ~d'être effectif contre les humanoïdes et les animaux~
+@13240523 = ~d'être inefficace contre les cibles aveuglées~
+@13240524 = ~d'être effectif contre les cibles aveuglées~
+@13240525 = ~d'être inefficace contre les cibles immunisées au froid~
+@13240526 = ~d'être inefficace contre les cibles sensibles au froid~
+@13240527 = ~d'être inefficace contre les golems~
+@13240528 = ~d'être effectif contre les golems~
+@13240529 = ~d'être inefficace contre les minotaures~
+@13240530 = ~d'être effectif contre les minotaures~
+@13240531 = ~d'être inefficace contre les morts-vivants et les myconides~
+@13240532 = ~d'être effectif contre les morts-vivants et les myconides~
+@13240533 = ~d'être inefficace contre les créatures neutres~
+@13240534 = ~d'être inefficace contre les créatures bonnes ou mauvaises~
+@13240535 = ~d'être inefficace contre les créatures bonnes~
+@13240536 = ~d'être inefficace contre les créatures neutres ou mauvaises~
+@13240537 = ~d'être inefficace contre les créatures mauvaises~
+@13240538 = ~d'être inefficace contre les créatures neutres ou bonnes~
+@13240539 = ~d'être inefficace contre les paladins~
+@13240540 = ~d'être effectif contre les paladins~
+@13240541 = ~d'être inefficace contre les créatures du même alignement que le porteur~
+@13240542 = ~d'être inefficace contre les créatures d'un alignement différent du porteur~
+@13240543 = ~d'être inefficace contre le porteur~
+@13240544 = ~d'être inefficace contre les cibles autre que le porteur~
+@13240545 = ~d'être inefficace contre les githyankis~
+@13240546 = ~d'être effectif contre les githyankis~
+@13240547 = ~d'être inefficace contre les golems, les morts-vivants et les myconides~
+@13240548 = ~d'être effectif contre les golems, les morts-vivants et les myconides~
+@13240549 = ~d'être inefficace contre les créatures alliées~
+@13240550 = ~d'être effectif contre les créatures alliées~
+@13240551 = ~d'être inefficace contre les créatures enemies~
+@13240552 = ~d'être effectif contre les créatures enemies~
+@13240553 = ~d'être inefficace contre les cibles immunisées au feu ou au froid~
+@13240554 = ~d'être inefficace contre les cibles sensibles au feu ou au froid~
+@13240555 = ~d'être inefficace contre les morts-vivants et les golems~
+@13240556 = ~d'être effectif contre les morts-vivants et les golems~
+@13240557 = ~d'être inefficace contre les hommes~
+@13240558 = ~d'être inefficace contre les femmes~
+// 
+@13240564 = ~d'être inefficace contre les orques~
+@13240565 = ~d'être effectif contre les orques~
+@13240566 = ~d'être inefficace contre les créatures sourdes~
+@13240567 = ~d'être effectif contre les créatures sourdes~
+@13240568 = ~d'être inefficace contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+@13240569 = ~d'être effectif contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+//
+@13240574 = ~d'être inefficace contre les créatures mortes~
+@13240575 = ~d'être inefficace contre les créatures vivantes~
+@13240577 = ~d'être inefficace contre les cibles immunisées au poison~
+@13240578 = ~d'être inefficace contre les cibles sensibles au poison~
+@13240579 = ~d'être inefficace contre les cibles immunisées à l'acide~
+@13240580 = ~d'être inefficace contre les cibles sensibles à l'acide~
+@13240581 = ~d'être inefficace contre les cibles immunisées à l'électricité~
+@13240582 = ~d'être inefficace contre les cibles sensibles à l'électricité~
+@13240583 = ~d'être inefficace contre les cibles immunisées aux dégâts magiques~
+@13240584 = ~d'être inefficace contre les cibles sensibles aux dégâts magiques~
+@13240585 = ~d'être inefficace contre les ankheg~
+@13240586 = ~d'être effectif contre les ankheg~
+@13240587 = ~d'être inefficace contre les liches~
+@13240588 = ~d'être effectif contre les liches~
+@13240589 = ~d'être inefficace entre 6h et 20h~
+@13240590 = ~d'être inefficace entre 21h et 5h~
+@13240591 = ~d'être inefficace contre les créatures paniquées~
+@13240592 = ~d'être effectif contre les créatures paniquées~
+
+@13240610 = ~d'être inefficace contre les créatures sous l'effet de %splstateName%~
+@13240611 = ~d'être effectif contre les créatures sous l'effet de %splstateName%~
+
+@13240619 = ~d'être inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
+@13240620 = ~d'être inefficace contre les créatures protégées contre les morts-vivants~
+//@13240121 = ~~ // TODO : splstate WILD_MAGIC_AREA actif
+@13240622 = ~d'être inefficace contre les créatures possédant une dextérité supérieure ou égale à %value%~
+@13240623 = ~d'être inefficace contre les créatures possédant une dextérité inférieure à %value%~
+@13240624 = ~d'être inefficace contre les créatures possédant une force supérieure ou égale à %value%~
+@13240625 = ~d'être inefficace contre les créatures possédant une force inférieure à %value%~
+@13240626 = ~d'être inefficace contre les créatures possédant une constitution supérieure ou égale à %value%~
+@13240627 = ~d'être inefficace contre les créatures possédant une constitution inférieure à %value%~
+@13240628 = ~d'être inefficace contre les créatures possédant une intelligence supérieure ou égale à %value%~
+@13240629 = ~d'être inefficace contre les créatures possédant une intelligence inférieure à %value%~
+@13240630 = ~d'être inefficace contre les créatures possédant une sagesse supérieure ou égale à %value%~
+@13240631 = ~d'être inefficace contre les créatures possédant une sagesse inférieure à %value%~
+@13240632 = ~d'être inefficace contre les créatures possédant un charisme supérieur ou égal à %value%~
+@13240633 = ~d'être inefficace contre les créatures possédant un charisme inférieur à %value%~
+@13240634 = ~d'être inefficace si le nombre de créatures invoquées est supérieur ou égal à %value%~
+@13240635 = ~d'être inefficace si le nombre de créatures invoquées est inférieur à %value%~
+@13240636 = ~d'être inefficace si le chapitre en cours est supérieur ou égal au %value%~
+@13240637 = ~d'être inefficace si le chapitre en cours est inférieur à %value%~
+@13240638 = ~d'être inefficace contre les créatures %descriptionState%~
+@13240639 = ~d'être effectif contre les créatures %descriptionState%~
+@13240640 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité~
+@13240641 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
+@13240642 = ~d'être inefficace contre les créatures invisibles~
+@13240643 = ~d'être effectif contre les créatures invisibles~
+@13240644 = ~d'être inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
+@13240645 = ~d'être inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
+
+@13240801 = ~d'être inefficace contre les %creatureType%~
+@13240802 = ~d'être effectif contre les %creatureType%~
+
+@13240901 = ~Immunité %againstWho%~
+@13240902 = ~Immunise %theTarget% %againstWho%~
+@13240903 = ~d'immuniser %theTarget% %againstWho%~
+
+@13240911 = ~contre le sort %spellName% et l'objet %itemName%~ // againstWho
+@13240912 = ~contre le sort %spellName%~
+@13240913 = ~contre l'objet %itemName%~
+
+
 
 // Opcode 325: Stat: Save vs. all [325]
 

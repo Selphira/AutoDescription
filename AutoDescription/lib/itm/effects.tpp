@@ -102,9 +102,15 @@ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
-	// Si la macro n'existe pas, on considère comme valide
-	PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
-
+	PATCH_IF NOT is_ee AND opcode >= 319 AND opcode <= 367 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Opcode doesn't exist in this game~ END
+	END
+	ELSE BEGIN
+		// Si la macro n'existe pas, on considère comme valide
+		PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
+	END
+	
 	PATCH_IF probability <= 0 BEGIN
 		SET isValid = 0
         LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Probability error : <= 0~ END
@@ -260,7 +266,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
 		END
 		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 		END
 
 		PATCH_IF strref != 0 BEGIN
@@ -364,7 +370,8 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 
 	PATCH_IF timingMode == TIMING_permanent OR timingMode == TIMING_permanent_after_death BEGIN
 		PATCH_IF NOT VARIABLE_IS_SET $opcodes_cant_be_permanent(~%opcode%~) BEGIN
-			PATCH_IF timingMode == TIMING_permanent BEGIN
+			PATCH_IF timingMode == TIMING_permanent OR
+					 VARIABLE_IS_SET $opcodes_cant_be_permanent_after_death(~%opcode%~) BEGIN
 				SPRINT value @100312 // ~de manière permanente~
 			END
 			ELSE BEGIN

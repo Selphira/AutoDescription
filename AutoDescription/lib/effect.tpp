@@ -405,22 +405,19 @@ BEGIN
 	// l'ensemble du taleau sur lequel on doit travailler...
 	PATCH_DEFINE_ARRAY opcodes_xx BEGIN END
 
-	SET count = $opcodes(~%opcode%~)
+	SET count = 0
 
 	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
 	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 	        LPM ~data_to_vars~
 	        LPF evaluate_expression STR_VAR expression RET value END
-	        PATCH_IF value == 1 BEGIN
-	            SET $opcodes(~%opcode%~) -= 1
-	        END
-	        ELSE BEGIN
+			PATCH_IF NOT value BEGIN
+				SET count += 1
 		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~) = 1
 	        END
 	    END
 	END
-
-	SET count = $opcodes(~%opcode%~)
+	SET $opcodes(~%opcode%~) = count
 END
 
 DEFINE_PATCH_FUNCTION ~get_opcode_position~

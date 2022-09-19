@@ -3,264 +3,593 @@
  * Vu qu'ils ne sont généralement pas
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
-	147 => 0   // Spell: Learn Spell [147]
-	360 => 0   // Stat: Ignore Reputation Breaking Point [360]
-	283 => 0   // Use EFF File (Cursed) [283]
+
 	318 => 0   // Protection: Immunity Spell [318]
 	324 => 0   // Protection: Immunity to Resource and Message [324]
-	112 => 0   // Item: Item Remove [112]
-	123 => 0   // Item: Remove Inventory Item [123]
-	216 => 1   // Spell Effect: Level Drain [216]
-	344 => 1   // Enchantment vs. creature type [344]
-	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
- 219000 => 3   // Stat: AC vs. Creature Type Modifier [219]
-	 54 => 4   // Stat: THAC0 Modifier [54]
-	178 => 5   // Spell Effect: THAC0 vs. Creature Type Modifier [178]
-	306 => 6   // Stat: THAC0 Modifier (On-Hand) [306]
-	305 => 6   // Stat: THAC0 Modifier (Off-Hand) [305]
-	284 => 7   // Stat: Melee THAC0 Modifier [284]
-	167 => 8   // Stat: THAC0 Modifier with Missile Weapons [167]
-	288 => 8   // Stat: Fist THAC0 Modifier [288]
-	278 => 9   // Stat: To Hit Modifier [278]
- 219001 => 10  // Stat: AC vs. Creature Type Modifier [219]
-	325 => 11  // Stat: Save vs. all [325]
-	 33 => 11  // Stat: Save vs. Death Modifier [33]
-	 34 => 12  // Stat: Save vs. Wands Modifier [34]
-	 35 => 13  // Stat: Save vs. Petrification/Polymorph Modifier [35]
-	 36 => 14  // Stat: Save vs. Breath Weapons Modifier [36]
-	 37 => 15  // Stat: Save vs. Spells Modifier [37]
-	346 => 16  // Save vs. school bonus [346]
-	 12 => 16  // HP: Damage [12]
-	 73 => 17  // Stat: Extra Damage Modifier [73]
-	332 => 17  // Stat: Specific Damage Modifier [332] : EE only
-	179 => 18  // Spell Effect: Damage vs. Creature Type Modifier [179]
-	250 => 19  // Spell Effect: Damage Luck Modifier [250]
-	285 => 20  // Stat: Melee Weapon Damage Modifier [285]
-	286 => 21  // Stat: Missile Weapon Damage Modifier [286]
-	289 => 22  // Stat: Fist Damage Modifier [289]
-	 25 => 23  // State: Poison [25]
-	 78 => 24  // State: Disease [78]
-    214 => 25  // Select Spell [214]
-    191 => 26  // Spell: Casting Level Modifier [191]
-	 42 => 27  // Spell: Wizard Spell Slots Modifier [42]
-	 62 => 28  // Spell: Priest Spell Slots Modifier [62]
-	145 => 29  // Spell: Disable Spell Casting Abilities [145]
-	261 => 30  // Spell: Restore Lost Spells [261]
-	244 => 31  // Spell: Drain Wizard Spell [244]
-	 99 => 32  // Spell Effect: Duration Modifier [99]
-	 96 => 33  // Stat: Level Change [96]
-	189 => 34  // Stat: Casting Time Modifier [189]
-	 60 => 35  // Stat: Miscast Magic [60]
-	190 => 36  // Stat: Attack Speed Factor [190]
-	  1 => 37  // Stat: Attacks Per Round Modifier [1]
-	 98 => 38  // Stat: Regeneration [98]
-	 18 => 39  // Stat: Maximum HP Modifier [18]
-	132 => 40  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
-	501 => 41  // Stat: Caractéristiques [501]
-	 44 => 41  // Stat: Strength Modifier [44]
-	 97 => 42  // Stat: Strength-Bonus Modifier [97]
-	 15 => 43  // Stat: Dexterity Modifier [15]
-	 10 => 44  // Stat: Constitution Modifier [10]
-	 19 => 45  // Stat: Intelligence Modifier [19]
-	 49 => 46  // Stat: Wisdom Modifier [49]
-	  6 => 47  // Stat: Charisma Modifier [6]
-	 22 => 48  // Stat: Luck Modifier [22]
-	281 => 60  // Stat: Wild Magic [281]
-	301 => 90  // Stat: Critical Hit Modifier [301]
-	362 => 91  // Critical miss bonus [362]
-	500 => 98  // Stat: Compétences de voleur [500]
-	 92 => 98  // Stat: Pick Pockets Modifier [92]
-	 90 => 99  // Stat: Open Locks Modifier [90]
-	276 => 100 // Stat: Detect Illusion Modifier [276]
-	 91 => 101 // Stat: Find Traps Modifier [91]
-	277 => 102 // Stat: Set Traps Modifier [277]
-	275 => 103 // Stat: Hide in Shadows Modifier [275]
-	 59 => 104 // Stat: Stealth Modifier [59]
-	263 => 105 // Stat: Backstab [263]
-	126 => 108 // Stat: Movement Modifier [126]
-	176 => 108 // Stat: Movement Modifier (II) [176]
-	233 => 110 // Stat: Proficiency [233]
-	166 => 119 // Stat: Magic Resistance Modifier [166]
-	 30 => 120 // Stat: Fire Resistance Modifier [30]
-	 28 => 121 // Stat: Cold Resistance Modifier [28]
-	 29 => 122 // Stat: Electricity Resistance Modifier [29]
-	173 => 123 // Stat: Poison Resistance Modifier [173]
-	 27 => 124 // Stat: Acid Resistance Modifier [27]
-	 31 => 125 // Stat: Magic Damage Resistance Modifier [31]
-	 84 => 126 // Stat: Reduced Damage from Magical Fire Modifier [84]
-	 85 => 127 // Stat: Reduced Damage from Magical Cold Modifier [85]
-	 86 => 136 // Stat: Reduced Damage from Slashing Modifier [86]
-	 87 => 137 // Stat: Reduced Damage from Crushing Modifier [87]
-	 88 => 138 // Stat: Reduced Damage from Piercing Modifier [88]
-	 89 => 139 // Stat: Reduced Damage from Missiles Modifier [89]
-	343 => 140 // HP Swap [343]
-	 17 => 145 // Stat: Current HP Modifier [17]
-	323 => 146 // Stat: Turn Undead Level [323]
-	 23 => 149 // Stat: Morale Modifier [23]
-	106 => 150 // Stat: Morale Break [106]
-	 21 => 155 // Stat: Lore Modifier [21]
-	262 => 157 // Stat: Visual Range [262]
-	 93 => 160 // Stat: Fatigue Modifier [93]
-	104 => 161 // Stat: Experience Points [104]
-	108 => 165 // Stat: Reputation [108]
-	 94 => 163 // Stat: Drunkenness Modifier [94]
-	 95 => 164 // Stat: Tracking Skill Modifier [95]
-	105 => 165 // Stat: Gold [105]
-	 16 => 169 // State: Haste [16]
-	317 => 169 // State: Haste2 [317]
-	130 => 170 // State: Bless [130]
-	129 => 171 // State: Aid [129]
-	 20 => 173 // State: Invisibility [20]
-	 65 => 174 // State: Blur [65]
-	 63 => 175 // State: Infravision [63]
-	 64 => 175 // State: Remove Infravision [64]
-	 40 => 176 // State: Slow [40]
-	  3 => 177 // State: Berserking [3]
-	246 => 177 // Spell Effect: Berserking [246]
-	245 => 177 // Check For Berserk [245]
-	247 => 177 // Spell Effect: Attack Nearest Creature [247]
-	 24 => 178 // State: Horror [24]
-	 74 => 179 // State: Blindness [74]
-	 45 => 180 // State: Stun [45]
-	210 => 180 // Spell Effect: Stun 90HP [210]
-	165 => 180 // Spell Effect: Pause Target [165]
-	 80 => 181 // Deafness [80]
-	 39 => 183 // State: Unconsciousness [39]
-	217 => 183 // Spell Effect: Unconsciousness 20HP [217]
-	128 => 184 // State: Confusion [128]
-	 38 => 185 // State: Silence [38]
-	134 => 186 // State: Petrification [134]
-	109 => 188 // State: Hold Creature I [109]
-	175 => 188 // State: Hold Creature II [175]
-	185 => 188 // State: Hold Creature III [185]
-	157 => 189 // State: Web Effect [157]
-	 76 => 190 // State: Feeblemindedness [76]
-	136 => 190 // State: Force Visible [136]
-	153 => 190 // Overlay: Sanctuary [153]
-	 55 => 191 // Death: Kill Creature Type [55]
-	209 => 192 // Death: Kill 60HP [209]
-	 13 => 193 // Death: Instant Death [13]
-	238 => 194 // Death: Disintegrate [238]
-	206 => 197 // Spell: Protection from Spell [206]
-	224 => 199 // Cure: Level Drain (Restoration) [224]
+
+	112 => 1   // Item: Item Remove [112]
+	123 => 1   // Item: Remove Inventory Item [123]
+	264 => 1   // Spell Effect: Drop Weapons in Panic [264]
+
+	// Modification des stats longue durée
+	283 => 2   // Use EFF File (Cursed) [283]
+	360 => 2   // Stat: Ignore Reputation Breaking Point [360]
+    214 => 2   // Select Spell [214]
+	 96 => 3   // Stat: Level Change [96]
+	233 => 3   // Stat: Proficiency [233]
+    191 => 4   // Spell: Casting Level Modifier [191]
+	 42 => 4   // Spell: Wizard Spell Slots Modifier [42]
+	 62 => 4   // Spell: Priest Spell Slots Modifier [62]
+	261 => 5   // Spell: Restore Lost Spells [261]
+
+	// Modification des stats
+
+	 12 => 10  // HP: Damage [12]
+	 78 => 11  // State: Disease [78]
+	 25 => 11  // State: Poison [25]
+
+	344 => 12  // Enchantment vs. creature type [344]
+	216 => 13  // Spell Effect: Level Drain [216]
+	246 => 13  // Spell Effect: Berserking [246]
+	  0 => 14  // Stat: AC vs. Damage Type Modifier [0]
+	506 => 15  // Stat: Classe d'armure cumulable
+ 219000 => 16  // Stat: AC vs. Creature Type Modifier [219]
+
+	  1 => 17  // Stat: Attacks Per Round Modifier [1]
+
+	301 => 18  // Stat: Critical Hit Modifier [301]
+	362 => 19  // Critical miss bonus [362]
+     73 => 20  // Stat: Extra Damage Modifier [73]
+	179 => 21  // Spell Effect: Damage vs. Creature Type Modifier [179]
+	285 => 23  // Stat: Melee Weapon Damage Modifier [285]
+	286 => 24  // Stat: Missile Weapon Damage Modifier [286]
+	289 => 25  // Stat: Fist Damage Modifier [289]
+	263 => 26  // Stat: Backstab [263]
+	332 => 27  // Stat: Specific Damage Modifier [332] : EE only
+	250 => 28  // Spell Effect: Damage Luck Modifier [250]
+
+	 54 => 30  // Stat: THAC0 Modifier [54]
+	278 => 30  // Stat: To Hit Modifier [278]
+	178 => 31  // Spell Effect: THAC0 vs. Creature Type Modifier [178]
+	306 => 32  // Stat: THAC0 Modifier (On-Hand) [306]
+	305 => 33  // Stat: THAC0 Modifier (Off-Hand) [305]
+	284 => 34  // Stat: Melee THAC0 Modifier [284]
+	167 => 35  // Stat: THAC0 Modifier with Missile Weapons [167]
+	288 => 36  // Stat: Fist THAC0 Modifier [288]
+
+	325 => 50  // Stat: Save vs. all [325]
+ 219001 => 51  // Stat: JS vs. Creature Type Modifier [219]
+	 33 => 52  // Stat: Save vs. Death Modifier [33]
+	 34 => 53  // Stat: Save vs. Wands Modifier [34]
+	 35 => 54  // Stat: Save vs. Petrification/Polymorph Modifier [35]
+	 36 => 55  // Stat: Save vs. Breath Weapons Modifier [36]
+	 37 => 56  // Stat: Save vs. Spells Modifier [37]
+	346 => 57  // Save vs. school bonus [346]
+
+	126 => 60  // Stat: Movement Modifier [126]
+	176 => 60  // Stat: Movement Modifier (II) [176]
+
+	 18 => 61  // Stat: Maximum HP Modifier [18]
+	 98 => 62  // Stat: Regeneration [98]
+	 17 => 63  // Stat: Current HP Modifier [17]
+	343 => 64  // HP Swap [343]
+	208 => 65  // Stat: Minimum HP Limit [208]
+
+	299 => 66  // Spell Effect: Chaos Shield [299]
+
+	 99 => 67  // Spell Effect: Duration Modifier [99]
+	 60 => 68  // Stat: Miscast Magic [60]
+	189 => 69  // Stat: Casting Time Modifier [189]
+	190 => 70  // Stat: Attack Speed Factor [190]
+
+	501 => 80  // Stat: Caractéristiques [501]
+	132 => 81  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
+	 44 => 82  // Stat: Strength Modifier [44]
+	 97 => 83  // Stat: Strength-Bonus Modifier [97]
+	 15 => 84  // Stat: Dexterity Modifier [15]
+	 10 => 85  // Stat: Constitution Modifier [10]
+	 19 => 86  // Stat: Intelligence Modifier [19]
+	 49 => 87  // Stat: Wisdom Modifier [49]
+	  6 => 88  // Stat: Charisma Modifier [6]
+
+	 22 => 89  // Stat: Luck Modifier [22]
+	133 => 90  // Spell Effect: Luck Non-Cumulative [133]
+	131 => 91  // State: Positive Chant [131]
+	137 => 92  // State: Negative Chant [137]
+
+	500 => 95  // Stat: Compétences de voleur [500]
+	 92 => 96  // Stat: Pick Pockets Modifier [92]
+	 90 => 97  // Stat: Open Locks Modifier [90]
+	276 => 98  // Stat: Detect Illusion Modifier [276]
+	 91 => 99  // Stat: Find Traps Modifier [91]
+	277 => 100 // Stat: Set Traps Modifier [277]
+	275 => 101 // Stat: Hide in Shadows Modifier [275]
+	 59 => 102 // Stat: Stealth Modifier [59]
+
+
+	// Invocation
+
+	 67 => 127 // Summon: Creature Summoning [67]
+	127 => 128 // Summon: Monster Summoning [127]
+	331 => 129 // Summon: Random Monster Summoning [331]
+	151 => 130 // Summon: Replace Creature [151]
+
+	// Dissipation
+
+	304 => 199 // Mass Raise Dead [304]
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
-	160 => 200 // Remove Sanctuary [160]
-	162 => 201 // Cure: Hold [162]
-	161 => 202 // Cure: Fear [161]
-	 48 => 204 // Cure: Silence (Vocalize) [48]
-	 79 => 205 // Cure: Disease [79]
-	 11 => 206 // Cure: Poison [11]
-	 75 => 207 // Cure: Blindness [75]
-	 81 => 208 // Cure: Deafness [81]
-	 77 => 209 // Cure: Feeblemindedness [77]
-	116 => 210 // Cure: (Remove) Invisibility [116]
-	 32 => 211 // Cure: Death (Raise Dead) [32]
-	  4 => 213 // Cure: Berserking [4]
-	 46 => 214 // Cure: Stun (Unstun) [46]
-	 47 => 215 // Cure: Invisibility [47]
-	 43 => 216 // Cure: Stone to Flesh [43]
-	 14 => 216 // Graphics: Defrost [14]
-	  2 => 217 // Cure: Sleep [2]
-	242 => 218 // Cure: Confusion [242]
-	 70 => 219 // Cure: Non-Detection [2]
-	164 => 219 // Cure: Drunkeness [164]
-    101 => 220 // Protection: from Opcode [101]
-	163 => 229 // Protection: Free Action [163]
-	223 => 230 // Spell: Immunity (by School, decrementing [223]
-	226 => 230 // Spell: Immunity (by Secondary Type, decrementing) [226]
-	204 => 230 // Spell: Protection from Spell (School) [204]
-	205 => 231 // Spell: Protection from Spell (Secondary Type) [205]
-	102 => 232 // Protection: from Spell Levels [102]
-	259 => 233 // Protection: Spell Trap [259]
-	292 => 234 // Protection: Backstab [292]
-	100 => 235 // Protection: from Creature Type [100]
-	120 => 236 // Protection: from Melee Weapons [120]
-	 83 => 237 // Protection: From Projectile (Any) [83]
-	310 => 238 // Protection: from Timestop [310]
-	218 => 239 // Protection: Stoneskin [218]
-	 69 => 240 // Protection: From Detection (Non-Detection) [69]
-	212 => 241 // Protection: Freedom [212]
-	172 => 244 // Spell: Remove Spell [172]
-	272 => 245 // Spell: Apply Repeating EFF [272]
-	148 => 245 // Spell: Cast Spell (at Point) [148]
-	311 => 245 // Spell: Random Wish Spell [311]
-	201 => 246 // Spell: Decrementing Spell Immunity [201]
-	199 => 247 // Spell: Bounce Spells [199]
-	202 => 247 // Spell: Bounce (by School) [202]
-	203 => 247 // Spell: Bounce (by Secondary Type) [203]
-	227 => 247 // Spell: Bounce (by School, decrementing) [227]
-	228 => 247 // Spell: Bounce (by Secondary Type, decrementing) [228]
-	200 => 248 // Spell: Decrementing Bounce Spells [200]
-	207 => 249 // Spell: Bounce Specified Spell [207]
-	197 => 250 // Spell: Bounce Projectile [197]
-	232 => 250 // Spell Effect: Cast Spell on Condition [232]
-	326 => 251 // Apply Effects List [326]
-	303 => 252 // Spell Effect: Backstab Every Hit [303]
-	231 => 253 // Spell Effect: Time Stop [231]
-	188 => 254 // Spell Effect: Aura Cleansing [188]
-	119 => 255 // Spell Effect: Mirror Image [119]
-	159 => 256 // Spell Effect: Mirror Image (Exact Number) [159]
-	280 => 257 // Spell Effect: Wild Magic [280]
-	235 => 258 // Spell Effect: Wing Buffet [235]
-	239 => 259 // Spell Effect: Farsight [239]
-	125 => 260 // Spell Effect: Unlock (Knock) [125]
-	213 => 261 // Spell Effect: Maze [213]
-	211 => 262 // Spell Effect: Imprisonment [211]
-	329 => 263 // Spell Effect: Slow Poison [329] : EE only
-	124 => 264 // Spell Effect: Teleport (Dimension Door) [124]
-	274 => 267 // Spell Effect: Teleport to Target [274]
-	222 => 268 // Spell Effect: Teleport Field [222]
-	150 => 269 // Spell Effect: Find Traps [150]
-	268 => 270 // Spell Effect: Explore (Wizard Eye) [268]
-	117 => 271 // Spell Effect: Reveal Area [117]
-	236 => 272 // Spell Effect: Image Projection [236]
-	316 => 275 // Spell: Magical Rest [316]
-	131 => 276 // State: Positive Chant [131]
-	137 => 277 // State: Negative Chant [137]
-	133 => 278 // Spell Effect: Luck Non-Cumulative [133]
-	  5 => 279 // Charm: Charm Specific Creature [5]
-	241 => 280 // Charm: Control Creature [241]
-	115 => 281 // Detect: Alignment [115]
-	 57 => 282 // Alignment: Change [57]
-	 56 => 283 // Alignment: Invert [56]
-	 71 => 284 // Sex Change [71]
-	111 => 285 // Item: Create Magical Weapon [111]
-	143 => 286 // Item: Create Item in Slot [143]
-	122 => 287 // Item: Create Inventory Item [122]
-	255 => 288 // Item: Create Inventory Item (days) [255]
-	302 => 289 // Item: Can Use Any Item [302]
-	180 => 289 // Item: Can't Use Item [180]
-	181 => 289 // Item: Can't Use Itemtype [181]
-	 26 => 290 // Item: Remove Curse [26]
-	248 => 291 // Item: Set Melee Effect [248]
-	249 => 292 // Item: Set Ranged Effect [249]
-	243 => 292 // Item: Drain Item Charges [243]
-	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
-	361 => 293 // Cast spell on critical miss [361]
-	340 => 294 // Spell Effect: Change Backstab Effect [340]
-	127 => 295 // Summon: Monster Summoning [127]
-	331 => 295 // Summon: Random Monster Summoning [331]
-	 68 => 295 // Summon: Unsummon Creature [68]
-	151 => 296 // Summon: Replace Creature [151]
-	135 => 297 // Polymorph into Specific [135]
-	321 => 298 // Removal: Effects specified by Resource [321]
-	220 => 298 // Removal: Remove School [220]
-	221 => 298 // Removal: Remove Secondary Type [221]
-	229 => 298 // Removal: Remove One School [229]
-	230 => 298 // Removal: Remove One Secondary Type [230]
-	193 => 299 // Spell Effect: Invisible Detection by Script [193]
-	144 => 300 // Button: Disable Button [144]
-	279 => 300 // Button: Enable Button [279]
-	300 => 301 // NPC Bump [300]
+	 32 => 201 // Cure: Death (Raise Dead) [32]
+	 43 => 201 // Cure: Stone to Flesh [43]
+	 14 => 202 // Graphics: Defrost [14]
+    224 => 203 // Cure: Level Drain (Restoration) [224]
+	 46 => 204 // Cure: Stun (Unstun) [46]
+    162 => 205 // Cure: Hold [162]
+	270 => 205 // Cure: Unpause Target [270]
+	 77 => 206 // Cure: Feeblemindedness [77]
+	 79 => 207 // Cure: Disease [79]
+	 11 => 208 // Cure: Poison [11]
+    242 => 209 // Cure: Confusion [242]
+	161 => 210 // Cure: Fear [161]
+	  4 => 211 // Cure: Berserking [4]
+	  2 => 212 // Cure: Sleep [2]
+	 48 => 213 // Cure: Silence (Vocalize) [48]
+	 75 => 214 // Cure: Blindness [75]
+	 81 => 215 // Cure: Deafness [81]
+    160 => 216 // Remove Sanctuary [160]
+	 47 => 217 // Cure: Invisibility [47]
+    116 => 218 // Cure: (Remove) Invisibility [116]
+    164 => 219 // Cure: Drunkeness [164]
+	 70 => 220 // Cure: Non-Detection [2]
+	 64 => 221 // State: Remove Infravision [64]
+	220 => 223 // Removal: Remove School [220]
+	221 => 224 // Removal: Remove Secondary Type [221]
+	229 => 225 // Removal: Remove One School [229]
+	230 => 226 // Removal: Remove One Secondary Type [230]
+	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
-	 // Charge
-	146 => 274 // Spell: Cast Spell (at Target) [146]
-	171 => 275 // Spell: Give Innate Ability [171]
-	 67 => 280 // Summon: Creature Summoning [67]
-	208 => 300 // Stat: Minimum HP Limit [208]
-	273 => 350 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
+	// Absorption 
 
-	177 => 400
+	259 => 240 // Protection: Spell Trap [259]
+
+	// Renvoi
+
+	199 => 241 // Spell: Bounce Spells [199]
+	200 => 241 // Spell: Decrementing Bounce Spells [200]
+	202 => 242 // Spell: Bounce (by School) [202]
+	203 => 243 // Spell: Bounce (by Secondary Type) [203]
+	227 => 244 // Spell: Bounce (by School, decrementing) [227]
+	228 => 245 // Spell: Bounce (by Secondary Type, decrementing) [228]
+	197 => 246 // Spell: Bounce Projectile [197]
+	207 => 247 // Spell: Bounce Specified Spell [207]
+
+	// Cas particulier peut dissiper comme immuniser
+	321 => 278 // Removal: Effects specified by Resource [321]
+
+	// Les immunités
+
+	102 => 250 // Protection: from Spell Levels [102]
+	201 => 251 // Spell: Decrementing Spell Immunity [201]
+	204 => 252 // Spell: Protection from Spell (School) [204]
+	205 => 253 // Spell: Protection from Spell (Secondary Type) [205]
+	223 => 254 // Spell: Immunity (by School, decrementing [223]
+	226 => 255 // Spell: Immunity (by Secondary Type, decrementing) [226]
+	206 => 256 // Spell: Protection from Spell [206]
+
+	100 => 280 // Protection: from Creature Type [100]
+	120 => 281 // Protection: from Melee Weapons [120]
+	 83 => 282 // Protection: From Projectile (Any) [83]
+    101 => 283 // Protection: from Opcode [101]
+	163 => 284 // Protection: Free Action [163]
+    505 => 285 // Protection contre les capacités psioniques
+	292 => 286 // Protection: Backstab [292]
+	310 => 287 // Protection: from Timestop [310]
+	212 => 288 // Protection: Freedom [212]
+	 69 => 289 // Protection: From Detection (Non-Detection) [69]
+
+	// Les résistances qui peuvent être des immunités
+
+	106 => 299 // Stat: Morale Break [106]
+    502 => 300 // Stat: Résistance aux dégâts [502]
+    503 => 301 // Stat: Résistance aux dégâts élémentaires [503]
+    504 => 302 // Stat: Résistance aux dégâts physiques [504]
+	166 => 303 // Stat: Magic Resistance Modifier [166]
+	 30 => 304 // Stat: Fire Resistance Modifier [30]
+	 28 => 305 // Stat: Cold Resistance Modifier [28]
+	 29 => 306 // Stat: Electricity Resistance Modifier [29]
+	 27 => 308 // Stat: Acid Resistance Modifier [27]
+	 31 => 309 // Stat: Magic Damage Resistance Modifier [31]
+	 84 => 310 // Stat: Reduced Damage from Magical Fire Modifier [84]
+	 85 => 311 // Stat: Reduced Damage from Magical Cold Modifier [85]
+	 86 => 312 // Stat: Reduced Damage from Slashing Modifier [86]
+	 87 => 313 // Stat: Reduced Damage from Crushing Modifier [87]
+	 88 => 314 // Stat: Reduced Damage from Piercing Modifier [88]
+	 89 => 315 // Stat: Reduced Damage from Missiles Modifier [89]
+	173 => 316 // Stat: Poison Resistance Modifier [173]
+
+
+	// Les états
+
+	231 => 350 // Spell Effect: Time Stop [231]
+	 13 => 351 // Death: Instant Death [13]
+	 55 => 352 // Death: Kill Creature Type [55]
+	238 => 353 // Death: Disintegrate [238]
+	 68 => 354 // Summon: Unsummon Creature [68]
+	209 => 355 // Death: Kill 60HP [209]
+	211 => 366 // Spell Effect: Imprisonment [211]
+	213 => 367 // Spell Effect: Maze [213]
+	134 => 368 // State: Petrification [134]
+	  5 => 369 // Charm: Charm Specific Creature [5]
+	241 => 369 // Charm: Control Creature [241]
+	 45 => 370 // State: Stun [45]
+	210 => 371 // Spell Effect: Stun 90HP [210]
+	109 => 372 // State: Hold Creature I [109]
+	175 => 372 // State: Hold Creature II [175]
+	185 => 372 // State: Hold Creature III [185]
+	157 => 373 // State: Web Effect [157]
+	165 => 373 // Spell Effect: Pause Target [165]
+	154 => 374 // Overlay: Entangle [154]
+	244 => 376 // Spell: Drain Wizard Spell [244]
+	 39 => 377 // State: Unconsciousness [39]
+	217 => 378 // Spell Effect: Unconsciousness 20HP [217]
+	128 => 379 // State: Confusion [128]
+	  3 => 380 // State: Berserking [3]
+	247 => 381 // Spell Effect: Attack Nearest Creature [247]
+	135 => 382 // Polymorph into Specific [135]
+	 76 => 383 // State: Feeblemindedness [76]
+	 16 => 384 // State: Haste [16]
+	317 => 385 // State: Haste2 [317]
+	 40 => 386 // State: Slow [40]
+	 20 => 388 // State: Invisibility [20]
+	130 => 389 // State: Bless [130]
+	129 => 390 // State: Aid [129]
+	 65 => 391 // State: Blur [65]
+	 63 => 392 // State: Infravision [63]
+	 24 => 393 // State: Horror [24]
+	 38 => 394 // State: Silence [38]
+	 80 => 395 // Deafness [80]
+	 74 => 396 // State: Blindness [74]
+	136 => 397 // State: Force Visible [136]
+	153 => 398 // Overlay: Sanctuary [153]
+	329 => 399 // Spell Effect: Slow Poison [329] : EE only
+
+	303 => 400 // Spell Effect: Backstab Every Hit [303]
+	188 => 401 // Spell Effect: Aura Cleansing [188]
+	119 => 402 // Spell Effect: Mirror Image [119]
+	159 => 403 // Spell Effect: Mirror Image (Exact Number) [159]
+	280 => 404 // Spell Effect: Wild Magic [280]
+	193 => 405 // Spell Effect: Invisible Detection by Script [193]
+	218 => 406 // Protection: Stoneskin [218]
+	314 => 407 // Spell: Golem Stoneskin [314]
+
+	281 => 420 // Stat: Wild Magic [281]
+	323 => 421 // Stat: Turn Undead Level [323]
+	 23 => 422 // Stat: Morale Modifier [23]
+	104 => 424 // Stat: Experience Points [104]
+	 21 => 425 // Stat: Lore Modifier [21]
+	262 => 426 // Stat: Visual Range [262]
+	 93 => 427 // Stat: Fatigue Modifier [93]
+	108 => 428 // Stat: Reputation [108]
+	 94 => 429 // Stat: Drunkenness Modifier [94]
+	 95 => 430 // Stat: Tracking Skill Modifier [95]
+	105 => 431 // Stat: Gold [105]
+	245 => 432 // Check For Berserk [245]
+
+	235 => 450 // Spell Effect: Wing Buffet [235]
+	239 => 451 // Spell Effect: Farsight [239]
+	125 => 452 // Spell Effect: Unlock (Knock) [125]
+	124 => 453 // Spell Effect: Teleport (Dimension Door) [124]
+	274 => 454 // Spell Effect: Teleport to Target [274]
+	222 => 455 // Spell Effect: Teleport Field [222]
+	150 => 456 // Spell Effect: Find Traps [150]
+	268 => 457 // Spell Effect: Explore (Wizard Eye) [268]
+	117 => 458 // Spell Effect: Reveal Area [117]
+	236 => 459 // Spell Effect: Image Projection [236]
+	316 => 460 // Spell: Magical Rest [316]
+	115 => 461 // Detect: Alignment [115]
+	 57 => 462 // Alignment: Change [57]
+	 56 => 463 // Alignment: Invert [56]
+	 71 => 464 // Sex Change [71]
+
+	// Effets
+	// Parfois les immunités protègent contre les effet donc...
+
+	146 => 465 // Spell: Cast Spell (at Target) [146]
+	148 => 466 // Spell: Cast Spell (at Point) [148]
+	272 => 467 // Spell: Apply Repeating EFF [272]
+	232 => 468 // Spell Effect: Cast Spell on Condition [232]
+	326 => 469 // Apply Effects List [326]
+	311 => 470 // Spell: Random Wish Spell [311]
+	252 => 471 // Spell Effect: Set Trap [252]
+	177 => 472 // EFF File
+	
+	// Effets au toucher
+
+	248 => 472 // Item: Set Melee Effect [248]
+	249 => 473 // Item: Set Ranged Effect [249]
+	341 => 474 // Spell Effect: Change Critical Hit Effect [341]
+	361 => 475 // Cast spell on critical miss [361]
+	340 => 476 // Spell Effect: Change Backstab Effect [340]
+
+
+	111 => 480 // Item: Create Magical Weapon [111]
+	143 => 481 // Item: Create Item in Slot [143]
+	122 => 482 // Item: Create Inventory Item [122]
+	255 => 483 // Item: Create Inventory Item (days) [255]
+	302 => 484 // Item: Can Use Any Item [302]
+	180 => 485 // Item: Can't Use Item [180]
+	181 => 486 // Item: Can't Use Itemtype [181]
+	243 => 487 // Item: Drain Item Charges [243]
+
+	 26 => 488 // Item: Remove Curse [26]
+	172 => 489 // Spell: Remove Spell [172]
+	147 => 490 // Spell: Learn Spell [147]
+	171 => 491 // Spell: Give Innate Ability [171]
+	251 => 492 // Spell Effect: Change Bard Song Effect [251]
+
+
+	145 => 492 // Spell: Disable Spell Casting Abilities [145]
+	144 => 493 // Button: Disable Button [144]
+	279 => 494 // Button: Enable Button [279]
+	300 => 495 // NPC Bump [300]
+
+// 	147 => 0   // Spell: Learn Spell [147]
+// 	360 => 0   // Stat: Ignore Reputation Breaking Point [360]
+// 	283 => 0   // Use EFF File (Cursed) [283]
+// 	318 => 0   // Protection: Immunity Spell [318]
+// 	324 => 0   // Protection: Immunity to Resource and Message [324]
+// 	112 => 0   // Item: Item Remove [112]
+// 	123 => 0   // Item: Remove Inventory Item [123]
+// 	216 => 1   // Spell Effect: Level Drain [216]
+// 	344 => 1   // Enchantment vs. creature type [344]
+// 	  0 => 2   // Stat: AC vs. Damage Type Modifier [0]
+//  219000 => 3   // Stat: AC vs. Creature Type Modifier [219]
+// 	 54 => 4   // Stat: THAC0 Modifier [54]
+// 	178 => 5   // Spell Effect: THAC0 vs. Creature Type Modifier [178]
+// 	306 => 6   // Stat: THAC0 Modifier (On-Hand) [306]
+// 	305 => 6   // Stat: THAC0 Modifier (Off-Hand) [305]
+// 	284 => 7   // Stat: Melee THAC0 Modifier [284]
+// 	167 => 8   // Stat: THAC0 Modifier with Missile Weapons [167]
+// 	288 => 8   // Stat: Fist THAC0 Modifier [288]
+// 	278 => 9   // Stat: To Hit Modifier [278]
+//  219001 => 10  // Stat: AC vs. Creature Type Modifier [219]
+// 	325 => 11  // Stat: Save vs. all [325]
+// 	 33 => 11  // Stat: Save vs. Death Modifier [33]
+// 	 34 => 12  // Stat: Save vs. Wands Modifier [34]
+// 	 35 => 13  // Stat: Save vs. Petrification/Polymorph Modifier [35]
+// 	 36 => 14  // Stat: Save vs. Breath Weapons Modifier [36]
+// 	 37 => 15  // Stat: Save vs. Spells Modifier [37]
+// 	346 => 16  // Save vs. school bonus [346]
+// 	 12 => 16  // HP: Damage [12]
+// 	 73 => 17  // Stat: Extra Damage Modifier [73]
+// 	332 => 17  // Stat: Specific Damage Modifier [332] : EE only
+// 	179 => 18  // Spell Effect: Damage vs. Creature Type Modifier [179]
+// 	250 => 19  // Spell Effect: Damage Luck Modifier [250]
+// 	285 => 20  // Stat: Melee Weapon Damage Modifier [285]
+// 	286 => 21  // Stat: Missile Weapon Damage Modifier [286]
+// 	289 => 22  // Stat: Fist Damage Modifier [289]
+// 	 25 => 23  // State: Poison [25]
+// 	 78 => 24  // State: Disease [78]
+//     214 => 25  // Select Spell [214]
+//     191 => 26  // Spell: Casting Level Modifier [191]
+// 	 42 => 27  // Spell: Wizard Spell Slots Modifier [42]
+// 	 62 => 28  // Spell: Priest Spell Slots Modifier [62]
+// 	145 => 29  // Spell: Disable Spell Casting Abilities [145]
+// 	261 => 30  // Spell: Restore Lost Spells [261]
+// 	244 => 31  // Spell: Drain Wizard Spell [244]
+// 	 99 => 32  // Spell Effect: Duration Modifier [99]
+// 	 96 => 33  // Stat: Level Change [96]
+// 	189 => 34  // Stat: Casting Time Modifier [189]
+// 	 60 => 35  // Stat: Miscast Magic [60]
+// 	190 => 36  // Stat: Attack Speed Factor [190]
+// 	  1 => 37  // Stat: Attacks Per Round Modifier [1]
+// 	 98 => 38  // Stat: Regeneration [98]
+// 	 18 => 39  // Stat: Maximum HP Modifier [18]
+// 	132 => 40  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
+// 	501 => 41  // Stat: Caractéristiques [501]
+// 	 44 => 41  // Stat: Strength Modifier [44]
+// 	 97 => 42  // Stat: Strength-Bonus Modifier [97]
+// 	 15 => 43  // Stat: Dexterity Modifier [15]
+// 	 10 => 44  // Stat: Constitution Modifier [10]
+// 	 19 => 45  // Stat: Intelligence Modifier [19]
+// 	 49 => 46  // Stat: Wisdom Modifier [49]
+// 	  6 => 47  // Stat: Charisma Modifier [6]
+// 	 22 => 48  // Stat: Luck Modifier [22]
+// 	281 => 60  // Stat: Wild Magic [281]
+// 	301 => 90  // Stat: Critical Hit Modifier [301]
+// 	362 => 91  // Critical miss bonus [362]
+// 	500 => 98  // Stat: Compétences de voleur [500]
+// 	 92 => 98  // Stat: Pick Pockets Modifier [92]
+// 	 90 => 99  // Stat: Open Locks Modifier [90]
+// 	276 => 100 // Stat: Detect Illusion Modifier [276]
+// 	 91 => 101 // Stat: Find Traps Modifier [91]
+// 	277 => 102 // Stat: Set Traps Modifier [277]
+// 	275 => 103 // Stat: Hide in Shadows Modifier [275]
+// 	 59 => 104 // Stat: Stealth Modifier [59]
+// 	263 => 105 // Stat: Backstab [263]
+// 	126 => 108 // Stat: Movement Modifier [126]
+// 	176 => 108 // Stat: Movement Modifier (II) [176]
+// 	233 => 110 // Stat: Proficiency [233]
+// 	166 => 119 // Stat: Magic Resistance Modifier [166]
+// 	 30 => 120 // Stat: Fire Resistance Modifier [30]
+// 	 28 => 121 // Stat: Cold Resistance Modifier [28]
+// 	 29 => 122 // Stat: Electricity Resistance Modifier [29]
+// 	173 => 123 // Stat: Poison Resistance Modifier [173]
+// 	 27 => 124 // Stat: Acid Resistance Modifier [27]
+// 	 31 => 125 // Stat: Magic Damage Resistance Modifier [31]
+// 	 84 => 126 // Stat: Reduced Damage from Magical Fire Modifier [84]
+// 	 85 => 127 // Stat: Reduced Damage from Magical Cold Modifier [85]
+// 	 86 => 136 // Stat: Reduced Damage from Slashing Modifier [86]
+// 	 87 => 137 // Stat: Reduced Damage from Crushing Modifier [87]
+// 	 88 => 138 // Stat: Reduced Damage from Piercing Modifier [88]
+// 	 89 => 139 // Stat: Reduced Damage from Missiles Modifier [89]
+// 	343 => 140 // HP Swap [343]
+// 	 17 => 145 // Stat: Current HP Modifier [17]
+// 	323 => 146 // Stat: Turn Undead Level [323]
+// 	 23 => 149 // Stat: Morale Modifier [23]
+// 	106 => 150 // Stat: Morale Break [106]
+// 	 21 => 155 // Stat: Lore Modifier [21]
+// 	262 => 157 // Stat: Visual Range [262]
+// 	 93 => 160 // Stat: Fatigue Modifier [93]
+// 	104 => 161 // Stat: Experience Points [104]
+// 	108 => 165 // Stat: Reputation [108]
+// 	 94 => 163 // Stat: Drunkenness Modifier [94]
+// 	 95 => 164 // Stat: Tracking Skill Modifier [95]
+// 	105 => 165 // Stat: Gold [105]
+// 	 16 => 169 // State: Haste [16]
+// 	317 => 169 // State: Haste2 [317]
+// 	130 => 170 // State: Bless [130]
+// 	129 => 171 // State: Aid [129]
+// 	 20 => 173 // State: Invisibility [20]
+// 	 65 => 174 // State: Blur [65]
+// 	 63 => 175 // State: Infravision [63]
+// 	 64 => 175 // State: Remove Infravision [64]
+// 	 40 => 176 // State: Slow [40]
+// 	  3 => 177 // State: Berserking [3]
+// 	246 => 177 // Spell Effect: Berserking [246]
+// 	245 => 177 // Check For Berserk [245]
+// 	247 => 177 // Spell Effect: Attack Nearest Creature [247]
+// 	 24 => 178 // State: Horror [24]
+// 	 74 => 179 // State: Blindness [74]
+// 	 45 => 180 // State: Stun [45]
+// 	210 => 180 // Spell Effect: Stun 90HP [210]
+// 	165 => 180 // Spell Effect: Pause Target [165]
+// 	 80 => 181 // Deafness [80]
+// 	 39 => 183 // State: Unconsciousness [39]
+// 	217 => 183 // Spell Effect: Unconsciousness 20HP [217]
+// 	128 => 184 // State: Confusion [128]
+// 	 38 => 185 // State: Silence [38]
+// 	134 => 186 // State: Petrification [134]
+// 	109 => 188 // State: Hold Creature I [109]
+// 	175 => 188 // State: Hold Creature II [175]
+// 	185 => 188 // State: Hold Creature III [185]
+// 	157 => 189 // State: Web Effect [157]
+// 	 76 => 190 // State: Feeblemindedness [76]
+// 	136 => 190 // State: Force Visible [136]
+// 	153 => 190 // Overlay: Sanctuary [153]
+// 	 55 => 191 // Death: Kill Creature Type [55]
+// 	209 => 192 // Death: Kill 60HP [209]
+// 	 13 => 193 // Death: Instant Death [13]
+// 	238 => 194 // Death: Disintegrate [238]
+// 	206 => 197 // Spell: Protection from Spell [206]
+// 	224 => 199 // Cure: Level Drain (Restoration) [224]
+// 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
+// 	160 => 200 // Remove Sanctuary [160]
+// 	162 => 201 // Cure: Hold [162]
+// 	161 => 202 // Cure: Fear [161]
+// 	 48 => 204 // Cure: Silence (Vocalize) [48]
+// 	 79 => 205 // Cure: Disease [79]
+// 	 11 => 206 // Cure: Poison [11]
+// 	 75 => 207 // Cure: Blindness [75]
+// 	 81 => 208 // Cure: Deafness [81]
+// 	 77 => 209 // Cure: Feeblemindedness [77]
+// 	116 => 210 // Cure: (Remove) Invisibility [116]
+// 	 32 => 211 // Cure: Death (Raise Dead) [32]
+// 	  4 => 213 // Cure: Berserking [4]
+// 	 46 => 214 // Cure: Stun (Unstun) [46]
+// 	 47 => 215 // Cure: Invisibility [47]
+// 	 43 => 216 // Cure: Stone to Flesh [43]
+// 	 14 => 216 // Graphics: Defrost [14]
+// 	  2 => 217 // Cure: Sleep [2]
+// 	242 => 218 // Cure: Confusion [242]
+// 	 70 => 219 // Cure: Non-Detection [2]
+// 	164 => 219 // Cure: Drunkeness [164]
+//     101 => 220 // Protection: from Opcode [101]
+// 	163 => 229 // Protection: Free Action [163]
+// 	223 => 230 // Spell: Immunity (by School, decrementing [223]
+// 	226 => 230 // Spell: Immunity (by Secondary Type, decrementing) [226]
+// 	204 => 230 // Spell: Protection from Spell (School) [204]
+// 	205 => 231 // Spell: Protection from Spell (Secondary Type) [205]
+// 	102 => 232 // Protection: from Spell Levels [102]
+// 	259 => 233 // Protection: Spell Trap [259]
+// 	292 => 234 // Protection: Backstab [292]
+// 	100 => 235 // Protection: from Creature Type [100]
+// 	120 => 236 // Protection: from Melee Weapons [120]
+// 	 83 => 237 // Protection: From Projectile (Any) [83]
+// 	310 => 238 // Protection: from Timestop [310]
+// 	218 => 239 // Protection: Stoneskin [218]
+// 	 69 => 240 // Protection: From Detection (Non-Detection) [69]
+// 	212 => 241 // Protection: Freedom [212]
+// 	172 => 244 // Spell: Remove Spell [172]
+// 	272 => 245 // Spell: Apply Repeating EFF [272]
+// 	148 => 245 // Spell: Cast Spell (at Point) [148]
+// 	311 => 245 // Spell: Random Wish Spell [311]
+// 	201 => 246 // Spell: Decrementing Spell Immunity [201]
+// 	199 => 247 // Spell: Bounce Spells [199]
+// 	202 => 247 // Spell: Bounce (by School) [202]
+// 	203 => 247 // Spell: Bounce (by Secondary Type) [203]
+// 	227 => 247 // Spell: Bounce (by School, decrementing) [227]
+// 	228 => 247 // Spell: Bounce (by Secondary Type, decrementing) [228]
+// 	200 => 248 // Spell: Decrementing Bounce Spells [200]
+// 	207 => 249 // Spell: Bounce Specified Spell [207]
+// 	197 => 250 // Spell: Bounce Projectile [197]
+// 	232 => 250 // Spell Effect: Cast Spell on Condition [232]
+// 	326 => 251 // Apply Effects List [326]
+// 	303 => 252 // Spell Effect: Backstab Every Hit [303]
+// 	231 => 253 // Spell Effect: Time Stop [231]
+// 	188 => 254 // Spell Effect: Aura Cleansing [188]
+// 	119 => 255 // Spell Effect: Mirror Image [119]
+// 	159 => 256 // Spell Effect: Mirror Image (Exact Number) [159]
+// 	280 => 257 // Spell Effect: Wild Magic [280]
+// 	235 => 258 // Spell Effect: Wing Buffet [235]
+// 	239 => 259 // Spell Effect: Farsight [239]
+// 	125 => 260 // Spell Effect: Unlock (Knock) [125]
+// 	213 => 261 // Spell Effect: Maze [213]
+// 	211 => 262 // Spell Effect: Imprisonment [211]
+// 	329 => 263 // Spell Effect: Slow Poison [329] : EE only
+// 	124 => 264 // Spell Effect: Teleport (Dimension Door) [124]
+// 	274 => 267 // Spell Effect: Teleport to Target [274]
+// 	222 => 268 // Spell Effect: Teleport Field [222]
+// 	150 => 269 // Spell Effect: Find Traps [150]
+// 	268 => 270 // Spell Effect: Explore (Wizard Eye) [268]
+// 	117 => 271 // Spell Effect: Reveal Area [117]
+// 	236 => 272 // Spell Effect: Image Projection [236]
+// 	316 => 275 // Spell: Magical Rest [316]
+// 	131 => 276 // State: Positive Chant [131]
+// 	137 => 277 // State: Negative Chant [137]
+// 	133 => 278 // Spell Effect: Luck Non-Cumulative [133]
+// 	  5 => 279 // Charm: Charm Specific Creature [5]
+// 	241 => 280 // Charm: Control Creature [241]
+// 	115 => 281 // Detect: Alignment [115]
+// 	 57 => 282 // Alignment: Change [57]
+// 	 56 => 283 // Alignment: Invert [56]
+// 	 71 => 284 // Sex Change [71]
+// 	111 => 285 // Item: Create Magical Weapon [111]
+// 	143 => 286 // Item: Create Item in Slot [143]
+// 	122 => 287 // Item: Create Inventory Item [122]
+// 	255 => 288 // Item: Create Inventory Item (days) [255]
+// 	302 => 289 // Item: Can Use Any Item [302]
+// 	180 => 289 // Item: Can't Use Item [180]
+// 	181 => 289 // Item: Can't Use Itemtype [181]
+// 	 26 => 290 // Item: Remove Curse [26]
+// 	248 => 291 // Item: Set Melee Effect [248]
+// 	249 => 292 // Item: Set Ranged Effect [249]
+// 	243 => 292 // Item: Drain Item Charges [243]
+// 	341 => 293 // Spell Effect: Change Critical Hit Effect [341]
+// 	361 => 293 // Cast spell on critical miss [361]
+// 	340 => 294 // Spell Effect: Change Backstab Effect [340]
+// 	127 => 295 // Summon: Monster Summoning [127]
+// 	331 => 295 // Summon: Random Monster Summoning [331]
+// 	 68 => 295 // Summon: Unsummon Creature [68]
+// 	151 => 296 // Summon: Replace Creature [151]
+// 	135 => 297 // Polymorph into Specific [135]
+// 	321 => 298 // Removal: Effects specified by Resource [321]
+// 	220 => 298 // Removal: Remove School [220]
+// 	221 => 298 // Removal: Remove Secondary Type [221]
+// 	229 => 298 // Removal: Remove One School [229]
+// 	230 => 298 // Removal: Remove One Secondary Type [230]
+// 	193 => 299 // Spell Effect: Invisible Detection by Script [193]
+// 	144 => 300 // Button: Disable Button [144]
+// 	279 => 300 // Button: Enable Button [279]
+// 	300 => 301 // NPC Bump [300]
+
+// 	 // Charge
+// 	146 => 274 // Spell: Cast Spell (at Target) [146]
+// 	171 => 275 // Spell: Give Innate Ability [171]
+// 	 67 => 280 // Summon: Creature Summoning [67]
+// 	208 => 300 // Stat: Minimum HP Limit [208]
+// 	273 => 350 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
+
+// 	177 => 400
 END
 
 /*
@@ -290,7 +619,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	141 => 0
 	142 => 0
 	152 => 0 // Spell Effect: Play Movie [152]
-	154 => 0 // Overlay: Entangle [154]
 	155 => 0 // Overlay: Minor Globe [155]
 	156 => 0 // Overlay: Protection from Normal Missiles Cylinder [156]
 	158 => 0 // State: Grease [158]
@@ -313,39 +641,32 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	234 => 0 // Spell Effect: Contingency Creation [234]
 	237 => 0 // Spell Effect: Puppet ID [237]
 	240 => 0 // Graphics: Remove Special Effect Icon [240]
-	251 => 1 // Spell Effect: Change Bard Song Effect [251]
-	252 => 1 // Spell Effect: Set Trap [252]
 	253 => 0 // Spell Effect: Add Map Marker [253]
 	254 => 0 // Spell Effect: Remove Map Marker [254]
 	256 => 0 // Spell: Spell Sequencer Active [256]
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
-	260 => 0 //
-	264 => 1 // Spell Effect: Drop Weapons in Panic [264]
+	260 => 1 //
 	265 => 0 // Script: Set Global Variable [265]
 	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
-	270 => 1 // Cure: Unpause Target [270]
 	271 => 0 // Graphics: Avatar Removal [271]
-	282 => 0 // Script: Scripting State Modifier [282]
+	282 => 1 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
 	291 => 0 // Graphics: Disable Visual Effect [291]
 	293 => 0 // Script: Enable Offscreen AI [293]
 	294 => 0 // Existance Delay Override [294]
-	295 => 0
-	296 => 0
+	295 => 1 // Graphics: Disable Permanent Death [295]
+	296 => 0 // Graphics: Protection from Specific Animation [296]
 	297 => 0 // Text: Protection from Display Specific String [297]
 	298 => 0 // Spell Effect: Execute Script cut250a [298]
-	299 => 1 // Spell Effect: Chaos Shield [299]
-	304 => 1 // Mass Raise Dead [304]
 	307 => 0 // Ranger Tracking Ability [307]
 	308 => 0 // Protection: From Tracking [308]
 	309 => 0 // Script: Set/Modify Local Variable [309]
 	312 => 0
 	313 => 0 // High-Level Ability Denotation [313]
-	314 => 1 // Spell: Golem Stoneskin [314]
 	315 => 0 // Graphics: Animation Removal [315]
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
@@ -385,6 +706,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
+	0 => ~0 %meter%~
 	1 => ~0,6 %meter%~
 	2 => ~1,2 %meter%~
 	3 => ~1,8 %meter%~
@@ -398,6 +720,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
 	11 => ~7 %meters%~
 	12 => ~7,5 %meters%~
 	13 => ~8 %meters%~
+	14 => ~8,5 %meters%~
 	15 => ~9 %meters%~
 	16 => ~9,5 %meters%~
 	17 => ~10 %meters%~
@@ -450,79 +773,110 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
 	~lcrobe~ => 102150 // ~~
 END
 
+/* 
+	Opcodes dont le champ Duration n'est pas impactant
+	Conséquence : La durée n'est pas écrire car considérée comme implicite
+	Trois cas :
+	0- l'effet est instantané et ne peut perdurer ou être dissipé
+		(dissipation, soin (dans le sens où on peut les reperdre peu de temps après))
+		~ duration 0
+	1- l'effet est instantané mais est dissipé en cas de mort/résurrection ()
+		~ permanent
+	3- l'effet est soit permanent soit permanent after death (selon le timing choisi)
+		~ à vérifier
+	9- l'effet est instantané, définitif et ne peut être dissipé (perte d'un objet, oubli d'un sort)
+		~ permanent after death
+*/
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
-	  2 => 1
-	  4 => 1
-	 11 => 1 // Neutralisation du poison
-	 12 => 1 // Dégâts
-	 13 => 1 // Mort
-	 14 => 1
-	 17 => 1
-	 23 => 1 // Modification du moral
-	 26 => 1
-	 32 => 1
-	 43 => 1
-	 46 => 1
-	 47 => 1 // Dissipation : invisibilité
-	 48 => 1
-	 55 => 1 // Mort
-	 58 => 1 // Dissipation : Magie
-	 64 => 1 // Dissipation : Infravision
-	 68 => 1 // Désinvocation
-	 70 => 1 // Dissipation non détection
-	 75 => 1 // Dissipation : Aveuglement
-	 77 => 1
-	 79 => 1
-	 81 => 1
-	105 => 1 // Modification : or
-	108 => 1 // Modification Réputation
-	112 => 1 // Retrait item
-	116 => 1 // Dissipation : invisibilité
-	123 => 1 // Item: Remove Inventory Item
-	124 => 1 // Spell Effect: Teleport (Dimension Door)
-	125 => 1 // Spell Effect: Unlock (Knock)
+	  2 => 0 // Cure: Sleep
+	  4 => 0 // Cure: Berserking
+	 11 => 0 // Cure: Poison
+	 12 => 0 // HP: Damage
+	 13 => 1 // Death: Instant Death
+	 14 => 0 // Graphics: Defrost
+	 17 => 0 // HP: Current HP Modifier
+	 23 => 0 // Stat: Morale Modifier
+	 26 => 0 // Item: Remove Curse
+	 32 => 0 // Cure: Death (Raise Dead)
+	 43 => 0 // Cure: Stone to Flesh
+	 46 => 0 // Cure: Stun (Unstun)
+	 47 => 0 // Cure: Invisibility
+	 48 => 0 // Cure: Silence (Vocalize)
+	 55 => 0 // Death: Kill Creature Type
+	 58 => 0 // Cure: Dispellable Effects (Dispel Magic)
+	 64 => 0 // State: Remove Infravision
+	 68 => 9 // Summon: Unsummon Creature
+	 70 => 0 // Cure: Non-Detection
+	 75 => 0 // Cure: Blindness
+	 77 => 0 // Cure: Feeblemindedness
+	 79 => 0 // Cure: Disease
+	 81 => 0 // Cure: Deafness 
+	105 => 0 // Stat: Gold
+	108 => 0 // Stat: Reputation
+	112 => 9 // Item: Remove Item
+	116 => 0 // State: Cure Invisibility
+	123 => 9 // Item: Remove Inventory Item
+	124 => 0 // Spell Effect: Teleport (Dimension Door)
+	125 => 9 // Spell Effect: Unlock (Knock)
 	134 => 1 // State: Petrification
-	136 => 1 // State: Force Visible
-	150 => 1 // Spell Effect: Find Traps
-	151 => 1 // Summon: Replace Creature
-	160 => 1 // Remove Sanctuary
-	161 => 1 // Cure: Horror
-	162 => 1 // Cure: Hold
-	163 => 1 // Protection: Free Action
-	164 => 1 // Cure: Drunkeness
-	171 => 1 // Spell: Give Ability
-	172 => 1 // Spell: Remove Spell
+	136 => 0 // State: Force Visible
+	150 => 0 // Spell Effect: Find Traps
+	151 => 3 // Summon: Replace Creature (FIXME: peut-être des nuances selon le mode)
+	160 => 0 // Remove Sanctuary
+	161 => 0 // Cure: Horror
+	162 => 0 // Cure: Hold
+	163 => 0 // Protection: Free Action
+	164 => 0 // Cure: Drunkeness
+	171 => 3 // Spell: Give Ability
+	172 => 9 // Spell: Remove Spell
 	209 => 1 // Death: Kill 60HP
-	210 => 1 // Spell Effect: Stun 90HP
-	211 => 1 // Spell Effect: Imprisonment
-	212 => 1 // Protection: Freedom
-	220 => 1 // Removal: Remove School
-	221 => 1 // Removal: Remove Secondary Type
-	222 => 1 // Spell Effect: Teleport Field
-	224 => 1 // Cure: Level Drain (Restoration)
-	229 => 1 // Removal: Remove One School
-	230 => 1 // Removal: Remove One Secondary Type
+	210 => 0 // Spell Effect: Stun 90HP
+	211 => 9 // Spell Effect: Imprisonment - bien qu'il puisse être dissipé sous une condition
+	212 => 0 // Protection: Freedom
+	220 => 0 // Removal: Remove School
+	221 => 0 // Removal: Remove Secondary Type
+	222 => 0 // Spell Effect: Teleport Field
+	224 => 0 // Cure: Level Drain (Restoration)
+	229 => 0 // Removal: Remove One School
+	230 => 0 // Removal: Remove One Secondary Type
 	238 => 1 // Death: Disintegrate
-	242 => 1 // Cure: Confusion
-	243 => 1 // Item: Drain Item Charges
-	244 => 1 // Spell: Drain Wizard Spell
+	242 => 0 // Cure: Confusion
+	243 => 9 // Item: Drain Item Charges
+	244 => 9 // Spell: Drain Wizard Spell
+	251 => 9 // Spell Effect: Change Bard Song Effect
+	252 => 9 // Spell Effect: Set Trap // durée : jusqu'à activation
+	261 => 9 // Spell: Restore Lost Spells
+	264 => 9 // Spell Effect: Drop Weapons in Panic
+	270 => 0 // Cure: Unpause Target
+	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
+	316 => 0 // Spell: Magical Rest
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
+// Traduction : durée normale ou jusqu'à dissipation / utilisation
+// Conséquence : les durées permanentes et permanentes, persiste après la mort n'est pas affichée
+// TODO: à améliorer ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
-	 24 => 1 // Panique
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
-	177 => 1
+	177 => 1 // Use EFF File
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
-	233 => 1 // Stat: Proficiency Modifier
 	236 => 1 // Spell Effect: Image Projection
-	261 => 1
-	273 => 1
-	280 => 1
-	316 => 1
+	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
+END
+
+// Opcodes qui sont dissipés par la mort (directement ou indirectement)
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent_after_death~ BEGIN
+	24  => 1 // State: Horror
+	25  => 1 // State: Poison
+	45  => 1 // State: Stun
+	109 => 1 // State: Paralyze
+	157 => 1 // State: Web Effect
+	175 => 1 // State: Hold
+	185 => 1 // State: Hold (II)
+	210 => 1 // Spell Effect: Stun 90HP
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_parameters_should_be_zero~ BEGIN
@@ -569,6 +923,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_127_files~ BEGIN
     9 => ~ANISUM02~
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~death_to_strref~ BEGIN
+	0	 => 500001
+	1	 => 500002
+	2	 => 500003
+	4	 => 500004
+	8	 => 500005
+	16	 => 500006
+	32	 => 500007
+	64	 => 500004
+	128  => 500004
+	256  => 500010
+	512  => 500011
+	1024 => 500012
+END
+
 OUTER_SET AbilityType_Charge = 1
 OUTER_SET AbilityType_Combat = 2
 OUTER_SET AbilityType_Equipped = 3
@@ -584,7 +953,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 
 	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -609,7 +978,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
 	END
 	ELSE BEGIN
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -624,20 +993,16 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	END
 END
 
-
 DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		// FIXME ? Pas compris la condition
-		PATCH_IF %itemType% != ITM_TYPE_armor BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-		END
+		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN
 		LPM ~opcode_0_get_value~
-		PATCH_IF parameter2 != AC_MOD_TYPE_all BEGIN
+		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
 			SPRINT value ~%value% %versus%~
@@ -656,7 +1021,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
 	PATCH_IF armor_class_show_bonus_malus BEGIN
-		PATCH_IF value > 0 BEGIN
+		PATCH_IF value >= 0 BEGIN
 			SPRINT value @10000101 // ~Bonus de %value%~
 		END
 		ELSE BEGIN
@@ -684,6 +1049,54 @@ DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
 	PATCH_IF parameter1 == 0 AND parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter1 equal to 0 for a bonus/malus to the armor class.~ END
 		SET isValid = 0
+	END
+END
+
+// Association des classes d'armure V1
+DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
+	SET group = 0
+	DEFINE_ASSOCIATIVE_ARRAY ~opcode_0_CA~ BEGIN END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_while_equipped AND (
+				parameter2 == AC_MOD_TYPE_crushing OR
+				parameter2 == AC_MOD_TYPE_missile OR
+				parameter2 == AC_MOD_TYPE_piercing OR
+				parameter2 == AC_MOD_TYPE_slashing) BEGIN
+			SET newValue = parameter2
+			PATCH_IF VARIABLE_IS_SET $opcode_0_CA(~%parameter1%~) BEGIN
+				SET currentValue = $opcode_0_CA(~%parameter1%~)
+				// PATCH_IF NOT currentValue BAND parameter2 BEGIN
+				// Que faire des doublons ?
+				SET newValue = currentValue | parameter2
+			END
+			SET $opcode_0_CA(~%parameter1%~) = newValue
+		END
+	END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_while_equipped AND (
+				parameter2 == AC_MOD_TYPE_crushing OR
+				parameter2 == AC_MOD_TYPE_missile OR
+				parameter2 == AC_MOD_TYPE_piercing OR
+				parameter2 == AC_MOD_TYPE_slashing) BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode
+				STR_VAR expression = ~position = %position%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+		END
+	END
+
+	PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+		SET opcode = 506
+		SET parameter1 = amount
+		SET parameter2 = armorType
+		SET timingMode = TIMING_while_equipped
+		SET target = TARGET_FX_self
+		SET probability2 = 100
+		LPM ~add_opcode~
 	END
 END
 
@@ -824,6 +1237,7 @@ END
 /* --------------------- *
  * State: Berserking [3] *
  * --------------------- */
+// TODO : timing != 1 AND (parameter2 != 1 OR NOT is_ee) : que durant les combats
 DEFINE_PATCH_MACRO ~opcode_self_3~ BEGIN
 	SPRINT description @10030001 // ~Provoque la rage du berserker chez %theTarget%~
 END
@@ -996,11 +1410,19 @@ END
  * --------------- */
 DEFINE_PATCH_MACRO ~opcode_self_12~ BEGIN
 	LPM ~opcode_12_flags~
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120001 RET description END // ~Inflige %damage% %damageType% %toTheTarget%~
+	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120001
+								   strref_1 = 10120006
+								   strref_2 = 10120007
+								   strref_3 = 10120008
+		RET description
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %damageType% %toTheTarget%~
+	LOCAL_SET strref_1 = 10120006 // ~Passe les points de vie de %theTarget% à %damage%~
+	LOCAL_SET strref_2 = 10120007 // ~Passe les points de vie de %theTarget% à %damage% %~
+	LOCAL_SET strref_3 = 10120008 // ~Inflige %damage% % des points de vie maximums %toTheTarget%~
 
 	LPM ~opcode_12_flags~
 
@@ -1014,17 +1436,24 @@ DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 		SET strref_0 = 10120005 // ~Transfert %damage% %damageType% %toTheTarget%~
 	END
 
-	LPF ~opcode_12_common~ INT_VAR strref_0 RET description END
+	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_12~ BEGIN
 	LPM ~opcode_12_flags~
-	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120011 RET description END // ~d'infliger %damage% %damageType% %toTheTarget%~
+	LPF ~opcode_12_common~ INT_VAR strref_0 = 10120011
+								   strref_1 = 10120016
+								   strref_2 = 10120017
+								   strref_3 = 10120018
+		RET description
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 	LOCAL_SET strref_0 = 10120012 // ~d'infliger %damage% %damageType% supplémentaires~
-	LOCAL_SET strref_3 = 10120016 // ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
+	LOCAL_SET strref_1 = 10120016 // ~de faire passer les points de vie de %theTarget% à %damage%~
+	LOCAL_SET strref_2 = 10120017 // ~de faire passer les points actuels de vie de %theTarget% à %damage% %~
+	LOCAL_SET strref_3 = 10120018 // ~d'infliger %damage% % des points de vie maximums %toTheTarget%~
 
 	LPM ~opcode_12_flags~
 
@@ -1038,7 +1467,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 		SET strref_0 = 10120015 // ~de transférer %damage% %damageType% %toTheTarget%~
 	END
 
-	LPF ~opcode_12_common~ INT_VAR strref_0 strref_3 RET description END
+	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_12_flags~ BEGIN
@@ -1097,17 +1526,17 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 			SET damage = ~0~
 		END
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 1 a gerer : les points de vie de la cible passent a %damage%"
+		LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END
 	END
 	// Set to Percentage
 	ELSE PATCH_IF mode == 2 BEGIN
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
-			PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 2 a gerer : les points de vie de la cible passent à %damage% % de ses pv max"
+			LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END
 		END
 	END
 	// Reduce by Percentage
 	ELSE PATCH_IF mode == 3 BEGIN
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: mode 3 a gerer : la cible perd %damage% % de ses pv max"
+		LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END
 	END
 
 	// Hack pour forcer l'affichage de la durée de l'augmentation des points de vie maximum
@@ -1153,7 +1582,8 @@ END
  * Death: Instant Death [13] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_13~ BEGIN
-	SPRINT description @10130001 // ~Tue instantanément %theTarget%~
+	SET strref = $death_to_strref(~%parameter2%~)
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
@@ -1161,11 +1591,20 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_13~ BEGIN
-	LPM ~opcode_self_13~ // ~Tue instantanément %theTarget%~
+	LPM ~opcode_self_13~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
-	SPRINT description @10130002 // ~de tuer instantanément %theTarget%~
+	SET strref = $death_to_strref(~%parameter2%~)
+	SET strref += 100
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_13_is_valid~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%parameter2%~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown Death Type %parameter2%.~ END
+	END
 END
 
 /* ----------------------------- *
@@ -1783,9 +2222,8 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 	SET amount = 0
-	SET frequencyMultiplier = 1
 	SET frequency = 1
-	SET p4IsActive = isExternal AND parameter4 != 0
+	SET p4IsActive = isExternal AND parameter4 != 0 AND is_ee
 	SET type = parameter2
 
 	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
@@ -1820,20 +2258,14 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 		SET frequency = 1
 	END
 
-	PATCH_IF amount == 1 AND frequency == 1 BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts par seconde~
+	LPF ~get_frequency_duration~ INT_VAR duration = frequency RET strDuration = frequency END
+
+	PATCH_IF amount == 1 AND frequency >= 1 BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts %strDuration%~
 	END
-	ELSE PATCH_IF amount > 1 AND frequency == 1 BEGIN
+	ELSE PATCH_IF amount > 1 AND frequency >= 1 BEGIN
 		SET strref += 1
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts par seconde~
-	END
-	ELSE PATCH_IF amount == 1 AND frequency > 1 BEGIN
-		SET strref += 2
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
-	END
-	ELSE PATCH_IF amount > 1 AND frequency > 1 BEGIN
-		SET strref += 3
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant 1 point de dégâts toutes les %frequency% secondes~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empoisonne %theTarget%, lui infligeant %amount% points de dégâts %strDuration%~
 	END
 	ELSE PATCH_IF amount < 0 BEGIN
 		// TODO: Dans le cas où P2 == 4 et & P3 < 0
@@ -1847,10 +2279,15 @@ DEFINE_PATCH_MACRO ~opcode_25_is_valid~ BEGIN
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 	PATCH_IF parameter2 > 4 OR parameter2 < 0 BEGIN
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does no effect with %parameter2%.~ END
+	END
+	PATCH_IF NOT isExternal AND parameter2 == 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type 4 can only be used in external eff files.~ END
 	END
 END
 
@@ -2056,9 +2493,11 @@ DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
-	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	PATCH_IF is_ee BEGIN
+		LPM ~opcode_modstat3_is_valid~
+	END
+	ELSE BEGIN
+		LPM ~opcode_modstat2_is_valid~
 	END
 END
 
@@ -2421,39 +2860,39 @@ DEFINE_PATCH_MACRO ~opcode_self_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_55~ BEGIN
-	// Ici pas besoin de calcul compliqué
-	// A partir du moment où le fichier ids est correct (checké dans opcode_x_is_valid)
-	// Si P1 == 0 => aucune restriction
-	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @10550005 // ~Tue instantanément %theTarget%~
-	END
-	ELSE BEGIN
-		// FIXME : la restriction de niveau devrait être simplement géré par add_target_level
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		 PATCH_IF diceCount > 0 BEGIN
-			SPRINT description @10550002 // ~Tue instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-		END ELSE BEGIN
-			SPRINT description @10550001 // ~Tue instantanément les %creatureType%~
-		END
-	END
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_55~ BEGIN
+	LPM ~opcode_target_probability_55~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
-	PATCH_IF parameter1 == 0 BEGIN
-		SPRINT description @10550006 // ~de tuer instantanément %theTarget%~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_55_common~ BEGIN
+	PATCH_IF parameter1 != 0 BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET theTarget = idName END
+		SPRINT pluralPronoun @100020 // ~les~
+		SPRINT theTarget EVAL ~%pluralPronoun% %theTarget%~
+		LPM ~add_target_level~
 	END
-	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-		PATCH_IF diceCount > 0 BEGIN
-			SPRINT description @10550004 // ~de tuer instantanément les %creatureType% de %diceCount% dés de vie ou moins~
-		END ELSE BEGIN
-			SPRINT description @10550003 // ~de tuer instantanément les %creatureType%~
-		END
-	END
+	SPRINT description (AT description_strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_55_is_valid~ BEGIN
+	LOCAL_SET death_type = 0x4
 	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
+	END
 END
 
 /* ---------------------- *
@@ -2905,7 +3344,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_74_is_valid~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter2 %parameter2% have strong impact on the duration.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Warning ! Parameter2 %parameter2% have strong impact on the duration.~ END
 	END
 END
 
@@ -3034,7 +3473,7 @@ DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 			 timingMode == 7 OR
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
 END
 
@@ -3561,7 +4000,7 @@ DEFINE_PATCH_MACRO ~opcode_99_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
-	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND is_ee BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 2 OR parameter2 > 1 AND NOT is_ee BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
 	END
@@ -4399,10 +4838,7 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
-	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource cannot be empty~ END
-	END
+	LPM ~opcode_resref_is_valid~
 END
 
 
@@ -4487,50 +4923,37 @@ END
 /* ----------------------------- *
  * Stat: Movement Modifier [126] *
  * ----------------------------- */
+
 DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
-	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260005 // ~Rétablissement de la vitesse de déplacement~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260003 // ~Immobilise %theTarget%~
+	SET strref = 11260001 // ~Vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260001 BEGIN
+		LPF ~opcode_mod~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 11260001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260007 // ~de rétablir la vitesse de déplacement %ofTheTarget%~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260004 // ~d'immobiliser %theTarget%~
+	SET strref = 11260003 // ~la vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260003 BEGIN
+		LPF ~opcode_probability~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_probability~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_126~ BEGIN
-	PATCH_IF parameter2 == 5 BEGIN
-		SET parameter2 = MOD_TYPE_percentage
-	END
-	PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
-		SPRINT description @11260006 // ~Rétabli la vitesse de déplacement %ofTheTarget%~
-	END
-	ELSE PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
-		SPRINT description @11260003 // ~Immobilise %theTarget%~
+	SET strref = 11260002 // ~la vitesse de déplacement~
+	LPM ~opcode_126_common~
+	PATCH_IF strref == 11260002 BEGIN
+		LPF ~opcode_target~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
 	END
 	ELSE BEGIN
-		LPF ~opcode_target~ INT_VAR strref = 11260002 RET description END // ~la vitesse de déplacement~
+		SPRINT description (AT strref)
 	END
 END
 
@@ -4551,6 +4974,19 @@ DEFINE_PATCH_MACRO ~opcode_126_group~ BEGIN
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_126_common~ BEGIN
+	SET parameter2 = parameter2 == 5 ? MOD_TYPE_percentage : parameter2
+
+	// Contrairement aux autres opcodes, le calcul est fondé sur la vitesse de déplacement de base de la cible
+	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
+	PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
+		SET strref += 10
+	END
+	ELSE PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
+		SET strref += 20
 	END
 END
 
@@ -4890,7 +5326,7 @@ DEFINE_PATCH_MACRO ~opcode_143_is_valid~ BEGIN
 	END
 	PATCH_IF parameter1 < 0 OR parameter1 > 38 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid slot %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid slot %parameter1%.~ END
 	END
 END
 
@@ -4899,13 +5335,25 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @11440020
+	SPRINT action @11440020 // ~Empêche~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_144~ BEGIN
+	LOCAL_SET strref = 11440001 + parameter2
+	SPRINT action @11440021 // ~d'empêcher~
 	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_144~ BEGIN
 	LOCAL_SET strref = 11440021 + parameter2
-	SPRINT action @11440040
+	SPRINT action @11440040 // ~Empêche %theTarget%~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_144~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @11440041 //~d'empêcher %theTarget%~
 	LPM ~opcode_144_common~
 END
 
@@ -4917,7 +5365,7 @@ DEFINE_PATCH_MACRO ~opcode_144_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 15 OR
 			 NOT is_ee AND (parameter2 == 15 OR parameter2 == 10) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
 	END
 END
 
@@ -4951,7 +5399,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR paramater2 > 3 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
 	END
 END
 
@@ -5166,6 +5614,57 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_153~ BEGIN
 	LPM ~opcode_self_probability_153~ // ~de lancer Sanctuaire sur %theTarget%~
+END
+
+/* ----------------------- *
+ * Overlay: Entangle [154] *
+ * ----------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_154~ BEGIN
+	SPRINT description @11540001 // ~Enchevêtrement~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_154~ BEGIN
+	SPRINT description @11540003 // ~d'enchevêtrer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_154~ BEGIN
+	SPRINT description @11540002 // ~Enchevêtre %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_154~ BEGIN
+	LPM ~opcode_self_probability_154~ // ~d'enchevêtrer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
+	LOCAL_SET searchOpcode = 126
+	PATCH_IF VARIABLE_IS_SET $opcodes(~%searchOpcode%~) BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+
+			SET opcode = searchOpcode
+			SET oldPosition = position
+			SET oldCount = $opcodes(~%opcode%~)
+			LPF ~delete_opcode~
+				INT_VAR opcode
+				STR_VAR expression = ~parameter1 = 0 AND parameter2 = 1 AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			PATCH_IF oldCount == $opcodes(~%opcode%~) BEGIN
+				SET opcode = 154
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %oldPosition%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+	END
+	ELSE BEGIN
+		CLEAR_ARRAY EVAL ~opcodes_%opcode%~
+		SET $opcodes(~%opcode%~) = 0
+	END
 END
 
 /* ----------------------- *
@@ -5391,7 +5890,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_167~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_167_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* -------------------------------- *
@@ -5555,7 +6054,7 @@ DEFINE_PATCH_MACRO ~opcode_173_is_valid~ BEGIN
 	LOCAL_SET parameter1 = parameter1 BAND 255
 	PATCH_IF is_ee AND parameter1 == 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected Value = Value + %parameter1%.~ END
 	END
 END
 
@@ -5788,7 +6287,7 @@ DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
 	LOCAL_SET value = isExternal? parameter3 : 0
 	PATCH_IF value == 0 AND (is_ee == 0 OR special == 0) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
 	END
 END
 
@@ -5846,7 +6345,7 @@ DEFINE_PATCH_MACRO ~opcode_180_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 	PATCH_IF parameter2 != 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
 	END
 END
 
@@ -5854,7 +6353,7 @@ END
  * Item: Can't Use Itemtype [181] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_181~ BEGIN
-	LOCAL_SET strref = 11810100
+	LOCAL_SET strref = 230000
 	SET strref += is_ee ? parameter1 : parameter2
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET itemType = string END
@@ -5865,7 +6364,7 @@ DEFINE_PATCH_MACRO ~opcode_181_is_valid~ BEGIN
 	LOCAL_SET parameter = is_ee ? parameter1 : parameter2
 	PATCH_IF parameter < 0 OR parameter > 73 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
 	END
 END
 
@@ -5973,7 +6472,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_189_is_valid~ BEGIN
 	PATCH_IF (parameter1 BAND 255) == 0 AND parameter2 == 0 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
 	END
 END
 
@@ -6046,7 +6545,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_191_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 1 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2%.~ END
 	END
 END
 
@@ -6124,7 +6623,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_199_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter1%.~ END
 	END
 END
 
@@ -6152,11 +6651,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
 	PATCH_IF parameter1 > 0 AND (parameter2 < 0 OR parameter2 > 9) BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Power Level %parameter2%.~ END
 	END
 	ELSE PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -6354,15 +6853,30 @@ DEFINE_PATCH_MACRO ~opcode_self_209~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_209~ BEGIN
-	SPRINT description @12090001 // ~Tue instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SPRINT descriptionAdd @12090001 // ~si ses points de vie sont inférieurs à 60~
+
+	SPRINT description (AT description_strref)
+	SPRINT description EVAL ~%description% %descriptionAdd%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_209~ BEGIN
-	SPRINT description @12090002 // ~de tuer instantanément %theTarget% si ses points de vie sont inférieurs à 60~
+	SET death_type = 0x4
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	SPRINT descriptionAdd @12090001 // ~si ses points de vie sont inférieurs à 60~
+
+	SPRINT description (AT description_strref)
+	SPRINT description EVAL ~%description% %descriptionAdd%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_209~ BEGIN
 	LPM ~opcode_self_probability_209~
+END
+
+DEFINE_PATCH_MACRO ~opcode_209_is_valid~ BEGIN
+	LPM ~opcode_55_is_valid~
 END
 
 /* ----------------------------- *
@@ -6584,19 +7098,19 @@ END
  * Protection: Stoneskin [218] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_218~ BEGIN
-	LOCAL_SET strref = 12180001 // ~Peau de pierre (1 peau)~
+	LOCAL_SET strref = 12180001 // ~Crée %amount% %skinType%~
 
 	LPM ~opcode_218_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_218~ BEGIN
-	LOCAL_SET strref = 12180003 // ~de lancer Peau de pierre (1 peau) sur %theTarget%~
+	LOCAL_SET strref = 12180002 // ~de créer %amount% %skinType% sur %theTarget%~
 
 	LPM ~opcode_218_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_218~ BEGIN
-	LOCAL_SET strref = 12180005 // ~Lance Peau de pierre (1 peau) sur %theTarget%~
+	LOCAL_SET strref = 12180003 // ~Crée %amount% %skinType% sur %theTarget%~
 
 	LPM ~opcode_218_common~
 END
@@ -6605,26 +7119,33 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_218~ BEGIN
 	LPM ~opcode_self_probability_218~
 END
 
+// Commun aux opcodes 218 et 314
 DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 AND opcode == 218 BEGIN
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 		END
 	END
-
-	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
-		SET strref += 1
+	// "Dissipation"
+	PATCH_IF IS_AN_INT amount AND amount == 0 BEGIN
+		SET strref += 10
 	END
+
+	SET skinTypeRef = 10000101 + opcode * 10000
+	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
+		SET skinTypeRef += 1 // ~peaux de pierre~
+	END
+	SPRINT skinType (AT skinTypeRef) // ~peau de pierre~
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_218_is_valid~ BEGIN
 	PATCH_IF parameter1 <= 0 AND (NOT is_ee OR parameter2 == 0 OR diceCount == 0) BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
 	END
 END
 
@@ -6782,7 +7303,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_223_is_valid~ BEGIN
 	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -6828,7 +7349,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
 	PATCH_IF is_ee == 0 AND parameter1 < 1 BEGIN
 		isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
 END
 
@@ -7289,37 +7810,33 @@ END
  * Death: Disintegrate [238] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_238~ BEGIN
-	LOCAL_SET strref = 12380001 // ~Désintègre %theTarget%~
-
-	PATCH_IF parameter1 != 0 BEGIN
-		SET strref += 1 // ~Désintègre les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_238~ BEGIN
-	LOCAL_SET strref = 12380003 // ~de désintégrer %theTarget%~
-
-	PATCH_IF parameter1 != 0 BEGIN
-		SET strref += 1 // ~de désintégrer les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	LPM ~opcode_target_238~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_238~ BEGIN
-	LPM ~opcode_self_238~
+	SET death_type = 0x200
+	SET description_strref = $death_to_strref(~%death_type%~)
+	LPM ~opcode_55_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_238~ BEGIN
+	LPM ~opcode_target_probability_238~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_238~ BEGIN
-	LPM ~opcode_self_probability_238~
+	SET death_type = 0x200
+	SET description_strref = $death_to_strref(~%death_type%~)
+	SET description_strref += 100
+	LPM ~opcode_55_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_238_is_valid~ BEGIN
+	LOCAL_SET death_type = 0x200
 	LPM ~opcode_idscheck_is_valid~
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
+	END
 END
 
 /* ---------------------------- *
@@ -7488,37 +8005,47 @@ END
  * Spell Effect: Berserking [246] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_246~ BEGIN
-	LPM ~opcode_self_3~
+	SPRINT description @12460001 // ~Points de vie +15, dégâts +1, TAC0 +1~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_246~ BEGIN
-	LPM ~opcode_self_probability_3~
+	SPRINT description @12460002 // ~d'augmenter les caractéristiques %ofTheTarget% : Points de vie +15, dégâts +1, TAC0 +1~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_246~ BEGIN
-	LPM ~opcode_target_3~
+	LPM ~opcode_target_246~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_246~ BEGIN
-	LPM ~opcode_target_probability_3~
+	LPM ~opcode_target_probability_246~
 END
 
 /* ------------------------------------------- *
  * Spell Effect: Attack Nearest Creature [247] *
  * ------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_247~ BEGIN
-	SPRINT description @12470001 // ~Provoque la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+ DEFINE_PATCH_MACRO ~opcode_self_247~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		LPM ~opcode_self_3~
+	END
+	ELSE BEGIN
+		SPRINT description @12470001 // ~Apaise %theTarget%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_247~ BEGIN
-	SPRINT description @12470002 // ~de provoquer la folie du berserker (+2 au TAC0 et aux dégâts) chez %theTarget%~
+	PATCH_IF parameter2 != 0 BEGIN
+		LPM ~opcode_self_probability_3~
+	END
+	ELSE BEGIN
+		SPRINT description @12470002 // d'apaiser %theTarget%
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_247~ BEGIN
 	LPM ~opcode_self_247~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_245~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_probability_247~ BEGIN
 	LPM ~opcode_self_probability_247~
 END
 
@@ -7526,49 +8053,38 @@ END
  * Item: Set Melee Effect [248] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480002 // ~À chaque attaque au poing réussie: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480001 // ~À chaque attaque de mêlée réussie: %description%~
-		END
-	END
+	SET strref = 12480001 // ~À chaque attaque de mêlée réussie: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480006 // ~par attaque au poing réussie par %theTarget%: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
-		END
-	END
+	SET strref = 12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF is_ee == 1 AND parameter2 == 4 BEGIN
-			SPRINT description @12480004 // ~À chaque attaque au poing réussie par %theTarget%: %description%~
-		END
-		ELSE BEGIN
-			SPRINT description @12480003 // ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
-		END
-	END
+	SET strref = 12480003 // ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_248~ BEGIN
 	LPM ~opcode_self_probability_248~
+END
+
+DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
+	SET abilityType = AbilityType_Combat
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF is_ee == 1 AND (parameter2 BAND 4) BEGIN // Attaque au poing
+			SET strref += 1
+		END
+		SPRINT description (AT strref)
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_248_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ----------------------------- *
@@ -7605,6 +8121,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_249~ BEGIN
 	LPM ~opcode_self_probability_249~
 END
 
+DEFINE_PATCH_MACRO ~opcode_249_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ----------------------------------- *
  * Spell Effect: Damage Modifier [250] *
  * ----------------------------------- */
@@ -7624,117 +8144,193 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_250~ BEGIN
 	LPM ~opcode_self_probability_250~
 END
 
+DEFINE_PATCH_MACRO ~opcode_250_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Damage Modifier == %parameter1%~ END
+	END
+END
+
+/* ------------------------------------------- *
+ * Spell Effect: Change Bard Song Effect [251] *
+ * ------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_251~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12510004
+END
+
+DEFINE_PATCH_MACRO ~opcode_251_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
+/* ---------------------------- *
+ * Spell Effect: Set Trap [252] *
+ * ---------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520001
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520002
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_252~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	SPRINT description @12520004
+END
+
+DEFINE_PATCH_MACRO ~opcode_252_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ---------------------------------------- *
  * Item: Create Inventory Item (days) [255] *
  * ---------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_255~ BEGIN
-	// TODO: duration in days !
+	// Conversion en jour
+	SET duration *= 7200
 	LPM ~opcode_self_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_self_probability_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_target_122~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_255~ BEGIN
+	SET duration *= 7200
 	LPM ~opcode_target_probability_122~
+END
+
+DEFINE_PATCH_MACRO ~opcode_255_is_valid~ BEGIN
+	LPM ~opcode_122_is_valid~
 END
 
 /* ---------------------------- *
  * Protection: Spell Trap [259] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590001 // ~Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés)~
+	SET strref = 12590001 // ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LPM ~opcode_259_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590003 // ~de lancer Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+	SET strref = 12590002 // ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LPM ~opcode_259_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_259~ BEGIN
-	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
-	//TODO: On EE games, resource field ⟶ Spell cast when this effect self-terminates, default = Parent + "B".
-	SPRINT description @12590002 // ~Lance Piège à sorts (piège des sorts de niveau %spellLevel% ou moins, jusqu'à ce que %amount% niveaux de sort aient été emprisonnés) sur %theTarget%~
+DEFINE_PATCH_MACRO ~opcode_259_common~ BEGIN
+	LPM ~opcode_223_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_259~ BEGIN
-	LPM ~opcode_self_probability_259~
+DEFINE_PATCH_MACRO ~opcode_259_is_valid~ BEGIN
+	LPM ~opcode_223_is_valid~
+	PATCH_IF parameter2 > 9 OR parameter2 < 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Power Level: %parameter2% (0-9 expected)~ END
+	END
 END
 
 /* -------------------------------- *
  * Spell: Restore Lost Spells [261] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_261~ BEGIN
-	LOCAL_SET spellLevel = parameter1
-	LOCAL_SET strref = 12610001
-
-	PATCH_IF spellLevel > 1 BEGIN
-		SET strref += 1
-	END
-	PATCH_IF parameter2 != 0 BEGIN
-		SET strref += 2
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_261~ BEGIN
-	LOCAL_SET spellLevel = parameter1
-	LOCAL_SET strref = 12610005
-
-	PATCH_IF spellLevel > 1 BEGIN
-		SET strref += 1
-	END
-	PATCH_IF parameter2 != 0 BEGIN
-		SET strref += 2
-	END
-
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	SET strref = 12610001
+	LPM ~opcode_261_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_261~ BEGIN
-	LPM ~opcode_self_261~
+	SET strref = 12610002
+	LPM ~opcode_261_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_261~ BEGIN
+	SET strref = 12610003
+	LPM ~opcode_261_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_261~ BEGIN
-	LPM ~opcode_self_probability_261~
+	SET strref = 12610004
+	LPM ~opcode_261_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
+	LOCAL_SET spellLevel = parameter1
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT spellType @12610011 // ~profane~
+		SET spellLevel = spellLevel > 9 ? 9 : spellLevel
+	END
+	ELSE PATCH_IF parameter2 == 1 BEGIN
+		SPRINT spellType @12610012 // ~divin~
+		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
+	END
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_261_is_valid~ BEGIN
+	PATCH_IF parameter2 != 0 AND parameter2 != 1 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type: %parameter2% (0 or 1 expected)~ END
+	END
+	PATCH_IF parameter1 < 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level: %parameter1% (positive value expected)~ END
+	END
 END
 
 /* ------------------------ *
  * Stat: Visual Range [262] *
  * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_262_common~ BEGIN
+	SET value = parameter2 == MOD_TYPE_flat AND parameter1 < 0 ? 0 : parameter1
+	SET isNegative = value < 0 ? 1 : 0
+	SET value = ABS value
+	// parameter seems to be in the 0–15 interval
+	SET value = value > 15 ? 15 : value
+	// Each unit of visible range equals 2ft
+	SET value *= 2
+	SPRINT value $feets_to_meters(~%value%~)
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-	LOCAL_SET isNegative = 0
-
-	PATCH_IF value < 0 BEGIN
-		SET isNegative = 1
-		SET value = ABS value
-	END
-
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		PATCH_IF value < 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-			SPRINT value ~-%value%~
-		END
-		ELSE BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-			SPRINT value ~+%value%~
-		END
+	LPM ~opcode_262_common~
+	PATCH_IF isNegative BEGIN
+		SPRINT value ~-%value%~
 	END
 	ELSE BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
+		SPRINT value ~+%value%~
+	END
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	SPRINT name @12620001 // ~Champ de vision~
@@ -7742,45 +8338,35 @@ DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
+	LPM ~opcode_262_common~
 	SPRINT theStatistic @12620002 // ~le champ de vision~
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
+        PATCH_IF isNegative BEGIN
+	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
+	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
 		SPRINT description @102545 // ~de passer %theStatistic% %ofTheTarget% à %value%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_262~ BEGIN
-	LOCAL_SET value = ~%parameter1%~
-
+	LPM ~opcode_262_common~
 	SPRINT theStatistic @12620002 // ~le champ de vision~
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF value > 0 BEGIN
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+        PATCH_IF isNegative BEGIN
+	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
-			SPRINT value $feets_to_meters(~%value%~)
-	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value $feets_to_meters(~%value%~)
 		SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
 	END
 END
@@ -7789,23 +8375,74 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_262~ BEGIN
 	LPM ~opcode_self_probability_262~
 END
 
+DEFINE_PATCH_MACRO ~opcode_262_is_valid~ BEGIN
+	PATCH_IF parameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type: %parameter2% (0 or 1 expected)~ END
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Visual range += 0~ END
+	END
+END
+
 /* -------------------- *
  * Stat: Backstab [263] *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_263~ BEGIN
+	// Spécificité de l'opcode
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_mod~ INT_VAR strref = 12630001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_263~ BEGIN
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_target~ INT_VAR strref = 12630002 RET description END // ~le multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_263~ BEGIN
+	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
 	LPF ~opcode_probability~ INT_VAR strref = 12630002 RET description END // ~le multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_263~ BEGIN
 	LPM ~opcode_self_probability_263~
+END
+
+DEFINE_PATCH_MACRO ~opcode_263_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
+/* ----------------------------------------- *
+ * Spell Effect: Drop Weapons in Panic [264] *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640001
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640002
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640003
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_264~ BEGIN
+	LPM ~opcode_264_common~
+	SPRINT description @12640004
+END
+
+DEFINE_PATCH_MACRO ~opcode_264_common~ BEGIN
+	PATCH_IF parameter2 == 1 BEGIN
+		SPRINT objectType @12640011
+	END
+	ELSE BEGIN
+		SPRINT objectType @12640010
+	END
 END
 
 /* ---------------------------------------- *
@@ -7819,109 +8456,31 @@ DEFINE_PATCH_MACRO ~opcode_target_268~ BEGIN
 	LPM ~opcode_self_268~ // ~Permet %toTheTarget% d'explorer la carte~
 END
 
+/* -------------------------- *
+ * Cure: Unpause Target [270] *
+ * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_270~ BEGIN
+	LPM ~opcode_target_270~ // ~Libère des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_270~ BEGIN
+	SPRINT description @12700001 // ~Libère des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_270~ BEGIN
+	LPM ~opcode_target_probability_270~ // ~de libérer des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_270~ BEGIN
+	SPRINT description @12700002 // ~de libérer des combats mentaux~
+END
+
 /* -------------------------------- *
  * Spell: Apply Repeating EFF [272] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
-	LOCAL_SET strref = 12720000 + parameter2
-	LOCAL_SET amount1 = parameter1
-	LOCAL_SET amount2 = 0
-	LOCAL_SET frequencyMultiplier = 1
-	LOCAL_SET amount = amount1
-	LOCAL_SET frequency = 1
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF isExternal BEGIN
-			SET amount2 = parameter3
-			SET frequencyMultiplier = parameter4
-		END
-		PATCH_IF parameter2 == 4 BEGIN
-			SET amount = amount2
-		END
-		PATCH_IF parameter2 == 2 BEGIN
-			SET frequency = frequencyMultiplier
-		END
-		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
-			SET frequency = amount1 * frequencyMultiplier
-		END
-
-		PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 BEGIN
-			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
-
-			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
-				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
-					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
-				END
-				PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-					SET strref = 12720010 // ~%description%, %amount% fois par %strDuration%~
-				END
-				ELSE BEGIN
-					SET strref = 12720005 // ~%description%, à chaque %strDuration%~
-				END
-			END
-			ELSE BEGIN
-				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
-					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-						SET strref = 12720008 // ~%description%, %amount% fois toutes les %strDuration%~
-					END
-					ELSE BEGIN
-						SET strref = 12720003 // ~%description%, toutes les %strDuration%~
-					END
-				END
-				ELSE BEGIN
-					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
-                        SET strref = 12720009 // ~%description%, %amount% fois tous les %strDuration%~
-                    END
-                    ELSE BEGIN
-						SET strref = 12720004 // ~%description%, tous les %strDuration%~
-                    END
-				END
-			END
-		END
-	END
-	ELSE BEGIN
-		SET frequency = amount1
-		PATCH_IF parameter2 == 3 BEGIN
-			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
-
-			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
-				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
-					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
-				END
-				SET strref = 12720005 // ~%description%, à chaque %strDuration%~
-			END
-			ELSE BEGIN
-				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
-					SET strref = 12720003 // ~%description%, toutes les %strDuration%~
-				END
-				ELSE BEGIN
-					SET strref = 12720004 // ~%description%, tous les %strDuration%~
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 4 BEGIN
-			PATCH_IF isExternal BEGIN
-				SET amount = parameter3
-				SET strref = frequency == 1 ? 12720007 : 12720006
-			END
-			ELSE BEGIN
-				SET strref = 0
-	            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
-			END
-		END
-	END
-	PATCH_IF parameter1 <= 0 BEGIN
-        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter1 : %parameter2%~ END
-	END
-	PATCH_IF parameter2 == 1 OR parameter2 >= 5 BEGIN
-        LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid value for parameter2 : %parameter2% >= 5 OR %parameter2% == 2 => crash the game~ END
-	END
-	ELSE PATCH_IF strref > 0 BEGIN
-		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
-		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-		END
-	END
+	SET strref = 12720001
+	LPM ~opcode_272_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_272~ BEGIN
@@ -7933,26 +8492,167 @@ DEFINE_PATCH_MACRO ~opcode_target_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
-	LPM ~opcode_self_probability_272~
+	LPM ~opcode_self_272~
+END
+
+DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
+	LPM ~opcode_25_common~
+	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+// DEFINE_PATCH_MACRO ~opcode_self_272~ BEGIN
+// 	LOCAL_SET strref = 12720000 + parameter2
+// 	LOCAL_SET amount1 = parameter1
+// 	LOCAL_SET amount2 = 0
+// 	LOCAL_SET frequencyMultiplier = 1
+// 	LOCAL_SET amount = amount1
+// 	LOCAL_SET frequency = 1
+
+// 	PATCH_IF is_ee == 1 BEGIN
+// 		PATCH_IF isExternal BEGIN
+// 			SET amount2 = parameter3
+// 			SET frequencyMultiplier = parameter4
+// 		END
+// 		PATCH_IF parameter2 == 4 BEGIN
+// 			SET amount = amount2
+// 		END
+// 		PATCH_IF parameter2 == 2 BEGIN
+// 			SET frequency = frequencyMultiplier
+// 		END
+// 		ELSE PATCH_IF parameter2 == 3 OR parameter2 == 4 BEGIN
+// 			SET frequency = amount1 * frequencyMultiplier
+// 		END
+
+// 		PATCH_IF parameter2 == 2 OR parameter2 == 3 OR parameter2 == 4 BEGIN
+// 			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
+
+// 			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+// 				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+// 					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+// 				END
+// 				PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+// 					SET strref = 12720010 // ~%description%, %amount% fois par %strDuration%~
+// 				END
+// 				ELSE BEGIN
+// 					SET strref = 12720005 // ~%description%, à chaque %strDuration%~
+// 				END
+// 			END
+// 			ELSE BEGIN
+// 				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+// 					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+// 						SET strref = 12720008 // ~%description%, %amount% fois toutes les %strDuration%~
+// 					END
+// 					ELSE BEGIN
+// 						SET strref = 12720003 // ~%description%, toutes les %strDuration%~
+// 					END
+// 				END
+// 				ELSE BEGIN
+// 					PATCH_IF parameter2 == 2 OR parameter2 == 4 BEGIN
+//                         SET strref = 12720009 // ~%description%, %amount% fois tous les %strDuration%~
+//                     END
+//                     ELSE BEGIN
+// 						SET strref = 12720004 // ~%description%, tous les %strDuration%~
+//                     END
+// 				END
+// 			END
+// 		END
+// 	END
+// 	ELSE BEGIN
+// 		SET frequency = amount1
+// 		PATCH_IF parameter2 == 3 BEGIN
+// 			LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
+
+// 			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+// 				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+// 					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+// 				END
+// 				SET strref = 12720005 // ~%description%, à chaque %strDuration%~
+// 			END
+// 			ELSE BEGIN
+// 				PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+// 					SET strref = 12720003 // ~%description%, toutes les %strDuration%~
+// 				END
+// 				ELSE BEGIN
+// 					SET strref = 12720004 // ~%description%, tous les %strDuration%~
+// 				END
+// 			END
+// 		END
+// 		ELSE PATCH_IF parameter2 == 4 BEGIN
+// 			PATCH_IF isExternal BEGIN
+// 				SET amount = parameter3
+// 				SET strref = frequency == 1 ? 12720007 : 12720006
+// 			END
+// 			ELSE BEGIN
+// 				SET strref = 0
+// 	            LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: parameter2 = 4 can only be used in external eff files~ END
+// 			END
+// 		END
+// 	END
+// 	PATCH_IF strref > 0 BEGIN
+// 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+// 		PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+// 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+// 		END
+// 	END
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_self_probability_272~ BEGIN
+// 	LPM ~opcode_self_272~
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_target_272~ BEGIN
+// 	LPM ~opcode_self_272~
+// END
+
+// DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
+// 	LPM ~opcode_self_probability_272~
+// END
+
+DEFINE_PATCH_MACRO ~opcode_272_is_valid~ BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 == 1 OR parameter2 > 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Type: 0-2-3-4 expected.~ END
+	END
+	PATCH_IF NOT isExternal AND parameter2 == 4 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type 4 can only be used in external eff files.~ END
+	END
 END
 
 /* ----------------------------------------------------- *
  * Remove: Specific Area Effect(Zone of Sweet Air) [273] *
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_273~ BEGIN
-	SPRINT description @12730001 // ~Zone d'air pur~
+	SET strref = 12730001 // ~Zone d'air pur~
+	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_273~ BEGIN
-	SPRINT description @12730003 // ~de lancer Zone d'air pur sur %theTarget%~
+	SET strref = 12730003 // ~de lancer Zone d'air pur~
+	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_273~ BEGIN
-	SPRINT description @12730002 // ~Lance Zone d'air pur sur %theTarget%~
+	SET strref = 12730002 // ~Lance Zone d'air pur sur %theTarget%~
+	LPM ~opcode_273_common~
+END
+			
+DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
+	SET strref = 12730004 // ~de lancer Zone d'air pur sur %theTarget%~
+	LPM ~opcode_273_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
-	LPM ~opcode_self_probability_273~
+DEFINE_PATCH_MACRO ~opcode_273_common~ BEGIN
+	PATCH_IF NOT is_ee OR ~%resref%~ STRING_EQUAL ~~ OR ~%resref%~ STRING_EQUAL_CASE ~CLEARAIR~ BEGIN
+		SPRINT description (AT strref)
+	END
+	ELSE BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : %resref%.2DA a gerer.~ END
+		SPRINT description ~~
+	END
 END
 
 /* -------------------------------------- *
@@ -7993,6 +8693,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_275~ BEGIN
 	LPM ~opcode_self_probability_275~
 END
 
+DEFINE_PATCH_MACRO ~opcode_275_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------ *
  * Stat: Detect Illusion Modifier [276] *
  * ------------------------------------ */
@@ -8010,6 +8714,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_276~ BEGIN
 	LPM ~opcode_self_probability_276~
+END
+
+DEFINE_PATCH_MACRO ~opcode_276_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------ *
@@ -8031,6 +8739,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_277~ BEGIN
 	LPM ~opcode_self_probability_277~
 END
 
+DEFINE_PATCH_MACRO ~opcode_277_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* --------------------------- *
  * Stat: To Hit Modifier [278] *
  * --------------------------- */
@@ -8050,18 +8762,34 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_278~ BEGIN
 	LPM ~opcode_self_probability_278~
 END
 
+DEFINE_PATCH_MACRO ~opcode_278_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------ *
  * Button: Enable Button [279] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_279~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @12790020
+	SPRINT action @12790020 // ~Permet~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_279~ BEGIN
+	LOCAL_SET strref = 11440001 + parameter2
+	SPRINT action @12790021 // ~de permettre~
 	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_279~ BEGIN
 	LOCAL_SET strref = 11440021 + parameter2
-	SPRINT action @12790040
+	SPRINT action @12790040 // ~Permet %toTheTarget%~
+	LPM ~opcode_144_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_279~ BEGIN
+	LOCAL_SET strref = 11440021 + parameter2
+	SPRINT action @12790041 // ~de permettre %toTheTarget%~
 	LPM ~opcode_144_common~
 END
 
@@ -8076,17 +8804,23 @@ DEFINE_PATCH_MACRO ~opcode_self_280~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
 		SPRINT description @12800001 // ~Le prochain sort lancé par %theTarget% déclenche automatiquement un hiatus entropique~
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF parameter2 > 1 BEGIN
 		SPRINT description @12800002 // ~Les sorts lancés par %theTarget% déclenchent automatiquement un hiatus entropique~
+	END
+	ELSE BEGIN
+		SPRINT description @12800003 // ~Dissipe les effets qui forcent le déclenchement des hiatus entropiques~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_280~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @12800003 // ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+		SPRINT description @12800004 // ~que le prochain sort lancé par %theTarget% déclenche un hiatus entropique~
+	END
+	ELSE PATCH_IF parameter2 > 1 BEGIN
+		SPRINT description @12800005 // ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
 	END
 	ELSE BEGIN
-		SPRINT description @12800004 // ~que les sorts lancés par %theTarget% déclenchent un hiatus entropique~
+		SPRINT description @12800006 // ~de dissiper les effets qui forcent le déclenchement des hiatus entropiques~
 	END
 END
 
@@ -8102,19 +8836,23 @@ END
  *  Stat: Wild Magic [281] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_281~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12810001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 12810001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_281~ BEGIN
-	LPF ~opcode_target~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_target_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_281~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_probability_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_281~ BEGIN
 	LPM ~opcode_self_probability_281~
+END
+
+DEFINE_PATCH_MACRO ~opcode_281_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* --------------------------- *
@@ -8160,6 +8898,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_283~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_283_is_valid~ BEGIN
+	LPM ~opcode_177_is_valid~
+END
+
 /* -------------------------------- *
  * Stat: Melee THAC0 Modifier [284] *
  * -------------------------------- */
@@ -8177,6 +8919,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_284~ BEGIN
 	LPM ~opcode_self_probability_584~
+END
+
+DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ---------------------------------------- *
@@ -8198,6 +8944,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_285~ BEGIN
 	LPM ~opcode_self_probability_285~
 END
 
+DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------------------ *
  * Stat: Missile Weapon Damage Modifier [286] *
  * ------------------------------------------ */
@@ -8215,6 +8965,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_286~ BEGIN
 	LPM ~opcode_self_probability_286~
+END
+
+DEFINE_PATCH_MACRO ~opcode_286_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------- *
@@ -8236,6 +8990,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_288~ BEGIN
 	LPM ~opcode_self_probability_288~
 END
 
+DEFINE_PATCH_MACRO ~opcode_288_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* -------------------------------- *
  * Stat: Fist Damage Modifier [289] *
  * -------------------------------- */
@@ -8255,6 +9013,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_289~ BEGIN
 	LPM ~opcode_self_probability_289~
 END
 
+DEFINE_PATCH_MACRO ~opcode_289_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* -------------------------- *
  * Protection: Backstab [292] *
  * -------------------------- */
@@ -8262,11 +9024,17 @@ DEFINE_PATCH_MACRO ~opcode_self_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920001 // ~Immunité aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920011 // ~Sensible aux attaques sournoises~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920003 // ~de résister aux attaques sournoises~
+	END
+	ELSE BEGIN
+		SPRINT description @12920013 // ~de rendre sensible aux attaques sournoises~
 	END
 END
 
@@ -8274,17 +9042,46 @@ DEFINE_PATCH_MACRO ~opcode_target_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920002 // ~Immunise %theTarget% aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920012 // ~rend %theTarget% sensible aux attaques sournoises~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT description @12920004 // ~d'immuniser %theTarget% aux attaques sournoises~
 	END
+	ELSE BEGIN
+		SPRINT description @12920014 // ~de rendre %theTarget% sensible aux attaques sournoises~
+	END
+END
+
+/* --------------------------------- *
+ *  Spell Effect: Chaos Shield [299] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_mod~ INT_VAR strref = 12990001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_target~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_299~ BEGIN
+	SET parameter2 = MOD_TYPE_flat
+	LPF ~opcode_probability~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_299~ BEGIN
+	LPM ~opcode_self_probability_299~
 END
 
 /* -------------- *
  * NPC Bump [300] *
  * -------------- */
+// TODO: à vérifier
 DEFINE_PATCH_MACRO ~opcode_self_300~ BEGIN
 	PATCH_IF parameter2 > 0 BEGIN
 		SET strref = 13000000 + parameter2
@@ -8299,14 +9096,29 @@ END
 /* --------------------------------- *
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
+// TODO: tester les valeurs : special > 3
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
-	// TODO: Gérer attack type de EE
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
 	SPRINT name @13010001 // ~Chance de coup critique~
-	PATCH_IF is_ee == 1 AND parameter2 == 1 BEGIN
+	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @130100020 // ~avec les %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	ELSE PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
+		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		PATCH_IF isExternal AND parameter3 != 0 BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+		END
+	END
+	PATCH_IF is_ee AND special >= 1 BEGIN
+		SET strref = 130100010 + special // ~en mêlée~
+		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
+		TEXT_SPRINT name ~%name% %descriptionAdd%~
 	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
@@ -8315,28 +9127,72 @@ END
  * Item: Can Use Any Item [302] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_302~ BEGIN
-	//TODO:si parameter2 == 0, désactive l'effet sur la cible si elle l'avait déjà par un autre moyen
-	SPRINT description @13020001 // ~Permet d'utiliser n'importe quel objet~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13020001 // ~Bloque la capacité d'utiliser n'importe quel objet~
+	END
+	ELSE BEGIN
+		SPRINT description @13020002 // ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+	END
 END
 
 /* -------------------------------------- *
  * Spell Effect: Backstab Every Hit [303] *
  * -------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_303~ BEGIN
-	//TODO:si parameter2 == 0, désactive l'effet sur la cible si elle l'avait déjà par un autre moyen
-	SPRINT description @13030001 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030001 // ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030011 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_303~ BEGIN
-	SPRINT description @13030003 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030003 // ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030013 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_303~ BEGIN
-	SPRINT description @13030002 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13030002 // ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
+	END
+	ELSE BEGIN
+		SPRINT description @13030012 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_303~ BEGIN
 	LPM ~opcode_self_probability_303~ // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
+END
+
+/* --------------------- *
+ * Mass Raise Dead [304] *
+ * --------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_304~ BEGIN
+	LPM ~opcode_target_304~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_304~ BEGIN
+	LPM ~opcode_target_probability_304~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_304~ BEGIN
+	// TODO: rendre maintenable
+	SPRINT theTarget   @102473 // ~les membres du groupe~
+	SPRINT ofTheTarget @101088 // ~des membres du groupe~
+	SPRINT toTheTarget @101182 // ~aux membres du groupe~
+	LPM ~opcode_target_32~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_304~ BEGIN
+	SPRINT theTarget   @102473 // ~les membres du groupe~
+	SPRINT ofTheTarget @101088 // ~des membres du groupe~
+	SPRINT toTheTarget @101182 // ~aux membres du groupe~
+	LPM ~opcode_target_probability_32~
 END
 
 /* ------------------------------------- *
@@ -8346,16 +9202,20 @@ DEFINE_PATCH_MACRO ~opcode_self_305~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 13050001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_605~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_305~ BEGIN
 	LPF ~opcode_target~ INT_VAR strref = 13050002 RET description END // ~le TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_605~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_probability_305~ BEGIN
 	LPF ~opcode_probability~ INT_VAR strref = 13050002 RET description END // ~le TAC0 de la main secondaire~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target_probability_605~ BEGIN
-	LPM ~opcode_self_probability_605~
+DEFINE_PATCH_MACRO ~opcode_target_probability_305~ BEGIN
+	LPM ~opcode_self_probability_305~
+END
+
+DEFINE_PATCH_MACRO ~opcode_305_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* ------------------------------------ *
@@ -8377,19 +9237,38 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_306~ BEGIN
 	LPM ~opcode_self_probability_306~
 END
 
+DEFINE_PATCH_MACRO ~opcode_306_is_valid~ BEGIN
+	LPM ~opcode_modstat2_is_valid~
+END
+
 /* ------------------------------- *
  * Protection: from Timestop [310] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_310~ BEGIN
-	SPRINT description @13100001 // ~Immunité à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100001 // ~Bloque l'immunité à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100011 // ~Immunité à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_310~ BEGIN
-	SPRINT description @13100003 // ~d'immuniser %theTarget% à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100003 // ~de rendre sensible %theTarget% à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100013 // ~d'immuniser %theTarget% à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_310~ BEGIN
-	SPRINT description @13100002 // ~Immunise %theTarget% à l'arrêt du temps~
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT description @13100002 // ~Rendre sensible %theTarget% à l'arrêt du temps~
+	END
+	ELSE BEGIN
+		SPRINT description @13100012 // ~Immunise %theTarget% à l'arrêt du temps~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_310~ BEGIN
@@ -8413,6 +9292,25 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_311~ BEGIN
 	LPM ~opcode_self_probability_311~
+END
+
+/* ----------------------------- *
+ *  Spell: Golem Stoneskin [314] *
+ * ----------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_314~ BEGIN
+	LPM ~opcode_self_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_314~ BEGIN
+	LPM ~opcode_self_probability_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_314~ BEGIN
+	LPM ~opcode_target_218~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_314~ BEGIN
+	LPM ~opcode_self_probability_314~
 END
 
 /* ------------------------- *
@@ -8469,17 +9367,19 @@ END
  * Removal: Effects specified by Resource [321] *
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_321~ BEGIN
-	LOCAL_SET strref = 13210001
-	LPM ~opcode_321_common~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_321~ BEGIN
+	// 13210001, parfois la capacité de charge cible le porteur et la cible, utile d'expliciter la cible ?
 	LOCAL_SET strref = 13210004
 	LPM ~opcode_321_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_321~ BEGIN
+	LOCAL_SET strref = 13210007
+	LPM ~opcode_321_common~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_321~ BEGIN
-	LPM ~opcode_self_321~
+	LOCAL_SET strref = 13210004
+	LPM ~opcode_321_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
@@ -8487,28 +9387,39 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
-	// TODO: Gérer le type = parameter2
-	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ AND
+			(timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
 		SET ignoreDuration = 1
 		SET forceSort = 1
 		SET sort = 0
-		SPRINT description @13210007 // ~Les effets ne se cumulent pas~
+		SPRINT description @13210020 // ~Les effets ne se cumulent pas~
 	END
 	ELSE BEGIN
+		PATCH_IF timingMode != TIMING_duration OR duration != 0 BEGIN // Dissipe & protège
+			SET strref += 10
+		END
 		LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
 		LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
 		TO_LOWER resref
 
+		SPRINT effectType @13210100 // ~effets~
+		PATCH_IF parameter2 == 1 BEGIN
+			SPRINT effectType @13210101 // ~capacités d'équipement~
+		END
+		ELSE PATCH_IF parameter2 == 2 BEGIN
+			SPRINT effectType @13210102 // ~effets non équipés~
+		END
+
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 2
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
 		END
 		ELSE PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 			SET strref += 1
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets de l'objet %itemName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% de l'objet %itemName% sur %theTarget%~
 		END
 		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les effets du sort %spellName% sur %theTarget%~
+			LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~Dissipe les %effectType% du sort %spellName% sur %theTarget%~
 		END
 		// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 		ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
@@ -8517,9 +9428,20 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_321_is_valid~ BEGIN
+	// Leaving the resource field empty will remove any effect on the creature without a parent resource
+	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
+	END
+END
+
 /* ----------------------------- *
  * Stat: Turn Undead Level [323] *
  * ----------------------------- */
+
+// TODO : à vérifier : pas de MOD_TYPE_percent dans 2.5.16
+// FIXME: special != 0 : P1 = P1 + niveau de la classe la plus élevée
 DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 13230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de repousser les morts-vivants~
 END
@@ -8536,81 +9458,76 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_323~ BEGIN
 	LPM ~opcode_self_probability_323~
 END
 
-/* -------------------------------------------------- *
- * Protection: Immunity to Resource and Message [324] *
- * -------------------------------------------------- */
-DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240501 // ~Immunité au sort %spellName%~
-			END
-		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self avec parameter1 et parameter2 différent de 0~ END
-		END
+DEFINE_PATCH_MACRO ~opcode_323_is_valid~ BEGIN
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 AND special == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
 	END
 END
 
+/* -------------------------------------------------- *
+ * Protection: Immunity to Resource and Message [324] *
+ * -------------------------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_324~ BEGIN
+	LOCAL_SET strref = 13240000
+	LOCAL_SET descriptionStrref = 13240901 // ~Immunité au sort %spellName%~
+	LPM ~opcode_common_324~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_324~ BEGIN
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240503 // ~d'immuniser %theTarget% au sort %spellName%~
-			END
-		END
-		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : self_probability avec parameter1 et parameter2 différent de 0~ END
-		END
-	END
+	LOCAL_SET strref = 13240500
+	LOCAL_SET descriptionStrref = 13240903 // ~d'immuniser %theTarget% au sort %spellName%~
+	LPM ~opcode_common_324~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_324~ BEGIN
 	LOCAL_SET strref = 13240000
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-			PATCH_IF NOT ~%spellName%~ STRING_EQUAL_CASE ~~ BEGIN
-				SPRINT description @13240502 // ~Immunise %theTarget% au sort %spellName%~
-			END
-		END
-		ELSE BEGIN
-			LPM ~opcode_common_324~
-		END
-	END
+	LOCAL_SET descriptionStrref = 13240902 // ~Immunise %theTarget% au sort %spellName%~
+	LPM ~opcode_common_324~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_324~ BEGIN
-	LOCAL_SET strref = 13240151
-
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter1 == 0 AND parameter2 = 0 BEGIN
-			LPM ~opcode_self_probability_324~
-		END
-		ELSE BEGIN
-			LPM ~opcode_common_324~
-		END
-	END
+	LPM ~opcode_self_probability_324~
 END
 
 DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
-	SET ignoreDuration = 1
-	PATCH_IF is_ee == 1 BEGIN
+
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter2 == 0 BEGIN
+		LPM ~opcode_324_against_who~
+		PATCH_IF isValid BEGIN
+			SET strref = descriptionStrref
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+		END
+	END
+	ELSE BEGIN
+		SET ignoreDuration = 1
 		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
-			PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
+			PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
 				SET idsId = statType - 100
-				SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
-				PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
-					SET idsId = statType - 110
-					SET strref = strref + 1 // ~Effectif contre les %creatureType%~
-				END
+				SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+			END
+			ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+				SET oldStrref = strref + statType
+				SET strref = 420000 + parameter1
+				LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+				SET strref = oldStrref
+			END
+			ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
+				SET idsId = statType - 110
+				SET strref = strref + 302 // ~Effectif contre les %creatureType%~
+				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+			END
+			ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
+				LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
+				SET strref = strref + statType
 			END
 			ELSE BEGIN
 				SET strref = strref + statType
@@ -8618,8 +9535,43 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 		END
 		ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à une ressource (spl ou itm) différente de l'objet : %resref%~ END
+			LPM ~opcode_324_against_who~
+			PATCH_IF isValid BEGIN
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Immunité à %againstWho% différente de l'objet : %resref%~ END
+			END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
+	LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
+	LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
+	SET againstWhoStrref = 13240911
+	SET isValid = 1
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre le sort %spellName% et l'objet %itemName%~
+	END
+	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SET againstWhoStrref += 1
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre le sort %spellName%~
+	END
+	ELSE PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		SET againstWhoStrref += 2
+		LPF ~getTranslation~ INT_VAR strref = strref opcode RET description = string END // ~contre l'objet %itemName%~
+	END
+	// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
+	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+		SET isValid = 0
+	END
+	SPRINT againstWho (AT againstWhoStrref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_324_is_valid~ BEGIN
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND timingMode == TIMING_duration AND duration == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
 	END
 END
 
@@ -8649,6 +9601,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_325~ BEGIN
 	LPM ~opcode_self_probability_325~
+END
+
+DEFINE_PATCH_MACRO ~opcode_325_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------------ *
@@ -9075,6 +10031,24 @@ END
 
 // Opcode vide, utilisé en couple avec l'opcode 101
 
+/* ------------------------------------- *
+ * Stat: Classe d'armure cumulable [506] *
+ * ------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_506~ BEGIN
+	LPM ~opcode_self_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_506~ BEGIN
+	LPM ~opcode_self_probability_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_506~ BEGIN
+	LPM ~opcode_target_0~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_506~ BEGIN
+	LPM ~opcode_target_probability_0~
+END
 
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
@@ -9572,13 +10546,11 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 
 	PATCH_IF level == 0 BEGIN
 		// Double le nombre de sorts de niveau amount et moins (pas de binaire ici !)
-		PATCH_IF amount > 0 AND amount <= spellLevelMax BEGIN
+		SET amount = amount > spellLevelMax ? spellLevelMax : amount
+		PATCH_IF amount > 0 BEGIN
 			LPM ~opcode_self_42_62_get_levelstr~
 			SET strref = startStrref + 4
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
-		END
-		ELSE BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1/parameter2 %amount%/%level%~ END
 		END
 	END
 	ELSE PATCH_IF level == 512 BEGIN
@@ -9944,7 +10916,7 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	SPRINT descriptionState ~~
 	SET hexValue = 0b1
 	SET initRef = 410000
-	SPRINT sep @410100 // ~ou~
+	SPRINT sep @100004 // ~ou~
 	FOR (i = 1 ; i <= 32 ; ++i) BEGIN
 		PATCH_IF state BAND hexValue BEGIN
 			SET strref = initRef + i
@@ -9961,4 +10933,24 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
 		SPRINT descriptionState @410000 // ~normal~
 	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequency BEGIN
+	LPF ~get_str_duration~ INT_VAR duration = duration RET strDuration END
+	PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+		INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+		END
+		SET strref = 100320 // ~à chaque %strDuration%~
+	END
+	ELSE BEGIN
+		// FIXME: données en français et genrées => traduction impossible
+		PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+			SET strref = 100321 // ~toutes les %strDuration%~
+		END
+		ELSE BEGIN
+			SET strref = 100322 // ~tous les %strDuration%~
+		END
+	END
+	SPRINT frequency (AT strref)
 END
