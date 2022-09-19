@@ -672,7 +672,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
-	328 => 0 // State: Set State [328]
+	328 => 1 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
 	333 => 1 // Spell Effect: Static Charge [333]
 	334 => 0 // Spell Effect: Turn Undead [334]
@@ -9673,21 +9673,29 @@ END
  * Spell Effect: Slow Poison [329] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_329~ BEGIN
-	LOCAL_SET seconds = parameter1
-	SPRINT description @13290001 // ~Force la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290001 // ~Abaissement de la virulence de la plupart des poisons de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
-	LOCAL_SET seconds = parameter1
-	SPRINT description @13290002 // ~de forcer la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290003 // ~d'abaisser la virulence de la plupart des poisons sur %theTarget% de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_329~ BEGIN
-	LPM ~opcode_self_329~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290002 // ~Abaisse la virulence de la plupart des poisons sur %theTarget% de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_329~ BEGIN
 	LPM ~opcode_self_probability_329~
+END
+
+DEFINE_PATCH_MACRO ~opcode_329_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 OR parameter1 == 1 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Slow Factor == %parameter1% (>= 2 expected).~ END
+	END
 END
 
 /* -------------------------------------- *
@@ -10422,7 +10430,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 			END
 		END
 		ELSE PATCH_IF showWarning BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.spl doesn't exist.~ END
 		END
 	END
 END
@@ -10465,7 +10473,7 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" 
 		END
 	END
 	ELSE PATCH_IF showWarning BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.itm doesn't exist.~ END
 	END
 END
 
@@ -10499,7 +10507,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.cre doesn't exist.~ END
 	END
 END
 
@@ -10545,7 +10553,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.cre doesn't exist.~ END
 	END
 END
 

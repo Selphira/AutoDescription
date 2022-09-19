@@ -3340,8 +3340,9 @@
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 
-@13290001 = ~Force la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
-@13290002 = ~de forcer la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+@13290001 = ~Abaissement de la virulence de la plupart des poisons de %amount%~
+@13290002 = ~Abaisse la virulence de la plupart des poisons sur %theTarget% de %amount%~
+@13290003 = ~d'abaisser la virulence de la plupart des poisons sur %theTarget% de %amount%~
 
 // Opcode 331: Summon: Random Monster Summoning [331]
 
