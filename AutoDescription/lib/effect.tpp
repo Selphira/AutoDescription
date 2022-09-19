@@ -266,8 +266,8 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
 			INNER_PATCH_SAVE probability1 ~%range%~ BEGIN
-				SPRINT regex ~\([0-9][0-9]\)$~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~\1~
+				SPRINT regex ~^\([0-9][0-9]\)~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
 
 			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
