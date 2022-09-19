@@ -6795,7 +6795,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 		END
 	END
 	SET opcode = 206
-	// Solution : possède la protection contre plus de 2 capacités psioniques
+	// Solution : possède la protection contre au moins 5 capacités psioniques
 	PATCH_IF nbFound >= 5 BEGIN
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
 			// Affichage warning car sort non trouvé
@@ -6805,7 +6805,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 				RET hasOpcode
 			END
 			PATCH_IF NOT hasOpcode BEGIN
-				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre capacite psionique detectee : Opcode 206 avec %resref% non trouve.~ END
+				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
 			END
 		END
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
