@@ -3018,12 +3018,12 @@
 @13240065 = ~Effectif contre les orques~
 @13240066 = ~Inefficace contre les créatures sourdes~
 @13240067 = ~Effectif contre les créatures sourdes~
-//@13240068 SPLSTATE=MOLD_TOUCH
-//@13240069 SPLSTATE!=MOLD_TOUCH
-//@13240070 SPLSTATE=STATIC_CHARGE
-//@13240071 SPLSTATE!=STATIC_CHARGE
-//@13240072 SPLSTATE=SHROUD_OF_FLAME
-//@13240073 SPLSTATE!=SHROUD_OF_FLAME
+@13240068 = ~Inefficace contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+@13240069 = ~Effectif contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+//@13240070 SPLSTATE=STATIC_CHARGE > jamais vu
+//@13240071 SPLSTATE!=STATIC_CHARGE > jamais vu
+//@13240072 SPLSTATE=SHROUD_OF_FLAME > jamais vu
+//@13240073 SPLSTATE!=SHROUD_OF_FLAME > jamais vu
 @13240074 = ~Inefficace contre les créatures mortes~
 @13240075 = ~Inefficace contre les créatures vivantes~ // FIXME: tendancieux : les morts-vivants sont touchés
 @13240077 = ~Inefficace contre les cibles immunisées au poison~
@@ -3048,7 +3048,7 @@
 
 @13240119 = ~Inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
 @13240120 = ~Inefficace contre les créatures protégées contre les morts-vivants~
-//@13240121 = ~~ // TODO : splstate WILD_MAGIC_AREA actif
+//@13240121 = ~~ // TODO : splstate WILD_MAGIC_AREA actif > jamais vu
 @13240122 = ~Inefficace contre les créatures possédant une dextérité supérieure ou égale à %value%~
 @13240123 = ~Inefficace contre les créatures possédant une dextérité inférieure à %value%~
 @13240124 = ~Inefficace contre les créatures possédant une force supérieure ou égale à %value%~
@@ -3142,6 +3142,8 @@
 @13240565 = ~d'être effectif contre les orques~
 @13240566 = ~d'être inefficace contre les créatures sourdes~
 @13240567 = ~d'être effectif contre les créatures sourdes~
+@13240568 = ~d'être inefficace contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
+@13240569 = ~d'être effectif contre les créatures sous l'effet d'un toucher de la goule~ // Maladie, mode 11/12
 //
 @13240574 = ~d'être inefficace contre les créatures mortes~
 @13240575 = ~d'être inefficace contre les créatures vivantes~
