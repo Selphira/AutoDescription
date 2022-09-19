@@ -2861,12 +2861,12 @@
 @13010001 = ~Chance de coup critique~
 @13010002 = ~Chance de coup critique avec cette arme~
 
-@130100010 = ~~
-@130100011 = ~en mêlée~
-@130100012 = ~à distance~
-@130100013 = ~magique~
+@13010010 = ~~
+@13010011 = ~en mêlée~
+@13010012 = ~à distance~
+@13010013 = ~magique~
 
-@130100020 = ~avec les %weaponType%~
+@13010020 = ~avec des %weaponType%~
 
 
 // Opcode 302: Item: Can Use Any Item [302]
@@ -3379,6 +3379,8 @@
 @13410001 = ~À chaque coup critique~
 @13410002 = ~À chaque coup critique %ofTheTarget%~
 @13410003 = ~À chaque coup critique provoqué avec cette arme~
+
+@13410020 = ~provoqué avec des %weaponType%~
 
 // Opcode 343: HP Swap [343]
 

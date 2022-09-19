@@ -775,8 +775,8 @@ END
 
 /* 
 	Opcodes dont le champ Duration n'est pas impactant
-	Conséquence : La durée n'est pas écrire car considérée comme implicite
-	Trois cas :
+	Conséquence : La durée n'est pas à écrire car considérée comme implicite
+	Plusieurs cas :
 	0- l'effet est instantané et ne peut perdurer ou être dissipé
 		(dissipation, soin (dans le sens où on peut les reperdre peu de temps après))
 		~ duration 0
@@ -787,6 +787,7 @@ END
 	9- l'effet est instantané, définitif et ne peut être dissipé (perte d'un objet, oubli d'un sort)
 		~ permanent after death
 */
+// Conséquence : à définir
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	  2 => 0 // Cure: Sleep
 	  4 => 0 // Cure: Berserking
@@ -854,10 +855,11 @@ END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
 // Traduction : durée normale ou jusqu'à dissipation / utilisation
-// Conséquence : les durées permanentes et permanentes, persiste après la mort n'est pas affichée
-// TODO: à améliorer ou retirer
+// Conséquence : les durées "permanentes" et "permanentes, persiste après la mort" ne sont pas affichées
+// TODO: à clarifier ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
+	127 => 1 // Summon: Monster Summoning
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
 	177 => 1 // Use EFF File
@@ -865,9 +867,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	218 => 1 // Protection: Stoneskin
 	236 => 1 // Spell Effect: Image Projection
 	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
+	331 => 1 // Summon: Random Monster Summoning
 END
 
 // Opcodes qui sont dissipés par la mort (directement ou indirectement)
+// Conséquence : Timing 9 est converti en Timing 1
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent_after_death~ BEGIN
 	24  => 1 // State: Horror
 	25  => 1 // State: Poison
@@ -9102,23 +9106,23 @@ DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
 	SPRINT name @13010001 // ~Chance de coup critique~
-	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
-		SET strref = 230000 + parameter3
-		SPRINT weaponType (AT strref)
-		SPRINT strref @130100020 // ~avec les %weaponType%~
-		TEXT_SPRINT name ~%name% %strref%~
-	END
-	ELSE PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+		SPRINT name @13010002 // // ~Chance de coup critique avec cette arme~
 		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
 		END
 	END
 	PATCH_IF is_ee AND special >= 1 BEGIN
-		SET strref = 130100010 + special // ~en mêlée~
+		SET strref = 13010010 + special // ~en mêlée~
 		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
 		TEXT_SPRINT name ~%name% %descriptionAdd%~
+	END
+	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @13010020 // ~avec des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
 	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
@@ -9768,6 +9772,17 @@ DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Modifier == %parameter1%.~ END
+	END
+	PATCH_IF parameter2 < 0 OR parameter2 > 10 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2% (0-10 expected).~ END
+	END
+END
+
 /* ---------------------------------------------- *
  * Spell Effect: Change Backstab Effect [340]     *
  * ---------------------------------------------- */
@@ -9787,6 +9802,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_340~ BEGIN
 	LPM ~opcode_target_340~
+END
+
+DEFINE_PATCH_MACRO ~opcode_340_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------------------- *
@@ -9819,8 +9838,27 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_341~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
+	PATCH_IF special >= 1 BEGIN
+		SET strref = 13010010 + special // ~en mêlée~
+		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
+		TEXT_SPRINT condition ~%condition% %descriptionAdd%~
+	END
+	PATCH_IF parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @13410020 // ~avec des %weaponType%~
+		TEXT_SPRINT condition ~%condition% %strref%~
+	END
+	ELSE PATCH_IF parameter2 != 0 BEGIN
+		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		PATCH_IF isExternal AND parameter3 != 0 BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+		END
+	END
+
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
 	LPF ~get_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
@@ -9841,6 +9879,10 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
     ELSE BEGIN
 	    SPRINT description @12320001 // ~Lance le sort %spellName% sur %theTarget%~
     END
+END
+
+DEFINE_PATCH_MACRO ~opcode_341_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ------------- *
