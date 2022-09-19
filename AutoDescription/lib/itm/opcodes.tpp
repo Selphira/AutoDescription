@@ -2493,9 +2493,11 @@ DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
-	PATCH_IF parameter2 > 2 AND is_ee == 0 BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	PATCH_IF is_ee BEGIN
+		LPM ~opcode_modstat3_is_valid~
+	END
+	ELSE BEGIN
+		LPM ~opcode_modstat2_is_valid~
 	END
 END
 
@@ -5888,7 +5890,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_167~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_167_is_valid~ BEGIN
-	LPM ~opcode_modstat3_is_valid~
+	LPM ~opcode_modstat2_is_valid~
 END
 
 /* -------------------------------- *
@@ -9599,6 +9601,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_325~ BEGIN
 	LPM ~opcode_self_probability_325~
+END
+
+DEFINE_PATCH_MACRO ~opcode_325_is_valid~ BEGIN
+	LPM ~opcode_33_is_valid~
 END
 
 /* ------------------------ *
