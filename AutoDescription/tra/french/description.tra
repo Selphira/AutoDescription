@@ -3431,6 +3431,14 @@
 @13620001 = ~Chance d'échec critique~
 @13620002 = ~Chance d'échec critique avec cette arme~
 
+// Opcode 367: Minimum base stats [367]
+
+@13670001 = ~Immunité à la mort par aborption de caractéristique~
+@13670002 = ~d'être immunisé à la mort par absorption de caractéristique~
+@13670003 = ~Sensible à la mort par aborption de caractéristique~
+@13670004 = ~d'être sensible à la mort par absorption de caractéristique~ // FIXME
+
+
 // Fake Opcode 500: Stat: Compétences de voleur [500]
 
 @15000001 = ~Compétences de voleur~

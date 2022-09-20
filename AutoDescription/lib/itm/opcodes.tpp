@@ -175,6 +175,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	226 => 255 // Spell: Immunity (by Secondary Type, decrementing) [226]
 	206 => 256 // Spell: Protection from Spell [206]
 
+	367 => 279 // Minimum base stats [367]
 	100 => 280 // Protection: from Creature Type [100]
 	120 => 281 // Protection: from Melee Weapons [120]
 	 83 => 282 // Protection: From Projectile (Any) [83]
@@ -686,7 +687,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	363 => 0 // Modal state check [363]
 	365 => 0 // Make unselectable [365]
 	366 => 0 // Spell: Apply Spell On Move [366]
-	367 => 0 // Minimum base stats [367]
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
@@ -10046,6 +10046,29 @@ DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
 		SPRINT name @13620001 // ~Chance d'échec critique~
 	END
 	LPM ~opcode_301_common~
+END
+
+/* ------------------------ *
+ * Minimum base stats [367] *
+ * ------------------------ */
+// FIXME: Est utilisé dans certains sorts qui diminue les caractéristiques sans pouvoir tuer la cible
+// Idéalement, il faudrait trouver cet effet de même durée et les grouper : Constitution -2 (minimum 1)
+DEFINE_PATCH_MACRO ~opcode_self_367~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @13670001 // ~Immunité à la mort par aborption de caractéristique~
+	END
+	ELSE BEGIN
+		SPRINT description @13670003 // ~Sensible à la mort par aborption de caractéristique~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_367~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @13670002 // ~d'être immunisé à la mort par absorption de caractéristique~
+	END
+	ELSE BEGIN
+		SPRINT description @13670004 // ~d'être sensible à la mort par absorption de caractéristique~
+	END
 END
 
 /* --------------------------------- *
