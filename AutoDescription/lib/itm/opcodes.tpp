@@ -9098,13 +9098,22 @@ END
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
 // TODO: tester les valeurs : special > 3
+
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+		SPRINT name @13010002 // // ~Chance de coup critique avec cette arme~
+	END
+	ELSE BEGIN
+		SPRINT name @13010001 // ~Chance de coup critique~
+	END
+	LPM ~opcode_301_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	SPRINT name @13010001 // ~Chance de coup critique~
 	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010002 // // ~Chance de coup critique avec cette arme~
 		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
@@ -10030,17 +10039,13 @@ END
  * Critical miss bonus [362] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
-	//TODO: Gérer attack type
-	LOCAL_SET value = 5 * parameter1
-	LPF ~signed_value~ INT_VAR value RET value END
-	SPRINT value @10002 // ~%value% %~
-	PATCH_IF parameter2 == 1 BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT name @13620002 // ~Chance d'échec critique avec cette arme~
 	END
 	ELSE BEGIN
 		SPRINT name @13620001 // ~Chance d'échec critique~
 	END
-	SPRINT description @100001 // ~%name%%colon%%value%~
+	LPM ~opcode_301_common~
 END
 
 /* --------------------------------- *
