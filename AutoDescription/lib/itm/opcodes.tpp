@@ -9890,21 +9890,21 @@ END
  * ------------- */
 DEFINE_PATCH_MACRO ~opcode_self_343~ BEGIN
 	LOCAL_SET mode = parameter2
-	PATCH_IF mode == 0 BEGIN
-		SPRINT description @13430002 // ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	PATCH_IF mode == 1 BEGIN
+		SPRINT description @13430001 // ~Échange les points de vie du porteur et de la cible~
 	END
 	ELSE BEGIN
-		SPRINT description @13430001 // ~Échange les points de vie du porteur et de la cible~
+		SPRINT description @13430002 // ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_343~ BEGIN
 	LOCAL_SET mode = parameter2
-	PATCH_IF mode == 0 BEGIN
-		SPRINT description @13430004 // ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	PATCH_IF mode == 1 BEGIN
+		SPRINT description @13430003 // ~d'échanger les points de vie du porteur et de la cible~
 	END
 	ELSE BEGIN
-		SPRINT description @13430003 // ~d'échanger les points de vie du porteur et de la cible~
+		SPRINT description @13430004 // ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
 	END
 END
 
