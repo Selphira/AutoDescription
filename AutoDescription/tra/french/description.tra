@@ -3394,6 +3394,12 @@
 @13440001 = ~Enchantement~
 @13440002 = ~l'enchantement~
 
+@13440011 = ~dans la main directrice~ // weaponSlot
+@13440012 = ~dans la main secondaire~
+@13440013 = ~des armes~
+
+@13440020 = ~des %weaponType%~
+
 // Opcode 346: Save vs. school bonus [346]
 
 @13460010 = ~~

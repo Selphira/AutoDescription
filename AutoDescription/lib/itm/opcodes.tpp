@@ -851,6 +851,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	270 => 0 // Cure: Unpause Target
 	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
 	316 => 0 // Spell: Magical Rest
+	343 => 0 // HP Swap
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -2892,7 +2893,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_55_is_valid~ BEGIN
 	LOCAL_SET death_type = 0x4
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
@@ -4043,11 +4044,7 @@ DEFINE_PATCH_MACRO ~opcode_100_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_100_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
-	PATCH_IF parameter2 == 9 BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Kit.ids is not available, IDS file %parameter2%.~ END
-	END
+	LPM ~opcode_idscheck8_is_valid~
 END
 
 /* ----------------------------- *
@@ -6082,7 +6079,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_175~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_175_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 END
 
 /* ---------------------------------- *
@@ -6232,7 +6229,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET d
 END
 
 DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	LPM ~opcode_resref_is_valid~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
@@ -7195,7 +7192,7 @@ DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_219_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck8_is_valid~
 END
 
 /* ---------------------------- *
@@ -7836,7 +7833,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_238_is_valid~ BEGIN
 	LOCAL_SET death_type = 0x200
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
@@ -9912,13 +9909,27 @@ END
  * Enchantment vs. creature type [344] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
-	//TODO: weaponSlot + weaponCategory
-	LOCAL_SET strref = 13440001 // ~Enchantement~
+	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+	SPRINT name @13440001 // ~Enchantement~
+	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+		SET strref = 230000 + parameter4
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+		SPRINT strref @13440020 // ~des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+		TEXT_SPRINT name ~%name% %weaponSlot%~
+	END
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 	SET value = special
-	SET parameter2 = MOD_TYPE_cumulative
-	LPM ~opcode_mod_base~
+	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_344_is_valid~ BEGIN
+	LPM ~opcode_idscheck8_is_valid~
 END
 
 //TODO: 345: arme visée considérée comme une arme du type configuré...
@@ -10857,9 +10868,17 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_idscheck9_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_idscheck8_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < 2 OR parameter2 > 8 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
 	END
