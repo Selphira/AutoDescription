@@ -9932,7 +9932,31 @@ DEFINE_PATCH_MACRO ~opcode_344_is_valid~ BEGIN
 	LPM ~opcode_idscheck8_is_valid~
 END
 
-//TODO: 345: arme visée considérée comme une arme du type configuré...
+/* ----------------------- *
+ * Enchantment bonus [345] *
+ * ----------------------- */
+// Je ne comprends pas comment il peut fonctionner : où se trouve le bonus ?
+// TODO: parameter2 + parameter1, s'inspirer de l'opcode 120
+// DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
+// 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+// 	SET parameter3 = special != 0 ? special : parameter3
+// 	SPRINT name @13440001 // ~Enchantement~
+// 	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+// 		SET strref = 230000 + parameter4
+// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+// 		SPRINT strref @13440020 // ~des %weaponType%~
+// 		TEXT_SPRINT name ~%name% %strref%~
+// 	END
+// 	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+// 		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+// 		TEXT_SPRINT name ~%name% %weaponSlot%~
+// 	END
+// 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+// 	SET value = special
+// 	LPF ~signed_value~ INT_VAR value RET value END
+// 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
+// END
 
 /* --------------------------- *
  * Save vs. school bonus [346] *
