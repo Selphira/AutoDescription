@@ -22,7 +22,7 @@ BEGIN
 	SET hasLauncher = 0
 	SET selectedHeader = 0
 	SET headerIndex = 0
-	SET hasSpecialProjectileAbility = 0
+	SPRINT specialProjectileAbility ~~
 
 	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
@@ -71,15 +71,14 @@ BEGIN
 
 			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND charges == 0 BEGIN
 				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
-					SPRINT effectDescription @102270 // ~Ne nécessite pas de munitions~
+					SPRINT specialProjectileAbility @102270 // ~Ne nécessite pas de munitions~
 				END
 				ELSE BEGIN
-					SPRINT effectDescription @102269 // ~Revient dans la main du lanceur~
+					SPRINT specialProjectileAbility @102269 // ~Revient dans la main du lanceur~
 				END
 
-				SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+				SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%specialProjectileAbility%~) = 1
 				SET ~countLines%index%~ += 1
-				SET hasSpecialProjectileAbility = 1
 			END
 		END
 		SORT_ARRAY_INDICES ~lines%index%~ NUMERICALLY
@@ -134,8 +133,8 @@ BEGIN
 	END
 
 	PATCH_IF countHeaders == 1 OR (countHeaders > 0 AND hasSameAbilities == 1 AND hasSameAttributes == 1) BEGIN
-		PATCH_IF hasSpecialProjectileAbility BEGIN
-			SET $EVAL ~lines%selectedHeader%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+		PATCH_IF NOT ~%specialProjectileAbility%~ STRING_EQUAL ~~ BEGIN
+			SET $EVAL ~lines%selectedHeader%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%specialProjectileAbility%~) = 1
 			SET ~countLines%selectedHeader%~ += 1
 		END
 		SPRINT title @100011 // ~Capacités de combat~
