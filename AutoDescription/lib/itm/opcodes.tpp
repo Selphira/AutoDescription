@@ -9460,10 +9460,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_323~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_323_is_valid~ BEGIN
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
-	END
+	LPM ~opcode_modstat1_is_valid~
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 AND special == 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
@@ -9937,7 +9934,7 @@ END
  * ----------------------- */
 // Je ne comprends pas comment il peut fonctionner : où se trouve le bonus ?
 // TODO: parameter2 + parameter1, s'inspirer de l'opcode 120
-// DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
+// DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
 // 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
 // 	SET parameter3 = special != 0 ? special : parameter3
 // 	SPRINT name @13440001 // ~Enchantement~
@@ -9975,6 +9972,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_346~ BEGIN
 	LOCAL_SET strref = 13460010 + special
 	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_346~ BEGIN
+	LPM ~opcode_self_probability_346~
+END
+
+DEFINE_PATCH_MACRO ~opcode_346_is_valid~ BEGIN
+	// Pas de mode percent
+	LPM ~opcode_modstat1_is_valid~
+	PATCH_IF special < 0 OR special > 11 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Primary Type %special% (0-11 expected).~ END
+	END
 END
 
 /* -------------------------------------------- *
@@ -10873,6 +10883,14 @@ DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_percentage AND parameter1 == 100 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value * 100 / 100.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_modstat1_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
 	END
 END
 

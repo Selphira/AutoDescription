@@ -3402,6 +3402,7 @@
 
 // Opcode 346: Save vs. school bonus [346]
 
+//FIXME: répétition avec spellSchoolName @100100
 @13460010 = ~~
 @13460011 = ~contre les sorts de l'école de l'Abjuration~
 @13460012 = ~contre les sorts de l'école de la Conjuration~
@@ -3411,8 +3412,8 @@
 @13460016 = ~contre les sorts de l'école de l'Invocation~
 @13460017 = ~contre les sorts de l'école de la Nécromancie~
 @13460018 = ~contre les sorts de l'école de l'Altération~
-@13460019 = ~~
-@13460020 = ~~
+@13460019 = ~contre les sorts de l'école Généraliste~
+@13460020 = ~contre les sorts de l'école de l'Entropie~
 @13460021 = ~~
 
 // Opcode 360: Stat: Ignore Reputation Breaking Point [360]
