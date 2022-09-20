@@ -9933,6 +9933,7 @@ END
  * Enchantment bonus [345] *
  * ----------------------- */
 // Je ne comprends pas comment il peut fonctionner : où se trouve le bonus ?
+// le seul cas où ça peut matcher c'est pour P2==0
 // TODO: parameter2 + parameter1, s'inspirer de l'opcode 120
 // DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
 // 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
@@ -10019,6 +10020,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_361~ BEGIN
 	LPM ~opcode_target_361~
+END
+
+DEFINE_PATCH_MACRO ~opcode_361_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ------------------------- *
