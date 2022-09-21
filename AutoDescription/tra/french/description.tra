@@ -3455,15 +3455,21 @@
 @15020001 = ~Résistance aux dégâts~
 @15020002 = ~aux dégâts~
 
-// Fake Opcode 503: Stat: Résistance aux dégâts élémentaires~ [503]
+// Fake Opcode 503: Stat: Résistance aux dégâts élémentaires [503]
 
 @15030001 = ~Résistance aux dégâts élémentaires~
 @15030002 = ~aux dégâts élémentaires~
 
-// Fake Opcode 504: Stat: Résistance aux dégâts physiques~ [504]
+// Fake Opcode 504: Stat: Résistance aux dégâts physiques [504]
 
 @15040001 = ~Résistance aux dégâts physiques~
 @15040002 = ~aux dégâts physiques~
+
+// Fake Opcode 509 : Immunité aux sorts (par niveau) (cumulatif) [509]
+
+@15090001 = ~Immunité aux sorts~ // FIXME: Immunité aux sorts "ciblés", ne protège pas contre les effets de zone
+@15090002 = ~d'immuniser aux sorts~
+
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

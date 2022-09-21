@@ -165,10 +165,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	207 => 247 // Spell: Bounce Specified Spell [207]
 
 	// Cas particulier peut dissiper comme immuniser
-	321 => 278 // Removal: Effects specified by Resource [321]
+	321 => 248 // Removal: Effects specified by Resource [321]
 
 	// Les immunités
-
+	509 => 249 // Protection: from Spell Levels (cumulable) [509]
 	102 => 250 // Protection: from Spell Levels [102]
 	201 => 251 // Spell: Decrementing Spell Immunity [201]
 	204 => 252 // Spell: Protection from Spell (School) [204]
@@ -2691,7 +2691,7 @@ DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
-	LOCAL_SET initOpcode = 42
+	LOCAL_SET initOpcode = opcode
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
 
@@ -4265,6 +4265,48 @@ DEFINE_PATCH_MACRO ~opcode_102_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level %parameter1%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
+	LOCAL_SET initOpcode = opcode
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET newP1 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = initOpcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = initOpcode
+				SET parameter = parameter1 - 1
+				SET newP1 |= ~%BIT%parameter%%~
+			END
+		END
+		PATCH_IF newP1 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
+			// Fonctionnel dans les cas généraux
+			SET opcode = 509
+			SET parameter1 = newP1
+			LPM ~add_opcode~
+		END
 	END
 END
 
@@ -10290,6 +10332,59 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_508~ BEGIN
 	LPM ~opcode_target_probability_62~
 END
 
+/* --------------------------------------- *
+ * Stat: Immunité aux sorts (par niveau) (cumulatif) [509] *
+ * --------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090001 // ~Immunité aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020001 // ~Immunité aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090002 // ~d'immuniser aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020003 // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090001 // ~Immunité aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020002 // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
+	SPRINT levelStr ~~
+	FOR (idx = 0 ; idx < 9 ; ++idx) BEGIN
+		SET bit = EVAL ~%BIT%idx%%~
+		PATCH_IF (parameter1 BAND bit) != 0 BEGIN
+			SET level = idx + 1
+			SPRINT levelStr ~%levelStr%, %level%~
+		END
+	END
+
+	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ et \1~
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| et \)~ ~~
+	END
+	SPRINT spellLevel ~%levelStr%~
+END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
