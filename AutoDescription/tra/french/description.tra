@@ -1480,6 +1480,7 @@
 
 // Opcode 42: Spell: Wizard Spell Slots Modifier [42]
 
+// FIXME: regrouper les strrefs avec 62
 @10420001 = ~Mémorisation d'un sort profane supplémentaire de niveau %levelStr%~
 @10420002 = ~Mémorisation de %amount% sorts profanes supplémentaires de niveau %levelStr%~
 @10420003 = ~Suppression d'un sort profane de niveau %levelStr%~

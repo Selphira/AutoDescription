@@ -18,9 +18,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 96 => 3   // Stat: Level Change [96]
 	233 => 3   // Stat: Proficiency [233]
     191 => 4   // Spell: Casting Level Modifier [191]
-	 42 => 4   // Spell: Wizard Spell Slots Modifier [42]
-	 62 => 4   // Spell: Priest Spell Slots Modifier [62]
-	261 => 5   // Spell: Restore Lost Spells [261]
+	507 => 5   // Emplacement sorts profanes [507]
+	 42 => 6   // Spell: Wizard Spell Slots Modifier [42]
+	508 => 7   // Emplacement sorts divins [508]
+	 62 => 8   // Spell: Priest Spell Slots Modifier [62]
+	261 => 9   // Spell: Restore Lost Spells [261]
 
 	// Modification des stats
 
@@ -647,7 +649,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	256 => 0 // Spell: Spell Sequencer Active [256]
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
-	260 => 1 //
+	260 => 1 // Spell: Spell Sequencer Activation [260]
 	265 => 0 // Script: Set Global Variable [265]
 	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
@@ -2688,6 +2690,49 @@ DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10420001 RET description END
 END
 
+DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
+	LOCAL_SET initOpcode = 42
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET searchP1 = parameter1
+		SET newP2 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = initOpcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = initOpcode
+				SET newP2 |= parameter2
+			END
+		END
+		PATCH_IF newP2 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
+			// Fonctionnel dans les cas généraux
+			SET opcode = initOpcode == 42 ? 507 : 508
+			SET parameter2 = newP2
+			SET parameter1 = searchP1
+			LPM ~add_opcode~
+		END
+	END
+END
+
 /* ------------------------- *
  * Cure: Stone to Flesh [43] *
  * ------------------------- */
@@ -3134,6 +3179,10 @@ DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET spellLevelMax = 7
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620001 RET description END
+END
+
+DEFINE_PATCH_MACRO ~opcode_62_group~ BEGIN
+	LPM ~opcode_42_group~
 END
 
 /* ----------------------- *
@@ -5398,7 +5447,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_145~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
-	PATCH_IF parameter2 < 0 OR paramater2 > 3 BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 3 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
 	END
@@ -10200,6 +10249,45 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_506~ BEGIN
 	LPM ~opcode_target_probability_0~
+END
+
+/* --------------------------------------- *
+ * Stat: Emplacement de sort profane [507] *
+ * --------------------------------------- */
+
+ DEFINE_PATCH_MACRO ~opcode_self_507~ BEGIN
+	LPM ~opcode_self_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_507~ BEGIN
+	LPM ~opcode_self_probability_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_507~ BEGIN
+	LPM ~opcode_target_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_507~ BEGIN
+	LPM ~opcode_target_probability_42~
+END
+
+/* --------------------------------------- *
+ * Stat: Emplacement de sort divin [508] *
+ * --------------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_508~ BEGIN
+	LPM ~opcode_self_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_508~ BEGIN
+	LPM ~opcode_self_probability_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_508~ BEGIN
+	LPM ~opcode_target_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_508~ BEGIN
+	LPM ~opcode_target_probability_62~
 END
 
 
