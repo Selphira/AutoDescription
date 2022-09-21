@@ -5696,7 +5696,7 @@ DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
 			SET oldCount = $opcodes(~%opcode%~)
 			LPF ~delete_opcode~
 				INT_VAR opcode
-				STR_VAR expression = ~parameter1 = 0 AND parameter2 = 1 AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+				STR_VAR expression = ~parameter1 = 0 AND (parameter2 = 1 OR parameter2 = 2 OR parameter2 = 5) AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
