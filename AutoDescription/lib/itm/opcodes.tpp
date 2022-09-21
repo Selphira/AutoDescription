@@ -4204,6 +4204,33 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
+		ELSE PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
+			SET opcode = 206
+			//FIXME: un terme pour différencier l'opcode 5 du 241 ?
+			// NPCHAN protège contre le 5, non contre le 241 et est estampillé Immunité aux charmes
+			// Potentiellement la liste des sorts est beaucoup plus longue :
+			// SPIN980, SPCL641, SPIN553, SPIN558, SPIN980, SPIN985, SPIN506, DEMOCHM, OHREYEB1
+			// + tout ceux qui sont oubliés + les dominations
+			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Charm: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 		// Génère beaucoup de log, les sorts sont rarement bloqués
 		// ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
 		// 	SET opcode = 206
