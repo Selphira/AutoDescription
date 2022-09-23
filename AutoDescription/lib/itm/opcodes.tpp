@@ -4227,6 +4227,28 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
+		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Web: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 		ELSE PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
 			SET opcode = 206
 			//FIXME: un terme pour différencier l'opcode 5 du 241 ?
