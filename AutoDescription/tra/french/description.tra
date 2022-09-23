@@ -2433,8 +2433,10 @@
 
 // Opcode 134: State: Petrification [134]
 
-@11340001 = ~Pétrifie %theTarget%~
-@11340002 = ~de pétrifier %theTarget%~
+@11340001 = ~Pétrification~
+@11340002 = ~Pétrifie %theTarget%~
+@11340003 = ~d'être pétrifié~
+@11340004 = ~de pétrifier %theTarget%~
 
 // Opcode 135: Polymorph into Specific [135]
 

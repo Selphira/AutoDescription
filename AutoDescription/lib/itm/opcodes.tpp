@@ -5385,12 +5385,20 @@ END
 /* -------------------------- *
  * State: Petrification [134] *
  * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_134~ BEGIN
+	SPRINT description @11340001 // ~Pétrification~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_134~ BEGIN
-	SPRINT description @11340001 // ~Pétrifie %theTarget%~
+	SPRINT description @11340002 // ~Pétrifie %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_134~ BEGIN
+	SPRINT description @11340003 // ~d'être pétrifié~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_134~ BEGIN
-	SPRINT description @11340002 // ~de pétrifier %theTarget%~
+	SPRINT description @11340004 // ~de pétrifier %theTarget%~
 END
 
 /* ----------------------------- *
