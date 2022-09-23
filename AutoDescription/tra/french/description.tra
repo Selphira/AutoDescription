@@ -2729,6 +2729,12 @@
 @12640010 = ~un objet de son inventaire~ // %objectType%
 @12640011 = ~une arme équipée~
 
+// Opcode 266: Spell: Remove Protection from Spell [266]
+@12660001 = ~Lève l'immunité au sort %spellName%~
+@12660002 = ~Lève l'immunité %ofTheTarget% au sort %spellName%~
+@12660003 = ~de lever l'immunité au sort %spellName%~
+@12660004 = ~de lever l'immunité %ofTheTarget% au sort %spellName%~
+
 // Opcode 268: Spell Effect: Explore (Wizard Eye) [268]
 
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~

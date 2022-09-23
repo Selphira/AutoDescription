@@ -148,6 +148,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	229 => 225 // Removal: Remove One School [229]
 	230 => 226 // Removal: Remove One Secondary Type [230]
 	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
+	266 => 228 // Spell: Remove Protection from Spell [266]
 
 	// Absorption 
 
@@ -651,7 +652,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	258 => 0 // Spell: Spell Sequencer Activation [258]
 	260 => 1 // Spell: Spell Sequencer Activation [260]
 	265 => 0 // Script: Set Global Variable [265]
-	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
@@ -675,7 +675,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
-	328 => 1 // State: Set State [328]
+	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
 	333 => 1 // Spell Effect: Static Charge [333]
 	334 => 0 // Spell Effect: Turn Undead [334]
@@ -7023,6 +7023,10 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_206_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ----------------------------------- *
  * Spell: Bounce Specified Spell [207] *
  * ----------------------------------- */
@@ -8647,6 +8651,45 @@ DEFINE_PATCH_MACRO ~opcode_264_common~ BEGIN
 	ELSE BEGIN
 		SPRINT objectType @12640010
 	END
+END
+
+/* ----------------------------------------- *
+ * Spell: Remove Protection from Spell [266] *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660001 // ~Lève l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660003 // ~de lever l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660002 // ~Lève l'immunité %ofTheTarget% au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660004 // ~de lever l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_266_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------------- *
