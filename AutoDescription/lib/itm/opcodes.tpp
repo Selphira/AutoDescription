@@ -4182,6 +4182,29 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
+		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Hold: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+
+			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 		ELSE PATCH_IF parameter2 == 154 BEGIN // Enchevêtrement
 			SET opcode = 206
 			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
@@ -10978,10 +11001,9 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		PATCH_IF ~%entry%~ STRING_EQUAL ~%idsEntry%~ BEGIN
 			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
 		END
-		ELSE BEGIN
-			SET strref = 200000 + (file * 1000) + entry
-			LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
-		END
+		// si une entrée n'est pas définie dans le fichier ids, elle peut quand même l'être dans les strrefs
+		SET strref = 200000 + (file * 1000) + entry
+		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
