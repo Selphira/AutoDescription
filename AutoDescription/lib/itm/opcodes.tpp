@@ -823,6 +823,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	125 => 9 // Spell Effect: Unlock (Knock)
 	134 => 1 // State: Petrification
 	136 => 0 // State: Force Visible
+	147 => 9 // Spell: Learn Spell (A CONFIRMER, parfaitement adapté dans 99.9% des cas)
 	150 => 0 // Spell Effect: Find Traps
 	151 => 3 // Summon: Replace Creature (FIXME: peut-être des nuances selon le mode)
 	160 => 0 // Remove Sanctuary
@@ -853,6 +854,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	270 => 0 // Cure: Unpause Target
 	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
 	316 => 0 // Spell: Magical Rest
+	337 => 0 // Remove: Opcode
 	343 => 0 // HP Swap
 END
 
@@ -1731,36 +1733,35 @@ END
  * HP: Current HP Modifier [17] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
-	LOCAL_SET strref_1 = 10170001 // ~Soigne 1 point de vie %toTheTarget%~
-	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts %toTheTarget%~
-	// fix: renommage en rtype pour éviter conflit avec le 'type' de log_warning
-	SET rtype = parameter2 BAND 65535
-	SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170001 // ~Soigne 1 point de vie~
+	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie~
+	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts~
+	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
 
-	PATCH_IF rtype == 1 BEGIN
+	PATCH_IF type == 1 BEGIN
 		SET damageAmount = parameter1
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
-	ELSE PATCH_IF rtype == 0 OR rtype == 2 BEGIN
+	ELSE PATCH_IF type == 0 OR type == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
-	LOCAL_SET strref_1 = 10170005 // ~de soigner 1 point de vie %toTheTarget%~
-	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts %toTheTarget%
-	SET rtype = parameter2 BAND 65535
-	SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170005 // ~de soigner 1 point de vie~
+	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie~
+	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts~
+	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
 
-	PATCH_IF rtype == 0 OR rtype == 2 BEGIN
+	PATCH_IF type == 0 OR type == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
-	ELSE PATCH_IF rtype == 1 BEGIN
+	ELSE BEGIN
 		SET damageAmount = parameter1
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
@@ -1768,11 +1769,39 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
-	LPM ~opcode_self_17~
+	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %toTheTarget%~
+	LOCAL_SET strref_2 = 10170012 // ~Soigne %value% points de vie %toTheTarget%~
+	LOCAL_SET strref_3 = 10170013 // ~Inflige 1 point de dégâts %toTheTarget%~
+	LOCAL_SET strref_4 = 10170014 // ~Inflige %value% points de dégâts %toTheTarget%~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
+
+	PATCH_IF type == 1 BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
+	END
+	ELSE BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
-	LPM ~opcode_self_probability_17~
+	LOCAL_SET strref_1 = 10170015 // ~de soigner 1 point de vie %toTheTarget%~
+	LOCAL_SET strref_2 = 10170016 // ~de soigner %value% points de vie %toTheTarget%~
+	LOCAL_SET strref_3 = 10170017 // ~d'infliger 1 point de dégâts %toTheTarget%~
+	LOCAL_SET strref_4 = 10170018 // ~d'infliger %value% points de dégâts %toTheTarget%
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
+
+	PATCH_IF type == 0 OR type == 2 BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	END
+	ELSE BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
@@ -1792,7 +1821,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 		PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-				PATCH_IF rtype == 2 BEGIN
+				PATCH_IF type == 2 BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
 				END
 			END
@@ -1807,7 +1836,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 		ELSE BEGIN
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
-				PATCH_IF rtype == 2 BEGIN
+				PATCH_IF type == 2 BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
 				END
 			END
@@ -1835,10 +1864,10 @@ DEFINE_PATCH_MACRO ~opcode_17_group~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
-	SET rtype = parameter2 BAND 65535
-	PATCH_IF rtype < CURRENT_HP_MOD_TYPE_cumulative OR rtype > CURRENT_HP_MOD_TYPE_percentage BEGIN
+	LOCAL_SET type = parameter2 BAND 65535
+	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %rtype%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -4632,7 +4661,21 @@ DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
 			SPRINT description @11110001 // ~Crée une arme magique (%itemName%)~
 		END
 		ELSE BEGIN
-			SPRINT description @11110002 // ~Crée %amount% armes magiques (%itemName%)~
+			SPRINT description @11110011 // ~Crée %amount% armes magiques (%itemName%)~
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_111~ BEGIN
+	LOCAL_SET amount = parameter1
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF amount <= 1 BEGIN
+			SPRINT description @11110002 // ~Équipe %theTarget% d'une arme magique (%itemName%)~
+		END
+		ELSE BEGIN
+			SPRINT description @11110012 // ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~
 		END
 	END
 END
@@ -5651,27 +5694,39 @@ DEFINE_PATCH_MACRO ~opcode_146_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_146_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ------------------------ *
  * Spell: Learn Spell [147] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_147~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	SPRINT description @11470001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
+	SPRINT description @11470001 // ~Retranscription du sort %spellName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_147~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	SPRINT description @11470002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+	SPRINT description @11470003 // ~de retranscrire le sort %spellName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_147~ BEGIN
-	LPM ~opcode_self_147~
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470002 // ~Fait retranscrire le sort %spellName% %toTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_147~ BEGIN
-	LPM ~opcode_self_probability_147~
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470004 // ~de faire retranscrire le sort %spellName% %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_147_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------- *
@@ -5719,6 +5774,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_148~ BEGIN
 	LPM ~opcode_self_probability_148~
+END
+
+DEFINE_PATCH_MACRO ~opcode_148_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ------------------------------ *
