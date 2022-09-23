@@ -35,6 +35,7 @@
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
 @100020 = ~les~
+@100021 = ~et~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101083 = ~Arme à 1 main~
 @101084 = ~Arme à 2 mains~
@@ -2703,11 +2704,10 @@
 
 // Opcode 197: Spell: Bounce Projectile [197]
 
-@11970001 = ~Renvoie les %projectiles%~
-@11970002 = ~Renvoie les %projectiles% visant %theTarget%~
-@11970003 = ~de renvoyer les %projectiles%~
-@11970004 = ~de renvoyer les %projectiles% visant %theTarget%~
-
+@11970001 = ~Renvoie %the% %projectiles%~
+@11970002 = ~Renvoie %the% %projectiles% visant %theTarget%~
+@11970003 = ~de renvoyer %the% %projectiles%~
+@11970004 = ~de renvoyer %the% %projectiles% visant %theTarget%~
 
 // Opcode 198: Spell: Bounce (by Opcode) [198]
 

@@ -6810,26 +6810,27 @@ END
  * Spell: Bounce Projectile [197] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
-	LOCAL_SET strref = 11970001 // ~Renvoie les %projectiles%~
+	LOCAL_SET strref = 11970001 // ~Renvoie %the% %projectiles%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
-	LOCAL_SET strref = 11970003 // ~de renvoyer les %projectiles%~
+	LOCAL_SET strref = 11970003 // ~de renvoyer %the% %projectiles%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_197~ BEGIN
-	LOCAL_SET strref = 11970002 // ~Renvoie les %projectiles% visant %theTarget%~
+	LOCAL_SET strref = 11970002 // ~Renvoie %the% %projectiles% visant %theTarget%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_197~ BEGIN
-	LOCAL_SET strref = 11970004 // ~de renvoyer les %projectiles% visant %theTarget%~
+	LOCAL_SET strref = 11970004 // ~de renvoyer %the% %projectiles% visant %theTarget%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
+	SPRINT the @100020 // ~les~
 	PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
 
@@ -6846,6 +6847,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
 	PATCH_IF $opcodes(~%opcode%~) >= 2 BEGIN
+		SPRINT the @100020 // ~les~
 		SPRINT myCustomStr ~~
 		DEFINE_ASSOCIATIVE_ARRAY projectiles_name BEGIN END
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -6858,20 +6860,17 @@ DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
 		END
 		CLEAR_ARRAY ~opcodes_%opcode%~
 		SET $opcodes(~%opcode%~) = 0
-		SPRINT custom_str ~~
-		PATCH_PHP_EACH projectiles_name AS projectiles => _ BEGIN
-			PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
-				SPRINT custom_str ~%projectiles%~
+		SPRINT text ~~
+		PATCH_PHP_EACH projectiles_name AS projectile_name => _ BEGIN
+			PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
+				SPRINT text ~%projectile_name%~
 			END
 			ELSE BEGIN
-				// FIXME: traduction impossible
-				SPRINT custom_str ~%custom_str%, les %projectiles%~
+				SPRINT text ~%text%, %the% %projectile_name%~
 			END
 		END
-		INNER_PATCH_SAVE custom_str ~%custom_str%~ BEGIN
-			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([a-z ]+\)$~ ~ et \1~
-		END
-	
+		SPRINT str @100021 // ~et~
+		LPF ~replace_last_comma_with~ STR_VAR text str RET custom_str = text END	
 		LPM ~add_opcode~
 	END
 END
