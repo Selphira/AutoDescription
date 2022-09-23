@@ -123,7 +123,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 32 => 201 // Cure: Death (Raise Dead) [32]
 	 43 => 201 // Cure: Stone to Flesh [43]
 	 14 => 202 // Graphics: Defrost [14]
-    224 => 203 // Cure: Level Drain (Restoration) [224]
+	 224 => 203 // Cure: Level Drain (Restoration) [224]
+	337 => 203 // Remove: Opcode [337]
 	 46 => 204 // Cure: Stun (Unstun) [46]
     162 => 205 // Cure: Hold [162]
 	270 => 205 // Cure: Unpause Target [270]
@@ -152,11 +153,12 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
 	// Absorption 
 
-	259 => 240 // Protection: Spell Trap [259]
+	259 => 238 // Protection: Spell Trap [259]
 
 	// Renvoi
 
-	199 => 241 // Spell: Bounce Spells [199]
+	198 => 239 // Spell: Bounce (by Opcode) [198]
+	199 => 240 // Spell: Bounce Spells [199]
 	200 => 241 // Spell: Decrementing Bounce Spells [200]
 	202 => 242 // Spell: Bounce (by School) [202]
 	203 => 243 // Spell: Bounce (by Secondary Type) [203]
@@ -639,7 +641,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	194 => 0 // Ignore Dialog Pause [194]
 	195 => 1 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
 	196 => 1 // Spell Effect: Familiar Block [196]
-	198 => 1 // Spell: Bounce (by Opcode) [198]
 	215 => 0
 	225 => 0 // Spell: Reveal Magic [225]
 	234 => 0 // Spell Effect: Contingency Creation [234]
@@ -681,7 +682,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	334 => 0 // Spell Effect: Turn Undead [334]
 	335 => 1 // Spell Effect: Seven Eyes [335]
 	336 => 0 // Graphics: Display Eyes Overlay [336]
-	337 => 1 // Remove: Opcode [337]
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
 	342 => 0 // Animation: Override Data [342]
@@ -6809,6 +6809,41 @@ DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
 	END
 END
 
+/* ------------------------------- *
+ * Spell: Bounce (by Opcode) [198] *
+ * ------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980001 // ~Renvoie %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980003 // ~de renvoyer %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980002 // ~Renvoie %opcodeStr% visant %onTheTarget%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980004 // ~de renvoyer %opcodeStr% visant %onTheTarget%~
+	END
+END
+
 /* ------------------------------------- *
  *  Spell: Bounce (by Power Level) [199] *
  * ------------------------------------- */
@@ -10029,6 +10064,41 @@ DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 10 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2% (0-10 expected).~ END
+	END
+END
+
+/* -------------------- *
+ * Remove: Opcode [337] *
+ * -------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370001 // ~Dissipe %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370003 // ~de dissiper %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370002 // ~Dissipe %opcodeStr% %onTheTarget%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370004 // ~de dissiper %opcodeStr% %onTheTarget%~
 	END
 END
 
