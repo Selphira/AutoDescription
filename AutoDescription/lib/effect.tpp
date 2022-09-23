@@ -30,6 +30,9 @@ DEFINE_PATCH_MACRO ~read_effect_vars~ BEGIN
 	SET parameter4 = 0
 	SET resref2 = 0
 	SET resref3 = 0
+
+	SET custom_int = 0
+	SPRINT custom_str ~~
 END
 
 DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
@@ -53,6 +56,9 @@ DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
 	READ_LONG  EFF2_parameter4 parameter4
 	READ_ASCII EFF2_resource2 resref2
 	READ_ASCII EFF2_resource3 resref3
+
+	SET custom_int = 0
+	SPRINT custom_str ~~
 END
 
 DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
@@ -78,6 +84,8 @@ DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
 	SET parameter4   = ~%data_19%~
 	SPRINT resref2     ~%data_20%~
 	SPRINT resref3     ~%data_21%~
+	SET custom_int   = ~%data_22%~
+	SPRINT custom_str  ~%data_23%~
 END
 
 
@@ -220,32 +228,40 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 			SET range_low = line_4
 			SET range_high = line_5
 
-			PATCH_IF prev_range_high > range_low BEGIN
-				SET range_low = prev_range_high + 1
-			END
+			PATCH_IF prev_range_low != range_low OR prev_range_high != range_high BEGIN
+				PATCH_IF prev_range_high > range_low BEGIN
+					SET range_low = prev_range_high + 1
+				END
 
-			PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
-				PATCH_IF prev_range_low != line2_4 OR prev_range_high != line2_5 BEGIN
-					PATCH_IF range_low < line2_5 AND range_high > line2_4 BEGIN
-						PATCH_IF range_low < line2_4 - 1 AND range_high > line2_4 BEGIN
-							SET range_high = line2_4 - 1
+				PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
+					PATCH_IF prev_range_low != line2_4 OR prev_range_high != line2_5 BEGIN
+						PATCH_IF range_low < line2_5 AND range_high > line2_4 BEGIN
+							PATCH_IF range_low < line2_4 - 1 AND range_high > line2_4 BEGIN
+								SET range_high = line2_4 - 1
+							END
 						END
 					END
 				END
-			END
 
-			// Ensuite on récupère tous les effets qui se trouvent dans le range caclulé
-			// En cas de chevauchement, un même effet se retrouvera dans plusieurs groupes de range.
-			PATCH_IF range_low < range_high BEGIN
-				LPF ~get_range_key~ INT_VAR probability1 = range_high probability2 = range_low RET range = rangeKey END
-				SET count_range += 1
-				SPRINT $ranges(~%count_range%~) ~%range%~
-				SET EVAL ~count_ranges_%range%~ = 0
+				// Ensuite on récupère tous les effets qui se trouvent dans le range caclulé
+				// En cas de chevauchement, un même effet se retrouvera dans plusieurs groupes de range.
+				PATCH_IF range_low <= range_high BEGIN
+					LPF ~get_range_key~ INT_VAR probability1 = range_high probability2 = range_low RET range = rangeKey END
+					SET count_range += 1
+					SPRINT $ranges(~%count_range%~) ~%range%~
+					SET EVAL ~count_ranges_%range%~ = 0
 
-				PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
-					PATCH_IF range_low >= line2_4 AND range_high <= line2_5 BEGIN
-						SET EVAL ~count_ranges_%range%~ += 1
-						SET $EVAL ~range_effects_%range%~(~%line2_0%~ ~%line2_1%~ ~%line2_2%~ ~%line2_3%~ ~%line2_4%~ ~%line2_5%~ ~%line2_6%~) = value2
+					PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
+						PATCH_IF range_low >= line2_4 AND range_high <= line2_5 BEGIN
+							LPF ~get_probability~ INT_VAR probability1 = range_high probability2 = range_low RET probability END
+
+							INNER_PATCH_SAVE line2_6 ~%line2_6%~ BEGIN
+								REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%line2_3% %~ ~%probability% %~
+							END
+
+							SET EVAL ~count_ranges_%range%~ += 1
+							SET $EVAL ~range_effects_%range%~(~%range%~ ~%line2_1%~ ~%line2_2%~ ~%probability%~ ~%range_low%~ ~%range_high%~ ~%line2_6%~) = value2
+						END
 					END
 				END
 			END
@@ -392,7 +408,7 @@ DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	ELSE BEGIN
 		SET $opcodes(~%opcode%~) += 1
 	END
-	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~) = 1
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~) = 1
 END
 
 DEFINE_PATCH_FUNCTION ~delete_opcode~
@@ -418,7 +434,7 @@ BEGIN
 	        LPF evaluate_expression STR_VAR expression RET value END
 			PATCH_IF NOT value BEGIN
 				SET count += 1
-		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~) = 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~) = 1
 	        END
 	    END
 	END
