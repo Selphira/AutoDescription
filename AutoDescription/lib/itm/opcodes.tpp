@@ -6732,20 +6732,58 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_197~ BEGIN
 	LOCAL_SET strref = 11970002 // ~Renvoie les %projectiles% visant %theTarget%~
-	LPM ~opcode_self_197~
+	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_197~ BEGIN
 	LOCAL_SET strref = 11970004 // ~de renvoyer les %projectiles% visant %theTarget%~
-	LPM ~opcode_target_197~
+	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
-	LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+	PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
 
-	PATCH_IF projref > 0 BEGIN
-		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+		PATCH_IF projref > 0 BEGIN
+			LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+		END
+	END
+	ELSE BEGIN
+		SPRINT projectiles ~%custom_str%~
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
+	PATCH_IF $opcodes(~%opcode%~) >= 2 BEGIN
+		SPRINT myCustomStr ~~
+		DEFINE_ASSOCIATIVE_ARRAY projectiles_name BEGIN END
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+			PATCH_IF projref > 0 BEGIN
+				LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+				SET $projectiles_name(~%projectiles%~) = 1
+			END
+		END
+		CLEAR_ARRAY ~opcodes_%opcode%~
+		SET $opcodes(~%opcode%~) = 0
+		SPRINT custom_str ~~
+		PATCH_PHP_EACH projectiles_name AS projectiles => _ BEGIN
+			PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+				SPRINT custom_str ~%projectiles%~
+			END
+			ELSE BEGIN
+				// FIXME: traduction impossible
+				SPRINT custom_str ~%custom_str%, les %projectiles%~
+			END
+		END
+		INNER_PATCH_SAVE custom_str ~%custom_str%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([a-z ]+\)$~ ~ et \1~
+		END
+	
+		LPM ~add_opcode~
 	END
 END
 
@@ -6939,15 +6977,17 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	SET opcode = 206
 	// Solution : possède la protection contre au moins 5 capacités psioniques
 	PATCH_IF nbFound >= 5 BEGIN
-		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
-			// Affichage warning car sort non trouvé
-			LPF ~has_opcode~
-				INT_VAR opcode
-				STR_VAR expression = ~resref = %resref%~
-				RET hasOpcode
-			END
-			PATCH_IF NOT hasOpcode BEGIN
-				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
+		PATCH_IF show_lack_immunity BEGIN
+			PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+				// Affichage warning car sort non trouvé
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
+				END
 			END
 		END
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
