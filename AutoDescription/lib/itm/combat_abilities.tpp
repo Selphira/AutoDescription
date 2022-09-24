@@ -70,7 +70,10 @@ BEGIN
 			SET charges = ~%data_3%~
 
 			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND charges == 0 BEGIN
-				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
+				PATCH_IF isAmmo BEGIN
+					SPRINT specialProjectileAbility @102271 // ~Munition à usage illimité~
+				END
+				ELSE PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
 					SPRINT specialProjectileAbility @102270 // ~Ne nécessite pas de munitions~
 				END
 				ELSE BEGIN
@@ -224,6 +227,7 @@ BEGIN
         READ_SHORT ITM_enchantment enchantment
 
 		READ_BYTE  (headerOffset + ITM_HEAD_range) range
+		READ_BYTE  (headerOffset + ITM_HEAD_projectile_type) projectileType
 		READ_BYTE  (headerOffset + ITM_HEAD_speed) speedFactor
 		READ_SHORT (headerOffset + ITM_HEAD_thac0_bonus) tac0
 		READ_BYTE  (headerOffset + ITM_HEAD_dice_sides) diceSides
@@ -250,7 +254,7 @@ BEGIN
 			LPF ~get_damage_value~ INT_VAR diceCount = diceThrown diceSides damageAmount = damageBonus RET damage END
 		END
 
-        SET $attributes(~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~ ~%range%~ ~%enchantment%~ ~%flags%~ ~%isRanged%~) = 1
+        SET $attributes(~%tac0%~ ~%damage%~ ~%damageType%~ ~%speedFactor%~ ~%range%~ ~%enchantment%~ ~%flags%~ ~%isRanged%~ ~%projectileType%~) = 1
 	END
 END
 
@@ -358,13 +362,14 @@ DEFINE_PATCH_FUNCTION ~add_weapon_attributes_to_description~
 BEGIN
     PATCH_PHP_EACH ~weaponAttributes%index%~ AS data => value BEGIN
         SPRINT damage ~%data_1%~
-        SET tac0        = ~%data_0%~
-        SET damageType  = ~%data_2%~
-        SET speedFactor = ~%data_3%~
-        SET range       = ~%data_4%~
-        SET enchantment = ~%data_5%~
-        SET flags       = ~%data_6%~
-        SET isRanged    = ~%data_7%~
+        SET tac0           = ~%data_0%~
+        SET damageType     = ~%data_2%~
+        SET speedFactor    = ~%data_3%~
+        SET range          = ~%data_4%~
+        SET enchantment    = ~%data_5%~
+        SET flags          = ~%data_6%~
+        SET isRanged       = ~%data_7%~
+        SET projectileType = ~%data_8%~
 
         LPF ~appendLine~ RET description END
 
@@ -431,7 +436,14 @@ BEGIN
 			END
 		END
 
-		LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = ~%speedFactor%~ RET description END // ~Facteur de vitesse~
+		PATCH_IF NOT isAmmo BEGIN
+			LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = ~%speedFactor%~ RET description END // ~Facteur de vitesse~
+		END
+		ELSE BEGIN
+			SET strref = 101078 + projectileType
+			LPF ~getTranslation~ INT_VAR strref RET value = string END
+			LPF ~appendValue~ INT_VAR strref = 101082 STR_VAR value RET description END // ~Arme de jet~
+		END
 
 		// TODO: Ou si la portée d'une arme de mêlée est différente de sa portée par défaut
 		//PATCH_IF isRanged == 1 BEGIN

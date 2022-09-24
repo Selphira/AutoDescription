@@ -50,6 +50,7 @@ BEGIN
 	LPF ~is_weapon~ INT_VAR itemType RET isWeapon END
 	LPF ~is_armor~ INT_VAR itemType RET isArmor END
 	LPF ~is_robe~ INT_VAR itemType RET isRobe END
+	LPF ~is_ammo~ INT_VAR itemType RET isAmmo END
 
 	LPF ~add_equipped_abilities~ STR_VAR description RET description END
 	LPF ~add_charged_abilities~ STR_VAR description RET description END
@@ -109,6 +110,18 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~is_ammo~
+	INT_VAR
+		itemType = 0
+	RET
+		isAmmo
+BEGIN
+	SET isAmmo = 0
+	PATCH_IF itemType == ITM_TYPE_arrows OR itemType == ITM_TYPE_bullets OR itemType == ITM_TYPE_bolts BEGIN
+		SET isAmmo = 1
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~can_update_item~
 	INT_VAR
 		itemType = 0
@@ -158,7 +171,7 @@ BEGIN
 			// Les consommables
 			// ITM_TYPE_potion ITM_TYPE_wand ITM_TYPE_scroll
 			// Les munitions
-			// ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
+			ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
 			BEGIN
 				SET canUpdateItem = 1
 			END
