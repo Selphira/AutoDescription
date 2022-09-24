@@ -63,7 +63,7 @@ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Resource %file%.spl doesn't exist.~ END
 	END
 END
 
@@ -150,7 +150,7 @@ BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~La ressource %file%.spl n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Resource %file%.spl doesn't exist.~ END
 	END
 END
 

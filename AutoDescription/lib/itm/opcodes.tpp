@@ -18,9 +18,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 96 => 3   // Stat: Level Change [96]
 	233 => 3   // Stat: Proficiency [233]
     191 => 4   // Spell: Casting Level Modifier [191]
-	 42 => 4   // Spell: Wizard Spell Slots Modifier [42]
-	 62 => 4   // Spell: Priest Spell Slots Modifier [62]
-	261 => 5   // Spell: Restore Lost Spells [261]
+	507 => 5   // Emplacement sorts profanes [507]
+	 42 => 6   // Spell: Wizard Spell Slots Modifier [42]
+	508 => 7   // Emplacement sorts divins [508]
+	 62 => 8   // Spell: Priest Spell Slots Modifier [62]
+	261 => 9   // Spell: Restore Lost Spells [261]
 
 	// Modification des stats
 
@@ -121,7 +123,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 32 => 201 // Cure: Death (Raise Dead) [32]
 	 43 => 201 // Cure: Stone to Flesh [43]
 	 14 => 202 // Graphics: Defrost [14]
-    224 => 203 // Cure: Level Drain (Restoration) [224]
+	 224 => 203 // Cure: Level Drain (Restoration) [224]
+	337 => 203 // Remove: Opcode [337]
 	 46 => 204 // Cure: Stun (Unstun) [46]
     162 => 205 // Cure: Hold [162]
 	270 => 205 // Cure: Unpause Target [270]
@@ -146,14 +149,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	229 => 225 // Removal: Remove One School [229]
 	230 => 226 // Removal: Remove One Secondary Type [230]
 	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
+	266 => 228 // Spell: Remove Protection from Spell [266]
 
 	// Absorption 
 
-	259 => 240 // Protection: Spell Trap [259]
+	259 => 238 // Protection: Spell Trap [259]
 
 	// Renvoi
 
-	199 => 241 // Spell: Bounce Spells [199]
+	198 => 239 // Spell: Bounce (by Opcode) [198]
+	199 => 240 // Spell: Bounce Spells [199]
 	200 => 241 // Spell: Decrementing Bounce Spells [200]
 	202 => 242 // Spell: Bounce (by School) [202]
 	203 => 243 // Spell: Bounce (by Secondary Type) [203]
@@ -163,10 +168,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	207 => 247 // Spell: Bounce Specified Spell [207]
 
 	// Cas particulier peut dissiper comme immuniser
-	321 => 278 // Removal: Effects specified by Resource [321]
+	321 => 248 // Removal: Effects specified by Resource [321]
 
 	// Les immunités
-
+	509 => 249 // Protection: from Spell Levels (cumulable) [509]
 	102 => 250 // Protection: from Spell Levels [102]
 	201 => 251 // Spell: Decrementing Spell Immunity [201]
 	204 => 252 // Spell: Protection from Spell (School) [204]
@@ -175,6 +180,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	226 => 255 // Spell: Immunity (by Secondary Type, decrementing) [226]
 	206 => 256 // Spell: Protection from Spell [206]
 
+	367 => 279 // Minimum base stats [367]
 	100 => 280 // Protection: from Creature Type [100]
 	120 => 281 // Protection: from Melee Weapons [120]
 	 83 => 282 // Protection: From Projectile (Any) [83]
@@ -635,7 +641,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	194 => 0 // Ignore Dialog Pause [194]
 	195 => 1 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
 	196 => 1 // Spell Effect: Familiar Block [196]
-	198 => 1 // Spell: Bounce (by Opcode) [198]
 	215 => 0
 	225 => 0 // Spell: Reveal Magic [225]
 	234 => 0 // Spell Effect: Contingency Creation [234]
@@ -646,9 +651,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	256 => 0 // Spell: Spell Sequencer Active [256]
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
-	260 => 1 //
+	260 => 1 // Spell: Spell Sequencer Activation [260]
 	265 => 0 // Script: Set Global Variable [265]
-	266 => 1 // Spell: Remove Protection from Spell [266]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
@@ -678,7 +682,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	334 => 0 // Spell Effect: Turn Undead [334]
 	335 => 1 // Spell Effect: Seven Eyes [335]
 	336 => 0 // Graphics: Display Eyes Overlay [336]
-	337 => 1 // Remove: Opcode [337]
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
 	342 => 0 // Animation: Override Data [342]
@@ -686,7 +689,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	363 => 0 // Modal state check [363]
 	365 => 0 // Make unselectable [365]
 	366 => 0 // Spell: Apply Spell On Move [366]
-	367 => 0 // Minimum base stats [367]
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
@@ -775,8 +777,8 @@ END
 
 /* 
 	Opcodes dont le champ Duration n'est pas impactant
-	Conséquence : La durée n'est pas écrire car considérée comme implicite
-	Trois cas :
+	Conséquence : La durée n'est pas à écrire car considérée comme implicite
+	Plusieurs cas :
 	0- l'effet est instantané et ne peut perdurer ou être dissipé
 		(dissipation, soin (dans le sens où on peut les reperdre peu de temps après))
 		~ duration 0
@@ -787,6 +789,7 @@ END
 	9- l'effet est instantané, définitif et ne peut être dissipé (perte d'un objet, oubli d'un sort)
 		~ permanent after death
 */
+// Conséquence : à définir
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	  2 => 0 // Cure: Sleep
 	  4 => 0 // Cure: Berserking
@@ -820,6 +823,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	125 => 9 // Spell Effect: Unlock (Knock)
 	134 => 1 // State: Petrification
 	136 => 0 // State: Force Visible
+	147 => 9 // Spell: Learn Spell (A CONFIRMER, parfaitement adapté dans 99.9% des cas)
 	150 => 0 // Spell Effect: Find Traps
 	151 => 3 // Summon: Replace Creature (FIXME: peut-être des nuances selon le mode)
 	160 => 0 // Remove Sanctuary
@@ -850,14 +854,17 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	270 => 0 // Cure: Unpause Target
 	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
 	316 => 0 // Spell: Magical Rest
+	337 => 0 // Remove: Opcode
+	343 => 0 // HP Swap
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
 // Traduction : durée normale ou jusqu'à dissipation / utilisation
-// Conséquence : les durées permanentes et permanentes, persiste après la mort n'est pas affichée
-// TODO: à améliorer ou retirer
+// Conséquence : les durées "permanentes" et "permanentes, persiste après la mort" ne sont pas affichées
+// TODO: à clarifier ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
+	127 => 1 // Summon: Monster Summoning
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
 	177 => 1 // Use EFF File
@@ -865,9 +872,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	218 => 1 // Protection: Stoneskin
 	236 => 1 // Spell Effect: Image Projection
 	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
+	331 => 1 // Summon: Random Monster Summoning
 END
 
 // Opcodes qui sont dissipés par la mort (directement ou indirectement)
+// Conséquence : Timing 9 est converti en Timing 1
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent_after_death~ BEGIN
 	24  => 1 // State: Horror
 	25  => 1 // State: Poison
@@ -1724,36 +1733,35 @@ END
  * HP: Current HP Modifier [17] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
-	LOCAL_SET strref_1 = 10170001 // ~Soigne 1 point de vie %toTheTarget%~
-	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts %toTheTarget%~
-	// fix: renommage en rtype pour éviter conflit avec le 'type' de log_warning
-	SET rtype = parameter2 BAND 65535
-	SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170001 // ~Soigne 1 point de vie~
+	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie~
+	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts~
+	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
 
-	PATCH_IF rtype == 1 BEGIN
+	PATCH_IF type == 1 BEGIN
 		SET damageAmount = parameter1
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
-	ELSE PATCH_IF rtype == 0 OR rtype == 2 BEGIN
+	ELSE PATCH_IF type == 0 OR type == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
-	LOCAL_SET strref_1 = 10170005 // ~de soigner 1 point de vie %toTheTarget%~
-	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts %toTheTarget%
-	SET rtype = parameter2 BAND 65535
-	SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170005 // ~de soigner 1 point de vie~
+	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie~
+	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts~
+	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
 
-	PATCH_IF rtype == 0 OR rtype == 2 BEGIN
+	PATCH_IF type == 0 OR type == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
 	END
-	ELSE PATCH_IF rtype == 1 BEGIN
+	ELSE BEGIN
 		SET damageAmount = parameter1
 		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
 		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
@@ -1761,11 +1769,39 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
-	LPM ~opcode_self_17~
+	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %toTheTarget%~
+	LOCAL_SET strref_2 = 10170012 // ~Soigne %value% points de vie %toTheTarget%~
+	LOCAL_SET strref_3 = 10170013 // ~Inflige 1 point de dégâts %toTheTarget%~
+	LOCAL_SET strref_4 = 10170014 // ~Inflige %value% points de dégâts %toTheTarget%~
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
+
+	PATCH_IF type == 1 BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
+	END
+	ELSE BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
-	LPM ~opcode_self_probability_17~
+	LOCAL_SET strref_1 = 10170015 // ~de soigner 1 point de vie %toTheTarget%~
+	LOCAL_SET strref_2 = 10170016 // ~de soigner %value% points de vie %toTheTarget%~
+	LOCAL_SET strref_3 = 10170017 // ~d'infliger 1 point de dégâts %toTheTarget%~
+	LOCAL_SET strref_4 = 10170018 // ~d'infliger %value% points de dégâts %toTheTarget%
+	LOCAL_SET type = parameter2 BAND 65535
+	LOCAL_SET subType = parameter2 / 65535
+
+	PATCH_IF type == 0 OR type == 2 BEGIN
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+	END
+	ELSE BEGIN
+		SET damageAmount = parameter1
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
@@ -1785,7 +1821,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 		PATCH_IF ~%value%~ STRING_CONTAINS_REGEXP ~^-~ BEGIN
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-				PATCH_IF rtype == 2 BEGIN
+				PATCH_IF type == 2 BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
 				END
 			END
@@ -1800,7 +1836,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 		ELSE BEGIN
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
-				PATCH_IF rtype == 2 BEGIN
+				PATCH_IF type == 2 BEGIN
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
 				END
 			END
@@ -1828,10 +1864,10 @@ DEFINE_PATCH_MACRO ~opcode_17_group~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
-	SET rtype = parameter2 BAND 65535
-	PATCH_IF rtype < CURRENT_HP_MOD_TYPE_cumulative OR rtype > CURRENT_HP_MOD_TYPE_percentage BEGIN
+	LOCAL_SET type = parameter2 BAND 65535
+	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %rtype%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
 	END
 END
 
@@ -2683,6 +2719,49 @@ DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10420001 RET description END
 END
 
+DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
+	LOCAL_SET initOpcode = opcode
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET searchP1 = parameter1
+		SET newP2 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = initOpcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = initOpcode
+				SET newP2 |= parameter2
+			END
+		END
+		PATCH_IF newP2 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
+			// Fonctionnel dans les cas généraux
+			SET opcode = initOpcode == 42 ? 507 : 508
+			SET parameter2 = newP2
+			SET parameter1 = searchP1
+			LPM ~add_opcode~
+		END
+	END
+END
+
 /* ------------------------- *
  * Cure: Stone to Flesh [43] *
  * ------------------------- */
@@ -2888,7 +2967,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_55_is_valid~ BEGIN
 	LOCAL_SET death_type = 0x4
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
@@ -3129,6 +3208,10 @@ DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET spellLevelMax = 7
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620001 RET description END
+END
+
+DEFINE_PATCH_MACRO ~opcode_62_group~ BEGIN
+	LPM ~opcode_42_group~
 END
 
 /* ----------------------- *
@@ -4039,11 +4122,7 @@ DEFINE_PATCH_MACRO ~opcode_100_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_100_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
-	PATCH_IF parameter2 == 9 BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Kit.ids is not available, IDS file %parameter2%.~ END
-	END
+	LPM ~opcode_idscheck8_is_valid~
 END
 
 /* ----------------------------- *
@@ -4118,12 +4197,35 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					STR_VAR expression = ~resref = %resref%~
 					RET hasOpcode
 				END
-				PATCH_IF NOT hasOpcode BEGIN
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
 					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Haste: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
 
 			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Hold: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+
+			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~resref = %resref%~
@@ -4141,7 +4243,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					STR_VAR expression = ~resref = %resref%~
 					RET hasOpcode
 				END
-				PATCH_IF NOT hasOpcode BEGIN
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
 					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Entangle: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
@@ -4154,29 +4256,78 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				END
 			END
 		END
+		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Web: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+		ELSE PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
+			SET opcode = 206
+			//FIXME: un terme pour différencier l'opcode 5 du 241 ?
+			// NPCHAN protège contre le 5, non contre le 241 et est estampillé Immunité aux charmes
+			// Potentiellement la liste des sorts est beaucoup plus longue :
+			// SPIN980, SPCL641, SPIN553, SPIN558, SPIN980, SPIN985, SPIN506, DEMOCHM, OHREYEB1
+			// + tout ceux qui sont oubliés + les dominations
+			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Charm: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 		// Génère beaucoup de log, les sorts sont rarement bloqués
-		// ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
-		// 	SET opcode = 206
-		// 	PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-		// 		// Aucun retrait
-		// 		LPF ~has_opcode~
-		// 			INT_VAR opcode
-		// 			STR_VAR expression = ~resref = %resref%~
-		// 			RET hasOpcode
-		// 		END
-		// 		PATCH_IF NOT hasOpcode BEGIN
-		// 			LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
-		// 		END
-		// 	END
-		// 	PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-		// 		LPF ~delete_opcode~
-		// 			INT_VAR opcode
-		// 			STR_VAR expression = ~resref = %resref%~
-		// 			RET $opcodes(~%opcode%~) = count
-		// 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-		// 		END
-		// 	END
-		// END
+		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
+			SET opcode = 206
+			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+				// Aucun retrait
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
+				END
+			END
+			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
 	END
 	SET opcode = 101
 END
@@ -4215,6 +4366,48 @@ DEFINE_PATCH_MACRO ~opcode_102_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Level %parameter1%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
+	LOCAL_SET initOpcode = opcode
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET newP1 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = initOpcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = initOpcode
+				SET parameter = parameter1 - 1
+				SET newP1 |= ~%BIT%parameter%%~
+			END
+		END
+		PATCH_IF newP1 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
+			// Fonctionnel dans les cas généraux
+			SET opcode = 509
+			SET parameter1 = newP1
+			LPM ~add_opcode~
+		END
 	END
 END
 
@@ -4468,7 +4661,21 @@ DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
 			SPRINT description @11110001 // ~Crée une arme magique (%itemName%)~
 		END
 		ELSE BEGIN
-			SPRINT description @11110002 // ~Crée %amount% armes magiques (%itemName%)~
+			SPRINT description @11110011 // ~Crée %amount% armes magiques (%itemName%)~
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_111~ BEGIN
+	LOCAL_SET amount = parameter1
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF amount <= 1 BEGIN
+			SPRINT description @11110002 // ~Équipe %theTarget% d'une arme magique (%itemName%)~
+		END
+		ELSE BEGIN
+			SPRINT description @11110012 // ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~
 		END
 	END
 END
@@ -5221,12 +5428,20 @@ END
 /* -------------------------- *
  * State: Petrification [134] *
  * -------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_134~ BEGIN
+	SPRINT description @11340001 // ~Pétrification~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_134~ BEGIN
-	SPRINT description @11340001 // ~Pétrifie %theTarget%~
+	SPRINT description @11340002 // ~Pétrifie %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_134~ BEGIN
+	SPRINT description @11340003 // ~d'être pétrifié~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_134~ BEGIN
-	SPRINT description @11340002 // ~de pétrifier %theTarget%~
+	SPRINT description @11340004 // ~de pétrifier %theTarget%~
 END
 
 /* ----------------------------- *
@@ -5397,7 +5612,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_145~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
-	PATCH_IF parameter2 < 0 OR paramater2 > 3 BEGIN
+	PATCH_IF parameter2 < 0 OR parameter2 > 3 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
 	END
@@ -5479,27 +5694,39 @@ DEFINE_PATCH_MACRO ~opcode_146_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_146_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ------------------------ *
  * Spell: Learn Spell [147] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_147~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	SPRINT description @11470001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
+	SPRINT description @11470001 // ~Retranscription du sort %spellName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_147~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-	SPRINT description @11470002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+	SPRINT description @11470003 // ~de retranscrire le sort %spellName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_147~ BEGIN
-	LPM ~opcode_self_147~
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470002 // ~Fait retranscrire le sort %spellName% %toTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_147~ BEGIN
-	LPM ~opcode_self_probability_147~
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	SPRINT description @11470004 // ~de faire retranscrire le sort %spellName% %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_147_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------- *
@@ -5547,6 +5774,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_148~ BEGIN
 	LPM ~opcode_self_probability_148~
+END
+
+DEFINE_PATCH_MACRO ~opcode_148_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ------------------------------ *
@@ -5646,7 +5877,7 @@ DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
 			SET oldCount = $opcodes(~%opcode%~)
 			LPF ~delete_opcode~
 				INT_VAR opcode
-				STR_VAR expression = ~parameter1 = 0 AND parameter2 = 1 AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+				STR_VAR expression = ~parameter1 = 0 AND (parameter2 = 1 OR parameter2 = 2 OR parameter2 = 5) AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -6078,7 +6309,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_175~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_175_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 END
 
 /* ---------------------------------- *
@@ -6228,11 +6459,11 @@ DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET d
 END
 
 DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	LPM ~opcode_resref_is_valid~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %resref%.eff n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %resref%.eff doesn't exist.~ END
 	END
 END
 
@@ -6579,31 +6810,103 @@ END
  * Spell: Bounce Projectile [197] *
  * ------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_197~ BEGIN
-	LOCAL_SET strref = 11970001 // ~Renvoie les %projectiles%~
+	LOCAL_SET strref = 11970001 // ~Renvoie %the% %projectiles%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_197~ BEGIN
-	LOCAL_SET strref = 11970003 // ~de renvoyer les %projectiles%~
+	LOCAL_SET strref = 11970003 // ~de renvoyer %the% %projectiles%~
 	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_197~ BEGIN
-	LOCAL_SET strref = 11970002 // ~Renvoie les %projectiles% visant %theTarget%~
-	LPM ~opcode_self_197~
+	LOCAL_SET strref = 11970002 // ~Renvoie %the% %projectiles% visant %theTarget%~
+	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_197~ BEGIN
-	LOCAL_SET strref = 11970004 // ~de renvoyer les %projectiles% visant %theTarget%~
-	LPM ~opcode_target_197~
+	LOCAL_SET strref = 11970004 // ~de renvoyer %the% %projectiles% visant %theTarget%~
+	LPM ~opcode_197_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
-	LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+	SPRINT the @100020 // ~les~
+	PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
 
-	PATCH_IF projref > 0 BEGIN
-		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+		PATCH_IF projref > 0 BEGIN
+			LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+		END
+	END
+	ELSE BEGIN
+		SPRINT projectiles ~%custom_str%~
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
+	PATCH_IF $opcodes(~%opcode%~) >= 2 BEGIN
+		SPRINT the @100020 // ~les~
+		SPRINT myCustomStr ~~
+		DEFINE_ASSOCIATIVE_ARRAY projectiles_name BEGIN END
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+			PATCH_IF projref > 0 BEGIN
+				LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+				SET $projectiles_name(~%projectiles%~) = 1
+			END
+		END
+		CLEAR_ARRAY ~opcodes_%opcode%~
+		SET $opcodes(~%opcode%~) = 0
+		SPRINT text ~~
+		PATCH_PHP_EACH projectiles_name AS projectile_name => _ BEGIN
+			PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
+				SPRINT text ~%projectile_name%~
+			END
+			ELSE BEGIN
+				SPRINT text ~%text%, %the% %projectile_name%~
+			END
+		END
+		SPRINT str @100021 // ~et~
+		LPF ~replace_last_comma_with~ STR_VAR text str RET custom_str = text END	
+		LPM ~add_opcode~
+	END
+END
+
+/* ------------------------------- *
+ * Spell: Bounce (by Opcode) [198] *
+ * ------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980001 // ~Renvoie %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980003 // ~de renvoyer %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980002 // ~Renvoie %opcodeStr% visant %onTheTarget%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_198~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11980004 // ~de renvoyer %opcodeStr% visant %onTheTarget%~
 	END
 END
 
@@ -6795,17 +7098,19 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 		END
 	END
 	SET opcode = 206
-	// Solution : possède la protection contre plus de 2 capacités psioniques
+	// Solution : possède la protection contre au moins 5 capacités psioniques
 	PATCH_IF nbFound >= 5 BEGIN
-		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
-			// Affichage warning car sort non trouvé
-			LPF ~has_opcode~
-				INT_VAR opcode
-				STR_VAR expression = ~resref = %resref%~
-				RET hasOpcode
-			END
-			PATCH_IF NOT hasOpcode BEGIN
-				LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunite contre capacite psionique detectee : Opcode 206 avec %resref% non trouve.~ END
+		PATCH_IF show_lack_immunity BEGIN
+			PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+				// Affichage warning car sort non trouvé
+				LPF ~has_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~resref = %resref%~
+					RET hasOpcode
+				END
+				PATCH_IF NOT hasOpcode BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
+				END
 			END
 		END
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
@@ -6817,6 +7122,10 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 			END
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_206_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ----------------------------------- *
@@ -7191,7 +7500,7 @@ DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_219_is_valid~ BEGIN
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck8_is_valid~
 END
 
 /* ---------------------------- *
@@ -7832,7 +8141,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_238_is_valid~ BEGIN
 	LOCAL_SET death_type = 0x200
-	LPM ~opcode_idscheck_is_valid~
+	LPM ~opcode_idscheck9_is_valid~
 	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
 		isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
@@ -8286,11 +8595,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT spellType @12610011 // ~profane~
+		SPRINT spellType @12610010 // ~profane~
 		SET spellLevel = spellLevel > 9 ? 9 : spellLevel
 	END
 	ELSE PATCH_IF parameter2 == 1 BEGIN
-		SPRINT spellType @12610012 // ~divin~
+		SPRINT spellType @12610011 // ~divin~
 		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
 	END
 
@@ -8443,6 +8752,45 @@ DEFINE_PATCH_MACRO ~opcode_264_common~ BEGIN
 	ELSE BEGIN
 		SPRINT objectType @12640010
 	END
+END
+
+/* ----------------------------------------- *
+ * Spell: Remove Protection from Spell [266] *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660001 // ~Lève l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660003 // ~de lever l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660002 // ~Lève l'immunité %ofTheTarget% au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_266~ BEGIN
+	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12660004 // ~de lever l'immunité au sort %spellName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_266_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------------- *
@@ -9097,28 +9445,37 @@ END
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
 // TODO: tester les valeurs : special > 3
+
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+		SPRINT name @13010002 // // ~Chance de coup critique avec cette arme~
+	END
+	ELSE BEGIN
+		SPRINT name @13010001 // ~Chance de coup critique~
+	END
+	LPM ~opcode_301_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
 	LOCAL_SET value = 5 * parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	SPRINT name @13010001 // ~Chance de coup critique~
-	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
-		SET strref = 230000 + parameter3
-		SPRINT weaponType (AT strref)
-		SPRINT strref @130100020 // ~avec les %weaponType%~
-		TEXT_SPRINT name ~%name% %strref%~
-	END
-	ELSE PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
 		END
 	END
 	PATCH_IF is_ee AND special >= 1 BEGIN
-		SET strref = 130100010 + special // ~en mêlée~
+		SET strref = 13010010 + special // ~en mêlée~
 		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
 		TEXT_SPRINT name ~%name% %descriptionAdd%~
+	END
+	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @13010020 // ~avec des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
 	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
@@ -9423,7 +9780,7 @@ DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
 		END
 		// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 		ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		END
 	END
 END
@@ -9432,7 +9789,7 @@ DEFINE_PATCH_MACRO ~opcode_321_is_valid~ BEGIN
 	// Leaving the resource field empty will remove any effect on the creature without a parent resource
 	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Resource key is empty : non gere.~ END
 	END
 END
 
@@ -9459,10 +9816,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_323~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_323_is_valid~ BEGIN
-	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
-		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
-	END
+	LPM ~opcode_modstat1_is_valid~
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 == 0 AND special == 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Value = Value + 0.~ END
@@ -9514,7 +9868,8 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 			END
-			ELSE PATCH_IF statType == 110 OR statType == 111 BEGIN // SplState
+			ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
+				SET statType = statType == 76 ? 110 : statType
 				SET oldStrref = strref + statType
 				SET strref = 420000 + parameter1
 				LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
@@ -9562,7 +9917,7 @@ DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
 	END
 	// distinguer les cas où ~%spellName%~ == ~~ parce qu'il n'existe pas ou parce qu'il n'a pas de nom
 	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		SET isValid = 0
 	END
 	SPRINT againstWho (AT againstWhoStrref)
@@ -9571,7 +9926,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_324_is_valid~ BEGIN
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND timingMode == TIMING_duration AND duration == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
 	END
 END
 
@@ -9610,6 +9965,7 @@ END
 /* ------------------------ *
  * Apply Effects List [326] *
  * ------------------------ */
+// TODO : gérer 326 avec 324
 DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
@@ -9640,47 +9996,66 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
-	PATCH_IF is_ee == 1 BEGIN
-		PATCH_IF (statType >= 102 AND statType <= 108) OR (statType >= 112 AND statType <= 118) BEGIN
-			SET idsId = statType - 100
-			SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
-			PATCH_IF (statType >= 112 AND statType <= 118) BEGIN
-				SET idsId = statType - 110
-				SET strref = strref + 147 // ~Effectif contre les %creatureType%~
-			END
-			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-		END
-		ELSE BEGIN
-			SET strref = strref + statType
-		END
-		LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+	PATCH_IF statType >= 102 AND statType <= 109 BEGIN
+		SET idsId = statType - 100
+		SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 	END
+	ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
+		SET statType = statType == 76 ? 110 : statType
+		SET oldStrref = strref + statType
+		SET strref = 420000 + parameter1
+		LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+		SET strref = oldStrref
+	END
+	ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN
+		SET idsId = statType - 110
+		SET strref = strref + 147 // ~Effectif contre les %creatureType%~
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+	END
+	ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
+		LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
+		SET strref = strref + statType
+	END
+	ELSE BEGIN
+		SET strref = strref + statType
+	END
+	LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
 END
 
 /* ------------------------------- *
  * Spell Effect: Slow Poison [329] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_329~ BEGIN
-	LOCAL_SET seconds = parameter1
-	SPRINT description @13290001 // ~Force la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290001 // ~Abaissement de la virulence de la plupart des poisons de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_329~ BEGIN
-	LOCAL_SET seconds = parameter1
-	SPRINT description @13290002 // ~de forcer la plupart des poisons sur %theTarget% à agir toutes les %seconds% secondes~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290003 // ~d'abaisser la virulence de la plupart des poisons sur %theTarget% de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_329~ BEGIN
-	LPM ~opcode_self_329~
+	LOCAL_SET amount = parameter1
+	SPRINT description @13290002 // ~Abaisse la virulence de la plupart des poisons sur %theTarget% de %amount%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_329~ BEGIN
 	LPM ~opcode_self_probability_329~
 END
 
+DEFINE_PATCH_MACRO ~opcode_329_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 OR parameter1 == 1 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Slow Factor == %parameter1% (>= 2 expected).~ END
+	END
+END
+
 /* -------------------------------------- *
  * Summon: Random Monster Summoning [331] *
  * -------------------------------------- */
+// FIXME: pas de test possible en 2.5.16
 DEFINE_PATCH_MACRO ~opcode_self_331~ BEGIN
 	LOCAL_SET strref = 13310001 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 	LPM ~opcode_331_common~
@@ -9723,6 +10098,17 @@ DEFINE_PATCH_MACRO ~opcode_331_common~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
+DEFINE_PATCH_MACRO ~opcode_331_is_valid~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.2da~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File %resref%.2da does not exist, the game may crash.~ END
+	END
+	ELSE PATCH_IF NOT FILE_EXISTS_IN_GAME ~smtables.2da~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File smtables.2da does not exist, the game may crash.~ END
+	END
+END
+
 /* ------------------------------------ *
  * Stat: Specific Damage Modifier [332] *
  * ------------------------------------ */
@@ -9734,6 +10120,52 @@ DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 	SPRINT value @10002 // ~%value% %~
 	SPRINT description @100001 // ~%name%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Modifier == %parameter1%.~ END
+	END
+	PATCH_IF parameter2 < 0 OR parameter2 > 10 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2% (0-10 expected).~ END
+	END
+END
+
+/* -------------------- *
+ * Remove: Opcode [337] *
+ * -------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370001 // ~Dissipe %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370003 // ~de dissiper %opcodeStr%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370002 // ~Dissipe %opcodeStr% %onTheTarget%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_337~ BEGIN
+	LOCAL_SET strref = 401000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @13370004 // ~de dissiper %opcodeStr% %onTheTarget%~
+	END
 END
 
 /* ---------------------------------------------- *
@@ -9755,6 +10187,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_340~ BEGIN
 	LPM ~opcode_target_340~
+END
+
+DEFINE_PATCH_MACRO ~opcode_340_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
 END
 
 /* ---------------------------------------------- *
@@ -9787,8 +10223,27 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_341~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
+	PATCH_IF special >= 1 BEGIN
+		SET strref = 13010010 + special // ~en mêlée~
+		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
+		TEXT_SPRINT condition ~%condition% %descriptionAdd%~
+	END
+	PATCH_IF parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @13410020 // ~avec des %weaponType%~
+		TEXT_SPRINT condition ~%condition% %strref%~
+	END
+	ELSE PATCH_IF parameter2 != 0 BEGIN
+		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		PATCH_IF isExternal AND parameter3 != 0 BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+		END
+	END
+
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
 	LPF ~get_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
@@ -9811,26 +10266,30 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
     END
 END
 
+DEFINE_PATCH_MACRO ~opcode_341_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ------------- *
  * HP Swap [343] *
  * ------------- */
 DEFINE_PATCH_MACRO ~opcode_self_343~ BEGIN
 	LOCAL_SET mode = parameter2
-	PATCH_IF mode == 0 BEGIN
-		SPRINT description @13430002 // ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	PATCH_IF mode == 1 BEGIN
+		SPRINT description @13430001 // ~Échange les points de vie du porteur et de la cible~
 	END
 	ELSE BEGIN
-		SPRINT description @13430001 // ~Échange les points de vie du porteur et de la cible~
+		SPRINT description @13430002 // ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_343~ BEGIN
 	LOCAL_SET mode = parameter2
-	PATCH_IF mode == 0 BEGIN
-		SPRINT description @13430004 // ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
+	PATCH_IF mode == 1 BEGIN
+		SPRINT description @13430003 // ~d'échanger les points de vie du porteur et de la cible~
 	END
 	ELSE BEGIN
-		SPRINT description @13430003 // ~d'échanger les points de vie du porteur et de la cible~
+		SPRINT description @13430004 // ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont plus grands~
 	END
 END
 
@@ -9838,16 +10297,55 @@ END
  * Enchantment vs. creature type [344] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
-	//TODO: weaponSlot + weaponCategory
-	LOCAL_SET strref = 13440001 // ~Enchantement~
+	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+	SPRINT name @13440001 // ~Enchantement~
+	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+		SET strref = 230000 + parameter4
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+		SPRINT strref @13440020 // ~des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+		TEXT_SPRINT name ~%name% %weaponSlot%~
+	END
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 	SET value = special
-	SET parameter2 = MOD_TYPE_cumulative
-	LPM ~opcode_mod_base~
+	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
 END
 
-//TODO: 345: arme visée considérée comme une arme du type configuré...
+DEFINE_PATCH_MACRO ~opcode_344_is_valid~ BEGIN
+	LPM ~opcode_idscheck8_is_valid~
+END
+
+/* ----------------------- *
+ * Enchantment bonus [345] *
+ * ----------------------- */
+// Je ne comprends pas comment il peut fonctionner : où se trouve le bonus ?
+// le seul cas où ça peut matcher c'est pour P2==0
+// TODO: parameter2 + parameter1, s'inspirer de l'opcode 120
+// DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
+// 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+// 	SET parameter3 = special != 0 ? special : parameter3
+// 	SPRINT name @13440001 // ~Enchantement~
+// 	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+// 		SET strref = 230000 + parameter4
+// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+// 		SPRINT strref @13440020 // ~des %weaponType%~
+// 		TEXT_SPRINT name ~%name% %strref%~
+// 	END
+// 	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+// 		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+// 		TEXT_SPRINT name ~%name% %weaponSlot%~
+// 	END
+// 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+// 	SET value = special
+// 	LPF ~signed_value~ INT_VAR value RET value END
+// 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
+// END
 
 /* --------------------------- *
  * Save vs. school bonus [346] *
@@ -9866,6 +10364,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_346~ BEGIN
 	LOCAL_SET strref = 13460010 + special
 	LPF ~opcode_save_vs~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_346~ BEGIN
+	LPM ~opcode_self_probability_346~
+END
+
+DEFINE_PATCH_MACRO ~opcode_346_is_valid~ BEGIN
+	// Pas de mode percent
+	LPM ~opcode_modstat1_is_valid~
+	PATCH_IF special < 0 OR special > 11 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Primary Type %special% (0-11 expected).~ END
+	END
 END
 
 /* -------------------------------------------- *
@@ -9902,21 +10413,44 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_361~ BEGIN
 	LPM ~opcode_target_361~
 END
 
+DEFINE_PATCH_MACRO ~opcode_361_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+END
+
 /* ------------------------- *
  * Critical miss bonus [362] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
-	//TODO: Gérer attack type
-	LOCAL_SET value = 5 * parameter1
-	LPF ~signed_value~ INT_VAR value RET value END
-	SPRINT value @10002 // ~%value% %~
-	PATCH_IF parameter2 == 1 BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
 		SPRINT name @13620002 // ~Chance d'échec critique avec cette arme~
 	END
 	ELSE BEGIN
 		SPRINT name @13620001 // ~Chance d'échec critique~
 	END
-	SPRINT description @100001 // ~%name%%colon%%value%~
+	LPM ~opcode_301_common~
+END
+
+/* ------------------------ *
+ * Minimum base stats [367] *
+ * ------------------------ */
+// FIXME: Est utilisé dans certains sorts qui diminue les caractéristiques sans pouvoir tuer la cible
+// Idéalement, il faudrait trouver cet effet de même durée et les grouper : Constitution -2 (minimum 1)
+DEFINE_PATCH_MACRO ~opcode_self_367~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @13670001 // ~Immunité à la mort par aborption de caractéristique~
+	END
+	ELSE BEGIN
+		SPRINT description @13670003 // ~Sensible à la mort par aborption de caractéristique~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_367~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @13670002 // ~d'être immunisé à la mort par absorption de caractéristique~
+	END
+	ELSE BEGIN
+		SPRINT description @13670004 // ~d'être sensible à la mort par absorption de caractéristique~
+	END
 END
 
 /* --------------------------------- *
@@ -10050,6 +10584,98 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_506~ BEGIN
 	LPM ~opcode_target_probability_0~
 END
 
+/* --------------------------------------- *
+ * Stat: Emplacement de sort profane [507] *
+ * --------------------------------------- */
+
+ DEFINE_PATCH_MACRO ~opcode_self_507~ BEGIN
+	LPM ~opcode_self_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_507~ BEGIN
+	LPM ~opcode_self_probability_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_507~ BEGIN
+	LPM ~opcode_target_42~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_507~ BEGIN
+	LPM ~opcode_target_probability_42~
+END
+
+/* --------------------------------------- *
+ * Stat: Emplacement de sort divin [508] *
+ * --------------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_508~ BEGIN
+	LPM ~opcode_self_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_508~ BEGIN
+	LPM ~opcode_self_probability_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_508~ BEGIN
+	LPM ~opcode_target_62~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_508~ BEGIN
+	LPM ~opcode_target_probability_62~
+END
+
+/* --------------------------------------- *
+ * Stat: Immunité aux sorts (par niveau) (cumulatif) [509] *
+ * --------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090001 // ~Immunité aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020001 // ~Immunité aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090002 // ~d'immuniser aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020003 // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
+	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		SPRINT description @15090001 // ~Immunité aux sorts~
+	END
+	ELSE BEGIN
+		LPM ~opcode_509_common~
+		SPRINT description @11020002 // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
+	SPRINT levelStr ~~
+	FOR (idx = 0 ; idx < 9 ; ++idx) BEGIN
+		SET bit = EVAL ~%BIT%idx%%~
+		PATCH_IF (parameter1 BAND bit) != 0 BEGIN
+			SET level = idx + 1
+			SPRINT levelStr ~%levelStr%, %level%~
+		END
+	END
+
+	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ et \1~
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| et \)~ ~~
+	END
+	SPRINT spellLevel ~%levelStr%~
+END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
@@ -10410,7 +11036,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 			END
 		END
 		ELSE PATCH_IF showWarning BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.spl n'existe pas.~ END
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.spl doesn't exist.~ END
 		END
 	END
 END
@@ -10453,7 +11079,7 @@ DEFINE_PATCH_FUNCTION ~get_item_name~ INT_VAR showWarning = 1 STR_VAR file = "" 
 		END
 	END
 	ELSE PATCH_IF showWarning BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.itm n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.itm doesn't exist.~ END
 	END
 END
 
@@ -10480,14 +11106,14 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEG
 			END
 			/*
 			ELSE BEGIN
-				SPRINT creatureName @102549 // ~Créature inconnue~
+				SPRINT creatureName @102550 // ~Créature inconnue~
 				LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom de la créature introuvable pour %file%.cre~ END
 			END
 			*/
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.cre doesn't exist.~ END
 	END
 END
 
@@ -10533,7 +11159,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance
 		END
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : La ressource %file%.cre n'existe pas.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %file%.cre doesn't exist.~ END
 	END
 END
 
@@ -10616,10 +11242,9 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		PATCH_IF ~%entry%~ STRING_EQUAL ~%idsEntry%~ BEGIN
 			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
 		END
-		ELSE BEGIN
-			SET strref = 200000 + (file * 1000) + entry
-			LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
-		END
+		// si une entrée n'est pas définie dans le fichier ids, elle peut quand même l'être dans les strrefs
+		SET strref = 200000 + (file * 1000) + entry
+		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
@@ -10767,6 +11392,14 @@ DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_modstat1_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_flat BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_modstat2_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > MOD_TYPE_percentage BEGIN
@@ -10783,9 +11416,17 @@ DEFINE_PATCH_MACRO ~opcode_modstat3_is_valid~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_idscheck_is_valid~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_idscheck9_is_valid~ BEGIN
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_idscheck8_is_valid~ BEGIN
+	LPM ~opcode_modstat_is_valid~
+	PATCH_IF parameter2 < 2 OR parameter2 > 8 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown IDS file %parameter2%.~ END
 	END

@@ -106,13 +106,19 @@ DEFINE_PATCH_FUNCTION ~appendSubProperty~ INT_VAR strref = 0 STR_VAR name = "" v
 END
 
 DEFINE_PATCH_FUNCTION ~signed_value~ INT_VAR value = 0 RET value BEGIN
-	PATCH_IF value > 0 BEGIN
+	PATCH_IF value >= 0 BEGIN
 		SPRINT value @10003
 	END
 END
 
 DEFINE_PATCH_FUNCTION ~percent_value~ INT_VAR value = 0 RET value BEGIN
-	PATCH_IF value > 0 BEGIN
+	PATCH_IF value >= 0 BEGIN
 		SPRINT value @10002 // ~%value% %~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~replace_last_comma_with~ STR_VAR text = "" str = "" RET text BEGIN
+	INNER_PATCH_SAVE text ~%text%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~,\([^,]+\)$~ ~ %str%\1~
 	END
 END

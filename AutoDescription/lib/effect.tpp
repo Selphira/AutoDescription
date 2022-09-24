@@ -130,6 +130,11 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		SET position += 1
 		SET isValid = 1
 
+		// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
+		PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
+			SET target = TARGET_FX_self
+		END
+
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 		LPM ~opcode_is_valid~
 
@@ -505,6 +510,14 @@ BEGIN
 				SPRINT theTarget   @102473 // ~les membres du groupe~
 				SPRINT ofTheTarget @101088 // ~des membres du groupe~
 				SPRINT toTheTarget @101182 // ~aux membres du groupe~
+			END
+		END
+		ELSE PATCH_IF target == TARGET_FX_everyone BEGIN
+			SPRINT opcode_target ~_target~
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+				SPRINT theTarget   @102474 // ~les créatures dans la zone d'effet~
+				SPRINT ofTheTarget @101089 // ~des créatures dans la zone d'effet~
+				SPRINT toTheTarget @101190 // ~aux créatures dans la zone d'effet~
 			END
 		END
 
