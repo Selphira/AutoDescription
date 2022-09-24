@@ -1057,7 +1057,7 @@
  * ------------------------------------- */
 
 @401000 = ~les effets modifiant la classe d'armure~
-@400001 = ~les effets modifiant la vitesse d'attaque~
+@401001 = ~les effets modifiant la vitesse d'attaque~
 @401002 = ~les effets dissipant du sommeil~
 @401003 = ~les effets provoquant la folie du berserker~
 @401004 = ~les effets dissipant la folie du berserker~
@@ -1602,6 +1602,9 @@
 @10010006 = ~\1 et demi~
 @10010007 = ~une demi supplémentaire~
 @10010008 = ~Fixée à %value%~
+
+@10010011 = ~Empêche %theTarget% d'attaquer~ // TODO: trouver une tournure pour self ?
+@10010012 = ~d'empêcher %theTarget% d'attaquer~
 
 // Opcode 2: Cure: Sleep [2]
 
@@ -3162,7 +3165,7 @@
 @12780001 = ~Jets de toucher~
 @12780002 = ~les jets de toucher~
 
-// Opcode 279:  Button: Enable Button [279]
+// Opcode 279: Button: Enable Button [279]
 
 @12790020 = ~Permet~ // action
 @12790021 = ~de permettre~ // action
@@ -3228,10 +3231,20 @@
 
 // Opcode 295: Graphics: Disable Permanent Death [295]
 
-// TODO : "protection" contre les morts violentes : la mort est toujours douce mais elle est toujours là
+// FIXME : "protection" contre la mort permanente : la mort est toujours douce mais elle est toujours là => le personnage peut toujours être ressuscité
+
+@12950001 = ~Protection contre la mort permanente~
+@12950002 = ~Protège %theTarget% contre la mort permanente~
+@12950003 = ~d'être protégé contre la mort permanente~
+@12950004 = ~de protéger %theTarget% contre la mort permanente~
+
+@12950011 = ~Dissipation de la protection contre la mort permanente~
+@12950012 = ~rend %theTarget% sensible à la mort permanente~
+@12950013 = ~de rendre sensible à la mort permanente~
+@12950014 = ~de rendre %theTarget% sensible à la mort permanente~
 
 
-// Opcode 299:  Spell Effect: Chaos Shield [299]
+// Opcode 299: Spell Effect: Chaos Shield [299]
 
 @12990001 = ~Modificateur des hiatus entropiques~
 @12990002 = ~le modificateur des hiatus entropiques~
@@ -3295,7 +3308,7 @@
 @13110001 = ~Lance un souhait aléatoire sur %theTarget%~
 @13110002 = ~de lancer un souhait aléatoire sur %theTarget%~
 
-// Opcode 314:  Spell: Golem Stoneskin [314]
+// Opcode 314: Spell: Golem Stoneskin [314]
 
 @13140101 = ~peau de golem~ // skinType
 @13140102 = ~peaux de golem~ // plural

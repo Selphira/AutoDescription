@@ -191,6 +191,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	310 => 287 // Protection: from Timestop [310]
 	212 => 288 // Protection: Freedom [212]
 	 69 => 289 // Protection: From Detection (Non-Detection) [69]
+	295 => 290 // Graphics: Disable Permanent Death [295]
 
 	// Les résistances qui peuvent être des immunités
 
@@ -403,7 +404,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	291 => 0 // Graphics: Disable Visual Effect [291]
 	293 => 0 // Script: Enable Offscreen AI [293]
 	294 => 0 // Existance Delay Override [294]
-	295 => 1 // Graphics: Disable Permanent Death [295]
 	296 => 0 // Graphics: Protection from Specific Animation [296]
 	297 => 0 // Text: Protection from Display Specific String [297]
 	298 => 0 // Spell Effect: Execute Script cut250a [298]
@@ -857,44 +857,54 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
 	LPM ~opcode_1_common~
 
-	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-		SPRINT value @10010 // ~Passe à %value%~
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
+		SPRINT description @10010011 // ~Empêche %theTarget% d'attaquer~
 	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-		SET value = ~%parameter1%~
-		SET value -= 100
-		LPF ~signed_value~ INT_VAR value RET value END
-		SPRINT value @10002 // ~%value% %~
-	END
-	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-		SPRINT value @10010008 // ~Fixée à %value%~
-	END
+	ELSE BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SPRINT value @10010 // ~Passe à %value%~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+			SET value = ~%parameter1%~
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			SPRINT value @10002 // ~%value% %~
+		END
+		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
+			SPRINT value @10010008 // ~Fixée à %value%~
+		END
 
-	PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
-		SPRINT value @10010007 // ~une demi supplémentaire~
-	END
+		PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
+			SPRINT value @10010007 // ~une demi supplémentaire~
+		END
 
-	SPRINT name @102007 // ~Attaque par round~
-	SPRINT description @100001 // ~%name%%colon%%value%~
+		SPRINT name @102007 // ~Attaque par round~
+		SPRINT description @100001 // ~%name%%colon%%value%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
 	LPM ~opcode_1_common~
 
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		SPRINT description @10010001 // ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
-	END
-	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-		SET value = ~%parameter1%~
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @10010003 // ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
-	END
-	// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
-	ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT isExternal AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
-		SPRINT description @10010004 // ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
+		SPRINT description @10010012 // ~d'empêcher %theTarget% d'attaquer~
 	END
 	ELSE BEGIN
-		SPRINT description @10010002 // ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			SPRINT description @10010001 // ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+			SET value = ~%parameter1%~
+			SPRINT value @10002 // ~%value% %~
+			SPRINT description @10010003 // ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
+		END
+		// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
+		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT isExternal AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
+			SPRINT description @10010004 // ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
+		END
+		ELSE BEGIN
+			SPRINT description @10010002 // ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
+		END
 	END
 END
 
@@ -9115,6 +9125,45 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_292~ BEGIN
 	END
 	ELSE BEGIN
 		SPRINT description @12920014 // ~de rendre %theTarget% sensible aux attaques sournoises~
+	END
+END
+
+/* --------------------------------------- *
+ * Graphics: Disable Permanent Death [295] *
+ * --------------------------------------- */
+ DEFINE_PATCH_MACRO ~opcode_self_295~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @12950001 // ~Protection contre la mort permanente~
+	END
+	ELSE BEGIN
+		SPRINT description @12950011 // ~Dissipation de la protection contre la mort permanente~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_295~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @12950003 // ~d'être protégé contre la mort permanente~
+	END
+	ELSE BEGIN
+		SPRINT description @12950013 // ~de rendre sensible à la mort permanente~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_295~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @12950002 // ~Protège %theTarget% contre la mort permanente~
+	END
+	ELSE BEGIN
+		SPRINT description @12950012 // ~rend %theTarget% sensible à la mort permanente~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_295~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT description @12950004 // ~de protéger %theTarget% contre la mort permanente~
+	END
+	ELSE BEGIN
+		SPRINT description @12950014 // ~de rendre %theTarget% sensible à la mort permanente~
 	END
 END
 
