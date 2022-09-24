@@ -4176,7 +4176,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					STR_VAR expression = ~resref = %resref%~
 					RET hasOpcode
 				END
-				PATCH_IF NOT hasOpcode BEGIN
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
 					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Slow: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
@@ -7136,7 +7136,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 					STR_VAR expression = ~resref = %resref%~
 					RET hasOpcode
 				END
-				PATCH_IF NOT hasOpcode BEGIN
+				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
 					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
