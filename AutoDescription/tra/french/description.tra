@@ -3233,23 +3233,23 @@
 @12920004 = ~d'immuniser %theTarget% aux attaques sournoises~
 
 @12920011 = ~Sensible aux attaques sournoises~
-@12920012 = ~rend %theTarget% sensible aux attaques sournoises~
-@12920013 = ~de rendre sensible aux attaques sournoises~
+@12920012 = ~Rend %theTarget% sensible aux attaques sournoises~
+@12920013 = ~d'être sensible aux attaques sournoises~
 @12920014 = ~de rendre %theTarget% sensible aux attaques sournoises~
 
 // Opcode 295: Graphics: Disable Permanent Death [295]
 
-// FIXME : "protection" contre la mort permanente : la mort est toujours douce mais elle est toujours là => le personnage peut toujours être ressuscité
+// FIXME : "protection" contre la mort définitive : la mort est toujours douce mais elle est toujours là => le personnage peut toujours être ressuscité
 
-@12950001 = ~Protection contre la mort permanente~
-@12950002 = ~Protège %theTarget% contre la mort permanente~
-@12950003 = ~d'être protégé contre la mort permanente~
-@12950004 = ~de protéger %theTarget% contre la mort permanente~
+@12950001 = ~Protection contre la mort définitive~
+@12950002 = ~Protège %theTarget% contre la mort définitive~
+@12950003 = ~d'être protégé contre la mort définitive~
+@12950004 = ~de protéger %theTarget% contre la mort définitive~
 
-@12950011 = ~Dissipation de la protection contre la mort permanente~
-@12950012 = ~rend %theTarget% sensible à la mort permanente~
-@12950013 = ~de rendre sensible à la mort permanente~
-@12950014 = ~de rendre %theTarget% sensible à la mort permanente~
+@12950011 = ~Dissipation de la protection contre la mort définitive~
+@12950012 = ~Rend %theTarget% sensible à la mort définitive~
+@12950013 = ~d'être sensible à la mort définitive~
+@12950014 = ~de rendre %theTarget% sensible à la mort définitive~
 
 
 // Opcode 299: Spell Effect: Chaos Shield [299]
