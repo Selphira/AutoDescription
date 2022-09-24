@@ -2707,6 +2707,10 @@
 @11910003 = ~le niveau de lanceur de sorts profanes~
 @11910004 = ~le niveau de lanceur de sorts divins~
 
+// Opcode 192: Spell Effect: Find Familiar [192]
+
+@11920001 = ~Invocation du familier~
+
 // Opcode 193: Spell Effect: Invisible Detection by Script [193]
 
 @11930001 = ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~
@@ -2714,6 +2718,10 @@
 
 @11930011 = ~Empêche %theTarget% de pouvoir attaquer une créature cachée ou invisible~
 @11930012 = ~d'empêcher %theTarget% de pouvoir attaquer une créature cachée ou invisible~
+
+// Opcode 196: Spell Effect: Familiar Block [196]
+
+@11960001 = ~Empêche l'invocation du familier~ // TODO
 
 // Opcode 197: Spell: Bounce Projectile [197]
 

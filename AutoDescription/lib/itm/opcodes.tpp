@@ -317,27 +317,28 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	361 => 475 // Cast spell on critical miss [361]
 	340 => 476 // Spell Effect: Change Backstab Effect [340]
 
-
+	192 => 479 // Spell Effect: Find Familiar [192]
 	111 => 480 // Item: Create Magical Weapon [111]
 	143 => 481 // Item: Create Item in Slot [143]
 	122 => 482 // Item: Create Inventory Item [122]
 	255 => 483 // Item: Create Inventory Item (days) [255]
 	302 => 484 // Item: Can Use Any Item [302]
-	180 => 485 // Item: Can't Use Item [180]
-	181 => 486 // Item: Can't Use Itemtype [181]
-	243 => 487 // Item: Drain Item Charges [243]
+	196 => 485 // Spell Effect: Familiar Block [196]
+	180 => 486 // Item: Can't Use Item [180]
+	181 => 487 // Item: Can't Use Itemtype [181]
+	243 => 488 // Item: Drain Item Charges [243]
 
-	 26 => 488 // Item: Remove Curse [26]
-	172 => 489 // Spell: Remove Spell [172]
-	147 => 490 // Spell: Learn Spell [147]
-	171 => 491 // Spell: Give Innate Ability [171]
-	251 => 492 // Spell Effect: Change Bard Song Effect [251]
+	 26 => 489 // Item: Remove Curse [26]
+	172 => 490 // Spell: Remove Spell [172]
+	147 => 491 // Spell: Learn Spell [147]
+	171 => 492 // Spell: Give Innate Ability [171]
+	251 => 493 // Spell Effect: Change Bard Song Effect [251]
 
 
-	145 => 492 // Spell: Disable Spell Casting Abilities [145]
-	144 => 493 // Button: Disable Button [144]
-	279 => 494 // Button: Enable Button [279]
-	300 => 495 // NPC Bump [300]
+	145 => 495 // Spell: Disable Spell Casting Abilities [145]
+	144 => 496 // Button: Disable Button [144]
+	279 => 497 // Button: Enable Button [279]
+	300 => 498 // NPC Bump [300]
 END
 
 /*
@@ -379,10 +380,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
 	186 => 0 // Script: MoveToArea [186] // A gérer ??
 	187 => 0 // Script: Store Local Variable [187]
-	192 => 1 // Spell Effect: Find Familiar [192]
 	194 => 0 // Ignore Dialog Pause [194]
-	195 => 1 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
-	196 => 1 // Spell Effect: Familiar Block [196]
+	195 => 0 // Spell Effect: Death Dependent Constitution Loss (Familiar Bond) [195]
 	215 => 0
 	225 => 0 // Spell: Reveal Magic [225]
 	234 => 0 // Spell Effect: Contingency Creation [234]
@@ -6533,6 +6532,13 @@ DEFINE_PATCH_MACRO ~opcode_191_is_valid~ BEGIN
 	END
 END
 
+/* --------------------------------- *
+ * Spell Effect: Find Familiar [192] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_192~ BEGIN
+	SPRINT description @11920001 // ~Invocation du familier~
+END
+
 /* ------------------------------------------------- *
  * Spell Effect: Invisible Detection by Script [193] *
  * ------------------------------------------------- */
@@ -6557,6 +6563,13 @@ END
 DEFINE_PATCH_MACRO ~opcode_193_common~ BEGIN
 	SET strref += parameter2 == 0? 10 : 0
 	SPRINT description (AT strref)
+END
+
+/* ---------------------------------- *
+ * Spell Effect: Familiar Block [196] *
+ * ---------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_196~ BEGIN
+	SPRINT description @11960001 // ~Empêche l'invocation du familier~
 END
 
 /* ------------------------------ *
