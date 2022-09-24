@@ -1733,12 +1733,13 @@ END
  * HP: Current HP Modifier [17] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
-	LOCAL_SET strref_1 = 10170001 // ~Soigne 1 point de vie~
-	LOCAL_SET strref_2 = 10170002 // ~Soigne %value% points de vie~
-	LOCAL_SET strref_3 = 10170003 // ~Inflige 1 point de dégâts~
-	LOCAL_SET strref_4 = 10170004 // ~Inflige %value% points de dégâts~
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
+	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170001 ? 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
+	LOCAL_SET strref_2 = strref_1 + 1 // ~Soigne %value% points de vie %ofTheTarget%~
+	LOCAL_SET strref_3 = strref_1 + 2 // ~Inflige 1 point de dégâts %ofTheTarget%~
+	LOCAL_SET strref_4 = strref_1 + 3 // ~Inflige %value% points de dégâts %ofTheTarget%~
 
 	PATCH_IF type == 1 BEGIN
 		SET damageAmount = parameter1
@@ -1751,12 +1752,13 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
-	LOCAL_SET strref_1 = 10170005 // ~de soigner 1 point de vie~
-	LOCAL_SET strref_2 = 10170006 // ~de soigner %value% points de vie~
-	LOCAL_SET strref_3 = 10170007 // ~d'infliger 1 point de dégâts~
-	LOCAL_SET strref_4 = 10170008 // ~d'infliger %value% points de dégâts~
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
+	LOCAL_SET strref_1 = 10170011 // // ~de soigner 1 point de vie %ofTheTarget%~
+	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170005 ? 10170015 
+	LOCAL_SET strref_2 = strref_1 + 1 // ~de soigner %value% points de vie %ofTheTarget%~
+	LOCAL_SET strref_3 = strref_1 + 2 // ~d'infliger 1 point de dégâts %ofTheTarget%~
+	LOCAL_SET strref_4 = strref_1 + 3 // ~d'infliger %value% points de dégâts %ofTheTarget%~
 
 	PATCH_IF type == 0 OR type == 2 BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
@@ -1769,7 +1771,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
-	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %toTheTarget%~
+	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
 	LOCAL_SET strref_2 = 10170012 // ~Soigne %value% points de vie %toTheTarget%~
 	LOCAL_SET strref_3 = 10170013 // ~Inflige 1 point de dégâts %toTheTarget%~
 	LOCAL_SET strref_4 = 10170014 // ~Inflige %value% points de dégâts %toTheTarget%~
@@ -5328,7 +5330,7 @@ END
  * ------------------ */
 // TODO : split des effets
 DEFINE_PATCH_MACRO ~opcode_self_130~ BEGIN
-    SPRINT description @11300001 // ~Bénédiction permanente~
+    SPRINT description @11300001 // ~Bénédiction~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_130~ BEGIN
@@ -10671,6 +10673,7 @@ DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
 	END
 
 	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
+		// FIXME: replace_last_comma_with
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ et \1~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| et \)~ ~~
 	END
@@ -11219,6 +11222,7 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 	END
 
 	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
+		// FIXME: replace_last_comma_with
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ et \1~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| et \)~ ~~
 	END
