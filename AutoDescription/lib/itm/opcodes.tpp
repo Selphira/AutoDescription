@@ -6935,22 +6935,34 @@ END
 /* -------------------------------------------------- *
  * Spell: Bounce (by Power level, decrementing) [200] *
  * -------------------------------------------------- */
-
 DEFINE_PATCH_MACRO ~opcode_self_200~ BEGIN
-	SET strref = 12000001 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000001 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_200~ BEGIN
+	LOCAL_SET strref = 12000002 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_200~ BEGIN
-	SET strref = 12000002 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000003 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110003
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_200~ BEGIN
+	LOCAL_SET strref = 12000004 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET spellLevel = parameter2
-	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
-	SPRINT description (AT strref)
+	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
@@ -6968,12 +6980,26 @@ END
  * Spell: Immunity (by Power Level, decrementing) [201] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_201~ BEGIN
-	SET strref = 12010001 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010001 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_201~ BEGIN
+	LOCAL_SET strref = 12010002 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_201~ BEGIN
-	SET strref = 12010002 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010003 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110003
+	LPM ~opcode_200_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_201~ BEGIN
+	LOCAL_SET strref = 12010004 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_200_common~
 END
 
@@ -7592,23 +7618,36 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_222~ BEGIN
 END
 
 /* ---------------------------------------------- *
- * Spell: Immunity (by School, decrementing [223] *
+ * Spell: Immunity (by School, decrementing) [223] *
  * ---------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_223~ BEGIN
-	SET strref = 12230001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref = 12230001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_223_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_223~ BEGIN
+	LOCAL_SET strref = 12230002 // ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_223_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_223~ BEGIN
-	SET strref = 12230002 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref = 12230003 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110003
+	LPM ~opcode_223_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_223~ BEGIN
+	LOCAL_SET strref = 12230004 // ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_223_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_223_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
-	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
-	SPRINT description (AT strref)
+	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_223_is_valid~ BEGIN
@@ -7641,20 +7680,33 @@ END
  * Spell: Immunity (by Secondary Type, decrementing) [226] *
  * ------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_226~ BEGIN
-	SET strref = 12260001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref = 12260001 // ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_226_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_226~ BEGIN
+	LOCAL_SET strref = 12260002 // ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_226_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_226~ BEGIN
-	SET strref = 12260002 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref = 12260003 // ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	LOCAL_SET strref_if_amount_0 = 110003
+	LPM ~opcode_226_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_226~ BEGIN
+	LOCAL_SET strref = 12260004 // ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_226_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_226_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	LPF ~side_spell~ INT_VAR strref = strref amount = amount RET strref spellName END
-	SPRINT description (AT strref)
+	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
@@ -7667,14 +7719,27 @@ END
 /* --------------------------------------------- *
  * Spell: Bounce (by School, decrementing) [227] *
  * --------------------------------------------- */
-
 DEFINE_PATCH_MACRO ~opcode_self_227~ BEGIN
 	SET strref = 12270001 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_227_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_227~ BEGIN
+	SET strref = 12270002 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% ciblant %theTarget%~
+	SET strref_if_amount_0 = 110002
 	LPM ~opcode_227_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_227~ BEGIN
-	SET strref = 12270002 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref = 12270003 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110003
+	LPM ~opcode_227_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_227~ BEGIN
+	SET strref = 12270004 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110004
 	LPM ~opcode_227_common~
 END
 
@@ -7691,20 +7756,34 @@ END
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_228~ BEGIN
 	SET strref = 12280001 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
+	LPM ~opcode_228_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_228~ BEGIN
+	SET strref = 12280002 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110002
 	LPM ~opcode_228_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_228~ BEGIN
-	SET strref = 12280002 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref = 12280003 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110003
+	LPM ~opcode_228_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_228~ BEGIN
+	SET strref = 12280004 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref_if_amount_0 = 110004
 	LPM ~opcode_228_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_228_common~ BEGIN
-	LPM ~opcopde_226_common~
+	LPM ~opcode_226_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
-	LPM ~opcopde_226_is_valid~
+DEFINE_PATCH_MACRO ~opcode_228_is_valid~ BEGIN
+	LPM ~opcode_226_is_valid~
 END
 
 /* -------------------------------- *
@@ -11534,26 +11613,35 @@ DEFINE_PATCH_FUNCTION ~get_projectile_name~ INT_VAR projectile = 0 RET projref B
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 amount = 0 RET strref spellName BEGIN
-	SPRINT spellName ~~
+DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 strref_if_amount_0 = 0 amount = 0 RET string BEGIN
 	PATCH_IF is_ee BEGIN
+		SPRINT spellName ~~
 		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 		END
 		ELSE BEGIN
 			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
-			PATCH_IF strLen < 8 BEGIN
+			PATCH_IF strLen <= 7 BEGIN
 				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
 			END
 		END
-	END
-	PATCH_IF amount > 0 BEGIN
+
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			SET strref += 2 // ~Renvoie jusque %amount% sorts de niveau %spellLevel% puis lance %spellName%~
+			PATCH_IF amount >= 1 BEGIN
+				LPF ~getTranslation~ INT_VAR strref RET string END
+
+				SET strref = 110011 // ~puis lance %spellName%~
+				LPF ~getTranslation~ INT_VAR strref RET descAdd = string END
+				TEXT_SPRINT string ~%string% %descAdd%~
+			END
+			ELSE BEGIN
+				SET strref = strref_if_amount_0 // ~Lance %spellName%~
+				LPF ~getTranslation~ INT_VAR strref RET string END
+			END
 		END
 	END
-	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SET strref += 4 // ~Lance %spellName%~
+	ELSE BEGIN
+		LPF ~getTranslation~ INT_VAR strref RET string END
 	END
 END
 
