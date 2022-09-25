@@ -335,7 +335,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	172 => 490 // Spell: Remove Spell [172]
 	147 => 491 // Spell: Learn Spell [147]
 	171 => 492 // Spell: Give Innate Ability [171]
-	251 => 493 // Spell Effect: Change Bard Song Effect [251]
+	335 => 493 // Spell Effect: Seven Eyes [335]
+	251 => 494 // Spell Effect: Change Bard Song Effect [251]
 
 
 	145 => 495 // Spell: Disable Spell Casting Abilities [145]
@@ -423,7 +424,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
 	334 => 0 // Spell Effect: Turn Undead [334]
-	335 => 1 // Spell Effect: Seven Eyes [335]
 	336 => 0 // Graphics: Display Eyes Overlay [336]
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
@@ -5877,7 +5877,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
 	// Hack pour forcer l'affichage de la durée / usage strictement interne
-	PATCH_IF special == 172 AND timingMode == TIMING_duration AND duration > 0 BEGIN
+	PATCH_IF custom_int AND timingMode == TIMING_duration AND duration > 0 BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
@@ -5947,7 +5947,7 @@ DEFINE_PATCH_MACRO ~opcode_172_group~ BEGIN
 						// ajout de l'opcode 171 modifié
 						SET timingMode = TIMING_duration
 						SET duration = currentDuration
-						SET special = currentOpcode
+						SET custom_int = 1 // Force l'affichage de la durée
 						LPM ~add_opcode~
 
 						// suppression de l'opcode 171 initial
@@ -10033,7 +10033,47 @@ DEFINE_PATCH_MACRO ~opcode_333_is_valid~ BEGIN
 	END
 END
 
-/* -------------------- *
+/* ------------------------------ *
+ * Spell Effect: Seven Eyes [335] *
+ * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_335~ BEGIN
+	LPM ~opcode_target_335~
+END
+
+// FIXME : affecte la cible que si elle n'est pas déjà affectée
+DEFINE_PATCH_MACRO ~opcode_target_335~ BEGIN
+	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
+	SET stateRef = 420000 + parameter1
+	LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+	SPRINT description @13350002 // ~Affecte %theTarget% par %splstate%~
+
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		SPRINT descriptionAdd @13350011 // ~et lui apprend le sort %spellName%~
+		SPRINT description ~%description% %descriptionAdd%~
+	END
+	LPM ~opcode_not_cumulative~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_335~ BEGIN
+	LPM ~opcode_target_probability_335~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_335~ BEGIN
+	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
+	SET stateRef = 420000 + parameter1
+	LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+	SPRINT description @13350004 // ~d'affecter %theTarget% par %splstate%~
+
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		SPRINT descriptionAdd @13350012 // ~et de lui apprendre le sort %spellName%~
+		SPRINT description ~%description% %descriptionAdd%~
+	END
+	LPM ~opcode_not_cumulative~
+END
+
+ /* -------------------- *
  * Remove: Opcode [337] *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN

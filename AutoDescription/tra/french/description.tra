@@ -3787,6 +3787,14 @@
 @13330003 = ~de lancer %amount% fois le sort %spellName% %strDuration%~
 @13330004 = ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
 
+// Opcode 335: Spell Effect: Seven Eyes [335]
+
+@13350002 = ~Affecte %theTarget% par %splstate%~
+@13350004 = ~d'affecter %theTarget% par %splstate%~
+
+@13350011 = ~et lui apprend le sort %spellName%~
+@13350012 = ~et de lui apprendre le sort %spellName%~
+
 // Opcode 337: Remove: Opcode [337]
 
 @13370001 = ~Dissipe %opcodeStr%~
