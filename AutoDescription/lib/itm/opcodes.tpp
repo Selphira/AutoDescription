@@ -341,6 +341,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	144 => 496 // Button: Disable Button [144]
 	279 => 497 // Button: Enable Button [279]
 	300 => 498 // NPC Bump [300]
+
+	// Aucune importance => l'opcode est remplacé par d'autres
+	282 => 999 // Script: Scripting State Modifier [282]
 END
 
 /*
@@ -398,7 +401,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
-	282 => 1 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
 	291 => 0 // Graphics: Disable Visual Effect [291]
@@ -8933,6 +8935,78 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_281_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+/* -------------------------------------- *
+ * Script: Scripting State Modifier [282] *
+ * -------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_282_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET currentP2 = parameter2
+		PATCH_IF currentP2 >= 10 AND currentP2 <= 12 OR currentP2 == 14 OR currentP2 == 15 BEGIN
+			SET opcode = parameter2 + 274
+			SET parameter2 = MOD_TYPE_flat
+			LPM ~add_opcode~
+		END
+		SET currentP2 += is_ee ? 0 : 1 
+		PATCH_IF currentP2 == 20 BEGIN // IMMUNITY_TO_BACKSTAB
+			SET opcode = 292
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 31 BEGIN // NO_PERMANENT_DEATH
+			SET opcode = 295
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 32 BEGIN // IMMUNE_TO_TURN_UNDEAD
+			SET opcode = 297
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 33 BEGIN // CHAOS_SHIELD
+			SET opcode = 299
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 34 BEGIN // NPC_BUMP
+			SET opcode = 300
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 35 BEGIN // USE_ANY_ITEM
+			SET opcode = 302
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 36 BEGIN // ASSASSINATE
+			SET opcode = 303
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 37 BEGIN // SEX_CHANGED
+			SET opcode = 71
+			SET parameter2 = MOD_TYPE_flat
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 38 BEGIN // SPELL_FAILURE_INNATE
+			SET opcode = 60
+			SET parameter2 = 2
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 41 BEGIN // IMMUNE_TO_TIME_STOP
+			SET opcode = 310
+			SET parameter2 = parameter1
+			LPM ~add_opcode~
+		END
+		ELSE PATCH_IF currentP2 == 43 BEGIN // STONESKINSGOLEM
+			SET opcode = 314
+			LPM ~add_opcode~
+		END
+	END
+	SET opcode = 282
+	CLEAR_ARRAY ~opcodes_%opcode%~
+	SET $opcodes(~%opcode%~) = 0
 END
 
 /* --------------------------- *
