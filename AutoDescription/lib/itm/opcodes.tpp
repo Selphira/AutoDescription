@@ -3935,177 +3935,127 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
-	// TODO: d'abord checker la présence de la protection contre les sorts avant d'activer l'immunité éventuelle
-	// Méthode pour 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF parameter2 == 40 BEGIN // Lenteur
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Slow: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-
-			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 16 BEGIN // Hâte
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Haste: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-
-			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Hold: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-
-			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 154 BEGIN // Enchevêtrement
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Entangle: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Web: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-			PATCH_FOR_EACH resref IN "SPDR157" "SPIN566" "SPIN683" "SPWI215" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
-			END
-		END
-		ELSE PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
-			SET opcode = 206
+		PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
 			//FIXME: un terme pour différencier l'opcode 5 du 241 ?
 			// NPCHAN protège contre le 5, non contre le 241 et est estampillé Immunité aux charmes
 			// Potentiellement la liste des sorts est beaucoup plus longue :
 			// SPIN980, SPCL641, SPIN553, SPIN558, SPIN980, SPIN985, SPIN506, DEMOCHM, OHREYEB1
 			// + tout ceux qui sont oubliés + les dominations
+			TEXT_SPRINT spellState ~Charm~
 			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Charm: Opcode 206 with resref %resref% not found.~ END
-				END
-			END
-			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
+				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
-		// Génère beaucoup de log, les sorts sont rarement bloqués
-		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
-			SET opcode = 206
-			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-				// Aucun retrait
-				LPF ~has_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET hasOpcode
-				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
-					LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to Confusion: Opcode 206 with resref %resref% not found.~ END
-				END
+		ELSE PATCH_IF parameter2 == 16 BEGIN // Hâte
+			TEXT_SPRINT spellState ~Haste~
+			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
 			END
-			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR709" BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-				END
+		END
+		ELSE PATCH_IF parameter2 == 24 BEGIN // Panique
+			TEXT_SPRINT spellState ~Horror~
+			PATCH_FOR_EACH resref IN "SPPR416" "SPPR706" "SPWI811" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 38 BEGIN // Silence
+			TEXT_SPRINT spellState ~Silence~
+			PATCH_FOR_EACH resref IN "SPPR211" "SPWI508" "SPPR709" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 39 BEGIN // Inconscience
+			TEXT_SPRINT spellState ~Unconsciousness~
+			PATCH_FOR_EACH resref IN "SPPR102" "SPPR512" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 40 BEGIN // Lenteur
+			TEXT_SPRINT spellState ~Slow~
+			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 45 BEGIN // Étourdissement
+			TEXT_SPRINT spellState ~Stun~
+			PATCH_FOR_EACH resref IN "SPWI816" "SPPR718" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 74 BEGIN // Cécité
+			TEXT_SPRINT spellState ~Blindness~
+			PATCH_FOR_EACH resref IN "SPWI815" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 76 BEGIN // Débilité mentale
+			TEXT_SPRINT spellState ~Feeblemindedness~
+			PATCH_FOR_EACH resref IN "SPWI509" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
+			TEXT_SPRINT spellState ~Confusion~
+			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR311" "SPPR709" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 135 BEGIN // Polymorphie
+			TEXT_SPRINT spellState ~Polymorph~
+			PATCH_FOR_EACH resref IN "SPWM113" "SPWI415" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 154 BEGIN // Enchevêtrement
+			TEXT_SPRINT spellState ~Entangle~
+			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
+			TEXT_SPRINT spellState ~Web~
+			PATCH_FOR_EACH resref IN "SPDR157" "SPDR201" "SPIN566" "SPIN683" "SPWI215" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
+			TEXT_SPRINT spellState ~Hold~
+			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 213 BEGIN // Labyrinthe
+			TEXT_SPRINT spellState ~Maze~
+			PATCH_FOR_EACH resref IN "SPWI813" "SPIN774" "SPCL937" BEGIN
+				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
 	END
-	SET opcode = 101
 END
 
+DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
+	// FIXME: lent, intéressant de regrouper les deletes ? (resref = SPWIxx OR resref = SPWIyy)
+	LOCAL_SET oldCount = $opcodes(~%opcode%~)
+	LOCAL_SET opcode = 206
+	LPF ~has_opcode~
+		INT_VAR opcode
+		STR_VAR expression = ~resref = %resref%~
+		RET hasOpcode
+	END
+	PATCH_IF hasOpcode BEGIN
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+	END
+	PATCH_IF show_lack_immunity AND oldCount == $opcodes(~%opcode%~) BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to %spellState%: Opcode 206 with resref %resref% not found.~ END
+	END
+END
 
 // DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
 // 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
