@@ -30,6 +30,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 78 => 11  // State: Disease [78]
 	 25 => 11  // State: Poison [25]
 
+	345 => 12  // Enchantment bonus [345]
 	344 => 12  // Enchantment vs. creature type [344]
 	216 => 13  // Spell Effect: Level Drain [216]
 	246 => 13  // Spell Effect: Berserking [246]
@@ -427,7 +428,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	338 => 0 // Disable Rest [338]
 	339 => 0 // Alter Animation [339]
 	342 => 0 // Animation: Override Data [342]
-	345 => 1 // Enchantment bonus [345]
 	363 => 0 // Modal state check [363]
 	365 => 0 // Make unselectable [365]
 	366 => 0 // Spell: Apply Spell On Move [366]
@@ -10225,27 +10225,30 @@ END
  * ----------------------- */
 // Je ne comprends pas comment il peut fonctionner : où se trouve le bonus ?
 // le seul cas où ça peut matcher c'est pour P2==0
-// TODO: parameter2 + parameter1, s'inspirer de l'opcode 120
-// DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
-// 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
-// 	SET parameter3 = special != 0 ? special : parameter3
-// 	SPRINT name @13440001 // ~Enchantement~
-// 	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
-// 		SET strref = 230000 + parameter4
-// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
-// 		SPRINT strref @13440020 // ~des %weaponType%~
-// 		TEXT_SPRINT name ~%name% %strref%~
-// 	END
-// 	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
-// 		SET strref = 13440010 + parameter3 // ~dans la main directrice~
-// 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
-// 		TEXT_SPRINT name ~%name% %weaponSlot%~
-// 	END
-// 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
-// 	SET value = special
-// 	LPF ~signed_value~ INT_VAR value RET value END
-// 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
-// END
+// FIXME: P2 != 0
+DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : parameter2 != 0 non gere : %parameter2%~ END
+	END
+
+	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+	SET parameter3 = special != 0 ? special : parameter3
+	SPRINT name @13440001 // ~Enchantement~
+	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+		SET strref = 230000 + parameter4
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+		SPRINT strref @13440020 // ~des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+		TEXT_SPRINT name ~%name% %weaponSlot%~
+	END
+	SET value = parameter1
+	LPF ~signed_value~ INT_VAR value RET value END
+	SPRINT description @100001 // ~%name%%colon%%value%~
+END
 
 /* --------------------------- *
  * Save vs. school bonus [346] *
