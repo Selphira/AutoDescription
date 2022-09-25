@@ -3779,9 +3779,9 @@
 // Opcode 337: Remove: Opcode [337]
 
 @13370001 = ~Dissipe %opcodeStr%~
-@13370002 = ~Dissipe %opcodeStr% %onTheTarget%~
+@13370002 = ~Dissipe %opcodeStr% %ofTheTarget%~
 @13370003 = ~de dissiper %opcodeStr%~
-@13370004 = ~de dissiper %opcodeStr% %onTheTarget%~
+@13370004 = ~de dissiper %opcodeStr% %ofTheTarget%~
 
 // Opcode 340: Spell Effect: Change Backstab Effect [340]
 

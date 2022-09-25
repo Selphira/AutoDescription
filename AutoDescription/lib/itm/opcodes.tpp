@@ -2847,6 +2847,28 @@ DEFINE_PATCH_MACRO ~opcode_58_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_58_group~ BEGIN
+	// Implicitement, la dissipation à la magie dissipe également la surdité et la débilité mentale
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET opcode = 77
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+		SET opcode = 81
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+		SET opcode = 58
+	END
+END
+
 /* --------------------------- *
  * Stat: Stealth Modifier [59] *
  * --------------------------- */
@@ -6664,7 +6686,7 @@ DEFINE_PATCH_MACRO ~opcode_target_198~ BEGIN
 	LOCAL_SET strref = 401000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11980002 // ~Renvoie %opcodeStr% visant %onTheTarget%~
+		SPRINT description @11980002 // ~Renvoie %opcodeStr% visant %theTarget%~
 	END
 END
 
@@ -6672,7 +6694,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_198~ BEGIN
 	LOCAL_SET strref = 401000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11980004 // ~de renvoyer %opcodeStr% visant %onTheTarget%~
+		SPRINT description @11980004 // ~de renvoyer %opcodeStr% visant %theTarget%~
 	END
 END
 
@@ -9932,7 +9954,7 @@ DEFINE_PATCH_MACRO ~opcode_target_337~ BEGIN
 	LOCAL_SET strref = 401000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370002 // ~Dissipe %opcodeStr% %onTheTarget%~
+		SPRINT description @13370002 // ~Dissipe %opcodeStr% %ofTheTarget%~
 	END
 END
 
@@ -9940,7 +9962,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_337~ BEGIN
 	LOCAL_SET strref = 401000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370004 // ~de dissiper %opcodeStr% %onTheTarget%~
+		SPRINT description @13370004 // ~de dissiper %opcodeStr% %ofTheTarget%~
 	END
 END
 
@@ -10453,6 +10475,7 @@ DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
 	END
 	SPRINT spellLevel ~%levelStr%~
 END
+
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
