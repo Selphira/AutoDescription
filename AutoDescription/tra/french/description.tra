@@ -3776,6 +3776,13 @@
 @13320009 = ~Dégâts contondants~
 @13320010 = ~Dégâts de projectiles~
 
+// Opcode 333: Spell Effect: Static Charge [333]
+
+@13330001 = ~Lance %amount% fois le sort %spellName% %strDuration%~
+@13330002 = ~Permet à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
+@13330003 = ~de lancer %amount% fois le sort %spellName% %strDuration%~
+@13330004 = ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
+
 // Opcode 337: Remove: Opcode [337]
 
 @13370001 = ~Dissipe %opcodeStr%~

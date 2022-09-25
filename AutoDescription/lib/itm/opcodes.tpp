@@ -308,14 +308,15 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	311 => 470 // Spell: Random Wish Spell [311]
 	252 => 471 // Spell Effect: Set Trap [252]
 	177 => 472 // EFF File
-	
+	333 => 473 // Spell Effect: Static Charge [333]
+
 	// Effets au toucher
 
-	248 => 472 // Item: Set Melee Effect [248]
-	249 => 473 // Item: Set Ranged Effect [249]
-	341 => 474 // Spell Effect: Change Critical Hit Effect [341]
-	361 => 475 // Cast spell on critical miss [361]
-	340 => 476 // Spell Effect: Change Backstab Effect [340]
+	248 => 474 // Item: Set Melee Effect [248]
+	249 => 475 // Item: Set Ranged Effect [249]
+	341 => 476 // Spell Effect: Change Critical Hit Effect [341]
+	361 => 477 // Cast spell on critical miss [361]
+	340 => 478 // Spell Effect: Change Backstab Effect [340]
 
 	192 => 479 // Spell Effect: Find Familiar [192]
 	111 => 480 // Item: Create Magical Weapon [111]
@@ -418,7 +419,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
-	333 => 1 // Spell Effect: Static Charge [333]
 	334 => 0 // Spell Effect: Turn Undead [334]
 	335 => 1 // Spell Effect: Seven Eyes [335]
 	336 => 0 // Graphics: Display Eyes Overlay [336]
@@ -9881,10 +9881,65 @@ DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
 	END
 END
 
+/* --------------------------------- *
+ * Spell Effect: Static Charge [333] *
+ * --------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_333~ BEGIN
+	LPM ~opcode_333_common~
+	SPRINT description @13330001 // ~Lance %amount% fois le sort %spellName% %strDuration%~
+	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+	SPRINT description ~%description% (%castingLevelStr%)~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_333~ BEGIN
+	LPM ~opcode_333_common~
+	SPRINT description @13330002 // ~Permet à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
+	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+	SPRINT description ~%description% (%castingLevelStr%)~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_333~ BEGIN
+	LPM ~opcode_333_common~
+	SPRINT description @13330003 // ~de lancer %amount% fois le sort %spellName% %strDuration%~
+	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+	SPRINT description ~%description% (%castingLevelStr%)~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_333~ BEGIN
+	LPM ~opcode_333_common~
+	SPRINT description @13330004 // ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
+	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+	SPRINT description ~%description% (%castingLevelStr%)~
+END
+
+DEFINE_PATCH_MACRO ~opcode_333_common~ BEGIN
+	LOCAL_SET frequency = special == 0 ? 6 : special
+	SET amount = parameter1
+	SET castingLevel = parameter2 <= 1 ? 1 : parameter2
+	SPRINT spellName ~~
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	END
+	ELSE BEGIN
+		SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+		PATCH_IF strLen <= 7 BEGIN
+			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+		END
+	END
+	LPF ~get_frequency_duration~ INT_VAR duration = frequency RET strDuration = frequency END
+END
+
+DEFINE_PATCH_MACRO ~opcode_333_is_valid~ BEGIN
+	PATCH_IF parameter1 <= 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Number %parameter1%.~ END
+	END
+END
+
 /* -------------------- *
  * Remove: Opcode [337] *
  * -------------------- */
- DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN
 	LOCAL_SET strref = 401000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
@@ -11337,7 +11392,7 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 END
 
 DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequency BEGIN
-	LPF ~get_str_duration~ INT_VAR duration = duration RET strDuration END
+	LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 	PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
 		INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
 			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
