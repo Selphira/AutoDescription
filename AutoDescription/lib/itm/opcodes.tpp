@@ -307,8 +307,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	326 => 469 // Apply Effects List [326]
 	311 => 470 // Spell: Random Wish Spell [311]
 	252 => 471 // Spell Effect: Set Trap [252]
-	177 => 472 // EFF File
+	177 => 472 // EFF File [177]
 	333 => 473 // Spell Effect: Static Charge [333]
+	183 => 473 // Item: Apply Effect Itemtype [183]
 
 	// Effets au toucher
 
@@ -377,7 +378,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	170 => 0 // Graphics: Play Damage Animation [170]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
 	182 => 0 // Item: Apply Effect Item [182]
-	183 => 1 // Item: Apply Effect Itemtype [183]
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
 	186 => 0 // Script: MoveToArea [186] // A gérer ??
 	187 => 0 // Script: Store Local Variable [187]
@@ -393,7 +393,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	256 => 0 // Spell: Spell Sequencer Active [256]
 	257 => 0 // Spell: Spell Sequencer Creation [257]
 	258 => 0 // Spell: Spell Sequencer Activation [258]
-	260 => 1 // Spell: Spell Sequencer Activation [260]
+	260 => 0 // Spell: Spell Sequencer Activation [260]
 	265 => 0 // Script: Set Global Variable [265]
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
@@ -6320,6 +6320,29 @@ DEFINE_PATCH_MACRO ~opcode_181_is_valid~ BEGIN
 	PATCH_IF parameter < 0 OR parameter > 73 BEGIN
 		isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter%.~ END
+	END
+END
+
+/* ---------------------------------- *
+ *  Item: Apply Effect Itemtype [183] *
+ * ---------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_183~ BEGIN
+	LPM ~opcode_target_183~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_183~ BEGIN
+	LOCAL_SET strref = 230000 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET itemType = string END
+	SPRINT strref @11830002 // ~si l'équipement %ofTheTarget% contient des %itemType%~
+	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+	SPRINT description ~%description% %strref%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_183_is_valid~ BEGIN
+	LPM ~opcode_resref_is_valid~
+	PATCH_IF NOT is_ee BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No effect.~ END
 	END
 END
 
