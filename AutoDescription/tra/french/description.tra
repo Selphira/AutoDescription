@@ -37,6 +37,10 @@
 @100020 = ~les~
 @100021 = ~et~
 @101074 = ~%classname% monoclassé et multiclassé~
+@101079 = ~Arc~
+@101080 = ~Arbalète~
+@101081 = ~Fronde~
+@101082 = ~Arme de jet~
 @101083 = ~Arme à 1 main~
 @101084 = ~Arme à 2 mains~
 @101090 = ~Personnage d'alignement~
@@ -104,6 +108,7 @@
 @102268 = ~Le bonus de dégât en fonction de la force ne s'applique pas à cette arme~
 @102269 = ~Revient dans la main du lanceur~
 @102270 = ~Ne nécessite pas de munitions~
+@102271 = ~Munition à usage illimité~
 
 @102281 = ~Réduit de %value% la %resistName% %ofTheTarget%~
 @102282 = ~Augmente de %value% la %resistName% %ofTheTarget%~
