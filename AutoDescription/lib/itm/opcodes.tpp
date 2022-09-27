@@ -5005,7 +5005,7 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 	LOCAL_SPRINT itemName2 ~~
 	LOCAL_SPRINT itemName3 ~~
 
-	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+	LPF ~get_random_treasure_names~ STR_VAR file = EVAL ~%resref%~ RET itemName = randomTreasureNames END
 	LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref%~ RET canStack END
 	PATCH_IF canStack == 0 OR amount == 0 BEGIN
 		SET amount = 1
@@ -5015,14 +5015,14 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 		SET amount2 = parameter3
 		SET amount3 = parameter4
 		PATCH_IF NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 = itemName END
+			LPF ~get_random_treasure_names~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 = randomTreasureNames END
 			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref2%~ RET canStack2 = canStack END
 			PATCH_IF canStack2 == 0 OR amount2 == 0 BEGIN
 				SET amount2 = 1
 			END
 		END
 		PATCH_IF NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 = itemName END
+			LPF ~get_random_treasure_names~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 = randomTreasureNames END
 			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref3%~ RET canStack3 = canStack END
 			PATCH_IF canStack3 == 0 OR amount3 == 0 BEGIN
 				SET amount3 = 1
