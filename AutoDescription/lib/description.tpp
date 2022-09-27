@@ -4,7 +4,12 @@ DEFINE_ACTION_MACRO ~update_descriptions~ BEGIN
 END
 
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
+	OUTER_SET totalItems = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+		SET totalItems += 1
+		PATCH_IF totalItems MODULO 100 == 0 BEGIN
+			PATCH_PRINT "%totalItems% items processed"
+		END
 		PATCH_TRY
 			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
 		WITH DEFAULT
@@ -15,7 +20,12 @@ DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
 END
 
 DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
+	OUTER_SET totalSpells = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
+		SET totalSpells += 1
+		PATCH_IF totalSpells MODULO 100 == 0 BEGIN
+			PATCH_PRINT "%totalSpells% spells processed"
+		END
 		LPF ~update_spell_description~ END
 	BUT_ONLY_IF_IT_CHANGES
 END
@@ -120,5 +130,49 @@ END
 DEFINE_PATCH_FUNCTION ~replace_last_comma_with~ STR_VAR text = "" str = "" RET text BEGIN
 	INNER_PATCH_SAVE text ~%text%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~,\([^,]+\)$~ ~ %str%\1~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~array_count~ STR_VAR array_name = ~~ RET count BEGIN
+	SET count = 0
+
+	PATCH_PHP_EACH ~%array_name%~ AS entry => _ BEGIN
+		SET count += 1
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~implode~ STR_VAR array_name = ~~ glue = ~, ~ final_glue = ~~ RET text BEGIN
+	SPRINT text ~~
+	SET idx = 0
+
+	LPF ~array_count~ STR_VAR array_name RET count END
+
+	PATCH_PHP_EACH ~%array_name%~ AS entry => _ BEGIN
+		SET idx += 1
+
+		PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
+			SPRINT text ~%entry%~
+		END
+		ELSE BEGIN
+			PATCH_IF idx < count - 1 BEGIN
+				SPRINT real_glue ~%glue%~
+			END
+			ELSE BEGIN
+				SPRINT real_glue ~%final_glue%~
+			END
+			SPRINT text ~%text%%real_glue%%entry%~
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_random_treasure_names~ STR_VAR file = ~~ RET randomTreasureNames BEGIN
+	TO_LOWER file
+
+	SPRINT final_glue @100004 //= ~ou~
+	SPRINT final_glue ~" %final_glue% "~
+	LPF ~implode~ STR_VAR array_name = ~random_treasures_%file%~ glue = ~", "~ final_glue RET randomTreasureNames = text END
+
+	PATCH_IF ~%randomTreasureNames%~ STRING_EQUAL ~~ BEGIN
+		LPF ~get_item_name~ STR_VAR file RET randomTreasureNames = itemName END
 	END
 END
