@@ -154,7 +154,7 @@ DEFINE_PATCH_FUNCTION ~implode~ STR_VAR array_name = ~~ glue = ~, ~ final_glue =
 			SPRINT text ~%entry%~
 		END
 		ELSE BEGIN
-			PATCH_IF idx < count - 1 BEGIN
+			PATCH_IF idx < count BEGIN
 				SPRINT real_glue ~%glue%~
 			END
 			ELSE BEGIN
