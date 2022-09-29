@@ -54,6 +54,37 @@ COPY_EXISTING ~tooltip.2da~ ~override~
 	END
     BUT_ONLY_IF_IT_CHANGES
 
+/* ---------------------------------------------------------------- *
+ * Récupération du nom des objets aléatoires. *
+ * ---------------------------------------------------------------- */
+COPY_EXISTING ~rndtres.2da~ ~override~
+	COUNT_2DA_ROWS ~3~ ~rows~
+	FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
+		COUNT_2DA_COLS colCount
+		READ_2DA_ENTRY row 0 3 itemRef
+		TO_LOWER itemRef
+		SET col = 1
+		SET done=0
+		WHILE !done & col < colCount BEGIN
+			PATCH_TRY
+				PATCH_SILENT
+				READ_2DA_ENTRY row col 3 rndItemRef
+				PATCH_IF NOT ~%rndItemRef%~ STRING_EQUAL ~*~ BEGIN
+					LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%rndItemRef%~ RET itemName END
+					PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ AND ~%itemName%~ STRING_MATCHES_REGEXP ~<Invalid Strref -?[0-9]+>~ BEGIN
+						SET $EVAL ~random_treasures_%itemRef%~(~%itemName%~) = 1
+					END
+				END
+				ELSE BEGIN
+					SET done = 1
+				END
+				SET col+=1
+			WITH DEFAULT
+				SET done = 1
+			END
+		END
+	END
+    BUT_ONLY_IF_IT_CHANGES
 
 DEFINE_ACTION_FUNCTION ~ucfirst~ STR_VAR value = ~~ RET string BEGIN
 	OUTER_SNPRINT 1 first ~%value%~
