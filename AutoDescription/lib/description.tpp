@@ -1,22 +1,21 @@
-DEFINE_ACTION_MACRO ~update_descriptions~ BEGIN
-	LAM ~update_item_descriptions~
-	//LAM ~update_spell_descriptions~
-END
-
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
 	OUTER_SET totalItems = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-		SET totalItems += 1
-		PATCH_IF totalItems MODULO 100 == 0 BEGIN
-			PATCH_PRINT "%totalItems% items processed"
-		END
-		PATCH_TRY
-			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
-		WITH DEFAULT
-			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
-			SET totalFailed += 1
-		END
+		LPM ~update_item_description~
 	BUT_ONLY_IF_IT_CHANGES
+END
+
+DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
+	SET totalItems += 1
+	PATCH_IF totalItems MODULO 100 == 0 BEGIN
+		PATCH_PRINT "%totalItems% items processed"
+	END
+	PATCH_TRY
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+	WITH DEFAULT
+		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
+		SET totalFailed += 1
+	END
 END
 
 DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN

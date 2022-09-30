@@ -119,6 +119,33 @@ BEGIN
 	END
 END
 
+/* ===================================================== *
+ * Retourne le nom du jeu sur lequel on installe le mod. *
+ * ===================================================== */
+DEFINE_ACTION_FUNCTION ~get_game_name~
+	RET gameName
+BEGIN
+	OUTER_SPRINT gameName ~unknown~
+	ACTION_IF GAME_IS ~eet~ BEGIN
+		OUTER_SPRINT gameName ~eet~
+	END
+	ELSE ACTION_IF GAME_IS ~bg2ee~ BEGIN
+		OUTER_SPRINT gameName ~bg2ee~
+	END
+	ELSE ACTION_IF GAME_IS ~bgee~ BEGIN
+		OUTER_SPRINT gameName ~bgee~
+	END
+	ELSE ACTION_IF GAME_IS ~bgt~ BEGIN
+		OUTER_SPRINT gameName ~bgt~
+	END
+	ELSE ACTION_IF GAME_IS ~tob~ BEGIN
+		OUTER_SPRINT gameName ~tob~
+	END
+	ELSE ACTION_IF GAME_IS ~soa~ BEGIN
+		OUTER_SPRINT gameName ~soa~
+	END
+END
+
 //TODO: lowerFirst
 /*
 		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower

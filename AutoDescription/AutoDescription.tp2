@@ -32,7 +32,6 @@ ALWAYS
             reload_array = arrayReload
     END
 
-	OUTER_SPRINT log_filename ~all~
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
@@ -79,9 +78,16 @@ LANGUAGE ~Francais~ ~french~
 
 BEGIN @10 DESIGNATED 10
 SILENT
-LAM ~init_log_file~
+LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~all~ RET log_filename END
 LAM ~init_statistics~
-LAM ~update_descriptions~
+LAM ~update_item_descriptions~
+LAM ~show_statistics~
+
+BEGIN @15 DESIGNATED 15
+SILENT
+LAF ~init_log_file~ STR_VAR type = ~spells~ mod = ~all~ RET log_filename END
+LAM ~init_statistics~
+LAM ~update_spell_descriptions~
 LAM ~show_statistics~
 
 BEGIN @20 DESIGNATED 20
@@ -95,16 +101,16 @@ OUTER_WHILE NOT(DIRECTORY_EXISTS ~%directory%~) BEGIN
 	PRINT @202
 	ACTION_READLN directory
 END
-OUTER_SPRINT log_filename ~%directory%~
 ACTION_DEFINE_ARRAY ~itemFiles~ BEGIN END
 LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFiles END
 SILENT
-LAM ~init_log_file~
+LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~%directory%~ RET log_filename END
 LAM ~init_statistics~
+OUTER_SET totalItems = 0
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
 		COPY_EXISTING ~%itemFile%~ ~override~
-			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+			LPM ~update_item_description~
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
