@@ -12,6 +12,7 @@ BEGIN
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
+		READ_SHORT (headerOffset + SPL_HEAD_target) spellTarget
 
 		LPF ~load_extended_effects~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
 
@@ -44,11 +45,17 @@ BEGIN
 	LPM ~filter_effects~
 	LPM ~group_effects~
 
+	PATCH_IF spellTarget == TARGET_HEAD_self OR spellTarget == TARGET_HEAD_self_ignore_pause BEGIN
+		SPRINT theTarget   @102475 // ~le lanceur~
+		SPRINT ofTheTarget @102476 // ~du lanceur~
+		SPRINT toTheTarget @102477 // ~au lanceur~
+	END
+
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
-				//TODO: Forcer la cible à la cible du sort ??
+		        //TODO: La cible est implicitement envoyée, il faudrait le faire explicitement
 				LPF ~get_effect_description~ RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
