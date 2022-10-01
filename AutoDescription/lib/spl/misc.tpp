@@ -58,7 +58,6 @@ DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
 		END
 	END
 
-	SET currentRange = 0
 	LPF ~appendValue~ INT_VAR strref = 102006 STR_VAR value = ~%currentRange%~ RET description END // ~Portée~
 END
 
