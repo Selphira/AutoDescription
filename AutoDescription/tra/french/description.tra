@@ -36,6 +36,13 @@
 @100009 = ~%name%%colon%%value% %versus%~
 @100020 = ~les~
 @100021 = ~et~
+@100030 = ~École~
+@100031 = ~Durée~
+@100032 = ~Spécial~
+@100033 = ~Spéciale~
+@100034 = ~Contact~
+@100035 = ~Zone d'effet~
+@100036 = ~Jet de sauvegarde~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101079 = ~Arc~
 @101080 = ~Arbalète~
@@ -110,14 +117,6 @@
 @102270 = ~Ne nécessite pas de munitions~
 @102271 = ~Munition à usage illimité~
 
-@102281 = ~Réduit de %value% la %resistName% %ofTheTarget%~
-@102282 = ~Augmente de %value% la %resistName% %ofTheTarget%~
-@102283 = ~Porte à %value% la %resistName% %ofTheTarget%~
-@102284 = ~Multiplie par %value% la %resistName% %ofTheTarget%~
-@102539 = ~de réduire de %value% la %resistName% %ofTheTarget%~
-@102540 = ~d'augmenter de %value% la %resistName% %ofTheTarget%~
-@102541 = ~de passer à %value% la %resistName% %ofTheTarget%~
-@102542 = ~de multiplier par %value% la %resistName% %ofTheTarget%~
 @102285 = ~Réduit de %value% %theStatistic% %ofTheTarget%~
 @102286 = ~Augmente de %value% %theStatistic% %ofTheTarget%~
 @102287 = ~Porte à %value% %theStatistic% %ofTheTarget%~
@@ -195,6 +194,18 @@
 @100108 = ~de l'Altération~
 @100109 = ~généraliste~
 @100110 = ~de l'Entropie~
+
+@100120 = ~Aucune~
+@100121 = ~Abjuration~
+@100122 = ~Conjuration~
+@100123 = ~Divination~
+@100124 = ~Enchantement~
+@100125 = ~Illusion~
+@100126 = ~Invocation~
+@100127 = ~Nécromancie~
+@100128 = ~Altération~
+@100129 = ~Généraliste~
+@100130 = ~Entropie~
 
 // spellSecondaryTypeName
 @100200 = ~sans type secondaire~
@@ -512,7 +523,14 @@
 @205207 = ~paladins~
 @205208 = ~druides~
 @205209 = ~rôdeurs~
+@205210 = ~WIZARD_EYE~ // TODO: traduire
+@205211 = ~CANDLEKEEP_WATCHER~ // TODO: traduire
+@205212 = ~soldats amniens~
+@205213 = ~gardes de la ville~
 @205219 = ~élémentaires d'eau~
+@205220 = ~dragons verts~
+@205222 = ~trolls spectraux~
+@205223 = ~WIGHT~ // TODO: traduire
 
 /* ------------ *
  * Specific.ids *
@@ -1784,26 +1802,31 @@
 
 @10270001 = ~Résistance à l'acide~
 @10270002 = ~à l'acide~
+@10270003 = ~la résistance à l'acide~
 
 // Opcode 28: Stat: Cold Resistance Modifier [28]
 
 @10280001 = ~Résistance au froid~
 @10280002 = ~au froid~
+@10280003 = ~la résistance au froid~
 
 // Opcode 29: Stat: Electricity Resistance Modifier [29]
 
 @10290001 = ~Résistance à l'électricité~
 @10290002 = ~à l'électricité~
+@10290003 = ~la résistance à l'électricité~
 
 // Opcode 30: Stat: Fire Resistance Modifier [30]
 
 @10300001 = ~Résistance au feu~
 @10300002 = ~au feu~
+@10300003 = ~la résistance au feu~
 
 // Opcode 31: Stat: Magic Damage Resistance Modifier [31]
 
 @10310001 = ~Résistance aux dégâts magiques~
 @10310002 = ~aux dégâts magiques~
+@10310003 = ~la résistance aux dégâts magiques~
 
 // Opcode 32: Cure: Death (Raise Dead) [32]
 
@@ -2108,31 +2131,37 @@
 
 @10840001 = ~Résistance aux dégâts de feu magiques~
 @10840002 = ~aux dégâts de feu magiques~
+@10840003 = ~la résistance aux dégâts de feu magiques~
 
 // Opcode 85: Stat: Magical Cold Resistance Modifier [85]
 
 @10850001 = ~Résistance aux dégâts de froid magiques~
 @10850002 = ~aux dégâts de froid magiques~
+@10850003 = ~la résistance aux dégâts de froid magiques~
 
 // Opcode 86: Stat: Slashing Resistance Modifier [86]
 
 @10860001 = ~Résistance aux dégâts tranchants~
 @10860002 = ~aux dégâts tranchants~
+@10860003 = ~la résistance aux dégâts tranchants~
 
 // Opcode 87: Stat: Crushing Resistance Modifier [87]
 
 @10870001 = ~Résistance aux dégâts contondants~
 @10870002 = ~aux dégâts contondants~
+@10870003 = ~la résistance aux dégâts contondants~
 
 // Opcode 88: Stat: Piercing Resistance Modifier [88]
 
 @10880001 = ~Résistance aux dégâts perforants~
 @10880002 = ~aux dégâts perforants~
+@10880003 = ~la résistance aux dégâts perforants~
 
 // Opcode 89: Stat: Missiles Resistance Modifier [89]
 
 @10890001 = ~Résistance aux dégâts de projectiles~
 @10890002 = ~aux dégâts de projectiles~
+@10890003 = ~la résistance aux dégâts de projectiles~
 
 // Opcode 90: Stat: Open Locks Modifier [90]
 
@@ -2628,6 +2657,7 @@
 
 @11660001 = ~Résistance à la magie~
 @11660002 = ~à la magie~
+@11660003 = ~la résistance à la magie~
 
 // Opcode 167: Stat: THAC0 Modifier with Missile Weapons [167]
 
@@ -3853,16 +3883,19 @@
 
 @15020001 = ~Résistance aux dégâts~
 @15020002 = ~aux dégâts~
+@15020003 = ~la résistance aux dégâts~
 
 // Fake Opcode 503: Stat: Résistance aux dégâts élémentaires [503]
 
 @15030001 = ~Résistance aux dégâts élémentaires~
 @15030002 = ~aux dégâts élémentaires~
+@15030003 = ~la résistance aux dégâts élémentaires~
 
 // Fake Opcode 504: Stat: Résistance aux dégâts physiques [504]
 
 @15040001 = ~Résistance aux dégâts physiques~
 @15040002 = ~aux dégâts physiques~
+@15040003 = ~la résistance aux dégâts physiques~
 
 // Fake Opcode 509 : Immunité aux sorts (par niveau) (cumulatif) [509]
 

@@ -17,7 +17,9 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
     INCLUDE ~%MOD_FOLDER%/lib/log.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/strings.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/spl.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/spl/casting_features.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/spl/extended_effects.tpp~
+    INCLUDE ~%MOD_FOLDER%/lib/spl/misc.tpp~
 
     INCLUDE ~%MOD_FOLDER%/lib/lib_ini.tpa~
 

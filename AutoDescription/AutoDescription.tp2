@@ -35,41 +35,6 @@ ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
-
-	DEFINE_ACTION_MACRO ~init_statistics~ BEGIN
-		OUTER_SET total = 0
-		OUTER_SET totalFailed = 0
-		OUTER_SET totalSuccessful = 0
-		OUTER_SET totalIgnored = 0
-		OUTER_SET totalIgnoredCursed = 0
-		OUTER_SET totalIgnoredWithoutDescription = 0
-		OUTER_SET totalIgnoredNotMoveable = 0
-		OUTER_SET totalIgnoredType = 0
-		OUTER_SET opcodeTodo = 0
-	END
-
-	DEFINE_ACTION_MACRO ~show_statistics~ BEGIN
-		ACTION_PHP_EACH ignored_opcodes AS opcode => value BEGIN
-			ACTION_IF value == 1 BEGIN
-				OUTER_SET opcodeTodo += 1
-			END
-		END
-
-		OUTER_SET totalIgnored = totalIgnoredCursed + totalIgnoredWithoutDescription + totalIgnoredNotMoveable + totalIgnoredType
-		OUTER_SET total = totalIgnored + totalSuccessful + totalFailed
-
-		PRINT "Reussis : %totalSuccessful%
-Echoues : %totalFailed%
-Ignores : %totalIgnored%
-   Maudits : %totalIgnoredCursed%
-   Sans description : %totalIgnoredWithoutDescription%
-   Non deplacables : %totalIgnoredNotMoveable%
-   Type non gere : %totalIgnoredType%
-
-Total : %total%
-
-Opcodes a coder : %opcodeTodo%"
-	END
 END
 
 LANGUAGE ~Francais~ ~french~
@@ -79,16 +44,16 @@ LANGUAGE ~Francais~ ~french~
 BEGIN @10 DESIGNATED 10
 SILENT
 LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~all~ RET log_filename END
-LAM ~init_statistics~
+LAM ~init_item_statistics~
 LAM ~update_item_descriptions~
-LAM ~show_statistics~
+LAM ~show_item_statistics~
 
 BEGIN @15 DESIGNATED 15
 SILENT
 LAF ~init_log_file~ STR_VAR type = ~spells~ mod = ~all~ RET log_filename END
-LAM ~init_statistics~
+LAM ~init_spell_statistics~
 LAM ~update_spell_descriptions~
-LAM ~show_statistics~
+LAM ~show_spell_statistics~
 
 BEGIN @20 DESIGNATED 20
 
@@ -105,7 +70,7 @@ ACTION_DEFINE_ARRAY ~itemFiles~ BEGIN END
 LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFiles END
 SILENT
 LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~%directory%~ RET log_filename END
-LAM ~init_statistics~
+LAM ~init_item_statistics~
 OUTER_SET totalItems = 0
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
@@ -114,4 +79,4 @@ ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
-LAM ~show_statistics~
+LAM ~show_item_statistics~

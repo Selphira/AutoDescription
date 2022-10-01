@@ -146,6 +146,19 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~feets_to_meters~ INT_VAR range = 0 RET range rangeToMeter BEGIN
+	SET range *= 1000
+	SET range /= 3281
+	SET rangeToMeter = range
+
+	PATCH_IF range < 2 BEGIN
+		SPRINT rangeToMeter ~%range% %meter%~
+	END
+	ELSE BEGIN
+		SPRINT rangeToMeter ~%range% %meters%~
+	END
+END
+
 //TODO: lowerFirst
 /*
 		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower
