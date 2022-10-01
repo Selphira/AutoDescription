@@ -6957,7 +6957,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_209~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_209_is_valid~ BEGIN
-	LPM ~opcode_55_is_valid~
+	LOCAL_SET death_type = 0x4
+	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%death_type%~) BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mort a gerer : %death_type%~ END
+	END
 END
 
 /* ----------------------------- *
