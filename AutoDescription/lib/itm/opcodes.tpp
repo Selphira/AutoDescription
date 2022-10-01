@@ -689,6 +689,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~death_to_strref~ BEGIN
 	1024 => 500012
 END
 
+
+// + d'autres sous condition : (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_without_level_restriction~ BEGIN 
+	12  => 1
+	17  => 1
+	18  => 1
+	331 => 1
+	333 => 1
+END
+
 OUTER_SET AbilityType_Charge = 1
 OUTER_SET AbilityType_Combat = 2
 OUTER_SET AbilityType_Equipped = 3
@@ -6117,6 +6127,8 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 		SET probability177 = probability
 		SET saveType177 = saveType
 		SET saveBonus177 = saveBonus
+		SET diceSides177 = diceSides // levelMin
+		SET diceCount177 = diceCount // levelMax
 		SET isExternal = 1
 
 		LPM ~read_external_effect_vars~
@@ -6128,11 +6140,16 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 
 			// Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
 			// FIXME: le parameter6 également mais non configuré dans AutoComplétion (et probablement jamais utilisé)
-			// TODO: rajouter les restrictions de niveau (attention aux cas particuliers : 12, 17, 18 & co)
 			// Pour les cas particuliers il sera nécessaire de trouver un moyen alternatif d'afficher la restriction
 			SET timingMode = timingMode177
 			SET duration = duration177
 			SET target = target177
+
+			// La restriction de niveau dépend de celle de l'opcode 177, excepté pour les opcodes qui n'en ont pas
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0) BEGIN
+				SET diceSides = diceSides177
+				SET diceCount = diceCount177
+			END
 
 			// Si le JS du 177 est renseigné contrairement à celui de l'opcode appelé => transmission
 			// FIXME: en réalité les JS se cumulent, ne sont présents que les cas les plus simples
