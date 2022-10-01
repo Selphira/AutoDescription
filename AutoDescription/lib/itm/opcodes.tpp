@@ -3306,7 +3306,7 @@ DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 	PATCH_IF (timingMode == TIMING_permanent OR
 			 timingMode == TIMING_delayed OR
 			 timingMode == 7 OR
-			 timingMode == TIMING_permanent_after_death) AND duration == 0 BEGIN
+			 timingMode == TIMING_permanent_after_death) AND duration == 0 AND parameter2 <= 3 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
 	END
