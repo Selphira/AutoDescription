@@ -1,36 +1,3 @@
-DEFINE_ACTION_MACRO ~update_descriptions~ BEGIN
-	LAM ~update_item_descriptions~
-	//LAM ~update_spell_descriptions~
-END
-
-DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
-	OUTER_SET totalItems = 0
-	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-		SET totalItems += 1
-		PATCH_IF totalItems MODULO 100 == 0 BEGIN
-			PATCH_PRINT "%totalItems% items processed"
-		END
-		PATCH_TRY
-			LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
-		WITH DEFAULT
-			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
-			SET totalFailed += 1
-		END
-	BUT_ONLY_IF_IT_CHANGES
-END
-
-DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
-	OUTER_SET totalSpells = 0
-	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
-		SET totalSpells += 1
-		PATCH_IF totalSpells MODULO 100 == 0 BEGIN
-			PATCH_PRINT "%totalSpells% spells processed"
-		END
-		LPF ~update_spell_description~ END
-	BUT_ONLY_IF_IT_CHANGES
-END
-
-
 DEFINE_PATCH_FUNCTION ~add_section_to_description~
 	INT_VAR
 		count = 0
@@ -154,7 +121,7 @@ DEFINE_PATCH_FUNCTION ~implode~ STR_VAR array_name = ~~ glue = ~, ~ final_glue =
 			SPRINT text ~%entry%~
 		END
 		ELSE BEGIN
-			PATCH_IF idx < count - 1 BEGIN
+			PATCH_IF idx < count BEGIN
 				SPRINT real_glue ~%glue%~
 			END
 			ELSE BEGIN

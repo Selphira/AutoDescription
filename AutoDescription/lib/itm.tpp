@@ -1,3 +1,23 @@
+DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
+	OUTER_SET totalItems = 0
+	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+		LPM ~update_item_description~
+	BUT_ONLY_IF_IT_CHANGES
+END
+
+DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
+	SET totalItems += 1
+	PATCH_IF totalItems MODULO 100 == 0 BEGIN
+		PATCH_PRINT "%totalItems% items processed"
+	END
+	PATCH_TRY
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+	WITH DEFAULT
+		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
+		SET totalFailed += 1
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~update_item_description~
 	RET
 		totalIgnoredCursed
@@ -69,8 +89,6 @@ BEGIN
 		// Supprime les lignes vides consécutives
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
 	END
-
-	//PATCH_PRINT "%description%"
 END
 
 DEFINE_PATCH_FUNCTION ~is_weapon~
@@ -141,7 +159,7 @@ BEGIN
 	// Evite un crash sur les objets vides
 	PATCH_IF SOURCE_SIZE <= 0x71 BEGIN
 		SET canUpdateItem = 0
-		LPF ~add_log_error~ STR_VAR message = ~Fichier invalide.~ END
+		LPF ~add_log_error~ STR_VAR message = ~Invalid file.~ END
 	END
 	// Si l'utilisateur ne veut pas modifier la description des objets maudits
 	ELSE PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) == BIT4 BEGIN
@@ -180,4 +198,39 @@ BEGIN
 				SET canUpdateItem = 0
 		END
     END
+END
+
+DEFINE_ACTION_MACRO ~init_item_statistics~ BEGIN
+	OUTER_SET total = 0
+	OUTER_SET totalFailed = 0
+	OUTER_SET totalSuccessful = 0
+	OUTER_SET totalIgnored = 0
+	OUTER_SET totalIgnoredCursed = 0
+	OUTER_SET totalIgnoredWithoutDescription = 0
+	OUTER_SET totalIgnoredNotMoveable = 0
+	OUTER_SET totalIgnoredType = 0
+	OUTER_SET opcodeTodo = 0
+END
+
+DEFINE_ACTION_MACRO ~show_item_statistics~ BEGIN
+	ACTION_PHP_EACH ignored_opcodes AS opcode => value BEGIN
+		ACTION_IF value == 1 BEGIN
+			OUTER_SET opcodeTodo += 1
+		END
+	END
+
+	OUTER_SET totalIgnored = totalIgnoredCursed + totalIgnoredWithoutDescription + totalIgnoredNotMoveable + totalIgnoredType
+	OUTER_SET total = totalIgnored + totalSuccessful + totalFailed
+
+	PRINT "Reussis : %totalSuccessful%
+Echoues : %totalFailed%
+Ignores : %totalIgnored%
+   Maudits : %totalIgnoredCursed%
+   Sans description : %totalIgnoredWithoutDescription%
+   Non deplacables : %totalIgnoredNotMoveable%
+   Type non gere : %totalIgnoredType%
+
+Total : %total%
+
+Opcodes a coder : %opcodeTodo%"
 END

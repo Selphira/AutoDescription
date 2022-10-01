@@ -449,40 +449,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_stunning%~    => 10120032 // 134217728 ~points de dégâts non létal~
 END
 
-ACTION_DEFINE_ASSOCIATIVE_ARRAY ~feets_to_meters~ BEGIN
-	0 => ~0 %meter%~
-	1 => ~0,6 %meter%~
-	2 => ~1,2 %meter%~
-	3 => ~1,8 %meter%~
-	4 => ~2,5 %meters%~
-	5 => ~3 %meters%~
-	6 => ~3,5 %meters%~
-	7 => ~4,5 %meters%~
-	8 => ~5 %meters%~
-	9 => ~5,5 %meters%~
-	10 => ~6 %meters%~
-	11 => ~7 %meters%~
-	12 => ~7,5 %meters%~
-	13 => ~8 %meters%~
-	14 => ~8,5 %meters%~
-	15 => ~9 %meters%~
-	16 => ~9,5 %meters%~
-	17 => ~10 %meters%~
-	18 => ~11 %meters%~
-	19 => ~11,5 %meters%~
-	20 => ~12 %meters%~
-	21 => ~13 %meters%~
-	22 => ~13,5 %meters%~
-	23 => ~14 %meters%~
-	24 => ~14,5 %meters%~
-	25 => ~15 %meters%~
-	26 => ~16 %meters%~
-	27 => ~16,5 %meters%~
-	28 => ~17 %meters%~
-	29 => ~17,5 %meters%~
-	30 => ~18 %meters%~
-END
-
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
 	2 => ~ea~
 	3 => ~general~
@@ -5325,7 +5291,7 @@ END
  * Spell: Disable Spell Casting Abilities [145] *
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
-	PATCH_IF parameter2 == 0 AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND isRobe)) BEGIN
+	PATCH_IF parameter2 == 0 AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND VARIABLE_IS_SET isRobe AND isRobe)) BEGIN
 		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts profanes~
 	END
 	ELSE PATCH_IF parameter2 != 0 BEGIN
@@ -6498,8 +6464,8 @@ END
 DEFINE_PATCH_MACRO ~opcode_190_common~ BEGIN
 	SET parameter2 = MOD_TYPE_flat
 	SET parameter1 = parameter1 BAND 255
-	SET parameter1 = parameter < 0? 0 : parameter1
-	SET parameter1 = parameter > 10? 10 : parameter1
+	SET parameter1 = parameter1 < 0 ? 0 : parameter1
+	SET parameter1 = parameter1 > 10 ? 10 : parameter1
 	SET parameter1 = 10 - parameter1
 END
 
@@ -6789,7 +6755,7 @@ END
  * Spell: Bounce (by School) [202] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_202~ BEGIN
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	PATCH_IF NOT ~%spellSchoolName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12020001 // ~Renvoie les sorts de l'école %spellSchoolName%~
@@ -6797,7 +6763,7 @@ DEFINE_PATCH_MACRO ~opcode_self_202~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_202~ BEGIN
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	PATCH_IF NOT ~%spellSchoolName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12020002 // ~de renvoyer les sorts de l'école %spellSchoolName%~
@@ -6823,13 +6789,13 @@ END
  * Spell: Protection from Spell (School) [204] *
  * ------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_204~ BEGIN
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12040001 // ~Immunité aux sorts de l'école %spellSchoolName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_204~ BEGIN
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12040002 // ~de résister aux sorts de l'école %spellSchoolName%~
 END
@@ -7275,6 +7241,15 @@ DEFINE_PATCH_MACRO ~opcode_self_219000~ BEGIN
 	SPRINT name @102008        // ~Classe d'armure~
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
+
+DEFINE_PATCH_MACRO ~opcode_target_219000~ BEGIN
+	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+
+	SPRINT value ~+2 %versus%~
+	SPRINT name @102008        // ~Classe d'armure~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+END
+
 // Save throws
 DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
@@ -7282,6 +7257,14 @@ DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
 	SPRINT value ~+2 %versus%~
 	SPRINT name @102034        // ~Jets de sauvegarde~
 	SPRINT description @100001 // ~%name%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_219001~ BEGIN
+	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+
+	SPRINT value ~+2 %versus%~
+	SPRINT name @102034        // ~Jets de sauvegarde~
+	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
@@ -7315,7 +7298,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_220~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12200001 // ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
 END
@@ -7323,7 +7306,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_220~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12200002 // ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
 END
@@ -7375,14 +7358,15 @@ END
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_222~ BEGIN
 	LOCAL_SET value = parameter1
-	SPRINT range $feets_to_meters(~%value%~)
+	LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
 
 	SPRINT description @12220001 // ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_222~ BEGIN
 	LOCAL_SET value = parameter1
-	SPRINT range $feets_to_meters(~%value%~)
+	LOCAL_SET value = parameter1
+	LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
 
 	SPRINT description @12220002 // ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~
 END
@@ -7424,7 +7408,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_223_common~ BEGIN
 	LOCAL_SET amount = parameter1
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
@@ -7570,7 +7554,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_229~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12290001 // ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
 END
@@ -7578,7 +7562,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_229~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_school~ INT_VAR school = parameter2 RET spellSchoolName END
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	SPRINT description @12290002 // ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
 END
@@ -7687,7 +7671,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = ~%resref3%~ RET spellName3 = spellName END
 	END
 
-	LPF ~get_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
@@ -7782,7 +7766,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	END
 	ELSE PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
 		SET value = parameter2 == 8 ? 4 : parameter2 == 9 ? 10 : special
-		SPRINT range $feets_to_meters(~%value%~)
+		LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
 		SPRINT condition @12320024 // ~Lorsque la cible se trouve à moins de %range%~
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
@@ -8487,7 +8471,7 @@ DEFINE_PATCH_MACRO ~opcode_262_common~ BEGIN
 	SET value = value > 15 ? 15 : value
 	// Each unit of visible range equals 2ft
 	SET value *= 2
-	SPRINT value $feets_to_meters(~%value%~)
+	LPF ~feets_to_meters~ INT_VAR range = value RET value = rangeToMeter END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_262~ BEGIN
@@ -9832,7 +9816,7 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
 
-	LPF ~get_spell_description~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 
 	PATCH_IF count == 1 AND featureCount == 1 BEGIN
 		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
@@ -10201,7 +10185,7 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
-	LPF ~get_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
@@ -10893,27 +10877,27 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 		SPRINT description @102548 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
-		SPRINT resistName (AT resistName)
-		TO_LOWER resistName
+		SET resistName += 1
+		SPRINT theStatistic (AT resistName)
 
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 			PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 				SPRINT value @10002 // ~%value% %~
-				SPRINT description @102282 // ~Augmente la %resistName% %ofTheTarget% de %value%~
+				SPRINT description @102286 // ~Augmente de %value% %theStatistic% %ofTheTarget%~
 			END
 			ELSE BEGIN
 				value = ABS value
 				SPRINT value @10002 // ~%value% %~
-				SPRINT description @102281 // ~Réduit la %resistName% %ofTheTarget% de %value%~
+				SPRINT description @102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
 			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 			SPRINT value @10002 // ~%value% %~
-			SPRINT description @102283 // ~de passer la %resistName% %ofTheTarget% à %value%~
+			SPRINT description @102287 // ~Porte à %value% %theStatistic% %ofTheTarget%~
 		END
 		ELSE BEGIN // percent
 			SPRINT value @10002 // ~%value% %~
-			SPRINT description @102284 // ~Multiplie la %resistName% %ofTheTarget% par %value%~
+			SPRINT description @102288 // ~Multiplie par %value% %theStatistic% %ofTheTarget%~
 		END
 	END
 END
@@ -10933,27 +10917,27 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 		SPRINT description @102548 // ~d'immuniser %resistName%~
 	END
 	ELSE BEGIN
-		SPRINT resistName (AT resistName)
-		TO_LOWER resistName
+		SET resistName += 2
+		SPRINT theStatistic (AT resistName)
 
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 			PATCH_IF value >= 0 BEGIN
 				SPRINT value @10002 // ~%value% %~
-				SPRINT description @102540 // ~d'augmenter la %resistName% %ofTheTarget% de %value%~
+				SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
 			END
 			ELSE BEGIN
 				value = ABS value
 				SPRINT value @10002 // ~%value% %~
-				SPRINT description @102539 // ~de réduire la %resistName% %ofTheTarget% de %value%~
+				SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
 			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 			SPRINT value @10002 // ~%value% %~
-			SPRINT description @102541 // ~de passer la %resistName% %ofTheTarget% à %value%~
+			SPRINT description @102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
 		END
 		ELSE BEGIN // percent
 			SPRINT value @10002 // ~%value% %~
-			SPRINT description @102542 // ~de multiplier la %resistName% %ofTheTarget% par %value%~
+			SPRINT description @102546 // ~de multiplier par %value% %theStatistic% %ofTheTarget%~
 		END
 	END
 END
@@ -11003,8 +10987,13 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_school~ INT_VAR school = 0 RET spellSchoolName BEGIN
+DEFINE_PATCH_FUNCTION ~get_spell_school~ INT_VAR school = 0 opcode = 0 RET spellSchoolName BEGIN
 	SET strref = 100100 + school
+	LPF ~getTranslation~ INT_VAR strref opcode RET spellSchoolName = string END
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_school_name~ INT_VAR school = 0 opcode = 0 RET spellSchoolName BEGIN
+	SET strref = 100120 + school
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSchoolName = string END
 END
 

@@ -1,3 +1,67 @@
+DEFINE_PATCH_FUNCTION ~add_extended_effects~
+	STR_VAR
+		description = ~~
+	RET
+		description
+BEGIN
+	// Variable utilisée à plusieurs endroits...
+	// TODO: Trouver une meilleure solution
+	SET abilityType = ~-1~
+	SET countHeaders = 0
+
+	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
+
+		LPF ~load_extended_effects~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+
+		SPRINT title @12320400 // ~À partir du niveau %requiredLevel%~
+		LPF ~add_section_to_description~ INT_VAR count = ~countLines%countHeaders%~ STR_VAR title arrayName = ~lines%countHeaders%~ RET description END
+
+		SET countHeaders += 1
+	END
+END
+
+
+DEFINE_PATCH_FUNCTION ~load_extended_effects~
+	INT_VAR
+		headerOffset = 0
+	RET
+		countLines
+	RET_ARRAY
+		lines
+BEGIN
+	SET countLines = 0
+
+	CLEAR_ARRAY lines
+	CLEAR_ARRAY opcodes
+
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY lines BEGIN END
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
+
+	LPM ~load_extended_effects~
+	LPM ~replace_effects~
+	LPM ~filter_effects~
+	LPM ~group_effects~
+
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 0 BEGIN
+		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		        LPM ~data_to_vars~
+				//TODO: Forcer la cible à la cible du sort ??
+				LPF ~get_effect_description~ RET effectDescription = description sort END
+				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
+					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+					SET countLines += 1
+				END
+		    END
+	    END
+	END
+
+	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
+	LPF ~group_probability_effects~ RET countLines = count RET_ARRAY lines = effects END
+END
+
 DEFINE_PATCH_FUNCTION ~get_spell_effects~
 	INT_VAR
 		forceTarget = 0
@@ -154,7 +218,7 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_description~
+DEFINE_PATCH_FUNCTION ~get_item_spell_description~
 	INT_VAR
 		forceTarget = 0
 		probability = 100

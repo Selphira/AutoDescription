@@ -42,7 +42,7 @@ DEFINE_ACTION_FUNCTION ~add_log~
 		message = ~~
 		type = ~warning~
 BEGIN
-	APPEND_OUTER ~AutoDescription/log/%type%-%log_filename%.log~ ~%SOURCE_FILE% : %message%~
+	APPEND_OUTER ~AutoDescription/log/%log_filename%-%type%.log~ ~%SOURCE_FILE% : %message%~
 END
 
 DEFINE_PATCH_FUNCTION ~add_compare_row~
@@ -54,21 +54,28 @@ DEFINE_PATCH_FUNCTION ~add_compare_row~
 BEGIN
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/diff-%log_filename%.html~ ~<tr><th class="title">%filename%<br/>%itemName%</th><td class="description before"><pre>%originalDescription%</pre></td><td class="description after"><pre>%description%</pre></td></tr>~ KEEP_CRLF
+		APPEND_OUTER ~AutoDescription/log/%log_filename%-diff.html~ ~<tr><th class="title">%filename%<br/>%itemName%</th><td class="description before"><pre>%originalDescription%</pre></td><td class="description after"><pre>%description%</pre></td></tr>~ KEEP_CRLF
 		VERBOSE
 	END
 END
 
-DEFINE_ACTION_MACRO ~init_log_file~ BEGIN
+DEFINE_ACTION_FUNCTION ~init_log_file~
+	STR_VAR
+		type = ~items~
+		mod = ~all~
+	RET log_filename
+BEGIN
+	LAF ~get_game_name~ RET gameName END
+	OUTER_SPRINT log_filename ~%gameName%-%mod%-%type%~
 	// Initialisation des fichiers de log
 	<<<<<<<< .../AutoDescription/inlined/empty.log
-	>>>>>>>>
-	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/warning-%log_filename%.log~
-	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/error-%log_filename%.log~
+>>>>>>>>
+	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-warning.log~
+	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-error.log~
 	ACTION_IF is_ee BEGIN
-		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/diff-%log_filename%.html~
+		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END
 	ELSE BEGIN
-		COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/diff-%log_filename%.html~
+		COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END
 END
