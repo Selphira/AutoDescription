@@ -121,7 +121,8 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 	                        READ_SHORT 0x8 type
 	                        PATCH_IF type == 3 BEGIN
 		                        READ_SHORT 0x206 area
-		                        SET area /= 16
+		                        // On divise par 8.5 pour avoir le diamètre en pied, et encore par 2 pour avoir le rayon
+		                        SET area /= 17
 		                        LPF ~feets_to_meters~ INT_VAR range = area RET range = rangeToMeter END
 								SPRINT target @102463 // ~Rayon de %range% autour du lanceur~
 	                        END
@@ -150,7 +151,8 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 	                        READ_SHORT 0x8 type
 	                        PATCH_IF type == 3 BEGIN
 		                        READ_SHORT 0x206 area
-		                        SET area /= 16
+		                        // On divise par 8.5 pour avoir le diamètre en pied, et encore par 2 pour avoir le rayon
+		                        SET area /= 17
 		                        LPF ~feets_to_meters~ INT_VAR range = area RET range = rangeToMeter END
 								SPRINT target @102464 // ~Rayon de %range%~
 	                        END
