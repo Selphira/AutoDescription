@@ -1537,6 +1537,7 @@
 @420074 = ~Don de Lathandre~
 @420075 = ~la fatigue du berserker~
 @420076 = ~Rage du barbare~
+@420077 = ~Rage du berserker~ // Celle du kit
 @420078 = ~Furie~ // Celle de Minsc
 @420079 = ~Arme empoisonée~
 @420080 = ~Kaï~
@@ -2029,6 +2030,9 @@
 // Opcode 63: State: Infravision [63]
 
 @10630001 = ~Infravision~
+@10630011 = ~Octroie la capacité d'infravision %toTheTarget%~
+@10630021 = ~d'octroyer la capacité d'infravision~
+@10630031 = ~d'octroyer la capacité d'infravision %toTheTarget% ~
 
 // Opcode 64: State: Remove Infravision [64]
 

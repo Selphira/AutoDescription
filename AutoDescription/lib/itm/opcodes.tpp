@@ -2957,6 +2957,18 @@ DEFINE_PATCH_MACRO ~opcode_self_63~ BEGIN
 	SPRINT description @10630001 // ~Infravision~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_63~ BEGIN
+	SPRINT description @10630011 // ~Octroie la capacité d'infravision %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_63~ BEGIN
+	SPRINT description @10630021 // ~d'octroyer la capacité d'infravision~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_63~ BEGIN
+	SPRINT description @10630031 // ~d'octroyer la capacité d'infravision %toTheTarget% ~
+END
+
 /* ------------------------------ *
  * State: Remove Infravision [64] *
  * ------------------------------ */
