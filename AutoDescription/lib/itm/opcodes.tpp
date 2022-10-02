@@ -5154,19 +5154,40 @@ END
  * Polymorph into Specific [135] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_135~ BEGIN
-	//TODO: type == 0 => Gain Resistances/statistics (spell-casting disabled)
+	SET strref = 11350001 // ~Transformation en %creatureName%~
+	LPM ~opcode_135_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_135~ BEGIN
+	SET strref = 11350011 // ~Transforme %theTarget% en %creatureName%~
+	LPM ~opcode_135_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_135~ BEGIN
+	SET strref = 11350021 // ~de se transformer en %creatureName%~
+	LPM ~opcode_135_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_135~ BEGIN
+	SET strref = 11350031 // ~de transformer %theTarget% en %creatureName%~
+	LPM ~opcode_135_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_135_common~ BEGIN
 	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11350002 // ~%theTarget% retrouve sa forme naturelle~
+		SET ignoreDuration = 1
+		SET strref += 2 // ~%theTarget% retrouve sa forme naturelle~
 	END
 	ELSE BEGIN
+		SET strref += parameter2 == 0 ? 0 : 1 // transformation / déguisement
 		LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-		PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @11350001 // ~Transforme le porteur en %creatureName%~
-		END
-		ELSE BEGIN
+		PATCH_IF ~%creatureName%~ STRING_EQUAL ~~ BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% self : Nom de la créature introuvable : %resref%~ END
+			SPRINT creatureName @11350100 // ~créature sans nom~
 		END
+		SPRINT description @11350001 // ~Transforme %theTarget% en %creatureName%~
 	END
+	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
 /* -------------------------- *

@@ -2516,9 +2516,24 @@
 
 // Opcode 135: Polymorph into Specific [135]
 
-@11350001 = ~Transforme le porteur en %creatureName%~
+@11350001 = ~Transformation en %creatureName%~
+@11350002 = ~Déguisement en %creatureName%~
+@11350003 = ~Retrouve sa forme naturelle~
+
+@11350011 = ~Transforme %theTarget% en %creatureName%~
+@11350012 = ~Déguise %theTarget% en %creatureName%~
 // TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
-@11350002 = ~%theTarget% retrouve sa forme naturelle~
+@11350013 = ~%theTarget% retrouve sa forme naturelle~
+
+@11350021 = ~de se transformer en %creatureName%~
+@11350022 = ~de se déguiser en %creatureName%~
+@11350023 = ~de retrouver sa forme naturelle~
+
+@11350031 = ~de transformer %theTarget% en %creatureName%~
+@11350032 = ~de déguiser %theTarget% en %creatureName%~
+@11350033 = ~de faire retrouver la forme naturelle de %theTarget%~
+
+@11350100 = ~créature sans nom~
 
 // Opcode 136: State: Force Visible [136]
 
