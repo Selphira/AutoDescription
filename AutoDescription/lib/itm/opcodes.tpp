@@ -7038,6 +7038,7 @@ END
 /* -------------------------------- *
  * Spell Effect: Imprisonment [211] *
  * -------------------------------- */
+//TODO : grouper avec opcode 71, P2 == 1 & P1 == 66
 DEFINE_PATCH_MACRO ~opcode_self_211~ BEGIN
 	SPRINT description @12110001 // ~Emprisonne %theTarget%~
 END

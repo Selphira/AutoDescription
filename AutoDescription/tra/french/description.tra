@@ -147,6 +147,13 @@
 @101181 = ~à la cible~
 @101182 = ~aux membres du groupe~
 @101190 = ~aux créatures dans la zone d'effet~
+@101191 = ~les créatures non membres du groupe~
+@101192 = ~des créatures non membres du groupe~
+@101193 = ~aux créatures non membres du groupe~
+@101194 = ~les autres créatures dans la zone d'effet~
+@101195 = ~des autres créatures dans la zone d'effet~
+@101196 = ~aux autres créatures dans la zone d'effet~
+
 @102386 = ~aux %targetType%~
 @102387 = ~contre les %targetType%~
 @101186 = ~%target% (de niveau %levelMin%)~
@@ -1552,7 +1559,7 @@
 @420093 = ~Arme enchantée~
 @420095 = ~Forme spirituelle~
 @420096 = ~Élu des esprits~
-@420097 = ~Lame critique~ // TODO?, sort sans nom : Coup critique +10%
+@420097 = ~Arme critique~ // TODO?, sort sans nom : Coup critique +10%
 @420098 = ~Potion de blocage de la magie~
 @420099 = ~Potion de clarté~
 @420100 = ~Parchemin de protection contre la magie~
@@ -1571,6 +1578,7 @@
 @420121 = ~Manteau~
 @420122 = ~Manteau amélioré~
 @420123 = ~Immunité absolue~
+@420124 = ~Banni~ // FIXME: l'emprisonnement détruit la cible plutôt que de l'enfermer, non hardcoded
 @420125 = ~le mode histoire~ // Mode de jeu facile ++
 @420126 = ~Bouclier~
 @420250 = ~la maladie~
@@ -1658,10 +1666,6 @@
 @10010033 = ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
 @10010034 = ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
 @10010035 = ~d'empêcher %theTarget% d'attaquer~
-
-
-@10010011 = ~Empêche %theTarget% d'attaquer~
-@10010012 = ~d'empêcher %theTarget% d'attaquer~
 
 @10010101 = ~une demi~
 @10010102 = ~\1 et demi~
