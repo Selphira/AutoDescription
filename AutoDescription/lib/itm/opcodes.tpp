@@ -5517,8 +5517,16 @@ DEFINE_PATCH_MACRO ~opcode_self_150~ BEGIN
 	SPRINT description @11500001 // ~Détecte les pièges~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_150~ BEGIN
+	SPRINT description @11500002 // ~%theTarget% détecte les pièges~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_150~ BEGIN
-	SPRINT description @11500002 // ~de détecter les pièges~
+	SPRINT description @11500003 // ~de détecter les pièges~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_150~ BEGIN
+	SPRINT description @11500004 // ~que %theTarget% détecte les pièges~
 END
 
 /* ------------------------------ *
