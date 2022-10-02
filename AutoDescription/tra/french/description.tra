@@ -137,6 +137,16 @@
 @102472 = ~le porteur~
 @102473 = ~les membres du groupe~
 @102474 = ~les créatures dans la zone d'effet~
+@102475 = ~le lanceur~
+@102476 = ~du lanceur~
+@102477 = ~au lanceur~
+@102467 = ~Le lanceur~
+@102466 = ~1 créature~
+@102465 = ~%countTarget% créatures~
+@102464 = ~Rayon de %range%~
+@102463 = ~Rayon de %range% autour du lanceur~
+@102462 = ~Point dans le champ visuel du lanceur~
+@102461 = ~Champ visuel du lanceur~
 @102384 = ~les %targetType%~
 @101085 = ~de la cible~
 @101086 = ~du porteur~

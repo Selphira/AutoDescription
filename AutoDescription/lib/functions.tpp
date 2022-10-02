@@ -147,15 +147,30 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~feets_to_meters~ INT_VAR range = 0 RET range rangeToMeter BEGIN
-	SET range *= 1000
+	SET range *= 10000
 	SET range /= 3281
 	SET rangeToMeter = range
 
-	PATCH_IF range < 2 BEGIN
-		SPRINT rangeToMeter ~%range% %meter%~
+	PATCH_IF range > 10 BEGIN
+		SET decimal = range MODULO 10
+		INNER_PATCH_SAVE rangeToMeter ~%range%~ BEGIN
+			REPLACE_TEXTUALLY ~\([0-9]\)+[0-9]$~ ~\1~
+		END
+		PATCH_IF decimal > 0 BEGIN
+			PATCH_IF decimal >= 3 AND decimal <= 7 BEGIN
+				SPRINT rangeToMeter ~%rangeToMeter%,5~
+			END
+			ELSE PATCH_IF decimal > 7 BEGIN
+				SET rangeToMeter += 1
+			END
+		END
+	END
+
+	PATCH_IF range < 20 BEGIN
+		SPRINT rangeToMeter ~%rangeToMeter% %meter%~
 	END
 	ELSE BEGIN
-		SPRINT rangeToMeter ~%range% %meters%~
+		SPRINT rangeToMeter ~%rangeToMeter% %meters%~
 	END
 END
 
