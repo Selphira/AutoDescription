@@ -496,7 +496,7 @@ BEGIN
 				SPRINT toTheTarget @101180 // ~au porteur~
 			END
 		END
-		ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
+		ELSE PATCH_IF target == TARGET_FX_preset BEGIN
 			SPRINT opcode_target ~_target~
 			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102471 // ~la cible~
@@ -504,7 +504,9 @@ BEGIN
 				SPRINT toTheTarget @101181 // ~à la cible~
 			END
 		END
-		ELSE PATCH_IF target == TARGET_FX_party BEGIN
+		// TARGET_FX_party : membre de groupe de CHARNAME
+		// TARGET_FX_everyone_match_specific_caster: membre du groupe du lanceur de sort
+		ELSE PATCH_IF target == TARGET_FX_party OR target == TARGET_FX_everyone_match_specific_caster BEGIN
 			SPRINT opcode_target ~_target~
 			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102473 // ~les membres du groupe~
@@ -518,6 +520,22 @@ BEGIN
 				SPRINT theTarget   @102474 // ~les créatures dans la zone d'effet~
 				SPRINT ofTheTarget @101089 // ~des créatures dans la zone d'effet~
 				SPRINT toTheTarget @101190 // ~aux créatures dans la zone d'effet~
+			END
+		END
+		ELSE PATCH_IF target == TARGET_FX_everyone_except_party BEGIN
+			SPRINT opcode_target ~_target~
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+				SPRINT theTarget   @101191 // ~les créatures non membres du groupe~
+				SPRINT ofTheTarget @101192 // ~des créatures non membres du groupe~
+				SPRINT toTheTarget @101193 // ~aux créatures non membres du groupe~
+			END
+		END
+		ELSE PATCH_IF target == TARGET_FX_everyone_except_self BEGIN
+			SPRINT opcode_target ~_target~
+			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+				SPRINT theTarget   @101194 // ~les autres créatures dans la zone d'effet~
+				SPRINT ofTheTarget @101195 // ~des autres créatures dans la zone d'effet~
+				SPRINT toTheTarget @101196 // ~aux autres créatures dans la zone d'effet~
 			END
 		END
 
