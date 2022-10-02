@@ -4399,7 +4399,7 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11120001 // ~Retire "%itemName%" de l'inventaire~
 		// Hack pour forcer l'affichage de la durée / usage strictement interne
-		PATCH_IF special == 122 AND timingMode == TIMING_duration BEGIN
+		PATCH_IF custom_int == 122 AND timingMode == TIMING_duration BEGIN
 			LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 			PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
@@ -4512,16 +4512,16 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 					PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 						LPM ~data_to_vars~
 						PATCH_IF position == currentPosition BEGIN
-							// Ajout du nouveau, le spécial permettra de force l'affichage de la durée
+							// Ajout du nouveau, le custom_int permettra de force l'affichage de la durée
 							SET timingMode = TIMING_duration
 							SET duration = searchDuration
-							SET special = 122
+							SET custom_int = 122
 							LPM ~add_opcode~
 
 							// Suppression de l'opcode 112 actuel
 							LPF ~delete_opcode~
 								INT_VAR opcode
-								STR_VAR expression = ~position = %position% AND duration = %currentDuration% AND NOT special = 122~
+								STR_VAR expression = ~position = %position% AND duration = %currentDuration% AND NOT custom_int = 122~
 								RET $opcodes(~%opcode%~) = count
 								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 							END
