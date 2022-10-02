@@ -554,11 +554,28 @@
 /* --------- *
  * Gender.ids *
  * --------- */
+// plural
 @207001 = ~hommes~
 @207002 = ~femmes~
+//@207003 = ~~
+//@207004 = ~~
+@207005 = ~bisexués~
 @207006 = ~créatures convoquées~
 @207007 = ~illusions~
+//@207008 = ~~
 @207009 = ~démons convoqués~
+@207066 = ~créatures emprisonnées~
+
+@207501 = ~homme~
+@207502 = ~femme~
+//@207503 = ~~
+//@207504 = ~~
+@207505 = ~bisexué~
+@207506 = ~créature convoquée~
+@207507 = ~illusion~
+//@207508 = ~~
+@207509 = ~démon convoqué~
+@207566 = ~créature emprisonnée~
 
 /* --------- *
  * Align.ids *
@@ -2029,11 +2046,10 @@
 // Opcode 71: Sex Change [71]
 
 @10710001 = ~Inverse le sexe %ofTheTarget%~
-@10710002 = ~Change %theTarget% en homme~
-@10710003 = ~Change %theTarget% en femme~
+@10710002 = ~Change %theTarget% en %genderType%~
+
 @10710011 = ~d'inverser le sexe %ofTheTarget%~
-@10710012 = ~de changer %theTarget% en homme~
-@10710013 = ~de changer %theTarget% en femme~
+@10710012 = ~de changer %theTarget% en %genderType%~
 
 // Opcode 73: Stat: Extra Damage Modifier [73]
 

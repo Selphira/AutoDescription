@@ -3104,13 +3104,13 @@ END
  * Sex Change [71] *
  * --------------- */
 DEFINE_PATCH_MACRO ~opcode_self_71~ BEGIN
-	LOCAL_SET strref = 10710001 // ~Inverse le sexe %ofTheTarget%~
+	LOCAL_SET descStrref = 10710001 + parameter2 // ~Inverse le sexe %ofTheTarget%~
 
 	LPM ~opcode_71_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_71~ BEGIN
-	LOCAL_SET strref = 10710011 // ~d'inverser le sexe %ofTheTarget%~
+	LOCAL_SET descStrref = 10710011 + parameter2 // ~d'inverser le sexe %ofTheTarget%~
 
 	LPM ~opcode_71_common~
 END
@@ -3124,15 +3124,19 @@ DEFINE_PATCH_MACRO ~opcode_target_71~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_71_common~ BEGIN
-	PATCH_IF parameter2 == 1 BEGIN
-		PATCH_IF parameter1 >= 1 AND parameter1 <= 2 BEGIN
-			SET strref += parameter1
-        END
-        ELSE BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Sexe a gerer : %parameter1%~ END
-        END
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		LPF ~get_ids_strref~ INT_VAR entry = parameter1 file = ~7~ RET strref END
+		SET strref += 500 // mise au singulier
+		LPF ~getTranslation~ INT_VAR strref opcode RET genderType = string END
 	END
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	LPF ~getTranslation~ INT_VAR strref = descStrref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_71_is_valid~ BEGIN
+	PATCH_IF parmameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
+		// Sans intérêt en terme de gameplay mais pas sans effet pour autant
+		SET isValid = 0
+	END
 END
 
 /* -------------------------------- *
@@ -11199,7 +11203,7 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid ids entry : %idsFile%.ids (%idsEntry%)~ END
 		END
 		// si une entrée n'est pas définie dans le fichier ids, elle peut quand même l'être dans les strrefs
-		SET strref = 200000 + (file * 1000) + entry
+		LPF ~get_ids_strref~ INT_VAR entry file RET strref END
 		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
 	END
 	ELSE BEGIN
@@ -11207,6 +11211,9 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~get_ids_strref~ INT_VAR entry = 0 file = 0 RET strref BEGIN
+	SET strref = 200000 + (file * 1000) + entry
+END
 
 DEFINE_PATCH_FUNCTION ~get_ids_versus_name~ INT_VAR entry = 0 file = 0 RET idVersusName BEGIN
 	SPRINT idVersusName ~~
