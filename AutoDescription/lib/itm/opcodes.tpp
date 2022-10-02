@@ -10433,22 +10433,22 @@ END
 // FIXME: Est utilisé dans certains sorts qui diminue les caractéristiques sans pouvoir tuer la cible
 // Idéalement, il faudrait trouver cet effet de même durée et les grouper : Constitution -2 (minimum 1)
 DEFINE_PATCH_MACRO ~opcode_self_367~ BEGIN
-	SET strref += parameter2 == 0 ? 13670001 : 13670002
+	SET strref = parameter2 == 0 ? 13670001 : 13670002
 	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_367~ BEGIN
-	SET strref += parameter2 == 0 ? 13670011 : 13670012
+	SET strref = parameter2 == 0 ? 13670011 : 13670012
 	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_367~ BEGIN
-	SET strref += parameter2 == 0 ? 13670021 : 13670022
+	SET strref = parameter2 == 0 ? 13670021 : 13670022
 	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_367~ BEGIN
-	SET strref += parameter2 == 0 ? 13670031 : 13670032
+	SET strref = parameter2 == 0 ? 13670031 : 13670032
 	SPRINT description (AT strref)
 END
 
