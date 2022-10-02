@@ -1278,8 +1278,8 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		SPRINT description ~%description% (%dontWakeUp%)~
 	END
 	PATCH_IF flagFistDamage == 1 BEGIN
-		// FIXME : formulation
-		PATCH_FAIL "%SOURCE_FILE%: opcode_12_common: flagFistDamage : l'effet est n'efficace que si la source est désarmée"
+		SPRINT unarmed @10120041 // ~efficace si la source est désarmée~
+		SPRINT description ~%description% (%unarmed%)~
 	END
 END
 
@@ -10420,21 +10420,23 @@ END
 // FIXME: Est utilisé dans certains sorts qui diminue les caractéristiques sans pouvoir tuer la cible
 // Idéalement, il faudrait trouver cet effet de même durée et les grouper : Constitution -2 (minimum 1)
 DEFINE_PATCH_MACRO ~opcode_self_367~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT description @13670001 // ~Immunité à la mort par aborption de caractéristique~
-	END
-	ELSE BEGIN
-		SPRINT description @13670003 // ~Sensible à la mort par aborption de caractéristique~
-	END
+	SET strref += parameter2 == 0 ? 13670001 : 13670002
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_367~ BEGIN
+	SET strref += parameter2 == 0 ? 13670011 : 13670012
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_367~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT description @13670002 // ~d'être immunisé à la mort par absorption de caractéristique~
-	END
-	ELSE BEGIN
-		SPRINT description @13670004 // ~d'être sensible à la mort par absorption de caractéristique~
-	END
+	SET strref += parameter2 == 0 ? 13670021 : 13670022
+	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_367~ BEGIN
+	SET strref += parameter2 == 0 ? 13670031 : 13670032
+	SPRINT description (AT strref)
 END
 
 /* --------------------------------- *
@@ -10917,7 +10919,7 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 		SPRINT description @102548 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
-		// SET resistName += 1
+		SET resistName += 2
 		SPRINT theStatistic (AT resistName)
 
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN

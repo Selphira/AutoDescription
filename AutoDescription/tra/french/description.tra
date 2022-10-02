@@ -1741,6 +1741,7 @@
 @10120033 = ~points de dégâts à mains nues~
 
 @10120040 = ~ne réveille pas la cible~
+@10120041 = ~efficace si la source est désarmée~ // FIXME: aucune arme dans la main directrice
 
 // Opcode 13: Death: Instant Death [13]
 
@@ -3962,11 +3963,17 @@
 
 // Opcode 367: Minimum base stats [367]
 
-@13670001 = ~Immunité à la mort par aborption de caractéristique~
-@13670002 = ~d'être immunisé à la mort par absorption de caractéristique~
-@13670003 = ~Sensible à la mort par aborption de caractéristique~
-@13670004 = ~d'être sensible à la mort par absorption de caractéristique~ // FIXME
+@13670001 = ~Sensible à la mort par aborption de caractéristique~
+@13670002 = ~Immunité à la mort par aborption de caractéristique~
 
+@13670011 = ~Rend %theTarget% sensible à la mort par aborption de caractéristique~
+@13670012 = ~Immunise %theTarget% à la mort par aborption de caractéristique~
+
+@13670021 = ~d'être sensible à la mort par absorption de caractéristique~ // FIXME
+@13670022 = ~d'être immunisé à la mort par absorption de caractéristique~
+
+@13670031 = ~de rendre %theTarget% sensible à la mort par aborption de caractéristique~
+@13670032 = ~d'immuniser %theTarget% à la mort par aborption de caractéristique~
 
 // Fake Opcode 500: Stat: Compétences de voleur [500]
 
