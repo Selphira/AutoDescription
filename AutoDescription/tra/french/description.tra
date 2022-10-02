@@ -1634,17 +1634,37 @@
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
-@10010001 = ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
-@10010002 = ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
-@10010003 = ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
-@10010004 = ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
-@10010005 = ~une demi~
-@10010006 = ~\1 et demi~
-@10010007 = ~une demi supplémentaire~
-@10010008 = ~Fixée à %value%~
+@10010001 = ~Attaque par round : %value%~
+@10010002 = ~Attaque par round : Passe à %value%~
+@10010003 = ~Attaque par round : %value%~
+@10010004 = ~Attaque par round : Fixée à %value%~
+@10010005 = ~Attaque impossible~ // TODO: trouver une tournure pour self
 
-@10010011 = ~Empêche %theTarget% d'attaquer~ // TODO: trouver une tournure pour self ?
+@10010011 = ~Modifie le nombre d'attaque par round %ofTheTarget% de %value%~
+@10010012 = ~Passe le nombre d'attaque par round %ofTheTarget% à %value%~
+@10010013 = ~Multiplie le nombre d'attaque par round %ofTheTarget% par %value%~
+@10010014 = ~Fixe le nombre d'attaque par round %ofTheTarget% à %value%~
+@10010015 = ~Empêche %theTarget% d'attaquer~
+
+@10010021 = ~de modifier le nombre d'attaque par round de %value%~
+@10010022 = ~de passer le nombre d'attaque par round à %value%~
+@10010023 = ~de multiplier le nombre d'attaque par round par %value%~
+@10010024 = ~de fixer le nombre d'attaque par round à %value%~
+@10010025 = ~d'empêcher %theTarget% d'attaquer~ // TODO: trouver une tournure pour self
+
+@10010031 = ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
+@10010032 = ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
+@10010033 = ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
+@10010034 = ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
+@10010035 = ~d'empêcher %theTarget% d'attaquer~
+
+
+@10010011 = ~Empêche %theTarget% d'attaquer~
 @10010012 = ~d'empêcher %theTarget% d'attaquer~
+
+@10010101 = ~une demi~
+@10010102 = ~\1 et demi~
+@10010103 = ~une demi supplémentaire~
 
 // Opcode 2: Cure: Sleep [2]
 
@@ -2357,9 +2377,17 @@
 
 // Opcode 115: Detect: Alignment [115]
 
-@11150001 = ~Détection du mal~
-@11150002 = ~Détection du neutre~
-@11150003 = ~Détection du bien~
+@11150001 = ~Détection du %alignment%~
+
+@11150011 = ~%theTarget% détecte le %alignment%~ // TODO : placer %theTarget% ailleurs
+
+@11150021 = ~de détecter le %alignment%~
+
+@11150031 = ~que %theTarget% détecte le %alignment%~
+
+@11150101 = ~mal~
+@11150102 = ~neutre~
+@11150103 = ~bien~
 
 // Opcode 117: Spell Effect: Reveal Area [117]
 

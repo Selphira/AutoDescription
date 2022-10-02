@@ -832,65 +832,23 @@ END
  * ------------------------------------ */
 
 DEFINE_PATCH_MACRO ~opcode_self_1~ BEGIN
+	SET strref = 10010001
 	LPM ~opcode_1_common~
+END
 
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
-		SPRINT description @10010011 // ~Empêche %theTarget% d'attaquer~
-	END
-	ELSE BEGIN
-		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-		END
-		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-			SET value = ~%parameter1%~
-			SET value -= 100
-			LPF ~signed_value~ INT_VAR value RET value END
-			SPRINT value @10002 // ~%value% %~
-		END
-		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 BEGIN
-			SPRINT value @10010008 // ~Fixée à %value%~
-		END
-
-		PATCH_IF ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
-			SPRINT value @10010007 // ~une demi supplémentaire~
-		END
-
-		SPRINT name @102007 // ~Attaque par round~
-		SPRINT description @100001 // ~%name%%colon%%value%~
-	END
+DEFINE_PATCH_MACRO ~opcode_target_1~ BEGIN
+	SET strref = 10010011
+	LPM ~opcode_1_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_1~ BEGIN
+	SET strref = 10010021
 	LPM ~opcode_1_common~
-
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
-		SPRINT description @10010012 // ~d'empêcher %theTarget% d'attaquer~
-	END
-	ELSE BEGIN
-		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-			SPRINT description @10010001 // ~de modifier le nombre d'attaque par round %ofTheTarget% de %value%~
-		END
-		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-			SET value = ~%parameter1%~
-			SPRINT value @10002 // ~%value% %~
-			SPRINT description @10010003 // ~de multiplier le nombre d'attaque par round %ofTheTarget% par %value%~
-		END
-		// ne doit pas passer par un EFF et doit être de timing 2, 5, 8 => sinon comme Type 1
-		ELSE PATCH_IF parameter2 == 3 AND is_ee == 1 AND NOT isExternal AND (timingMode == TIMING_while_equipped OR timingMode == 5 OR timingMode == 8) BEGIN
-			SPRINT description @10010004 // ~de fixer le nombre d'attaque par round %ofTheTarget% à %value%~
-		END
-		ELSE BEGIN
-			SPRINT description @10010002 // ~de passer le nombre d'attaque par round %ofTheTarget% à %value%~
-		END
-	END
 END
 
-// TODO
-// DEFINE_PATCH_MACRO ~opcode_target_1~ BEGIN
-// END
-
 DEFINE_PATCH_MACRO ~opcode_target_probability_1~ BEGIN
-	LPM ~opcode_self_probability_1~
+	SET strref = 10010031
+	LPM ~opcode_1_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
@@ -902,9 +860,11 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 		SET value = 10
 	END
 
+	SET parameter2 = (parameter2 == 3 AND NOT is_ee) ? MOD_TYPE_cumulative : parameter2
+
 	PATCH_IF parameter2 != MOD_TYPE_percentage BEGIN
-		SPRINT oneHalf @10010005 // ~une demi~
-		SPRINT andHalf @10010006 // ~\1 et demi~
+		SPRINT oneHalf @10010101 // ~une demi~
+		SPRINT andHalf @10010102 // ~\1 et demi~
 		// Weidu ne gérant pas les nombres flottants, une solution est de passer par des nombres 10 fois plus grand.
 		SET value = $opcode_1_values(~%value%~)
 
@@ -921,6 +881,30 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 			REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
 		END
 	END
+
+	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
+		SET strref += 4 // ~Attaque impossible~
+	END
+	ELSE BEGIN
+		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			SET strref += 1 // ~Attaque par round : Passe à %value%~
+		END
+		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+			SET strref += 2 // ~Attaque par round : %value%~
+			SET value = ~%parameter1%~
+			SET value -= 100
+			LPF ~signed_value~ INT_VAR value RET value END
+			SPRINT value @10002 // ~%value% %~
+		END
+		ELSE PATCH_IF parameter2 == 3 BEGIN
+			SET strref += 3 // ~Fixée à %value%~
+		END
+
+		PATCH_IF parameter2 == MOD_TYPE_cumulative AND ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
+			SPRINT value @10010103 // ~une demi supplémentaire~
+		END
+	END
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
@@ -4541,8 +4525,27 @@ END
  * Detect: Alignment [115] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_115~ BEGIN
-	LOCAL_SET strref = 11150001 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Détection du xxx~
+	LOCAL_SET strref = 11150101 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET alignment = string END // ~Détection du xxx~
+	SPRINT description @11150001
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_115~ BEGIN
+	LOCAL_SET strref = 11150101 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET alignment = string END // ~Détection du xxx~
+	SPRINT description @11150011
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_115~ BEGIN
+	LOCAL_SET strref = 11150101 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET alignment = string END // ~Détection du xxx~
+	SPRINT description @11150021
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_115~ BEGIN
+	LOCAL_SET strref = 11150101 + parameter2
+	LPF ~getTranslation~ INT_VAR strref opcode RET alignment = string END // ~Détection du xxx~
+	SPRINT description @11150031
 END
 
 DEFINE_PATCH_MACRO ~opcode_115_is_valid~ BEGIN
@@ -10906,7 +10909,7 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 		SPRINT description @102548 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
-		SET resistName += 1
+		// SET resistName += 1
 		SPRINT theStatistic (AT resistName)
 
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
