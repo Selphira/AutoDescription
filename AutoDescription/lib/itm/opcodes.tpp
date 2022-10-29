@@ -152,7 +152,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
 	266 => 228 // Spell: Remove Protection from Spell [266]
 
-	// Absorption 
+	// Absorption
 
 	259 => 238 // Protection: Spell Trap [259]
 
@@ -483,7 +483,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
 	~lcrobe~ => 102150 // ~~
 END
 
-/* 
+/*
 	Opcodes dont le champ Duration n'est pas impactant
 	Conséquence : La durée n'est pas à écrire car considérée comme implicite
 	Plusieurs cas :
@@ -521,7 +521,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	 75 => 0 // Cure: Blindness
 	 77 => 0 // Cure: Feeblemindedness
 	 79 => 0 // Cure: Disease
-	 81 => 0 // Cure: Deafness 
+	 81 => 0 // Cure: Deafness
 	105 => 0 // Stat: Gold
 	108 => 0 // Stat: Reputation
 	112 => 9 // Item: Remove Item
@@ -657,7 +657,7 @@ END
 
 
 // + d'autres sous condition : (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)
-ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_without_level_restriction~ BEGIN 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_without_level_restriction~ BEGIN
 	12  => 1
 	17  => 1
 	18  => 1
@@ -1467,7 +1467,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
 	LOCAL_SET strref_1 = 10170011 // // ~de soigner 1 point de vie %ofTheTarget%~
-	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170005 ? 10170015 
+	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170005 ? 10170015
 	LOCAL_SET strref_2 = strref_1 + 1 // ~de soigner %value% points de vie %ofTheTarget%~
 	LOCAL_SET strref_3 = strref_1 + 2 // ~d'infliger 1 point de dégâts %ofTheTarget%~
 	LOCAL_SET strref_4 = strref_1 + 3 // ~d'infliger %value% points de dégâts %ofTheTarget%~
@@ -1910,7 +1910,7 @@ DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
-					
+
 					// retrait de l'opcode actuel
 					SET opcode = 23
 					LPF ~delete_opcode~
@@ -4171,7 +4171,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_105~ BEGIN
 	LPM ~opcode_self_105~
-	
+
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_105~ BEGIN
@@ -4302,7 +4302,7 @@ DEFINE_PATCH_MACRO ~opcode_108_is_valid~ BEGIN
 		PATCH_IF parameter2 < MOD_TYPE_cumulative OR parameter2 > 5 BEGIN
 			SET isValid = 0
 			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
-		END	
+		END
 	END
 END
 
@@ -4626,6 +4626,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_119~ BEGIN
 	LPM ~opcode_self_probability_119~ // ~de lancer Image miroir sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_119_match~ BEGIN
+	LPM ~opcode_match_except_parameter1_and_parameter2~
 END
 
 /* ------------------------------------ *
@@ -6183,7 +6187,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
-				LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration RET description saveAdded ignoreDuration END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
 					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
@@ -6664,7 +6668,7 @@ DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
 			END
 		END
 		SPRINT str @100021 // ~et~
-		LPF ~replace_last_comma_with~ STR_VAR text str RET custom_str = text END	
+		LPF ~replace_last_comma_with~ STR_VAR text str RET custom_str = text END
 		LPM ~add_opcode~
 	END
 END
@@ -6900,7 +6904,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	// TODO: vérifier que les durées et les JS correspondent
 	LOCAL_SET searchOpcode = 171
 	LOCAL_SET nbFound = 0
-	PATCH_DEFINE_ARRAY psionicCapacities BEGIN 
+	PATCH_DEFINE_ARRAY psionicCapacities BEGIN
 		"SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975"
 	END
 
@@ -6934,7 +6938,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 			END
 		END
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
-			LPF ~delete_opcode~ 
+			LPF ~delete_opcode~
 				INT_VAR opcode
 				STR_VAR expression = ~resref = %resref%~
 				RET $opcodes(~%opcode%~) = count
@@ -6946,6 +6950,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_206_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_206_match~ BEGIN
+	LPM ~opcode_match_except_parameter1_and_parameter2~
 END
 
 /* ----------------------------------- *
@@ -8775,7 +8783,7 @@ DEFINE_PATCH_MACRO ~opcode_target_273~ BEGIN
 	SET strref = 12730002 // ~Lance Zone d'air pur sur %theTarget%~
 	LPM ~opcode_273_common~
 END
-			
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
 	SET strref = 12730004 // ~de lancer Zone d'air pur sur %theTarget%~
 	LPM ~opcode_273_common~
@@ -9003,7 +9011,7 @@ DEFINE_PATCH_MACRO ~opcode_282_group~ BEGIN
 			SET parameter2 = MOD_TYPE_flat
 			LPM ~add_opcode~
 		END
-		SET currentP2 += is_ee ? 0 : 1 
+		SET currentP2 += is_ee ? 0 : 1
 		PATCH_IF currentP2 == 20 BEGIN // IMMUNITY_TO_BACKSTAB
 			SET opcode = 292
 			SET parameter2 = parameter1
@@ -10929,7 +10937,7 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
-		SPRINT description @102552 // ~Immunise %theTarget% %resistName%~
+		SPRINT description @102552 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
 		SET resistName += 2
@@ -10969,7 +10977,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
-		SPRINT description @102549 // ~d'immuniser %theTarget% %resistName%~
+		SPRINT description @102549 // ~d'immuniser %resistName%~
 	END
 	ELSE BEGIN
 		SET resistName += 2
@@ -11615,4 +11623,30 @@ DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequenc
 		END
 	END
 	SPRINT frequency (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
+	SET match = (match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        //AND match_parameter1   == parameter1
+        //AND match_parameter2   == parameter2
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL ~%custom_str%~
+    )
 END
