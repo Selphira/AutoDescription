@@ -1466,7 +1466,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
-	LOCAL_SET strref_1 = 10170011 // // ~de soigner 1 point de vie %ofTheTarget%~
+	LOCAL_SET strref_1 = 10170015 // ~de soigner 1 point de vie %ofTheTarget%~
 	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170005 ? 10170015
 	LOCAL_SET strref_2 = strref_1 + 1 // ~de soigner %value% points de vie %ofTheTarget%~
 	LOCAL_SET strref_3 = strref_1 + 2 // ~d'infliger 1 point de dégâts %ofTheTarget%~
@@ -6738,7 +6738,7 @@ DEFINE_PATCH_MACRO ~opcode_self_200~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_200~ BEGIN
-	LOCAL_SET strref = 12000002 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000002 // ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
 	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_200_common~
 END
@@ -6750,7 +6750,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_200~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_200~ BEGIN
-	LOCAL_SET strref = 12000004 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000004 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
 	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_200_common~
 END
@@ -6932,7 +6932,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 					STR_VAR expression = ~resref = %resref%~
 					RET hasOpcode
 				END
-				PATCH_IF NOT hasOpcode AND show_lack_immunity BEGIN
+				PATCH_IF NOT hasOpcode BEGIN
 					LPF ~add_log_error~ STR_VAR message = EVAL ~Fichier %SOURCE_FILE% : Immunity against psionic spells: Opcode 206 with resref %resref% not found.~ END
 				END
 			END
