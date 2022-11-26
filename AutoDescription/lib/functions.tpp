@@ -154,7 +154,7 @@ DEFINE_PATCH_FUNCTION ~feets_to_meters~ INT_VAR range = 0 RET range rangeToMeter
 	PATCH_IF range > 10 BEGIN
 		SET decimal = range MODULO 10
 		INNER_PATCH_SAVE rangeToMeter ~%range%~ BEGIN
-			REPLACE_TEXTUALLY ~\([0-9]\)+[0-9]$~ ~\1~
+			REPLACE_TEXTUALLY ~\([0-9]+\)+[0-9]$~ ~\1~
 		END
 		PATCH_IF decimal > 0 BEGIN
 			PATCH_IF decimal >= 3 AND decimal <= 7 BEGIN
