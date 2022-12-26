@@ -11063,7 +11063,7 @@ END
 DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
 	SET strref = 100200 + secondaryType
 	PATCH_IF secondaryType > 13 OR secondaryType < 0 BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: secondary type must be between 0 and 13 inclusive~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: secondary type (%secondaryType%) must be between 0 and 13 inclusive~ END
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
 END
