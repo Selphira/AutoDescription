@@ -7137,7 +7137,7 @@ BEGIN
 
 	INNER_PATCH_FILE ~%file%.2da~ BEGIN
 		COUNT_2DA_ROWS ~3~ ~rows~
-		FOR (row = 1 ; row < rows ; row = row + 1) BEGIN
+		FOR (row = 0 ; row < rows ; row = row + 1) BEGIN
 			READ_2DA_ENTRY row 1 3 resref
 			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 				LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
