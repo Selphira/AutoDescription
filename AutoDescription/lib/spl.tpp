@@ -139,9 +139,11 @@ DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" 
 		REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
 			SPRINT find ~%MATCH1%~
 		END ~~
-		INNER_PATCH_SAVE description ~%description%~ BEGIN
-			REPLACE_TEXTUALLY ~%find%%crlf%%crlf%~ ~~
-			REPLACE_TEXTUALLY ~%find%%crlf%~ ~~
+		PATCH_IF NOT ~%find%~ STRING_EQUAL ~~ BEGIN
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				REPLACE_TEXTUALLY ~%find%%crlf%%crlf%~ ~~
+				REPLACE_TEXTUALLY ~%find%%crlf%~ ~~
+			END
 		END
 	END
 END
