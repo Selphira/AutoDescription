@@ -1,0 +1,9 @@
+@10 = ~Standardize item descriptions~
+@15 = ~Standardize spell descriptions (Alpha)~
+@20 = ~Standardize item descriptions of a mod~
+@201 = ~Please enter the folder name of the mod for which you want to standardize the descriptions.
+
+Folder name (or 0 to cancel)~
+@202 = ~The folder "%directory%" does not exist
+
+Folder name (or 0 to cancel)~
