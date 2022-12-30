@@ -1695,6 +1695,7 @@
 
 @10030001 = ~Provoque la folie du berserker chez %theTarget%~
 @10030002 = ~de provoquer la folie du berserker chez %theTarget%~
+@10030003 = ~En combat~
 
 // Opcode 4: Cure: Berserking [4]
 

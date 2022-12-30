@@ -958,8 +958,8 @@ END
 /* --------------------- *
  * State: Berserking [3] *
  * --------------------- */
-// TODO : timing != 1 AND (parameter2 != 1 OR NOT is_ee) : que durant les combats
 DEFINE_PATCH_MACRO ~opcode_self_3~ BEGIN
+	LPM ~opcode_3_condition~
 	SPRINT description @10030001 // ~Provoque la rage du berserker chez %theTarget%~
 END
 
@@ -968,11 +968,18 @@ DEFINE_PATCH_MACRO ~opcode_target_3~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_3~ BEGIN
+	LPM ~opcode_3_condition~
 	SPRINT description @10030002 // ~de provoquer la rage du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_3~ BEGIN
 	LPM ~opcode_self_probability_3~ // ~de provoquer la rage du berserker chez %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_3_condition~ BEGIN
+	PATCH_IF timingMode != 1 AND (parameter2 != 1 OR NOT is_ee) BEGIN
+		SPRINT condition @10030003 // En combat
+	END
 END
 
 /* -------------------- *
