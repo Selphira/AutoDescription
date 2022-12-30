@@ -4033,6 +4033,17 @@
 @15090001 = ~Immunité aux sorts~ // FIXME: Immunité aux sorts "ciblés", ne protège pas contre les effets de zone
 @15090002 = ~d'immuniser aux sorts~
 
+// Fake Opcode 510: Spell: Restore Lost Spells (cumulative) [510]
+
+@15100001 = ~Se remémore 1 sort %spellType% de chaque niveau~
+@15100002 = ~Se remémore 1 sort %spellType% de niveau %spellLevel%~
+@15100003 = ~Remet en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
+@15100004 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@15100005 = ~de se remémorer 1 sort %spellType% de chaque niveau~
+@15100006 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
+@15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
+@15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

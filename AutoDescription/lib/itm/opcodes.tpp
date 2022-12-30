@@ -23,6 +23,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	508 => 7   // Emplacement sorts divins [508]
 	 62 => 8   // Spell: Priest Spell Slots Modifier [62]
 	261 => 9   // Spell: Restore Lost Spells [261]
+	510 => 9   // Spell: Restore Lost Spells (cumulative) [510]
 
 	// Modification des stats
 
@@ -8528,6 +8529,48 @@ DEFINE_PATCH_MACRO ~opcode_261_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
+	LOCAL_SET initOpcode = opcode
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET newP1 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = initOpcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND parameter2 = %parameter2% AND power = %power% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = initOpcode
+				SET parameter = parameter1 - 1
+				SET newP1 |= ~%BIT%parameter%%~
+			END
+		END
+		PATCH_IF newP1 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
+			// Fonctionnel dans les cas généraux
+			SET opcode = 510
+			SET parameter1 = newP1
+			LPM ~add_opcode~
+		END
+	END
+END
+
 /* ------------------------ *
  * Stat: Visual Range [262] *
  * ------------------------ */
@@ -10693,6 +10736,45 @@ DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
 	SPRINT spellLevel ~%levelStr%~
 END
 
+/* -------------------------------------------- *
+ * Spell: Restore Lost Spells (cumulative) [510] *
+ * -------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_510~ BEGIN
+	LOCAL_SET strref = 15100001 // ~Se remémore 1 sort %spellType% de chaque niveau~
+	LPM ~opcode_510_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_510~ BEGIN
+	LOCAL_SET strref = 15100003 // ~Remet en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
+	LPM ~opcode_510_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_510~ BEGIN
+	LOCAL_SET strref = 15100005 // ~de se remémorer 1 sort %spellType% de chaque niveau~
+	LPM ~opcode_510_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_510~ BEGIN
+	LOCAL_SET strref = 15100007 // ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
+	LPM ~opcode_510_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_510_common~ BEGIN
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT spellType @12610010 // ~profane~
+	END
+	ELSE PATCH_IF parameter2 == 1 BEGIN
+		SPRINT spellType @12610011 // ~divin~
+	END
+
+	PATCH_IF parameter1 != 0x1FF BEGIN // 511
+		LPM ~opcode_509_common~
+		SET strref += 1
+	END
+
+	SPRINT description (AT strref)
+END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
