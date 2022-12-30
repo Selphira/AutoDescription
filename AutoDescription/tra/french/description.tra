@@ -3220,6 +3220,10 @@
 @12610002 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
 @12610003 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~
 @12610004 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610005 = ~Se remémore 1 sort %spellType% de niveau %spellLevel%~
+@12610006 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@12610007 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
+@12610008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 
 @12610010 = ~profane~ // ~%spellType%~
 @12610011 = ~divin~
