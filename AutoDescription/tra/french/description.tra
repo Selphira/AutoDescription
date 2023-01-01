@@ -2563,7 +2563,7 @@
 // Opcode 134: State: Petrification [134]
 
 @11340001 = ~Pétrification~ // Transmutation de la chair en pierre
-@11340002 = ~Pétrifie~ // Transmute %theTarget% en pierre
+@11340002 = ~Pétrifie %theTarget%~ // Transmute %theTarget% en pierre
 @11340003 = ~d'être pétrifié~// d'être transmuté en pierre
 @11340004 = ~de pétrifier %theTarget%~// de transmuter %theTarget% en pierre
 
