@@ -6112,7 +6112,7 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 	END
 	ELSE BEGIN
-		LPM ~opcode_177_set_target_strings~
+		LPM ~opcode_set_target_strings~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% (%selfTarget%)~
@@ -6130,7 +6130,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 	PATCH_IF parameter1 != 0 BEGIN
-		LPM ~opcode_177_set_target_strings~
+		LPM ~opcode_set_target_strings~
 		LPM ~add_target_level~
 	END
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded ignoreDuration opcode END
@@ -6232,13 +6232,17 @@ DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_177_group~ BEGIN
+	LPM ~opcode_group_by_target~
+END
+
+DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 	// Un problème fait qu'avec le add_opcode() l'opcode en cours de traitement est remis, bien qu'il ai été supprimé avant...
 	// On doit donc supprimer ces entrées une seconde fois à la fin du traitement
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~to_delete~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_grouped~ BEGIN END
 
-	PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET currentPosition = position
 
@@ -6277,7 +6281,7 @@ DEFINE_PATCH_MACRO ~opcode_177_group~ BEGIN
 		    END
 
 		    PATCH_IF count > 1 BEGIN
-		        LPF ~opcode_177_get_target_type~ RET target_type END
+		        LPF ~opcode_get_target_type~ RET target_type END
 
 				SET $to_delete(~%currentPosition%~) = 1
 				SET position += 1000
@@ -6312,7 +6316,7 @@ DEFINE_PATCH_MACRO ~opcode_177_group~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_177_set_target_strings~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypes~ BEGIN END
 	CLEAR_ARRAY ~targetTypes~
 
@@ -6368,10 +6372,10 @@ DEFINE_PATCH_MACRO ~opcode_177_set_target_strings~ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_177_get_target_type~ RET target_type
+DEFINE_PATCH_FUNCTION ~opcode_get_target_type~ RET target_type
 BEGIN
 	SPRINT target_type ~~
-	PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
 			LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
@@ -10560,7 +10564,7 @@ DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
 		TEXT_SPRINT name ~%name% %weaponSlot%~
 	END
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	LPM ~opcode_set_target_strings~
 	SET value = special
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
@@ -10568,6 +10572,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_344_is_valid~ BEGIN
 	LPM ~opcode_idscheck8_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_344_group~ BEGIN
+	LPM ~opcode_group_by_target~
 END
 
 /* ----------------------- *
