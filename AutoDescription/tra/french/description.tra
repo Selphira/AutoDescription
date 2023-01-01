@@ -2784,6 +2784,14 @@
 // Opcode 177: Use EFF File [177]
 
 @11770001 = ~uniquement pour les %targetType%~
+@11770100 = ~mages monoclassés et multiclassés~
+@11770101 = ~voleurs monoclassés et multiclassés~
+@11770200 = ~les~
+@11770201 = ~et les~
+@11770202 = ~des~
+@11770203 = ~et des~
+@11770204 = ~aux~
+@11770205 = ~et aux~
 
 // Opcode 178: Effect: THAC0 vs. Creature Type Modifier [178]
 

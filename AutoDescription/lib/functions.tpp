@@ -174,6 +174,54 @@ DEFINE_PATCH_FUNCTION ~feets_to_meters~ INT_VAR range = 0 RET range rangeToMeter
 	END
 END
 
+/* ============================================== *
+ * Complète une chaîne jusqu'à une taille donnée. *
+ * ============================================== */
+DEFINE_PATCH_FUNCTION ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~~ pad = ~0~ RET string BEGIN
+	WHILE (STRING_LENGTH ~%string%~ < min_length) BEGIN
+		TEXT_SPRINT string ~%pad%%string%~
+	END
+END
+
+/* ================================================================================== *
+ * Supprime tous les élements de la liste "elements" se trouvant dans la liste "list" *
+ * ================================================================================== */
+DEFINE_PATCH_FUNCTION remove_elements_in_list
+	STR_VAR
+        elements = ~~
+        list = ~~
+	RET
+		list
+BEGIN
+	WHILE ~%elements%~ STRING_COMPARE ~~ BEGIN
+		LPF return_first_entry STR_VAR list = ~%elements%~ RET entry elements = list END
+
+		INNER_PATCH_SAVE list ~%list%~ BEGIN
+			REPLACE_TEXTUALLY ~ %entry%~ ~~
+			REPLACE_TEXTUALLY ~%entry% ~ ~~
+			REPLACE_TEXTUALLY ~%entry%~ ~~
+		END
+	END
+END
+
+/* ==================================================================================== *
+ * Indique si tous les élements de la liste "elements" se trouvant dans la liste "list" *
+ * ==================================================================================== */
+DEFINE_PATCH_FUNCTION all_elements_in_list
+	STR_VAR
+        elements = ~~
+        list = ~~
+	RET
+		value
+BEGIN
+	SET value = 1
+
+	WHILE ~%elements%~ STRING_COMPARE ~~ AND value == 1 BEGIN
+		LPF return_first_entry STR_VAR list = ~%elements%~ RET element = entry elements = list END
+		LPF element_in_list STR_VAR element list RET value END
+	END
+END
+
 //TODO: lowerFirst
 /*
 		        REPLACE_EVALUATE CASE_INSENSITIVE ~^\(.\)~ BEGIN // First char to lower

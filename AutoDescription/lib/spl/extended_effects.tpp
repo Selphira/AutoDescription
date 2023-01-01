@@ -294,10 +294,10 @@ BEGIN
 	                    AND match_parameter3   == parameter3
 	                    AND match_parameter4   == parameter4
 	                    AND match_custom_int   == custom_int
-	                    AND ~%match_resref%~     STRING_EQUAL ~%resref%~
-	                    AND ~%match_resref2%~    STRING_EQUAL ~%resref2%~
-	                    AND ~%match_resref3%~    STRING_EQUAL ~%resref3%~
-	                    AND ~%match_custom_str%~ STRING_EQUAL ~%custom_str%~
+	                    AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+	                    AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+	                    AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+	                    AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
 	                )
 				END
 				PATCH_IF match == 1 BEGIN
