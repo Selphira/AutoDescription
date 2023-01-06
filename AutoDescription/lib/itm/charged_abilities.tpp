@@ -13,6 +13,7 @@ BEGIN
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
 		READ_BYTE  (headerOffset + ITM_HEAD_location) location
+		READ_SHORT (headerOffset + ITM_HEAD_target) headTarget
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
 		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
 
@@ -36,47 +37,64 @@ BEGIN
 
 				SET sort = ( index + 1 ) * 1000000
 
-				LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource = ~%SOURCE_RES%~ RET tooltip END
+				PATCH_IF itemType == ITM_TYPE_potion BEGIN
+	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+	                    SET lineSort = sort + ~%data_0%~
+						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 1
+					END
+				END
+				ELSE BEGIN
+					LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource = ~%SOURCE_RES%~ RET tooltip END
 
-				// Ajout du nom de la capacité
-                PATCH_IF NOT ~%tooltip%~ STRING_EQUAL ~~ BEGIN
-                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%tooltip%~ RET title END
-					SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
-					SET countLines += 1
-					SET hasTitle = 1
-                END
-
-				PATCH_IF EVAL ~countLines%index%~ > 1 BEGIN
-					// On ajoute le titre générique que si on n'a pas trouvé le titre par tooltip
-					PATCH_IF ~%title%~ STRING_EQUAL ~~ BEGIN
-						SET abilityNumber = index + 1
-						SPRINT title @101124 // ~Capacité %abilityNumber%~
-
-	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+					// Ajout du nom de la capacité
+	                PATCH_IF NOT ~%tooltip%~ STRING_EQUAL ~~ BEGIN
+	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%tooltip%~ RET title END
 						SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
 						SET countLines += 1
 						SET hasTitle = 1
-					END
-				END
+	                END
 
-                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
-                    SET lineSort = sort + ~%data_0%~
-                    PATCH_IF hasTitle == 0 BEGIN
-	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET title END
-						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%title%~) = 1
-                    END
-                    ELSE BEGIN
-						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
-                    END
-					SET countLines += 1
-                END
+					PATCH_IF EVAL ~countLines%index%~ > 1 BEGIN
+						// On ajoute le titre générique que si on n'a pas trouvé le titre par tooltip
+						PATCH_IF ~%title%~ STRING_EQUAL ~~ BEGIN
+							SET abilityNumber = index + 1
+							SPRINT title @101124 // ~Capacité %abilityNumber%~
+
+		                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+							SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
+							SET countLines += 1
+							SET hasTitle = 1
+						END
+					END
+
+	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+	                    SET lineSort = sort + ~%data_0%~
+	                    PATCH_IF hasTitle == 0 BEGIN
+		                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET title END
+							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%title%~) = 1
+	                    END
+	                    ELSE BEGIN
+							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
+	                    END
+						SET countLines += 1
+	                END
+	            END
 			END
 		END
 
 		SORT_ARRAY_INDICES lines NUMERICALLY
 
-		SPRINT title @100012  // ~Capacités de charge~
-		LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
+		PATCH_IF itemType == ITM_TYPE_potion BEGIN
+			LPF ~get_charged_string~ INT_VAR charges depletion RET chargeStr END
+			LPF ~ucfirst~ STR_VAR value = ~%chargeStr%~ RET string END
+			LPF ~appendLine~ STR_VAR string RET description END
+			LPF ~appendLine~ RET description END
+			LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
+		END
+		ELSE BEGIN
+			SPRINT title @100012  // ~Capacités de charge~
+			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
+		END
 	END
 END
 
@@ -108,6 +126,10 @@ BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
 
+		        PATCH_IF itemType == ITM_TYPE_potion AND headTarget == TARGET_HEAD_self BEGIN
+		            SET target = TARGET_FX_self
+		        END
+
 				LPF ~get_effect_description~ RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
@@ -120,6 +142,25 @@ BEGIN
 	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
 END
 
+DEFINE_PATCH_FUNCTION ~get_charged_string~
+	INT_VAR
+		charges = 0
+		depletion = 0
+	RET
+		chargeStr
+BEGIN
+    PATCH_IF depletion == 1 BEGIN
+        PATCH_IF charges == 1 BEGIN
+			SPRINT chargeStr @102677 // ~usage unique~
+        END
+        ELSE BEGIN
+			SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
+        END
+    END
+    ELSE BEGIN
+		SPRINT chargeStr @102094 // ~%charges% fois par jour~
+    END
+END
 
 DEFINE_PATCH_FUNCTION ~get_charged_ability_title~
 	INT_VAR
@@ -130,17 +171,7 @@ DEFINE_PATCH_FUNCTION ~get_charged_ability_title~
 	RET
 		title
 BEGIN
-    PATCH_IF depletion == 1 BEGIN
-        PATCH_IF charges == 1 BEGIN
-			SPRINT chargeStr @102677 // ~%charges% charge, l'objet est détruit quand la charge est utilisée~
-        END
-        ELSE BEGIN
-			SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
-        END
-    END
-    ELSE BEGIN
-		SPRINT chargeStr @102094 // ~%charges% fois par jour~
-    END
+	LPF ~get_charged_string~ INT_VAR charges depletion RET chargeStr END
 
 	SPRINT title ~%title% (%chargeStr%)~
 END

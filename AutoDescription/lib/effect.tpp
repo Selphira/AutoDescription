@@ -491,9 +491,16 @@ BEGIN
 		PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
 			SPRINT opcode_target ~_self~
 			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
-				SPRINT theTarget   @102472 // ~le porteur~
-				SPRINT ofTheTarget @101086 // ~du porteur~
-				SPRINT toTheTarget @101180 // ~au porteur~
+				PATCH_IF itemType == ITM_TYPE_potion BEGIN
+					SPRINT theTarget   @102451 // ~le buveur~
+					SPRINT ofTheTarget @102452 // ~du buveur~
+					SPRINT toTheTarget @102453 // ~au buveur~
+				END
+				ELSE BEGIN
+					SPRINT theTarget   @102472 // ~le porteur~
+					SPRINT ofTheTarget @101086 // ~du porteur~
+					SPRINT toTheTarget @101180 // ~au porteur~
+				END
 			END
 		END
 		ELSE PATCH_IF target == TARGET_FX_preset BEGIN
