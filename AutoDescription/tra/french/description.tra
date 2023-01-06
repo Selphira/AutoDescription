@@ -2910,11 +2910,15 @@
 
 @12040001 = ~Immunité aux sorts de l'école %spellSchoolName%~
 @12040002 = ~de résister aux sorts de l'école %spellSchoolName%~
+@12040003 = ~Immunise %theTarget% aux sorts de l'école %spellSchoolName%~
+@12040004 = ~d'immuniser %theTarget% aux sorts de l'école %spellSchoolName%~
 
 // Opcode 205: Spell: Protection from Spell (Secondary Type) [205]
 
 @12050001 = ~Immunité aux sorts %spellSecondaryTypeName%~
 @12050002 = ~de résister aux sorts %spellSecondaryTypeName%~
+@12050003 = ~Immunise %theTarget% aux sorts %spellSecondaryTypeName%~
+@12050004 = ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
 
 // Opcode 206: Spell: Protection from Spell [206]
 
