@@ -2402,6 +2402,8 @@
 @11120001 = ~Retire "%itemName%" de l'inventaire~
 @11120002 = ~Retire "%itemName%" de l'inventaire %ofTheTarget%~
 @11120003 = ~Retire "%itemName%" de l'inventaire %ofTheTarget% pendant %duration%~
+@11120004 = ~de retirer "%itemName%" de l'inventaire~
+@11120005 = ~de retirer "%itemName%" de l'inventaire %ofTheTarget%~
 
 // Opcode 115: Detect: Alignment [115]
 

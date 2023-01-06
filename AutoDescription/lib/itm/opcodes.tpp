@@ -4453,6 +4453,14 @@ DEFINE_PATCH_MACRO ~opcode_target_112~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_112~ BEGIN
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @11120005 // ~de retirer "%itemName%" de l'inventaire %ofTheTarget%~
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 	LOCAL_SET searchOpcode = 111
 	LOCAL_SET searchOpcode2 = 122
