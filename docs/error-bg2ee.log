@@ -10,9 +10,13 @@ NPPLAT.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 NPPLAT.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
 NPPLAT.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
 OHBREW02.ITM : Opcode 177: Resource key is empty.
+OHBREW04.ITM : Opcode 177: Invalid ids entry : specific.ids (100)
 OHBREW05.ITM : Opcode 344: Invalid ids entry : specific.ids (5)
 OHBREW05.ITM : Opcode 178: Invalid ids entry : specific.ids (5)
 OHBREW05.ITM : Opcode 177: Invalid ids entry : specific.ids (5)
+POTN45.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+POTN45.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
+POTN45.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
 RING09.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 RING09.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
 RING09.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.

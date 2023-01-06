@@ -1,7 +1,27 @@
-	
-SHLD06P.ITM : Opcode 178: Wrong ids file : 255
-SHLD06P.ITM : Opcode 219000: Wrong ids file : 255
-SHLD06P.ITM : Opcode 219000: Wrong ids file : 255
-SHLD06P.ITM : Opcode 219001: Wrong ids file : 255
-SHLD06P.ITM : Opcode 219001: Wrong ids file : 255
-SW2HD1.ITM : Opcode 221: secondary type must be between 0 and 13 inclusive
+
+CLCK04.ITM : Opcode 172 : Resource spinhum.spl doesn't exist.
+JWSUPER.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+JWSUPER.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
+JWSUPER.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+POTN45.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+POTN45.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
+POTN45.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+RING09.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+RING09.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
+RING09.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SHLD06P.ITM : Opcode 178 : No change detected : Value = Value + 0.
+SHLD06P.ITM : Opcode 219: Unknown IDS file 255.
+SHLD06P.ITM : Opcode 219: Unknown IDS file 255.
+SHLD08P.ITM : Opcode 206 : Resource spwish27.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource spwish32.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource spwish35.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource sppr725d.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource spwish27.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource spwish32.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource spwish35.spl doesn't exist.
+SHLD08P.ITM : Opcode 206 : Resource sppr725d.spl doesn't exist.
+SW1P01.ITM : Opcode 180 : Resource POTN55.itm doesn't exist.
+SW2H06.ITM : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+SW2H06.ITM : Opcode 206 : Resource cdmound.spl doesn't exist.
+SW2H06.ITM : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SW2HD1.ITM : Opcode 221: secondary type (14) must be between 0 and 13 inclusive
