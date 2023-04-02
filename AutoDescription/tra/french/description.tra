@@ -3067,6 +3067,7 @@
 
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
+@12320000 = ~~
 @12320001 = ~Lance le sort %spellName% sur %theTarget%~
 @12320002 = ~Lance les sorts %spellName% et %spellName2% sur %theTarget%~
 @12320003 = ~Lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
@@ -3891,6 +3892,10 @@
 @13260145 = ~Si les points de vie %ofTheTarget% sont inférieurs à %value%~
 @13260146 = ~Si %theTarget% fait partie des %creatureType%~
 @13260147 = ~Si %theTarget% ne fait pas partie des %creatureType%~
+
+@13261000 = ~Si la compétence %proficiency% est supérieure ou égale à %value%~
+@13261001 = ~Si la compétence %proficiency% est égale à %value%~
+@13261002 = ~Si la compétence %proficiency% est inférieure à %value%~
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 

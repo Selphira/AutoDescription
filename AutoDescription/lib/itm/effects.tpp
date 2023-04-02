@@ -3,6 +3,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~
 		forceTarget = 0
 		forceProbability = 0
 		forcedProbability = 100
+		ignoreDuration = 0
 	STR_VAR
 		theTarget = ~~
 		ofTheTarget = ~~
@@ -11,7 +12,6 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~
 		description
 		sort
 BEGIN
-	SET ignoreDuration = 0
 	SET isValid = 1
 	SET saveAdded = 0
 	SET sort = 0

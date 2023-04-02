@@ -333,8 +333,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	243 => 488 // Item: Drain Item Charges [243]
 
 	 26 => 489 // Item: Remove Curse [26]
-	172 => 490 // Spell: Remove Spell [172]
-	147 => 491 // Spell: Learn Spell [147]
+	// 172 => 490 // Spell: Remove Spell [172]
+	// 147 => 491 // Spell: Learn Spell [147]
 	171 => 492 // Spell: Give Innate Ability [171]
 	335 => 493 // Spell Effect: Seven Eyes [335]
 	251 => 494 // Spell Effect: Change Bard Song Effect [251]
@@ -375,6 +375,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	140 => 0 // Graphics: Casting Glow [140]
 	141 => 0
 	142 => 0
+	147 => 0 // Spell: Learn Spell [147]
 	152 => 0 // Spell Effect: Play Movie [152]
 	155 => 0 // Overlay: Minor Globe [155]
 	156 => 0 // Overlay: Protection from Normal Missiles Cylinder [156]
@@ -382,6 +383,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	168 => 0 // Summon: Remove Creature [168]
 	169 => 0
 	170 => 0 // Graphics: Play Damage Animation [170]
+	172 => 0 // Spell: Remove Spell [172]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
 	182 => 0 // Item: Apply Effect Item [182]
 	184 => 0 // Graphics: Passwall (Don't Jump) [184]
@@ -5436,7 +5438,6 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
             INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
                 REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
             END
-			PATCH_PRINT "%description%"
         END
         ELSE BEGIN
             INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
@@ -8052,11 +8053,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = ~%resref3%~ RET spellName3 = spellName END
 	END
 
-	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
-
-	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
-	END
+	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
@@ -8087,15 +8084,19 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		END
 
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
-			LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
-
-			INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
+            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
+            END
+			INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
 		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
+				INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+					REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+				END
 				// FIXME: le temps des deux effets s'affichent
 				// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
 				// Il faudrait revoir l'affichage, éventuellement mettre la durée en premier
@@ -8121,7 +8122,16 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	PATCH_IF parameter2 >= 2 AND parameter2 <= 4 OR parameter2 == 20 BEGIN
 		SET value = parameter2 == 2 ? 50 : parameter2 == 3 ? 25 : parameter2 == 4 ? 10 : special
 		PATCH_IF value >= 100 BEGIN
-			SPRINT condition @12320020 // ~À chaque round~
+			// Un sort lancé à chaque round via une capacité d'équipement peut être considéré comme permanent.
+			// Il existe un risque où il serait préférable d'indiquer que le sort est lancé chaque round, mais je n'ai pas encore rencontré ce cas.
+			// Tous les sorts actuellement rencontrés et lancés de cette manière sont des buffs.
+			PATCH_IF abilityType = AbilityType_Equipped BEGIN
+				SPRINT condition @12320000 // ~~
+				SET ignoreDuration = 1
+			END
+			ELSE BEGIN
+				SPRINT condition @12320020 // ~À chaque round~
+			END
 		END
 		ELSE BEGIN
 			LPF ~percent_value~ INT_VAR value RET percent = value END
@@ -10244,12 +10254,10 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
 
-	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 
 	PATCH_IF count == 1 AND featureCount == 1 BEGIN
-		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
-
-		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
+		INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
 		END
 	END
@@ -10270,6 +10278,9 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET value = parameter1
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
+	LOCAL_SPRINT proficiency ~~
+	LOCAL_SPRINT proficiencyId ~~
+
 	PATCH_IF statType >= 102 AND statType <= 109 BEGIN
 		SET idsId = statType - 100
 		SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
@@ -10291,10 +10302,57 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 		LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
 		SET strref = strref + statType
 	END
+	ELSE PATCH_IF statType > 145 BEGIN
+		LPM ~opcode_326_condition_mod~
+	END
 	ELSE BEGIN
 		SET strref = strref + statType
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
+	SPRINT splprot $splprots(~%statType%~)
+	PATCH_IF VARIABLE_IS_SET $splprotstats(~%statType%~) BEGIN
+		SPRINT proficiencyId $splprotstats(~%statType%~)
+	END
+	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%proficiencyId%~) BEGIN
+		SPRINT proficiency $tra_proficiencies(~%proficiencyId%~)
+	END
+	PATCH_MATCH ~%splprot%~ WITH
+		//mo_2h_bonus BEGIN END
+		// Skills and Abilities
+		mo_thrown_prof1 mo_thrown_prof2
+		mo_con_prof1 mo_con_prof2 mo_con_prof3 mo_con_prof4 mo_con_prof5
+		mo_dev_prof1 mo_dev_prof2 mo_dev_prof3 mo_dev_prof4 mo_dev_prof5
+		mo_has_prof1 mo_has_prof2 mo_has_prof3 mo_has_prof4 mo_has_prof5
+		mo_spl_prof1 mo_spl_prof2 mo_spl_prof3 mo_spl_prof4 mo_spl_prof5
+		BEGIN
+			SET strref = 13261000 // ~Si la compétence %proficiency% est supérieure ou égale à %value%~
+		END
+		// Skills and Abilities
+		mo_armor_prof0 mo_armor_prof1 mo_armor_prof2 mo_armor_prof3 mo_armor_prof4 mo_armor_prof5
+		BEGIN
+			SET strref = 13261001 // ~Si la compétence %proficiency% est égale à %value%~
+		END
+		// Skills and Abilities
+		mo_2h_bonus mo_arch_prof1 mo_arch_prof2 mo_swsh_bonus
+		BEGIN
+			SET strref = 13261002 // ~Si la compétence %proficiency% est inférieure à %value%~
+		END
+		DEFAULT
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: splprot %splprot% non gere~ END
+	END
+	PATCH_MATCH ~%splprot%~ WITH
+		mo_armor_prof0 BEGIN SET value = 0 END
+		mo_thrown_prof1 mo_armor_prof1 mo_con_prof1 mo_dev_prof1 mo_has_prof1 mo_spl_prof1 BEGIN SET value = 1 END
+		mo_thrown_prof2 mo_armor_prof2 mo_con_prof2 mo_dev_prof2 mo_has_prof2 mo_spl_prof2 mo_2h_bonus mo_swsh_bonus BEGIN SET value = 2 END
+		mo_armor_prof3 mo_con_prof3 mo_dev_prof3 mo_has_prof3 mo_spl_prof3 BEGIN SET value = 3 END
+		mo_armor_prof4 mo_con_prof4 mo_dev_prof4 mo_has_prof4 mo_spl_prof4 BEGIN SET value = 4 END
+		mo_armor_prof5 mo_con_prof5 mo_dev_prof5 mo_has_prof5 mo_spl_prof5 BEGIN SET value = 5 END
+		DEFAULT
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Valeur du splprot %splprot% non geree~ END
+	END
 END
 
 /* ------------------------------- *
