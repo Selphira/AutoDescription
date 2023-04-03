@@ -616,7 +616,7 @@ BEGIN
 			PATCH_IF requiredLevel == data_3 BEGIN
 				SPRINT levelSpellDescription ~%levelSpellDescription%%crlf%%indentation%- %data_2%~
 				// Indique que les effets ne sont (in)valides que sous certaines conditions, mais il n'y a pas d'autres effets listés.
-				PATCH_IF count == 1 AND data_4 == 318 BEGIN
+				PATCH_IF featureCount == 1 AND data_4 == 318 BEGIN
 					SPRINT levelSpellDescription ~~
 				END
 			END
