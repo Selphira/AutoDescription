@@ -9128,10 +9128,9 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
-	LPM ~opcode_25_common~
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+		LPM ~opcode_25_common~
 	END
 END
 
