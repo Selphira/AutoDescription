@@ -90,6 +90,9 @@ BEGIN
 			LPF ~appendLine~ STR_VAR string RET description END
 			LPF ~appendLine~ RET description END
 			LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
+            INNER_PATCH_SAVE description ~%description%~ BEGIN
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~- %crlf%~ ~~
+            END
 		END
 		ELSE BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
