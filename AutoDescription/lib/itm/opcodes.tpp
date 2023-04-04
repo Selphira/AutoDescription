@@ -7731,6 +7731,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_221~ BEGIN
 	LPM ~opcode_self_probability_221~
 END
 
+DEFINE_PATCH_MACRO ~opcode_221_is_valid~ BEGIN
+	PATCH_IF parameter1 < 1 BEGIN
+		isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Maximum Level %parameter1%.~ END
+	END
+END
+
 /* ---------------------------------- *
  * Spell Effect: Teleport Field [222] *
  * ---------------------------------- */
