@@ -155,7 +155,9 @@ BEGIN
 		END
 	END
 
-	LPF ~add_weapon_attributes_to_description~ RET description END
+	PATCH_IF isWeapon == 1 OR isAmmo == 1 BEGIN
+		LPF ~add_weapon_attributes_to_description~ RET description END
+	END
 END
 
 
@@ -361,10 +363,14 @@ BEGIN
 	        SET $EVAL ~enchantments%enchantment%~(~%index%~) = 0
 	        SET $tac0s(~tac0s%tac0%~) = tac0
 	        SET $EVAL ~tac0s%tac0%~(~%index%~) = 0
-	        PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
-		        SPRINT $damages(~damages%damage%~) ~%damage%~
-		        SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+	        PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
+				SPRINT $damages(~damages0~) ~%damage%~
+				SPRINT $EVAL ~damages0~(~%index%~) ~~
 	        END
+			ELSE BEGIN
+				SPRINT $damages(~damages%damage%~) ~%damage%~
+				SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+			END
 	        SET $damageTypes(~damageTypes%damageType%~) = damageType
 	        SET $EVAL ~damageTypes%damageType%~(~%index%~) = 0
 	        SET $speedFactors(~speedFactors%speedFactor%~) = speedFactor
@@ -411,8 +417,8 @@ BEGIN
 
 	LPF ~array_count~ STR_VAR array_name = ~damageTypes~ RET count END
 	PATCH_PHP_EACH ~damageTypes~ AS array_name => value BEGIN
+		SET found = 0
 		PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
-			SET found = 0
 			PATCH_PHP_EACH ~damages~ AS array_damages => damage BEGIN
 				PATCH_PHP_EACH ~%array_damages%~ AS index_damage => _ BEGIN
 					PATCH_IF found == 0 BEGIN

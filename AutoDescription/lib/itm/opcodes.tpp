@@ -8110,15 +8110,15 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF NOT (abilityType == AbilityType_Equipped AND ~%condition%~ STRING_EQUAL ~~) BEGIN
+				PATCH_IF abilityType == AbilityType_Equipped AND (~%condition%~ STRING_EQUAL ~~ OR parameter2 == 13)BEGIN
+		            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+		                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
+		            END
+				END
+				ELSE BEGIN
 					INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 						REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
 					END
-				END
-				ELSE BEGIN
-		            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-		                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
-		            END
 				END
 				// FIXME: le temps des deux effets s'affichent
 				// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
@@ -8190,7 +8190,13 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 		SPRINT condition @12320024 // ~Lorsque la cible se trouve à moins de %range%~
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
-		SET timeofdayRef = 12320300 + special
+		PATCH_IF abilityType == AbilityType_Equipped BEGIN
+			SET timeofdayRef = 12320300 + special
+			SET ignoreDuration = 1
+		END
+		ELSE BEGIN
+			SET timeofdayRef = 12320304 + special
+		END
 		LPF ~getTranslation~ INT_VAR strref = timeofdayRef opcode RET condition = string END
 	END
 	ELSE PATCH_IF parameter2 == 21 BEGIN
