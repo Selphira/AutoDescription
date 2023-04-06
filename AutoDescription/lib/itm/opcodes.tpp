@@ -3675,7 +3675,7 @@ END
  * Stat: Fatigue Modifier [93] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_93~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10930001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Fatigue~
+	LPF ~opcode_mod~ INT_VAR strref = 10930001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Fatigue~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_93~ BEGIN
