@@ -122,6 +122,21 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~lcfirst~
+	STR_VAR
+		value = ~~
+	RET
+		string
+BEGIN
+	SNPRINT 1 first ~%value%~
+	SPRINT lcfirst ~%first%~
+	TO_LOWER lcfirst
+
+	INNER_PATCH_SAVE string ~%value%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%first%~ ~%lcfirst%~
+	END
+END
+
 /* ----------------------------------------------------------------------------------- *
  * Des chaînes récupérées directement depuis leur référence dans le fichier dialog.tlk *
  * Possible aussi pour les multi-classes, mais demande un traitement différent.        *
