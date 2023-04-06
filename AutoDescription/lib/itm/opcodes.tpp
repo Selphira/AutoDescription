@@ -10700,7 +10700,7 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
-	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
