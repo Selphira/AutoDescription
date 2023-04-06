@@ -8106,10 +8106,14 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 				// Pendant 5 rounds : A chaque round ; Lorsque que la cible se trouve à moins de 7 mètres ; Lance Emprisonnement
 				// Fix rapide qui cache la durée de l'effet secondaire:
 				SET ignoreDuration = 1
-				//
-		        SET strref += 3 // ~lance un sort sur %theTarget%~
-			    SPRINT description (AT ~%strref%~)
-				SPRINT description ~%description%%spellDescription%~
+				PATCH_IF abilityType != AbilityType_Equipped BEGIN
+			        SET strref += 3 // ~lance un sort sur %theTarget%~
+				    SPRINT description (AT ~%strref%~)
+					SPRINT description ~%description%%spellDescription%~
+				END
+				ELSE BEGIN
+					SPRINT description ~%spellDescription%~
+				END
 			END
 	    END
 	    ELSE BEGIN
