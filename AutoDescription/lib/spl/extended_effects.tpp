@@ -477,7 +477,10 @@ BEGIN
     PHP_EACH blockOffsets AS _ => blockOffset BEGIN
 		READ_SHORT blockOffset opcode
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-			SET abilityType = AbilityType_Charge
+			//TODO: Meilleur test pour vérifier si provient d'un effet d'une capacité d'équipement
+			PATCH_IF abilityType != AbilityType_Equipped BEGIN
+				SET abilityType = AbilityType_Charge
+			END
 			PATCH_IF opcode == 219 BEGIN
 				SET opcodeBase = opcode
 				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
@@ -502,7 +505,7 @@ BEGIN
 			ELSE BEGIN
 				LPF ~get_description_effect~ INT_VAR ignoreDuration forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-					PATCH_IF cumulable == 0 BEGIN
+					PATCH_IF cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
 						SPRINT stringNotCumulable @102682
 						SPRINT desc ~%desc% (%stringNotCumulable%)~
 					END

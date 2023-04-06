@@ -569,6 +569,15 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	343 => 0 // HP Swap
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
+	 16 => 1
+	 40 => 1
+	177 => 1
+	190 => 1
+	206 => 1
+	335 => 1
+END
+
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
 // Traduction : durée normale ou jusqu'à dissipation / utilisation
 // Conséquence : les durées "permanentes" et "permanentes, persiste après la mort" ne sont pas affichées
@@ -8097,8 +8106,15 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
-				INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-					REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+				PATCH_IF NOT (abilityType == AbilityType_Equipped AND ~%condition%~ STRING_EQUAL ~~) BEGIN
+					INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+						REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+					END
+				END
+				ELSE BEGIN
+		            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+		                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
+		            END
 				END
 				// FIXME: le temps des deux effets s'affichent
 				// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
@@ -10177,7 +10193,10 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 			ELSE BEGIN
 				SET strref = strref + statType
 			END
-			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+			LPF ~getTranslation~ INT_VAR strref opcode RET description = string exist END
+			PATCH_IF exist == 0 BEGIN
+				SPRINT description ~~
+			END
 		END
 		ELSE BEGIN
 			LPM ~opcode_324_against_who~
