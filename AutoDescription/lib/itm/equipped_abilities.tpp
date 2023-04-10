@@ -16,14 +16,14 @@ BEGIN
 	PATCH_IF (flags BAND BIT4) != 0 BEGIN
 		SET countLines += 1
 		SPRINT effectDescription @102126 // ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-		SET $lines(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+		SET $lines(~-2~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
 	END
 
 	PATCH_IF itemType == ITM_TYPE_helm BEGIN
 		PATCH_IF ((flags BAND BIT25) == 0 AND itemType == ITM_TYPE_helm) OR ((flags BAND BIT25) == BIT25 AND itemType != ITM_TYPE_helm) BEGIN
 			SET countLines += 1
 			SPRINT effectDescription @102679 // ~Protection contre les coups critiques~
-			SET $lines(~0~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
+			SET $lines(~-1~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
 		END
 	END
 
