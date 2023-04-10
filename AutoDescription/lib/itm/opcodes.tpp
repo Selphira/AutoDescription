@@ -5440,8 +5440,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
-		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
-		PATCH_IF count == 1 AND featureCount == 1 BEGIN
+		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
+		PATCH_IF count == 1 AND lineCount == 1 BEGIN
             LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
             INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
@@ -8070,7 +8070,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = ~%resref3%~ RET spellName3 = spellName END
 	END
 
-	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
@@ -8100,9 +8100,9 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 			SPRINT resref ~%resref2%~
 		END
 
-		PATCH_IF count == 1 AND featureCount == 1 BEGIN
+		PATCH_IF count == 1 AND lineCount == 1 BEGIN
             INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-                REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
             END
 			INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
 		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
@@ -8111,7 +8111,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF abilityType == AbilityType_Equipped AND (~%condition%~ STRING_EQUAL ~~ OR parameter2 == 13)BEGIN
+				PATCH_IF abilityType == AbilityType_Equipped AND (~%condition%~ STRING_EQUAL ~~ /*OR parameter2 == 13*/)BEGIN
 		            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
 		            END
@@ -10290,9 +10290,9 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
 
-	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
 
-	PATCH_IF count == 1 AND featureCount == 1 BEGIN
+	PATCH_IF count == 1 AND lineCount == 1 BEGIN
 		INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
 		END
@@ -10707,13 +10707,13 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
-	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
+	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
 
 	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
 	END
 
-	PATCH_IF count == 1 AND featureCount == 1 BEGIN
+	PATCH_IF count == 1 AND lineCount == 1 BEGIN
 		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ RET effectDescription END
 
 		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
