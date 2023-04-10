@@ -3114,10 +3114,14 @@
 @12320222 = ~to nearest opponent~
 @12320223 = ~to nearest creature~
 
-@12320300 = ~During the day, in every round~
-@12320301 = ~At sunset, in every round~
-@12320302 = ~At nightfall, in every round~
-@12320303 = ~At daybreak, in every round~
+@12320300 = ~During the day~
+@12320301 = ~At sunset~
+@12320302 = ~At nightfall~
+@12320303 = ~At daybreak~
+@12320304 = ~During the day, in every round~
+@12320305 = ~At sunset, in every round~
+@12320306 = ~At nightfall, in every round~
+@12320307 = ~At daybreak, in every round~
 
 @12320400 = ~From level %requiredLevel%~
 
