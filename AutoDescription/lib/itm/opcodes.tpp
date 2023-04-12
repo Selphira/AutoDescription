@@ -1097,7 +1097,7 @@ DEFINE_PATCH_MACRO ~opcode_6_group~ BEGIN
 	LOCAL_SET opcode = 6
 	LOCAL_SET newOpcode = 501
 
-	PATCH_IF enable_shrinkage AND shrink_abilities BEGIN
+	PATCH_IF shrink_abilities BEGIN
 		PATCH_DEFINE_ARRAY listOpcodes BEGIN 10 15 19 44 49 END
 
 		LPM ~group_opcode_with_same_parameters~
@@ -1910,19 +1910,8 @@ DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
-					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~parameter2 = 106 AND duration = %position106%~
-						RET $opcodes(~%opcode%~) = count
-						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
-					END
 
 					SET opcode = 106
-					// rajout de l'effet d'immunité à la panique
-					SET parameter1 = 0
-					SET parameter2 = MOD_TYPE_flat
-					LPM ~add_opcode~
-
 					// retrait bonus : rupture de moral fixée à 1 (non nécessaire au groupe mais redondant)
 					LPF ~delete_opcode~
 						INT_VAR opcode
@@ -2114,7 +2103,7 @@ DEFINE_PATCH_MACRO ~opcode_27_group~ BEGIN
 	LOCAL_SET opcode = 27
 	LOCAL_SET newOpcode = 503 // ~Résistance aux dégâts élémentaires~
 
-	PATCH_IF enable_shrinkage AND shrink_resistances BEGIN
+	PATCH_IF shrink_resistances BEGIN
 		LPM ~opcode_group_all_resistances~
 
 		PATCH_DEFINE_ARRAY listOpcodes BEGIN 28 29 30 END
@@ -2279,7 +2268,7 @@ DEFINE_PATCH_MACRO ~opcode_33_group~ BEGIN
 	LOCAL_SET opcode = 33
 	LOCAL_SET newOpcode = 325
 
-	PATCH_IF enable_shrinkage AND shrink_saves_throws BEGIN
+	PATCH_IF shrink_saves_throws BEGIN
 		PATCH_DEFINE_ARRAY listOpcodes BEGIN 34 35 36 37 END
 
 		LPM ~group_opcode_with_same_parameters~
@@ -2882,7 +2871,7 @@ DEFINE_PATCH_MACRO ~opcode_59_group~ BEGIN
 	LOCAL_SET newOpcode = 500
 	LOCAL_SET opcode = 59
 
-	PATCH_IF enable_shrinkage AND shrink_thief_skills BEGIN
+	PATCH_IF shrink_thief_skills BEGIN
 		PATCH_DEFINE_ARRAY listOpcodes BEGIN 90 91 92 275 276 277 END
 
 		LPM ~group_opcode_with_same_parameters~
@@ -3519,7 +3508,7 @@ DEFINE_PATCH_MACRO ~opcode_86_group~ BEGIN
 	LOCAL_SET opcode = 86
 	LOCAL_SET newOpcode = 504 // ~Résistance aux dégâts physiques~
 
-	PATCH_IF enable_shrinkage AND shrink_resistances BEGIN
+	PATCH_IF shrink_resistances BEGIN
 		LPM ~opcode_group_all_resistances~
 
 		PATCH_DEFINE_ARRAY listOpcodes BEGIN 87 88 89 END
@@ -3905,8 +3894,14 @@ END
  * Protection: from Opcode [101] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
-	LOCAL_SET strref = 400000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	LOCAL_SET strref = 0
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT opcodeStr ~%custom_str%~
+	END
+	ELSE BEGIN
+		SET strref = 400000 + parameter2
+		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11010001 // ~Immunité %opcodeStr%~
 	END
@@ -3939,7 +3934,12 @@ END
 DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
+		SET opcode = 101
+		PATCH_IF parameter2 == 3 BEGIN // Folie du berserker
+			SET opcode = 4 // Cure: Berserking [4]
+			LPM ~delete_cure_linked_to_specific_immunity~
+        END
+        ELSE PATCH_IF parameter2 == 5 BEGIN // Charme-personne v1 (mineur : pas de résistance à la domination)
 			//FIXME: un terme pour différencier l'opcode 5 du 241 ?
 			// NPCHAN protège contre le 5, non contre le 241 et est estampillé Immunité aux charmes
 			// Potentiellement la liste des sorts est beaucoup plus longue :
@@ -3948,6 +3948,16 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			TEXT_SPRINT spellState ~Charm~
 			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
+		ELSE PATCH_IF parameter2 == 13 BEGIN // Mort
+			PATCH_IF shrink_cure_with_immunities BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 101
+					STR_VAR expression = ~parameter2 = 209 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET $opcodes(~101~) = count
+					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+				END
 			END
 		END
 		ELSE PATCH_IF parameter2 == 16 BEGIN // Hâte
@@ -3961,17 +3971,63 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_FOR_EACH resref IN "SPPR416" "SPPR706" "SPWI811" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 161 // Cure: Fear [161]
+			LPM ~delete_cure_linked_to_specific_immunity~
+		END
+		ELSE PATCH_IF parameter2 == 25 BEGIN // Empoisonnement
+			SET opcode = 11 // Cure: Poison [11]
+			LPM ~delete_cure_linked_to_specific_immunity~
+
+			LPF ~has_opcode~
+				INT_VAR opcode = 173
+				STR_VAR expression = ~parameter1 > 99 AND (parameter2 = %MOD_TYPE_flat% OR parameter2 = %MOD_TYPE_cumulative%) AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+				RET hasOpcode
+			END
+			PATCH_IF hasOpcode == 1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 173
+					STR_VAR expression = ~parameter1 > 99 AND (parameter2 = %MOD_TYPE_flat% OR parameter2 = %MOD_TYPE_cumulative%) AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET $opcodes(~173~) = count
+					RET_ARRAY EVAL ~opcodes_173~ = opcodes_xx
+				END
+				LPF ~delete_opcode~
+					INT_VAR opcode = 101
+					STR_VAR expression = ~parameter2 = 25 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET $opcodes(~101~) = count
+					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~101~) == 0 BEGIN
+                    CLEAR_ARRAY ~opcodes_101~
+                END
+				SET opcode = 101
+				SET parameter2 = 507 // ~aux poisons~
+				LPM ~add_opcode~
+			END
 		END
 		ELSE PATCH_IF parameter2 == 38 BEGIN // Silence
 			TEXT_SPRINT spellState ~Silence~
 			PATCH_FOR_EACH resref IN "SPPR211" "SPWI508" "SPPR709" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 48 // Cure: Silence (Vocalize) [48]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 39 BEGIN // Inconscience
 			TEXT_SPRINT spellState ~Unconsciousness~
 			PATCH_FOR_EACH resref IN "SPPR102" "SPPR512" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
+			END
+			SET opcode = 2 // Cure: Sleep [2]
+			LPM ~delete_cure_linked_to_specific_immunity~
+			PATCH_IF shrink_cure_with_immunities BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 101
+					STR_VAR expression = ~parameter2 = 217 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET $opcodes(~101~) = count
+					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+				END
 			END
 		END
 		ELSE PATCH_IF parameter2 == 40 BEGIN // Lenteur
@@ -3985,24 +4041,44 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_FOR_EACH resref IN "SPWI816" "SPPR718" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 46 // Cure: Stun (Unstun) [46]
+			LPM ~delete_cure_linked_to_specific_immunity~
+			PATCH_IF shrink_cure_with_immunities BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 101
+					STR_VAR expression = ~parameter2 = 210 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET $opcodes(~101~) = count
+					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+				END
+			END
 		END
 		ELSE PATCH_IF parameter2 == 74 BEGIN // Cécité
 			TEXT_SPRINT spellState ~Blindness~
 			PATCH_FOR_EACH resref IN "SPWI815" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 75 // Cure: Blindness [75]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 76 BEGIN // Débilité mentale
 			TEXT_SPRINT spellState ~Feeblemindedness~
 			PATCH_FOR_EACH resref IN "SPWI509" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 77 // Cure: Feeblemindedness [77]
+			LPM ~delete_cure_linked_to_specific_immunity~
+		END
+		ELSE PATCH_IF parameter2 == 80 BEGIN // Surdité
+			SET opcode = 81 // Cure: Deafness [81]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
 			TEXT_SPRINT spellState ~Confusion~
 			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR311" "SPPR709" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 242 // Cure: Confusion [242]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 135 BEGIN // Polymorphie
 			TEXT_SPRINT spellState ~Polymorph~
@@ -4018,8 +4094,12 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
 			TEXT_SPRINT spellState ~Web~
-			PATCH_FOR_EACH resref IN "SPDR157" "SPDR201" "SPIN566" "SPIN683" "SPWI215" BEGIN
+			PATCH_FOR_EACH resref IN "SPDR157" "SPDR201" "SPIN566" "SPIN683" "SPIN575" "SPWI215" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
+			END
+			SET opcode = 83 // Protection: From Projectile [83]
+			PATCH_FOR_EACH parameter2 IN 62 63 259 319 BEGIN
+				LPM ~delete_cure_linked_to_specific_immunity~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
@@ -4027,12 +4107,122 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+			SET opcode = 162 // Cure: Hold [162]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 213 BEGIN // Labyrinthe
 			TEXT_SPRINT spellState ~Maze~
 			PATCH_FOR_EACH resref IN "SPWI813" "SPIN774" "SPCL937" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
+		END
+		ELSE PATCH_IF parameter2 == 216 BEGIN // Drain de niveau
+			SET opcode = 224 // Cure: Level Drain (Restoration) [224]
+			LPM ~delete_cure_linked_to_specific_immunity~
+		END
+	END
+
+	// Action libre
+	// Nécessite d'être traité à part, afin que tous les autres effets puissent grouper si nécessaire.
+	PATCH_IF abilityType == AbilityType_Equipped BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_101~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter2 == 126 BEGIN // Stat: Movement Modifier [126]
+				SET hasAllOpcode = 1
+				LPF ~has_opcode~
+					INT_VAR opcode = 163
+					STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					RET hasOpcode
+				END
+				PATCH_IF hasOpcode == 0 BEGIN
+					// Au cas où le regroupement de l'opcode 163 aurait déjà été appliqué
+					LPF ~has_opcode~
+						INT_VAR opcode = 126
+						STR_VAR expression = ~parameter2 = 2 AND parameter1 = 100 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						RET hasOpcode
+					END
+					PATCH_IF hasOpcode == 0 BEGIN
+						hasAllOpcode = 0
+					END
+				END
+				PATCH_FOR_EACH parameter2 IN 16 40 109 154 157 175 BEGIN
+					PATCH_IF hasAllOpcode == 1 BEGIN
+						LPF ~has_opcode~
+							INT_VAR opcode = 101
+							STR_VAR expression = ~parameter2 = %parameter2% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+							RET hasOpcode
+						END
+						PATCH_IF hasOpcode == 0 BEGIN
+							hasAllOpcode = 0
+						END
+					END
+				END
+				PATCH_IF hasAllOpcode == 1 BEGIN
+					SET opcode = 520
+					LPM ~add_opcode~
+					// 46 et 162 sont optionnels, non testés ci-dessus.
+					PATCH_FOR_EACH opcode IN 46 126 162 163 BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+					PATCH_FOR_EACH parameter2 IN 16 40 109 126 154 157 175 BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = 101
+							STR_VAR expression = ~parameter2 = %parameter2% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+							RET $opcodes(~101~) = count
+							RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
+	LOCAL_SET strref = 0
+	LOCAL_SET count = 0
+	LOCAL_SPRINT listOpcodes ~~
+	PATCH_IF shrink_immunities_single_line == 1 BEGIN
+		//Toutes les immunités regroupées en un seul opcode
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF probability == 100 AND target = TARGET_FX_self BEGIN
+				SET count += 1
+			END
+		END
+		PATCH_IF count > 1 BEGIN
+			PATCH_DEFINE_ARRAY ~immunitiesList~ BEGIN END
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF probability == 100 AND target = TARGET_FX_self BEGIN
+					SET strref = 400000 + parameter2
+					LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+					PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+						SET $immunitiesList(~%opcodeStr%~) = 1
+					END
+					LPF ~delete_opcode~
+						INT_VAR opcode = 101
+						STR_VAR expression = ~parameter2 = %parameter2% AND probability = 100 AND target = %TARGET_FX_self%~
+						RET $opcodes(~101~) = count
+						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+					END
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~101~) == 0 BEGIN
+				CLEAR_ARRAY ~opcodes_101~
+			END
+			SPRINT and @100021 // ~et~
+			LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
+			SET opcode = 101
+			SPRINT custom_str ~%immunities%~
+			LPM ~add_opcode~
 		END
 	END
 END
@@ -4056,6 +4246,17 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 	END
 	PATCH_IF show_lack_immunity AND oldCount == $opcodes(~%opcode%~) BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to %spellState%: Opcode 206 with resref %resref% not found.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
+	PATCH_IF shrink_cure_with_immunities AND abilityType == AbilityType_Equipped BEGIN
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
 	END
 END
 
@@ -4243,7 +4444,7 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 			SET parameter1 = 0
 		END
 		PATCH_IF parameter1 == 0 BEGIN
-			SPRINT description @11060004 // ~Le moral %ofTheTarget% ne peut plus flancher~
+			SPRINT description @11060004 // ~Immunité à la panique~
 		END
 		ELSE PATCH_IF parameter1 == 1 BEGIN
 			SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
@@ -11196,6 +11397,14 @@ DEFINE_PATCH_MACRO ~opcode_510_common~ BEGIN
 	SPRINT description (AT strref)
 END
 
+/* ------------------------------ *
+ * Protection: Action libre [520] *
+ * ------------------------------ */
+
+DEFINE_PATCH_MACRO ~opcode_self_520~ BEGIN
+	SPRINT description @15200001 // ~Action libre~
+END
+
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
 	LOCAL_SET newOpcode = 502 // ~Résistance aux dégâts~
@@ -11406,13 +11615,9 @@ END
  * Gestion des modifications des résistances *
  * ----------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
-	LOCAL_SET value = parameter1 BAND 255
-	// Ce n'est pas la valeur qui est limitée à 127 -128, mais le résultat final
-	// PATCH_IF value > 127 BEGIN
-	// 	   SET value -= 256
-	// END
+	LOCAL_SET value = parameter1
 
-	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_flat AND value >= 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
 		SPRINT description @102547 // ~Immunité %resistName%~
@@ -11443,10 +11648,7 @@ END
 
 
 DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
-	LOCAL_SET value = parameter1 BAND 255
-	PATCH_IF value > 127 BEGIN
-		SET value -= 256
-	END
+	LOCAL_SET value = parameter1
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
@@ -11483,10 +11685,7 @@ END
  * Gestion des modifications des résistances par probabilité *
  * --------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
-	LOCAL_SET value = parameter1 BAND 255
-	PATCH_IF value > 127 BEGIN
-		SET value -= 256
-	END
+	LOCAL_SET value = parameter1
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1

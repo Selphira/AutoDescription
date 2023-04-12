@@ -370,13 +370,22 @@ END
  * nouvelle entrée doit être créée, contenant les données qui seront traitées par les macros habituelles.
  * Si la chaîne générée est trop différente, il est tout à fait possible de faire en sorte d'appeler une macro d'un
  * opcode imaginaire, qui va se charger de générer la chaîne spécifiquement pour le regroupement.
- * Si des paramètres spécifiques doivent être passé, il y a toute la place dans les variables présentes
+ * Si des paramètres spécifiques doivent être passés, il y a toute la place dans les variables présentes
  * Attention, seules les variables resref, resref2 et resref3 peuvent accueillir une chaîne.
  */
 DEFINE_PATCH_MACRO ~group_effects~ BEGIN
-	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
-		PATCH_IF count > 0 BEGIN
-			PATCH_TRY LPM ~opcode_%opcode%_group~ WITH DEFAULT END
+	PATCH_IF enable_shrinkage == 1 BEGIN
+		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+			PATCH_IF count > 0 BEGIN
+				PATCH_TRY LPM ~opcode_%opcode%_group~ WITH DEFAULT END
+			END
+		END
+		// Second passe, pour les regroupements qui peuvent être affectés par le précécent regroupement.
+		// Notamment par la suppression d'opcodes.
+		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+			PATCH_IF count > 0 BEGIN
+				PATCH_TRY LPM ~opcode_%opcode%_post_group~ WITH DEFAULT END
+			END
 		END
 	END
 END
