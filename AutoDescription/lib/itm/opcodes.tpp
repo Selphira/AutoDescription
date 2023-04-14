@@ -1697,7 +1697,7 @@ END
 /*
 DEFINE_PATCH_MACRO ~opcode_18_not_cumulative~ BEGIN
 	PATCH_IF isCumulative == 0 AND is_ee == 1 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @101185 // ~%description% (non cumulable)~
+		SPRINT description @101185 // ~%description% (non cumulatif)~
 	END
 END
 */
@@ -2848,15 +2848,15 @@ END
  * Stat: Stealth Modifier [59] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_59~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 10590001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Furtivité~
+	LPF ~opcode_mod_percent~ INT_VAR strref = 10590001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Déplacement silencieux~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_59~ BEGIN
-	LPF ~opcode_probability_percent~ INT_VAR strref = 10590002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la furtivité~
+	LPF ~opcode_probability_percent~ INT_VAR strref = 10590002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le Déplacement silencieux~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_59~ BEGIN
-	LPF ~opcode_target_percent~ INT_VAR strref = 10590002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~la furtivité~
+	LPF ~opcode_target_percent~ INT_VAR strref = 10590002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le Déplacement silencieux~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_59~ BEGIN
@@ -4186,7 +4186,6 @@ END
 DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 	LOCAL_SET strref = 0
 	LOCAL_SET count = 0
-	LOCAL_SPRINT listOpcodes ~~
 	PATCH_IF shrink_immunities_single_line == 1 BEGIN
 		//Toutes les immunités regroupées en un seul opcode
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -6800,9 +6799,14 @@ DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
 		SPRINT description @11800001 // ~Unique : Un seul exemple peut être équipé~
 	END
 	ELSE BEGIN
-		LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+		PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+			SPRINT itemName ~%custom_str%~
+		END
+		ELSE BEGIN
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+		END
 		PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @11800002 // ~Empêche d'équiper %itemName%~
+			SPRINT description @11800002 // ~Empêche d'utiliser %itemName%~
 		END
 	END
 END
@@ -6813,6 +6817,35 @@ DEFINE_PATCH_MACRO ~opcode_180_is_valid~ BEGIN
 		isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Parameter2 %parameter2% seems to have no effect.~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
+	PATCH_DEFINE_ARRAY ~itemNamesList~ BEGIN END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+			PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
+				SET $itemNamesList(~%itemName%~) = 1
+			END
+			LPF ~delete_opcode~
+				INT_VAR opcode = 180
+				STR_VAR expression = ~position = %position%~
+				RET $opcodes(~180~) = count
+				RET_ARRAY EVAL ~opcodes_180~ = opcodes_xx
+			END
+		END
+	END
+	// Bug où il reste toujours un item dans le tableau si c'était le dernier
+	// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+	PATCH_IF $opcodes(~180~) == 0 BEGIN
+		CLEAR_ARRAY ~opcodes_180~
+	END
+	SPRINT and @100021 // ~et~
+	LPF ~implode~ STR_VAR array_name = ~itemNamesList~ glue = ~, ~ final_glue = ~ %and% ~ RET itemNames = text END
+	SET opcode = 180
+	SPRINT custom_str ~%itemNames%~
+	LPM ~add_opcode~
 END
 
 /* ------------------------------ *
@@ -11722,7 +11755,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_not_cumulative~ BEGIN
-    SPRINT notCumulative @102682 // ~non cumulable~
+    SPRINT notCumulative @102682 // ~non cumulatif~
     SPRINT description ~%description% (%notCumulative%)~
 END
 

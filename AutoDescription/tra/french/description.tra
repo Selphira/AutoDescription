@@ -62,7 +62,7 @@
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
-@101185 = ~%description% (non cumulable)~
+@101185 = ~%description% (non cumulatif)~
 
 
 // JS
@@ -108,7 +108,7 @@
 @102550 = ~Créature inconnue~
 @102551 = ~Sort inconnu~
 @102679 = ~Protection contre les coups critiques~
-@102682 = ~non cumulable~
+@102682 = ~non cumulatif~
 
 @102263 = ~Les bonus de Force s'appliquent à cette arme~
 @102264 = ~Le bonus de dégât en fonction de la force s'applique à cette arme~
@@ -347,7 +347,7 @@
 @204119 = ~vases~
 @204120 = ~fées~
 @204121 = ~démons~
-@204122 = ~loups-garous~
+@204122 = ~lycanthropes~
 @204123 = ~spectateurs~
 @204124 = ~flagelleurs mentaux~
 @204125 = ~vampires~
@@ -585,10 +585,10 @@
 //@207003 = ~~
 //@207004 = ~~
 @207005 = ~hermaphrodites~
-@207006 = ~créatures convoquées~
+@207006 = ~créatures invoquées~
 @207007 = ~illusions~
 //@207008 = ~~
-@207009 = ~démons convoqués~
+@207009 = ~démons invoqués~
 @207066 = ~créatures emprisonnées~
 
 @207501 = ~homme~
@@ -596,10 +596,10 @@
 //@207503 = ~~
 //@207504 = ~~
 @207505 = ~hermaphrodite~
-@207506 = ~créature convoquée~
+@207506 = ~créature invoquée~
 @207507 = ~illusion~
 //@207508 = ~~
-@207509 = ~démon convoqué~
+@207509 = ~démon invoqué~
 @207566 = ~créature emprisonnée~
 
 /* --------- *
@@ -826,7 +826,7 @@
 @400056 = ~à l'inversion d'alignement~
 @400057 = ~au changement d'alignement~
 @400058 = ~à la dissipation de la magie~
-@400059 = ~à la modification du score de Furtivité~
+@400059 = ~à la modification du score de Déplacement silencieux~
 @400060 = ~à l'échec d'incantation des sorts~
 @400061 = ~~ // Opcode visuel
 @400062 = ~à la mémorisation de sorts divins supplémentaires~
@@ -849,7 +849,7 @@
 @400079 = ~à la guérison des maladies et de la débilité mentale~
 @400080 = ~à la surdité~
 @400081 = ~à la guérison de la surdité~
-@400082 = ~au changement d'IA~
+@400082 = ~au changement de script d'IA~
 @400083 = ~à la protection contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @400084 = ~à la modification de la résistance au feu magique~
 @400085 = ~à la modification de la résistance au froid magique~
@@ -1182,7 +1182,7 @@
 @401056 = ~les effets provoquant l'inversion d'alignement~
 @401057 = ~les effets provoquant le changement d'alignement~
 @401058 = ~les effets dissipant la magie~
-@401059 = ~les effets modifiant le score de Furtivité~
+@401059 = ~les effets modifiant le score de Déplacement silencieux~
 @401060 = ~les effets altérant l'échec d'incantation des sorts~
 @401061 = ~~ // Opcode visuel
 @401062 = ~les effets permettant la mémorisation de sorts divins supplémentaires~
@@ -1205,7 +1205,7 @@
 @401079 = ~les effets dissipant les maladies et la débilité mentale~
 @401080 = ~les effets provoquant la surdité~
 @401081 = ~les effets dissipant la surdité~
-@401082 = ~les effets provoquant un changement d'IA~
+@401082 = ~les effets provoquant un changement de script d'IA~
 @401083 = ~les effets protégeant contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @401084 = ~les effets modifiant la résistance au feu magique~
 @401085 = ~les effets modifiant la résistance au froid magique~
@@ -2030,8 +2030,8 @@
 
 // Opcode 59: Stat: Stealth Modifier [59]
 
-@10590001 = ~Furtivité~
-@10590002 = ~la furtivité~
+@10590001 = ~Déplacement silencieux~
+@10590002 = ~le Déplacement silencieux~
 
 // Opcode 60: Stat: Miscast Magic [60]
 
@@ -2808,7 +2808,7 @@
 // Opcode 180: Item: Can't Use Item [180]
 
 @11800001 = ~Unique : Un seul exemplaire peut être équipé~
-@11800002 = ~Empêche d'équiper %itemName%~
+@11800002 = ~Empêche d'utiliser %itemName%~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
 
@@ -4096,7 +4096,7 @@
 @102479 = ~Vitesse d'incantation des sorts divins~
 @102480 = ~excepté pour les bardes~
 @102482 = ~Réduit les points de vie maximum des créatures vertébrées de 3 pendant 1 tour~ // Spécifique à Item Revision : DVBONEBR
-@102483 = ~Détruit les créatures convoquées~ // Spécifique à Item Revision : DVBANISH
+@102483 = ~Détruit les créatures invoquées~ // Spécifique à Item Revision : DVBANISH
 @102484 = ~Emprisonne la cible dans les flammes pendant 2 rounds (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVFLWHIP
 @102485 = ~Draine 1d4 points de vie si la cible possède du sang et les transfère au porteur~ // Spécifique à Item Revision : DVVAMPIR
 @102486 = ~Réduit la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVSUNDER
