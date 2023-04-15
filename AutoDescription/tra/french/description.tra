@@ -1656,6 +1656,7 @@
 @10000013 = ~contre les armes contondantes, tranchantes et perforantes~ // FIXME: contre les armes de mêlée ?
 @10000014 = ~contre les armes tranchantes, perforantes et les projectiles~
 
+@10000099 = ~Classe d'armure~
 @10000100 = ~Classe d'armure de base~
 @10000101 = ~Bonus de %value%~
 @10000102 = ~Malus de %value%~
@@ -4080,6 +4081,10 @@
 // Fake Opcode 520: Protection: Action libre [520]
 
 @15200001 = ~Action libre~
+
+// Fake Opcode 521: Protection: Aucune protection [521]
+
+@15210001 = ~Ne protège pas %versus%~
 
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\

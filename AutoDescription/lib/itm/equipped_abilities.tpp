@@ -6,12 +6,15 @@ DEFINE_PATCH_FUNCTION ~add_equipped_abilities~
 		description = ~~
 	RET
 		description
+		countGlobalLines
+	RET_ARRAY
+		globalLines
 BEGIN
     READ_LONG ITM_flags flags
 
 	SET abilityType = AbilityType_Equipped
 
-	LPF ~load_equipped_abilities~ RET countLines RET_ARRAY lines END
+	LPF ~load_equipped_abilities~ RET countLines countGlobalLines RET_ARRAY lines globalLines END
 
 	PATCH_IF (flags BAND BIT4) != 0 BEGIN
 		SET countLines += 1
@@ -35,15 +38,20 @@ END
 DEFINE_PATCH_FUNCTION ~load_equipped_abilities~
 	RET
 		countLines
+		countGlobalLines
 	RET_ARRAY
 		lines
+		globalLines
 BEGIN
 	SET countLines = 0
+	SET countGlobalLines = 0
 
 	CLEAR_ARRAY lines
+	CLEAR_ARRAY globalLines
 	CLEAR_ARRAY opcodes
 
     PATCH_DEFINE_ASSOCIATIVE_ARRAY lines BEGIN END
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY globalLines BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
 	LPM ~load_feature_effects~
@@ -55,15 +63,29 @@ BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
+				SET isGlobal = 0
+				SET baseOpcode = opcode
 
 				// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
 				SET target = TARGET_FX_self
 
+				PATCH_IF opcode >= 1000 AND opcode < 2000 BEGIN
+					SET opcode -= 1000
+					SET isGlobal = 1
+				END
+
 				LPF ~get_effect_description~ RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
-					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
-					SET countLines += 1
+					PATCH_IF isGlobal BEGIN
+						SET $globalLines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 100
+						SET countGlobalLines += 1
+					END
+					ELSE BEGIN
+						SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+						SET countLines += 1
+					END
 				END
+				SET opcode = baseOpcode
 		    END
 	    END
 	END
