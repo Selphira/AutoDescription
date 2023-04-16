@@ -5775,13 +5775,13 @@ DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
 		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts profanes~
 	END
 	ELSE PATCH_IF parameter2 != 0 BEGIN
-		SET strref = 11450001 + parameter2
+		SET strref = 11450000 + parameter2
 		SPRINT description (AT ~%strref%~)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_145~ BEGIN
-	LOCAL_SET strref = 11450005+parameter2
+	LOCAL_SET strref = 11450050 + parameter2
 	SPRINT description (AT ~%strref%~)
 END
 
@@ -5797,6 +5797,47 @@ DEFINE_PATCH_MACRO ~opcode_145_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 3 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Spell Type %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
+	LOCAL_SET group = 1
+	LOCAL_SET newSpellType = 0
+	LOCAL_SET spellType = 0
+	LOCAL_SET currentOpcode = opcode
+	PATCH_PHP_EACH ~opcodes_145~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 0
+		SET newSpellType = (2 << %parameter2%) * 2
+		CLEAR_ARRAY positions
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+			~%parameter2%~ => ~%position%~
+		END
+		PATCH_FOR_EACH spellType IN 0 1 2 BEGIN
+			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+			PATCH_IF opcodePosition >= 0 BEGIN
+				SET group = 1
+				SET newSpellType += (2 << %spellType%) * 2
+				SET $positions(~%spellType%~) = opcodePosition
+			END
+		END
+		PATCH_IF group == 1 BEGIN
+			PATCH_PHP_EACH positions AS _ => position1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        SET parameter2 = newSpellType
+            LPM ~add_opcode~
+		END
 	END
 END
 
