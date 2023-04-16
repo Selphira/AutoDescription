@@ -75,7 +75,7 @@ DEFINE_PATCH_FUNCTION ~appendValue~ INT_VAR strref = 0 STR_VAR name = "" value =
 	PATCH_IF strref > 0 BEGIN
 		SPRINT name (AT %strref%)
 	END
-	SPRINT string @100001 // %name% : %value%
+	SPRINT string @100001 // %name%%colon%%value%
     SPRINT description "%description%%crlf%%string%"
 END
 
@@ -85,7 +85,7 @@ DEFINE_PATCH_FUNCTION ~appendProperty~ INT_VAR strref = 0 indentation_num = 0 ST
 	END
 
 	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @100001 // %name% : %value%
+		SPRINT name @100001 // %name%%colon%%value%
 	END
 
 	SPRINT indentation ~~

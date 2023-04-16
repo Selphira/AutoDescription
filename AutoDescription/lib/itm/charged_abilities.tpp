@@ -8,6 +8,7 @@ BEGIN
 	SET countHeaders = 0
 	SET headerIndex = 0
 	SET countLines = 0
+	SET isGlobalDuration = 0
 
 	GET_OFFSET_ARRAY headerOffsets ITM_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
@@ -18,7 +19,7 @@ BEGIN
 		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
 
 		PATCH_IF charges > 0 BEGIN
-			LPF ~load_charged_abilities~ INT_VAR headerOffset index = headerIndex RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+			LPF ~load_charged_abilities~ INT_VAR headerOffset index = headerIndex RET EVAL ~countLines%countHeaders%~ = countLines isGlobalDuration globalDuration globalTimingMode RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
 			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%depletion%~ ~%charges%~) = 1
 
 			SET countHeaders += 1
@@ -93,6 +94,16 @@ BEGIN
             INNER_PATCH_SAVE description ~%description%~ BEGIN
                 REPLACE_TEXTUALLY EVALUATE_REGEXP ~- %crlf%~ ~~
             END
+            PATCH_IF countHeaders == 1 AND isGlobalDuration AND globalDuration > 0 AND (globalTimingMode == TIMING_duration OR globalTimingMode == TIMING_duration_ticks) BEGIN
+                PATCH_IF globalTimingMode == TIMING_duration_ticks BEGIN
+                    SET globalDuration = globalDuration / 15
+                END
+                LPF ~get_str_duration~ INT_VAR duration = globalDuration RET value = strDuration END
+                PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+					LPF ~appendLine~ RET description END
+					LPF ~appendValue~ INT_VAR strref = 100031 STR_VAR value RET description END // Durée
+                END
+            END
 		END
 		ELSE BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
@@ -108,10 +119,17 @@ DEFINE_PATCH_FUNCTION ~load_charged_abilities~
 		headerOffset = 0
 	RET
 		countLines
+		isGlobalDuration
+		globalDuration
+		globalTimingMode
 	RET_ARRAY
 		lines
 BEGIN
 	SET countLines = 0
+	SET isGlobalDuration = 0
+	SET globalDuration = ~-1~
+	SET globalTimingMode = 0
+	SET ignoreDuration = 0
 
 	CLEAR_ARRAY lines
 	CLEAR_ARRAY opcodes
@@ -124,6 +142,32 @@ BEGIN
 	LPM ~filter_effects~
 	LPM ~group_effects~
 
+	PATCH_IF itemType == ITM_TYPE_potion BEGIN
+		SET isGlobalDuration = 1
+		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+			//FIXME: Si opcode 146 (et autres opcode lançant un sortilège), vérifier les opcodes à l'intérieur du sort... (voir "spell_duration")
+			PATCH_IF count > 0 AND opcode != 146 AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
+			    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+			        PATCH_IF isGlobalDuration BEGIN
+				        LPM ~data_to_vars~
+				        PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_duration_ticks BEGIN
+					        PATCH_IF globalDuration < 0 BEGIN
+					            SET globalDuration = duration
+					            SET globalTimingMode = timingMode
+					        END
+					        PATCH_IF globalDuration != duration BEGIN
+					            SET isGlobalDuration = 0
+					        END
+				        END
+			        END
+			    END
+			END
+	    END
+	END
+	PATCH_IF isGlobalDuration AND globalDuration > 0 BEGIN
+		SET ignoreDuration = 1
+	END
+
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -133,7 +177,7 @@ BEGIN
 		            SET target = TARGET_FX_self
 		        END
 
-				LPF ~get_effect_description~ RET effectDescription = description sort END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
 					SET countLines += 1
