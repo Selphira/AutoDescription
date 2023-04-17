@@ -42,6 +42,14 @@ BEGIN
 	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
 	                    SET lineSort = sort + ~%data_0%~
 						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 1
+						SET countLines += 1
+					END
+				END
+				ELSE PATCH_IF isAmmo AND countHeaders == 1 BEGIN
+	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
+	                    SET lineSort = sort + ~%data_0%~
+						SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 1
+						SET countLines += 1
 					END
 				END
 				ELSE BEGIN
@@ -104,6 +112,13 @@ BEGIN
 					LPF ~appendValue~ INT_VAR strref = 100031 STR_VAR value RET description END // Durée
                 END
             END
+		END
+		ELSE PATCH_IF isAmmo AND countHeaders == 1 BEGIN
+			PATCH_PRINT "isAmmo !! : %countLines%"
+			SPRINT title @100011 // ~Capacités de combat~
+			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
+			// désindenter
+			// pas de "usage unique"
 		END
 		ELSE BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
