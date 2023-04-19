@@ -75,6 +75,12 @@
 @101208 = ~8th~
 @101209 = ~9th~
 
+// Types des sorts
+@101300 = ~wizard~
+@101301 = ~priest~
+@101302 = ~innate~
+@101303 = ~magic~
+
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~save %saveTypeStr% half~
@@ -2056,15 +2062,12 @@
 
 // Opcode 60: Stat: Miscast Magic [60]
 
-@10600001 = ~wizards~
-@10600002 = ~divines~
-@10600003 = ~innates~
-@10600004 = ~Unable to cast %spellType% spells~
-@10600005 = ~%percent% of spellcasting failure (%spellType%)~
-@10600006 = ~Unable to cast %spellType%) spells for %theTarget%~
-@10600007 = ~%percent% of spellcasting failure (%spellType%) for %theTarget%~
-@10600008 = ~de provoquer l'échec des sorts %spellType% incantés par %theTarget%~
-@10600009 = ~de provoquer l'échec de %percent% des sorts %spellType% incantés par %theTarget%~
+@10600001 = ~%percent% of spellcasting failure~
+@10600002 = ~%percent% of spellcasting failure (%spellType%)~
+@10600003 = ~%percent% of spellcasting failure for %theTarget%~
+@10600004 = ~%percent% of spellcasting failure (%spellType%) for %theTarget%~
+@10600005 = ~de provoquer l'échec de %percent% des sorts lancés par %theTarget%~
+@10600006 = ~de provoquer l'échec de %percent% des sorts %spellType% lancés par %theTarget%~
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
@@ -2676,23 +2679,11 @@
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
-@11450000 = ~Disables %theTarget% to cast wizard spells~
-@11450001 = ~Disables %theTarget% to cast priest spells~
-@11450002 = ~Disables %theTarget% to cast innate spells~
-@11450003 = ~Disables %theTarget% to cast magic spells~
-@11450012 = ~Disables %theTarget% to cast wizard and priest spells~
-@11450020 = ~Disables %theTarget% to cast wizard and innate spells~
-@11450024 = ~Disables %theTarget% to cast priest and innate spells~
-@11450028 = ~Disables %theTarget% to cast spells~
+@11450000 = ~Disables %theTarget% to cast %spellType% spells~
+@11450001 = ~Disables %theTarget% to cast spells~
 
-@11450050 = ~to disable %theTarget% to cast wizard spells~
-@11450051 = ~to disable %theTarget% to cast priest spells~
-@11450052 = ~to disable %theTarget% to cast innate spells~
-@11450053 = ~to disable %theTarget% to cast magic spells~
-@11450062 = ~to disable %theTarget% to cast wizard and priest spells~
-@11450070 = ~to disable %theTarget% to cast wizard and innate spells~
-@11450074 = ~to disable %theTarget% to cast priest and innate spells~
-@11450078 = ~to disable %theTarget% to cast spells~
+@11450050 = ~to disable %theTarget% to cast %spellType% spells~
+@11450051 = ~to disable %theTarget% to cast spells~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
