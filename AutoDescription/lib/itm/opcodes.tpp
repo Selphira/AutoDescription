@@ -3610,15 +3610,36 @@ END
  * Deafness [80] *
  * ------------- */
 DEFINE_PATCH_MACRO ~opcode_self_80~ BEGIN
-	SPRINT description @10800001 // ~Surdité~
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SPRINT description @10800001 // ~Surdité~
+	END
+	ELSE BEGIN
+		SET parameter1 = 50
+		SET custom_int = 3 // profanes et divins
+		LPM ~opcode_self_60~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_80~ BEGIN
-	SPRINT description @10800003 // ~d'assourdir %theTarget%~
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SPRINT description @10800003 // ~d'assourdir %theTarget%~
+	END
+	ELSE BEGIN
+		SET parameter1 = 50
+		SET custom_int = 3 // profanes et divins
+		LPM ~opcode_self_probability_60~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_80~ BEGIN
-	SPRINT description @10800002 // ~Assourdit %theTarget%~
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SPRINT description @10800002 // ~Assourdit %theTarget%~
+	END
+	ELSE BEGIN
+		SET parameter1 = 50
+		SET custom_int = 3 // profanes et divins
+		LPM ~opcode_target_60~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_80~ BEGIN
@@ -4024,6 +4045,41 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_97_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_97_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+			LPF ~get_opcode_position~
+				INT_VAR opcode  = 44
+				STR_VAR expression = ~target = %target% AND power = %power% AND parameter2 = %MOD_TYPE_flat% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+				RET opcodePosition = position
+			END
+			PATCH_IF opcodePosition >= 0 BEGIN
+				LPF ~get_opcode_by_position~
+					INT_VAR opcode = 44 position = opcodePosition
+					RET op44_parameter1 = parameter1
+				END
+				LPF ~delete_opcode~
+                    INT_VAR opcode
+                    STR_VAR expression = ~position = %position%~
+                    RET $opcodes(~%opcode%~) = count
+                    RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+                END
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 44
+                    STR_VAR expression = ~position = %opcodePosition%~
+                    RET $opcodes(~44~) = count
+                    RET_ARRAY EVAL ~opcodes_44~ = opcodes_xx
+                END
+				SET opcode = 522
+				SET parameter2 = parameter1      // Force exceptionnelle
+				SET parameter1 = op44_parameter1 // Force
+				LPM ~add_opcode~
+			END
+        END
+	END
 END
 
 /* --------------------- *
@@ -11815,6 +11871,20 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_521~ BEGIN
 	SPRINT versus ~%custom_str%~
 	SPRINT description @15210001 // ~Ne protège pas %versus%~
+END
+
+/* ----------------------------------------- *
+ * Stat: Force et Force exceptionnelle [522] *
+ * ----------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_522~ BEGIN
+	LOCAL_SPRINT name @10440001 // ~Force~
+	LOCAL_SPRINT value ~~
+	PATCH_IF parameter2 == 100 BEGIN
+		SPRINT parameter2 ~00~
+	END
+	SPRINT value ~%parameter1%/%parameter2%~
+	SPRINT value @10010 // ~Passe à %value%~
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN

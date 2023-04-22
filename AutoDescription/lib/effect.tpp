@@ -450,6 +450,74 @@ BEGIN
 	SET $opcodes(~%opcode%~) = count
 END
 
+DEFINE_PATCH_FUNCTION ~get_opcode_by_position~
+	INT_VAR
+		opcode = 0
+		match_position = 0
+	RET
+		found
+		position
+		isExternal
+		target
+		power
+		parameter1
+		parameter2
+		timingMode
+		resistance
+		duration
+		probability
+		probability1
+		probability2
+		resref
+		diceCount
+		diceSides
+		saveType
+		saveBonus
+		special
+		parameter3
+		parameter4
+		resref2
+		resref3
+		custom_int
+		custom_str
+BEGIN
+	SET found        = 0
+	SET position     = 0
+	SET isExternal   = 0
+	SET target       = 0
+	SET power        = 0
+	SET parameter1   = 0
+	SET parameter2   = 0
+	SET timingMode   = 0
+	SET resistance   = 0
+	SET duration     = 0
+	SET probability  = 0
+	SET probability1 = 0
+	SET probability2 = 0
+	SPRINT resref      ~~
+	SET diceCount    = 0
+	SET diceSides    = 0
+	SET saveType     = 0
+	SET saveBonus    = 0
+	SET special      = 0
+	SET parameter3   = 0
+	SET parameter4   = 0
+	SPRINT resref2     ~~
+	SPRINT resref3     ~~
+	SET custom_int   = 0
+	SPRINT custom_str  ~~
+	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
+	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+	        PATCH_IF found == 0 BEGIN
+		        LPM ~data_to_vars~
+				PATCH_IF position == match_position BEGIN
+					SET found = 1
+		        END
+	        END
+	    END
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~get_opcode_position~
 	INT_VAR
 		opcode = 0
