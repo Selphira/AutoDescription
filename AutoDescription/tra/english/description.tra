@@ -2101,6 +2101,15 @@
 @10670007 = ~to summon allied creature (%creatureName%)~
 @10670008 = ~To summon neutral creature (%creatureName%)~
 
+@10670001 = ~Summon %amount% creatures (%creatureName%)~
+@10670002 = ~Summon %amount% hostiles creatures (%creatureName%)~
+@10670003 = ~to summon %amount% creatures (%creatureName%)~
+@10670004 = ~to summon %amount% hostiles creatures (%creatureName%)~
+@10670005 = ~Summon %amount% allied creatures (%creatureName%)~
+@10670006 = ~Summon %amount% neutral creatures (%creatureName%)~
+@10670007 = ~to summon %amount% allied creatures (%creatureName%)~
+@10670008 = ~To summon %amount% neutral creatures (%creatureName%)~
+
 // Opcode 68: Summon: Unsummon Creature [68]
 
 @10680001 = ~Unsummon %theTarget% if it is a summoned creature~
