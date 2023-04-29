@@ -5537,7 +5537,8 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 		PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
 			SET isMonster = 0
 		END
-		SET strref += amount == 1 ? 4 : 6
+		LPF ~get_creatures_amount~ INT_VAR totalLevel = amount STR_VAR file RET amount amountMin amountMax END
+		SET strref += amountMax == 1 ? 4 : 6
 		SET strref += isMonster == 1 ? 0 : 1
 		SET strref += isHostile == 1 ? 8 : 0
 	END
@@ -12372,6 +12373,92 @@ BEGIN
 		SPRINT strOr @100004 // ~ou~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([^,]+\)$~ ~ %strOr% \1~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| %strOr% \)~ ~~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_creatures_amount~
+	INT_VAR
+		totalLevel = 0
+	STR_VAR
+		file = ~~
+	RET
+		amount
+		amountMin
+		amountMax
+BEGIN
+	SET amount = 0
+	SET amountMin = 0
+	SET amountMax = 0
+
+	LPF ~get_summon_limit~ RET limitNormal limitCelestial END
+
+	INNER_PATCH_FILE ~%file%.2da~ BEGIN
+		COUNT_2DA_ROWS ~2~ ~rows~
+		FOR (row = 1 ; row < rows ; row = row + 1) BEGIN
+			READ_2DA_ENTRY row 0 2 id
+			READ_2DA_ENTRY row 1 2 resref
+
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
+				INNER_PATCH_FILE ~%resref%.cre~ BEGIN
+					READ_LONG CRE_XP_power_level powerLevel
+					READ_LONG CRE_animation animation
+					READ_BYTE CRE_allegiance allegiance
+					READ_BYTE CRE_gender gender
+
+					SET count = totalLevel / powerLevel
+					SET limit = 0
+					// NORMAL = (EA <= 15 and EA != FAMILIAR) and (GENDER == SUMMONED or GENDER == SUMMONED_DEMON)
+					PATCH_IF (allegiance <= 15 AND allegiance != 3) AND (gender == 6 OR gender == 9) BEGIN
+						SET limit = limitNormal
+					END
+					// CELESTIAL = resref IN ["DEVAGOOD", "DEVAEVIL", "PLANGOOD", "PLANEVIL"] OR ((EA <= 15 and EA != FAMILIAR) and (GENDER == BOTH) and (animationID == 0x7F3B or animationID == 0x7F3C))
+					ELSE PATCH_IF ("%resref%" STRING_MATCHES_REGEXP "^\(DEVAGOOD\|DEVAEVIL\|PLANGOOD\|PLANEVIL\)$") == 0 OR ((allegiance <= 15 AND allegiance != 3) AND gender == 5 AND (animation == 0x7F3B OR animation == 0x7F3C)) BEGIN
+						SET limit = limitNormal
+					END
+					PATCH_IF count > limit BEGIN
+						SET count = limit
+					END
+
+					PATCH_IF amountMin == 0 OR amountMin > count BEGIN
+						SET amountMin = count
+					END
+					PATCH_IF amountMax == 0 OR amountMax < count BEGIN
+						SET amountMax = count
+					END
+				END
+			END
+		END
+		PATCH_IF amountMin == amountMax BEGIN
+			SET amount = amountMin
+		END
+		ELSE BEGIN
+			SPRINT amount @101130 // ~entre %amountMin% et %amountMax%~
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_summon_limit~
+	RET
+		limitNormal
+		limitCelestial
+BEGIN
+	SET limitNormal = 5
+	SET limitCelestial = 1
+
+	PATCH_IF FILE_EXISTS_IN_GAME ~summlimt.2da~ BEGIN
+		INNER_PATCH_FILE ~summlimt.2da~ BEGIN
+			COUNT_2DA_COLS numCols
+			COUNT_2DA_ROWS numCols numRows
+			FOR (row = 0; row < numRows; row += 1) BEGIN
+				READ_2DA_ENTRY row 0 numCols type
+				PATCH_IF (~%type%~ STR_EQ ~NORMAL~) BEGIN
+					READ_2DA_ENTRY row 1 numCols limitNormal
+				END
+				ELSE BEGIN
+					READ_2DA_ENTRY row 1 numCols limitCelestial
+				END
+			END
+		END
 	END
 END
 
