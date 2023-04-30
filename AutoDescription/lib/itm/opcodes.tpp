@@ -6952,7 +6952,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 				SPRINT custom_str ~%target_type%~
 				LPM ~add_opcode~
 
-				PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+				PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 					LPM ~data_to_vars~
 					PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
 						SET $positions_already_grouped(~%position%~) = 1
@@ -7125,9 +7125,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_178_common~ BEGIN
 	TEXT_SPRINT versus ~~
 
-	PATCH_IF parameter2 >= 2 AND parameter2 <= 8 AND parameter1 != 0 BEGIN
-		LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
-	END
+	LPM ~opcode_set_target_strings~
 
 	SET value = isExternal? parameter3 : 0
 	PATCH_IF is_ee AND value == 0 BEGIN
@@ -7150,6 +7148,10 @@ DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected : Value = Value + 0.~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_178_group~ BEGIN
+	LPM ~opcode_group_by_target~
 END
 
 /* ----------------------------------------------------- *
@@ -7183,6 +7185,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_179_is_valid~ BEGIN
 	LPM ~opcode_178_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_179_group~ BEGIN
+	LPM ~opcode_group_by_target~
 END
 
 /* -------------------------- *
