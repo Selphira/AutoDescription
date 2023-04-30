@@ -586,6 +586,7 @@ END
 // TODO: à clarifier ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
+	122 => 1 // Item: Create Inventory Item [122]
 	127 => 1 // Summon: Monster Summoning
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
