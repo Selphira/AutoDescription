@@ -48,6 +48,14 @@ BEGIN
 
 			SET countHeaders += 1
 		END
+		ELSE PATCH_IF itemType == ITM_TYPE_dart BEGIN
+			PATCH_DEFINE_ARRAY EVAL ~lines%countHeaders%~ BEGIN END
+			SET EVAL ~countLines%countHeaders%~ = 0
+			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
+			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
+			SET countHeaders += 1
+		END
 		// Les cas où on a une capacité de charge qui diminue à chaque attaque (Ex: BG2 => STAF05)
 		ELSE PATCH_IF attackType == ITM_ATTACK_TYPE_projectile OR attackType == ITM_ATTACK_TYPE_launcher OR attackType == ITM_ATTACK_TYPE_melee BEGIN
 			PATCH_DEFINE_ARRAY EVAL ~lines%countHeaders%~ BEGIN END
