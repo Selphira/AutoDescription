@@ -2924,10 +2924,10 @@
 
 // Opcode 200: Spell: Bounce (by Power level, decrementing) [200]
 
-@12000001 = ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel%~
-@12000002 = ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
-@12000003 = ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
-@12000004 = ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
+@12000001 = ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12000002 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
+@12000003 = ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12000004 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
@@ -3539,9 +3539,9 @@
 @13210015 = ~Dissipe et protège des %effectType% de l'objet %itemName% sur %theTarget%~
 @13210016 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
 
-@13210017 = ~de dissiper et protège des %effectType% du sort %spellName% sur %theTarget%~
-@13210018 = ~de dissiper et protège des %effectType% de l'objet %itemName% sur %theTarget%~
-@13210019 = ~de dissiper et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210017 = ~de dissiper et protèger des %effectType% du sort %spellName% sur %theTarget%~
+@13210018 = ~de dissiper et protèger des %effectType% de l'objet %itemName% sur %theTarget%~
+@13210019 = ~de dissiper et protèger des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
 
 @13210020 = ~Les effets ne se cumulent pas~
 
