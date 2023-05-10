@@ -594,6 +594,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
 	236 => 1 // Spell Effect: Image Projection
+	274 => 1 // Spell Effect: Teleport to Target [274]
 	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
 	331 => 1 // Summon: Random Monster Summoning
 END
@@ -2675,11 +2676,17 @@ DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
 			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
 			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
 			// Fonctionnel dans les cas généraux
-			SET opcode = initOpcode == 42 ? 507 : 508
+			SET opcode = initOpcode
 			SET parameter2 = newP2
 			SET parameter1 = searchP1
+			SET position += 100
 			LPM ~add_opcode~
 		END
 	END
@@ -5217,8 +5224,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_119~ BEGIN
 	LPM ~opcode_self_probability_119~ // ~de lancer Image miroir sur %theTarget%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_119_match~ BEGIN
-	LPM ~opcode_match_except_parameter1_and_parameter2~
+DEFINE_PATCH_MACRO ~opcode_119_spell_level_match~ BEGIN
+	// Parameter #1: Irrelevant
+    // Parameter #2: Irrelevant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------------ *
@@ -6030,17 +6040,11 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
-		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
-		PATCH_IF count == 1 AND lineCount == 1 BEGIN
-            LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
-
-            INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
-                REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
-            END
-        END
-        ELSE BEGIN
-            SPRINT description ~%spellDescription%~
-        END
+		PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+			SET castingLevel = 0
+		END
+		LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET spellDescription = description END
+        SPRINT description ~%spellDescription%~
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -6064,6 +6068,12 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 			END
 			LPM ~opcode_146_common~
 		END
+		ELSE BEGIN
+			PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+				SET castingLevel = 0
+			END
+			LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET description END
+		END
 	END
 END
 
@@ -6083,7 +6093,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-
 			PATCH_IF type > 0 BEGIN
 				SPRINT description @11460004 // ~de lancer instantanément le sort %spellName% sur %theTarget%~
 			END
@@ -6091,6 +6100,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				SPRINT description @11460003 // ~de lancer le sort %spellName% sur %theTarget%~
 			END
 			LPM ~opcode_146_common~
+		END
+		ELSE BEGIN
+			PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+				SET castingLevel = 0
+			END
+			LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				SPRINT regex ~[0-9]+ % de chances ~ // TODO: Rendre traductible
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+			END
 		END
 	END
 END
@@ -6854,7 +6874,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
-				LPF ~get_effect_description~ INT_VAR ignoreDuration RET description saveAdded ignoreDuration END
+				LPF ~get_effect_description~ INT_VAR forceTarget = 1 ignoreDuration RET description saveAdded ignoreDuration END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
 					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
@@ -7196,7 +7216,7 @@ END
  * Item: Can't Use Item [180] *
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
-	PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+	PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
 		SET forceSort = 1
 		SET sort = 0
 		SPRINT description @11800001 // ~Unique : Un seul exemple peut être équipé~
@@ -7226,7 +7246,7 @@ DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
 	PATCH_DEFINE_ARRAY ~itemNamesList~ BEGIN END
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
 			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 			PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 				SET $itemNamesList(~%itemName%~) = 1
@@ -7339,7 +7359,7 @@ DEFINE_PATCH_MACRO ~opcode_target_188~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_188~ BEGIN
-	LPM  ~opcode_self_probability_188~ // ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
+	LPM ~opcode_self_probability_188~ // ~de permettre %toTheTarget% de lancer plusieurs sorts par round~
 END
 
 /* --------------------------------- *
@@ -7668,7 +7688,24 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
 	LOCAL_SET amount = parameter1
-	LOCAL_SET spellLevel = parameter2
+	LOCAL_SET level = custom_int > 0 ? custom_int : parameter2
+	LOCAL_SET spellLevelMax = 9
+	LOCAL_SPRINT levelStr ~~
+	LOCAL_SPRINT and @100021 // ~et~
+
+	PATCH_DEFINE_ARRAY ~levels~ BEGIN END
+	CLEAR_ARRAY ~levels~
+
+	FOR (idx = 0 ; idx < spellLevelMax ; ++idx) BEGIN
+		SET bit = EVAL ~%BIT%idx%%~
+		PATCH_IF (level BAND bit) != 0 BEGIN
+			SET spellStrref = 101200 + idx + 1
+			SPRINT levelStr (AT spellStrref)
+			SPRINT $levels(~%levelStr%~) ~~
+		END
+	END
+
+	LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET levelStr = text END
 	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
@@ -7681,6 +7718,52 @@ DEFINE_PATCH_MACRO ~opcode_200_is_valid~ BEGIN
 		isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Total Amount %parameter1%.~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_200_group~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET searchP1 = parameter1
+		SET newP2 = 0b0
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+				// On retire l'opcode de ceux à checker dans les futures itérations
+				SET $positions_already_check(~%position%~) = 1
+				// On ajoute l'opcode courant à ceux qui seront désactivés
+				SET $positions(~%position%~) = opcode
+				// P2 retiré
+				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+				SET $positions(~%opcodePosition%~) = opcode
+				SET parameter2 -= 1
+				SET newP2 |= ~BIT%parameter2%~
+			END
+		END
+		PATCH_IF newP2 > 0 BEGIN
+			// Suppression des effets similaires
+			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+			SET custom_int = newP2
+			SET parameter1 = searchP1
+			LPM ~add_opcode~
+		END
+	END
+
 END
 
 /* ---------------------------------------------------- *
@@ -7921,8 +8004,11 @@ DEFINE_PATCH_MACRO ~opcode_206_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
-DEFINE_PATCH_MACRO ~opcode_206_match~ BEGIN
-	LPM ~opcode_match_except_parameter1_and_parameter2~
+DEFINE_PATCH_MACRO ~opcode_206_spell_level_match~ BEGIN
+	// Parameter #1: String Reference (sans importance pour AutoDescription)
+    // Parameter #2: Irrelevant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------------------- *
@@ -8736,6 +8822,7 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	SPRINT theTarget   (AT ~%theTargetRef%~)
 	SPRINT ofTheTarget (AT ~%ofTheTargetRef%~)
 	SPRINT toTheTarget (AT ~%toTheTargetRef%~)
+	SPRINT versus (AT ~%toTheTargetRef%~)
 
 	LPM ~opcode_232_condition~
 
@@ -8748,9 +8835,6 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	PATCH_IF isExternal AND NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = ~%resref3%~ RET spellName3 = spellName END
 	END
-
-	LPF ~get_item_spell_description~ INT_VAR forceTarget = 1 forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
-
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellName2%~ STRING_EQUAL ~~ AND NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 		SET strref += 2 // ~lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
 		SPRINT description (AT ~%strref%~)
@@ -8771,53 +8855,16 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	END
 	ELSE BEGIN // Un seul sort
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref3%~ RET description END
 			SPRINT spellName ~%spellName3%~
 			SPRINT resref ~%resref3%~
 		END
 		ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref2%~ RET description END
 			SPRINT spellName ~%spellName2%~
 			SPRINT resref ~%resref2%~
-		END
-
-		PATCH_IF count == 1 AND lineCount == 1 BEGIN
-            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
-            END
-            SPRINT description ~%spellDescription%~
-			/*
-			INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
-		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-			END
-			*/
-		END
-		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF abilityType == AbilityType_Equipped AND (~%condition%~ STRING_EQUAL ~~ /*OR parameter2 == 13*/)BEGIN
-		            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-		                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
-		            END
-				END
-				ELSE BEGIN
-					INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-						REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
-					END
-				END
-				// FIXME: le temps des deux effets s'affichent
-				// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
-				// Il faudrait revoir l'affichage, éventuellement mettre la durée en premier
-				// Pendant 5 rounds : A chaque round ; Lorsque que la cible se trouve à moins de 7 mètres ; Lance Emprisonnement
-				// Fix rapide qui cache la durée de l'effet secondaire:
-				SET ignoreDuration = 1
-				PATCH_IF abilityType != AbilityType_Equipped BEGIN
-			        SET strref += 3 // ~lance un sort sur %theTarget%~
-				    SPRINT description (AT ~%strref%~)
-					SPRINT description ~%description%%spellDescription%~
-				END
-				ELSE BEGIN
-					SPRINT description ~%spellDescription%~
-				END
-			END
+		END ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 	    END
 	    ELSE BEGIN
 		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
@@ -9841,9 +9888,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
-	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPM ~opcode_25_common~
+		//LPM ~opcode_272_condition~
+		//SET ignoreDuration = 1
 	END
 END
 
@@ -9856,6 +9905,75 @@ DEFINE_PATCH_MACRO ~opcode_272_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type 4 can only be used in external eff files.~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
+	SET amount = 0
+	SET frequency = 1
+	SET p4IsActive = isExternal AND parameter4 != 0 AND is_ee
+	SET type = parameter2
+
+	// Compliqué de faire une phrase simple
+	PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) BEGIN
+		SET amount = 1
+	END
+	ELSE PATCH_IF type == 2 AND parameter1 > 0 BEGIN
+		SET amount = parameter1
+	END
+	ELSE PATCH_IF type == 3 BEGIN
+		SET amount = 1
+		SET frequency = parameter1
+	END
+	ELSE PATCH_IF type == 4 AND isExternal BEGIN
+		SET amount = parameter3
+		SET frequency = parameter1
+	END
+
+	PATCH_IF p4IsActive AND type >= 2 BEGIN
+		SET frequency = frequency * parameter4
+	END
+	PATCH_IF frequency < 1 BEGIN
+		SET frequency = 1
+	END
+
+	LPF ~get_str_duration~ INT_VAR duration = frequency RET strDuration END
+
+	PATCH_IF amount == 1 BEGIN
+		PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+			INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+				REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+			END
+			SET strref = 12720010 // ~À chaque %strDuration%~
+		END
+		ELSE BEGIN
+			// FIXME: données en français et genrées => traduction impossible
+			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+				SET strref = 12720011 // ~Toutes les %strDuration%~
+			END
+			ELSE BEGIN
+				SET strref = 12720012 // ~Tous les %strDuration%~
+			END
+		END
+	END
+	ELSE BEGIN
+		PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
+			INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+				REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+			END
+			SET strref = 12720013 // ~%amount% fois par %strDuration%~
+		END
+		ELSE BEGIN
+			// FIXME: données en français et genrées => traduction impossible
+			PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ heure~ == 0 OR ~%strDuration%~ STRING_MATCHES_REGEXP ~^[0-9]+ seconde~ == 0 BEGIN
+				SET strref = 12720014 // ~%amount% fois toutes les %strDuration%~
+			END
+			ELSE BEGIN
+				SET strref = 12720015 // ~%amount% fois tous les %strDuration%~
+			END
+		END
+	END
+
+	SPRINT condition (AT strref)
 END
 
 /* ----------------------------------------------------- *
@@ -10743,7 +10861,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_321_common~ BEGIN
-	PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ AND
+	PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND
 			(timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
 		SET ignoreDuration = 1
 		SET forceSort = 1
@@ -10852,7 +10970,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	LOCAL_SET statType = parameter2
 	LOCAL_SET idsId = 0
 
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND parameter2 == 0 BEGIN
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND parameter2 == 0 BEGIN
 		LPM ~opcode_324_against_who~
 		PATCH_IF isValid BEGIN
 			SET strref = descriptionStrref
@@ -10861,7 +10979,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	END
 	ELSE BEGIN
 		SET ignoreDuration = 1
-		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
 			PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
 				SET idsId = statType - 100
 				SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
@@ -10929,9 +11047,260 @@ DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_324_is_valid~ BEGIN
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ AND timingMode == TIMING_duration AND duration == 0 BEGIN
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND timingMode == TIMING_duration AND duration == 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no effect : duration 0~ END
+	END
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_effective~ BEGIN
+	2   => ~203004~ // ~morts-vivants~
+	6   => ~203001~ // ~humanoïdes~
+	8   => ~203002~ // ~animaux~
+	10  => ~204145~ // ~élémentaires~
+	12  => ~204164~ // ~myconides~
+	14  => ~13241013~ // ~créatures gigantesques~
+	16  => ~204002~ // ~elfes~
+	18  => ~204130~ // ~ombres des roches~
+	20  => ~204003~ // ~demi-elfes~
+	22  => ~203001 204145~ // ~humanoïdes~ ~animaux~
+	24  => ~13241023~ // ~créatures aveuglées~
+	28  => ~204144~ // ~golems~
+	30  => ~204171~ // ~minotaures~
+	32  => ~203004 204164~ // ~morts-vivants~ ~myconides~
+	40  => ~205006~ // ~paladins~
+	46  => ~204152~ // ~githyankis~
+	48  => ~204144 203004 204164~ // ~golems~ ~morts-vivants~ ~myconides~
+	50  => ~202028~ // ~créatures alliées~
+	52  => ~202200~ // ~créatures hostiles~
+	56  => ~203004 204144~ // ~morts-vivants~ ~golems~
+	65  => ~204143~ // ~orques~
+	67  => ~13241066~ // ~créatures sourdes~
+	69  => ~13241068~ // ~créatures sous l'effet d'un toucher de la goule~
+	75  => ~13241075~ // ~créatures vivantes~
+	86  => ~204101~ // ~ankhegs~
+	88  => ~204150~ // ~liches~
+	92  => ~13241091~ // ~créatures paniquées~
+	119 => ~204003~ // ~demi-elfes~
+	139 => ~13241138~ // ~créatures %descriptionState%~
+	143 => ~13241142~ // ~créatures invisibles~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective~ BEGIN
+	1   => ~203004~ // ~morts-vivants~
+	3   => ~13241003~ // ~créatures immunisées au feu~
+	4   => ~13241004~ // ~créatures sensibles au feu~
+	5   => ~203001~ // ~humanoïdes~
+	7   => ~203002~ // ~animaux~
+	9   => ~204145~ // ~élémentaires~
+	11  => ~204164~ // ~myconides~
+	13  => ~13241013~ // ~créatures gigantesques~
+	15  => ~204002~ // ~elfes~
+	17  => ~204130~ // ~ombres des roches~
+	19  => ~204003~ // ~demi-elfes~
+	21  => ~203001 204145~ // ~humanoïdes~ ~animaux~
+	23  => ~13241023~ // ~créatures aveuglées~
+	25  => ~13241025~ // ~créatures immunisées au froid~
+	26  => ~13241026~ // ~créatures sensibles au froid~
+	27  => ~204144~ // ~golems~
+	29  => ~204171~ // ~minotaures~
+	31  => ~203004 204164~ // ~morts-vivants~ ~myconides~
+	33  => ~13241033~ // ~créatures neutres~
+	34  => ~13241034~ // ~créatures bonnes ou mauvaises~
+	35  => ~13241035~ // ~créatures bonnes~
+	36  => ~13241036~ // ~créatures neutres ou mauvaises~
+	37  => ~13241037~ // ~créatures mauvaises~
+	38  => ~13241038~ // ~créatures neutres ou bonnes~
+	39  => ~205006~ // ~paladins~
+	41  => ~13241041~ // ~créatures du même alignement que le porteur~
+	42  => ~13241042~ // ~créatures d'un alignement différent du porteur~
+	43  => ~12320200~ // ~le porteur~
+	44  => ~13241044~ // ~créatures autre que le porteur~
+	45  => ~204152~ // ~githyankis~
+	47  => ~204144 203004 204164~ // ~golems~ ~morts-vivants~ ~myconides~
+	49  => ~202028~ // ~créatures alliées~
+	51  => ~202200~ // ~créatures hostiles~
+	53  => ~13241053~ // ~créatures immunisées au feu ou au froid~
+	54  => ~13241054~ // ~créatures sensibles au feu ou au froid~
+	55  => ~203004 204144~ // ~morts-vivants~ ~golems~
+	57  => ~13241057~ // ~créatures masculines~
+	58  => ~13241058~ // ~créatures féminines~
+	64  => ~204143~ // ~orques~
+	66  => ~13241066~ // ~créatures sourdes~
+	68  => ~13241068~ // ~créatures sous l'effet d'un toucher de la goule~
+	74  => ~13241074~ // ~créatures mortes~
+	77  => ~13241077~ // ~créatures immunisées aux poisons~
+	78  => ~13241078~ // ~créatures sensibles aux poisons~
+	79  => ~13241079~ // ~créatures immunisées à l'acide~
+	80  => ~13241080~ // ~créatures sensibles à l'acide~
+	81  => ~13241081~ // ~créatures immunisées à l'électricité~
+	82  => ~13241082~ // ~créatures sensibles à l'électricité~
+	83  => ~13241083~ // ~créatures immunisées aux dégâts magiques~
+	84  => ~13241084~ // ~créatures sensibles aux dégâts magiques~
+	85  => ~204101~ // ~ankhegs~
+	87  => ~204150~ // ~liches~
+	91  => ~13241091~ // ~créatures paniquées~
+	119 => ~203001 203002~ // ~humanoïdes~ ~animaux~
+	120 => ~13241120~ // ~créatures protégées contre les morts-vivants~
+	122 => ~13241122~ // ~créatures possédant une dextérité supérieure ou égale à %value%~
+	123 => ~13241123~ // ~créatures possédant une dextérité inférieure à %value%~
+	124 => ~13241124~ // ~créatures possédant une force supérieure ou égale à %value%~
+	125 => ~13241125~ // ~créatures possédant une force inférieure à %value%~
+	126 => ~13241126~ // ~créatures possédant une constitution supérieure ou égale à %value%~
+	127 => ~13241127~ // ~créatures possédant une constitution inférieure à %value%~
+	128 => ~13241128~ // ~créatures possédant une intelligence supérieure ou égale à %value%~
+	129 => ~13241129~ // ~créatures possédant une intelligence inférieure à %value%~
+	130 => ~13241130~ // ~créatures possédant une sagesse supérieure ou égale à %value%~
+	131 => ~13241131~ // ~créatures possédant une sagesse inférieure à %value%~
+	132 => ~13241132~ // ~créatures possédant un charisme supérieur ou égal à %value%~
+	133 => ~13241133~ // ~créatures possédant un charisme inférieur à %value%~
+	138 => ~13241138~ // ~créatures %descriptionState%~
+	140 => ~13241140~ // ~créatures sous l'effet d'une invisibilité~
+	141 => ~13241141~ // ~créatures sous l'effet d'une invisibilité améliorée~
+	142 => ~13241142~ // ~créatures invisibles~
+	144 => ~13241144~ // ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
+	145 => ~13241145~ // ~créatures dont les points de vie sont inférieurs à %value%~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective_between~ BEGIN
+	89 => ~13241089~ // ~entre 6h et 20h~
+	90 => ~13241090~ // ~entre 21h et 5h~
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective_if~ BEGIN
+	134 => ~13241134~ // ~si le nombre de créatures invoquées est supérieur ou égal à %value%~
+	135 => ~13241135~ // ~si le nombre de créatures invoquées est inférieur à %value%~
+	136 => ~13241136~ // ~si le chapitre en cours est supérieur ou égal au %value%~
+	137 => ~13241137~ // ~si le chapitre en cours est inférieur à %value%~
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_324_target_exceptions~
+	STR_VAR list = ~~
+	RET target_exceptions
+BEGIN
+	SPRINT target_exceptions ~~
+
+	SPRINT and @100021 // ~et~
+	SPRINT the @11770200 // ~les~
+	SPRINT andThe @11770201 // ~et les~
+	SPRINT target_effective ~~
+	SPRINT target_not_effective ~~
+	SPRINT target_not_effective_between ~~
+	SPRINT target_not_effective_if ~~
+
+	PATCH_DEFINE_ARRAY effective_against BEGIN END
+	PATCH_DEFINE_ARRAY not_effective_against BEGIN END
+	PATCH_DEFINE_ARRAY not_effective_between BEGIN END // cas particulier pour 89 et 90
+	PATCH_DEFINE_ARRAY not_effective_if BEGIN END // cas particulier pour 134, 135, 136, 137
+	PATCH_DEFINE_ARRAY target_conditions BEGIN END
+
+	WHILE "%list%" STRING_COMPARE "" BEGIN
+		LPF return_first_pair STR_VAR list RET parameter1 = key parameter2 = value list END
+		SET value = parameter1
+		SET statType = parameter2
+
+		PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
+            SET idsId = statType - 100
+            LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+            SET $not_effective_against(~%creatureType%~) = 1
+        END
+        ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
+            SET strref = 420000 + parameter1
+            LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
+            PATCH_IF statType == 76 OR statType == 110 BEGIN
+                SET $not_effective_against(~%creatureType%~) = 1
+            END
+            ELSE PATCH_IF statType == 111 BEGIN
+                SET $effective_against(~%creatureType%~) = 1
+            END
+        END
+        ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
+            SET idsId = statType - 110
+            LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+            SET $effective_against(~%creatureType%~) = 1
+        END
+        ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
+            LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
+            SPRINT creatureType @13241138 // ~créatures %descriptionState%~
+            PATCH_IF statType == 138 BEGIN
+                SET $not_effective_against(~%creatureType%~) = 1
+            END
+            ELSE BEGIN
+                SET $effective_against(~%creatureType%~) = 1
+            END
+        END
+        ELSE BEGIN
+            PATCH_IF VARIABLE_IS_SET $opcode_324_effective(~%statType%~) BEGIN
+                SPRINT opcode_324_list $opcode_324_effective(~%statType%~)
+
+				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+	                SET $effective_against(~%creatureType%~) = 1
+				END
+            END
+            ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective(~%statType%~) BEGIN
+                SPRINT opcode_324_list $opcode_324_not_effective(~%statType%~)
+				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+	                SET $not_effective_against(~%creatureType%~) = 1
+				END
+            END
+            ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_between(~%statType%~) BEGIN
+                SPRINT opcode_324_list $opcode_324_not_effective_between(~%statType%~)
+				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+	                SET $not_effective_between(~%creatureType%~) = 1
+				END
+            END
+            ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_if(~%statType%~) BEGIN
+                SPRINT opcode_324_list $opcode_324_not_effective_if(~%statType%~)
+				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+	                SET $not_effective_if(~%creatureType%~) = 1
+				END
+            END
+        END
+	END
+
+	LPF ~implode~ STR_VAR array_name = ~effective_against~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_effective @13241500 // ~Uniquement contre les %creaturesList%~
+	END
+	LPF ~implode~ STR_VAR array_name = ~not_effective_against~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_not_effective @13241502 // ~contre les %creaturesList%~
+	END
+	LPF ~implode~ STR_VAR array_name = ~not_effective_between~ glue = ~ %and% ~ final_glue = ~ %and% ~ RET target_not_effective_between = text END
+	LPF ~implode~ STR_VAR array_name = ~not_effective_if~ glue = ~, ~ final_glue = ~ %and% ~ RET target_not_effective_if = text END
+
+	PATCH_IF NOT ~%target_not_effective%~ STRING_EQUAL ~~ BEGIN
+		SET $target_conditions(~%target_not_effective%~) = 1
+	END
+	PATCH_IF NOT ~%target_not_effective_between%~ STRING_EQUAL ~~ BEGIN
+		SET $target_conditions(~%target_not_effective_between%~) = 1
+	END
+	PATCH_IF NOT ~%target_not_effective_if%~ STRING_EQUAL ~~ BEGIN
+		SET $target_conditions(~%target_not_effective_if%~) = 1
+	END
+	LPF ~implode~ STR_VAR array_name = ~target_conditions~ glue = ~, ~ final_glue = ~, ~ RET targetCondition = text END
+	PATCH_IF NOT ~%targetCondition%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_not_effective @13241501 // ~Sauf %targetCondition%~
+	END
+
+
+	PATCH_IF NOT ~%target_effective%~ STRING_EQUAL ~~ AND NOT ~%target_not_effective%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_exceptions ~%target_effective%. %target_not_effective%~
+	END
+	ELSE PATCH_IF NOT ~%target_not_effective%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_exceptions ~%target_not_effective%~
+	END
+	ELSE PATCH_IF NOT ~%target_effective%~ STRING_EQUAL ~~ BEGIN
+		SPRINT target_exceptions ~%target_effective%~
 	END
 END
 
@@ -10975,19 +11344,7 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
 
-	LPF ~get_item_spell_description~ INT_VAR forcedProbability = probability ignoreDuration STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
-
-	PATCH_IF count == 1 AND lineCount == 1 BEGIN
-		INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
-			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
-		END
-	END
-    ELSE BEGIN
-		INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-			REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
-		END
-	    SPRINT description ~%spellDescription%~
-    END
+	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_326~ BEGIN
@@ -11226,9 +11583,9 @@ DEFINE_PATCH_MACRO ~opcode_333_common~ BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 	END
 	ELSE BEGIN
-		SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+		SET strLen = STRING_LENGTH ~%CURRENT_SOURCE_RES%~
 		PATCH_IF strLen <= 7 BEGIN
-			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%CURRENT_SOURCE_RES%B~ RET spellName END
 		END
 	END
 	LPF ~get_frequency_duration~ INT_VAR duration = frequency RET strDuration = frequency END
@@ -11391,29 +11748,8 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 
 	SET abilityType = AbilityType_Combat
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	//FIXME: Les durées semblent s'afficher pour les opcodes dans la liste ignore_duration
-	LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount lineCount END
 
-	INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
-	END
-
-	PATCH_IF count == 1 AND lineCount == 1 BEGIN
-		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ RET effectDescription END
-        SPRINT description ~%effectDescription%~
-		/*
-		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
-	        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
-			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-		END
-		*/
-	END
-	ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description ~%description%%spellDescription%~
-    END
-    ELSE BEGIN
-	    SPRINT description @12320001 // ~Lance le sort %spellName% sur %theTarget%~
-    END
+	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_341_is_valid~ BEGIN
@@ -11741,45 +12077,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_506~ BEGIN
 	LPM ~opcode_target_probability_0~
-END
-
-/* --------------------------------------- *
- * Stat: Emplacement de sort profane [507] *
- * --------------------------------------- */
-
- DEFINE_PATCH_MACRO ~opcode_self_507~ BEGIN
-	LPM ~opcode_self_42~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_507~ BEGIN
-	LPM ~opcode_self_probability_42~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_507~ BEGIN
-	LPM ~opcode_target_42~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_probability_507~ BEGIN
-	LPM ~opcode_target_probability_42~
-END
-
-/* --------------------------------------- *
- * Stat: Emplacement de sort divin [508] *
- * --------------------------------------- */
- DEFINE_PATCH_MACRO ~opcode_self_508~ BEGIN
-	LPM ~opcode_self_62~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_508~ BEGIN
-	LPM ~opcode_self_probability_62~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_508~ BEGIN
-	LPM ~opcode_target_62~
-END
-
-DEFINE_PATCH_MACRO ~opcode_target_probability_508~ BEGIN
-	LPM ~opcode_target_probability_62~
 END
 
 /* --------------------------------------- *
@@ -12878,9 +13175,9 @@ DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 strref_if_amount_0 = 0 amo
 			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 		END
 		ELSE BEGIN
-			SET strLen = STRING_LENGTH ~%SOURCE_RES%~
+			SET strLen = STRING_LENGTH ~%CURRENT_SOURCE_RES%~
 			PATCH_IF strLen <= 7 BEGIN
-				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%SOURCE_RES%B~ RET spellName END
+				LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%CURRENT_SOURCE_RES%B~ RET spellName END
 			END
 		END
 
@@ -12948,7 +13245,7 @@ DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequenc
 		INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
 			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
 		END
-		SET strref = 100320 // ~à chaque %strDuration%~
+		SET strref = 100320 // ~par %strDuration%~
 	END
 	ELSE BEGIN
 		// FIXME: données en français et genrées => traduction impossible
@@ -12967,7 +13264,38 @@ DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
 	        match_isExternal   == isExternal
         AND match_target       == target
         AND match_power        == power
+        // AND match_parameter1   == parameter1
+        // AND match_parameter2   == parameter2
         AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+
+DEFINE_PATCH_MACRO ~opcode_match_except_duration~ BEGIN
+	SET match = (
+			match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        // AND match_duration     == duration
         AND match_timingMode   == timingMode
         AND match_resistance   == resistance
         AND match_probability  == probability

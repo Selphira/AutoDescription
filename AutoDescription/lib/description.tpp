@@ -21,10 +21,22 @@ DEFINE_PATCH_FUNCTION ~add_items_section_to_description~
 		description
 BEGIN
     PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
+        // Prise en compte des cas où un sort lancé depuis un opcode 146 (ou autre), génère plusieurs lignes...
+        // Pas vraiment top de le faire ici...
+		INNER_PATCH_SAVE data_5 ~%data_5%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
+		END
         PATCH_IF value == 100 BEGIN
             LPF ~appendLine~ STR_VAR string = EVAL ~%data_5%~ RET description END
         END
         ELSE PATCH_IF value MODULO 2 == 1 BEGIN
+            // Cas d'un sort sans nom lancé depuis un objet
+            PATCH_IF ~%data_5%~ STRING_MATCHES_REGEXP ~^%crlf%~ == 0 BEGIN
+				INNER_PATCH_SAVE data_5 ~%data_5%~ BEGIN
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%  - ~ ~~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~  - ~ ~- ~
+				END
+            END
 			LPF ~appendProperty~ INT_VAR indentation_num = value / 2 STR_VAR name = EVAL ~%data_5%~ RET description END
 		END
 		ELSE PATCH_IF value MODULO 2 == 0 BEGIN

@@ -4,6 +4,7 @@ DEFINE_PATCH_FUNCTION ~get_description_effect~
 		forceProbability = 0
 		forcedProbability = 100
 		ignoreDuration = 0
+		baseProbability = 100
 	STR_VAR
 		theTarget = ~~
 		ofTheTarget = ~~
@@ -28,6 +29,8 @@ BEGIN
 	PATCH_IF forceProbability == 1 BEGIN
 		SET probability = forcedProbability
 	END
+
+	SET probability = probability * baseProbability / 100
 
 	// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
 	PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
@@ -97,6 +100,8 @@ BEGIN
 				LPM ~add_condition~
 				LPM ~add_duration~
 				LPM ~add_save~
+				LPM ~add_cumulable~
+				LPM ~add_target_exceptions~
 			END
 			ELSE BEGIN
 				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END
@@ -291,6 +296,29 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		        SPRINT EVAL ~%vTarget%~ (AT strref)
 		    END
 		    SET target = oldTarget
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_cumulable~ BEGIN
+	PATCH_IF cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
+		SPRINT stringNotCumulable @102682
+		SPRINT description ~%description% (%stringNotCumulable%)~
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_target_exceptions~ BEGIN
+	PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
+		PATCH_PRINT "%opcode% : target exception : %target_exceptions%"
+		//TODO: savoir lesquels sont des "sauf contre", "uniquement contre" ou "uniquement entre xh et yh"
+		//      Avoir 3 tableaux, et voir dans lequel se trouve notre numéro !
+
+		// FIXME: Prendre en compte les probabilité de base des opcodes 318/324 pour savoir si la restriction s'applique à la ligne en cours !!!
+		//        Ajouter ces données dans la liste et faire des sous listes...
+		//
+		LPF ~opcode_324_target_exceptions~ STR_VAR list = ~%target_exceptions%~ RET target_exceptions END
+		PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
+			SPRINT description ~%description% (%target_exceptions%)~
 		END
 	END
 END

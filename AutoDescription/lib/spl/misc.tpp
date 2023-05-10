@@ -83,7 +83,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 				READ_SHORT (offset) opcode
 				READ_ASCII (offset + EFF_resref_key) resref
 				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-					PATCH_IF NOT (opcode == 321 AND ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~) BEGIN
+					PATCH_IF NOT (opcode == 321 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
 						READ_LONG  (offset + EFF_duration) duration
 
 						PATCH_IF base_level == ~-1~ BEGIN

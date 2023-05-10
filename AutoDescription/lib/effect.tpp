@@ -86,12 +86,46 @@ DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
 	SPRINT resref3     ~%data_21%~
 	SET custom_int   = ~%data_22%~
 	SPRINT custom_str  ~%data_23%~
+	SET cumulable    = ~%data_24%~
+	SPRINT target_exceptions ~%data_25%~
+END
+
+DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
+	SET match_opcode       = opcode
+	SET match_position     = ~%data_0%~
+	SET match_isExternal   = ~%data_1%~
+	SET match_target       = ~%data_2%~
+	SET match_power        = ~%data_3%~
+	SET match_parameter1   = ~%data_4%~
+	SET match_parameter2   = ~%data_5%~
+	SET match_timingMode   = ~%data_6%~
+	SET match_resistance   = ~%data_7%~
+	SET match_duration     = ~%data_8%~
+	SET match_probability  = ~%data_9%~
+	SET match_probability1 = ~%data_10%~
+	SET match_probability2 = ~%data_11%~
+	SPRINT match_resref      ~%data_12%~
+	SET match_diceCount    = ~%data_13%~
+	SET match_diceSides    = ~%data_14%~
+	SET match_saveType     = ~%data_15%~
+	SET match_saveBonus    = ~%data_16%~
+	SET match_special      = ~%data_17%~
+	SET match_parameter3   = ~%data_18%~
+	SET match_parameter4   = ~%data_19%~
+	SPRINT match_resref2     ~%data_20%~
+	SPRINT match_resref3     ~%data_21%~
+	SET match_custom_int   = ~%data_22%~
+	SPRINT match_custom_str  ~%data_23%~
+	SET match_cumulable    = ~%data_24%~
+	SPRINT match_target_exceptions ~%data_25%~
 END
 
 
 DEFINE_PATCH_MACRO ~load_feature_effects~
 BEGIN
+	SET cumulable = 1
 	SET position = 0
+	SPRINT target_exceptions ~~
 	CLEAR_ARRAY opcodes
 
     GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
@@ -102,7 +136,9 @@ END
 
 DEFINE_PATCH_MACRO ~load_extended_effects~
 BEGIN
+	SET cumulable = 1
 	SET position = 0
+	SPRINT target_exceptions ~~
 	CLEAR_ARRAY opcodes
 
 	GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
@@ -137,6 +173,27 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 		LPM ~opcode_is_valid~
+
+		PATCH_PRINT "%opcode% (%isValid%) -> %resref% ==? %CURRENT_SOURCE_RES%"
+		PATCH_IF isValid == 1 AND opcode == 321 BEGIN
+			PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND
+                    (timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
+                SET cumulable = 0
+                SET isValid = 0
+            END
+        END
+        // Uniquement pour le cas de l'objet ou du sort même...
+        /*
+        // TODO: A réactiver lorsque la gestion des probabilités sera réalisée. Un opcode 318 ne va pas forcément agir sur l'ensemble des opcodes 100% du temps !
+        Opcode 318 à 0 - 14 de proba, puis opcode 12 à 10 - 19 de proba... ça fait que l'opcode 12 aura 50% de chance d'être inefficace  ! (Il a 10% de chance de s'enclencher, mais sur ces 10%, 5% (donc 50% de son range) sont chevauchés par le 318.
+        Et si on rajoute un autre opcode 318 à 17 - 30, là c'est pire
+        50% d'être inefficace grâce au premier 318, 20% grâce au second 318
+        ELSE PATCH_IF isValid == 1 AND opcode == 318 OR opcode == 324 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
+			SPRINT target_exceptions ~%target_exceptions% %parameter1%=>%parameter2%~
+            SET isValid = 0
+		END
+		PATCH_PRINT "Opcode %opcode% (load) : %target_exceptions%"
+		*/
 
         PATCH_IF isValid == 1 BEGIN
             LPM ~add_opcode~
@@ -272,10 +329,13 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 	END
 
 	SET cpt = 0
+	PATCH_IF VARIABLE_IS_SET $ranges(~1~) BEGIN
+		SET count = 0
+	END
 	PATCH_PHP_EACH ~ranges~ AS _ => range BEGIN
-		SET count = EVAL ~count_ranges_%range%~
+		SET countRange = EVAL ~count_ranges_%range%~
 
-		PATCH_IF count == 1 BEGIN
+		PATCH_IF countRange == 1 BEGIN
 			PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
 				SET $effects(~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value
 				SET count += 1
@@ -417,7 +477,7 @@ DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	ELSE BEGIN
 		SET $opcodes(~%opcode%~) += 1
 	END
-	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~) = 1
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = 1
 END
 
 DEFINE_PATCH_FUNCTION ~delete_opcode~
@@ -443,7 +503,7 @@ BEGIN
 	        LPF evaluate_expression STR_VAR expression RET value END
 			PATCH_IF NOT value BEGIN
 				SET count += 1
-		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~) = 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~) = 1
 	        END
 	    END
 	END
@@ -546,6 +606,7 @@ END
 DEFINE_PATCH_FUNCTION ~get_effect_description~
 	INT_VAR
 		resetTarget = 0
+		forceTarget = 0
 		ignoreDuration = 0
 	RET
 		description
@@ -567,8 +628,13 @@ BEGIN
 	PATCH_TRY
 		PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
 			SPRINT opcode_target ~_self~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
-				PATCH_IF itemType == ITM_TYPE_potion BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+				PATCH_IF isSpell BEGIN
+					SPRINT theTarget   @102475 // ~le lanceur~
+					SPRINT ofTheTarget @102476 // ~du lanceur~
+					SPRINT toTheTarget @102477 // ~au lanceur~
+				END
+				ELSE PATCH_IF VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion BEGIN
 					SPRINT theTarget   @102451 // ~le buveur~
 					SPRINT ofTheTarget @102452 // ~du buveur~
 					SPRINT toTheTarget @102453 // ~au buveur~
@@ -582,7 +648,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_preset BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102471 // ~la cible~
 				SPRINT ofTheTarget @101085 // ~de la cible~
 				SPRINT toTheTarget @101181 // ~à la cible~
@@ -592,7 +658,7 @@ BEGIN
 		// TARGET_FX_everyone_match_specific_caster: membre du groupe du lanceur de sort
 		ELSE PATCH_IF target == TARGET_FX_party OR target == TARGET_FX_everyone_match_specific_caster BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102473 // ~les membres du groupe~
 				SPRINT ofTheTarget @101088 // ~des membres du groupe~
 				SPRINT toTheTarget @101182 // ~aux membres du groupe~
@@ -600,7 +666,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_everyone BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @102474 // ~les créatures dans la zone d'effet~
 				SPRINT ofTheTarget @101089 // ~des créatures dans la zone d'effet~
 				SPRINT toTheTarget @101190 // ~aux créatures dans la zone d'effet~
@@ -608,7 +674,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_everyone_except_party BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @101191 // ~les créatures non membres du groupe~
 				SPRINT ofTheTarget @101192 // ~des créatures non membres du groupe~
 				SPRINT toTheTarget @101193 // ~aux créatures non membres du groupe~
@@ -616,7 +682,7 @@ BEGIN
 		END
 		ELSE PATCH_IF target == TARGET_FX_everyone_except_self BEGIN
 			SPRINT opcode_target ~_target~
-			PATCH_IF NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				SPRINT theTarget   @101194 // ~les autres créatures dans la zone d'effet~
 				SPRINT ofTheTarget @101195 // ~des autres créatures dans la zone d'effet~
 				SPRINT toTheTarget @101196 // ~aux autres créatures dans la zone d'effet~
@@ -637,13 +703,15 @@ BEGIN
 				LPM ~set_opcode_sort~
 				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-					SPRINT description @101125 // ~%probability% de chance %description%~
+					SPRINT description @101125 // ~%probability% de chances %description%~
 				END
 			END
 
 			LPM ~add_condition~
 			LPM ~add_duration~
 			LPM ~add_save~
+			LPM ~add_cumulable~
+			LPM ~add_target_exceptions~
 		END
 		ELSE BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END

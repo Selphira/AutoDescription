@@ -40,6 +40,8 @@ BEGIN
 	END
 
 	PATCH_IF canUpdateItem BEGIN
+		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
+
 		LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
 
 		// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
@@ -65,6 +67,8 @@ DEFINE_PATCH_FUNCTION ~get_item_description~
 	RET
 		description
 BEGIN
+	SET isItem = 1
+	SET isSpell = 0
 	// On supprime la description technique de la description originale
 	LPF ~removeTechnicalDescription~ STR_VAR description = EVAL ~%originalDescription%~ RET description END
 	LPF ~is_weapon~ INT_VAR itemType RET isWeapon END
