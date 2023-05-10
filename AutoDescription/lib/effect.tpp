@@ -174,7 +174,6 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 		LPM ~opcode_is_valid~
 
-		PATCH_PRINT "%opcode% (%isValid%) -> %resref% ==? %CURRENT_SOURCE_RES%"
 		PATCH_IF isValid == 1 AND opcode == 321 BEGIN
 			PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND
                     (timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
