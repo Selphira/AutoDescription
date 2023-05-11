@@ -309,13 +309,6 @@ END
 
 DEFINE_PATCH_MACRO ~add_target_exceptions~ BEGIN
 	PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
-		PATCH_PRINT "%opcode% : target exception : %target_exceptions%"
-		//TODO: savoir lesquels sont des "sauf contre", "uniquement contre" ou "uniquement entre xh et yh"
-		//      Avoir 3 tableaux, et voir dans lequel se trouve notre numéro !
-
-		// FIXME: Prendre en compte les probabilité de base des opcodes 318/324 pour savoir si la restriction s'applique à la ligne en cours !!!
-		//        Ajouter ces données dans la liste et faire des sous listes...
-		//
 		LPF ~opcode_324_target_exceptions~ STR_VAR list = ~%target_exceptions%~ RET target_exceptions END
 		PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% (%target_exceptions%)~

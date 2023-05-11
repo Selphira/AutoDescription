@@ -3878,9 +3878,10 @@
 @13241142 = ~créatures invisibles~
 @13241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13241145 = ~créatures dont les points de vie sont inférieurs à %value%~
-@13241500 = ~Uniquement contre les %creaturesList%~
-@13241501 = ~Sauf %targetCondition%~
+@13241500 = ~Effectif %creaturesList%~
+@13241501 = ~Inefficace %targetCondition%~
 @13241502 = ~contre les %creaturesList%~
+@13241503 = ~à %probability% % ~
 
 // Opcode 325: Stat: Save vs. all [325]
 

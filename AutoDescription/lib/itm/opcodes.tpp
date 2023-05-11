@@ -11220,54 +11220,88 @@ DEFINE_PATCH_FUNCTION ~opcode_324_target_exceptions~
 BEGIN
 	SPRINT target_exceptions ~~
 
-	SPRINT and @100021 // ~et~
 	SPRINT the @11770200 // ~les~
+	SPRINT and @100021 // ~et~
 	SPRINT andThe @11770201 // ~et les~
 	SPRINT target_effective ~~
 	SPRINT target_not_effective ~~
 	SPRINT target_not_effective_between ~~
 	SPRINT target_not_effective_if ~~
 
+	PATCH_DEFINE_ARRAY keys BEGIN END
 	PATCH_DEFINE_ARRAY effective_against BEGIN END
 	PATCH_DEFINE_ARRAY not_effective_against BEGIN END
 	PATCH_DEFINE_ARRAY not_effective_between BEGIN END // cas particulier pour 89 et 90
 	PATCH_DEFINE_ARRAY not_effective_if BEGIN END // cas particulier pour 134, 135, 136, 137
 	PATCH_DEFINE_ARRAY target_conditions BEGIN END
 
-	WHILE "%list%" STRING_COMPARE "" BEGIN
-		LPF return_first_pair STR_VAR list RET parameter1 = key parameter2 = value list END
+	LPF ~get_probability~ INT_VAR probability1 probability2 RET baseProbability = probability END
+	SET baseProbability1 = probability1
+	SET baseProbability2 = probability2
+
+	WHILE "%list%" STRING_COMPARE ~~ BEGIN
+		LPF return_first_entry STR_VAR list separator=" " RET list entry END
+		LPF return_first_entry STR_VAR list = ~%entry%~ separator=";" RET params = entry entry = list END
+		LPF return_first_pair STR_VAR list = ~%params%~ RET probability1 = key probability2 = value params = list END
+		LPF return_first_entry STR_VAR list = ~%entry%~ separator=";" RET params = entry END
+		LPF return_first_pair STR_VAR list = ~%params%~ RET parameter1 = key parameter2 = value END
+
+		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+
+		PATCH_IF NOT (baseProbability1 < probability2 OR baseProbability2 > probability1) BEGIN
+			// Recalcul de la probabilité par ratio
+			PATCH_IF baseProbability1 == probability1 OR baseProbability2 == probability2 BEGIN
+				SET probability = 100
+			END
+			ELSE PATCH_IF baseProbability1 != probability1 OR baseProbability2 != probability2 BEGIN
+				SET newProbability1 = baseProbability1
+				SET newProbability2 = baseProbability2
+
+				PATCH_IF newProbability1 > probability1 BEGIN
+					SET newProbability1 = probability1
+				END
+				PATCH_IF newProbability2 < probability2 BEGIN
+					SET newProbability2 = probability2
+				END
+				LPF ~get_probability~ INT_VAR probability1 = newProbability1 probability2 = newProbability2 RET newProbability = probability END
+				SET probability = newProbability * 100 / baseProbability
+			END
+
+		SET key = 100 - probability
+		SET $keys(~%key%~) = 1
+
 		SET value = parameter1
 		SET statType = parameter2
 
 		PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
             SET idsId = statType - 100
             LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-            SET $not_effective_against(~%creatureType%~) = 1
+            SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
         END
         ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
             SET strref = 420000 + parameter1
             LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
             SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
             PATCH_IF statType == 76 OR statType == 110 BEGIN
-                SET $not_effective_against(~%creatureType%~) = 1
+                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
             END
             ELSE PATCH_IF statType == 111 BEGIN
-                SET $effective_against(~%creatureType%~) = 1
+                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
             END
         END
         ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
             SET idsId = statType - 110
             LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-            SET $effective_against(~%creatureType%~) = 1
+            SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
         END
         ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
             LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
             SPRINT creatureType @13241138 // ~créatures %descriptionState%~
             PATCH_IF statType == 138 BEGIN
-                SET $not_effective_against(~%creatureType%~) = 1
+                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
             END
             ELSE BEGIN
-                SET $effective_against(~%creatureType%~) = 1
+                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
             END
         END
         ELSE BEGIN
@@ -11277,7 +11311,7 @@ BEGIN
 				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
 					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
 					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $effective_against(~%creatureType%~) = 1
+	                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
 				END
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective(~%statType%~) BEGIN
@@ -11285,7 +11319,7 @@ BEGIN
 				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
 					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
 					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $not_effective_against(~%creatureType%~) = 1
+	                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
 				END
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_between(~%statType%~) BEGIN
@@ -11293,7 +11327,7 @@ BEGIN
 				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
 					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
 					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $not_effective_between(~%creatureType%~) = 1
+	                SET $EVAL ~not_effective_between%key%~(~%creatureType%~) = 1
 				END
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_if(~%statType%~) BEGIN
@@ -11301,20 +11335,79 @@ BEGIN
 				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
 					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
 					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $not_effective_if(~%creatureType%~) = 1
+	                SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
 				END
             END
         END
+
+
+        END
 	END
 
-	LPF ~implode~ STR_VAR array_name = ~effective_against~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
-	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-		SPRINT target_effective @13241500 // ~Uniquement contre les %creaturesList%~
+	SORT_ARRAY_INDICES ~keys~ NUMERICALLY
+	SPRINT effectiveAndThe ~%andThe%~
+	SPRINT notEffectiveAndThe ~%andThe%~
+	PATCH_PHP_EACH keys AS key => _ BEGIN
+		SET probability = 100 - key
+			SPRINT probabilityStr ~~
+			PATCH_IF probability < 100 BEGIN
+				SPRINT probabilityStr @13241503 // ~à %probability% % ~
+			END
+
+			CLEAR_ARRAY targetsList
+			PATCH_PHP_EACH ~effective_against%key%~ AS target => _ BEGIN
+				SET $targetsList(~%target%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF probability < 100 BEGIN
+					SPRINT effectiveAndThe ~%and%~
+				END
+				SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
+				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+				SET $effective_against(~%creaturesList%~) = 1
+			END
+
+			CLEAR_ARRAY targetsList
+			PATCH_PHP_EACH ~not_effective_against%key%~ AS target => _ BEGIN
+				SET $targetsList(~%target%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF probability < 100 BEGIN
+					SPRINT notEffectiveAndThe ~%and%~
+				END
+				SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
+				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+				SET $not_effective_against(~%creaturesList%~) = 1
+			END
+
+			CLEAR_ARRAY targetsList
+			PATCH_PHP_EACH ~not_effective_between%key%~ AS target => _ BEGIN
+				SET $targetsList(~%target%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+				SET $not_effective_between(~%creaturesList%~) = 1
+			END
+
+			CLEAR_ARRAY targetsList
+			PATCH_PHP_EACH ~not_effective_if%key%~ AS target => _ BEGIN
+				SET $targetsList(~%target%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+				SET $not_effective_if(~%creaturesList%~) = 1
+			END
 	END
-	LPF ~implode~ STR_VAR array_name = ~not_effective_against~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+
+	LPF ~implode~ STR_VAR array_name = ~effective_against~ glue = ~, %the% ~ final_glue = ~ %effectiveAndThe% ~ RET creaturesList = text END
 	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-		SPRINT target_not_effective @13241502 // ~contre les %creaturesList%~
+		SPRINT target_effective @13241500 // ~Effectif %creaturesList%~
 	END
+	LPF ~implode~ STR_VAR array_name = ~not_effective_against~ glue = ~, %the% ~ final_glue = ~ %notEffectiveAndThe% ~ RET target_not_effective = text END
 	LPF ~implode~ STR_VAR array_name = ~not_effective_between~ glue = ~ %and% ~ final_glue = ~ %and% ~ RET target_not_effective_between = text END
 	LPF ~implode~ STR_VAR array_name = ~not_effective_if~ glue = ~, ~ final_glue = ~ %and% ~ RET target_not_effective_if = text END
 
@@ -11329,7 +11422,7 @@ BEGIN
 	END
 	LPF ~implode~ STR_VAR array_name = ~target_conditions~ glue = ~, ~ final_glue = ~, ~ RET targetCondition = text END
 	PATCH_IF NOT ~%targetCondition%~ STRING_EQUAL ~~ BEGIN
-		SPRINT target_not_effective @13241501 // ~Sauf %targetCondition%~
+		SPRINT target_not_effective @13241501 // ~Inefficace %targetCondition%~
 	END
 
 

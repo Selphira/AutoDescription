@@ -181,18 +181,10 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
                 SET isValid = 0
             END
         END
-        // Uniquement pour le cas de l'objet ou du sort même...
-        /*
-        // TODO: A réactiver lorsque la gestion des probabilités sera réalisée. Un opcode 318 ne va pas forcément agir sur l'ensemble des opcodes 100% du temps !
-        Opcode 318 à 0 - 14 de proba, puis opcode 12 à 10 - 19 de proba... ça fait que l'opcode 12 aura 50% de chance d'être inefficace  ! (Il a 10% de chance de s'enclencher, mais sur ces 10%, 5% (donc 50% de son range) sont chevauchés par le 318.
-        Et si on rajoute un autre opcode 318 à 17 - 30, là c'est pire
-        50% d'être inefficace grâce au premier 318, 20% grâce au second 318
-        ELSE PATCH_IF isValid == 1 AND opcode == 318 OR opcode == 324 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
-			SPRINT target_exceptions ~%target_exceptions% %parameter1%=>%parameter2%~
+        ELSE PATCH_IF isValid == 1 AND opcode == 318 OR opcode == 324 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+			SPRINT target_exceptions ~%target_exceptions% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
             SET isValid = 0
 		END
-		PATCH_PRINT "Opcode %opcode% (load) : %target_exceptions%"
-		*/
 
         PATCH_IF isValid == 1 BEGIN
             LPM ~add_opcode~
