@@ -87,12 +87,12 @@
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
 @101184 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
-@102121 = ~jet de sauvegarde %saveTypeStr% pour éviter~
-@102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+@102121 = ~jet de sauvegarde %saveTypeStr% pour annuler~
+@102122 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
 // v0.9.19
 // en cas de jet de sauvegarde réussi, l'effet est annulé, en cas d'échec, les dégâts sont divisés par deux
-@102123 = ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
-@102124 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+@102123 = ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~
+@102124 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~
 // les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
 @102125 = ~réduits de moitié~
 
@@ -128,12 +128,12 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulatif~
 
-@102263 = ~Les bonus de Force s'appliquent à cette arme~
-@102264 = ~Le bonus de dégât en fonction de la force s'applique à cette arme~
-@102265 = ~Le bonus de toucher en fonction de la force s'applique à cette arme~
-@102266 = ~Les bonus de Force ne s'appliquent pas à cette arme~
-@102267 = ~Le bonus de toucher en fonction de la force ne s'applique pas à cette arme~
-@102268 = ~Le bonus de dégât en fonction de la force ne s'applique pas à cette arme~
+@102263 = ~Les bonus au toucher et aux dégâts liés à la force s'appliquent à cette arme~
+@102264 = ~Le bonus aux dégâts lié à la force s'applique à cette arme~
+@102265 = ~Le bonus au toucher lié à la force s'applique à cette arme~
+@102266 = ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~
+@102267 = ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~
+@102268 = ~Le bonus aux dégâts lié à la force ne s'applique pas à cette arme~
 @102269 = ~Revient dans la main de son porteur après avoir été lancée~
 @102270 = ~Ne nécessite pas de munitions~
 @102271 = ~Munition à usage illimité~
