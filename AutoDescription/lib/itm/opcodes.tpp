@@ -12862,7 +12862,13 @@ BEGIN
 					READ_BYTE CRE_allegiance allegiance
 					READ_BYTE CRE_gender gender
 
-					SET count = totalLevel / powerLevel
+					SET count = (totalLevel * 10 / powerLevel)
+					// Summon until Creature Power Level equals/exceeds Number
+					SET remains = count MODULO 10
+					SET count /= 10
+					PATCH_IF remains > 0 BEGIN
+						SET count += 1
+					END
 					SET limit = 0
 					// NORMAL = (EA <= 15 and EA != FAMILIAR) and (GENDER == SUMMONED or GENDER == SUMMONED_DEMON)
 					PATCH_IF (allegiance <= 15 AND allegiance != 3) AND (gender == 6 OR gender == 9) BEGIN
