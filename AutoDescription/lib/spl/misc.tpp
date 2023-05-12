@@ -170,17 +170,22 @@ BEGIN
 	SET duration_by_level = base_duration / base_level
 	SET prev_duration = base_duration
 	SET prev_level = base_level
+	SET cpt = 0
 
 	PATCH_PHP_EACH ~%array_name%~ AS level => duration BEGIN
-		PATCH_IF delta_duration = 0 BEGIN
-			SET delta_duration = duration - prev_duration
-			SET delta_level = level - prev_level
-		END
-		ELSE PATCH_IF delta_duration != duration - prev_duration OR delta_level != level - prev_level BEGIN
-			SET is_valid = 0
+		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+		PATCH_IF cpt > 0 BEGIN
+			PATCH_IF delta_duration = 0 BEGIN
+				SET delta_duration = duration - prev_duration
+				SET delta_level = level - prev_level
+			END
+			ELSE PATCH_IF delta_duration != duration - prev_duration OR delta_level != level - prev_level BEGIN
+				SET is_valid = 0
+			END
 		END
 		SET prev_duration = duration
 		SET prev_level = level
+		SET cpt += 1
 	END
 
 	PATCH_IF is_valid == 1 BEGIN
@@ -200,6 +205,12 @@ BEGIN
 				LPF ~get_str_duration~ INT_VAR duration = base_duration RET baseDuration = strDuration END
 				SPRINT complex_duration ~%deltaDuration% par tranche de %delta_level% niveaux~
 			END
+			SET remains_duration = duration - (delta_duration * level / delta_level)
+			PATCH_IF remains_duration > 0 BEGIN
+				LPF ~get_str_duration~ INT_VAR duration = remains_duration RET remainsDuration = strDuration END
+				SPRINT complex_duration ~%remainsDuration% + %complex_duration%~
+			END
+			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
 		END
 	END
 	ELSE BEGIN
@@ -332,6 +343,16 @@ DEFINE_PATCH_FUNCTION ~get_first_level_for_spell~
 	RET
 		minLevel
 BEGIN
+	// TODO: Déterminer le niveau selon les fichier mxsplxx.2da ? Afin de prendre le niveau auquel le personnage peut apprendre le sort ?
+	SET count_levels = 0
+    PATCH_DEFINE_ARRAY levels BEGIN END
+	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
+		SET $levels(~%count_levels%~) = requiredLevel
+		SET count_levels += 1
+	END
+
 	SET diff = 0
 	SET delta = 0
 	SET level1 = 0

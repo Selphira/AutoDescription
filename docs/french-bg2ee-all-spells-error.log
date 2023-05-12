@@ -1,0 +1,32 @@
+
+OHBPR608.SPL : Opcode 111: Resource key is empty.
+OHTYR1.SPL : Opcode 321 : no sppr422.spl or sppr422.itm found
+SPCL909.SPL : Opcode 235: has no effect : levelMin (10) > levelMax (2) 
+SPCL909.SPL : Opcode 45: has no effect : levelMin (10) > levelMax (2) 
+SPCL909.SPL : Opcode 235: has no effect : levelMin (10) > levelMax (2) 
+SPCL909.SPL : Opcode 45: has no effect : levelMin (10) > levelMax (2) 
+SPIN530.SPL : Opcode 173 : No change detected Value = Value + 0.
+SPIN853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+SPIN853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
+SPIN853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SPIN944.SPL : Opcode 324 : no effect : duration 0
+SPPR350.SPL : Opcode 321 : no bdaurafe.spl or bdaurafe.itm found
+SPPR350.SPL : Opcode 321 : no bdmycsp1.spl or bdmycsp1.itm found
+SPPR350.SPL : Opcode 321 : no bdmycsp2.spl or bdmycsp2.itm found
+SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
+SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SPSD02.SPL : Opcode 1: Invalid parameter1 value ([-10 10] expected).
+SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
+SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
+SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SPWI959.SPL : Opcode 324 : no effect : duration 0
+SPWI960.SPL : Opcode 324 : no effect : duration 0
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
+SPWI982.SPL : Opcode 67 : Resource pheogurd.cre doesn't exist.
