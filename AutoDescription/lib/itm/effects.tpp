@@ -301,8 +301,8 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_cumulable~ BEGIN
-	PATCH_IF cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
-		SPRINT stringNotCumulable @102682
+	PATCH_IF cumulable == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
+		SPRINT stringNotCumulable @102682 // ~non cumulatif~
 		SPRINT description ~%description% (%stringNotCumulable%)~
 	END
 END
