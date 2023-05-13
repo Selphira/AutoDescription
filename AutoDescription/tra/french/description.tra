@@ -2931,10 +2931,10 @@
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
-@12010001 = ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
-@12010002 = ~Immunise %theTarget% jusqu'à %amount% sorts de niveau %spellLevel%~
-@12010003 = ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
-@12010004 = ~d'immuniser %theTarget% jusqu'à %amount% sorts de niveau %spellLevel%~
+@12010001 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12010002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12010003 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12010004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 
 // Opcode 202: Spell: Bounce (by School) [202]
 
