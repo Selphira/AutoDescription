@@ -3522,6 +3522,7 @@
 // Opcode 316: Spell: Magical Rest [316]
 
 @13160001 = ~de reposer %theTarget%~
+@13160002 = ~Repose %theTarget%~
 
 // Opcode 321: Removal: Effects specified by Resource [321]
 
