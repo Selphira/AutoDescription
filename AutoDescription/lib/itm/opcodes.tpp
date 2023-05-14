@@ -4589,7 +4589,7 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 			LPM ~add_opcode~
 		END
 
-
+		SET count = 0
 		//Toutes les immunités ciblées regroupées en un seul opcode
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
