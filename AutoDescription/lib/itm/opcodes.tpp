@@ -7793,25 +7793,47 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_200~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_200_common~ BEGIN
+	LOCAL_SET spellStrref = 0
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = custom_int > 0 ? custom_int : parameter2
 	LOCAL_SET spellLevelMax = 9
 	LOCAL_SPRINT levelStr ~~
 	LOCAL_SPRINT and @100021 // ~et~
 
-	PATCH_DEFINE_ARRAY ~levels~ BEGIN END
-	CLEAR_ARRAY ~levels~
+	PATCH_IF level == 511 BEGIN
+		SET strref += 10
+	END
+	ELSE BEGIN
+		PATCH_DEFINE_ARRAY ~levels~ BEGIN END
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~levelAndBelow~ BEGIN
+			  3 => 2
+			  7 => 3
+			 15 => 4
+			 31 => 5
+			 63 => 6
+			127 => 7
+			255 => 8
+		END
+		CLEAR_ARRAY ~levels~
 
-	FOR (idx = 0 ; idx < spellLevelMax ; ++idx) BEGIN
-		SET bit = EVAL ~%BIT%idx%%~
-		PATCH_IF (level BAND bit) != 0 BEGIN
-			SET spellStrref = 101200 + idx + 1
+		PATCH_IF VARIABLE_IS_SET $levelAndBelow(~%level%~) BEGIN
+			SET spellStrref = 101200 + $levelAndBelow(~%level%~)
+			SET strref += 20
 			SPRINT levelStr (AT spellStrref)
-			SPRINT $levels(~%levelStr%~) ~~
+		END
+		ELSE BEGIN
+			FOR (idx = 0 ; idx < spellLevelMax ; ++idx) BEGIN
+				SET bit = EVAL ~%BIT%idx%%~
+				PATCH_IF (level BAND bit) != 0 BEGIN
+					SET spellStrref = 101200 + idx + 1
+					SPRINT levelStr (AT spellStrref)
+					SPRINT $levels(~%levelStr%~) ~~
+				END
+			END
+
+			LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET levelStr = text END
 		END
 	END
-
-	LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET levelStr = text END
 	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 

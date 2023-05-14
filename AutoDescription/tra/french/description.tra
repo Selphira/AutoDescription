@@ -2928,6 +2928,14 @@
 @12000002 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
 @12000003 = ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 @12000004 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
+@12000011 = ~Renvoie jusqu'à %amount% niveaux de sorts~
+@12000012 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget%~
+@12000013 = ~de renvoyer jusqu'à %amount% niveaux de sorts~
+@12000014 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget%~
+@12000021 = ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12000022 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau et inférieur~
+@12000023 = ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12000024 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau et inférieur~
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
@@ -2935,6 +2943,14 @@
 @12010002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 @12010003 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 @12010004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
+@12010011 = ~Immunise jusqu'à %amount% niveaux de sorts~
+@12010012 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts~
+@12010013 = ~d'immuniser jusqu'à %amount% niveaux de sorts~
+@12010014 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts~
+@12010021 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12010022 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12010023 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12010024 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
 
 // Opcode 202: Spell: Bounce (by School) [202]
 
