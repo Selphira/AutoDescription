@@ -86,6 +86,10 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 					PATCH_IF NOT (opcode == 321 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
 						READ_LONG  (offset + EFF_duration) duration
 
+						PATCH_IF opcode == 217 BEGIN
+							SET duration = 30
+						END
+
 						PATCH_IF base_level == ~-1~ BEGIN
 							SET base_level = requiredLevel
 						END
@@ -343,7 +347,6 @@ DEFINE_PATCH_FUNCTION ~get_first_level_for_spell~
 	RET
 		minLevel
 BEGIN
-	// TODO: Déterminer le niveau selon les fichier mxsplxx.2da ? Afin de prendre le niveau auquel le personnage peut apprendre le sort ?
 	SET count_levels = 0
     PATCH_DEFINE_ARRAY levels BEGIN END
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
@@ -374,6 +377,10 @@ BEGIN
 	END
 	PATCH_IF isValid == 1 AND VARIABLE_IS_SET $levels(1) BEGIN
 		SET minLevel = $levels(1) - diff
+	END
+	ELSE PATCH_IF count_levels == 1 BEGIN
+		// TODO: Déterminer le niveau selon les fichier mxsplxx.2da ? Afin de prendre le niveau auquel le personnage peut apprendre le sort
+		SET minLevel = $levels(0)
 	END
 	ELSE BEGIN
 		LPF ~add_log_warning~ STR_VAR message = ~Niveau minimum non calculable~ END
