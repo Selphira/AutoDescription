@@ -4266,8 +4266,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
-	LOCAL_SET strref = 400000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	LOCAL_SET strref = 0
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT opcodeStr ~%custom_str%~
+	END
+	ELSE BEGIN
+		SET strref = 400000 + parameter2
+		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11010002 // ~Immunise %theTarget% %opcodeStr%~
 	END
@@ -4578,6 +4584,46 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 			SPRINT and @100021 // ~et~
 			LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
 			SET opcode = 101
+			SET target = TARGET_FX_self
+			SPRINT custom_str ~%immunities%~
+			LPM ~add_opcode~
+		END
+
+
+		//Toutes les immunités ciblées regroupées en un seul opcode
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF probability == 100 AND target = TARGET_FX_preset BEGIN
+				SET count += 1
+			END
+		END
+		PATCH_IF count > 1 BEGIN
+			PATCH_DEFINE_ARRAY ~immunitiesList~ BEGIN END
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF probability == 100 AND target = TARGET_FX_preset BEGIN
+					SET strref = 400000 + parameter2
+					LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+					PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+						SET $immunitiesList(~%opcodeStr%~) = 1
+					END
+					LPF ~delete_opcode~
+						INT_VAR opcode = 101
+						STR_VAR expression = ~parameter2 = %parameter2% AND probability = 100 AND target = %TARGET_FX_preset%~
+						RET $opcodes(~101~) = count
+						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+					END
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~101~) == 0 BEGIN
+				CLEAR_ARRAY ~opcodes_101~
+			END
+			SPRINT and @100021 // ~et~
+			LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
+			SET opcode = 101
+			SET target = TARGET_FX_preset
 			SPRINT custom_str ~%immunities%~
 			LPM ~add_opcode~
 		END
