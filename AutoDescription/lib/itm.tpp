@@ -31,27 +31,39 @@ BEGIN
 	READ_SHORT  ITM_type            itemType
 	READ_STRREF ITM_identified_desc originalDescription
 	READ_LONG   ITM_identified_desc originalDescriptionRef
+	READ_STRREF ITM_unidentified_desc originalUnidentifiedDescription
+	READ_LONG   ITM_unidentified_desc originalUnidentifiedDescriptionRef
     READ_SHORT  ITM_flags           flags
 
 	LPF ~can_update_item~
-		INT_VAR itemType originalDescriptionRef flags
-		STR_VAR originalDescription
+		INT_VAR itemType originalDescriptionRef flags originalUnidentifiedDescriptionRef
+		STR_VAR originalDescription originalUnidentifiedDescription
 		RET canUpdateItem totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType
 	END
 
 	PATCH_IF canUpdateItem BEGIN
 		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
 
-		LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
-
-		// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
-		PATCH_IF alter_item_files BEGIN
-			SAY DESC ~%description%~
+		PATCH_IF ~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0 BEGIN
+			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription = ~%originalUnidentifiedDescription%~ RET description END
+			// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
+			PATCH_IF alter_item_files BEGIN
+				SAY UNIDENTIFIED_DESC ~%description%~
+			END
+			// Ecrire dans le fichier de comparaison
+			READ_STRREF ITM_unidentified_name itemName
+			LPF ~add_compare_row~ STR_VAR itemName originalDescription = ~%originalUnidentifiedDescription%~ description END
 		END
-
-		// Ecrire dans le fichier de comparaison
-		READ_STRREF ITM_identified_name itemName
-		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
+		ELSE BEGIN
+			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
+			// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
+			PATCH_IF alter_item_files BEGIN
+				SAY DESC ~%description%~
+			END
+			// Ecrire dans le fichier de comparaison
+			READ_STRREF ITM_identified_name itemName
+			LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
+		END
 
 		SET totalSuccessful += 1
 	END
@@ -154,9 +166,11 @@ DEFINE_PATCH_FUNCTION ~can_update_item~
 	INT_VAR
 		itemType = 0
 		originalDescriptionRef = 0
+		originalUnidentifiedDescriptionRef = 0
 		flags = 0
 	STR_VAR
 		originalDescription = ~~
+		originalUnidentifiedDescription = ~~
 	RET
 		canUpdateItem
 		totalIgnoredCursed
@@ -177,7 +191,7 @@ BEGIN
 		SET canUpdateItem = 0
 	END
 	// Si l'utilisateur ne veut pas inclure les objets sans description
-	ELSE PATCH_IF NOT include_items_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) BEGIN
+	ELSE PATCH_IF NOT include_items_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) AND (~%originalUnidentifiedDescription%~ STRING_EQUAL ~~ OR originalUnidentifiedDescriptionRef <= 0) BEGIN
 		SET totalIgnoredWithoutDescription += 1
 		SET canUpdateItem = 0
 	END
