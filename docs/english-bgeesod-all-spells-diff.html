@@ -659,19 +659,19 @@ This spell quickens the caster's reflexes, enabling faster and more effective co
 
 STATISTICS: 
 
-- Speed Factor: Set to 9
+- Speed Factor: 1 bonus (not cumulative)
 - Dexterity: +1
 
 From level 12
-- Speed Factor: Set to 8
+- Speed Factor: 2 bonus (not cumulative)
 - Dexterity: +1
 
 From level 16
-- Speed Factor: Set to 7
+- Speed Factor: 3 bonus (not cumulative)
 - Dexterity: +1
 
 From level 20
-- Speed Factor: Set to 6
+- Speed Factor: 4 bonus (not cumulative)
 - Dexterity: +2</pre></td></tr>
 <tr><th class="title">MARW401<br/>Daer'Ragh's Aura Cleansing</th><td class="description before"><pre>The use of magic causes the collection of magical residue around the caster, which prevents even the most skilled of casters from casting spells in quick succession. Daer'Ragh's Aura Cleansing removes this residue as the next spell begins, allowing for a greatly increased rate of spellcasting.</pre></td><td class="description after"><pre>Daer'Ragh's Aura Cleansing
 
@@ -5304,10 +5304,7 @@ When the spell is cast, it confers complete invulnerability to all magical weapo
 STATISTICS: 
 
 - Immunity to magical weapons
-- Immunity to Mantle spell
-- Immunity to Improved Mantle spell
-- Immunity to Absolute Immunity spell
-- Immunity to Protection From Normal Weapons spell</pre></td></tr>
+- Immunity to Absolute Immunity, Improved Mantle, Mantle and Protection From Normal Weapons spells</pre></td></tr>
 <tr><th class="title">SPIN687<br/>Create Shadows</th><td class="description before"><pre>Improved Invisibility
 (Illusion/Phantasm)
 
@@ -6370,26 +6367,7 @@ STATISTICS:
 - Inflicts 20 magic damage to the caster
 - Inflicts 40 magic damage to the caster
 - Inflicts 1500 magic damage to the caster
-- Immunity to Shapeshift: Flind spell
-- Immunity to Shapeshift: Ogre spell
-- Immunity to Shapeshift: Spider spell
-- Immunity to Shapeshift: Mustard Jelly spell
-- Immunity to Shapeshift: Brown Bear spell
-- Immunity to Shapeshift: Black Bear spell
-- Immunity to Shapeshift: Wolf spell
-- Immunity to Shapeshift: Natural Form spell
-- Immunity to Shapeshift: Baby Wyvern spell
-- Immunity to Shapeshift: Fire Salamander spell
-- Immunity to Shapeshift: Sword Spider spell
-- Immunity to Shapechange: Mind Flayer spell
-- Immunity to Shapechange: Iron Golem spell
-- Immunity to Shapechange: Giant Troll spell
-- Immunity to Shapechange: Greater Wolfwere spell
-- Immunity to Shapechange: Fire Elemental spell
-- Immunity to Shapechange: Earth Elemental spell
-- Immunity to Polymorph Other spell
-- Immunity to Polymorph Self spell
-- Immunity to Shapechange spell</pre></td></tr>
+- Immunity to Polymorph Other, Polymorph Self, Shapechange, Shapechange: Earth Elemental, Shapechange: Fire Elemental, Shapechange: Giant Troll, Shapechange: Greater Wolfwere, Shapechange: Iron Golem, Shapechange: Mind Flayer, Shapeshift: Baby Wyvern, Shapeshift: Black Bear, Shapeshift: Brown Bear, Shapeshift: Fire Salamander, Shapeshift: Flind, Shapeshift: Mustard Jelly, Shapeshift: Natural Form, Shapeshift: Ogre, Shapeshift: Spider, Shapeshift: Sword Spider and Shapeshift: Wolf spells</pre></td></tr>
 <tr><th class="title">SPIN824<br/>Death Curse</th><td class="description before"><pre>Finger of Death
 (Necromancy)
 
@@ -15635,8 +15613,7 @@ In addition, the caster may choose the form of brown bear, black bear, or wolf.
 
 STATISTICS: 
 
-- Immunity to Shapechange spell for 31 rounds
-- Immunity to Polymorph Self spell for 31 rounds
+- Immunity to Polymorph Self and Shapechange spells for 31 rounds
 - Casts Shapeshift: Natural Form on the caster (as a level 7 spellcaster) after 190 seconds
 
 From level 8
@@ -17367,11 +17344,7 @@ When the spell is cast, it confers complete invulnerability to all magical weapo
 STATISTICS: 
 
 - Immunity to magical weapons
-- Immunity to Mantle spell
-- Immunity to Improved Mantle spell
-- Immunity to Absolute Immunity spell
-- Immunity to Protection From Normal Weapons spell
-- Immunity to Etherealness spell</pre></td></tr>
+- Immunity to Absolute Immunity, Etherealness, Improved Mantle, Mantle and Protection From Normal Weapons spells</pre></td></tr>
 <tr><th class="title">SPWI612<br/>Power Word, Silence</th><td class="description before"><pre>Power Word, Silence
 (Conjuration/Summoning)
 
@@ -17421,9 +17394,8 @@ The affected creature functions at double its normal movement and attack rates a
 
 STATISTICS: 
 
-- Immune the target to Offensive Spin spell
-- Immune the target to Haste spell
-- Double movement speed and grants one additional attack per round to the target</pre></td></tr>
+- Double movement speed and grants one additional attack per round to the target
+- Immune the target to Haste and Offensive Spin spells</pre></td></tr>
 <tr><th class="title">SPWI614<br/>Death Fog</th><td class="description before"><pre>Death Fog
 (Evocation)
 
@@ -19493,8 +19465,7 @@ STATISTICS:
 
 - Casts Shapeshift: Natural Form on the caster (as a level 20 spellcaster)
 - Instantly cast Shapeshift: Natural Form on the caster
-- Immunity to Polymorph Self spell
-- Immunity to Shapechange spell</pre></td></tr>
+- Immunity to Polymorph Self and Shapechange spells</pre></td></tr>
 <tr><th class="title">SPWI917<br/>Freedom</th><td class="description before"><pre>Freedom
 (Abjuration) 
 
@@ -20520,7 +20491,7 @@ The Polymorph Other spell is a powerful magic that permanently alters the form o
 STATISTICS: 
 
 - Reduces the THAC0 of the target by 1
-- Change the Speed Factor of the target to 0</pre></td></tr>
+- Reduces the Speed Factor of the target by 1 (not cumulative)</pre></td></tr>
 <tr><th class="title">SPWM152<br/>Polymorph Other</th><td class="description before"><pre>Polymorph Other 
 (Alteration)
 
@@ -20950,7 +20921,7 @@ The Polymorph Other spell is a powerful magic that permanently alters the form o
 
 STATISTICS: 
 
-- Change the Speed Factor of the target to 0 (save vs. Spells neg.)</pre></td></tr>
+- Reduces the Speed Factor of the target by 2 (save vs. Spells neg.) (not cumulative)</pre></td></tr>
 <tr><th class="title">SPWM198<br/>Polymorph Other</th><td class="description before"><pre>Polymorph Other 
 (Alteration)
 

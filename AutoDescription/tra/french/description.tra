@@ -4198,6 +4198,12 @@
 @15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
 @15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 
+// Fake Opcode 519: Immunité aux sorts
+
+@15180001 = ~Immunité aux sorts %spellNames%~
+@15180002 = ~Immunise %theTarget% aux sorts %spellNames%~
+@15180003 = ~d'immuniser %theTarget% aux sorts %spellNames%~
+
 // Fake Opcode 519: Arme brisée
 
 @15190001 = ~que l'arme se brise~
