@@ -6112,10 +6112,9 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 	END
 	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		LPM ~opcode_177_set_target_strings~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-			SPRINT selfTarget @11770001 // ~ uniquement pour les %targetType%~
 			SPRINT description ~%description% (%selfTarget%)~
 		END
 	END
@@ -6131,11 +6130,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_177~ BEGIN
 	PATCH_IF parameter1 != 0 BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		SPRINT theTarget   @102384 // ~les %targetType%~
-		SPRINT ofTheTarget @102385 // ~des %targetType%~
-		SPRINT toTheTarget @102386 // ~aux %targetType%~
-		SPRINT versus      @102387 // ~contre les %targetType%~
+		LPM ~opcode_177_set_target_strings~
 		LPM ~add_target_level~
 	END
 	LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_target_~ RET description saveAdded ignoreDuration opcode END
@@ -6233,6 +6228,204 @@ DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %resref%.eff doesn't exist.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_177_group~ BEGIN
+	// Un problème fait qu'avec le add_opcode() l'opcode en cours de traitement est remis, bien qu'il ai été supprimé avant...
+	// On doit donc supprimer ces entrées une seconde fois à la fin du traitement
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~to_delete~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_grouped~ BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET currentPosition = position
+
+		PATCH_IF NOT VARIABLE_IS_SET $positions_already_grouped(~%position%~) BEGIN
+		    LPF opcode_177_get_all_opcode_positions
+				INT_VAR
+					match_opcode       = opcode
+					match_isExternal   = isExternal
+					match_target       = target
+					match_power        = power
+					match_parameter1   = parameter1
+					match_parameter2   = parameter2
+					match_timingMode   = timingMode
+					match_resistance   = resistance
+					match_duration     = duration
+					match_probability  = probability
+					match_probability1 = probability1
+					match_probability2 = probability2
+					match_diceCount    = diceCount
+					match_diceSides    = diceSides
+					match_saveType     = saveType
+					match_saveBonus    = saveBonus
+					match_special      = special
+					match_parameter3   = parameter3
+					match_parameter4   = parameter4
+					match_custom_int   = custom_int
+				STR_VAR
+					match_resref     = ~%resref%~
+					match_resref2    = ~%resref2%~
+					match_resref3    = ~%resref3%~
+					match_custom_str = ~%custom_str%~
+		        RET
+		            count
+		        RET_ARRAY
+		            opcode_positions = positions
+		    END
+
+		    PATCH_IF count > 1 BEGIN
+		        LPF ~opcode_177_get_target_type~ RET target_type END
+
+				SET $to_delete(~%currentPosition%~) = 1
+				SET position += 1000
+				SPRINT custom_str ~%target_type%~
+				LPM ~add_opcode~
+
+				PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+					LPM ~data_to_vars~
+					PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
+						SET $positions_already_grouped(~%position%~) = 1
+						SET $opcode_positions(~%position%~) = 0
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~position = %position%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+			    END
+			END
+			SET $opcode_positions(~%currentPosition%~) = 0
+		END
+	END
+
+	PATCH_PHP_EACH EVAL ~to_delete~ AS position => _ BEGIN
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~position = %position%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_177_set_target_strings~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypes~ BEGIN END
+	CLEAR_ARRAY ~targetTypes~
+
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT targetType ~%custom_str%~
+
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypeGroups~ BEGIN
+			~5:001 5:007 5:010 5:013 5:014 5:017~ => 11770100
+			~5:004 5:009 5:010 5:013 5:015~       => 11770101
+		END
+
+		PATCH_PHP_EACH ~targetTypeGroups~ AS elements => strref BEGIN
+			LPF all_elements_in_list STR_VAR elements list = ~%targetType%~ RET value END
+			PATCH_IF value == 1 BEGIN
+				LPF remove_elements_in_list STR_VAR elements list = ~%targetType%~ RET targetType = list END
+				SPRINT string (AT strref)
+				SET $targetTypes(~%string%~) = 1
+			END
+		END
+
+		WHILE ~%targetType%~ STRING_COMPARE ~~ BEGIN
+			LPF return_first_entry STR_VAR list = ~%targetType%~ RET entry targetType = list END
+			LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~:~ RET file = entry entry = list END
+			LPF ~get_ids_name~ INT_VAR entry file RET idName END
+			SET $targetTypes(~%idName%~) = 1
+		END
+	END
+	ELSE BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			SET $targetTypes(~%targetType%~) = 1
+		END
+	END
+
+	LPF ~array_count~ STR_VAR array_name = ~targetTypes~ RET count END
+
+	PATCH_IF count > 0 BEGIN
+		SPRINT the @11770200 // ~les~
+		SPRINT andThe @11770201 // ~et les~
+		SPRINT of @11770202 // ~des~
+		SPRINT andOf @11770203 // ~et des~
+		SPRINT to @11770204 // ~aux~
+		SPRINT andTo @11770205 // ~et aux~
+
+		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
+		SPRINT versus      @102387 // ~contre les %targetType%~
+		SPRINT selfTarget  @11770001 // ~ uniquement pour les %targetType%~
+		SPRINT theTarget   @102384 // ~les %targetType%~
+		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
+		SPRINT ofTheTarget @102385 // ~des %targetType%~
+		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %to% ~ final_glue = ~ %andTo% ~ RET targetType = text END
+		SPRINT toTheTarget @102386 // ~aux %targetType%~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_177_get_target_type~ RET target_type
+BEGIN
+	SPRINT target_type ~~
+	PATCH_PHP_EACH EVAL ~opcodes_177~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
+			LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
+			SPRINT target_type "%target_type% %parameter2%:%string%"
+		END
+    END
+
+	INNER_PATCH_SAVE target_type ~%target_type%~ BEGIN
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~ \(.+\)$~ ~\1~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_177_get_all_opcode_positions~
+	INT_VAR
+		match_opcode       = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
+	STR_VAR
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+	RET
+		count
+	RET_ARRAY
+		positions
+BEGIN
+	SET count = 0
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	CLEAR_ARRAY ~positions~
+	PATCH_PHP_EACH EVAL ~opcodes_%match_opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPM ~opcode_match_except_parameter1_and_parameter2~
+		PATCH_IF match BEGIN
+			SET $positions(~%position%~) = 1
+			SET count += 1
+		END
 	END
 END
 
@@ -11722,11 +11915,11 @@ DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequenc
 END
 
 DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
-	SET match = (match_isExternal   == isExternal
+	SET match = (
+	        match_isExternal   == isExternal
         AND match_target       == target
         AND match_power        == power
-        //AND match_parameter1   == parameter1
-        //AND match_parameter2   == parameter2
+        AND match_duration     == duration
         AND match_timingMode   == timingMode
         AND match_resistance   == resistance
         AND match_probability  == probability
@@ -11740,9 +11933,9 @@ DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
         AND match_parameter3   == parameter3
         AND match_parameter4   == parameter4
         AND match_custom_int   == custom_int
-        AND ~%match_resref%~     STRING_EQUAL ~%resref%~
-        AND ~%match_resref2%~    STRING_EQUAL ~%resref2%~
-        AND ~%match_resref3%~    STRING_EQUAL ~%resref3%~
-        AND ~%match_custom_str%~ STRING_EQUAL ~%custom_str%~
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
     )
 END

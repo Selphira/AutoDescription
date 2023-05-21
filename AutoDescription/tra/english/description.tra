@@ -2563,7 +2563,7 @@
 // Opcode 134: State: Petrification [134]
 
 @11340001 = ~Flesh to Stone~ // Transmutation de la chair en pierre
-@11340002 = ~Flesh to Stone~ // Transmute %theTarget% en pierre
+@11340002 = ~Transmutes %theTarget% into stone~ // Transmute %theTarget% en pierre
 @11340003 = ~to be transmuted into stone~// d'être transmuté en pierre
 @11340004 = ~to transmute %theTarget% into stone~// de transmuter %theTarget% en pierre
 
@@ -2784,6 +2784,14 @@
 // Opcode 177: Use EFF File [177]
 
 @11770001 = ~only for %targetType%~
+@11770100 = ~single and multiclassed mages~
+@11770101 = ~single and multiclassed thieves~
+@11770200 = ~the~
+@11770201 = ~and the~
+@11770202 = ~of~
+@11770203 = ~and of~
+@11770204 = ~to~
+@11770205 = ~and to~
 
 // Opcode 178: Effect: THAC0 vs. Creature Type Modifier [178]
 
