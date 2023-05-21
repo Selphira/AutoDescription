@@ -4329,7 +4329,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 38 BEGIN // Silence
 			TEXT_SPRINT spellState ~Silence~
-			PATCH_FOR_EACH resref IN "SPPR211" "SPWI508" "SPPR709" BEGIN
+			PATCH_FOR_EACH resref IN "SPPR211" "SPPR709" "SPPR988" "SPWI508" "SPWI612" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 48 // Cure: Silence (Vocalize) [48]
@@ -4359,7 +4359,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 45 BEGIN // Étourdissement
 			TEXT_SPRINT spellState ~Stun~
-			PATCH_FOR_EACH resref IN "SPWI816" "SPPR718" BEGIN
+			PATCH_FOR_EACH resref IN "SPPR718" "SPWI715" "SPWI816" "SPWI898" "SPWI959" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 46 // Cure: Stun (Unstun) [46]
@@ -4375,7 +4375,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 74 BEGIN // Cécité
 			TEXT_SPRINT spellState ~Blindness~
-			PATCH_FOR_EACH resref IN "SPWI815" BEGIN
+			PATCH_FOR_EACH resref IN "SPDM101" "SPWI106" "SPWM178" "SPWI228" "SPWI815" "SPWI958" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 75 // Cure: Blindness [75]
@@ -4392,6 +4392,14 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		ELSE PATCH_IF parameter2 == 80 BEGIN // Surdité
 			SET opcode = 81 // Cure: Deafness [81]
 			LPM ~delete_cure_linked_to_specific_immunity~
+		END
+		ELSE PATCH_IF parameter2 == 93 BEGIN // Stat: Fatigue Modifier [93]
+			LPF ~delete_opcode~
+				INT_VAR opcode = 93
+				STR_VAR expression = ~parameter1 = 0 AND parameter2 = %MOD_TYPE_flat% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+				RET $opcodes(~93~) = count
+				RET_ARRAY EVAL ~opcodes_93~ = opcodes_xx
+			END
 		END
 		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
 			TEXT_SPRINT spellState ~Confusion~
