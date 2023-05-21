@@ -8104,10 +8104,13 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
             INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
                 REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%?- ~ ~~
             END
+            SPRINT description ~%spellDescription%~
+			/*
 			INNER_PATCH_SAVE description ~%spellDescription%~ BEGIN
 		        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
+			*/
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
@@ -10715,11 +10718,13 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 
 	PATCH_IF count == 1 AND lineCount == 1 BEGIN
 		LPF ~get_single_spell_effect~ INT_VAR forcedProbability = probability STR_VAR file = EVAL ~%resref%~ RET effectDescription END
-
+        SPRINT description ~%effectDescription%~
+		/*
 		INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
 	        SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 		END
+		*/
 	END
 	ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description ~%description%%spellDescription%~
