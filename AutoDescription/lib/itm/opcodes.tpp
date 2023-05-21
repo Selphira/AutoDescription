@@ -5432,7 +5432,6 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
 		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
-			PATCH_PRINT "%theTarget% %ofTheTarget% %toTheTarget%"
             LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
             INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
@@ -11366,9 +11365,10 @@ END
  * ----------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
-	PATCH_IF value > 127 BEGIN
-		SET value -= 256
-	END
+	// Ce n'est pas la valeur qui est limitée à 127 -128, mais le résultat final
+	// PATCH_IF value > 127 BEGIN
+	// 	   SET value -= 256
+	// END
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
@@ -11387,7 +11387,9 @@ DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
-			SET value -= 100
+			// Après test, 50 ajoute bien environ 50% de la résistance actuelle, le -100 est faux, du moins sous BGEE.
+			// Je dis environ, car il semble que le type 2 soit buggé pour les résistances, et d'autres valeurs sont prises en compte.
+			// SET value -= 100
 			LPF ~signed_value~ INT_VAR value RET value END
 			SPRINT value @10002 // ~%value% %~
 		END
