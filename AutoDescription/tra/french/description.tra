@@ -20,7 +20,7 @@
 @10004 = ~ ; ~
 @10006 = ~Multiplié par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
-@10009 = ~^[0-9]+ % de chance ~
+@10009 = ~^[0-9]+ % de chances ~
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
@@ -34,6 +34,7 @@
 @100007 = ~%name% %ofTheTarget%%colon%%value%~
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
+@100019 = ~%value% en %attribute%~
 @100020 = ~les~
 @100021 = ~et~
 @100030 = ~École~
@@ -49,15 +50,15 @@
 @101079 = ~Arc~
 @101080 = ~Arbalète~
 @101081 = ~Fronde~
-@101082 = ~Arme de jet~
+@101082 = ~Arme de trait~
 @101083 = ~Arme à 1 main~
 @101084 = ~Arme à 2 mains~
 @101090 = ~Personnage d'alignement~
 @101092 = ~points de dégâts~
 @101123 = ~%name% %target%%colon%%value%~
 @101124 = ~Capacité %abilityNumber%~
-@101125 = ~%probability% de chance %description%~
-@101126 = ~%probability% de chance~
+@101125 = ~%probability% de chances %description%~
+@101126 = ~%probability% de chances~
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
@@ -825,7 +826,7 @@
 @400056 = ~à l'inversion d'alignement~
 @400057 = ~au changement d'alignement~
 @400058 = ~à la dissipation de la magie~
-@400059 = ~à la modification du score de déplacement silencieux~
+@400059 = ~à la modification du score de Furtivité~
 @400060 = ~à l'échec d'incantation des sorts~
 @400061 = ~~ // Opcode visuel
 @400062 = ~à la mémorisation de sorts divins supplémentaires~
@@ -841,14 +842,14 @@
 @400072 = ~à la modification des attributs~
 @400073 = ~à la modification des dégâts d'attaque~
 @400074 = ~à la cécité~
-@400075 = ~à la dissipation de la cécité~
+@400075 = ~à la guérison de la cécité~
 @400076 = ~à la débilité mentale~
-@400077 = ~à la dissipation de la débilité mentale~
+@400077 = ~à la guérison de la débilité mentale~
 @400078 = ~à la maladie~
-@400079 = ~à la dissipation des maladies et de la débilité mentale~
+@400079 = ~à la guérison des maladies et de la débilité mentale~
 @400080 = ~à la surdité~
-@400081 = ~à la dissipation de la surdité~
-@400082 = ~au changement de script~
+@400081 = ~à la guérison de la surdité~
+@400082 = ~au changement d'IA~
 @400083 = ~à la protection contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @400084 = ~à la modification de la résistance au feu magique~
 @400085 = ~à la modification de la résistance au froid magique~
@@ -881,7 +882,7 @@
  @400112 = ~aux effets qui retirent des objets de l'inventaire~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
 @400113 = ~~ // Sans effet
 @400114 = ~à l'identification d'objet~
-@400115 = ~à la détection de l'alignement~
+@400115 = ~à la détection des alignements~
 @400116 = ~à la dissipation de l'invisibilité~
 @400117 = ~à la clairvoyance~
 @400118 = ~~ // Sans effet
@@ -916,7 +917,7 @@
 @400147 = ~à la retranscription des sorts~
 @400148 = ~aux effets qui lancent des sorts sur une zone~
 @400149 = ~~ // Sans effet
-@400150 = ~à la modification du score de détection des pièges~
+@400150 = ~à la modification du score de Détection des pièges~
 @400151 = ~à la permutation de créature~
 @400152 = ~~ // Opcode visuel
 @400153 = ~au sanctuaire~
@@ -1041,9 +1042,9 @@
 @400272 = ~aux effets activant des sorts à intervalle régulier~
 @400273 = ~~ // Non pertinent
 @400274 = ~à la téléportation auprès d'un adversaire aléatoire~
-@400275 = ~à la modification du score de se cacher dans l'ombre~
-@400276 = ~à la modification du score de détection des illusions~
-@400277 = ~à la modification du score de pose de pièges~
+@400275 = ~à la modification du score de Se cacher dans l'ombre~
+@400276 = ~à la modification du score de Détection des illusions~
+@400277 = ~à la modification du score de Pose de pièges~
 @400278 = ~à la modification du TAC0~
 @400279 = ~au déblocage des compétences actives~
 @400280 = ~au changement du déclenchement des hiatus entropiques~ // -_-'
@@ -1180,7 +1181,7 @@
 @401056 = ~les effets provoquant l'inversion d'alignement~
 @401057 = ~les effets provoquant le changement d'alignement~
 @401058 = ~les effets dissipant la magie~
-@401059 = ~les effets modifiant le score de Déplacement silencieux~
+@401059 = ~les effets modifiant le score de Furtivité~
 @401060 = ~les effets altérant l'échec d'incantation des sorts~
 @401061 = ~~ // Opcode visuel
 @401062 = ~les effets permettant la mémorisation de sorts divins supplémentaires~
@@ -1203,7 +1204,7 @@
 @401079 = ~les effets dissipant les maladies et la débilité mentale~
 @401080 = ~les effets provoquant la surdité~
 @401081 = ~les effets dissipant la surdité~
-@401082 = ~les effets provoquant un changement de script~
+@401082 = ~les effets provoquant un changement d'IA~
 @401083 = ~les effets protégeant contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @401084 = ~les effets modifiant la résistance au feu magique~
 @401085 = ~les effets modifiant la résistance au froid magique~
@@ -1702,14 +1703,14 @@
 
 // Opcode 4: Cure: Berserking [4]
 
-@10040001 = ~Apaise %theTarget%~
-@10040002 = ~d'apaiser %theTarget%~
+@10040001 = ~Calme %theTarget%~
+@10040002 = ~de calmer %theTarget%~
 
 // Opcode 5: Charm: Charm Specific Creature [5]
 
 @10050001 = ~Charme %theTarget%~
 @10050002 = ~de charmer %theTarget%~
-@10050003 = ~Charme universel sur %theTarget%~
+@10050003 = ~Domination sur %theTarget%~
 
 // Opcode 6: Stat: Charisma Modifier [6]
 
@@ -1773,9 +1774,9 @@
 // Opcode 14: Graphics: Defrost [14]
 
 // TODO
-@10140001 = ~Décongélation~
-@10140002 = ~de décongeler %theTarget%~
-@10140003 = ~Décongèle %theTarget%~
+@10140001 = ~Dégel~
+@10140002 = ~de dégeler %theTarget%~
+@10140003 = ~Dégèle %theTarget%~
 
 // Opcode 15: Stat: Dexterity Modifier [15]
 
@@ -1841,7 +1842,7 @@
 
 // Opcode 21: Stat: Lore Modifier [21]
 
-@10210001 = ~Connaissance~
+@10210001 = ~Connaissances~
 @10210002 = ~les connaissances~
 
 // Opcode 22: Stat: Cumulative Luck Bonus [22]
@@ -2243,17 +2244,17 @@
 // Opcode 90: Stat: Open Locks Modifier [90]
 
 @10900001 = ~Crochetage de serrures~
-@10900002 = ~le crochetage de serrures~
+@10900002 = ~le score de Crochetage de serrures~
 
 // Opcode 91: Stat: Find Traps Modifier [91]
 
 @10910001 = ~Détection / Désamorçage des pièges~
-@10910002 = ~la détection / désamorçage des pièges~
+@10910002 = ~le score de Détection / Désamorçage des pièges~
 
 // Opcode 92: Stat: Pick Pockets Modifier [92]
 
 @10920001 = ~Vol à la tire~
-@10920002 = ~le vol à la tire~
+@10920002 = ~le score de Vol à la tire~
 
 // Opcode 93: Stat: Fatigue Modifier [93]
 
@@ -2262,8 +2263,8 @@
 
 // Opcode 94: Stat: Drunkenness Modifier [94]
 
-@10940001 = ~Ivresse~
-@10940002 = ~l'ivresse~
+@10940001 = ~Ébriété~
+@10940002 = ~l'ébriété~
 
 // Opcode 95: Tracking Skill Modifier [95]
 
@@ -3179,8 +3180,8 @@
 
 // Opcode 245: Check For Berserk [245]
 
-@12450001 = ~Chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
-@12450002 = ~que chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
+@12450001 = ~Chaque attaque réussie a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
+@12450002 = ~que chaque attaque réussie a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
 
 // Opcode 246: Spell Effect: Berserking [246]
 
@@ -3189,8 +3190,8 @@
 
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Apaise %theTarget%~
-@12470002 = ~d'apaiser %theTarget%~
+@12470001 = ~Calme %theTarget%~
+@12470002 = ~de calmer %theTarget%~
 
 // Opcode 248: Item: Set Melee Effect [248]
 
@@ -3307,18 +3308,18 @@
 
 // Opcode 275: Stat: Hide in Shadows Modifier [275]
 
-@12750001 = ~Camouflage dans l'ombre~
-@12750002 = ~le camouflage dans l'ombre~
+@12750001 = ~Se cacher dans l'ombre~
+@12750002 = ~le score de Se cacher dans l'ombre~
 
 // Opcode 276: Stat: Detect Illusion Modifier [276]
 
 @12760001 = ~Détection des illusions~
-@12760002 = ~la détection des illusions~
+@12760002 = ~le score de Détection des illusions~
 
 // Opcode 277: Stat: Set Traps Modifier [277]
 
 @12770001 = ~Pose de pièges~
-@12770002 = ~la pose de pièges~
+@12770002 = ~le score de Pose de pièges~
 
 // Opcodre 278: Stat: To Hit Modifier [278]
 
