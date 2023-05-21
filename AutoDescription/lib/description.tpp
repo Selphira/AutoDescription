@@ -10,16 +10,24 @@ BEGIN
 	PATCH_IF count > 0 BEGIN
         SORT_ARRAY_INDICES ~%arrayName%~ NUMERICALLY
 		LPF ~appendSection~ STR_VAR string = ~%title%~ RET description END
-
-	    PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
-	        PATCH_IF value MODULO 2 == 1 BEGIN
-				LPF ~appendProperty~ INT_VAR indentation_num = value / 2 STR_VAR name = EVAL ~%data_5%~ RET description END
-			END
-			ELSE PATCH_IF value MODULO 2 == 0 BEGIN
-				LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
-			END
-	    END
+		LPF ~add_items_section_to_description~ STR_VAR arrayName RET description END
 	END
+END
+
+DEFINE_PATCH_FUNCTION ~add_items_section_to_description~
+	STR_VAR
+		arrayName = ~~
+	RET
+		description
+BEGIN
+    PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
+        PATCH_IF value MODULO 2 == 1 BEGIN
+			LPF ~appendProperty~ INT_VAR indentation_num = value / 2 STR_VAR name = EVAL ~%data_5%~ RET description END
+		END
+		ELSE PATCH_IF value MODULO 2 == 0 BEGIN
+			LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
+		END
+    END
 END
 
 DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET description BEGIN
