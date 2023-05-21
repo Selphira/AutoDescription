@@ -421,7 +421,7 @@ BEGIN
 								SET strref = 102010 + value
 								SPRINT string_value (AT ~%strref%~)
 								LPF ~get_combat_attribute_name~ INT_VAR strref = 102005 count STR_VAR array_name RET name END // ~Type de dégâts~
-								LPF ~appendValue~ STR_VAR name value = string_value RET description END
+								LPF ~appendValue~ STR_VAR name value = ~%string_value%~ RET description END
 								SET found = 1
 							END
 						END
