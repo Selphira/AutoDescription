@@ -17,10 +17,10 @@ DEFINE_PATCH_FUNCTION ~needs~ RET description BEGIN
 
  	LPF ~needs_attribute~ INT_VAR value = minLevel strref = 10960001 RET countNeeds RET_ARRAY needs END
  	LPF ~needs_attribute~ INT_VAR value = minStrength bonus = minStrengthBonus strref = 10440001 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minIntelligence strref = 10190001 RET countNeeds RET_ARRAY needs END
  	LPF ~needs_attribute~ INT_VAR value = minDexterite strref = 10150001 RET countNeeds RET_ARRAY needs END
- 	LPF ~needs_attribute~ INT_VAR value = minWisdom strref = 10490001 RET countNeeds RET_ARRAY needs END
  	LPF ~needs_attribute~ INT_VAR value = minConstitution strref = 10100001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minIntelligence strref = 10190001 RET countNeeds RET_ARRAY needs END
+ 	LPF ~needs_attribute~ INT_VAR value = minWisdom strref = 10490001 RET countNeeds RET_ARRAY needs END
  	LPF ~needs_attribute~ INT_VAR value = minCharisma strref = 10060001 RET countNeeds RET_ARRAY needs END
 
  	PATCH_IF countNeeds > 0 BEGIN
