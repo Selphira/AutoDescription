@@ -12872,6 +12872,9 @@ BEGIN
 					ELSE PATCH_IF ("%resref%" STRING_MATCHES_REGEXP "^\(DEVAGOOD\|DEVAEVIL\|PLANGOOD\|PLANEVIL\)$") == 0 OR ((allegiance <= 15 AND allegiance != 3) AND gender == 5 AND (animation == 0x7F3B OR animation == 0x7F3C)) BEGIN
 						SET limit = limitNormal
 					END
+					PATCH_IF count == 0 BEGIN
+						SET count = 1
+					END
 					PATCH_IF count > limit BEGIN
 						SET count = limit
 					END
