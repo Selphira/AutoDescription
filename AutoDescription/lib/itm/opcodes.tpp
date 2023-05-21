@@ -586,7 +586,8 @@ END
 // TODO: à clarifier ou retirer
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	 20 => 1 // Invisibilité
-	122 => 1 // Item: Create Inventory Item [122]
+	 94 => 1 // // Stat: Drunkenness Modifier [94]
+	122 => 1 // // Item: Create Inventory Item [122]
 	127 => 1 // Summon: Monster Summoning
 	146 => 1 // Spell: Cast Spell (at Creature)
 	148 => 1 // Spell: Cast Spell (at Point)
@@ -594,10 +595,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	214 => 1 // Spell Effect: Select Spell
 	218 => 1 // Protection: Stoneskin
 	236 => 1 // Spell Effect: Image Projection
-	274 => 1 // Spell Effect: Teleport to Target [274]
+	274 => 1 // // Spell Effect: Teleport to Target [274]
 	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
 	331 => 1 // Summon: Random Monster Summoning
-	519 => 1 // Arme brisée
+	519 => 1 // // Arme brisée
 END
 
 // Opcodes qui sont dissipés par la mort (directement ou indirectement)
