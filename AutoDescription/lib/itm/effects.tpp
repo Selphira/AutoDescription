@@ -308,7 +308,7 @@ DEFINE_PATCH_MACRO ~add_cumulable~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_target_exceptions~ BEGIN
-	PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~opcode_324_target_exceptions~ STR_VAR list = ~%target_exceptions%~ RET target_exceptions END
 		PATCH_IF NOT ~%target_exceptions%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% (%target_exceptions%)~
