@@ -63,6 +63,7 @@
 @101128 = ~%classname% and their kits~
 @101129 = ~Sorcerer~
 @101130 = ~between %amountMin% and %amountMax%~
+@101131 = ~Use~
 @101185 = ~%description% (not cumulative)~
 
 // Niveau des sorts

@@ -84,6 +84,9 @@ BEGIN
 	END
 
 	LPF ~appendLine~         RET description END
+	PATCH_IF itemType == ITM_TYPE_potion OR itemType == ITM_TYPE_dart BEGIN
+		LPF ~uses~ RET description END
+	END
 	LPF ~weight~             RET description END
 	LPF ~needs~              RET description END
 	LPF ~usability~          RET description END

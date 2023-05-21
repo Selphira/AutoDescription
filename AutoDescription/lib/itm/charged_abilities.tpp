@@ -94,10 +94,6 @@ BEGIN
 		SORT_ARRAY_INDICES lines NUMERICALLY
 
 		PATCH_IF itemType == ITM_TYPE_potion BEGIN
-			LPF ~get_charged_string~ INT_VAR charges depletion RET chargeStr END
-			LPF ~ucfirst~ STR_VAR value = ~%chargeStr%~ RET string END
-			LPF ~appendLine~ STR_VAR string RET description END
-			LPF ~appendLine~ RET description END
 			LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
             INNER_PATCH_SAVE description ~%description%~ BEGIN
                 REPLACE_TEXTUALLY EVALUATE_REGEXP ~- %crlf%~ ~~
@@ -116,10 +112,8 @@ BEGIN
 		ELSE PATCH_IF isAmmo AND countHeaders == 1 BEGIN
 			SPRINT title @100011 // ~Capacités de combat~
 			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
-			// désindenter
-			// pas de "usage unique"
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF (itemType != ITM_TYPE_dart OR (itemType == ITM_TYPE_dart AND countHeaders > 1)) BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
 			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
 		END
