@@ -2453,6 +2453,10 @@ DEFINE_PATCH_MACRO ~opcode_target_33~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10330001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la paralysie, la mort et les poisons~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_33~ BEGIN
+	LPM ~opcode_self_probability_33~
+END
+
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	PATCH_IF is_ee BEGIN
 		LPM ~opcode_modstat3_is_valid~
@@ -2492,6 +2496,10 @@ DEFINE_PATCH_MACRO ~opcode_target_34~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10340001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les baguettes, les sceptres et les bâtons~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_34~ BEGIN
+	LPM ~opcode_self_probability_34~
+END
+
 DEFINE_PATCH_MACRO ~opcode_34_is_valid~ BEGIN
 	LPM ~opcode_33_is_valid~
 END
@@ -2513,6 +2521,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_35~ BEGIN
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10350001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre la pétrification et la métamorphose~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_35~ BEGIN
+	LPM ~opcode_self_probability_35~
 END
 
 DEFINE_PATCH_MACRO ~opcode_35_is_valid~ BEGIN
@@ -2538,6 +2550,10 @@ DEFINE_PATCH_MACRO ~opcode_target_36~ BEGIN
 	LPF ~opcode_save_vs~ INT_VAR strref = 10360001 STR_VAR value = EVAL ~%parameter1%~ target = 1 RET description END // ~contre les souffles~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_36~ BEGIN
+	LPM ~opcode_self_probability_36~
+END
+
 DEFINE_PATCH_MACRO ~opcode_36_is_valid~ BEGIN
 	LPM ~opcode_33_is_valid~
 END
@@ -2559,6 +2575,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_37~ BEGIN
 	SET parameter2 = parameter2 MODULO 3
 	LPF ~opcode_save_vs~ INT_VAR strref = 10370001 target = 1 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~contre les sorts~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_37~ BEGIN
+	LPM ~opcode_self_probability_37~
 END
 
 DEFINE_PATCH_MACRO ~opcode_37_is_valid~ BEGIN
@@ -10832,8 +10852,16 @@ END
 /* ------------------------- *
  * Spell: Magical Rest [316] *
  * ------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_316~ BEGIN
+	SPRINT description @13160002 // ~Repose %theTarget%~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_316~ BEGIN
 	SPRINT description @13160001 // ~de reposer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_316~ BEGIN
+	LPM ~opcode_self_316~ // ~Repose %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_316~ BEGIN
@@ -12362,6 +12390,16 @@ DEFINE_PATCH_MACRO ~opcode_self_522~ BEGIN
 	SPRINT value ~%parameter1%/%parameter2%~
 	SPRINT value @10010 // ~Passe à %value%~
 	SPRINT description @100001 // ~%name%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_522~ BEGIN
+	LOCAL_SPRINT theStatistic @10440002 // ~la force~
+	LOCAL_SPRINT value ~~
+	PATCH_IF parameter2 == 100 BEGIN
+		SPRINT parameter2 ~00~
+	END
+	SPRINT value ~%parameter1%/%parameter2%~
+	SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
