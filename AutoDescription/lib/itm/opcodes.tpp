@@ -182,6 +182,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	223 => 254 // Spell: Immunity (by School, decrementing [223]
 	226 => 255 // Spell: Immunity (by Secondary Type, decrementing) [226]
 	206 => 256 // Spell: Protection from Spell [206]
+	518 => 256 // Fake: Immunité aux sorts [518]
 
 	367 => 279 // Minimum base stats [367]
 	100 => 280 // Protection: from Creature Type [100]
@@ -8132,6 +8133,59 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	END
 END
 
+// Traitement des immunités aux sortilèges qui n'auraient pas été supprimées par les précédents regroupements
+DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
+	LOCAL_SET count = 0
+	LOCAL_SPRINT and @100021 // ~et~
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_206_positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_206_positions_already_check~ BEGIN END
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) BEGIN
+			SET searchTarget = target
+			SET searchTimingMode = timingMode
+			SET searchDuration = duration
+			CLEAR_ARRAY opcode_206_positions
+			SET $opcode_206_positions(~%position%~) = opcode
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) AND searchTarget == target AND searchTimingMode == timingMode AND searchDuration == duration BEGIN
+					LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+
+					PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+						SET $spellList(~%spellName%~) = 1
+						SET $opcode_206_positions_already_check(~%position%~) = opcode
+						SET $opcode_206_positions(~%position%~) = opcode
+					END
+				END
+			END
+			SET count = 0
+			PATCH_PHP_EACH spellList AS spellName => _ BEGIN
+				SET count += 1
+			END
+			PATCH_IF count > 1 BEGIN
+				PATCH_PHP_EACH opcode_206_positions AS position => opcode BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~position = %position%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~206~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_206~
+		        END
+				SORT_ARRAY_INDICES spellList
+				SET opcode = 518
+				LPF ~implode~ STR_VAR array_name = ~spellList~ glue = ~, ~ final_glue = ~ %and% ~ RET custom_str = text END
+				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_206_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
@@ -12424,6 +12478,28 @@ DEFINE_PATCH_MACRO ~opcode_510_common~ BEGIN
 	END
 
 	SPRINT description (AT strref)
+END
+
+/* ------------------------ *
+ * Immunité aux sorts [518] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_518~ BEGIN
+	LOCAL_SPRINT spellNames ~%custom_str%~
+	SPRINT description @15180001 // ~Immunité aux sorts %spellNames%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_518~ BEGIN
+	LOCAL_SPRINT spellNames ~%custom_str%~
+	SPRINT description @15180003 // ~d'immuniser %theTarget% au sorts %spellNames%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_518~ BEGIN
+	LOCAL_SPRINT spellNames ~%custom_str%~
+	SPRINT description @15180002 // ~Immunise %theTarget% aux sorts %spellNames%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_518~ BEGIN
+	LPM ~opcode_self_probability_518~
 END
 
 /* ----------------- *
