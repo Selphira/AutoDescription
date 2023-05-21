@@ -36,6 +36,8 @@ BEGIN
 	END
 
 	PATCH_IF canUpdateSpell BEGIN
+		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
+
 		LPF ~get_spell_description~ STR_VAR originalDescription spellName RET description END
 
 		// Si l'utilisateur a choisi d'enregistrer la description des sorts dans ses fichiers
@@ -57,6 +59,8 @@ DEFINE_PATCH_FUNCTION ~get_spell_description~
 	RET
 		description
 BEGIN
+	SET isItem = 0
+	SET isSpell = 1
 	READ_LONG  SPL_extended_headers_offset headerOffset
 	READ_SHORT SPL_extended_headers_count  headerCount
 
@@ -65,7 +69,6 @@ BEGIN
 
 	SET ignoreDuration = 0
 
-	SPRINT parameters @100003  // ~PARAMÈTRES~
 	SPRINT description ~%spellName%%crlf%~
 
 	LPF ~spell_school~ RET description END
@@ -79,10 +82,18 @@ BEGIN
 	SPRINT description ~%description%%crlf%%crlf%%roleplayDescription%~
 
 	PATCH_IF add_statistics_section_to_spell_description BEGIN
-		LPF ~appendSection~ STR_VAR string = ~%parameters%~ RET description END
+		LPF ~appendSection~ INT_VAR strref = 100003 RET description END // ~PARAMÈTRES~
+        LPF ~appendLine~ RET description END
 
 		LPF ~add_casting_features~ STR_VAR description RET description END
-		LPF ~add_extended_effects~ STR_VAR description RET description END
+		// TODO: Cette variable est utilisée à plusieurs endroits...  Trouver une meilleure solution
+		SET abilityType = ~-1~
+		LPF ~get_spell_effects_description~ STR_VAR description RET description END
+	END
+
+	INNER_PATCH_SAVE description ~%description%~ BEGIN
+		// Supprime les lignes vides consécutives
+		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%crlf%%crlf%%crlf%\)+~ ~%crlf%%crlf%~
 	END
 END
 
