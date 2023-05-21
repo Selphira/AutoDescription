@@ -72,11 +72,14 @@ BEGIN
 	LPF ~is_robe~ INT_VAR itemType RET isRobe END
 	LPF ~is_ammo~ INT_VAR itemType RET isAmmo END
 
-	LPF ~add_equipped_abilities~ STR_VAR description RET description END
+	LPF ~add_equipped_abilities~ STR_VAR description RET description countGlobalLines RET_ARRAY globalLines END
 	LPF ~add_charged_abilities~ STR_VAR description RET description END
 	LPF ~add_combat_abilities~ STR_VAR description RET description END
 
-	PATCH_IF isWeapon == 1 BEGIN
+	PATCH_IF isArmor == 1 BEGIN
+		LPF ~add_global_effects_to_description~ RET description END
+	END
+	ELSE PATCH_IF isWeapon == 1 BEGIN
 		LPF ~proficiency~ RET description END
 	END
 

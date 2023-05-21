@@ -1656,6 +1656,7 @@
 @10000013 = ~vs. crushing, slashing and piercing attacks~ // FIXME: contre les armes de mêlée ?
 @10000014 = ~vs. slashing, piercing and missile attacks~
 
+@10000099 = ~Armor Class Bonus~
 @10000100 = ~Base Armor Class~
 @10000101 = ~%value% bonus~
 @10000102 = ~%value% penalty~
@@ -4080,6 +4081,10 @@
 // Fake Opcode 520: Protection: Action libre [520]
 
 @15200001 = ~Free action~
+
+// Fake Opcode 521: Protection: Aucune protection [521]
+
+@15210001 = ~No protection %versus%~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

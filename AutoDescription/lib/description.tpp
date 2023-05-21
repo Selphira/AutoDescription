@@ -21,13 +21,27 @@ DEFINE_PATCH_FUNCTION ~add_items_section_to_description~
 		description
 BEGIN
     PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
-        PATCH_IF value MODULO 2 == 1 BEGIN
+        PATCH_IF value == 100 BEGIN
+            LPF ~appendLine~ STR_VAR string = EVAL ~%data_5%~ RET description END
+        END
+        ELSE PATCH_IF value MODULO 2 == 1 BEGIN
 			LPF ~appendProperty~ INT_VAR indentation_num = value / 2 STR_VAR name = EVAL ~%data_5%~ RET description END
 		END
 		ELSE PATCH_IF value MODULO 2 == 0 BEGIN
 			LPF ~appendSubProperty~ STR_VAR name = EVAL ~%data_5%~ RET description END
 		END
     END
+END
+
+DEFINE_PATCH_FUNCTION ~add_global_effects_to_description~
+	RET
+		description
+BEGIN
+	PATCH_IF countGlobalLines > 0 BEGIN
+        SORT_ARRAY_INDICES ~globalLines~ NUMERICALLY
+        LPF ~appendLine~ RET description END
+		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~globalLines~ RET description END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET description BEGIN

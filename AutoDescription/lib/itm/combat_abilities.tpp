@@ -385,6 +385,7 @@ BEGIN
 	SPRINT damageNone @10015 // ~Aucun~
 
     LPF ~appendLine~ RET description END
+    LPF ~add_global_effects_to_description~ RET description END
 
 	// Enchantement
 	LPF ~array_count~ STR_VAR array_name = ~enchantments~ RET count END

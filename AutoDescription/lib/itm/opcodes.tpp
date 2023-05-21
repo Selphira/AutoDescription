@@ -38,6 +38,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	  0 => 14  // Stat: AC vs. Damage Type Modifier [0]
 	506 => 15  // Stat: Classe d'armure cumulable
  219000 => 16  // Stat: AC vs. Creature Type Modifier [219]
+	521 => 17  // Protection: Aucune protection [521]
 
 	  1 => 17  // Stat: Attacks Per Round Modifier [1]
 
@@ -690,8 +691,12 @@ OUTER_SET AbilityType_Equipped = 3
 DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
+	LOCAL_SPRINT name @10000099 // ~Classe d'armure~
 
-	PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT value ~%custom_str%~
+	END
+	ELSE PATCH_IF parameter2 != AC_MOD_TYPE_set_base BEGIN
 		LPM ~opcode_0_get_value~
 		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
@@ -699,10 +704,7 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 			SPRINT value ~%value% %versus%~
 		END
 	END
-
-	SPRINT name @102008 // ~Classe d'armure~
-
-	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+	ELSE BEGIN
 		SPRINT name @10000100  // ~Classe d'armure de base~
 	END
 
@@ -750,7 +752,7 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	END
 
 	PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @102008        // ~Classe d'armure~
+		SPRINT name @10000099      // ~Classe d'armure~
 		SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 	END
 END
@@ -792,10 +794,185 @@ DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
 	END
 END
 
-// Association des classes d'armure V1
+// Association des classes d'armure V2
 DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
-	SET group = 0
+	LOCAL_SET value = 0
+	LOCAL_SET baseClassArmor = 0
+	LOCAL_SET allClassArmor = 0
+	LOCAL_SET hasBaseClassArmor = 0
+	LOCAL_SPRINT classArmorValue ~~
+	LOCAL_SPRINT and @100021 // ~et~
+	LOCAL_SPRINT the @11770200 // ~les~
+	LOCAL_SPRINT andThe @11770201 // ~et les~
 	DEFINE_ASSOCIATIVE_ARRAY ~opcode_0_CA~ BEGIN END
+	DEFINE_ASSOCIATIVE_ARRAY ~opcode_0_CA_values~ BEGIN END
+	DEFINE_ASSOCIATIVE_ARRAY ~opcode_0_no_protect_values~ BEGIN END
+	DEFINE_ASSOCIATIVE_ARRAY ~opcode_219000_CA_values~ BEGIN END
+
+	PATCH_IF shrink_class_armor BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self BEGIN
+				PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+					SET baseClassArmor = parameter1
+					SET hasBaseClassArmor = 1
+				END
+				ELSE PATCH_IF parameter2 == AC_MOD_TYPE_all BEGIN
+					SET allClassArmor += parameter1
+				END
+				ELSE PATCH_IF parameter2 == AC_MOD_TYPE_crushing OR
+		                parameter2 == AC_MOD_TYPE_missile OR
+		                parameter2 == AC_MOD_TYPE_piercing OR
+		                parameter2 == AC_MOD_TYPE_slashing BEGIN
+					SET newValue = parameter2
+					PATCH_IF VARIABLE_IS_SET $opcode_0_CA(~%parameter1%~) BEGIN
+						SET currentValue = $opcode_0_CA(~%parameter1%~)
+						// Que faire des doublons ?
+						SET newValue = currentValue | parameter2
+					END
+					SET $opcode_0_CA(~%parameter1%~) = newValue
+                END
+			END
+		END
+
+		PATCH_PHP_EACH EVAL ~opcodes_219000~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self BEGIN
+				PATCH_IF VARIABLE_IS_SET $ids_files(~%parameter2%~) BEGIN
+                    LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET idName END
+                    SET $opcode_219000_CA_values(~%idName%~) = 1
+                END
+                ELSE BEGIN
+                    LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
+                END
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 219000
+                    STR_VAR expression = ~position = %position%~
+                    RET $opcodes(~219000~) = count
+                    RET_ARRAY EVAL ~opcodes_219000~ = opcodes_xx
+                END
+			END
+		END
+		LPF ~implode~ STR_VAR array_name = ~opcode_219000_CA_values~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
+
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			// Ne pas prendre en compte la classe d'armure de base dans le regroupement
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND (isArmor OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+		END
+		// Bug où il reste toujours un item dans le tableau si c'était le dernier
+		// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+		PATCH_IF $opcodes(~0~) == 0 BEGIN
+            CLEAR_ARRAY ~opcodes_0~
+        END
+		// Créer la donnée à ajouter en tant qu'attribut de l'objet !!
+		SORT_ARRAY_INDICES ~opcode_0_CA~ NUMERICALLY
+
+		PATCH_IF isArmor AND hasBaseClassArmor BEGIN
+			SET baseClassArmor -= allClassArmor
+			SPRINT classArmorValue ~%baseClassArmor%~
+			PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+				SET value = baseClassArmor - amount
+				SET strref = 10000000 + armorType
+				LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
+				PATCH_IF amount == 2 BEGIN
+                    PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+                        INNER_PATCH_SAVE versus ~%versus%~ BEGIN
+                            REPLACE_TEXTUALLY ~ %and% ~ ~ ,~
+                        END
+                        SPRINT versus ~%versus%, %the% %targetType%~
+                    END
+                END
+				SPRINT value ~%value% %versus%~
+				SET $opcode_0_CA_values(~%value%~) = 1
+			END
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+				SET value = baseClassArmor - 2
+				SPRINT versus @102387 // ~contre les %targetType%~
+				SPRINT value ~%value% %targetType%~
+				SET $opcode_0_CA_values(~%value%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~opcode_0_CA_values~ glue = ~, ~ final_glue = ~, ~ RET classArmorValues = text END
+			PATCH_IF NOT ~%classArmorValues%~ STRING_EQUAL ~~ BEGIN
+				SPRINT classArmorValue ~%classArmorValue% (%classArmorValues%)~
+			END
+			// Création d'un opcode dont la description de l'effet sera ajoutée à la description globale de l'objet, et non plus à la description de la section
+			SET opcode = 1000
+			SPRINT custom_str ~%classArmorValue%~
+            LPM ~add_opcode~
+			SET opcode = 0
+		END
+		ELSE BEGIN
+			PATCH_IF allClassArmor != 0 BEGIN
+				LPF ~signed_value~ INT_VAR value = allClassArmor RET value END
+				SPRINT classArmorValue ~%value%~
+			END
+			PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+				SET value = allClassArmor + amount
+				SET strref = 10000000 + armorType
+				LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
+				PATCH_IF amount == 2 BEGIN
+					PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+						INNER_PATCH_SAVE versus ~%versus%~ BEGIN
+							REPLACE_TEXTUALLY ~ %and% ~ ~ ,~
+						END
+						SPRINT versus ~%versus%, %the% %targetType%~
+					END
+				END
+				PATCH_IF value != 0 BEGIN
+					LPF ~signed_value~ INT_VAR value RET value END
+					SET $opcode_0_CA_values(~%value% %versus%~) = 1
+				END
+				ELSE BEGIN
+					SET $opcode_0_no_protect_values(~%versus%~) = 1
+				END
+			END
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+				SET value = allClassArmor + 2
+				SPRINT versus @102387 // ~contre les %targetType%~
+				PATCH_IF value != 0 BEGIN
+					LPF ~signed_value~ INT_VAR value RET value END
+					SET $opcode_0_CA_values(~%value% %versus%~) = 1
+				END
+				ELSE BEGIN
+					SET $opcode_0_no_protect_values(~%versus%~) = 1
+				END
+			END
+
+			LPF ~implode~ STR_VAR array_name = ~opcode_0_no_protect_values~ glue = ~, ~ final_glue = ~, ~ RET noProtectValues = text END
+			PATCH_IF NOT ~%noProtectValues%~ STRING_EQUAL ~~ BEGIN
+				SET opcode = 521
+                SPRINT custom_str ~%noProtectValues%~
+                LPM ~add_opcode~
+			END
+
+			LPF ~implode~ STR_VAR array_name = ~opcode_0_CA_values~ glue = ~, ~ final_glue = ~, ~ RET classArmorValues = text END
+			PATCH_IF NOT ~%classArmorValues%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF NOT ~%classArmorValue%~ STRING_EQUAL ~~ BEGIN
+					SPRINT classArmorValue ~%classArmorValue%, %classArmorValues%~
+				END
+				ELSE BEGIN
+					SPRINT classArmorValue ~%classArmorValues%~
+				END
+			END
+			PATCH_IF NOT ~%classArmorValue%~ STRING_EQUAL ~~ BEGIN
+				// Création d'un opcode dont la description de l'effet sera ajoutée à la description globale de l'objet, et non plus à la description de la section
+				SET opcode = 0
+				SPRINT custom_str ~%classArmorValue%~
+	            LPM ~add_opcode~
+            END
+		END
+	END
+
+	CLEAR_ARRAY opcode_0_CA
+
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF timingMode == TIMING_while_equipped AND (
@@ -6845,6 +7022,7 @@ DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
 	LPF ~implode~ STR_VAR array_name = ~itemNamesList~ glue = ~, ~ final_glue = ~ %and% ~ RET itemNames = text END
 	SET opcode = 180
 	SPRINT custom_str ~%itemNames%~
+	SPRINT resref ~~
 	LPM ~add_opcode~
 END
 
@@ -7864,7 +8042,7 @@ DEFINE_PATCH_MACRO ~opcode_self_219000~ BEGIN
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
 	SPRINT value ~+2 %versus%~
-	SPRINT name @102008        // ~Classe d'armure~
+	SPRINT name @10000099      // ~Classe d'armure~
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
@@ -7872,14 +8050,18 @@ DEFINE_PATCH_MACRO ~opcode_target_219000~ BEGIN
 	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
 
 	SPRINT value ~+2 %versus%~
-	SPRINT name @102008        // ~Classe d'armure~
+	SPRINT name @10000099      // ~Classe d'armure~
 	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
 // Save throws
 DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
-
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT versus ~%custom_str%~
+	END
+	ELSE BEGIN
+		LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	END
 	SPRINT value ~+2 %versus%~
 	SPRINT name @102034        // ~Jets de sauvegarde~
 	SPRINT description @100001 // ~%name%%colon%%value%~
@@ -7891,6 +8073,43 @@ DEFINE_PATCH_MACRO ~opcode_target_219001~ BEGIN
 	SPRINT value ~+2 %versus%~
 	SPRINT name @102034        // ~Jets de sauvegarde~
 	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_219001_group~ BEGIN
+	LOCAL_SPRINT the @11770200 // ~les~
+	LOCAL_SPRINT andThe @11770201 // ~et les~
+	CLEAR_ARRAY targetTypes
+    PATCH_DEFINE_ARRAY targetTypes BEGIN END
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self BEGIN
+			PATCH_IF VARIABLE_IS_SET $ids_files(~%parameter2%~) BEGIN
+                LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET idName END
+                SET $targetTypes(~%idName%~) = 1
+            END
+            ELSE BEGIN
+                LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
+            END
+			LPF ~delete_opcode~
+                INT_VAR opcode
+                STR_VAR expression = ~position = %position%~
+                RET $opcodes(~%opcode%~) = count
+                RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+            END
+		END
+	END
+	// Bug où il reste toujours un item dans le tableau si c'était le dernier
+	// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+	PATCH_IF $opcodes(~219001~) == 0 BEGIN
+        CLEAR_ARRAY ~opcodes_219001~
+    END
+	LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
+
+	PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+		SPRINT custom_str @102387 // ~contre les %targetType%~
+		LPM ~add_opcode~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
@@ -11439,6 +11658,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_520~ BEGIN
 	SPRINT description @15200001 // ~Action libre~
+END
+
+/* ----------------------------------- *
+ * Protection: Aucune protection [521] *
+ * ----------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_521~ BEGIN
+	SPRINT versus ~%custom_str%~
+	SPRINT description @15210001 // ~Ne protège pas %versus%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
