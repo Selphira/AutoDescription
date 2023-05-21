@@ -121,9 +121,11 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" RET description BEGIN
+	SPRINT saving_throw @100036 // ~Jet de sauvegarde~
+
 	// Suppression des lignes techniques
 	INNER_PATCH ~%description%~ BEGIN
-		SPRINT regex ~\(.*\)Jet de sauvegarde\(.*[%MNL%%LNL%%WNL%]*\)*~
+		SPRINT regex ~\(.*\)%saving_throw%\(.*[%MNL%%LNL%%WNL%]*\)*~
 		SPRINT replace ~~
 		REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
 			SPRINT description ~%MATCH0%~
@@ -131,14 +133,15 @@ DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" 
 	END
 
 	INNER_PATCH ~%description%~ BEGIN
-		SPRINT regex ~\(Jet de sauvegarde[^%crlf%]+\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+		SPRINT regex ~\(%saving_throw%[^%crlf%]+\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 		SPRINT find ~~
 		SPRINT replace ~~
 		REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
-			SPRINT find ~%MATCH1%%crlf%%crlf%~
+			SPRINT find ~%MATCH1%~
 		END ~~
 		INNER_PATCH_SAVE description ~%description%~ BEGIN
-			REPLACE_TEXTUALLY ~%find%~ ~~
+			REPLACE_TEXTUALLY ~%find%%crlf%%crlf%~ ~~
+			REPLACE_TEXTUALLY ~%find%%crlf%~ ~~
 		END
 	END
 END
