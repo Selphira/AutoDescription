@@ -5439,9 +5439,6 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
             END
         END
         ELSE BEGIN
-            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
-                REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
-            END
             SPRINT description ~%spellDescription%~
         END
 	END
