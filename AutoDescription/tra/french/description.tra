@@ -136,6 +136,9 @@
 
 // Les différentes cibles
 // FIXME: mettre de l'ordre dans les n°
+@102451 = ~le buveur~
+@102452 = ~du buveur~
+@102453 = ~au buveur~
 @102471 = ~la cible~
 @102472 = ~le porteur~
 @102473 = ~les membres du groupe~
@@ -1793,21 +1796,21 @@
 
 // Opcode 17: HP: Current HP Modifier [17]
 
-@10170001 = ~Soigne %value% point de vie~
-@10170002 = ~Soigne %value% points de vie~
+@10170001 = ~Restaure %value% point de vie~
+@10170002 = ~Restaure %value% points de vie~
 @10170003 = ~Inflige %value% point de dégâts~
 @10170004 = ~Inflige %value% points de dégâts~
-@10170005 = ~de soigner %value% point de vie~
-@10170006 = ~de soigner %value% points de vie~
+@10170005 = ~de restaurer %value% point de vie~
+@10170006 = ~de restaurer %value% points de vie~
 @10170007 = ~d'infliger %value% point de dégâts~
 @10170008 = ~d'infliger %value% points de dégâts~
 
-@10170011 = ~Soigne %value% point de vie %ofTheTarget%~
-@10170012 = ~Soigne %value% points de vie %ofTheTarget%~
+@10170011 = ~Restaure %value% point de vie %toTheTarget%~
+@10170012 = ~Restaure %value% points de vie %toTheTarget%~
 @10170013 = ~Inflige %value% point de dégâts %toTheTarget%~
 @10170014 = ~Inflige %value% points de dégâts %toTheTarget%~
-@10170015 = ~de soigner %value% point de vie %ofTheTarget%~
-@10170016 = ~de soigner %value% points de vie %ofTheTarget%~
+@10170015 = ~de restaurer %value% point de vie %toTheTarget%~
+@10170016 = ~de restaurer %value% points de vie %toTheTarget%~
 @10170017 = ~d'infliger %value% point de dégâts %toTheTarget%~
 @10170018 = ~d'infliger %value% points de dégâts %toTheTarget%~
 
@@ -2363,13 +2366,13 @@
 @11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
 @11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
 @11060004 = ~Immunité à la panique~
-@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~
+@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %parameter1%~
 
 @11060006 = ~de garder le moral %ofTheTarget% au plus haut~
 @11060007 = ~de renforcer le moral %ofTheTarget% de %value%~
 @11060008 = ~d'affaiblir le moral %ofTheTarget% de %value%~
 @11060009 = ~d'immuniser %theTarget% contre la rupture de moral~
-@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
+@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %parameter1%~
 
 // Opcode 108: Stat: Reputation [108]
 

@@ -187,7 +187,7 @@ BEGIN
 			ITM_TYPE_armor ITM_TYPE_shield_not_in_iwd ITM_TYPE_necklace ITM_TYPE_amulet ITM_TYPE_belt ITM_TYPE_girdle
 			ITM_TYPE_boots ITM_TYPE_bracers ITM_TYPE_gauntlets ITM_TYPE_helm ITM_TYPE_ring ITM_TYPE_cloak
 			// Les consommables
-			// ITM_TYPE_potion ITM_TYPE_wand ITM_TYPE_scroll
+			ITM_TYPE_potion //ITM_TYPE_wand ITM_TYPE_scroll
 			// Les munitions
 			ITM_TYPE_arrows ITM_TYPE_bullets ITM_TYPE_bolts
 			BEGIN

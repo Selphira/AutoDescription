@@ -1943,6 +1943,10 @@ END
 /* ------------------ *
  * State: Horror [24] *
  * ------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_24~ BEGIN
+	LPM ~opcode_target_24~
+END
+
 DEFINE_PATCH_MACRO ~opcode_self_probability_24~ BEGIN
 	SPRINT description @10240002 // ~d'infliger Horreur %toTheTarget%~
 END
@@ -4206,7 +4210,7 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 			SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
 		END
 		ELSE BEGIN
-			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %value%~
+			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %parameter1%~
 		END
 	END
 	ELSE BEGIN
@@ -4236,7 +4240,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 			SPRINT description @11060006 // ~de garder le moral %ofTheTarget% au plus haut~
 		END
 		ELSE BEGIN
-			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
+			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %parameter1%~
 		END
 	END
 	ELSE BEGIN
@@ -5387,6 +5391,24 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	PATCH_IF VARIABLE_IS_SET $opcode_target_146_item_revision(~%resref%~) BEGIN
 		SET strref = $opcode_target_146_item_revision(~%resref%~)
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
+		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
+		PATCH_IF count == 1 AND featureCount == 1 BEGIN
+			PATCH_PRINT "%theTarget% %ofTheTarget% %toTheTarget%"
+            LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
+
+            INNER_PATCH_SAVE description ~%effectDescription%~ BEGIN
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
+            END
+			PATCH_PRINT "%description%"
+        END
+        ELSE BEGIN
+            INNER_PATCH_SAVE spellDescription ~%spellDescription%~ BEGIN
+                REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  ~ // Indentation de la description du sort
+            END
+            SPRINT description ~%spellDescription%~
+        END
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
