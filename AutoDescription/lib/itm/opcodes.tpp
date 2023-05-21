@@ -825,6 +825,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 		                parameter2 == AC_MOD_TYPE_piercing OR
 		                parameter2 == AC_MOD_TYPE_slashing BEGIN
 					SET newValue = parameter2
+					SET parameter1 *= ~-1~
 					PATCH_IF VARIABLE_IS_SET $opcode_0_CA(~%parameter1%~) BEGIN
 						SET currentValue = $opcode_0_CA(~%parameter1%~)
 						// Que faire des doublons ?
@@ -879,6 +880,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 			SET baseClassArmor -= allClassArmor
 			SPRINT classArmorValue ~%baseClassArmor%~
 			PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+				SET amount *= ~-1~
 				SET value = baseClassArmor - amount
 				SET strref = 10000000 + armorType
 				LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -893,7 +895,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				SPRINT value ~%value% %versus%~
 				SET $opcode_0_CA_values(~%value%~) = 1
 			END
-			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~-2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 				SET value = baseClassArmor - 2
 				SPRINT versus @102387 // ~contre les %targetType%~
 				SPRINT value ~%value% %targetType%~
@@ -915,6 +917,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				SPRINT classArmorValue ~%value%~
 			END
 			PATCH_PHP_EACH ~opcode_0_CA~ AS amount => armorType BEGIN
+				SET amount *= ~-1~
 				SET value = allClassArmor + amount
 				SET strref = 10000000 + armorType
 				LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -934,7 +937,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 					SET $opcode_0_no_protect_values(~%versus%~) = 1
 				END
 			END
-			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~-2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 				SET value = allClassArmor + 2
 				SPRINT versus @102387 // ~contre les %targetType%~
 				PATCH_IF value != 0 BEGIN
