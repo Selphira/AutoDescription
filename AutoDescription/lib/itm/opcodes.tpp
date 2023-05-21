@@ -5439,7 +5439,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
-		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ RET spellDescription count featureCount END
+		LPF ~get_item_spell_description~ STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET spellDescription count featureCount END
 		PATCH_IF count == 1 AND featureCount == 1 BEGIN
             LPF ~get_single_spell_effect~ INT_VAR forceTarget = 1 forcedProbability = probability STR_VAR file = EVAL ~%resref%~ theTarget ofTheTarget toTheTarget RET effectDescription END
 
@@ -6178,6 +6178,10 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		LPM ~opcode_set_target_strings~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			// On ajoute le (uniquement pour les xxx) derrière chaque sous-effets
+            INNER_PATCH_SAVE description ~%description%~ BEGIN
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%selfTarget%)%crlf%~
+            END
 			SPRINT description ~%description% (%selfTarget%)~
 		END
 	END
