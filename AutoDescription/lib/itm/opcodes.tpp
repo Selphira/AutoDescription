@@ -6079,7 +6079,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		SET strref = $opcode_target_146_item_revision(~%resref%~)
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
-	ELSE PATCH_IF itemType == ITM_TYPE_potion BEGIN
+	ELSE PATCH_IF VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion BEGIN
 		PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
 			SET castingLevel = 0
 		END
@@ -9587,12 +9587,14 @@ END
  * Protection: Spell Trap [259] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_259~ BEGIN
-	SET strref = 12590001 // ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LOCAL_SET strref = 12590001 // ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LOCAL_SET strref_if_amount_0 = 110001
 	LPM ~opcode_259_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_259~ BEGIN
-	SET strref = 12590002 // ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LOCAL_SET strref = 12590002 // ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+	LOCAL_SET strref_if_amount_0 = 110003
 	LPM ~opcode_259_common~
 END
 
