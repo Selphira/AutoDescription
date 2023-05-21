@@ -1808,6 +1808,16 @@
 @10160008 = ~Lance Hâte améliorée sur %theTarget%~
 @10160009 = ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~
 
+@10160011 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round~
+@10160012 = ~Double la vitesse de déplacement et le nombre d'attaques par round~
+@10160013 = ~Double la vitesse de déplacement~
+@10160014 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %ofTheTarget%~
+@10160015 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~
+@10160016 = ~de doubler la vitesse de déplacement %ofTheTarget%~
+@10160017 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round %ofTheTarget%~
+@10160018 = ~Double la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~
+@10160019 = ~Double la vitesse de déplacement %ofTheTarget%~
+
 // Opcode 17: HP: Current HP Modifier [17]
 
 @10170001 = ~Restaure %value% point de vie~
@@ -2098,6 +2108,8 @@
 @10690001 = ~Non-détection~
 @10690002 = ~Lance Non-détection sur %theTarget%~
 @10690003 = ~de lancer Non-détection sur %theTarget%~
+@10690004 = ~Rend %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
+@10690005 = ~de rendre %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
 
 // Opcode 70: Cure: Non-Detection [70]
 

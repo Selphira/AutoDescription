@@ -1599,39 +1599,54 @@ END
  * ----------------- */
 // TODO : parameter2 == 1 : l'APR est arrondie au supérieur, 1 => 1, 3/2 => 2
 DEFINE_PATCH_MACRO ~opcode_self_16~ BEGIN
+	LOCAL_SET strref = 0
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @10160002 // ~Hâte améliorée~
+		SET strref = 10160002 // ~Hâte améliorée~
 	END
 	ELSE PATCH_IF parameter2 == 2 BEGIN
-		SPRINT description @10160003 // ~Hâte (sans bonus d'attaque par round)~
+		SET strref = 10160003 // ~Hâte (sans bonus d'attaque par round)~
 	END
 	ELSE BEGIN
-		SPRINT description @10160001 // ~Hâte~
+		SET strref = 10160001 // ~Hâte~
 	END
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SET strref += 10
+	END
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_16~ BEGIN
+	LOCAL_SET strref = 0
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @10160005 // ~de lancer Hâte améliorée sur %theTarget%~
+		SET strref = 10160005 // ~de lancer Hâte améliorée sur %theTarget%~
 	END
 	ELSE PATCH_IF parameter2 == 2 BEGIN
-		SPRINT description @10160006 // ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~
+		SET strref = 10160006 // ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @10160004 // ~de lancer Hâte sur %theTarget%~
+		SET strref = 10160004 // ~de lancer Hâte sur %theTarget%~
 	END
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SET strref += 10
+	END
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_16~ BEGIN
+	LOCAL_SET strref = 0
 	PATCH_IF parameter2 == 1 BEGIN
-		SPRINT description @10160008 // ~Lance Hâte améliorée sur %theTarget%~
+		SET strref = 10160008 // ~Lance Hâte améliorée sur %theTarget%~
 	END
 	PATCH_IF parameter2 == 2 BEGIN
-		SPRINT description @10160009 // ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~
+		SET strref = 10160009 // ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @10160007 // ~Lance Hâte sur %theTarget%~
+		SET strref = 10160007 // ~Lance Hâte sur %theTarget%~
 	END
+	PATCH_IF NOT use_short_effect_description BEGIN
+		SET strref += 10
+	END
+	SPRINT description (AT strref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_16~ BEGIN
@@ -3252,15 +3267,30 @@ END
  * Protection: From Detection (Non-Detection) [69] *
  * ----------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_69~ BEGIN
-	SPRINT description @10690001 // ~Non-détection~
+	PATCH_IF use_short_effect_description BEGIN
+		SPRINT description @10690001 // ~Non-détection~
+	END
+	ELSE BEGIN
+		SPRINT description @10690004 // ~Rend %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_69~ BEGIN
-	SPRINT description @10690003 // ~de lancer non-détection sur %theTarget%~
+	PATCH_IF use_short_effect_description BEGIN
+		SPRINT description @10690003 // ~de lancer non-détection sur %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10690005 // ~de rendre %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_69~ BEGIN
-	SPRINT description @10690002 // ~Lance non-détection sur %theTarget%~
+	PATCH_IF use_short_effect_description BEGIN
+		SPRINT description @10690002 // ~Lance non-détection sur %theTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @10690004 // ~Rend %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_69~ BEGIN
