@@ -7114,6 +7114,20 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_204~ BEGIN
 	SPRINT description @12040002 // ~de résister aux sorts de l'école %spellSchoolName%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_204~ BEGIN
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12040003 // ~Immunise %theTarget% aux sorts de l'école %spellSchoolName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_204~ BEGIN
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
+
+	SPRINT description @12040004 // ~d'immuniser %theTarget% aux sorts de l'école %spellSchoolName%~
+END
+
 /* --------------------------------------------------- *
  * Spell: Protection from Spell (Secondary Type) [205] *
  * --------------------------------------------------- */
@@ -7127,6 +7141,20 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
 	SPRINT description @12050002 // ~de résister aux sorts %spellSecondaryTypeName%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_205~ BEGIN
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+
+	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12050003 // ~Immunise %theTarget% aus sorts %spellSecondaryTypeName%~
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_205~ BEGIN
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+
+	SPRINT description @12050004 // ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_205_group~ BEGIN
@@ -7174,7 +7202,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12060003 // ~de résister au sort %spellName%~
+		SPRINT description @12060003 // ~d'immuniser %theTarget% au sort %spellName%~
 	END
 END
 
