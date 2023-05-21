@@ -361,8 +361,10 @@ BEGIN
 	        SET $EVAL ~enchantments%enchantment%~(~%index%~) = 0
 	        SET $tac0s(~tac0s%tac0%~) = tac0
 	        SET $EVAL ~tac0s%tac0%~(~%index%~) = 0
-	        SPRINT $damages(~damages%damage%~) ~%damage%~
-	        SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+	        PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
+		        SPRINT $damages(~damages%damage%~) ~%damage%~
+		        SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+	        END
 	        SET $damageTypes(~damageTypes%damageType%~) = damageType
 	        SET $EVAL ~damageTypes%damageType%~(~%index%~) = 0
 	        SET $speedFactors(~speedFactors%speedFactor%~) = speedFactor
