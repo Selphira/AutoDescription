@@ -1951,11 +1951,11 @@
 // Opcode 42: Spell: Wizard Spell Slots Modifier [42]
 
 // FIXME: regrouper les strrefs avec 62
-@10420001 = ~Can memorize an extra %levelStr% wizard spell~
-@10420002 = ~Can memorize %amount% extra %levelStr% wizard spells~
-@10420003 = ~Remove an additional %levelStr% wizard spell~
-@10420004 = ~Delete %amount% of %levelStr% wizard spells~
-@10420005 = ~Double the number of %levelStr% wizard spells that can be memorized~
+@10420001 = ~Memorise an extra level %levelStr% wizard spell~
+@10420002 = ~Memorise %amount% extra level %levelStr% wizard spells~
+@10420003 = ~Remove an extra level %levelStr% wizard spell~
+@10420004 = ~Delete %amount% of level %levelStr% wizard spells~
+@10420005 = ~Double the number of level %levelStr% wizard spells that can be memorized~
 
 // Opcode 43: Cure: Stone to Flesh [43]
 
@@ -3952,9 +3952,9 @@
 
 // Opcode 341: Spell Effect: Change Critical Hit Effect [341]
 
-@13410001 = ~À chaque coup critique~
-@13410002 = ~À chaque coup critique %ofTheTarget%~
-@13410003 = ~À chaque coup critique provoqué avec cette arme~
+@13410001 = ~On a critical hit~
+@13410002 = ~On a critical hit %ofTheTarget%~
+@13410003 = ~On a critical hit caused by this weapon~
 
 @13410020 = ~provoqué avec des %weaponType%~
 
@@ -3998,9 +3998,9 @@
 
 // Opcode 361: Cast spell on critical miss [361]
 
-@13610001 = ~À chaque échec critique~
-@13610002 = ~À chaque échec critique %ofTheTarget%~
-@13610003 = ~À chaque échec critique provoqué avec cette arme~
+@13610001 = ~On a critical miss~
+@13610002 = ~On a critical miss %ofTheTarget%~
+@13610003 = ~On a critical miss caused by this weapon~
 
 // Opcode 362: Critical miss bonus [362]
 
