@@ -16,7 +16,8 @@ ALWAYS
 		END
 	END
 
-	OUTER_SET is_ee = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
+	OUTER_SET is_ee    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
+	OUTER_SET has_eeex = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
 
     ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END
     ACTION_DEFINE_ARRAY arrayReload BEGIN ~description~ END

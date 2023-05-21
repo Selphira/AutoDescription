@@ -6,11 +6,8 @@ DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
-	SET totalSpells += 1
-	PATCH_IF totalSpells MODULO 100 == 0 BEGIN
-		PATCH_PRINT "%totalSpells% spells processed"
-	END
 	PATCH_TRY
+		PATCH_PRINT "Traitement de %SOURCE_FILE%..."
 		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
@@ -66,13 +63,15 @@ BEGIN
 	// On récupère la description roleplay de la description originale
 	LPF ~get_spell_roleplay_description~ STR_VAR description = ~%originalDescription%~ RET roleplayDescription = description END
 
+	SET ignoreDuration = 0
+
 	SPRINT parameters @100003  // ~PARAMÈTRES~
 	SPRINT description ~%spellName%%crlf%~
 
 	LPF ~spell_school~ RET description END
 	LPF ~spell_level~ RET description END
 	LPF ~spell_range~ RET description END
-	LPF ~spell_duration~ RET description END
+	LPF ~spell_duration~ RET description ignoreDuration END
 	LPF ~spell_casting_time~ RET description END
 	LPF ~spell_target~ RET description END
 	LPF ~spell_saving_throw~ RET description END
@@ -83,9 +82,6 @@ BEGIN
 
 	LPF ~add_casting_features~ STR_VAR description RET description END
 	LPF ~add_extended_effects~ STR_VAR description RET description END
-
-	//LPF ~get_item_spell_description~ INT_VAR STR_VAR file = ~%SOURCE_RES%~ RET spellDescription END
-	//SPRINT description ~%description%%crlf%%spellDescription%~
 END
 
 DEFINE_PATCH_FUNCTION ~can_update_spell~

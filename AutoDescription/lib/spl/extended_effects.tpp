@@ -4,25 +4,353 @@ DEFINE_PATCH_FUNCTION ~add_extended_effects~
 	RET
 		description
 BEGIN
+	READ_SHORT SPL_type  spellType
+	READ_LONG  SPL_level spellLevel
 	// Variable utilisée à plusieurs endroits...
 	// TODO: Trouver une meilleure solution
 	SET abilityType = ~-1~
 	SET countHeaders = 0
+	SET count_levels = 0
+
+	CLEAR_ARRAY levels
+
+    PATCH_DEFINE_ARRAY levels BEGIN END
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY common_opcodes BEGIN END
 
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
 		READ_SHORT (headerOffset + SPL_HEAD_target) spellTarget
 
-		LPF ~load_extended_effects~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+		SET $levels(~%count_levels%~) = requiredLevel
+		SET count_levels += 1
 
-		SPRINT title @12320400 // ~À partir du niveau %requiredLevel%~
-		LPF ~add_section_to_description~ INT_VAR count = ~countLines%countHeaders%~ STR_VAR title arrayName = ~lines%countHeaders%~ RET description END
+		LPF ~load_leveled_extended_effects~
+			INT_VAR requiredLevel headerOffset
+			RET EVAL ~count_leveled_opcodes_%requiredLevel%~ = count_leveled_opcodes
+			RET_ARRAY
+				EVAL ~leveled_opcodes_%requiredLevel%~ = leveled_opcodes
+		END
 
 		SET countHeaders += 1
 	END
+
+	// FIXME: SPPR729
+	// TODO: Avant de calculer les descriptions :
+	// - Regrouper les effets dont seule la durée diffère (+ déterminer la formule)
+	// - Regrouper les effets dont seul les dégâts diffèrent (+ déterminer la formule)
+	// - Pour le "à partir du niveau 1", le véritable niveau à prendre en compte pour les calculs est celui où l'on peut apprendre le sort
+	//   Ex: sort de niveau 7 = niveau 14
+	//   Donc avoir un tableau qui fait la correspondance entre niveau du sort => niveau du lanceur
+	//   et ce pour chaque type de sort (mage, prêtre, etc.)
+
+	SET level = $levels(~0~)
+	PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
+		CLEAR_ARRAY effects_to_disabled
+		PATCH_IF opcode >= 0 BEGIN
+		    LPM ~data_to_vars~
+		    // TODO: Si un effet exactement pareil est présent dans les niveaux plus haut, le supprimer des niveaux supérieurs !
+		    // TODO: Modifier la fonction pour qu'elle retourne dans effects_to_disabled tous les effets qui se trouvent dans un niveau supérieur à l'effet en cours.
+		    LPF has_same_effect_in_all_levels
+				INT_VAR
+					match_opcode = opcode
+					match_level = level
+					match_isExternal   = isExternal
+					match_target       = target
+					match_power        = power
+					match_parameter1   = parameter1
+					match_parameter2   = parameter2
+					match_timingMode   = timingMode
+					match_resistance   = resistance
+					match_duration     = duration
+					match_probability  = probability
+					match_probability1 = probability1
+					match_probability2 = probability2
+					match_diceCount    = diceCount
+					match_diceSides    = diceSides
+					match_saveType     = saveType
+					match_saveBonus    = saveBonus
+					match_special      = special
+					match_parameter3   = parameter3
+					match_parameter4   = parameter4
+					match_custom_int   = custom_int
+				STR_VAR
+					match_resref     = ~%resref%~
+					match_resref2    = ~%resref2%~
+					match_resref3    = ~%resref3%~
+					match_custom_str = ~%custom_str%~
+		        RET
+		            inAllLevels
+		            total_durations
+		        RET_ARRAY
+		            effects_to_disabled
+		            all_durations
+		    END
+		    PATCH_IF inAllLevels BEGIN
+		        // TODO: Et si la durée du sort est égale à spéciale, dans les autres cas, pas besoin de recalculer la durée, vu qu'elle ne sera pas affichée
+		        PATCH_IF total_durations > 0 BEGIN
+					PATCH_IF level == 1 BEGIN
+						LPF get_first_level_for_spell RET level = minLevel END
+					END
+
+					LPF ~get_complex_duration~
+						INT_VAR
+							base_level = level
+							base_duration = duration
+						STR_VAR
+							array_name = ~all_durations~
+						RET
+							complex_duration
+					END
+					PATCH_PRINT "Durée complexe: %complex_duration%"
+
+					//TODO: Si complex_duration est vide, ne pas l'utiliser ?
+
+		        END
+				SET $common_opcodes(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~) = opcode
+
+				// On désactive les effets qui se trouvent dans les niveaux plus importants
+				PATCH_PHP_EACH effects_to_disabled AS data => level2 BEGIN
+					// Dépend du type du sort !
+		            LPM ~data_to_vars~
+				    SET $EVAL ~leveled_opcodes_%level2%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~) = ~-1~
+				END
+		    END
+		END
+	END
+
+	LPF ~add_common_opcodes_to_description~ RET description END
+	LPF ~add_leveled_opcodes_to_description~ RET description END
 END
 
+DEFINE_PATCH_FUNCTION ~add_common_opcodes_to_description~
+	RET description
+BEGIN
+	PATCH_PHP_EACH ~common_opcodes~ AS data => opcode BEGIN
+		LPM ~data_to_vars~
+		LPM ~add_opcode~
+	END
+	LPM ~add_common_opcodes_to_description~
+	LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
+END
+
+DEFINE_PATCH_MACRO ~add_common_opcodes_to_description~ BEGIN
+	SET countLines = 0
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 0 BEGIN
+		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		        LPM ~data_to_vars~
+		        //TODO: La cible est implicitement envoyée, il faudrait le faire explicitement
+				//TODO: Ignorer la durée pour tous les opcodes si on a une durée du sort autre que "Spécial" !!
+				LPF ~get_effect_description~ INT_VAR ignoreDuration RET effectDescription = description sort END
+				//LPF ~get_effect_description~ RET effectDescription = description sort END
+				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
+					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+					SET countLines += 1
+				END
+		    END
+	    END
+	END
+
+	LPF ~get_unique_effects~ RET countLines = count RET_ARRAY lines = effects END
+	LPF ~group_probability_effects~ RET countLines = count RET_ARRAY lines = effects END
+END
+
+DEFINE_PATCH_FUNCTION ~add_leveled_opcodes_to_description~
+	RET description
+BEGIN
+	PATCH_PHP_EACH levels AS _ => level BEGIN
+		SET requiredLevel = level
+		LPF ~load_leveled_opcodes~ INT_VAR requiredLevel RET description END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~load_leveled_opcodes~
+	INT_VAR requiredLevel = 0
+	RET description
+BEGIN
+	PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+		PATCH_IF opcode >= 0 BEGIN
+		    LPM ~data_to_vars~
+			LPM ~add_opcode~
+		END
+	END
+
+	PATCH_IF requiredLevel == 1 BEGIN
+		LPF get_first_level_for_spell RET requiredLevel = minLevel END
+	END
+
+	LPM ~add_common_opcodes_to_description~
+	SPRINT title @12320400 // ~À partir du niveau %requiredLevel%~
+	LPF ~add_section_to_description~ INT_VAR count = ~countLines~ STR_VAR title arrayName = ~lines~ RET description END
+END
+
+DEFINE_PATCH_FUNCTION ~load_leveled_extended_effects~
+	INT_VAR
+		headerOffset = 0
+		requiredLevel = 0
+	RET
+		count_leveled_opcodes
+	RET_ARRAY
+		leveled_opcodes
+BEGIN
+	SET count_leveled_opcodes = 0
+
+	CLEAR_ARRAY leveled_opcodes
+	CLEAR_ARRAY opcodes
+
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY leveled_opcodes BEGIN END
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
+
+	LPM ~load_extended_effects~
+	LPM ~replace_effects~
+	LPM ~filter_effects~
+	LPM ~group_effects~
+
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 0 BEGIN
+		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		        LPM ~data_to_vars~
+		        SET count_leveled_opcodes += 1
+				SET $leveled_opcodes(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~) = opcode
+		    END
+	    END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~has_same_effect_in_all_levels~
+	INT_VAR
+		match_opcode = 0
+		match_level = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
+	STR_VAR
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+	RET
+		inAllLevels
+		total_durations
+	RET_ARRAY
+		effects_to_disabled
+		all_durations
+BEGIN
+	SET inAllLevels = 1
+    SET total = 0
+    SET total_durations = 0
+
+    PATCH_DEFINE_ARRAY all_durations BEGIN END
+    PATCH_DEFINE_ASSOCIATIVE_ARRAY effects_to_disabled BEGIN END
+
+	FOR (levelIndex = 0; levelIndex < count_levels; levelIndex += 1) BEGIN
+		SET level = $levels(~%levelIndex%~)
+		SET found = 0
+		PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
+			PATCH_IF opcode >= 0 AND opcode == match_opcode AND found == 0 BEGIN
+			    LPM ~data_to_vars~
+			    // TODO: Vérifier si une méthode du genre opcode_%opcode_match existe
+			    //       Si oui, l'utiliser, cela permettra de faire des vérifications, qui peuvent éviter de tenir
+			    //       compte de variables qui ne sont pas relevant...
+			    //Exempla vec opcode 119 : Parameter #1: Irrelevant
+				//                         Parameter #2: Irrelevant
+
+				PATCH_TRY
+					LPM ~opcode_%opcode%_match~
+				WITH DEFAULT
+					SET match = (
+						match_isExternal   == isExternal
+	                    AND match_target       == target
+	                    AND match_power        == power
+	                    AND match_parameter1   == parameter1
+	                    AND match_parameter2   == parameter2
+	                    AND match_timingMode   == timingMode
+	                    AND match_resistance   == resistance
+	                    AND match_probability  == probability
+	                    AND match_probability1 == probability1
+	                    AND match_probability2 == probability2
+	                    AND match_diceCount    == diceCount
+	                    AND match_diceSides    == diceSides
+	                    AND match_saveType     == saveType
+	                    AND match_saveBonus    == saveBonus
+	                    AND match_special      == special
+	                    AND match_parameter3   == parameter3
+	                    AND match_parameter4   == parameter4
+	                    AND match_custom_int   == custom_int
+	                    AND ~%match_resref%~     STRING_EQUAL ~%resref%~
+	                    AND ~%match_resref2%~    STRING_EQUAL ~%resref2%~
+	                    AND ~%match_resref3%~    STRING_EQUAL ~%resref3%~
+	                    AND ~%match_custom_str%~ STRING_EQUAL ~%custom_str%~
+	                )
+				END
+				PATCH_IF match == 1 BEGIN
+					SET found = 1
+					SET total += 1
+
+					PATCH_IF match_duration != duration BEGIN
+						SET $all_durations(~%level%~) = duration
+						SET total_durations += 1
+					END
+
+					SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%level%~) = level
+				END
+				ELSE BEGIN
+					PATCH_PRINT "NIVEAU : %level% - OPCODE: %opcode%
+					    %match_isExternal%   == %isExternal%
+					AND %match_target%       == %target%
+					AND %match_power%        == %power%
+					AND %match_parameter1%   == %parameter1%
+					AND %match_parameter2%   == %parameter2%
+					AND %match_timingMode%   == %timingMode%
+					AND %match_resistance%   == %resistance%
+					//AND match_duration     == duration
+					AND %match_probability%  == %probability%
+					AND %match_probability1% == %probability1%
+					AND %match_probability2% == %probability2%
+					AND %match_diceCount%    == %diceCount%
+					AND %match_diceSides%    == %diceSides%
+					AND %match_saveType%     == %saveType%
+					AND %match_saveBonus%    == %saveBonus%
+					AND %match_special%      == %special%
+					AND %match_parameter3%   == %parameter3%
+					AND %match_parameter4%   == %parameter4%
+					AND %match_custom_int%   == %custom_int%
+					AND %match_resref%     STRING_EQUAL %resref%
+					AND %match_resref2%    STRING_EQUAL %resref2%
+					AND %match_resref3%    STRING_EQUAL %resref3%
+					AND %match_custom_str% STRING_EQUAL %custom_str%
+					"
+				END
+			END
+		END
+
+		PATCH_IF found == 0 BEGIN
+			SET inAllLevels = 0
+			SET levelIndex = count_levels
+		END
+	END
+
+	PATCH_IF total_durations > 0 AND total - 1 != total_durations BEGIN
+		SET inAllLevels = 0
+	END
+END
 
 DEFINE_PATCH_FUNCTION ~load_extended_effects~
 	INT_VAR

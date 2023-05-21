@@ -469,13 +469,13 @@ END
 DEFINE_PATCH_FUNCTION ~get_effect_description~
 	INT_VAR
 		resetTarget = 0
+		ignoreDuration = 0
 	RET
 		description
 		sort
 		saveAdded
 		ignoreDuration
 BEGIN
-	SET ignoreDuration = 0
 	SET isValid = 1
 	SET saveAdded = 0
 	SET saveForHalf = 0
