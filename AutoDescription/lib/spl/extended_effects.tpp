@@ -592,6 +592,7 @@ DEFINE_PATCH_FUNCTION ~get_item_spell_description~
 		spellDescription
 		count
 		featureCount
+		lineCount
 BEGIN
 	LPF ~get_spell_effects~ INT_VAR ignoreDuration forceTarget = 1 STR_VAR file theTarget ofTheTarget toTheTarget RET count RET_ARRAY effects levels END
 
@@ -632,6 +633,10 @@ BEGIN
 			//LPF ~shrink_thief_skills~ RET spellDescription END
 		END
 		SPRINT spellDescription ~%spellDescription%%levelSpellDescription%~
+	END
+
+	INNER_PATCH ~%spellDescription%~ BEGIN
+		COUNT_2DA_ROWS ~1~ ~lineCount~
 	END
 END
 
