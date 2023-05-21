@@ -395,9 +395,14 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 		END
 	END
 	ELSE PATCH_IF timingMode != TIMING_while_equipped AND duration > 0 BEGIN
+		// 1 tick = 1/15 de seconde
+		PATCH_IF timingMode == TIMING_duration_ticks BEGIN
+			SET duration = duration / 15
+		END
+
         LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 
-		PATCH_IF timingMode == TIMING_duration BEGIN
+		PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_duration_ticks BEGIN
 			SPRINT value @100311 // ~pendant %strDuration%~
 		END
 		ELSE PATCH_IF timingMode == TIMING_delayed BEGIN

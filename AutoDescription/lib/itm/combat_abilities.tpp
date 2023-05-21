@@ -411,7 +411,7 @@ BEGIN
 	LPF ~array_count~ STR_VAR array_name = ~damageTypes~ RET damageTypeCount = count END
 	PATCH_PHP_EACH ~damages~ AS array_name => value BEGIN
 	    PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ AND NOT ~%value%~ STRING_EQUAL ~%damageNone%~ BEGIN
-	        PATCH_IF damageTypeCount == 1 BEGIN
+	        PATCH_IF enable_shrinkage == 1 AND shrink_weapon_attributes == 1 AND damageTypeCount == 1 BEGIN
 				PATCH_PHP_EACH ~damageTypes~ AS array_damageTypes => damageType BEGIN
 					SET strref = 102010 + damageType
 					SPRINT string_value (AT ~%strref%~)
@@ -424,7 +424,7 @@ BEGIN
 	END
 
 	LPF ~array_count~ STR_VAR array_name = ~damageTypes~ RET count END
-	PATCH_IF count > 1 BEGIN
+	PATCH_IF count > 1 OR enable_shrinkage == 0 OR shrink_weapon_attributes == 0 BEGIN
 		PATCH_PHP_EACH ~damageTypes~ AS array_name => value BEGIN
 			SET found = 0
 			PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN

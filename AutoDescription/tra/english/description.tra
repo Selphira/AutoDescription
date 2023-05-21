@@ -172,7 +172,7 @@
 @101196 = ~to the other creatures in the area of effect~
 
 @102386 = ~to the %targetType%~
-@102387 = ~against %targetType%~
+@102387 = ~vs. %targetType%~
 @101186 = ~%target% (of level %levelMin%)~
 @101187 = ~%target% (of level %levelMin% or lower)~
 @101188 = ~%target% (of level %levelMin% or higher)~
@@ -873,7 +873,7 @@
 @400103 = ~~ // Opcode visuel
 @400104 = ~à la modification de l'expérience acquise~
 @400105 = ~à la modification de la quantité d'or possédée~
-@400106 = ~~ // FIXME: Rupture de moral, à grouper avec Immunité à la panique qui peut se produire de deux façons : abaissement du moral ou hausse du niveau de rupture
+@400106 = ~à la panique~
 @400107 = ~~ // Opcode visuel
 @400108 = ~à la modification de la réputation~
 @400109 = ~from paralysis~
@@ -1116,6 +1116,7 @@
 @400346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~
 
 @400505 = ~from psionic abilities~
+@400507 = ~aux poisons~
 
 
 /* ------------------------------------- *
@@ -1471,6 +1472,7 @@
 @401346 = ~les effets modifiant les jets de sauvegarde contre une école de magie spécifique~
 
 @401505 = ~les effets protégeant contre les capacités psioniques~
+@401507 = ~les effets protégeant contre les poisons~
 
 
 
@@ -2219,27 +2221,27 @@
 
 // Opcode 86: Stat: Slashing Resistance Modifier [86]
 
-@10860001 = ~Slashing Resistance~
+@10860001 = ~Slashing Damage Resistance~
 @10860002 = ~to slashing damage~
-@10860003 = ~the Slashing Resistance~
+@10860003 = ~the Slashing Damage Resistance~
 
 // Opcode 87: Stat: Crushing Resistance Modifier [87]
 
-@10870001 = ~Crushing Resistance~
+@10870001 = ~Crushing Damage Resistance~
 @10870002 = ~to crushing damage~
-@10870003 = ~the Crushing Resistance~
+@10870003 = ~the Crushing Damage Resistance~
 
 // Opcode 88: Stat: Piercing Resistance Modifier [88]
 
-@10880001 = ~Piercing Resistance~
+@10880001 = ~Piercing Damage Resistance~
 @10880002 = ~the piercing damage~
-@10880003 = ~the Piercing Resistance~
+@10880003 = ~the Piercing Damage Resistance~
 
 // Opcode 89: Stat: Missiles Resistance Modifier [89]
 
-@10890001 = ~Missile Resistance~
+@10890001 = ~Missile Damage Resistance~
 @10890002 = ~to missile damage~
-@10890003 = ~the Missile Resistance~
+@10890003 = ~the Missile Damage Resistance~
 
 // Opcode 90: Stat: Open Locks Modifier [90]
 
@@ -4075,6 +4077,9 @@
 @15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
 @15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 
+// Fake Opcode 520: Protection: Action libre [520]
+
+@15200001 = ~Free action~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

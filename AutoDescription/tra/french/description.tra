@@ -791,8 +791,8 @@
 @400021 = ~à la modification du score de connaissances~
 @400022 = ~à la modification de la chance~
 @400023 = ~à la modification du moral~
-@400024 = ~à l'horreur~
-@400025 = ~à l'empoisonnement~ // l'immunité aux poisons étant une résistance de 100% au poison
+@400024 = ~à la peur~
+@400025 = ~à l'empoisonnement~ // l'immunité aux poisons étant une résistance de 100% aux poisons
 @400026 = ~à la dissipation des malédictions~
 @400027 = ~à la modification de la résistance à l'acide~
 @400028 = ~à la modification de la résistance au froid~
@@ -873,7 +873,7 @@
 @400103 = ~~ // Opcode visuel
 @400104 = ~à la modification de l'expérience acquise~
 @400105 = ~à la modification de la quantité d'or possédée~
-@400106 = ~~ // FIXME: Rupture de moral, à grouper avec Immunité à la panique qui peut se produire de deux façons : abaissement du moral ou hausse du niveau de rupture
+@400106 = ~à la panique~
 @400107 = ~~ // Opcode visuel
 @400108 = ~à la modification de la réputation~
 @400109 = ~à la paralysie~
@@ -928,7 +928,7 @@
 @400158 = ~~ // Opcode visuel
 @400159 = ~à la modification du nombre d'image-miroir~
 @400160 = ~à la dissipation de Sanctuaire~
-@400161 = ~à la dissipation de l'horreur~
+@400161 = ~à la dissipation de la peur~
 @400162 = ~à la dissipation de la paralysie~
 @400163 = ~à la modification de la vitesse de déplacement~
 @400164 = ~à la dissipation de l'ivresse~
@@ -1116,6 +1116,7 @@
 @400346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~
 
 @400505 = ~aux capacités psioniques~
+@400507 = ~aux poisons~
 
 
 /* ------------------------------------- *
@@ -1146,8 +1147,8 @@
 @401021 = ~les effets modifiant le score de connaissances~
 @401022 = ~les effets modifiant la chance~
 @401023 = ~les effets modifiant le moral~
-@401024 = ~les effets provoquant l'horreur~
-@401025 = ~les effets provoquant l'empoisonnement~ // l'immunité aux poisons étant une résistance de 100% au poison
+@401024 = ~les effets provoquant la peur~
+@401025 = ~les effets provoquant l'empoisonnement~ // l'immunité aux poisons étant une résistance de 100% aux poisons
 @401026 = ~les effets dissipant les malédictions~
 @401027 = ~les effets modifiant la résistance à l'acide~
 @401028 = ~les effets modifiant la résistance au froid~
@@ -1283,7 +1284,7 @@
 @401158 = ~~ // Opcode visuel
 @401159 = ~les effets modifiant la quantité d'image-miroir~
 @401160 = ~les effets dissipant Sanctuaire~
-@401161 = ~les effets dissipant l'horreur~
+@401161 = ~les effets dissipant la peur~
 @401162 = ~les effets dissipant la paralysie~
 @401163 = ~les effets modifiant la vitesse de déplacement~
 @401164 = ~les effets dissipant l'ivresse~
@@ -1471,6 +1472,7 @@
 @401346 = ~les effets modifiant les jets de sauvegarde contre une école de magie spécifique~
 
 @401505 = ~les effets protégeant contre les capacités psioniques~
+@401507 = ~les effets protégeant contre les poisons~
 
 
 
@@ -1703,8 +1705,8 @@
 
 // Opcode 4: Cure: Berserking [4]
 
-@10040001 = ~Calme %theTarget%~
-@10040002 = ~de calmer %theTarget%~
+@10040001 = ~Apaise %theTarget%~
+@10040002 = ~d'apaiser %theTarget%~
 
 // Opcode 5: Charm: Charm Specific Creature [5]
 
@@ -2729,9 +2731,9 @@
 
 // Opcode 161: Cure: Horror [161]
 
-@11610001 = ~Dissipation de l'horreur~
-@11610002 = ~Dissipe l'horreur %ofTheTarget%~
-@11610003 = ~de dissiper l'horreur %ofTheTarget%~
+@11610001 = ~Dissipation de la peur~
+@11610002 = ~Dissipe la peur %ofTheTarget%~
+@11610003 = ~de dissiper la peur %ofTheTarget%~
 
 // Opcode 162: Cure: Hold [162]
 
@@ -3190,8 +3192,8 @@
 
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Calme %theTarget%~
-@12470002 = ~de calmer %theTarget%~
+@12470001 = ~Apaise %theTarget%~
+@12470002 = ~d'apaiser %theTarget%~
 
 // Opcode 248: Item: Set Melee Effect [248]
 
@@ -3594,8 +3596,8 @@
 @13240074 = ~Inefficace contre les créatures mortes~
 @13240075 = ~Inefficace contre les créatures vivantes~ // FIXME: tendancieux : les morts-vivants sont touchés
 @13240076 = ~~ // @13240110
-@13240077 = ~Inefficace contre les cibles immunisées au poison~
-@13240078 = ~Inefficace contre les cibles sensibles au poison~
+@13240077 = ~Inefficace contre les cibles immunisées aux poisons~
+@13240078 = ~Inefficace contre les cibles sensibles aux poisons~
 @13240079 = ~Inefficace contre les cibles immunisées à l'acide~
 @13240080 = ~Inefficace contre les cibles sensibles à l'acide~
 @13240081 = ~Inefficace contre les cibles immunisées à l'électricité~
@@ -3716,8 +3718,8 @@
 @13240574 = ~d'être inefficace contre les créatures mortes~
 @13240575 = ~d'être inefficace contre les créatures vivantes~
 @13240076 = ~~ // @13240610
-@13240577 = ~d'être inefficace contre les cibles immunisées au poison~
-@13240578 = ~d'être inefficace contre les cibles sensibles au poison~
+@13240577 = ~d'être inefficace contre les cibles immunisées aux poisons~
+@13240578 = ~d'être inefficace contre les cibles sensibles aux poisons~
 @13240579 = ~d'être inefficace contre les cibles immunisées à l'acide~
 @13240580 = ~d'être inefficace contre les cibles sensibles à l'acide~
 @13240581 = ~d'être inefficace contre les cibles immunisées à l'électricité~
@@ -3849,8 +3851,8 @@
 @13260074 = ~Si %theTarget% est mort~
 @13260075 = ~Si %theTarget% est vivant~
 @13260076 = ~~ // @13260110
-@13260077 = ~Si %theTarget% est immunisé au poison~
-@13260078 = ~Si %theTarget% est sensible au poison~
+@13260077 = ~Si %theTarget% est immunisé aux poisons~
+@13260078 = ~Si %theTarget% est sensible aux poisons~
 @13260079 = ~Si %theTarget% est immunisé à l'acide~
 @13260080 = ~Si %theTarget% est sensible à l'acide~
 @13260081 = ~Si %theTarget% est immunisé à l'électricité~
@@ -4074,6 +4076,10 @@
 @15100006 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
 @15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
 @15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+
+// Fake Opcode 520: Protection: Action libre [520]
+
+@15200001 = ~Action libre~
 
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
