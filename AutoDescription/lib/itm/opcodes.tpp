@@ -8514,6 +8514,9 @@ DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 		SPRINT spellType @12610011 // ~divin~
 		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
 	END
+	PATCH_IF spellLevel == 1 BEGIN
+		SET strref += 4
+	END
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
