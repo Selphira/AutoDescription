@@ -695,6 +695,7 @@
 @230023 = ~fléaux~
 @230024 = ~fléchettes~
 @230025 = ~haches~
+@230026 = ~bâtons~
 @230027 = ~arbalètes~
 @230028 = ~poings~
 @230029 = ~lances~
@@ -1657,10 +1658,10 @@
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
-@10010001 = ~Attaque par round : %value%~
-@10010002 = ~Attaque par round : Passe à %value%~
-@10010003 = ~Attaque par round : %value%~
-@10010004 = ~Attaque par round : Fixée à %value%~
+@10010001 = ~Attaque par round%colon%%value%~
+@10010002 = ~Attaque par round%colon%Passe à %value%~
+@10010003 = ~Attaque par round%colon%%value%~
+@10010004 = ~Attaque par round%colon%Fixée à %value%~
 @10010005 = ~Attaque impossible~ // TODO: trouver une tournure pour self // Ne peut (plus) attaquer // Ne peut (plus) effectuer d'attaque pas sur de ce que self veut dire dans quel contexte ?...
 
 @10010011 = ~Modifie le nombre d'attaque par round %ofTheTarget% de %value%~
@@ -2627,7 +2628,7 @@
 @11440027 = ~%action% d'utiliser repousser les morts-vivants~
 @11440028 = ~%action% d'utiliser les discussions~
 @11440029 = ~%action% d'utiliser les objets~
-@11440030 = ~%action% d'utiliser les premier objet rapide~
+@11440030 = ~%action% d'utiliser le premier objet rapide~
 @11440031 = ~%action% d'utiliser les chants de barde et les danses de shaman~
 @11440032 = ~%action% d'utiliser le second objet rapide~
 @11440033 = ~%action% d'utiliser le troisième objet rapide~
@@ -2739,9 +2740,9 @@
 
 // Opcode 164: Cure: Drunkeness [164]
 
-@11640001 = ~Guérison de l'ivresse~
-@11640002 = ~Dessoûle %theTarget%~
-@11640003 = ~de dessoûler %theTarget%~
+@11640001 = ~Dissipe l'état d'ébriété~
+@11640002 = ~Dissipe l'état d'ébriété %ofTheTarget%~
+@11640003 = ~de dissiper l'état d'ébriété %ofTheTarget%~
 
 // Opcode 165: Pause Target [165]
 // TODO: trouver mieux
