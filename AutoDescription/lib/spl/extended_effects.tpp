@@ -503,6 +503,9 @@ BEGIN
             	END
             END
 			ELSE BEGIN
+				// Ne pas forcer la cible permet d'éviter un bug où la cible était considérée comme le porteur, alors que la véritable cible est "la cible"
+				// N'est pas l'idéal, car on peut dans certains cas perdre du détail.
+				SET forceTarget = 0
 				LPF ~get_description_effect~ INT_VAR ignoreDuration forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
 					PATCH_IF cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
