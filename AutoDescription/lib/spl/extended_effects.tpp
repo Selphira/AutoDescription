@@ -401,6 +401,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects~
 	INT_VAR
 		forceTarget = 0
 		forcedProbability = 100
+		ignoreDuration = 0
 	STR_VAR
 		file = ~~
 		theTarget = ~~
@@ -471,6 +472,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_level_effects~
 		effects
 		levels
 BEGIN
+	SET cumulable = 1
 	SET featureCount = 0
     PHP_EACH blockOffsets AS _ => blockOffset BEGIN
 		READ_SHORT blockOffset opcode
@@ -480,17 +482,31 @@ BEGIN
 				SET opcodeBase = opcode
 				PATCH_FOR_EACH subOpcode IN 0 1 BEGIN
 					SET opcode = opcodeBase * 1000 + subOpcode
-					LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
+					LPF ~get_description_effect~ INT_VAR ignoreDuration forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 					PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-						SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
+						PATCH_IF cumulable == 0 BEGIN
+							SPRINT stringNotCumulable @102682
+							SPRINT desc ~%desc% (%stringNotCumulable%)~
+						END
+						SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~ ~%opcode%~) = 1
 						SET featureCount += 1
 					END
 				END
 			END
+			PATCH_IF opcode == 321 BEGIN
+				PATCH_IF ~%resref%~ STRING_EQUAL ~%SOURCE_RES%~ AND
+            			(timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
+            		SET cumulable = 0
+            	END
+            END
 			ELSE BEGIN
-				LPF ~get_description_effect~ INT_VAR forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
+				LPF ~get_description_effect~ INT_VAR ignoreDuration forceTarget STR_VAR theTarget ofTheTarget toTheTarget RET desc = description sort END
 				PATCH_IF NOT ~%desc%~ STRING_EQUAL ~~ BEGIN
-					SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~) = 1
+					PATCH_IF cumulable == 0 BEGIN
+						SPRINT stringNotCumulable @102682
+						SPRINT desc ~%desc% (%stringNotCumulable%)~
+					END
+					SET $tmpEffects(~%sort%~ ~%featureCount%~ ~%desc%~ ~%requiredLevel%~ ~%opcode%~) = 1
 					SET featureCount += 1
 				END
 			END
@@ -506,7 +522,7 @@ BEGIN
 		SORT_ARRAY_INDICES features NUMERICALLY
 
 		PATCH_PHP_EACH features AS data => value BEGIN
-			SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~) = value
+			SET $effects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~) = value
 		END
 
 		SET $levels(~%requiredLevel%~) = featureCount
@@ -517,6 +533,7 @@ DEFINE_PATCH_FUNCTION ~get_single_spell_effect~
 	INT_VAR
 		forceTarget = 0
 		forcedProbability = 100
+		cumulable = 1
 	STR_VAR
 		file = ~~
 		theTarget = ~~
@@ -542,7 +559,12 @@ BEGIN
 				PATCH_PHP_EACH blockOffsets AS _ => blockOffset BEGIN
 					READ_SHORT blockOffset opcode
 					PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-						LPF ~get_description_effect~ INT_VAR forceTarget forceProbability = 1 forcedProbability STR_VAR theTarget ofTheTarget toTheTarget RET effectDescription = description descSort = sort END
+						LPF ~get_description_effect~ INT_VAR ignoreDuration forceTarget forceProbability = 1 forcedProbability STR_VAR theTarget ofTheTarget toTheTarget RET effectDescription = description descSort = sort END
+
+						PATCH_IF cumulable == 0 BEGIN
+							SPRINT stringNotCumulable @102682
+							SPRINT effectDescription ~%effectDescription% (%stringNotCumulable%)~
+						END
 					END
 				END
 			END
@@ -557,6 +579,7 @@ DEFINE_PATCH_FUNCTION ~get_item_spell_description~
 	INT_VAR
 		forceTarget = 0
 		probability = 100
+		ignoreDuration = 0
 	STR_VAR
 		file = ~~
 		theTarget = ~~
@@ -567,7 +590,7 @@ DEFINE_PATCH_FUNCTION ~get_item_spell_description~
 		count
 		featureCount
 BEGIN
-	LPF ~get_spell_effects~ INT_VAR forceTarget = 1 STR_VAR file theTarget ofTheTarget toTheTarget RET count RET_ARRAY effects levels END
+	LPF ~get_spell_effects~ INT_VAR ignoreDuration forceTarget = 1 STR_VAR file theTarget ofTheTarget toTheTarget RET count RET_ARRAY effects levels END
 
 	SET featureCount = 0
 	SPRINT spellDescription ~~
@@ -592,6 +615,10 @@ BEGIN
 		PATCH_PHP_EACH effects AS data => feature BEGIN
 			PATCH_IF requiredLevel == data_3 BEGIN
 				SPRINT levelSpellDescription ~%levelSpellDescription%%crlf%%indentation%- %data_2%~
+				// Indique que les effets ne sont (in)valides que sous certaines conditions, mais il n'y a pas d'autres effets listés.
+				PATCH_IF count == 1 AND data_4 == 318 BEGIN
+					SPRINT levelSpellDescription ~~
+				END
 			END
 		END
 
@@ -626,7 +653,7 @@ DEFINE_PATCH_FUNCTION ~get_unique_spell_effects~ INT_VAR requiredLevel = 0 STR_V
 				END
 			END
 			PATCH_IF found == 0 BEGIN
-				SET $newAbilities(~%data_0%~ ~%count%~ ~%data_2%~ ~%data_3%~) = 1
+				SET $newAbilities(~%data_0%~ ~%count%~ ~%data_2%~ ~%data_3%~ ~%data_4%~) = 1
 				SET count += 1
 			END
 		END

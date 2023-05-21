@@ -55,6 +55,20 @@ COPY_EXISTING ~tooltip.2da~ ~override~
     BUT_ONLY_IF_IT_CHANGES
 
 /* ---------------------------------------------------------------- *
+ * Récupération du nom et du numéro de ligne des conditions         *
+ * ---------------------------------------------------------------- */
+COPY_EXISTING ~splprot.2da~ ~override~
+	COUNT_2DA_COLS cols // amount of columns
+	READ_2DA_ENTRIES_NOW rows cols // read all file into memory
+	FOR (row = 146; row < rows; ++row) BEGIN // iterate over rows
+		READ_2DA_ENTRY_FORMER rows row 0 ~id~ // read column value
+		READ_2DA_ENTRY_FORMER rows row 1 ~stat~ // read column value
+		SPRINT $splprots(~%row%~) ~%id%~
+		SPRINT $splprotstats(~%row%~) ~%stat%~
+	END
+	BUT_ONLY_IF_IT_CHANGES
+
+/* ---------------------------------------------------------------- *
  * Récupération du nom des objets aléatoires. *
  * ---------------------------------------------------------------- */
 ACTION_IF FILE_EXISTS_IN_GAME ~rndtres.2da~ BEGIN

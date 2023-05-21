@@ -322,7 +322,7 @@
 @204001 = ~humans~
 @204002 = ~elves~
 @204003 = ~half elves~
-@204004 = ~dwarfs~
+@204004 = ~dwarves~
 @204005 = ~halflings~
 @204006 = ~gnomes~
 @204007 = ~half orc~
@@ -3067,6 +3067,7 @@
 
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
+@12320000 = ~~
 @12320001 = ~Cast %spellName% on %theTarget%~
 @12320002 = ~Cast %spellName% and %spellName2% on %theTarget%~
 @12320003 = ~Cast %spellName%, %spellName2% and %spellName3% on %theTarget%~
@@ -3891,6 +3892,10 @@
 @13260145 = ~Si les points de vie %ofTheTarget% sont inférieurs à %value%~
 @13260146 = ~Si %theTarget% fait partie des %creatureType%~
 @13260147 = ~Si %theTarget% ne fait pas partie des %creatureType%~
+
+@13261000 = ~Si la compétence %proficiency% est supérieure ou égale à %value%~
+@13261001 = ~Si la compétence %proficiency% est égale à %value%~
+@13261002 = ~Si la compétence %proficiency% est inférieure à %value%~
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 
