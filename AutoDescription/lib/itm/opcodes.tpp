@@ -10929,7 +10929,7 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
-		SPRINT description @102548 // ~d'immuniser %theTarget% %resistName%~
+		SPRINT description @102552 // ~Immunise %theTarget% %resistName%~
 	END
 	ELSE BEGIN
 		SET resistName += 2
@@ -10969,7 +10969,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
-		SPRINT description @102548 // ~d'immuniser %resistName%~
+		SPRINT description @102549 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
 		SET resistName += 2
@@ -11553,10 +11553,12 @@ DEFINE_PATCH_FUNCTION ~side_spell~ INT_VAR strref = 0 strref_if_amount_0 = 0 amo
 			END
 		END
 
+		PATCH_IF amount >= 1 BEGIN
+			LPF ~getTranslation~ INT_VAR strref RET string END
+		END
+
 		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF amount >= 1 BEGIN
-				LPF ~getTranslation~ INT_VAR strref RET string END
-
 				SET strref = 110011 // ~puis lance %spellName%~
 				LPF ~getTranslation~ INT_VAR strref RET descAdd = string END
 				TEXT_SPRINT string ~%string% %descAdd%~
