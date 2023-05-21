@@ -90,9 +90,6 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 							SET base_level = requiredLevel
 						END
 
-						// TODO: Si duration == 0 et timingMode == permanent, selon l'opcode, la durée est soit instantanée (12), soit permanente...
-						// Pouvoir différencier les 2, et indiquer si on a l'un ou l'autre, voir les 2
-						// permanent/instantané/durée déterminée
 						PATCH_IF duration > 0 BEGIN
 							PATCH_IF base_duration == ~-1~ BEGIN
 								SET base_duration = duration
@@ -115,11 +112,12 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 	END
 
 	PATCH_IF isValid == 1 BEGIN
-		PATCH_PRINT "base_level : %base_level%"
+		PATCH_IF base_duration == ~-1~ BEGIN
+			SET base_duration = 0
+		END
 		PATCH_IF base_level == 1 BEGIN
 			LPF get_first_level_for_spell RET base_level = minLevel END
 		END
-		PATCH_PRINT "base_level after : %base_level%"
 		LPF ~get_complex_duration~
 			INT_VAR
 				base_level
@@ -138,6 +136,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 			SPRINT duration @100033 // ~Spéciale~
 		END
 		PATCH_IF is_permanent BEGIN
+			//TODO: Gestion du permanent ! Dépend des opcodes utilisés par le sort...
 			//SPRINT duration @100037 // ~Permanente~
 			SPRINT duration @100038 // ~Instantanée~
 		END
@@ -185,11 +184,8 @@ BEGIN
 	END
 
 	PATCH_IF is_valid == 1 BEGIN
-		PATCH_PRINT "Durée valide, base_level = %base_level% - base_duration = %base_duration% -  delta_duration = %delta_duration% - delta_level = %delta_level%"
-
 		PATCH_IF base_duration == 0 AND delta_duration == 0 BEGIN
 			SET is_permanent = 1
-			//FIXME: instantané ou permanent ? Dépend des cas... des opcodes...
 		END
 		ELSE PATCH_IF base_duration > 0 AND delta_duration == 0 BEGIN
 			LPF ~get_str_duration~ INT_VAR duration = base_duration RET complex_duration = strDuration END
@@ -207,7 +203,6 @@ BEGIN
 		END
 	END
 	ELSE BEGIN
-		PATCH_PRINT "Durée invalide, delta_duration = %delta_duration% - delta_level = %delta_level%"
 		SET is_special = 1
 	END
 END
