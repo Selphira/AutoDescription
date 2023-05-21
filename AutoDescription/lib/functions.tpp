@@ -172,11 +172,11 @@ DEFINE_PATCH_FUNCTION ~feets_to_meters~ INT_VAR range = 0 RET range rangeToMeter
 		END
 	END
 
-	PATCH_IF range < 20 BEGIN
-		SPRINT rangeToMeter ~%rangeToMeter% %meter%~
+	PATCH_IF (IS_AN_INT rangeToMeter AND rangeToMeter > 1) OR range >= 20 BEGIN
+		SPRINT rangeToMeter ~%rangeToMeter% %meters%~
 	END
 	ELSE BEGIN
-		SPRINT rangeToMeter ~%rangeToMeter% %meters%~
+		SPRINT rangeToMeter ~%rangeToMeter% %meter%~
 	END
 END
 

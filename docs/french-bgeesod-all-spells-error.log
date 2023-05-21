@@ -5,6 +5,8 @@ MDK2SUMM.SPL : Opcode 67 : Resource mdk2doc.cre doesn't exist.
 OHTYR1.SPL : Opcode 321 : no sppr422.spl or sppr422.itm found
 SPIN127.SPL : Opcode 135 : Resource plybass.cre doesn't exist.
 SPIN127.SPL : Opcode 111 : Resource plybass.itm doesn't exist.
+SPIN545.SPL : Opcode 146 : Resource spin545a.spl doesn't exist.
+SPIN545.SPL : Resource SPIN545A.spl doesn't exist.
 SPIN663.SPL : Opcode 111 : Resource npsw02.itm doesn't exist.
 SPIN667.SPL : Opcode 112 : Resource SLAYERWP.itm doesn't exist.
 SPIN717.SPL : Opcode 135 : Resource slayer.cre doesn't exist.
@@ -21,52 +23,14 @@ SPIN944.SPL : Opcode 324 : no effect : duration 0
 SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
 SPPR725.SPL : Opcode 232 : Resource sppr725d.spl doesn't exist.
 SPPR725.SPL : Resource SPPR725D.spl doesn't exist.
 SPSD02.SPL : Opcode 1: Invalid parameter1 value ([-10 10] expected).
 SPWI213.SPL : Opcode 324 : no effect : duration 0
+SPWI413.SPL : Opcode 206 : Resource spwish27.spl doesn't exist.
+SPWI413.SPL : Opcode 206 : Resource spwish32.spl doesn't exist.
+SPWI413.SPL : Opcode 206 : Resource spwish35.spl doesn't exist.
+SPWI413.SPL : Opcode 206 : Resource sppr725d.spl doesn't exist.
 SPWI413.SPL : Opcode 206 : Resource spwish27.spl doesn't exist.
 SPWI413.SPL : Opcode 206 : Resource spwish32.spl doesn't exist.
 SPWI413.SPL : Opcode 206 : Resource spwish35.spl doesn't exist.

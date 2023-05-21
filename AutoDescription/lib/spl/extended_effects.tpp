@@ -131,9 +131,11 @@ BEGIN
 
 					// On ne désactive pas l'opcode du niveau 0
 					PATCH_IF level > 0 BEGIN
+						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%level%~) = level
 					END
 				END
 				ELSE BEGIN
+				/*
 					PATCH_PRINT "NIVEAU : %level% - OPCODE: %opcode%
 					    match_isExternal : %match_isExternal%   == %isExternal%
 					AND match_target : %match_target%       == %target%
@@ -159,6 +161,7 @@ BEGIN
 					AND match_resref3 : %match_resref3%    STRING_EQUAL %resref3%
 					AND match_custom_str : %match_custom_str% STRING_EQUAL %custom_str%
 					"
+				*/
 				END
 			END
 		END
@@ -482,10 +485,6 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 						RET
 							complex_duration
 					END
-					PATCH_PRINT "Durée complexe: %complex_duration%"
-
-					//TODO: Si complex_duration est vide, ne pas l'utiliser ?
-
 		        END
 		        SET $level_effects(~-1~) = 0
 				SET $leveled_opcodes_0(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = opcode
