@@ -97,6 +97,17 @@ DEFINE_ACTION_FUNCTION ~ucfirst~ STR_VAR value = ~~ RET string BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~ucfirst~
+	STR_VAR
+		value = ~~
+	RET
+		string
+BEGIN
+	INNER_ACTION BEGIN
+		LAF ~ucfirst~ STR_VAR value RET string END
+	END
+END
+
 /* ----------------------------------------------------------------------------------- *
  * Des chaînes récupérées directement depuis leur référence dans le fichier dialog.tlk *
  * Possible aussi pour les multi-classes, mais demande un traitement différent.        *
