@@ -114,7 +114,6 @@ BEGIN
             END
 		END
 		ELSE PATCH_IF isAmmo AND countHeaders == 1 BEGIN
-			PATCH_PRINT "isAmmo !! : %countLines%"
 			SPRINT title @100011 // ~Capacités de combat~
 			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
 			// désindenter

@@ -3079,54 +3079,50 @@ DEFINE_PATCH_MACRO ~opcode_self_60~ BEGIN
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value >= 100 BEGIN
-		SPRINT description @10600004 // ~Empêche l'incantation des sorts %spellType%~
+	PATCH_IF spellTypes == 7 BEGIN
+		SPRINT description @10600001 // ~Provoque l'échec de %percent% des sorts~
 	END
 	ELSE BEGIN
-		SPRINT description @10600005 // ~Provoque l'échec de %percent% des sorts %spellType%~
+		SPRINT description @10600002 // ~Provoque l'échec de %percent% des sorts %spellType%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_60~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
-	LOCAL_SET type = parameter2
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value >= 100 BEGIN
-		SPRINT description @10600006 // ~Provoque l'échec des sorts %spellType% incantés par %theTarget%~
+	PATCH_IF spellTypes == 7 BEGIN
+		SPRINT description @10600003 // ~Provoque l'échec de %percent% des sorts lancés par %theTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @10600007 // ~Provoque l'échec de %percent% des sorts %spellType% incantés par %theTarget%~
+		SPRINT description @10600004 // ~Provoque l'échec de %percent% des sorts %spellType% lancés par %theTarget%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_60~ BEGIN
 	LOCAL_SET value = parameter1 BAND 255
-	LOCAL_SET type = parameter2
 
 	LPM ~opcode_60_common~
 
-	PATCH_IF value >= 100 BEGIN
-		SPRINT description @10600008 // ~de provoquer l'échec des sorts %spellType% incantés par %theTarget%~
+	PATCH_IF spellTypes == 7 BEGIN
+		SPRINT description @10600005 // ~de provoquer l'échec de %percent% des sorts lancés par %theTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @10600009 // ~de provoquer l'échec de %percent% des sorts %spellType% incantés par %theTarget%~
+		SPRINT description @10600006 // ~de provoquer l'échec de %percent% des sorts %spellType% lancés par %theTarget%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_60_common~ BEGIN
-    SPRINT percent @10002 // ~%value% %~
+	SET spellTypes = 0
 
-	PATCH_IF type == 0 OR type== 3 BEGIN
-		SPRINT spellType @10600001 // ~profanes~
+	PATCH_IF parameter2 > 2 BEGIN
+		SET parameter2 -= 3
 	END
-	ELSE PATCH_IF type == 1 OR type== 4 BEGIN
-		SPRINT spellType @10600002 // ~divins~
-	END
-	ELSE PATCH_IF type == 2 OR type== 5 BEGIN
-		SPRINT spellType @10600003 // ~innés~
-	END
+
+	SET spellTypes = custom_int > 0 ? custom_int : (1 << parameter2)
+	LPF ~get_spell_type_str~ INT_VAR value = spellTypes RET spellType END
+    SPRINT percent @10002 // ~%value% %~
 END
 
 DEFINE_PATCH_MACRO ~opcode_60_is_valid~ BEGIN
@@ -3137,6 +3133,53 @@ DEFINE_PATCH_MACRO ~opcode_60_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 5 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_60_group~ BEGIN
+	LOCAL_SET group = 1
+	LOCAL_SET newSpellType = 0
+	LOCAL_SET spellType = 0
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		PATCH_IF parameter2 > 2 BEGIN
+			SET parameter2 -= 3
+		END
+
+		SET group = 0
+		SET newSpellType = 1 << %parameter2%
+		CLEAR_ARRAY positions
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+			~%parameter2%~ => ~%position%~
+		END
+		PATCH_FOR_EACH spellType IN 0 1 2 BEGIN
+			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND custom_int = 0 AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+
+			PATCH_IF opcodePosition >= 0 BEGIN
+				SET group = 1
+				SET newSpellType |= 1 << %spellType%
+				SET $positions(~%spellType%~) = opcodePosition
+			END
+		END
+		PATCH_IF group == 1 BEGIN
+			PATCH_PHP_EACH positions AS _ => position1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode
+					STR_VAR expression = ~position = %position1%~
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        SET custom_int = newSpellType
+	        LPM ~add_opcode~
+		END
 	END
 END
 
@@ -5801,18 +5844,34 @@ END
  * Spell: Disable Spell Casting Abilities [145] *
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
-	PATCH_IF parameter2 == 0 AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND VARIABLE_IS_SET isRobe AND isRobe)) BEGIN
-		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts profanes~
+	LOCAL_SET value = custom_int > 0 ? custom_int : (1 << parameter2)
+
+	PATCH_IF value == 7 BEGIN
+		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts~
 	END
-	ELSE PATCH_IF parameter2 != 0 BEGIN
-		SET strref = 11450000 + parameter2
-		SPRINT description (AT ~%strref%~)
+	ELSE BEGIN
+		LPF ~get_spell_type_str~ INT_VAR value RET spellType END
+
+		PATCH_IF (parameter2 == 0 OR custom_int == 1) AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND VARIABLE_IS_SET isRobe AND isRobe)) BEGIN
+			SPRINT description @11450000 // ~Empêche %theTarget% de lancer des sorts %spellType%~
+		END
+		ELSE PATCH_IF parameter2 != 0 AND custom_int != 1 BEGIN
+			SPRINT description @11450000 // ~Empêche %theTarget% de lancer des sorts %spellType%~
+		END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_145~ BEGIN
-	LOCAL_SET strref = 11450050 + parameter2
-	SPRINT description (AT ~%strref%~)
+	LOCAL_SET value = custom_int > 0 ? custom_int : (1 << parameter2)
+
+	PATCH_IF value == 7 BEGIN
+		SPRINT description @11450051 // ~d'empêcher %theTarget% de lancer des sorts~
+	END
+	ELSE BEGIN
+		LPF ~get_spell_type_str~ INT_VAR value RET spellType END
+
+		SPRINT description @11450050 // ~d'empêcher %theTarget% de lancer des sorts %spellType%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_145~ BEGIN
@@ -5832,22 +5891,24 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 	LOCAL_SET group = 1
-	LOCAL_SET newSpellType = 0
+	LOCAL_SET newSpellType = 0b0
 	LOCAL_SET spellType = 0
-	LOCAL_SET currentOpcode = opcode
+
 	PATCH_PHP_EACH ~opcodes_145~ AS data => _ BEGIN
 		LPM ~data_to_vars~
+		// TODO: Toute cette partie est commune avec l'opcode 60, cependant, si je déplace ce code dans une macro, le
+		//       tableau opcodes_145 n'est pas mis à jour si un regroupement est effectué dans la macro...
 		SET group = 0
-		SET newSpellType = (2 << %parameter2%) * 2
+		SET newSpellType = 1 << %parameter2%
 		CLEAR_ARRAY positions
 		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
 			~%parameter2%~ => ~%position%~
 		END
 		PATCH_FOR_EACH spellType IN 0 1 2 BEGIN
-			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND custom_int = 0 AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
 			PATCH_IF opcodePosition >= 0 BEGIN
 				SET group = 1
-				SET newSpellType += (2 << %spellType%) * 2
+				SET newSpellType |= 1 << %spellType%
 				SET $positions(~%spellType%~) = opcodePosition
 			END
 		END
@@ -5865,8 +5926,8 @@ DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
 	            CLEAR_ARRAY ~opcodes_%opcode%~
 	        END
-	        SET parameter2 = newSpellType
-            LPM ~add_opcode~
+	        SET custom_int = newSpellType
+	        LPM ~add_opcode~
 		END
 	END
 END
@@ -12671,6 +12732,20 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
 		SPRINT descriptionState @410000 // ~normal~
 	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 RET spellType BEGIN
+	SPRINT and @100021 // ~et~
+	PATCH_DEFINE_ARRAY ~spellTypes~ BEGIN END
+	FOR (idx = 0 ; idx < 3 ; ++idx) BEGIN
+		SET bit = EVAL ~%BIT%idx%%~
+		PATCH_IF (value BAND bit) != 0 BEGIN
+			SET strref = 101300 + idx
+			SPRINT spellTypeStr (AT strref)
+			SPRINT $spellTypes(~%spellTypeStr%~) ~~
+		END
+	END
+	LPF ~implode~ STR_VAR array_name = ~spellTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET spellType = text END
 END
 
 DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequency BEGIN

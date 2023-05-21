@@ -75,6 +75,12 @@
 @101208 = ~8ème~
 @101209 = ~9ème~
 
+// Types des sorts
+@101300 = ~profanes~
+@101301 = ~divins~
+@101302 = ~innés~
+@101303 = ~magiques~
+
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
@@ -2056,15 +2062,12 @@
 
 // Opcode 60: Stat: Miscast Magic [60]
 
-@10600001 = ~profanes~
-@10600002 = ~divins~
-@10600003 = ~innés~
-@10600004 = ~Empêche l'incantation des sorts %spellType%~
-@10600005 = ~Provoque l'échec de %percent% des sorts %spellType%~
-@10600006 = ~Provoque l'échec des sorts %spellType% incantés par %theTarget%~
-@10600007 = ~Provoque l'échec de %percent% des sorts %spellType% incantés par %theTarget%~
-@10600008 = ~de provoquer l'échec des sorts %spellType% incantés par %theTarget%~
-@10600009 = ~de provoquer l'échec de %percent% des sorts %spellType% incantés par %theTarget%~
+@10600001 = ~Provoque l'échec de %percent% des sorts~
+@10600002 = ~Provoque l'échec de %percent% des sorts %spellType%~
+@10600003 = ~Provoque l'échec de %percent% des sorts lancés par %theTarget%~
+@10600004 = ~Provoque l'échec de %percent% des sorts %spellType% lancés par %theTarget%~
+@10600005 = ~de provoquer l'échec de %percent% des sorts lancés par %theTarget%~
+@10600006 = ~de provoquer l'échec de %percent% des sorts %spellType% lancés par %theTarget%~
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
@@ -2676,23 +2679,11 @@
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
-@11450000 = ~Empêche %theTarget% de lancer des sorts profanes~
-@11450001 = ~Empêche %theTarget% de lancer des sorts divins~
-@11450002 = ~Empêche %theTarget% de lancer des sorts innés~
-@11450003 = ~Empêche %theTarget% de lancer des sorts magiques~
-@11450012 = ~Empêche %theTarget% de lancer des sorts profanes et divins~
-@11450020 = ~Empêche %theTarget% de lancer des sorts profanes et innés~
-@11450024 = ~Empêche %theTarget% de lancer des sorts divins et innés~
-@11450028 = ~Empêche %theTarget% de lancer des sorts~
+@11450000 = ~Empêche %theTarget% de lancer des sorts %spellType%~
+@11450001 = ~Empêche %theTarget% de lancer des sorts~
 
-@11450050 = ~d'empêcher %theTarget% de lancer des sorts profanes~
-@11450051 = ~d'empêcher %theTarget% de lancer des sorts divins~
-@11450052 = ~d'empêcher %theTarget% de lancer des sorts innés~
-@11450053 = ~d'empêcher %theTarget% de lancer des sorts magiques~
-@11450062 = ~d'empêcher %theTarget% de lancer des sorts profanes et divins~
-@11450070 = ~d'empêcher %theTarget% de lancer des sorts profanes et innés~
-@11450074 = ~d'empêcher %theTarget% de lancer des sorts divins et innés~
-@11450078 = ~d'empêcher %theTarget% de lancer des sorts~
+@11450050 = ~d'empêcher %theTarget% de lancer des sorts %spellType%~
+@11450051 = ~d'empêcher %theTarget% de lancer des sorts~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
