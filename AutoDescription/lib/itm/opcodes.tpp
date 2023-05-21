@@ -4085,6 +4085,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 	LOCAL_SET initOpcode = opcode
+	LOCAL_SET maxSpellLevel = 0
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
 
@@ -4092,6 +4093,11 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 		LPM ~data_to_vars~
 		SET newP1 = 0b0
 		CLEAR_ARRAY positions
+
+		PATCH_IF maxSpellLevel < parameter1 BEGIN
+			SET maxSpellLevel = parameter1
+		END
+
 		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
@@ -4121,6 +4127,27 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 			SET opcode = 509
 			SET parameter1 = newP1
 			LPM ~add_opcode~
+		END
+	END
+
+	// On supprime les éventuelles immunités spécifiques à un sort dont le niveau est inférieur ou égal au niveau le plus grand de l'opcode 102
+	PATCH_IF maxSpellLevel > 0 BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_206~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+				INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+					READ_LONG SPL_level spellLevel
+					PATCH_IF spellLevel <= maxSpellLevel BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = 206
+							STR_VAR expression = ~position = %position%~
+							RET $opcodes(~206~) = count
+							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
+						END
+					END
+				END
+			END
 		END
 	END
 END
