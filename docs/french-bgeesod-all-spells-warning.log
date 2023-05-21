@@ -76,10 +76,7 @@ SPCL102.SPL : Niveau minimum non calculable
 SPCL103.SPL : Niveau minimum non calculable
 SPCL104.SPL : Niveau minimum non calculable
 SPCL121.SPL : Opcode 54: Invalid target : 255
-SPCL121.SPL : Opcode 54: Invalid target : 255
-SPCL121.SPL : Opcode 54: Invalid target : 255
 SPCL121.SPL : Opcode 44: Invalid target : 255
-SPCL121.SPL : Opcode 54: Invalid target : 255
 SPCL121.SPL : Opcode 44: Invalid target : 255
 SPCL121.SPL : Opcode 12: Invalid target : 255
 SPCL144.SPL : Niveau minimum non calculable
@@ -292,17 +289,6 @@ SPPR502.SPL : Niveau minimum non calculable
 SPPR504.SPL : Niveau minimum non calculable
 SPPR504.SPL : Cible à gerer : 3 
 SPPR505.SPL : Niveau minimum non calculable
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
-SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
 SPPR507.SPL : FAILURE: Unknown macro: opcode_target_522
 SPPR510.SPL : Niveau minimum non calculable
 SPPR511.SPL : Niveau minimum non calculable

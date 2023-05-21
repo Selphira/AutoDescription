@@ -131,7 +131,7 @@ BEGIN
 
 					// On ne désactive pas l'opcode du niveau 0
 					PATCH_IF level > 0 BEGIN
-						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%level%~) = level
+						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%level%~) = level
 					END
 				END
 				ELSE BEGIN
@@ -387,12 +387,6 @@ BEGIN
 	PATCH_PHP_EACH level_effects AS _ => requiredLevel BEGIN
 		CLEAR_ARRAY lines
 
-		PATCH_IF ~leveled_opcodes_count_%requiredLevel%~ > 0 AND requiredLevel > 1 BEGIN
-            LPF ~appendLine~ RET description END
-			SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
-			SPRINT description ~%description%%crlf%%levelDescription%~
-		END
-
 		LPM ~clear_opcodes~
 
 		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
@@ -405,6 +399,12 @@ BEGIN
 
 		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
+
+		PATCH_IF countLines > 0 AND /*~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ requiredLevel > 1 BEGIN
+            LPF ~appendLine~ RET description END
+			SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
+			SPRINT description ~%description%%crlf%%levelDescription%~
+		END
 		//LPM ~add_common_opcodes_to_description
 		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
 	END

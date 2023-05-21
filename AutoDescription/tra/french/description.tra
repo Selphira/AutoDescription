@@ -1819,10 +1819,10 @@
 @10160011 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round~
 @10160012 = ~Double la vitesse de déplacement et le nombre d'attaques par round~
 @10160013 = ~Double la vitesse de déplacement~
-@10160014 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %ofTheTarget%~
+@10160014 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %toTheTarget%~
 @10160015 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~
 @10160016 = ~de doubler la vitesse de déplacement %ofTheTarget%~
-@10160017 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round %ofTheTarget%~
+@10160017 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round %toTheTarget%~
 @10160018 = ~Double la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~
 @10160019 = ~Double la vitesse de déplacement %ofTheTarget%~
 
