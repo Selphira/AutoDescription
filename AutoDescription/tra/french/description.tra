@@ -132,7 +132,7 @@
 @102266 = ~Les bonus de Force ne s'appliquent pas à cette arme~
 @102267 = ~Le bonus de toucher en fonction de la force ne s'applique pas à cette arme~
 @102268 = ~Le bonus de dégât en fonction de la force ne s'applique pas à cette arme~
-@102269 = ~Revient dans la main du lanceur~
+@102269 = ~Revient dans la main de son porteur après avoir été lancée~
 @102270 = ~Ne nécessite pas de munitions~
 @102271 = ~Munition à usage illimité~
 
@@ -2100,6 +2100,15 @@
 @10670006 = ~Invoque une créature neutre (%creatureName%)~
 @10670007 = ~d'invoquer une créature alliée (%creatureName%)~
 @10670008 = ~d'invoquer une créature neutre (%creatureName%)~
+
+@10670011 = ~Invoque %amount% créatures (%creatureName%)~
+@10670012 = ~Invoque %amount% créatures hostiles (%creatureName%)~
+@10670013 = ~d'invoquer %amount% créatures (%creatureName%)~
+@10670014 = ~d'invoquer %amount% créatures hostiles (%creatureName%)~
+@10670015 = ~Invoque %amount% créatures alliées (%creatureName%)~
+@10670016 = ~Invoque %amount% créatures neutres (%creatureName%)~
+@10670017 = ~d'invoquer %amount% créatures alliées (%creatureName%)~
+@10670018 = ~d'invoquer %amount% créatures neutres (%creatureName%)~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 

@@ -3248,6 +3248,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_67~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
+	LOCAL_SET strref = 0
+	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
@@ -3255,41 +3257,51 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
 			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
-				SPRINT description @10670002 // ~Invoque une créature hostile (%creatureName%)~
+				SET strref = 10670002 // ~Invoque une créature hostile (%creatureName%)~
 			END
 			ELSE PATCH_IF allegiance <= 30 BEGIN // GOODCUTOFF
-				SPRINT description @10670005 // ~Invoque une créature alliée (%creatureName%)~
+				SET strref = 10670005 // ~Invoque une créature alliée (%creatureName%)~
 			END
 			ELSE BEGIN
-				SPRINT description @10670006 // ~Invoque une créature neutre (%creatureName%)~
+				SET strref = 10670006 // ~Invoque une créature neutre (%creatureName%)~
 			END
 		END
 		// Allégiance variable selon celle de la cible, donc pas de précision
 		ELSE BEGIN
-			SPRINT description @10670001 // ~Invoque une créature (%creatureName%)~
+			SET strref = 10670001 // ~Invoque une créature (%creatureName%)~
 		END
+		PATCH_IF amount > 1 BEGIN
+			SET strref += 10
+		END
+		SPRINT description (AT strref)
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
+	LOCAL_SET strref = 0
+	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
 			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
-				SPRINT description @10670004 // ~d'invoquer une créature hostile (%creatureName%)~
+				SET strref = 10670004 // ~d'invoquer une créature hostile (%creatureName%)~
 			END
 			ELSE PATCH_IF allegiance <= 30 BEGIN // GOODCUTOFF
-				SPRINT description @10670007 // ~d'invoquer une créature alliée (%creatureName%)~
+				SET strref = 10670007 // ~d'invoquer une créature alliée (%creatureName%)~
 			END
 			ELSE BEGIN
-				SPRINT description @10670008 // ~d'invoquer une créature neutre (%creatureName%)~
+				SET strref = 10670008 // ~d'invoquer une créature neutre (%creatureName%)~
 			END
 		END
 		ELSE BEGIN
-			SPRINT description @10670003 // ~d'invoquer une créature (%creatureName%)~
+			SET strref = 10670003 // ~d'invoquer une créature (%creatureName%)~
 		END
+		PATCH_IF amount > 1 BEGIN
+			SET strref += 10
+		END
+		SPRINT description (AT strref)
 	END
 END
 
@@ -6746,9 +6758,9 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 			// On ajoute le (uniquement pour les xxx) derrière chaque sous-effets
             INNER_PATCH_SAVE description ~%description%~ BEGIN
-                REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%selfTarget%)%crlf%~
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%onlyForTarget%)%crlf%~
             END
-			SPRINT description ~%description% (%selfTarget%)~
+			SPRINT description ~%description% (%onlyForTarget%)~
 		END
 	END
 END
@@ -6783,6 +6795,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 		SET saveBonus177 = saveBonus
 		SET diceSides177 = diceSides // levelMin
 		SET diceCount177 = diceCount // levelMax
+		SET custom_int177 = custom_int
 		SET isExternal = 1
 
 		LPM ~read_external_effect_vars~
@@ -6819,6 +6832,11 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 			END
 			// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
 			SET probability = probability177 * probability / 100
+
+			// Gestion pour les invocations de la même créature en plusieurs exemplaires.
+			PATCH_IF opcode == 67 BEGIN
+				SET custom_int = custom_int177
+			END
 
 			LPM ~opcode_is_valid~
 
@@ -6918,6 +6936,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 
 				SET $to_delete(~%currentPosition%~) = 1
 				SET position += 1000
+				SET custom_int = count
 				SPRINT custom_str ~%target_type%~
 				LPM ~add_opcode~
 
@@ -6995,9 +7014,9 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		SPRINT andTo @11770205 // ~et aux~
 
 		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
-		SPRINT versus      @102387 // ~contre les %targetType%~
-		SPRINT selfTarget  @11770001 // ~ uniquement pour les %targetType%~
-		SPRINT theTarget   @102384 // ~les %targetType%~
+		SPRINT versus        @102387 // ~contre les %targetType%~
+		SPRINT onlyForTarget @11770001 // ~uniquement pour les %targetType%~
+		SPRINT theTarget     @102384 // ~les %targetType%~
 		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
 		SPRINT ofTheTarget @102385 // ~des %targetType%~
 		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %to% ~ final_glue = ~ %andTo% ~ RET targetType = text END
