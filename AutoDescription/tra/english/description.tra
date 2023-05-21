@@ -62,6 +62,7 @@
 @101127 = ~Single and multiclassed %classname% and their kits~
 @101128 = ~%classname% and their kits~
 @101129 = ~Sorcerer~
+@101130 = ~between %amountMin% and %amountMax%~
 @101185 = ~%description% (not cumulative)~
 
 // Niveau des sorts
@@ -1505,7 +1506,7 @@
 @410003 = ~sous l'effet de la panique~
 @410004 = ~sous l'effet de l'étourdissement~
 @410005 = ~sous l'effet de l'invisibilité~
-@410006 = ~sans défense~
+@410006 = ~rendu impuissant~
 @410007 = ~sous l'effet d'un gel~
 @410008 = ~sous l'effet d'une pétrification~
 @410009 = ~~
@@ -3360,8 +3361,8 @@
 
 // Opcodre 278: Stat: To Hit Modifier [278]
 
-@12780001 = ~To Hit Roll~
-@12780002 = ~the To Hit Roll~
+@12780001 = ~THAC0~
+@12780002 = ~the THAC0~
 
 // Opcode 279: Button: Enable Button [279]
 

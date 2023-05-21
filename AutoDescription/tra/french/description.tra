@@ -62,6 +62,7 @@
 @101127 = ~%classname% monoclassé, multiclassé et ses kits~
 @101128 = ~%classname% et ses kits~
 @101129 = ~Sorcier~
+@101130 = ~entre %amountMin% et %amountMax%~
 @101185 = ~%description% (non cumulatif)~
 
 // Niveau des sorts
@@ -1505,7 +1506,7 @@
 @410003 = ~sous l'effet de la panique~
 @410004 = ~sous l'effet de l'étourdissement~
 @410005 = ~sous l'effet de l'invisibilité~
-@410006 = ~sans défense~
+@410006 = ~rendu impuissant~
 @410007 = ~sous l'effet d'un gel~
 @410008 = ~sous l'effet d'une pétrification~
 @410009 = ~~
@@ -2648,7 +2649,7 @@
 // Opcode 144: Button: Disable Button [144]
 
 @11440001 = ~%action% l'utilisation du camouflage dans l'ombre~
-@11440002 = ~%action% l'utilisation des compétences de voleur~
+@11440002 = ~%action% l'utilisation des compétences de roublard~
 @11440003 = ~%action% l'utilisation des sorts~
 @11440004 = ~%action% l'utilisation du premier sort rapide~
 @11440005 = ~%action% l'utilisation du second sort rapide~
@@ -2667,7 +2668,7 @@
 @11440021 = ~d'empêcher~ // Action
 
 @11440021 = ~%action% d'utiliser le camouflage dans l'ombre~
-@11440022 = ~%action% d'utiliser les compétences de voleur~
+@11440022 = ~%action% d'utiliser les compétences de roublard~
 @11440023 = ~%action% d'utiliser les sorts~
 @11440024 = ~%action% d'utiliser le premier sort rapide~
 @11440025 = ~%action% d'utiliser le second sort rapide~
@@ -3360,8 +3361,8 @@
 
 // Opcodre 278: Stat: To Hit Modifier [278]
 
-@12780001 = ~Jets de toucher~
-@12780002 = ~les jets de toucher~
+@12780001 = ~TAC0~
+@12780002 = ~le TAC0~
 
 // Opcode 279: Button: Enable Button [279]
 
@@ -4068,10 +4069,10 @@
 @13670031 = ~de rendre %theTarget% sensible à la mort par absorption de caractéristique~
 @13670032 = ~d'immuniser %theTarget% à la mort par absorption de caractéristique~
 
-// Fake Opcode 500: Stat: Compétences de voleur [500]
+// Fake Opcode 500: Stat: Compétences de roublard [500]
 
-@15000001 = ~Compétences de voleur~
-@15000002 = ~les compétences de voleur~
+@15000001 = ~Compétences de roublard~
+@15000002 = ~les compétences de roublard~
 
 // Fake Opcode 501: Stat: Caractéristiques [501]
 
