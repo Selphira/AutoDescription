@@ -7783,16 +7783,18 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 			END
 		END
 		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			// FIXME: le temps des deux effets s'affichent
-			// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
-			// Il faudrait revoir l'affichage, éventuellement mettre la durée en premier
-			// Pendant 5 rounds : A chaque round ; Lorsque que la cible se trouve à moins de 7 mètres ; Lance Emprisonnement
-			// Fix rapide qui cache la durée de l'effet secondaire:
-			SET ignoreDuration = 1
-			//
-	        SET strref += 3 // ~lance un sort sur %theTarget%~
-		    SPRINT description (AT ~%strref%~)
-			SPRINT description ~%description%%spellDescription%~
+			PATCH_IF NOT ~%spellDescription%~ STRING_EQUAL ~~ BEGIN
+				// FIXME: le temps des deux effets s'affichent
+				// Ex: Condition ; A chaque round ; Lance un sortilège pendant 5 rounds pendant 2 rounds
+				// Il faudrait revoir l'affichage, éventuellement mettre la durée en premier
+				// Pendant 5 rounds : A chaque round ; Lorsque que la cible se trouve à moins de 7 mètres ; Lance Emprisonnement
+				// Fix rapide qui cache la durée de l'effet secondaire:
+				SET ignoreDuration = 1
+				//
+		        SET strref += 3 // ~lance un sort sur %theTarget%~
+			    SPRINT description (AT ~%strref%~)
+				SPRINT description ~%description%%spellDescription%~
+			END
 	    END
 	    ELSE BEGIN
 		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
