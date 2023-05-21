@@ -37,10 +37,10 @@ DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET 
 	INNER_PATCH_SAVE description ~%description%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~%regex%~ ~%replace%%colon%%crlf%~
 	END
-
-	PATCH_IF ~%description%~ STRING_MATCHES_REGEXP ~%replace%~ != 0 BEGIN
-		SPRINT description ~%description%%crlf%%crlf%%replace%%colon%%crlf%~
-	END
+	// Ajout du PARAMÈTRES si non présent... ne fonctionne pas correctement, la regex ne gère pas les caractères accentués
+	//PATCH_IF ~%description%~ STRING_MATCHES_REGEXP ~%replace%~ != 0 BEGIN
+	//	SPRINT description ~%description%%crlf%%crlf%%replace%%colon%%crlf%~
+	//END
 END
 
 DEFINE_PATCH_FUNCTION ~appendLine~ INT_VAR strref = 0 STR_VAR string = "" RET description BEGIN
