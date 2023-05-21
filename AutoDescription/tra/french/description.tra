@@ -210,7 +210,7 @@
 @100103 = ~de la Divination~
 @100104 = ~de l'Enchantement~
 @100105 = ~de l'Illusion~
-@100106 = ~de l'Invocation~
+@100106 = ~de l'Évocation~
 @100107 = ~de la Nécromancie~
 @100108 = ~de l'Altération~
 @100109 = ~généraliste~
@@ -222,7 +222,7 @@
 @100123 = ~Divination~
 @100124 = ~Enchantement~
 @100125 = ~Illusion~
-@100126 = ~Invocation~
+@100126 = ~Évocation~
 @100127 = ~Nécromancie~
 @100128 = ~Altération~
 @100129 = ~Généraliste~
@@ -3961,7 +3961,7 @@
 @13460013 = ~contre les sorts de l'école de la Divination~
 @13460014 = ~contre les sorts de l'école de l'Enchantement~
 @13460015 = ~contre les sorts de l'école de l'Illusion~
-@13460016 = ~contre les sorts de l'école de l'Invocation~
+@13460016 = ~contre les sorts de l'école de l'Évocation~
 @13460017 = ~contre les sorts de l'école de la Nécromancie~
 @13460018 = ~contre les sorts de l'école de l'Altération~
 @13460019 = ~contre les sorts de l'école Généraliste~
