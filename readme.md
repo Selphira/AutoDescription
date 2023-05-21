@@ -69,6 +69,6 @@ Il est aussi prévu de prendre en compte les munitions, les potions, et peut-êt
 
 Un grand merci à toutes ces personnes pour leur aide dans l'amélioration du mod !
 
-- [JohnBob](https://www.baldursgateworld.fr/lacouronne/members/johnbob.html)
-- [rivvers](https://www.baldursgateworld.fr/lacouronne/members/rivvers.html)
-- [Deratiseur](https://www.baldursgateworld.fr/lacouronne/members/deratiseur.html)
+- [JohnBob](https://www.baldursgateworld.fr/memberlist.php?mode=viewprofile&u=16284)
+- [rivvers](https://www.baldursgateworld.fr/memberlist.php?mode=viewprofile&u=12905)
+- [Deratiseur](https://www.baldursgateworld.fr/memberlist.php?mode=viewprofile&u=8352)
