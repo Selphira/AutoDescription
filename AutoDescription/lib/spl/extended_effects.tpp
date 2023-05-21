@@ -695,10 +695,10 @@ BEGIN
 			SPRINT options ~~
 			SET canShrink = 1
 
-		    PATCH_FOR_EACH strref IN 10370001 10360001 10350001 10340001 10330001 BEGIN
+		    PATCH_FOR_EACH strref IN 10330001 10340001 10350001 10360001 10370001 BEGIN
 				SPRINT name @102034 // ~Jets de sauvegarde~
 				SPRINT versus (AT ~%strref%~)
-	            SPRINT regex ~\([ ]*\)- %name%\(.*\)%colon%\([^(]*\) %versus%\(.*\)\(%crlf%\)*~
+	            SPRINT regex ~\([ ]*\)- %name%\(.*\)%colon%\([-\+]+[0-9]*\) %versus%\(.*\)\(%crlf%\)*~
 
 			    found = INDEX_BUFFER (CASE_INSENSITIVE EVALUATE_REGEXP ~%regex%~)
 				PATCH_IF found != "-1" BEGIN
@@ -726,9 +726,11 @@ BEGIN
 	        PATCH_IF canShrink == 1 BEGIN
 				SPRINT name @102034 // ~Jets de sauvegarde~
 				SPRINT regex ~~
-				SPRINT replace ~%crlf%%indentation%- %name%%target%%colon%%value%%options%~
-
-			    PATCH_FOR_EACH strref IN 10370001 10360001 10350001 10340001 10330001 BEGIN
+				SPRINT replace ~%indentation%- %name%%target%%colon%%value%%options%~
+				INNER_PATCH_SAVE value ~%value%~ BEGIN
+					REPLACE_TEXTUALLY ~+~ ~\+~
+				END
+			    PATCH_FOR_EACH strref IN 10330001 10340001 10350001 10360001 10370001 BEGIN
 					SPRINT versus (AT ~%strref%~)
 			        SPRINT regex ~%regex%%crlf%[ ]*- %name%%target%%colon%%value% %versus%%options%~
 			    END
