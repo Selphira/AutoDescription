@@ -66,7 +66,7 @@ DEFINE_ACTION_FUNCTION ~init_log_file~
 	RET log_filename
 BEGIN
 	LAF ~get_game_name~ RET gameName END
-	OUTER_SPRINT log_filename ~%gameName%-%mod%-%type%~
+	OUTER_SPRINT log_filename ~%gameName%-%mod%-%type%-%MOD_VERSION%~
 	// Initialisation des fichiers de log
 	<<<<<<<< .../AutoDescription/inlined/empty.log
 >>>>>>>>
