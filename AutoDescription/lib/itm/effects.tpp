@@ -85,6 +85,7 @@ BEGIN
 					LPM ~set_opcode_sort~
 					PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 						LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+						LPF ~lcfirst~ STR_VAR value = ~%description%~ RET description = string END
 						SPRINT description @101125 // ~%probability% de chance %description%~
 					END
 				END
