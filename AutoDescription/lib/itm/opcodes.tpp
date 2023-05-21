@@ -335,7 +335,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 26 => 489 // Item: Remove Curse [26]
 	// 172 => 490 // Spell: Remove Spell [172]
 	// 147 => 491 // Spell: Learn Spell [147]
-	171 => 492 // Spell: Give Innate Ability [171]
+	// 171 => 492 // Spell: Give Innate Ability [171]
 	335 => 493 // Spell Effect: Seven Eyes [335]
 	251 => 494 // Spell Effect: Change Bard Song Effect [251]
 
@@ -383,6 +383,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	168 => 0 // Summon: Remove Creature [168]
 	169 => 0
 	170 => 0 // Graphics: Play Damage Animation [170]
+	171 => 0 // Spell: Give Innate Ability [171]
 	172 => 0 // Spell: Remove Spell [172]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
 	182 => 0 // Item: Apply Effect Item [182]
