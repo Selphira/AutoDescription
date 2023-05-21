@@ -31,11 +31,15 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~removeTechnicalDescription~ STR_VAR description = "" RET description BEGIN
+	SPRINT regex @10008     // ~^[ %TAB%]*\(CARACTÉRISTIQUES\|STATISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+	SPRINT replace @100003  // ~PARAMÈTRES~
 	// On ne garde que le texte roleplay
 	INNER_PATCH_SAVE description ~%description%~ BEGIN
-		SPRINT regex @10008     // ~^[ %TAB%]*\(CARACTÉRISTIQUES\|STATISTIQUES\|PARAMETRES\|PARAMÈTRES\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
-		SPRINT replace @100003  // ~PARAMÈTRES~
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~%regex%~ ~%replace%%colon%%crlf%~
+	END
+
+	PATCH_IF ~%description%~ STRING_MATCHES_REGEXP ~%replace%~ != 0 BEGIN
+		SPRINT description ~%description%%crlf%%crlf%%replace%%colon%%crlf%~
 	END
 END
 
