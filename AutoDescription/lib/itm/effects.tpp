@@ -48,7 +48,11 @@ BEGIN
 			END
 			ELSE PATCH_IF target == TARGET_FX_preset OR target == TARGET_FX_everyone_except_self BEGIN
 				SPRINT opcode_target ~_target~
-				PATCH_IF forceTarget == 0 BEGIN
+				SPRINT selfTheTarget   @102472 // ~le porteur~
+				// Cas où on lance un sort depuis l'opcode 232;341, où la cible de l'effet original est différente de la
+				// cible de l'effet en cours.
+				// Loin d'être idéal, mais je ne vois pas comment faire autrement avec la structure actuelle du code...
+				PATCH_IF forceTarget == 0 OR ~%selfTheTarget%~ STRING_EQUAL ~%theTarget%~ BEGIN
 					SPRINT theTarget   @102471 // ~la cible~
 					SPRINT ofTheTarget @101085 // ~de la cible~
 					SPRINT toTheTarget @101181 // ~à la cible~
