@@ -6885,10 +6885,7 @@ END
  * Use EFF File [177] *
  * ------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
-	PATCH_IF ~%resref%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 BEGIN // Effet d'Item Revision v4
-		LPF ~opcode_self_177_item_revision_casting_penality~ RET description forceSort sort END
-	END
-	ELSE PATCH_IF parameter1 == 0 BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
 	END
 	ELSE BEGIN
@@ -7509,7 +7506,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_189~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_189_common~ BEGIN
-	SET parameter1 = parameter1 BAND 255
 	PATCH_IF parameter2 > 2 OR parameter2 < MOD_TYPE_cumulative OR parameter2 == 2 AND NOT is_ee BEGIN
 		SET parameter2 = MOD_TYPE_cumulative
 	END
@@ -7532,30 +7528,31 @@ END
  * Stat: Attack Speed Factor [190] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
-	LPM ~opcode_190_common~
-	LPF ~opcode_mod~ INT_VAR strref = 11900001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Facteur de vitesse~
+	LOCAL_SET value = parameter1
+	PATCH_IF value >= 0 BEGIN
+		SPRINT value @10000101 // ~Bonus de %value%~
+	END
+	ELSE BEGIN
+		SET value = ABS value
+		SPRINT value @10000102 // ~Malus de %value%~
+	END
+	LPF ~opcode_mod~ INT_VAR strref = 11900001 STR_VAR value RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_190~ BEGIN
-	LPM ~opcode_190_common~
+	LOCAL_SET value = parameter1 * ~-1~
+	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_probability~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_190~ BEGIN
-	LPM ~opcode_190_common~
+	LOCAL_SET value = parameter1 * ~-1~
+	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_target~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_190~ BEGIN
 	LPM ~opcode_self_probability_190~
-END
-
-DEFINE_PATCH_MACRO ~opcode_190_common~ BEGIN
-	SET parameter2 = MOD_TYPE_flat
-	SET parameter1 = parameter1 BAND 255
-	SET parameter1 = parameter1 < 0 ? 0 : parameter1
-	SET parameter1 = parameter1 > 10 ? 10 : parameter1
-	SET parameter1 = 10 - parameter1
 END
 
 /* ----------------------------------- *
@@ -13237,47 +13234,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_target_probability_146_item_revision~ BE
 	RR#BBOW  => 102602 // ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter, les spectateurs ont une pénalité de -5)~
 	RR#SCAXE => 102603 // ~d'étourdir la cible pendant 1 round~
 END
-
-/* ----------------------------------------------------------------------------------- *
- * Gestion de la pénalité à la vitesse d'incantation sur les armures ajoutée par IR v4 *
- * ----------------------------------------------------------------------------------- */
-DEFINE_PATCH_FUNCTION ~opcode_self_177_item_revision_casting_penality~ RET description forceSort sort BEGIN
-	SET forceSort = 0
-	SET sort = 0
-	SPRINT description ~~
-	INNER_PATCH_SAVE value ~%resref%~ BEGIN
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(.*\)\([0-9]+\)$~ ~-\2~
-	END
-	PATCH_IF parameter1 == 1 BEGIN // mage
-		SET forceSort = 1
-		SET sort = $sort_opcodes(~189~) // Après Stat: Casting Time Modifier [189]
-		SET parameter2 = MOD_TYPE_cumulative
-		LPF ~opcode_mod~ INT_VAR strref = 102478 STR_VAR value RET description END // ~Vitesse d'incantation des sorts profanes~
-		SET exceptBards = 1
-        INNER_PATCH_FILE ~%SOURCE_FILE%~ BEGIN
-            GET_OFFSET_ARRAY blockOffsets_177 ITM_V10_GEN_EFFECTS
-            PHP_EACH blockOffsets_177 AS int => blockOffset_177 BEGIN
-                READ_SHORT (blockOffset_177)                  opcode_177
-                READ_BYTE  (blockOffset_177 + EFF_parameter1) parameter1_177
-                READ_ASCII (blockOffset_177 + EFF_resref_key) resref_177
-                PATCH_IF opcode_177 == 177 AND ~%resref_177%~ STRING_MATCHES_REGEXP ~^AG#IRS~ == 0 AND parameter1_177 == 5 BEGIN // Barde
-                    SET exceptBards = 0
-                END
-            END
-        END
-        PATCH_IF exceptBards == 1 BEGIN
-            SPRINT except @102480 // ~excepté pour les bardes~
-            SPRINT description ~%description% (%except%)~
-        END
-	END
-	ELSE PATCH_IF parameter1 == 3 BEGIN // clerc
-		SET forceSort = 1
-		SET sort = 35
-		SET parameter2 = MOD_TYPE_cumulative
-		LPF ~opcode_mod~ INT_VAR strref = 102479 STR_VAR value RET description END // ~Vitesse d'incantation des sorts divins~
-	END
-END
-
 
 // Macro pour opcode de modificateur de caractéristiques
 DEFINE_PATCH_MACRO ~opcode_modstat_is_valid~ BEGIN
