@@ -2651,14 +2651,23 @@
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
-@11450001 = ~Empêche %theTarget% de lancer des sorts profanes~
-@11450002 = ~Empêche %theTarget% de lancer des sorts divins~
-@11450003 = ~Empêche %theTarget% de lancer des sorts innés~
-@11450004 = ~Empêche %theTarget% de lancer des sorts magiques~
-@11450005 = ~d'empêcher %theTarget% de lancer des sorts profanes~
-@11450006 = ~d'empêcher %theTarget% de lancer des sorts divins~
-@11450007 = ~d'empêcher %theTarget% de lancer des sorts innés~
-@11450008 = ~d'empêcher %theTarget% de lancer des sorts magiques~
+@11450000 = ~Empêche %theTarget% de lancer des sorts profanes~
+@11450001 = ~Empêche %theTarget% de lancer des sorts divins~
+@11450002 = ~Empêche %theTarget% de lancer des sorts innés~
+@11450003 = ~Empêche %theTarget% de lancer des sorts magiques~
+@11450012 = ~Empêche %theTarget% de lancer des sorts profanes et divins~
+@11450020 = ~Empêche %theTarget% de lancer des sorts profanes et innés~
+@11450024 = ~Empêche %theTarget% de lancer des sorts divins et innés~
+@11450028 = ~Empêche %theTarget% de lancer des sorts~
+
+@11450050 = ~d'empêcher %theTarget% de lancer des sorts profanes~
+@11450051 = ~d'empêcher %theTarget% de lancer des sorts divins~
+@11450052 = ~d'empêcher %theTarget% de lancer des sorts innés~
+@11450053 = ~d'empêcher %theTarget% de lancer des sorts magiques~
+@11450062 = ~d'empêcher %theTarget% de lancer des sorts profanes et divins~
+@11450070 = ~d'empêcher %theTarget% de lancer des sorts profanes et innés~
+@11450074 = ~d'empêcher %theTarget% de lancer des sorts divins et innés~
+@11450078 = ~d'empêcher %theTarget% de lancer des sorts~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 

@@ -2651,14 +2651,23 @@
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
 
-@11450001 = ~Empêche %theTarget% de lancer des sorts profanes~
-@11450002 = ~Empêche %theTarget% de lancer des sorts divins~
-@11450003 = ~Empêche %theTarget% de lancer des sorts innés~
-@11450004 = ~Empêche %theTarget% de lancer des sorts magiques~
-@11450005 = ~d'empêcher %theTarget% de lancer des sorts profanes~
-@11450006 = ~d'empêcher %theTarget% de lancer des sorts divins~
-@11450007 = ~d'empêcher %theTarget% de lancer des sorts innés~
-@11450008 = ~d'empêcher %theTarget% de lancer des sorts magiques~
+@11450000 = ~Disables %theTarget% to cast wizard spells~
+@11450001 = ~Disables %theTarget% to cast priest spells~
+@11450002 = ~Disables %theTarget% to cast innate spells~
+@11450003 = ~Disables %theTarget% to cast magic spells~
+@11450012 = ~Disables %theTarget% to cast wizard and priest spells~
+@11450020 = ~Disables %theTarget% to cast wizard and innate spells~
+@11450024 = ~Disables %theTarget% to cast priest and innate spells~
+@11450028 = ~Disables %theTarget% to cast spells~
+
+@11450050 = ~to disable %theTarget% to cast wizard spells~
+@11450051 = ~to disable %theTarget% to cast priest spells~
+@11450052 = ~to disable %theTarget% to cast innate spells~
+@11450053 = ~to disable %theTarget% to cast magic spells~
+@11450062 = ~to disable %theTarget% to cast wizard and priest spells~
+@11450070 = ~to disable %theTarget% to cast wizard and innate spells~
+@11450074 = ~to disable %theTarget% to cast priest and innate spells~
+@11450078 = ~to disable %theTarget% to cast spells~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
