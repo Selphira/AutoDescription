@@ -11,7 +11,7 @@
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
 
-@9999 = ~Schtroumpf~
+@9999 = ~Schtroumpfette~
 @10000 = ~
 ~
 @10001 = ~ : ~
@@ -43,6 +43,8 @@
 @100034 = ~Contact~
 @100035 = ~Zone d'effet~
 @100036 = ~Jet de sauvegarde~
+@100037 = ~Permanente~
+@100038 = ~Instantanée~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101079 = ~Arc~
 @101080 = ~Arbalète~
@@ -107,10 +109,10 @@
 @102679 = ~Protection contre les coups critiques~
 @102682 = ~non cumulable~
 
-@102263 = ~Les bonus de la force s'appliquent à cette arme~
+@102263 = ~Les bonus de Force s'appliquent à cette arme~
 @102264 = ~Le bonus de dégât en fonction de la force s'applique à cette arme~
 @102265 = ~Le bonus de toucher en fonction de la force s'applique à cette arme~
-@102266 = ~Les bonus de la force ne s'appliquent pas à cette arme~
+@102266 = ~Les bonus de Force ne s'appliquent pas à cette arme~
 @102267 = ~Le bonus de toucher en fonction de la force ne s'applique pas à cette arme~
 @102268 = ~Le bonus de dégât en fonction de la force ne s'applique pas à cette arme~
 @102269 = ~Revient dans la main du lanceur~
@@ -129,6 +131,7 @@
 @102547 = ~Immunité %resistName%~
 @102548 = ~d'immuniser %resistName%~
 @102549 = ~d'immuniser %theTarget% %resistName%~
+@102552 = ~Immunise %theTarget% %resistName%~
 
 
 // Les différentes cibles
@@ -281,7 +284,7 @@
 @202004 = ~alliés~
 @202005 = ~créatures contrôlées~
 @202006 = ~créatures charmées~
-@202007 = ~créatures envoutées~
+@202007 = ~créatures envoûtées~
 //@202008 = ~~ // Ne correspond à aucune entrée mais utilisée par CM1H07.ITM (The Undying)
 @202028 = ~créatures alliées~
 @202029 = ~créatures alliées~
@@ -325,7 +328,7 @@
 @204103 = ~ours~
 @204104 = ~vers charognards~
 @204105 = ~chiens~
-@204106 = ~dopplegangers~
+@204106 = ~doppelgängers~
 @204107 = ~ettercaps~
 @204108 = ~goules~
 @204109 = ~grouilleux~
@@ -353,7 +356,7 @@
 @204132 = ~ombres~
 @204133 = ~spectres~
 @204134 = ~âmes-en-peine~
-@204135 = ~kuo-tas~
+@204135 = ~kuo-toas~
 @204136 = ~brumes~
 @204137 = ~chats~
 @204138 = ~duergars~
@@ -397,7 +400,7 @@
 @204177 = ~chimères~
 @204178 = ~demi-dragons~
 @204179 = ~yétis~
-@204180 = ~barrils~
+@204180 = ~barrils~ // KEG ??
 @204181 = ~feu follets~
 @204182 = ~mammifères~
 @204183 = ~reptiles~
@@ -414,7 +417,7 @@
 @204208 = ~lances~
 @204209 = ~poings~
 @204210 = ~marteaux~
-@204211 = ~etoiles du matin~
+@204211 = ~étoiles du matin~
 @204212 = ~robes~
 @204213 = ~armures de cuir~
 @204214 = ~cottes de mailles~
@@ -452,8 +455,8 @@
 @205105 = ~ours bruns~
 @205106 = ~ours des cavernes~
 @205107 = ~ours de montagne~
-@205111 = ~dopplegängers~
-@205112 = ~grands dopplegängers~
+@205111 = ~doppelgängers~
+@205112 = ~grands doppelgängers~
 @205113 = ~Drizzt~
 @205114 = ~Elminster~
 @205115 = ~ettercaps~
@@ -535,12 +538,12 @@
 @205192 = ~dragons argentés~
 @205193 = ~djinns~
 @205194 = ~daos~
-@205195 = ~efrits~
+@205195 = ~éfrits~
 @205196 = ~djinns nobles~
-@205197 = ~efrits nobles~
+@205197 = ~éfrits nobles~
 @205198 = ~zombies~
-//@205199 = ~FOOD_CREATURE ???~
-//@205200 = ~HUNTER_CREATURE ???~
+@205199 = ~proies~
+@205200 = ~prédateurs~
 @205201 = ~épées longues~
 @205202 = ~mages~
 @205203 = ~guerriers~
@@ -550,20 +553,20 @@
 @205207 = ~paladins~
 @205208 = ~druides~
 @205209 = ~rôdeurs~
-@205210 = ~WIZARD_EYE~ // TODO: traduire
-@205211 = ~CANDLEKEEP_WATCHER~ // TODO: traduire
+@205210 = ~œils de magicien~
+@205211 = ~sentinelles~
 @205212 = ~soldats amniens~
 @205213 = ~gardes de la ville~
 @205219 = ~élémentaires d'eau~
 @205220 = ~dragons verts~
 @205222 = ~trolls spectraux~
-@205223 = ~WIGHT~ // TODO: traduire
+@205223 = ~nécrophages~
 
 /* ------------ *
  * Specific.ids *
  * ------------ */
 @206000 = ~??????~
-@206005 = ~drows~
+@206005 = ~elfes noirs~
 @206150 = ~githyankis~
 @206243 = ~ménestrels~
 @206250 = ~esprits~
@@ -576,7 +579,7 @@
 @207002 = ~femmes~
 //@207003 = ~~
 //@207004 = ~~
-@207005 = ~bisexués~
+@207005 = ~hermaphrodites~
 @207006 = ~créatures convoquées~
 @207007 = ~illusions~
 //@207008 = ~~
@@ -587,7 +590,7 @@
 @207502 = ~femme~
 //@207503 = ~~
 //@207504 = ~~
-@207505 = ~bisexué~
+@207505 = ~hermaphrodite~
 @207506 = ~créature convoquée~
 @207507 = ~illusion~
 //@207508 = ~~
@@ -712,15 +715,15 @@
 @230049 = ~boucliers moyens~
 @230050 = ~notes~
 @230053 = ~petits boucliers~
-@230055 = ~téléscopes~
+@230055 = ~télescopes~
 @230056 = ~boissons~
 @230057 = ~épées longues~
 @230058 = ~conteneurs~
 @230059 = ~peaux et les fourrures~
 @230060 = ~armures de cuir~
 @230061 = ~armures de cuir clouté~
-@230062 = ~armures de mailles~
-@230063 = ~~ // ITM_TYPE_splint_mail = 0x3f
+@230062 = ~armures en cotte de mailles~
+@230063 = ~armures feuilletées~
 @230064 = ~armures de plate~
 @230065 = ~armures de plate complète~
 @230066 = ~armures de peau~
@@ -770,13 +773,13 @@
 @400009 = ~~ // Opcode visuel
 @400010 = ~à la modification de la constitution~
 @400011 = ~à la dissipation des poisons~
-@400012 = ~aux dégâts supplémentaires~ // non-naturels ?
+@400012 = ~aux dégâts exceptionnels~
 @400013 = ~à la mort magique~
 @400014 = ~à la dissipation de la congélation~
 @400015 = ~à la modification de la dextérité~
 @400016 = ~à la hâte~
 @400017 = ~aux soins~
-@400018 = ~à la modification des points de vie maximums~
+@400018 = ~à la modification du maximum de point de vie~
 @400019 = ~à la modification de l'intelligence~
 @400020 = ~à l'invisibilité~
 @400021 = ~à la modification du score de connaissances~
@@ -826,14 +829,14 @@
 @400065 = ~~ // Opcode visuel
 @400066 = ~~ // Opcode visuel
 @400067 = ~~ // Invocation de créature, non pertinent
-@400068 = ~à la désinvocation~ // pas assez clair
+@400068 = ~au bannissement~
 @400069 = ~à la non-détection~
 @400070 = ~à la dissipation de la non-détection~
 @400071 = ~au changement de sexe~
 @400072 = ~à la modification des attributs~
 @400073 = ~à la modification des dégâts d'attaque~
-@400074 = ~à l'aveuglement~
-@400075 = ~à la dissipation de l'aveuglement~
+@400074 = ~à la cécité~
+@400075 = ~à la dissipation de la cécité~
 @400076 = ~à la débilité mentale~
 @400077 = ~à la dissipation de la débilité mentale~
 @400078 = ~à la maladie~
@@ -841,20 +844,20 @@
 @400080 = ~à la surdité~
 @400081 = ~à la dissipation de la surdité~
 @400082 = ~au changement de script~
-@400083 = ~à la protection contre un projectile spécifique~ // pas assez clair, protection contre les .PRO
+@400083 = ~à la protection contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @400084 = ~à la modification de la résistance au feu magique~
 @400085 = ~à la modification de la résistance au froid magique~
 @400086 = ~à la modification de la résistance aux dégâts tranchants~
 @400087 = ~à la modification de la résistance aux dégâts contondants~
 @400088 = ~à la modification de la résistance aux dégâts perforants~
 @400089 = ~à la modification de la résistance aux dégâts de projectiles~
-@400090 = ~à la modification du score de crochetage~
-@400091 = ~à la modification du score de détection des pièges~
-@400092 = ~à la modification du score de vol à la tire~
+@400090 = ~à la modification du score de Crochetage de serrures~
+@400091 = ~à la modification du score de Détection des pièges~
+@400092 = ~à la modification du score de Vol à la tire~
 @400093 = ~à la fatigue~ // à la modification du score de fatigue
 @400094 = ~à la modification du score d'ivresse~
 @400095 = ~à la modification du score de pistage~
-@400096 = ~à la modification du niveau~
+@400096 = ~à la modification de niveau~
 @400097 = ~à la modification de la force exceptionnelle~
 @400098 = ~à la régénération~
 @400099 = ~à la modification de la durée des sorts~
@@ -870,7 +873,7 @@
 @400109 = ~à la paralysie~
 @400110 = ~~ // Sans effet
 @400111 = ~à l'invocation d'armes magiques~
-@400112 = ~aux effets qui retirent des objets de l'équipement~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
+ @400112 = ~aux effets qui retirent des objets de l'inventaire~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
 @400113 = ~~ // Sans effet
 @400114 = ~à l'identification d'objet~
 @400115 = ~à la détection de l'alignement~
@@ -881,19 +884,19 @@
 @400120 = ~à la protection contre un type d'arme spécifique~
 @400121 = ~~ // Sans effet
 @400122 = ~à la création d'objets magiques~
-@400123 = ~au retrait d'objets magiques~
-@400124 = ~à la téléportation sur une cible~
-@400125 = ~à la modification du score de crochetage des serrures~
+@400123 = ~au retrait de l'inventaire des objets créés par magie~
+@400124 = ~à la téléportation auprès d'une cible~
+@400125 = ~à la modification du score de Crochetage de serrures~
 @400126 = ~à la modification de la vitesse de déplacement~
 @400127 = ~~ // Invocation de créature, non pertinent
 @400128 = ~à la confusion~
-@400129 = ~à l'Aide~
-@400130 = ~à la Bénédiction~
+@400129 = ~à Aide~
+@400130 = ~à Bénédiction~ // ~aux bénédictions~
 @400131 = ~aux cantiques alliés~
-@400132 = ~à la Puissance sacrée~
-@400133 = ~à la Chance~
+@400132 = ~à Puissance sacrée~
+@400133 = ~à la chance~
 @400134 = ~à la pétrification~
-@400135 = ~à la polymorphie~
+@400135 = ~à la métamorphose~
 @400136 = ~aux effets rendant partiellement visible~
 @400137 = ~aux cantiques adverses~
 @400138 = ~~ // Opcode visuel
@@ -909,7 +912,7 @@
 @400148 = ~aux effets qui lancent des sorts sur une zone~
 @400149 = ~~ // Sans effet
 @400150 = ~à la modification du score de détection des pièges~
-@400151 = ~au remplacement de créature~
+@400151 = ~à la permutation de créature~
 @400152 = ~~ // Opcode visuel
 @400153 = ~au sanctuaire~
 @400154 = ~à l'enchevêtrement~
@@ -917,8 +920,8 @@
 @400156 = ~~ // Opcode visuel
 @400157 = ~aux toiles~
 @400158 = ~~ // Opcode visuel
-@400159 = ~à la modification de la quantité d'image-miroir~
-@400160 = ~à la dissipation de sanctuaire~
+@400159 = ~à la modification du nombre d'image-miroir~
+@400160 = ~à la dissipation de Sanctuaire~
 @400161 = ~à la dissipation de l'horreur~
 @400162 = ~à la dissipation de la paralysie~
 @400163 = ~à la modification de la vitesse de déplacement~
@@ -926,7 +929,7 @@
 @400165 = ~aux combats mentaux~
 @400166 = ~à la modification de la résistance à la magie~
 @400167 = ~à la modification du TAC0 des armes de jet~
-@400168 = ~à la dissipation des créatures invoquées~
+@400168 = ~au bannissement des créatures invoquées~
 @400169 = ~~ // Opcode visuel
 @400170 = ~~ // Opcode visuel
 @400171 = ~à l'apprentissage de sorts~
@@ -946,7 +949,7 @@
 @400185 = ~à la paralysie~
 @400186 = ~à la téléportation~
 @400187 = ~~ // non pertinent
-@400188 = ~à la modification de la limite de sorts lancés chaque round~
+@400188 = ~à la modification de la limite de sorts pouvant être lancé par round~
 @400189 = ~à la modification du temps d'incantation des sorts~
 @400190 = ~à la modification du facteur de vitesse~
 @400191 = ~à la modification du niveau de lanceur de sort~
@@ -967,22 +970,22 @@
 @400206 = ~à la protection contre un sort spécifique~
 @400207 = ~au renvoi de sort spécifique~
 @400208 = ~à la modification du nombre de points de vie minimum~
-@400209 = ~à la mort magique~ // Limité au Doigt de mort
-@400210 = ~à l'étourdissement~ // Limité au Mot de pouvoir : Étoudissement
+@400209 = ~aux conséquences de Doigt de mort~ // Limité au Doigt de mort
+@400210 = ~aux conséquences de Mot de pouvoir : Étourdissement~ // Limité au Mot de pouvoir : Étourdissement
 @400211 = ~à l'emprisonnement~
 @400212 = ~~ // Non fonctionnel
 @400213 = ~au labyrinthe~
 @400214 = ~à la génération de sorts multiple~
 @400215 = ~~ // Opcode visuel
 @400216 = ~au drain de niveaux~
-@400217 = ~au sommeil~ // Limité au Mot de pouvoir : Sommeil
+@400217 = ~aux conséquences de Mot de pouvoir : Sommeil~ // Limité au Mot de pouvoir : Sommeil
 @400218 = ~aux peaux de pierre~
 @400219 = ~à la protection contre un type de créature spécifique~ // Protection à changer, terme employé IG mais non adapté à l'opcode
 @400220 = ~à la dissipation des sorts d'une école de magie spécifique~ // Removal: Remove School [220]
-@400221 = ~à la dissipation des sorts d'une sphère spécifique~ // Removal: Remove Secondary Type [221]
+@400221 = ~à la dissipation des sorts d'une sphère de magie spécifique~ // Removal: Remove Secondary Type [221]
 @400222 = ~à la téléportation aléatoire~
 @400223 = ~à la protection contre une quantité spécifique de niveau de sort appartenant à une école de magie~
-@400224 = ~à la restauration des niveaux~
+@400224 = ~à la restauration de niveau~
 @400225 = ~à la détection de la magie~
 @400226 = ~à la protection contre une quantité spécifique de niveau de sort appartenant à une sphère de magie~
 @400227 = ~au renvoi d'une quantité spécifique de niveau de sort appartenant à une école de magie~
@@ -1001,14 +1004,14 @@
 @400240 = ~~ // Opcode visuel
 @400241 = ~aux charmes~
 @400242 = ~à la dissipation de la confusion~
-@400243 = ~à la décharge des objets magiques~
+@400243 = ~à la perte de charge des objets magiques~
 @400244 = ~à l'oubli de sorts profanes~
 //@400245 = ~~ // TODO
 @400246 = ~aux bonus de la folie du berserker~
 @400247 = ~à la modification de l'état de la folie du berserker~
 @400248 = ~à la création d'effet après une attaque de mêlée~
 @400249 = ~à la création d'effet après une attaque à distance~
-@400250 = ~à la modification de dégâts de la Chance~
+@400250 = ~à la modification de dégâts du à la Chance~
 @400251 = ~au changement du chant de barde~
 @400252 = ~à la pose de pièges~
 @400253 = ~~ // Opcode visuel
@@ -1019,7 +1022,7 @@
 //@400258 = ~~ // TODO
 @400259 = ~au piège à sorts~
 //@400260 = ~~ // TODO
-@400261 = ~à la remémorisation des sorts~
+@400261 = ~à la restauration des sorts~
 @400262 = ~à la modification du champ de vision~
 @400263 = ~à la modification du multiplicateur d'attaque sournoise~
 @400264 = ~à l'abandon de son équipement~
@@ -1032,7 +1035,7 @@
 @400271 = ~~ // Opcode visuel
 @400272 = ~aux effets activant des sorts à intervalle régulier~
 @400273 = ~~ // Non pertinent
-@400274 = ~à la téléportation sur un adversaire aléatoire~
+@400274 = ~à la téléportation auprès d'un adversaire aléatoire~
 @400275 = ~à la modification du score de se cacher dans l'ombre~
 @400276 = ~à la modification du score de détection des illusions~
 @400277 = ~à la modification du score de pose de pièges~
@@ -1042,9 +1045,9 @@
 @400281 = ~à la modification de la probabilité de déclenchement des hiatus entropiques~
 @400282 = ~à la modification des caractéristiques~ // Pas clair : les effets modifiant les caractéristiques dans STATS.ids
 @400283 = ~aux effets maudits~
-@400284 = ~à la modification du TAC0 de mêlée~
-@400285 = ~à la modification des dégâts de mêlée~
-@400286 = ~à la modification des dégâts à distance~
+@400284 = ~à la modification du TAC0 avec une arme de mêlée~
+@400285 = ~à la modification des dégâts avec une arme de mêlée~
+@400286 = ~à la modification des dégâts avec une arme à distance~
 @400287 = ~~ // Opcode visuel
 @400288 = ~à la modification du TAC0 des poings~
 @400289 = ~à la modification des dégâts des poings~
@@ -1053,20 +1056,20 @@
 @400292 = ~à la modification de la protection contre les attaques sournoises~
 @400293 = ~~ // Non pertinent
 @400294 = ~~ // Opcode sonore
-@400295 = ~à la modification de la protection contre les morts violentes~
+@400295 = ~à la modification de la protection contre les morts définitives~
 @400296 = ~~ // Opcode visuel
-@400297 = ~à la modification de la protection contre le repoussement des morts-vivants~
+@400297 = ~à la modification de la protection contre Repousser les morts-vivants~
 @400298 = ~~ // Non pertinent
 @400299 = ~à la modification du score des hiatus entropiques~
 @400300 = ~à la modification de la collision des personnages~
 @400301 = ~à la modification de la probabilité de porter un coup critique~
-@400302 = ~à la permission d'utiliser tous les objets~
+@400302 = ~à la capacité Utilisation des objets~
 @400303 = ~au changement de la prise en compte du multiplicateur d'attaque sournoise~ // -_-"
 @400304 = ~~ // Non pertinent
 @400305 = ~à la modification du TAC0 de l'arme secondaire~
 @400306 = ~à la modification du TAC0 de l'arme principale~
 @400307 = ~au pistage~
-@400308 = ~à la protection contre pistage~
+@400308 = ~à la protection contre le pistage~
 @400309 = ~~ // Non pertinent
 @400310 = ~à la protection contre l'arrêt du temps~
 @400311 = ~à la génération de souhait aléatoire~
@@ -1077,14 +1080,14 @@
 @400316 = ~au repos~
 @400317 = ~à la hâte~
 @400318 = ~à la protection contre un type de créature contre un sort spécifique~
-@400319 = ~à la limitation de l'utilisation d'objet~
+@400319 = ~aux restrictions d'utilisation des objets~
 @400320 = ~~ // Opcode visuel
 @400321 = ~à la protection contre un sort ou un objet spécifique~
 @400322 = ~~ // Sans effet
 @400323 = ~à la modification du niveau de Repousser les morts-vivants~
 @400324 = ~à la protection contre un sort ou un objet spécifique~
 @400325 = ~à la modification de tous les jets de sauvegarde~
-@400326 = ~à l'incantation de sort sur une cible de type spécifique~
+@400326 = ~à l'incantation de sort sur une cible d'un type spécifique~
 @400327 = ~~ // Opcode visuel
 //@400328 = ~~ // TODO: difficilement compréhensible pour un joueur
 @400329 = ~au ralentissement du poison~
@@ -1092,7 +1095,7 @@
 @400331 = ~~ // Invocation de créature, non pertinent
 @400332 = ~à la modification des dégâts d'un type spécifique~
 @400333 = ~aux effets incantant des sorts à intervalle régulier~
-@400334 = ~au repoussement des créatures~
+@400334 = ~ à la possibilité de repousser des créatures~
 //@400335 = ~~ // TODO
 @400336 = ~~ // Opcode visuel
 @400337 = ~à la dissipation d'effet spécifique~
@@ -1102,7 +1105,7 @@
 @400341 = ~à la génération d'effet en cas de coup critique~
 @400342 = ~~ // Opcode visuel
 @400343 = ~à l'échange de points de vie avec une cible~
-@400344 = ~à la modification de l'enchantement d'une arme contre une cible de type spécifique~
+@400344 = ~à la modification de l'enchantement d'une arme contre une cible d'un type spécifique~
 @400345 = ~à la modification de l'enchantement d'une arme d'un type spécifique~
 @400346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~
 
@@ -1115,7 +1118,7 @@
 
 @401000 = ~les effets modifiant la classe d'armure~
 @401001 = ~les effets modifiant la vitesse d'attaque~
-@401002 = ~les effets dissipant du sommeil~
+@401002 = ~les effets dissipant le sommeil~
 @401003 = ~les effets provoquant la folie du berserker~
 @401004 = ~les effets dissipant la folie du berserker~
 @401005 = ~les effets de charme~
@@ -1125,13 +1128,13 @@
 @401009 = ~~ // Opcode visuel
 @401010 = ~les effets modifiant la constitution~
 @401011 = ~les effets dissipant les poisons~
-@401012 = ~les effets infligeant des dégâts supplémentaires~ // non-naturels ?
+@401012 = ~les effets infligeant des dégâts exceptionnels~
 @401013 = ~les effets de mort magique~
 @401014 = ~les effets dissipant la congélation~
 @401015 = ~les effets modifiant la dextérité~
 @401016 = ~les effets provoquant la hâte~
-@401017 = ~les effets de soins~
-@401018 = ~les effets modifiant les points de vie maximums~
+@401017 = ~les effets des soins~
+@401018 = ~les effets modifiant le maximum de points de vie~
 @401019 = ~les effets modifiant l'intelligence~
 @401020 = ~les effets provoquant l'invisibilité~
 @401021 = ~les effets modifiant le score de connaissances~
@@ -1172,43 +1175,43 @@
 @401056 = ~les effets provoquant l'inversion d'alignement~
 @401057 = ~les effets provoquant le changement d'alignement~
 @401058 = ~les effets dissipant la magie~
-@401059 = ~les effets modifiant le score de déplacement silencieux~
+@401059 = ~les effets modifiant le score de Déplacement silencieux~
 @401060 = ~les effets altérant l'échec d'incantation des sorts~
 @401061 = ~~ // Opcode visuel
 @401062 = ~les effets permettant la mémorisation de sorts divins supplémentaires~
 @401063 = ~à l'infravision~
-@401064 = ~les effets dissipant de l'infravision~
+@401064 = ~les effets dissipant l'infravision~
 @401065 = ~~ // Opcode visuel
 @401066 = ~~ // Opcode visuel
 @401067 = ~~ // Invocation de créature, non pertinent
-@401068 = ~les effets provoquant la désinvocation~ // pas assez clair
+@401068 = ~les effets provoquant le bannissement~
 @401069 = ~les effets provoquant la non-détection~
 @401070 = ~les effets dissipant la non-détection~
 @401071 = ~les effets provoquant le changement de sexe~
 @401072 = ~les effets modifiant les attributs~
 @401073 = ~les effets modifiant les dégâts d'attaque~
-@401074 = ~les effets provoquant l'aveuglement~
-@401075 = ~les effets dissipant l'aveuglement~
+@401074 = ~les effets provoquant la cécité~
+@401075 = ~les effets dissipant la cécité~
 @401076 = ~les effets provoquant la débilité mentale~
 @401077 = ~les effets dissipant la débilité mentale~
-@401078 = ~les effets provoquant la maladie~
+@401078 = ~les effets provoquant des maladies~
 @401079 = ~les effets dissipant les maladies et la débilité mentale~
 @401080 = ~les effets provoquant la surdité~
 @401081 = ~les effets dissipant la surdité~
 @401082 = ~les effets provoquant un changement de script~
-@401083 = ~les effets protégeant contre un projectile spécifique~ // pas assez clair, protection contre les .PRO
+@401083 = ~les effets protégeant contre un type de projectile spécifique~ // pas assez clair, protection contre les .PRO
 @401084 = ~les effets modifiant la résistance au feu magique~
 @401085 = ~les effets modifiant la résistance au froid magique~
 @401086 = ~les effets modifiant la résistance aux dégâts tranchants~
 @401087 = ~les effets modifiant la résistance aux dégâts contondants~
 @401088 = ~les effets modifiant la résistance aux dégâts perforants~
 @401089 = ~les effets modifiant la résistance aux dégâts de projectiles~
-@401090 = ~les effets modifiant le score de crochetage~
-@401091 = ~les effets modifiant le score de détection des pièges~
-@401092 = ~les effets modifiant le score de vol à la tire~
+@401090 = ~les effets modifiant le score de Crochetage de serrure~
+@401091 = ~les effets modifiant le score de Détection des pièges~
+@401092 = ~les effets modifiant le score de Vol à la tire~
 @401093 = ~les effets provoquant la fatigue~ // les effets modifiant du score de fatigue
 @401094 = ~les effets modifiant le score d'ivresse~
-@401095 = ~les effets modifiant le score de pistage~
+@401095 = ~les effets modifiant le score de Pistage~
 @401096 = ~les effets modifiant le niveau~
 @401097 = ~les effets modifiant la force exceptionnelle~
 @401098 = ~les effets provoquant la régénération~
@@ -1228,8 +1231,8 @@
 @401112 = ~les effets qui retirent des objets équipés~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
 @401113 = ~~ // Sans effet
 @401114 = ~~ // Non pertinent
-@401115 = ~les effets détectant de l'alignement~
-@401116 = ~les effets dissipant de l'invisibilité~
+@401115 = ~les effets détectant l'alignement~
+@401116 = ~les effets dissipant l'invisibilité~
 @401117 = ~les effets provoquant la clairvoyance~
 @401118 = ~~ // Sans effet
 @401119 = ~les effets générant des images-miroirs~
@@ -1237,18 +1240,18 @@
 @401121 = ~~ // Sans effet
 @401122 = ~les effets créant des objets magiques~
 @401123 = ~les effets provoquant le retrait d'objets magiques~
-@401124 = ~les effets provoquant la téléportation sur une cible~
-@401125 = ~les effets modifiant le score de crochetage des serrures~
+@401124 = ~les effets provoquant la téléportation auprès d'une cible~
+@401125 = ~les effets modifiant le score de Crochetage des serrures~
 @401126 = ~les effets modifiant la vitesse de déplacement~
 @401127 = ~~ // Invocation de créature, non pertinent
 @401128 = ~les effets provoquant la confusion~
-@401129 = ~les effets provoquant l'Aide~
-@401130 = ~les effets provoquant la Bénédiction~
+@401129 = ~les effets provoquant Aide~
+@401130 = ~les effets provoquant Bénédiction~
 @401131 = ~les effets des cantiques alliés~
-@401132 = ~les effets provoquant la Puissance sacrée~
-@401133 = ~les effets provoquant la Chance~
+@401132 = ~les effets provoquant Puissance sacrée~
+@401133 = ~les effets provoquant la chance~
 @401134 = ~les effets provoquant la pétrification~
-@401135 = ~les effets provoquant la polymorphie~
+@401135 = ~les effets provoquant la métamorphose~
 @401136 = ~les effets rendant partiellement visible~
 @401137 = ~les effets des cantiques adverses~
 @401138 = ~~ // Opcode visuel
@@ -1263,17 +1266,17 @@
 @401147 = ~les effets provoquant la retranscription des sorts~
 @401148 = ~les effets lançant des sorts sur une zone~
 @401149 = ~~ // Sans effet
-@401150 = ~les effets modifiant le score de détection des pièges~
-@401151 = ~les effets provoquant un remplacement de créature~
+@401150 = ~les effets modifiant le score de Détection des pièges~
+@401151 = ~les effets provoquant une permutation de créature~
 @401152 = ~~ // Opcode visuel
-@401153 = ~les effets de sanctuaire~
+@401153 = ~les effets de Sanctuaire~
 @401154 = ~les effets provoquant l'enchevêtrement~
 @401155 = ~~ // Opcode visuel
 @401156 = ~~ // Opcode visuel
 @401157 = ~les effets de toiles~
 @401158 = ~~ // Opcode visuel
 @401159 = ~les effets modifiant la quantité d'image-miroir~
-@401160 = ~les effets dissipant sanctuaire~
+@401160 = ~les effets dissipant Sanctuaire~
 @401161 = ~les effets dissipant l'horreur~
 @401162 = ~les effets dissipant la paralysie~
 @401163 = ~les effets modifiant la vitesse de déplacement~
@@ -1281,7 +1284,7 @@
 @401165 = ~les effets provoquant des combats mentaux~
 @401166 = ~les effets modifiant la résistance à la magie~
 @401167 = ~les effets modifiant le TAC0 des armes de jet~
-@401168 = ~les effets dissipant les créatures invoquées~
+@401168 = ~les effets bannissant les créatures invoquées~
 @401169 = ~~ // Opcode visuel
 @401170 = ~~ // Opcode visuel
 @401171 = ~les effets provoquant l'apprentissage de sorts~
@@ -1301,7 +1304,7 @@
 @401185 = ~les effets provoquant la paralysie~
 @401186 = ~les effets provoquant la téléportation~
 @401187 = ~~ // non pertinent
-@401188 = ~les effets modifiant la limite de sorts lancés chaque round~
+@401188 = ~les effets modifiant la limite de sorts lancés par round~
 @401189 = ~les effets modifiant le temps d'incantation des sorts~
 @401190 = ~les effets modifiant le facteur de vitesse~
 @401191 = ~les effets modifiant le niveau de lanceur de sort~
@@ -1322,19 +1325,19 @@
 @401206 = ~les effets protégeant contre un sort spécifique~
 @401207 = ~les effets renvoyant un sort spécifique~
 @401208 = ~les effets modifiant le nombre de points de vie minimum~
-@401209 = ~les effets provoquant la mort magique~ // Limité au Doigt de mort
-@401210 = ~les effets provoquant l'étourdissement~ // Limité au Mot de pouvoir : Étoudissement
+@401209 = ~les effets provoqués par Doigt de mort~ // Limité au Doigt de mort
+@401210 = ~les effets provoqués par Mot de pouvoir : Étourdissement~ // Limité au Mot de pouvoir : Étourdissement
 @401211 = ~les effets provoquant l'emprisonnement~
 @401212 = ~~ // Non fonctionnel
 @401213 = ~les effets provoquant un labyrinthe~
 @401214 = ~les effets générant des sorts multiples~
 @401215 = ~~ // Opcode visuel
 @401216 = ~les effets drainant les niveaux~
-@401217 = ~les effets générant le sommeil~ // Limité au Mot de pouvoir : Sommeil
+@401217 = ~les effets générés par Mot de pouvoir : Sommeil~ // Limité au Mot de pouvoir : Sommeil
 @401218 = ~les effets générant des peaux de pierre~
 @401219 = ~les effets protégeant contre un type de créature spécifique~ // Protection à changer, terme employé IG mais non adapté à l'opcode
 @401220 = ~les effets dissipant les sorts d'une école de magie spécifique~ // Removal: Remove School [220]
-@401221 = ~les effets dissipant les sorts d'une sphère spécifique~ // Removal: Remove Secondary Type [221]
+@401221 = ~les effets dissipant les sorts d'une sphère de magie spécifique~ // Removal: Remove Secondary Type [221]
 @401222 = ~les effets provoquant la téléportation aléatoire~
 @401223 = ~les effets protégeant contre une quantité spécifique de niveau de sort appartenant à une école de magie~
 @401224 = ~les effets restaurant les niveaux~
@@ -1352,18 +1355,18 @@
 @401236 = ~les effets provoquant une projection d'image~
 @401237 = ~~ // Non pertinent
 @401238 = ~les effets provoquant la désintégration~
-@401239 = ~les effets provoquant la vision lointaine~ // pas assez clair
+@401239 = ~les effets octroyant Vision lointaine~
 @401240 = ~~ // Opcode visuel
-@401241 = ~les effets provoquant le charme~
+@401241 = ~les effets provoquant un charme~
 @401242 = ~les effets dissipant la confusion~
-@401243 = ~les effets provoquant la décharge des objets magiques~
+@401243 = ~les effets provoquant la perte de charge des objets magiques~
 @401244 = ~les effets provoquant l'oubli de sorts profanes~
 //@401245 = ~~ // TODO
 @401246 = ~les effets générant les bonus de la folie du berserker~
 @401247 = ~les effets provoquant l'état de la folie du berserker~
 @401248 = ~les effets provoquant la création d'effet après une attaque de mêlée~
 @401249 = ~les effets provoquant la création d'effet après une attaque à distance~
-@401250 = ~les effets modifiant les dégâts de la Chance~
+@401250 = ~les effets modifiant les dégâts du à la chance~
 @401251 = ~les effets changeant le chant de barde~
 @401252 = ~les effets provoquant la pose de pièges~
 @401253 = ~~ // Opcode visuel
@@ -1374,7 +1377,7 @@
 //@401258 = ~~ // TODO
 @401259 = ~les effets générant un piège à sorts~
 //@401260 = ~~ // TODO
-@401261 = ~les effets provoquant la remémorisation des sorts~
+@401261 = ~les effets provoquant la restauration des sorts~
 @401262 = ~les effets modifiant le champ de vision~
 @401263 = ~les effets modifiant le multiplicateur d'attaque sournoise~
 @401264 = ~les effets provoquant l'abandon de son équipement~
@@ -1387,19 +1390,19 @@
 @401271 = ~~ // Opcode visuel
 @401272 = ~les effets activant les sorts à intervalle régulier~
 @401273 = ~~ // Non pertinent
-@401274 = ~les effets provoquant la téléportation sur un adversaire aléatoire~
-@401275 = ~les effets modifiant le score de se cacher dans l'ombre~
-@401276 = ~les effets modifiant le score de détection des illusions~
-@401277 = ~les effets modifiant le score de pose de pièges~
+@401274 = ~les effets provoquant la téléportation auprès d'un adversaire aléatoire~
+@401275 = ~les effets modifiant le score de Se cacher dans l'ombre~
+@401276 = ~les effets modifiant le score de Détection des illusions~
+@401277 = ~les effets modifiant le score de Pose de pièges~
 @401278 = ~les effets modifiant le TAC0~
 @401279 = ~les effets débloquant les compétences actives~
 @401280 = ~les effets activant le déclenchement des hiatus entropiques~ // -_-'
 @401281 = ~les effets modifiant la probabilité de déclenchement des hiatus entropiques~
 @401282 = ~les effets modifiant les statistiques~ // Pas clair : les effets modifiant les caractéristiques dans STATS.ids
 @401283 = ~les effets maudits~
-@401284 = ~les effets modifiant le TAC0 de mêlée~
-@401285 = ~les effets modifiant les dégâts de mêlée~
-@401286 = ~les effets modifiant les dégâts à distance~
+@401284 = ~les effets modifiant le TAC0 avec une arme de mêlée~
+@401285 = ~les effets modifiant les dégâts avec une arme de mêlée~
+@401286 = ~les effets modifiant les dégâts avec une arme à distance~
 @401287 = ~~ // Opcode visuel
 @401288 = ~les effets modifiant le TAC0 des poings~
 @401289 = ~les effets modifiant les dégâts des poings~
@@ -1408,22 +1411,22 @@
 @401292 = ~les effets modifiant la protection contre les attaques sournoises~
 @401293 = ~~ // Non pertinent
 @401294 = ~~ // Opcode sonore
-@401295 = ~les effets modifiant la protection contre les morts violentes~
+@401295 = ~les effets modifiant la protection contre les morts définitives~
 @401296 = ~~ // Opcode visuel
-@401297 = ~les effets modifiant la protection contre le repoussement des morts-vivants~
+@401297 = ~les effets modifiant la protection contre Repousser les morts-vivants~
 @401298 = ~~ // Non pertinent
 @401299 = ~les effets modifiant le score des hiatus entropiques~
 @401300 = ~les effets modifiant la collision des personnages~
 @401301 = ~les effets modifiant la probabilité de porter un coup critique~
-@401302 = ~les effets permettant d'utiliser tous les objets~
+@401302 = ~les effets de la capacité Utilisation des objets~
 @401303 = ~les effets activant la prise en compte du multiplicateur d'attaque sournoise~
 @401304 = ~~ // Non pertinent
 @401305 = ~les effets modifiant le TAC0 de l'arme secondaire~
 @401306 = ~les effets modifiant le TAC0 de l'arme principale~
-@401307 = ~les effets de pistage~
-@401308 = ~les effets protégeant du pistage~
+@401307 = ~les effets de Pistage~
+@401308 = ~les effets protégeant contre le pistage~
 @401309 = ~~ // Non pertinent
-@401310 = ~les effets protégeant de l'arrêt du temps~
+@401310 = ~les effets protégeant contre l'arrêt du temps~
 @401311 = ~les effets générant un souhait aléatoire~
 @401312 = ~~ // Sans effet
 @401313 = ~~ // Non pertinent
@@ -1431,15 +1434,15 @@
 @401315 = ~~ // Opcode visuel
 @401316 = ~les effets provoquant le repos~
 @401317 = ~les effets provoquant la hâte~
-@401318 = ~les effets protégeant contre un type de créature contre un sort spécifique~
-@401319 = ~les effets provoquant la limitation de l'utilisation d'objet~
+@401318 = ~les effets protégeant contre un type de créature et contre un sort spécifique~
+@401319 = ~les effets provoquant la limitation de l'utilisation d'objets~
 @401320 = ~~ // Opcode visuel
 @401321 = ~les effets protégeant contre un sort ou un objet spécifique~
 @401322 = ~~ // Sans effet
 @401323 = ~les effets modifiant le niveau de Repousser les morts-vivants~
 @401324 = ~les effets protégeant contre un sort ou un objet spécifique~
 @401325 = ~les effets modifiant tous les jets de sauvegarde~
-@401326 = ~les effets provoquant l'incantation de sort sur une cible de type spécifique~
+@401326 = ~les effets provoquant l'incantation de sort sur une cible d'un type spécifique~
 @401327 = ~~ // Opcode visuel
 //@401328 = ~~ // TODO: difficilement compréhensible pour un joueur
 @401329 = ~les effets ralentissant du poison~
@@ -1447,7 +1450,7 @@
 @401331 = ~~ // Invocation de créature, non pertinent
 @401332 = ~les effets modifiant les dégâts d'un type spécifique~
 @401333 = ~les effets incantant les sorts à intervalle régulier~
-@401334 = ~les effets repoussant des créatures~
+@401334 = ~les effets permettant de repousser des créatures~
 //@401335 = ~~ // TODO
 @401336 = ~~ // Opcode visuel
 @401337 = ~les effets dissipant un effet spécifique~
@@ -1457,7 +1460,7 @@
 @401341 = ~les effets générant un effet en cas de coup critique~
 @401342 = ~~ // Opcode visuel
 @401343 = ~les effets provoquant l'échange de points de vie avec une cible~
-@401344 = ~les effets modifiant l'enchantement d'une arme contre une cible de type spécifique~
+@401344 = ~les effets modifiant l'enchantement d'une arme contre une cible d'un type spécifique~
 @401345 = ~les effets modifiant l'enchantement d'une arme d'un type spécifique~
 @401346 = ~les effets modifiant les jets de sauvegarde contre une école de magie spécifique~
 
@@ -1472,12 +1475,12 @@
 // ou @13240639 = ~d'être effectif contre les créatures ...~
 // FIXME: problème d'accord potentiel selon le genre de la target
 
-@410000 = ~sous aucun effet~
-@410001 = ~sous l'effet de sommeil~
-@410002 = ~sous l'effet de folie du berserker~
-@410003 = ~sous l'effet de panique~
-@410004 = ~sous l'effet d'étourdissement~
-@410005 = ~sous l'effet d'invisibilité~
+@410000 = ~sous aucun effet~// libre de tout effet
+@410001 = ~sous l'effet de Sommeil~
+@410002 = ~sous l'effet de la folie du berserker~
+@410003 = ~sous l'effet de la panique~
+@410004 = ~sous l'effet de l'étourdissement~
+@410005 = ~sous l'effet de l'invisibilité~
 @410006 = ~sans défense~
 @410007 = ~sous l'effet d'un gel~
 @410008 = ~sous l'effet d'une pétrification~
@@ -1485,26 +1488,26 @@
 @410010 = ~~
 @410011 = ~~
 @410012 = ~sous l'effet de la mort~ // FIXME
-@410013 = ~sous l'effet d'un silence~
+@410013 = ~sous l'effet de Silence~
 @410014 = ~sous l'effet d'un charme~
 @410015 = ~sous l'effet d'un poison~
 @410016 = ~sous l'effet de la hâte~
-@410017 = ~sous l'effet de lenteur~
+@410017 = ~sous l'effet de Lenteur~
 @410018 = ~sous l'effet de l'infravision~ // FIXME
-@410019 = ~sous l'effet de l'aveuglement~
+@410019 = ~sous l'effet de la cécité~
 @410020 = ~sous l'effet de la maladie~
 @410021 = ~sous l'effet de la débilité mentale~
-@410022 = ~sous l'effet de non détection~
-@410023 = ~sous l'effet d'invisibilité améliorée~
-@410024 = ~sous l'effet de bénédiction~
+@410022 = ~sous l'effet de Non-détection~
+@410023 = ~sous l'effet d'Invisibilité améliorée~
+@410024 = ~sous l'effet de Bénédiction~
 @410025 = ~sous l'effet d'un cantique allié~
-@410026 = ~sous l'effet d'une puissance sacrée~
-@410027 = ~sous l'effet de chance~
-@410028 = ~sous l'effet d'aide~
+@410026 = ~sous l'effet de Puissance sacrée~
+@410027 = ~sous l'effet de Chance~
+@410028 = ~sous l'effet d'Aide~
 @410029 = ~sous l'effet d'un cantique adverse~
-@410030 = ~sous l'effet de flou~
-@410031 = ~sous l'effet de image-miroir~
-@410032 = ~sous l'effet de confusion~
+@410030 = ~sous l'effet de Flou~
+@410031 = ~sous l'effet de Image-miroir~
+@410032 = ~sous l'effet de la confusion~
 
 
 
@@ -1524,29 +1527,29 @@
 @420006 = ~Bouclier de feu (bleu)~
 @420008 = ~Protection contre la mort~
 @420009 = ~Puissance sacrée~
-@420021 = ~Sphère d'Otiluke~
+@420021 = ~Sphère résistante d'Otiluke~
 @420024 = ~Peau d'écorce~
 @420031 = ~Bouclier tempête~
-@420036 = ~le sommeil profond~
+@420036 = ~un sommeil profond~
 @420038 = ~la surdité~
-@420040 = ~la protection contre les attaques sournoises~
+@420040 = ~une protection contre les attaques sournoises~
 @420041 = ~Ordres chaotiques~
 @420042 = ~Fourvoiement magique~
 @420044 = ~Grande malédiction~
 @420046 = ~le toucher de la goule~ // Maladie, mode 11/12
 @420055 = ~Fatalité~
-@420056 = ~l'immunité aux sorts d'Abjuration~ // Immunité aux sorts
-@420057 = ~l'immunité aux sorts de Conjuration~
-@420058 = ~l'immunité aux sorts de Divination~
-@420059 = ~l'immunité aux sorts d'Enchantement~
-@420060 = ~l'immunité aux sorts d'Illusion~
-@420061 = ~l'immunité aux sorts d'Évocation~
-@420062 = ~l'immunité aux sorts de Nécromancie~
-@420063 = ~l'immunité aux sorts de Transmutation~
-@420064 = ~la protection contre les armes~
-@420065 = ~la protection contre les éléments~
-@420066 = ~la protection contre les sorts~
-@420067 = ~la protection contre les sorts incapacitants~
+@420056 = ~une immunité aux sorts d'Abjuration~
+@420057 = ~une immunité aux sorts de Conjuration~
+@420058 = ~une immunité aux sorts de Divination~
+@420059 = ~une immunité aux sorts d'Enchantement~
+@420060 = ~une immunité aux sorts d'Illusion~
+@420061 = ~une immunité aux sorts d'Évocation~
+@420062 = ~une immunité aux sorts de Nécromancie~
+@420063 = ~une immunité aux sorts de Transmutation~
+@420064 = ~une protection contre les armes~
+@420065 = ~une protection contre les éléments~
+@420066 = ~une protection contre les sorts~
+@420067 = ~une protection contre les sorts incapacitants~
 @420068 = ~un stimulant de combat~
 @420071 = ~Poussière scintillante~
 @420072 = ~l'incapacité de devenir invisible~
@@ -1556,10 +1559,10 @@
 @420076 = ~Rage du barbare~
 @420077 = ~Rage du berserker~ // Celle du kit
 @420078 = ~Furie~ // Celle de Minsc
-@420079 = ~Arme empoisonée~
+@420079 = ~Arme empoisonnée~
 @420080 = ~Kaï~
 @420081 = ~Position défensive~
-@420082 = ~Tir ciblé~
+@420082 = ~Tir ajusté~
 @420083 = ~Bouclier du chaos~
 @420084 = ~Bouclier majeur du chaos~
 @420087 = ~le chant d'un Scalde~
@@ -1569,13 +1572,13 @@
 @420093 = ~Arme enchantée~
 @420095 = ~Forme spirituelle~
 @420096 = ~Élu des esprits~
-@420097 = ~Arme critique~ // TODO?, sort sans nom : Coup critique +10%
-@420098 = ~Potion de blocage de la magie~
-@420099 = ~Potion de clarté~
-@420100 = ~Parchemin de protection contre la magie~
-@420101 = ~Parchemin de protection contre les morts-vivants~
-@420104 = ~la folie du berserker~ // concerne également la rage du Barbare, la rage Animale...
-@420106 = ~la protection contre la peur~
+@420097 = ~Arme critique~ // TODO?, sort sans nom : Coup critique +10% // une augmentation de 10 % du nombre de coups critiques // Chance de coup critique : +10 %
+@420098 = ~une potion de blocage de la magie~
+@420099 = ~une potion de clarté~
+@420100 = ~un parchemin de protection contre la magie~
+@420101 = ~un parchemin de protection contre les morts-vivants~
+@420104 = ~la folie du berserker~ // concerne également la rage du Barbare, la rage Animale... // les effets de l'état berserk / les effets de la rage
+@420106 = ~une protection contre la peur~
 @420107 = ~Protection contre la pétrification~
 @420108 = ~Bouclier de sort~
 @420109 = ~Protection contre les projectiles non magiques~
@@ -1588,7 +1591,7 @@
 @420121 = ~Manteau~
 @420122 = ~Manteau amélioré~
 @420123 = ~Immunité absolue~
-@420124 = ~Banni~ // FIXME: l'emprisonnement détruit la cible plutôt que de l'enfermer, non hardcoded
+@420124 = ~un bannissement~ // FIXME: l'emprisonnement détruit la cible plutôt que de l'enfermer, non hardcoded
 @420125 = ~le mode histoire~ // Mode de jeu facile ++
 @420126 = ~Bouclier~
 @420250 = ~la maladie~
@@ -1598,7 +1601,7 @@
 
 @500001 = ~Dissout %theTarget%~
 @500002 = ~Carbonise %theTarget%~
-@500003 = ~Explose %theTarget% en morceaux~
+@500003 = ~Démembre %theTarget%~
 @500004 = ~Tue instantanément %theTarget%~
 @500005 = ~Décapite %theTarget%~
 @500006 = ~Pétrifie %theTarget%~
@@ -1611,7 +1614,7 @@
 
 @500101 = ~de dissoudre %theTarget%~
 @500102 = ~de carboniser %theTarget%~
-@500103 = ~d'exploser %theTarget% en morceaux~
+@500103 = ~de démembrer %theTarget%~
 @500104 = ~de tuer instantanément %theTarget%~
 @500105 = ~de décapiter %theTarget%~
 @500106 = ~de pétrifier %theTarget%~
@@ -1657,7 +1660,7 @@
 @10010002 = ~Attaque par round : Passe à %value%~
 @10010003 = ~Attaque par round : %value%~
 @10010004 = ~Attaque par round : Fixée à %value%~
-@10010005 = ~Attaque impossible~ // TODO: trouver une tournure pour self
+@10010005 = ~Attaque impossible~ // TODO: trouver une tournure pour self // Ne peut (plus) attaquer // Ne peut (plus) effectuer d'attaque pas sur de ce que self veut dire dans quel contexte ?...
 
 @10010011 = ~Modifie le nombre d'attaque par round %ofTheTarget% de %value%~
 @10010012 = ~Passe le nombre d'attaque par round %ofTheTarget% à %value%~
@@ -1715,8 +1718,8 @@
 // Opcode 11: Cure: Poison [11]
 
 @10110001 = ~Neutralisation des poisons~
-@10110002 = ~Neutralise les poisons %ofTheTarget%~
-@10110003 = ~de neutraliser les poisons sur %theTarget%~
+@10110002 = ~Neutralise les poisons infectant %theTarget%~
+@10110003 = ~de neutraliser les poisons infectant %theTarget%~
 
 // Opcode 12: HP: Damage [12]
 
@@ -1725,18 +1728,18 @@
 @10120003 = ~Inflige %damage% %damageType% %versus%~
 @10120004 = ~Draine %damage% %damageType% %toTheTarget%~
 @10120005 = ~Transfert %damage% %damageType% %toTheTarget%~
-@10120006 = ~Passe la santé de %theTarget% à %damage%~
-@10120007 = ~Passe la santé de %theTarget% à %damage% %~
-@10120008 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~
+@10120006 = ~Passe les points de vie %ofTheTarget% à %damage%~
+@10120007 = ~Passe les points de vie %ofTheTarget% à %damage% %~
+@10120008 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~// déjà vu aussi mais Inflige %damage% % du maximum de points de vie %toTheTarget%
 
 @10120011 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120012 = ~d'infliger %damage% %damageType% %toTheTarget%~
 @10120013 = ~d'infliger %damage% %damageType% %versus%~
 @10120014 = ~de drainer %damage% %damageType% %toTheTarget%~
 @10120015 = ~de transférer %damage% %damageType% %toTheTarget%~
-@10120016 = ~de faire passer la santé de %theTarget% à %damage%~
-@10120017 = ~de faire passer la santé de %theTarget% à %damage% %~
-@10120018 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~
+@10120016 = ~de faire passer les points de vie %ofTheTarget% à %damage%~
+@10120017 = ~de faire passer les points de vie %ofTheTarget% à %damage% %~
+@10120018 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~ // ~d'infliger %damage% % du maximum de points de vie %toTheTarget%~
 
 // @10120016 = ~de retirer %value% des points de vie de la cible sous forme de %damageType%~
 
@@ -1756,7 +1759,7 @@
 @10120033 = ~points de dégâts à mains nues~
 
 @10120040 = ~ne réveille pas la cible~
-@10120041 = ~efficace si la source est désarmée~ // FIXME: aucune arme dans la main directrice
+@10120041 = ~efficace si la source est désarmée~ // FIXME: aucune arme dans la main directrice // la source ??~
 
 // Opcode 13: Death: Instant Death [13]
 
@@ -1764,7 +1767,7 @@
 // Opcode 14: Graphics: Defrost [14]
 
 // TODO
-@10140001 = ~Dissipation de la congélation~
+@10140001 = ~Décongélation~
 @10140002 = ~de décongeler %theTarget%~
 @10140003 = ~Décongèle %theTarget%~
 
@@ -1810,8 +1813,8 @@
 
 // Opcode 18: Stat: Maximum HP Modifier [18]
 
-@10180001 = ~Points de vie maximums~
-@10180002 = ~les points de vie maximums~
+@10180001 = ~Points de vie maximums~// Maximum de points de vie
+@10180002 = ~les points de vie maximums~// Le maximum de points de vie
 @10180003 = ~Points de vie~
 @10180004 = ~les points de vie~
 
@@ -1951,8 +1954,8 @@
 // Opcode 43: Cure: Stone to Flesh [43]
 
 @10430001 = ~Transmutation de la pierre en chair~
-@10430002 = ~de dépétrifier %theTarget%~
-@10430003 = ~Dépétrifie %theTarget%~
+@10430002 = ~de dépétrifier %theTarget%~ // de transmuter %theTarget% en chair
+@10430003 = ~Dépétrifie %theTarget%~ // Transmute %theTarget% en chair
 
 // Opcode 44: Stat: Strength Modifier [44]
 
@@ -1966,8 +1969,8 @@
 
 // Opcode 46: Cure: Stun (Unstun) [46]
 
-@10460001 = ~Guérison de l'étourdissement~
-@10460002 = ~de ranimer %theTarget%~
+@10460001 = ~Guérison de l'étourdissement~ // Atténuation de l'étourdissement ??
+@10460002 = ~de ranimer %theTarget%~ // Ranime ou Réanime (déjà vu) ??
 @10460003 = ~Ranime %theTarget%~
 
 // Opcode 47: Cure: Invisibility [47]
@@ -2067,20 +2070,20 @@
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
-@10680001 = ~Renvoie %theTarget% si c'est une créature invoquée~
-@10680002 = ~de renvoyer %theTarget% si c'est une créature invoquée~
+@10680001 = ~Renvoie %theTarget% s'il s'agit d'une créature invoquée~
+@10680002 = ~de renvoyer %theTarget% s'il s'agit d'une créature invoquée~
 
 // Opcode 69: Protection: From Detection (Non-Detection) [69]
 
 @10690001 = ~Non-détection~
-@10690002 = ~Lance non-détection sur %theTarget%~
-@10690003 = ~de lancer non-détection sur %theTarget%~
+@10690002 = ~Lance Non-détection sur %theTarget%~
+@10690003 = ~de lancer Non-détection sur %theTarget%~
 
 // Opcode 70: Cure: Non-Detection [70]
 
-@10700001 = ~Dissipation de la non-détection~
-@10700002 = ~Dissipe la non-détection %ofTheTarget%~
-@10700003 = ~de dissiper la non-détection %ofTheTarget%~
+@10700001 = ~Dissipation de Non-détection~
+@10700002 = ~Dissipe Non-détection %ofTheTarget%~
+@10700003 = ~de dissiper Non-détection %ofTheTarget%~
 
 // Opcode 71: Sex Change [71]
 
@@ -2197,7 +2200,7 @@
 
 // Opcode 84: Stat: Magical Fire Resistance Modifier [84]
 
-@10840001 = ~Résistance aux dégâts de feu magiques~
+@10840001 = ~Résistance aux dégâts de feu magiques~ // question bête "de feu magiques" ou "de feu magique" pareil pour la suite...
 @10840002 = ~aux dégâts de feu magiques~
 @10840003 = ~la résistance aux dégâts de feu magiques~
 
@@ -2238,7 +2241,7 @@
 
 // Opcode 91: Stat: Find Traps Modifier [91]
 
-@10910001 = ~Détection / désamorçage des pièges~
+@10910001 = ~Détection / Désamorçage des pièges~
 @10910002 = ~la détection / désamorçage des pièges~
 
 // Opcode 92: Stat: Pick Pockets Modifier [92]
@@ -2384,9 +2387,9 @@
 // Opcode 111: Item: Create Magical Weapon [111]
 
 @11110001 = ~Crée une arme magique (%itemName%)~
-@11110002 = ~Équipe %theTarget% d'une arme magique (%itemName%)~
+@11110002 = ~Équipe %theTarget% d'une arme magique (%itemName%)~ // ~Équipe %theTarget% avec une arme magique (%itemName%)~ Pas trop sûr que ce soit mieux...?
 @11110011 = ~Crée %amount% armes magiques (%itemName%)~
-@11110012 = ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~
+@11110012 = ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~ // avec ?
 
 // Opcode 112: Item: Remove Item [112]
 
@@ -2396,17 +2399,17 @@
 
 // Opcode 115: Detect: Alignment [115]
 
-@11150001 = ~Détection du %alignment%~
+@11150001 = ~Détection du %alignment%~// Détection des créatures %alignment% // Faut-il du singulier ? // Détection de créature %alignment%
 
-@11150011 = ~%theTarget% détecte le %alignment%~ // TODO : placer %theTarget% ailleurs
+@11150011 = ~%theTarget% détecte le %alignment%~ // TODO : placer %theTarget% ailleurs // Les créatures %alignment% sont détectées par %theTarget%
 
-@11150021 = ~de détecter le %alignment%~
+@11150021 = ~de détecter le %alignment%~ //de détecter les créatures %alignment%
 
-@11150031 = ~que %theTarget% détecte le %alignment%~
+@11150031 = ~que %theTarget% détecte le %alignment%~//que %theTarget% détecte les créatures %alignment% // que les créatures %alignment% soient détectées par %theTarget%
 
-@11150101 = ~mal~
-@11150102 = ~neutre~
-@11150103 = ~bien~
+@11150101 = ~mal~ // mauvaises / néfastes // maléfique / néfaste
+@11150102 = ~neutre~// neutres // neutre
+@11150103 = ~bien~ // bonnes  / bienfaisantes // bonne / bienfaisante
 
 // Opcode 117: Spell Effect: Reveal Area [117]
 
@@ -2433,7 +2436,7 @@
 @11200012 = ~armes non-magiques~
 @11200013 = ~armes en argent~
 @11200014 = ~armes qui ne sont pas en argent~
-@11200015 = ~armes enchantées +0 exceptées celles en argent~
+@11200015 = ~armes enchantées +0 exceptées celles en argent~ // le plus 0 est-il nécessaire, si l'arme est enchantée c'est implicite ?
 @11200016 = ~armes à 2 mains~
 @11200017 = ~armes à 1 main~
 @11200018 = ~armes maudites~
@@ -2453,23 +2456,23 @@
 // Opcode 124: Spell Effect: Teleport (Dimension Door) [124]
 
 @11240001 = ~Téléporte %theTarget%~
-@11240002 = ~Téléporte %theTarget% vers sa cible~
-@11240003 = ~Téléporte %theTarget% vers un endroit sûr~
-@11240004 = ~Échange la place %ofTheTarget% avec sa cible~
-@11240005 = ~Téléporte %theTarget% vers le porteur~
-@11240006 = ~Échange la place %ofTheTarget% avec le porteur~
+@11240002 = ~Téléporte %theTarget% auprès de sa cible~
+@11240003 = ~Téléporte %theTarget% dans un endroit sûr~
+@11240004 = ~Permute %ofTheTarget% avec sa cible~
+@11240005 = ~Téléporte %theTarget% auprès du porteur~
+@11240006 = ~Permute %theTarget% avec le porteur~
 
 @11240011 = ~de téléporter %theTarget%~
-@11240012 = ~de téléporter %theTarget% vers sa cible~
-@11240013 = ~de téléporter %theTarget% vers un endroit sûr~
-@11240014 = ~d'échanger la place %ofTheTarget% avec sa cible~
-@11240015 = ~de téléporter %theTarget% vers le porteur~
-@11240016 = ~d'échanger la place %ofTheTarget% avec le porteur~
+@11240012 = ~de téléporter %theTarget% auprès de sa cible~
+@11240013 = ~de téléporter %theTarget% dans un endroit sûr~
+@11240014 = ~d'échanger la place %ofTheTarget% auprès de sa cible~
+@11240015 = ~de téléporter %theTarget% auprès du porteur~
+@11240016 = ~de permuter %theTarget% avec le porteur~
 
 // Opcode 125: Spell Effect: Unlock (Knock) [125]
 
-@11250001 = ~Déverrouille la serrure ciblée~
-@11250002 = ~de déverrouiller la serrure ciblée~
+@11250001 = ~Déverrouille la serrure ciblée~ // Crochète la serrure ciblée
+@11250002 = ~de déverrouiller la serrure ciblée~ // de crocheter la serrure ciblée
 
 // Opcode 126: Stat: Movement Modifier [126]
 
@@ -2488,10 +2491,10 @@
 
 // Opcode 127: Summon: Monster Summoning [127]
 
-@11270001 = ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~
+@11270001 = ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à %amount% niveaux (%creatures%) ??
 @11270002 = ~Invoque des animaux pour un total de %amount% niveaux (%creatures%)~
-@11270003 = ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270004 = ~Invoque des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~
+@11270003 = ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à celui du lanceur (%creatures%)
+@11270004 = ~Invoque des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~//...
 @11270005 = ~Invoque 1 monstre (%creatures%)~
 @11270006 = ~Invoque 1 animal (%creatures%)~
 @11270007 = ~Invoque %amount% monstres (%creatures%)~
@@ -2534,8 +2537,8 @@
 // Opcode 128: State: Confusion [128]
 
 @11280001 = ~Confusion~
-@11280002 = ~Inflige confusion %toTheTarget%~
-@11280003 = ~d'infliger confusion %toTheTarget%~
+@11280002 = ~Inflige Confusion %toTheTarget%~
+@11280003 = ~d'infliger Confusion %toTheTarget%~
 
 // Opcode 129: State: Aid [129]
 
@@ -2556,31 +2559,31 @@
 
 // Opcode 134: State: Petrification [134]
 
-@11340001 = ~Pétrification~
-@11340002 = ~Pétrifie %theTarget%~
-@11340003 = ~d'être pétrifié~
-@11340004 = ~de pétrifier %theTarget%~
+@11340001 = ~Pétrification~ // Transmutation de la chair en pierre
+@11340002 = ~Pétrifie~ // Transmute %theTarget% en pierre
+@11340003 = ~d'être pétrifié~// d'être transmuté en pierre
+@11340004 = ~de pétrifier %theTarget%~// de transmuter %theTarget% en pierre
 
 // Opcode 135: Polymorph into Specific [135]
 
-@11350001 = ~Transformation en %creatureName%~
-@11350002 = ~Déguisement en %creatureName%~
-@11350003 = ~Retrouve sa forme naturelle~
+@11350001 = ~Transformation en %creatureName%~ // Métamorphose en %creatureName%
+@11350002 = ~Déguisement en %creatureName%~ // Simule / Prend l'apparence de %creatureName%
+@11350003 = ~Retrouve sa forme naturelle~ // Métamorphose en / dans sa forme naturelle
 
-@11350011 = ~Transforme %theTarget% en %creatureName%~
-@11350012 = ~Déguise %theTarget% en %creatureName%~
+@11350011 = ~Transforme %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
+@11350012 = ~Déguise %theTarget% en %creatureName%~// Donne à %theTarget% l'apparence de %creatureName%
 // TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
-@11350013 = ~%theTarget% retrouve sa forme naturelle~
+@11350013 = ~%theTarget% retrouve sa forme naturelle~// Métamorphose %theTarget% dans sa forme naturelle
 
-@11350021 = ~de se transformer en %creatureName%~
-@11350022 = ~de se déguiser en %creatureName%~
-@11350023 = ~de retrouver sa forme naturelle~
+@11350021 = ~de se transformer en %creatureName%~ // de se métamorphoser en %creatureName%
+@11350022 = ~de se déguiser en %creatureName%~// de prendre l'apparence de %creatureName%
+@11350023 = ~de retrouver sa forme naturelle~// de se métamorphoser dans sa forme naturelle
 
-@11350031 = ~de transformer %theTarget% en %creatureName%~
-@11350032 = ~de déguiser %theTarget% en %creatureName%~
-@11350033 = ~de faire retrouver la forme naturelle de %theTarget%~
+@11350031 = ~de transformer %theTarget% en %creatureName%~// de métamorphoser %theTarget% en %creatureName%
+@11350032 = ~de déguiser %theTarget% en %creatureName%~// de donner l'apparence de %creatureName% à %theTarget%
+@11350033 = ~de faire retrouver la forme naturelle de %theTarget%~ // de métamorphoser %theTarget% dans sa forme naturelle
 
-@11350100 = ~créature sans nom~
+@11350100 = ~créature sans nom~ // non identifiée
 
 // Opcode 136: State: Force Visible [136]
 
@@ -3109,11 +3112,11 @@
 
 // Opcode 236: Spell Effect: Image Projection [236]
 
-@12360001 = ~Crée un clône %ofTheTarget% possédant le même nombre de points de vie~
+@12360001 = ~Crée un clone %ofTheTarget% possédant le même nombre de points de vie~
 @12360002 = ~Crée une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~
 @12360003 = ~Crée une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~
 @12360004 = ~Crée un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~
-@12360005 = ~de créer un clône %ofTheTarget% possédant le même nombre de points de vie~
+@12360005 = ~de créer un clone %ofTheTarget% possédant le même nombre de points de vie~
 @12360006 = ~de créer une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~
 @12360007 = ~de créer une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~
 @12360008 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~
@@ -3317,7 +3320,7 @@
 // Opcode 283: Use EFF File (Cursed) [283]
 
 @12830001 = ~Malédiction~
-@12830002 = ~de maudir %theTarget% et~
+@12830002 = ~de maudire %theTarget% et~
 @12830003 = ~Maudit %theTarget% et~
 
 // Opcode 284: Stat: Melee THAC0 Modifier [284]
@@ -3479,8 +3482,8 @@
 
 // Opcode 323: Stat: Turn Undead Level [323]
 
-@13230001 = ~Niveau de repousser les morts-vivants~
-@13230002 = ~le niveau de repousser les morts-vivants~
+@13230001 = ~Niveau de Repousser les morts-vivants~
+@13230002 = ~le niveau de Repousser les morts-vivants~
 
 // Opcode 324: Protection: Immunity to Resource and Message [324]
 
@@ -3535,8 +3538,8 @@
 @13240048 = ~Effectif contre les golems, les morts-vivants et les myconides~
 @13240049 = ~Inefficace contre les créatures alliées~
 @13240050 = ~Effectif contre les créatures alliées~
-@13240051 = ~Inefficace contre les créatures enemies~
-@13240052 = ~Effectif contre les créatures enemies~
+@13240051 = ~Inefficace contre les créatures ennemies~
+@13240052 = ~Effectif contre les créatures ennemies~
 @13240053 = ~Inefficace contre les cibles immunisées au feu ou au froid~
 @13240054 = ~Inefficace contre les cibles sensibles au feu ou au froid~
 @13240055 = ~Inefficace contre les morts-vivants et les golems~
@@ -3569,8 +3572,8 @@
 @13240082 = ~Inefficace contre les cibles sensibles à l'électricité~
 @13240083 = ~Inefficace contre les cibles immunisées aux dégâts magiques~
 @13240084 = ~Inefficace contre les cibles sensibles aux dégâts magiques~
-@13240085 = ~Inefficace contre les ankheg~
-@13240086 = ~Effectif contre les ankheg~
+@13240085 = ~Inefficace contre les ankhegs~
+@13240086 = ~Effectif contre les ankhegs~
 @13240087 = ~Inefficace contre les liches~
 @13240088 = ~Effectif contre les liches~
 @13240089 = ~Inefficace entre 6h et 20h~
@@ -3664,15 +3667,15 @@
 @13240548 = ~d'être effectif contre les golems, les morts-vivants et les myconides~
 @13240549 = ~d'être inefficace contre les créatures alliées~
 @13240550 = ~d'être effectif contre les créatures alliées~
-@13240551 = ~d'être inefficace contre les créatures enemies~
-@13240552 = ~d'être effectif contre les créatures enemies~
+@13240551 = ~d'être inefficace contre les créatures ennemies~
+@13240552 = ~d'être effectif contre les créatures ennemies~
 @13240553 = ~d'être inefficace contre les cibles immunisées au feu ou au froid~
 @13240554 = ~d'être inefficace contre les cibles sensibles au feu ou au froid~
 @13240555 = ~d'être inefficace contre les morts-vivants et les golems~
 @13240556 = ~d'être effectif contre les morts-vivants et les golems~
 @13240557 = ~d'être inefficace contre les hommes~
 @13240558 = ~d'être inefficace contre les femmes~
-// 
+//
 @13240564 = ~d'être inefficace contre les orques~
 @13240565 = ~d'être effectif contre les orques~
 @13240566 = ~d'être inefficace contre les créatures sourdes~
@@ -3691,8 +3694,8 @@
 @13240582 = ~d'être inefficace contre les cibles sensibles à l'électricité~
 @13240583 = ~d'être inefficace contre les cibles immunisées aux dégâts magiques~
 @13240584 = ~d'être inefficace contre les cibles sensibles aux dégâts magiques~
-@13240585 = ~d'être inefficace contre les ankheg~
-@13240586 = ~d'être effectif contre les ankheg~
+@13240585 = ~d'être inefficace contre les ankhegs~
+@13240586 = ~d'être effectif contre les ankhegs~
 @13240587 = ~d'être inefficace contre les liches~
 @13240588 = ~d'être effectif contre les liches~
 @13240589 = ~d'être inefficace entre 6h et 20h~
@@ -3801,8 +3804,8 @@
 @13260048 = ~Si %theTarget% n'est ni un golem, ni un mort-vivant, ni un myconide~
 @13260049 = ~Si %theTarget% est une alliée~
 @13260050 = ~Si %theTarget% n'est pas une alliée~
-@13260051 = ~Si %theTarget% est une enemie~
-@13260052 = ~Si %theTarget% n'est pas une enemie~
+@13260051 = ~Si %theTarget% est une ennemie~
+@13260052 = ~Si %theTarget% n'est pas une ennemie~
 @13260053 = ~Si %theTarget% est immunisé au feu ou au froid~
 @13260054 = ~Si %theTarget% est sensible au feu ou au froid~
 @13260055 = ~Si %theTarget% est un mort-vivant ou un golem~
@@ -3982,17 +3985,17 @@
 
 // Opcode 367: Minimum base stats [367]
 
-@13670001 = ~Sensible à la mort par aborption de caractéristique~
-@13670002 = ~Immunité à la mort par aborption de caractéristique~
+@13670001 = ~Sensible à la mort par absorption de caractéristique~
+@13670002 = ~Immunité à la mort par absorption de caractéristique~
 
-@13670011 = ~Rend %theTarget% sensible à la mort par aborption de caractéristique~
-@13670012 = ~Immunise %theTarget% à la mort par aborption de caractéristique~
+@13670011 = ~Rend %theTarget% sensible à la mort par absorption de caractéristique~
+@13670012 = ~Immunise %theTarget% à la mort par absorption de caractéristique~
 
 @13670021 = ~d'être sensible à la mort par absorption de caractéristique~ // FIXME
 @13670022 = ~d'être immunisé à la mort par absorption de caractéristique~
 
-@13670031 = ~de rendre %theTarget% sensible à la mort par aborption de caractéristique~
-@13670032 = ~d'immuniser %theTarget% à la mort par aborption de caractéristique~
+@13670031 = ~de rendre %theTarget% sensible à la mort par absorption de caractéristique~
+@13670032 = ~d'immuniser %theTarget% à la mort par absorption de caractéristique~
 
 // Fake Opcode 500: Stat: Compétences de voleur [500]
 
@@ -4090,7 +4093,7 @@
 @102528 = ~de renverser la cible et les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVSHAKE
 @102529 = ~Immobilise et inflige 1d4 +5 points de dégâts perforants supplémentaires à chaque round à la cible pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour éviter)~ // Spécifique à Item Revision : DVPIN
 @102530 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres et de les étourdir pendant 1 round (jet de sauvegarde contre les sorts pour éviter d'être étourdi)~ // Spécifique à Item Revision : DVSBURST
-@102531 = ~Etourdit les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVTHCLAP
+@102531 = ~Étourdit les adversaires dans un rayon d'1,50 mètre pendant 1 round (jet de sauvegarde contre les souffles pour éviter)~ // Spécifique à Item Revision : DVTHCLAP
 @102532 = ~d'infliger 5d4 points de dégâts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVHSMITE
 @102533 = ~de réduire la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVCORROS
 @102534 = ~d'infliger 4d4 points de dégâts contondants aux adversaires dans un rayon de 3 mètres~ // Spécifique à Item Revision : DVRESON
