@@ -10444,6 +10444,9 @@ DEFINE_PATCH_MACRO ~opcode_324_against_who~ BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : no %resref%.spl or %resref%.itm found~ END
 		SET isValid = 0
 	END
+	ELSE BEGIN
+		SET isValid = 0
+	END
 	SPRINT againstWho (AT againstWhoStrref)
 END
 
