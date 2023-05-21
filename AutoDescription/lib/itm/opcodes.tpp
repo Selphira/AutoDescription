@@ -10578,7 +10578,7 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 		LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
 		SET strref = strref + statType
 	END
-	ELSE PATCH_IF statType > 145 BEGIN
+	ELSE PATCH_IF is_ee AND statType > 145 BEGIN
 		LPM ~opcode_326_condition_mod~
 	END
 	ELSE BEGIN
