@@ -10977,7 +10977,7 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
-		SPRINT description @102549 // ~d'immuniser %resistName%~
+		SPRINT description @102549 // ~d'immuniser %theTarget% %resistName%~
 	END
 	ELSE BEGIN
 		SET resistName += 2
