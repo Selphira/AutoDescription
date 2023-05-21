@@ -142,9 +142,8 @@ BEGIN
 		END
 		SPRINT title @100011 // ~Capacités de combat~
 		LPF ~add_section_to_description~ INT_VAR count = ~countLines%selectedHeader%~ STR_VAR title arrayName = ~lines%selectedHeader%~ RET description END
-		LPF ~add_weapon_attributes_to_description~ INT_VAR index = 0 group = countHeaders != 1 RET description END
 	END
-	ELSE PATCH_IF hasSameAbilities == 0 AND hasSameAttributes == 1 BEGIN
+	ELSE PATCH_IF (hasSameAbilities == 0 AND hasSameAttributes == 1) OR (hasSameAbilities == 0 AND hasSameAttributes == 0) OR (hasSameAbilities == 1 AND hasSameAttributes == 0) BEGIN
 		FOR (index = 0; index < countHeaders; index += 1) BEGIN
 			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 				SET attackType = ~%data_0%~
@@ -154,20 +153,9 @@ BEGIN
 				LPF ~add_section_to_description~ INT_VAR count = ~countLines%index%~ STR_VAR title arrayName = ~lines%index%~ RET description END
 			END
 		END
-		LPF ~add_weapon_attributes_to_description~ INT_VAR index = selectedHeader group = 1 RET description END
 	END
-	ELSE PATCH_IF (hasSameAbilities == 0 AND hasSameAttributes == 0) OR (hasSameAbilities == 1 AND hasSameAttributes == 0) BEGIN
-		FOR (index = 0; index < countHeaders; index += 1) BEGIN
-			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
-				SET attackType = ~%data_0%~
-				SET location = ~%data_1%~
-				SET headerIndex = ~%data_2%~
-				LPF ~get_combat_section_title~ INT_VAR headerIndex attackType location RET title END
-				LPF ~add_section_to_description~ INT_VAR count = ~countLines%index%~ STR_VAR title arrayName = ~lines%index%~ RET description END
-				LPF ~add_weapon_attributes_to_description~ INT_VAR index = index RET description END
-			END
-		END
-	END
+
+	LPF ~add_weapon_attributes_to_description~ RET description END
 END
 
 
@@ -354,100 +342,142 @@ END
 
 
 DEFINE_PATCH_FUNCTION ~add_weapon_attributes_to_description~
-	INT_VAR
-		index = 0
-		group = 0
 	RET
 		description
 BEGIN
-    PATCH_PHP_EACH ~weaponAttributes%index%~ AS data => value BEGIN
-        SPRINT damage ~%data_1%~
-        SET tac0           = ~%data_0%~
-        SET damageType     = ~%data_2%~
-        SET speedFactor    = ~%data_3%~
-        SET range          = ~%data_4%~
-        SET enchantment    = ~%data_5%~
-        SET flags          = ~%data_6%~
-        SET isRanged       = ~%data_7%~
-        SET projectileType = ~%data_8%~
+	FOR (index = 0; index < countHeaders; index += 1) BEGIN
+		PATCH_PHP_EACH ~weaponAttributes%index%~ AS data => value BEGIN
+	        SPRINT damage ~%data_1%~
+	        SET tac0           = ~%data_0%~
+	        SET damageType     = ~%data_2%~
+	        SET speedFactor    = ~%data_3%~
+	        SET range          = ~%data_4%~
+	        SET enchantment    = ~%data_5%~
+	        SET flags          = ~%data_6%~
+	        SET isRanged       = ~%data_7%~
+	        SET projectileType = ~%data_8%~
 
-        LPF ~appendLine~ RET description END
+	        SET $enchantments(~enchantments%enchantment%~) = enchantment
+	        SET $EVAL ~enchantments%enchantment%~(~%index%~) = 0
+	        SET $tac0s(~tac0s%tac0%~) = tac0
+	        SET $EVAL ~tac0s%tac0%~(~%index%~) = 0
+	        SPRINT $damages(~damages%damage%~) ~%damage%~
+	        SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+	        SET $damageTypes(~damageTypes%damageType%~) = damageType
+	        SET $EVAL ~damageTypes%damageType%~(~%index%~) = 0
+	        SET $speedFactors(~speedFactors%speedFactor%~) = speedFactor
+	        SET $EVAL ~speedFactors%speedFactor%~(~%index%~) = 0
+	        SET $isRangeds(~isRangeds%isRanged%~) = isRanged
+	        SET $EVAL ~isRangeds%isRanged%~(~%index%~) = 0
+	        SET $projectileTypes(~projectileTypes%projectileType%~) = projectileType
+	        SET $EVAL ~projectileTypes%projectileType%~(~%index%~) = 0
+        END
+    END
 
-		PATCH_IF enchantment > 0 BEGIN
-			LPF ~signed_value~ INT_VAR value = enchantment RET value END
-			LPF ~appendValue~ INT_VAR strref = 13440001 STR_VAR value RET description END // ~Enchantement~
+	SPRINT damageNone @10015 // ~Aucun~
+
+    LPF ~appendLine~ RET description END
+
+	// Enchantement
+	LPF ~array_count~ STR_VAR array_name = ~enchantments~ RET count END
+	PATCH_PHP_EACH ~enchantments~ AS array_name => value BEGIN
+	    PATCH_IF ~%value%~ != 0 BEGIN
+	        LPF ~get_combat_attribute_name~ INT_VAR strref = 13440001 count STR_VAR array_name RET name END
+			LPF ~signed_value~ INT_VAR value RET value END
+			LPF ~appendValue~ STR_VAR name value RET description END // ~TAC0~
 		END
+	END
 
-	    PATCH_IF ~%tac0%~ != 0 BEGIN
-			LPF ~signed_value~ INT_VAR value = tac0 RET value END
-			LPF ~appendValue~ INT_VAR strref = 10540001 STR_VAR value RET description END // ~TAC0~
-	    END
-
-		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
-			LPF ~appendValue~ INT_VAR strref = 10730001 STR_VAR value = ~%damage%~ RET description END // ~Dégâts~
+	// TAC0
+	LPF ~array_count~ STR_VAR array_name = ~tac0s~ RET count END
+	PATCH_PHP_EACH ~tac0s~ AS array_name => value BEGIN
+	    PATCH_IF ~%value%~ != 0 BEGIN
+	        LPF ~get_combat_attribute_name~ INT_VAR strref = 10540001 count STR_VAR array_name RET name END
+			LPF ~signed_value~ INT_VAR value RET value END
+			LPF ~appendValue~ STR_VAR name value RET description END // ~TAC0~
 		END
+	END
 
-		SPRINT damageNone @10015 // ~Aucun~
+	// Dégâts
+	LPF ~array_count~ STR_VAR array_name = ~damages~ RET count END
+	PATCH_PHP_EACH ~damages~ AS array_name => value BEGIN
+	    PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
+	        LPF ~get_combat_attribute_name~ INT_VAR strref = 10730001 count STR_VAR array_name RET name END // ~Dégâts~
+			LPF ~appendValue~ STR_VAR name value RET description END
+		END
+	END
 
-		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~%damageNone%~ BEGIN
-			PATCH_IF countHeaders == 1 OR group = 0 BEGIN
-				SET strref = 102010 + damageType
-		        SPRINT value (AT ~%strref%~)
-				LPF ~appendValue~ INT_VAR strref = 102005 STR_VAR value RET description END // ~Type de dégâts~
-			END
-			ELSE BEGIN
-				PATCH_DEFINE_ARRAY ~damageTypes~ BEGIN END
-				PATCH_DEFINE_ARRAY ~damageTypesTmp~ BEGIN END
-
-				FOR (index2 = 0; index2 < countHeaders; index2 += 1) BEGIN
-					PATCH_PHP_EACH ~weaponAttributes%index2%~ AS weaponData => _ BEGIN
-	                    SET damageType  = ~%weaponData_2%~
-						SET strref = 102010 + damageType
-				        SPRINT value (AT ~%strref%~)
-
-						PATCH_PHP_EACH ~headers%index2%~ AS headerData => _ BEGIN
-							SET attackType = ~%headerData_0%~
-							SET location = ~%headerData_1%~
-	                        SET headerIndex = ~%headerData_2%~
-	                        LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
-	                    END
-
-						SPRINT name @102005 // ~Type de dégâts~
-	                    SPRINT name ~%name% (%sectionType%)~
-						SPRINT $damageTypesTmp(~%index2%~) @100001 // %name% : %value%
-					END
-	            END
-
-				PATCH_PHP_EACH ~damageTypesTmp~ AS index3 => damageType BEGIN
-					SET found = 0
-					PATCH_PHP_EACH damageTypes AS _ => damageTypeTmp BEGIN
-						PATCH_IF ~%damageType%~ STRING_EQUAL ~%damageTypeTmp%~ BEGIN
-							SET found = 1
+	LPF ~array_count~ STR_VAR array_name = ~damageTypes~ RET count END
+	PATCH_PHP_EACH ~damageTypes~ AS array_name => value BEGIN
+		PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
+			SET found = 0
+			PATCH_PHP_EACH ~damages~ AS array_damages => damage BEGIN
+				PATCH_PHP_EACH ~%array_damages%~ AS index_damage => _ BEGIN
+					PATCH_IF found == 0 BEGIN
+						PATCH_IF NOT ~%damage%~ STRING_EQUAL ~%damageNone%~ BEGIN
+							PATCH_IF index == index_damage BEGIN
+								SET strref = 102010 + value
+								SPRINT value (AT ~%strref%~)
+								LPF ~get_combat_attribute_name~ INT_VAR strref = 102005 count STR_VAR array_name RET name END // ~Type de dégâts~
+								LPF ~appendValue~ STR_VAR name value RET description END
+								SET found = 1
+							END
 						END
 					END
-					PATCH_IF found == 0 BEGIN
-						SPRINT $damageTypes(~%index3%~) ~%damageType%~
-					END
-				END
-
-				PATCH_PHP_EACH ~damageTypes~ AS _ => damageType BEGIN
-					LPF ~appendLine~ STR_VAR string = ~%damageType%~ RET description END
 				END
 			END
 		END
+	END
 
-		PATCH_IF NOT isAmmo BEGIN
-			LPF ~appendValue~ INT_VAR strref = 11900001 STR_VAR value = ~%speedFactor%~ RET description END // ~Facteur de vitesse~
+	// Facteur de vitesse
+	PATCH_IF NOT isAmmo BEGIN
+		LPF ~array_count~ STR_VAR array_name = ~speedFactors~ RET count END
+		PATCH_PHP_EACH ~speedFactors~ AS array_name => value BEGIN
+			LPF ~get_combat_attribute_name~ INT_VAR strref = 11900001 count STR_VAR array_name RET name END // ~Facteur de vitesse~
+			LPF ~appendValue~ STR_VAR name value RET description END
 		END
-		ELSE BEGIN
-			SET strref = 101078 + projectileType
-			LPF ~getTranslation~ INT_VAR strref RET value = string END
-			LPF ~appendValue~ INT_VAR strref = 101082 STR_VAR value RET description END // ~Arme de jet~
+	END
+	// Arme de jet
+	ELSE BEGIN
+		PATCH_PHP_EACH ~projectileTypes~ AS array_name => value BEGIN
+			SET strref = 101078 + value
+			SPRINT value (AT ~%strref%~)
+			LPF ~get_combat_attribute_name~ INT_VAR strref = 101082 count STR_VAR array_name RET name END // ~Arme de jet~
+			LPF ~appendValue~ STR_VAR name value RET description END
 		END
+	END
 
-		// TODO: Ou si la portée d'une arme de mêlée est différente de sa portée par défaut
-		//PATCH_IF isRanged == 1 BEGIN
-		//	LPF ~appendValue~ INT_VAR strref = 102006 STR_VAR value = ~%range%~ RET description END // ~Portée~
-		//END
-    END
+	// TODO: Ou si la portée d'une arme de mêlée est différente de sa portée par défaut
+	//PATCH_IF isRanged == 1 BEGIN
+	//	LPF ~appendValue~ INT_VAR strref = 102006 STR_VAR value = ~%range%~ RET description END // ~Portée~
+	//END
+END
+
+
+DEFINE_PATCH_FUNCTION ~get_combat_attribute_name~
+	INT_VAR
+		strref = 0
+		count = 0
+	STR_VAR
+		array_name = ~~
+	RET
+		name
+BEGIN
+	SPRINT name (AT strref)
+	SPRINT and @100021 // ~et~
+
+	PATCH_IF count > 1 BEGIN
+		PATCH_DEFINE_ARRAY ~sectionTypes~ BEGIN END
+		PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
+			PATCH_PHP_EACH ~headers%index%~ AS headerData => _ BEGIN
+				SET attackType = ~%headerData_0%~
+				SET location = ~%headerData_1%~
+                SET headerIndex = ~%headerData_2%~
+                LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
+                SET $sectionTypes(~%sectionType%~) = 0
+            END
+		END
+		LPF ~implode~ STR_VAR array_name = ~sectionTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET sectionType = text END
+        SPRINT name ~%name% (%sectionType%)~
+	END
 END
