@@ -7723,25 +7723,25 @@ END
  * Spell: Bounce (by Power level, decrementing) [200] *
  * -------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_200~ BEGIN
-	LOCAL_SET strref = 12000001 // ~Renvoie jusque %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000001 // ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_200~ BEGIN
-	LOCAL_SET strref = 12000002 // ~Renvoie jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
+	LOCAL_SET strref = 12000002 // ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_200~ BEGIN
-	LOCAL_SET strref = 12000003 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12000003 // ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110003
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_200~ BEGIN
-	LOCAL_SET strref = 12000004 // ~de renvoyer jusqu'à %amount% sorts de niveau %spellLevel% ciblant %theTarget%~
+	LOCAL_SET strref = 12000004 // ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_200_common~
 END
@@ -7830,31 +7830,35 @@ END
  * Spell: Immunity (by Power Level, decrementing) [201] *
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_201~ BEGIN
-	LOCAL_SET strref = 12010001 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010001 //~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110001 // ~Lance %spellName%~
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_201~ BEGIN
-	LOCAL_SET strref = 12010002 // ~Immunise jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010002 // ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110002
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_201~ BEGIN
-	LOCAL_SET strref = 12010003 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010003 // ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110003
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_201~ BEGIN
-	LOCAL_SET strref = 12010004 // ~d'immuniser jusqu'à %amount% sorts de niveau %spellLevel%~
+	LOCAL_SET strref = 12010004 // ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
 	LOCAL_SET strref_if_amount_0 = 110004
 	LPM ~opcode_200_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_201_is_valid~ BEGIN
 	LPM ~opcode_200_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_201_group~ BEGIN
+	LPM ~opcode_200_group~
 END
 
 /* ------------------------------- *
