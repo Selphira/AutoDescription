@@ -7121,6 +7121,36 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_205~ BEGIN
 	SPRINT description @12050002 // ~de résister aux sorts %spellSecondaryTypeName%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_205_group~ BEGIN
+	LOCAL_SET initOpcode = opcode
+	LOCAL_SET baseSpellSecondaryType = 0
+
+	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		SET baseSpellSecondaryType = parameter2
+
+		// On supprime les éventuelles immunités spécifiques à un sort dont le type secondaire est identique à celui indiqué par l'opcode 205
+		PATCH_PHP_EACH EVAL ~opcodes_206~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+
+			PATCH_IF baseSpellSecondaryType > 0 AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+				INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+					READ_LONG SPL_sectype spellSecondaryType
+					PATCH_IF spellSecondaryType == baseSpellSecondaryType BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = 206
+							STR_VAR expression = ~position = %position%~
+							RET $opcodes(~206~) = count
+							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+	END
+END
+
 /* ---------------------------------- *
  * Spell: Protection from Spell [206] *
  * ---------------------------------- */
