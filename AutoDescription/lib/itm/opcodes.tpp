@@ -11601,32 +11601,35 @@ END
  * Stat: Immunité aux sorts (par niveau) (cumulatif) [509] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_509~ BEGIN
+	LOCAL_SET strref = 11020001
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
 		SPRINT description @15090001 // ~Immunité aux sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description @11020001 // ~Immunité aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~Immunité aux sorts de niveau %spellLevel%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+	LOCAL_SET strref = 11020005
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
 		SPRINT description @15090002 // ~d'immuniser aux sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description @11020003 // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
+	LOCAL_SET strref = 11020003
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
 		SPRINT description @15090001 // ~Immunité aux sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description @11020002 // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
 	END
 END
 
@@ -11635,22 +11638,35 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
-	SPRINT levelStr ~~
-	FOR (idx = 0 ; idx < 9 ; ++idx) BEGIN
-		SET bit = EVAL ~%BIT%idx%%~
-		PATCH_IF (parameter1 BAND bit) != 0 BEGIN
-			SET level = idx + 1
-			SPRINT levelStr ~%levelStr%, %level%~
+	LOCAL_SET levelStrref = 0
+	LOCAL_SPRINT levelStr ~~
+	LOCAL_SPRINT and @100021 // ~et~
+	PATCH_DEFINE_ARRAY ~levels~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~levelAndBelow~ BEGIN
+		  3 => 2
+		  7 => 3
+		 15 => 4
+		 31 => 5
+		 63 => 6
+		127 => 7
+		255 => 8
+	END
+	PATCH_IF opcode == 509 AND VARIABLE_IS_SET $levelAndBelow(~%parameter1%~) BEGIN
+		SET levelStrref = 101200 + $levelAndBelow(~%parameter1%~)
+		SET strref += 1
+		SPRINT spellLevel (AT levelStrref)
+	END
+	ELSE BEGIN
+		FOR (idx = 0 ; idx < 9 ; ++idx) BEGIN
+			SET bit = EVAL ~%BIT%idx%%~
+			PATCH_IF (parameter1 BAND bit) != 0 BEGIN
+				SET levelStrref = 101200 + idx + 1
+				SPRINT levelStr (AT levelStrref)
+				SPRINT $levels(~%levelStr%~) ~~
+			END
 		END
+		LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET spellLevel = text END
 	END
-
-	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
-		// FIXME: replace_last_comma_with
-		SPRINT and @100021 // ~et~
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ %and% \1~
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| %and% \)~ ~~
-	END
-	SPRINT spellLevel ~%levelStr%~
 END
 
 /* -------------------------------------------- *
@@ -12235,27 +12251,30 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
+	LOCAL_SET strref = 0
+	SPRINT levelStr ~~
+	SPRINT and @100021 // ~et~
+	PATCH_DEFINE_ARRAY ~levels~ BEGIN END
+
 	PATCH_IF level == 0 BEGIN
-		FOR (i = 1 ; i <= amount ; ++i) BEGIN
-			SPRINT levelStr ~%levelStr%, %i%~
+		FOR (idx = 1 ; idx <= amount ; ++idx) BEGIN
+			SET strref = 101200 + idx
+			SPRINT levelStr (AT strref)
+			SPRINT $levels(~%levelStr%~) ~~
 		END
 	END
 	ELSE BEGIN
 		FOR (idx = 0 ; idx < spellLevelMax ; ++idx) BEGIN
 			SET bit = EVAL ~%BIT%idx%%~
 			PATCH_IF (level BAND bit) != 0 BEGIN
-				SET spellLevel = idx + 1
-				SPRINT levelStr ~%levelStr%, %spellLevel%~
+				SET strref = 101200 + idx + 1
+				SPRINT levelStr (AT strref)
+				SPRINT $levels(~%levelStr%~) ~~
 			END
 		END
 	END
 
-	INNER_PATCH_SAVE levelStr ~%levelStr%~ BEGIN
-		// FIXME: replace_last_comma_with
-		SPRINT and @100021 // ~et~
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~, \([0-9]\)$~ ~ %and% \1~
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^\(, \| %and% \)~ ~~
-	END
+	LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET levelStr = text END
 END
 
 DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN

@@ -64,6 +64,16 @@
 @101129 = ~Sorcerer~
 @101185 = ~%description% (not cumulative)~
 
+// Niveau des sorts
+@101201 = ~1st~
+@101202 = ~2nd~
+@101203 = ~3rd~
+@101204 = ~4th~
+@101205 = ~5th~
+@101206 = ~6th~
+@101207 = ~7th~
+@101208 = ~8th~
+@101209 = ~9th~
 
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
@@ -1955,11 +1965,11 @@
 // Opcode 42: Spell: Wizard Spell Slots Modifier [42]
 
 // FIXME: regrouper les strrefs avec 62
-@10420001 = ~Memorise an extra level %levelStr% wizard spell~
-@10420002 = ~Memorise %amount% extra level %levelStr% wizard spells~
-@10420003 = ~Remove an extra level %levelStr% wizard spell~
-@10420004 = ~Delete %amount% of level %levelStr% wizard spells~
-@10420005 = ~Double the number of level %levelStr% wizard spells that can be memorized~
+@10420001 = ~Memorise an extra wizard spell of %levelStr% level~
+@10420002 = ~Memorise %amount% extra wizard spells of %levelStr% level~
+@10420003 = ~Remove a wizard spell of %levelStr% level~
+@10420004 = ~Delete %amount% wizard spells of %levelStr% level~
+@10420005 = ~Double the number of wizard spells of %levelStr% level that can be memorized~
 
 // Opcode 43: Cure: Stone to Flesh [43]
 
@@ -2048,11 +2058,11 @@
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
-@10620001 = ~Can memorize an extra %levelStr% divine spell~
-@10620002 = ~Can memorize %amount% extra %levelStr% divine spells~
-@10620003 = ~Remove an extra %levelStr% divine spell~
-@10620004 = ~Delete %amount% of %levelStr% divine spells~
-@10620005 = ~Double the number of %levelStr% divine spells that can be memorized~
+@10620001 = ~Memorise an extra priest spell of %levelStr% level~
+@10620002 = ~Memorise %amount% extra priest spells of %levelStr% level~
+@10620003 = ~Remove a priest spell of %levelStr% level~
+@10620004 = ~Delete %amount% priest spells of %levelStr% level~
+@10620005 = ~Double the number of priest spells of %levelStr% level that can be memorized~
 
 // Opcode 63: State: Infravision [63]
 
@@ -2349,9 +2359,12 @@
 
 // Opcode 102: Spell: Immunity (by Power Level) [102]
 
-@11020001 = ~Immunité aux sorts de niveau %spellLevel%~
-@11020002 = ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
-@11020003 = ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+@11020001 = ~Immunity to %spellLevel% level spells~
+@11020002 = ~Immunity to %spellLevel% level spells and below~
+@11020003 = ~Immune %theTarget% to %spellLevel% level spells~
+@11020004 = ~Immune %theTarget% to %spellLevel% level spells and below~
+@11020005 = ~to immune %theTarget% to %spellLevel% level spells~
+@11020006 = ~to immune %theTarget% to %spellLevel% level spells and below~
 
 // Opcode 104: Stat: Experience Points [104]
 

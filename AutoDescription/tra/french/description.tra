@@ -64,6 +64,16 @@
 @101129 = ~Sorcier~
 @101185 = ~%description% (non cumulatif)~
 
+// Niveau des sorts
+@101201 = ~1er~
+@101202 = ~2ème~
+@101203 = ~3ème~
+@101204 = ~4ème~
+@101205 = ~5ème~
+@101206 = ~6ème~
+@101207 = ~7ème~
+@101208 = ~8ème~
+@101209 = ~9ème~
 
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
@@ -1955,11 +1965,11 @@
 // Opcode 42: Spell: Wizard Spell Slots Modifier [42]
 
 // FIXME: regrouper les strrefs avec 62
-@10420001 = ~Mémorisation d'un sort profane supplémentaire de niveau %levelStr%~
-@10420002 = ~Mémorisation de %amount% sorts profanes supplémentaires de niveau %levelStr%~
-@10420003 = ~Suppression d'un sort profane de niveau %levelStr%~
-@10420004 = ~Suppression de %amount% sorts profanes de niveau %levelStr%~
-@10420005 = ~Double le nombre de sorts profanes mémorisables de niveau %levelStr%~
+@10420001 = ~Mémorisation d'un sort profane supplémentaire de %levelStr% niveau~
+@10420002 = ~Mémorisation de %amount% sorts profanes supplémentaires de %levelStr% niveau~
+@10420003 = ~Suppression d'un sort profane de %levelStr% niveau~
+@10420004 = ~Suppression de %amount% sorts profanes de %levelStr% niveau~
+@10420005 = ~Double le nombre de sorts profanes mémorisables de %levelStr% niveau~
 
 // Opcode 43: Cure: Stone to Flesh [43]
 
@@ -2048,11 +2058,11 @@
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
-@10620001 = ~Mémorisation d'un sort divin supplémentaire de niveau %levelStr%~
-@10620002 = ~Mémorisation de %amount% sorts divins supplémentaires de niveau %levelStr%~
-@10620003 = ~Suppression d'un sort divin de niveau %levelStr%~
-@10620004 = ~Suppression de %amount% sorts divins de niveau %levelStr%~
-@10620005 = ~Double le nombre de sorts divins mémorisables de niveau %levelStr%~
+@10620001 = ~Mémorisation d'un sort divin supplémentaire de %levelStr% niveau~
+@10620002 = ~Mémorisation de %amount% sorts divins supplémentaires de %levelStr% niveau~
+@10620003 = ~Suppression d'un sort divin de %levelStr% niveau~
+@10620004 = ~Suppression de %amount% sorts divins de %levelStr% niveau~
+@10620005 = ~Double le nombre de sorts divins mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
 
@@ -2349,9 +2359,12 @@
 
 // Opcode 102: Spell: Immunity (by Power Level) [102]
 
-@11020001 = ~Immunité aux sorts de niveau %spellLevel%~
-@11020002 = ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
-@11020003 = ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+@11020001 = ~Immunité aux sorts de %spellLevel% niveau~
+@11020002 = ~Immunité aux sorts de %spellLevel% niveau et inférieurs~
+@11020003 = ~Immunise %theTarget% aux sorts de %spellLevel% niveau~
+@11020004 = ~Immunise %theTarget% aux sorts de %spellLevel% niveau et inférieurs~
+@11020005 = ~d'immuniser %theTarget% aux sorts de %spellLevel% niveau~
+@11020006 = ~d'immuniser %theTarget% aux sorts de %spellLevel% niveau et inférieurs~
 
 // Opcode 104: Stat: Experience Points [104]
 
