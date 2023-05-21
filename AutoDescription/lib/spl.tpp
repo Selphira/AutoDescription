@@ -78,10 +78,12 @@ BEGIN
 
 	SPRINT description ~%description%%crlf%%crlf%%roleplayDescription%~
 
-	LPF ~appendSection~ STR_VAR string = ~%parameters%~ RET description END
+	PATCH_IF add_statistics_section_to_spell_description BEGIN
+		LPF ~appendSection~ STR_VAR string = ~%parameters%~ RET description END
 
-	LPF ~add_casting_features~ STR_VAR description RET description END
-	LPF ~add_extended_effects~ STR_VAR description RET description END
+		LPF ~add_casting_features~ STR_VAR description RET description END
+		LPF ~add_extended_effects~ STR_VAR description RET description END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~can_update_spell~
