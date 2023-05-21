@@ -575,7 +575,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	 16 => 1
 	 40 => 1
 	177 => 1
-	190 => 1
 	206 => 1
 	335 => 1
 END
@@ -7530,6 +7529,7 @@ END
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
 	LOCAL_SET value = parameter1
+	SET cumulable = 0
 	PATCH_IF value >= 0 BEGIN
 		SPRINT value @10000101 // ~Bonus de %value%~
 	END
@@ -7542,12 +7542,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_190~ BEGIN
 	LOCAL_SET value = parameter1 * ~-1~
+	SET cumulable = 0
 	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_probability~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_190~ BEGIN
 	LOCAL_SET value = parameter1 * ~-1~
+	SET cumulable = 0
 	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_target~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
