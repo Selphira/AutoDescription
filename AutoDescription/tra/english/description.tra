@@ -2402,6 +2402,8 @@
 @11120001 = ~Remove "%itemName%" from inventory~
 @11120002 = ~Remove "%itemName%" from inventory %ofTheTarget%~
 @11120003 = ~Remove "%itemName%" from inventory %ofTheTarget% for %duration%~
+@11120004 = ~to remove "%itemName%" from inventory~
+@11120005 = ~to remove "%itemName%" from inventory %ofTheTarget%~
 
 // Opcode 115: Detect: Alignment [115]
 
