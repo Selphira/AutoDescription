@@ -6176,10 +6176,16 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 			LPM ~opcode_146_common~
 		END
 		ELSE BEGIN
-			PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
-				SET castingLevel = 0
+			// Protection contre les boucles infinies
+			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+				PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+					SET castingLevel = 0
+				END
+				SET $recursive_resref(~%resref%~) = 1
+				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET description END
 			END
-			LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET description END
+			CLEAR_ARRAY recursive_resref
 		END
 	END
 END
@@ -6209,15 +6215,21 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 			LPM ~opcode_146_common~
 		END
 		ELSE BEGIN
-			PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
-				SET castingLevel = 0
-			END
-			LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+			// Protection contre les boucles infinies
+			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+				PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+					SET castingLevel = 0
+				END
+				SET $recursive_resref(~%resref%~) = 1
+				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 
-			INNER_PATCH_SAVE description ~%description%~ BEGIN
-				SPRINT regex ~[0-9]+ % de chances ~ // TODO: Rendre traductible
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+				INNER_PATCH_SAVE description ~%description%~ BEGIN
+					SPRINT regex ~[0-9]+ % de chances ~ // TODO: Rendre traductible
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+				END
 			END
+			CLEAR_ARRAY recursive_resref
 		END
 	END
 END
