@@ -11392,6 +11392,7 @@ BEGIN
 	SPRINT and @100021 // ~et~
 	SPRINT andThe @11770201 // ~et les~
 	SPRINT target_effective ~~
+	SPRINT target_effective_if ~~
 	SPRINT target_not_effective ~~
 	SPRINT target_not_effective_between ~~
 	SPRINT target_not_effective_if ~~
@@ -11401,6 +11402,7 @@ BEGIN
 	PATCH_DEFINE_ARRAY not_effective_against BEGIN END
 	PATCH_DEFINE_ARRAY not_effective_between BEGIN END // cas particulier pour 89 et 90
 	PATCH_DEFINE_ARRAY not_effective_if BEGIN END // cas particulier pour 134, 135, 136, 137
+	PATCH_DEFINE_ARRAY effective_if BEGIN END // cas particulier pour 136 avec valeur 6
 	PATCH_DEFINE_ARRAY target_conditions BEGIN END
 
 	LPF ~get_probability~ INT_VAR probability1 probability2 RET baseProbability = probability END
@@ -11500,10 +11502,20 @@ BEGIN
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_if(~%statType%~) BEGIN
                 SPRINT opcode_324_list $opcode_324_not_effective_if(~%statType%~)
-				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
-					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
-					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
+                PATCH_IF statType == 136 AND value == 6 BEGIN
+                    SPRINT opcode_324_list ~13240401~ // ~durant la pénurie de fer~
+					WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+						LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+						LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+		                SET $EVAL ~effective_if%key%~(~%creatureType%~) = 1
+					END
+                END
+                ELSE BEGIN
+					WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+						LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+						LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+		                SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
+					END
 				END
             END
         END
@@ -11569,12 +11581,34 @@ BEGIN
 				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
 				SET $not_effective_if(~%creaturesList%~) = 1
 			END
+
+			CLEAR_ARRAY targetsList
+			PATCH_PHP_EACH ~effective_if%key%~ AS target => _ BEGIN
+				SET $targetsList(~%target%~) = 1
+			END
+			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+				SET $effective_if(~%creaturesList%~) = 1
+			END
 	END
 
+	LPF ~implode~ STR_VAR array_name = ~effective_if~ glue = ~, ~ final_glue = ~ %and% ~ RET target_effective_if = text END
+	PATCH_IF NOT ~%target_effective_if%~ STRING_EQUAL ~~ BEGIN
+		SET $target_conditions(~%target_effective_if%~) = 1
+	END
 	LPF ~implode~ STR_VAR array_name = ~effective_against~ glue = ~, %the% ~ final_glue = ~ %effectiveAndThe% ~ RET creaturesList = text END
+	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+		SET $target_conditions(~%creaturesList%~) = 1
+	END
+	LPF ~implode~ STR_VAR array_name = ~target_conditions~ glue = ~, ~ final_glue = ~, ~ RET creaturesList = text END
 	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
 		SPRINT target_effective @13241500 // ~Effectif %creaturesList%~
 	END
+
+	SPRINT target_conditions ~~
+	CLEAR_ARRAY target_conditions
+
 	LPF ~implode~ STR_VAR array_name = ~not_effective_against~ glue = ~, %the% ~ final_glue = ~ %notEffectiveAndThe% ~ RET target_not_effective = text END
 	LPF ~implode~ STR_VAR array_name = ~not_effective_between~ glue = ~ %and% ~ final_glue = ~ %and% ~ RET target_not_effective_between = text END
 	LPF ~implode~ STR_VAR array_name = ~not_effective_if~ glue = ~, ~ final_glue = ~ %and% ~ RET target_not_effective_if = text END
@@ -12518,7 +12552,7 @@ END
  * Arme brisée [519] *
  * ----------------- */
 DEFINE_PATCH_MACRO ~opcode_target_probability_519~ BEGIN
-	SPRINT description @15190001 // ~que l'arme se brise~
+	SPRINT description @15190001 // ~de se briser~
 END
 
 /* ------------------------------ *

@@ -3707,6 +3707,8 @@
 @13240301 = ~Inefficace contre les %creatureType%~
 @13240302 = ~Effectif contre les %creatureType%~
 
+@13240401 = ~durant la pénurie de fer~
+
 
 @13240500 = ~~
 @13240501 = ~d'être inefficace contre les morts-vivants~
@@ -4206,7 +4208,7 @@
 
 // Fake Opcode 519: Arme brisée
 
-@15190001 = ~que l'arme se brise~
+@15190001 = ~de se briser~
 
 // Fake Opcode 520: Protection: Action libre [520]
 
