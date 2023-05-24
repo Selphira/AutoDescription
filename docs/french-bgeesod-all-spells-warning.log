@@ -17,16 +17,10 @@ SPIN717.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPIN783.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPIN823.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPIN852.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
-SPJA01.SPL : Cible à gerer : 3 
 SPPR411.SPL : Niveau minimum non calculable
-SPPR504.SPL : Cible à gerer : 3 
-SPPR550.SPL : Cible à gerer : 3 
-SPPR712.SPL : Cible à gerer : 3 
 SPPR717.SPL : Opcode 24: Invalid target : 255
 SPRA303.SPL : Opcode 83 : Réflection du type de projectile '329'
-SPWI110.SPL : Cible à gerer : 3 
 SPWI118.SPL : Niveau minimum non calculable
 SPWI311.SPL : Opcode 83 : Réflection du type de projectile '329'
 SPWI417.SPL : FAILURE: Unknown macro: opcode_target_345
 SPWI711.SPL : FAILURE: Unknown macro: opcode_target_probability_111
-SPWISH25.SPL : Cible à gerer : 6 

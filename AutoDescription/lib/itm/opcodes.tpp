@@ -3338,6 +3338,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_67_group~ BEGIN
+	LPM ~opcode_group_by_target~
+END
+
 /* ------------------------------ *
  * Summon: Unsummon Creature [68] *
  * ------------------------------ */
@@ -5443,7 +5447,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC56~ BEGIN
+		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%resref%~ STRING_EQUAL_CASE ~MISC56_~ BEGIN
 			LPF ~get_opcode_position~
 				INT_VAR opcode = 112
 				STR_VAR expression = ~resref = %CURRENT_SOURCE_RES% AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
@@ -5666,7 +5670,7 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 		PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
 			SET isMonster = 0
 		END
-		LPF ~get_creatures_amount~ INT_VAR totalLevel = amount STR_VAR file RET amount amountMin amountMax END
+		LPF ~get_creatures_amount~ INT_VAR totalLevel = amount multiplier = custom_int STR_VAR file RET amount amountMin amountMax END
 		SET strref += amountMax == 1 ? 4 : 6
 		SET strref += isMonster == 1 ? 0 : 1
 		SET strref += isHostile == 1 ? 8 : 0
@@ -5681,6 +5685,7 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 			SET strref += 17 // ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
 		END
 		ELSE BEGIN
+			SET amount = custom_int > 1 ? amount * custom_int : amount
 			PATCH_IF isExternal BEGIN
 				LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
 				INNER_PATCH_SAVE amount ~%amount%~ BEGIN
@@ -5703,6 +5708,10 @@ DEFINE_PATCH_MACRO ~opcode_127_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File %resref%.2da does not exist, the game may crash.~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_127_group~ BEGIN
+	LPM ~opcode_group_by_target~
 END
 
 /* ---------------------- *
@@ -6951,42 +6960,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET isValid = 1
-
-			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
-
-			// Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
-			// FIXME: le parameter6 également mais non configuré dans AutoComplétion (et probablement jamais utilisé)
-			// Pour les cas particuliers il sera nécessaire de trouver un moyen alternatif d'afficher la restriction
-			SET timingMode = timingMode177
-			SET duration = duration177
-			SET target = target177
-
-			// La restriction de niveau dépend de celle de l'opcode 177, excepté pour les opcodes qui n'en ont pas
-			PATCH_IF NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0) BEGIN
-				SET diceSides = diceSides177
-				SET diceCount = diceCount177
-			END
-
-			// Si le JS du 177 est renseigné contrairement à celui de l'opcode appelé => transmission
-			// FIXME: en réalité les JS se cumulent, ne sont présents que les cas les plus simples
-			// FIXME: peut créer des conflits mineurs avec l'opcode 12 + special 256 ou 512
-			PATCH_IF saveType == 0 AND saveType177 != 0 BEGIN
-				SET saveType = saveType177
-				SET saveBonus = saveBonus177
-			END
-			// Si deux JS différents avec un saveBonus identiques sont présents, ils se cumulent
-			// FIXME: insuffisant, deux JS identiques doivent pouvoir aussi se cumuler
-			ELSE PATCH_IF saveBonus == saveBonus177 BEGIN
-				SET saveType = saveType | saveType177
-			END
-			// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
-			SET probability = probability177 * probability / 100
-
-			// Gestion pour les invocations de la même créature en plusieurs exemplaires.
-			PATCH_IF opcode == 67 BEGIN
-				SET custom_int = custom_int177
-			END
-
+			LPM ~opcode_177_replace_effect_vars~
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
@@ -7028,6 +7002,84 @@ DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ AND NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Resource %resref%.eff doesn't exist.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		PATCH_IF ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+				SET timingMode177 = timingMode
+				SET duration177 = duration
+				SET target177 = target
+				SET probability177 = probability
+				SET saveType177 = saveType
+				SET saveBonus177 = saveBonus
+				SET diceSides177 = diceSides // levelMin
+				SET diceCount177 = diceCount // levelMax
+				SET custom_int177 = custom_int
+				SET position177 = position
+				SET probability2177 = probability2
+				SET probability1177 = probability1
+				SET isExternal = 1
+
+				LPM ~read_external_effect_vars~
+
+				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+					LPM ~opcode_177_replace_effect_vars~
+					LPF ~delete_opcode~
+	                    INT_VAR opcode = 177
+	                    STR_VAR expression = ~position = %position177%~
+	                    RET $opcodes(~177~) = count
+	                    RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
+	                END
+	                //FIXME: Pas suffisant pour la gestion des probabilités différentes entre l'opcode 177 et l'opcode pointé
+	                //       Attention à la gestion du regroupement par probabilité
+					SET probability2 = probability2177
+					SET probability1 = probability1177
+	                LPM ~add_opcode~
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_177_replace_effect_vars~ BEGIN
+	LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+
+	// Les paramètres timingMode, duration et target écrasent les paramètres de l'opcode pointé
+	// FIXME: le parameter6 également mais non configuré dans AutoComplétion (et probablement jamais utilisé)
+	// Pour les cas particuliers il sera nécessaire de trouver un moyen alternatif d'afficher la restriction
+	SET timingMode = timingMode177
+	SET duration = duration177
+	SET target = target177
+
+	// La restriction de niveau dépend de celle de l'opcode 177, excepté pour les opcodes qui n'en ont pas
+	PATCH_IF NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0) BEGIN
+		SET diceSides = diceSides177
+		SET diceCount = diceCount177
+	END
+
+	// Si le JS du 177 est renseigné contrairement à celui de l'opcode appelé => transmission
+	// FIXME: en réalité les JS se cumulent, ne sont présents que les cas les plus simples
+	// FIXME: peut créer des conflits mineurs avec l'opcode 12 + special 256 ou 512
+	PATCH_IF saveType == 0 AND saveType177 != 0 BEGIN
+		SET saveType = saveType177
+		SET saveBonus = saveBonus177
+	END
+	// Si deux JS différents avec un saveBonus identiques sont présents, ils se cumulent
+	// FIXME: insuffisant, deux JS identiques doivent pouvoir aussi se cumuler
+	ELSE PATCH_IF saveBonus == saveBonus177 BEGIN
+		SET saveType = saveType | saveType177
+	END
+	// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
+	SET probability = probability177 * probability / 100
+
+	// Gestion pour les invocations de la même créature en plusieurs exemplaires.
+	PATCH_IF opcode == 67 OR opcode = 127 BEGIN
+		SET custom_int = custom_int177
 	END
 END
 
@@ -13068,6 +13120,7 @@ END
 DEFINE_PATCH_FUNCTION ~get_creatures_amount~
 	INT_VAR
 		totalLevel = 0
+		multiplier = 1
 	STR_VAR
 		file = ~~
 	RET
@@ -13078,6 +13131,10 @@ BEGIN
 	SET amount = 0
 	SET amountMin = 0
 	SET amountMax = 0
+
+	PATCH_IF multiplier < 1 BEGIN
+		SET multiplier = 1
+	END
 
 	LPF ~get_summon_limit~ RET limitNormal limitCelestial END
 
@@ -13126,6 +13183,9 @@ BEGIN
 				END
 			END
 		END
+		SET amount    *= multiplier
+		SET amountMin *= multiplier
+		SET amountMax *= multiplier
 		PATCH_IF amountMin == amountMax BEGIN
 			SET amount = amountMin
 		END
