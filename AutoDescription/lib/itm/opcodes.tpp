@@ -4329,7 +4329,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 24 BEGIN // Panique
 			TEXT_SPRINT spellState ~Horror~
-			PATCH_FOR_EACH resref IN "SPPR416" "SPPR706" "SPWI811" BEGIN
+			PATCH_FOR_EACH resref IN "spin105" "SPPR416" "SPPR706" "spwi205" "SPWI811" BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 161 // Cure: Fear [161]
@@ -4654,6 +4654,24 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 	END
 	PATCH_IF show_lack_immunity AND oldCount == $opcodes(~%opcode%~) BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to %spellState%: Opcode 206 with resref %resref% not found.~ END
+	END
+
+	SET opcode = 321
+	LPF ~has_opcode~
+		INT_VAR opcode
+		STR_VAR expression = ~resref = %resref%~
+		RET hasOpcode
+	END
+	PATCH_IF hasOpcode BEGIN
+		LPF ~delete_opcode~
+			INT_VAR opcode
+			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			RET $opcodes(~%opcode%~) = count
+			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		END
+	END
+	PATCH_IF show_lack_immunity AND oldCount == $opcodes(~%opcode%~) BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Immunity to %spellState%: Opcode 321 with resref %resref% not found.~ END
 	END
 END
 
