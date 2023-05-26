@@ -33,6 +33,7 @@ DEFINE_PATCH_MACRO ~read_effect_vars~ BEGIN
 
 	SET custom_int = 0
 	SPRINT custom_str ~~
+	SPRINT target_type ~~
 END
 
 DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
@@ -59,6 +60,7 @@ DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
 
 	SET custom_int = 0
 	SPRINT custom_str ~~
+	SPRINT target_type ~~
 END
 
 DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
@@ -88,6 +90,7 @@ DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
 	SPRINT custom_str  ~%data_23%~
 	SET cumulable    = ~%data_24%~
 	SPRINT target_exceptions ~%data_25%~
+	SPRINT target_type ~%data_26%~
 END
 
 DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
@@ -118,6 +121,7 @@ DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
 	SPRINT match_custom_str  ~%data_23%~
 	SET match_cumulable    = ~%data_24%~
 	SPRINT match_target_exceptions ~%data_25%~
+	SPRINT match_target_type ~%data_26%~
 END
 
 
@@ -126,7 +130,7 @@ BEGIN
 	SET cumulable = 1
 	SET position = 0
 	SPRINT target_exceptions ~~
-	CLEAR_ARRAY opcodes
+	LPM ~clear_opcodes~
 
     GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
     PHP_EACH offsets AS _ => offset BEGIN
@@ -139,7 +143,8 @@ BEGIN
 	SET cumulable = 1
 	SET position = 0
 	SPRINT target_exceptions ~~
-	CLEAR_ARRAY opcodes
+
+	LPM ~clear_opcodes~
 
 	GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
 	PHP_EACH offsets AS _ => offset BEGIN
@@ -181,13 +186,30 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
                 SET isValid = 0
             END
         END
-        ELSE PATCH_IF isValid == 1 AND opcode == 318 OR opcode == 324 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND (parameter1 != 0 OR parameter2 != 0) BEGIN
+        ELSE PATCH_IF isValid == 1 AND (opcode == 318 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 			SPRINT target_exceptions ~%target_exceptions% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
             SET isValid = 0
 		END
+        ELSE PATCH_IF isValid == 1 AND opcode == 318 AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
+            PATCH_IF NOT VARIABLE_IS_SET EVAL ~target_exceptions_%resref%~ BEGIN
+                SPRINT EVAL ~target_exceptions_%resref%~ ~~
+            END
+			SPRINT EVAL ~target_exceptions_%resref%~ EVAL ~%target_exceptions_%resref%% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
+			SPRINT var_target_exceptions EVAL ~%target_exceptions_%resref%%~
+            SET isValid = 0
+        END
+		// TODO: 206 depuis un 177 qui rend innefficace certains effets => RR#WEAR
 
         PATCH_IF isValid == 1 BEGIN
-            LPM ~add_opcode~
+            PATCH_IF VARIABLE_IS_SET EVAL ~target_exceptions_%resref%~ BEGIN
+                SPRINT old_target_exceptions ~%target_exceptions%~
+                SPRINT target_exceptions EVAL ~%target_exceptions% %target_exceptions_%resref%%~
+                LPM ~add_opcode~
+                SPRINT target_exceptions ~%old_target_exceptions%~
+            END
+            ELSE BEGIN
+                LPM ~add_opcode~
+            END
         END
     END
 END
@@ -389,12 +411,6 @@ END
  * phase de regroupement.
  */
 DEFINE_PATCH_MACRO ~replace_effects~ BEGIN
-	//TODO: Ecrire le traitement...
-	//TODO: Nécessiterait de pouvoir fournir d'une manière ou d'une autre une cible forcée, selon les paramètres de
-	//      l'opcode 177...
-	//TODO: Avoir les différentes chaînes de cible déjà dans le tableau "opcodes_xx" ??
-	//TODO: Si opcode 177 géré ici, ne pas oubier de multiplier les chances d'activation ! On ne doit pas écrire
-	//      des choses comme "10 % de chance d'avoir 50% de chance...", mais directement "5 % de chance"
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
 			PATCH_TRY LPM ~opcode_%opcode%_replace~ WITH DEFAULT END
@@ -428,6 +444,7 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	PATCH_IF enable_shrinkage == 1 BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 0 BEGIN
+				LPM ~opcode_group_by_target~
 				PATCH_TRY LPM ~opcode_%opcode%_group~ WITH DEFAULT END
 			END
 		END
@@ -468,7 +485,7 @@ DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	ELSE BEGIN
 		SET $opcodes(~%opcode%~) += 1
 	END
-	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = 1
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~) = 1
 END
 
 DEFINE_PATCH_FUNCTION ~delete_opcode~
@@ -494,7 +511,7 @@ BEGIN
 	        LPF evaluate_expression STR_VAR expression RET value END
 			PATCH_IF NOT value BEGIN
 				SET count += 1
-		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~) = 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~) = 1
 	        END
 	    END
 	END
@@ -680,6 +697,10 @@ BEGIN
 			END
 		END
 
+		PATCH_IF NOT ~%target_type~ STRING_EQUAL ~~ BEGIN
+			LPM ~opcode_set_target_strings~
+		END
+
 		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
@@ -702,6 +723,7 @@ BEGIN
 			LPM ~add_duration~
 			LPM ~add_save~
 			LPM ~add_cumulable~
+			LPM ~add_only_for~
 			LPM ~add_target_exceptions~
 		END
 		ELSE BEGIN

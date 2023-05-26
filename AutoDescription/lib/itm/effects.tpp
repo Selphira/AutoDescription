@@ -78,6 +78,10 @@ BEGIN
 				END
 			END
 
+			PATCH_IF NOT ~%target_type~ STRING_EQUAL ~~ BEGIN
+				LPM ~opcode_set_target_strings~
+			END
+
 			LPM ~add_target_level~
 
 			PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
@@ -101,6 +105,7 @@ BEGIN
 				LPM ~add_duration~
 				LPM ~add_save~
 				LPM ~add_cumulable~
+				LPM ~add_only_for~
 				LPM ~add_target_exceptions~
 			END
 			ELSE BEGIN
@@ -187,6 +192,16 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 			SPRINT description ~%description% %duration%~
 			SET ignoreDuration = 1
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~add_only_for~ BEGIN
+	PATCH_IF ~%opcode_target%~ STRING_EQUAL ~_self~ AND VARIABLE_IS_SET onlyForTarget AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		// On ajoute le (uniquement pour les xxx) derrière chaque sous-effets
+        INNER_PATCH_SAVE description ~%description%~ BEGIN
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%onlyForTarget%)%crlf%~
+        END
+		SPRINT description ~%description% (%onlyForTarget%)~
 	END
 END
 

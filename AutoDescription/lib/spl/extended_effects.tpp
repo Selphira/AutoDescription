@@ -47,7 +47,7 @@ BEGIN
 	SET count_leveled_opcodes = 0
 
 	CLEAR_ARRAY leveled_opcodes
-	CLEAR_ARRAY opcodes
+	LPM ~clear_opcodes~
 
     PATCH_DEFINE_ASSOCIATIVE_ARRAY leveled_opcodes BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
@@ -62,7 +62,7 @@ BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
 		        SET count_leveled_opcodes += 1
-				SET $leveled_opcodes(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = opcode
+				SET $leveled_opcodes(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~) = opcode
 		    END
 	    END
 	END
@@ -131,7 +131,7 @@ BEGIN
 
 					// On ne désactive pas l'opcode du niveau 0
 					PATCH_IF level > 0 BEGIN
-						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%level%~) = level
+						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%level%~) = level
 					END
 				END
 				ELSE BEGIN
@@ -360,15 +360,13 @@ END
 
 DEFINE_PATCH_MACRO ~clear_opcodes~ BEGIN
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
-		PATCH_IF count > 0 BEGIN
-		    CLEAR_ARRAY ~opcodes_%opcode%~
-		END
+		CLEAR_ARRAY ~opcodes_%opcode%~
 	END
 	CLEAR_ARRAY opcodes
 END
 
 DEFINE_PATCH_MACRO ~clear_levels~ BEGIN
-	PATCH_PHP_EACH level_effects AS requiredLevel => _ BEGIN
+	PATCH_PHP_EACH level_effects AS _ => requiredLevel BEGIN
 		CLEAR_ARRAY ~leveled_opcodes_%requiredLevel%~
 	END
 	CLEAR_ARRAY level_effects
@@ -487,14 +485,14 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 					END
 		        END
 		        SET $level_effects(~-1~) = 0
-				SET $leveled_opcodes_0(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = opcode
+				SET $leveled_opcodes_0(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~) = opcode
 				SET leveled_opcodes_count_0 += 1
 
 				// On désactive les effets qui se trouvent dans les niveaux plus importants
 				PATCH_PHP_EACH effects_to_disabled AS data => level2 BEGIN
 					// Dépend du type du sort !
 		            LPM ~data_to_vars~
-				    SET $EVAL ~leveled_opcodes_%level2%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~) = ~-1~
+				    SET $EVAL ~leveled_opcodes_%level2%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~) = ~-1~
 				    SET ~leveled_opcodes_count_%level2%~ -= 1
 				    PATCH_IF ~leveled_opcodes_count_%level2%~ == 0 BEGIN
 				        CLEAR_ARRAY ~leveled_opcodes_%level2%~

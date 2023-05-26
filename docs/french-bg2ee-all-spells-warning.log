@@ -1,6 +1,5 @@
 
 BHAAL1B.SPL : Niveau minimum non calculable
-BHAAL4A.SPL : Cible à gerer : 3 
 OHNRDTEL.SPL : FAILURE: Unknown macro: opcode_self_68
 SPCL103.SPL : Niveau minimum non calculable
 SPCL121.SPL : Opcode 54: Invalid target : 255
@@ -13,13 +12,7 @@ SPCL623.SPL : Niveau minimum non calculable
 SPCL624.SPL : Niveau minimum non calculable
 SPCL625.SPL : Niveau minimum non calculable
 SPDR101.SPL : Niveau minimum non calculable
-SPJA01.SPL : Cible à gerer : 3 
 SPPR411.SPL : Niveau minimum non calculable
-SPPR504.SPL : Cible à gerer : 3 
-SPPR550.SPL : Cible à gerer : 3 
-SPPR712.SPL : Cible à gerer : 3 
-SPWI110.SPL : Cible à gerer : 3 
 SPWI118.SPL : Niveau minimum non calculable
 SPWI417.SPL : FAILURE: Unknown macro: opcode_target_345
 SPWI711.SPL : FAILURE: Unknown macro: opcode_target_probability_111
-SPWISH25.SPL : Cible à gerer : 6 

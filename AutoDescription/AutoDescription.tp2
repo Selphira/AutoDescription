@@ -27,8 +27,8 @@ ALWAYS
             infer_charsets = 1
         STR_VAR
             default_language = ~french~
-            tra_path = EVAL ~%MOD_FOLDER%/tra~
-            out_path = EVAL ~weidu_external/Lang/%MOD_FOLDER%~
+            tra_path = ~AutoDescription/tra~
+            out_path = ~weidu_external/Lang/AutoDescription~
             noconvert_array = arrayNoConvert
             reload_array = arrayReload
     END
@@ -39,12 +39,12 @@ ALWAYS
 END
 
 LANGUAGE ~Francais~ ~french~
-         ~%MOD_FOLDER%/tra/french/setup.tra~
-         ~%MOD_FOLDER%/tra/french/description.tra~
+         ~AutoDescription/tra/french/setup.tra~
+         ~AutoDescription/tra/french/description.tra~
 
 LANGUAGE ~English (Beta)~ ~english~
-         ~%MOD_FOLDER%/tra/english/setup.tra~
-         ~%MOD_FOLDER%/tra/english/description.tra~
+         ~AutoDescription/tra/english/setup.tra~
+         ~AutoDescription/tra/english/description.tra~
 
 BEGIN @10 DESIGNATED 10
 SILENT

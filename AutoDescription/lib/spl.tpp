@@ -61,6 +61,11 @@ DEFINE_PATCH_FUNCTION ~get_spell_description~
 BEGIN
 	SET isItem = 0
 	SET isSpell = 1
+	SET isWeapon = 0
+	SET isArmor = 0
+	SET isRobe = 0
+	SET isAmmo = 0
+
 	READ_LONG  SPL_extended_headers_offset headerOffset
 	READ_SHORT SPL_extended_headers_count  headerCount
 

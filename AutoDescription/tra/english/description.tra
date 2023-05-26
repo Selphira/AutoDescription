@@ -3915,6 +3915,10 @@
 @13241502 = ~contre les %creaturesList%~
 @13241503 = ~à %probability% % ~
 
+@13242000 = ~si la compétence %proficiency% est supérieure ou égale à %value%~
+@13242001 = ~si la compétence %proficiency% est égale à %value%~
+@13242002 = ~si la compétence %proficiency% est inférieure à %value%~
+
 // Opcode 325: Stat: Save vs. all [325]
 
 @13250002 = ~les jets de sauvegarde~

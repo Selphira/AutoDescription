@@ -140,7 +140,7 @@ BEGIN
 	SET ignoreDuration = 0
 
 	CLEAR_ARRAY lines
-	CLEAR_ARRAY opcodes
+	LPM ~clear_opcodes~
 
     PATCH_DEFINE_ASSOCIATIVE_ARRAY lines BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END

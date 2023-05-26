@@ -6963,6 +6963,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 		SPRINT oldOfTheTarget ~%ofTheTarget%~
 		SPRINT oldToTheTarget ~%toTheTarget%~
 
+		SPRINT target_exceptions177 ~%target_exceptions%~
 		SET timingMode177 = timingMode
 		SET duration177 = duration
 		SET target177 = target
@@ -6975,6 +6976,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 		SET isExternal = 1
 
 		LPM ~read_external_effect_vars~
+		SPRINT target_exceptions ~~ // Nécessaire pour éviter d'avoir l'exception en doublon dans la description
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET isValid = 1
@@ -6991,6 +6993,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 			END
 		END
 
+		SPRINT target_exceptions ~%target_exceptions177%~
 		SPRINT theTarget   ~%oldTheTarget%~
 		SPRINT ofTheTarget ~%oldOfTheTarget%~
 		SPRINT toTheTarget ~%oldToTheTarget%~
@@ -7024,41 +7027,47 @@ DEFINE_PATCH_MACRO ~opcode_177_is_valid~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
-	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+	PATCH_PHP_EACH ~opcodes_177~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		PATCH_IF ~%targetType%~ STRING_EQUAL ~~ BEGIN
-			INNER_PATCH_FILE ~%resref%.eff~ BEGIN
-				SET timingMode177 = timingMode
-				SET duration177 = duration
-				SET target177 = target
-				SET probability177 = probability
-				SET saveType177 = saveType
-				SET saveBonus177 = saveBonus
-				SET diceSides177 = diceSides // levelMin
-				SET diceCount177 = diceCount // levelMax
-				SET custom_int177 = custom_int
-				SET position177 = position
-				SET probability2177 = probability2
-				SET probability1177 = probability1
-				SET isExternal = 1
+		INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+			SET timingMode177 = timingMode
+			SET duration177 = duration
+			SET target177 = target
+			SET probability177 = probability
+			SET saveType177 = saveType
+			SET saveBonus177 = saveBonus
+			SET diceSides177 = diceSides // levelMin
+			SET diceCount177 = diceCount // levelMax
+			SET custom_int177 = custom_int
+			SET position177 = position
+			SET probability2177 = probability2
+			SET probability1177 = probability1
+			SET parameter1177 = parameter1
+			SET parameter2177 = parameter2
+			SET isExternal = 1
 
-				LPM ~read_external_effect_vars~
+			LPM ~read_external_effect_vars~
 
-				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-					LPM ~opcode_177_replace_effect_vars~
-					LPF ~delete_opcode~
-	                    INT_VAR opcode = 177
-	                    STR_VAR expression = ~position = %position177%~
-	                    RET $opcodes(~177~) = count
-	                    RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
-	                END
-	                //FIXME: Pas suffisant pour la gestion des probabilités différentes entre l'opcode 177 et l'opcode pointé
-	                //       Attention à la gestion du regroupement par probabilité
-					SET probability2 = probability2177
-					SET probability1 = probability1177
-	                LPM ~add_opcode~
+			LPF ~delete_opcode~
+                INT_VAR opcode = 177
+                STR_VAR expression = ~position = %position177%~
+                RET $opcodes(~177~) = count
+                RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
+            END
+
+			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+				LPM ~opcode_177_replace_effect_vars~
+
+				PATCH_IF parameter1177 != 0 BEGIN
+					LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
+					SPRINT target_type "%parameter2177%:%string%"
 				END
+
+                //FIXME: Pas suffisant pour la gestion des probabilités différentes entre l'opcode 177 et l'opcode pointé
+                //       Attention à la gestion du regroupement par probabilité
+				SET probability2 = probability2177
+				SET probability1 = probability1177
+                LPM ~add_opcode~
 			END
 		END
 	END
@@ -7112,51 +7121,92 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_grouped~ BEGIN END
 
+	CLEAR_ARRAY to_delete
+	CLEAR_ARRAY opcode_positions
+	CLEAR_ARRAY positions_already_grouped
+
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET currentPosition = position
 
 		PATCH_IF NOT VARIABLE_IS_SET $positions_already_grouped(~%position%~) BEGIN
-		    LPF opcode_177_get_all_opcode_positions
-				INT_VAR
-					match_opcode       = opcode
-					match_isExternal   = isExternal
-					match_target       = target
-					match_power        = power
-					match_parameter1   = parameter1
-					match_parameter2   = parameter2
-					match_timingMode   = timingMode
-					match_resistance   = resistance
-					match_duration     = duration
-					match_probability  = probability
-					match_probability1 = probability1
-					match_probability2 = probability2
-					match_diceCount    = diceCount
-					match_diceSides    = diceSides
-					match_saveType     = saveType
-					match_saveBonus    = saveBonus
-					match_special      = special
-					match_parameter3   = parameter3
-					match_parameter4   = parameter4
-					match_custom_int   = custom_int
-				STR_VAR
-					match_resref     = ~%resref%~
-					match_resref2    = ~%resref2%~
-					match_resref3    = ~%resref3%~
-					match_custom_str = ~%custom_str%~
-		        RET
-		            count
-		        RET_ARRAY
-		            opcode_positions = positions
-		    END
-
+			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 BEGIN
+			    LPF opcode_177_get_all_opcode_positions
+					INT_VAR
+						match_opcode       = opcode
+						match_isExternal   = isExternal
+						match_target       = target
+						match_power        = power
+						match_parameter1   = parameter1
+						match_parameter2   = parameter2
+						match_timingMode   = timingMode
+						match_resistance   = resistance
+						match_duration     = duration
+						match_probability  = probability
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_diceCount    = diceCount
+						match_diceSides    = diceSides
+						match_saveType     = saveType
+						match_saveBonus    = saveBonus
+						match_special      = special
+						match_parameter3   = parameter3
+						match_parameter4   = parameter4
+						match_custom_int   = custom_int
+					STR_VAR
+						match_resref     = ~%resref%~
+						match_resref2    = ~%resref2%~
+						match_resref3    = ~%resref3%~
+						match_custom_str = ~%custom_str%~
+			        RET
+			            count
+			        RET_ARRAY
+			            opcode_positions = positions
+			    END
+			END
+			ELSE BEGIN
+			    LPF opcode_not_177_get_all_opcode_positions
+					INT_VAR
+						match_opcode       = opcode
+						match_isExternal   = isExternal
+						match_target       = target
+						match_power        = power
+						match_parameter1   = parameter1
+						match_parameter2   = parameter2
+						match_timingMode   = timingMode
+						match_resistance   = resistance
+						match_duration     = duration
+						match_probability  = probability
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_diceCount    = diceCount
+						match_diceSides    = diceSides
+						match_saveType     = saveType
+						match_saveBonus    = saveBonus
+						match_special      = special
+						match_parameter3   = parameter3
+						match_parameter4   = parameter4
+						match_custom_int   = custom_int
+					STR_VAR
+						match_resref     = ~%resref%~
+						match_resref2    = ~%resref2%~
+						match_resref3    = ~%resref3%~
+						match_custom_str = ~%custom_str%~
+			        RET
+			            count
+			        RET_ARRAY
+			            opcode_positions = positions
+			    END
+			END
 		    PATCH_IF count > 1 BEGIN
 		        LPF ~opcode_get_target_type~ RET target_type END
 
 				SET $to_delete(~%currentPosition%~) = 1
 				SET position += 1000
 				SET custom_int = count
-				SPRINT custom_str ~%target_type%~
+				PATCH_IF ~%target_type%~ STRING_EQUAL ~0:000~ BEGIN
+					SPRINT target_type ~~
+				END
 				LPM ~add_opcode~
 
 				PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -7191,8 +7241,14 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypes~ BEGIN END
 	CLEAR_ARRAY ~targetTypes~
 
-	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
-		SPRINT targetType ~%custom_str%~
+	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
+			SET $targetTypes(~%targetType%~) = 1
+		END
+	END
+	ELSE PATCH_IF NOT ~%target_type%~ STRING_EQUAL ~~ BEGIN
+		SPRINT targetType ~%target_type%~
 
 		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypeGroups~ BEGIN
 			~5:001 5:007 5:010 5:013 5:014 5:017~ => 11770100
@@ -7212,13 +7268,9 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 			LPF return_first_entry STR_VAR list = ~%targetType%~ RET entry targetType = list END
 			LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~:~ RET file = entry entry = list END
 			LPF ~get_ids_name~ INT_VAR entry file RET idName END
-			SET $targetTypes(~%idName%~) = 1
-		END
-	END
-	ELSE BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
-		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
-			SET $targetTypes(~%targetType%~) = 1
+			PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
+				SET $targetTypes(~%idName%~) = 1
+			END
 		END
 	END
 
@@ -7234,7 +7286,9 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 
 		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
 		SPRINT versus        @102387 // ~contre les %targetType%~
-		SPRINT onlyForTarget @11770001 // ~uniquement pour les %targetType%~
+		PATCH_IF NOT (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
+			SPRINT onlyForTarget @11770001 // ~uniquement pour les %targetType%~
+		END
 		SPRINT theTarget     @102384 // ~les %targetType%~
 		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
 		SPRINT ofTheTarget @102385 // ~des %targetType%~
@@ -7245,18 +7299,25 @@ END
 
 DEFINE_PATCH_FUNCTION ~opcode_get_target_type~ RET target_type
 BEGIN
-	SPRINT target_type ~~
+	SPRINT targetType ~~
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
-			LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
-			SPRINT target_type "%target_type% %parameter2%:%string%"
+			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 BEGIN
+				LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
+				SPRINT targetType "%targetType% %parameter2%:%string%"
+			END
+			ELSE PATCH_IF NOT ~%target_type%~ STRING_EQUAL ~~ BEGIN
+				SPRINT targetType "%targetType% %target_type%"
+			END
 		END
     END
 
-	INNER_PATCH_SAVE target_type ~%target_type%~ BEGIN
+	INNER_PATCH_SAVE targetType ~%targetType%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~ \(.+\)$~ ~\1~
 	END
+
+	SPRINT target_type ~%targetType%~
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_177_get_all_opcode_positions~
@@ -7304,6 +7365,51 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~opcode_not_177_get_all_opcode_positions~
+	INT_VAR
+		match_opcode       = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
+	STR_VAR
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+	RET
+		count
+	RET_ARRAY
+		positions
+BEGIN
+	SET count = 0
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	CLEAR_ARRAY ~positions~
+	PATCH_PHP_EACH EVAL ~opcodes_%match_opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPM ~opcode_match~
+		PATCH_IF match BEGIN
+			SET $positions(~%position%~) = 1
+			SET count += 1
+		END
+	END
+END
+
 /* ---------------------------------------------------- *
  * Spell Effect: THAC0 vs. Creature Type Modifier [178] *
  * ---------------------------------------------------- */
@@ -7330,10 +7436,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_178~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_178_common~ BEGIN
-	TEXT_SPRINT versus ~~
-
-	LPM ~opcode_set_target_strings~
-
 	SET value = isExternal? parameter3 : 0
 	PATCH_IF is_ee AND value == 0 BEGIN
 		SET value = special
@@ -11544,6 +11646,15 @@ BEGIN
                 SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
             END
         END
+		ELSE PATCH_IF is_ee AND statType > 145 BEGIN
+			SET strref = 0
+			LPM ~opcode_326_condition_mod~
+			PATCH_IF strref > 0 BEGIN
+				SET strref -= 19000
+				LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+				SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
+			END
+		END
         ELSE BEGIN
             PATCH_IF VARIABLE_IS_SET $opcode_324_effective(~%statType%~) BEGIN
                 SPRINT opcode_324_list $opcode_324_effective(~%statType%~)
@@ -12201,7 +12312,6 @@ DEFINE_PATCH_MACRO ~opcode_self_344~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
 		TEXT_SPRINT name ~%name% %weaponSlot%~
 	END
-	LPM ~opcode_set_target_strings~
 	SET value = special
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT description @100009 // ~%name%%colon%%value% %versus%~
@@ -13703,6 +13813,33 @@ DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
     )
 END
 
+DEFINE_PATCH_MACRO ~opcode_match~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
 
 DEFINE_PATCH_MACRO ~opcode_match_except_duration~ BEGIN
 	SET match = (
