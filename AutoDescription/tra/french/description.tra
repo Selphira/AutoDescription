@@ -2818,8 +2818,8 @@
 
 // Opcode 167: Stat: THAC0 Modifier with Missile Weapons [167]
 
-@11670001 = ~TAC0 des armes à projectiles~
-@11670002 = ~le TAC0 des armes à projectiles~
+@11670001 = ~%value% avec les armes de trait et les armes de jet~
+@11670002 = ~le TAC0 avec les armes de trait et les armes de jet~
 
 // Opcode 171: Give Ability [171]
 

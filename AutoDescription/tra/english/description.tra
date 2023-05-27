@@ -2818,7 +2818,7 @@
 
 // Opcode 167: Stat: THAC0 Modifier with Missile Weapons [167]
 
-@11670001 = ~Missile Weapons THAC0~
+@11670001 = ~%value% with Missile Weapons~
 @11670002 = ~the Missile Weapons THAC0~
 
 // Opcode 171: Give Ability [171]

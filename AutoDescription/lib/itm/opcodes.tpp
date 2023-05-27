@@ -6687,15 +6687,22 @@ END
  * Stat: THAC0 Modifier with Missile Weapons [167] *
  * ----------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_167~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 11670001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 des armes à projectiles~
+	LOCAL_SET value = parameter1
+	SET parameter2 = parameter2 BAND 65535
+	LPM ~opcode_mod_base~
+	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
+	    SPRINT name @10540001  // ~TAC0~
+	    SPRINT value @11670001 // ~%value% avec les armes de trait et les armes de jet~
+		SPRINT description @100001 // ~%name%%colon%%value%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_167~ BEGIN
-	LPF ~opcode_target~ INT_VAR strref = 11670002 RET description END // ~le TAC0 des armes à projectiles~
+	LPF ~opcode_target~ INT_VAR strref = 11670002 RET description END // ~le TAC0 avec les armes de trait et les armes de jet~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_167~ BEGIN
-	LPF ~opcode_probability~ INT_VAR strref = 11670002 RET description END // ~le TAC0 des armes à projectiles~
+	LPF ~opcode_probability~ INT_VAR strref = 11670002 RET description END // ~le TAC0 avec les armes de trait et les armes de jet~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_167~ BEGIN
