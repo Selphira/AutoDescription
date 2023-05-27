@@ -2230,6 +2230,16 @@
 @10780130 = ~d'inoculer une maladie qui inflige 1 point de dégâts de poison %strDuration% %toTheTarget%~
 @10780131 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~
 
+@10780140 = ~d'inoculer une maladie qui diminue de %amount% %theAttributes% %ofTheTarget%~
+@10780150 = ~d'inoculer une maladie qui augmente de %amount% %theAttributes% %ofTheTarget%~
+
+@10780164 = ~the Strength~
+@10780165 = ~the Dexterity~
+@10780166 = ~the Constitution~
+@10780167 = ~the Intelligence~
+@10780168 = ~the Wisdom~
+@10780169 = ~the Charisma~
+
 // Opcode 79: Cure: Disease [79]
 
 @10790001 = ~Cure Disease~

@@ -3575,35 +3575,45 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_78_common~ BEGIN
 	SET amount = parameter1
-	SET type = parameter2
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT theAttributes ~%custom_str%~
+		SET strref += 40
+		PATCH_IF amount < 0 BEGIN
+			SET amount = ABS amount
+			SET strref += 10
+		END
+	END
+	ELSE BEGIN
+		SET type = parameter2
 
-	PATCH_IF type >= 0 AND type <= 3 BEGIN
-		// En théorie toutes les versions infligent du dégâts de poison, je laisse dans le doute
-		PATCH_IF is_ee == 1 BEGIN
-			SET strref += 30
+		PATCH_IF type >= 0 AND type <= 3 BEGIN
+			// En théorie toutes les versions infligent du dégâts de poison, je laisse dans le doute
+			PATCH_IF is_ee == 1 BEGIN
+				SET strref += 30
+			END
+			LPM ~opcode_25_common~
 		END
-		LPM ~opcode_25_common~
-	END
-	ELSE PATCH_IF type >= 4 AND type <= 9 BEGIN
-		SET strref += type
-		PATCH_IF amount < 0 BEGIN
-			SET amount = ABS amount
-			SET strref += 10
+		ELSE PATCH_IF type >= 4 AND type <= 9 BEGIN
+			SET strref += type
+			PATCH_IF amount < 0 BEGIN
+				SET amount = ABS amount
+				SET strref += 10
+			END
 		END
-	END
-	ELSE PATCH_IF type == 10 BEGIN
-		SET strref += type
-	END
-	ELSE PATCH_IF type == 11 OR type == 12 BEGIN
-		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
-	END
-	ELSE PATCH_IF type == 13 BEGIN
-		SET strref += type
-		PATCH_IF amount < 0 BEGIN
-			SET amount = ABS amount
+		ELSE PATCH_IF type == 10 BEGIN
+			SET strref += type
 		END
-		ELSE BEGIN
-			SET strref += 10
+		ELSE PATCH_IF type == 11 OR type == 12 BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Mold touch à gerer : %amount% : %frequency% : %resref%~ END
+		END
+		ELSE PATCH_IF type == 13 BEGIN
+			SET strref += type
+			PATCH_IF amount < 0 BEGIN
+				SET amount = ABS amount
+			END
+			ELSE BEGIN
+				SET strref += 10
+			END
 		END
 	END
 
@@ -3621,6 +3631,52 @@ DEFINE_PATCH_MACRO ~opcode_78_is_valid~ BEGIN
 			 timingMode == TIMING_permanent_after_death) AND duration == 0 AND parameter2 <= 3 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: This effect does not work with Timing Mode %timingMode%.~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_78_group~ BEGIN
+	LOCAL_SPRINT and @100021 // ~et~
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 >= 4 AND parameter2 <= 9 BEGIN
+			CLEAR_ARRAY positions
+			SET group = 0
+			SET strref = 10780160 + parameter2
+			SPRINT attribute (AT strref)
+			SET $positions(~%attribute%~) = position
+			PATCH_FOR_EACH attribute IN 4 5 6 7 8 9 BEGIN
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+					STR_VAR expression = ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %attribute% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+					RET opcodePosition = position
+				END
+				PATCH_IF opcodePosition >= 0 BEGIN
+					SET group = 1
+					SET strref = 10780160 + attribute
+					SPRINT attribute (AT strref)
+					SET $positions(~%attribute%~) = opcodePosition
+				END
+			END
+			PATCH_IF group == 1 BEGIN
+				PATCH_PHP_EACH positions AS _ => position1 BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~position = %position1%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_%opcode%~
+		        END
+				LPF ~implode~ STR_VAR array_name = ~positions~ glue = ~, ~ final_glue = ~ %and% ~ RET attributes = text END
+		        SPRINT custom_str ~%attributes%~
+		        SET parameter2 = 0 - 1
+		        LPM ~add_opcode~
+			END
+		END
 	END
 END
 
