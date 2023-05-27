@@ -149,6 +149,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 64 => 221 // State: Remove Infravision [64]
 	220 => 223 // Removal: Remove School [220]
 	221 => 224 // Removal: Remove Secondary Type [221]
+	511 => 224 // Dissipe toutes les illusions [511]
 	229 => 225 // Removal: Remove One School [229]
 	230 => 226 // Removal: Remove One Secondary Type [230]
 	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
@@ -570,6 +571,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	316 => 0 // Spell: Magical Rest
 	337 => 0 // Remove: Opcode
 	343 => 0 // HP Swap
+	511 => 0 // Dissipe toutes les illusions
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
@@ -8909,6 +8911,38 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_220~ BEGIN
 	LPM ~opcode_self_probability_220~
 END
 
+DEFINE_PATCH_MACRO ~opcode_220_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter1 == 9 AND parameter2 == 5 BEGIN
+			// Chercher un opcode 221 avec parameter1 == 9 ET parameter2 == 3
+			// toutes les illusions
+			//
+			LPF ~get_opcode_position~
+				INT_VAR opcode = 221
+				STR_VAR expression = ~parameter1 = 9 AND parameter2 = 3 AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+				RET opcodePosition = position
+			END
+			PATCH_IF opcodePosition >= 0 BEGIN
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 220
+                    STR_VAR expression = ~position = %position%~
+                    RET $opcodes(~220~) = count
+                    RET_ARRAY EVAL ~opcodes_220~ = opcodes_xx
+                END
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 221
+                    STR_VAR expression = ~position = %opcodePosition%~
+                    RET $opcodes(~221~) = count
+                    RET_ARRAY EVAL ~opcodes_221~ = opcodes_xx
+                END
+                SET opcode = 511
+                LPM ~add_opcode~
+			END
+		END
+	END
+END
+
 /* ------------------------------------ *
  * Removal: Remove Secondary Type [221] *
  * ------------------------------------ */
@@ -12767,6 +12801,26 @@ DEFINE_PATCH_MACRO ~opcode_510_common~ BEGIN
 	END
 
 	SPRINT description (AT strref)
+END
+
+/* -------------------------------------------- *
+ * Spell: Dissipe toutes les illusions [511] *
+ * -------------------------------------------- */
+
+DEFINE_PATCH_MACRO ~opcode_self_511~ BEGIN
+	SPRINT description @15110001 // ~Dissipe toutes les illusions qui affectent %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_511~ BEGIN
+	SPRINT description @15110002 // ~de dissiper toutes les illusions qui affectent %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_511~ BEGIN
+	LPM ~opcode_self_511~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_511~ BEGIN
+	LPM ~opcode_self_probability_511~
 END
 
 /* ------------------------ *

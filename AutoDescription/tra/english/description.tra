@@ -4227,6 +4227,11 @@
 @15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
 @15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 
+// Fake Opcode 511: Dissipe toutes les illusions
+
+@15110001 = ~Dissipe toutes les illusions qui affectent %theTarget%~
+@15110002 = ~de dissiper toutes les illusions qui affectent %theTarget%~
+
 // Fake Opcode 519: Immunité aux sorts
 
 @15180001 = ~Immunity to %spellNames% spells~
