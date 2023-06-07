@@ -23,7 +23,10 @@ END
  *   Ex: 10 mètres + 1 mètre par niveau ?
  */
 DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
+	SET base_level = ~-1~
+	SET base_range = ~-1~
 	SET count = 0
+	SET first = 0 - 1
 
 	PATCH_DEFINE_ARRAY ~ranges~ BEGIN END
 
@@ -33,21 +36,32 @@ DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
 
 			READ_SHORT (offset + SPL_HEAD_target) target
 			READ_SHORT (offset + SPL_HEAD_range) range
+			READ_SHORT (offset + SPL_HEAD_level_required) requiredLevel
 
 			PATCH_IF target == 5 OR target == 7 BEGIN
 				SET range = 0
 			END
-			SET $ranges(~%count%~) = range
+
+			PATCH_IF base_level == ~-1~ BEGIN
+				SET base_level = requiredLevel
+			END
+			PATCH_IF base_range == ~-1~ BEGIN
+				SET base_range = range
+			END
+
+			PATCH_IF first == 0 - 1 BEGIN
+				SET first = requiredLevel
+			END
+			SET $ranges(~%requiredLevel%~) = range
 			SET count += 1
 	    END
 	END
 
-	SET currentRange = $ranges(~0~)
+	SET currentRange = $ranges(~%first%~)
 
-	FOR (i = 1 ; i < count ; ++i ) BEGIN
-		PATCH_IF currentRange != $ranges(~%i%~) BEGIN
+	PATCH_PHP_EACH ~ranges~ AS level => levelRange BEGIN
+		PATCH_IF IS_AN_INT ~%currentRange%~ AND currentRange != levelRange BEGIN
 			SPRINT currentRange @100033 // ~Spéciale~
-			SET i = count
 		END
 	END
 
@@ -57,10 +71,88 @@ DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
 			SPRINT currentRange @100034 // ~Contact~
 		END
 	END
+	ELSE BEGIN
+		PATCH_IF base_range == ~-1~ BEGIN
+			SET base_range = 0
+		END
+		PATCH_IF base_level == 1 BEGIN
+			LPF get_first_level_for_spell RET base_level = minLevel END
+		END
+		LPF ~get_complex_range~
+			INT_VAR
+				base_level
+				base_range
+			STR_VAR
+				array_name = ~ranges~
+			RET
+				currentRange = complex_range
+		END
+	END
 
 	// TODO: @102461 = ~Champ visuel du lanceur~
 
 	LPF ~appendValue~ INT_VAR strref = 102006 STR_VAR value = ~%currentRange%~ RET description END // ~Portée~
+END
+
+DEFINE_PATCH_FUNCTION ~get_complex_range~
+	INT_VAR
+		base_level = 0
+		base_range = 0
+	STR_VAR
+		array_name = ~~
+	RET
+		complex_range
+BEGIN
+	SPRINT complex_range ~~
+
+	SET delta_range = 0
+	SET delta_level = 0
+	SET is_valid = 1
+	SET prev_range = base_range
+	SET prev_level = base_level
+	SET cpt = 0
+
+	PATCH_PHP_EACH ~%array_name%~ AS level => range BEGIN
+		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+		PATCH_IF cpt > 0 BEGIN
+			PATCH_IF delta_range = 0 BEGIN
+				SET delta_range = range - prev_range
+				SET delta_level = level - prev_level
+			END
+			ELSE PATCH_IF delta_range != range - prev_range OR delta_level != level - prev_level BEGIN
+				SET is_valid = 0
+			END
+			SET prev_level = level
+		END
+		SET prev_range = range
+		SET cpt += 1
+	END
+
+	PATCH_IF is_valid == 1 BEGIN
+		PATCH_IF base_range > 0 AND delta_range == 0 BEGIN
+			LPF ~feets_to_meters~ INT_VAR range = base_range RET complex_range = rangeToMeter END
+		END
+		ELSE BEGIN
+			LPF ~feets_to_meters~ INT_VAR range = delta_range RET deltaRange = rangeToMeter END
+
+			PATCH_IF delta_level == 1 BEGIN
+				SPRINT complex_range ~%deltaRange% par niveau~
+			END
+			ELSE BEGIN
+				SPRINT complex_range ~%deltaRange% par tranche de %delta_level% niveaux~
+			END
+			SET remains_range = range - (delta_range * level / delta_level)
+			PATCH_IF remains_range > 0 BEGIN
+				LPF ~feets_to_meters~ INT_VAR range = remains_range RET remainsRange = rangeToMeter END
+				SPRINT complex_range ~%remainsRange% + %complex_range%~
+			END
+			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
+			// TODO: Ajouter le "jusqu'au niveau xx"
+		END
+	END
+	ELSE BEGIN
+		SPRINT complex_range @100033 // ~Spéciale~
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
@@ -170,7 +262,6 @@ BEGIN
 	SET is_valid = 1
 	SET is_special = 0
 	SET is_permanent = 0
-	SET by_x_level = 1
 	SET duration_by_level = base_duration / base_level
 	SET prev_duration = base_duration
 	SET prev_level = base_level
@@ -206,7 +297,6 @@ BEGIN
 				SPRINT complex_duration ~%deltaDuration% par niveau~
 			END
 			ELSE BEGIN
-				LPF ~get_str_duration~ INT_VAR duration = base_duration RET baseDuration = strDuration END
 				SPRINT complex_duration ~%deltaDuration% par tranche de %delta_level% niveaux~
 			END
 			SET remains_duration = duration - (delta_duration * level / delta_level)
@@ -215,6 +305,7 @@ BEGIN
 				SPRINT complex_duration ~%remainsDuration% + %complex_duration%~
 			END
 			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
+			// TODO: Ajouter le "jusqu'au niveau xx"
 		END
 	END
 	ELSE BEGIN

@@ -3426,11 +3426,11 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_71~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_71~ BEGIN
-	LPM ~opcode_self_71~
+	LPM ~opcode_self_probability_71~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_71~ BEGIN
-	LPM ~opcode_self_probability_71~
+	LPM ~opcode_self_71~
 END
 
 DEFINE_PATCH_MACRO ~opcode_71_common~ BEGIN
@@ -5523,6 +5523,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
+		//PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC56%eet_var%~ BEGIN
 		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%resref%~ STRING_EQUAL_CASE ~MISC56_~ BEGIN
 			LPF ~get_opcode_position~
 				INT_VAR opcode = 112
@@ -7099,14 +7100,14 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 			SET duration177 = duration
 			SET target177 = target
 			SET probability177 = probability
+			SET probability1177 = probability1
+			SET probability2177 = probability2
 			SET saveType177 = saveType
 			SET saveBonus177 = saveBonus
 			SET diceSides177 = diceSides // levelMin
 			SET diceCount177 = diceCount // levelMax
 			SET custom_int177 = custom_int
 			SET position177 = position
-			SET probability2177 = probability2
-			SET probability1177 = probability1
 			SET parameter1177 = parameter1
 			SET parameter2177 = parameter2
 			SET isExternal = 1
@@ -7127,11 +7128,6 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 					LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
 					SPRINT target_type "%parameter2177%:%string%"
 				END
-
-                //FIXME: Pas suffisant pour la gestion des probabilités différentes entre l'opcode 177 et l'opcode pointé
-                //       Attention à la gestion du regroupement par probabilité
-				SET probability2 = probability2177
-				SET probability1 = probability1177
                 LPM ~add_opcode~
 			END
 		END
@@ -7166,8 +7162,19 @@ DEFINE_PATCH_MACRO ~opcode_177_replace_effect_vars~ BEGIN
 	ELSE PATCH_IF saveBonus == saveBonus177 BEGIN
 		SET saveType = saveType | saveType177
 	END
-	// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
-	SET probability = probability177 * probability / 100
+
+	// Cas où 177 < 100% et opcode == 100
+    PATCH_IF probability == 100 AND probability177 < 100 BEGIN
+		SET probability2 = probability2177
+		SET probability1 = probability1177
+		SET probability  = probability177
+    END
+    ELSE PATCH_IF probability < 100 AND probability177 < 100 BEGIN
+        // Attention à la gestion du regroupement par probabilité
+        // TODO: Trouver comment calculer probability1 et probability2
+		// Multiplication des probabilités de l'opcode 177 et de l'opcode pointé
+        SET probability  = probability177 * probability / 100
+    END
 
 	// Gestion pour les invocations de la même créature en plusieurs exemplaires.
 	PATCH_IF opcode == 67 OR opcode = 127 BEGIN
