@@ -74,9 +74,10 @@ BEGIN
 
 	SET ignoreDuration = 0
 
-	SPRINT description ~%spellName%%crlf%~
+	SPRINT description ~%spellName%~
 
 	LPF ~spell_school~ RET description END
+	LPF ~appendLine~ RET description END // ~École~
 	LPF ~spell_level~ RET description END
 	LPF ~spell_range~ RET description END
 	LPF ~spell_duration~ RET description ignoreDuration END

@@ -13,7 +13,7 @@ DEFINE_PATCH_FUNCTION ~spell_school~ RET description BEGIN
 
 	PATCH_IF spellSchool > 0 BEGIN
 		LPF ~get_spell_school_name~ INT_VAR school = spellSchool RET spellSchoolName END
-		LPF ~appendValue~ INT_VAR strref = 100030 STR_VAR value = ~%spellSchoolName%~ RET description END // ~École~
+		LPF ~appendLine~ STR_VAR string = ~(%spellSchoolName%)~ RET description END
 	END
 END
 
