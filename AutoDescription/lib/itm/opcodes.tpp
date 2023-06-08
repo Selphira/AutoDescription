@@ -6747,6 +6747,7 @@ END
  * ----------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_167~ BEGIN
 	LOCAL_SET value = parameter1
+	LOCAL_SET strref = 0
 	SET parameter2 = parameter2 BAND 65535
 	LPM ~opcode_mod_base~
 	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
@@ -12932,7 +12933,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 		END
 	END
-	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
+	PATCH_IF (NOT IS_AN_INT ~%value%~ OR value != 0) AND strref > 0 BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET name = string END
 	END
 END
