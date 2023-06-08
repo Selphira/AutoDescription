@@ -25,6 +25,8 @@
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
 @10015 = ~None~
+@10016 = ~Neg.~
+@10017 = ~1/2~
 @100001 = ~%name%%colon%%value%~
 @100002 = ~Weight~
 @100003 = ~STATISTICS~

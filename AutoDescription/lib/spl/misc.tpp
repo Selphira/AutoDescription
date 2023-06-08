@@ -484,7 +484,52 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description BEGIN
-	LPF ~appendValue~ INT_VAR strref = 100036 STR_VAR value = ~TODO~ RET description END // ~Jet de sauvegarde~
+	SET count = 0
+	SET isSpecial = 0
+	SET baseSavingType = 0 - 1
+	SET baseSavingBonus = 0 - 1
+
+	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+		PATCH_IF isSpecial == 0 BEGIN
+			GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
+			PHP_EACH offsets AS _ => offset BEGIN
+				READ_SHORT (offset) opcode
+				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+					READ_LONG (offset + EFF_parameter2) parameter2
+					READ_LONG (offset + EFF_save_type) saveType
+					READ_LONG (offset + EFF_save_bonus) saveBonus
+					READ_LONG (offset + 0x2c) special
+
+					PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
+						SET saveType = 4 // demi-dégâts
+					END
+					PATCH_IF baseSavingType == 0 - 1 BEGIN
+						SET baseSavingType = saveType
+						SET baseSavingBonus = saveBonus
+					END
+					PATCH_IF baseSavingType != saveType BEGIN
+						SET isSpecial = 1
+					END
+				END
+			END
+		END
+	END
+
+	PATCH_IF isSpecial BEGIN
+		SPRINT savingThrow @100032 // ~Spécial~
+	END
+	ELSE PATCH_IF baseSavingType == 4 BEGIN
+		SPRINT savingThrow @10017 // ~1/2~
+	END
+	ELSE PATCH_IF baseSavingType > 0 BEGIN
+		SPRINT savingThrow @10016 // ~Annule~
+	END
+	ELSE BEGIN
+		SPRINT savingThrow @10015 // ~Aucun~
+	END
+
+	LPF ~appendValue~ INT_VAR strref = 100036 STR_VAR value = ~%savingThrow%~ RET description END // ~Jet de sauvegarde~
 END
 
 DEFINE_PATCH_FUNCTION ~get_first_level_for_spell~
