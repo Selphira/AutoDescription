@@ -11695,7 +11695,7 @@ BEGIN
 
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 
-		PATCH_IF NOT (baseProbability1 < probability2 OR baseProbability2 > probability1) BEGIN
+		PATCH_IF baseProbability < 100 AND NOT (baseProbability1 < probability2 OR baseProbability2 > probability1) BEGIN
 			// Recalcul de la probabilité par ratio
 			PATCH_IF baseProbability1 == probability1 OR baseProbability2 == probability2 BEGIN
 				SET probability = 100
@@ -11713,6 +11713,7 @@ BEGIN
 				LPF ~get_probability~ INT_VAR probability1 = newProbability1 probability2 = newProbability2 RET newProbability = probability END
 				SET probability = newProbability * 100 / baseProbability
 			END
+        END
 
 		SET key = 100 - probability
 		SET $keys(~%key%~) = 1
@@ -11805,9 +11806,6 @@ BEGIN
 				END
             END
         END
-
-
-        END
 	END
 
 	SORT_ARRAY_INDICES ~keys~ NUMERICALLY
@@ -11815,68 +11813,68 @@ BEGIN
 	SPRINT notEffectiveAndThe ~%andThe%~
 	PATCH_PHP_EACH keys AS key => _ BEGIN
 		SET probability = 100 - key
-			SPRINT probabilityStr ~~
+		SPRINT probabilityStr ~~
+		PATCH_IF probability < 100 BEGIN
+			SPRINT probabilityStr @13241503 // ~à %probability% % ~
+		END
+
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~effective_against%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF probability < 100 BEGIN
-				SPRINT probabilityStr @13241503 // ~à %probability% % ~
+				SPRINT effectiveAndThe ~%and%~
 			END
+			SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $effective_against(~%creaturesList%~) = 1
+		END
 
-			CLEAR_ARRAY targetsList
-			PATCH_PHP_EACH ~effective_against%key%~ AS target => _ BEGIN
-				SET $targetsList(~%target%~) = 1
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~not_effective_against%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
+		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF probability < 100 BEGIN
+				SPRINT notEffectiveAndThe ~%and%~
 			END
-			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
-			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF probability < 100 BEGIN
-					SPRINT effectiveAndThe ~%and%~
-				END
-				SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
-				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
-				SET $effective_against(~%creaturesList%~) = 1
-			END
+			SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $not_effective_against(~%creaturesList%~) = 1
+		END
 
-			CLEAR_ARRAY targetsList
-			PATCH_PHP_EACH ~not_effective_against%key%~ AS target => _ BEGIN
-				SET $targetsList(~%target%~) = 1
-			END
-			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET creaturesList = text END
-			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF probability < 100 BEGIN
-					SPRINT notEffectiveAndThe ~%and%~
-				END
-				SPRINT creaturesList @13241502 // ~contre les %creaturesList%~
-				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
-				SET $not_effective_against(~%creaturesList%~) = 1
-			END
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~not_effective_between%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $not_effective_between(~%creaturesList%~) = 1
+		END
 
-			CLEAR_ARRAY targetsList
-			PATCH_PHP_EACH ~not_effective_between%key%~ AS target => _ BEGIN
-				SET $targetsList(~%target%~) = 1
-			END
-			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
-			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
-				SET $not_effective_between(~%creaturesList%~) = 1
-			END
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~not_effective_if%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $not_effective_if(~%creaturesList%~) = 1
+		END
 
-			CLEAR_ARRAY targetsList
-			PATCH_PHP_EACH ~not_effective_if%key%~ AS target => _ BEGIN
-				SET $targetsList(~%target%~) = 1
-			END
-			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
-			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
-				SET $not_effective_if(~%creaturesList%~) = 1
-			END
-
-			CLEAR_ARRAY targetsList
-			PATCH_PHP_EACH ~effective_if%key%~ AS target => _ BEGIN
-				SET $targetsList(~%target%~) = 1
-			END
-			LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
-			PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-				SPRINT creaturesList ~%probabilityStr%%creaturesList%~
-				SET $effective_if(~%creaturesList%~) = 1
-			END
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~effective_if%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
+		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $effective_if(~%creaturesList%~) = 1
+		END
 	END
 
 	LPF ~implode~ STR_VAR array_name = ~effective_if~ glue = ~, ~ final_glue = ~ %and% ~ RET target_effective_if = text END
@@ -11923,6 +11921,8 @@ BEGIN
 	ELSE PATCH_IF NOT ~%target_effective%~ STRING_EQUAL ~~ BEGIN
 		SPRINT target_exceptions ~%target_effective%~
 	END
+
+	PATCH_PRINT "target_exceptions: %target_exceptions%"
 END
 
 /* ------------------------ *
