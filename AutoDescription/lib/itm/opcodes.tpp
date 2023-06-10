@@ -410,6 +410,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
+	// 282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
 	291 => 0 // Graphics: Disable Visual Effect [291]
@@ -8544,7 +8545,6 @@ END
 /* -------------------------------- *
  * Spell Effect: Imprisonment [211] *
  * -------------------------------- */
-//TODO : grouper avec opcode 71, P2 == 1 & P1 == 66
 DEFINE_PATCH_MACRO ~opcode_self_211~ BEGIN
 	SPRINT description @12110001 // ~Emprisonne %theTarget%~
 END
@@ -8559,6 +8559,20 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_211~ BEGIN
 	LPM ~opcode_self_probability_211~
+END
+
+DEFINE_PATCH_MACRO ~opcode_211_group~ BEGIN
+	PATCH_PHP_EACH ~opcodes_71~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter1 == 66 AND parameter2 == 1 BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode = 71
+				STR_VAR expression = ~position = %position%~
+				RET $opcodes(~71~) = count
+				RET_ARRAY EVAL ~opcodes_71~ = opcodes_xx
+			END
+		END
+	END
 END
 
 /* ------------------------ *
@@ -11921,8 +11935,6 @@ BEGIN
 	ELSE PATCH_IF NOT ~%target_effective%~ STRING_EQUAL ~~ BEGIN
 		SPRINT target_exceptions ~%target_effective%~
 	END
-
-	PATCH_PRINT "target_exceptions: %target_exceptions%"
 END
 
 /* ------------------------ *
