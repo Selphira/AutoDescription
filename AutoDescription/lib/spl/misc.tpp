@@ -156,7 +156,6 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
-	SET base_level = ~-1~
 	SET base_duration = ~-1~
 	SET isValid = 1
 	SET count_levels = 0
@@ -170,20 +169,39 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 			READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
 			SET $levels(~%count_levels%~) = requiredLevel
 			SET count_levels += 1
+			SET delayedDuration = 0
 			GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
 			PHP_EACH offsets AS _ => offset BEGIN
 				READ_SHORT (offset) opcode
 				READ_ASCII (offset + EFF_resref_key) resref
-				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-					PATCH_IF NOT (opcode == 321 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
-						READ_LONG  (offset + EFF_duration) duration
+				PATCH_IF opcode == 177 BEGIN
+					INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+						READ_SHORT EFF2_opcode opcode
+						READ_BYTE  EFF2_timing timingMode
+                        READ_LONG  EFF2_duration duration
+                        READ_ASCII EFF2_resource resref
+					END
+				END
+				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
+					PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+						READ_LONG (offset + EFF_duration) duration
+						READ_BYTE (offset + EFF_timing_mode) timingMode
+
+		                PATCH_IF timingMode == TIMING_duration_ticks BEGIN
+		                    SET duration = duration / 15
+		                END
+						ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
+							PATCH_IF delayedDuration < duration BEGIN
+								SET delayedDuration = duration
+							END
+							SET duration = 0 - 1
+						END
+						ELSE PATCH_IF timingMode != TIMING_duration AND timingMode != TIMING_duration_ticks BEGIN
+							SET duration = 0
+						END
 
 						PATCH_IF opcode == 217 BEGIN
 							SET duration = 30
-						END
-
-						PATCH_IF base_level == ~-1~ BEGIN
-							SET base_level = requiredLevel
 						END
 
 						PATCH_IF duration > 0 BEGIN
@@ -191,33 +209,31 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 								SET base_duration = duration
 							END
 
-							PATCH_IF count_levels > 1 BEGIN
-								PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
-									SET $all_durations(~%requiredLevel%~) = duration
-								END
+							PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
+								SET $all_durations(~%requiredLevel%~) = duration
+							END
 
-								PATCH_IF $all_durations(~%requiredLevel%~) != duration BEGIN
-									SET isValid = 0
-								END
+							PATCH_IF $all_durations(~%requiredLevel%~) != duration BEGIN
+								SET isValid = 0
 							END
 						END
 					END
+				END
+			END
+			PATCH_IF isValid AND delayedDuration > 0 BEGIN
+				PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
+					SET $all_durations(~%requiredLevel%~) = delayedDuration
+				END
+
+				PATCH_IF $all_durations(~%requiredLevel%~) != delayedDuration BEGIN
+					SET isValid = 0
 				END
 			END
 		END
 	END
 
 	PATCH_IF isValid == 1 BEGIN
-		PATCH_IF base_duration == ~-1~ BEGIN
-			SET base_duration = 0
-		END
-		PATCH_IF base_level == 1 BEGIN
-			LPF get_first_level_for_spell RET base_level = minLevel END
-		END
 		LPF ~get_complex_duration~
-			INT_VAR
-				base_level
-				base_duration
 			STR_VAR
 				array_name = ~all_durations~
 			RET
@@ -232,7 +248,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 			SPRINT duration @100033 // ~Spéciale~
 		END
 		PATCH_IF is_permanent BEGIN
-			//TODO: Gestion du permanent ! Dépend des opcodes utilisés par le sort...
+			//FIXME: Gestion du permanent ! Dépend des opcodes utilisés par le sort...
 			//SPRINT duration @100037 // ~Permanente~
 			SPRINT duration @100038 // ~Instantanée~
 		END
@@ -245,9 +261,6 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_complex_duration~
-	INT_VAR
-		base_level = 0
-		base_duration = 0
 	STR_VAR
 		array_name = ~~
 	RET
@@ -257,19 +270,20 @@ DEFINE_PATCH_FUNCTION ~get_complex_duration~
 BEGIN
 	SPRINT complex_duration ~~
 
+	SET base_duration = 0
 	SET delta_duration = 0
 	SET delta_level = 0
 	SET is_valid = 1
 	SET is_special = 0
 	SET is_permanent = 0
-	SET duration_by_level = base_duration / base_level
-	SET prev_duration = base_duration
-	SET prev_level = base_level
 	SET cpt = 0
 
 	PATCH_PHP_EACH ~%array_name%~ AS level => duration BEGIN
+		PATCH_IF level <= 1 BEGIN
+			LPF get_first_level_for_spell RET level = minLevel END
+		END
 		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
-		PATCH_IF cpt > 0 BEGIN
+		PATCH_IF cpt > 1 BEGIN
 			PATCH_IF delta_duration = 0 BEGIN
 				SET delta_duration = duration - prev_duration
 				SET delta_level = level - prev_level
@@ -278,12 +292,40 @@ BEGIN
 				SET is_valid = 0
 			END
 		END
+		ELSE BEGIN
+			SET base_duration = duration
+		END
 		SET prev_duration = duration
 		SET prev_level = level
 		SET cpt += 1
 	END
 
-	PATCH_IF is_valid == 1 BEGIN
+	PATCH_IF cpt == 2 BEGIN
+		SET cpt = 0
+		SET delta_duration = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => duration BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			PATCH_IF cpt > 0 BEGIN
+				PATCH_IF delta_duration = 0 BEGIN
+					SET delta_duration = duration - prev_duration
+					SET delta_level = level - prev_level
+				END
+			END
+			ELSE BEGIN
+				SET base_duration = duration
+			END
+			SET prev_duration = duration
+			SET prev_level = level
+			SET cpt += 1
+		END
+		LPF ~get_str_duration~ INT_VAR duration = base_duration RET baseDuration = strDuration END
+		LPF ~get_str_duration~ INT_VAR duration = delta_duration RET deltaDuration = strDuration END
+		SPRINT complex_duration ~%baseDuration% + %deltaDuration% au niveau %level%~
+	END
+	ELSE PATCH_IF is_valid == 1 BEGIN
 		PATCH_IF base_duration == 0 AND delta_duration == 0 BEGIN
 			SET is_permanent = 1
 		END

@@ -475,9 +475,6 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 					END
 
 					LPF ~get_complex_duration~
-						INT_VAR
-							base_level = level
-							base_duration = duration
 						STR_VAR
 							array_name = ~all_durations~
 						RET
