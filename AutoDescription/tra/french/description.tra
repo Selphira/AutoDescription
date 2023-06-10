@@ -3088,11 +3088,15 @@
 
 @12200001 = ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
 @12200002 = ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12200003 = ~Dissipe tous les sorts de l'école %spellSchoolName% sur %theTarget%~
+@12200004 = ~de dissiper tous les sorts de l'école %spellSchoolName% sur %theTarget%~
 
 // Opcode 221: Removal: Remove Secondary Type [221]
 
 @12210001 = ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
 @12210002 = ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12210003 = ~Dissipe tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+@12210004 = ~de dissiper tous les sorts %spellSecondaryTypeName% sur %theTarget%~
 
 // Opcode 222: Spell Effect: Teleport Field [222]
 
@@ -3134,13 +3138,17 @@
 
 // Opcode 229: Removal: Remove One School [229]
 
-@12290001 = ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12290002 = ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12290001 = ~Dissipe un sort de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12290002 = ~de dissiper un sort de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12290003 = ~Dissipe un sort de l'école %spellSchoolName% sur %theTarget%~
+@12290004 = ~de dissiper un sort de l'école %spellSchoolName% sur %theTarget%~
 
 // Opcode 230: Removal: Remove One Secondary Type [230]
 
-@12300001 = ~Dissipe tous les sorts de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12300002 = ~de dissiper tous les sorts de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12300001 = ~Dissipe un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12300002 = ~de dissiper un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12300003 = ~Dissipe un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+@12300004 = ~de dissiper un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
 
 // Opcode 231: Spell Effect: Time Stop [231]
 

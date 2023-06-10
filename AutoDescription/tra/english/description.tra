@@ -3084,13 +3084,17 @@
 
 // Opcode 220: Removal: Remove School [220]
 
-@12200001 = ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
-@12200002 = ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
+@12200001 = ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12200002 = ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12200003 = ~Dissipe tous les sorts de l'école %spellSchoolName% sur %theTarget%~
+@12200004 = ~de dissiper tous les sorts de l'école %spellSchoolName% sur %theTarget%~
 
 // Opcode 221: Removal: Remove Secondary Type [221]
 
 @12210001 = ~Dispels all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
 @12210002 = ~to dispel all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
+@12210001 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~
+@12210002 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~
 
 // Opcode 222: Spell Effect: Teleport Field [222]
 
@@ -3132,19 +3136,23 @@
 
 // Opcode 229: Removal: Remove One School [229]
 
-@12290001 = ~Dissipe tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
-@12290002 = ~de dissiper tous les sorts de l'école %spellSchoolName% de niveau %spellLevel% ou moins sur %theTarget%~
+@12290001 = ~Dissipe un sort de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12290002 = ~de dissiper un sort de l'école %spellSchoolName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12290003 = ~Dissipe un sort de l'école %spellSchoolName% sur %theTarget%~
+@12290004 = ~de dissiper un sort de l'école %spellSchoolName% sur %theTarget%~
 
 // Opcode 230: Removal: Remove One Secondary Type [230]
 
-@12300001 = ~Dispels all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
-@12300002 = ~to dispel all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
+@12300001 = ~Dispels one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~
+@12300002 = ~to dispel one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~
+@12300003 = ~Dispels one %spellSecondaryTypeName% spell on %theTarget%~
+@12300004 = ~to dispel one %spellSecondaryTypeName% spell on %theTarget%~
 
 // Opcode 231: Spell Effect: Time Stop [231]
 
-@12310001 = ~Arrêt du temps~
-@12310002 = ~Lance Arrêt du temps~
-@12310003 = ~de lancer Arrêt du temps~
+@12310001 = ~Time stop~
+@12310002 = ~Cast Time stop~
+@12310003 = ~to cast Time stop~
 
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
@@ -3309,10 +3317,10 @@
 
 // Opcode 259: Protection: Spell Trap [259]
 
-@12590001 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
-@12590002 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins~
-@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
-@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou moins puis lance %spellName%~
+@12590001 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+@12590002 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
+@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance %spellName%~
+@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance %spellName%~
 @12590005 = ~Lance %spellName%~
 @12590006 = ~de lancer %spellName%~
 
