@@ -94,7 +94,7 @@ BEGIN
 		LPF ~add_casting_features~ STR_VAR description RET description END
 		// TODO: Cette variable est utilisée à plusieurs endroits...  Trouver une meilleure solution
 		SET abilityType = ~-1~
-		LPF ~get_spell_effects_description~ STR_VAR description RET description END
+		LPF ~get_spell_effects_description~ INT_VAR ignoreDuration STR_VAR description RET description END
 	END
 
 	INNER_PATCH_SAVE description ~%description%~ BEGIN

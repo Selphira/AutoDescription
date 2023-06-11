@@ -234,7 +234,7 @@ BEGIN
                 LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget RET description totalLines END
             END
             ELSE BEGIN
-                LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget STR_VAR description RET description totalLines END
+                LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
             END
 			PATCH_IF totalLines == 1 BEGIN
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
@@ -257,6 +257,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_description~
 	INT_VAR
 		baseProbability = 100
 		forceTarget = 0
+		ignoreDuration = 0
 	STR_VAR
 		description = ~~
 	RET
@@ -287,6 +288,7 @@ BEGIN
 		END
 	END
 
+	LPM ~group_identical_spell_effects_between_level~
 	LPM ~group_spell_effects_by_duration~
 	LPM ~group_spell_effects_by_damage~
 	//TODO: Regroupement des effets identiques entre chacun des niveaux ( a mettre dans leveled_opcodes_0 pour être géré de manière générique ?? Ca permettrait d'avoir la même chose entre ici et la version pour un niveau particulier)
@@ -382,7 +384,8 @@ DEFINE_PATCH_FUNCTION ~build_spell_effects_description~
 		totalLines
 BEGIN
 	SET totalLines = 0
-	PATCH_PHP_EACH level_effects AS _ => requiredLevel BEGIN
+	SET isFirstLevel = 1
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		CLEAR_ARRAY lines
 
 		LPM ~clear_opcodes~
@@ -398,10 +401,15 @@ BEGIN
 		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
 
-		PATCH_IF countLines > 0 AND /*~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ requiredLevel > 1 BEGIN
-            LPF ~appendLine~ RET description END
-			SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
-			SPRINT description ~%description%%crlf%%levelDescription%~
+		PATCH_IF countLines > 0 /*AND ~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ BEGIN
+			PATCH_IF isFirstLevel == 0 BEGIN
+	            LPF ~appendLine~ RET description END
+				SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
+				SPRINT description ~%description%%crlf%%levelDescription%~
+			END
+			ELSE BEGIN
+				SET isFirstLevel = 0
+			END
 		END
 		//LPM ~add_common_opcodes_to_description
 		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
@@ -411,6 +419,67 @@ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^%crlf%~ ~~
 	END
 	*/
+END
+
+DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
+	LOCAL_SET desactivated = 0
+	LOCAL_SET continue = 1
+	LOCAL_SET lastFoundLevel = 0 - 1
+
+	CLEAR_ARRAY positions
+
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+		SET loop1 = 1
+		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+			SET loop2 = 1
+			PATCH_IF loop1 == 1/*opcode >= 0*/ BEGIN
+	            LPM ~data_to_vars~
+	            SET desactivated = 0
+	            SET continue = 1
+				PATCH_PHP_EACH level_effects AS _ => matchRequiredLevel BEGIN
+					PATCH_IF loop1 == 1 AND loop2 == 1 BEGIN
+						SET loop3 = 1
+						PATCH_IF continue == 1 AND requiredLevel < matchRequiredLevel BEGIN
+							PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
+								PATCH_IF loop1 == 1 AND loop2 == 1 AND loop3 == 1 BEGIN
+									SET loop4 = 1
+							        LPM ~data_to_match_vars~
+									PATCH_IF matchOpcode == opcode AND NOT VARIABLE_IS_SET $positions(~%matchRequiredLevel%-%match_position%~) BEGIN
+										PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+							            PATCH_IF ignoreDuration BEGIN
+							                LPM ~opcode_match_except_duration~
+							            END
+							            ELSE BEGIN
+											LPM ~opcode_match~
+										END
+							            PATCH_IF match == 1 BEGIN
+							                SET $positions(~%matchRequiredLevel%-%match_position%~) = 1
+						                    SET desactivated = 1
+						                    SET loop2 = 0
+							            END
+							        END
+							    END
+							END
+					        PATCH_IF desactivated == 0 BEGIN
+					            SET continue = 0
+					        END
+						END
+					END
+				END
+			END
+		END
+	END
+
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+	        LPM ~data_to_vars~
+	        PATCH_IF VARIABLE_IS_SET $positions(~%requiredLevel%-%position%~) AND $positions(~%requiredLevel%-%position%~) == 1 BEGIN
+	            SET $EVAL ~leveled_opcodes_%requiredLevel%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~) = ~-1~
+	        END
+		END
+	END
+
+	CLEAR_ARRAY positions
 END
 
 DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
