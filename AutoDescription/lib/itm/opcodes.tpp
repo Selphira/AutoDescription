@@ -7079,7 +7079,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET d
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
-				LPF ~get_effect_description~ INT_VAR resetTarget = 1 RET description saveAdded ignoreDuration END
+				LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
 			END
 		END
 	END
@@ -12014,10 +12014,9 @@ END
  * ------------------------ */
 // TODO : gérer 326 avec 324
 DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
-	SET ignoreDuration = 1
 	LPM ~opcode_326_condition~
-
 	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+	SET ignoreDuration = 1
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_326~ BEGIN
