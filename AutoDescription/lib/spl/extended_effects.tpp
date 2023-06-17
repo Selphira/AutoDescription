@@ -402,7 +402,7 @@ BEGIN
 		SET totalLines += countLines
 
 		PATCH_IF countLines > 0 /*AND ~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ BEGIN
-			PATCH_IF isFirstLevel == 0 BEGIN
+			PATCH_IF isFirstLevel == 0 AND requiredLevel > 1 BEGIN
 	            LPF ~appendLine~ RET description END
 				SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
 				SPRINT description ~%description%%crlf%%levelDescription%~
