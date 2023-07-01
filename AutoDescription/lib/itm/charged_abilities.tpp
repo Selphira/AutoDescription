@@ -60,18 +60,21 @@ BEGIN
 	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%tooltip%~ RET title END
 						SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
 						SET countLines += 1
-						SET hasTitle = 1
+						SET hasTitle = 2
 	                END
 
 					PATCH_IF EVAL ~countLines%index%~ > 1 BEGIN
 						// On ajoute le titre générique que si on n'a pas trouvé le titre par tooltip
-						PATCH_IF ~%title%~ STRING_EQUAL ~~ BEGIN
+						PATCH_IF ~%title%~ STRING_EQUAL ~~ AND countHeaders > 1 BEGIN
 							SET abilityNumber = index + 1
 							SPRINT title @101124 // ~Capacité %abilityNumber%~
 
 		                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
 							SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
 							SET countLines += 1
+							SET hasTitle = 2
+						END
+						ELSE PATCH_IF ~%title%~ STRING_EQUAL ~~ AND countHeaders == 1 BEGIN
 							SET hasTitle = 1
 						END
 					END
@@ -83,7 +86,7 @@ BEGIN
 							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%title%~) = 1
 	                    END
 	                    ELSE BEGIN
-							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 2
+							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = hasTitle
 	                    END
 						SET countLines += 1
 	                END
@@ -115,6 +118,10 @@ BEGIN
 		END
 		ELSE PATCH_IF (itemType != ITM_TYPE_dart OR (itemType == ITM_TYPE_dart AND countHeaders > 1)) BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
+			PATCH_IF itemType != ITM_TYPE_dart AND countHeaders == 1 AND ~countLines0~ > 1 BEGIN
+				SPRINT title @100015  // ~Capacité de charge~
+				LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+			END
 			LPF ~add_section_to_description~ INT_VAR count = countLines STR_VAR title arrayName = ~lines~ RET description END
 		END
 	END
