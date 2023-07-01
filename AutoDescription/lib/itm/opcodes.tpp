@@ -6332,6 +6332,44 @@ DEFINE_PATCH_MACRO ~opcode_146_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_146_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		// Si un opcode 321 pointant le même sort que le 146 existe => supprimer le  321 + ajouter (non cumulable) au 146
+		LPF ~get_opcode_position~
+			INT_VAR opcode = 321
+			STR_VAR expression = ~position < %position% AND resref = %resref% AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+			RET opcodePosition = position
+		END
+		PATCH_IF opcodePosition >= 0 BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode = 321
+				STR_VAR expression = ~position = %opcodePosition%~
+				RET $opcodes(~321~) = count
+				RET_ARRAY EVAL ~opcodes_321~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~321~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_321~
+	        END
+			LPF ~delete_opcode~
+				INT_VAR opcode
+				STR_VAR expression = ~position = %position%~
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+			SET cumulable= 0
+			LPM ~add_opcode~
+		END
+	END
+END
+
 /* ------------------------ *
  * Spell: Learn Spell [147] *
  * ------------------------ */

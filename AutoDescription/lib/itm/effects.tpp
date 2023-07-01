@@ -185,7 +185,7 @@ END
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	// durée ou pas, un effet peut avoir un délai avant fonctionnement
 	PATCH_IF (timingMode == TIMING_delayed OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
-			 opcode != 177 AND opcode != 183 AND opcode != 283 AND ignoreDuration == 0 AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR timingMode == TIMING_delayed) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN

@@ -120,7 +120,7 @@
 @102094 = ~%charges% fois par jour~
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
 @102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-@102127 = ~Permet de lancer des sorts profanes~
+@102127 = ~N'empêche pas de lancer des sorts profanes~
 @102159 = ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
 
 @102677 = ~usage unique~
@@ -1998,8 +1998,8 @@
 // Opcode 42: Spell: Wizard Spell Slots Modifier [42]
 
 // FIXME: regrouper les strrefs avec 62
-@10420001 = ~Mémorisation d'un sort profane supplémentaire de %levelStr% niveau~
-@10420002 = ~Mémorisation de %amount% sorts profanes supplémentaires de %levelStr% niveau~
+@10420001 = ~Permet de mémoriser un sort profane supplémentaire de %levelStr% niveau~
+@10420002 = ~Permet de mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
 @10420003 = ~Suppression d'un sort profane de %levelStr% niveau~
 @10420004 = ~Suppression de %amount% sorts profanes de %levelStr% niveau~
 @10420005 = ~Double le nombre de sorts profanes mémorisables de %levelStr% niveau~
@@ -2088,8 +2088,8 @@
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
-@10620001 = ~Mémorisation d'un sort divin supplémentaire de %levelStr% niveau~
-@10620002 = ~Mémorisation de %amount% sorts divins supplémentaires de %levelStr% niveau~
+@10620001 = ~Permet de mémoriser un sort divin supplémentaire de %levelStr% niveau~
+@10620002 = ~Permet de mémoriser %amount% sorts divins supplémentaires de %levelStr% niveau~
 @10620003 = ~Suppression d'un sort divin de %levelStr% niveau~
 @10620004 = ~Suppression de %amount% sorts divins de %levelStr% niveau~
 @10620005 = ~Double le nombre de sorts divins mémorisables de %levelStr% niveau~
