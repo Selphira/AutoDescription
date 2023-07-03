@@ -373,11 +373,11 @@ BEGIN
 	        SET $EVAL ~tac0s%tac0%~(~%index%~) = 0
 	        PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 				SPRINT $damages(~damages0~) ~%damage%~
-				SPRINT $EVAL ~damages0~(~%index%~) ~~
+				SET $EVAL ~damages0~(~%index%~) = 0
 	        END
 			ELSE BEGIN
 				SPRINT $damages(~damages%damage%~) ~%damage%~
-				SPRINT $EVAL ~damages%damage%~(~%index%~) ~~
+				SET $EVAL ~damages%damage%~(~%index%~) = 0
 			END
 	        SET $damageTypes(~damageTypes%damageType%~) = damageType
 	        SET $EVAL ~damageTypes%damageType%~(~%index%~) = 0
@@ -420,11 +420,26 @@ BEGIN
 	LPF ~array_count~ STR_VAR array_name = ~damageTypes~ RET damageTypeCount = count END
 	PATCH_PHP_EACH ~damages~ AS array_name => value BEGIN
 	    PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ AND NOT ~%value%~ STRING_EQUAL ~%damageNone%~ BEGIN
-	        PATCH_IF enable_shrinkage == 1 AND shrink_weapon_attributes == 1 AND damageTypeCount == 1 BEGIN
-				PATCH_PHP_EACH ~damageTypes~ AS array_damageTypes => damageType BEGIN
-					SET strref = 102010 + damageType
-					SPRINT string_value (AT ~%strref%~)
-	                SPRINT value ~%value% (%string_value%)~
+			LPF ~array_count~ STR_VAR array_name RET array_damageCount = count END
+			SET damageTypeAdded = 0
+	        PATCH_IF enable_shrinkage == 1 AND shrink_weapon_attributes == 1 /*AND damageCount == 1 AND damageTypeCount == 1*/ BEGIN
+				PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
+					PATCH_PHP_EACH ~damageTypes~ AS array_damageTypes => damageType BEGIN
+						LPF ~array_count~ STR_VAR array_name = ~%array_damageTypes%~ RET array_damageTypeCount = count END
+						PATCH_IF (array_damageTypeCount == 1 AND array_damageCount == 1) OR damageTypeCount == 1 BEGIN
+							PATCH_PHP_EACH ~%array_damageTypes%~ AS index_damageType => _ BEGIN
+								PATCH_IF index_damageType == index BEGIN
+									PATCH_IF damageTypeAdded == 0 BEGIN
+										SET strref = 102010 + damageType
+										SPRINT string_value (AT ~%strref%~)
+						                SPRINT value ~%value% (%string_value%)~
+						                SET damageTypeAdded = 1
+						            END
+		                            SET $EVAL ~%array_damageTypes%~(~%index_damageType%~) = 1
+				                END
+			                END
+		                END
+					END
 				END
 	        END
 	        LPF ~get_combat_attribute_name~ INT_VAR strref = 10730001 count STR_VAR array_name RET name END // ~Dégâts~
@@ -436,17 +451,19 @@ BEGIN
 	PATCH_IF count > 1 OR enable_shrinkage == 0 OR shrink_weapon_attributes == 0 BEGIN
 		PATCH_PHP_EACH ~damageTypes~ AS array_name => value BEGIN
 			SET found = 0
-			PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
-				PATCH_PHP_EACH ~damages~ AS array_damages => damage BEGIN
-					PATCH_PHP_EACH ~%array_damages%~ AS index_damage => _ BEGIN
-						PATCH_IF found == 0 BEGIN
-							PATCH_IF NOT ~%damage%~ STRING_EQUAL ~%damageNone%~ BEGIN
-								PATCH_IF index == index_damage BEGIN
-									SET strref = 102010 + value
-									SPRINT string_value (AT ~%strref%~)
-									LPF ~get_combat_attribute_name~ INT_VAR strref = 102005 count STR_VAR array_name RET name END // ~Type de dégâts~
-									LPF ~appendValue~ STR_VAR name value = ~%string_value%~ RET description END
-									SET found = 1
+			PATCH_PHP_EACH ~%array_name%~ AS index => ignore BEGIN
+				PATCH_IF ignore == 0 BEGIN
+					PATCH_PHP_EACH ~damages~ AS array_damages => damage BEGIN
+						PATCH_PHP_EACH ~%array_damages%~ AS index_damage => _ BEGIN
+							PATCH_IF found == 0 BEGIN
+								PATCH_IF NOT ~%damage%~ STRING_EQUAL ~%damageNone%~ BEGIN
+									PATCH_IF index == index_damage BEGIN
+										SET strref = 102010 + value
+										SPRINT string_value (AT ~%strref%~)
+										LPF ~get_combat_attribute_name~ INT_VAR strref = 102005 count STR_VAR array_name RET name END // ~Type de dégâts~
+										LPF ~appendValue~ STR_VAR name value = ~%string_value%~ RET description END
+										SET found = 1
+									END
 								END
 							END
 						END
@@ -495,13 +512,15 @@ BEGIN
 
 	PATCH_IF count > 1 BEGIN
 		PATCH_DEFINE_ARRAY ~sectionTypes~ BEGIN END
-		PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
-			PATCH_PHP_EACH ~headers%index%~ AS headerData => _ BEGIN
-				SET attackType = ~%headerData_0%~
-				SET location = ~%headerData_1%~
-                SET headerIndex = ~%headerData_2%~
-                LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
-                SET $sectionTypes(~%sectionType%~) = 0
+		PATCH_PHP_EACH ~%array_name%~ AS index => ignore BEGIN
+			PATCH_IF ignore == 0 BEGIN
+				PATCH_PHP_EACH ~headers%index%~ AS headerData => _ BEGIN
+					SET attackType = ~%headerData_0%~
+					SET location = ~%headerData_1%~
+	                SET headerIndex = ~%headerData_2%~
+	                LPF ~get_combat_section_type~ INT_VAR headerIndex attackType location RET sectionType END
+	                SET $sectionTypes(~%sectionType%~) = 0
+	            END
             END
 		END
 		LPF ~implode~ STR_VAR array_name = ~sectionTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET sectionType = text END
