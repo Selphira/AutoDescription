@@ -7349,6 +7349,119 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_group_by_duration~ BEGIN
+	LOCAL_SET matched = 0
+	LOCAL_SET has_instant_effect = 0
+	LOCAL_SET delta_duration = 0
+	LOCAL_SET prev_duration = 0
+	LOCAL_SET is_valid_duration = 1
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_grouped~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_group_durations~ BEGIN END
+
+	CLEAR_ARRAY opcode_group_durations
+	CLEAR_ARRAY positions_already_grouped
+	CLEAR_ARRAY to_delete
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		CLEAR_ARRAY opcode_group_durations
+
+		PATCH_IF NOT VARIABLE_IS_SET $positions_already_grouped(~%position%~) BEGIN
+			SET matched = 0
+			SET has_instant_effect = 0
+
+			PATCH_IF timingMode != TIMING_delayed OR (timingMode == TIMING_delayed AND duration == 0) BEGIN
+				SET has_instant_effect = 1
+			END
+			PATCH_IF timingMode == TIMING_delayed BEGIN
+				SET $opcode_group_durations(%position%) = duration
+			END
+
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				SET match = (
+						match_position     != position
+					AND match_isExternal   == isExternal
+			        AND match_target       == target
+			        AND match_power        == power
+			        AND match_parameter1   == parameter1
+			        AND match_parameter2   == parameter2
+			        AND match_timingMode   == TIMING_delayed
+			        AND match_resistance   == resistance
+			        AND match_probability  == probability
+			        AND match_probability1 == probability1
+			        AND match_probability2 == probability2
+			        AND match_diceCount    == diceCount
+			        AND match_diceSides    == diceSides
+			        AND match_saveType     == saveType
+			        AND match_saveBonus    == saveBonus
+			        AND match_special      == special
+			        AND match_parameter3   == parameter3
+			        AND match_parameter4   == parameter4
+			        AND match_custom_int   == custom_int
+			        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+			        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+			        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+			        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+			    )
+			    PATCH_IF match BEGIN
+			        SET matched = 1
+					SET $opcode_group_durations(~%match_position%~) = match_duration
+			    END
+			END
+
+			PATCH_IF matched BEGIN
+				SET delta_duration = 0
+				SET prev_duration = 0
+				SET is_valid_duration = 1
+				PATCH_PHP_EACH ~opcode_group_durations~ AS matched_position => matched_duration BEGIN
+					SET $positions_already_grouped(~%matched_position%~) = 1
+					PATCH_IF delta_duration = 0 BEGIN
+						SET delta_duration = matched_duration
+					END
+					ELSE PATCH_IF delta_duration != matched_duration - prev_duration BEGIN
+						SET is_valid_duration = 0
+					END
+					SET prev_duration = matched_duration
+				END
+
+				PATCH_IF is_valid_duration BEGIN
+					PATCH_PHP_EACH ~opcode_group_durations~ AS matched_position => matched_duration BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode
+							STR_VAR expression = ~position = %matched_position%~
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+					LPF ~delete_opcode~
+						INT_VAR opcode
+						STR_VAR expression = ~position = %position%~
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+					PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+			            CLEAR_ARRAY ~opcodes_%opcode%~
+			        END
+
+					PATCH_IF has_instant_effect BEGIN
+						SET timingMode = 5001
+					END
+					ELSE BEGIN
+						SET timingMode = 5000
+					END
+					SET duration = (delta_duration * 10000) + prev_duration
+                    LPM ~add_opcode~
+				END
+			END
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypes~ BEGIN END
 	CLEAR_ARRAY ~targetTypes~
@@ -13979,13 +14092,12 @@ DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 RET spellType BEGIN
 	LPF ~implode~ STR_VAR array_name = ~spellTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET spellType = text END
 END
 
-DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 RET frequency BEGIN
+DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 strref = 100320 RET frequency BEGIN // ~par %strDuration%~
 	LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 	PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
 		INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
 			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
 		END
-		SET strref = 100320 // ~par %strDuration%~
 	END
 	ELSE BEGIN
 		// FIXME: données en français et genrées => traduction impossible

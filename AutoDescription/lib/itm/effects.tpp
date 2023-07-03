@@ -184,8 +184,8 @@ END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	// durée ou pas, un effet peut avoir un délai avant fonctionnement
-	PATCH_IF (timingMode == TIMING_delayed OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
-			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR timingMode == TIMING_delayed) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF (timingMode == TIMING_delayed OR timingMode == 5000 OR timingMode == 5001 OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
+			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR timingMode == TIMING_delayed OR timingMode == 5000 OR timingMode == 5001) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
@@ -391,7 +391,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 	SPRINT value ~~
 	// FIXME, il peut avoir certaines subtilités entre un vrai timing 1 et un timing X
 	// Il faudrait considérer un nouveau timing dont l'effet à mi-chemin entre le 1 et le 9
-	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration BEGIN
+	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration AND timingMode != 5000 AND timingMode != 5001 BEGIN
 		SET timingMode = TIMING_permanent
 	END
 	ELSE PATCH_IF timingMode == 6 BEGIN
@@ -431,14 +431,19 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 		END
 	END
 	ELSE PATCH_IF timingMode != TIMING_while_equipped AND duration > 0 BEGIN
-		// 1 tick = 1/15 de seconde
-		PATCH_IF timingMode == TIMING_duration_ticks BEGIN
-			SET duration = duration / 15
-		END
-
         LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 
 		PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_duration_ticks BEGIN
+			// 1 tick = 1/15 de seconde
+			PATCH_IF timingMode == TIMING_duration_ticks BEGIN
+				PATCH_IF duration >= 15 BEGIN
+					SET duration = duration / 15
+                    LPF ~get_str_duration~ INT_VAR duration RET strDuration END
+				END
+				ELSE BEGIN
+					SPRINT strDuration ~%duration% ticks~
+				END
+			END
 			SPRINT value @100311 // ~pendant %strDuration%~
 		END
 		ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
@@ -447,6 +452,28 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
 		ELSE PATCH_IF timingMode == TIMING_delayed_duration BEGIN
 			// TODO, meilleure tournure
 			SPRINT value @100314 // ~après %strDuration% et pendant %strDuration%~
+		END
+		ELSE PATCH_IF timingMode == 5000 OR timingMode == 5001 BEGIN
+			SET tmpDuration = duration
+			SET duration = duration MODULO 10000
+			SET frequency = (tmpDuration - duration) / 10000
+
+            PATCH_IF timingMode == 5000 BEGIN
+				SET strref = 100316 // ~%frequency% pendant %strDuration% mais après %afterStrDuration%~
+			END
+			ELSE BEGIN
+				// On ajoute la fréquence à la durée, car l'effet si le dernier effet est activé après le 2ème round,
+				// cela veut dire qu'il faut 3 rounds pour que l'ensemble des effets agissent.
+				// L'effet direct (round 1), le second (après 1 round), et le 3ème (après 2 rounds)
+				SET duration += frequency
+				SET strref = 100315 // ~%frequency% pendant %strDuration%~
+			END
+
+            LPF ~get_str_duration~ INT_VAR duration offset = 1 RET strDuration END
+            LPF ~get_str_duration~ INT_VAR duration = frequency RET afterStrDuration = strDuration END
+            LPF ~get_frequency_duration~ INT_VAR duration = frequency strref = 100323 RET frequency END
+
+			SPRINT value (AT %strref%)
 		END
 		ELSE BEGIN
 			LPF ~add_log_warning~ STR_VAR message = ~opcode %opcode% : timing %timingMode%~ END
@@ -465,14 +492,16 @@ END
 DEFINE_PATCH_FUNCTION ~get_str_duration~ INT_VAR duration = 0 RET strDuration BEGIN
 	SPRINT strDuration ~~
 
-	PATCH_PHP_EACH durations AS divisor => strref BEGIN
-		PATCH_IF duration MODULO divisor == 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-			SET amount = duration / divisor
-			PATCH_IF amount > 1 BEGIN
-				SET strref += 1
-			END
+	PATCH_IF duration > 0 BEGIN
+		PATCH_PHP_EACH durations AS divisor => strref BEGIN
+			PATCH_IF duration MODULO divisor == 0 AND ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+				SET amount = duration / divisor
+				PATCH_IF amount > 1 BEGIN
+					SET strref += 1
+				END
 
-            SPRINT strDuration (AT strref)
+	            SPRINT strDuration (AT strref)
+			END
 		END
 	END
 END

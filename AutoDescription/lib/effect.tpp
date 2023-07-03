@@ -445,6 +445,7 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 0 BEGIN
 				LPM ~opcode_group_by_target~
+				LPM ~opcode_group_by_duration~
 				PATCH_TRY LPM ~opcode_%opcode%_group~ WITH DEFAULT END
 			END
 		END

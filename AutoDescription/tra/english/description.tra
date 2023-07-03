@@ -298,10 +298,13 @@
 @100312 = ~permanently~
 @100313 = ~permanently, persists after death~
 @100314 = ~after %strDuration% and for %strDuration%~
+@100315 = ~%frequency% for %strDuration%~
+@100316 = ~%frequency% for %strDuration% after %afterStrDuration%~
 
 @100320 = ~per %strDuration%~
 @100321 = ~every %strDuration%~
 @100322 = ~every %strDuration%~
+@100323 = ~every %strDuration%~
 
 
 // Spell_side
