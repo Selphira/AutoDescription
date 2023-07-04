@@ -12936,7 +12936,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
 	LOCAL_SET strref = 11020005
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
-		SPRINT description @15090002 // ~d'immuniser aux sorts~
+		SPRINT description @15090002 // ~d'immuniser %theTarget% aux sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
@@ -12947,7 +12947,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
 	LOCAL_SET strref = 11020003
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
-		SPRINT description @15090001 // ~Immunité aux sorts~
+		SPRINT description @15090003 // ~Immunise %theTarget% aux sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
@@ -12957,6 +12957,27 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
 	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_509_post_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter1 == 0x1FF BEGIN // 511
+			PATCH_FOR_EACH searchOpcode IN 204 205 BEGIN
+				LPF ~delete_opcode~
+		            INT_VAR opcode = searchOpcode
+					STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+		            RET $opcodes(~%searchOpcode%~) = count
+		            RET_ARRAY EVAL ~opcodes_%searchOpcode%~ = opcodes_xx
+		        END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~%searchOpcode%~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_%searchOpcode%~
+		        END
+	        END
+        END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN

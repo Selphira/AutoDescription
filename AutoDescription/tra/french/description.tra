@@ -4230,7 +4230,8 @@
 // Fake Opcode 509 : Immunité aux sorts (par niveau) (cumulatif) [509]
 
 @15090001 = ~Immunité aux sorts~ // FIXME: Immunité aux sorts "ciblés", ne protège pas contre les effets de zone
-@15090002 = ~d'immuniser aux sorts~
+@15090002 = ~d'immuniser %theTarget% aux sorts~
+@15090003 = ~Immunise %theTarget% aux sorts~
 
 // Fake Opcode 510: Spell: Restore Lost Spells (cumulative) [510]
 
