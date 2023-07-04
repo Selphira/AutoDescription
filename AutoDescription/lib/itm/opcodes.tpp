@@ -8548,6 +8548,24 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 	LOCAL_SPRINT and @100021 // ~et~
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_206_positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_206_positions_already_check~ BEGIN END
+
+	// Suppression opcode 321 associé à la même ressource, pour un joueur lambda, avoir l'immunité signifie aussi que les effets en cours sont dissipés.
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPF ~delete_opcode~
+			INT_VAR opcode = 321
+			STR_VAR expression = ~resref = %resref%~
+			RET $opcodes(~321~) = count
+			RET_ARRAY EVAL ~opcodes_321~ = opcodes_xx
+		END
+		// Bug où il reste toujours un item dans le tableau si c'était le dernier
+		// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+		PATCH_IF $opcodes(~321~) == 0 BEGIN
+            CLEAR_ARRAY ~opcodes_321~
+        END
+	END
+
+	// Regroupement des immunités restantes en une seule ligne
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) BEGIN
