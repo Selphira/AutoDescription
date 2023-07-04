@@ -4706,7 +4706,7 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 	PATCH_IF hasOpcode BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
