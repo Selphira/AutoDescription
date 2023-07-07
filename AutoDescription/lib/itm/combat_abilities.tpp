@@ -29,6 +29,7 @@ BEGIN
 		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
 		READ_BYTE  (headerOffset + ITM_HEAD_location) location
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
+		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
 		READ_SHORT (headerOffset + ITM_HEAD_flags) flags
 
 		PATCH_IF charges == 0
@@ -77,7 +78,7 @@ BEGIN
 			SET attackType = ~%data_0%~
 			SET charges = ~%data_3%~
 
-			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND charges == 0 BEGIN
+			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND (charges == 0 OR (depletion >= 3 AND charges == 1 AND isAmmo)) BEGIN
 				PATCH_IF isAmmo BEGIN
 					SPRINT specialProjectileAbility @102271 // ~Munition à usage illimité~
 				END
@@ -85,11 +86,11 @@ BEGIN
 					SPRINT specialProjectileAbility @102270 // ~Ne nécessite pas de munitions~
 				END
 				ELSE BEGIN
-					SPRINT specialProjectileAbility @102269 // ~Revient dans la main du lanceur~
+					SPRINT specialProjectileAbility @102269 // ~Revient dans la main de son porteur après avoir été lancée~
 				END
 
 				SET $EVAL ~lines%index%~(~0~ ~0~ ~100~ ~0~ ~99~ ~%specialProjectileAbility%~) = 1
-				SET ~countLines%index%~ += 1
+				SET EVAL ~countLines%index%~ += 1
 			END
 		END
 		SORT_ARRAY_INDICES ~lines%index%~ NUMERICALLY

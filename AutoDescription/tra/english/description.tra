@@ -123,6 +123,19 @@
 @102126 = ~May only be removed with a Remove Curse spell~
 @102127 = ~Allows arcane spellcasting~
 @102159 = ~%charges% charges, the item is destroyed when all charges are used~
+@102160 = ~%baseValue% + %value% on level %level%~
+@102161 = ~%value%/level~
+@102162 = ~%value%/%level% levels~
+@102163 = ~%value%/level/%levelMax%~
+@102164 = ~%value%/%level% levels/%levelMax%~
+@102165 = ~%value% %valueType%~
+@102166 = ~%damage% %damageType%~
+
+/* Type de dégâts */
+@600170 = ~hit point~
+@600171 = ~hit points~
+@600172 = ~point of damage~
+@600173 = ~points of damage~
 
 @102677 = ~one-time use~
 //@102677 = ~%charges% charge, the item is destroyed when the charge is used~
@@ -1692,6 +1705,7 @@
 @10000012 = ~vs. slashing and piercing attacks~
 @10000013 = ~vs. crushing, slashing and piercing attacks~ // FIXME: contre les armes de mêlée ?
 @10000014 = ~vs. slashing, piercing and missile attacks~
+@10000015 = ~~
 
 @10000099 = ~Armor Class~
 @10000100 = ~Base Armor Class~
@@ -1770,20 +1784,20 @@
 
 // Opcode 12: HP: Damage [12]
 
-@10120001 = ~Inflicts %damage% %damageType% %toTheTarget%~
-@10120002 = ~Inflicts %damage% %damageType% %toTheTarget%~
-@10120003 = ~Inflicts %damage% %damageType% %versus%~
-@10120004 = ~Drains %damage% %damageType% %toTheTarget%~
-@10120005 = ~Transfer %damage% %damageType% %toTheTarget%~
+@10120001 = ~Inflicts %damage% %toTheTarget%~
+@10120002 = ~Inflicts %damage% %toTheTarget%~
+@10120003 = ~Inflicts %damage% %versus%~
+@10120004 = ~Drains %damage% %toTheTarget%~
+@10120005 = ~Transfer %damage% %toTheTarget%~
 @10120006 = ~Change %theTarget%'s hit points to %damage%~
 @10120007 = ~Change %theTarget%'s hit points to %damage% %~
 @10120008 = ~Inflicts %damage% % of maximum hit points %toTheTarget%~// déjà vu aussi mais Inflige %damage% % du maximum de points de vie %toTheTarget%
 
-@10120011 = ~to inflict %damage% %damageType% %toTheTarget%~
-@10120012 = ~to inflict %damage% %damageType% %toTheTarget%~
-@10120013 = ~to inflict %damage% %damageType% %versus%~
-@10120014 = ~to drain %damage% %damageType% %toTheTarget%~
-@10120015 = ~to transfer %damage% %damageType% %toTheTarget%~
+@10120011 = ~to inflict %damage% %toTheTarget%~
+@10120012 = ~to inflict %damage% %toTheTarget%~
+@10120013 = ~to inflict %damage% %versus%~
+@10120014 = ~to drain %damage% %toTheTarget%~
+@10120015 = ~to transfer %damage% %toTheTarget%~
 @10120016 = ~to change %theTarget%'s hit points to %damage%~
 @10120017 = ~to change %theTarget%'s hit points to %damage% %~
 @10120018 = ~to inflict %damage% % of maximum hit points %toTheTarget%~ // ~d'infliger %damage% % du maximum de points de vie %toTheTarget%~
@@ -1847,23 +1861,10 @@
 
 // Opcode 17: HP: Current HP Modifier [17]
 
-@10170001 = ~Heals %value% hit point~
-@10170002 = ~Heals %value% hit points~
-@10170003 = ~Inflicts %value% damage~
-@10170004 = ~Inflicts %value% damages~
-@10170005 = ~to heal %value% hit point~
-@10170006 = ~to heal %value% hit points~
-@10170007 = ~to inflict %value% damage~
-@10170008 = ~to inflict %value% damages~
-
-@10170011 = ~Heals %value% hit point %toTheTarget%~
-@10170012 = ~Heals %value% hit points %toTheTarget%~
-@10170013 = ~Inflicts %value% damage %toTheTarget%~
-@10170014 = ~Inflicts %value% damages %toTheTarget%~
-@10170015 = ~to heal %value% hit point %toTheTarget%~
-@10170016 = ~to heal %value% hit points %toTheTarget%~
-@10170017 = ~to inflict %value% damage %toTheTarget%~
-@10170018 = ~to inflict %value% damages %toTheTarget%~
+@10170001 = ~Heals %value% %toTheTarget%~
+@10170002 = ~Inflicts %value% %toTheTarget%~
+@10170003 = ~to heal %value% %toTheTarget%~
+@10170004 = ~to inflict %value% %toTheTarget%~
 
 @10170021 = ~Current hit points~
 @10170022 = ~the current hit points~

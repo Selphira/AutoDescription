@@ -321,9 +321,9 @@ BEGIN
 			SET prev_level = level
 			SET cpt += 1
 		END
-		LPF ~get_str_duration~ INT_VAR duration = base_duration RET baseDuration = strDuration END
-		LPF ~get_str_duration~ INT_VAR duration = delta_duration RET deltaDuration = strDuration END
-		SPRINT complex_duration ~%baseDuration% + %deltaDuration% au niveau %level%~
+		LPF ~get_str_duration~ INT_VAR duration = base_duration RET baseValue = strDuration END
+		LPF ~get_str_duration~ INT_VAR duration = delta_duration RET value = strDuration END
+		SPRINT complex_duration @102160 // ~%baseValue% + %value% au niveau %level%~
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN
 		PATCH_IF base_duration == 0 AND delta_duration == 0 BEGIN
@@ -333,15 +333,15 @@ BEGIN
 			LPF ~get_str_duration~ INT_VAR duration = base_duration RET complex_duration = strDuration END
 		END
 		ELSE BEGIN
-			LPF ~get_str_duration~ INT_VAR duration = delta_duration RET deltaDuration = strDuration END
-
+			LPF ~get_str_duration~ INT_VAR duration = delta_duration RET value = strDuration END
 			PATCH_IF delta_level == 1 BEGIN
-				SPRINT complex_duration ~%deltaDuration% par niveau~
+				SPRINT complex_duration @102161 // ~%value% par niveau~
 			END
 			ELSE BEGIN
-				SPRINT complex_duration ~%deltaDuration% par tranche de %delta_level% niveaux~
+				SET level = delta_level
+				SPRINT complex_duration @102162 // ~%value% par tranche de %level% niveaux~
 			END
-			SET remains_duration = duration - (delta_duration * level / delta_level)
+			SET remains_duration = duration - (delta_duration * prev_level / delta_level)
 			PATCH_IF remains_duration > 0 BEGIN
 				LPF ~get_str_duration~ INT_VAR duration = remains_duration RET remainsDuration = strDuration END
 				SPRINT complex_duration ~%remainsDuration% + %complex_duration%~
@@ -352,6 +352,138 @@ BEGIN
 	END
 	ELSE BEGIN
 		SET is_special = 1
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_complex_value~
+	INT_VAR
+		is_percent = 0
+		dice_sides = 0
+	STR_VAR
+		array_name = ~~
+	RET
+		is_valid
+		complex_value
+		complex_value_int
+BEGIN
+	SPRINT complex_value ~~
+	SET complex_value_int = 0
+
+	SET is_valid = 1
+
+	SET base_value = 0
+	SET delta_value = 0
+	SET delta_level = 0
+	SET prev_value = 0
+	SET cpt = 0
+
+	PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
+		PATCH_IF level <= 1 BEGIN
+			LPF get_first_level_for_spell RET level = minLevel END
+		END
+		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+		PATCH_IF cpt > 0 BEGIN
+			PATCH_IF delta_value = 0 BEGIN
+				SET delta_value = value - prev_value
+				SET delta_level = level - prev_level
+			END
+			ELSE PATCH_IF delta_value != value - prev_value OR delta_level != level - prev_level BEGIN
+				SET is_valid = 0
+			END
+		END
+		ELSE BEGIN
+			SET base_value = value
+		END
+		SET prev_value = value
+		SET prev_level = level
+		SET cpt += 1
+	END
+
+	PATCH_IF cpt == 2 BEGIN
+		SET cpt = 0
+		SET delta_value = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			PATCH_IF cpt > 0 BEGIN
+				PATCH_IF delta_value = 0 BEGIN
+					SET delta_value = value - prev_value
+					SET delta_level = level - prev_level
+				END
+			END
+			ELSE BEGIN
+				SET base_value = value
+			END
+			SET prev_value = value
+			SET prev_level = level
+			SET cpt += 1
+		END
+		PATCH_IF is_percent BEGIN
+			SPRINT value ~%base_value%~
+			SPRINT base_value @10002 // ~%value% %~
+			SPRINT value ~%delta_value%~
+			SPRINT delta_value @10002 // ~%value% %~
+		END
+		SPRINT complex_value ~%base_value% + %delta_value% au niveau %level%~
+	END
+	ELSE PATCH_IF is_valid == 1 BEGIN
+		PATCH_TRY LPF ~opcode_%opcode%_typed_value~ INT_VAR value = delta_value RET strref END WITH DEFAULT strref = 0 END
+		SET value = ABS delta_value
+		SET complex_value_int = delta_value
+		PATCH_IF dice_sides > 0 BEGIN
+			SET diceCount = value
+			SET diceSides = dice_sides
+			SPRINT value @10014 // ~%diceCount%d%diceSides%~
+		END
+		PATCH_IF base_value > 0 AND delta_value == 0 BEGIN
+			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET complex_value = value END
+		END
+		ELSE BEGIN
+			SET levelMax = level
+			SET remains_value = ABS prev_value - (ABS delta_value * level / delta_level)
+			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
+			PATCH_IF ABS delta_level == 1 BEGIN
+				SPRINT complex_value @102163 // ~%value% par niveau/%levelMax%~
+			END
+			ELSE BEGIN
+				SET level = delta_level
+				SPRINT complex_value @102164 // ~%value% par tranche de %level% niveaux/%levelMax%~
+			END
+			PATCH_IF remains_value > 0 BEGIN
+				PATCH_IF dice_sides > 0 BEGIN
+					SET diceCount = remains_value
+					SET diceSides = dice_sides
+					SPRINT remains_value @10014 // ~%diceCount%d%diceSides%~
+				END
+				PATCH_IF delta_level < 0 BEGIN
+					SPRINT complex_value ~%remains_value% %complex_value%~
+				END
+				ELSE BEGIN
+					SPRINT complex_value ~%remains_value% + %complex_value%~
+				END
+			END
+			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
+		END
+		PATCH_PRINT "opcode: %opcode% - complex_value: %complex_value%"
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_complex_typed_value~ INT_VAR strref = 0 STR_VAR value = 0 RET value BEGIN
+	PATCH_IF strref > 0 BEGIN
+		PATCH_IF is_percent BEGIN
+			SPRINT value ~%value%~
+			SPRINT value @10002 // ~%value% %~
+		END
+		SPRINT valueType (AT strref)
+		SPRINT value @102165 // ~%value% %valueType%~
+	END
+	ELSE BEGIN
+		PATCH_IF is_percent BEGIN
+			SPRINT value ~%value%~
+			SPRINT value @10002 // ~%value% %~
+		END
 	END
 END
 

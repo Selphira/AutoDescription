@@ -1261,7 +1261,7 @@ END
  * --------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_6~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10060001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Charisme~
+	LPF ~opcode_mod~ INT_VAR strref = 10060001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Charisme~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_6~ BEGIN
@@ -1295,7 +1295,7 @@ END
  * Stat: Constitution Modifier [10] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_10~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10100001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Constitution~
+	LPF ~opcode_mod~ INT_VAR strref = 10100001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Constitution~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_10~ BEGIN
@@ -1347,7 +1347,7 @@ DEFINE_PATCH_MACRO ~opcode_self_12~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
-	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %damageType% %toTheTarget%~
+	LOCAL_SET strref_0 = 10120002 // ~Inflige %damage% %toTheTarget%~
 	LOCAL_SET strref_1 = 10120006 // ~Passe les points de vie de %theTarget% à %damage%~
 	LOCAL_SET strref_2 = 10120007 // ~Passe les points de vie de %theTarget% à %damage% %~
 	LOCAL_SET strref_3 = 10120008 // ~Inflige %damage% % des points de vie maximums %toTheTarget%~
@@ -1436,14 +1436,22 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 
 	// Dégâts basiques
 	PATCH_IF mode == 0 BEGIN
-		// Type de dégâts inconnus
-		PATCH_IF VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
-			SET type = $damage_types(~%type%~)
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT damage ~%complex_value%~
 		END
 		ELSE BEGIN
-			SET type = 101092 // ~points de dégâts~
+			// Type de dégâts inconnus
+			PATCH_IF VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
+				SET type = $damage_types(~%type%~)
+			END
+			ELSE BEGIN
+				SET type = 101092 // ~points de dégâts~
+			END
+			LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
+			PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
+				SPRINT damage @102166 // ~%damage% %damageType%~
+			END
 		END
-		LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 
 		PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
 			LPF ~getTranslation~ INT_VAR strref = strref_0 opcode RET description = string END
@@ -1506,6 +1514,17 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~opcode_12_typed_value~ INT_VAR value = 0 RET strref BEGIN
+	SET mode = parameter2 BAND 65535
+	SET type = parameter2 - mode
+	PATCH_IF VARIABLE_IS_SET $damage_types(~%type%~) BEGIN
+		SET strref = $damage_types(~%type%~)
+	END
+	ELSE BEGIN
+		SET strref = 101092 // ~points de dégâts~
+	END
+END
+
 /* ------------------------- *
  * Death: Instant Death [13] *
  * ------------------------- */
@@ -1559,7 +1578,7 @@ END
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_15~ BEGIN
 	LPM ~opcode_15_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10150001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dextérité~
+	LPF ~opcode_mod~ INT_VAR strref = 10150001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dextérité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_15~ BEGIN
@@ -1669,11 +1688,9 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
-	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
+	LOCAL_SET strref_1 = 10170001 // ~Restaure %value% %toTheTarget%~
 	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170001 ? 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
-	LOCAL_SET strref_2 = strref_1 + 1 // ~Soigne %value% points de vie %ofTheTarget%~
-	LOCAL_SET strref_3 = strref_1 + 2 // ~Inflige 1 point de dégâts %ofTheTarget%~
-	LOCAL_SET strref_4 = strref_1 + 3 // ~Inflige %value% points de dégâts %ofTheTarget%~
+	LOCAL_SET strref_2 = strref_1 + 1 // ~Inflige %value% %toTheTarget%~
 
 	PATCH_IF type == 1 BEGIN
 		SET damageAmount = parameter1
@@ -1681,21 +1698,19 @@ DEFINE_PATCH_MACRO ~opcode_self_17~ BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
 	ELSE PATCH_IF type == 0 OR type == 2 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
-	LOCAL_SET strref_1 = 10170015 // ~de soigner 1 point de vie %ofTheTarget%~
+	LOCAL_SET strref_1 = 10170003 // ~de restaurer %value% %toTheTarget%~
 	// LOCAL_SET strref_1 = itemType == ITM_TYPE_potion : 10170005 ? 10170015
-	LOCAL_SET strref_2 = strref_1 + 1 // ~de soigner %value% points de vie %ofTheTarget%~
-	LOCAL_SET strref_3 = strref_1 + 2 // ~d'infliger 1 point de dégâts %ofTheTarget%~
-	LOCAL_SET strref_4 = strref_1 + 3 // ~d'infliger %value% points de dégâts %ofTheTarget%~
+	LOCAL_SET strref_2 = strref_1 + 1 // ~d'infliger %value% %toTheTarget%~
 
 	PATCH_IF type == 0 OR type == 2 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 	ELSE BEGIN
 		SET damageAmount = parameter1
@@ -1705,10 +1720,8 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
-	LOCAL_SET strref_1 = 10170011 // ~Soigne 1 point de vie %ofTheTarget%~
-	LOCAL_SET strref_2 = 10170012 // ~Soigne %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170013 // ~Inflige 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170014 // ~Inflige %value% points de dégâts %toTheTarget%~
+	LOCAL_SET strref_1 = 10170001 // ~Restaure %value% %toTheTarget%~
+	LOCAL_SET strref_2 = strref_1 + 1 // ~Inflige %value% %toTheTarget%~
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
 
@@ -1718,20 +1731,18 @@ DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
 	END
 	ELSE BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
-	LOCAL_SET strref_1 = 10170015 // ~de soigner 1 point de vie %toTheTarget%~
-	LOCAL_SET strref_2 = 10170016 // ~de soigner %value% points de vie %toTheTarget%~
-	LOCAL_SET strref_3 = 10170017 // ~d'infliger 1 point de dégâts %toTheTarget%~
-	LOCAL_SET strref_4 = 10170018 // ~d'infliger %value% points de dégâts %toTheTarget%
+	LOCAL_SET strref_1 = 10170003 // ~de restaurer %value% %toTheTarget%~
+	LOCAL_SET strref_2 = strref_1 + 1 // ~d'infliger %value% %toTheTarget%~
 	LOCAL_SET type = parameter2 BAND 65535
 	LOCAL_SET subType = parameter2 / 65535
 
 	PATCH_IF type == 0 OR type == 2 BEGIN
-		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 strref_3 strref_4 RET description END
+		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 	ELSE BEGIN
 		SET damageAmount = parameter1
@@ -1740,7 +1751,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strref_3 = 0 strref_4 = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 RET description BEGIN
 	// TODO
 	// Dissipe tous les effets non permanent_after_death puis la soigne
 	SET purgeEff = subType BAND BIT1 > 0
@@ -1762,12 +1773,20 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 				END
 			END
 
-			PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Soigne %value% point de vie~
+			PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
 			END
 			ELSE BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END // ~Soigne %value% points de vie~
+				PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+					LPF ~getTranslation~ INT_VAR strref = 600170 opcode RET valueType = string END // ~point de vie~
+				END
+				ELSE BEGIN
+					LPF ~getTranslation~ INT_VAR strref = 600171 opcode RET valueType = string END // ~points de vie~
+				END
+				SPRINT value @102165 // ~%value% %valueType%~
 			END
+
+			LPF ~getTranslation~ INT_VAR strref = strref_1 opcode RET description = string END // ~Restaure %value% %toTheTarget%~
 		END
 		ELSE BEGIN
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
@@ -1777,12 +1796,20 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 strre
 				END
 			END
 
-			PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_3 opcode RET description = string END // ~Inflige %value% point de vie~
+			PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
 			END
 			ELSE BEGIN
-				LPF ~getTranslation~ INT_VAR strref = strref_4 opcode RET description = string END // ~Inflige %value% points de vie~
+				PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+					LPF ~getTranslation~ INT_VAR strref = 600172 opcode RET valueType = string END // ~point de dégât~
+				END
+				ELSE BEGIN
+					LPF ~getTranslation~ INT_VAR strref = 600173 opcode RET valueType = string END // ~points de dégâts~
+				END
+				SPRINT value @102165 // ~%value% %valueType%~
 			END
+
+			LPF ~getTranslation~ INT_VAR strref = strref_2 opcode RET description = string END // ~Inflige %value% %toTheTarget%~
 		END
 	END
 END
@@ -1804,6 +1831,20 @@ DEFINE_PATCH_MACRO ~opcode_17_is_valid~ BEGIN
 	PATCH_IF type < CURRENT_HP_MOD_TYPE_cumulative OR type > CURRENT_HP_MOD_TYPE_percentage BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %type%.~ END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_17_typed_value~ INT_VAR value = 0 RET strref BEGIN
+	SET strref = 600170 // ~point de vie~
+
+	PATCH_IF value > 1 BEGIN
+		SET strref = 600171 // ~points de vie~
+	END
+	ELSE PATCH_IF value == 0 - 1 BEGIN
+		SET strref = 600172 // ~point de dégât~
+	END
+	ELSE PATCH_IF value < 0 - 1 BEGIN
+		SET strref = 600173 // ~points de dégâts~
 	END
 END
 
@@ -1915,7 +1956,7 @@ END
  * Stat: Intelligence Modifier [19] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_19~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10190001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Intelligence~
+	LPF ~opcode_mod~ INT_VAR strref = 10190001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Intelligence~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_19~ BEGIN
@@ -1973,7 +2014,7 @@ END
  * Stat: Lore Modifier [21] *
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_21~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Connaissance~
+	LPF ~opcode_mod~ INT_VAR strref = 10210001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Connaissance~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_21~ BEGIN
@@ -2003,7 +2044,7 @@ END
  * Stat: Cumulative Luck Bonus [22] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_22~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10220001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Chance~
+	LPF ~opcode_mod~ INT_VAR strref = 10220001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Chance~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_22~ BEGIN
@@ -2032,7 +2073,7 @@ DEFINE_PATCH_MACRO ~opcode_self_23~ BEGIN
 		SPRINT description @10230003 // ~Rétabli le moral %ofTheTarget%~
 	END
 	ELSE BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 10230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Moral~
+		LPF ~opcode_mod~ INT_VAR strref = 10230001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Moral~
 	END
 END
 
@@ -2679,16 +2720,15 @@ DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 		SET newP2 = 0b0
 		CLEAR_ARRAY positions
 		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
-			LPM ~data_to_vars~
-			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			LPM ~data_to_match_vars~
+			PATCH_IF match_parameter1 == searchP1 AND match_parameter2 >= 1 AND match_parameter2 <= 256 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
 				// On retire l'opcode de ceux à checker dans les futures itérations
-				SET $positions_already_check(~%position%~) = 1
+				SET $positions_already_check(~%match_position%~) = 1
 				// On ajoute l'opcode courant à ceux qui seront désactivés
-				SET $positions(~%position%~) = initOpcode
+				SET $positions(~%match_position%~) = initOpcode
 				// P2 retiré
-				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
-				SET $positions(~%opcodePosition%~) = initOpcode
-				SET newP2 |= parameter2
+				SET $positions(~%position%~) = initOpcode
+				SET newP2 |= match_parameter2
 			END
 		END
 		PATCH_IF newP2 > 0 BEGIN
@@ -2740,7 +2780,7 @@ END
  * Stat: Strength Modifier [44] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_44~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10440001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force~
+	LPF ~opcode_mod~ INT_VAR strref = 10440001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Force~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_44~ BEGIN
@@ -2844,7 +2884,7 @@ END
  * Stat: Wisdom Modifier [49] *
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_49~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10490001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Sagesse~
+	LPF ~opcode_mod~ INT_VAR strref = 10490001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Sagesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_49~ BEGIN
@@ -2867,7 +2907,7 @@ END
  * Stat: THAC0 Modifier [54] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_54~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
+	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_54~ BEGIN
@@ -3454,7 +3494,7 @@ END
  * Stat: Extra Damage Modifier [73] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_73~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10730001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts~
+	LPF ~opcode_mod~ INT_VAR strref = 10730001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_73~ BEGIN
@@ -3867,7 +3907,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_86~ BEGIN
 	SET resistName = 10860001 // ~Résistance aux dégâts tranchants~
-	LPM ~opcode_self_resist~
+	LPM ~opcode_probability_resist~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_86~ BEGIN
@@ -4044,7 +4084,7 @@ END
  * Stat: Fatigue Modifier [93] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_93~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10930001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Fatigue~
+	LPF ~opcode_mod~ INT_VAR strref = 10930001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Fatigue~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_93~ BEGIN
@@ -4067,7 +4107,7 @@ END
  * Stat: Drunkenness Modifier [94] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_94~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10940001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Ivresse~
+	LPF ~opcode_mod~ INT_VAR strref = 10940001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Ivresse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_94~ BEGIN
@@ -4090,7 +4130,7 @@ END
  * Tracking Skill Modifier [95] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_95~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10950001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Pistage~
+	LPF ~opcode_mod~ INT_VAR strref = 10950001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Pistage~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_95~ BEGIN
@@ -4113,7 +4153,7 @@ END
  * Stat: Level Change [96] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_96~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10960001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau~
+	LPF ~opcode_mod~ INT_VAR strref = 10960001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Niveau~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_96~ BEGIN
@@ -4136,7 +4176,7 @@ END
  * Stat: Strength-Bonus Modifier [97] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_97~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 10970001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force exceptionnelle~
+	LPF ~opcode_mod~ INT_VAR strref = 10970001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Force exceptionnelle~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_97~ BEGIN
@@ -4854,7 +4894,7 @@ END
  * Stat: Experience Points [104] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_104~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 11040001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Expérience~
+	LPF ~opcode_mod~ INT_VAR strref = 11040001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Expérience~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_104~ BEGIN
@@ -4999,7 +5039,7 @@ END
  * ---------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_108~ BEGIN
     LPM ~opcode_108_common~
-    LPF ~opcode_mod~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Réputation du personnage~
+    LPF ~opcode_mod~ INT_VAR strref = EVAL ~%strref%~ STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Réputation du personnage~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_108~ BEGIN
@@ -5648,7 +5688,7 @@ DEFINE_PATCH_MACRO ~opcode_self_126~ BEGIN
 	SET strref = 11260001 // ~Vitesse de déplacement~
 	LPM ~opcode_126_common~
 	PATCH_IF strref == 11260001 BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = strref STR_VAR value = EVAL ~%parameter1%~ RET description END
+		LPF ~opcode_mod~ INT_VAR strref = strref STR_VAR value = ~%parameter1%~ complex_value RET description END
 	END
 	ELSE BEGIN
 		SPRINT description (AT strref)
@@ -5895,7 +5935,7 @@ END
  * --------------------------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_132~ BEGIN
 	LPM ~opcode_132_common~
-	LPF ~opcode_mod~ INT_VAR strref = 11320001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Force, dextérité et constitution~
+	LPF ~opcode_mod~ INT_VAR strref = 11320001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Force, dextérité et constitution~
 	LPM ~opcode_not_cumulative~
 END
 
@@ -6969,6 +7009,10 @@ DEFINE_PATCH_MACRO ~opcode_173_common~ BEGIN
 	SET parameter2 = is_ee ? MOD_TYPE_cumulative : MOD_TYPE_flat
 END
 
+DEFINE_PATCH_MACRO ~opcode_173_spell_level_match~ BEGIN
+	LPM ~opcode_173_common~
+END
+
 DEFINE_PATCH_MACRO ~opcode_173_is_valid~ BEGIN
 	LOCAL_SET parameter1 = parameter1 BAND 255
 	PATCH_IF is_ee AND parameter1 == 0 BEGIN
@@ -7640,7 +7684,7 @@ END
  * ---------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_178~ BEGIN
 	LPM ~opcode_178_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0~
+	LPF ~opcode_mod~ INT_VAR strref = 10540001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0~
 	LPM ~opcode_178_end~
 END
 
@@ -7676,6 +7720,10 @@ DEFINE_PATCH_MACRO ~opcode_178_end~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_178_spell_level_match~ BEGIN
+	LPM ~opcode_178_common~
+END
+
 DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
 	LOCAL_SET value = isExternal? parameter3 : 0
 	PATCH_IF value == 0 AND (is_ee == 0 OR special == 0) BEGIN
@@ -7693,7 +7741,7 @@ END
  * ----------------------------------------------------- */
  DEFINE_PATCH_MACRO ~opcode_self_179~ BEGIN
 	LPM ~opcode_179_common~
-	LPF ~opcode_mod~ INT_VAR strref = 10730001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts~
+	LPF ~opcode_mod~ INT_VAR strref = 10730001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts~
 	LPM ~opcode_178_end~
 END
 
@@ -7881,11 +7929,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
 	LPM ~opcode_189_common~
 	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 11890001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Temps d'incantation~
+		LPF ~opcode_mod~ INT_VAR strref = 11890001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Temps d'incantation~
 	END
 	ELSE BEGIN
 		SET parameter2 = MOD_TYPE_flat
-		LPF ~opcode_mod~ INT_VAR strref = 11890003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Temps d'incantation maximal~
+		LPF ~opcode_mod~ INT_VAR strref = 11890003 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Temps d'incantation maximal~
 	END
 END
 
@@ -7925,6 +7973,10 @@ DEFINE_PATCH_MACRO ~opcode_189_common~ BEGIN
 	ELSE PATCH_IF parameter1 < 0 BEGIN
 		SET parameter1 = 0
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_189_spell_level_match~ BEGIN
+	LPM ~opcode_189_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_189_is_valid~ BEGIN
@@ -7975,7 +8027,7 @@ DEFINE_PATCH_MACRO ~opcode_self_191~ BEGIN
 	LOCAL_SET strref = 11910001 // ~Niveau de lanceur de sorts profanes~
 
 	LPM ~opcode_191_common~
-	LPF ~opcode_mod~ INT_VAR strref STR_VAR value = EVAL ~%parameter1%~ RET description END
+	LPF ~opcode_mod~ INT_VAR strref STR_VAR value = ~%parameter1%~ complex_value RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_191~ BEGIN
@@ -10135,7 +10187,7 @@ END
  * Spell Effect: Damage Modifier [250] *
  * ----------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_250~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12500001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts minimum~
+	LPF ~opcode_mod~ INT_VAR strref = 12500001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts minimum~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_250~ BEGIN
@@ -10445,7 +10497,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_263~ BEGIN
 	// Spécificité de l'opcode
 	SET timingMode = timingMode == TIMING_permanent ? TIMING_permanent_after_death : timingMode
-	LPF ~opcode_mod~ INT_VAR strref = 12630001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Multiplicateur d'attaque sournoise~
+	LPF ~opcode_mod~ INT_VAR strref = 12630001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Multiplicateur d'attaque sournoise~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_263~ BEGIN
@@ -10801,7 +10853,7 @@ END
  * Stat: To Hit Modifier [278] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_278~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12780001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Chances de toucher~
+	LPF ~opcode_mod~ INT_VAR strref = 12780001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Chances de toucher~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_278~ BEGIN
@@ -11032,7 +11084,7 @@ END
  * Stat: Melee THAC0 Modifier [284] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_284~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12840001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 des armes de mêlée~
+	LPF ~opcode_mod~ INT_VAR strref = 12840001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0 des armes de mêlée~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_284~ BEGIN
@@ -11055,7 +11107,7 @@ END
  * Stat: Melee Weapon Damage Modifier [285] *
  * ---------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_285~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12850001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts des armes de mêlée~
+	LPF ~opcode_mod~ INT_VAR strref = 12850001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts des armes de mêlée~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_285~ BEGIN
@@ -11078,7 +11130,7 @@ END
  * Stat: Missile Weapon Damage Modifier [286] *
  * ------------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_286~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12860001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts des armes à projectiles~
+	LPF ~opcode_mod~ INT_VAR strref = 12860001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts des armes à projectiles~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_286~ BEGIN
@@ -11101,7 +11153,7 @@ END
  * Stat: Fist THAC0 Modifier [288] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_288~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12880001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 des poings~
+	LPF ~opcode_mod~ INT_VAR strref = 12880001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0 des poings~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_288~ BEGIN
@@ -11124,7 +11176,7 @@ END
  * Stat: Fist Damage Modifier [289] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_289~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 12890001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Dégâts des poings~
+	LPF ~opcode_mod~ INT_VAR strref = 12890001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Dégâts des poings~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_289~ BEGIN
@@ -11226,7 +11278,7 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_299~ BEGIN
 	SET parameter2 = MOD_TYPE_flat
-	LPF ~opcode_mod~ INT_VAR strref = 12990001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Modificateur des hiatus entropiques~
+	LPF ~opcode_mod~ INT_VAR strref = 12990001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Modificateur des hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_299~ BEGIN
@@ -11373,7 +11425,7 @@ END
  * Stat: THAC0 Modifier (Off-Hand) [305] *
  * ------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_305~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 13050001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main secondaire~
+	LPF ~opcode_mod~ INT_VAR strref = 13050001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0 de la main secondaire~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_305~ BEGIN
@@ -11396,7 +11448,7 @@ END
  * Stat: THAC0 Modifier (On-Hand) [306] *
  * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_306~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 13060001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~TAC0 de la main principale~
+	LPF ~opcode_mod~ INT_VAR strref = 13060001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~TAC0 de la main principale~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_306~ BEGIN
@@ -11625,7 +11677,7 @@ END
 // TODO : à vérifier : pas de MOD_TYPE_percent dans 2.5.16
 // FIXME: special != 0 : P1 = P1 + niveau de la classe la plus élevée
 DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
-	LPF ~opcode_mod~ INT_VAR strref = 13230001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Niveau de repousser les morts-vivants~
+	LPF ~opcode_mod~ INT_VAR strref = 13230001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Niveau de repousser les morts-vivants~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_323~ BEGIN
@@ -12153,7 +12205,7 @@ DEFINE_PATCH_MACRO ~opcode_self_325~ BEGIN
 	PATCH_IF parameter2 == 3 BEGIN
 		SET parameter2 = MOD_TYPE_cumulative
 	END
-	LPF ~opcode_mod~ INT_VAR strref = 102034 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Jets de sauvegarde~
+	LPF ~opcode_mod~ INT_VAR strref = 102034 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Jets de sauvegarde~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_325~ BEGIN
@@ -13153,7 +13205,16 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		PATCH_IF IS_AN_INT ~%value%~ BEGIN
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF IS_AN_INT ~%value%~ AND value >= 0 BEGIN
+				SPRINT value ~%complex_value%~
+				SPRINT value @10003
+			END
+			ELSE BEGIN
+				SPRINT value ~%complex_value%~
+			END
+		END
+		ELSE PATCH_IF IS_AN_INT ~%value%~ BEGIN
 			LPF ~signed_value~ INT_VAR value RET value END
 		END
 	END
@@ -13179,7 +13240,7 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_mod~ INT_VAR strref = 0 STR_VAR value = ~~ complex_value = ~~ RET description BEGIN
 	SET parameter2 = parameter2 BAND 65535
 	LPM ~opcode_mod_base~
 	PATCH_IF NOT IS_AN_INT ~%value%~ OR value != 0 BEGIN
@@ -13310,10 +13371,16 @@ DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
             value = ABS value
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
 	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
 	END
@@ -13332,10 +13399,16 @@ DEFINE_PATCH_FUNCTION ~opcode_probability~ INT_VAR strref = 0 RET description BE
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
         PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
             value = ABS value
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
 	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
         END
 	END
@@ -13361,10 +13434,15 @@ DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 	END
 	ELSE BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-			PATCH_IF value >= 0 BEGIN
-				LPF ~signed_value~ INT_VAR value RET value END
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
 			END
-			SPRINT value @10002 // ~%value% %~
+			ELSE BEGIN
+				PATCH_IF value >= 0 BEGIN
+					LPF ~signed_value~ INT_VAR value RET value END
+				END
+				SPRINT value @10002 // ~%value% %~
+			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 			SPRINT value @10010 // ~Passe à %value%~
@@ -13399,11 +13477,17 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 			PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
 				SPRINT value @10002 // ~%value% %~
+				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+					SPRINT value ~%complex_value%~
+				END
 				SPRINT description @102286 // ~Augmente de %value% %theStatistic% %ofTheTarget%~
 			END
 			ELSE BEGIN
 				value = ABS value
 				SPRINT value @10002 // ~%value% %~
+				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+					SPRINT value ~%complex_value%~
+				END
 				SPRINT description @102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
 			END
 		END
@@ -13436,11 +13520,17 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 			PATCH_IF value >= 0 BEGIN
 				SPRINT value @10002 // ~%value% %~
+				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+					SPRINT value ~%complex_value%~
+				END
 				SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
 			END
 			ELSE BEGIN
 				value = ABS value
 				SPRINT value @10002 // ~%value% %~
+				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+					SPRINT value ~%complex_value%~
+				END
 				SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
 			END
 		END
@@ -14164,6 +14254,61 @@ DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
         AND match_probability1 == probability1
         AND match_probability2 == probability2
         AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_duration~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        // AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        // AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+DEFINE_PATCH_MACRO ~opcode_match_except_diceCount_and_duration~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        // AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        // AND match_diceCount    == diceCount
         AND match_diceSides    == diceSides
         AND match_saveType     == saveType
         AND match_saveBonus    == saveBonus

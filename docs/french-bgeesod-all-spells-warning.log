@@ -17,6 +17,7 @@ SPIN783.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPIN823.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPIN852.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
 SPPR411.SPL : Niveau minimum non calculable
+SPPR411.SPL : Niveau minimum non calculable
 SPPR717.SPL : Opcode 24: Invalid target : 255
 SPRA303.SPL : Opcode 83 : Réflection du type de projectile '329'
 SPWI118.SPL : Niveau minimum non calculable
