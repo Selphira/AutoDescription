@@ -824,7 +824,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 					SET baseClassArmor = parameter1
 					SET hasBaseClassArmor = 1
 				END
-				ELSE PATCH_IF parameter2 == AC_MOD_TYPE_all BEGIN
+				ELSE PATCH_IF NOT isArmor AND parameter2 == AC_MOD_TYPE_all BEGIN
 					SET allClassArmor += parameter1
 				END
 				ELSE PATCH_IF parameter2 == AC_MOD_TYPE_crushing OR
@@ -866,7 +866,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 			// Ne pas prendre en compte la classe d'armure de base dans le regroupement
-			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND (isArmor OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) BEGIN
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ((isArmor AND parameter2 != AC_MOD_TYPE_all) OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode
 					STR_VAR expression = ~position = %position%~
