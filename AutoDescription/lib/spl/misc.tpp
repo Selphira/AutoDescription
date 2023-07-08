@@ -204,6 +204,8 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 							SET duration = 30
 						END
 
+						// FIXME: PATCH_IF opcode == 146 BEGIN // Récupérer la durée des effets lancés par le 146 !
+
 						PATCH_IF duration > 0 BEGIN
 							PATCH_IF base_duration == ~-1~ BEGIN
 								SET base_duration = duration

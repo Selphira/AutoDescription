@@ -328,6 +328,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_description_for_level~
 		description totalLines
 BEGIN
 	SET countLevels = 0
+	SET countHeaders = 0
 
 	LPM ~clear_levels~
 

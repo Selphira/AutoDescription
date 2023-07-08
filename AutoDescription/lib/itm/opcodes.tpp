@@ -6340,7 +6340,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
+				PATCH_IF NOT (type >= 2 OR (castingLevel > 0 AND type == 1)) BEGIN
 					SET castingLevel = 0
 				END
 				SET $recursive_resref(~%resref%~) = 1
