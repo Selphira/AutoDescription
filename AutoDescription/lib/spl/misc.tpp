@@ -276,6 +276,7 @@ BEGIN
 	SET is_valid = 1
 	SET is_special = 0
 	SET is_permanent = 0
+	SET prev_duration = 0
 	SET cpt = 0
 
 	PATCH_PHP_EACH ~%array_name%~ AS level => duration BEGIN
@@ -283,7 +284,7 @@ BEGIN
 			LPF get_first_level_for_spell RET level = minLevel END
 		END
 		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
-		PATCH_IF cpt > 1 BEGIN
+		PATCH_IF cpt > 1 AND prev_duration != duration BEGIN
 			PATCH_IF delta_duration = 0 BEGIN
 				SET delta_duration = duration - prev_duration
 				SET delta_level = level - prev_level
@@ -295,8 +296,10 @@ BEGIN
 		ELSE BEGIN
 			SET base_duration = duration
 		END
-		SET prev_duration = duration
-		SET prev_level = level
+		PATCH_IF prev_duration != duration BEGIN
+			SET prev_duration = duration
+			SET prev_level = level
+		END
 		SET cpt += 1
 	END
 
@@ -466,7 +469,6 @@ BEGIN
 			END
 			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
 		END
-		PATCH_PRINT "opcode: %opcode% - complex_value: %complex_value%"
 	END
 END
 

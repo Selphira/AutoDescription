@@ -1854,10 +1854,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_18~ BEGIN
 	LPM ~opcode_18_common~
 	PATCH_IF healOnlyMaxPV == 1 BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+		LPF ~opcode_mod~ INT_VAR strref = 10180001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Points de vie maximum~
 	END
 	ELSE BEGIN
-		LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Points de vie maximum~
+		LPF ~opcode_mod~ INT_VAR strref = 10180003 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Points de vie maximum~
 	END
 	// LPM ~opcode_18_not_cumulative~
 END
@@ -1931,9 +1931,14 @@ DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	SET damageAmount = parameter1
 	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND special != 0
 	SET parameter2 = parameter2 MODULO 3
-	LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-	INNER_PATCH_SAVE value ~%value%~ BEGIN
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT value ~%complex_value%~
+	END
+	ELSE BEGIN
+		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
+		INNER_PATCH_SAVE value ~%value%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+		END
 	END
 END
 
@@ -5132,35 +5137,65 @@ END
  * Item: Create Magical Weapon [111] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
-	LOCAL_SET amount = parameter1
+	LOCAL_SET amount = parameter1 > 0 ? parameter1 : 1
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF amount <= 1 BEGIN
-			SPRINT description @11110001 // ~Crée une arme magique (%itemName%)~
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT amount ~%complex_value%~
 		END
 		ELSE BEGIN
-			SPRINT description @11110011 // ~Crée %amount% armes magiques (%itemName%)~
+			SET strref = 11110101 // ~arme magique~
+			PATCH_IF amount > 1 BEGIN
+				SET strref += 1 // ~armes magiques~
+			END
+			SPRINT valueType (AT strref)
+			SPRINT value ~%amount%~
+			SPRINT amount @102165 // ~%value% %valueType%~
 		END
+		SPRINT description @11110001 // ~Crée %amount% (%itemName%)~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_111~ BEGIN
-	LOCAL_SET amount = parameter1
+	LOCAL_SET amount = parameter1 > 0 ? parameter1 : 1
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF amount <= 1 BEGIN
-			SPRINT description @11110002 // ~Équipe %theTarget% d'une arme magique (%itemName%)~
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT amount ~%complex_value%~
 		END
 		ELSE BEGIN
-			SPRINT description @11110012 // ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~
+			SET strref = 11110101 // ~arme magique~
+			PATCH_IF amount > 1 BEGIN
+				SET strref += 1 // ~armes magiques~
+			END
+			SPRINT valueType (AT strref)
+			SPRINT value ~%amount%~
+			SPRINT amount @102165 // ~%value% %valueType%~
 		END
+		SPRINT description @11110002 // ~Équipe %theTarget% d'%amount% (%itemName%)~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_111_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_111_spell_level_match~ BEGIN
+	PATCH_IF parameter1 < 1 BEGIN
+		SET parameter1 = 1
+	END
+	PATCH_IF match_parameter1 < 1 BEGIN
+		SET match_parameter1 = 1
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_111_typed_value~ INT_VAR value = 0 RET strref BEGIN
+	SET strref = 11110101 // ~arme magique~
+	PATCH_IF value > 1 BEGIN
+		SET strref = 11110102 // ~armes magiques~
+	END
 END
 
 /* --------------------------------- *
@@ -8998,22 +9033,30 @@ END
 DEFINE_PATCH_MACRO ~opcode_218_common~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF is_ee == 1 AND parameter2 != 0 AND opcode == 218 BEGIN
-		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
-		INNER_PATCH_SAVE amount ~%amount%~ BEGIN
-			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
-		END
+	PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT amount ~%complex_value%~
 	END
-	// "Dissipation"
-	PATCH_IF IS_AN_INT amount AND amount == 0 BEGIN
-		SET strref += 10
+	ELSE BEGIN
+		PATCH_IF is_ee == 1 AND parameter2 != 0 AND opcode == 218 BEGIN
+			LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = amount RET amount = damage END
+			INNER_PATCH_SAVE amount ~%amount%~ BEGIN
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+			END
+		END
+		// "Dissipation"
+		PATCH_IF IS_AN_INT amount AND amount == 0 BEGIN
+			SET strref += 10
+		END
+
+		SET skinTypeRef = 10000101 + opcode * 10000
+		PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
+			SET skinTypeRef += 1 // ~peaux de pierre~
+		END
+		SPRINT valueType (AT skinTypeRef) // ~peau de pierre~
+		SPRINT value ~%amount%~
+		SPRINT amount @102165 // ~%value% %valueType%~
 	END
 
-	SET skinTypeRef = 10000101 + opcode * 10000
-	PATCH_IF NOT IS_AN_INT amount OR amount != 1 BEGIN
-		SET skinTypeRef += 1 // ~peaux de pierre~
-	END
-	SPRINT skinType (AT skinTypeRef) // ~peau de pierre~
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
@@ -9021,6 +9064,13 @@ DEFINE_PATCH_MACRO ~opcode_218_is_valid~ BEGIN
 	PATCH_IF parameter1 <= 0 AND (NOT is_ee OR parameter2 == 0 OR diceCount == 0) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No stoneskin detected~ END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_218_typed_value~ INT_VAR value = 0 RET strref BEGIN
+	SET strref = 12180101 // ~peau de pierre~
+	PATCH_IF value > 1 BEGIN
+		SET strref = 12180102 // ~peaux de pierre~
 	END
 END
 

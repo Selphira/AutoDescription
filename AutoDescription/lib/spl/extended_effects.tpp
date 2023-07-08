@@ -117,7 +117,11 @@ BEGIN
 	FOR (levelIndex = 0; levelIndex < countLevels; levelIndex += 1) BEGIN
 		SET level = $level_effects(~%levelIndex%~)
 		SET found = 0
+		SET hasOpcode = 0
 		PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
+			PATCH_IF opcode >= 0 BEGIN
+				SET hasOpcode = 1
+			END
 			PATCH_IF opcode >= 0 AND opcode == match_opcode AND found == 0 BEGIN
 			    LPM ~data_to_vars~
 
@@ -142,7 +146,7 @@ BEGIN
 				END
 				ELSE BEGIN
 				/*
-					PATCH_PRINT "NIVEAU : %level% - OPCODE: %opcode%
+					PATCH_PRINT "NIVEAU : %level% - OPCODE: %opcode% - %match_macro%
 					    match_isExternal : %match_isExternal%   == %isExternal%
 					AND match_target : %match_target%       == %target%
 					AND match_power : %match_power%        == %power%
@@ -172,7 +176,7 @@ BEGIN
 			END
 		END
 
-        PATCH_IF found == 0 BEGIN
+        PATCH_IF found == 0 AND hasOpcode == 1 BEGIN
             SET inAllLevels = 0
             SET levelIndex = countLevels
         END
@@ -594,11 +598,14 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		PATCH_FOR_EACH basicOpcode IN
 			6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
 			27 28 29 30 31 84 85 86 87 88 89 166 173 502 503 504 // Les résistances
-			17
+			12 17 18 111 218
 			// 25 98
 		BEGIN
 			PATCH_IF opcode == basicOpcode BEGIN
 			    LPM ~data_to_vars~
+			    PATCH_IF opcode == 12 BEGIN
+					SET parameter2 = parameter2 BAND 65535
+				END
 			    PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
 			        LPM ~data_to_match_vars~
 				    LPF spell_has_same_effects_on_all_levels_except_duration
@@ -629,7 +636,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 								complex_value_int
 						END
 						PATCH_IF is_valid BEGIN
-				            PATCH_IF opcode == 17 BEGIN
+				            PATCH_IF opcode == 12 OR opcode == 17 BEGIN
 				                LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = 0 RET value = damage END
 								PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 									PATCH_IF complex_value_int > 0 BEGIN

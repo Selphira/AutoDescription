@@ -2467,10 +2467,13 @@
 
 // Opcode 111: Item: Create Magical Weapon [111]
 
-@11110001 = ~Crée une arme magique (%itemName%)~
-@11110002 = ~Équipe %theTarget% d'une arme magique (%itemName%)~ // ~Équipe %theTarget% avec une arme magique (%itemName%)~ Pas trop sûr que ce soit mieux...?
-@11110011 = ~Crée %amount% armes magiques (%itemName%)~
-@11110012 = ~Équipe %theTarget% de %amount% armes magiques (%itemName%)~ // avec ?
+@11110001 = ~Crée %amount% (%itemName%)~
+@11110002 = ~Équipe %theTarget% d'%amount% (%itemName%)~ // ~Équipe %theTarget% avec une arme magique (%itemName%)~ Pas trop sûr que ce soit mieux...?
+@11110011 = ~Crée %amount% (%itemName%)~
+@11110012 = ~Équipe %theTarget% de %amount% (%itemName%)~ // avec ?
+
+@11110101 = ~arme magique~
+@11110102 = ~armes magiques~
 
 // Opcode 112: Item: Remove Item [112]
 
@@ -3078,9 +3081,9 @@
 
 // Opcode 218: Protection: Stoneskin [218]
 
-@12180001 = ~Crée %amount% %skinType%~
-@12180002 = ~de créer %amount% %skinType% sur %theTarget%~
-@12180003 = ~Crée %amount% %skinType% sur %theTarget%~
+@12180001 = ~Crée %amount%~
+@12180002 = ~de créer %amount% sur %theTarget%~
+@12180003 = ~Crée %amount% sur %theTarget%~
 
 @12180011 = ~Dissipation des %skinType%~
 @12180012 = ~de dissiper les %skinType% sur %theTarget%~
