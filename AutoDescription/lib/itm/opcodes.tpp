@@ -854,8 +854,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
                     LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
                 END
 				LPF ~delete_opcode~
-                    INT_VAR opcode = 219000
-                    STR_VAR expression = ~position = %position%~
+                    INT_VAR opcode = 219000 match_position = position
                     RET $opcodes(~219000~) = count
                     RET_ARRAY EVAL ~opcodes_219000~ = opcodes_xx
                 END
@@ -868,8 +867,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 			// Ne pas prendre en compte la classe d'armure de base dans le regroupement
 			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ((isArmor AND parameter2 != AC_MOD_TYPE_all) OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position%~
+					INT_VAR opcode match_position = position
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -1008,8 +1006,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				parameter2 == AC_MOD_TYPE_piercing OR
 				parameter2 == AC_MOD_TYPE_slashing) BEGIN
 			LPF ~delete_opcode~
-				INT_VAR opcode
-				STR_VAR expression = ~position = %position%~
+				INT_VAR opcode match_position = position
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -2171,8 +2168,7 @@ DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
 					// retrait de l'opcode actuel
 					SET opcode = 23
 					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~position = %currentPosition%~
+						INT_VAR opcode match_position = currentPosition
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -2740,8 +2736,7 @@ DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -3247,8 +3242,7 @@ DEFINE_PATCH_MACRO ~opcode_60_group~ BEGIN
 		PATCH_IF group == 1 BEGIN
 			PATCH_PHP_EACH positions AS _ => position1 BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -3708,8 +3702,7 @@ DEFINE_PATCH_MACRO ~opcode_78_group~ BEGIN
 			PATCH_IF group == 1 BEGIN
 				PATCH_PHP_EACH positions AS _ => position1 BEGIN
 					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~position = %position1%~
+						INT_VAR opcode match_position = position1
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -4215,14 +4208,12 @@ DEFINE_PATCH_MACRO ~opcode_97_group~ BEGIN
 					RET op44_parameter1 = parameter1
 				END
 				LPF ~delete_opcode~
-                    INT_VAR opcode
-                    STR_VAR expression = ~position = %position%~
+                    INT_VAR opcode match_position = position
                     RET $opcodes(~%opcode%~) = count
                     RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
                 END
 				LPF ~delete_opcode~
-                    INT_VAR opcode = 44
-                    STR_VAR expression = ~position = %opcodePosition%~
+                    INT_VAR opcode = 44 match_position = opcodePosition
                     RET $opcodes(~44~) = count
                     RET_ARRAY EVAL ~opcodes_44~ = opcodes_xx
                 END
@@ -4859,8 +4850,7 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -4883,8 +4873,7 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 					READ_LONG SPL_level spellLevel
 					PATCH_IF spellLevel <= maxSpellLevel BEGIN
 						LPF ~delete_opcode~
-							INT_VAR opcode = 206
-							STR_VAR expression = ~position = %position%~
+							INT_VAR opcode = 206 match_position = position
 							RET $opcodes(~206~) = count
 							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
 						END
@@ -5293,8 +5282,7 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 						// Suppression de l'opcode 112 devenu inutile
 						SET opcode = currentOpcode
 						LPF ~delete_opcode~
-							INT_VAR opcode
-							STR_VAR expression = ~position = %currentPosition%~
+							INT_VAR opcode match_position = currentPosition
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
@@ -5319,8 +5307,7 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 					SET opcode = searchOpcode2
 					SET searchDuration = duration
 					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~position = %position%~
+						INT_VAR opcode match_position = position
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -5508,8 +5495,7 @@ DEFINE_PATCH_MACRO ~opcode_120_group~ BEGIN
 			LPM ~data_to_vars~
 			PATCH_IF parameter2 == 0 AND parameter1 < maxEnchantment BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position%~
+					INT_VAR opcode match_position = position
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -5608,8 +5594,7 @@ DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position%~
+					INT_VAR opcode match_position = position
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -5619,8 +5604,7 @@ DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 		            CLEAR_ARRAY ~opcodes_%opcode%~
 		        END
 				LPF ~delete_opcode~
-					INT_VAR opcode = 112
-					STR_VAR expression = ~position = %opcodePosition%~
+					INT_VAR opcode = 112 match_position = opcodePosition
 					RET $opcodes(~112~) = count
 					RET_ARRAY ~opcodes_112~ = opcodes_xx
 				END
@@ -6275,8 +6259,7 @@ DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 		PATCH_IF group == 1 BEGIN
 			PATCH_PHP_EACH positions AS _ => position1 BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -6418,8 +6401,7 @@ DEFINE_PATCH_MACRO ~opcode_146_group~ BEGIN
 		END
 		PATCH_IF opcodePosition >= 0 BEGIN
 			LPF ~delete_opcode~
-				INT_VAR opcode = 321
-				STR_VAR expression = ~position = %opcodePosition%~
+				INT_VAR opcode = 321 match_position = opcodePosition
 				RET $opcodes(~321~) = count
 				RET_ARRAY EVAL ~opcodes_321~ = opcodes_xx
 			END
@@ -6429,8 +6411,7 @@ DEFINE_PATCH_MACRO ~opcode_146_group~ BEGIN
 	            CLEAR_ARRAY ~opcodes_321~
 	        END
 			LPF ~delete_opcode~
-				INT_VAR opcode
-				STR_VAR expression = ~position = %position%~
+				INT_VAR opcode match_position = position
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -6639,8 +6620,7 @@ DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
 			PATCH_IF oldCount == $opcodes(~%opcode%~) BEGIN
 				SET opcode = 154
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %oldPosition%~
+					INT_VAR opcode match_position = oldPosition
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -7002,8 +6982,7 @@ DEFINE_PATCH_MACRO ~opcode_172_group~ BEGIN
 						// Suppression de l'opcode 172 devenu inutile
 						SET opcode = currentOpcode
 						LPF ~delete_opcode~
-							INT_VAR opcode
-							STR_VAR expression = ~position = %currentPosition%~
+							INT_VAR opcode match_position = currentPosition
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
@@ -7234,8 +7213,7 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 			LPM ~read_external_effect_vars~
 
 			LPF ~delete_opcode~
-                INT_VAR opcode = 177
-                STR_VAR expression = ~position = %position177%~
+                INT_VAR opcode = 177 match_position = position177
                 RET $opcodes(~177~) = count
                 RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
             END
@@ -7406,8 +7384,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 						SET $positions_already_grouped(~%position%~) = 1
 						SET $opcode_positions(~%position%~) = 0
 						LPF ~delete_opcode~
-							INT_VAR opcode
-							STR_VAR expression = ~position = %position%~
+							INT_VAR opcode match_position = position
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
@@ -7420,8 +7397,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 
 	PATCH_PHP_EACH EVAL ~to_delete~ AS position => _ BEGIN
 		LPF ~delete_opcode~
-			INT_VAR opcode
-			STR_VAR expression = ~position = %position%~
+			INT_VAR opcode match_position = position
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -7455,7 +7431,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_duration~ BEGIN
 				SET has_instant_effect = 1
 			END
 			PATCH_IF timingMode == TIMING_delayed BEGIN
-				SET $opcode_group_durations(%position%) = duration
+				SET $opcode_group_durations(~%position%~) = duration
 			END
 
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -7509,15 +7485,13 @@ DEFINE_PATCH_MACRO ~opcode_group_by_duration~ BEGIN
 				PATCH_IF is_valid_duration BEGIN
 					PATCH_PHP_EACH ~opcode_group_durations~ AS matched_position => matched_duration BEGIN
 						LPF ~delete_opcode~
-							INT_VAR opcode
-							STR_VAR expression = ~position = %matched_position%~
+							INT_VAR opcode match_position = matched_position
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
 					END
 					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~position = %position%~
+						INT_VAR opcode match_position = position
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -7848,8 +7822,7 @@ DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
 				SET $itemNamesList(~%itemName%~) = 1
 			END
 			LPF ~delete_opcode~
-				INT_VAR opcode = 180
-				STR_VAR expression = ~position = %position%~
+				INT_VAR opcode = 180 match_position = position
 				RET $opcodes(~180~) = count
 				RET_ARRAY EVAL ~opcodes_180~ = opcodes_xx
 			END
@@ -8178,6 +8151,40 @@ DEFINE_PATCH_MACRO ~opcode_197_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_197_group~ BEGIN
+	LOCAL_SET deleted = 0
+	// Regroupement avec l'opcode 207 pour les sorts qui utilisent le même projectile
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_PHP_EACH EVAL ~opcodes_207~ AS data => _ BEGIN
+			LPM ~data_to_match_vars~
+			PATCH_IF FILE_EXISTS_IN_GAME ~%match_resref%.spl~ BEGIN
+				INNER_PATCH_FILE ~%match_resref%.spl~ BEGIN
+					READ_LONG  SPL_extended_headers_offset headerOffset
+					READ_SHORT SPL_extended_headers_count  headerCount
+					SET deleted = 0
+				    FOR (headerIndex = 0; headerIndex < headerCount; headerIndex += 1) BEGIN
+			            SET offset = headerOffset + 0x28 * headerIndex
+			            READ_SHORT (offset + SPL_HEAD_projectile) projectile
+			            SET projectile -= 1 // in BG2, this value is off-by-one from projectl.ids value
+						PATCH_IF projectile == parameter2 AND deleted == 0 BEGIN
+							LPF ~delete_opcode~
+								INT_VAR opcode = 207 match_position
+								RET $opcodes(~207~) = count
+								RET_ARRAY EVAL ~opcodes_207~ = opcodes_xx
+							END
+							// Bug où il reste toujours un item dans le tableau si c'était le dernier
+							// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+							PATCH_IF $opcodes(~207~) == 0 BEGIN
+					            CLEAR_ARRAY ~opcodes_207~
+					        END
+					        SET deleted = 1
+						END
+					END
+				END
+			END
+		END
+	END
+
 	PATCH_IF $opcodes(~%opcode%~) >= 2 BEGIN
 		SPRINT the @100020 // ~les~
 		SPRINT myCustomStr ~~
@@ -8372,8 +8379,7 @@ DEFINE_PATCH_MACRO ~opcode_200_group~ BEGIN
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -8536,8 +8542,7 @@ DEFINE_PATCH_MACRO ~opcode_205_group~ BEGIN
 					READ_LONG SPL_sectype spellSecondaryType
 					PATCH_IF spellSecondaryType == baseSpellSecondaryType BEGIN
 						LPF ~delete_opcode~
-							INT_VAR opcode = 206
-							STR_VAR expression = ~position = %position%~
+							INT_VAR opcode = 206 match_position = position
 							RET $opcodes(~206~) = count
 							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
 						END
@@ -8680,8 +8685,7 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 			PATCH_IF count > 1 BEGIN
 				PATCH_PHP_EACH opcode_206_positions AS position => opcode BEGIN
 					LPF ~delete_opcode~
-						INT_VAR opcode
-						STR_VAR expression = ~position = %position%~
+						INT_VAR opcode match_position = position
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -8822,8 +8826,7 @@ DEFINE_PATCH_MACRO ~opcode_211_group~ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF parameter1 == 66 AND parameter2 == 1 BEGIN
 			LPF ~delete_opcode~
-				INT_VAR opcode = 71
-				STR_VAR expression = ~position = %position%~
+				INT_VAR opcode = 71 match_position = position
 				RET $opcodes(~71~) = count
 				RET_ARRAY EVAL ~opcodes_71~ = opcodes_xx
 			END
@@ -9132,8 +9135,7 @@ DEFINE_PATCH_MACRO ~opcode_219001_group~ BEGIN
                 LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
             END
 			LPF ~delete_opcode~
-                INT_VAR opcode
-                STR_VAR expression = ~position = %position%~
+                INT_VAR opcode match_position = position
                 RET $opcodes(~%opcode%~) = count
                 RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
             END
@@ -9157,8 +9159,7 @@ DEFINE_PATCH_MACRO ~opcode_219_replace~ BEGIN
 		LPM ~data_to_vars~
 
 		LPF ~delete_opcode~
-			INT_VAR opcode
-			STR_VAR expression = ~position = %position%~
+			INT_VAR opcode match_position = position
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -9228,14 +9229,12 @@ DEFINE_PATCH_MACRO ~opcode_220_group~ BEGIN
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
 				LPF ~delete_opcode~
-                    INT_VAR opcode = 220
-                    STR_VAR expression = ~position = %position%~
+                    INT_VAR opcode = 220 match_position = position
                     RET $opcodes(~220~) = count
                     RET_ARRAY EVAL ~opcodes_220~ = opcodes_xx
                 END
 				LPF ~delete_opcode~
-                    INT_VAR opcode = 221
-                    STR_VAR expression = ~position = %opcodePosition%~
+                    INT_VAR opcode = 221 match_position = opcodePosition
                     RET $opcodes(~221~) = count
                     RET_ARRAY EVAL ~opcodes_221~ = opcodes_xx
                 END
@@ -10448,8 +10447,7 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
@@ -14139,8 +14137,7 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS opcode => position1 BEGIN
 				LPF ~delete_opcode~
-					INT_VAR opcode
-					STR_VAR expression = ~position = %position1%~
+					INT_VAR opcode match_position = position1
 					RET $opcodes(~%opcode%~) = count
 					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 				END
