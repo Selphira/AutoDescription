@@ -184,13 +184,13 @@
 @102467 = ~Caster~
 @102466 = ~1 creature~
 @102465 = ~%countTarget% creatures~
-@102462 = ~Point dans le champ visuel du lanceur~
-@102461 = ~Champ visuel du lanceur~
-@102460 = ~Les alliés dans un cône de %range% sur un arc de %angle%°~
-@102459 = ~Les ennemis dans un cône de %range% sur un arc de %angle%°~
-@102458 = ~Cône de %range% sur un arc de %angle%°~
-@102457 = ~Les alliés dans un rayon de %range% autour %ofTheTarget%~
-@102456 = ~Les ennemis dans un rayon de %range% autour %ofTheTarget%~
+@102462 = ~Point in the visual range of the caster~
+@102461 = ~Visual range of the caster~
+@102460 = ~Allies within a %range% cone on a %angle%° arc~
+@102459 = ~Enemies within a %range% cone on a %angle%° arc~
+@102458 = ~%range% cone on a %angle%° arc~
+@102457 = ~Allies within a %range% radius around %ofTheTarget%~
+@102456 = ~Enemies within a %range% radius around %ofTheTarget%~
 @102455 = ~%range%' radius around %theTarget%~
 @102450 = ~Le lanceur et tout allié dans un rayon de %range%~
 @102449 = ~Le lanceur et tout ennemi dans un rayon de %range%~
@@ -198,8 +198,8 @@
 @102447 = ~1 créature et tout allié dans un rayon de %range%~
 @102446 = ~1 créature et tout ennemi dans un rayon de %range%~
 @102445 = ~1 créature et toute créature dans un rayon de %range%~
-@102444 = ~Les alliés dans un rayon de %range%~
-@102443 = ~Les ennemis dans un rayon de %range%~
+@102444 = ~Allies within a %range% radius~
+@102443 = ~Enemies within a %range% radius~
 @102442 = ~%range%' radius~
 @102384 = ~the %targetType%~
 @101085 = ~of the target~
@@ -2678,7 +2678,7 @@
 // Opcode 143: Item: Create Item in Slot [143]
 
 @11430001 = ~Creates 1 "%itemName%" at %slotName% slot %ofTheTarget%~
-@11430002 = ~de créer 1 "%itemName%" à l'emplacement %slotName% %ofTheTarget%~
+@11430002 = ~to create 1 "%itemName%" at %slotName% slot %ofTheTarget%~
 
 // Opcode 144: Button: Disable Button [144]
 
@@ -3387,7 +3387,7 @@
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
 @12720001 = ~%description%, %strDuration%~
-@12720002 = ~%description%, %amount% fois %strDuration%~
+@12720002 = ~%description%, %amount% times %strDuration%~
 
 @12720010 = ~À chaque %strDuration%~
 @12720011 = ~Toutes les %strDuration%~
@@ -3748,7 +3748,7 @@
 @13240301 = ~Ineffective against the %creatureType%~
 @13240302 = ~Effective against the %creatureType%~
 
-@13240401 = ~durant la pénurie de fer~
+@13240401 = ~during the iron crisis~
 
 
 @13240500 = ~~
@@ -3938,10 +3938,10 @@
 @13241142 = ~créatures invisibles~
 @13241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13241145 = ~créatures dont les points de vie sont inférieurs à %value%~
-@13241500 = ~Effectif %creaturesList%~
-@13241501 = ~Inefficace %targetCondition%~
-@13241502 = ~contre les %creaturesList%~
-@13241503 = ~à %probability% % ~
+@13241500 = ~Effective %creaturesList%~
+@13241501 = ~Ineffective %targetCondition%~
+@13241502 = ~against %creaturesList%~
+@13241503 = ~at %probability% % ~
 
 @13242000 = ~si la compétence %proficiency% est supérieure ou égale à %value%~
 @13242001 = ~si la compétence %proficiency% est égale à %value%~
@@ -4248,8 +4248,8 @@
 
 // Fake Opcode 511: Dissipe toutes les illusions
 
-@15110001 = ~Dissipe toutes les illusions qui affectent %theTarget%~
-@15110002 = ~de dissiper toutes les illusions qui affectent %theTarget%~
+@15110001 = ~Dispels all illusionary protection spells on %theTarget%~
+@15110002 = ~to dispel all illusionary protection spells on %theTarget%~
 
 // Fake Opcode 519: Immunité aux sorts
 

@@ -6606,7 +6606,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
-					SPRINT regex ~[0-9]+ % de chances ~ // TODO: Rendre traductible
+					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 				END
 			END
