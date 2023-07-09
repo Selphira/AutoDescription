@@ -2151,7 +2151,9 @@ DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
 					SET opcode = searchOpcode
 					LPF ~delete_opcode~
 						INT_VAR opcode
-						STR_VAR expression = ~parameter2 = 23 AND position = %position23%~
+							match_parameter2 = 23
+							match_position = position23
+                        STR_VAR match_macro = ~opcode_match_parameter2_and_position~
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -2160,7 +2162,9 @@ DEFINE_PATCH_MACRO ~opcode_23_group~ BEGIN
 					// retrait bonus : rupture de moral fixée à 1 (non nécessaire au groupe mais redondant)
 					LPF ~delete_opcode~
 						INT_VAR opcode
-						STR_VAR expression = ~parameter2 = 1 AND parameter1 = 1~
+							match_parameter1 = 1
+							match_parameter2 = 1
+                        STR_VAR match_macro = ~opcode_match_parameter1_and_parameter2~
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
@@ -3097,14 +3101,32 @@ DEFINE_PATCH_MACRO ~opcode_58_group~ BEGIN
 		SET opcode = 77
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+				match_diceCount = diceCount
+				match_diceSides = diceSides
+				match_power = power
+				match_probability1 = probability1
+				match_probability2 = probability2
+				match_resistance = resistance
+				match_target = target
+				match_saveBonus = saveBonus
+				match_saveType = saveType
+            STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
 		SET opcode = 81
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+				match_diceCount = diceCount
+				match_diceSides = diceSides
+				match_power = power
+				match_probability1 = probability1
+				match_probability2 = probability2
+				match_resistance = resistance
+				match_target = target
+				match_saveBonus = saveBonus
+				match_saveType = saveType
+            STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -3231,7 +3253,29 @@ DEFINE_PATCH_MACRO ~opcode_60_group~ BEGIN
 			~%parameter2%~ => ~%position%~
 		END
 		PATCH_FOR_EACH spellType IN 0 1 2 BEGIN
-			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND custom_int = 0 AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+			LPF ~get_opcode_position~
+				INT_VAR opcode
+					match_position     = position
+					match_custom_int   = 0
+					match_target       = target
+					match_probability1 = probability1
+					match_probability2 = probability2
+					match_parameter1   = parameter1
+					match_parameter2   = spellType
+					match_parameter3   = parameter3
+					match_parameter4   = parameter4
+					match_timingMode   = timingMode
+					match_resistance   = resistance
+					match_duration     = duration
+					match_power        = power
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+					match_saveType     = saveType
+					match_saveBonus    = saveBonus
+					match_special      = special
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				RET opcodePosition = position
+			END
 
 			PATCH_IF opcodePosition >= 0 BEGIN
 				SET group = 1
@@ -3689,7 +3733,24 @@ DEFINE_PATCH_MACRO ~opcode_78_group~ BEGIN
 			PATCH_FOR_EACH attribute IN 4 5 6 7 8 9 BEGIN
 				LPF ~get_opcode_position~
 					INT_VAR opcode
-					STR_VAR expression = ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %attribute% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+						match_position     = position
+						match_target       = target
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_parameter1   = parameter1
+						match_parameter2   = attribute
+						match_parameter3   = parameter3
+						match_parameter4   = parameter4
+						match_timingMode   = timingMode
+						match_resistance   = resistance
+						match_duration     = duration
+						match_power        = power
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+						match_saveType     = saveType
+						match_saveBonus    = saveBonus
+						match_special      = special
+					STR_VAR match_macro = ~opcode_match_opcode_78_group~
 					RET opcodePosition = position
 				END
 				PATCH_IF opcodePosition >= 0 BEGIN
@@ -4199,7 +4260,22 @@ DEFINE_PATCH_MACRO ~opcode_97_group~ BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
 			LPF ~get_opcode_position~
 				INT_VAR opcode  = 44
-				STR_VAR expression = ~target = %target% AND power = %power% AND parameter2 = %MOD_TYPE_flat% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+		            match_target       = target
+			        match_power        = power
+			        match_parameter2   = MOD_TYPE_flat
+			        match_parameter3   = parameter3
+			        match_parameter4   = parameter4
+			        match_timingMode   = timingMode
+			        match_resistance   = resistance
+					match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_special      = special
+				STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
 				RET opcodePosition = position
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
@@ -4410,7 +4486,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_IF shrink_cure_with_immunities BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode = 101
-					STR_VAR expression = ~parameter2 = 209 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_parameter2 = 209
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_saveBonus = saveBonus
+						match_saveType = saveType
+						match_target = target
+					STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 					RET $opcodes(~101~) = count
 					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 				END
@@ -4435,20 +4517,36 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			LPM ~delete_cure_linked_to_specific_immunity~
 
 			LPF ~has_opcode~
-				INT_VAR opcode = 173
-				STR_VAR expression = ~parameter1 > 99 AND (parameter2 = %MOD_TYPE_flat% OR parameter2 = %MOD_TYPE_cumulative%) AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					INT_VAR opcode = 173
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_target       = target
+						match_saveType     = saveType
+						match_saveBonus    = saveBonus
+					STR_VAR match_macro = ~opcode_match_opcode_101_group~
 				RET hasOpcode
 			END
 			PATCH_IF hasOpcode == 1 BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode = 173
-					STR_VAR expression = ~parameter1 > 99 AND (parameter2 = %MOD_TYPE_flat% OR parameter2 = %MOD_TYPE_cumulative%) AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_probability1 = probability1
+						match_probability2 = probability2
+						match_target       = target
+						match_saveType     = saveType
+						match_saveBonus    = saveBonus
+					STR_VAR match_macro = ~opcode_match_opcode_101_group~
 					RET $opcodes(~173~) = count
 					RET_ARRAY EVAL ~opcodes_173~ = opcodes_xx
 				END
 				LPF ~delete_opcode~
 					INT_VAR opcode = 101
-					STR_VAR expression = ~parameter2 = 25 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_parameter2   = 25
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_saveBonus    = saveBonus
+				        match_saveType     = saveType
+				        match_target       = target
+					STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 					RET $opcodes(~101~) = count
 					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 				END
@@ -4480,7 +4578,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_IF shrink_cure_with_immunities BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode = 101
-					STR_VAR expression = ~parameter2 = 217 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_parameter2   = 217
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_saveBonus    = saveBonus
+				        match_saveType     = saveType
+				        match_target       = target
+					STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 					RET $opcodes(~101~) = count
 					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 				END
@@ -4502,7 +4606,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			PATCH_IF shrink_cure_with_immunities BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode = 101
-					STR_VAR expression = ~parameter2 = 210 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_parameter2   = 210
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_saveBonus    = saveBonus
+				        match_saveType     = saveType
+				        match_target       = target
+					STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 					RET $opcodes(~101~) = count
 					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 				END
@@ -4531,7 +4641,14 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		ELSE PATCH_IF parameter2 == 93 BEGIN // Stat: Fatigue Modifier [93]
 			LPF ~delete_opcode~
 				INT_VAR opcode = 93
-				STR_VAR expression = ~parameter1 = 0 AND parameter2 = %MOD_TYPE_flat% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+					match_parameter1   = 0
+					match_parameter2   = MOD_TYPE_flat
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_saveBonus    = saveBonus
+			        match_saveType     = saveType
+			        match_target       = target
+				STR_VAR match_macro = ~opcode_match_parameter1_and_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 				RET $opcodes(~93~) = count
 				RET_ARRAY EVAL ~opcodes_93~ = opcodes_xx
 			END
@@ -4595,14 +4712,26 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				SET hasAllOpcode = 1
 				LPF ~has_opcode~
 					INT_VAR opcode = 163
-					STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+						match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_saveBonus    = saveBonus
+				        match_saveType     = saveType
+				        match_target       = target
+					STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 					RET hasOpcode
 				END
 				PATCH_IF hasOpcode == 0 BEGIN
 					// Au cas où le regroupement de l'opcode 163 aurait déjà été appliqué
 					LPF ~has_opcode~
 						INT_VAR opcode = 126
-						STR_VAR expression = ~parameter2 = 2 AND parameter1 = 100 AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+							match_parameter1   = 100
+							match_parameter2   = 2
+					        match_probability1 = probability1
+					        match_probability2 = probability2
+					        match_saveBonus    = saveBonus
+					        match_saveType     = saveType
+					        match_target       = target
+						STR_VAR match_macro = ~opcode_match_parameter1_and_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 						RET hasOpcode
 					END
 					PATCH_IF hasOpcode == 0 BEGIN
@@ -4613,7 +4742,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					PATCH_IF hasAllOpcode == 1 BEGIN
 						LPF ~has_opcode~
 							INT_VAR opcode = 101
-							STR_VAR expression = ~parameter2 = %parameter2% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+								match_parameter2   = parameter2
+						        match_probability1 = probability1
+						        match_probability2 = probability2
+						        match_saveBonus    = saveBonus
+						        match_saveType     = saveType
+						        match_target       = target
+							STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 							RET hasOpcode
 						END
 						PATCH_IF hasOpcode == 0 BEGIN
@@ -4628,7 +4763,12 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					PATCH_FOR_EACH opcode IN 46 126 162 163 BEGIN
 						LPF ~delete_opcode~
 							INT_VAR opcode
-							STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+								match_probability1 = probability1
+                                match_probability2 = probability2
+                                match_saveBonus    = saveBonus
+                                match_saveType     = saveType
+                                match_target       = target
+							STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
@@ -4636,7 +4776,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					PATCH_FOR_EACH parameter2 IN 16 40 109 126 154 157 175 BEGIN
 						LPF ~delete_opcode~
 							INT_VAR opcode = 101
-							STR_VAR expression = ~parameter2 = %parameter2% AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+								match_parameter2   = parameter2
+                                match_probability1 = probability1
+                                match_probability2 = probability2
+                                match_saveBonus    = saveBonus
+                                match_saveType     = saveType
+                                match_target       = target
+							STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 							RET $opcodes(~101~) = count
 							RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 						END
@@ -4670,7 +4816,10 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 					END
 					LPF ~delete_opcode~
 						INT_VAR opcode = 101
-						STR_VAR expression = ~parameter2 = %parameter2% AND probability = 100 AND target = %TARGET_FX_self%~
+							match_parameter2  = parameter2
+					        match_probability = 100
+					        match_target      = TARGET_FX_self
+						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
 						RET $opcodes(~101~) = count
 						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 					END
@@ -4709,7 +4858,10 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 					END
 					LPF ~delete_opcode~
 						INT_VAR opcode = 101
-						STR_VAR expression = ~parameter2 = %parameter2% AND probability = 100 AND target = %TARGET_FX_preset%~
+							match_parameter2  = parameter2
+					        match_probability = 100
+					        match_target      = TARGET_FX_preset
+						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
 						RET $opcodes(~101~) = count
 						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 					END
@@ -4736,13 +4888,25 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 	LOCAL_SET opcode = 206
 	LPF ~has_opcode~
 		INT_VAR opcode
-		STR_VAR expression = ~resref = %resref%~
+		STR_VAR
+			match_macro  = ~opcode_match_resref~
+			match_resref = ~%resref%~
 		RET hasOpcode
 	END
 	PATCH_IF hasOpcode BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+	            match_target       = target
+		        match_probability1 = probability1
+		        match_probability2 = probability2
+		        match_diceCount    = diceCount
+		        match_diceSides    = diceSides
+		        match_power        = power
+		        match_saveType     = saveType
+		        match_saveBonus    = saveBonus
+			STR_VAR
+				match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resref_and_target_saveBonus_and_saveType~
+				match_resref = ~%resref%~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -4754,13 +4918,26 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 	SET opcode = 321
 	LPF ~has_opcode~
 		INT_VAR opcode
-		STR_VAR expression = ~resref = %resref%~
+		STR_VAR
+			match_macro  = ~opcode_match_resref~
+			match_resref = ~%resref%~
 		RET hasOpcode
 	END
 	PATCH_IF hasOpcode BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~resref = %resref% AND target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+	            match_target       = target
+		        match_probability1 = probability1
+		        match_probability2 = probability2
+		        match_diceCount    = diceCount
+		        match_diceSides    = diceSides
+		        match_power        = power
+		        match_resistance   = resistance
+		        match_saveType     = saveType
+		        match_saveBonus    = saveBonus
+			STR_VAR
+				match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_resref_and_target_and_saveBonus_and_saveType~
+				match_resref = ~%resref%~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -4774,7 +4951,12 @@ DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
 	PATCH_IF shrink_cure_with_immunities AND abilityType == AbilityType_Equipped BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
-			STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+				match_probability1 = probability1
+				match_probability2 = probability2
+				match_target = target
+				match_saveType = saveType
+				match_saveBonus = saveBonus
+			STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -4840,7 +5022,22 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 				// On ajoute l'opcode courant à ceux qui seront désactivés
 				SET $positions(~%position%~) = initOpcode
 				// P2 retiré
-				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~ RET opcodePosition = position END
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+			            match_target       = target
+				        match_power        = power
+				        match_timingMode   = timingMode
+				        match_resistance   = resistance
+						match_duration     = duration
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~
+					RET opcodePosition = position
+				END
 				SET $positions(~%opcodePosition%~) = initOpcode
 				SET parameter = parameter1 - 1
 				SET newP1 |= ~%BIT%parameter%%~
@@ -5267,7 +5464,9 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 							// La position n'est pas une condition suffisante
 							LPF ~delete_opcode~
 								INT_VAR opcode
-								STR_VAR expression = ~timingMode = %oldTimingMode% AND duration = %oldDuration%~
+									match_timingMode = oldTimingMode
+									match_duration = oldDuration
+								STR_VAR match_macro = ~opcode_match_duration_and_timingMode~
 								RET $opcodes(~%opcode%~) = count
 								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 							END
@@ -5324,7 +5523,10 @@ DEFINE_PATCH_MACRO ~opcode_112_group~ BEGIN
 							// Suppression de l'opcode 112 actuel
 							LPF ~delete_opcode~
 								INT_VAR opcode
-								STR_VAR expression = ~position = %position% AND duration = %currentDuration% AND NOT custom_int = 122~
+									match_position = position
+									match_duration = currentDuration
+									match_custom_int = 122
+								STR_VAR match_macro = ~opcode_match_opcode_112_group~
 								RET $opcodes(~%opcode%~) = count
 								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 							END
@@ -5589,7 +5791,17 @@ DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%resref%~ STRING_EQUAL_CASE ~MISC56_~ BEGIN
 			LPF ~get_opcode_position~
 				INT_VAR opcode = 112
-				STR_VAR expression = ~resref = %CURRENT_SOURCE_RES% AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+			        match_target       = target
+			        match_timingMode   = timingMode
+			        match_resistance   = resistance
+			        match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_special      = special
+				STR_VAR match_macro = ~opcode_match_duration_and_probability1_and_probability2_and_resistance_and_resref_and_target_and_timingMode_and_saveBonus_and_saveType_and_special~
+			        match_resref = ~%CURRENT_SOURCE_RES%~
 				RET opcodePosition = position
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
@@ -5748,7 +5960,9 @@ DEFINE_PATCH_MACRO ~opcode_126_group~ BEGIN
 			SET opcode = 163
 			LPF ~delete_opcode~
 				INT_VAR opcode // "Free action"
-				STR_VAR expression = ~probability1 = %probability1% AND probability2 = %probability2%~
+					match_probability1 = probability1
+					match_probability2 = probability2
+				STR_VAR match_macro = ~opcode_match_probability1_and_probability2~
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -6249,7 +6463,29 @@ DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 			~%parameter2%~ => ~%position%~
 		END
 		PATCH_FOR_EACH spellType IN 0 1 2 BEGIN
-			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~NOT position = %position% AND custom_int = 0 AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+			LPF ~get_opcode_position~
+				INT_VAR opcode
+					match_position     = position
+					match_custom_int   = 0
+					match_target       = target
+					match_probability1 = probability1
+					match_probability2 = probability2
+					match_parameter1   = parameter1
+					match_parameter2   = spellType
+					match_parameter3   = parameter3
+					match_parameter4   = parameter4
+					match_timingMode   = timingMode
+					match_resistance   = resistance
+					match_duration     = duration
+					match_power        = power
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+					match_saveType     = saveType
+					match_saveBonus    = saveBonus
+					match_special      = special
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				RET opcodePosition = position
+			END
 			PATCH_IF opcodePosition >= 0 BEGIN
 				SET group = 1
 				SET newSpellType |= 1 << %spellType%
@@ -6396,7 +6632,18 @@ DEFINE_PATCH_MACRO ~opcode_146_group~ BEGIN
 		// Si un opcode 321 pointant le même sort que le 146 existe => supprimer le  321 + ajouter (non cumulable) au 146
 		LPF ~get_opcode_position~
 			INT_VAR opcode = 321
-			STR_VAR expression = ~position < %position% AND resref = %resref% AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+				match_position     = position
+				match_target       = target
+				match_timingMode   = timingMode
+				match_resistance   = resistance
+				match_duration     = duration
+				match_probability1 = probability1
+				match_probability2 = probability2
+				match_saveType     = saveType
+				match_saveBonus    = saveBonus
+				match_special      = special
+			STR_VAR match_macro = ~opcode_match_opcode_146_group~
+		        match_resref = ~%resref%~
 			RET opcodePosition = position
 		END
 		PATCH_IF opcodePosition >= 0 BEGIN
@@ -6613,7 +6860,18 @@ DEFINE_PATCH_MACRO ~opcode_154_group~ BEGIN
 			SET oldCount = $opcodes(~%opcode%~)
 			LPF ~delete_opcode~
 				INT_VAR opcode
-				STR_VAR expression = ~parameter1 = 0 AND (parameter2 = 1 OR parameter2 = 2 OR parameter2 = 5) AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+				    match_target       = target
+			        match_timingMode   = timingMode
+			        match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+			        match_power        = power
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_resistance   = resistance
+				STR_VAR match_macro = ~opcode_match_opcode_154_group~
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -6972,7 +7230,10 @@ DEFINE_PATCH_MACRO ~opcode_172_group~ BEGIN
 						// La position n'est pas une condition suffisante
 						LPF ~delete_opcode~
 							INT_VAR opcode
-							STR_VAR expression = ~timingMode = %oldTimingMode% AND duration = %oldDuration%~
+								match_timingMode = oldTimingMode
+								match_duration = oldDuration
+							STR_VAR
+								match_macro = ~opcode_match_duration_and_timingMode~
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
@@ -8369,7 +8630,26 @@ DEFINE_PATCH_MACRO ~opcode_200_group~ BEGIN
 				// On ajoute l'opcode courant à ceux qui seront désactivés
 				SET $positions(~%position%~) = opcode
 				// P2 retiré
-				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+			            match_target       = target
+				        match_power        = power
+				        match_parameter1   = parameter1
+				        match_parameter3   = parameter3
+				        match_parameter4   = parameter4
+				        match_timingMode   = timingMode
+				        match_resistance   = resistance
+						match_duration     = duration
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+				        match_special      = special
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
+					RET opcodePosition = position
+				END
 				SET $positions(~%opcodePosition%~) = opcode
 				SET parameter2 -= 1
 				SET newP2 |= ~BIT%parameter2%~
@@ -8615,7 +8895,9 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 				// Affichage warning car sort non trouvé
 				LPF ~has_opcode~
 					INT_VAR opcode
-					STR_VAR expression = ~resref = %resref%~
+					STR_VAR
+						match_macro  = ~opcode_match_resref~
+						match_resref = ~%resref%~
 					RET hasOpcode
 				END
 				PATCH_IF NOT hasOpcode BEGIN
@@ -8626,7 +8908,9 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
 			LPF ~delete_opcode~
 				INT_VAR opcode
-				STR_VAR expression = ~resref = %resref%~
+				STR_VAR
+					match_macro  = ~opcode_match_resref~
+					match_resref = ~%resref%~
 				RET $opcodes(~%opcode%~) = count
 				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 			END
@@ -8646,7 +8930,9 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 		LPM ~data_to_vars~
 		LPF ~delete_opcode~
 			INT_VAR opcode = 321
-			STR_VAR expression = ~resref = %resref%~
+			STR_VAR
+				match_macro  = ~opcode_match_resref~
+				match_resref = ~%resref%~
 			RET $opcodes(~321~) = count
 			RET_ARRAY EVAL ~opcodes_321~ = opcodes_xx
 		END
@@ -9224,7 +9510,18 @@ DEFINE_PATCH_MACRO ~opcode_220_group~ BEGIN
 			//
 			LPF ~get_opcode_position~
 				INT_VAR opcode = 221
-				STR_VAR expression = ~parameter1 = 9 AND parameter2 = 3 AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+			        match_target       = target
+			        match_parameter1   = 9
+			        match_parameter2   = 3
+			        match_timingMode   = timingMode
+			        match_resistance   = resistance
+					match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_special      = special
+				STR_VAR match_macro = ~opcode_match_duration_and_parameter1_and_parameter2_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
 				RET opcodePosition = position
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
@@ -10437,7 +10734,23 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 				// On ajoute l'opcode courant à ceux qui seront désactivés
 				SET $positions(~%position%~) = initOpcode
 				// P2 retiré
-				LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND parameter2 = %parameter2% AND power = %power% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~ RET opcodePosition = position END
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+			            match_target       = target
+				        match_parameter2   = parameter2
+				        match_power        = power
+				        match_timingMode   = timingMode
+				        match_resistance   = resistance
+						match_duration     = duration
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~
+					RET opcodePosition = position
+				END
 				SET $positions(~%opcodePosition%~) = initOpcode
 				SET parameter = parameter1 - 1
 				SET newP1 |= ~%BIT%parameter%%~
@@ -13066,7 +13379,16 @@ DEFINE_PATCH_MACRO ~opcode_509_post_group~ BEGIN
 			PATCH_FOR_EACH searchOpcode IN 204 205 BEGIN
 				LPF ~delete_opcode~
 		            INT_VAR opcode = searchOpcode
-					STR_VAR expression = ~target = %target% AND power = %power% AND resistance = %resistance% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+			            match_target       = target
+				        match_power        = power
+				        match_resistance   = resistance
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~
 		            RET $opcodes(~%searchOpcode%~) = count
 		            RET_ARRAY EVAL ~opcodes_%searchOpcode%~ = opcodes_xx
 		        END
@@ -14120,7 +14442,27 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 		END
 
 		PATCH_PHP_EACH ~listOpcodes~ AS _ => opcode BEGIN
-			LPF ~get_opcode_position~ INT_VAR opcode STR_VAR expression = ~target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %parameter2% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~ RET opcodePosition = position END
+			LPF ~get_opcode_position~
+				INT_VAR opcode
+		            match_target       = target
+		            match_power        = power
+			        match_parameter1   = parameter1
+			        match_parameter2   = parameter2
+			        match_parameter3   = parameter3
+			        match_parameter4   = parameter4
+			        match_timingMode   = timingMode
+			        match_resistance   = resistance
+					match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_special      = special
+				STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
+				RET opcodePosition = position
+			END
 
 			SET $positions(~%opcode%~) = opcodePosition
 
@@ -14419,5 +14761,372 @@ DEFINE_PATCH_MACRO ~opcode_match_except_duration~ BEGIN
         AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
         AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
         AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_power        == power
+        AND match_resistance   == resistance
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_duration_and_parameter1_and_parameter2_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_parameter2   == parameter2
+        AND match_power        == power
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_power        == power
+        AND match_parameter2   == parameter2
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_power        == power
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resref_and_target_saveBonus_and_saveType~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_power        == power
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_resref_and_target_and_saveBonus_and_saveType~ BEGIN
+	SET match = (
+            match_target       == target
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_power        == power
+        AND match_resistance   == resistance
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_duration_and_probability1_and_probability2_and_resistance_and_resref_and_target_and_timingMode_and_saveBonus_and_saveType_and_special~ BEGIN
+	SET match = (
+            match_target       == target
+        AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_duration_and_timingMode~ BEGIN
+	SET match = (
+			match_duration   == duration
+        AND match_timingMode == timingMode
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter1_and_parameter2~ BEGIN
+	SET match = (
+			match_parameter1 == parameter1
+        AND match_parameter2 == parameter2
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_position~ BEGIN
+	SET match = (
+			match_position   == position
+        AND match_parameter2 == parameter2
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter1_and_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~ BEGIN
+	SET match = (
+			match_parameter1   == parameter1
+		AND match_parameter2   == parameter2
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveBonus    == saveBonus
+        AND match_saveType     == saveType
+        AND match_target       == target
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~ BEGIN
+	SET match = (
+			match_parameter2   == parameter2
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveBonus    == saveBonus
+        AND match_saveType     == saveType
+        AND match_target       == target
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_probability~ BEGIN
+	SET match = (
+			match_parameter2  == parameter2
+        AND match_probability == probability
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_probability_and_target~ BEGIN
+	SET match = (
+			match_parameter2  == parameter2
+        AND match_probability == probability
+        AND match_target      == target
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_position~ BEGIN
+	SET match = (
+		match_position == position
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_probability1_and_probability2~ BEGIN
+	SET match = (
+			match_probability1 == probability1
+        AND match_probability2 == probability2
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~ BEGIN
+	SET match = (
+			match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveBonus    == saveBonus
+        AND match_saveType     == saveType
+        AND match_target       == target
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_resref~ BEGIN
+	SET match = (
+		~%match_resref%~ STRING_EQUAL_CASE ~%resref%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_60_145_group~ BEGIN
+	// ~NOT position = %position% AND custom_int = 0 AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %spellType% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+	SET match = (
+		    match_position     != position
+		AND match_custom_int   == custom_int
+		AND match_target       == target
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+		AND match_parameter1   == parameter1
+		AND match_parameter2   == parameter2
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_power        == power
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_78_group~ BEGIN
+	// ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter2 = %attribute% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+	SET match = (
+		    match_position     != position
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter1   == parameter1
+		AND match_parameter2   == parameter2
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_101_group~ BEGIN
+	// ~parameter1 > 99 AND (parameter2 = %MOD_TYPE_flat% OR parameter2 = %MOD_TYPE_cumulative%) AND probability1 = %probability1% AND probability2 = %probability2% AND target = %target% AND saveType = %saveType% AND saveBonus = %saveBonus%~
+	SET match = (
+			parameter1 > 99
+		AND (
+				MOD_TYPE_flat      == parameter2
+			OR MOD_TYPE_cumulative == parameter2
+		)
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+		AND match_target       == target
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_112_group~ BEGIN
+	SET match = (
+			match_position       == position
+        AND match_duration       == duration
+        AND NOT match_custom_int == custom_int
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_146_group~ BEGIN
+	// ~position < %position% AND resref = %resref% AND target = %target% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+	SET match = (
+			position < match_position
+        AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
+		AND match_target       == target
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_154_group~ BEGIN
+	// ~parameter1 = 0 AND (parameter2 = 1 OR parameter2 = 2 OR parameter2 = 5) AND target=%target% AND timingMode=%timingMode% AND duration=%duration% AND probability1=%probability1% AND probability2=%probability2% AND diceCount=%diceCount% AND diceSides=%diceSides% AND power=%power% AND saveType=%saveType% AND saveBonus=%saveBonus% AND resistance=%resistance%~
+	SET match = (
+			0 == parameter1
+        AND (
+	           1 == parameter2
+	        OR 2 == parameter2
+	        OR 5 == parameter2
+	    )
+	    AND match_target       == target
+        AND match_timingMode   == timingMode
+        AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_power        == power
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_resistance   == resistance
     )
 END

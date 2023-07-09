@@ -93,7 +93,9 @@ BEGIN
 	PATCH_IF isArmor AND NOT isRobe AND armor_show_allows_to_cast_spells BEGIN
 		LPF ~has_opcode~
 			INT_VAR opcode = 145
-			STR_VAR expression = ~probability = 100 AND parameter2 = 0~
+				match_parameter2  = 0
+	            match_probability = 100
+			STR_VAR match_macro = ~opcode_match_parameter2_and_probability~
 			RET hasOpcode
 		END
 		PATCH_IF NOT hasOpcode BEGIN

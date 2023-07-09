@@ -466,8 +466,33 @@ END
 DEFINE_PATCH_FUNCTION ~has_opcode~
 	INT_VAR
 		opcode = 0
+
+		match_opcode       = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
 	STR_VAR
-		expression = ~~
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+		match_macro      = ~~
 	RET
 		hasOpcode
 BEGIN
@@ -475,8 +500,8 @@ BEGIN
 	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
 	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 	        LPM ~data_to_vars~
-	        LPF evaluate_expression STR_VAR expression RET value END
-	        PATCH_IF value == 1 BEGIN
+			LPM ~%match_macro%~
+	        PATCH_IF match == 1 BEGIN
 	            SET hasOpcode = 1
 	        END
 	    END
@@ -497,8 +522,33 @@ DEFINE_PATCH_FUNCTION ~delete_opcode~
 	INT_VAR
 		opcode = 0
 		match_position = ~-1~
+
+		match_opcode       = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
 	STR_VAR
-		expression = ~~
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+		match_macro      = ~opcode_match_position~
 	RET
 		count
 	RET_ARRAY
@@ -512,25 +562,14 @@ BEGIN
 	SET count = 0
 
 	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
-		PATCH_IF match_position >= 0 BEGIN
-		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
-		        LPM ~data_to_vars~
-				PATCH_IF match_position != position BEGIN
-					SET count += 1
-			        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~) = 1
-		        END
-		    END
-		END
-		ELSE BEGIN
-		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
-		        LPM ~data_to_vars~
-		        LPF evaluate_expression STR_VAR expression RET value END
-				PATCH_IF NOT value BEGIN
-					SET count += 1
-			        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~) = 1
-		        END
-		    END
-		END
+	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+	        LPM ~data_to_vars~
+			LPM ~%match_macro%~
+			PATCH_IF NOT match BEGIN
+				SET count += 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~) = 1
+	        END
+	    END
 	END
 	SET $opcodes(~%opcode%~) = count
 END
@@ -606,8 +645,33 @@ END
 DEFINE_PATCH_FUNCTION ~get_opcode_position~
 	INT_VAR
 		opcode = 0
+		match_position     = 0
+		match_opcode       = 0
+		match_isExternal   = 0
+		match_target       = 0
+		match_power        = 0
+		match_parameter1   = 0
+		match_parameter2   = 0
+		match_timingMode   = 0
+		match_resistance   = 0
+		match_duration     = 0
+		match_probability  = 0
+		match_probability1 = 0
+		match_probability2 = 0
+		match_diceCount    = 0
+		match_diceSides    = 0
+		match_saveType     = 0
+		match_saveBonus    = 0
+		match_special      = 0
+		match_parameter3   = 0
+		match_parameter4   = 0
+		match_custom_int   = 0
 	STR_VAR
-		expression = ~~
+		match_resref     = ~~
+		match_resref2    = ~~
+		match_resref3    = ~~
+		match_custom_str = ~~
+		match_macro      = ~~
 	RET
 		position
 BEGIN
@@ -617,8 +681,8 @@ BEGIN
 	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 	        PATCH_IF found == 0 BEGIN
 		        LPM ~data_to_vars~
-		        LPF evaluate_expression STR_VAR expression RET value END
-		        PATCH_IF value == 1 BEGIN
+				LPM ~%match_macro%~
+				PATCH_IF match BEGIN
 		            SET return = position
 		            SET found = 1
 		        END
