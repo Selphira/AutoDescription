@@ -62,6 +62,9 @@ BEGIN
 			PATCH_DEFINE_ARRAY EVAL ~lines%countHeaders%~ BEGIN END
 			SET EVAL ~countLines%countHeaders%~ = 0
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
+			PATCH_IF charges == 0 BEGIN
+				LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
+			END
 			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
 			SET countHeaders += 1
 		END
@@ -266,6 +269,14 @@ BEGIN
 	SET hasSameAbilities = 1
 
 	PATCH_IF countHeaders > 1 BEGIN
+		PATCH_IF countLines0 == 0 BEGIN
+			FOR (index = 1; index < countHeaders; index += 1) BEGIN
+				PATCH_IF EVAL ~countLines%index%~ > 0 BEGIN
+	                SET hasSameAbilities = 0
+	                SET index = countHeaders
+				END
+			END
+		END
 		PATCH_PHP_EACH ~lines0~ AS base => _ BEGIN
 			FOR (index = 1; index < countHeaders; index += 1) BEGIN
 				PATCH_IF EVAL ~countLines%index%~ > 0 BEGIN

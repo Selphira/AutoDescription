@@ -13497,10 +13497,6 @@ DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 			SPRINT value @10002 // ~%value% %~
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
-			// Après test, 50 ajoute bien environ 50% de la résistance actuelle (donc multiplié par 150%), le -100 est faux, du moins sous BGEE.
-			// Je dis environ, car il semble que le type 2 soit buggé pour les résistances, et d'autres valeurs sont prises en compte.
-			// SET value -= 100
-			SET value += 100
 			SPRINT value @10006 // ~Multiplié par %value%~
 			SPRINT value @10002 // ~%value% %~
 		END
