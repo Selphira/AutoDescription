@@ -4,120 +4,122 @@
  */
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
-	318 => 0   // Protection: Immunity Spell [318]
-	324 => 0   // Protection: Immunity to Resource and Message [324]
+	135 => 1   // Polymorph into Specific [135]
+	318 => 2   // Protection: Immunity Spell [318]
+	324 => 3   // Protection: Immunity to Resource and Message [324]
 
-	112 => 1   // Item: Item Remove [112]
-	123 => 1   // Item: Remove Inventory Item [123]
-	264 => 1   // Spell Effect: Drop Weapons in Panic [264]
+	519 => 4   // Arme brisée [519]
+	112 => 5   // Item: Item Remove [112]
+	123 => 6   // Item: Remove Inventory Item [123]
+	264 => 7   // Spell Effect: Drop Weapons in Panic [264]
 
 	// Modification des stats longue durée
-	283 => 2   // Use EFF File (Cursed) [283]
-	360 => 2   // Stat: Ignore Reputation Breaking Point [360]
-    214 => 2   // Select Spell [214]
-	 96 => 3   // Stat: Level Change [96]
-	233 => 3   // Stat: Proficiency [233]
-    191 => 4   // Spell: Casting Level Modifier [191]
-	507 => 5   // Emplacement sorts profanes [507]
-	 42 => 6   // Spell: Wizard Spell Slots Modifier [42]
-	508 => 7   // Emplacement sorts divins [508]
-	 62 => 8   // Spell: Priest Spell Slots Modifier [62]
-	261 => 9   // Spell: Restore Lost Spells [261]
-	510 => 9   // Spell: Restore Lost Spells (cumulative) [510]
+	283 => 10   // Use EFF File (Cursed) [283]
+	360 => 11   // Stat: Ignore Reputation Breaking Point [360]
+    214 => 12   // Select Spell [214]
+	 96 => 13   // Stat: Level Change [96]
+	233 => 14   // Stat: Proficiency [233]
+    191 => 15   // Spell: Casting Level Modifier [191]
+	507 => 16   // Emplacement sorts profanes [507]
+	 42 => 17   // Spell: Wizard Spell Slots Modifier [42]
+	508 => 18   // Emplacement sorts divins [508]
+	 62 => 19   // Spell: Priest Spell Slots Modifier [62]
+	261 => 20   // Spell: Restore Lost Spells [261]
+	510 => 21   // Spell: Restore Lost Spells (cumulative) [510]
 
 	// Modification des stats
 
-	 12 => 10  // HP: Damage [12]
-	 78 => 11  // State: Disease [78]
-	 25 => 11  // State: Poison [25]
+	 12 => 22  // HP: Damage [12]
+	 78 => 23  // State: Disease [78]
+	 25 => 24  // State: Poison [25]
 
-	345 => 12  // Enchantment bonus [345]
-	344 => 12  // Enchantment vs. creature type [344]
-	216 => 13  // Spell Effect: Level Drain [216]
-	246 => 13  // Spell Effect: Berserking [246]
-	  0 => 14  // Stat: AC vs. Damage Type Modifier [0]
-	506 => 15  // Stat: Classe d'armure cumulable
- 219000 => 16  // Stat: AC vs. Creature Type Modifier [219]
-	521 => 17  // Protection: Aucune protection [521]
+	345 => 30  // Enchantment bonus [345]
+	344 => 31  // Enchantment vs. creature type [344]
+	216 => 32  // Spell Effect: Level Drain [216]
+	246 => 33  // Spell Effect: Berserking [246]
+	  0 => 34  // Stat: AC vs. Damage Type Modifier [0]
+	506 => 35  // Stat: Classe d'armure cumulable
+ 219000 => 36  // Stat: AC vs. Creature Type Modifier [219]
+	521 => 37  // Protection: Aucune protection [521]
 
-	  1 => 17  // Stat: Attacks Per Round Modifier [1]
+	  1 => 38  // Stat: Attacks Per Round Modifier [1]
 
-	301 => 18  // Stat: Critical Hit Modifier [301]
-	362 => 19  // Critical miss bonus [362]
-     73 => 20  // Stat: Extra Damage Modifier [73]
-	179 => 21  // Spell Effect: Damage vs. Creature Type Modifier [179]
-	285 => 23  // Stat: Melee Weapon Damage Modifier [285]
-	286 => 24  // Stat: Missile Weapon Damage Modifier [286]
-	289 => 25  // Stat: Fist Damage Modifier [289]
-	263 => 26  // Stat: Backstab [263]
-	332 => 27  // Stat: Specific Damage Modifier [332] : EE only
-	250 => 28  // Spell Effect: Damage Luck Modifier [250]
+	301 => 40  // Stat: Critical Hit Modifier [301]
+	362 => 41  // Critical miss bonus [362]
+     73 => 42  // Stat: Extra Damage Modifier [73]
+	179 => 43  // Spell Effect: Damage vs. Creature Type Modifier [179]
+	285 => 44  // Stat: Melee Weapon Damage Modifier [285]
+	286 => 45  // Stat: Missile Weapon Damage Modifier [286]
+	289 => 46  // Stat: Fist Damage Modifier [289]
+	263 => 47  // Stat: Backstab [263]
+	332 => 48  // Stat: Specific Damage Modifier [332] : EE only
+	250 => 49  // Spell Effect: Damage Luck Modifier [250]
 
-	 54 => 30  // Stat: THAC0 Modifier [54]
-	278 => 30  // Stat: To Hit Modifier [278]
-	178 => 31  // Spell Effect: THAC0 vs. Creature Type Modifier [178]
-	306 => 32  // Stat: THAC0 Modifier (On-Hand) [306]
-	305 => 33  // Stat: THAC0 Modifier (Off-Hand) [305]
-	284 => 34  // Stat: Melee THAC0 Modifier [284]
-	167 => 35  // Stat: THAC0 Modifier with Missile Weapons [167]
-	288 => 36  // Stat: Fist THAC0 Modifier [288]
+	 54 => 60  // Stat: THAC0 Modifier [54]
+	278 => 61  // Stat: To Hit Modifier [278]
+	178 => 62  // Spell Effect: THAC0 vs. Creature Type Modifier [178]
+	306 => 63  // Stat: THAC0 Modifier (On-Hand) [306]
+	305 => 64  // Stat: THAC0 Modifier (Off-Hand) [305]
+	284 => 65  // Stat: Melee THAC0 Modifier [284]
+	167 => 66  // Stat: THAC0 Modifier with Missile Weapons [167]
+	288 => 67  // Stat: Fist THAC0 Modifier [288]
 
-	325 => 50  // Stat: Save vs. all [325]
- 219001 => 51  // Stat: JS vs. Creature Type Modifier [219]
-	 33 => 52  // Stat: Save vs. Death Modifier [33]
-	 34 => 53  // Stat: Save vs. Wands Modifier [34]
-	 35 => 54  // Stat: Save vs. Petrification/Polymorph Modifier [35]
-	 36 => 55  // Stat: Save vs. Breath Weapons Modifier [36]
-	 37 => 56  // Stat: Save vs. Spells Modifier [37]
-	346 => 57  // Save vs. school bonus [346]
+	325 => 70  // Stat: Save vs. all [325]
+ 219001 => 71  // Stat: JS vs. Creature Type Modifier [219]
+	 33 => 72  // Stat: Save vs. Death Modifier [33]
+	 34 => 73  // Stat: Save vs. Wands Modifier [34]
+	 35 => 74  // Stat: Save vs. Petrification/Polymorph Modifier [35]
+	 36 => 75  // Stat: Save vs. Breath Weapons Modifier [36]
+	 37 => 76  // Stat: Save vs. Spells Modifier [37]
+	346 => 77  // Save vs. school bonus [346]
 
-	126 => 60  // Stat: Movement Modifier [126]
-	176 => 60  // Stat: Movement Modifier (II) [176]
+	126 => 80  // Stat: Movement Modifier [126]
+	176 => 81  // Stat: Movement Modifier (II) [176]
 
-	 18 => 61  // Stat: Maximum HP Modifier [18]
-	 98 => 62  // Stat: Regeneration [98]
-	 17 => 63  // Stat: Current HP Modifier [17]
-	343 => 64  // HP Swap [343]
-	208 => 65  // Stat: Minimum HP Limit [208]
+	 18 => 82  // Stat: Maximum HP Modifier [18]
+	 98 => 83  // Stat: Regeneration [98]
+	 17 => 84  // Stat: Current HP Modifier [17]
+	343 => 85  // HP Swap [343]
+	208 => 86  // Stat: Minimum HP Limit [208]
 
-	299 => 66  // Spell Effect: Chaos Shield [299]
+	299 => 90  // Spell Effect: Chaos Shield [299]
 
-	 99 => 67  // Spell Effect: Duration Modifier [99]
-	 60 => 68  // Stat: Miscast Magic [60]
-	189 => 69  // Stat: Casting Time Modifier [189]
-	190 => 70  // Stat: Attack Speed Factor [190]
+	 99 => 91  // Spell Effect: Duration Modifier [99]
+	 60 => 92  // Stat: Miscast Magic [60]
+	189 => 93  // Stat: Casting Time Modifier [189]
+	190 => 94  // Stat: Attack Speed Factor [190]
 
-	501 => 80  // Stat: Caractéristiques [501]
-	132 => 81  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
-	 44 => 82  // Stat: Strength Modifier [44]
-	 97 => 83  // Stat: Strength-Bonus Modifier [97]
-	 15 => 84  // Stat: Dexterity Modifier [15]
-	 10 => 85  // Stat: Constitution Modifier [10]
-	 19 => 86  // Stat: Intelligence Modifier [19]
-	 49 => 87  // Stat: Wisdom Modifier [49]
-	  6 => 88  // Stat: Charisma Modifier [6]
+	501 => 100  // Stat: Caractéristiques [501]
+	132 => 101  // State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
+	 44 => 102  // Stat: Strength Modifier [44]
+	 97 => 103  // Stat: Strength-Bonus Modifier [97]
+	 15 => 104  // Stat: Dexterity Modifier [15]
+	 10 => 105  // Stat: Constitution Modifier [10]
+	 19 => 106  // Stat: Intelligence Modifier [19]
+	 49 => 107  // Stat: Wisdom Modifier [49]
+	  6 => 108  // Stat: Charisma Modifier [6]
 
-	 22 => 89  // Stat: Luck Modifier [22]
-	133 => 90  // Spell Effect: Luck Non-Cumulative [133]
-	131 => 91  // State: Positive Chant [131]
-	137 => 92  // State: Negative Chant [137]
+	 22 => 110  // Stat: Luck Modifier [22]
+	133 => 111  // Spell Effect: Luck Non-Cumulative [133]
+	131 => 112  // State: Positive Chant [131]
+	137 => 113  // State: Negative Chant [137]
 
-	500 => 95  // Stat: Compétences de voleur [500]
-	 92 => 96  // Stat: Pick Pockets Modifier [92]
-	 90 => 97  // Stat: Open Locks Modifier [90]
-	276 => 98  // Stat: Detect Illusion Modifier [276]
-	 91 => 99  // Stat: Find Traps Modifier [91]
-	277 => 100 // Stat: Set Traps Modifier [277]
-	275 => 101 // Stat: Hide in Shadows Modifier [275]
-	 59 => 102 // Stat: Stealth Modifier [59]
+	500 => 120  // Stat: Compétences de voleur [500]
+	 92 => 121  // Stat: Pick Pockets Modifier [92]
+	 90 => 122  // Stat: Open Locks Modifier [90]
+	276 => 123  // Stat: Detect Illusion Modifier [276]
+	 91 => 124  // Stat: Find Traps Modifier [91]
+	277 => 125 // Stat: Set Traps Modifier [277]
+	275 => 126 // Stat: Hide in Shadows Modifier [275]
+	 59 => 127 // Stat: Stealth Modifier [59]
 
 
 	// Invocation
 
-	 67 => 127 // Summon: Creature Summoning [67]
-	127 => 128 // Summon: Monster Summoning [127]
-	331 => 129 // Summon: Random Monster Summoning [331]
-	151 => 130 // Summon: Replace Creature [151]
+	 67 => 130 // Summon: Creature Summoning [67]
+	127 => 131 // Summon: Monster Summoning [127]
+	331 => 132 // Summon: Random Monster Summoning [331]
+	151 => 133 // Summon: Replace Creature [151]
 
 	// Dissipation
 
@@ -191,12 +193,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 83 => 282 // Protection: From Projectile (Any) [83]
     101 => 283 // Protection: from Opcode [101]
 	163 => 284 // Protection: Free Action [163]
-    505 => 285 // Protection contre les capacités psioniques
-	292 => 286 // Protection: Backstab [292]
-	310 => 287 // Protection: from Timestop [310]
-	212 => 288 // Protection: Freedom [212]
-	 69 => 289 // Protection: From Detection (Non-Detection) [69]
-	295 => 290 // Graphics: Disable Permanent Death [295]
+	520 => 285 // Protection: Action libre [520]
+    505 => 286 // Protection contre les capacités psioniques
+	292 => 287 // Protection: Backstab [292]
+	310 => 288 // Protection: from Timestop [310]
+	212 => 289 // Protection: Freedom [212]
+	 69 => 290 // Protection: From Detection (Non-Detection) [69]
+	295 => 291 // Graphics: Disable Permanent Death [295]
 
 	// Les résistances qui peuvent être des immunités
 
@@ -246,7 +249,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	128 => 379 // State: Confusion [128]
 	  3 => 380 // State: Berserking [3]
 	247 => 381 // Spell Effect: Attack Nearest Creature [247]
-	135 => 382 // Polymorph into Specific [135]
 	 76 => 383 // State: Feeblemindedness [76]
 	 16 => 384 // State: Haste [16]
 	317 => 385 // State: Haste2 [317]
@@ -3431,6 +3433,10 @@ END
 /* ------------------------------ *
  * Summon: Unsummon Creature [68] *
  * ------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_68~ BEGIN
+	LPM ~opcode_target_68~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_68~ BEGIN
 	//FIXME fonctionne aussi si la créature n'est pas invoquée...
 	SPRINT description @10680001 // ~Renvoie %theTarget% si c'est une créature invoquée~
@@ -5363,6 +5369,44 @@ DEFINE_PATCH_MACRO ~opcode_target_111~ BEGIN
 		SPRINT description @11110002 // ~Équipe %theTarget% d'%amount% (%itemName%)~
 	END
 END
+/*
+DEFINE_PATCH_MACRO ~opcode_111_replace~ BEGIN
+	PATCH_PHP_EACH ~opcodes_111~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET itemDuration = duration
+		SET itemTimingMode = timingMode
+		PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+			INNER_PATCH_FILE ~%resref%.itm~ BEGIN
+				READ_LONG ITM_identified_name itemNameRef
+				PATCH_IF itemNameRef == 25615 OR itemNameRef == 10966  // "Attaquer"
+					OR itemNameRef == 6854 // "Morgenstern "
+				BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+					PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+			            CLEAR_ARRAY ~opcodes_%opcode%~
+			        END
+					//lire les opcodes de l'item et les ajouter dans les opcodes actuels
+				    GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
+				    PHP_EACH offsets AS _ => offset BEGIN
+					    LPM ~read_effect_vars~
+					    // Ne dure que le temps que l'arme est équipée
+					    SET duration = itemDuration
+					    SET timingMode = itemTimingMode
+					    LPM ~load_opcode~
+				    END
+				    // TODO: Si aucun opcode n'a été ajouté, et que l'objet est une arme, transformer les dégâts en un opcode 12 !
+				END
+			END
+		END
+	END
+END
+*/
 
 DEFINE_PATCH_MACRO ~opcode_111_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
@@ -5540,6 +5584,18 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_112_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+	PATCH_IF isValid == 1 AND FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+		INNER_PATCH_FILE ~%resref%.itm~ BEGIN
+			// N'a aucune plus value pour le joueur, généralement sur des sorts ou objets qui métamorphosent.
+			READ_LONG ITM_identified_name itemNameRef
+			PATCH_IF itemNameRef == 25615 OR itemNameRef == 10966  // "Attaquer"
+				OR itemNameRef == 6854 // "Morgenstern "
+			BEGIN
+				SET isValid = 0
+			END
+		END
+	END
 END
 
 /* ----------------------- *
@@ -6606,7 +6662,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
-					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+					SPRINT regex @10019 // ~^[0-9]+ % de chance ~
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 				END
 			END

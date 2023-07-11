@@ -6,8 +6,11 @@ DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
+	SET totalSpells += 1
+	PATCH_IF totalSpells MODULO 100 == 0 BEGIN
+		PATCH_PRINT "%totalSpells% spells processed"
+	END
 	PATCH_TRY
-		PATCH_PRINT "Traitement de %SOURCE_FILE%..."
 		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END

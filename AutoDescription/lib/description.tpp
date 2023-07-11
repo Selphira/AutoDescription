@@ -8,7 +8,6 @@ DEFINE_PATCH_FUNCTION ~add_section_to_description~
 		description
 BEGIN
 	PATCH_IF count > 0 BEGIN
-        SORT_ARRAY_INDICES ~%arrayName%~ NUMERICALLY
 		LPF ~appendSection~ STR_VAR string = ~%title%~ RET description END
 		LPF ~add_items_section_to_description~ STR_VAR arrayName RET description END
 	END
@@ -20,6 +19,7 @@ DEFINE_PATCH_FUNCTION ~add_items_section_to_description~
 	RET
 		description
 BEGIN
+    SORT_ARRAY_INDICES ~%arrayName%~ NUMERICALLY
     PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
         // Prise en compte des cas où un sort lancé depuis un opcode 146 (ou autre), génère plusieurs lignes...
         // Pas vraiment top de le faire ici...
@@ -50,7 +50,6 @@ DEFINE_PATCH_FUNCTION ~add_global_effects_to_description~
 		description
 BEGIN
 	PATCH_IF countGlobalLines > 0 BEGIN
-        SORT_ARRAY_INDICES ~globalLines~ NUMERICALLY
         LPF ~appendLine~ RET description END
 		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~globalLines~ RET description END
 	END

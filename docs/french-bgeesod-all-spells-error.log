@@ -9,8 +9,10 @@ SPIN545.SPL : Opcode 146 : Resource spin545a.spl doesn't exist.
 SPIN545.SPL : Resource SPIN545A.spl doesn't exist.
 SPIN663.SPL : Opcode 111 : Resource npsw02.itm doesn't exist.
 SPIN667.SPL : Opcode 112 : Resource SLAYERWP.itm doesn't exist.
+SPIN667.SPL : Opcode 112 : Resource SLAYERWP.itm doesn't exist.
 SPIN717.SPL : Opcode 135 : Resource slayer.cre doesn't exist.
 SPIN717.SPL : Opcode 111 : Resource slayerwp.itm doesn't exist.
+SPIN718.SPL : Opcode 112 : Resource SLAYERWP.itm doesn't exist.
 SPIN718.SPL : Opcode 112 : Resource SLAYERWP.itm doesn't exist.
 SPIN783.SPL : Opcode 135 : Resource slayer.cre doesn't exist.
 SPIN823.SPL : Opcode 135 : Resource slayer.cre doesn't exist.

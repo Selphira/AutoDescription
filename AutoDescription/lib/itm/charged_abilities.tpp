@@ -94,8 +94,6 @@ BEGIN
 			END
 		END
 
-		SORT_ARRAY_INDICES lines NUMERICALLY
-
 		PATCH_IF itemType == ITM_TYPE_potion BEGIN
 			LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
             INNER_PATCH_SAVE description ~%description%~ BEGIN

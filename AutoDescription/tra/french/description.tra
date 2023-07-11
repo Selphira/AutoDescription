@@ -25,6 +25,7 @@
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
+@10019 = ~[0-9]+ % de chances ~
 @10015 = ~Aucun~
 @10016 = ~Annule~
 @10017 = ~1/2~
@@ -2652,20 +2653,20 @@
 
 // Opcode 135: Polymorph into Specific [135]
 
-@11350001 = ~Transformation en %creatureName%~ // Métamorphose en %creatureName%
+@11350001 = ~Métamorphose en %creatureName%~ // Métamorphose en %creatureName%
 @11350002 = ~Déguisement en %creatureName%~ // Simule / Prend l'apparence de %creatureName%
 @11350003 = ~Retrouve sa forme naturelle~ // Métamorphose en / dans sa forme naturelle
 
-@11350011 = ~Transforme %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
+@11350011 = ~Métamorphose %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
 @11350012 = ~Déguise %theTarget% en %creatureName%~// Donne à %theTarget% l'apparence de %creatureName%
 // TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
 @11350013 = ~%theTarget% retrouve sa forme naturelle~// Métamorphose %theTarget% dans sa forme naturelle
 
-@11350021 = ~de se transformer en %creatureName%~ // de se métamorphoser en %creatureName%
+@11350021 = ~de se métamorphoser en %creatureName%~ // de se métamorphoser en %creatureName%
 @11350022 = ~de se déguiser en %creatureName%~// de prendre l'apparence de %creatureName%
 @11350023 = ~de retrouver sa forme naturelle~// de se métamorphoser dans sa forme naturelle
 
-@11350031 = ~de transformer %theTarget% en %creatureName%~// de métamorphoser %theTarget% en %creatureName%
+@11350031 = ~de métamorphoser %theTarget% en %creatureName%~// de métamorphoser %theTarget% en %creatureName%
 @11350032 = ~de déguiser %theTarget% en %creatureName%~// de donner l'apparence de %creatureName% à %theTarget%
 @11350033 = ~de faire retrouver la forme naturelle de %theTarget%~ // de métamorphoser %theTarget% dans sa forme naturelle
 

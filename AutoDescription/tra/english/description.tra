@@ -28,6 +28,7 @@
 @10015 = ~None~
 @10016 = ~Neg.~
 @10017 = ~1/2~
+@10019 = ~[0-9]+ % chance ~
 @100001 = ~%name%%colon%%value%~
 @100002 = ~Weight~
 @100003 = ~STATISTICS~
@@ -124,10 +125,10 @@
 @102127 = ~Allows arcane spellcasting~
 @102159 = ~%charges% charges, the item is destroyed when all charges are used~
 @102160 = ~%baseValue% + %value% on level %level%~
-@102161 = ~%value%/level~
-@102162 = ~%value%/%level% levels~
-@102163 = ~%value%/level/%levelMax%~
-@102164 = ~%value%/%level% levels/%levelMax%~
+@102161 = ~%value% per caster level~
+@102162 = ~%value% for every caster %level% levels~
+@102163 = ~%value% per caster level/%levelMax%~
+@102164 = ~%value% for every caster %level% levels/%levelMax%~
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
 
@@ -2650,20 +2651,20 @@
 
 // Opcode 135: Polymorph into Specific [135]
 
-@11350001 = ~Transformation en %creatureName%~ // Métamorphose en %creatureName%
+@11350001 = ~Shapeshift into %creatureName%~ // Métamorphose en %creatureName%
 @11350002 = ~Déguisement en %creatureName%~ // Simule / Prend l'apparence de %creatureName%
 @11350003 = ~Retrouve sa forme naturelle~ // Métamorphose en / dans sa forme naturelle
 
-@11350011 = ~Transforme %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
+@11350011 = ~Shapeshift %theTarget% into %creatureName%~//// Métamorphose %theTarget% en %creatureName%
 @11350012 = ~Déguise %theTarget% en %creatureName%~// Donne à %theTarget% l'apparence de %creatureName%
 // TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
 @11350013 = ~%theTarget% retrouve sa forme naturelle~// Métamorphose %theTarget% dans sa forme naturelle
 
-@11350021 = ~de se transformer en %creatureName%~ // de se métamorphoser en %creatureName%
+@11350021 = ~to shapeshift into %creatureName%~ // de se métamorphoser en %creatureName%
 @11350022 = ~de se déguiser en %creatureName%~// de prendre l'apparence de %creatureName%
 @11350023 = ~de retrouver sa forme naturelle~// de se métamorphoser dans sa forme naturelle
 
-@11350031 = ~de transformer %theTarget% en %creatureName%~// de métamorphoser %theTarget% en %creatureName%
+@11350031 = ~to shapeshift %theTarget% into %creatureName%~// de métamorphoser %theTarget% en %creatureName%
 @11350032 = ~de déguiser %theTarget% en %creatureName%~// de donner l'apparence de %creatureName% à %theTarget%
 @11350033 = ~de faire retrouver la forme naturelle de %theTarget%~ // de métamorphoser %theTarget% dans sa forme naturelle
 
@@ -4251,7 +4252,7 @@
 @15110001 = ~Dispels all illusionary protection spells on %theTarget%~
 @15110002 = ~to dispel all illusionary protection spells on %theTarget%~
 
-// Fake Opcode 519: Immunité aux sorts
+// Fake Opcode 518: Immunité aux sorts
 
 @15180001 = ~Immunity to %spellNames% spells~
 @15180002 = ~Immune %theTarget% to %spellNames% spells~
