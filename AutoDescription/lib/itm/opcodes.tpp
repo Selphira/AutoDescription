@@ -5400,6 +5400,9 @@ DEFINE_PATCH_MACRO ~opcode_111_replace~ BEGIN
 					    SET timingMode = itemTimingMode
 					    LPM ~load_opcode~
 				    END
+					READ_SHORT  ITM_type            itemType
+				    READ_SHORT  ITM_flags           flags
+					LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription = ~~ RET description END
 				    // TODO: Si aucun opcode n'a été ajouté, et que l'objet est une arme, transformer les dégâts en un opcode 12 !
 				END
 			END
@@ -12653,7 +12656,13 @@ END
 // TODO : gérer 326 avec 324
 DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	LPM ~opcode_326_condition~
-	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+	// Protection contre les boucles infinies
+	PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+		SET $recursive_resref(~%resref%~) = 1
+		SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+		LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+	END
+	CLEAR_ARRAY recursive_resref
 	SET ignoreDuration = 1
 END
 
