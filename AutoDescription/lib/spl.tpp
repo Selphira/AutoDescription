@@ -69,6 +69,8 @@ BEGIN
 	SET isRobe = 0
 	SET isAmmo = 0
 
+	LPM ~load_level_effects~
+
 	READ_LONG  SPL_extended_headers_offset headerOffset
 	READ_SHORT SPL_extended_headers_count  headerCount
 
@@ -95,8 +97,6 @@ BEGIN
         LPF ~appendLine~ RET description END
 
 		LPF ~add_casting_features~ STR_VAR description RET description END
-		// TODO: Cette variable est utilisée à plusieurs endroits...  Trouver une meilleure solution
-		SET abilityType = ~-1~
 		LPF ~get_spell_effects_description~ INT_VAR ignoreDuration STR_VAR description RET description END
 	END
 

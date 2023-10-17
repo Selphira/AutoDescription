@@ -212,9 +212,9 @@
 @101181 = ~à la cible~
 @101182 = ~aux membres du groupe~
 @101190 = ~aux créatures dans la zone d'effet~
-@101191 = ~les créatures non membres du groupe~
-@101192 = ~des créatures non membres du groupe~
-@101193 = ~aux créatures non membres du groupe~
+@101191 = ~les créatures externes au groupe~
+@101192 = ~des créatures externes au groupe~
+@101193 = ~aux créatures externes au groupe~
 @101194 = ~les autres créatures dans la zone d'effet~
 @101195 = ~des autres créatures dans la zone d'effet~
 @101196 = ~aux autres créatures dans la zone d'effet~

@@ -2,6 +2,7 @@ DEFINE_PATCH_FUNCTION ~load_spell_extended_effects~
 	INT_VAR
 		baseProbability = 100
 		forceTarget = 0
+		ignoreDuration = 0
 	RET
 		countLines
 	RET_ARRAY
@@ -244,6 +245,7 @@ BEGIN
                 LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget RET description totalLines END
             END
             ELSE BEGIN
+				LPM ~load_level_effects~
                 LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
             END
 			PATCH_IF totalLines == 1 BEGIN
@@ -273,6 +275,28 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_description~
 	RET
 		description totalLines
 BEGIN
+	LPM ~group_identical_spell_effects_between_level~
+	LPM ~group_spell_effects_by_duration~
+	LPM ~group_spell_effects_by_parameters~
+	LPM ~group_spell_effects_by_damage~
+	//TODO: Regroupement des effets identiques entre chacun des niveaux ( a mettre dans leveled_opcodes_0 pour être géré de manière générique ?? Ca permettrait d'avoir la même chose entre ici et la version pour un niveau particulier)
+	// FIXME: SPPR729
+	// TODO: Avant de calculer les descriptions :
+	// - Regrouper les effets dont seule la durée diffère (+ déterminer la formule)
+	// - Regrouper les effets dont seul les dégâts diffèrent (+ déterminer la formule)
+	// - Pour le "à partir du niveau 1", le véritable niveau à prendre en compte pour les calculs est celui où l'on peut apprendre le sort
+	//   Ex: sort de niveau 7 = niveau 14
+	//   Donc avoir un tableau qui fait la correspondance entre niveau du sort => niveau du lanceur
+	//   et ce pour chaque type de sort (mage, prêtre, etc.)
+
+	SORT_ARRAY_INDICES level_effects NUMERICALLY
+
+	LPF ~build_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration RET description totalLines END
+END
+
+DEFINE_PATCH_MACRO ~load_level_effects~ BEGIN
+	// TODO: Cette variable est utilisée à plusieurs endroits...  Trouver une meilleure solution
+	SET abilityType = ~-1~
 	SET countLevels = 0
 	SET countHeaders = 0
 
@@ -297,24 +321,6 @@ BEGIN
 				EVAL ~leveled_opcodes_%requiredLevel%~ = leveled_opcodes
 		END
 	END
-
-	LPM ~group_identical_spell_effects_between_level~
-	LPM ~group_spell_effects_by_duration~
-	LPM ~group_spell_effects_by_parameters~
-	LPM ~group_spell_effects_by_damage~
-	//TODO: Regroupement des effets identiques entre chacun des niveaux ( a mettre dans leveled_opcodes_0 pour être géré de manière générique ?? Ca permettrait d'avoir la même chose entre ici et la version pour un niveau particulier)
-	// FIXME: SPPR729
-	// TODO: Avant de calculer les descriptions :
-	// - Regrouper les effets dont seule la durée diffère (+ déterminer la formule)
-	// - Regrouper les effets dont seul les dégâts diffèrent (+ déterminer la formule)
-	// - Pour le "à partir du niveau 1", le véritable niveau à prendre en compte pour les calculs est celui où l'on peut apprendre le sort
-	//   Ex: sort de niveau 7 = niveau 14
-	//   Donc avoir un tableau qui fait la correspondance entre niveau du sort => niveau du lanceur
-	//   et ce pour chaque type de sort (mage, prêtre, etc.)
-
-	SORT_ARRAY_INDICES level_effects NUMERICALLY
-
-	LPF ~build_spell_effects_description~ INT_VAR baseProbability forceTarget RET description totalLines END
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_effects_description_for_level~
@@ -391,6 +397,7 @@ DEFINE_PATCH_FUNCTION ~build_spell_effects_description~
 	INT_VAR
 		baseProbability = 100
 		forceTarget = 0
+		ignoreDuration = 0
 	RET
 		description
 		totalLines
@@ -410,7 +417,7 @@ BEGIN
 			END
 		END
 
-		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget RET countLines RET_ARRAY lines END
+		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
 
 		PATCH_IF countLines > 0 /*AND ~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ BEGIN

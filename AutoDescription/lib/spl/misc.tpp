@@ -163,72 +163,61 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
     PATCH_DEFINE_ARRAY levels BEGIN END
     PATCH_DEFINE_ARRAY all_durations BEGIN END
 
-	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
-	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_IF isValid == 1 BEGIN
-			READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
 			SET $levels(~%count_levels%~) = requiredLevel
 			SET count_levels += 1
-			SET delayedDuration = 0
-			GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
-			PHP_EACH offsets AS _ => offset BEGIN
-				READ_SHORT (offset) opcode
-				READ_ASCII (offset + EFF_resref_key) resref
-				PATCH_IF opcode == 177 BEGIN
-					INNER_PATCH_FILE ~%resref%.eff~ BEGIN
-						READ_SHORT EFF2_opcode opcode
-						READ_BYTE  EFF2_timing timingMode
-                        READ_LONG  EFF2_duration duration
-                        READ_ASCII EFF2_resource resref
-					END
-				END
-				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
-					PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
-						READ_LONG (offset + EFF_duration) duration
-						READ_BYTE (offset + EFF_timing_mode) timingMode
-
-		                PATCH_IF timingMode == TIMING_duration_ticks BEGIN
-		                    SET duration = duration / 15
-		                END
-						ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
-							PATCH_IF delayedDuration < duration BEGIN
-								SET delayedDuration = duration
+			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+				// Si plus petit, c'est qu'on a désactivé l'entrée lors d'une précédente opération
+				PATCH_IF opcode >= 0 BEGIN
+				    LPM ~data_to_vars~
+				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+	                    PATCH_IF opcode == 146 BEGIN
+							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+									//lire les opcodes de l'item et les ajouter dans les opcodes actuels
+								    GET_OFFSET_ARRAY offsets SPL_V10_GEN_EFFECTS
+								    PHP_EACH offsets AS _ => offset BEGIN
+									    LPM ~read_effect_vars~
+									    // Ne dure que le temps que l'arme est équipée
+									    SET duration = itemDuration
+									    SET timingMode = itemTimingMode
+								    END
+								END
 							END
-							SET duration = 0 - 1
+	                    END
+
+	                    PATCH_IF timingMode == TIMING_duration_ticks BEGIN
+	                        SET duration = duration / 15
+	                    END
+	                    ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
+	                        SET duration = 0
+	                    END
+						ELSE PATCH_IF timingMode == 5000 OR timingMode == 5001 BEGIN
+							SET duration = duration MODULO 10000
 						END
-						ELSE PATCH_IF timingMode != TIMING_duration AND timingMode != TIMING_duration_ticks BEGIN
-							SET duration = 0
-						END
+	                    ELSE PATCH_IF timingMode != TIMING_duration AND timingMode != TIMING_duration_ticks AND timingMode != TIMING_delayed_duration BEGIN
+	                        SET duration = 0
+	                    END
 
-						PATCH_IF opcode == 217 BEGIN
-							SET duration = 30
-						END
+	                    PATCH_IF opcode == 217 BEGIN
+	                        SET duration = 30
+	                    END
 
-						// FIXME: PATCH_IF opcode == 146 BEGIN // Récupérer la durée des effets lancés par le 146 !
+	                    PATCH_IF duration > 0 BEGIN
+	                        PATCH_IF base_duration == ~-1~ BEGIN
+	                            SET base_duration = duration
+	                        END
 
-						PATCH_IF duration > 0 BEGIN
-							PATCH_IF base_duration == ~-1~ BEGIN
-								SET base_duration = duration
-							END
+	                        PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
+	                            SET $all_durations(~%requiredLevel%~) = duration
+	                        END
 
-							PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
-								SET $all_durations(~%requiredLevel%~) = duration
-							END
-
-							PATCH_IF $all_durations(~%requiredLevel%~) != duration BEGIN
-								SET isValid = 0
-							END
-						END
-					END
-				END
-			END
-			PATCH_IF isValid AND delayedDuration > 0 BEGIN
-				PATCH_IF NOT VARIABLE_IS_SET $all_durations(~%requiredLevel%~) BEGIN
-					SET $all_durations(~%requiredLevel%~) = delayedDuration
-				END
-
-				PATCH_IF $all_durations(~%requiredLevel%~) != delayedDuration BEGIN
-					SET isValid = 0
+	                        PATCH_IF $all_durations(~%requiredLevel%~) != duration BEGIN
+	                            SET isValid = 0
+	                        END
+	                    END
+	                END
 				END
 			END
 		END
