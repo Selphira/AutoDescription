@@ -98,6 +98,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 19 => 106  // Stat: Intelligence Modifier [19]
 	 49 => 107  // Stat: Wisdom Modifier [49]
 	  6 => 108  // Stat: Charisma Modifier [6]
+	523 => 109  // Stat: Bonus force [523]
 
 	 22 => 110  // Stat: Luck Modifier [22]
 	133 => 111  // Spell Effect: Luck Non-Cumulative [133]
@@ -10093,6 +10094,44 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_232_group~ BEGIN
+	LPM ~opcode_232_group_mod~
+END
+
+DEFINE_PATCH_MACRO ~opcode_232_group_mod~ BEGIN
+	LOCAL_SET count = 0
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	// Skills and Abilities
+	PATCH_IF has_base_str_damage == 1 BEGIN
+		CLEAR_ARRAY positions
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND ~%resref%~ STRING_MATCHES_REGEXP ~MOSTR0[0-9]+~ == 0 BEGIN
+				SET $positions(~%resref%~) = position
+				SET count += 1
+			END
+		END
+		PATCH_IF count == 6 BEGIN
+			PATCH_PHP_EACH ~positions~ AS _ => position BEGIN
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 232 match_position = position
+                    RET $opcodes(~232~) = count
+                    RET_ARRAY EVAL ~opcodes_232~ = opcodes_xx
+                END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~232~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_232~
+	        END
+			// Création fake opcode "Le bonus aux dégâts liés à la force est augmenté de 50% (non cumulatif)"
+			SET opcode = 523
+			LPM ~add_opcode~
+		END
+	END
+	CLEAR_ARRAY positions
+END
+
 DEFINE_PATCH_MACRO ~opcode_232_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 3 BEGIN
 		SET isValid = 0
@@ -13627,6 +13666,13 @@ DEFINE_PATCH_MACRO ~opcode_target_522~ BEGIN
 	END
 	SPRINT value ~%parameter1%/%parameter2%~
 	SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+END
+
+/* ------------------------ *
+ * Stat : Bonus force [523] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_523~ BEGIN
+	SPRINT description @15230001 // ~Le bonus aux dégâts liés à la force est augmenté de 50%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN

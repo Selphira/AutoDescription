@@ -4272,6 +4272,9 @@
 
 @15210001 = ~Ne protège pas %versus%~
 
+// Fake Opcode 523: Stat : Bonus force [523]
+
+@15230001 = ~Le bonus aux dégâts liés à la force est augmenté de 50 %~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

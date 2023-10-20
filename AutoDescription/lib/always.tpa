@@ -21,6 +21,28 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
     INCLUDE ~%MOD_FOLDER%/lib/spl/extended_effects.tpp~
     INCLUDE ~%MOD_FOLDER%/lib/spl/misc.tpp~
 
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY ~base_str_damage_bonus~ BEGIN
+		  18 => 2
+		  19 => 7
+		  20 => 8
+		  21 => 9
+		  22 => 10
+		  23 => 11
+		  24 => 12
+		  25 => 14
+	END
+	OUTER_SET has_base_str_damage = 1
+	COPY_EXISTING ~strmod.2da~ ~override~
+		READ_2DA_ENTRIES_NOW strmod 5
+		FOR (row = 18; row <= 25; ++row) BEGIN
+			READ_2DA_ENTRY_FORMER strmod row 2 ~bonus~
+			PATCH_IF $base_str_damage_bonus(~%row%~) != ~%bonus%~ BEGIN
+				SET has_base_str_damage = 0
+				SET row = 26
+			END
+		END
+		BUT_ONLY_IF_IT_CHANGES
+
     INCLUDE ~%MOD_FOLDER%/lib/lib_ini.tpa~
 
 	OUTER_SPRINT ini_to_read "%MOD_FOLDER%/settings-default.ini"
