@@ -6200,13 +6200,13 @@ END
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_131~ BEGIN
 	//Statistic Modifier only reads the first byte for its value, the last 3 bytes are ignored.
-	SET parameter1 = parameter1 BAND 255
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	LPM ~opcode_self_22~  // ~Chance~
     LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_131~ BEGIN
-	SET parameter1 = parameter1 BAND 255
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	LPM ~opcode_self_probability_22~ // ~la chance~
     LPM ~opcode_not_cumulative~
 END
@@ -6218,7 +6218,7 @@ DEFINE_PATCH_MACRO ~opcode_target_131~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_131~ BEGIN
-	SET parameter1 = parameter1 BAND 255
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
     LPM ~opcode_target_probability_22~ // ~la chance~
     LPM ~opcode_not_cumulative~
 END
