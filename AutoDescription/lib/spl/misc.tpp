@@ -172,6 +172,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
 				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+				        /*
 	                    PATCH_IF opcode == 146 BEGIN
 							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
@@ -186,6 +187,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 								END
 							END
 	                    END
+	                    */
 
 	                    PATCH_IF timingMode == TIMING_duration_ticks BEGIN
 	                        SET duration = duration / 15

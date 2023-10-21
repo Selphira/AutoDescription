@@ -7866,7 +7866,12 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		WHILE ~%targetType%~ STRING_COMPARE ~~ BEGIN
 			LPF return_first_entry STR_VAR list = ~%targetType%~ RET entry targetType = list END
 			LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~:~ RET file = entry entry = list END
-			LPF ~get_ids_name~ INT_VAR entry file RET idName END
+            PATCH_IF ~%entry%~ STRING_EQUAL ~~ BEGIN
+                SPRINT idName (AT file)
+            END
+            ELSE BEGIN
+				LPF ~get_ids_name~ INT_VAR entry file RET idName END
+            END
 			PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
 				SET $targetTypes(~%idName%~) = 1
 			END
@@ -12694,7 +12699,9 @@ END
  * ------------------------ */
 // TODO : gérer 326 avec 324
 DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
-	LPM ~opcode_326_condition~
+	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ BEGIN
+		LPM ~opcode_326_condition~
+	END
 	// Protection contre les boucles infinies
 	PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
 		SET $recursive_resref(~%resref%~) = 1
@@ -12788,6 +12795,147 @@ DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
 		mo_armor_prof5 mo_con_prof5 mo_dev_prof5 mo_has_prof5 mo_spl_prof5 BEGIN SET value = 5 END
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Valeur du splprot %splprot% non geree~ END
+	END
+END
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
+	1   => ~3:004~ // ~morts-vivants~
+	3   => ~13241003~ // ~créatures immunisées au feu~ //1:001 => utiliser 2001001 complètement inventé, comme un ids!
+	4   => ~13241004~ // ~créatures sensibles au feu~
+	5   => ~3:001~ // ~humanoïdes~
+	7   => ~3:002~ // ~animaux~
+	9   => ~4:145~ // ~élémentaires~
+	11  => ~4:164~ // ~myconides~
+	13  => ~13241013~ // ~créatures gigantesques~
+	15  => ~4:002~ // ~elfes~
+	17  => ~4:130~ // ~ombres des roches~
+	19  => ~4:003~ // ~demi-elfes~
+	21  => ~3:001 4:145~ // ~humanoïdes~ ~animaux~
+	23  => ~13241023~ // ~créatures aveuglées~
+	25  => ~13241025~ // ~créatures immunisées au froid~
+	26  => ~13241026~ // ~créatures sensibles au froid~
+	27  => ~4:144~ // ~golems~
+	29  => ~4:171~ // ~minotaures~
+	31  => ~3:004 4:164~ // ~morts-vivants~ ~myconides~
+	33  => ~13241033~ // ~créatures neutres~
+	34  => ~13241034~ // ~créatures bonnes ou mauvaises~
+	35  => ~13241035~ // ~créatures bonnes~
+	36  => ~13241036~ // ~créatures neutres ou mauvaises~
+	37  => ~13241037~ // ~créatures mauvaises~
+	38  => ~13241038~ // ~créatures neutres ou bonnes~
+	39  => ~5:006~ // ~paladins~
+	41  => ~13241041~ // ~créatures du même alignement que le porteur~
+	42  => ~13241042~ // ~créatures d'un alignement différent du porteur~
+	43  => ~12320200~ // ~le porteur~
+	44  => ~13241044~ // ~créatures autre que le porteur~
+	45  => ~4:152~ // ~githyankis~
+	47  => ~4:144 3:004 4:164~ // ~golems~ ~morts-vivants~ ~myconides~
+	49  => ~2:028~ // ~créatures alliées~
+	51  => ~2:200~ // ~créatures hostiles~
+	53  => ~13241053~ // ~créatures immunisées au feu ou au froid~
+	54  => ~13241054~ // ~créatures sensibles au feu ou au froid~
+	55  => ~3:004 4:144~ // ~morts-vivants~ ~golems~
+	57  => ~13241057~ // ~créatures masculines~
+	58  => ~13241058~ // ~créatures féminines~
+	64  => ~4:143~ // ~orques~
+	66  => ~13241066~ // ~créatures sourdes~
+	68  => ~13241068~ // ~créatures sous l'effet d'un toucher de la goule~
+	74  => ~13241074~ // ~créatures mortes~
+	77  => ~13241077~ // ~créatures immunisées aux poisons~
+	78  => ~13241078~ // ~créatures sensibles aux poisons~
+	79  => ~13241079~ // ~créatures immunisées à l'acide~
+	80  => ~13241080~ // ~créatures sensibles à l'acide~
+	81  => ~13241081~ // ~créatures immunisées à l'électricité~
+	82  => ~13241082~ // ~créatures sensibles à l'électricité~
+	83  => ~13241083~ // ~créatures immunisées aux dégâts magiques~
+	84  => ~13241084~ // ~créatures sensibles aux dégâts magiques~
+	85  => ~4:101~ // ~ankhegs~
+	87  => ~4:150~ // ~liches~
+	91  => ~13241091~ // ~créatures paniquées~
+	119 => ~3:001 3:002~ // ~humanoïdes~ ~animaux~
+	120 => ~13241120~ // ~créatures protégées contre les morts-vivants~
+	122 => ~13241122~ // ~créatures possédant une dextérité supérieure ou égale à %value%~
+	123 => ~13241123~ // ~créatures possédant une dextérité inférieure à %value%~
+	124 => ~13241124~ // ~créatures possédant une force supérieure ou égale à %value%~
+	125 => ~13241125~ // ~créatures possédant une force inférieure à %value%~
+	126 => ~13241126~ // ~créatures possédant une constitution supérieure ou égale à %value%~
+	127 => ~13241127~ // ~créatures possédant une constitution inférieure à %value%~
+	128 => ~13241128~ // ~créatures possédant une intelligence supérieure ou égale à %value%~
+	129 => ~13241129~ // ~créatures possédant une intelligence inférieure à %value%~
+	130 => ~13241130~ // ~créatures possédant une sagesse supérieure ou égale à %value%~
+	131 => ~13241131~ // ~créatures possédant une sagesse inférieure à %value%~
+	132 => ~13241132~ // ~créatures possédant un charisme supérieur ou égal à %value%~
+	133 => ~13241133~ // ~créatures possédant un charisme inférieur à %value%~
+	138 => ~13241138~ // ~créatures %descriptionState%~
+	140 => ~13241140~ // ~créatures sous l'effet d'une invisibilité~
+	141 => ~13241141~ // ~créatures sous l'effet d'une invisibilité améliorée~
+	142 => ~13241142~ // ~créatures invisibles~
+	144 => ~13241144~ // ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
+	145 => ~13241145~ // ~créatures dont les points de vie sont inférieurs à %value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
+	PATCH_DEFINE_ARRAY target_types BEGIN END
+	PATCH_DEFINE_ARRAY positions BEGIN END
+	PATCH_DEFINE_ARRAY counts BEGIN END
+
+	CLEAR_ARRAY identifiants
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY counts
+
+	// Regroupement des conditions du style "Si la cible fait partie des xxx" et "Si la cible est un xxx" qui poitent vers une même ressource
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF VARIABLE_IS_SET $opcode_326_targets(~%parameter2%~) BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET $counts(~%resref%~) BEGIN
+				SET $counts(~%resref%~) = 0
+				SPRINT $positions(~%resref%~) ~~
+				SPRINT $target_types(~%resref%~) ~~
+			END
+			SPRINT tmp_new_target_types $opcode_326_targets(~%parameter2%~)
+			SPRINT tmp_positions $positions(~%resref%~)
+			SPRINT tmp_target_types $target_types(~%resref%~)
+			SPRINT $positions(~%resref%~) ~%tmp_positions% %position%~
+			SPRINT $target_types(~%resref%~) ~%tmp_target_types% %tmp_new_target_types%~
+			SET $counts(~%resref%~) = $counts(~%resref%~) + 1
+		END
+		ELSE PATCH_IF parameter2 >= 102 AND parameter2 <= 109 BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET $counts(~%resref%~) BEGIN
+				SET $counts(~%resref%~) = 0
+				SPRINT $positions(~%resref%~) ~~
+				SPRINT $target_types(~%resref%~) ~~
+			END
+			SET idsId = parameter2 - 100
+			LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
+			SPRINT tmp_new_target_types ~%idsId%:%string%~
+			SPRINT tmp_positions $positions(~%resref%~)
+			SPRINT tmp_target_types $target_types(~%resref%~)
+			SPRINT $positions(~%resref%~) ~%tmp_positions% %position%~
+			SPRINT $target_types(~%resref%~) ~%tmp_target_types% %tmp_new_target_types%~
+			SET $counts(~%resref%~) = $counts(~%resref%~) + 1
+		END
+	END
+
+	PATCH_PHP_EACH EVAL ~counts~ AS resref => count BEGIN
+		PATCH_IF count > 1 BEGIN
+			SPRINT tmp_positions $positions(~%resref%~)
+			WHILE NOT ~%tmp_positions%~ STRING_EQUAL ~~ BEGIN
+				LPF return_first_entry STR_VAR list = ~%tmp_positions%~ RET position=entry EVAL tmp_positions = list END
+				LPF ~delete_opcode~
+                    INT_VAR opcode = 326 match_position = position
+                    RET $opcodes(~326~) = count
+                    RET_ARRAY EVAL ~opcodes_326~ = opcodes_xx
+                END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~326~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_326~
+	        END
+			SET opcode = 326
+            SPRINT target_type $target_types(~%resref%~)
+            LPM ~add_opcode~
+		END
 	END
 END
 
@@ -13108,6 +13256,16 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+
+	INNER_PATCH_SAVE tmp_description ~%description%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~~
+	END
+    PATCH_IF NOT ~%description%~ STRING_EQUAL ~%tmp_description%~ AND ~%description%~ STRING_MATCHES_REGEXP ~^%crlf%~ == 1 BEGIN
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+		END
+		SPRINT description ~%crlf%  - %description%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_341_is_valid~ BEGIN

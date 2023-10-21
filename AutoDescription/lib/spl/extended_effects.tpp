@@ -250,7 +250,7 @@ BEGIN
             END
 			PATCH_IF totalLines == 1 BEGIN
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
-		            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~~
+		            REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
 		        END
 	        END
 			ELSE PATCH_IF totalLines > 1 BEGIN
