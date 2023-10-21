@@ -10578,6 +10578,65 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_248~ BEGIN
 	LPM ~opcode_self_probability_248~
 END
 
+DEFINE_PATCH_MACRO ~opcode_248_group~ BEGIN
+	PATCH_PRINT "opcode_248_group"
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPF ~get_opcode_position~
+			INT_VAR opcode  = 249
+	            match_isExternal   = isExternal
+	            match_target       = target
+		        match_power        = power
+		        match_parameter3   = parameter3
+		        match_parameter4   = parameter4
+		        match_timingMode   = timingMode
+		        match_resistance   = resistance
+				match_duration     = duration
+		        match_probability  = probability
+		        match_probability1 = probability1
+		        match_probability2 = probability2
+		        match_diceCount    = diceCount
+		        match_diceSides    = diceSides
+		        match_saveType     = saveType
+		        match_saveBonus    = saveBonus
+		        match_special      = special
+		        match_custom_int   = custom_int
+			STR_VAR
+				match_resref     = ~%resref%~
+				match_resref2    = ~%resref2%~
+				match_resref3    = ~%resref3%~
+				match_custom_str = ~%custom_str%~
+				match_macro      = ~opcode_match_except_parameter1_and_parameter2~
+			RET opcodePosition = position
+		END
+		PATCH_IF opcodePosition >= 0 BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode match_position = position
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+			LPF ~delete_opcode~
+				INT_VAR opcode = 249 match_position = opcodePosition
+				RET $opcodes(~249~) = count
+				RET_ARRAY ~opcodes_249~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~249~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_249~
+	        END
+
+	        SET opcode = 524
+	        LPM ~add_opcode~
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
 	SET abilityType = AbilityType_Combat
 	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
@@ -13853,6 +13912,28 @@ END
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_523~ BEGIN
 	SPRINT description @15230001 // ~Le bonus aux dégâts liés à la force est augmenté de 50%~
+END
+
+/* --------------------------------------- *
+ * Item: Set Melee and Ranged Effect [524] *
+ * --------------------------------------- */
+DEFINE_PATCH_MACRO ~opcode_self_524~ BEGIN
+	SET strref = 15240001 // ~À chaque attaque réussie: %description%~
+	LPM ~opcode_248_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_524~ BEGIN
+	SET strref = 15240003 // ~par attaque réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_524~ BEGIN
+	SET strref = 15240002 // ~À chaque attaque réussie par %theTarget%: %description%~
+	LPM ~opcode_248_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_524~ BEGIN
+	LPM ~opcode_self_probability_524~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN

@@ -4274,6 +4274,12 @@
 
 @15230001 = ~Strength damage bonus increased by 50%~
 
+// Fake Opcode 524: Item: Set Melee and Ranged Effect
+
+@15240001 = ~À chaque attaque réussie: %description%~
+@15240002 = ~À chaque attaque réussie par %theTarget%: %description%~
+@15240003 = ~par attaque réussie par %theTarget%: %description%~
+
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ //
