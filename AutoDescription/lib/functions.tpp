@@ -54,7 +54,7 @@ DEFINE_PATCH_FUNCTION ~get_tooltip~ INT_VAR index = 0 STR_VAR resource = ~~ RET 
 	SPRINT tooltip ~~
 	SPRINT strref $tra_tooltips(~%resource%~ ~%index%~)
 
-	PATCH_IF IS_AN_INT strref  BEGIN
+	PATCH_IF IS_AN_INT strref AND strref > 0 BEGIN
 		GET_STRREF strref tooltip
 	END
 END
