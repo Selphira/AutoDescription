@@ -13567,15 +13567,15 @@ END
  * Stat: Caractéristiques [501] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_501~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 15010001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Caractéristiques~
+	LPF ~opcode_mod~ INT_VAR strref = 15010001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Caractéristiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_501~ BEGIN
-	LPF ~opcode_probability_percent~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
+	LPF ~opcode_probability~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_501~ BEGIN
-	LPF ~opcode_target_percent~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
+	LPF ~opcode_target~ INT_VAR strref = 15010002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~les caractéristiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_501~ BEGIN
