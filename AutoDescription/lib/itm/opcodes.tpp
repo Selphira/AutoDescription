@@ -10580,7 +10580,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND (parameter2 BAND 4) BEGIN // Attaque au poing
@@ -10594,33 +10594,55 @@ DEFINE_PATCH_MACRO ~opcode_248_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_FUNCTION ~get_res_description_248~ INT_VAR resetTarget = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
+	INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+		SET isExternal = 1
+		SET diceSides248 = diceSides // levelMin
+		SET diceCount248 = diceCount // levelMax
+
+		LPM ~read_external_effect_vars~
+
+		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			SET isValid = 1
+			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+			// La restriction de niveau dépend de celle de l'opcode 248, excepté pour les opcodes qui n'en ont pas
+			PATCH_IF NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0) BEGIN
+				SET diceSides = diceSides248
+				SET diceCount = diceCount248
+			END
+			LPM ~opcode_is_valid~
+
+			PATCH_IF isValid == 1 BEGIN
+				LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
+			END
+		END
+	END
+END
+
 /* ----------------------------- *
  * Item: Set Ranged Effect [249] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_249~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12490001 // ~À chaque attaque à distance réussie: %description%~
-	END
+	SET strref = 12490001 // ~À chaque attaque à distance réussie: %description%~
+	LPM ~opcode_249_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_249~ BEGIN
-	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12490003 // ~par attaque à distance réussie par %theTarget%: %description%~
-	END
+	SET strref = 12490003 // ~par attaque à distance réussie par %theTarget%: %description%~
+	LPM ~opcode_249_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_249~ BEGIN
+	SET strref = 12490002 // ~À chaque attaque à distance réussie par %theTarget%: %description%~
+	LPM ~opcode_249_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_249_common~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12490002 // ~À chaque attaque à distance réussie par %theTarget%: %description%~
+		SPRINT description (AT strref)
 	END
 END
 

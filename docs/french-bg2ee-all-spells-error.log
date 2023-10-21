@@ -1,10 +1,6 @@
 
 OHBPR608.SPL : Opcode 111: Resource key is empty.
 OHTYR1.SPL : Opcode 321 : no sppr422.spl or sppr422.itm found
-SPCL909.SPL : Opcode 235: has no effect : levelMin (10) > levelMax (2) 
-SPCL909.SPL : Opcode 45: has no effect : levelMin (10) > levelMax (2) 
-SPCL909.SPL : Opcode 235: has no effect : levelMin (10) > levelMax (2) 
-SPCL909.SPL : Opcode 45: has no effect : levelMin (10) > levelMax (2) 
 SPIN530.SPL : Opcode 173 : No change detected Value = Value + 0.
 SPIN853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPIN853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
