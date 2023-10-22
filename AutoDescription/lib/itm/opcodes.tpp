@@ -9283,6 +9283,9 @@ BEGIN
 					SPRINT spells ~%spells%%crlf%%spellName%~
 				END
 			END
+			ELSE BEGIN
+				LPF ~add_log_error~ STR_VAR message = ~Opcode %opcode% : File %resref%.spl not found~ END
+			END
 		END
 	END
 
