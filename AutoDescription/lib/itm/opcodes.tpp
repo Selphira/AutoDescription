@@ -14177,7 +14177,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 	LOCAL_SET value = parameter1
 
-	PATCH_IF parameter2 == MOD_TYPE_flat AND value >= 100 BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_flat AND value == 100 BEGIN
 		SET resistName += 1
 		SPRINT resistName (AT resistName)
 		SPRINT description @102547 // ~Immunité %resistName%~
