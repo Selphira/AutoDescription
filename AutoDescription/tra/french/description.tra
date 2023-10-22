@@ -3253,6 +3253,15 @@
 @12360007 = ~de créer une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~
 @12360008 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~
 
+@12360011 = ~Crée %amount% clones %ofTheTarget% possédant le même nombre de points de vie~
+@12360012 = ~Crée %amount% images %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~
+@12360013 = ~Crée %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~
+@12360014 = ~Crée %amount% simulacres %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~
+@12360015 = ~de créer %amount% clones %ofTheTarget% possédant le même nombre de points de vie~
+@12360016 = ~de créer %amount% images %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~
+@12360017 = ~de créer %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~
+@12360018 = ~de créer %amount% simulacres %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~
+
 // Opcode 238: Death: Disintegrate [238]
 
 

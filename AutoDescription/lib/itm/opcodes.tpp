@@ -10311,12 +10311,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_236~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_236_common~ BEGIN
-	LOCAL_SET type = parameter2
+	LOCAL_SET type   = parameter2
+	LOCAL_SET amount = custom_int
 
 	PATCH_IF type > 3 OR type < 0 BEGIN
 		SET type = 0
 	END
 	SET strref += type
+
+	PATCH_IF amount > 1 BEGIN
+		SET strref += 10
+	END
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
@@ -10587,7 +10592,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_248~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_248_group~ BEGIN
-	PATCH_PRINT "opcode_248_group"
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		LPF ~get_opcode_position~
