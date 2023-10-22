@@ -10847,7 +10847,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_259~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_259_common~ BEGIN
-	LPM ~opcode_223_common~
+	LOCAL_SET amount = parameter1
+	LOCAL_SET spellLevel = parameter2
+	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
+	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
 
 DEFINE_PATCH_MACRO ~opcode_259_is_valid~ BEGIN
