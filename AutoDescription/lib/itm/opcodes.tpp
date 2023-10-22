@@ -1076,9 +1076,9 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 	    END
 
 		INNER_PATCH_SAVE value ~%value%~ BEGIN
+			REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
 			REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
 			REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
-			REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
 		END
 	END
 
