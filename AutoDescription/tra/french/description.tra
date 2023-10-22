@@ -139,6 +139,7 @@
 @600173 = ~points de dégâts~
 
 @102677 = ~usage unique~
+@102678 = ~usage illimité~
 //@102677 = ~%charges% charge, l'objet est détruit quand la charge est utilisée~
 @102550 = ~Créature inconnue~
 @102551 = ~Sort inconnu~
@@ -4241,13 +4242,13 @@
 // Fake Opcode 510: Spell: Restore Lost Spells (cumulative) [510]
 
 @15100001 = ~Se remémore 1 sort %spellType% de chaque niveau~
-@15100002 = ~Se remémore 1 sort %spellType% de niveau %spellLevel%~
+@15100002 = ~Se remémore 1 sort %spellType% de %spellLevel% niveau~
 @15100003 = ~Remet en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
-@15100004 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@15100004 = ~Remet en mémoire 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~
 @15100005 = ~de se remémorer 1 sort %spellType% de chaque niveau~
-@15100006 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
+@15100006 = ~de se remémorer 1 sort %spellType% de %spellLevel% niveau~
 @15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
-@15100008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@15100008 = ~de remettre en mémoire 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~
 
 // Fake Opcode 511: Dissipe toutes les illusions
 

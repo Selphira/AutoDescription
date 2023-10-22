@@ -18,7 +18,7 @@ BEGIN
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
 		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
 
-		PATCH_IF charges > 0 BEGIN
+		PATCH_IF charges > 0 OR location == 3 BEGIN
 			LPF ~load_charged_abilities~ INT_VAR headerOffset index = headerIndex RET EVAL ~countLines%countHeaders%~ = countLines isGlobalDuration globalDuration globalTimingMode RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
 			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%depletion%~ ~%charges%~) = 1
 
@@ -212,6 +212,9 @@ BEGIN
     PATCH_IF depletion == 1 BEGIN
         PATCH_IF charges == 1 BEGIN
 			SPRINT chargeStr @102677 // ~usage unique~
+        END
+        ELSE PATCH_IF charges == 0 BEGIN
+			SPRINT chargeStr @102678 // ~usage illimité~
         END
         ELSE BEGIN
 			SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~

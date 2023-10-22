@@ -33,6 +33,7 @@ BEGIN
 		READ_SHORT (headerOffset + ITM_HEAD_flags) flags
 
 		PATCH_IF charges == 0
+			AND location != 3 // Equipment / Item
 			AND NOT (attackType == ITM_ATTACK_TYPE_projectile AND (hasProjectile == 1 OR hasLauncher == 1))
 			AND NOT (attackType == ITM_ATTACK_TYPE_launcher AND (hasLauncher == 1 OR hasProjectile == 1))
 		BEGIN

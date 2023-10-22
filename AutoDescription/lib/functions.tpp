@@ -25,6 +25,32 @@ BEGIN
 END
 
 /* ============================================================== *
+ * Retourne un tableau contenant la liste de tous les sorts       *
+ * ajoutés ou modifiés par un mod                                 *
+ * ============================================================== */
+DEFINE_ACTION_FUNCTION ~getSpellsFromOtherMod~
+	STR_VAR
+		directory = ~~
+	RET_ARRAY
+		splFiles
+BEGIN
+	GET_DIRECTORY_ARRAY $directories(~%directory%~) ~%directory%~ ~~
+	GET_FILE_ARRAY files ~%directory%~ ~^.+\.spl$~
+
+	ACTION_PHP_EACH files AS k => vFile BEGIN
+		OUTER_INNER_PATCH_SAVE vFile ~%vFile%~ BEGIN
+			REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^.*/~ ~~
+		END
+
+		OUTER_SPRINT $splFiles(~%vFile%~) ~~
+	END
+
+	ACTION_PHP_EACH $directories(~%directory%~) AS k => vDirectory BEGIN
+        LAF getSpellsFromOtherMod STR_VAR directory = EVAL ~%vDirectory%~ RET_ARRAY splFiles END
+	END
+END
+
+/* ============================================================== *
  * Retourne la chaîne correspondant à la variable strref.         *
  * Si la traduction n'existe pas, une entrée de log est créée.    *
  * ============================================================== */
