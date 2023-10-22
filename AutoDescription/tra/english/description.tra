@@ -2011,6 +2011,12 @@
 @10420004 = ~Delete %amount% wizard spells of %levelStr% level~
 @10420005 = ~Double the number of wizard spells of %levelStr% level that can be memorized~
 
+@10420011 = ~de pouvoir mémoriser un sort profane supplémentaire de %levelStr% niveau~
+@10420012 = ~de pouvoir mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
+@10420013 = ~de supprimer un sort profane de %levelStr% niveau~
+@10420014 = ~de supprimer %amount% sorts profanes de %levelStr% niveau~
+@10420015 = ~de doubler le nombre de sorts profanes mémorisables de %levelStr% niveau~
+
 // Opcode 43: Cure: Stone to Flesh [43]
 
 @10430001 = ~Stone to Flesh~
@@ -2100,6 +2106,12 @@
 @10620003 = ~Remove a priest spell of %levelStr% level~
 @10620004 = ~Delete %amount% priest spells of %levelStr% level~
 @10620005 = ~Double the number of priest spells of %levelStr% level that can be memorized~
+
+@10620011 = ~de pouvoir mémoriser un sort divin supplémentaire de %levelStr% niveau~
+@10620012 = ~de pouvoir mémoriser %amount% sorts divins supplémentaires de %levelStr% niveau~
+@10620013 = ~de supprimer un sort divin de %levelStr% niveau~
+@10620014 = ~de supprimer %amount% sorts divins de %levelStr% niveau~
+@10620015 = ~de doubler le nombre de sorts divins mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
 

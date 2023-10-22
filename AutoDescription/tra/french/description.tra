@@ -2011,6 +2011,12 @@
 @10420004 = ~Suppression de %amount% sorts profanes de %levelStr% niveau~
 @10420005 = ~Double le nombre de sorts profanes mémorisables de %levelStr% niveau~
 
+@10420011 = ~de pouvoir mémoriser un sort profane supplémentaire de %levelStr% niveau~
+@10420012 = ~de pouvoir mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
+@10420013 = ~de supprimer un sort profane de %levelStr% niveau~
+@10420014 = ~de supprimer %amount% sorts profanes de %levelStr% niveau~
+@10420015 = ~de doubler le nombre de sorts profanes mémorisables de %levelStr% niveau~
+
 // Opcode 43: Cure: Stone to Flesh [43]
 
 @10430001 = ~Transmutation de la pierre en chair~
@@ -2100,6 +2106,12 @@
 @10620003 = ~Suppression d'un sort divin de %levelStr% niveau~
 @10620004 = ~Suppression de %amount% sorts divins de %levelStr% niveau~
 @10620005 = ~Double le nombre de sorts divins mémorisables de %levelStr% niveau~
+
+@10620011 = ~de pouvoir mémoriser un sort divin supplémentaire de %levelStr% niveau~
+@10620012 = ~de pouvoir mémoriser %amount% sorts divins supplémentaires de %levelStr% niveau~
+@10620013 = ~de supprimer un sort divin de %levelStr% niveau~
+@10620014 = ~de supprimer %amount% sorts divins de %levelStr% niveau~
+@10620015 = ~de doubler le nombre de sorts divins mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
 

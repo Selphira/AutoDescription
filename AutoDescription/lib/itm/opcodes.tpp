@@ -2717,6 +2717,14 @@ DEFINE_PATCH_MACRO ~opcode_self_42~ BEGIN
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10420001 RET description END
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_42~ BEGIN
+	LOCAL_SET amount = parameter1
+	LOCAL_SET level = parameter2
+	LOCAL_SET spellLevelMax = 9
+
+	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10420011 RET description END
+END
+
 DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 	LOCAL_SET initOpcode = opcode
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
@@ -3314,6 +3322,14 @@ DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET spellLevelMax = 7
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620001 RET description END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_62~ BEGIN
+	LOCAL_SET amount = parameter1
+	LOCAL_SET level = parameter2
+	LOCAL_SET spellLevelMax = 9
+
+	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620011 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_62_group~ BEGIN
