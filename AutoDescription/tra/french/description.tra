@@ -1063,7 +1063,7 @@
 @400241 = ~aux charmes~
 @400242 = ~à la dissipation de la confusion~
 @400243 = ~à la perte de charge des objets magiques~
-@400244 = ~à l'oubli de sorts profanes~
+@400244 = ~au drain de sorts profanes~
 //@400245 = ~~ // TODO
 @400246 = ~aux bonus de la folie du berserker~
 @400247 = ~à la modification de l'état de la folie du berserker~
@@ -3300,10 +3300,10 @@
 
 // Opcode 244: Spell: Drain Wizard Spell [244]
 
-@12440001 = ~Supprime 1 sort profane de la mémoire %ofTheTarget%~
-@12440002 = ~Supprime %amount% sorts profanes de la mémoire %ofTheTarget%~
-@12440003 = ~de supprimer 1 sort profane de la mémoire %ofTheTarget%~
-@12440004 = ~de supprimer %amount% sorts profanes de la mémoire %ofTheTarget%~
+@12440001 = ~Draine 1 sort profane de la mémoire %ofTheTarget%~
+@12440002 = ~Draine %amount% sorts profanes de la mémoire %ofTheTarget%~
+@12440003 = ~de drainer 1 sort profane de la mémoire %ofTheTarget%~
+@12440004 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~
 
 // Opcode 245: Check For Berserk [245]
 
