@@ -14886,6 +14886,7 @@ DEFINE_PATCH_MACRO ~group_opcode_with_same_parameters~ BEGIN
 			SET opcode = newOpcode
             LPM ~add_opcode~
 		END
+		SET opcode = currentOpcode
 	END
 
 	CLEAR_ARRAY listOpcodes
