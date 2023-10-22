@@ -22,7 +22,7 @@ BEGIN
 		SET $lines(~-2~ ~0~ ~100~ ~0~ ~99~ ~%effectDescription%~) = 1
 	END
 
-	PATCH_IF itemType == ITM_TYPE_helm BEGIN
+	PATCH_IF is_ee BEGIN // TODO: OR has_tobex
 		PATCH_IF ((flags BAND BIT25) == 0 AND itemType == ITM_TYPE_helm) OR ((flags BAND BIT25) == BIT25 AND itemType != ITM_TYPE_helm) BEGIN
 			SET countLines += 1
 			SPRINT effectDescription @102679 // ~Protection contre les coups critiques~
