@@ -10300,7 +10300,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_235~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_235_common~ BEGIN
-	SET strref += parameter2
+	SET strref += parameter2 > 4 ? 1 : parameter2
     LPF ~feets_to_meters~ INT_VAR range = parameter1 RET range = rangeToMeter END
 	SPRINT description (AT strref)
 END
