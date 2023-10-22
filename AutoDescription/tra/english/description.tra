@@ -3231,8 +3231,14 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Knock down %theTarget%~ // TODO: Trouver une autre tournure pour "Wing buffet" ?
-@12350002 = ~to knock down %theTarget%~
+@12350001 = ~Repousse %theTarget% à %range% de l'endroit visé~
+@12350002 = ~Repousse %theTarget% à %range% %ofTheSource%~
+@12350003 = ~Attire %theTarget% de %range% vers l'endroit visé~
+@12350004 = ~Attire %theTarget% de %range% vers %theSource%~
+@12350005 = ~de repousser %theTarget% à %range% %ofTheSource%~
+@12350006 = ~de repousser %theTarget% à %range% de l'endroit visé~
+@12350007 = ~d'attirer %theTarget% de %range% vers %theSource%~
+@12350008 = ~d'attirer %theTarget% de %range% vers l'endroit visé~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 

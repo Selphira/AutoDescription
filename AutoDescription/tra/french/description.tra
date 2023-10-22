@@ -2692,7 +2692,7 @@
 @11440004 = ~%action% l'utilisation du premier sort rapide~
 @11440005 = ~%action% l'utilisation du second sort rapide~
 @11440006 = ~%action% l'utilisation du troisième sort rapide~
-@11440007 = ~%action% l'utilisation de repousser les morts-vivants~
+@11440007 = ~%action% l'utilisation de Repousser les morts-vivants~
 @11440008 = ~%action% l'utilisation des discussions~
 @11440009 = ~%action% l'utilisation des objets~
 @11440010 = ~%action% l'utilisation du premier objet rapide~
@@ -2711,7 +2711,7 @@
 @11440024 = ~%action% d'utiliser le premier sort rapide~
 @11440025 = ~%action% d'utiliser le second sort rapide~
 @11440026 = ~%action% d'utiliser le troisième sort rapide~
-@11440027 = ~%action% d'utiliser repousser les morts-vivants~
+@11440027 = ~%action% d'utiliser Repousser les morts-vivants~
 @11440028 = ~%action% d'utiliser les discussions~
 @11440029 = ~%action% d'utiliser les objets~
 @11440030 = ~%action% d'utiliser le premier objet rapide~
@@ -3233,8 +3233,14 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Renverse et sonne %theTarget%~ // TODO: Trouver une autre tournure pour "Wing buffet" ?
-@12350002 = ~de renverser et sonner %theTarget%~
+@12350001 = ~Repousse %theTarget% à %range% de l'endroit visé~
+@12350002 = ~Repousse %theTarget% à %range% %ofTheSource%~
+@12350003 = ~Attire %theTarget% de %range% vers l'endroit visé~
+@12350004 = ~Attire %theTarget% de %range% vers %theSource%~
+@12350005 = ~de repousser %theTarget% à %range% %ofTheSource%~
+@12350006 = ~de repousser %theTarget% à %range% de l'endroit visé~
+@12350007 = ~d'attirer %theTarget% de %range% vers %theSource%~
+@12350008 = ~d'attirer %theTarget% de %range% vers l'endroit visé~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 

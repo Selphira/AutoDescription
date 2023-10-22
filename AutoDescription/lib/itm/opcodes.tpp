@@ -10266,19 +10266,27 @@ END
  * Spell Effect: Wing Buffet [235] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_235~ BEGIN
-	SPRINT description @12350001 // ~Renverse et sonne %theTarget%~
+	LOCAL_SET strref = 12350000
+	LPM ~opcode_235_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_235~ BEGIN
-	SPRINT description @12350002 // ~de renverser et sonner %theTarget%~
+	LOCAL_SET strref = 12350004
+	LPM ~opcode_235_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_235~ BEGIN
-	LPM ~opcode_self_235~ // ~Renverse et sonne %theTarget%~
+	LPM ~opcode_self_235~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_235~ BEGIN
-	LPM ~opcode_self_probability_235~ // ~de renverser et sonner %theTarget%~
+	LPM ~opcode_self_probability_235~
+END
+
+DEFINE_PATCH_MACRO ~opcode_235_common~ BEGIN
+	SET strref += parameter2
+    LPF ~feets_to_meters~ INT_VAR range = parameter1 RET range = rangeToMeter END
+	SPRINT description (AT strref)
 END
 
 /* ------------------------------------ *

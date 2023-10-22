@@ -81,6 +81,18 @@ DEFINE_PATCH_FUNCTION ~get_item_description~
 BEGIN
 	SET isItem = 1
 	SET isSpell = 0
+
+	PATCH_IF itemType == ITM_TYPE_potion BEGIN
+		SPRINT theSource   @102451 // ~le buveur~
+		SPRINT ofTheSource @102452 // ~du buveur~
+		SPRINT toTheSource @102453 // ~au buveur~
+	END
+	ELSE BEGIN
+		SPRINT theSource   @102472 // ~le porteur~
+		SPRINT ofTheSource @101086 // ~du porteur~
+		SPRINT toTheSource @101180 // ~au porteur~
+	END
+
 	// On supprime la description technique de la description originale
 	LPF ~removeTechnicalDescription~ STR_VAR description = EVAL ~%originalDescription%~ RET description END
 	LPF ~is_weapon~ INT_VAR itemType RET isWeapon END

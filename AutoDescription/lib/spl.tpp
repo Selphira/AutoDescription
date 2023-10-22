@@ -69,6 +69,10 @@ BEGIN
 	SET isRobe = 0
 	SET isAmmo = 0
 
+	SPRINT theSource   @102475 // ~le lanceur~
+	SPRINT ofTheSource @102476 // ~du lanceur~
+	SPRINT toTheSource @102477 // ~au lanceur~
+
 	LPM ~load_level_effects~
 
 	READ_LONG  SPL_extended_headers_offset headerOffset
