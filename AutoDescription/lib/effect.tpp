@@ -317,7 +317,7 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 					END
 				END
 
-				// Ensuite on récupère tous les effets qui se trouvent dans le range caclulé
+				// Ensuite on récupère tous les effets qui se trouvent dans le range calculé
 				// En cas de chevauchement, un même effet se retrouvera dans plusieurs groupes de range.
 				PATCH_IF range_low <= range_high BEGIN
 					LPF ~get_range_key~ INT_VAR probability1 = range_high probability2 = range_low RET range = rangeKey END
@@ -785,6 +785,7 @@ BEGIN
 		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
+			SET thisOpcode = opcode
 			PATCH_IF probability >= 100 BEGIN
 				SPRINT method ~opcode%opcode_target%_%opcode%~
 				LPM ~%method%~
@@ -799,6 +800,7 @@ BEGIN
 					SPRINT description @101125 // ~%probability% de chances %description%~
 				END
 			END
+			SET opcode = thisOpcode
 
 			LPM ~add_condition~
 			LPM ~add_duration~

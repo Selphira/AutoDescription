@@ -10487,10 +10487,10 @@ DEFINE_PATCH_MACRO ~opcode_self_244~ BEGIN
 	LOCAL_SET amount = parameter1
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12440001 // ~Supprime 1 sort profane de la mémoire %ofTheTarget%~
+		SPRINT description @12440001 // ~Draine 1 sort profane de la mémoire %ofTheTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @12440002 // ~Supprime %amount% sorts profanes de la mémoire %ofTheTarget%~
+		SPRINT description @12440002 // ~Draine %amount% sorts profanes de la mémoire %ofTheTarget%~
 	END
 END
 
@@ -10498,10 +10498,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_244~ BEGIN
 	LOCAL_SET amount = parameter1
 
 	PATCH_IF amount == 1 BEGIN
-		SPRINT description @12440003 // ~de supprimer 1 sort profane de la mémoire %ofTheTarget%~
+		SPRINT description @12440003 // ~de drainer 1 sort profane de la mémoire %ofTheTarget%~
 	END
 	ELSE BEGIN
-		SPRINT description @12440004 // ~de supprimer %amount% sorts profanes de la mémoire %ofTheTarget%~
+		SPRINT description @12440004 // ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~
 	END
 END
 
@@ -10872,6 +10872,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_259_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET spellLevel = parameter2
+	//TODO: Prise en compte de power, qui décrémente le bouclier d'une valeur qui peut être différente dui niveau de sort.
 	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 END
@@ -10881,6 +10882,55 @@ DEFINE_PATCH_MACRO ~opcode_259_is_valid~ BEGIN
 	PATCH_IF parameter2 > 9 OR parameter2 < 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Power Level: %parameter2% (0-9 expected)~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_259_group~ BEGIN
+	LOCAL_SET maxLevel = 0
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY positions_already_check
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		CLEAR_ARRAY positions
+		SET $positions(~%position%~) = 1
+		SET maxLevel = parameter2
+		SET grouped = 0
+		PATCH_IF probability == 100 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			SET $positions_already_check(~%position%~) = 1
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+					LPM ~opcode_match_opcode_259_group~
+					PATCH_IF match == 1 BEGIN
+						PATCH_IF maxLevel < match_parameter2 BEGIN
+							SET maxLevel = match_parameter2
+						END
+						SET $positions(~%match_position%~) = 1
+						SET $positions_already_check(~%match_position%~) = 1
+						SET grouped = 1
+					END
+				END
+			END
+		END
+		PATCH_IF grouped == 1 BEGIN
+			PATCH_PHP_EACH positions AS position => _ BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        SET parameter2 = maxLevel
+	        LPM ~add_opcode~
+		END
 	END
 END
 
@@ -10939,11 +10989,14 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 	LOCAL_SET initOpcode = opcode
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY positions_already_check
 
 	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET newP1 = 0b0
 		CLEAR_ARRAY positions
+		SET $positions_already_check(~%position%~) = 1
 		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
@@ -10954,6 +11007,7 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 				// P2 retiré
 				LPF ~get_opcode_position~
 					INT_VAR opcode
+			            match_position     = position
 			            match_target       = target
 				        match_parameter2   = parameter2
 				        match_power        = power
@@ -10966,12 +11020,14 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 				        match_diceSides    = diceSides
 				        match_saveType     = saveType
 				        match_saveBonus    = saveBonus
-					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~
+					STR_VAR match_macro = ~opcode_match_not_position_and_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~
 					RET opcodePosition = position
 				END
-				SET $positions(~%opcodePosition%~) = initOpcode
-				SET parameter = parameter1 - 1
-				SET newP1 |= ~%BIT%parameter%%~
+				PATCH_IF opcodePosition >= 0 BEGIN
+					SET $positions(~%opcodePosition%~) = initOpcode
+					SET parameter = parameter1 - 1
+					SET newP1 |= ~%BIT%parameter%%~
+				END
 			END
 		END
 		PATCH_IF newP1 > 0 BEGIN
@@ -11219,11 +11275,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description~ STR_VAR resref RET description saveAdded opcode END
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		LPM ~opcode_25_common~
-		//LPM ~opcode_272_condition~
-		//SET ignoreDuration = 1
+		LPM ~opcode_272_condition~
+		SET ignoreDuration = 1
 	END
 END
 
@@ -11304,7 +11359,15 @@ DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
 		END
 	END
 
-	SPRINT condition (AT strref)
+	LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+
+	PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
+		SPRINT frequency (AT strref)
+		SPRINT condition ~%frequency% %tmpDuration%~
+	END
+	ELSE BEGIN
+		SPRINT condition (AT strref)
+	END
 END
 
 /* ----------------------------------------------------- *
@@ -15242,9 +15305,10 @@ DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parame
     )
 END
 
-DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_match_not_position_and_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~ BEGIN
 	SET match = (
-            match_target       == target
+            match_position     != position
+        AND match_target       == target
         AND match_parameter2   == parameter2
         AND match_power        == power
         AND match_timingMode   == timingMode
@@ -15535,5 +15599,27 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_154_group~ BEGIN
         AND match_saveType     == saveType
         AND match_saveBonus    == saveBonus
         AND match_resistance   == resistance
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_259_group~ BEGIN
+	// ~NOT position = %position% AND target = %target% AND power = %power% AND parameter1 = %parameter1% AND parameter3 = %parameter3% AND parameter4 = %parameter4% AND timingMode = %timingMode% AND resistance = %resistance% AND duration = %duration% AND probability1 = %probability1% AND probability2 = %probability2% AND diceCount = %diceCount% AND diceSides = %diceSides% AND saveType = %saveType% AND saveBonus = %saveBonus% AND special = %special%~
+	SET match = (
+		    match_position     != position
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter1   == parameter1
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
     )
 END
