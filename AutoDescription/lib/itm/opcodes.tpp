@@ -6599,6 +6599,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = parameter1
 	LOCAL_SET type = parameter2
+	LOCAL_SPRINT strDuration ~~
 	TO_UPPER resref
 	// FIXME: Non maintenable
 	PATCH_IF VARIABLE_IS_SET $opcode_target_146_item_revision(~%resref%~) BEGIN
@@ -6642,11 +6643,12 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET description END
+				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 STR_VAR file = ~%resref%~ RET description strDuration END
 			END
 			CLEAR_ARRAY recursive_resref
 		END
 	END
+	LPM ~opcode_146_condition~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_146~ BEGIN
@@ -6656,6 +6658,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
 	LOCAL_SET type = parameter2
+	LOCAL_SPRINT strDuration ~~
 	TO_UPPER resref
 	PATCH_IF VARIABLE_IS_SET $opcode_target_probability_146_item_revision(~%resref%~) BEGIN
 		SET strref = $opcode_target_probability_146_item_revision(~%resref%~)
@@ -6681,7 +6684,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
 					SPRINT regex @10019 // ~^[0-9]+ % de chance ~
@@ -6691,6 +6694,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 			CLEAR_ARRAY recursive_resref
 		END
 	END
+	LPM ~opcode_146_condition~
 END
 
 DEFINE_PATCH_MACRO ~opcode_146_common~ BEGIN
@@ -6702,6 +6706,32 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_146_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_146_condition~ BEGIN
+	PATCH_IF timingMode == TIMING_delayed BEGIN
+		INNER_PATCH_SAVE tmp_description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~~
+		END
+	    PATCH_IF NOT ~%description%~ STRING_EQUAL ~%tmp_description%~ BEGIN
+			LPF ~get_duration_value~ INT_VAR duration RET condition = value END
+			PATCH_IF NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+					SPRINT strDuration @100311 // ~pendant %strDuration%~
+					SPRINT condition ~%condition%, %strDuration%~
+				END
+				LPF ~ucfirst~ STR_VAR value = ~%condition%~ RET condition = string END
+		        PATCH_IF ~%description%~ STRING_MATCHES_REGEXP ~^%crlf%~ == 1 BEGIN
+					INNER_PATCH_SAVE description ~%description%~ BEGIN
+						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+					END
+					SPRINT description ~%crlf%  - %description%~
+				END
+			END
+			SET ignoreDuration = 1
+			SET timingMode = TIMING_duration // La méthode add_duration a une exception pour les timings delayed...
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_146_group~ BEGIN

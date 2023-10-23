@@ -155,10 +155,11 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
+DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuration BEGIN
 	SET base_duration = ~-1~
 	SET isValid = 1
 	SET count_levels = 0
+	SPRINT strDuration ~~
 
     PATCH_DEFINE_ARRAY levels BEGIN END
     PATCH_DEFINE_ARRAY all_durations BEGIN END
@@ -236,6 +237,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration BEGIN
 		END
 		PATCH_IF NOT is_special BEGIN
 			SET ignoreDuration = 1
+			SPRINT strDuration ~%duration%~
 		END
 		ELSE BEGIN
 			SPRINT duration @100033 // ~Spéciale~

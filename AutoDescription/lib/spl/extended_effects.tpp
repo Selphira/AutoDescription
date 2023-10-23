@@ -219,10 +219,12 @@ DEFINE_PATCH_FUNCTION ~get_item_spell_effects_description~
 	INT_VAR
 		castingLevel = 0
 		baseProbability = 100
+		ignoreDurationIfSameForAllEffect = 0
 	STR_VAR
 		file = ~~
 	RET
 		description
+		strDuration
 		totalLines
 BEGIN
 	// 146 :
@@ -232,6 +234,7 @@ BEGIN
 	// 341 : Semble que ce soit toujours la cible de l'attaque
 	SET forceTarget = (opcode == 146 OR opcode == 232 OR opcode == 326) ? 1 : 0
 	SET totalLines = 0
+	SPRINT strDuration ~~
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.
 	LPM ~clear_opcodes~
 
@@ -239,10 +242,14 @@ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
             SPRINT CURRENT_SOURCE_RES ~%file%~
 
-			//TODO: LPF ~spell_duration~ RET duration = description ignoreDuration END // Uniquement si plusieurs lignes seront générées... Comment savoir AVANT ???
+			PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
+				LPM ~load_level_effects~
+	            LPF ~spell_duration~ RET ignoreDuration strDuration END
+				LPM ~clear_levels~
+			END
 
             PATCH_IF castingLevel > 0 BEGIN
-                LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget RET description totalLines END
+                LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget ignoreDuration RET description totalLines END
             END
             ELSE BEGIN
 				LPM ~load_level_effects~
@@ -356,7 +363,7 @@ BEGIN
 			EVAL ~leveled_opcodes_%requiredLevel%~ = leveled_opcodes
 	END
 
-	LPF ~build_spell_effects_description~ INT_VAR baseProbability forceTarget RET description totalLines END
+	LPF ~build_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration RET description totalLines END
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_headeroffset_for_level~
