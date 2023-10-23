@@ -51,7 +51,7 @@ BEGIN
 				SAY UNIDENTIFIED_DESC ~%description%~
 			END
 			// Ecrire dans le fichier de comparaison
-			READ_STRREF ITM_unidentified_name itemName
+			LPM ~get_item_name~
 			LPF ~add_compare_row~ STR_VAR itemName originalDescription = ~%originalUnidentifiedDescription%~ description END
 		END
 		ELSE BEGIN
@@ -61,7 +61,7 @@ BEGIN
 				SAY DESC ~%description%~
 			END
 			// Ecrire dans le fichier de comparaison
-			READ_STRREF ITM_identified_name itemName
+			LPM ~get_item_name~
 			LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
 		END
 
@@ -69,6 +69,20 @@ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~get_item_name~ BEGIN
+	SPRINT itemName ~~
+
+	READ_LONG ITM_identified_name itemNameRef
+	PATCH_IF itemNameRef > 0 BEGIN
+		READ_STRREF ITM_identified_name itemName
+	END
+	ELSE BEGIN
+		READ_LONG ITM_unidentified_name itemNameRef
+		PATCH_IF itemNameRef > 0 BEGIN
+			READ_STRREF ITM_unidentified_name itemName
+		END
+	END
+END
 
 DEFINE_PATCH_FUNCTION ~get_item_description~
 	INT_VAR
