@@ -805,6 +805,7 @@ DEFINE_PATCH_MACRO ~opcode_0_is_valid~ BEGIN
 END
 
 // Association des classes d'armure V2
+// TODO: Pour gérer le regroupement avec des target_type différents, actuellement, seuls les effets sans aucune cible particulière sont gérés
 DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 	LOCAL_SET value = 0
 	LOCAL_SET baseClassArmor = 0
@@ -822,7 +823,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 	PATCH_IF shrink_class_armor BEGIN
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
-			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self BEGIN
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ~%target_type%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
 					SET baseClassArmor = parameter1
 					SET hasBaseClassArmor = 1
@@ -848,7 +849,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 
 		PATCH_PHP_EACH EVAL ~opcodes_219000~ AS data => _ BEGIN
 			LPM ~data_to_vars~
-			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self BEGIN
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ~%target_type%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF VARIABLE_IS_SET $ids_files(~%parameter2%~) BEGIN
                     LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET idName END
                     SET $opcode_219000_CA_values(~%idName%~) = 1
@@ -868,7 +869,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 			// Ne pas prendre en compte la classe d'armure de base dans le regroupement
-			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ((isArmor AND parameter2 != AC_MOD_TYPE_all) OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) BEGIN
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ((isArmor AND parameter2 != AC_MOD_TYPE_all) OR (NOT isArmor AND parameter2 != AC_MOD_TYPE_set_base)) AND ~%target_type%~ STRING_EQUAL ~~ BEGIN
 				LPF ~delete_opcode~
 					INT_VAR opcode match_position = position
 					RET $opcodes(~%opcode%~) = count
@@ -977,6 +978,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				// Création d'un opcode dont la description de l'effet sera ajoutée à la description globale de l'objet, et non plus à la description de la section
 				SET opcode = 0
 				SPRINT custom_str ~%classArmorValue%~
+				SPRINT target_type ~~
 	            LPM ~add_opcode~
             END
 		END
@@ -986,7 +988,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF timingMode == TIMING_while_equipped AND (
+		PATCH_IF timingMode == TIMING_while_equipped AND ~%target_type%~ STRING_EQUAL ~~ AND (
 				parameter2 == AC_MOD_TYPE_crushing OR
 				parameter2 == AC_MOD_TYPE_missile OR
 				parameter2 == AC_MOD_TYPE_piercing OR
@@ -1003,7 +1005,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 	END
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF timingMode == TIMING_while_equipped AND (
+		PATCH_IF timingMode == TIMING_while_equipped AND ~%target_type%~ STRING_EQUAL ~~ AND (
 				parameter2 == AC_MOD_TYPE_crushing OR
 				parameter2 == AC_MOD_TYPE_missile OR
 				parameter2 == AC_MOD_TYPE_piercing OR
