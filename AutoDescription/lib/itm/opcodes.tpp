@@ -10592,17 +10592,17 @@ END
  * Item: Set Melee Effect [248] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_248~ BEGIN
-	SET strref = 12480001 // ~À chaque attaque de mêlée réussie: %description%~
+	SET strref = 12480001 // ~À chaque attaque de mêlée réussie~
 	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_248~ BEGIN
-	SET strref = 12480005 // ~par attaque de mêlée réussie par %theTarget%: %description%~
+	SET strref = 12480005 // ~par attaque de mêlée réussie par %theTarget%~
 	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_248~ BEGIN
-	SET strref = 12480003 // ~À chaque attaque de mêlée réussie par %theTarget%: %description%~
+	SET strref = 12480003 // ~À chaque attaque de mêlée réussie par %theTarget%~
 	LPM ~opcode_248_common~
 END
 
@@ -10670,13 +10670,23 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF is_ee == 1 AND (parameter2 BAND 4) BEGIN // Attaque au poing
 			SET strref += 1
 		END
-		SPRINT description (AT strref)
+
+		LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+
+		PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT frequency (AT strref)
+			SPRINT condition ~%frequency% %tmpDuration%~
+		END
+		ELSE BEGIN
+			SPRINT condition (AT strref)
+		END
+		SET ignoreDuration = 1
 	END
 END
 
@@ -10729,10 +10739,19 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_249_common~ BEGIN
 	SET abilityType = AbilityType_Combat
-	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded ignoreDuration opcode END
+	LPF ~get_res_description_248~ STR_VAR resref RET description saveAdded opcode END
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description (AT strref)
+		LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+
+		PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT frequency (AT strref)
+			SPRINT condition ~%frequency% %tmpDuration%~
+		END
+		ELSE BEGIN
+			SPRINT condition (AT strref)
+		END
+		SET ignoreDuration = 1
 	END
 END
 
@@ -14015,17 +14034,17 @@ END
  * Item: Set Melee and Ranged Effect [524] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_524~ BEGIN
-	SET strref = 15240001 // ~À chaque attaque réussie: %description%~
+	SET strref = 15240001 // ~À chaque attaque réussie~
 	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_524~ BEGIN
-	SET strref = 15240003 // ~par attaque réussie par %theTarget%: %description%~
+	SET strref = 15240003 // ~par attaque réussie par %theTarget%~
 	LPM ~opcode_248_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_524~ BEGIN
-	SET strref = 15240002 // ~À chaque attaque réussie par %theTarget%: %description%~
+	SET strref = 15240002 // ~À chaque attaque réussie par %theTarget%~
 	LPM ~opcode_248_common~
 END
 

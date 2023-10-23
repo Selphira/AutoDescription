@@ -3320,18 +3320,18 @@
 
 // Opcode 248: Item: Set Melee Effect [248]
 
-@12480001 = ~For each successful melee attack: %description%~
-@12480002 = ~For each successful unarmed attack: %description%~
-@12480003 = ~For each successful melee attack by %theTarget%: %description%~
-@12480004 = ~For each successful unarmed attack by %theTarget%: %description%~
-@12480005 = ~per successful melee attack by %theTarget%: %description%~
-@12480006 = ~per successful unarmed attack by %theTarget%: %description%~
+@12480001 = ~For each successful melee attack%~
+@12480002 = ~For each successful unarmed attack~
+@12480003 = ~For each successful melee attack by %theTarget%~
+@12480004 = ~For each successful unarmed attack by %theTarget%~
+@12480005 = ~per successful melee attack by %theTarget%%~
+@12480006 = ~per successful unarmed attack by %theTarget%~
 
 // Opcode 249: Item: Set Ranged Effect [249]
 
-@12490001 = ~For each successful ranged attack: %description%~
-@12490002 = ~For each successful ranged attack by %theTarget%: %description%~
-@12490003 = ~per successful ranged attack by %theTarget%: %description%~
+@12490001 = ~For each successful ranged attack~
+@12490002 = ~For each successful ranged attack by %theTarget%~
+@12490003 = ~per successful ranged attack by %theTarget%~
 
 // Opcode 250: Spell Effect: Damage Modifier [250]
 
@@ -4304,9 +4304,9 @@
 
 // Fake Opcode 524: Item: Set Melee and Ranged Effect
 
-@15240001 = ~À chaque attaque réussie: %description%~
-@15240002 = ~À chaque attaque réussie par %theTarget%: %description%~
-@15240003 = ~par attaque réussie par %theTarget%: %description%~
+@15240001 = ~For each successful attack~
+@15240002 = ~For each successful attack by %theTarget%~
+@15240003 = ~per successful attack by %theTarget%~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
