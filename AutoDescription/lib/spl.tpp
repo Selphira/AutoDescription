@@ -89,7 +89,7 @@ BEGIN
 	LPF ~appendLine~ RET description END // ~École~
 	LPF ~spell_level~ RET description END
 	LPF ~spell_range~ RET description END
-	LPF ~spell_duration~ RET description ignoreDuration END
+	LPF ~spell_duration~ RET description ignoreDuration isSpecialDuration = is_special END
 	LPF ~spell_casting_time~ RET description END
 	LPF ~spell_target~ RET description END
 	LPF ~spell_saving_throw~ RET description END

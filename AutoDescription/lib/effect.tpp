@@ -35,6 +35,7 @@ DEFINE_PATCH_MACRO ~read_effect_vars~ BEGIN
 	SPRINT custom_str ~~
 	SPRINT target_type ~~
 	SPRINT complex_value ~~
+	SPRINT complex_duration ~~
 END
 
 DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
@@ -63,6 +64,7 @@ DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
 	SPRINT custom_str ~~
 	SPRINT target_type ~~
 	SPRINT complex_value ~~
+	SPRINT complex_duration ~~
 END
 
 DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
@@ -94,6 +96,7 @@ DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
 	SPRINT target_exceptions ~%data_25%~
 	SPRINT target_type ~%data_26%~
 	SPRINT complex_value ~%data_27%~
+	SPRINT complex_duration ~%data_28%~
 END
 
 DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
@@ -126,6 +129,7 @@ DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
 	SPRINT match_target_exceptions ~%data_25%~
 	SPRINT match_target_type ~%data_26%~
 	SPRINT match_complex_value ~%data_27%~
+	SPRINT match_complex_duration ~%data_28%~
 END
 
 
@@ -515,7 +519,7 @@ DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	ELSE BEGIN
 		SET $opcodes(~%opcode%~) += 1
 	END
-	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~) = 1
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = 1
 END
 
 DEFINE_PATCH_FUNCTION ~delete_opcode~
@@ -567,7 +571,7 @@ BEGIN
 			LPM ~%match_macro%~
 			PATCH_IF NOT match BEGIN
 				SET count += 1
-		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~) = 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~) = 1
 	        END
 	    END
 	END
