@@ -3331,7 +3331,7 @@
 
 // Opcode 249: Item: Set Ranged Effect [249]
 
-@12490001 = ~À chaque attaque à distance réussie%~
+@12490001 = ~À chaque attaque à distance réussie~
 @12490002 = ~À chaque attaque à distance réussie par %theTarget%~
 @12490003 = ~par attaque à distance réussie par %theTarget%~
 

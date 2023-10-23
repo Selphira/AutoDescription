@@ -3320,11 +3320,11 @@
 
 // Opcode 248: Item: Set Melee Effect [248]
 
-@12480001 = ~For each successful melee attack%~
+@12480001 = ~For each successful melee attack~
 @12480002 = ~For each successful unarmed attack~
 @12480003 = ~For each successful melee attack by %theTarget%~
 @12480004 = ~For each successful unarmed attack by %theTarget%~
-@12480005 = ~per successful melee attack by %theTarget%%~
+@12480005 = ~per successful melee attack by %theTarget%~
 @12480006 = ~per successful unarmed attack by %theTarget%~
 
 // Opcode 249: Item: Set Ranged Effect [249]
