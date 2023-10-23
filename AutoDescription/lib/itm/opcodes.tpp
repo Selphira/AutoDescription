@@ -6644,6 +6644,22 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
 				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 STR_VAR file = ~%resref%~ RET description strDuration END
+
+				// Remplacer les "pendant 1 round" par "chaque round pendant x rounds"
+				SET frequency = (duration - (duration MODULO 10000)) / 10000
+				PATCH_IF (timingMode == 5000 OR timingMode == 5001) AND frequency == 6 BEGIN
+					SPRINT strDuration @100302 // ~1 round~
+					SPRINT find @100311 // ~pendant %strDuration%~
+					LPF ~get_duration_value~ INT_VAR duration RET replace = value END
+					INNER_PATCH_SAVE tmp_description ~%description%~ BEGIN
+						REPLACE_TEXTUALLY ~%find%~ ~%replace%~
+					END
+				    PATCH_IF NOT ~%description%~ STRING_EQUAL ~%tmp_description%~ BEGIN
+				        SPRINT description ~%tmp_description%~
+						SET timingMode = TIMING_duration // Sinon durée ajoutée tout de même
+						SET ignoreDuration = 1
+				    END
+				END
 			END
 			CLEAR_ARRAY recursive_resref
 		END
