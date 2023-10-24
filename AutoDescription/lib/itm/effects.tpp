@@ -165,6 +165,12 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 	LOCAL_SET levelMin = diceSides
 	LOCAL_SET levelMax = diceCount
 	LOCAL_SET strref   = 0
+
+	//TODO: Limiter aux effets qui ont été appelés par =>  AND (opcode == 177 OR opcode == 183 OR opcode == 248 OR opcode == 249 OR opcode == 282 OR opcode == 283)
+	PATCH_IF isExternal == 1 AND VARIABLE_IS_SET minLevel BEGIN
+		SET levelMin = minLevel
+		SET levelMax = maxLevel
+	END
 	
 	PATCH_IF (levelMax > 0 OR levelMin > 1) AND (NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
 		PATCH_IF levelMin == levelMax BEGIN

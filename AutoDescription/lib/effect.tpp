@@ -60,6 +60,9 @@ DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
 	READ_ASCII EFF2_resource2 resref2
 	READ_ASCII EFF2_resource3 resref3
 
+	READ_LONG  0x54 minLevel
+	READ_LONG  0x58 maxLevel
+
 	SET custom_int = 0
 	SPRINT custom_str ~~
 	SPRINT target_type ~~
