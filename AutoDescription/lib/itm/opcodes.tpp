@@ -2017,6 +2017,35 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_20~ BEGIN
 	LPM ~opcode_self_probability_20~
 END
 
+DEFINE_PATCH_MACRO ~opcode_20_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == 1 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF position != match_position BEGIN
+					LPM ~opcode_match_except_parameter2~
+
+					PATCH_IF match BEGIN
+						SET $positions(~%position%~) = 1
+						SET count += 1
+						LPF ~delete_opcode~
+		                    INT_VAR opcode match_position
+		                    RET $opcodes(~20~) = count
+		                    RET_ARRAY EVAL ~opcodes_20~ = opcodes_xx
+		                END
+						// Bug où il reste toujours un item dans le tableau si c'était le dernier
+						// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+						PATCH_IF $opcodes(~20~) == 0 BEGIN
+							CLEAR_ARRAY ~opcodes_20~
+						END
+					END
+				END
+			END
+		END
+	END
+END
+
 /* ------------------------ *
  * Stat: Lore Modifier [21] *
  * ------------------------ */
@@ -11651,15 +11680,15 @@ END
  *  Stat: Wild Magic [281] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_281~ BEGIN
-	LPF ~opcode_mod_percent~ INT_VAR strref = 12810001 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~Hiatus entropique~
+	LPF ~opcode_mod~ INT_VAR strref = 12810001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Modificateur des hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_281~ BEGIN
-	LPF ~opcode_target_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_target~ INT_VAR strref = 12810002 RET description END // ~le modificateur des hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_281~ BEGIN
-	LPF ~opcode_probability_percent~ INT_VAR strref = 12810002 RET description END // ~le hiatus entropique~
+	LPF ~opcode_probability~ INT_VAR strref = 12810002 RET description END // ~le modificateur des hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_281~ BEGIN
@@ -11986,22 +12015,23 @@ END
  *  Spell Effect: Chaos Shield [299] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_299~ BEGIN
-	SET parameter2 = MOD_TYPE_flat
-	LPF ~opcode_mod~ INT_VAR strref = 12990001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Modificateur des hiatus entropiques~
+	LOCAL_SET amount = parameter1
+	SPRINT description @12990001 // ~Bloque %amount% hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_299~ BEGIN
-	SET parameter2 = MOD_TYPE_flat
-	LPF ~opcode_target~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+	LOCAL_SET amount = parameter1
+	SPRINT description @12990002 // ~Bloque %amount% hiatus entropiques %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_299~ BEGIN
-	SET parameter2 = MOD_TYPE_flat
-	LPF ~opcode_probability~ INT_VAR strref = 12990002 RET description END // ~le modificateur des hiatus entropiques~
+	LOCAL_SET amount = parameter1
+	SPRINT description @12990003 // ~de bloquer %amount% hiatus entropiques~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_299~ BEGIN
-	LPM ~opcode_self_probability_299~
+	LOCAL_SET amount = parameter1
+	SPRINT description @12990004 // ~de bloquer %amount% hiatus entropiques %ofTheTarget%~
 END
 
 /* -------------- *
@@ -15168,6 +15198,34 @@ DEFINE_PATCH_MACRO ~opcode_match_except_parameter1_and_parameter2~ BEGIN
         AND match_target       == target
         AND match_power        == power
         // AND match_parameter1   == parameter1
+        // AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_except_parameter2~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
         // AND match_parameter2   == parameter2
         AND match_duration     == duration
         AND match_timingMode   == timingMode

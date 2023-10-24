@@ -3475,8 +3475,8 @@
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Probability that a wild surge will have positive effect~
-@12810002 = ~the probability that a wild surge will have positive effect~
+@12810001 = ~Modificateur des hiatus entropiques~
+@12810002 = ~le modificateur des hiatus entropiques~
 
 // Opcode 283: Use EFF File (Cursed) [283]
 
@@ -3538,8 +3538,10 @@
 
 // Opcode 299: Spell Effect: Chaos Shield [299]
 
-@12990001 = ~Modificateur des hiatus entropiques~
-@12990002 = ~le modificateur des hiatus entropiques~
+@12990001 = ~Bloque les %amount% prochains hiatus entropiques~
+@12990002 = ~Bloque les %amount% prochains hiatus entropiques %ofTheTarget%~
+@12990003 = ~de bloquer les %amount% prochains hiatus entropiques~
+@12990004 = ~de bloquer les %amount% prochains hiatus entropiques %ofTheTarget%~
 
 // Opcode 300: NPC Bump [300]
 
