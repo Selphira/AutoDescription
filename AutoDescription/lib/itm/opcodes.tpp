@@ -2998,11 +2998,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_55_common~ BEGIN
-	PATCH_IF parameter1 != 0 BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET theTarget = idName END
-		SPRINT pluralPronoun @100020 // ~les~
-		SPRINT theTarget EVAL ~%pluralPronoun% %theTarget%~
-		LPM ~add_target_level~
+	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET versus BEGIN
+		PATCH_IF parameter1 != 0 BEGIN
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET theTarget = idName END
+			SPRINT pluralPronoun @100020 // ~les~
+			SPRINT theTarget EVAL ~%pluralPronoun% %theTarget%~
+			LPM ~add_target_level~
+		END
 	END
 	SPRINT description (AT description_strref)
 END
@@ -7717,7 +7719,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 		SET currentPosition = position
 
 		PATCH_IF NOT VARIABLE_IS_SET $positions_already_grouped(~%position%~) BEGIN
-			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 BEGIN
+			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 OR opcode == 55 BEGIN
 			    LPF opcode_177_get_all_opcode_positions
 					INT_VAR
 						match_opcode       = opcode
@@ -8004,7 +8006,7 @@ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF VARIABLE_IS_SET $opcode_positions(~%position%~) AND $opcode_positions(~%position%~) == 1 BEGIN
-			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 BEGIN
+			PATCH_IF opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177 OR opcode == 55 BEGIN
 				LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
 				SPRINT targetType "%targetType% %parameter2%:%string%"
 			END
