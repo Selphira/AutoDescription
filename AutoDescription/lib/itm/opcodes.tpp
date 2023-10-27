@@ -431,6 +431,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
+	321 => 0 // Removal: Effects specified by Resource [321] // Les descriptions générées ne sont pas utiles au joueur
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
