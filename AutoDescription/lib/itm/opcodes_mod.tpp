@@ -1,4 +1,18 @@
 /**
+ * Tweaks Anthology
+ * ****************
+ * On ignore les effets liés à une ressource commençant par "C!" ou "cd".
+ * Ce sont des effets qui indiquent que
+ * - l'on peut switcher d'une utilisation à 1 ou 2 mains (composants @2020 @2030 @2035)
+ * - l'on peut switcher d'un objet de protection avec ou sans bonus à la classe d'armure (composant @2150 @2151 @2152)
+ */
+DEFINE_PATCH_MACRO ~opcode_122_is_valid_mod~ BEGIN
+	PATCH_IF ~%resref%~ STRING_MATCHES_REGEXP ~^[Cc]d\|[Cc]\!~ == 0 BEGIN
+		SET isValid = 0
+	END
+END
+
+/**
  * Skills and Abilities
  * ********************
  * Ce regroupement n'est effectué que si les bonus de dégâts liés à la force originaux n'ont pas été modifiés par un
