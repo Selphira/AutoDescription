@@ -431,7 +431,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	// EE only
 	319 => 0 // Item Usability [319] // Pas nécessaire de le gérer, l'utilisabilité est gérée automatiquement par EE
 	320 => 0 // Change Weather [320]
-	321 => 0 // Removal: Effects specified by Resource [321] // Les descriptions générées ne sont pas utiles au joueur
 	327 => 0 // Graphics: Icewind Visual Spell Hit (plays sound) [327]
 	328 => 0 // State: Set State [328]
 	330 => 0 // Text: Float Text [330]
@@ -12313,18 +12312,24 @@ END
  * -------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_321~ BEGIN
 	// 13210001, parfois la capacité de charge cible le porteur et la cible, utile d'expliciter la cible ?
+/*
 	LOCAL_SET strref = 13210004
 	LPM ~opcode_321_common~
+*/
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_321~ BEGIN
+/*
 	LOCAL_SET strref = 13210007
 	LPM ~opcode_321_common~
+*/
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_321~ BEGIN
+/*
 	LOCAL_SET strref = 13210004
 	LPM ~opcode_321_common~
+*/
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_321~ BEGIN
@@ -12713,21 +12718,23 @@ BEGIN
             SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
         END
         ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
-            SET strref = 420000 + parameter1
-			PATCH_TRY
-                LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
-			WITH DEFAULT
-				LPF ~get_splstate_name_mod~ INT_VAR splstate = parameter1 RET splstateName END
-			END
-			PATCH_IF NOT ~%splstateName%~ STRING_EQUAL ~~ BEGIN
-	            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
-	            PATCH_IF statType == 76 OR statType == 110 BEGIN
-	                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
+            PATCH_IF parameter1 != 121 BEGIN // On ignore l'effet "Manteau"
+	            SET strref = 420000 + parameter1
+				PATCH_TRY
+	                LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+				WITH DEFAULT
+					LPF ~get_splstate_name_mod~ INT_VAR splstate = parameter1 RET splstateName END
+				END
+				PATCH_IF NOT ~%splstateName%~ STRING_EQUAL ~~ BEGIN
+		            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
+		            PATCH_IF statType == 76 OR statType == 110 BEGIN
+		                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
+		            END
+		            ELSE PATCH_IF statType == 111 BEGIN
+		                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
+		            END
 	            END
-	            ELSE PATCH_IF statType == 111 BEGIN
-	                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
-	            END
-            END
+	        END
         END
         ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
             SET idsId = statType - 110
