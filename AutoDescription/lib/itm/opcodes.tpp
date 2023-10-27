@@ -1527,6 +1527,40 @@ DEFINE_PATCH_FUNCTION ~opcode_12_typed_value~ INT_VAR value = 0 RET strref BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_12_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF saveType == 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				LPM ~opcode_match_opcode_12_group~
+				PATCH_IF match == 1 BEGIN
+					LPF ~delete_opcode~
+	                    INT_VAR opcode match_position
+	                    RET $opcodes(~12~) = count
+	                    RET_ARRAY EVAL ~opcodes_12~ = opcodes_xx
+	                END
+					LPF ~delete_opcode~
+	                    INT_VAR opcode match_position = position
+	                    RET $opcodes(~12~) = count
+	                    RET_ARRAY EVAL ~opcodes_12~ = opcodes_xx
+	                END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+					PATCH_IF $opcodes(~12~) == 0 BEGIN
+			            CLEAR_ARRAY ~opcodes_12~
+			        END
+					SET diceCount += match_diceCount
+					// special BAND BIT8
+					SET special |= BIT8
+					SET saveType = match_saveType
+			        LPM ~add_opcode~
+				END
+			END
+		END
+	END
+END
+
 /* ------------------------- *
  * Death: Instant Death [13] *
  * ------------------------- */
@@ -15558,6 +15592,35 @@ END
 DEFINE_PATCH_MACRO ~opcode_match_resref~ BEGIN
 	SET match = (
 		~%match_resref%~ STRING_EQUAL_CASE ~%resref%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_12_group~ BEGIN
+	SET match = (
+			match_position     != position
+	    AND match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        // AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        // AND match_saveType     == saveType
+        // AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
     )
 END
 
