@@ -12712,13 +12712,19 @@ BEGIN
         END
         ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
             SET strref = 420000 + parameter1
-            LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
-            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
-            PATCH_IF statType == 76 OR statType == 110 BEGIN
-                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
-            END
-            ELSE PATCH_IF statType == 111 BEGIN
-                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
+			PATCH_TRY
+                LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+			WITH DEFAULT
+				LPF ~get_splstate_name_mod~ INT_VAR splstate = parameter1 RET splstateName END
+			END
+			PATCH_IF NOT ~%splstateName%~ STRING_EQUAL ~~ BEGIN
+	            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
+	            PATCH_IF statType == 76 OR statType == 110 BEGIN
+	                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
+	            END
+	            ELSE PATCH_IF statType == 111 BEGIN
+	                SET $EVAL ~effective_against%key%~(~%creatureType%~) = 1
+	            END
             END
         END
         ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS

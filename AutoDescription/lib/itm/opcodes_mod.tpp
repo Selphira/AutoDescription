@@ -1,3 +1,16 @@
+DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
+	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%parameter1%~
+
+	PATCH_MATCH ~%splstateValue%~ WITH
+		// Pnp Potion
+		GT_UNDER_THE_EFFECTS_OF_A_POTION
+		BEGIN
+			SPRINT splstateName @230009 // ~potions~
+		END
+		DEFAULT SPRINT splstateName ~~
+	END
+END
+
 /**
  * Tweaks Anthology
  * ****************

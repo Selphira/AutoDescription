@@ -66,7 +66,7 @@ BEGIN
 	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~ ~AutoDescription/tra/french/description.tra~)) BEGIN
 		SET exist = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~opcode %opcode%: Traduction %strref% manquante~ END
-		SPRINT string @9999
+		PATCH_FAIL "%SOURCE_FILE% : opcode %opcode%: Traduction %strref% manquante"
 	END
 	ELSE BEGIN
 		SPRINT string (AT %strref%)
