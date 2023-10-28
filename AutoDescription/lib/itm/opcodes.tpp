@@ -4447,20 +4447,91 @@ END
 DEFINE_PATCH_MACRO ~opcode_99_common~ BEGIN
 	LOCAL_SET duration = parameter1
 	LOCAL_SET type = parameter2
+	LOCAL_SET value = 0
 
-	SET strref += type
+	PATCH_IF type == 2 BEGIN // Chant du barde
+		SET strref += 1
+	END
+	ELSE BEGIN
+		SET value = custom_int > 0 ? custom_int : (1 << parameter2)
+		LPF ~get_spell_type_str~ INT_VAR value RET spellType END
+	END
+
+	PATCH_PRINT "spellType: %spellType%"
 
 	PATCH_IF duration < 100 AND duration > 0 BEGIN
 		SET value = 100 - duration
 		SPRINT duration @10002 // ~%value% %~
-		SET strref += 3
+		SET strref += 2
 	END
 	ELSE PATCH_IF duration > 100 BEGIN
 		SET value = duration - 100
 		SPRINT duration @10002 // ~%value% %~
-		SET strref += 6
+		SET strref += 4
 	END
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_99_group~ BEGIN
+	LOCAL_SET group = 1
+	LOCAL_SET newSpellType = 0b0
+	LOCAL_SET spellType = 0
+
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET group = 0
+		SET newSpellType = 1 << %parameter2%
+		CLEAR_ARRAY positions
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+			~%parameter2%~ => ~%position%~
+		END
+		PATCH_FOR_EACH spellType IN 0 1 BEGIN
+			LPF ~get_opcode_position~
+				INT_VAR opcode
+					match_position     = position
+					match_custom_int   = 0
+					match_target       = target
+					match_probability1 = probability1
+					match_probability2 = probability2
+					match_parameter1   = parameter1
+					match_parameter2   = spellType
+					match_parameter3   = parameter3
+					match_parameter4   = parameter4
+					match_timingMode   = timingMode
+					match_resistance   = resistance
+					match_duration     = duration
+					match_power        = power
+			        match_diceCount    = diceCount
+			        match_diceSides    = diceSides
+					match_saveType     = saveType
+					match_saveBonus    = saveBonus
+					match_special      = special
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				RET opcodePosition = position
+			END
+			PATCH_IF opcodePosition >= 0 BEGIN
+				SET group = 1
+				SET newSpellType |= 1 << %spellType%
+				SET $positions(~%spellType%~) = opcodePosition
+			END
+		END
+		PATCH_IF group == 1 BEGIN
+			PATCH_PHP_EACH positions AS _ => position1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position1
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        SET custom_int = newSpellType
+	        LPM ~add_opcode~
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
@@ -6602,7 +6673,7 @@ DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 	LOCAL_SET newSpellType = 0b0
 	LOCAL_SET spellType = 0
 
-	PATCH_PHP_EACH ~opcodes_145~ AS data => _ BEGIN
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		// TODO: Toute cette partie est commune avec l'opcode 60, cependant, si je déplace ce code dans une macro, le
 		//       tableau opcodes_145 n'est pas mis à jour si un regroupement est effectué dans la macro...

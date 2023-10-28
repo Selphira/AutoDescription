@@ -2380,35 +2380,26 @@
 
 // Opcode 99: Spell Effect: Duration Modifier [99]
 
-@10990001 = ~Réduit à néant la durée des sorts profanes~
-@10990002 = ~Réduit à néant la durée des sorts divins~
-@10990003 = ~Réduit à néant la durée des chants de barde~
-@10990004 = ~Réduit de %duration% la durée des sorts profanes~
-@10990005 = ~Réduit de %duration% la durée des sorts divins~
-@10990006 = ~Réduit de %duration% la durée des chants de barde~
-@10990007 = ~Allonge de %duration% la durée des sorts profanes~
-@10990008 = ~Allonge de %duration% la durée des sorts divins~
-@10990009 = ~Allonge de %duration% la durée des chants de barde~
+@10990001 = ~Réduit à néant la durée des sorts %spellType%~
+@10990002 = ~Réduit à néant la durée des chants de barde~
+@10990003 = ~Réduit de %duration% la durée des sorts %spellType%~
+@10990004 = ~Réduit de %duration% la durée des chants de barde~
+@10990005 = ~Allonge de %duration% la durée des sorts %spellType%~
+@10990006 = ~Allonge de %duration% la durée des chants de barde~
 
-@10990011 = ~Réduit à néant la durée des sorts profanes %ofTheTarget%~
-@10990012 = ~Réduit à néant la durée des sorts divins %ofTheTarget%~
-@10990013 = ~Réduit à néant la durée des chants de barde %ofTheTarget%~
-@10990014 = ~Réduit de %duration% la durée des sorts profanes %ofTheTarget%~
-@10990015 = ~Réduit de %duration% la durée des sorts divins %ofTheTarget%~
-@10990016 = ~Réduit de %duration% la durée des chants de barde %ofTheTarget%~
-@10990017 = ~Allonge de %duration% la durée des sorts profanes %ofTheTarget%~
-@10990018 = ~Allonge de %duration% la durée des sorts divins %ofTheTarget%~
-@10990019 = ~Allonge de %duration% la durée des chants de barde %ofTheTarget%~
+@10990011 = ~Réduit à néant la durée des sorts %spellType% %ofTheTarget%~
+@10990012 = ~Réduit à néant la durée des chants de barde %ofTheTarget%~
+@10990013 = ~Réduit de %duration% la durée des sorts %spellType% %ofTheTarget%~
+@10990014 = ~Réduit de %duration% la durée des chants de barde %ofTheTarget%~
+@10990015 = ~Allonge de %duration% la durée des sorts %spellType% %ofTheTarget%~
+@10990016 = ~Allonge de %duration% la durée des chants de barde %ofTheTarget%~
 
-@10990021 = ~de réduire à néant la durée des sorts profanes %ofTheTarget%~
-@10990022 = ~de réduire à néant la durée des sorts divins %ofTheTarget%~
-@10990023 = ~de réduire à néant la durée des chants de barde %ofTheTarget%~
-@10990024 = ~de réduire de %duration% la durée des sorts profanes %ofTheTarget%~
-@10990025 = ~de réduire de %duration% la durée des sorts divins %ofTheTarget%~
-@10990026 = ~de réduire de %duration% la durée des chants de barde %ofTheTarget%~
-@10990027 = ~d'allonger de %duration% la durée des sorts profanes %ofTheTarget%~
-@10990028 = ~d'allonger de %duration% la durée des sorts divins %ofTheTarget%~
-@10990029 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~
+@10990021 = ~de réduire à néant la durée des sorts %spellType% %ofTheTarget%~
+@10990022 = ~de réduire à néant la durée des chants de barde %ofTheTarget%~
+@10990023 = ~de réduire de %duration% la durée des sorts %spellType% %ofTheTarget%~
+@10990024 = ~de réduire de %duration% la durée des chants de barde %ofTheTarget%~
+@10990025 = ~d'allonger de %duration% la durée des sorts %spellType% %ofTheTarget%~
+@10990026 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~
 
 // Opcode 100: Protection: from Creature Type [100]
 
