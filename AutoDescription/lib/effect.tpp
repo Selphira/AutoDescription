@@ -387,6 +387,9 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 				INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
 					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+					SPRINT regex @10019 // ~[0-9]+ % de chance ~
+					SPRINT regex ~; %regex%~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~; ~
 				END
 				SET sort += 1
 				SET $effects(~%sort%~ ~%count%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value + 2
