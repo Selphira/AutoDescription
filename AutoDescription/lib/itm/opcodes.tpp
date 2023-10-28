@@ -6493,6 +6493,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_143~ BEGIN
 	LPM ~opcode_self_probability_143~ // ~de créer 1 "%itemName%" à l'emplacement (%slotName%) %ofTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_143_group~ BEGIN
+	LPM ~opcode_143_group_mod~
+END
+
 DEFINE_PATCH_MACRO ~opcode_143_is_valid~ BEGIN
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
 		isValid = 0
@@ -10151,16 +10155,28 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	END
 	ELSE BEGIN // Un seul sort
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref3%~ RET description END
+			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref3%~ RET description END
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+			END
 			SPRINT spellName ~%spellName3%~
 			SPRINT resref ~%resref3%~
 		END
 		ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref2%~ RET description END
+			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref2%~ RET description END
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+			END
 			SPRINT spellName ~%spellName2%~
 			SPRINT resref ~%resref2%~
 		END ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-			LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+			END
 	    END
 	    ELSE BEGIN
 		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
@@ -14035,6 +14051,10 @@ END
 /* ----------------- *
  * Arme brisée [519] *
  * ----------------- */
+DEFINE_PATCH_MACRO ~opcode_self_probability_519~ BEGIN
+	SPRINT description @15190001 // ~de se briser~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_probability_519~ BEGIN
 	SPRINT description @15190001 // ~de se briser~
 END

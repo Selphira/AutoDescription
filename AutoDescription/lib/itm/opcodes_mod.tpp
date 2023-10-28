@@ -26,6 +26,31 @@ DEFINE_PATCH_MACRO ~opcode_122_is_valid_mod~ BEGIN
 END
 
 /**
+ * Tweaks Anthology
+ * ****************
+ * @1060 : Casques, Boucliers et Armures de fer cassables
+ */
+DEFINE_PATCH_MACRO ~opcode_143_group_mod~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~MISC57~ OR ~%resref%~ STRING_EQUAL_CASE ~MISC58~ OR ~%resref%~ STRING_EQUAL_CASE ~cddelhlm~ BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode match_position = position
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        SET opcode = 519
+	        LPM ~add_opcode~
+		END
+	END
+END
+
+/**
  * Skills and Abilities
  * ********************
  * Ce regroupement n'est effectué que si les bonus de dégâts liés à la force originaux n'ont pas été modifiés par un
