@@ -241,10 +241,11 @@ BEGIN
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
             SPRINT CURRENT_SOURCE_RES ~%file%~
+            SET isSpecialDuration = 0
 
 			PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
 				LPM ~load_level_effects~
-	            LPF ~spell_duration~ RET ignoreDuration strDuration END
+	            LPF ~spell_duration~ RET ignoreDuration strDuration isSpecialDuration = is_special END
 				LPM ~clear_levels~
 			END
 
