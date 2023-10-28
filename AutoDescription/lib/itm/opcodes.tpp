@@ -10156,31 +10156,24 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	ELSE BEGIN // Un seul sort
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref3%~ RET description END
-			INNER_PATCH_SAVE description ~%description%~ BEGIN
-				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-			END
-			SPRINT spellName ~%spellName3%~
-			SPRINT resref ~%resref3%~
 		END
 		ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref2%~ RET description END
-			INNER_PATCH_SAVE description ~%description%~ BEGIN
-				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-			END
-			SPRINT spellName ~%spellName2%~
-			SPRINT resref ~%resref2%~
 		END ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+	    END
+	    ELSE BEGIN
+			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description totalLines END
+			PATCH_IF totalLines > 1 BEGIN
+		        SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
+			END
+	    END
+		PATCH_IF probability < 100 BEGIN
 			INNER_PATCH_SAVE description ~%description%~ BEGIN
 				SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
 			END
-	    END
-	    ELSE BEGIN
-		    SPRINT description (AT ~%strref%~) // ~lance le sort %spellName% sur %theTarget%~
-	    END
+		END
     END
 END
 
@@ -13900,7 +13893,7 @@ DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_probability_509~ BEGIN
 	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
 END
 
