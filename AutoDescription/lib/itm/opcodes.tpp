@@ -494,6 +494,158 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~spellnames~ BEGIN
 	~lcrobe~ => 102150 // ~~
 END
 
+// Cécité
+ACTION_DEFINE_ASSOCIATIVE_ARRAY blindSpellList BEGIN
+	~SPDM101~ => 1 // Cécité
+	~SPWI106~ => 1 // Cécité
+	~SPWM178~ => 1 // Cécité
+	~SPWI228~ => 1 // -
+	~SPWI815~ => 1 // Mot de pouvoir : Cécité
+	~SPWI958~ => 1 // Mot de pouvoir : Cécité
+END
+
+// Charmes
+ACTION_DEFINE_ASSOCIATIVE_ARRAY charmSpellList BEGIN
+	~SPCL641~ => 1 // Charmer une personne ou un mammifère
+	~SPIN119~ => 1 // Charmer une personne
+	~SPIN883~ => 1 // Domination
+	~SPIN910~ => 1 // Domination
+	~SPWI104~ => 1 // Charmer une personne
+	~SPPR204~ => 1 // Charmer une personne ou un mammifère
+	~SPWI316~ => 1 // Charme néfaste
+END
+
+// Confusion
+ACTION_DEFINE_ASSOCIATIVE_ARRAY confusionSpellList BEGIN
+	~SPPR311~ => 1 // Obstination bornée
+	~SPPR709~ => 1 // Confusion
+	~SPWI401~ => 1 // Confusion
+	~SPWI508~ => 1 // Chaos
+END
+
+// Surdité
+ACTION_DEFINE_ASSOCIATIVE_ARRAY deafnessSpellList BEGIN
+	~spwi223~ => 1 // Surdité
+END
+
+// Enchevêtrement
+ACTION_DEFINE_ASSOCIATIVE_ARRAY entangleSpellList BEGIN
+	~SPIN688~ => 1 // Croissance végétale
+	~SPPR105~ => 1 // Enchevêtrement
+	~SPWM111~ => 1 // Enchevêtrement
+END
+
+// Débilité mentale
+ACTION_DEFINE_ASSOCIATIVE_ARRAY feeblemindednessSpellList BEGIN
+	~SPWI509~ => 1 // Débilité mentale
+END
+
+// Hâte
+ACTION_DEFINE_ASSOCIATIVE_ARRAY hasteSpellList BEGIN
+	~SPIN572~ => 1 // Hâte
+	~SPIN655~ => 1 // Hâte améliorée
+	~SPIN828~ => 1 // Hâte
+	~SPRA301~ => 1 // Hâte
+	~SPWI305~ => 1 // Hâte
+	~SPWI613~ => 1 // Hâte améliorée
+END
+
+// 175: Immobilisation
+ACTION_DEFINE_ASSOCIATIVE_ARRAY holdSpellList BEGIN
+	~SPIN648~ => 1 // Immobilisation des personnes
+	~SPIN988~ => 1 // Immobilisation des personnes
+	~SPPR208~ => 1 // Immobilisation des personnes
+	~SPPR305~ => 1 // Immobilisation des animaux
+	~SPPR989~ => 1 // Immobilisation des personnes
+	~SPWI306~ => 1 // Immobilisation des personnes
+	~SPWI507~ => 1 // Immobilisation des monstres
+	~SPWM122~ => 1 // Immobilisation des personnes
+END
+
+// 109: Paralysie
+ACTION_DEFINE_ASSOCIATIVE_ARRAY paralyseSpellList BEGIN
+END
+
+// Horror
+ACTION_DEFINE_ASSOCIATIVE_ARRAY horrorSpellList BEGIN
+	~spin105~ => 1 // Horreur
+	~SPIN675~ => 1 // Horreur errante
+	~SPPR416~ => 1 // Manteau de terreur
+	~SPPR706~ => 1 // Symbole : Terreur
+	~spwi205~ => 1 // Horreur
+	~SPWI811~ => 1 // Symbole : Terreur
+END
+
+// Labyrinthe
+ACTION_DEFINE_ASSOCIATIVE_ARRAY mazeSpellList BEGIN
+	~SPCL937~ => 1 // Labyrinthe de l'Ombre
+	~SPIN774~ => 1 // Labyrinthe psionique
+	~SPWI813~ => 1 // Labyrinthe
+END
+
+// Poison
+ACTION_DEFINE_ASSOCIATIVE_ARRAY poisonSpellList BEGIN
+	~SPIN673~ => 1 // Nuage mortel
+	~SPWI016~ => 1 // Nuage mortel
+	~SPWI502~ => 1 // Nuage mortel
+END
+
+// Pétrification
+ACTION_DEFINE_ASSOCIATIVE_ARRAY petrificationSpellList BEGIN
+	~spwi604~ => 1 // Pétrification
+END
+
+// Métamorphose
+ACTION_DEFINE_ASSOCIATIVE_ARRAY polymorphSpellList BEGIN
+	~SPWI415~ => 1 // Métamorphose d'autrui
+	~SPWM113~ => 1 // Métamorphose d'autrui
+END
+
+// Silence
+ACTION_DEFINE_ASSOCIATIVE_ARRAY silenceSpellList BEGIN
+	~spin692~ => 1 // Silence dans un rayon de 4,5m
+	~spin998~ => 1 // Silence dans un rayon de 4,5m
+	~SPPR211~ => 1 // Silence dans un rayon de 4,5m
+	~SPPR988~ => 1 // Silence dans un rayon de 4,5m
+	~SPWI612~ => 1 // Mot de pouvoir : Silence
+END
+
+// Lenteur
+ACTION_DEFINE_ASSOCIATIVE_ARRAY slowSpellList BEGIN
+	~SPIN575~  => 1 // Toile de vortex
+	~SPIN977~  => 1 // Lenteur du Golem
+	~SPIN983~  => 1 // Lent
+	~SPWI312~  => 1 // Lent
+	~SPWISH25~ => 1 // Lent
+	~SPWM164~  => 1 // Lent
+END
+
+// Etourdissement
+ACTION_DEFINE_ASSOCIATIVE_ARRAY stunSpellList BEGIN
+	~SPIN543~ => 1 // Douleur
+	~SPPR718~ => 1 // Symbole : Etourdissement
+	~SPWI715~ => 1 // Mot de pouvoir : Etourdissement
+	~SPWI816~ => 1 // Symbole : Etourdissement
+	~SPWI898~ => 1 // Symbole : Etourdissement
+	~SPWI959~ => 1 // Mot de pouvoir : Etourdissement
+END
+
+// Inconscience
+ACTION_DEFINE_ASSOCIATIVE_ARRAY unconsciousnessSpellList BEGIN
+	~SPPR102~ => 1 // Injonction
+	~SPPR512~ => 1 // Ordre majeur
+END
+
+// Toile d'araignée
+ACTION_DEFINE_ASSOCIATIVE_ARRAY webSpellList BEGIN
+	~SPDR157~ => 1
+	~SPDR201~ => 1 // Toile d'araignée
+	~SPIN566~ => 1 // Toile de mimique
+	~SPIN683~ => 1 // Enchevêtrement de toile
+	~SPIN575~ => 1 // Toile de vortex
+	~SPWI215~ => 1 // Toile d'araignée
+END
+
 /*
 	Opcodes dont le champ Duration n'est pas impactant
 	Conséquence : La durée n'est pas à écrire car considérée comme implicite
@@ -579,11 +731,25 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
+	 11 => 1
+	 12 => 1
 	 16 => 1
+	 39 => 1
 	 40 => 1
+	 46 => 1
+	 77 => 1
+	 79 => 1
+	101 => 1
+	161 => 1
 	177 => 1
 	206 => 1
+	208 => 1
+	221 => 1
+	224 => 1
+	235 => 1
+	242 => 1
 	335 => 1
+	337 => 1
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -3994,6 +4160,34 @@ DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_83_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_83~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET projectile = parameter2 + 1
+		// Supprimer des immunités aux sorts qui utilisent le même projectile
+		PATCH_PHP_EACH EVAL ~opcodes_206~ AS data => _ BEGIN
+			LPM ~data_to_match_vars~
+			PATCH_IF FILE_EXISTS_IN_GAME ~%match_resref%.spl~ BEGIN
+				INNER_PATCH_FILE ~%match_resref%.spl~ BEGIN
+					READ_SHORT (0x72 + SPL_HEAD_projectile) match_projectile
+					PATCH_IF projectile == match_projectile BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = 206 match_position
+							RET $opcodes(~206~) = count
+							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
+						END
+						// Bug où il reste toujours un item dans le tableau si c'était le dernier
+						// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+						PATCH_IF $opcodes(~206~) == 0 BEGIN
+				            CLEAR_ARRAY ~opcodes_206~
+				        END
+					END
+				END
+			END
+		END
+	END
+END
+
 /* ------------------------------------------- *
  * Stat: Magical Fire Resistance Modifier [84] *
  * ------------------------------------------- */
@@ -4457,8 +4651,6 @@ DEFINE_PATCH_MACRO ~opcode_99_common~ BEGIN
 		LPF ~get_spell_type_str~ INT_VAR value RET spellType END
 	END
 
-	PATCH_PRINT "spellType: %spellType%"
-
 	PATCH_IF duration < 100 AND duration > 0 BEGIN
 		SET value = 100 - duration
 		SPRINT duration @10002 // ~%value% %~
@@ -4639,7 +4831,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			// SPIN980, SPCL641, SPIN553, SPIN558, SPIN980, SPIN985, SPIN506, DEMOCHM, OHREYEB1
 			// + tout ceux qui sont oubliés + les dominations
 			TEXT_SPRINT spellState ~Charm~
-			PATCH_FOR_EACH resref IN "SPIN883" "SPWI104" "SPPR204" "SPWI316" "SPCL641" "SPIN119" BEGIN
+			PATCH_PHP_EACH charmSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
@@ -4661,22 +4853,25 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 16 BEGIN // Hâte
 			TEXT_SPRINT spellState ~Haste~
-			PATCH_FOR_EACH resref IN "SPWI305" "SPWI613" "SPIN572" "SPIN828" "SPRA301" BEGIN
+			PATCH_PHP_EACH hasteSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 24 BEGIN // Panique
 			TEXT_SPRINT spellState ~Horror~
-			PATCH_FOR_EACH resref IN "spin105" "SPPR416" "SPPR706" "spwi205" "SPWI811" BEGIN
+			PATCH_PHP_EACH horrorSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 161 // Cure: Fear [161]
 			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 25 BEGIN // Empoisonnement
+			TEXT_SPRINT spellState ~Poison~
+			PATCH_PHP_EACH poisonSpellList AS resref => _ BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
 			SET opcode = 11 // Cure: Poison [11]
 			LPM ~delete_cure_linked_to_specific_immunity~
-
 			LPF ~has_opcode~
 					INT_VAR opcode = 173
 						match_probability1 = probability1
@@ -4717,13 +4912,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
                     CLEAR_ARRAY ~opcodes_101~
                 END
 				SET opcode = 101
-				SET parameter2 = 507 // ~aux poisons~
+				SET parameter2 = 507 // ~à l'empoisonnement~
 				LPM ~add_opcode~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 38 BEGIN // Silence
 			TEXT_SPRINT spellState ~Silence~
-			PATCH_FOR_EACH resref IN "SPPR211" "SPPR709" "SPPR988" "SPWI508" "SPWI612" BEGIN
+			PATCH_PHP_EACH silenceSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 48 // Cure: Silence (Vocalize) [48]
@@ -4731,7 +4926,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 39 BEGIN // Inconscience
 			TEXT_SPRINT spellState ~Unconsciousness~
-			PATCH_FOR_EACH resref IN "SPPR102" "SPPR512" BEGIN
+			PATCH_PHP_EACH unconsciousnessSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 2 // Cure: Sleep [2]
@@ -4753,13 +4948,13 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 40 BEGIN // Lenteur
 			TEXT_SPRINT spellState ~Slow~
-			PATCH_FOR_EACH resref IN "SPWI312" "SPWISH25" "SPIN983" "SPIN575" "SPIN977" "SPWM164" BEGIN
+			PATCH_PHP_EACH slowSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 45 BEGIN // Étourdissement
 			TEXT_SPRINT spellState ~Stun~
-			PATCH_FOR_EACH resref IN "SPPR718" "SPWI715" "SPWI816" "SPWI898" "SPWI959" BEGIN
+			PATCH_PHP_EACH stunSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 46 // Cure: Stun (Unstun) [46]
@@ -4781,7 +4976,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 74 BEGIN // Cécité
 			TEXT_SPRINT spellState ~Blindness~
-			PATCH_FOR_EACH resref IN "SPDM101" "SPWI106" "SPWM178" "SPWI228" "SPWI815" "SPWI958" BEGIN
+			PATCH_PHP_EACH blindSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 75 // Cure: Blindness [75]
@@ -4789,7 +4984,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 76 BEGIN // Débilité mentale
 			TEXT_SPRINT spellState ~Feeblemindedness~
-			PATCH_FOR_EACH resref IN "SPWI509" BEGIN
+			PATCH_PHP_EACH feeblemindednessSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 77 // Cure: Feeblemindedness [77]
@@ -4797,6 +4992,9 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 80 BEGIN // Surdité
 			SET opcode = 81 // Cure: Deafness [81]
+			PATCH_PHP_EACH deafnessSpellList AS resref => _ BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
 			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 93 BEGIN // Stat: Fatigue Modifier [93]
@@ -4814,29 +5012,43 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				RET_ARRAY EVAL ~opcodes_93~ = opcodes_xx
 			END
 		END
+		ELSE PATCH_IF parameter2 == 109 BEGIN // Paralysie
+			TEXT_SPRINT spellState ~Paralyse~
+			PATCH_PHP_EACH paralyseSpellList AS resref => _ BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+			SET opcode = 162 // Cure: Hold [162]
+			LPM ~delete_cure_linked_to_specific_immunity~
+		END
 		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
 			TEXT_SPRINT spellState ~Confusion~
-			PATCH_FOR_EACH resref IN "SPWI401" "SPWI508" "SPPR311" "SPPR709" BEGIN
+			PATCH_PHP_EACH confusionSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 242 // Cure: Confusion [242]
 			LPM ~delete_cure_linked_to_specific_immunity~
 		END
+		ELSE PATCH_IF parameter2 == 134 BEGIN // Petrification
+			TEXT_SPRINT spellState ~Petrification~
+			PATCH_PHP_EACH petrificationSpellList AS resref => _ BEGIN
+				LPM ~delete_immunity_to_specific_spell~
+			END
+		END
 		ELSE PATCH_IF parameter2 == 135 BEGIN // Polymorphie
 			TEXT_SPRINT spellState ~Polymorph~
-			PATCH_FOR_EACH resref IN "SPWM113" "SPWI415" BEGIN
+			PATCH_PHP_EACH polymorphSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 154 BEGIN // Enchevêtrement
 			TEXT_SPRINT spellState ~Entangle~
-			PATCH_FOR_EACH resref IN "SPPR105" "SPIN688" "SPWM111" BEGIN
+			PATCH_PHP_EACH entangleSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
 		ELSE PATCH_IF parameter2 == 157 BEGIN // Toile d'araignée
 			TEXT_SPRINT spellState ~Web~
-			PATCH_FOR_EACH resref IN "SPDR157" "SPDR201" "SPIN566" "SPIN683" "SPIN575" "SPWI215" BEGIN
+			PATCH_PHP_EACH webSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 83 // Protection: From Projectile [83]
@@ -4844,9 +5056,9 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				LPM ~delete_cure_linked_to_specific_immunity~
 			END
 		END
-		ELSE PATCH_IF parameter2 == 175 BEGIN // Paralysie
+		ELSE PATCH_IF parameter2 == 175 BEGIN // Immobilisation
 			TEXT_SPRINT spellState ~Hold~
-			PATCH_FOR_EACH resref IN "SPWI306" "SPWI507" "SPWM122" "SPIN648" "SPIN988" "SPPR208" "SPPR305" "SPPR989" BEGIN
+			PATCH_PHP_EACH holdSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 			SET opcode = 162 // Cure: Hold [162]
@@ -4854,7 +5066,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 		ELSE PATCH_IF parameter2 == 213 BEGIN // Labyrinthe
 			TEXT_SPRINT spellState ~Maze~
-			PATCH_FOR_EACH resref IN "SPWI813" "SPIN774" "SPCL937" BEGIN
+			PATCH_PHP_EACH mazeSpellList AS resref => _ BEGIN
 				LPM ~delete_immunity_to_specific_spell~
 			END
 		END
@@ -6194,9 +6406,11 @@ DEFINE_PATCH_MACRO ~opcode_126_common~ BEGIN
 	// Ainsi mettre une vitesse à 100% revient à la faire revenir à la normale
 	PATCH_IF parameter1 == 0 AND parameter2 >= MOD_TYPE_flat BEGIN
 		SET strref += 10
+		SET cumulable = 1
 	END
 	ELSE PATCH_IF parameter1 == 100 AND parameter2 == MOD_TYPE_percentage BEGIN
 		SET strref += 20
+		SET cumulable = 1
 	END
 END
 
@@ -9226,7 +9440,7 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 			SET $opcode_206_positions(~%position%~) = opcode
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 				LPM ~data_to_vars~
-				PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) AND searchTarget == target AND searchTimingMode == timingMode AND searchDuration == duration BEGIN
+				PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) AND searchTarget == target AND (searchTimingMode == TIMING_while_equipped OR (searchTimingMode != TIMING_while_equipped AND searchTimingMode == timingMode AND searchDuration == duration)) BEGIN
 					LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 					PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
@@ -13482,34 +13696,30 @@ END
  * Remove: Opcode [337] *
  * -------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_337~ BEGIN
-	LOCAL_SET strref = 401000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
-	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370001 // ~Dissipe %opcodeStr%~
-	END
+	LOCAL_SET strref = 13370001
+	LPM ~opcode_337_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_337~ BEGIN
-	LOCAL_SET strref = 401000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
-	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370003 // ~de dissiper %opcodeStr%~
-	END
+	LOCAL_SET strref = 13370003
+	LPM ~opcode_337_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_337~ BEGIN
-	LOCAL_SET strref = 401000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
-	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370002 // ~Dissipe %opcodeStr% %ofTheTarget%~
-	END
+	LOCAL_SET strref = 13370002
+	LPM ~opcode_337_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_337~ BEGIN
-	LOCAL_SET strref = 401000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	LOCAL_SET strref = 13370004
+	LPM ~opcode_337_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_337_common~ BEGIN
+	LOCAL_SET opcodeStrref = 401000 + (parameter2 == 101 AND parameter1 >= 0 ? parameter1 : parameter2)
+	LPF ~getTranslation~ INT_VAR strref = opcodeStrref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @13370004 // ~de dissiper %opcodeStr% %ofTheTarget%~
+		SPRINT description (AT strref) // ~Dissipe %opcodeStr% %ofTheTarget%~
 	END
 END
 

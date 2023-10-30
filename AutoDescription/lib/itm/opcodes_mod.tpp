@@ -1,3 +1,11 @@
+OUTER_SET $entangleSpellList(~d2wk5s1a~) = 1 // The Workshop Kitpack v4.6
+OUTER_SET $entangleSpellList(~d2wk5s1b~) = 1 // The Workshop Kitpack v4.6
+OUTER_SET $entangleSpellList(~d2wk5s1e~) = 1 // The Workshop Kitpack v4.6
+OUTER_SET $entangleSpellList(~x#kispr~) = 1 // BG1 NPC Project v32
+
+OUTER_SET $slowSpellList(~finslow~) = 1 // Ascension v2.0.24
+OUTER_SET $slowSpellList(~mels545~) = 1 // Ascension v2.0.24
+
 DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
 	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%parameter1%~
 
