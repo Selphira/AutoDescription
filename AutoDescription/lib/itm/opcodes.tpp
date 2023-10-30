@@ -9357,13 +9357,30 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	LOCAL_SET searchOpcode = 171
 	LOCAL_SET nbFound = 0
 	PATCH_DEFINE_ARRAY psionicCapacities BEGIN
-		"SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975"
+		"SPIN542" // PSIONIC_DISINTEGRATE
+		"SPIN543" // PSIONIC_INFLICT_PAIN
+		"SPIN544" // PSIONIC_SUPERIOR_INVISIBILITY
+		"SPIN545" // PSIONIC_LIFE_DRAIN
+		"SPIN546" // PSIONIC_INERTIAL_BARRIER
+		"SPIN547" // PSIONIC_PROJECT_FORCE
+		"SPIN727" // NOSAVE_PSIONIC_BLAST
+		"SPIN774" // PSIONIC_MAZE
+		"SPIN775" // PSIONIC_MIND_BLAST
+		"SPIN804" // PSIONIC_EMOTION_KILL
+		"SPIN834" // BRAIN_PSIONIC_BLAST
+		"SPIN909" // PSIONIC_EGOWHIP
+		"SPIN910" // PSIONIC_DOMINATION
+		"SPIN911" // PSIONIC_BALLISTIC
+		"SPIN912" // PSIONIC_DETONATE
+		"SPIN959" // ULITHARID_PSIONIC_BLAST
+		"SPIN974" // MIND_FLAYER_PSIONIC_BLAST
+		"SPIN975" // Domination psionique
 	END
 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		FOR (i = 0 ; i < 10 ; ++i ) BEGIN
-			PATCH_IF $psionicCapacities(~%i%~) STRING_EQUAL_CASE ~%resref%~ BEGIN
+		PATCH_PHP_EACH psionicCapacities AS _ => match_resref BEGIN
+			PATCH_IF ~%match_resref%~ STRING_EQUAL_CASE ~%resref%~ BEGIN
 				SET nbFound += 1
 				PATCH_IF nbFound == 5 BEGIN
 					SET opcode = 101
@@ -9377,7 +9394,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 	// Solution : possède la protection contre au moins 5 capacités psioniques
 	PATCH_IF nbFound >= 5 BEGIN
 		PATCH_IF show_lack_immunity BEGIN
-			PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+			PATCH_PHP_EACH psionicCapacities AS _ => resref BEGIN
 				// Affichage warning car sort non trouvé
 				LPF ~has_opcode~
 					INT_VAR opcode
@@ -9391,7 +9408,7 @@ DEFINE_PATCH_MACRO ~opcode_206_group~ BEGIN
 				END
 			END
 		END
-		PATCH_FOR_EACH resref IN "SPIN774" "SPIN775" "SPIN834" "SPIN909" "SPIN910" "SPIN911" "SPIN912" "SPIN959" "SPIN974" "SPIN975" BEGIN
+		PATCH_PHP_EACH psionicCapacities AS _ => resref BEGIN
 			LPF ~delete_opcode~
 				INT_VAR opcode
 				STR_VAR
