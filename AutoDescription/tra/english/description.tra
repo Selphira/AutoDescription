@@ -20,7 +20,7 @@
 @10003 = ~+%value%~
 @10004 = ~; ~
 @10006 = ~Multiplied by %value%~
-@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~^[0-9]+% chance ~
 @10010 = ~Set to %value%~
 @10013 = ~%section% (%sectionType%)~
