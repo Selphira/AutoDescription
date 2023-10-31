@@ -13330,6 +13330,24 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 	SET ignoreDuration = 1
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_326~ BEGIN
+	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ BEGIN
+		LPM ~opcode_326_condition~
+	END
+	// Protection contre les boucles infinies
+	PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+		SET $recursive_resref(~%resref%~) = 1
+		SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+		LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			SPRINT regex @10019 // ~^[0-9]+ % de chance ~
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+		END
+	END
+	CLEAR_ARRAY recursive_resref
+	SET ignoreDuration = 1
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_326~ BEGIN
 	LPM ~opcode_self_326~
 END
