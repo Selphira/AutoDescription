@@ -5076,12 +5076,12 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 		END
 	END
 
-	// Action libre
-	// Nécessite d'être traité à part, afin que tous les autres effets puissent grouper si nécessaire.
-	PATCH_IF abilityType == AbilityType_Equipped BEGIN
-		PATCH_PHP_EACH EVAL ~opcodes_101~ AS data => _ BEGIN
-			LPM ~data_to_vars~
-			PATCH_IF parameter2 == 126 BEGIN // Stat: Movement Modifier [126]
+	PATCH_PHP_EACH EVAL ~opcodes_101~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == 126 BEGIN // Stat: Movement Modifier [126]
+			// Action libre
+			// Nécessite d'être traité à part, afin que tous les autres effets puissent grouper si nécessaire.
+			PATCH_IF abilityType == AbilityType_Equipped BEGIN
 				SET hasAllOpcode = 1
 				LPF ~has_opcode~
 					INT_VAR opcode = 163
@@ -5145,6 +5145,11 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 							RET $opcodes(~%opcode%~) = count
 							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 						END
+						// Bug où il reste toujours un item dans le tableau si c'était le dernier
+						// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+						PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+				            CLEAR_ARRAY ~opcodes_%opcode%~
+				        END
 					END
 					PATCH_FOR_EACH parameter2 IN 16 40 109 126 154 157 175 BEGIN
 						LPF ~delete_opcode~
@@ -5159,9 +5164,16 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 							RET $opcodes(~101~) = count
 							RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 						END
+						// Bug où il reste toujours un item dans le tableau si c'était le dernier
+						// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+						PATCH_IF $opcodes(~101~) == 0 BEGIN
+				            CLEAR_ARRAY ~opcodes_101~
+				        END
 					END
 				END
 			END
+			SET opcode = 126
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 	END
 END
@@ -5333,6 +5345,11 @@ DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
+		// Bug où il reste toujours un item dans le tableau si c'était le dernier
+		// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+		PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+            CLEAR_ARRAY ~opcodes_%opcode%~
+        END
 	END
 END
 
@@ -12810,7 +12827,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET statType = statType == 76 ? 110 : statType
 				SET oldStrref = strref + statType
 				SET strref = 420000 + parameter1
-				LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+				LPF ~get_splstate_name~ INT_VAR strref opcode splstate = parameter1 RET splstateName END
 				SET strref = oldStrref
 			END
 			ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
@@ -13065,11 +13082,7 @@ BEGIN
         ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
             PATCH_IF parameter1 != 121 BEGIN // On ignore l'effet "Manteau"
 	            SET strref = 420000 + parameter1
-				PATCH_TRY
-	                LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
-				WITH DEFAULT
-					LPF ~get_splstate_name_mod~ INT_VAR splstate = parameter1 RET splstateName END
-				END
+				LPF ~get_splstate_name~ INT_VAR strref opcode splstate = parameter1 RET splstateName END
 				PATCH_IF NOT ~%splstateName%~ STRING_EQUAL ~~ BEGIN
 		            SPRINT creatureType @13241110 // ~créatures sous l'effet de %splstateName%~
 		            PATCH_IF statType == 76 OR statType == 110 BEGIN
@@ -13338,7 +13351,7 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 		SET statType = statType == 76 ? 110 : statType
 		SET oldStrref = strref + statType
 		SET strref = 420000 + parameter1
-		LPF ~getTranslation~ INT_VAR strref opcode RET splstateName = string END
+		LPF ~get_splstate_name~ INT_VAR strref opcode splstate = parameter1 RET splstateName END
 		SET strref = oldStrref
 	END
 	ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN
@@ -15461,6 +15474,14 @@ DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 RET spellType BEGIN
 		END
 	END
 	LPF ~implode~ STR_VAR array_name = ~spellTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET spellType = text END
+END
+
+DEFINE_PATCH_FUNCTION ~get_splstate_name~ INT_VAR strref = 0 opcode = 0 splstate = 0 RET splstateName BEGIN
+	PATCH_TRY
+        LPF ~getTranslation~ INT_VAR strref opcode warning = 0 RET splstateName = string END
+	WITH DEFAULT
+		LPF ~get_splstate_name_mod~ INT_VAR splstate RET splstateName END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_frequency_duration~ INT_VAR duration = 0 strref = 100320 RET frequency BEGIN // ~par %strDuration%~
