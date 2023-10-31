@@ -288,7 +288,7 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 		PATCH_PHP_EACH ~probability_effects~ AS line => value BEGIN
 			PATCH_IF line_4 != range_low OR line_5 != range_high BEGIN
 				// On commence un nouveau groupe de range
-				SET range = line_0
+				SPRINT range ~%line_0%~
 				SET count_range += 1
 				SPRINT $ranges(~%count_range%~) ~%range%~
 				SET EVAL ~count_ranges_%range%~ = 0
