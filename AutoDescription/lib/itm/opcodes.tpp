@@ -1244,7 +1244,7 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 	    END
 
 		INNER_PATCH_SAVE value ~%value%~ BEGIN
-			REPLACE_TEXTUALLY ~5$~ ~%oneHalf%~           // 5  => une demi
+			REPLACE_TEXTUALLY ~+5$~ ~+%oneHalf%~         // 5  => une demi
 			REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
 			REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
 		END
@@ -4895,14 +4895,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					RET_ARRAY EVAL ~opcodes_173~ = opcodes_xx
 				END
 				LPF ~delete_opcode~
-					INT_VAR opcode = 101
-						match_parameter2   = 25
-				        match_probability1 = probability1
-				        match_probability2 = probability2
-				        match_saveBonus    = saveBonus
-				        match_saveType     = saveType
-				        match_target       = target
-					STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
+					INT_VAR opcode = 101 match_position = position
 					RET $opcodes(~101~) = count
 					RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
 				END
@@ -4990,6 +4983,33 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			SET opcode = 77 // Cure: Feeblemindedness [77]
 			LPM ~delete_cure_linked_to_specific_immunity~
 		END
+		ELSE PATCH_IF parameter2 == 78 BEGIN // Maladie
+			// Si possède aussi le 101 pour le 76 alors supprimer l'opcode 79
+			LPF ~has_opcode~
+				INT_VAR opcode = 101
+					match_parameter2   = 76
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_target       = target
+				STR_VAR match_macro = ~opcode_match_parameter2_and_probability1_and_probability2_and_target~
+				RET hasOpcode
+			END
+			PATCH_IF hasOpcode == 1 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 79
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+					STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_target~
+					RET $opcodes(~79~) = count
+					RET_ARRAY EVAL ~opcodes_79~ = opcodes_xx
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~79~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_79~
+		        END
+			END
+		END
 		ELSE PATCH_IF parameter2 == 80 BEGIN // Surdité
 			SET opcode = 81 // Cure: Deafness [81]
 			PATCH_PHP_EACH deafnessSpellList AS resref => _ BEGIN
@@ -5011,6 +5031,11 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 				RET $opcodes(~93~) = count
 				RET_ARRAY EVAL ~opcodes_93~ = opcodes_xx
 			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~93~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_93~
+	        END
 		END
 		ELSE PATCH_IF parameter2 == 109 BEGIN // Paralysie
 			TEXT_SPRINT spellState ~Paralyse~
@@ -5835,6 +5860,10 @@ DEFINE_PATCH_MACRO ~opcode_self_112~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_112~ BEGIN
+	LPM ~opcode_target_probability_112~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_112~ BEGIN
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
@@ -6286,8 +6315,16 @@ DEFINE_PATCH_MACRO ~opcode_self_123~ BEGIN
 	LPM ~opcode_self_112~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_123~ BEGIN
+	LPM ~opcode_self_probability_112~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_123~ BEGIN
 	LPM ~opcode_target_112~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_123~ BEGIN
+	LPM ~opcode_target_probability_112~
 END
 
 DEFINE_PATCH_MACRO ~opcode_123_is_valid~ BEGIN
@@ -7413,7 +7450,10 @@ END
  * ----------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_159~ BEGIN
 	LOCAL_SET amount = parameter1 MODULO 65536
-	PATCH_IF amount == 1 BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT amount ~%custom_str%~
+		SPRINT description @11590002 // ~Crée %amount% images miroir sur %theTarget%~
+	END ELSE PATCH_IF amount == 1 BEGIN
 		SPRINT description @11590001 // ~Crée 1 image miroir sur %theTarget%~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
@@ -7426,7 +7466,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_159~ BEGIN
 	LOCAL_SET amount = parameter1 MODULO 65536
-	PATCH_IF amount == 1 BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+    	SPRINT amount ~%custom_str%~
+		SPRINT description @11590012 // ~de créer %amount% images miroir sur %theTarget%~
+    END ELSE PATCH_IF amount == 1 BEGIN
 		SPRINT description @11590011 // ~de créer 1 image miroir sur %theTarget%~
 	END
 	ELSE PATCH_IF amount > 1 BEGIN
@@ -7443,6 +7486,68 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_159~ BEGIN
 	LPM ~opcode_self_probability_159~ // ~de créer %amount% images miroir sur %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_159_group~ BEGIN
+	LOCAL_SET amountMin = 0
+	LOCAL_SET amountMax = 0
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY positions_already_check
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET grouped = 0
+		CLEAR_ARRAY positions
+		PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			SET $positions(~%position%~) = 1
+			SET $positions_already_check(~%position%~) = 1
+			SET parameter1 = parameter1 MODULO 65536
+			PATCH_IF parameter1 > 0 BEGIN
+				PATCH_IF amountMin = 0 OR amountMin > parameter1 BEGIN
+					SET amountMin = parameter1
+				END
+				PATCH_IF amountMax = 0 OR amountMax < parameter1 BEGIN
+					SET amountMax = parameter1
+				END
+				PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+					LPM ~data_to_match_vars~
+					SET match_parameter1 = match_parameter1 MODULO 65536
+					PATCH_IF match_parameter1 > 0 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+						LPM ~opcode_match_opcode_159_group~
+						PATCH_IF match == 1 BEGIN
+							PATCH_IF amountMin = 0 OR amountMin > match_parameter1 BEGIN
+								SET amountMin = match_parameter1
+							END
+							PATCH_IF amountMax = 0 OR amountMax < match_parameter1 BEGIN
+								SET amountMax = match_parameter1
+							END
+							SET $positions(~%match_position%~) = 1
+							SET $positions_already_check(~%match_position%~) = 1
+							SET grouped = 1
+						END
+					END
+				END
+			END
+		END
+		PATCH_IF grouped == 1 BEGIN
+			PATCH_PHP_EACH positions AS position => _ BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+			SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
+	        LPM ~add_opcode~
+		END
+	END
 END
 
 /* ---------------------- *
@@ -9690,18 +9795,13 @@ END
  * Spell Effect: Select Spell [214] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_214~ BEGIN
-	LOCAL_SET type = parameter2
+	LOCAL_SET strref = 12140001 // ~Permet de lancer un sort du livre de sorts~
+	LPM ~opcode_214_common~
+END
 
-	PATCH_IF type == 0 BEGIN
-		LPF ~opcode_214_get_spells~ STR_VAR file = EVAL ~%resref%~ RET spells END
-		PATCH_IF NOT ~%spells%~ STRING_EQUAL ~~ BEGIN
-            SPRINT description @12140002 // ~Permet de lancer l'un des sorts de cette liste%colon%%spells%~
-		END
-	END
-	ELSE BEGIN
-		//TODO: IF ee ajouter sauf SPWI110 et SPWI124 ?
-        SPRINT description @12140001 // ~Permet de lancer un sort du livre de sorts~
-	END
+DEFINE_PATCH_MACRO ~opcode_target_214~ BEGIN
+	LOCAL_SET strref = 12140003 // ~Permet %toTheTarget% de lancer un sort du livre de sorts~
+	LPM ~opcode_214_common~
 END
 
 DEFINE_PATCH_FUNCTION ~opcode_214_get_spells~
@@ -9730,6 +9830,22 @@ BEGIN
 
 	INNER_PATCH_SAVE spells ~%spells%~ BEGIN
 		REPLACE_TEXTUALLY CASE_INSENSITIVE ~%crlf%~ ~%crlf%  * ~ // Indentation de la liste des sorts
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_214_common~ BEGIN
+	LOCAL_SET type = parameter2
+
+	PATCH_IF type == 0 BEGIN
+		LPF ~opcode_214_get_spells~ STR_VAR file = EVAL ~%resref%~ RET spells END
+		PATCH_IF NOT ~%spells%~ STRING_EQUAL ~~ BEGIN
+			SET strref += 1
+            SPRINT description (AT strref)
+		END
+	END
+	ELSE BEGIN
+		//TODO: IF ee ajouter sauf SPWI110 et SPWI124 ?
+        SPRINT description (AT strref) // ~Permet de lancer un sort du livre de sorts~
 	END
 END
 
@@ -10506,7 +10622,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 			// Un sort lancé à chaque round via une capacité d'équipement peut être considéré comme permanent.
 			// Il existe un risque où il serait préférable d'indiquer que le sort est lancé chaque round, mais je n'ai pas encore rencontré ce cas.
 			// Tous les sorts actuellement rencontrés et lancés de cette manière sont des buffs.
-			PATCH_IF abilityType = AbilityType_Equipped BEGIN
+			PATCH_IF abilityType == AbilityType_Equipped BEGIN
 				SPRINT condition @12320000 // ~~
 				SET ignoreDuration = 1
 			END
@@ -10713,7 +10829,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_235~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_235_common~ BEGIN
-	SET strref += parameter2 > 4 ? 1 : parameter2
+	SET strref += parameter2 > 4 OR parameter2 < 1 ? 1 : parameter2
     LPF ~feets_to_meters~ INT_VAR range = parameter1 RET range = rangeToMeter END
 	SPRINT description (AT strref)
 END
@@ -15890,6 +16006,23 @@ DEFINE_PATCH_MACRO ~opcode_match_parameter1_and_parameter2_and_probability1_and_
     )
 END
 
+DEFINE_PATCH_MACRO ~opcode_match_probability1_and_probability2_and_target~ BEGIN
+	SET match = (
+			match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_target       == target
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_probability1_and_probability2_and_target~ BEGIN
+	SET match = (
+			match_parameter2   == parameter2
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_target       == target
+    )
+END
+
 DEFINE_PATCH_MACRO ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~ BEGIN
 	SET match = (
 			match_parameter2   == parameter2
@@ -16082,6 +16215,34 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_154_group~ BEGIN
         AND match_saveType     == saveType
         AND match_saveBonus    == saveBonus
         AND match_resistance   == resistance
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_159_group~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        // AND match_parameter1   == parameter1
+        // AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        // AND match_probability  == probability
+        // AND match_probability1 == probability1
+        // AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
     )
 END
 

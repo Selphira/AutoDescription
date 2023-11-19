@@ -786,6 +786,7 @@
 @230065 = ~armures de plate complète~
 @230066 = ~armures de peau~
 @230067 = ~robes~
+@230068 = ~~
 @230069 = ~épées bâtardes~
 @230070 = ~écharpes~
 @230071 = ~nourritures~
@@ -3062,6 +3063,8 @@
 
 @12140001 = ~Permet de lancer un sort du livre de sorts~
 @12140002 = ~Permet de lancer un sort de cette liste%colon%%spells%~
+@12140003 = ~Permet %toTheTarget% de lancer un sort du livre de sorts~
+@12140004 = ~Permet %toTheTarget% de lancer un sort de cette liste%colon%%spells%~
 
 // Opcode 216: Spell Effect: Level Drain [216]
 

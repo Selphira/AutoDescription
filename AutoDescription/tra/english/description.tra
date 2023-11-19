@@ -786,6 +786,7 @@
 @230065 = ~fullplate armours~
 @230066 = ~skin armours~
 @230067 = ~robes~
+@230068 = ~~
 @230069 = ~bastard swords~
 @230070 = ~scarves~
 @230071 = ~foods~
@@ -3060,6 +3061,8 @@
 
 @12140001 = ~Permet de lancer un sort du livre de sorts~
 @12140002 = ~Permet de lancer un sort de cette liste%colon%%spells%~
+@12140003 = ~Permet %toTheTarget% de lancer un sort du livre de sorts~
+@12140004 = ~Permet %toTheTarget% de lancer un sort de cette liste%colon%%spells%~
 
 // Opcode 216: Spell Effect: Level Drain [216]
 
