@@ -672,3 +672,53 @@ DEFINE_PATCH_MACRO ~list_kits~ BEGIN
 		END
 	END
 END
+
+
+DEFINE_PATCH_FUNCTION ~cleric_can_use_item~
+	RET canUse
+BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY cleric_group BEGIN
+		CLERIC,              0, "BIT7"  => 1 // ~Clerc~
+		CLERIC_MAGE,         0, "BIT8"  => 1 // ~Clerc / Mage~
+	    CLERIC_THIEF,        0, "BIT9"  => 1 // ~Clerc / Voleur~
+		CLERIC_RANGER,       0, "BIT10" => 1 // ~Clerc / Rôdeur~
+		FIGHTER_CLERIC,      0, "BIT14" => 1 // ~Guerrier / Clerc~
+		FIGHTER_MAGE_CLERIC, 0, "BIT15" => 1 // ~Guerrier / Mage / Clerc~
+		//TALOS,               1, "BIT0"  => 1 // ~Prêtre de Talos~
+		//HELM,                1, "BIT1"  => 1 // ~Prêtre de Helm~
+		//LATHANDER,           1, "BIT2"  => 1 // ~Prêtre de Lathandre~
+	END
+	LPF ~class_can_use_item~ STR_VAR array_name = ~cleric_group~ RET canUse END
+END
+
+DEFINE_PATCH_FUNCTION ~druid_can_use_item~
+	RET canUse
+BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY druid_group BEGIN
+		FIGHTER_DRUID, 0, "BIT12" => 1 // ~Guerrier / Druide~
+		DRUID,         0, "BIT30" => 1 // ~Druide~
+		//TOTEMIC_DRUID, 1, "BIT3"  => 1 // ~Chaman~
+		//SHAPESHIFTER,  1, "BIT4"  => 1 // ~Métamorphe~
+		//BEAST_FRIEND,  1, "BIT5"  => 1 // ~Justicier~
+	END
+	LPF ~class_can_use_item~ STR_VAR array_name = ~druid_group~ RET canUse END
+END
+
+DEFINE_PATCH_FUNCTION ~class_can_use_item~
+	STR_VAR array_name = ~~
+	RET canUse
+BEGIN
+	SET canUse = 0
+	READ_LONG  ITM_usability_flags usability0
+	READ_BYTE  ITM_kit_usability1  usability1
+	READ_BYTE  ITM_kit_usability2  usability2
+	READ_BYTE  ITM_kit_usability3  usability3
+	READ_BYTE  ITM_kit_usability4  usability4
+
+	PATCH_PHP_EACH "%array_name%" AS data => value BEGIN
+		SET bit = EVAL "%%data_2%%"
+		PATCH_IF (EVAL ~usability%data_1%~ BAND %bit%) = 0 BEGIN
+			SET canUse = 1
+		END
+	END
+END

@@ -1806,7 +1806,7 @@ DEFINE_PATCH_MACRO ~opcode_15_common~ BEGIN
 				SET parameter1 = 1
 			END
 			ELSE BEGIN
-				LPF ~add_log_warning~ STR_VAR type = ~warning~ message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: mode : %parameter2% avec présence de CLSSPLAB.2da : non gere.~ END
 			END
 		END
 		// issu d'un EFF et parameter1 == 0: sans effet
@@ -3553,16 +3553,18 @@ DEFINE_PATCH_MACRO ~opcode_self_62~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
 	LOCAL_SET spellLevelMax = 7
+	LOCAL_SET spellTypes = 1 << 1
 
-	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620001 RET description END
+	LPF ~opcode_self_42_62~ INT_VAR level amount spellTypes startStrref = 10620001 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_62~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
 	LOCAL_SET spellLevelMax = 9
+	LOCAL_SET spellTypes = 1 << 1
 
-	LPF ~opcode_self_42_62~ INT_VAR level amount startStrref = 10620011 RET description END
+	LPF ~opcode_self_42_62~ INT_VAR level amount spellTypes startStrref = 10620011 RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_62_group~ BEGIN
@@ -8926,9 +8928,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_191~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_191_common~ BEGIN
-	PATCH_IF parameter2 == 1 BEGIN
-		SET strref += 1 // ~le niveau de lanceur de sorts divins~
-	END
+	SET spellTypes = 1 << parameter2
+	LPF ~get_spell_type_str~ INT_VAR value = spellTypes cleric_druid_limitation = 1 RET spellType END
 	SET parameter2 = MOD_TYPE_cumulative
 	SET parameter1 = parameter1 BAND 255
 END
@@ -15189,7 +15190,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_allegiance~ STR_VAR file = "" RET allegiance
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrref = 0 RET description BEGIN
+DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 spellTypes = 1 startStrref = 0 RET description BEGIN
 	SPRINT levelStr ~~
 
 	PATCH_IF amount > 32768 BEGIN
@@ -15201,6 +15202,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 		SET amount = amount > spellLevelMax ? spellLevelMax : amount
 		PATCH_IF amount > 0 BEGIN
 			LPM ~opcode_self_42_62_get_levelstr~
+			LPF ~get_spell_type_str~ INT_VAR value = spellTypes cleric_druid_limitation = 1 STR_VAR final_glue = ~/~ RET spellType END
 			SET strref = startStrref + 4
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
 		END
@@ -15208,6 +15210,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 	ELSE PATCH_IF level == 512 BEGIN
 		// Double le niveau de sorts de niveau amount
 		PATCH_IF amount > 0 AND amount <= spellLevelMax BEGIN
+			LPF ~get_spell_type_str~ INT_VAR value = spellTypes cleric_druid_limitation = 1 STR_VAR final_glue = ~/~ RET spellType END
 			SPRINT levelStr ~%amount%~
 			SET strref = startStrref + 4
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string END //~Double le nombre de sorts [profanes|divins] mémorisables de niveau inférieur ou égal à %levelStr%~
@@ -15218,6 +15221,7 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 startStrr
 	END
 	ELSE BEGIN
 		LPM ~opcode_self_42_62_get_levelstr~
+		LPF ~get_spell_type_str~ INT_VAR value = spellTypes singular = ABS amount == 1 cleric_druid_limitation = 1 STR_VAR final_glue = ~/~ RET spellType END
 		PATCH_IF amount > 0 BEGIN // Mémorisation
 			SET strref = amount == 1 ? startStrref: (startStrref+1)
         END
@@ -15596,18 +15600,52 @@ DEFINE_PATCH_FUNCTION ~get_states_str~ INT_VAR state = 0 RET descriptionState BE
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 RET spellType BEGIN
-	SPRINT and @100021 // ~et~
+DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 singular = 0 cleric_druid_limitation = 0 STR_VAR final_glue = ~~ RET spellType BEGIN
+	PATCH_IF ~%final_glue%~ STRING_EQUAL ~~ BEGIN
+		SPRINT final_glue @100021 // ~et~
+		SPRINT final_glue ~ %final_glue% ~
+	END
+	SET offset = singular > 0 ? 10 : 0
 	PATCH_DEFINE_ARRAY ~spellTypes~ BEGIN END
 	FOR (idx = 0 ; idx < 3 ; ++idx) BEGIN
 		SET bit = EVAL ~%BIT%idx%%~
 		PATCH_IF (value BAND bit) != 0 BEGIN
-			SET strref = 101300 + idx
-			SPRINT spellTypeStr (AT strref)
-			SPRINT $spellTypes(~%spellTypeStr%~) ~~
+			PATCH_IF idx == 1 BEGIN
+				SET clericCanUse = 1
+				SET druidCanUse = 1
+				PATCH_IF isItem AND cleric_druid_limitation BEGIN
+					LPF ~cleric_can_use_item~ RET clericCanUse = canUse END
+					LPF ~druid_can_use_item~ RET druidCanUse = canUse END
+					PATCH_IF !druidCanUse AND !clericCanUse BEGIN
+						LPF ~add_log_warning~ STR_VAR message = ~Opcode %opcode%: Item not usable by cleric or druid.~ END
+					END
+				END
+				PATCH_IF cleric_druid_limitation AND clericCanUse AND druidCanUse BEGIN
+					SET strref = 101305 + offset // ~divins/druidiques~
+					SPRINT spellTypeStr (AT strref)
+					SPRINT $spellTypes(~%spellTypeStr%~) ~~
+				END
+				ELSE BEGIN
+					PATCH_IF clericCanUse BEGIN
+						SET strref = 101301 + offset // ~divins~
+						SPRINT spellTypeStr (AT strref)
+						SPRINT $spellTypes(~%spellTypeStr%~) ~~
+					END
+					PATCH_IF druidCanUse BEGIN
+						SET strref = 101304 + offset // ~druidiques~
+						SPRINT spellTypeStr (AT strref)
+						SPRINT $spellTypes(~%spellTypeStr%~) ~~
+					END
+				END
+			END
+			ELSE BEGIN
+				SET strref = 101300 + idx + offset
+				SPRINT spellTypeStr (AT strref)
+				SPRINT $spellTypes(~%spellTypeStr%~) ~~
+			END
 		END
 	END
-	LPF ~implode~ STR_VAR array_name = ~spellTypes~ glue = ~, ~ final_glue = ~ %and% ~ RET spellType = text END
+	LPF ~implode~ STR_VAR array_name = ~spellTypes~ glue = ~, ~ final_glue RET spellType = text END
 END
 
 DEFINE_PATCH_FUNCTION ~get_splstate_name~ INT_VAR strref = 0 opcode = 0 splstate = 0 RET splstateName BEGIN

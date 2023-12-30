@@ -86,6 +86,14 @@
 @101301 = ~divins~
 @101302 = ~innés~
 @101303 = ~magiques~
+@101304 = ~druidiques~
+@101305 = ~divins/druidiques~
+@101310 = ~profane~
+@101311 = ~divin~
+@101312 = ~inné~
+@101313 = ~magique~
+@101314 = ~druidique~
+@101315 = ~divin/druidique~
 
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
@@ -882,7 +890,7 @@
 @400059 = ~à la modification du score de Déplacement silencieux~
 @400060 = ~à l'échec d'incantation des sorts~
 @400061 = ~~ // Opcode visuel
-@400062 = ~à la mémorisation de sorts divins supplémentaires~
+@400062 = ~à la mémorisation de sorts divins et druidiques supplémentaires~
 @400063 = ~à l'infravision~
 @400064 = ~à la dissipation de l'infravision~
 @400065 = ~~ // Opcode visuel
@@ -1238,7 +1246,7 @@
 @401059 = ~les effets modifiant le score de Déplacement silencieux~
 @401060 = ~les effets altérant l'échec d'incantation des sorts~
 @401061 = ~~ // Opcode visuel
-@401062 = ~les effets permettant la mémorisation de sorts divins supplémentaires~
+@401062 = ~les effets permettant la mémorisation de sorts divins et druidiques supplémentaires~
 @401063 = ~à l'infravision~
 @401064 = ~les effets dissipant l'infravision~
 @401065 = ~~ // Opcode visuel
@@ -2102,17 +2110,17 @@
 
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
-@10620001 = ~Permet de mémoriser un sort divin supplémentaire de %levelStr% niveau~
-@10620002 = ~Permet de mémoriser %amount% sorts divins supplémentaires de %levelStr% niveau~
-@10620003 = ~Suppression d'un sort divin de %levelStr% niveau~
-@10620004 = ~Suppression de %amount% sorts divins de %levelStr% niveau~
-@10620005 = ~Double le nombre de sorts divins mémorisables de %levelStr% niveau~
+@10620001 = ~Permet de mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~
+@10620002 = ~Permet de mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
+@10620003 = ~Suppression d'un sort %spellType% de %levelStr% niveau~
+@10620004 = ~Suppression de %amount% sorts %spellType% de %levelStr% niveau~
+@10620005 = ~Double le nombre de sorts %spellType% mémorisables de %levelStr% niveau~
 
-@10620011 = ~de pouvoir mémoriser un sort divin supplémentaire de %levelStr% niveau~
-@10620012 = ~de pouvoir mémoriser %amount% sorts divins supplémentaires de %levelStr% niveau~
-@10620013 = ~de supprimer un sort divin de %levelStr% niveau~
-@10620014 = ~de supprimer %amount% sorts divins de %levelStr% niveau~
-@10620015 = ~de doubler le nombre de sorts divins mémorisables de %levelStr% niveau~
+@10620011 = ~de pouvoir mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~
+@10620012 = ~de pouvoir mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
+@10620013 = ~de supprimer un sort %spellType% de %levelStr% niveau~
+@10620014 = ~de supprimer %amount% sorts %spellType% de %levelStr% niveau~
+@10620015 = ~de doubler le nombre de sorts %spellType% mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
 
@@ -2922,10 +2930,8 @@
 
 // Opcode 191: Spell: Casting Level Modifier [191]
 
-@11910001 = ~Niveau de lanceur de sorts profanes~
-@11910002 = ~Niveau de lanceur de sorts divins~
-@11910003 = ~le niveau de lanceur de sorts profanes~
-@11910004 = ~le niveau de lanceur de sorts divins~
+@11910001 = ~Niveau de lanceur de sorts %spellType%~
+@11910003 = ~le niveau de lanceur de sorts %spellType%~
 
 // Opcode 192: Spell Effect: Find Familiar [192]
 
