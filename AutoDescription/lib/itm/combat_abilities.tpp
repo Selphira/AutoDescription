@@ -408,13 +408,33 @@ BEGIN
     LPF ~appendLine~ RET description END
     LPF ~add_global_effects_to_description~ RET description END
 
-	// Enchantement
+	// Niveau d'enchantement
 	LPF ~array_count~ STR_VAR array_name = ~enchantments~ RET count END
 	PATCH_PHP_EACH ~enchantments~ AS array_name => value BEGIN
 	    PATCH_IF ~%value%~ != 0 BEGIN
-	        LPF ~get_combat_attribute_name~ INT_VAR strref = 13440001 count STR_VAR array_name RET name END
-			LPF ~signed_value~ INT_VAR value RET value END
-			LPF ~appendValue~ STR_VAR name value RET description END // ~TAC0~
+	        SET ignoreEnchantment = 0
+			SET found = 0
+			PATCH_IF show_weapon_enchantment_if_different_thac0 BEGIN
+				PATCH_PHP_EACH ~%array_name%~ AS index => _ BEGIN
+					PATCH_PHP_EACH ~tac0s~ AS array_tac0s => tac0 BEGIN
+						PATCH_PHP_EACH ~%array_tac0s%~ AS index_tac0 => _ BEGIN
+							PATCH_IF found == 0 BEGIN
+								PATCH_IF index == index_tac0 BEGIN
+									SET found = 1
+									PATCH_IF value == tac0 BEGIN
+										SET ignoreEnchantment = 1
+									END
+								END
+							END
+						END
+					END
+				END
+			END
+			PATCH_IF ignoreEnchantment == 0 BEGIN
+		        LPF ~get_combat_attribute_name~ INT_VAR strref = 13440001 count STR_VAR array_name RET name END
+				LPF ~signed_value~ INT_VAR value RET value END
+				LPF ~appendValue~ STR_VAR name value RET description END // ~Niveau d'enchantement~
+			END
 		END
 	END
 

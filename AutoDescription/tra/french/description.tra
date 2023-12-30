@@ -1172,8 +1172,8 @@
 @400341 = ~à la génération d'effet en cas de coup critique~
 @400342 = ~~ // Opcode visuel
 @400343 = ~à l'échange de points de vie avec une cible~
-@400344 = ~à la modification de l'enchantement d'une arme contre une cible d'un type spécifique~
-@400345 = ~à la modification de l'enchantement d'une arme d'un type spécifique~
+@400344 = ~à la modification du niveau d'enchantement d'une arme contre une cible d'un type spécifique~
+@400345 = ~à la modification du niveau d'enchantement d'une arme d'un type spécifique~
 @400346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~
 
 @400505 = ~aux capacités psioniques~
@@ -1528,8 +1528,8 @@
 @401341 = ~les effets générant un effet en cas de coup critique~
 @401342 = ~~ // Opcode visuel
 @401343 = ~les effets provoquant l'échange de points de vie avec une cible~
-@401344 = ~les effets modifiant l'enchantement d'une arme contre une cible d'un type spécifique~
-@401345 = ~les effets modifiant l'enchantement d'une arme d'un type spécifique~
+@401344 = ~les effets modifiant le niveau d'enchantement d'une arme contre une cible d'un type spécifique~
+@401345 = ~les effets modifiant le niveau d'enchantement d'une arme d'un type spécifique~
 @401346 = ~les effets modifiant les jets de sauvegarde contre une école de magie spécifique~
 
 @401505 = ~les effets protégeant contre les capacités psioniques~
@@ -4180,8 +4180,8 @@
 
 // Opcode 344: Enchantment vs. creature type [344]
 
-@13440001 = ~Enchantement~
-@13440002 = ~l'enchantement~
+@13440001 = ~Niveau d'enchantement~
+@13440002 = ~le niveau d'enchantement~
 
 @13440011 = ~dans la main directrice~ // weaponSlot
 @13440012 = ~dans la main secondaire~
