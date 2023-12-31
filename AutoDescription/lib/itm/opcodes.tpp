@@ -3643,7 +3643,10 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 		ELSE BEGIN
 			SET strref = 10670001 // ~Invoque une créature (%creatureName%)~
 		END
-		PATCH_IF amount > 1 BEGIN
+		PATCH_IF amount > 1 OR NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+				SPRINT amount ~%custom_str%~
+			END
 			SET strref += 10
 		END
 		SPRINT description (AT strref)
@@ -3671,7 +3674,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 		ELSE BEGIN
 			SET strref = 10670003 // ~d'invoquer une créature (%creatureName%)~
 		END
-		PATCH_IF amount > 1 BEGIN
+		PATCH_IF amount > 1 OR NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+				SPRINT amount ~%custom_str%~
+			END
 			SET strref += 10
 		END
 		SPRINT description (AT strref)
@@ -3679,7 +3685,42 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_67_group~ BEGIN
+	LOCAL_SET countProbabilityCreature = 0
 	LPM ~opcode_group_by_target~
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF probability == 100 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				LPM ~opcode_match_opcode_67_group~
+				PATCH_IF match == 1 BEGIN
+					LPF ~delete_opcode~
+	                    INT_VAR opcode match_position
+	                    RET $opcodes(~67~) = count
+	                    RET_ARRAY EVAL ~opcodes_67~ = opcodes_xx
+	                END
+					LPF ~delete_opcode~
+	                    INT_VAR opcode match_position = position
+	                    RET $opcodes(~67~) = count
+	                    RET_ARRAY EVAL ~opcodes_67~ = opcodes_xx
+	                END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+					PATCH_IF $opcodes(~67~) == 0 BEGIN
+			            CLEAR_ARRAY ~opcodes_67~
+			        END
+			        SET countProbabilityCreature += 1
+				END
+			END
+			// Si on a trouvé au moins une même créature qui est invoquée aléatoirement
+			PATCH_IF countProbabilityCreature > 0 BEGIN
+				SET amountMin = custom_int > 1 ? custom_int : 1
+				SET amountMax = amountMin + countProbabilityCreature
+				SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
+		        LPM ~add_opcode~
+			END
+		END
+	END
 END
 
 /* ------------------------------ *
@@ -16166,6 +16207,27 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_60_145_group~ BEGIN
 		AND match_saveType     == saveType
 		AND match_saveBonus    == saveBonus
 		AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_67_group~ BEGIN
+	SET match = (
+		    match_position     != position
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter1   == parameter1
+		AND match_parameter2   == parameter2
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+        AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
     )
 END
 
