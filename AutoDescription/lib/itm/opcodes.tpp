@@ -5781,46 +5781,46 @@ END
  * Item: Create Magical Weapon [111] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_111~ BEGIN
-	LOCAL_SET amount = parameter1 > 0 ? parameter1 : 1
-	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+	LPM ~opcode_target_111~
+END
 
-	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
-			SPRINT amount ~%complex_value%~
-		END
-		ELSE BEGIN
-			SET strref = 11110101 // ~arme magique~
-			PATCH_IF amount > 1 BEGIN
-				SET strref += 1 // ~armes magiques~
-			END
-			SPRINT valueType (AT strref)
-			SPRINT value ~%amount%~
-			SPRINT amount @102165 // ~%value% %valueType%~
-		END
-		SPRINT description @11110001 // ~Crée %amount% (%itemName%)~
-	END
+DEFINE_PATCH_MACRO ~opcode_self_probability_111~ BEGIN
+	LPM ~opcode_target_probability_111~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_111~ BEGIN
+	LOCAL_SET strref = 11110002
+	LPM ~opcode_111_common~
+END
+
+DEFINE_PATCH_MACRO  ~opcode_target_probability_111~ BEGIN
+	LOCAL_SET strref = 11110003
+	LPM ~opcode_111_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_111_common~ BEGIN
 	LOCAL_SET amount = parameter1 > 0 ? parameter1 : 1
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 
 	PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 			SPRINT amount ~%complex_value%~
+			SET strref += 10
 		END
 		ELSE BEGIN
-			SET strref = 11110101 // ~arme magique~
+			SET strrefWeapon = 11110101 // ~arme magique~
 			PATCH_IF amount > 1 BEGIN
-				SET strref += 1 // ~armes magiques~
+				SET strrefWeapon += 1 // ~armes magiques~
+				SET strref += 10
 			END
-			SPRINT valueType (AT strref)
+			SPRINT valueType (AT strrefWeapon)
 			SPRINT value ~%amount%~
 			SPRINT amount @102165 // ~%value% %valueType%~
 		END
-		SPRINT description @11110002 // ~Équipe %theTarget% d'%amount% (%itemName%)~
+		SPRINT description (AT strref) // ~Équipe %theTarget% d'%amount% (%itemName%)~
 	END
 END
+
 /*
 DEFINE_PATCH_MACRO ~opcode_111_replace~ BEGIN
 	PATCH_PHP_EACH ~opcodes_111~ AS data => _ BEGIN
