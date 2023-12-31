@@ -360,8 +360,14 @@ BEGIN
 	LPF ~get_spell_headeroffset_for_level~ INT_VAR castingLevel RET headerOffset END
 
 	READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
+	READ_SHORT (headerOffset + SPL_HEAD_target) spellTarget
+	READ_BYTE  (headerOffset + SPL_HEAD_target_number) spellTargetNumber
+	READ_SHORT (headerOffset + SPL_HEAD_projectile) spellProjectile
 
 	SET $level_effects(~%countLevels%~) = requiredLevel
+	SET $level_projectiles(~%countLevels%~) = spellProjectile
+	SET $level_targets(~%countLevels%~) = spellTarget
+	SET $level_target_numbers(~%countLevels%~) = spellTargetNumber
 	SET countLevels += 1
 	SET countHeaders += 1
 
