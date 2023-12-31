@@ -565,6 +565,115 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 	LPF ~appendValue~ INT_VAR strref = 100035 STR_VAR value = ~%currentTarget%~ RET description END // ~Zone d'effet~
 END
 
+
+DEFINE_PATCH_FUNCTION ~get_target_from_spell_target_by_projectile~
+	STR_VAR
+		theTarget = ~~
+		ofTheTarget = ~~
+		toTheTarget = ~~
+	RET
+		theTarget ofTheTarget toTheTarget
+BEGIN
+	SET strref = 0
+	SET projectile = 0
+	SET targetOffset = 0
+
+	PATCH_IF VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
+		SET projectile = $level_projectiles(~%levelIndex%~)
+		SET targetNumber = $level_target_numbers(~%levelIndex%~)
+		SET target = $level_targets(~%levelIndex%~)
+	END
+
+	PATCH_IF projectile > 1 BEGIN
+		SET projectile -= 1
+		LOOKUP_IDS_SYMBOL_OF_INT projectileFile ~projectl~ projectile
+
+        PATCH_IF !IS_AN_INT projectileFile BEGIN
+            INNER_PATCH_FILE ~%projectileFile%.pro~ BEGIN
+                READ_SHORT 0x8 type
+                PATCH_IF type == 3 BEGIN
+					READ_LONG  0xc   sparkingFlags
+					READ_LONG  0x2c  extendedFlags
+					READ_LONG  0x200 areaProjectileFlags
+                    READ_SHORT 0x206 areaOfEffect
+                    READ_SHORT 0x224 coneWidth
+
+                    // On divise par 8.5 pour avoir le diamètre en pied, et encore par 2 pour avoir le rayon
+                    SET areaOfEffect /= 17
+                    LPF ~feets_to_meters~ INT_VAR range = areaOfEffect RET range = rangeToMeter END
+
+					//LinedUpAreaOfEffect 0x2c BIT14
+					//RectangularAreaOfEffect 0x2c BIT15 (longeur = 0x204, largeur = 0x206) (Prioritaire sur LinedUpAreaOfEffect)
+					//CasterAffected 0x2c BIT31
+
+					SET ignoreTarget = (sparkingFlags BAND BIT4) == BIT4
+					SET enemiesOnly = (areaProjectileFlags BAND BIT6) == BIT6
+					SET alliesOnly = (areaProjectileFlags BAND BIT7) == BIT7
+					SET isConeShape = (areaProjectileFlags BAND BIT11) == BIT11
+
+					PATCH_IF alliesOnly AND enemiesOnly BEGIN
+						SET targetOffset = 2
+					END
+					ELSE PATCH_IF enemiesOnly BEGIN
+						SET targetOffset = 1
+					END
+
+					PATCH_IF isConeShape BEGIN
+						SET angle = coneWidth
+						SET strref = 102802 // ~%target% dans un cône de %range% sur un arc de %angle%°~
+					END
+					ELSE BEGIN
+						PATCH_IF target == TARGET_HEAD_self OR target == TARGET_HEAD_self_ignore_pause BEGIN
+							PATCH_IF ignoreTarget OR enemiesOnly BEGIN
+								SET strref = 102801 // ~%target% dans un rayon de %range% autour %ofTheTarget%~
+							END
+							ELSE BEGIN
+								SET strref = 102803 // ~%main_target% et %target% dans un rayon de %range%~
+							END
+						END
+						ELSE PATCH_IF target == TARGET_HEAD_creature BEGIN
+							PATCH_IF targetNumber <= 1 BEGIN
+								PATCH_IF ignoreTarget BEGIN
+									SET strref = 102801 // ~%target% dans un rayon de %range% autour %ofTheTarget%~
+								END
+								ELSE BEGIN
+									SET strref = 102803 // ~%main_target% et %target% dans un rayon de %range%~
+								END
+							END
+							ELSE BEGIN
+								SET targetOffset += 3
+							END
+						END
+						ELSE PATCH_IF target == TARGET_HEAD_area BEGIN
+							SET strref = 102800 // ~%target% dans un rayon de %range%~
+						END
+						ELSE BEGIN
+							// TODO: TARGET_HEAD_character_portrait // dead actor 1 objet ou une créature morte
+							LPF ~add_log_warning~ STR_VAR message = EVAL ~Cible à gerer : %target% ~ END
+						END
+					END
+					PATCH_IF strref > 0 BEGIN
+						SET strrefTarget = 102700 + targetOffset
+						SPRINT target (AT strrefTarget)
+						SPRINT main_target ~%theTarget%~
+                        SPRINT theTarget (AT strref)
+
+						SET strrefTarget = 102720 + targetOffset
+						SPRINT target (AT strrefTarget)
+						SPRINT main_target ~%toTheTarget%~
+                        SPRINT toTheTarget (AT strref)
+
+						SET strrefTarget = 102710 + targetOffset
+						SPRINT target (AT strrefTarget)
+						SPRINT main_target ~%ofTheTarget%~
+                        SPRINT ofTheTarget (AT strref)
+					END
+                END
+            END
+        END
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~spell_target_by_projectile~
 	INT_VAR
 		target = 0

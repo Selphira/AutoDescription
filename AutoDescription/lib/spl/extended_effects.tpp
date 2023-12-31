@@ -242,6 +242,7 @@ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
             SPRINT CURRENT_SOURCE_RES ~%file%~
             SET isSpecialDuration = 0
+            SET isSpellInItem = isItem
 
 			PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
 				LPM ~load_level_effects~
@@ -311,13 +312,21 @@ DEFINE_PATCH_MACRO ~load_level_effects~ BEGIN
 	LPM ~clear_levels~
 
     PATCH_DEFINE_ARRAY level_effects BEGIN END
+    PATCH_DEFINE_ARRAY level_projectiles BEGIN END
+    PATCH_DEFINE_ARRAY level_targets BEGIN END
+    PATCH_DEFINE_ARRAY level_target_numbers BEGIN END
 
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
 		READ_SHORT (headerOffset + SPL_HEAD_target) spellTarget
+		READ_BYTE  (headerOffset + SPL_HEAD_target_number) spellTargetNumber
+		READ_SHORT (headerOffset + SPL_HEAD_projectile) spellProjectile
 
 		SET $level_effects(~%countLevels%~) = requiredLevel
+		SET $level_projectiles(~%countLevels%~) = spellProjectile
+		SET $level_targets(~%countLevels%~) = spellTarget
+		SET $level_target_numbers(~%countLevels%~) = spellTargetNumber
 		SET countLevels += 1
 		SET countHeaders += 1
 
@@ -412,7 +421,7 @@ DEFINE_PATCH_FUNCTION ~build_spell_effects_description~
 BEGIN
 	SET totalLines = 0
 	SET isFirstLevel = 1
-	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+	PATCH_PHP_EACH level_effects AS levelIndex => requiredLevel BEGIN
 		CLEAR_ARRAY lines
 
 		LPM ~clear_opcodes~

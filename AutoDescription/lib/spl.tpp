@@ -64,6 +64,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_description~
 BEGIN
 	SET isItem = 0
 	SET isSpell = 1
+	SET isSpellInItem = 0
 	SET isWeapon = 0
 	SET isArmor = 0
 	SET isRobe = 0

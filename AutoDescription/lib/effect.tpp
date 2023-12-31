@@ -795,6 +795,10 @@ BEGIN
 		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
+			// Sortilège lancé depuis un objet
+			PATCH_IF isSpellInItem BEGIN
+				LPF ~get_target_from_spell_target_by_projectile~ STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
+			END
 			SET thisOpcode = opcode
 			PATCH_IF probability >= 100 BEGIN
 				SPRINT method ~opcode%opcode_target%_%opcode%~
