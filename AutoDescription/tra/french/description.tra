@@ -329,6 +329,12 @@
 @100322 = ~tous les %strDuration%~
 @100323 = ~chaque %strDuration%~
 
+// Trésors aléatoires
+@100401 = ~trésor aléatoire de qualité médiocre~
+@100402 = ~trésor aléatoire de qualité ordinaire~
+@100403 = ~trésor aléatoire de qualité~
+@100404 = ~trésor aléatoire de qualité supérieure~
+@100405 = ~trésor aléatoire de qualité exceptionnelle~
 
 // Spell_side
 @110001 = ~Lance %spellName%~

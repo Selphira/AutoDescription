@@ -183,6 +183,13 @@ DEFINE_PATCH_FUNCTION ~get_random_treasure_names~ STR_VAR file = ~~ RET randomTr
 	LPF ~implode~ STR_VAR array_name = ~random_treasures_%file%~ glue = ~", "~ final_glue RET randomTreasureNames = text END
 
 	PATCH_IF ~%randomTreasureNames%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_item_name~ STR_VAR file RET randomTreasureNames = itemName END
+		PATCH_MATCH ~%file%~ WITH
+			RNDTRE01 BEGIN SPRINT randomTreasureNames @100401 END // ~trésor aléatoire de qualité médiocre~
+			RNDTRE02 BEGIN SPRINT randomTreasureNames @100402 END // ~trésor aléatoire de qualité ordinaire~
+			RNDTRE03 BEGIN SPRINT randomTreasureNames @100403 END // ~trésor aléatoire de qualité~
+			RNDTRE04 BEGIN SPRINT randomTreasureNames @100404 END // ~trésor aléatoire de qualité supérieure~
+			RNDTRE05 BEGIN SPRINT randomTreasureNames @100405 END // ~trésor aléatoire de qualité exceptionnelle~
+			DEFAULT LPF ~get_item_name~ STR_VAR file RET randomTreasureNames = itemName END
+		END
 	END
 END
