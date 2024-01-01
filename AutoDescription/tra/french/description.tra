@@ -196,20 +196,20 @@
 @102465 = ~%countTarget% créatures~
 @102462 = ~Point dans le champ visuel du lanceur~
 @102461 = ~Champ visuel du lanceur~
-@102460 = ~Les alliés dans un cône de %range% sur un arc de %angle%°~
-@102459 = ~Les ennemis dans un cône de %range% sur un arc de %angle%°~
+@102460 = ~Les créatures alliées dans un cône de %range% sur un arc de %angle%°~
+@102459 = ~Les créatures hostiles dans un cône de %range% sur un arc de %angle%°~
 @102458 = ~Cône de %range% sur un arc de %angle%°~
-@102457 = ~Les alliés dans un rayon de %range% autour %ofTheTarget%~
-@102456 = ~Les ennemis dans un rayon de %range% autour %ofTheTarget%~
+@102457 = ~Les créatures alliées dans un rayon de %range% autour %ofTheTarget%~
+@102456 = ~Les créatures hostiles dans un rayon de %range% autour %ofTheTarget%~
 @102455 = ~Rayon de %range% autour %ofTheTarget%~
-@102450 = ~Le lanceur et tout allié dans un rayon de %range%~
-@102449 = ~Le lanceur et tout ennemi dans un rayon de %range%~
+@102450 = ~Le lanceur et toute créature alliée dans un rayon de %range%~
+@102449 = ~Le lanceur et toute créature hostile dans un rayon de %range%~
 @102448 = ~Le lanceur et toute créature dans un rayon de %range%~
-@102447 = ~1 créature et tout allié dans un rayon de %range%~
-@102446 = ~1 créature et tout ennemi dans un rayon de %range%~
+@102447 = ~1 créature et toute créature alliée dans un rayon de %range%~
+@102446 = ~1 créature et toute créature hostile dans un rayon de %range%~
 @102445 = ~1 créature et toute créature dans un rayon de %range%~
-@102444 = ~Les alliés dans un rayon de %range%~
-@102443 = ~Les ennemis dans un rayon de %range%~
+@102444 = ~Les créatures alliées dans un rayon de %range%~
+@102443 = ~Les créatures hostiles dans un rayon de %range%~
 @102442 = ~Rayon de %range%~
 @102384 = ~les %targetType%~
 @101085 = ~de la cible~
@@ -229,23 +229,23 @@
 @101196 = ~aux autres créatures dans la zone d'effet~
 
 @102700 = ~les créatures~
-@102701 = ~les ennemis~
-@102702 = ~les alliés~
+@102701 = ~les créatures hostiles~
+@102702 = ~les créatures alliées~
 @102703 = ~%countTarget% créatures~
-@102704 = ~%countTarget% ennemis~
-@102705 = ~%countTarget% alliés~
+@102704 = ~%countTarget% créatures hostiles~
+@102705 = ~%countTarget% créatures alliées~
 @102710 = ~des créatures~
-@102711 = ~des ennemis~
-@102712 = ~des alliés~
+@102711 = ~des créatures hostiles~
+@102712 = ~des créatures alliées~
 @102713 = ~de %countTarget% créatures~
-@102714 = ~de %countTarget% ennemis~
-@102715 = ~de %countTarget% alliés~
+@102714 = ~de %countTarget% créatures hostiles~
+@102715 = ~de %countTarget% créatures alliées~
 @102720 = ~aux créatures~
-@102721 = ~aux ennemis~
-@102722 = ~aux alliés~
+@102721 = ~aux créatures hostiles~
+@102722 = ~aux créatures alliées~
 @102723 = ~à %countTarget% créatures~
-@102724 = ~à %countTarget% ennemis~
-@102725 = ~à %countTarget% alliés~
+@102724 = ~à %countTarget% créatures hostiles~
+@102725 = ~à %countTarget% créatures alliées~
 @102800 = ~%target% dans un rayon de %range%~
 @102801 = ~%target% dans un rayon de %range% autour %ofTheTarget%~
 @102802 = ~%target% dans un cône de %range% sur un arc de %angle%°~
@@ -2529,7 +2529,7 @@
 
 @11150001 = ~Détection du %alignment%~// Détection des créatures %alignment% // Faut-il du singulier ? // Détection de créature %alignment%
 
-@11150011 = ~%theTarget% détecte le %alignment%~ // TODO : placer %theTarget% ailleurs // Les créatures %alignment% sont détectées par %theTarget%
+@11150011 = ~Détection du %alignment% par %theTarget%~ // TODO : placer %theTarget% ailleurs // Les créatures %alignment% sont détectées par %theTarget%
 
 @11150021 = ~de détecter le %alignment%~ //de détecter les créatures %alignment%
 
@@ -2796,8 +2796,8 @@
 
 // Opcode 150: Spell Effect: Find Traps [150]
 
-@11500001 = ~Détecte les pièges~
-@11500002 = ~%theTarget% détecte les pièges~
+@11500001 = ~Détection des pièges~
+@11500002 = ~Détection des pièges par %theTarget%~
 @11500003 = ~de détecter les pièges~
 @11500004 = ~que %theTarget% détecte les pièges~
 

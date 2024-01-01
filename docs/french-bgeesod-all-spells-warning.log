@@ -24,3 +24,4 @@ SPRA303.SPL : Opcode 83 : Réflection du type de projectile '329'
 SPWI118.SPL : Niveau minimum non calculable
 SPWI311.SPL : Opcode 83 : Réflection du type de projectile '329'
 SPWI417.SPL : FAILURE: Unknown macro: opcode_target_345
+SPWI960.SPL : Opcode 318 : Immunité à contre le sort Souffle psionique différente de l'objet : SPIN959
