@@ -771,6 +771,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_cant_be_permanent~ BEGIN
 	280 => 1 // Spell Effect: Wild Magic, est un peu tout en même temps
 	331 => 1 // Summon: Random Monster Summoning
 	519 => 1 // // Arme brisée
+	525 => 1 // // Item: Replace item [525]
 END
 
 // Opcodes qui sont dissipés par la mort (directement ou indirectement)
@@ -6345,6 +6346,51 @@ DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
 		        END
 
 		        SET opcode = 519
+		        LPM ~add_opcode~
+			END
+		END
+		ELSE BEGIN
+			LPF ~get_opcode_position~
+				INT_VAR opcode = 112
+			        match_target       = target
+			        match_timingMode   = timingMode
+			        match_resistance   = resistance
+			        match_duration     = duration
+			        match_probability1 = probability1
+			        match_probability2 = probability2
+			        match_saveType     = saveType
+			        match_saveBonus    = saveBonus
+			        match_special      = special
+				STR_VAR match_macro = ~opcode_match_duration_and_probability1_and_probability2_and_resistance_and_target_and_timingMode_and_saveBonus_and_saveType_and_special~
+				RET opcodePosition = position
+			END
+			PATCH_IF opcodePosition >= 0 BEGIN
+				SPRINT resref2 ~%resref%~
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_%opcode%~
+		        END
+				LPF ~get_opcode_by_position~
+					INT_VAR opcode = 112 position = opcodePosition
+					RET resref
+				END
+				LPF ~delete_opcode~
+					INT_VAR opcode = 112 match_position = opcodePosition
+					RET $opcodes(~112~) = count
+					RET_ARRAY ~opcodes_112~ = opcodes_xx
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~112~) == 0 BEGIN
+		            CLEAR_ARRAY ~opcodes_112~
+		        END
+		        SET opcode = 525
 		        LPM ~add_opcode~
 			END
 		END
@@ -14609,6 +14655,31 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_524~ BEGIN
 	LPM ~opcode_self_probability_524~
 END
 
+/* ------------------------ *
+ * Item: Replace item [525] *
+ * ------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_525~ BEGIN
+	LPF ~get_item_name~ STR_VAR file = ~%resref%~ RET itemName END
+	LPF ~get_item_name~ STR_VAR file = ~%resref2%~ RET itemName2 = itemName END
+
+	SPRINT description @15250001 // ~Remplace "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_525~ BEGIN
+	LPF ~get_item_name~ STR_VAR file = ~%resref%~ RET itemName END
+	LPF ~get_item_name~ STR_VAR file = ~%resref2%~ RET itemName2 = itemName END
+
+	SPRINT description @15250002 // ~de remplacer "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_525~ BEGIN
+	LPM ~opcode_self_525~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_525~ BEGIN
+	LPM ~opcode_self_probability_525~
+END
+
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN
 	LOCAL_SET opcode = 84
 	LOCAL_SET newOpcode = 502 // ~Résistance aux dégâts~
@@ -16041,6 +16112,20 @@ DEFINE_PATCH_MACRO ~opcode_match_duration_and_probability1_and_probability2_and_
 	SET match = (
             match_target       == target
         AND ~%match_resref%~   STRING_EQUAL_CASE ~%resref%~
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_duration     == duration
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_duration_and_probability1_and_probability2_and_resistance_and_target_and_timingMode_and_saveBonus_and_saveType_and_special~ BEGIN
+	SET match = (
+            match_target       == target
         AND match_timingMode   == timingMode
         AND match_resistance   == resistance
         AND match_duration     == duration

@@ -4312,7 +4312,7 @@
 @15110001 = ~Dissipe toutes les illusions qui affectent %theTarget%~
 @15110002 = ~de dissiper toutes les illusions qui affectent %theTarget%~
 
-// Fake Opcode 519: Immunité aux sorts
+// Fake Opcode 518: Immunité aux sorts
 
 @15180001 = ~Immunité aux sorts %spellNames%~
 @15180002 = ~Immunise %theTarget% aux sorts %spellNames%~
@@ -4339,6 +4339,11 @@
 @15240001 = ~À chaque attaque réussie~
 @15240002 = ~À chaque attaque réussie par %theTarget%~
 @15240003 = ~par attaque réussie par %theTarget%~
+
+// Fake Opcode 525: Item: Replace item [525]
+
+@15250001 = ~Remplace "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
+@15250002 = ~de remplacer "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
