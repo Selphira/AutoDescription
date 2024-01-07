@@ -4205,6 +4205,7 @@ DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_83_group~ BEGIN
+	LOCAL_SET projectile = 0
 	PATCH_PHP_EACH EVAL ~opcodes_83~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET projectile = parameter2 + 1

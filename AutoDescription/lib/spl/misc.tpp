@@ -250,11 +250,70 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 		END
 	END
 	ELSE BEGIN
-		SET is_special = 1
-		SPRINT duration @100033 // ~Spéciale~
+		PATCH_IF count_levels == 1 BEGIN // Ex: SPPR250
+			LPF ~get_spell_duration_by_projectile~ RET is_special is_permanent duration END
+			PATCH_IF NOT is_special BEGIN
+				SET ignoreDuration = 1
+				SPRINT strDuration ~%duration%~
+			END
+		END
+		ELSE BEGIN
+			SET is_special = 1
+		END
+		PATCH_IF is_special BEGIN
+			SPRINT duration @100033 // ~Spéciale~
+		END
 	END
 
 	LPF ~appendValue~ INT_VAR strref = 100031 STR_VAR value = ~%duration%~ RET description END // ~Durée~
+END
+
+
+DEFINE_PATCH_FUNCTION ~get_spell_duration_by_projectile~
+	RET
+		is_special
+		is_permanent
+		duration
+BEGIN
+	SET is_special = 1
+	SET is_permanent = 0
+	SPRINT duration ~~
+
+    PATCH_DEFINE_ARRAY all_projectile_durations BEGIN END
+
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+		SET projectile = $level_projectiles(~%index%~)
+		PATCH_IF projectile > 1 BEGIN
+			SET projectile -= 1
+			LOOKUP_IDS_SYMBOL_OF_INT projectileFile ~projectl~ projectile
+			PATCH_IF !IS_AN_INT projectileFile BEGIN
+				INNER_PATCH_FILE ~%projectileFile%.pro~ BEGIN
+	                READ_SHORT 0x8 type
+	                PATCH_IF type == 3 BEGIN
+						READ_SHORT 0x210 explosionDelay // 100 = 1 round
+						READ_BYTE 0x216 triggerCount
+						PATCH_IF triggerCount > 1 BEGIN
+							SET duration = 6 * explosionDelay * triggerCount / 100
+							PATCH_IF NOT VARIABLE_IS_SET $all_projectile_durations(~%requiredLevel%~) BEGIN
+								SET $all_projectile_durations(~%requiredLevel%~) = duration
+								SET is_special = 0
+							END
+						END
+					END
+				END
+			END
+		END
+	END
+	PATCH_IF is_special == 0 BEGIN
+		LPF ~get_complex_duration~
+			STR_VAR
+				array_name = ~all_projectile_durations~
+			RET
+				is_special
+				is_permanent
+				duration = complex_duration
+		END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_complex_duration~
@@ -566,7 +625,11 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 END
 
 
-DEFINE_PATCH_FUNCTION ~get_target_from_spell_target_by_projectile~
+DEFINE_PATCH_FUNCTION ~get_target_by_projectile~
+	INT_VAR
+		projectile = 0
+		target = 0
+		targetNumber = 0
 	STR_VAR
 		theTarget = ~~
 		ofTheTarget = ~~
@@ -575,14 +638,7 @@ DEFINE_PATCH_FUNCTION ~get_target_from_spell_target_by_projectile~
 		theTarget ofTheTarget toTheTarget
 BEGIN
 	SET strref = 0
-	SET projectile = 0
 	SET targetOffset = 0
-
-	PATCH_IF VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
-		SET projectile = $level_projectiles(~%levelIndex%~)
-		SET targetNumber = $level_target_numbers(~%levelIndex%~)
-		SET target = $level_targets(~%levelIndex%~)
-	END
 
 	PATCH_IF projectile > 1 BEGIN
 		SET projectile -= 1

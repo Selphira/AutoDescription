@@ -9,6 +9,16 @@ DEFINE_PATCH_FUNCTION ~load_spell_extended_effects~
 		lines
 BEGIN
 	SET countLines = 0
+	SET projectile = 0
+	SET projectileTarget = 0
+	SET projectileTargetNumber = 0
+
+	PATCH_IF isSpellInItem AND VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
+		SET projectile = $level_projectiles(~%levelIndex%~)
+		SET projectileTarget = $level_targets(~%levelIndex%~)
+		SET projectileTargetNumber = $level_target_numbers(~%levelIndex%~)
+	END
+
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
@@ -18,9 +28,7 @@ BEGIN
 				PATCH_IF baseProbability != 100 BEGIN
 		            SET probability = probability * baseProbability / 100
 		        END
-		        //TODO: La cible est implicitement envoyée, il faudrait le faire explicitement
-				//TODO: Ignorer la durée pour tous les opcodes si on a une durée du sort autre que "Spécial" !!
-				LPF ~get_effect_description~ INT_VAR ignoreDuration forceTarget RET effectDescription = description sort END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET probability = oldProbability
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1

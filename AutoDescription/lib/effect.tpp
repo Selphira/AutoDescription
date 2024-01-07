@@ -709,6 +709,9 @@ DEFINE_PATCH_FUNCTION ~get_effect_description~
 		resetTarget = 0
 		forceTarget = 0
 		ignoreDuration = 0
+		projectile = 0
+		projectileTarget = 0
+		projectileTargetNumber = 0
 	RET
 		description
 		sort
@@ -797,9 +800,8 @@ BEGIN
 		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
-			// Sortilège lancé depuis un objet
-			PATCH_IF isSpellInItem BEGIN
-				LPF ~get_target_from_spell_target_by_projectile~ STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
+			PATCH_IF projectile > 1 BEGIN
+				LPF ~get_target_by_projectile~ INT_VAR projectile target = projectileTarget targetNumber = projectileTargetNumber STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
 			END
 			SET thisOpcode = opcode
 			PATCH_IF probability >= 100 BEGIN

@@ -15,8 +15,15 @@ BEGIN
 		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
 		READ_BYTE  (headerOffset + ITM_HEAD_location) location
 		READ_SHORT (headerOffset + ITM_HEAD_target) headTarget
+		READ_BYTE  (headerOffset + ITM_HEAD_target_count) headTargetNumber
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
 		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
+
+		SET projectile = 0
+
+		PATCH_IF headTarget == TARGET_HEAD_area BEGIN
+			READ_SHORT (headerOffset + ITM_HEAD_projectile_animation) projectile
+		END
 
 		PATCH_IF charges > 0 OR location == 3 BEGIN
 			LPF ~load_charged_abilities~ INT_VAR headerOffset index = headerIndex RET EVAL ~countLines%countHeaders%~ = countLines isGlobalDuration globalDuration globalTimingMode RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
@@ -190,7 +197,7 @@ BEGIN
 		            SET target = TARGET_FX_self
 		        END
 
-				LPF ~get_effect_description~ INT_VAR ignoreDuration RET effectDescription = description sort END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration projectile projectileTarget = headTarget projectileTargetNumber = headTargetNumber RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
 					SET countLines += 1

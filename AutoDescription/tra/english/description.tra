@@ -3051,8 +3051,8 @@
 
 // Opcode 212: Protection: Freedom [212]
 
-@12120001 = ~Libère %theTarget% des effets de l'emprisonnement et du labyrinthe~
-@12120002 = ~de libérer %theTarget% des effets de l'emprisonnement et du labyrinthe~
+@12120001 = ~Libère les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~
+@12120002 = ~de libérer les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~
 
 // Opcode 213: Spell Effect: Maze [213]
 
