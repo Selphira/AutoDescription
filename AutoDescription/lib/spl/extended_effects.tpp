@@ -646,7 +646,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			    PATCH_IF opcode == 12 BEGIN
 					SET parameter2 = parameter2 BAND 65535
 				END
-			    PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR (parameter2 == MOD_TYPE_flat AND VARIABLE_IS_SET $opcodes_resistance(~%opcode%~)) BEGIN
 			        LPM ~data_to_match_vars~
 				    LPF spell_has_same_effects_on_all_levels_except_duration
 						INT_VAR

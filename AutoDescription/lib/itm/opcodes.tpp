@@ -14952,8 +14952,14 @@ DEFINE_PATCH_MACRO ~opcode_self_resist~ BEGIN
 			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT value @10010 // ~Passe à %value%~
-			SPRINT value @10002 // ~%value% %~
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+				SPRINT value @10010 // ~Passe à %value%~
+			END
+			ELSE BEGIN
+				SPRINT value @10010 // ~Passe à %value%~
+				SPRINT value @10002 // ~%value% %~
+			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
 			SPRINT value @10006 // ~Multiplié par %value%~
@@ -14995,7 +15001,12 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT value @10002 // ~%value% %~
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
+			ELSE BEGIN
+				SPRINT value @10002 // ~%value% %~
+			END
 			SPRINT description @102287 // ~Porte à %value% %theStatistic% %ofTheTarget%~
 		END
 		ELSE BEGIN // percent
@@ -15038,7 +15049,12 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 			END
 		END
 		ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
-			SPRINT value @10002 // ~%value% %~
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
+			ELSE BEGIN
+				SPRINT value @10002 // ~%value% %~
+			END
 			SPRINT description @102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
 		END
 		ELSE BEGIN // percent
