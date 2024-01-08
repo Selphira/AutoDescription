@@ -5823,47 +5823,67 @@ DEFINE_PATCH_MACRO ~opcode_111_common~ BEGIN
 	END
 END
 
-/*
+
 DEFINE_PATCH_MACRO ~opcode_111_replace~ BEGIN
 	PATCH_PHP_EACH ~opcodes_111~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		SET itemDuration = duration
-		SET itemTimingMode = timingMode
-		PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
-			INNER_PATCH_FILE ~%resref%.itm~ BEGIN
-				READ_LONG ITM_identified_name itemNameRef
-				PATCH_IF itemNameRef == 25615 OR itemNameRef == 10966  // "Attaquer"
-					OR itemNameRef == 6854 // "Morgenstern "
-				BEGIN
-					LPF ~delete_opcode~
-						INT_VAR opcode match_position = position
-						RET $opcodes(~%opcode%~) = count
-						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+		LPF ~has_opcode~
+			INT_VAR opcode = 135
+				match_duration  = duration
+	            match_timingMode = timingMode
+			STR_VAR match_macro = ~opcode_match_duration_and_timingMode~
+			RET hasOpcode
+		END
+		PATCH_IF hasOpcode BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode match_position = position
+				RET $opcodes(~%opcode%~) = count
+				RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+		END
+		ELSE BEGIN
+			SET itemPosition = position
+			SET itemDuration = duration
+			SET itemTimingMode = timingMode
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+				INNER_PATCH_FILE ~%resref%.itm~ BEGIN
+					READ_LONG ITM_identified_name itemNameRef
+					READ_STRREF ITM_identified_name itemName
+					PATCH_IF itemNameRef == 25615 OR itemNameRef == 10966  // "Attaquer"
+						OR itemNameRef == 6854 // "Morgenstern "
+					BEGIN
+				        SET opcode135Position = ~-1~
+						//lire les opcodes de l'item et les ajouter dans les opcodes actuels
+					    GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
+					    PHP_EACH offsets AS _ => offset BEGIN
+						    LPM ~read_effect_vars~
+						    PATCH_IF opcode == 135 BEGIN
+								LPF ~delete_opcode~
+									INT_VAR opcode = 111 match_position = itemPosition
+									RET $opcodes(~111~) = count
+									RET_ARRAY EVAL ~opcodes_111~ = opcodes_xx
+								END
+								// Bug où il reste toujours un item dans le tableau si c'était le dernier
+								// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+								PATCH_IF $opcodes(~111~) == 0 BEGIN
+						            CLEAR_ARRAY ~opcodes_111~
+						        END
+							    SET duration = itemDuration
+							    SET timingMode = itemTimingMode
+							    LPM ~add_opcode~
+						    END
+					    END
 					END
-					// Bug où il reste toujours un item dans le tableau si c'était le dernier
-					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
-					PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
-			            CLEAR_ARRAY ~opcodes_%opcode%~
-			        END
-					//lire les opcodes de l'item et les ajouter dans les opcodes actuels
-				    GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
-				    PHP_EACH offsets AS _ => offset BEGIN
-					    LPM ~read_effect_vars~
-					    // Ne dure que le temps que l'arme est équipée
-					    SET duration = itemDuration
-					    SET timingMode = itemTimingMode
-					    LPM ~load_opcode~
-				    END
-					READ_SHORT  ITM_type            itemType
-				    READ_SHORT  ITM_flags           flags
-					LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription = ~~ RET description END
-				    // TODO: Si aucun opcode n'a été ajouté, et que l'objet est une arme, transformer les dégâts en un opcode 12 !
 				END
 			END
 		END
 	END
 END
-*/
 
 DEFINE_PATCH_MACRO ~opcode_111_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
