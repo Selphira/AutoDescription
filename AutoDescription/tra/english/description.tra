@@ -33,8 +33,8 @@
 @100002 = ~Weight~
 @100003 = ~STATISTICS~
 @100004 = ~or~
-@100005 = ~meter~
-@100006 = ~meters~
+@100005 = ~feet~
+@100006 = ~feet~
 @100007 = ~%name% %ofTheTarget%%colon%%value%~
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
@@ -86,12 +86,14 @@
 @101301 = ~priest~
 @101302 = ~innate~
 @101303 = ~magic~
-@101309 = ~druid~
+@101304 = ~druid~
+@101305 = ~priest/druid~
 @101310 = ~wizard~
-@101311 = ~innate~
+@101311 = ~priest~
 @101312 = ~innate~
 @101313 = ~magic~
-@101319 = ~druid~
+@101314 = ~druid~
+@101315 = ~priest/druid~
 
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
@@ -145,7 +147,7 @@
 @600173 = ~points of damage~
 
 @102677 = ~one-time use~
-@102678 = ~usage illimité~
+@102678 = ~illimited use~
 //@102677 = ~%charges% charge, the item is destroyed when the charge is used~
 @102550 = ~Unknown creature~
 @102551 = ~Unknown spell~
@@ -226,6 +228,28 @@
 @101195 = ~of the other creatures in the area of effect~
 @101196 = ~to the other creatures in the area of effect~
 
+@102700 = ~the creatures~
+@102701 = ~the enemies~
+@102702 = ~the allies~
+@102703 = ~%countTarget% creatures~
+@102704 = ~%countTarget% enemies~
+@102705 = ~%countTarget% allies~
+@102710 = ~of creatures~
+@102711 = ~of enemies~
+@102712 = ~of allies~
+@102713 = ~of %countTarget% creatures~
+@102714 = ~of %countTarget% enemies~
+@102715 = ~of %countTarget% allies~
+@102720 = ~to creatures~
+@102721 = ~to enemies~
+@102722 = ~to allies~
+@102723 = ~to %countTarget% creatures~
+@102724 = ~to %countTarget% enemies~
+@102725 = ~to %countTarget% allies~
+@102800 = ~%target% within a %range% radius~
+@102801 = ~%target% within a %range% radius around %ofTheTarget%~
+@102802 = ~%target% within a %range% cone on a %angle%° arc~
+@102803 = ~%main_target% and %target% within a radius of %range%~
 @102386 = ~to the %targetType%~
 @102387 = ~vs. %targetType%~
 @101186 = ~%target% (of level %levelMin%)~
@@ -1001,7 +1025,7 @@
 @400172 = ~à l'oubli de sorts~
 @400173 = ~to modification of poison resistance~
 @400174 = ~~ // Opcode sonore
-@400175 = ~to hold~
+@400175 = ~hold~
 @400176 = ~change in movement rate~
 //@400177 = ~~ // TODO: trop variable, > à tous les effets lancés depuis l'opcode 177...
 @400178 = ~to modification of THAC0 against a specific creature type~
@@ -1175,7 +1199,7 @@
 @400346 = ~to modification of saving throws against a specific school of magic~
 
 @400505 = ~psionic abilities~
-@400507 = ~to poisoning~
+@400507 = ~poisoning~
 
 
 /* ------------------------------------- *
@@ -2163,8 +2187,8 @@
 @10690001 = ~Non-detection~
 @10690002 = ~Casts Non-detection on %theTarget%~
 @10690003 = ~to cast Non-detection on %theTarget%~
-@10690004 = ~Rend %theTarget% undetectable by magical means such as Detect Invisibility and other divinations~
-@10690005 = ~renders %theTarget% undetectable by magical means such as Detect Invisibility and other divinations~
+@10690004 = ~Makes %theTarget% non-detectable by magical means such as Detect Invisibility and other divinations~
+@10690005 = ~to make %theTarget% non-detectable by magical means such as Detect Invisibility and other divinations~
 
 // Opcode 70: Cure: Non-Detection [70]
 
@@ -2587,47 +2611,47 @@
 
 // Opcode 127: Summon: Monster Summoning [127]
 
-@11270001 = ~Invoque des monstres pour un total de %amount% niveaux (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à %amount% niveaux (%creatures%) ??
-@11270002 = ~Invoque des animaux pour un total de %amount% niveaux (%creatures%)~
-@11270003 = ~Invoque des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à celui du lanceur (%creatures%)
-@11270004 = ~Invoque des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~//...
-@11270005 = ~Invoque 1 monstre (%creatures%)~
-@11270006 = ~Invoque 1 animal (%creatures%)~
-@11270007 = ~Invoque %amount% monstres (%creatures%)~
-@11270008 = ~Invoque %amount% animaux (%creatures%)~
-@11270009 = ~Invoque des monstres hostiles pour un total de %amount% niveaux (%creatures%)~
-@11270010 = ~Invoque des animaux hostiles pour un total de %amount% niveaux (%creatures%)~
-@11270011 = ~Invoque des monstres hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270012 = ~Invoque des animaux hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270013 = ~Invoque 1 monstre hostile (%creatures%)~
-@11270014 = ~Invoque 1 animal hostile (%creatures%)~
-@11270015 = ~Invoque %amount% monstres hostiles (%creatures%)~
-@11270016 = ~Invoque %amount% animaux hostiles (%creatures%)~
-@11270017 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
-@11270018 = ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270019 = ~Invoque 1 créature (%creatures%)~
-@11270020 = ~Invoque %amount% créatures (%creatures%)~
+@11270001 = ~Summon monsters for a total of %amount% levels (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à %amount% niveaux (%creatures%) ??
+@11270002 = ~Summon animals for a total of %amount% levels (%creatures%)~
+@11270003 = ~Summon monsters for a total of levels equal to the caster's level (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est égal à celui du lanceur (%creatures%)
+@11270004 = ~Summon animals for a total of levels equal to the caster's level (%creatures%)~//...
+@11270005 = ~Summon 1 monster (%creatures%)~
+@11270006 = ~Summon 1 animal (%creatures%)~
+@11270007 = ~Summon %amount% monsters (%creatures%)~
+@11270008 = ~Summon %amount% animals (%creatures%)~
+@11270009 = ~Summon hostiles monsters for a total of %amount% levels (%creatures%)~
+@11270010 = ~Summon hostiles animals for a total of %amount% levels (%creatures%)~
+@11270011 = ~Summon hostiles monsters for a total of levels equal to the caster's level (%creatures%)~
+@11270012 = ~Summon hostiles animals for a total of levels equal to the caster's level (%creatures%)~
+@11270013 = ~Summon 1 hostile monster (%creatures%)~
+@11270014 = ~Summon 1 hostile animal (%creatures%)~
+@11270015 = ~Summon %amount% hostiles monsters (%creatures%)~
+@11270016 = ~Summon %amount% hostiles animals (%creatures%)~
+@11270017 = ~Summon creatures for a total of %amount% levels (%creatures%)~
+@11270018 = ~Summon creatures for a total of levels equal to the caster's level (%creatures%)~
+@11270019 = ~Summon 1 creature (%creatures%)~
+@11270020 = ~Summon %amount% creatures (%creatures%)~
 
-@11270021 = ~d'invoquer des monstres pour un total de %amount% niveaux (%creatures%)~
-@11270022 = ~d'invoquer des animaux pour un total de %amount% niveaux (%creatures%)~
-@11270023 = ~d'invoquer des monstres pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270024 = ~d'invoquer des animaux pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270025 = ~d'invoquer 1 monstre (%creatures%)~
-@11270026 = ~d'invoquer 1 animal (%creatures%)~
-@11270027 = ~d'invoquer %amount% monstres (%creatures%)~
-@11270028 = ~d'invoquer %amount% animaux (%creatures%)~
-@11270029 = ~d'invoquer des monstres hostiles pour un total de %amount% niveaux (%creatures%)~
-@11270030 = ~d'invoquer des animaux hostiles pour un total de %amount% niveaux (%creatures%)~
-@11270031 = ~d'invoquer des monstres hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270032 = ~d'invoquer des animaux hostiles pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270033 = ~d'invoquer 1 monstre hostile (%creatures%)~
-@11270034 = ~d'invoquer 1 animal hostile (%creatures%)~
-@11270035 = ~d'invoquer %amount% monstres hostiles (%creatures%)~
-@11270036 = ~d'invoquer %amount% animaux hostiles (%creatures%)~
-@11270037 = ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~
-@11270038 = ~d'invoquer des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~
-@11270039 = ~d'invoquer 1 créature (%creatures%)~
-@11270040 = ~d'invoquer %amount% créatures (%creatures%)~
+@11270021 = ~to summon monsters for a total of %amount% levels (%creatures%)~
+@11270022 = ~to summon animals for a total of %amount% levels (%creatures%)~
+@11270023 = ~to summon monsters for a total of levels equal to the caster's level (%creatures%)~
+@11270024 = ~to summon animals for a total of levels equal to the caster's level (%creatures%)~
+@11270025 = ~to summon 1 monster (%creatures%)~
+@11270026 = ~to summon 1 animal (%creatures%)~
+@11270027 = ~to summon %amount% monsters (%creatures%)~
+@11270028 = ~to summon %amount% animals (%creatures%)~
+@11270029 = ~to summon hostiles monsters for a total of %amount% levels (%creatures%)~
+@11270030 = ~to summon hostiles animals for a total of %amount% levels (%creatures%)~
+@11270031 = ~to summon hostiles monsters for a total of levels equal to the caster's level (%creatures%)~
+@11270032 = ~to summon hostiles animals for a total of levels equal to the caster's level (%creatures%)~
+@11270033 = ~to summon 1 hostile monster (%creatures%)~
+@11270034 = ~to summon 1 hostile animal (%creatures%)~
+@11270035 = ~to summon %amount% hostiles monsters (%creatures%)~
+@11270036 = ~to summon %amount% hostiles animals (%creatures%)~
+@11270037 = ~to summon creatures for a total of %amount% levels (%creatures%)~
+@11270038 = ~to summon creatures for a total of levels equal to the caster's level (%creatures%)~
+@11270039 = ~to summon 1 creature (%creatures%)~
+@11270040 = ~to summon %amount% creatures (%creatures%)~
 
 
 // Opcode 128: State: Confusion [128]
@@ -2666,7 +2690,7 @@
 @11350002 = ~Déguisement en %creatureName%~ // Simule / Prend l'apparence de %creatureName%
 @11350003 = ~Retrouve sa forme naturelle~ // Métamorphose en / dans sa forme naturelle
 
-@11350011 = ~Transforme %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
+@11350011 = ~Transform %theTarget% into %creatureName%~//// Métamorphose %theTarget% en %creatureName%
 @11350012 = ~Déguise %theTarget% en %creatureName%~// Donne à %theTarget% l'apparence de %creatureName%
 // TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
 @11350013 = ~%theTarget% retrouve sa forme naturelle~// Métamorphose %theTarget% dans sa forme naturelle
@@ -2675,7 +2699,7 @@
 @11350022 = ~de se déguiser en %creatureName%~// de prendre l'apparence de %creatureName%
 @11350023 = ~de retrouver sa forme naturelle~// de se métamorphoser dans sa forme naturelle
 
-@11350031 = ~de transformer %theTarget% en %creatureName%~// de métamorphoser %theTarget% en %creatureName%
+@11350031 = ~to transform %theTarget% into %creatureName%~// de métamorphoser %theTarget% en %creatureName%
 @11350032 = ~de déguiser %theTarget% en %creatureName%~// de donner l'apparence de %creatureName% à %theTarget%
 @11350033 = ~de faire retrouver la forme naturelle de %theTarget%~ // de métamorphoser %theTarget% dans sa forme naturelle
 
@@ -2771,10 +2795,10 @@
 
 // Opcode 151: Summon: Replace Creature [151]
 
-@11510001 = ~Remplace %theTarget% par %creatureName%~
-@11510002 = ~Tue et remplace %theTarget% par %creatureName%~
+@11510001 = ~Replace %theTarget% by %creatureName%~
+@11510002 = ~Tue et remplace %theTarget% by %creatureName%~
 @11510003 = ~Invoque %creatureName% sur %theTarget%~
-@11510004 = ~de remplacer %theTarget% par %creatureName%~
+@11510004 = ~to replace %theTarget% by %creatureName%~
 @11510005 = ~de tuer et remplacer %theTarget% par %creatureName%~
 @11510006 = ~d'invoquer %creatureName% sur %theTarget%~
 
@@ -3051,8 +3075,8 @@
 
 // Opcode 212: Protection: Freedom [212]
 
-@12120001 = ~Libère les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~
-@12120002 = ~de libérer les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~
+@12120001 = ~Frees the creatures in the area of effect from the effects of imprisonment and maze~
+@12120002 = ~to free the creatures in the area of effect from the effects of imprisonment and maze~
 
 // Opcode 213: Spell Effect: Maze [213]
 
@@ -3241,14 +3265,16 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Repousse %theTarget% à %range% de l'endroit visé~
-@12350002 = ~Repousse %theTarget% à %range% %ofTheSource%~
-@12350003 = ~Attire %theTarget% de %range% vers l'endroit visé~
-@12350004 = ~Attire %theTarget% de %range% vers %theSource%~
-@12350005 = ~de repousser %theTarget% à %range% %ofTheSource%~
-@12350006 = ~de repousser %theTarget% à %range% de l'endroit visé~
-@12350007 = ~d'attirer %theTarget% de %range% vers %theSource%~
-@12350008 = ~d'attirer %theTarget% de %range% vers l'endroit visé~
+@12350001 = ~Knock down %theTarget%~
+@12350002 = ~to knock down %theTarget%~
+@12350001 = ~Knock down %theTarget% %range% away from the target area~
+@12350002 = ~Knock down %theTarget% %range% away from %theSource%~
+@12350003 = ~Attracts %theTarget% %range% to the target area~
+@12350004 = ~Attracts %theTarget% %range% %toTheSource%~
+@12350005 = ~to knock down %theTarget% %range% away from %theSource%~
+@12350006 = ~to knock down %theTarget% %range% away from the target area~
+@12350007 = ~to attract %theTarget% %range% %toTheSource%~
+@12350008 = ~to attract %theTarget% %range% to the target area~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 
@@ -3362,17 +3388,17 @@
 
 // Opcode 261: Spell: Restore Lost Spells [261]
 
-@12610001 = ~Se remémore 1 sort %spellType% de niveau %spellLevel% ou inférieur~
-@12610002 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610003 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~
-@12610004 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
-@12610005 = ~Se remémore 1 sort %spellType% de niveau %spellLevel%~
-@12610006 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
-@12610007 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
-@12610008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@12610001 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower~
+@12610002 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower %toTheTarget%~
+@12610003 = ~to recover 1 %spellType% spell of level %spellLevel% or lower~
+@12610004 = ~to recover 1 %spellType% spell of level %spellLevel% or lower %toTheTarget%~
+@12610005 = ~Recovers 1 %spellType% spell of level %spellLevel%~
+@12610006 = ~Recovers 1 %spellType% spell of level %spellLevel% %toTheTarget%~
+@12610007 = ~to recover 1 %spellType% spell of level %spellLevel%~
+@12610008 = ~to recover 1 %spellType% spell of level %spellLevel% %toTheTarget%~
 
-@12610010 = ~profane~ // ~%spellType%~
-@12610011 = ~divin~
+@12610010 = ~wizard~ // ~%spellType%~
+@12610011 = ~priest~
 
 // Opcode 262: Stat: Visual Range [262]
 
@@ -3416,16 +3442,16 @@
 @12720001 = ~%description%, %strDuration%~
 @12720002 = ~%description%, %amount% times %strDuration%~
 
-@12720010 = ~À chaque %strDuration%~
-@12720011 = ~Toutes les %strDuration%~
-@12720012 = ~Tous les %strDuration%~
-@12720013 = ~%amount% fois par %strDuration%~
-@12720014 = ~%amount% fois toutes les %strDuration%~
-@12720015 = ~%amount% fois tous les %strDuration%~
+@12720010 = ~At each %strDuration%~
+@12720011 = ~Every %strDuration%~
+@12720012 = ~Every %strDuration%~
+@12720013 = ~%amount% times per %strDuration%~
+@12720014 = ~%amount% times every %strDuration%~
+@12720015 = ~%amount% times every %strDuration%~
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
-@12730001 = ~Zone d'air pur~
+@12730001 = ~Zone of Sweet Air~
 @12730002 = ~Lance Zone d'air pur~
 @12730003 = ~de lancer Zone d'air pur~
 @12730004 = ~de lancer Zone d'air pur sur %theTarget%~
@@ -3473,8 +3499,8 @@
 
 // Opcode 281: Stat: Wild Magic [281]
 
-@12810001 = ~Modificateur des hiatus entropiques~
-@12810002 = ~le modificateur des hiatus entropiques~
+@12810001 = ~Probability that a wild surge will have positive effect~
+@12810002 = ~the probability that a wild surge will have positive effect~
 
 // Opcode 283: Use EFF File (Cursed) [283]
 
@@ -3727,13 +3753,13 @@
 @13240075 = ~Inefficace contre les créatures vivantes~ // FIXME: tendancieux : les morts-vivants sont touchés
 @13240076 = ~~ // @13240110
 @13240077 = ~Not effective against targets immune to poison~
-@13240078 = ~Inefficace contre les créatures sensibles au poison~
-@13240079 = ~Inefficace contre les créatures immunisées à l'acide~
-@13240080 = ~Inefficace contre les créatures sensibles à l'acide~
-@13240081 = ~Inefficace contre les créatures immunisées à l'électricité~
-@13240082 = ~Inefficace contre les créatures sensibles à l'électricité~
-@13240083 = ~Inefficace contre les créatures immunisées aux dégâts magiques~
-@13240084 = ~Inefficace contre les créatures sensibles aux dégâts magiques~
+@13240078 = ~Not effective against poison-sensitive creatures~
+@13240079 = ~Not effective against creatures immune to acid~
+@13240080 = ~Not effective against acid-sensitive creatures~
+@13240081 = ~Not effective against creatures immune to electricity~
+@13240082 = ~Not effective against creatures sensitive to electricity~
+@13240083 = ~Not effective against creatures immune to magic damage~
+@13240084 = ~Not effective against creatures sensitive to magic damage~
 @13240085 = ~Inefficace contre les ankhegs~
 @13240086 = ~Effectif contre les ankhegs~
 @13240087 = ~Inefficace contre les liches~
@@ -3743,24 +3769,24 @@
 @13240091 = ~Inefficace contre les créatures paniquées~
 @13240092 = ~Effectif contre les créatures paniquées~
 
-@13240110 = ~Ineffective against creatures under the effect of %splstateName%~
+@13240110 = ~Not effective against creatures under the effect of %splstateName%~
 @13240111 = ~Effective against creatures under the effect of %splstateName%~
 
 @13240119 = ~Inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
 @13240120 = ~Inefficace contre les créatures protégées contre les morts-vivants~
 //@13240121 = ~~ // TODO : splstate WILD_MAGIC_AREA actif > jamais vu
-@13240122 = ~Inefficace contre les créatures possédant une dexterity supérieure ou égale à %value%~
-@13240123 = ~Inefficace contre les créatures possédant une dexterity inférieure à %value%~
-@13240124 = ~Inefficace contre les créatures possédant une strength supérieure ou égale à %value%~
-@13240125 = ~Inefficace contre les créatures possédant une strength inférieure à %value%~
-@13240126 = ~Inefficace contre les créatures possédant une constitution supérieure ou égale à %value%~
-@13240127 = ~Inefficace contre les créatures possédant une constitution inférieure à %value%~
-@13240128 = ~Inefficace contre les créatures possédant une intelligence supérieure ou égale à %value%~
-@13240129 = ~Inefficace contre les créatures possédant une intelligence inférieure à %value%~
-@13240130 = ~Inefficace contre les créatures possédant une wisdom supérieure ou égale à %value%~
-@13240131 = ~Inefficace contre les créatures possédant une wisdom inférieure à %value%~
-@13240132 = ~Inefficace contre les créatures possédant un charisma supérieur ou égal à %value%~
-@13240133 = ~Inefficace contre les créatures possédant un charisma inférieur à %value%~
+@13240122 = ~Not effective against creatures with a dexterity of %value% or more~
+@13240123 = ~Not effective against creatures with a dexterity of less than %value%~
+@13240124 = ~Not effective against creatures with a strength of %value% or more~
+@13240125 = ~Not effective against creatures with a strength of less than %value%~
+@13240126 = ~Not effective against creatures with a constitution of %value% or more~
+@13240127 = ~Not effective against creatures with a constitution of less than %value%~
+@13240128 = ~Not effective against creatures with a intelligence of %value% or more~
+@13240129 = ~Not effective against creatures with a intelligence of less than %value%~
+@13240130 = ~Not effective against creatures with a wisdom of %value% or more~
+@13240131 = ~Not effective against creatures with a wisdom of less than %value%~
+@13240132 = ~Not effective against creatures with a charisma of %value% or more~
+@13240133 = ~Not effective against creatures with a charisma of less than %value%~
 @13240134 = ~Inefficace si le nombre de créatures invoquées is greater than or equal to %value%~
 @13240135 = ~Inefficace si le nombre de créatures invoquées is less than %value%~
 @13240136 = ~Inefficace si le chapitre en cours est supérieur ou égal au %value%~
@@ -3769,12 +3795,12 @@
 @13240139 = ~Effectif contre les créatures %descriptionState%~
 @13240140 = ~Inefficace contre les créatures sous l'effet d'une invisibilité~
 @13240141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
-@13240142 = ~Ineffective against invisible creatures~
+@13240142 = ~Not effective against invisible creatures~
 @13240143 = ~Effective against invisible creatures~
 @13240144 = ~Inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13240145 = ~Inefficace contre les créatures dont les points de vie sont inférieurs à %value%~
 
-@13240301 = ~Ineffective against %creatureType%~
+@13240301 = ~Not effective against %creatureType%~
 @13240302 = ~Effective against %creatureType%~
 
 @13240401 = ~during the iron crisis~
@@ -3795,11 +3821,11 @@
 @13240512 = ~d'être effectif contre les myconides~
 @13240513 = ~d'être inefficace contre les créatures gigantesques~
 @13240514 = ~d'être effectif contre les créatures gigantesques~
-@13240515 = ~to be ineffective against elves~
+@13240515 = ~to be Not effective against elves~
 @13240516 = ~to be effective against elves~
 @13240517 = ~d'être inefficace contre les ombres des roches~
 @13240518 = ~d'être effectif contre les ombres des roches~
-@13240519 = ~to be ineffective against half elves~
+@13240519 = ~to be Not effective against half elves~
 @13240520 = ~to be effective against half elves~
 @13240521 = ~d'être inefficace contre les humanoïdes et les animaux~
 @13240522 = ~d'être effectif contre les humanoïdes et les animaux~
@@ -3835,10 +3861,10 @@
 @13240552 = ~d'être effectif contre les créatures hostiles~
 @13240553 = ~d'être inefficace contre les créatures immunisées au feu ou au froid~
 @13240554 = ~d'être inefficace contre les créatures sensibles au feu ou au froid~
-@13240555 = ~to be ineffective against undead and golems~
+@13240555 = ~to be Not effective against undead and golems~
 @13240556 = ~to be effective against undead and golems~
-@13240557 = ~to be ineffective against male~
-@13240558 = ~to be ineffective against female~
+@13240557 = ~to be Not effective against male~
+@13240558 = ~to be Not effective against female~
 //
 @13240564 = ~d'être inefficace contre les orques~
 @13240565 = ~d'être effectif contre les orques~
@@ -3850,8 +3876,8 @@
 @13240574 = ~d'être inefficace contre les créatures mortes~
 @13240575 = ~d'être inefficace contre les créatures vivantes~
 @13240076 = ~~ // @13240610
-@13240577 = ~to be ineffective against targets immune to poison~
-@13240578 = ~to be ineffective against poison-sensitive targets~
+@13240577 = ~to be Not effective against targets immune to poison~
+@13240578 = ~to be Not effective against poison-sensitive targets~
 @13240579 = ~d'être inefficace contre les créatures immunisées à l'acide~
 @13240580 = ~d'être inefficace contre les créatures sensibles à l'acide~
 @13240581 = ~d'être inefficace contre les créatures immunisées à l'électricité~
@@ -3902,12 +3928,12 @@
 @13240802 = ~d'être effectif contre les %creatureType%~
 
 @13240901 = ~Immunity %againstWho%~
-@13240902 = ~Immunise %theTarget% %againstWho%~
-@13240903 = ~d'immuniser %theTarget% %againstWho%~
+@13240902 = ~Immunize %theTarget% %againstWho%~
+@13240903 = ~to immunize %theTarget% %againstWho%~
 
-@13240911 = ~contre le sort %spellName% et l'objet %itemName%~ // againstWho
-@13240912 = ~contre le sort %spellName%~
-@13240913 = ~contre l'objet %itemName%~
+@13240911 = ~from %spellName% spell and %itemName% item~ // againstWho
+@13240912 = ~from %spellName% spell~
+@13240913 = ~from %itemName% item~
 
 @13241003 = ~créatures immunisées au feu~
 @13241004 = ~créatures sensibles au feu~
@@ -3968,7 +3994,7 @@
 @13241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13241145 = ~créatures dont les points de vie sont inférieurs à %value%~
 @13241500 = ~Effective %creaturesList%~
-@13241501 = ~Ineffective %targetCondition%~
+@13241501 = ~Not effective %targetCondition%~
 @13241502 = ~against %creaturesList%~
 @13241503 = ~at %probability%% ~
 
@@ -3978,15 +4004,15 @@
 
 // Opcode 325: Stat: Save vs. all [325]
 
-@13250002 = ~les jets de sauvegarde~
+@13250002 = ~save vs. all~
 
 // Opcode 326: Apply Effects List [326]
 
 @13260000 = ~~
 @13260001 = ~If %theTarget% est un mort-vivant~
 @13260002 = ~If %theTarget% n'est pas un mort-vivant~
-@13260003 = ~If %theTarget% est immunisé au feu~
-@13260004 = ~If %theTarget% est sensible au feu~
+@13260003 = ~If %theTarget% is immune to fire~
+@13260004 = ~If %theTarget% is sensitive to fire~
 @13260005 = ~If %theTarget% est un humanoïde~
 @13260006 = ~If %theTarget% n'est pas un humanoïde~
 @13260007 = ~If %theTarget% est un animal~
@@ -4149,10 +4175,10 @@
 
 // Opcode 337: Remove: Opcode [337]
 
-@13370001 = ~Dissipe %opcodeStr%~
-@13370002 = ~Dissipe %opcodeStr% sur %theTarget%~
-@13370003 = ~de dissiper %opcodeStr%~
-@13370004 = ~de dissiper %opcodeStr% sur %theTarget%~
+@13370001 = ~Dispels %opcodeStr%~
+@13370002 = ~Dispels %opcodeStr% on %theTarget%~
+@13370003 = ~to dispel %opcodeStr%~
+@13370004 = ~to dispel %opcodeStr% on %theTarget%~
 
 // Opcode 340: Spell Effect: Change Backstab Effect [340]
 
@@ -4307,6 +4333,11 @@
 @15240001 = ~For each successful attack~
 @15240002 = ~For each successful attack by %theTarget%~
 @15240003 = ~per successful attack by %theTarget%~
+
+// Fake Opcode 525: Item: Replace item [525]
+
+@15250001 = ~Replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
+@15250002 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

@@ -8138,7 +8138,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
+DEFINE_PATCH_FUNCTION ~get_res_description~ INT_VAR ignoreDuration = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
 	INNER_PATCH_FILE ~%resref%.eff~ BEGIN
 		SET isExternal = 1
 		LPM ~read_external_effect_vars~
@@ -8149,7 +8149,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description~ STR_VAR resref = ~~ macro = ~~ RET d
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
-				LPF ~get_effect_description~ RET description saveAdded ignoreDuration END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration RET description saveAdded ignoreDuration END
 			END
 		END
 	END
@@ -11929,11 +11929,12 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_272~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
-	LPF ~get_res_description~ STR_VAR resref RET description saveAdded opcode END
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		LPM ~opcode_272_condition~
-		SET ignoreDuration = 1
+	LPM ~opcode_272_condition~
+	LPF ~get_res_description~ INT_VAR ignoreDuration = (frequency == 6 AND abilityType == AbilityType_Equipped) STR_VAR resref RET description saveAdded opcode END
+	PATCH_IF ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT condition ~~
 	END
+	SET ignoreDuration = 1
 END
 
 DEFINE_PATCH_MACRO ~opcode_272_is_valid~ BEGIN
@@ -11980,10 +11981,16 @@ DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
 
 	PATCH_IF amount == 1 BEGIN
 		PATCH_IF ~%strDuration%~ STRING_MATCHES_REGEXP ~^1 ~ == 0 BEGIN
-			INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
-				REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+			PATCH_IF frequency == 6 AND abilityType == AbilityType_Equipped BEGIN
+                SET strref = 12320000 // ~~
+                SET ignoreDuration = 1
+            END
+            ELSE BEGIN
+				INNER_PATCH_SAVE strDuration ~%strDuration%~ BEGIN
+					REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~^1 ~ ~~
+				END
+				SET strref = 12720010 // ~À chaque %strDuration%~
 			END
-			SET strref = 12720010 // ~À chaque %strDuration%~
 		END
 		ELSE BEGIN
 			// FIXME: données en français et genrées => traduction impossible
@@ -12016,8 +12023,8 @@ DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
 	LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
 
 	PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
-		SPRINT frequency (AT strref)
-		SPRINT condition ~%frequency% %tmpDuration%~
+		SPRINT strFrequency (AT strref)
+		SPRINT condition ~%strFrequency% %tmpDuration%~
 	END
 	ELSE BEGIN
 		SPRINT condition (AT strref)
