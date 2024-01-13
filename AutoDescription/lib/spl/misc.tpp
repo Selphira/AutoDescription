@@ -892,11 +892,15 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 	END
 	ELSE PATCH_IF baseSavingType == 32 BEGIN
 		SPRINT savingThrow @10017 // ~1/2~
-		SET ignoreSavingThrow = 1
+		PATCH_IF baseSavingBonus == 0 BEGIN
+			SET ignoreSavingThrow = 1
+		END
 	END
 	ELSE PATCH_IF baseSavingType > 0 BEGIN
 		SPRINT savingThrow @10016 // ~Annule~
-		SET ignoreSavingThrow = 1
+		PATCH_IF baseSavingBonus == 0 BEGIN
+			SET ignoreSavingThrow = 1
+		END
 	END
 	ELSE BEGIN
 		SPRINT savingThrow @10015 // ~Aucun~
