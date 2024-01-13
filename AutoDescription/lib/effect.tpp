@@ -709,6 +709,7 @@ DEFINE_PATCH_FUNCTION ~get_effect_description~
 		resetTarget = 0
 		forceTarget = 0
 		ignoreDuration = 0
+		ignoreSavingThrow = 0
 		projectile = 0
 		projectileTarget = 0
 		projectileTargetNumber = 0

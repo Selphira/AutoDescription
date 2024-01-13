@@ -83,6 +83,7 @@ BEGIN
 	LPF ~get_spell_roleplay_description~ STR_VAR description = ~%originalDescription%~ RET roleplayDescription = description END
 
 	SET ignoreDuration = 0
+	SET ignoreSavingThrow = 0
 
 	SPRINT description ~%spellName%~
 
@@ -93,7 +94,7 @@ BEGIN
 	LPF ~spell_duration~ RET description ignoreDuration isSpecialDuration = is_special END
 	LPF ~spell_casting_time~ RET description END
 	LPF ~spell_target~ RET description END
-	LPF ~spell_saving_throw~ RET description END
+	LPF ~spell_saving_throw~ RET description ignoreSavingThrow END
 
 	SPRINT description ~%description%%crlf%%crlf%%roleplayDescription%~
 

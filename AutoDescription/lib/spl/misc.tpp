@@ -359,6 +359,39 @@ BEGIN
 		SET cpt += 1
 	END
 
+	PATCH_IF is_valid == 0 BEGIN
+		SET is_valid = 1
+		SET cpt = 0
+		SET prev_duration = 0
+		SET base_duration = 0
+		SET delta_duration = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => duration BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+			PATCH_IF cpt > 1 AND prev_duration != duration BEGIN
+				PATCH_IF delta_duration = 0 BEGIN
+					SET delta_duration = duration - prev_duration
+					SET delta_level = level - prev_level
+				END
+				ELSE PATCH_IF delta_duration != duration - prev_duration OR delta_level != level - prev_level BEGIN
+					SET is_valid = 0
+				END
+			END
+			ELSE BEGIN
+				SET base_duration = duration
+				SET prev_level = level
+			END
+			PATCH_IF prev_duration != duration BEGIN
+				SET prev_duration = duration
+				SET prev_level = level
+			END
+			SET cpt += 1
+		END
+	END
+
 	PATCH_IF cpt == 2 BEGIN
 		SET cpt = 0
 		SET delta_duration = 0
@@ -654,10 +687,6 @@ BEGIN
                     READ_SHORT 0x206 areaOfEffect
                     READ_SHORT 0x224 coneWidth
 
-                    // On divise par 8.5 pour avoir le diamètre en pied, et encore par 2 pour avoir le rayon
-                    SET areaOfEffect /= 17
-                    LPF ~feets_to_meters~ INT_VAR range = areaOfEffect RET range = rangeToMeter END
-
 					//LinedUpAreaOfEffect 0x2c BIT14
 					//RectangularAreaOfEffect 0x2c BIT15 (longeur = 0x204, largeur = 0x206) (Prioritaire sur LinedUpAreaOfEffect)
 					//CasterAffected 0x2c BIT31
@@ -666,6 +695,15 @@ BEGIN
 					SET enemiesOnly = (areaProjectileFlags BAND BIT6) == BIT6
 					SET alliesOnly = (areaProjectileFlags BAND BIT7) == BIT7
 					SET isConeShape = (areaProjectileFlags BAND BIT11) == BIT11
+
+                    // On divise par 8.5 pour avoir le diamètre en pied, et encore par 2 pour avoir le rayon
+                    PATCH_IF isConeShape BEGIN
+                        SET areaOfEffect = areaOfEffect * 10 / 85
+                    END
+                    ELSE BEGIN
+                        SET areaOfEffect /= 17
+                    END
+                    LPF ~feets_to_meters~ INT_VAR range = areaOfEffect RET range = rangeToMeter END
 
 					PATCH_IF alliesOnly AND enemiesOnly BEGIN
 						SET targetOffset = 2
@@ -821,32 +859,27 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description BEGIN
+DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEGIN
+	SET ignoreSavingThrow = 0
 	SET count = 0
 	SET isSpecial = 0
 	SET baseSavingType = 0 - 1
 	SET baseSavingBonus = 0 - 1
 
-	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
-	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_IF isSpecial == 0 BEGIN
-			GET_OFFSET_ARRAY2 offsets headerOffset ITM_V10_HEAD_EFFECTS
-			PHP_EACH offsets AS _ => offset BEGIN
-				READ_SHORT (offset) opcode
-				PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-					READ_LONG (offset + EFF_parameter2) parameter2
-					READ_LONG (offset + EFF_save_type) saveType
-					READ_LONG (offset + EFF_save_bonus) saveBonus
-					READ_LONG (offset + 0x2c) special
-
+			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+				PATCH_IF opcode >= 0 BEGIN
+				    LPM ~data_to_vars~
+					SET saveType = (saveType BAND 0b11111)
 					PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
-						SET saveType = 4 // demi-dégâts
+						SET saveType = 32 // demi-dégâts
 					END
 					PATCH_IF baseSavingType == 0 - 1 BEGIN
 						SET baseSavingType = saveType
 						SET baseSavingBonus = saveBonus
 					END
-					PATCH_IF baseSavingType != saveType BEGIN
+					PATCH_IF NOT (saveType == 0 AND saveType == 32) AND baseSavingType != saveType BEGIN
 						SET isSpecial = 1
 					END
 				END
@@ -857,11 +890,13 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description BEGIN
 	PATCH_IF isSpecial BEGIN
 		SPRINT savingThrow @100032 // ~Spécial~
 	END
-	ELSE PATCH_IF baseSavingType == 4 BEGIN
+	ELSE PATCH_IF baseSavingType == 32 BEGIN
 		SPRINT savingThrow @10017 // ~1/2~
+		SET ignoreSavingThrow = 1
 	END
 	ELSE PATCH_IF baseSavingType > 0 BEGIN
 		SPRINT savingThrow @10016 // ~Annule~
+		SET ignoreSavingThrow = 1
 	END
 	ELSE BEGIN
 		SPRINT savingThrow @10015 // ~Aucun~

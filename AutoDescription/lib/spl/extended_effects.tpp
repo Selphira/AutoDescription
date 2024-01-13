@@ -28,7 +28,7 @@ BEGIN
 				PATCH_IF baseProbability != 100 BEGIN
 		            SET probability = probability * baseProbability / 100
 		        END
-				LPF ~get_effect_description~ INT_VAR ignoreDuration forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
+				LPF ~get_effect_description~ INT_VAR ignoreDuration ignoreSavingThrow forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET probability = oldProbability
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1

@@ -6,11 +6,13 @@ SPCL121.SPL : Opcode 44: Invalid target : 255
 SPCL121.SPL : Opcode 12: Invalid target : 255
 SPCL238.SPL : Niveau minimum non calculable
 SPCL238.SPL : Niveau minimum non calculable
+SPCL238.SPL : Niveau minimum non calculable
 SPCL622.SPL : Niveau minimum non calculable
 SPCL623.SPL : Niveau minimum non calculable
 SPCL624.SPL : Niveau minimum non calculable
 SPCL625.SPL : Niveau minimum non calculable
 SPCL721.SPL : Opcode 83 : Réflection du type de projectile '329'
+SPDR101.SPL : Niveau minimum non calculable
 SPDR101.SPL : Niveau minimum non calculable
 SPIN127.SPL : Opcode 135 self : Nom de la créature introuvable : plybass
 SPIN717.SPL : Opcode 135 self : Nom de la créature introuvable : slayer
@@ -21,6 +23,7 @@ SPPR411.SPL : Niveau minimum non calculable
 SPPR411.SPL : Niveau minimum non calculable
 SPPR717.SPL : Opcode 24: Invalid target : 255
 SPRA303.SPL : Opcode 83 : Réflection du type de projectile '329'
+SPWI118.SPL : Niveau minimum non calculable
 SPWI118.SPL : Niveau minimum non calculable
 SPWI311.SPL : Opcode 83 : Réflection du type de projectile '329'
 SPWI417.SPL : FAILURE: Unknown macro: opcode_target_345

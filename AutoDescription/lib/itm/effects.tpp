@@ -93,71 +93,73 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~saveType_to_strref~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_save~ BEGIN
-	SET saveType = (saveType BAND 0b11111)
-	// FIXME
-	SET saveForHalf = 0
-	SET failForHalf = 0
-	PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 BEGIN
-		SET saveForHalf = (special BAND BIT8) > 0
-		SET failForHalf = (special BAND BIT9) > 0
-	END
-	//
-
-	// les dégâts sont réduits de moitié même si aucun JS n'est permis
-	// PATCH_IF saveForHalf AND failForHalf BEGIN
-	// 	SPRINT saveStr @102125 // ~réduits de moitié~
-	// END
-
-	// dégâts réduits de moitié si :
-	// pas de JS autorisés et failForHalf actif
-	// JS autorisés mais failForHalf et saveForHalf actifs
-	PATCH_IF failForHalf AND NOT ~%description%~ STRING_EQUAL ~~ AND (saveType == 0 OR saveForHalf) BEGIN
-		SPRINT saveStr @102125 // ~réduits de moitié~
-		SPRINT description ~%description% (%saveStr%)~
-	END
-	ELSE PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
-		// FIXME les js ne sont pas cumulés dans la description finale
-		SPRINT saveTypeStr ~~
-
-		PHP_EACH saveType_to_strref AS saveBit => strref BEGIN
-			PATCH_IF (saveType BAND saveBit) BEGIN
-				SPRINT strOr ~~
-				SPRINT strref (AT strref)
-				PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
-					SPRINT strOr @100004 // ~ou~
-					// FIXME le faire en une fois ?
-					SPRINT strOr ~ %strOr% ~
-				END
-				SPRINT saveTypeStr ~%saveTypeStr%%strOr%%strref%~
-			END
+	PATCH_IF ignoreSavingThrow == 0 BEGIN
+		SET saveType = (saveType BAND 0b11111)
+		// FIXME
+		SET saveForHalf = 0
+		SET failForHalf = 0
+		PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 BEGIN
+			SET saveForHalf = (special BAND BIT8) > 0
+			SET failForHalf = (special BAND BIT9) > 0
 		END
+		//
 
-		PATCH_IF saveBonus != 0 BEGIN
-			LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
-			PATCH_IF saveForHalf BEGIN
-				SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
-			END
-			ELSE PATCH_IF failForHalf BEGIN
-				SPRINT saveStr @102124 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
-			END
-			ELSE BEGIN
-				SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
-			END
-        END
-        ELSE BEGIN
-			PATCH_IF saveForHalf BEGIN
-				SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
-			END
-			ELSE PATCH_IF failForHalf BEGIN
-				SPRINT saveStr @102123 // ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
-			END
-			ELSE BEGIN
-				SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
-			END
-        END
+		// les dégâts sont réduits de moitié même si aucun JS n'est permis
+		// PATCH_IF saveForHalf AND failForHalf BEGIN
+		// 	SPRINT saveStr @102125 // ~réduits de moitié~
+		// END
 
-		SPRINT description ~%description% (%saveStr%)~
-		SET saveAdded = 1
+		// dégâts réduits de moitié si :
+		// pas de JS autorisés et failForHalf actif
+		// JS autorisés mais failForHalf et saveForHalf actifs
+		PATCH_IF failForHalf AND NOT ~%description%~ STRING_EQUAL ~~ AND (saveType == 0 OR saveForHalf) BEGIN
+			SPRINT saveStr @102125 // ~réduits de moitié~
+			SPRINT description ~%description% (%saveStr%)~
+		END
+		ELSE PATCH_IF saveAdded == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND saveType != 0 BEGIN
+			// FIXME les js ne sont pas cumulés dans la description finale
+			SPRINT saveTypeStr ~~
+
+			PHP_EACH saveType_to_strref AS saveBit => strref BEGIN
+				PATCH_IF (saveType BAND saveBit) BEGIN
+					SPRINT strOr ~~
+					SPRINT strref (AT strref)
+					PATCH_IF NOT ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+						SPRINT strOr @100004 // ~ou~
+						// FIXME le faire en une fois ?
+						SPRINT strOr ~ %strOr% ~
+					END
+					SPRINT saveTypeStr ~%saveTypeStr%%strOr%%strref%~
+				END
+			END
+
+			PATCH_IF saveBonus != 0 BEGIN
+				LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
+				PATCH_IF saveForHalf BEGIN
+					SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
+				END
+				ELSE PATCH_IF failForHalf BEGIN
+					SPRINT saveStr @102124 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+				END
+				ELSE BEGIN
+					SPRINT saveStr @102122 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour éviter~
+				END
+	        END
+	        ELSE BEGIN
+				PATCH_IF saveForHalf BEGIN
+					SPRINT saveStr @101183 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
+				END
+				ELSE PATCH_IF failForHalf BEGIN
+					SPRINT saveStr @102123 // ~jet de sauvegarde %saveTypeStr% pour éviter et pour moitié en cas d'échec~
+				END
+				ELSE BEGIN
+					SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
+				END
+	        END
+
+			SPRINT description ~%description% (%saveStr%)~
+			SET saveAdded = 1
+		END
 	END
 END
 
