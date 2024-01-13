@@ -1,7 +1,7 @@
 BACKUP ~AutoDescription/backup~
 AUTHOR ~Selphira (https://www.baldursgateworld.fr/memberlist.php?mode=viewprofile&u=5323)~
 
-VERSION ~0.9.31~
+VERSION ~0.9.32~
 
 AUTO_EVAL_STRINGS
 
@@ -43,6 +43,8 @@ LANGUAGE ~Francais~ ~french~
          ~AutoDescription/tra/french/description.tra~
 
 LANGUAGE ~English (Beta)~ ~english~
+         ~AutoDescription/tra/french/setup.tra~
+         ~AutoDescription/tra/french/description.tra~
          ~AutoDescription/tra/english/setup.tra~
          ~AutoDescription/tra/english/description.tra~
 
