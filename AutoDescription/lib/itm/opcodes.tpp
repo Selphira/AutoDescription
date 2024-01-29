@@ -2969,14 +2969,27 @@ DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 		CLEAR_ARRAY positions
 		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 			LPM ~data_to_match_vars~
-			PATCH_IF match_parameter1 == searchP1 AND match_parameter2 >= 1 AND match_parameter2 <= 256 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
-				// On retire l'opcode de ceux à checker dans les futures itérations
-				SET $positions_already_check(~%match_position%~) = 1
-				// On ajoute l'opcode courant à ceux qui seront désactivés
-				SET $positions(~%match_position%~) = initOpcode
-				// P2 retiré
-				SET $positions(~%position%~) = initOpcode
-				SET newP2 |= match_parameter2
+			PATCH_IF parameter2 == 0 BEGIN
+				PATCH_IF match_parameter1 == searchP1 AND parameter2 == match_parameter2 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+					// On retire l'opcode de ceux à checker dans les futures itérations
+					SET $positions_already_check(~%match_position%~) = 1
+					// On ajoute l'opcode courant à ceux qui seront désactivés
+					SET $positions(~%match_position%~) = initOpcode
+					// P2 retiré
+					SET $positions(~%position%~) = initOpcode
+					SET newP2 |= match_parameter2
+				END
+			END
+			ELSE BEGIN
+				PATCH_IF match_parameter1 == searchP1 AND match_parameter2 >= 1 AND match_parameter2 <= 256 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+					// On retire l'opcode de ceux à checker dans les futures itérations
+					SET $positions_already_check(~%match_position%~) = 1
+					// On ajoute l'opcode courant à ceux qui seront désactivés
+					SET $positions(~%match_position%~) = initOpcode
+					// P2 retiré
+					SET $positions(~%position%~) = initOpcode
+					SET newP2 |= match_parameter2
+				END
 			END
 		END
 		PATCH_IF newP2 > 0 BEGIN
