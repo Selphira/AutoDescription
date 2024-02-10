@@ -95,6 +95,15 @@
 @101314 = ~druidique~
 @101315 = ~divin/druidique~
 
+@101320 = ~Spécial~
+@101321 = ~Profane~
+@101322 = ~Divin/Druidique~
+@101323 = ~Psionique~
+@101324 = ~Inné~
+@101325 = ~Chant~
+@101326 = ~Divin~
+@101327 = ~Druidique~
+
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~

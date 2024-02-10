@@ -9,12 +9,37 @@ DEFINE_PATCH_FUNCTION ~spell_level~ RET description BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~spell_school~ RET description BEGIN
+	READ_SHORT SPL_type spellType
 	READ_BYTE SPL_school spellSchool
+
+	LPF ~get_spell_type_name~ INT_VAR type = spellType RET spellTypeName END
 
 	PATCH_IF spellSchool > 0 BEGIN
 		LPF ~get_spell_school_name~ INT_VAR school = spellSchool RET spellSchoolName END
-		LPF ~appendLine~ STR_VAR string = ~(%spellSchoolName%)~ RET description END
+		LPF ~appendLine~ STR_VAR string = ~(%spellTypeName% - %spellSchoolName%)~ RET description END
 	END
+	ELSE BEGIN
+		LPF ~appendLine~ STR_VAR string = ~(%spellTypeName%)~ RET description END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_type_name~ INT_VAR type = 0 RET spellTypeName BEGIN
+	PATCH_IF type == 2 BEGIN
+		READ_LONG SPL_exclusion_flags exclusionFlags
+		SET excludeCleric = (exclusionFlags BAND BIT30) == BIT30
+		SET excludeDruid = (exclusionFlags BAND BIT31) == BIT31
+		PATCH_IF excludeCleric AND excludeDruid BEGIN
+			LPF ~add_log_error~ STR_VAR message = ~Priest spell exclude cleric and druid.~ END
+		END
+		ELSE PATCH_IF excludeDruid BEGIN
+			SET type = 6 // ~Divin~
+		END
+		ELSE PATCH_IF excludeCleric BEGIN
+			SET type = 7 // ~Druidique~
+		END
+	END
+	SET strref = 101320 + type
+	LPF ~getTranslation~ INT_VAR strref opcode = 0 RET spellTypeName = string END
 END
 
 /*
@@ -890,14 +915,13 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 	PATCH_IF isSpecial BEGIN
 		SPRINT savingThrow @100032 // ~Spécial~
 	END
-	ELSE PATCH_IF baseSavingType == 32 BEGIN
-		SPRINT savingThrow @10017 // ~1/2~
-		PATCH_IF baseSavingBonus == 0 BEGIN
-			SET ignoreSavingThrow = 1
-		END
-	END
 	ELSE PATCH_IF baseSavingType > 0 BEGIN
-		SPRINT savingThrow @10016 // ~Annule~
+		PATCH_IF baseSavingType == 32 BEGIN
+			SPRINT savingThrow @10017 // ~1/2~
+		END
+		ELSE BEGIN
+			SPRINT savingThrow @10016 // ~Annule~
+		END
 		PATCH_IF baseSavingBonus == 0 BEGIN
 			SET ignoreSavingThrow = 1
 		END
