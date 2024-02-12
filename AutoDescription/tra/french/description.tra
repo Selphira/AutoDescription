@@ -2379,8 +2379,8 @@
 
 // Opcode 91: Stat: Find Traps Modifier [91]
 
-@10910001 = ~Détection / Désamorçage des pièges~
-@10910002 = ~le score de Détection / Désamorçage des pièges~
+@10910001 = ~Détection et désamorçage des pièges~
+@10910002 = ~le score de Détection et désamorçage des pièges~
 
 // Opcode 92: Stat: Pick Pockets Modifier [92]
 
@@ -3273,7 +3273,9 @@
 @12320306 = ~À la nuit tombée, à chaque round~
 @12320307 = ~Au lever du jour, à chaque round~
 
-@12320400 = ~À partir du niveau %requiredLevel%~
+@12320400 = ~À partir du niveau %minRequiredLevel%~
+@12320401 = ~Entre le niveau %minRequiredLevel% et %maxRequiredLevel%~
+@12320402 = ~Au niveau %minRequiredLevel%~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 

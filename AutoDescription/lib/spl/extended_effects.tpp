@@ -420,8 +420,9 @@ DEFINE_PATCH_MACRO ~clear_levels~ BEGIN
 	PATCH_PHP_EACH level_effects AS _ => requiredLevel BEGIN
 		CLEAR_ARRAY ~leveled_opcodes_%requiredLevel%~
 	END
+	CLEAR_ARRAY leveled_opcodes_zero
 	CLEAR_ARRAY level_effects
-	SET leveled_opcodes_count_0 = 0
+	SET leveled_opcodes_count_zero = 0
 END
 
 DEFINE_PATCH_FUNCTION ~build_spell_effects_description~
@@ -434,13 +435,89 @@ DEFINE_PATCH_FUNCTION ~build_spell_effects_description~
 		totalLines
 BEGIN
 	SET totalLines = 0
-	SET isFirstLevel = 1
+
+	// Traitement des effets qui sont effectifs que pour certains niveaux du sortilège
+
+	CLEAR_ARRAY grouped_level_effects
+	CLEAR_ARRAY groups_level_effects
+
 	PATCH_PHP_EACH level_effects AS levelIndex => requiredLevel BEGIN
+		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+			PATCH_IF opcode >= 0 BEGIN
+				SET minRequiredLevel = requiredLevel
+				SET maxRequiredLevel = 99
+				SET loop1 = 1
+				LPM ~data_to_vars~
+				PATCH_PHP_EACH level_effects AS matchLevelIndex => matchRequiredLevel BEGIN
+					SET matched = 0
+					SET nextLevelIndex = matchLevelIndex + 1
+					SET hasNextLevel = VARIABLE_IS_SET $level_effects(~%nextLevelIndex%~)
+					PATCH_IF loop1 == 1 AND requiredLevel < matchRequiredLevel BEGIN
+						PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
+							PATCH_IF (matchOpcode == opcode OR opcode == 0 - matchOpcode - 1) AND matched == 0 BEGIN
+								LPM ~data_to_match_vars~
+								PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+					            PATCH_IF ignoreDuration BEGIN
+					                LPM ~opcode_match_except_duration~
+					            END
+					            ELSE BEGIN
+									LPM ~opcode_match~
+								END
+					            PATCH_IF match == 1 BEGIN
+				                    SET matched = 1
+					            END
+							END
+						END
+
+						PATCH_IF matched == 0 BEGIN
+							SET maxRequiredLevel = matchRequiredLevel - 1
+							SET loop1 = 0
+						END
+					END
+				END
+				PATCH_IF minRequiredLevel == 1 AND maxRequiredLevel == 99 BEGIN
+					SET $EVAL ~leveled_opcodes_zero~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = opcode
+				END
+				ELSE BEGIN
+					SET key = ((minRequiredLevel + 100) * 100) + maxRequiredLevel
+					SET $groups_level_effects(~%key%~) = 1
+					SET $EVAL ~grouped_level_effects_%key%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = opcode
+				END
+			END
+		END
+	END
+
+	LPF ~array_count~ STR_VAR array_name = ~level_effects~ RET countLeveledOpcode = count END
+
+	SORT_ARRAY_INDICES groups_level_effects NUMERICALLY
+
+	CLEAR_ARRAY lines
+
+	LPM ~clear_opcodes~
+
+	// Traitement des effets qui sont effectifs pour tous les niveaux du sortilège
+
+	PATCH_PHP_EACH ~leveled_opcodes_zero~ AS data => opcode BEGIN
+		// Si plus petit, c'est qu'on a désactivé l'entrée lors d'une précédente opération
+		PATCH_IF opcode >= 0 BEGIN
+		    LPM ~data_to_vars~
+			LPM ~add_opcode~
+		END
+	END
+
+	LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
+	SET totalLines += countLines
+
+	PATCH_IF countLines > 0 BEGIN
+		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
+	END
+
+	PATCH_PHP_EACH groups_level_effects AS levelIndex => _ BEGIN
 		CLEAR_ARRAY lines
 
 		LPM ~clear_opcodes~
 
-		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+		PATCH_PHP_EACH ~grouped_level_effects_%levelIndex%~ AS data => opcode BEGIN
 			// Si plus petit, c'est qu'on a désactivé l'entrée lors d'une précédente opération
 			PATCH_IF opcode >= 0 BEGIN
 			    LPM ~data_to_vars~
@@ -451,15 +528,21 @@ BEGIN
 		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
 
-		PATCH_IF countLines > 0 /*AND ~leveled_opcodes_count_%requiredLevel%~ > 0 AND*/ BEGIN
-			PATCH_IF isFirstLevel == 0 AND requiredLevel > 1 BEGIN
-	            LPF ~appendLine~ RET description END
-				SPRINT levelDescription @12320400 // ~À partir du niveau %requiredLevel%~
-				SPRINT description ~%description%%crlf%%levelDescription%~
+		PATCH_IF countLines > 0 AND countLeveledOpcode > 1 BEGIN
+			SET maxRequiredLevel = levelIndex MODULO 100
+			SET minRequiredLevel = ((levelIndex - maxRequiredLevel) / 100) - 100
+
+            LPF ~appendLine~ RET description END
+            PATCH_IF maxRequiredLevel == 99 BEGIN
+				SPRINT levelDescription @12320400 // ~À partir du niveau %minRequiredLevel%~
+            END
+            ELSE PATCH_IF minRequiredLevel = maxRequiredLevel BEGIN
+				SPRINT levelDescription @12320402 // ~Au niveau %minRequiredLevel%~
+            END
+            ELSE BEGIN
+				SPRINT levelDescription @12320401 // ~Entre le niveau %minRequiredLevel% et %maxLevel%~
 			END
-			ELSE BEGIN
-				SET isFirstLevel = 0
-			END
+			SPRINT description ~%description%%crlf%%levelDescription%~
 		END
 		//LPM ~add_common_opcodes_to_description
 		LPF ~add_items_section_to_description~ STR_VAR arrayName = ~lines~ RET description END
@@ -475,24 +558,76 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 	LOCAL_SET desactivated = 0
 	LOCAL_SET continue = 1
 	LOCAL_SET lastFoundLevel = 0 - 1
+	LOCAL_SET inAllLevel = 1
+
+	// On commence par traiter tous les effets identiques qui se trouvent dans tous les niveaux du sort
+	CLEAR_ARRAY positions
+	SET requiredLevel = $level_effects(~0~)
+	PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+		LPM ~data_to_vars~
+		SET inAllLevel = 1
+		CLEAR_ARRAY tmpPositions
+		PATCH_PHP_EACH level_effects AS _ => matchRequiredLevel BEGIN
+			PATCH_IF inAllLevel == 1 AND requiredLevel < matchRequiredLevel BEGIN
+				PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
+					PATCH_IF matchOpcode == opcode AND inAllLevel == 1 BEGIN
+						LPM ~data_to_match_vars~
+						PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+			            PATCH_IF ignoreDuration BEGIN
+			                LPM ~opcode_match_except_duration~
+			            END
+			            ELSE BEGIN
+							LPM ~opcode_match~
+						END
+			            PATCH_IF match == 1 BEGIN
+			                SET $tmpPositions(~%matchRequiredLevel%-%match_position%~) = 1
+			            END
+			            ELSE BEGIN
+							SET inAllLevel = 0
+			            END
+					END
+				END
+			END
+		END
+		PATCH_IF inAllLevel == 1 BEGIN
+			SET $tmpPositions(~%requiredLevel%-%position%~) = 1
+			// On place l'effet dans les effets globaux du sort
+			SET $EVAL ~leveled_opcodes_zero~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = opcode
+
+			PATCH_PHP_EACH level_effects AS index => tmpRequiredLevel BEGIN
+				PATCH_PHP_EACH ~leveled_opcodes_%tmpRequiredLevel%~ AS data => tmpOpcode BEGIN
+			        LPM ~data_to_vars~
+			        PATCH_IF VARIABLE_IS_SET $tmpPositions(~%tmpRequiredLevel%-%position%~) AND $tmpPositions(~%tmpRequiredLevel%-%position%~) == 1 BEGIN
+			            SET $positions(~%tmpRequiredLevel%-%position%~) = 1
+			        END
+				END
+			END
+		END
+	END
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+	        LPM ~data_to_vars~
+	        PATCH_IF VARIABLE_IS_SET $positions(~%requiredLevel%-%position%~) AND $positions(~%requiredLevel%-%position%~) == 1 BEGIN
+	            SET $EVAL ~leveled_opcodes_%requiredLevel%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = 0 - opcode - 1
+	        END
+		END
+	END
 
 	CLEAR_ARRAY positions
 
+	// On traite ensuite les effets qui diffèrent selon le niveau
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
-		SET loop1 = 1
 		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 			SET loop2 = 1
-			PATCH_IF loop1 == 1/*opcode >= 0*/ BEGIN
+			PATCH_IF opcode >= 0 BEGIN
 	            LPM ~data_to_vars~
 	            SET desactivated = 0
 	            SET continue = 1
 				PATCH_PHP_EACH level_effects AS _ => matchRequiredLevel BEGIN
-					PATCH_IF loop1 == 1 AND loop2 == 1 BEGIN
-						SET loop3 = 1
+					PATCH_IF loop2 == 1 BEGIN
 						PATCH_IF continue == 1 AND requiredLevel < matchRequiredLevel BEGIN
 							PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
-								PATCH_IF loop1 == 1 AND loop2 == 1 AND loop3 == 1 BEGIN
-									SET loop4 = 1
+								PATCH_IF loop2 == 1 AND matchOpcode >= 0 BEGIN
 							        LPM ~data_to_match_vars~
 									PATCH_IF matchOpcode == opcode AND NOT VARIABLE_IS_SET $positions(~%matchRequiredLevel%-%match_position%~) BEGIN
 										PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
@@ -522,9 +657,11 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
-	        LPM ~data_to_vars~
-	        PATCH_IF VARIABLE_IS_SET $positions(~%requiredLevel%-%position%~) AND $positions(~%requiredLevel%-%position%~) == 1 BEGIN
-	            SET $EVAL ~leveled_opcodes_%requiredLevel%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = ~-1~
+			PATCH_IF opcode >= 0 BEGIN
+		        LPM ~data_to_vars~
+		        PATCH_IF VARIABLE_IS_SET $positions(~%requiredLevel%-%position%~) AND $positions(~%requiredLevel%-%position%~) == 1 BEGIN
+		            SET $EVAL ~leveled_opcodes_%requiredLevel%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = 0 - opcode - 1
+		        END
 	        END
 		END
 	END
@@ -741,9 +878,8 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~group_spell_effects_disable~ BEGIN
-	SET $level_effects(~-1~) = 0
-	SET $leveled_opcodes_0(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = opcode
-	SET leveled_opcodes_count_0 += 1
+	SET $leveled_opcodes_zero(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~) = opcode
+	SET leveled_opcodes_count_zero += 1
 
 	// On désactive les effets qui se trouvent dans les niveaux plus importants
 	PATCH_PHP_EACH effects_to_disabled AS data => level2 BEGIN

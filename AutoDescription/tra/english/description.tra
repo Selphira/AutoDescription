@@ -3256,7 +3256,9 @@
 @12320306 = ~At nightfall, in every round~
 @12320307 = ~At daybreak, in every round~
 
-@12320400 = ~From level %requiredLevel%~
+@12320400 = ~From level %minLevel%~
+@12320401 = ~Between level %minLevel% and %maxLevel%~
+@12320402 = ~At level %minLevel%~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 
