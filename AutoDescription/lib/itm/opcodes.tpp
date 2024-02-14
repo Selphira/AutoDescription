@@ -13890,6 +13890,103 @@ DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_332_group~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		CLEAR_ARRAY positions
+		SET found = 0
+		PATCH_IF parameter2 == 1 BEGIN
+			SET group = 1
+			PATCH_FOR_EACH damageType IN 2 3 4 BEGIN
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+			            match_target       = target
+			            match_power        = power
+				        match_parameter1   = parameter1
+				        match_parameter2   = damageType
+				        match_parameter3   = parameter3
+				        match_parameter4   = parameter4
+				        match_timingMode   = timingMode
+				        match_resistance   = resistance
+						match_duration     = duration
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+				        match_special      = special
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
+					RET opcodePosition = position
+				END
+
+				SET $positions(~%opcodePosition%~) = 1
+
+				PATCH_IF opcodePosition < 0 BEGIN
+					SET group = 0
+				END
+			END
+			PATCH_IF group == 1 BEGIN
+				SET $positions(~%position%~) = 1
+				PATCH_PHP_EACH positions AS position1 => _ BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position1
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+		        SET parameter2 = 11 // @13320011 = ~Dégâts élémentaires~
+		        LPM ~add_opcode~
+			END
+		END
+
+		PATCH_IF parameter2 == 7 BEGIN
+			SET group = 1
+			PATCH_FOR_EACH damageType IN 8 9 10 BEGIN
+				LPF ~get_opcode_position~
+					INT_VAR opcode
+			            match_target       = target
+			            match_power        = power
+				        match_parameter1   = parameter1
+				        match_parameter2   = damageType
+				        match_parameter3   = parameter3
+				        match_parameter4   = parameter4
+				        match_timingMode   = timingMode
+				        match_resistance   = resistance
+						match_duration     = duration
+				        match_probability1 = probability1
+				        match_probability2 = probability2
+				        match_diceCount    = diceCount
+				        match_diceSides    = diceSides
+				        match_saveType     = saveType
+				        match_saveBonus    = saveBonus
+				        match_special      = special
+					STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_duration_and_parameter1_and_parameter2_and_parameter3_and_parameter4_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_special_and_target_and_timingMode~
+					RET opcodePosition = position
+				END
+
+				SET $positions(~%opcodePosition%~) = 1
+
+				PATCH_IF opcodePosition < 0 BEGIN
+					SET group = 0
+				END
+			END
+			PATCH_IF group == 1 BEGIN
+				SET $positions(~%position%~) = 1
+				PATCH_PHP_EACH positions AS position1 => _ BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position1
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+		        SET parameter2 = 12 // @13320012 = ~Dégâts physiques~
+		        LPM ~add_opcode~
+			END
+		END
+	END
+END
+
 /* --------------------------------- *
  * Spell Effect: Static Charge [333] *
  * --------------------------------- */
