@@ -4174,6 +4174,8 @@
 @13320008 = ~Dégâts perforants~
 @13320009 = ~Dégâts contondants~
 @13320010 = ~Dégâts de projectiles~
+@13320011 = ~Dégâts élémentaires~
+@13320012 = ~Dégâts physiques~
 
 // Opcode 333: Spell Effect: Static Charge [333]
 

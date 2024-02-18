@@ -131,26 +131,32 @@ BEGIN
 			PATCH_IF opcode >= 0 BEGIN
 				SET hasOpcode = 1
 			END
-			PATCH_IF opcode >= 0 AND opcode == match_opcode AND found == 0 BEGIN
+			PATCH_IF (opcode == match_opcode OR match_opcode == 0 - opcode - 1) AND found == 0 BEGIN
 			    LPM ~data_to_vars~
+
+			    PATCH_IF opcode < 0 BEGIN
+			        SET opcode = 0 - opcode - 1
+			    END
 
 				PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
 				LPM ~%match_macro%~
 
 				PATCH_IF match == 1 BEGIN
 					SET found = 1
-					SET total += 1
+			        PATCH_IF opcode >=0 BEGIN
+						SET total += 1
 
-					SPRINT $all_effects(~%level%~) EVAL ~%%return_parameter%%~
+						SPRINT $all_effects(~%level%~) EVAL ~%%return_parameter%%~
 
-					PATCH_IF match_duration != duration BEGIN
-						SET $all_durations(~%level%~) = duration
-						SET total_durations += 1
-					END
+						PATCH_IF match_duration != duration BEGIN
+							SET $all_durations(~%level%~) = duration
+							SET total_durations += 1
+						END
 
-					// On ne désactive pas l'opcode du niveau 0
-					PATCH_IF level > 0 BEGIN
-						SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%level%~) = level
+						// On ne désactive pas l'opcode du niveau 0
+						PATCH_IF level > 0 BEGIN
+							SET $effects_to_disabled(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%level%~) = level
+						END
 					END
 				END
 				ELSE BEGIN
@@ -190,6 +196,8 @@ BEGIN
             SET levelIndex = countLevels
         END
 	END
+
+	SORT_ARRAY_INDICES ~all_durations~ NUMERICALLY
 
 	PATCH_IF total_durations > 0 AND total - 1 != total_durations BEGIN
 		SET inAllLevels = 0
@@ -296,7 +304,7 @@ BEGIN
 	LPM ~group_spell_effects_by_duration~
 	LPM ~group_spell_effects_by_parameters~
 	LPM ~group_spell_effects_by_damage~
-	//TODO: Regroupement des effets identiques entre chacun des niveaux ( a mettre dans leveled_opcodes_0 pour être géré de manière générique ?? Ca permettrait d'avoir la même chose entre ici et la version pour un niveau particulier)
+
 	// FIXME: SPPR729
 	// TODO: Avant de calculer les descriptions :
 	// - Regrouper les effets dont seule la durée diffère (+ déterminer la formule)
@@ -783,7 +791,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			    PATCH_IF opcode == 12 BEGIN
 					SET parameter2 = parameter2 BAND 65535
 				END
-			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR (parameter2 == MOD_TYPE_flat AND VARIABLE_IS_SET $opcodes_resistance(~%opcode%~)) BEGIN
+			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR ((parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) AND VARIABLE_IS_SET $opcodes_resistance(~%opcode%~)) BEGIN
 			        LPM ~data_to_match_vars~
 				    LPF spell_has_same_effects_on_all_levels_except_duration
 						INT_VAR
@@ -813,6 +821,21 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 								complex_value_int
 						END
 						PATCH_IF is_valid BEGIN
+					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+								PATCH_IF level == 1 BEGIN
+									LPF get_first_level_for_spell RET level = minLevel END
+								END
+
+								LPF ~get_complex_duration~
+									STR_VAR
+										array_name = ~all_durations~
+									RET
+										strDuration = complex_duration
+								END
+					        END
+					        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+					            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+					        END
 				            PATCH_IF opcode == 12 OR opcode == 17 BEGIN
 				                LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = 0 RET value = damage END
 								PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
@@ -866,6 +889,21 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							complex_value_int
 					END
 					PATCH_IF is_valid BEGIN
+				        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+							PATCH_IF level == 1 BEGIN
+								LPF get_first_level_for_spell RET level = minLevel END
+							END
+
+							LPF ~get_complex_duration~
+								STR_VAR
+									array_name = ~all_durations~
+								RET
+									strDuration = complex_duration
+							END
+				        END
+				        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+				            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+				        END
 						LPM ~group_spell_effects_disable~
 					END
 		        END

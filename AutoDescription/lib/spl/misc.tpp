@@ -492,6 +492,7 @@ BEGIN
 	SET delta_value = 0
 	SET delta_level = 0
 	SET prev_value = 0
+	SET prev_level = 0
 	SET cpt = 0
 
 	PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
@@ -500,20 +501,59 @@ BEGIN
 		END
 		// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
 		PATCH_IF cpt > 0 BEGIN
-			PATCH_IF delta_value = 0 BEGIN
-				SET delta_value = value - prev_value
-				SET delta_level = level - prev_level
-			END
-			ELSE PATCH_IF delta_value != value - prev_value OR delta_level != level - prev_level BEGIN
-				SET is_valid = 0
+			PATCH_IF value != prev_value BEGIN
+				PATCH_IF delta_value = 0 BEGIN
+					SET delta_value = value - prev_value
+					SET delta_level = level - prev_level
+				END
+				ELSE PATCH_IF delta_value != value - prev_value OR delta_level != level - prev_level BEGIN
+					SET is_valid = 0
+				END
 			END
 		END
 		ELSE BEGIN
 			SET base_value = value
 		END
+		PATCH_IF prev_level == 0 OR value != prev_value BEGIN
+			SET prev_level = level
+			SET cpt += 1
+		END
 		SET prev_value = value
-		SET prev_level = level
-		SET cpt += 1
+	END
+
+	// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+	PATCH_IF is_valid == 0 BEGIN
+		SET is_valid = 1
+		SET cpt = 0
+		SET prev_value = 0
+		SET base_value = 0
+		SET delta_value = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			PATCH_IF cpt > 1 AND prev_value != value BEGIN
+				PATCH_IF delta_value = 0 BEGIN
+					SET delta_value = value - prev_value
+					SET delta_level = level - prev_level
+				END
+				ELSE PATCH_IF delta_value != value - prev_value OR delta_level != level - prev_level BEGIN
+					SET is_valid = 0
+				END
+			END
+			ELSE BEGIN
+				SET base_value = value
+				PATCH_IF prev_value != value BEGIN
+					SET prev_level = level
+				END
+			END
+			PATCH_IF prev_value != value BEGIN
+				SET prev_value = value
+				SET prev_level = level
+			END
+			SET cpt += 1
+		END
 	END
 
 	PATCH_IF cpt == 2 BEGIN
@@ -573,6 +613,10 @@ BEGIN
 					SET diceCount = remains_value
 					SET diceSides = dice_sides
 					SPRINT remains_value @10014 // ~%diceCount%d%diceSides%~
+				END
+				PATCH_IF is_percent BEGIN
+					SPRINT value ~%remains_value%~
+					SPRINT remains_value @10002 // ~%value% %~
 				END
 				PATCH_IF delta_level < 0 BEGIN
 					SPRINT complex_value ~%remains_value% %complex_value%~
@@ -923,6 +967,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 			SPRINT savingThrow @10016 // ~Annule~
 		END
 		PATCH_IF baseSavingBonus == 0 BEGIN
+			// FIXME: Seulement si 0 pour tous les niveaux du sort !
 			SET ignoreSavingThrow = 1
 		END
 	END
