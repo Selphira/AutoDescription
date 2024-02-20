@@ -10927,6 +10927,11 @@ DEFINE_PATCH_MACRO ~opcode_233_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected. Proficiency %stat% += 0~ END
 	END
+	LPM ~opcode_233_common~
+
+	PATCH_IF NOT VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~) BEGIN
+		SET isValid = 0
+	END
 END
 
 /* ------------------------------- *
