@@ -928,8 +928,8 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEGIN
-	SET ignoreSavingThrow = 0
+DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow baseSavingType baseSavingBonus BEGIN
+	SET ignoreSavingThrow = 1
 	SET count = 0
 	SET isSpecial = 0
 	SET baseSavingType = 0 - 1
@@ -940,7 +940,15 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
-					SET saveType = (saveType BAND 0b11111)
+					SET saveType = (saveType BAND 0b111111)
+	                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146) BEGIN
+						PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+							INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+								LPM ~load_level_effects~
+								LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+							END
+						END
+	                END
 					PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
 						SET saveType = 32 // demi-dégâts
 					END
@@ -948,8 +956,12 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 						SET baseSavingType = saveType
 						SET baseSavingBonus = saveBonus
 					END
-					PATCH_IF NOT (saveType == 0 AND saveType == 32) AND baseSavingType != saveType BEGIN
+					PATCH_IF /*NOT (saveType == 0 AND saveType == 32) AND*/ baseSavingType != saveType BEGIN
 						SET isSpecial = 1
+						SET ignoreSavingThrow = 0
+					END
+					PATCH_IF saveBonus != 0 BEGIN
+						SET ignoreSavingThrow = 0
 					END
 				END
 			END
@@ -965,10 +977,6 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow BEG
 		END
 		ELSE BEGIN
 			SPRINT savingThrow @10016 // ~Annule~
-		END
-		PATCH_IF baseSavingBonus == 0 BEGIN
-			// FIXME: Seulement si 0 pour tous les niveaux du sort !
-			SET ignoreSavingThrow = 1
 		END
 	END
 	ELSE BEGIN
