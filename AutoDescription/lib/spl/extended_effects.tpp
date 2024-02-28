@@ -743,7 +743,18 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 							strDuration = complex_duration
 					END
 			        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-			            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+			            PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_duration_ticks BEGIN
+			                SPRINT complex_duration @100311 // ~pendant %strDuration%~
+                        END
+                        ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
+                            SPRINT complex_duration @100310 // ~après %strDuration%~
+                        END
+                        ELSE PATCH_IF timingMode == TIMING_delayed_duration BEGIN
+                            SPRINT complex_duration @100314 // ~après %strDuration% et pendant %strDuration%~
+                        END
+                        ELSE BEGIN
+                            SPRINT complex_duration ~TODO: group_spell_effects_by_duration : %timingMode%~
+                        END
 			        END
 		        END
 		        LPM ~group_spell_effects_disable~
