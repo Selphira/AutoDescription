@@ -742,11 +742,10 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 						RET
 							strDuration = complex_duration
 					END
+			        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+			            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+			        END
 		        END
-		        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-		            SPRINT complex_duration @100311 // ~pendant %strDuration%~
-		        END
-
 		        LPM ~group_spell_effects_disable~
 		    END
 		END
@@ -832,9 +831,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 									RET
 										strDuration = complex_duration
 								END
-					        END
-					        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-					            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+						        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+						            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+						        END
 					        END
 				            PATCH_IF opcode == 12 OR opcode == 17 BEGIN
 				                LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount = 0 RET value = damage END
@@ -900,9 +899,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 								RET
 									strDuration = complex_duration
 							END
-				        END
-				        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
-				            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+					        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+					            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+					        END
 				        END
 						LPM ~group_spell_effects_disable~
 					END
