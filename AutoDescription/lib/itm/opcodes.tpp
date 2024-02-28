@@ -15246,22 +15246,6 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 				PATCH_IF spellNameRef > 0 BEGIN
 					READ_STRREF SPL_unidentified_name spellName
 				END
-				ELSE BEGIN
-					READ_LONG SPL_unidentified_description spellDescriptionRef
-					PATCH_IF spellDescriptionRef > 0 BEGIN
-						READ_STRREF SPL_unidentified_description spellDescription
-
-						INNER_PATCH_SAVE spellName ~%spellDescription%~ BEGIN
-							REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\([ ]*%crlf%+.*\)~ ~~
-							REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~[ ]*(.*)*~ ~~
-						END
-					END
-				END
-				/*
-				PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
-					LPF ~add_log_warning~ STR_VAR message = EVAL ~%itemFilename% : Opcode %opcode% : Nom du sort introuvable pour %file%.spl.~ END
-				END
-				*/
 			END
 		END
 		ELSE PATCH_IF showWarning BEGIN

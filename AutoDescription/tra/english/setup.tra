@@ -1,7 +1,7 @@
 @10 = ~Standardize item descriptions~
-@15 = ~Standardize spell descriptions (Alpha)~
+@15 = ~Standardize spell descriptions~
 @20 = ~Standardize item descriptions of a mod~
-@25  = ~Uniformisation des descriptions des sortilèges (Alpha) d'un mod~
+@25  = ~Uniformisation des descriptions des sortilèges d'un mod~
 @201 = ~Please enter the folder name of the mod for which you want to standardize the descriptions.
 
 Folder name (or 0 to cancel)~
