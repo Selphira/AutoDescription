@@ -2896,8 +2896,10 @@
 
 // Opcode 171: Give Ability [171]
 
-@11710001 = ~Fait apprendre le sort %spellName% %toTheTarget%~
-@11710002 = ~de faire apprendre le sort %spellName% %toTheTarget%~
+@11710001 = ~Ajoute la capacité %spellName%~
+@11710002 = ~Ajoute le sort %spellName% dans le livre de sorts~
+@11710011 = ~d'ajouter la capacité %spellName%~
+@11710012 = ~d'ajouter le sort %spellName% dans le livre de sorts~
 
 // Opcode 172: Spell: Remove Spell [172]
 

@@ -341,7 +341,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	 26 => 489 // Item: Remove Curse [26]
 	// 172 => 490 // Spell: Remove Spell [172]
 	// 147 => 491 // Spell: Learn Spell [147]
-	// 171 => 492 // Spell: Give Innate Ability [171]
+	171 => 492 // Spell: Give Innate Ability [171]
 	335 => 493 // Spell Effect: Seven Eyes [335]
 	251 => 494 // Spell Effect: Change Bard Song Effect [251]
 
@@ -389,7 +389,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	168 => 0 // Summon: Remove Creature [168]
 	169 => 0
 	170 => 0 // Graphics: Play Damage Animation [170]
-	171 => 0 // Spell: Give Innate Ability [171]
 	172 => 0 // Spell: Remove Spell [172]
 	174 => 0 // Spell Effect: Play Sound Effect [174]
 	182 => 0 // Item: Apply Effect Item [182]
@@ -5863,35 +5862,44 @@ DEFINE_PATCH_MACRO ~opcode_111_replace~ BEGIN
 			SET itemPosition = position
 			SET itemDuration = duration
 			SET itemTimingMode = timingMode
+			SET itemSaveType = saveType
+			SET itemSaveBonus = saveBonus
+			SET itemResistance = resistance
+			SET itemProbability = probability
+			SET itemProbability1 = probability1
+			SET itemProbability2 = probability2
+			SET itemTarget = target
 			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
 				INNER_PATCH_FILE ~%resref%.itm~ BEGIN
 					READ_LONG ITM_identified_name itemNameRef
 					READ_STRREF ITM_identified_name itemName
-					PATCH_IF itemNameRef == 25615 OR itemNameRef == 10966  // "Attaquer"
-						OR itemNameRef == 6854 // "Morgenstern "
-					BEGIN
-				        SET opcode135Position = ~-1~
-						//lire les opcodes de l'item et les ajouter dans les opcodes actuels
-					    GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
-					    PHP_EACH offsets AS _ => offset BEGIN
-						    LPM ~read_effect_vars~
-						    PATCH_IF opcode == 135 BEGIN
-								LPF ~delete_opcode~
-									INT_VAR opcode = 111 match_position = itemPosition
-									RET $opcodes(~111~) = count
-									RET_ARRAY EVAL ~opcodes_111~ = opcodes_xx
-								END
-								// Bug où il reste toujours un item dans le tableau si c'était le dernier
-								// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
-								PATCH_IF $opcodes(~111~) == 0 BEGIN
-						            CLEAR_ARRAY ~opcodes_111~
-						        END
-							    SET duration = itemDuration
-							    SET timingMode = itemTimingMode
-							    LPM ~add_opcode~
-						    END
+					//lire les opcodes de l'item et les ajouter dans les opcodes actuels
+				    GET_OFFSET_ARRAY offsets ITM_V10_GEN_EFFECTS
+				    PHP_EACH offsets AS _ => offset BEGIN
+					    LPM ~read_effect_vars~
+					    PATCH_IF opcode == 135 BEGIN
+							LPF ~delete_opcode~
+								INT_VAR opcode = 111 match_position = itemPosition
+								RET $opcodes(~111~) = count
+								RET_ARRAY EVAL ~opcodes_111~ = opcodes_xx
+							END
+							// Bug où il reste toujours un item dans le tableau si c'était le dernier
+							// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+							PATCH_IF $opcodes(~111~) == 0 BEGIN
+					            CLEAR_ARRAY ~opcodes_111~
+					        END
+						    SET duration = itemDuration
+						    SET timingMode = itemTimingMode
+						    SET saveType = itemSaveType
+						    SET saveBonus = itemSaveBonus
+						    SET resistance = itemResistance
+						    SET probability = itemProbability
+						    SET probability1 = itemProbability1
+						    SET probability2 = itemProbability2
+						    SET target = itemTarget
+						    LPM ~add_opcode~
 					    END
-					END
+				    END
 				END
 			END
 		END
@@ -6884,6 +6892,31 @@ DEFINE_PATCH_MACRO ~opcode_135_common~ BEGIN
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 END
 
+DEFINE_PATCH_MACRO ~opcode_135_post_group~ BEGIN
+	PATCH_PHP_EACH ~opcodes_171~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET searchPosition = position
+		PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+			INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+				GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+				PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+					GET_OFFSET_ARRAY2 offsets headerOffset SPL_V10_HEAD_EFFECTS
+					PHP_EACH offsets AS _ => offset BEGIN
+						LPM ~read_effect_vars~
+						PATCH_IF opcode == 215 AND  ~%resref%~ STRING_EQUAL_CASE ~POLYBACK~ BEGIN
+							LPF ~delete_opcode~
+                                INT_VAR opcode = 171 match_position = searchPosition
+                                RET $opcodes(~171~) = count
+                                RET_ARRAY EVAL ~opcodes_171~ = opcodes_xx
+                            END
+						END
+					END
+				END
+			END
+		END
+	END
+END
+
 /* -------------------------- *
  * State: Force Visible [136] *
  * -------------------------- */
@@ -7855,16 +7888,12 @@ END
  * Spell: Give Innate Ability [171] *
  * -------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_171~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	SPRINT description @11710001 // ~Fait apprendre le sort %spellName% %toTheTarget%~
+	LOCAL_SET strref = 11710001 // ~Ajoute la capacité %spellName% %toTheTarget%~
 	LPM ~opcode_171_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_171~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	SPRINT description @11710002 // ~de faire apprendre le sort %spellName% %toTheTarget%~
+	LOCAL_SET strref = 11710011 // ~d'ajouter la capacité %spellName% %toTheTarget%~
 	LPM ~opcode_171_common~
 END
 
@@ -7877,13 +7906,23 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_171~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
-	// Hack pour forcer l'affichage de la durée / usage strictement interne
-	PATCH_IF custom_int AND timingMode == TIMING_duration AND duration > 0 BEGIN
-		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+	PATCH_IF FILE_EXISTS_IN_GAME "%resref%.spl" BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+		INNER_PATCH_FILE "%resref%.spl" BEGIN
+			READ_SHORT SPL_type spellType
+		END
+		PATCH_IF spellType == 1 OR spellType == 2 BEGIN
+			SET strref += strref // sorts
+		END
+		SPRINT description (AT strref)
+		// Hack pour forcer l'affichage de la durée / usage strictement interne
+		PATCH_IF custom_int AND timingMode == TIMING_duration AND duration > 0 BEGIN
+			LPF ~get_duration_value~ INT_VAR duration RET duration = value END
 
-		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description ~%description% %duration%~
-			SET ignoreDuration = 1
+			PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+				SPRINT description ~%description% %duration%~
+				SET ignoreDuration = 1
+			END
 		END
 	END
 END
