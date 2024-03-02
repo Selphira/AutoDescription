@@ -886,6 +886,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			        RET_ARRAY
 			            effects_to_disabled all_durations all_effects
 			    END
+			    SET is_valid = 0
 		        PATCH_IF inAllLevels AND total > 1 BEGIN
 					LPF ~get_complex_value~
 						INT_VAR
@@ -917,6 +918,80 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						LPM ~group_spell_effects_disable~
 					END
 		        END
+
+				PATCH_IF is_valid == 0 BEGIN
+				    LPF spell_has_same_effects_on_all_levels_except_duration
+						INT_VAR
+							match_opcode match_isExternal match_target match_power match_parameter1 match_parameter2
+							match_timingMode match_resistance match_duration match_probability match_probability1
+							match_probability2 match_diceCount match_diceSides match_saveType match_saveBonus match_special
+							match_parameter3 match_parameter4 match_custom_int
+						STR_VAR
+							match_resref match_resref2 match_resref3 match_custom_str
+							match_macro = ~opcode_match_except_diceCount_and_duration_and_parameter1~
+							return_parameter = ~diceCount~
+				        RET
+				            inAllLevels total total_durations
+				        RET_ARRAY
+				            effects_to_disabled all_durations all_effects
+				    END
+				    LPF spell_has_same_effects_on_all_levels_except_duration
+						INT_VAR
+							match_opcode match_isExternal match_target match_power match_parameter1 match_parameter2
+							match_timingMode match_resistance match_duration match_probability match_probability1
+							match_probability2 match_diceCount match_diceSides match_saveType match_saveBonus match_special
+							match_parameter3 match_parameter4 match_custom_int
+						STR_VAR
+							match_resref match_resref2 match_resref3 match_custom_str
+							match_macro = ~opcode_match_except_diceCount_and_duration_and_parameter1~
+							return_parameter = ~parameter1~
+				        RET
+				            p1InAllLevels = inAllLevels p1Total = total p1Total_durations = total_durations
+				        RET_ARRAY
+				            p1All_effects = all_effects
+				    END
+			        PATCH_IF inAllLevels AND p1InAllLevels AND total > 1 AND total == p1Total AND total_durations == p1Total_durations BEGIN
+						LPF ~get_complex_value~
+							INT_VAR
+								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
+								dice_sides = diceSides
+							STR_VAR
+								array_name = ~all_effects~
+							RET
+								c1_is_valid = is_valid
+								c1 = complex_value
+								c1_int = complex_value_int
+						END
+						LPF ~get_complex_value~
+							INT_VAR
+								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
+							STR_VAR
+								array_name = ~p1All_effects~
+							RET
+								c2_is_valid = is_valid
+								c2 = complex_value
+								c2_int = complex_value_int
+						END
+						PATCH_IF c1_is_valid AND c2_is_valid BEGIN
+							SPRINT complex_value ~%c1% + %c2%~
+					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+								PATCH_IF level == 1 BEGIN
+									LPF get_first_level_for_spell RET level = minLevel END
+								END
+								LPF ~get_complex_duration~
+									STR_VAR
+										array_name = ~all_durations~
+									RET
+										strDuration = complex_duration
+								END
+						        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+						            SPRINT complex_duration @100311 // ~pendant %strDuration%~
+						        END
+					        END
+							LPM ~group_spell_effects_disable~
+						END
+			        END
+				END
 
 				// Si parameter1 et duration sont différents
 				// Si diceCount et parameter1 et duration sont différents

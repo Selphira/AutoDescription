@@ -521,7 +521,7 @@ BEGIN
 		SET prev_value = value
 	END
 
-	// On ignore la première entrée qui n'est pas toujours en harmonie avec le reste
+	// delta_level est calculé qu'au moment où la valeur est modifiée (cas de la même valeur consécutive à travers les niveaux)
 	PATCH_IF is_valid == 0 BEGIN
 		SET is_valid = 1
 		SET cpt = 0
@@ -544,9 +544,37 @@ BEGIN
 			END
 			ELSE BEGIN
 				SET base_value = value
-				PATCH_IF prev_value != value BEGIN
-					SET prev_level = level
+			END
+			PATCH_IF prev_value != value BEGIN
+				SET prev_value = value
+				SET prev_level = level
+			END
+			SET cpt += 1
+		END
+	END
+	// On tente avec le delta_level qui ne tient pas compte du premier niveau.
+	PATCH_IF is_valid == 0 BEGIN
+		SET is_valid = 1
+		SET cpt = 0
+		SET prev_value = 0
+		SET base_value = 0
+		SET delta_value = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			PATCH_IF cpt > 1 AND prev_value != value BEGIN
+				PATCH_IF delta_value = 0 BEGIN
+					SET delta_value = value - prev_value
+					SET delta_level = level - prev_level + 1
 				END
+				ELSE PATCH_IF delta_value != value - prev_value OR delta_level != level - prev_level BEGIN
+					SET is_valid = 0
+				END
+			END
+			ELSE BEGIN
+				SET base_value = value
 			END
 			PATCH_IF prev_value != value BEGIN
 				SET prev_value = value
@@ -573,17 +601,29 @@ BEGIN
 			ELSE BEGIN
 				SET base_value = value
 			END
+			PATCH_IF prev_value != value BEGIN
+				SET prev_level = level
+			END
 			SET prev_value = value
-			SET prev_level = level
 			SET cpt += 1
 		END
-		PATCH_IF is_percent BEGIN
-			SPRINT value ~%base_value%~
-			SPRINT base_value @10002 // ~%value% %~
-			SPRINT value ~%delta_value%~
-			SPRINT delta_value @10002 // ~%value% %~
+		PATCH_IF base_value > 0 AND prev_value == 0 BEGIN
+			PATCH_IF is_percent BEGIN
+				SPRINT value ~%base_value%~
+				SPRINT base_value @10002 // ~%value% %~
+			END
+			SET level = prev_level - 1
+			SPRINT complex_value ~%base_value% jusqu'au niveau %level%~
 		END
-		SPRINT complex_value ~%base_value% + %delta_value% au niveau %level%~
+		ELSE BEGIN
+			PATCH_IF is_percent BEGIN
+				SPRINT value ~%base_value%~
+				SPRINT base_value @10002 // ~%value% %~
+				SPRINT value ~%delta_value%~
+				SPRINT delta_value @10002 // ~%value% %~
+			END
+			SPRINT complex_value ~%base_value% + %delta_value% au niveau %level%~
+		END
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN
 		PATCH_TRY LPF ~opcode_%opcode%_typed_value~ INT_VAR value = delta_value RET strref END WITH DEFAULT strref = 0 END
