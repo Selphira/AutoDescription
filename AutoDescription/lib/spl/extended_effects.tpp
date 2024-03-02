@@ -118,6 +118,7 @@ BEGIN
 	SET inAllLevels = 1
     SET total = 0
     SET total_durations = 0
+    SET prev_duration = match_duration
 
     PATCH_DEFINE_ARRAY all_durations BEGIN END
     PATCH_DEFINE_ARRAY all_effects BEGIN END
@@ -148,9 +149,10 @@ BEGIN
 
 						SPRINT $all_effects(~%level%~) EVAL ~%%return_parameter%%~
 
-						PATCH_IF match_duration != duration BEGIN
+						PATCH_IF prev_duration != duration BEGIN
 							SET $all_durations(~%level%~) = duration
 							SET total_durations += 1
+							SET prev_duration = duration
 						END
 
 						// On ne désactive pas l'opcode du niveau 0
@@ -199,7 +201,7 @@ BEGIN
 
 	SORT_ARRAY_INDICES ~all_durations~ NUMERICALLY
 
-	PATCH_IF total_durations > 0 AND total - 1 != total_durations BEGIN
+	PATCH_IF isSpecialDuration == 1 AND total_durations > 0 AND total - 1 != total_durations BEGIN
 		SET inAllLevels = 0
 	END
 END
