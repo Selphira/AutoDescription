@@ -201,16 +201,13 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 			SPRINT target_exceptions ~%target_exceptions% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
             SET isValid = 0
 		END
-		/*
         ELSE PATCH_IF isValid == 1 AND opcode == 318 AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
             PATCH_IF NOT VARIABLE_IS_SET EVAL ~target_exceptions_%resref%~ BEGIN
                 SPRINT EVAL ~target_exceptions_%resref%~ ~~
             END
 			SPRINT EVAL ~target_exceptions_%resref%~ EVAL ~%target_exceptions_%resref%% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
-			SPRINT var_target_exceptions EVAL ~%target_exceptions_%resref%%~
             SET isValid = 0
         END
-        */
 		// TODO: 206 depuis un 177 qui rend innefficace certains effets => RR#WEAR
 
         PATCH_IF isValid == 1 BEGIN
