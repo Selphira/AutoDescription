@@ -28,8 +28,8 @@ END
  * - l'on peut switcher d'un objet de protection avec ou sans bonus à la classe d'armure (composant @2150 @2151 @2152)
  */
 DEFINE_PATCH_MACRO ~opcode_122_is_valid_mod~ BEGIN
-	PATCH_IF ~%resref%~ STRING_MATCHES_REGEXP ~^[Cc]d\|[Cc]\!~ == 0 BEGIN
-		SET isValid = 0
+	PATCH_IF isValid == 1 BEGIN
+		SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[Cc]d\|[Cc]\!~
 	END
 END
 
@@ -55,6 +55,17 @@ DEFINE_PATCH_MACRO ~opcode_143_group_mod~ BEGIN
 	        SET opcode = 519
 	        LPM ~add_opcode~
 		END
+	END
+END
+
+/**
+ * 5E_spellcasting
+ * ***************
+ * On ignore les effets liés aux "fakes slots".
+ */
+DEFINE_PATCH_MACRO ~opcode_146_is_valid_mod~ BEGIN
+	PATCH_IF isValid == 1 BEGIN
+		SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
 	END
 END
 
@@ -110,15 +121,32 @@ END
  * 5E_spellcasting
  * ***************
  * On ignore les effets liés aux "fakes slots".
+ *
+ * npc_ee
+ * ******
+ * On ignore le sort qui regroupe l'ensemble des sortilèges
  */
+DEFINE_PATCH_MACRO ~opcode_321_is_valid_mod~ BEGIN
+	PATCH_IF isValid == 1 BEGIN
+		SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_326_is_valid_mod~ BEGIN
 	LOCAL_SPRINT splprot $splprots(~%parameter2%~)
-	PATCH_MATCH ~%splprot%~ WITH
-		D5_DIV_1_7 D5_DIV_8_9 D5_WIZ_1_7 D5_WIZ_8_9
-		BEGIN
-			SET isValid = 0
+	// 5E_spellcasting
+	PATCH_IF isValid == 1 BEGIN
+		PATCH_MATCH ~%splprot%~ WITH
+			D5_DIV_1_7 D5_DIV_8_9 D5_WIZ_1_7 D5_WIZ_8_9 D5_KIT_IS D5_FATIGUE_0 D5_FATIGUE_1 ~D5_DIV=1_7~ ~D5_WIZ=1_7~ ~D5_WIZ=8_9~
+			BEGIN
+				SET isValid = 0
+			END
+			DEFAULT SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
 		END
-		DEFAULT SET isValid = 1
+	END
+	// npc_ee
+	PATCH_IF isValid == 1 BEGIN
+		SET isValid = NOT ~%resref%~ STRING_EQUAL_CASE "D5_NUKT"
 	END
 END
 

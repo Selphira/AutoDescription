@@ -6340,9 +6340,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_122_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
-	PATCH_IF isValid == 1 BEGIN
-		LPM ~opcode_122_is_valid_mod~
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_122_group~ BEGIN
@@ -13823,10 +13820,6 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
             LPM ~add_opcode~
 		END
 	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_326_is_valid~ BEGIN
-	LPM ~opcode_326_is_valid_mod~
 END
 
 /* ------------------------------- *

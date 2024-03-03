@@ -6,6 +6,7 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 	ELSE BEGIN
 		// Si la macro n'existe pas, on considère comme valide
 		PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
+		PATCH_TRY LPM ~opcode_%opcode%_is_valid_mod~ WITH DEFAULT END
 	END
 	
 	PATCH_IF probability <= 0 BEGIN
