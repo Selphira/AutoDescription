@@ -987,10 +987,14 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 				    LPM ~data_to_vars~
 					SET saveType = (saveType BAND 0b111111)
 	                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146) BEGIN
-						PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
-							INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-								LPM ~load_level_effects~
-								LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+						SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+						PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+							SET $recursive_resref(~%resref%~) = 1
+							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+									LPM ~load_level_effects~
+									LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+								END
 							END
 						END
 	                END
