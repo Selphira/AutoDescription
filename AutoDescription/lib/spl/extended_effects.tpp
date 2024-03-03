@@ -250,7 +250,7 @@ BEGIN
 	// 272 : [272] Active un effet (boucle)
 	// 326 :
 	// 341 : Semble que ce soit toujours la cible de l'attaque
-	SET forceTarget = (opcode == 146 OR opcode == 232 OR opcode == 326) ? 1 : 0
+	SET forceTarget = (opcode == 146 OR (opcode == 232 AND parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR opcode == 326) ? 1 : 0
 	SET totalLines = 0
 	SPRINT strDuration ~~
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.

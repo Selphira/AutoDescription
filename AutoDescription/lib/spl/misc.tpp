@@ -823,7 +823,12 @@ BEGIN
 
 					PATCH_IF isConeShape BEGIN
 						SET angle = coneWidth
-						SET strref = 102802 // ~%target% dans un cône de %range% sur un arc de %angle%°~
+						PATCH_IF angle == 0 BEGIN
+							SET strref = 102800 // ~%target% dans un rayon de %range%~
+						END
+						ELSE BEGIN
+							SET strref = 102802 // ~%target% dans un cône de %range% sur un arc de %angle%°~
+						END
 					END
 					ELSE BEGIN
 						PATCH_IF target == TARGET_HEAD_self OR target == TARGET_HEAD_self_ignore_pause BEGIN

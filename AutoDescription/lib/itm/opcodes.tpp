@@ -1522,7 +1522,7 @@ DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 
 	LPM ~opcode_12_flags~
 
-	PATCH_IF VARIABLE_IS_SET versus BEGIN
+	PATCH_IF VARIABLE_IS_SET versus AND NOT %versus% STRING_EQUAL ~~ BEGIN
 		SET strref_0 = 10120003 // ~Inflige %damage% %damageType% supplémentaires %versus%~
 	END
 	PATCH_IF flagDrain == 1 BEGIN
@@ -1553,7 +1553,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 
 	LPM ~opcode_12_flags~
 
-	PATCH_IF VARIABLE_IS_SET versus BEGIN
+	PATCH_IF VARIABLE_IS_SET versus AND NOT %versus% STRING_EQUAL ~~ BEGIN
 		SET strref_0 = 10120013 // ~d'infliger %damage% %damageType% supplémentaires %versus%~
 	END
 	PATCH_IF flagDrain == 1 BEGIN
@@ -3210,7 +3210,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_55~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_55_common~ BEGIN
-	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET versus BEGIN
+	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND (NOT VARIABLE_IS_SET versus OR %versus% STRING_EQUAL ~~) BEGIN
 		PATCH_IF parameter1 != 0 BEGIN
 			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET theTarget = idName END
 			SPRINT pluralPronoun @100020 // ~les~
@@ -10750,12 +10750,17 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		SPRINT description (AT ~%strref%~)
 	END
 	ELSE BEGIN // Un seul sort
+		PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
+            //TODO: recalculer versus selon la cible du sort pointé ?
+            SPRINT versus ~~
+        END
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref3%~ RET description END
 		END
 		ELSE PATCH_IF NOT ~%spellName2%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref2%~ RET description END
-		END ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		END
+		ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 	    END
 	    ELSE BEGIN
