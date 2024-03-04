@@ -206,7 +206,7 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
                 SPRINT EVAL ~target_exceptions_%resref%~ ~~
             END
 			SPRINT EVAL ~target_exceptions_%resref%~ EVAL ~%target_exceptions_%resref%% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
-            SET isValid = 0
+            //SET isValid = 0
         END
 		// TODO: 206 depuis un 177 qui rend innefficace certains effets => RR#WEAR
 

@@ -13,7 +13,7 @@ BEGIN
 	SET projectileTarget = 0
 	SET projectileTargetNumber = 0
 
-	PATCH_IF isSpellInItem AND VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
+	PATCH_IF isSubSpell AND VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
 		SET projectile = $level_projectiles(~%levelIndex%~)
 		SET projectileTarget = $level_targets(~%levelIndex%~)
 		SET projectileTargetNumber = $level_target_numbers(~%levelIndex%~)
@@ -260,7 +260,7 @@ BEGIN
         INNER_PATCH_FILE ~%file%.spl~ BEGIN
             SPRINT CURRENT_SOURCE_RES ~%file%~
             SET isSpecialDuration = 0
-            SET isSpellInItem = isItem
+            SET isSubSpell = 1
 
 			PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
 				LPM ~load_level_effects~

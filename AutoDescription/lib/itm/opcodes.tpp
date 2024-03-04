@@ -6937,23 +6937,31 @@ END
  * State: Negative Chant [137] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_137~ BEGIN
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	SET parameter1 = 0 - parameter1
-    LPM ~opcode_self_131~ // ~Chance~
+	LPM ~opcode_self_22~  // ~Chance~
+    LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_137~ BEGIN
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	SET parameter1 = 0 - parameter1
-    LPM ~opcode_self_probability_131~ // ~Chance~
+	LPM ~opcode_self_probability_22~ // ~la chance~
+    LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_137~ BEGIN
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	SET parameter1 = 0 - parameter1
-    LPM ~opcode_target_131~ // ~Chance~
+	LPM ~opcode_target_22~ // ~la chance~
+    LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_137~ BEGIN
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	SET parameter1 = 0 - parameter1
-    LPM ~opcode_target_probability_131~ // ~Chance~
+    LPM ~opcode_target_probability_22~ // ~la chance~
+    LPM ~opcode_not_cumulative~
 END
 
 /* ------------------------------- *
@@ -7171,8 +7179,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion BEGIN
-		PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
-			SET castingLevel = 0
+		PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
+			//SET castingLevel = 0
 		END
 		LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET spellDescription = description END
         SPRINT description ~%spellDescription%~
@@ -7202,8 +7210,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF NOT (type >= 2 OR (castingLevel > 0 AND type == 1)) BEGIN
-					SET castingLevel = 0
+				PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
+					//SET castingLevel = 0
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
@@ -7259,8 +7267,8 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF NOT (type == 2 OR castingLevel > 0 AND type == 0) BEGIN
-					SET castingLevel = 0
+				PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
+					//SET castingLevel = 0
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
