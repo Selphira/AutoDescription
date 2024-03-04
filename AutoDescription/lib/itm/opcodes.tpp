@@ -8971,7 +8971,6 @@ END
  * Stat: Casting Time Modifier [189] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
-	LPM ~opcode_189_common~
 	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
 		LPF ~opcode_mod~ INT_VAR strref = 11890001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Temps d'incantation~
 	END
@@ -8982,7 +8981,6 @@ DEFINE_PATCH_MACRO ~opcode_self_189~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_189~ BEGIN
-	LPM ~opcode_189_common~
 	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
 		LPF ~opcode_probability~ INT_VAR strref = 11890002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation~
 	END
@@ -8993,7 +8991,6 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_189~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_189~ BEGIN
-	LPM ~opcode_189_common~
 	PATCH_IF parameter2 <= MOD_TYPE_flat BEGIN
 		LPF ~opcode_target~ INT_VAR strref = 11890002 STR_VAR value = EVAL ~%parameter1%~ RET description END // ~le temps d'incantation~
 	END
@@ -9007,26 +9004,21 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_189~ BEGIN
 	LPM ~opcode_self_probability_189~
 END
 
-DEFINE_PATCH_MACRO ~opcode_189_common~ BEGIN
-	PATCH_IF parameter2 > 2 OR parameter2 < MOD_TYPE_cumulative OR parameter2 == 2 AND NOT is_ee BEGIN
-		SET parameter2 = MOD_TYPE_cumulative
-	END
-	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-		SET parameter1 = 0 - parameter1
-	END
-	ELSE PATCH_IF parameter1 < 0 BEGIN
-		SET parameter1 = 0
-	END
-END
-
-DEFINE_PATCH_MACRO ~opcode_189_spell_level_match~ BEGIN
-	LPM ~opcode_189_common~
-END
-
 DEFINE_PATCH_MACRO ~opcode_189_is_valid~ BEGIN
 	PATCH_IF (parameter1 BAND 255) == 0 AND parameter2 == 0 BEGIN
 		isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Value = Value + 0.~ END
+	END
+	ELSE BEGIN
+		PATCH_IF parameter2 > 2 OR parameter2 < MOD_TYPE_cumulative OR parameter2 == 2 AND NOT is_ee BEGIN
+			SET parameter2 = MOD_TYPE_cumulative
+		END
+		PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+			SET parameter1 = 0 - parameter1
+		END
+		ELSE PATCH_IF parameter1 < 0 BEGIN
+			SET parameter1 = 0
+		END
 	END
 END
 
