@@ -803,7 +803,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			    PATCH_IF opcode == 12 BEGIN
 					SET parameter2 = parameter2 BAND 65535
 				END
-			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR ((parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage) AND VARIABLE_IS_SET $opcodes_resistance(~%opcode%~)) BEGIN
+			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage BEGIN
 			        LPM ~data_to_match_vars~
 				    LPF spell_has_same_effects_on_all_levels_except_duration
 						INT_VAR
@@ -825,6 +825,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						LPF ~get_complex_value~
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
+								is_flat_value = parameter2 == MOD_TYPE_flat ? 1 : 0
 							STR_VAR
 								array_name = ~all_effects~
 							RET

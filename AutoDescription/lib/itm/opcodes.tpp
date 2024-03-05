@@ -14926,6 +14926,9 @@ DEFINE_PATCH_MACRO ~opcode_mod_base~ BEGIN
 		END
 	END
 	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT value ~%complex_value%~
+		END
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN // percent

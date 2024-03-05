@@ -475,6 +475,7 @@ END
 DEFINE_PATCH_FUNCTION ~get_complex_value~
 	INT_VAR
 		is_percent = 0
+		is_flat_value = 0
 		dice_sides = 0
 	STR_VAR
 		array_name = ~~
@@ -489,6 +490,7 @@ BEGIN
 	SET is_valid = 1
 
 	SET base_value = 0
+	SET last_value = 0
 	SET delta_value = 0
 	SET delta_level = 0
 	SET prev_value = 0
@@ -658,6 +660,7 @@ BEGIN
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN
 		PATCH_TRY LPF ~opcode_%opcode%_typed_value~ INT_VAR value = delta_value RET strref END WITH DEFAULT strref = 0 END
+		SET last_value = value
 		SET value = ABS delta_value
 		SET complex_value_int = delta_value
 		PATCH_IF dice_sides > 0 BEGIN
@@ -667,11 +670,19 @@ BEGIN
 		END
 		PATCH_IF base_value > 0 AND delta_value == 0 BEGIN
 			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET complex_value = value END
+			PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
+				SET base_value = prev_level + last_value
+				SPRINT complex_value ~%base_value% -%complex_value%~
+			END
 		END
 		ELSE BEGIN
-			SET levelMax = level
+			SET levelMax = prev_level
 			SET remains_value = ABS prev_value - (ABS delta_value * level / delta_level)
 			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
+			PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
+				SET base_value = prev_level + last_value
+				SPRINT value ~%base_value% -%value%~
+			END
 			PATCH_IF ABS delta_level == 1 BEGIN
 				SPRINT complex_value @102163 // ~%value% par niveau/%levelMax%~
 			END
