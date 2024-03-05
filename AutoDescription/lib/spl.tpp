@@ -161,7 +161,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" 
 	END
 
 	INNER_PATCH ~%description%~ BEGIN
-		SPRINT regex ~\(%saving_throw%[^%crlf%]+\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+		SPRINT regex ~^\(%saving_throw%[^%crlf%]+\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 		SPRINT find ~~
 		SPRINT replace ~~
 		REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
