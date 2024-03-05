@@ -7404,39 +7404,11 @@ END
  * Spell: Cast Spell (at Point) [148] *
  * ---------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_148~ BEGIN
-	LOCAL_SET castingLevel = parameter1
-	LOCAL_SET type = parameter2
-
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF type == 0 BEGIN
-			SPRINT description ~%spellName%~
-		END
-		ELSE BEGIN
-			SET type = 1
-			SPRINT description @11460005 // ~%spellName% (instantané)~
-		END
-		LPM ~opcode_146_common~
-	END
+	LPM ~opcode_self_146~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_148~ BEGIN
-	LOCAL_SET castingLevel = parameter1
-	LOCAL_SET type = parameter2
-
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-
-	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		PATCH_IF type == 0 BEGIN
-			SPRINT description @11480002 // ~de lancer le sort %spellName% sur %theTarget%~
-		END
-		ELSE BEGIN
-			SET type = 1
-			SPRINT description @11480003 // ~de lancer instantanément le sort %spellName% sur %theTarget%~
-		END
-		LPM ~opcode_146_common~
-	END
+	LPM ~opcode_self_probability_146~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_148~ BEGIN
@@ -11032,11 +11004,80 @@ DEFINE_PATCH_MACRO ~opcode_236_common~ BEGIN
 	END
 	SET strref += type
 
-	PATCH_IF amount > 1 BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+        SPRINT amount ~%custom_str%~
+		SET strref += 10
+    END
+    ELSE PATCH_IF amount > 1 BEGIN
 		SET strref += 10
 	END
 
 	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+END
+
+DEFINE_PATCH_MACRO ~opcode_236_group~ BEGIN
+	LOCAL_SET amountMin = 0
+	LOCAL_SET amountMax = 0
+	LOCAL_SET type = 0
+
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY positions_already_check
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET amountMin = probability == 100 ? (custom_int ? custom_int : 1) : 0
+        SET amountMax = custom_int ? custom_int : 1
+		SET type = parameter2
+		PATCH_IF type > 3 OR type < 0 BEGIN
+			SET type = 0
+		END
+		SET grouped = 0
+		CLEAR_ARRAY positions
+		PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			SET $positions(~%position%~) = 1
+			SET $positions_already_check(~%position%~) = 1
+
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				SET match_type = match_parameter2
+				PATCH_IF match_type > 3 OR match_type < 0 BEGIN
+					SET match_type = 0
+				END
+				PATCH_IF match_type == type AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+					// On ne gère que les probability2 == 0 pour éviter de devoir gérer les cas complexes de regroupement par probaiblité ...
+					LPM ~opcode_match_opcode_236_group~
+					PATCH_IF match == 1 BEGIN
+						SET amountMin += match_probability == 100 ? (match_custom_int ? match_custom_int : 1) : 0
+				        SET amountMax += match_custom_int ? match_custom_int : 1
+						PATCH_PRINT "%match_probability%: entre %amountMin% et %amountMax%"
+						SET $positions(~%match_position%~) = 1
+						SET $positions_already_check(~%match_position%~) = 1
+						SET grouped = 1
+					END
+				END
+			END
+		END
+		PATCH_IF grouped == 1 BEGIN
+			PATCH_PHP_EACH positions AS position => _ BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+			SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
+			SET probability = 100
+			SET probability1 = 100
+			SET probability2 = 0
+	        LPM ~add_opcode~
+		END
+	END
 END
 
 /* ------------------------- *
@@ -16636,6 +16677,27 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_159_group~ BEGIN
         AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
         AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
         AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_236_group~ BEGIN
+	SET match = (
+		    match_position     != position
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter1   == parameter1
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		// AND match_probability1 == probability1
+		AND match_probability2 == 0
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
     )
 END
 
