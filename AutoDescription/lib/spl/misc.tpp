@@ -583,6 +583,37 @@ BEGIN
 			SET cpt += 1
 		END
 	END
+	// On tente en ignorant totalement la 1ère en-tête, et en vérifiant 2 delta_level différent.
+	PATCH_IF is_valid == 0 BEGIN
+		SET is_valid = 1
+		SET cpt = 0
+		SET prev_value = 0
+		SET base_value = 0
+		SET delta_value = 0
+		SET delta_level = 0
+		PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
+			PATCH_IF level <= 1 BEGIN
+				LPF get_first_level_for_spell RET level = minLevel END
+			END
+			PATCH_IF cpt > 1 AND prev_value != value BEGIN
+				PATCH_IF delta_value = 0 BEGIN
+					SET delta_value = value - prev_value
+					SET delta_level = level - prev_level
+				END
+				ELSE PATCH_IF delta_value != value - prev_value OR (delta_level != level - prev_level AND delta_level + 1 != level - prev_level) BEGIN
+					SET is_valid = 0
+				END
+			END
+			ELSE BEGIN
+				SET base_value = value
+			END
+			PATCH_IF prev_value != value OR cpt < 2 BEGIN
+				SET prev_value = value
+				SET prev_level = level
+			END
+			SET cpt += 1
+		END
+	END
 
 	PATCH_IF cpt == 2 BEGIN
 		SET cpt = 0
