@@ -5101,6 +5101,8 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 			END
 			SET opcode = 162 // Cure: Hold [162]
 			LPM ~delete_cure_linked_to_specific_immunity~
+			SET opcode = 46 // Cure: Stun (Unstun) [46]
+			LPM ~delete_cure_linked_to_specific_immunity~
 		END
 		ELSE PATCH_IF parameter2 == 128 BEGIN // Confusion
 			TEXT_SPRINT spellState ~Confusion~
