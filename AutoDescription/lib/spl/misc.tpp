@@ -1028,7 +1028,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
 					SET saveType = (saveType BAND 0b111111)
-	                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146) BEGIN
+	                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146 OR opcode == 148) BEGIN
 						SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
 						PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
 							SET $recursive_resref(~%resref%~) = 1

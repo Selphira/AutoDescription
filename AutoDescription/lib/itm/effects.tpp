@@ -134,8 +134,16 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 				END
 			END
 
-			PATCH_IF saveBonus != 0 BEGIN
-				LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
+			PATCH_IF saveBonus != 0 OR NOT ~%complex_save%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF NOT ~%complex_save%~ STRING_EQUAL ~~ BEGIN
+					SPRINT saveBonus ~%complex_save%~
+					PATCH_IF complex_value_int < 0 BEGIN
+						SPRINT saveBonus ~-%saveBonus%~
+					END
+				END
+				ELSE BEGIN
+					LPF ~signed_value~ INT_VAR value = EVAL ~%saveBonus%~ RET saveBonus = value END
+				END
 				PATCH_IF saveForHalf BEGIN
 					SPRINT saveStr @101184 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 				END

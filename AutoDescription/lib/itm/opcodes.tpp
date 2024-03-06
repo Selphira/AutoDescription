@@ -16206,6 +16206,34 @@ DEFINE_PATCH_MACRO ~opcode_match_except_duration~ BEGIN
     )
 END
 
+DEFINE_PATCH_MACRO ~opcode_match_except_saveBonus~ BEGIN
+	SET match = (
+			match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        // AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
 DEFINE_PATCH_MACRO ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~ BEGIN
 	SET match = (
             match_target       == target
