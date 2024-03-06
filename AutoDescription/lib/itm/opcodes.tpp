@@ -10832,6 +10832,10 @@ DEFINE_PATCH_MACRO ~opcode_232_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: TimeOfDay : Parameter1 must be equal to 0~ END
 	END
+	PATCH_IF parameter2 == 10 AND special == 0 BEGIN // TimeOfDay
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Crash warning: Opcode %opcode%: parameter2 = 10 and special = 0~ END
+	END
 	PATCH_IF ~%resref%~ STRING_EQUAL ~~ AND (NOT isExternal OR ~%resref2%~ STRING_EQUAL ~~ AND ~%resref3%~ STRING_EQUAL ~~) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: resource field are empty~ END
