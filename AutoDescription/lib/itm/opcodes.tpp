@@ -6636,8 +6636,14 @@ DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 		PATCH_IF type == 3 OR type == 4 OR type == 8 OR type == 9 BEGIN
 			SET isMonster = 0
 		END
-		LPF ~get_creatures_amount~ INT_VAR totalLevel = amount multiplier = custom_int STR_VAR file RET amount amountMin amountMax END
-		SET strref += amountMax == 1 ? 4 : 6
+		PATCH_IF ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_creatures_amount~ INT_VAR totalLevel = amount multiplier = custom_int STR_VAR file RET amount amountMin amountMax END
+			SET strref += amountMax == 1 ? 4 : 6
+		END
+		ELSE BEGIN
+			SPRINT amount ~%custom_str%~
+			SET strref += 6
+		END
 		SET strref += isMonster == 1 ? 0 : 1
 		SET strref += isHostile == 1 ? 8 : 0
 	END
@@ -6677,7 +6683,64 @@ DEFINE_PATCH_MACRO ~opcode_127_is_valid~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_127_group~ BEGIN
+	LOCAL_SET grouped = 0
+	LOCAL_SET amountMin = 0
+	LOCAL_SET amountMax = 0
+	LOCAL_SET totalProbability = 0
 	LPM ~opcode_group_by_target~
+
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		CLEAR_ARRAY positions
+		SET grouped = 0
+		SET totalProbability = probability
+		LPF ~get_creatures_amount~ INT_VAR totalLevel = parameter1 multiplier = custom_int STR_VAR file = $opcode_127_files(~%parameter2%~) RET amount amountMin amountMax END
+		PATCH_IF special == 0 AND ~%resref%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			SET $positions(~%position%~) = 1
+			SET $positions_already_check(~%position%~) = 1
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+					LPM ~opcode_match_opcode_127_group~
+					PATCH_IF match == 1 BEGIN
+						LPF ~get_creatures_amount~ INT_VAR totalLevel = match_parameter1 multiplier = match_custom_int STR_VAR file = $opcode_127_files(~%match_parameter2%~) RET matchAmountMin = amountMin matchAmountMax = amountMax END
+						PATCH_IF matchAmountMin < amountMin BEGIN
+							SET amountMin = matchAmountMin
+						END
+						PATCH_IF matchAmountMax > amountMax BEGIN
+	                        SET amountMax = matchAmountMax
+	                    END
+						SET $positions(~%match_position%~) = 1
+						SET $positions_already_check(~%match_position%~) = 1
+						SET grouped = 1
+						SET totalProbability += match_probability
+					END
+				END
+			END
+		END
+		PATCH_IF grouped == 1 BEGIN
+			PATCH_PHP_EACH positions AS position => _ BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+	            CLEAR_ARRAY ~opcodes_%opcode%~
+	        END
+	        PATCH_IF totalProbability < 100 BEGIN
+	            SET amountMin = 0
+	        END
+			SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
+			SET probability = 100
+			SET probability1 = 100
+			SET probability2 = 0
+	        LPM ~add_opcode~
+		END
+	END
 END
 
 /* ---------------------- *
@@ -11056,7 +11119,6 @@ DEFINE_PATCH_MACRO ~opcode_236_group~ BEGIN
 					PATCH_IF match == 1 BEGIN
 						SET amountMin += match_probability == 100 ? (match_custom_int ? match_custom_int : 1) : 0
 				        SET amountMax += match_custom_int ? match_custom_int : 1
-						PATCH_PRINT "%match_probability%: entre %amountMin% et %amountMax%"
 						SET $positions(~%match_position%~) = 1
 						SET $positions_already_check(~%match_position%~) = 1
 						SET grouped = 1
@@ -16646,6 +16708,34 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_112_group~ BEGIN
 			match_position       == position
         AND match_duration       == duration
         AND NOT match_custom_int == custom_int
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_127_group~ BEGIN
+	SET match = (
+	        match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        // AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        // AND match_probability  == probability
+        // AND match_probability1 == probability1
+        // AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        // AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
     )
 END
 
