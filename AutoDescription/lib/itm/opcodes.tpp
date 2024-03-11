@@ -9771,6 +9771,7 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 			SET searchTimingMode = timingMode
 			SET searchDuration = duration
 			CLEAR_ARRAY opcode_206_positions
+			CLEAR_ARRAY spellList
 			SET $opcode_206_positions(~%position%~) = opcode
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 				LPM ~data_to_vars~
