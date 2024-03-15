@@ -186,7 +186,7 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		SET isValid = 1
 
 		// ITM global (equipped) effects: Target is always the wearer, this field isn’t relevant.
-		PATCH_IF target == TARGET_FX_none AND ~%SOURCE_EXT%~ STRING_EQUAL_CASE ~ITM~ BEGIN
+		PATCH_IF isItem == 1 AND isSubSpell == 0 AND abilityType == AbilityType_Equipped BEGIN
 			SET target = TARGET_FX_self
 		END
 
