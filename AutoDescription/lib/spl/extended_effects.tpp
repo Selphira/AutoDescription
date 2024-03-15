@@ -798,6 +798,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			27 28 29 30 31 84 85 86 87 88 89 166 173 502 503 504 // Les résistances
 			12 17 18 111 218
 			// 25 98
+			33 34 35 36 37 // Les jets de sauvegarde
 		BEGIN
 			PATCH_IF opcode == basicOpcode BEGIN
 			    LPM ~data_to_vars~
