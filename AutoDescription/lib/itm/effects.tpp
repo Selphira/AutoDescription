@@ -26,13 +26,10 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Target is None~ END
 	END
 
-	/*
-	// FIXME: à utiliser une fois la liste opcodes_ignore_duration complète
 	PATCH_IF timingMode == TIMING_duration AND duration <= 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Duration is 0~ END
 	END
-	*/
 
 	PATCH_IF is_ee == 0 AND VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 		SET isValid = 0

@@ -724,6 +724,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	270 => 0 // Cure: Unpause Target
 	273 => 0 // Remove: Specific Area Effect(Zone of Sweet Air)
 	316 => 0 // Spell: Magical Rest
+	318 => 0 // Protection: Immunity Spell
+	321 => 0 // Removal: Effects specified by Resource
+	324 => 0 // Protection: Immunity to Resource and Message
 	337 => 0 // Remove: Opcode
 	343 => 0 // HP Swap
 	511 => 0 // Dissipe toutes les illusions

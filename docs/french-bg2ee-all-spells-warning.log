@@ -17,6 +17,15 @@ SPCL624.SPL : Niveau minimum non calculable
 SPCL625.SPL : Niveau minimum non calculable
 SPDR101.SPL : Niveau minimum non calculable
 SPDR101.SPL : Niveau minimum non calculable
+SPIN001.SPL : Opcode 135: Duration is 0
+SPIN122.SPL : Opcode 111: Duration is 0
+SPIN123.SPL : Opcode 111: Duration is 0
+SPIN124.SPL : Opcode 111: Duration is 0
+SPIN150.SPL : Opcode 111: Duration is 0
+SPIN151.SPL : Opcode 111: Duration is 0
+SPIN891.SPL : Opcode 177: Duration is 0
+SPINHUM.SPL : Opcode 111: Duration is 0
+SPJA01.SPL : Opcode 31: Duration is 0
 SPPR411.SPL : Niveau minimum non calculable
 SPPR411.SPL : Niveau minimum non calculable
 SPPR411.SPL : Niveau minimum non calculable
@@ -29,5 +38,20 @@ SPPR411.SPL : Niveau minimum non calculable
 SPPR411.SPL : Niveau minimum non calculable
 SPWI118.SPL : Niveau minimum non calculable
 SPWI118.SPL : Niveau minimum non calculable
+SPWI414.SPL : Opcode 31: Duration is 0
+SPWI414.SPL : Opcode 31: Duration is 0
+SPWI414.SPL : Opcode 31: Duration is 0
+SPWI416.SPL : Opcode 111: Duration is 0
 SPWI417.SPL : FAILURE: Unknown macro: opcode_target_345
+SPWI489.SPL : Opcode 111: Duration is 0
+SPWI490.SPL : Opcode 111: Duration is 0
+SPWI491.SPL : Opcode 111: Duration is 0
+SPWI818.SPL : Opcode 206: Duration is 0
+SPWI818.SPL : Opcode 206: Duration is 0
+SPWI818.SPL : Opcode 206: Duration is 0
+SPWI916.SPL : Opcode 111: Duration is 0
+SPWI916.SPL : Opcode 111: Duration is 0
+SPWI918.SPL : Opcode 206: Duration is 0
+SPWI918.SPL : Opcode 206: Duration is 0
+SPWI918.SPL : Opcode 206: Duration is 0
 SPWI960.SPL : Opcode 318 : Immunité à contre le sort Souffle psionique différente de l'objet : SPIN959
