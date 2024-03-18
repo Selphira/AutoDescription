@@ -3842,7 +3842,7 @@ DEFINE_PATCH_MACRO ~opcode_71_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_71_is_valid~ BEGIN
-	PATCH_IF parmameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
+	PATCH_IF parameter2 != MOD_TYPE_cumulative AND parameter2 != MOD_TYPE_flat BEGIN
 		// Sans intérêt en terme de gameplay mais pas sans effet pour autant
 		SET isValid = 0
 	END
@@ -14427,7 +14427,7 @@ DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
 
 	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
 	SET parameter3 = special != 0 ? special : parameter3
-	SPRINT name @13440001 // ~Enchantement~
+	SPRINT name @13440001 // ~Niveau d'enchantement~
 	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
 		SET strref = 230000 + parameter4
 		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
@@ -14442,6 +14442,50 @@ DEFINE_PATCH_MACRO ~opcode_self_345~ BEGIN
 	SET value = parameter1
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT description @100001 // ~%name%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_345~ BEGIN
+	LOCAL_SET value = parameter1
+	PATCH_IF parameter2 != 0 BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : parameter2 != 0 non gere : %parameter2%~ END
+	END
+
+	// Pas de sens de cumuler parameter3 == 3 et parameter4 != 0 => ignore parameter3
+	SET parameter3 = special != 0 ? special : parameter3
+	SPRINT theStatistic @13440002 // ~le niveau d'enchantement~
+	PATCH_IF isExternal AND parameter4 != 0 AND parameter3 >= 1 AND parameter3 <= 3 BEGIN
+		SET strref = 230000 + parameter4
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponType = string END
+		SPRINT strref @13440020 // ~des %weaponType%~
+		TEXT_SPRINT theStatistic ~%theStatistic% %strref%~
+	END
+	PATCH_IF isExternal AND parameter3 >= 1 AND parameter3 <= 2 OR (parameter3 == 3 AND parameter4 == 0) BEGIN // >= 4 : comme 0
+		SET strref = 13440010 + parameter3 // ~dans la main directrice~
+		LPF ~getTranslation~ INT_VAR strref opcode RET weaponSlot = string END
+		TEXT_SPRINT theStatistic ~%theStatistic% %weaponSlot%~
+	END
+	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
+        PATCH_IF value >= 0 OR NOT IS_AN_INT ~%value%~ BEGIN
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
+	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
+        END
+        ELSE BEGIN
+            value = ABS value
+			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+				SPRINT value ~%complex_value%~
+			END
+	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
+        END
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN // percent
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102288 // ~Multiplie %theStatistic% %ofTheTarget% par %value%~
+	END
 END
 
 /* --------------------------- *

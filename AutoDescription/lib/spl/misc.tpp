@@ -1081,42 +1081,90 @@ DEFINE_PATCH_FUNCTION ~get_first_level_for_spell~
 	RET
 		minLevel
 BEGIN
-	SET count_levels = 0
-    PATCH_DEFINE_ARRAY levels BEGIN END
-	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
-	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
-		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
-		SET $levels(~%count_levels%~) = requiredLevel
-		SET count_levels += 1
+	READ_SHORT SPL_type spellType
+	READ_LONG SPL_level spellLevel
+	PATCH_IF spellLevel < 1 BEGIN
+		SET spellLevel = 1
 	END
-
-	SET diff = 0
-	SET delta = 0
-	SET level1 = 0
-	SET level2 = 0
-	SET minLevel = 1
-	SET isValid = 1
-	PATCH_PHP_EACH levels AS _ => level BEGIN
-		SET level1 = level2
-		SET level2 = level
-		PATCH_IF level1 > 1 BEGIN
-			SET delta = level2 - level1
-			PATCH_IF diff == 0 BEGIN
-				SET diff = delta
-			END
-			PATCH_IF diff != delta BEGIN
-				SET isValid = 0
-			END
+	PATCH_IF spellType == 2 BEGIN
+		READ_LONG SPL_exclusion_flags exclusionFlags
+		SET excludeDruid = (exclusionFlags BAND BIT31) == BIT31
+		PATCH_IF NOT excludeDruid BEGIN
+			SET minLevel = $first_caster_level_druid(~%spellLevel%~)
+		END
+		ELSE BEGIN
+			SET minLevel = $first_caster_level_priest(~%spellLevel%~)
 		END
 	END
-	PATCH_IF isValid == 1 AND VARIABLE_IS_SET $levels(1) BEGIN
-		SET minLevel = $levels(1) - diff
-	END
-	ELSE PATCH_IF count_levels == 1 BEGIN
-		// TODO: Déterminer le niveau selon les fichier mxsplxx.2da ? Afin de prendre le niveau auquel le personnage peut apprendre le sort
-		SET minLevel = $levels(0)
+	ELSE PATCH_IF spellType == 1 BEGIN
+		SET minLevel = $first_caster_level_wizard(~%spellLevel%~)
 	END
 	ELSE BEGIN
-		LPF ~add_log_warning~ STR_VAR message = ~Niveau minimum non calculable~ END
+		SET count_levels = 0
+	    PATCH_DEFINE_ARRAY levels BEGIN END
+		GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+		PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+			READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
+			SET $levels(~%count_levels%~) = requiredLevel
+			SET count_levels += 1
+		END
+
+		SET diff = 0
+		SET delta = 0
+		SET level1 = 0
+		SET level2 = 0
+		SET minLevel = 1
+		SET isValid = 1
+		PATCH_PHP_EACH levels AS _ => level BEGIN
+			SET level1 = level2
+			SET level2 = level
+			PATCH_IF level1 > 1 BEGIN
+				SET delta = level2 - level1
+				PATCH_IF diff == 0 BEGIN
+					SET diff = delta
+				END
+				PATCH_IF diff != delta BEGIN
+					SET isValid = 0
+				END
+			END
+		END
+		PATCH_IF isValid == 1 AND VARIABLE_IS_SET $levels(1) BEGIN
+			SET minLevel = $levels(1) - diff
+		END
+		ELSE PATCH_IF count_levels == 1 BEGIN
+			SET minLevel = $levels(0)
+		END
+		ELSE BEGIN
+			// LPF ~add_log_warning~ STR_VAR message = ~Niveau minimum non calculable~ END
+		END
 	END
+END
+
+DEFINE_ACTION_FUNCTION ~get_first_caster_level_list~
+	STR_VAR
+		2dafile = ~~
+	RET_ARRAY
+		first_caster_level
+BEGIN
+	ACTION_DEFINE_ARRAY first_caster_level BEGIN END
+	COPY_EXISTING ~%2dafile%.2da~ ~override~
+		COUNT_2DA_COLS colCount
+		COUNT_2DA_ROWS colCount rowCount
+		READ_2DA_ENTRIES_NOW mxspl colCount
+		FOR (row = 0; row < rowCount; ++row) BEGIN
+			FOR (level = 1; level < colCount; ++level) BEGIN
+				SET $first_caster_level(~%level%~) = 0
+			END
+		END
+		FOR (row = 0; row < rowCount; ++row) BEGIN
+			FOR (level = 1; level < colCount; ++level) BEGIN
+				PATCH_IF $first_caster_level(~%level%~) == 0 BEGIN
+					READ_2DA_ENTRY_FORMER mxspl row level maxSpells
+					PATCH_IF maxSpells > 0 BEGIN
+						SET $first_caster_level(~%level%~) = row + 1
+					END
+				END
+			END
+		END
+	BUT_ONLY_IF_IT_CHANGES
 END

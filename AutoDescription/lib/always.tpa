@@ -44,6 +44,10 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
 		END
 		BUT_ONLY_IF_IT_CHANGES
 
+	LAF ~get_first_caster_level_list~ STR_VAR 2dafile = ~mxsplwiz~ RET_ARRAY first_caster_level_wizard = first_caster_level END
+	LAF ~get_first_caster_level_list~ STR_VAR 2dafile = ~mxsplprs~ RET_ARRAY first_caster_level_priest = first_caster_level END
+	LAF ~get_first_caster_level_list~ STR_VAR 2dafile = ~mxspldru~ RET_ARRAY first_caster_level_druid = first_caster_level END
+
     INCLUDE ~%MOD_FOLDER%/lib/lib_ini.tpa~
 
 	OUTER_SPRINT ini_to_read "%MOD_FOLDER%/settings-default.ini"
