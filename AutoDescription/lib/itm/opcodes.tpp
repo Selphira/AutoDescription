@@ -9069,10 +9069,16 @@ DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
 	LOCAL_SET value = parameter1
 	SET cumulable = 0
 	PATCH_IF value >= 0 BEGIN
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT value ~%complex_value%~
+		END
 		SPRINT value @10000101 // ~Bonus de %value%~
 	END
 	ELSE BEGIN
 		SET value = ABS value
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT value ~%complex_value%~
+		END
 		SPRINT value @10000102 // ~Malus de %value%~
 	END
 	LPF ~opcode_mod~ INT_VAR strref = 11900001 STR_VAR value RET description END
@@ -14475,6 +14481,10 @@ DEFINE_PATCH_MACRO ~opcode_target_345~ BEGIN
             value = ABS value
 			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 				SPRINT value ~%complex_value%~
+				INNER_PATCH_SAVE value ~%value%~ BEGIN
+                    REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ~ ~~
+                    REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+                END
 			END
 	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
@@ -15206,6 +15216,10 @@ DEFINE_PATCH_FUNCTION ~opcode_target~ INT_VAR strref = 0 RET description BEGIN
             value = ABS value
 			PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 				SPRINT value ~%complex_value%~
+				INNER_PATCH_SAVE value ~%value%~ BEGIN
+                    REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ~ ~~
+                    REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+                END
 			END
 	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
@@ -15315,6 +15329,10 @@ DEFINE_PATCH_MACRO ~opcode_target_resist~ BEGIN
 				SPRINT value @10002 // ~%value% %~
 				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 					SPRINT value ~%complex_value%~
+					INNER_PATCH_SAVE value ~%value%~ BEGIN
+                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ~ ~~
+                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+                    END
 				END
 				SPRINT description @102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
 			END
@@ -15359,10 +15377,12 @@ DEFINE_PATCH_MACRO ~opcode_probability_resist~ BEGIN
 				SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
 			END
 			ELSE BEGIN
-				value = ABS value
-				SPRINT value @10002 // ~%value% %~
 				PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 					SPRINT value ~%complex_value%~
+				END
+				ELSE BEGIN
+					value = ABS value
+					SPRINT value @10002 // ~%value% %~
 				END
 				SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
 			END
@@ -16311,6 +16331,34 @@ DEFINE_PATCH_MACRO ~opcode_match_except_duration~ BEGIN
         AND match_diceSides    == diceSides
         AND match_saveType     == saveType
         AND match_saveBonus    == saveBonus
+        AND match_special      == special
+        AND match_parameter3   == parameter3
+        AND match_parameter4   == parameter4
+        AND match_custom_int   == custom_int
+        AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+        AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+        AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+        AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+    )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_except_duration_saveBonus~ BEGIN
+	SET match = (
+			match_isExternal   == isExternal
+        AND match_target       == target
+        AND match_power        == power
+        AND match_parameter1   == parameter1
+        AND match_parameter2   == parameter2
+        // AND match_duration     == duration
+        AND match_timingMode   == timingMode
+        AND match_resistance   == resistance
+        AND match_probability  == probability
+        AND match_probability1 == probability1
+        AND match_probability2 == probability2
+        AND match_diceCount    == diceCount
+        AND match_diceSides    == diceSides
+        AND match_saveType     == saveType
+        // AND match_saveBonus    == saveBonus
         AND match_special      == special
         AND match_parameter3   == parameter3
         AND match_parameter4   == parameter4

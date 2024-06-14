@@ -69,6 +69,13 @@
 @101130 = ~entre %amountMin% et %amountMax%~
 @101131 = ~Utilisation~
 @101185 = ~%description% (non cumulatif)~
+@103001 = ~Sorts~
+@103002 = ~Souffles~
+@103004 = ~Paralysie, mort et poisons~
+@103008 = ~Baguettes, sceptres et bâtons~
+@103016 = ~Pétrification et métamorphose~
+@103100 = ~%saveType% (%savingThrow%)~
+@103101 = ~%saveType% à %value% (%savingThrow%)~
 
 // Niveau des sorts
 @101201 = ~1er~

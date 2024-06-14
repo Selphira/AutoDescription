@@ -90,6 +90,14 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~saveType_to_strref~ BEGIN
 	~%FLAG_SAVINGTHROW_polymorph%~  => 10350001 // ~contre la pétrification et la métamorphose~
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~short_saveType_to_strref~ BEGIN
+	~%FLAG_SAVINGTHROW_spell%~ 		=> 103001 // ~Sorts~
+	~%FLAG_SAVINGTHROW_breath%~ 	=> 103002 // ~Souffles~
+	~%FLAG_SAVINGTHROW_death%~ 		=> 103004 // ~Paralysie, mort et poisons~
+	~%FLAG_SAVINGTHROW_wand%~ 		=> 103008 // ~Baguettes, sceptres et bâtons~
+	~%FLAG_SAVINGTHROW_polymorph%~  => 103016 // ~Pétrification et métamorphose~
+END
+
 DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	PATCH_IF ignoreSavingThrow == 0 BEGIN
 		SET saveType = (saveType BAND 0b11111)

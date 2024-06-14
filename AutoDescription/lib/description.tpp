@@ -126,7 +126,7 @@ DEFINE_PATCH_FUNCTION ~appendSubProperty~ INT_VAR strref = 0 STR_VAR name = "" v
 END
 
 DEFINE_PATCH_FUNCTION ~signed_value~ INT_VAR value = 0 RET value BEGIN
-	PATCH_IF value >= 0 BEGIN
+	PATCH_IF value > 0 BEGIN
 		SPRINT value @10003
 	END
 END

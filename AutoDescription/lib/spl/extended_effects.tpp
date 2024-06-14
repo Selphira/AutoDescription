@@ -794,7 +794,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		 * Uniquement si parameter2 == MOD_TYPE_cumulative ET que parameter1 et duration sont différents
 		 */
 		PATCH_FOR_EACH basicOpcode IN
-			6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
+			6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 190 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
 			27 28 29 30 31 84 85 86 87 88 89 166 173 502 503 504 // Les résistances
 			12 17 18 111 218
 			// 25 98

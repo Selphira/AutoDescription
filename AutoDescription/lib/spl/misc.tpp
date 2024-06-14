@@ -662,50 +662,62 @@ BEGIN
 		PATCH_TRY LPF ~opcode_%opcode%_typed_value~ INT_VAR value = delta_value RET strref END WITH DEFAULT strref = 0 END
 		SET last_value = value
 		SET value = ABS delta_value
-		SET complex_value_int = delta_value
+		SET complex_value_int = base_value
 		PATCH_IF dice_sides > 0 BEGIN
 			SET diceCount = value
 			SET diceSides = dice_sides
 			SPRINT value @10014 // ~%diceCount%d%diceSides%~
 		END
+		ELSE BEGIN
+			SET value = delta_value
+		END
 		PATCH_IF base_value > 0 AND delta_value == 0 BEGIN
-			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET complex_value = value END
-			PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
+			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value = ~%base_value%~ RET complex_value = value END
+			PATCH_IF is_flat_value == 1 BEGIN
 				SET base_value = prev_level + last_value
-				SPRINT complex_value ~%base_value% -%complex_value%~
+				SPRINT complex_value ~%base_value% %complex_value%~
 			END
 		END
 		ELSE BEGIN
-			SET levelMax = prev_level
-			SET remains_value = ABS prev_value - (ABS delta_value * level / delta_level)
-			LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
-			PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
-				SET base_value = prev_level + last_value
-				SPRINT value ~%base_value% -%value%~
-			END
-			PATCH_IF ABS delta_level == 1 BEGIN
-				SPRINT complex_value @102163 // ~%value% par niveau/%levelMax%~
+			PATCH_IF delta_level != 0 BEGIN
+				SET levelMax = prev_level
+				SET remains_value = ABS prev_value - (ABS delta_value * level / delta_level)
+				LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
+				PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
+					SET base_value = prev_level + last_value
+					SPRINT value ~%base_value% %value%~
+				END
+				PATCH_IF ABS delta_level == 1 BEGIN
+					SPRINT complex_value @102163 // ~%value% par niveau/%levelMax%~
+				END
+				ELSE PATCH_IF delta_level != 0 BEGIN
+					SET level = delta_level
+					SPRINT complex_value @102164 // ~%value% par tranche de %level% niveaux/%levelMax%~
+				END
+				PATCH_IF remains_value > 0 BEGIN
+					PATCH_IF dice_sides > 0 BEGIN
+						SET diceCount = remains_value
+						SET diceSides = dice_sides
+						SPRINT remains_value @10014 // ~%diceCount%d%diceSides%~
+					END
+					PATCH_IF is_percent BEGIN
+						SPRINT value ~%remains_value%~
+						SPRINT remains_value @10002 // ~%value% %~
+					END
+					PATCH_IF delta_level < 0 BEGIN
+						SPRINT complex_value ~%remains_value% %complex_value%~
+					END
+					ELSE BEGIN
+						INNER_PATCH_SAVE complex_value ~%complex_value%~ BEGIN
+	                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ~ ~~
+	                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
+	                    END
+						SPRINT complex_value ~%remains_value% + %complex_value%~
+					END
+				END
 			END
 			ELSE BEGIN
-				SET level = delta_level
-				SPRINT complex_value @102164 // ~%value% par tranche de %level% niveaux/%levelMax%~
-			END
-			PATCH_IF remains_value > 0 BEGIN
-				PATCH_IF dice_sides > 0 BEGIN
-					SET diceCount = remains_value
-					SET diceSides = dice_sides
-					SPRINT remains_value @10014 // ~%diceCount%d%diceSides%~
-				END
-				PATCH_IF is_percent BEGIN
-					SPRINT value ~%remains_value%~
-					SPRINT remains_value @10002 // ~%value% %~
-				END
-				PATCH_IF delta_level < 0 BEGIN
-					SPRINT complex_value ~%remains_value% %complex_value%~
-				END
-				ELSE BEGIN
-					SPRINT complex_value ~%remains_value% + %complex_value%~
-				END
+				SPRINT complex_value ~%base_value%~
 			END
 			// TODO: Ajouter le "à partir du xxème" "1 round + 2 rounds par tranche de 3 niveaux à partir du 12ème"
 		END
@@ -1019,6 +1031,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 	SET ignoreSavingThrow = 1
 	SET count = 0
 	SET isSpecial = 0
+	SET isHalfDamage = 0
 	SET baseSavingType = 0 - 1
 	SET baseSavingBonus = 0 - 1
 
@@ -1027,32 +1040,30 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
-					SET saveType = (saveType BAND 0b111111)
-	                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146 OR opcode == 148) BEGIN
-						SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-						PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-							SET $recursive_resref(~%resref%~) = 1
-							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
-								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-									LPM ~load_level_effects~
-									LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+						SET saveType = (saveType BAND 0b111111)
+		                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146 OR opcode == 148) BEGIN
+							SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+							PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+								SET $recursive_resref(~%resref%~) = 1
+								PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+									INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+										LPM ~load_level_effects~
+										LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+									END
 								END
 							END
+		                END
+						PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
+							SET isHalfDamage = 1
 						END
-	                END
-					PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
-						SET saveType = 32 // demi-dégâts
-					END
-					PATCH_IF baseSavingType == 0 - 1 BEGIN
-						SET baseSavingType = saveType
-						SET baseSavingBonus = saveBonus
-					END
-					PATCH_IF /*NOT (saveType == 0 AND saveType == 32) AND*/ baseSavingType != saveType BEGIN
-						SET isSpecial = 1
-						SET ignoreSavingThrow = 0
-					END
-					PATCH_IF saveBonus != 0 BEGIN
-						SET ignoreSavingThrow = 0
+						PATCH_IF baseSavingType == 0 - 1 BEGIN
+							SET baseSavingType = saveType
+							SET baseSavingBonus = saveBonus
+						END
+						PATCH_IF baseSavingType != saveType BEGIN
+							SET isSpecial = 1
+						END
 					END
 				END
 			END
@@ -1061,20 +1072,96 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 
 	PATCH_IF isSpecial BEGIN
 		SPRINT savingThrow @100032 // ~Spécial~
+		SET ignoreSavingThrow = 0
 	END
 	ELSE PATCH_IF baseSavingType > 0 BEGIN
-		PATCH_IF baseSavingType == 32 BEGIN
+		PATCH_IF isHalfDamage == 1 BEGIN
 			SPRINT savingThrow @10017 // ~1/2~
 		END
 		ELSE BEGIN
 			SPRINT savingThrow @10016 // ~Annule~
 		END
+		LPF ~get_spell_effects_by_saving_throw~ RET value = complex_value is_valid END
+		PATCH_IF is_valid BEGIN
+			SPRINT saveTypeStrref $short_saveType_to_strref(~%baseSavingType%~)
+			SPRINT saveType (AT saveTypeStrref)
+			PATCH_IF ~%value%~ STRING_EQUAL ~~ OR ~%value%~ STRING_EQUAL ~0~ BEGIN
+				SPRINT savingThrow @103100 // ~%saveType% (%savingThrow%)~
+			END
+			ELSE BEGIN
+				SPRINT savingThrow @103101 // ~%saveType% à %value% (%savingThrow%)~
+			END
+		END
+		ELSE BEGIN
+            SPRINT savingThrow @100032 // ~Spécial~
+			SET ignoreSavingThrow = 0
+        END
 	END
 	ELSE BEGIN
 		SPRINT savingThrow @10015 // ~Aucun~
 	END
 
 	LPF ~appendValue~ INT_VAR strref = 100036 STR_VAR value = ~%savingThrow%~ RET description END // ~Jet de sauvegarde~
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_valid BEGIN
+	SPRINT complex_value ~~
+	SPRINT base_complex_value ~~
+	SET level = $level_effects(~0~)
+	SET is_valid = 1
+	PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
+		CLEAR_ARRAY effects_to_disabled
+		PATCH_IF opcode >= 0 AND is_valid == 1 BEGIN
+		    LPM ~data_to_vars~
+		    LPM ~data_to_match_vars~
+
+		    LPF spell_has_same_effects_on_all_levels_except_duration
+				INT_VAR
+					match_opcode match_isExternal match_target match_power match_parameter1 match_parameter2
+					match_timingMode match_resistance match_duration match_probability match_probability1
+					match_probability2 match_diceCount match_diceSides match_saveType match_saveBonus match_special
+					match_parameter3 match_parameter4 match_custom_int
+				STR_VAR
+					match_resref match_resref2 match_resref3 match_custom_str
+					match_macro = ~opcode_match_except_duration_saveBonus~
+					return_parameter = ~saveBonus~
+		        RET
+		            inAllLevels total
+		        RET_ARRAY
+		            all_effects
+		    END
+		    PATCH_IF inAllLevels BEGIN
+		        PATCH_IF total > 1 BEGIN
+					LPF ~get_complex_value~
+						STR_VAR
+							array_name = ~all_effects~
+						RET
+							is_valid
+							complex_value
+							complex_value_int
+					END
+					PATCH_IF complex_value_int > 0 BEGIN
+						SPRINT value ~%complex_value%~
+						SPRINT complex_value @10003
+					END
+			    END
+			    ELSE PATCH_IF total == 1 BEGIN
+					PATCH_PHP_EACH ~all_effects~ AS level => value BEGIN
+						LPF ~signed_value~ INT_VAR value RET complex_value = value END
+					END
+			    END"
+				PATCH_IF ~%base_complex_value%~ STRING_EQUAL ~~ BEGIN
+					SPRINT base_complex_value ~%complex_value%~
+				END
+				PATCH_IF NOT ~%base_complex_value%~ STRING_EQUAL ~%complex_value%~ BEGIN
+					SET is_valid = 0
+				END
+		        PATCH_IF is_valid == 0 BEGIN
+					SPRINT complex_value ~~
+		        END
+		    END
+		END
+	END
 END
 
 DEFINE_PATCH_FUNCTION ~get_first_level_for_spell~
