@@ -1149,7 +1149,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_v
 					PATCH_PHP_EACH ~all_effects~ AS level => value BEGIN
 						LPF ~signed_value~ INT_VAR value RET complex_value = value END
 					END
-			    END"
+			    END
 				PATCH_IF ~%base_complex_value%~ STRING_EQUAL ~~ BEGIN
 					SPRINT base_complex_value ~%complex_value%~
 				END
