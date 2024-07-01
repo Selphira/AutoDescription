@@ -64,7 +64,7 @@ DEFINE_PATCH_FUNCTION ~getTranslation~
 		exist
 BEGIN
 	SET exist = 1
-	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~ ~AutoDescription/tra/french/description.tra~)) BEGIN
+	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~)) BEGIN
 		SET exist = 0
 		PATCH_IF warning == 1 BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~opcode %opcode%: Traduction %strref% manquante~ END
