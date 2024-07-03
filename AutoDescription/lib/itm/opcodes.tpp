@@ -5465,7 +5465,7 @@ DEFINE_PATCH_MACRO ~opcode_target_102~ BEGIN
 	SPRINT description @11020002 // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_102~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_probability_102~ BEGIN
 	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
 END
 
