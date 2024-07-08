@@ -15,17 +15,17 @@
 @9999 = ~Schtroumpfette~
 @10000 = ~
 ~
-@10001 = ~ : ~
-@10002 = ~%value% %~
+@10001 = ~ : ~
+@10002 = ~%value% %~
 @10003 = ~+%value%~
-@10004 = ~ ; ~
+@10004 = ~ ; ~
 @10006 = ~Multiplié par %value%~
 @10008 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
-@10009 = ~^[0-9]+ % de chances ~
+@10009 = ~^[0-9]+ % de chances ~
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
-@10019 = ~[0-9]+ % de chances ~
+@10019 = ~[0-9]+ % de chances ~
 @10015 = ~Aucun~
 @10016 = ~Annule~
 @10017 = ~1/2~
@@ -145,7 +145,7 @@
 @102034 = ~Jets de sauvegarde~
 @102094 = ~%charges% fois par jour~
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
-@102126 = ~Maudit : Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
+@102126 = ~Maudit%colon%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
 @102127 = ~Permet de lancer des sorts profanes~
 @102159 = ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
 @102160 = ~%baseValue% + %value% au niveau %level%~
@@ -1081,15 +1081,15 @@
 @400206 = ~à la protection contre un sort spécifique~
 @400207 = ~au renvoi de sort spécifique~
 @400208 = ~à la modification du nombre de points de vie minimum~
-@400209 = ~aux conséquences de Doigt de mort~ // Limité au Doigt de mort
-@400210 = ~aux conséquences de Mot de pouvoir : Étourdissement~ // Limité au Mot de pouvoir : Étourdissement
+@400209 = ~aux conséquences de « Doigt de mort »~ // Limité au Doigt de mort
+@400210 = ~aux conséquences de « Mot de pouvoir%colon%Étourdissement »~ // Limité au Mot de pouvoir : Étourdissement
 @400211 = ~à l'emprisonnement~
 @400212 = ~~ // Non fonctionnel
 @400213 = ~au labyrinthe~
 @400214 = ~à la génération de sorts multiple~
 @400215 = ~~ // Opcode visuel
 @400216 = ~au drain de niveaux~
-@400217 = ~aux conséquences de Mot de pouvoir : Sommeil~ // Limité au Mot de pouvoir : Sommeil
+@400217 = ~aux conséquences de « Mot de pouvoir%colon%Sommeil »~ // Limité au Mot de pouvoir : Sommeil
 @400218 = ~aux peaux de pierre~
 @400219 = ~à la protection contre un type de créature spécifique~ // Protection à changer, terme employé IG mais non adapté à l'opcode
 @400220 = ~à la dissipation des sorts d'une école de magie spécifique~ // Removal: Remove School [220]
@@ -1437,15 +1437,15 @@
 @401206 = ~les effets protégeant contre un sort spécifique~
 @401207 = ~les effets renvoyant un sort spécifique~
 @401208 = ~les effets modifiant le nombre de points de vie minimum~
-@401209 = ~les effets provoqués par Doigt de mort~ // Limité au Doigt de mort
-@401210 = ~les effets provoqués par Mot de pouvoir : Étourdissement~ // Limité au Mot de pouvoir : Étourdissement
+@401209 = ~les effets provoqués par « Doigt de mort »~ // Limité au Doigt de mort
+@401210 = ~les effets provoqués par « Mot de pouvoir%colon%Étourdissement »~ // Limité au Mot de pouvoir : Étourdissement
 @401211 = ~les effets provoquant l'emprisonnement~
 @401212 = ~~ // Non fonctionnel
 @401213 = ~les effets provoquant un labyrinthe~
 @401214 = ~les effets générant des sorts multiples~
 @401215 = ~~ // Opcode visuel
 @401216 = ~les effets drainant les niveaux~
-@401217 = ~les effets générés par Mot de pouvoir : Sommeil~ // Limité au Mot de pouvoir : Sommeil
+@401217 = ~les effets générés par « Mot de pouvoir%colon%Sommeil »~ // Limité au Mot de pouvoir : Sommeil
 @401218 = ~les effets générant des peaux de pierre~
 @401219 = ~les effets protégeant contre un type de créature spécifique~ // Protection à changer, terme employé IG mais non adapté à l'opcode
 @401220 = ~les effets dissipant les sorts d'une école de magie spécifique~ // Removal: Remove School [220]
@@ -2939,7 +2939,7 @@
 
 // Opcode 180: Item: Can't Use Item [180]
 
-@11800001 = ~Unique : Un seul exemplaire peut être équipé~
+@11800001 = ~Unique%colon%Un seul exemplaire peut être équipé~
 @11800002 = ~Empêche d'utiliser %itemName%~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
@@ -3361,7 +3361,7 @@
 // Opcode 246: Spell Effect: Berserking [246]
 
 @12460001 = ~Points de vie +15, dégâts +1, TAC0 +1~
-@12460002 = ~d'augmenter les caractéristiques %ofTheTarget% : Points de vie +15, dégâts +1, TAC0 +1~
+@12460002 = ~d'augmenter les caractéristiques %ofTheTarget%%colon%Points de vie +15, dégâts +1, TAC0 +1~
 
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
@@ -4312,7 +4312,7 @@
 @15040002 = ~aux dégâts physiques~
 @15040003 = ~la résistance aux dégâts physiques~
 
-// Fake Opcode 509 : Immunité aux sorts (par niveau) (cumulatif) [509]
+// Fake Opcode 509: Immunité aux sorts (par niveau) (cumulatif) [509]
 
 @15090001 = ~Immunité aux sorts~ // FIXME: Immunité aux sorts "ciblés", ne protège pas contre les effets de zone
 @15090002 = ~d'immuniser %theTarget% aux sorts~
