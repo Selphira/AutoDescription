@@ -83,7 +83,7 @@ END
  * - Si la force du porteur est supérieure ou égale à 25 ; Dégâts : +1 (non cumulatif)
  * ---> - Le bonus aux dégâts liés à la force est augmenté de 50% (non cumulatif)
  */
-DEFINE_PATCH_MACRO ~opcode_232_group_mods~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_232_group_mod~ BEGIN
 	LOCAL_SET count = 0
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	// Skills and Abilities
