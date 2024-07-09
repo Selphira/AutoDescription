@@ -11607,8 +11607,7 @@ END
  * ------------------------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_251~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12510001
+	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
@@ -11617,8 +11616,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_251~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12510003
+	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_251~ BEGIN

@@ -3390,9 +3390,7 @@
 
 // Opcode 251: Spell Effect: Change Bard Song Effect [251]
 
-@12510001 = ~Apprend ule chant de barde ла%spellName%а╗~
 @12510002 = ~de faire apprendre le chant de barde ла%spellName%а╗~
-@12510003 = ~Apprend le chant de barde ла%spellName%а╗ %toTheTarget%~
 @12510004 = ~de faire apprendre le chant de barde ла%spellName%а╗ %toTheTarget%~
 
 // Opcode 252: Spell Effect: Set Trap [252]
