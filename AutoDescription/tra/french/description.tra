@@ -2591,11 +2591,11 @@
 // Opcode 122: Item: Create Inventory Item [122]
 
 @11220001 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~
-@11220002 = ~Crée aléatoirement %amount% « %itemName% » ou %amount2% « %itemName2% »~
-@11220003 = ~Crée aléatoirement %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% »~
+@11220002 = ~Crée %amount% « %itemName% » ou %amount2% « %itemName2% » dans l'inventaire %ofTheTarget%~
+@11220003 = ~Crée %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% » dans l'inventaire %ofTheTarget%~
 @11220004 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~
-@11220005 = ~de créer aléatoirement %amount% « %itemName% » ou %amount2% « %itemName2% »~
-@11220006 = ~de créer aléatoirement %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% »~
+@11220005 = ~de créer %amount% « %itemName% » ou %amount2% « %itemName2% » dans l'inventaire %ofTheTarget%~
+@11220006 = ~de créer %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% » dans l'inventaire %ofTheTarget%~
 
 // Opcode 124: Spell Effect: Teleport (Dimension Door) [124]
 

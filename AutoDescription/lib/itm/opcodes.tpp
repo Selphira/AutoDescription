@@ -6311,9 +6311,8 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 	END
 
 	PATCH_IF is_ee == 1 AND isExternal BEGIN
-		SET amount2 = parameter3
-		SET amount3 = parameter4
 		PATCH_IF NOT ~%resref2%~ STRING_EQUAL ~~ BEGIN
+			SET amount2 = parameter3
 			LPF ~get_random_treasure_names~ STR_VAR file = EVAL ~%resref2%~ RET itemName2 = randomTreasureNames END
 			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref2%~ RET canStack2 = canStack END
 			PATCH_IF canStack2 == 0 OR amount2 == 0 BEGIN
@@ -6321,6 +6320,7 @@ DEFINE_PATCH_MACRO ~opcode_122_common~ BEGIN
 			END
 		END
 		PATCH_IF NOT ~%resref3%~ STRING_EQUAL ~~ BEGIN
+			SET amount3 = parameter4
 			LPF ~get_random_treasure_names~ STR_VAR file = EVAL ~%resref3%~ RET itemName3 = randomTreasureNames END
 			LPF ~item_can_stack~ STR_VAR file = EVAL ~%resref3%~ RET canStack3 = canStack END
 			PATCH_IF canStack3 == 0 OR amount3 == 0 BEGIN
