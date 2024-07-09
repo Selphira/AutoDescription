@@ -375,12 +375,12 @@
 @100405 = ~trésor aléatoire de qualité exceptionnelle~
 
 // Spell_side
-@110001 = ~Lance %spellName%~
-@110002 = ~Le sort %spellName% est lancé par %theTarget%~
-@110003 = ~de lancer %spellName%~
-@110004 = ~que %theTarget% lance %spellName%~
+@110001 = ~Lance « %spellName% »~
+@110002 = ~Le sort « %spellName% » est lancé par %theTarget%~
+@110003 = ~de lancer « %spellName% »~
+@110004 = ~que %theTarget% lance « %spellName% »~
 
-@110011 = ~puis lance %spellName%~
+@110011 = ~puis lance « %spellName% »~
 
 /* ------ *
  * Ea.ids *
@@ -984,7 +984,7 @@
 @400109 = ~à la paralysie~
 @400110 = ~~ // Sans effet
 @400111 = ~à l'invocation d'armes magiques~
- @400112 = ~aux effets qui retirent des objets de l'inventaire~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
+@400112 = ~aux effets qui retirent des objets de l'inventaire~ // Utilisé comme ça mais l'opcode n'est pas limité à cette utilité
 @400113 = ~~ // Sans effet
 @400114 = ~à l'identification d'objet~
 @400115 = ~à la détection des alignements~
@@ -1610,16 +1610,16 @@
 @410019 = ~sous l'effet de la cécité~
 @410020 = ~sous l'effet de la maladie~
 @410021 = ~sous l'effet de la débilité mentale~
-@410022 = ~sous l'effet de Non-détection~
-@410023 = ~sous l'effet d'Invisibilité améliorée~
+@410022 = ~sous l'effet de « Non-détection »~
+@410023 = ~sous l'effet d'« Invisibilité améliorée »~
 @410024 = ~sous l'effet de Bénédiction~
 @410025 = ~sous l'effet d'un cantique allié~
-@410026 = ~sous l'effet de Puissance sacrée~
+@410026 = ~sous l'effet de « Puissance sacrée »~
 @410027 = ~sous l'effet de Chance~
 @410028 = ~sous l'effet d'Aide~
 @410029 = ~sous l'effet d'un cantique adverse~
-@410030 = ~sous l'effet de Flou~
-@410031 = ~sous l'effet de Image-miroir~
+@410030 = ~sous l'effet de « Flou »~
+@410031 = ~sous l'effet de « Image-miroir »~
 @410032 = ~sous l'effet de la confusion~
 
 
@@ -1634,23 +1634,23 @@
 
 // Complète la phrase @12320031 = ~À chaque round où %theTarget% est affecté par %splstate%~
 
-@420000 = ~Émotion~
-@420002 = ~Armure de la foi~
-@420005 = ~Bouclier de feu (rouge)~
-@420006 = ~Bouclier de feu (bleu)~
-@420008 = ~Protection contre la mort~
-@420009 = ~Puissance sacrée~
-@420021 = ~Sphère résistante d'Otiluke~
-@420024 = ~Peau d'écorce~
-@420031 = ~Bouclier tempête~
+@420000 = ~« Émotion »~
+@420002 = ~« Armure de la foi »~
+@420005 = ~« Bouclier de feu (rouge) »~
+@420006 = ~« Bouclier de feu (bleu) »~
+@420008 = ~« Protection contre la mort »~
+@420009 = ~« Puissance sacrée »~
+@420021 = ~« Sphère résistante d'Otiluke »~
+@420024 = ~« Peau d'écorce »~
+@420031 = ~« Bouclier tempête »~
 @420036 = ~un sommeil profond~
 @420038 = ~la surdité~
 @420040 = ~une protection contre les attaques sournoises~
-@420041 = ~Ordres chaotiques~
-@420042 = ~Fourvoiement magique~
-@420044 = ~Grande malédiction~
+@420041 = ~« Ordres chaotiques »~
+@420042 = ~« Fourvoiement magique »~
+@420044 = ~« Grande malédiction »~
 @420046 = ~le toucher de la goule~ // Maladie, mode 11/12
-@420055 = ~Fatalité~
+@420055 = ~« Fatalité »~
 @420056 = ~une immunité aux sorts d'Abjuration~
 @420057 = ~une immunité aux sorts de Conjuration~
 @420058 = ~une immunité aux sorts de Divination~
@@ -1664,27 +1664,27 @@
 @420066 = ~une protection contre les sorts~
 @420067 = ~une protection contre les sorts incapacitants~
 @420068 = ~un stimulant de combat~
-@420071 = ~Poussière scintillante~
+@420071 = ~« Poussière scintillante »~
 @420072 = ~l'incapacité de devenir invisible~
 @420073 = ~la danse d'un Shaman~
-@420074 = ~Don de Lathandre~
+@420074 = ~« Don de Lathandre »~
 @420075 = ~la fatigue du berserker~
-@420076 = ~Rage du barbare~
-@420077 = ~Rage du berserker~ // Celle du kit
-@420078 = ~Furie~ // Celle de Minsc
-@420079 = ~Arme empoisonnée~
-@420080 = ~Kaï~
-@420081 = ~Position défensive~
-@420082 = ~Tir ajusté~
-@420083 = ~Bouclier du chaos~
-@420084 = ~Bouclier majeur du chaos~
+@420076 = ~« Rage du barbare »~
+@420077 = ~« Rage du berserker »~ // Celle du kit
+@420078 = ~« Furie »~ // Celle de Minsc
+@420079 = ~« Arme empoisonnée »~
+@420080 = ~« Kaï »~
+@420081 = ~« Position défensive »~
+@420082 = ~« Tir ajusté »~
+@420083 = ~« Bouclier du chaos »~
+@420084 = ~« Bouclier majeur du chaos »~
 @420087 = ~le chant d'un Scalde~
 @420088 = ~le chant d'un Bouffon~
 @420089 = ~le chant amélioré d'un Barde~
-@420092 = ~Protection de l'esprit~
-@420093 = ~Arme enchantée~
-@420095 = ~Forme spirituelle~
-@420096 = ~Élu des esprits~
+@420092 = ~« Protection de l'esprit »~
+@420093 = ~« Arme enchantée »~
+@420095 = ~« Forme spirituelle »~
+@420096 = ~« Élu des esprits »~
 @420097 = ~Arme critique~ // TODO?, sort sans nom : Coup critique +10% // une augmentation de 10 % du nombre de coups critiques // Chance de coup critique : +10 %
 @420098 = ~une potion de blocage de la magie~
 @420099 = ~une potion de clarté~
@@ -1692,21 +1692,21 @@
 @420101 = ~un parchemin de protection contre les morts-vivants~
 @420104 = ~la folie du berserker~ // concerne également la rage du Barbare, la rage Animale... // les effets de l'état berserk / les effets de la rage
 @420106 = ~une protection contre la peur~
-@420107 = ~Protection contre la pétrification~
-@420108 = ~Bouclier de sort~
-@420109 = ~Protection contre les projectiles non magiques~
-@420110 = ~Spirale offensive~
-@420111 = ~Protection contre les armes non magiques~
-@420112 = ~Transformation de Tenser~
-@420113 = ~Spirale défensive~
-@420118 = ~Résistance d'acier~
-@420120 = ~Protection contre les armes magiques~
-@420121 = ~Manteau~
-@420122 = ~Manteau amélioré~
-@420123 = ~Immunité absolue~
+@420107 = ~« Protection contre la pétrification »~
+@420108 = ~« Bouclier de sort »~
+@420109 = ~« Protection contre les projectiles non magiques »~
+@420110 = ~« Spirale offensive »~
+@420111 = ~« Protection contre les armes non magiques »~
+@420112 = ~« Transformation de Tenser »~
+@420113 = ~« Spirale défensive »~
+@420118 = ~« Résistance d'acier »~
+@420120 = ~« Protection contre les armes magiques »~
+@420121 = ~« Manteau »~
+@420122 = ~« Manteau amélioré »~
+@420123 = ~« Immunité absolue »~
 @420124 = ~un bannissement~ // FIXME: l'emprisonnement détruit la cible plutôt que de l'enfermer, non hardcoded
 @420125 = ~le mode histoire~ // Mode de jeu facile ++
-@420126 = ~Bouclier~
+@420126 = ~« Bouclier »~
 @420250 = ~la maladie~
 
 
@@ -1941,10 +1941,10 @@
 
 @10200001 = ~Invisibilité~
 @10200002 = ~Invisibilité améliorée~
-@10200003 = ~de lancer Invisibilité sur %theTarget%~
-@10200004 = ~de lancer Invisibilité améliorée sur %theTarget%~
-@10200005 = ~Lance Invisibilité sur %theTarget%~
-@10200006 = ~Lance Invisibilité améliorée sur %theTarget%~
+@10200003 = ~de lancer « Invisibilité » sur %theTarget%~
+@10200004 = ~de lancer « Invisibilité améliorée » sur %theTarget%~
+@10200005 = ~Lance « Invisibilité » sur %theTarget%~
+@10200006 = ~Lance « Invisibilité améliorée » sur %theTarget%~
 
 // Opcode 21: Stat: Lore Modifier [21]
 
@@ -2207,16 +2207,16 @@
 // Opcode 69: Protection: From Detection (Non-Detection) [69]
 
 @10690001 = ~Non-détection~
-@10690002 = ~Lance Non-détection sur %theTarget%~
-@10690003 = ~de lancer Non-détection sur %theTarget%~
-@10690004 = ~Rend %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
-@10690005 = ~de rendre %theTarget% indétectable par des moyens magiques tels que la Détection de l'invisibilité et autres divinations~
+@10690002 = ~Lance « Non-détection » sur %theTarget%~
+@10690003 = ~de lancer « Non-détection » sur %theTarget%~
+@10690004 = ~Rend %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~
+@10690005 = ~de rendre %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~
 
 // Opcode 70: Cure: Non-Detection [70]
 
-@10700001 = ~Dissipation de Non-détection~
-@10700002 = ~Dissipe Non-détection %ofTheTarget%~
-@10700003 = ~de dissiper Non-détection %ofTheTarget%~
+@10700001 = ~Dissipation de « Non-détection »~
+@10700002 = ~Dissipe « Non-détection » %ofTheTarget%~
+@10700003 = ~de dissiper « Non-détection » %ofTheTarget%~
 
 // Opcode 71: Sex Change [71]
 
@@ -2535,11 +2535,11 @@
 
 // Opcode 112: Item: Remove Item [112]
 
-@11120001 = ~Retire "%itemName%" de l'inventaire~
-@11120002 = ~Retire "%itemName%" de l'inventaire %ofTheTarget%~
-@11120003 = ~Retire "%itemName%" de l'inventaire %ofTheTarget% pendant %duration%~
-@11120004 = ~de retirer "%itemName%" de l'inventaire~
-@11120005 = ~de retirer "%itemName%" de l'inventaire %ofTheTarget%~
+@11120001 = ~Retire « %itemName% » de l'inventaire~
+@11120002 = ~Retire « %itemName% » de l'inventaire %ofTheTarget%~
+@11120003 = ~Retire « %itemName% » de l'inventaire %ofTheTarget% pendant %duration%~
+@11120004 = ~de retirer « %itemName% » de l'inventaire~
+@11120005 = ~de retirer « %itemName% » de l'inventaire %ofTheTarget%~
 
 // Opcode 115: Detect: Alignment [115]
 
@@ -2590,12 +2590,12 @@
 
 // Opcode 122: Item: Create Inventory Item [122]
 
-@11220001 = ~Crée %amount% "%itemName%" dans l'inventaire %ofTheTarget%~
-@11220002 = ~Crée aléatoirement %amount% "%itemName%" ou %amount2% "%itemName2%"~
-@11220003 = ~Crée aléatoirement %amount% "%itemName%", %amount2% "%itemName2%" ou %amount3% "%itemName3%"~
-@11220004 = ~de créer %amount% "%itemName%" dans l'inventaire %ofTheTarget%~
-@11220005 = ~de créer aléatoirement %amount% "%itemName%" ou %amount2% "%itemName2%"~
-@11220006 = ~de créer aléatoirement %amount% "%itemName%", %amount2% "%itemName2%" ou %amount3% "%itemName3%"~
+@11220001 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~
+@11220002 = ~Crée aléatoirement %amount% « %itemName% » ou %amount2% « %itemName2% »~
+@11220003 = ~Crée aléatoirement %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% »~
+@11220004 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~
+@11220005 = ~de créer aléatoirement %amount% « %itemName% » ou %amount2% « %itemName2% »~
+@11220006 = ~de créer aléatoirement %amount% « %itemName% », %amount2% « %itemName2% » ou %amount3% « %itemName3% »~
 
 // Opcode 124: Spell Effect: Teleport (Dimension Door) [124]
 
@@ -2737,8 +2737,8 @@
 
 // Opcode 143: Item: Create Item in Slot [143]
 
-@11430001 = ~Crée 1 "%itemName%" à l'emplacement %slotName% %ofTheTarget%~
-@11430002 = ~de créer 1 "%itemName%" à l'emplacement %slotName% %ofTheTarget%~
+@11430001 = ~Crée 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~
+@11430002 = ~de créer 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~
 
 // Opcode 144: Button: Disable Button [144]
 
@@ -2791,24 +2791,24 @@
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
-@11460001 = ~Lance %spellName% sur %theTarget%~
-@11460002 = ~Lance instantanément %spellName% sur %theTarget%~
-@11460003 = ~de lancer le sort %spellName% sur %theTarget%~
-@11460004 = ~de lancer instantanément le sort %spellName% sur %theTarget%~
+@11460001 = ~Lance « %spellName% » sur %theTarget%~
+@11460002 = ~Lance instantanément « %spellName% » sur %theTarget%~
+@11460003 = ~de lancer le sort « %spellName% » sur %theTarget%~
+@11460004 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~
 @11460005 = ~%spellName% (instantané)~
 
 // Opcode 147: Spell: Learn Spell [147]
 
-@11470001 = ~Retranscription du sort %spellName%~
-@11470002 = ~Fait retranscrire le sort %spellName% %toTheTarget%~
-@11470003 = ~de retranscrire le sort %spellName%~
-@11470004 = ~de retranscrire le sort %spellName% %toTheTarget%~
+@11470001 = ~Retranscription du sort « %spellName% »~
+@11470002 = ~Fait retranscrire le sort « %spellName% » %toTheTarget%~
+@11470003 = ~de retranscrire le sort « %spellName% »~
+@11470004 = ~de retranscrire le sort « %spellName% » %toTheTarget%~
 
 // Opcode 148: Spell: Cast Spell (at Point) [148]
 
-@11480001 = ~Lance %spellName% sur %theTarget%~
-@11480002 = ~de lancer le sort %spellName% sur %theTarget%~
-@11480003 = ~de lancer instantanément le sort %spellName% sur %theTarget%~
+@11480001 = ~Lance « %spellName% » sur %theTarget%~
+@11480002 = ~de lancer le sort « %spellName% » sur %theTarget%~
+@11480003 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~
 
 // Opcode 150: Spell Effect: Find Traps [150]
 
@@ -2903,17 +2903,17 @@
 
 // Opcode 171: Give Ability [171]
 
-@11710001 = ~Ajoute la capacité %spellName%~
-@11710002 = ~Ajoute le sort %spellName% dans le livre de sorts~
-@11710011 = ~d'ajouter la capacité %spellName%~
-@11710012 = ~d'ajouter le sort %spellName% dans le livre de sorts~
+@11710001 = ~Ajoute la capacité « %spellName% »~
+@11710002 = ~Ajoute le sort « %spellName% » dans le livre de sorts~
+@11710011 = ~d'ajouter la capacité « %spellName% »~
+@11710012 = ~d'ajouter le sort « %spellName% » dans le livre de sorts~
 
 // Opcode 172: Spell: Remove Spell [172]
 
-@11720001 = ~Supprime le sort %spellName% du livre de sorts %ofTheTarget%~
-@11720002 = ~Supprime le sort %spellName% de la mémoire et du livre de sorts %ofTheTarget%~
-@11720003 = ~de supprimer le sort %spellName% du livre de sorts %ofTheTarget%~
-@11720004 = ~de supprimer le sort %spellName% de la mémoire et du livre de sorts %ofTheTarget%~
+@11720001 = ~Supprime le sort « %spellName% » du livre de sorts %ofTheTarget%~
+@11720002 = ~Supprime le sort « %spellName% » de la mémoire et du livre de sorts %ofTheTarget%~
+@11720003 = ~de supprimer le sort « %spellName% » du livre de sorts %ofTheTarget%~
+@11720004 = ~de supprimer le sort « %spellName% » de la mémoire et du livre de sorts %ofTheTarget%~
 
 // Opcode 173: Stat: Poison Resistance Modifier [173]
 
@@ -2940,7 +2940,7 @@
 // Opcode 180: Item: Can't Use Item [180]
 
 @11800001 = ~Unique%colon%Un seul exemplaire peut être équipé~
-@11800002 = ~Empêche d'utiliser %itemName%~
+@11800002 = ~Empêche d'utiliser « %itemName% »~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
 
@@ -3071,14 +3071,14 @@
 
 // Opcode 206: Spell: Protection from Spell [206]
 
-@12060001 = ~Immunité au sort %spellName%~
-@12060002 = ~Immunise %theTarget% au sort %spellName%~
-@12060003 = ~d'immuniser %theTarget% au sort %spellName%~
+@12060001 = ~Immunité au sort « %spellName% »~
+@12060002 = ~Immunise %theTarget% au sort « %spellName% »~
+@12060003 = ~d'immuniser %theTarget% au sort « %spellName% »~
 
 // Opcode 207: Spell: Bounce Specified Spell [207]
 
-@12070001 = ~Renvoie le sort %spellName%~
-@12070002 = ~de renvoyer le sort %spellName%~
+@12070001 = ~Renvoie le sort « %spellName% »~
+@12070002 = ~de renvoyer le sort « %spellName% »~
 
 // Opcode 208: HP: Minimum Limit [208]
 
@@ -3227,14 +3227,14 @@
 // Opcode 232: Spell Effect: Cast Spell on Condition [232]
 
 @12320000 = ~~
-@12320001 = ~Lance le sort %spellName% sur %theTarget%~
-@12320002 = ~Lance les sorts %spellName% et %spellName2% sur %theTarget%~
-@12320003 = ~Lance les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320001 = ~Lance le sort « %spellName% » sur %theTarget%~
+@12320002 = ~Lance les sorts « %spellName% » et « %spellName2% » sur %theTarget% »~
+@12320003 = ~Lance les sorts « %spellName% », « %spellName2% » et « %spellName3% » sur %theTarget%~
 @12320004 = ~Lance un sortilège~
 
-@12320005 = ~de lancer le sort %spellName% sur %theTarget%~
-@12320006 = ~de lancer les sorts %spellName% et %spellName2% sur %theTarget%~
-@12320007 = ~de lancer les sorts %spellName%, %spellName2% et %spellName3% sur %theTarget%~
+@12320005 = ~de lancer le sort « %spellName% » sur %theTarget%~
+@12320006 = ~de lancer les sorts « %spellName% » et « %spellName2% » sur %theTarget%~
+@12320007 = ~de lancer les sorts « %spellName% », « %spellName2% » et « %spellName3% » sur %theTarget%~
 @12320008 = ~de lancer un sortilège~
 
 @12320010 = ~Lorsque le porteur est touché~
@@ -3390,26 +3390,26 @@
 
 // Opcode 251: Spell Effect: Change Bard Song Effect [251]
 
-@12510001 = ~Apprend un nouveau chant de barde (%spellName%)~
-@12510002 = ~de faire apprendre un nouveau chant de barde (%spellName%)~
-@12510003 = ~Apprend un nouveau chant de barde (%spellName%) %toTheTarget%~
-@12510004 = ~de faire apprendre un nouveau chant de barde (%spellName%) %toTheTarget%~
+@12510001 = ~Apprend ule chant de barde « %spellName% »~
+@12510002 = ~de faire apprendre le chant de barde « %spellName% »~
+@12510003 = ~Apprend le chant de barde « %spellName% » %toTheTarget%~
+@12510004 = ~de faire apprendre le chant de barde « %spellName% » %toTheTarget%~
 
 // Opcode 252: Spell Effect: Set Trap [252]
 
-@12520001 = ~Tente de poser un piège %spellName%~ // TODO: "tente" dans le sens où la probabilité dépend du talent pose de piège et peut donc échouer
-@12520002 = ~de poser un piège %spellName%~ // TODO : "tente" aussi mais formulation trop complexe
-@12520003 = ~Fait poser un piège %spellName% %toTheTarget%~
-@12520004 = ~de faire poser un piège %spellName% %toTheTarget%~
+@12520001 = ~Tente de poser un piège « %spellName% »~ // TODO: "tente" dans le sens où la probabilité dépend du talent pose de piège et peut donc échouer
+@12520002 = ~de poser un piège « %spellName% »~ // TODO : "tente" aussi mais formulation trop complexe
+@12520003 = ~Fait poser un piège « %spellName% » %toTheTarget%~
+@12520004 = ~de faire poser un piège « %spellName% » %toTheTarget%~
 
 // Opcode 259: Protection: Spell Trap [259]
 
 @12590001 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
 @12590002 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~
-@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance %spellName%~
-@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance %spellName%~
-@12590005 = ~Lance %spellName%~
-@12590006 = ~de lancer %spellName%~
+@12590003 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance « %spellName% »~
+@12590004 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur puis lance « %spellName% »~
+@12590005 = ~Lance « %spellName% »~
+@12590006 = ~de lancer « %spellName% »~
 
 
 // Opcode 261: Spell: Restore Lost Spells [261]
@@ -3448,10 +3448,10 @@
 @12640011 = ~une arme équipée~
 
 // Opcode 266: Spell: Remove Protection from Spell [266]
-@12660001 = ~Lève l'immunité au sort %spellName%~
-@12660002 = ~Lève l'immunité %ofTheTarget% au sort %spellName%~
-@12660003 = ~de lever l'immunité au sort %spellName%~
-@12660004 = ~de lever l'immunité %ofTheTarget% au sort %spellName%~
+@12660001 = ~Lève l'immunité au sort « %spellName% »~
+@12660002 = ~Lève l'immunité %ofTheTarget% au sort « %spellName% »~
+@12660003 = ~de lever l'immunité au sort « %spellName% »~
+@12660004 = ~de lever l'immunité %ofTheTarget% au sort « %spellName% »~
 
 // Opcode 268: Spell Effect: Explore (Wizard Eye) [268]
 
@@ -3664,29 +3664,29 @@
 
 // Opcode 321: Removal: Effects specified by Resource [321]
 
-@13210001 = ~Dissipe les %effectType% du sort %spellName%~
-@13210002 = ~Dissipe les %effectType% de l'objet %itemName%~
-@13210003 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName%~
+@13210001 = ~Dissipe les %effectType% du sort « %spellName% »~
+@13210002 = ~Dissipe les %effectType% de l'objet « %itemName% »~
+@13210003 = ~Dissipe les %effectType% du sort « %spellName% » et de l'objet « %itemName% »~
 
-@13210004 = ~Dissipe les %effectType% du sort %spellName% sur %theTarget%~
-@13210005 = ~Dissipe les %effectType% de l'objet %itemName% sur %theTarget%~
-@13210006 = ~Dissipe les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210004 = ~Dissipe les %effectType% du sort « %spellName% » sur %theTarget%~
+@13210005 = ~Dissipe les %effectType% de l'objet « %itemName% » sur %theTarget%~
+@13210006 = ~Dissipe les %effectType% du sort « %spellName% » et de l'objet « %itemName% » sur %theTarget%~
 
-@13210007 = ~de dissiper les %effectType% du sort %spellName% sur %theTarget%~
-@13210008 = ~de dissiper les %effectType% de l'objet %itemName% sur %theTarget%~
-@13210009 = ~de dissiper les %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210007 = ~de dissiper les %effectType% du sort « %spellName% » sur %theTarget%~
+@13210008 = ~de dissiper les %effectType% de l'objet « %itemName% » sur %theTarget%~
+@13210009 = ~de dissiper les %effectType% du sort « %spellName% » et de l'objet « %itemName% » sur %theTarget%~
 
-@13210011 = ~Dissipe et protège des %effectType% du sort %spellName%~
-@13210012 = ~Dissipe et protège des %effectType% de l'objet %itemName%~
-@13210013 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName%~
+@13210011 = ~Dissipe et protège des %effectType% du sort « %spellName% »~
+@13210012 = ~Dissipe et protège des %effectType% de l'objet « %itemName% »~
+@13210013 = ~Dissipe et protège des %effectType% du sort « %spellName% » et de l'objet « %itemName% »~
 
-@13210014 = ~Dissipe et protège des %effectType% du sort %spellName% sur %theTarget%~
-@13210015 = ~Dissipe et protège des %effectType% de l'objet %itemName% sur %theTarget%~
-@13210016 = ~Dissipe et protège des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210014 = ~Dissipe et protège des %effectType% du sort « %spellName% » sur %theTarget%~
+@13210015 = ~Dissipe et protège des %effectType% de l'objet « %itemName% » sur %theTarget%~
+@13210016 = ~Dissipe et protège des %effectType% du sort « %spellName% » et de l'objet « %itemName% » sur %theTarget%~
 
-@13210017 = ~de dissiper et protèger des %effectType% du sort %spellName% sur %theTarget%~
-@13210018 = ~de dissiper et protèger des %effectType% de l'objet %itemName% sur %theTarget%~
-@13210019 = ~de dissiper et protèger des %effectType% du sort %spellName% et de l'objet %itemName% sur %theTarget%~
+@13210017 = ~de dissiper et protèger des %effectType% du sort « %spellName% » sur %theTarget%~
+@13210018 = ~de dissiper et protèger des %effectType% de l'objet « %itemName% » sur %theTarget%~
+@13210019 = ~de dissiper et protèger des %effectType% du sort « %spellName% » et de l'objet « %itemName% » sur %theTarget%~
 
 @13210020 = ~Les effets ne se cumulent pas~
 
@@ -3957,9 +3957,9 @@
 @13240902 = ~Immunise %theTarget% %againstWho%~
 @13240903 = ~d'immuniser %theTarget% %againstWho%~
 
-@13240911 = ~contre le sort %spellName% et l'objet %itemName%~ // againstWho
-@13240912 = ~contre le sort %spellName%~
-@13240913 = ~contre l'objet %itemName%~
+@13240911 = ~contre le sort « %spellName% » et l'objet « %itemName% »~ // againstWho
+@13240912 = ~contre le sort « %spellName% »~
+@13240913 = ~contre l'objet « %itemName% »~
 
 @13241003 = ~créatures immunisées au feu~
 @13241004 = ~créatures sensibles au feu~
@@ -4188,18 +4188,18 @@
 
 // Opcode 333: Spell Effect: Static Charge [333]
 
-@13330001 = ~Lance %amount% fois le sort %spellName% %strDuration%~
-@13330002 = ~Permet à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
-@13330003 = ~de lancer %amount% fois le sort %spellName% %strDuration%~
-@13330004 = ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
+@13330001 = ~Lance %amount% fois le sort « %spellName% » %strDuration%~
+@13330002 = ~Permet à %theTarget% de lancer %amount% fois le sort « %spellName% » %strDuration%~
+@13330003 = ~de lancer %amount% fois le sort « %spellName% » %strDuration%~
+@13330004 = ~de permettre à %theTarget% de lancer %amount% fois le sort « %spellName% » %strDuration%~
 
 // Opcode 335: Spell Effect: Seven Eyes [335]
 
 @13350002 = ~Affecte %theTarget% par %splstate%~
 @13350004 = ~d'affecter %theTarget% par %splstate%~
 
-@13350011 = ~et lui apprend le sort %spellName%~
-@13350012 = ~et de lui apprendre le sort %spellName%~
+@13350011 = ~et lui apprend le sort « %spellName% »~
+@13350012 = ~et de lui apprendre le sort « %spellName% »~
 
 // Opcode 337: Remove: Opcode [337]
 
@@ -4364,8 +4364,8 @@
 
 // Fake Opcode 525: Item: Replace item [525]
 
-@15250001 = ~Remplace "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
-@15250002 = ~de remplacer "%itemName%" par "%itemName2%" dans l'inventaire %ofTheTarget%~
+@15250001 = ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
+@15250002 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||

@@ -26,4 +26,4 @@ SPWI916.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
 SPWI918.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 SPWI918.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 SPWI918.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
-SPWI960.SPL : Opcode 318 : Immunité à contre le sort Souffle psionique différente de l'objet : SPIN959
+SPWI960.SPL : Opcode 318 : Immunité à contre le sort « Souffle psionique » différente de l'objet : SPIN959
