@@ -1027,7 +1027,7 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow baseSavingType baseSavingBonus BEGIN
+DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow baseSavingType baseSavingBonus isHalfDamage BEGIN
 	SET ignoreSavingThrow = 1
 	SET count = 0
 	SET isSpecial = 0
@@ -1040,7 +1040,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
-				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+				    PATCH_IF( NOT (opcode == 318 OR opcode == 321 OR opcode == 324) AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
 						SET saveType = (saveType BAND 0b111111)
 		                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146 OR opcode == 148) BEGIN
 							SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
@@ -1049,7 +1049,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 								PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 									INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 										LPM ~load_level_effects~
-										LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus END
+										LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus isHalfDamage END
 									END
 								END
 							END
@@ -1057,12 +1057,14 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 						PATCH_IF is_ee AND opcode == 12 AND (parameter2 BAND 65535) == 0 AND (special BAND BIT8) > 0 BEGIN
 							SET isHalfDamage = 1
 						END
-						PATCH_IF baseSavingType == 0 - 1 BEGIN
-							SET baseSavingType = saveType
-							SET baseSavingBonus = saveBonus
-						END
-						PATCH_IF baseSavingType != saveType BEGIN
-							SET isSpecial = 1
+						PATCH_IF saveType != 0 - 1 BEGIN
+							PATCH_IF baseSavingType == 0 - 1 BEGIN
+								SET baseSavingType = saveType
+								SET baseSavingBonus = saveBonus
+							END
+							PATCH_IF baseSavingType != saveType BEGIN
+								SET isSpecial = 1
+							END
 						END
 					END
 				END
