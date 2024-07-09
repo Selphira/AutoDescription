@@ -9813,7 +9813,7 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 		        END
 				SORT_ARRAY_INDICES spellList
 				SET opcode = 518
-				LPF ~implode~ STR_VAR array_name = ~spellList~ glue = ~, ~ final_glue = ~ %and% ~ RET custom_str = text END
+				LPF ~implode~ STR_VAR array_name = ~spellList~ glue = ~ », « ~ final_glue = ~ » %and% « ~ RET custom_str = text END
 				LPM ~add_opcode~
 			END
 		END
@@ -13075,6 +13075,34 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_318~ BEGIN
 	LPM ~opcode_target_probability_324~
+END
+
+DEFINE_PATCH_MACRO ~opcode_318_replace~ BEGIN
+	PATCH_PHP_EACH EVAL ~opcodes_318~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND parameter2 == 0 BEGIN
+			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
+			LPF ~get_item_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET itemName END
+
+			PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND ~%itemName%~ STRING_EQUAL ~~ BEGIN
+				SET opcode = 206
+				LPM ~add_opcode~
+				// Nécessaire de remettre le numéro original pour les itérations suivantes
+				SET opcode = 318
+
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = position
+					RET $opcodes(~318~) = count
+					RET_ARRAY EVAL ~opcodes_318~ = opcodes_xx
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+				PATCH_IF $opcodes(~318~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_318~
+				END
+			END
+		END
+	END
 END
 
 /* -------------------------------------------- *

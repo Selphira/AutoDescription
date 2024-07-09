@@ -4334,9 +4334,9 @@
 
 // Fake Opcode 518: Immunité aux sorts
 
-@15180001 = ~Immunité aux sorts %spellNames%~
-@15180002 = ~Immunise %theTarget% aux sorts %spellNames%~
-@15180003 = ~d'immuniser %theTarget% aux sorts %spellNames%~
+@15180001 = ~Immunité aux sorts « %spellNames% »~
+@15180002 = ~Immunise %theTarget% aux sorts « %spellNames% »~
+@15180003 = ~d'immuniser %theTarget% aux sorts « %spellNames% »~
 
 // Fake Opcode 519: Arme brisée
 
