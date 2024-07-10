@@ -3314,6 +3314,10 @@ DEFINE_PATCH_MACRO ~opcode_self_58~ BEGIN
 	LPM ~opcode_target_58~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_58~ BEGIN
+	LPM ~opcode_target_probability_58~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_58~ BEGIN
 	LOCAL_SET strref = 10580001 // ~Dissipation de la magie sur %theTarget%~
 	LPM ~opcode_58_common~
