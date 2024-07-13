@@ -61,12 +61,17 @@ BEGIN
 				END
 				ELSE BEGIN
 					LPF ~get_tooltip~ INT_VAR index = headerIndex STR_VAR resource = ~%SOURCE_RES%~ RET tooltip END
-
+					SPRINT tooltipTitle ~~
 					// Ajout du nom de la capacité
 	                PATCH_IF NOT ~%tooltip%~ STRING_EQUAL ~~ BEGIN
-	                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%tooltip%~ RET title END
-						SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
-						SET countLines += 1
+	                    SPRINT title ~%tooltip%~
+	                    PATCH_IF EVAL ~countLines%index%~ == 0 BEGIN
+							PATCH_IF countHeaders != 1 BEGIN
+		                        LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+		                    END
+							SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
+							SET countLines += 1
+						END
 						SET hasTitle = 2
 	                END
 
@@ -89,12 +94,34 @@ BEGIN
 	                PATCH_PHP_EACH ~lines%index%~ AS data => _ BEGIN
 	                    SET lineSort = sort + ~%data_0%~
 	                    PATCH_IF hasTitle == 0 BEGIN
-		                    LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET title END
-							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%title%~) = 1
+							PATCH_IF countHeaders != 1 BEGIN
+		                        LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET data_5 = title END
+							END
+							SET hasTitle = 1
+		                    SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = hasTitle
+	                    END
+	                    ELSE PATCH_IF hasTitle == 2 BEGIN
+	                        PATCH_IF "%data_5%" STRING_MATCHES_REGEXP "%title%" BEGIN
+								PATCH_IF countHeaders != 1 BEGIN
+	                                LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
+								END
+								SET $lines(~%sort%~ ~%countLines%~ ~100~ ~0~ ~99~ ~%title%~) = 1
+		                        SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = hasTitle
+								SPRINT title ~~
+	                        END
+	                        ELSE BEGIN
+								PATCH_IF countHeaders != 1 AND EVAL ~countLines%index%~ == 1 BEGIN
+			                        LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title = ~%data_5%~ RET data_5 = title END
+			                        SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = 1
+								END
+								ELSE BEGIN
+			                        SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = EVAL ~countLines%index%~ == 1 ? 1 : 2
+			                    END
+	                        END
 	                    END
 	                    ELSE BEGIN
-							SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = hasTitle
-	                    END
+		                    SET $lines(~%lineSort%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~) = hasTitle
+						END
 						SET countLines += 1
 	                END
 	            END
@@ -123,7 +150,7 @@ BEGIN
 		END
 		ELSE PATCH_IF (itemType != ITM_TYPE_dart OR (itemType == ITM_TYPE_dart AND countHeaders > 1)) BEGIN
 			SPRINT title @100012  // ~Capacités de charge~
-			PATCH_IF itemType != ITM_TYPE_dart AND countHeaders == 1 AND ~countLines0~ > 1 BEGIN
+			PATCH_IF itemType != ITM_TYPE_dart AND countHeaders <= 1 BEGIN
 				SPRINT title @100015  // ~Capacité de charge~
 				LPF ~get_charged_ability_title~ INT_VAR charges depletion STR_VAR title RET title END
 			END
