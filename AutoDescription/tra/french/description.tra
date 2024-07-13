@@ -342,6 +342,13 @@
 @100211 = ~invalidante~
 @100212 = ~de combinaison~
 @100213 = ~non offensive~
+@100220 = ~de potions~
+@100221 = ~de dissipation~
+@100222 = ~de pétrification~ // k1#Petrify => spell_rev
+@100223 = ~de lenteur~ // k1#Slow => spell_rev
+@100224 = ~de hâte~ // k1#Haste => spell_rev
+@100225 = ~de maladie~ // ~fl#Disease~    => atweaks
+@100226 = ~de peur~ // ~fl#Fear~    => atweaks
 
 // duration
 @100300 = ~1 seconde~
@@ -675,6 +682,7 @@
  * ------------ */
 @206000 = ~??????~
 @206005 = ~elfes noirs~
+@206100 = ~~
 @206150 = ~githyankis~
 @206200 = ~~
 @206243 = ~ménestrels~
@@ -4025,6 +4033,7 @@
 @13242000 = ~si la compétence %proficiency% est supérieure ou égale à %value%~
 @13242001 = ~si la compétence %proficiency% est égale à %value%~
 @13242002 = ~si la compétence %proficiency% est inférieure à %value%~
+@13242003 = ~si la zone n'est pas extraplanaire~
 
 // Opcode 325: Stat: Save vs. all [325]
 
@@ -4150,6 +4159,7 @@
 @13261000 = ~Si la compétence %proficiency% est supérieure ou égale à %value%~
 @13261001 = ~Si la compétence %proficiency% est égale à %value%~
 @13261002 = ~Si la compétence %proficiency% est inférieure à %value%~
+@13261003 = ~Si la zone n'est pas extraplanaire~
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 

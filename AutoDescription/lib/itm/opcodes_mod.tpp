@@ -7,7 +7,7 @@ OUTER_SET $slowSpellList(~finslow~) = 1 // Ascension v2.0.24
 OUTER_SET $slowSpellList(~mels545~) = 1 // Ascension v2.0.24
 
 DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
-	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%parameter1%~
+	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%splstate%~
 
 	PATCH_MATCH ~%splstateValue%~ WITH
 		// Pnp Potion
@@ -16,6 +16,20 @@ DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateN
 			SPRINT splstateName @230009 // ~potions~
 		END
 		DEFAULT SPRINT splstateName ~~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
+	SPRINT spellSecondaryTypeName ~~
+	PATCH_IF VARIABLE_IS_SET $msectype(~%secondaryType%~) BEGIN
+		SET strref = $msectype(~%secondaryType%~)
+		PATCH_IF strref > 0 BEGIN
+			LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
+			SPRINT spellSecondaryTypeName ~%opcode% => spellSecondaryTypeName~
+		END
+	END
+	ELSE BEGIN
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: type de sort secondaire non gere (%secondaryType%)~ END
 	END
 END
 
@@ -137,7 +151,7 @@ DEFINE_PATCH_MACRO ~opcode_326_is_valid_mod~ BEGIN
 	// 5E_spellcasting
 	PATCH_IF isValid == 1 BEGIN
 		PATCH_MATCH ~%splprot%~ WITH
-			D5_DIV_1_7 D5_DIV_8_9 D5_WIZ_1_7 D5_WIZ_8_9 D5_KIT_IS D5_FATIGUE_0 D5_FATIGUE_1 ~D5_DIV=1_7~ ~D5_WIZ=1_7~ ~D5_WIZ=8_9~
+			D5_DIV_1_7 D5_DIV_8_9 D5_WIZ_1_7 D5_WIZ_8_9 D5_KIT_IS D5_FATIGUE_0 D5_FATIGUE_1 ~D5_DIV=1_7~ ~D5_WIZ=1_7~ ~D5_WIZ=8_9~ D5_FATIGUE_3
 			BEGIN
 				SET isValid = 0
 			END
@@ -147,6 +161,10 @@ DEFINE_PATCH_MACRO ~opcode_326_is_valid_mod~ BEGIN
 	// npc_ee
 	PATCH_IF isValid == 1 BEGIN
 		SET isValid = NOT ~%resref%~ STRING_EQUAL_CASE "D5_NUKT"
+	END
+	// might_and_guile
+	PATCH_IF isValid == 1 BEGIN
+		SET isValid = NOT ~%splprot%~ STRING_EQUAL_CASE "D5_115_FEATS"
 	END
 END
 
@@ -182,6 +200,10 @@ DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
 		BEGIN
 			SET strref = 13261002 // ~Si la compétence %proficiency% est inférieure à %value%~
 		END
+		~%statType%_AREATYPE!=EXTRAPLANAR~
+		BEGIN
+			SET strref = 13261003 // ~Si la zone n'est pas extraplanaire~
+		END
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: splprot %splprot% non gere~ END
 	END
@@ -192,6 +214,7 @@ DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
 		mo_armor_prof3 mo_con_prof3 mo_dev_prof3 mo_has_prof3 mo_spl_prof3 BEGIN SET value = 3 END
 		mo_armor_prof4 mo_con_prof4 mo_dev_prof4 mo_has_prof4 mo_spl_prof4 BEGIN SET value = 4 END
 		mo_armor_prof5 mo_con_prof5 mo_dev_prof5 mo_has_prof5 mo_spl_prof5 BEGIN SET value = 5 END
+		~%statType%_AREATYPE!=EXTRAPLANAR~ BEGIN END
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Valeur du splprot %splprot% non geree~ END
 	END

@@ -5424,7 +5424,7 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
-	PATCH_IF shrink_cure_with_immunities AND abilityType == AbilityType_Equipped BEGIN
+	PATCH_IF shrink_cure_with_immunities AND (abilityType == AbilityType_Equipped OR abilityType < 0) BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
 				match_probability1 = probability1
@@ -7251,8 +7251,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion BEGIN
-		PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
-			//SET castingLevel = 0
+		PATCH_IF isItem == 1 AND type == 1 BEGIN
+			SET castingLevel = 0
 		END
 		LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET spellDescription = description END
         SPRINT description ~%spellDescription%~
@@ -7282,8 +7282,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
-					//SET castingLevel = 0
+				PATCH_IF isItem == 1 AND type == 1 BEGIN
+					SET castingLevel = 0
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
@@ -9553,13 +9553,17 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_203~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	SPRINT description @12030001 // ~Renvoie les sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12030001 // ~Renvoie les sorts %spellSecondaryTypeName%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_203~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	SPRINT description @12030002 // ~de renvoyer les sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12030002 // ~de renvoyer les sorts %spellSecondaryTypeName%~
+	END
 END
 
 /* ------------------------------------------- *
@@ -9597,27 +9601,33 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	SPRINT description @12050001 // ~Immunité aux sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12050001 // ~Immunité aux sorts %spellSecondaryTypeName%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	SPRINT description @12050002 // ~de résister aux sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12050002 // ~de résister aux sorts %spellSecondaryTypeName%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12050003 // ~Immunise %theTarget% aus sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12050003 // ~Immunise %theTarget% aux sorts %spellSecondaryTypeName%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	SPRINT description @12050004 // ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description @12050004 // ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_205_group~ BEGIN
@@ -10398,11 +10408,13 @@ DEFINE_PATCH_MACRO ~opcode_self_221~ BEGIN
 	PATCH_TRY
 		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-		PATCH_IF spellLevel < 9 BEGIN
-			SPRINT description @12210001 // ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-		END
-	    ELSE BEGIN
-	        SPRINT description @12210003 // ~Dissipe tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+		PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF spellLevel < 9 BEGIN
+				SPRINT description @12210001 // ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+			END
+		    ELSE BEGIN
+		        SPRINT description @12210003 // ~Dissipe tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+		    END
 	    END
 	WITH DEFAULT
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
@@ -10415,11 +10427,13 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_221~ BEGIN
 	PATCH_TRY
 		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-		PATCH_IF spellLevel < 9 BEGIN
-			SPRINT description @12210002 // ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-		END
-	    ELSE BEGIN
-	        SPRINT description @12210004 // ~de dissiper tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+		PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF spellLevel < 9 BEGIN
+				SPRINT description @12210002 // ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+			END
+		    ELSE BEGIN
+		        SPRINT description @12210004 // ~de dissiper tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+		    END
 	    END
 	WITH DEFAULT
         LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong parameter2 : %parameter2%~ END
@@ -10556,7 +10570,9 @@ END
 DEFINE_PATCH_MACRO ~opcode_226_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
-	LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_226_is_valid~ BEGIN
@@ -10681,11 +10697,13 @@ DEFINE_PATCH_MACRO ~opcode_self_230~ BEGIN
 
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	PATCH_IF spellLevel < 9 BEGIN
-		SPRINT description @12300001 // ~Dissipe un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-	END
-    ELSE BEGIN
-        SPRINT description @12300003 // ~Dissipe un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF spellLevel < 9 BEGIN
+			SPRINT description @12300001 // ~Dissipe un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+		END
+	    ELSE BEGIN
+	        SPRINT description @12300003 // ~Dissipe un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+	    END
     END
 END
 
@@ -10694,11 +10712,13 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_230~ BEGIN
 
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
 
-	PATCH_IF spellLevel < 9 BEGIN
-		SPRINT description @12300002 // ~de dissiper un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-	END
-	ELSE BEGIN
-		SPRINT description @12300004 // ~de dissiper un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF spellLevel < 9 BEGIN
+			SPRINT description @12300002 // ~de dissiper un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+		END
+		ELSE BEGIN
+			SPRINT description @12300004 // ~de dissiper un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+		END
 	END
 END
 
@@ -15475,9 +15495,11 @@ END
 DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
 	SET strref = 100200 + secondaryType
 	PATCH_IF secondaryType > 13 OR secondaryType < 0 BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: secondary type (%secondaryType%) must be between 0 and 13 inclusive~ END
+		LPF ~get_spell_secondary_type_mod~ INT_VAR secondaryType RET spellSecondaryTypeName END
 	END
-	LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
+	ELSE BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
+	END
 END
 
 // Rajout d'un paramètre pour bloquer l'affichage du warning (dans le cas où l'objet n'a pas besoin d'exister (opcode 321))

@@ -70,6 +70,30 @@ ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~msectypeMod~ BEGIN
+	~GT_PotionEffects~ => 100220 // pnp_potion
+	// Généralement, des effets qui font doublons pour la description
+	// Exemple pour un objet qui ralentit la cible, l'effet ajouté sera "dissipe les sorts de hâte", n'ajoute rien de vraiment utile pour le joueur.
+	~k1#Dispel~        => 0 // 100221 // spell_rev
+	~k1#Petrify~       => 0 // 100222 // spell_rev
+	~k1#Slow~          => 0 // 100223 // spell_rev
+	~k1#Haste~         => 0 // 100224 // spell_rev
+	~fl#Disease~       => 0 // 100225 // atweaks
+	~fl#Fear~          => 0 // 100226 // atweaks
+END
+COPY_EXISTING ~msectype.2da~ ~override~
+	COUNT_2DA_COLS cols
+	READ_2DA_ENTRIES_NOW rows cols
+	FOR (row = 15; row < rows; ++row) BEGIN
+		READ_2DA_ENTRY_FORMER rows row 0 ~id~
+		PATCH_IF VARIABLE_IS_SET $msectypeMod(~%id%~) BEGIN
+			SET value = row - 1
+			// récupérer une correspondance de @xxx par rapport à id qui serait donc un mod
+			SPRINT $msectype(~%value%~) $msectypeMod(~%id%~)
+		END
+	END
+	BUT_ONLY_IF_IT_CHANGES
+
 /* ---------------------------------------------------------------- *
  * Récupération du nom des objets aléatoires. *
  * ---------------------------------------------------------------- */
