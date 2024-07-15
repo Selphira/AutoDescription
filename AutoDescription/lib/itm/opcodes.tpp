@@ -892,13 +892,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LOCAL_SPRINT versus ~~
-	LOCAL_SET value = ABS ~%parameter1%~
+	LOCAL_SET value = parameter1
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
-		// xx% de chance de faire passer la classe d'armure du porteur [contre les] à yy [pendant ...]
-		PATCH_FAIL "%SOURCE_FILE% : opcode_target_probability_0 pourcentage d'armure de la cible à gérer"
+		SPRINT description  @10000105 // ~de passer la classe d'armure de base %ofTheTarget% à %value%~
 	END
 	ELSE BEGIN
+		SET value = ABS value
+
 		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
 			LPF ~getTranslation~ INT_VAR strref opcode RET versus = string END // ~contre les xxx~
@@ -10905,7 +10906,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	END
 	ELSE PATCH_IF parameter2 == 21 BEGIN
 		SET stateRef = 420000 + special
-		LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+		LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
 		PATCH_IF NOT ~%splstate%~ STRING_EQUAL ~~ BEGIN
 			SPRINT condition @12320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
 		END
@@ -12821,12 +12822,23 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
 	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010002 // // ~Chance de coup critique avec cette arme~
+		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
 	END
 	ELSE BEGIN
 		SPRINT name @13010001 // ~Chance de coup critique~
 	END
 	LPM ~opcode_301_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_301~ BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+		SPRINT name @13010004 // ~la chance de coup critique avec cette arme~
+	END
+	ELSE BEGIN
+		SPRINT name @13010003 // ~la chance de coup critique~
+	END
+
+	LPM ~opcode_301_probability_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
@@ -12851,6 +12863,37 @@ DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
 		TEXT_SPRINT name ~%name% %strref%~
 	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_probability_common~ BEGIN
+	LOCAL_SET value = 5 * parameter1
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		PATCH_IF isExternal AND parameter3 != 0 BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
+		END
+	END
+	PATCH_IF is_ee AND special >= 1 BEGIN
+		SET strref = 13010010 + special // ~en mêlée~
+		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
+		TEXT_SPRINT name ~%name% %descriptionAdd%~
+	END
+	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
+		SET strref = 230000 + parameter3
+		SPRINT weaponType (AT strref)
+		SPRINT strref @13010020 // ~avec des %weaponType%~
+		TEXT_SPRINT name ~%name% %strref%~
+	END
+	SPRINT theStatistic ~%name%~
+	PATCH_IF value > 0 BEGIN
+		SPRINT value @10002 // ~%value% %~
+        SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
+	END
+	ELSE BEGIN
+		SET value = ABS value
+		SPRINT value @10002 // ~%value% %~
+		SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
+	END
 END
 
 /* ---------------------------- *
@@ -13812,6 +13855,10 @@ DEFINE_PATCH_MACRO ~opcode_target_326~ BEGIN
 	LPM ~opcode_self_326~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_326~ BEGIN
+	LPM ~opcode_self_probability_326~
+END
+
 DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET strref = 13260000
 	LOCAL_SET value = parameter1
@@ -14090,6 +14137,22 @@ DEFINE_PATCH_MACRO ~opcode_self_332~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_332~ BEGIN
+	LOCAL_SET strref = 13320100 + parameter2
+	LOCAL_SET value = parameter1
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
+    PATCH_IF value >= 0 BEGIN
+		SPRINT value @10002 // ~%value% %~
+        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
+    END
+    ELSE BEGIN
+        value = ABS value
+		SPRINT value @10002 // ~%value% %~
+        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
+    END
+END
+
 DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
 	PATCH_IF parameter1 == 0 BEGIN
 		SET isValid = 0
@@ -14264,7 +14327,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
-	LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+	LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
 	SPRINT description @13350002 // ~Affecte %theTarget% par %splstate%~
 
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
@@ -14282,7 +14345,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
-	LPF ~getTranslation~ INT_VAR strref = stateRef opcode RET splstate = string END
+	LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
 	SPRINT description @13350004 // ~d'affecter %theTarget% par %splstate%~
 
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
@@ -14629,6 +14692,16 @@ DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
 		SPRINT name @13620001 // ~Chance d'échec critique~
 	END
 	LPM ~opcode_301_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_362~ BEGIN
+	PATCH_IF parameter2 != 0 BEGIN
+		SPRINT name @13620004 // ~la chance d'échec critique avec cette arme~
+	END
+	ELSE BEGIN
+		SPRINT name @13620003 // ~la chance d'échec critique~
+	END
+	LPM ~opcode_301_probability_common~
 END
 
 /* ------------------------ *
@@ -16173,10 +16246,11 @@ DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 singular = 0 cleric
 END
 
 DEFINE_PATCH_FUNCTION ~get_splstate_name~ INT_VAR strref = 0 opcode = 0 splstate = 0 RET splstateName BEGIN
-	PATCH_TRY
-        LPF ~getTranslation~ INT_VAR strref opcode warning = 0 RET splstateName = string END
-	WITH DEFAULT
+	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~)) BEGIN
 		LPF ~get_splstate_name_mod~ INT_VAR splstate RET splstateName END
+	END
+	ELSE BEGIN
+		SPRINT splstateName (AT %strref%)
 	END
 END
 

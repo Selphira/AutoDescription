@@ -1776,6 +1776,7 @@
 @10000102 = ~Malus de %value%~
 @10000103 = ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
 @10000104 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~
+@10000105 = ~de passer la classe d'armure de base %ofTheTarget% à %value%~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
@@ -3609,6 +3610,8 @@
 
 @13010001 = ~Chance de coup critique~
 @13010002 = ~Chance de coup critique avec cette arme~
+@13010003 = ~la chance de coup critique~
+@13010004 = ~la chance de coup critique avec cette arme~
 
 @13010010 = ~~
 @13010011 = ~en mêlée~
@@ -4194,6 +4197,20 @@
 @13320011 = ~Dégâts élémentaires~
 @13320012 = ~Dégâts physiques~
 
+@13320100 = ~les dégâts~
+@13320101 = ~les dégâts de feu~
+@13320102 = ~les dégâts de froid~
+@13320103 = ~les dégâts d'électricité~
+@13320104 = ~les dégâts d'acide~
+@13320105 = ~les dégâts magique~
+@13320106 = ~les dégâts de poison~
+@13320107 = ~les dégâts tranchants~
+@13320108 = ~les dégâts perforants~
+@13320109 = ~les dégâts contondants~
+@13320110 = ~les dégâts de projectiles~
+@13320111 = ~les dégâts élémentaires~
+@13320112 = ~les dégâts physiques~
+
 // Opcode 333: Spell Effect: Static Charge [333]
 
 @13330001 = ~Lance %amount% fois le sort « %spellName% » %strDuration%~
@@ -4277,6 +4294,8 @@
 
 @13620001 = ~Chance d'échec critique~
 @13620002 = ~Chance d'échec critique avec cette arme~
+@13620003 = ~la chance d'échec critique~
+@13620004 = ~la chance d'échec critique avec cette arme~
 
 // Opcode 367: Minimum base stats [367]
 
