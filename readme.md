@@ -1,6 +1,8 @@
 [![Github Releases](https://img.shields.io/github/v/release/Selphira/AutoDescription?include_prereleases&color=blue)](https://github.com/Selphira/AutoDescription/releases/latest)
 ![Langues](https://img.shields.io/static/v1?label=Langues&message=Français%20%7C%20English&color=limegreen)
 ![Jeux supportés](https://img.shields.io/static/v1?label=Jeux%20supportés&message=BG2%20%7C%20BGT%20%7C%20BGEE%20%7C%20BG2EE%20%7C%20EET&color=dodgerblue)
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/Selphira/AutoDescription/total)
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/Selphira/AutoDescription/latest/total)
 
 # AutoDescription
 
