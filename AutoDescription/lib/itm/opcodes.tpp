@@ -10908,7 +10908,7 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	END
 	ELSE PATCH_IF parameter2 == 21 BEGIN
 		SET stateRef = 420000 + special
-		LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
+		LPF ~get_splstate_name~ INT_VAR strref = stateRef opcode splstate = special RET splstate = splstateName END
 		PATCH_IF NOT ~%splstate%~ STRING_EQUAL ~~ BEGIN
 			SPRINT condition @12320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
 		END
@@ -14329,7 +14329,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
-	LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
+	LPF ~get_splstate_name~ INT_VAR strref = stateRef opcode splstate = parameter1 RET splstate = splstateName END
 	SPRINT description @13350002 // ~Affecte %theTarget% par %splstate%~
 
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
@@ -14347,7 +14347,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
-	LPF ~get_splstate_name~ INT_VAR strref opcode splstate = stateRef RET splstate = splstateName END
+	LPF ~get_splstate_name~ INT_VAR strref = stateRef opcode splstate = parameter1 RET splstate = splstateName END
 	SPRINT description @13350004 // ~d'affecter %theTarget% par %splstate%~
 
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
