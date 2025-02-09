@@ -457,6 +457,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_magic_fire%~  => 10120030 //  33554432 ~points de dégâts de feu magique~
 	~%DAMAGETYPE_magic_cold%~  => 10120031 //  67108864 ~points de dégâts de froid magique~
 	~%DAMAGETYPE_stunning%~    => 10120032 // 134217728 ~points de dégâts non létal~
+	~%DAMAGETYPE_soul_eater%~  => 101092   // 268435456 ~points de dégâts~
+	~%DAMAGETYPE_disease%~     => 101092   //1073741824 ~points de dégâts~
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
@@ -1249,6 +1251,7 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 
 		INNER_PATCH_SAVE value ~%value%~ BEGIN
 			REPLACE_TEXTUALLY ~+5$~ ~+%oneHalf%~         // 5  => une demi
+			REPLACE_TEXTUALLY ~^5$~ ~%oneHalf%~          // 5  => une demi
 			REPLACE_TEXTUALLY ~\([0-9]\)+0$~ ~\1~        // 20 => 2
 			REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%andHalf%~ // 25 => 2 et demi
 		END
@@ -2895,7 +2898,6 @@ END
 /* --------------------------- *
  * State: Unconsciousness [39] *
  * --------------------------- */
-// TODO: P2 == 1: endort profondemment la cible (ne se réveille si subit des dégâts)
 DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
 	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
 		SPRINT description @10390001 // ~Endort %theTarget%~
