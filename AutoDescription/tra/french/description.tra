@@ -123,6 +123,10 @@
 @102124 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~
 // les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
 @102125 = ~réduits de moitié~
+@102170 = ~ignore la cible principale~
+@102171 = ~ignore la cible secondaire~
+@102172 = ~ignore les images miroir~
+@102173 = ~ignore la difficulté~
 
 @102003 = ~Type de compétence~
 @102004 = ~Type~

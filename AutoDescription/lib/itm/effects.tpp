@@ -100,7 +100,8 @@ END
 
 DEFINE_PATCH_MACRO ~add_save~ BEGIN
 	PATCH_IF ignoreSavingThrow == 0 BEGIN
-		SET saveType = (saveType BAND 0b11111)
+		SET saveFlags = saveType
+		SET saveType  = (saveType BAND 0b11111)
 		// FIXME
 		SET saveForHalf = 0
 		SET failForHalf = 0
@@ -170,6 +171,25 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 					SPRINT saveStr @102121 // ~jet de sauvegarde %saveTypeStr% pour éviter~
 				END
 	        END
+
+            PATCH_IF is_ee BEGIN
+                PATCH_IF saveFlags BAND FLAG_SAVINGTHROW_ignore_primary_target_EE BEGIN
+                    SPRINT saveStrExtra @102170 // ~ignore la cible principale~
+                    SPRINT saveStr ~%saveStr%, %saveStrExtra%~
+                END
+                PATCH_IF saveFlags BAND FLAG_SAVINGTHROW_ignore_secondary_target_EE BEGIN
+                    SPRINT saveStrExtra @102171 // ~ignore la cible secondaire~
+                    SPRINT saveStr ~%saveStr%, %saveStrExtra%~
+                END
+                PATCH_IF (opcode == 12 OR opcode == 25) AND saveFlags BAND FLAG_SAVINGTHROW_bypass_mirror_image_EE BEGIN
+                    SPRINT saveStrExtra @102172 // ~ignore les images miroir~
+                    SPRINT saveStr ~%saveStr%, %saveStrExtra%~
+                END
+                PATCH_IF opcode == 12 AND saveFlags BAND FLAG_SAVINGTHROW_ignore_difficulty_EE BEGIN
+                    SPRINT saveStrExtra @102173 // ~ignore la difficulté~
+                    SPRINT saveStr ~%saveStr%, %saveStrExtra%~
+                END
+            END
 
 			SPRINT description ~%description% (%saveStr%)~
 			SET saveAdded = 1
