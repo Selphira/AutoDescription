@@ -6987,6 +6987,101 @@ DEFINE_PATCH_MACRO ~opcode_135_post_group~ BEGIN
 			END
 		END
 	END
+
+    // Suppression des "Métamorphose forme naturelle" si présente avec une métamorphose en xxx
+	PATCH_PHP_EACH ~opcodes_135~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+
+		SET position135 = position
+		SET timingMode135 = timingMode
+		SET duration135 = duration
+        SET target135 = target
+        SET probability135 = probability
+        SET probability1135 = probability1
+        SET probability2135 = probability2
+        SET saveType135 = saveType
+        SET saveBonus135 = saveBonus
+        SET diceSides135 = diceSides
+        SET diceCount135 = diceCount
+        SET custom_int135 = custom_int
+        SET position135 = position
+        SET parameter1135 = parameter1
+        SET parameter2135 = parameter2
+        SPRINT resref135 ~%resref%~
+
+        PATCH_PHP_EACH ~opcodes_146~ AS data => _ BEGIN
+            LPM ~data_to_vars~
+            SET searchPosition = position
+		    SET duration146 = duration
+		    SET timingMode146 = timingMode
+            PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+                INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+                    GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+                    PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+                        GET_OFFSET_ARRAY2 offsets headerOffset SPL_V10_HEAD_EFFECTS
+                        PHP_EACH offsets AS _ => offset BEGIN
+                            LPM ~read_effect_vars~
+                            PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~SPWI491~ AND timingMode146 == TIMING_delayed BEGIN
+                                PATCH_IF timingMode135 == TIMING_duration AND duration135 == duration146 BEGIN
+                                    LPF ~delete_opcode~
+                                        INT_VAR opcode = 146 match_position = searchPosition
+                                        RET $opcodes(~146~) = count
+                                        RET_ARRAY EVAL ~opcodes_146~ = opcodes_xx
+                                    END
+                                    // Bug où il reste toujours un item dans le tableau si c'était le dernier
+                                    // N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+                                    PATCH_IF $opcodes(~146~) == 0 BEGIN
+                                        CLEAR_ARRAY ~opcodes_146~
+                                    END
+                                END
+                                ELSE PATCH_IF timingMode135 == TIMING_permanent BEGIN
+                                    LPF ~delete_opcode~
+                                        INT_VAR opcode = 146 match_position = searchPosition
+                                        RET $opcodes(~146~) = count
+                                        RET_ARRAY EVAL ~opcodes_146~ = opcodes_xx
+                                    END
+                                    LPF ~delete_opcode~
+                                        INT_VAR opcode = 135 match_position = position135
+                                        RET $opcodes(~135~) = count
+                                        RET_ARRAY EVAL ~opcodes_135~ = opcodes_xx
+                                    END
+                                    // Bug où il reste toujours un item dans le tableau si c'était le dernier
+                                    // N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+                                    PATCH_IF $opcodes(~135~) == 0 BEGIN
+                                        CLEAR_ARRAY ~opcodes_135~
+                                    END
+                                    PATCH_IF $opcodes(~146~) == 0 BEGIN
+                                        CLEAR_ARRAY ~opcodes_146~
+                                    END
+
+                                    SET opcode = 135
+                                    SET duration = duration146
+                                    SET timingMode = TIMING_duration
+                                    SET position = position135
+                                    SET target = target135
+                                    SET probability = probability135
+                                    SET probability1 = probability1135
+                                    SET probability2 = probability2135
+                                    SET saveType = saveType135
+                                    SET saveBonus = saveBonus135
+                                    SET diceSides = diceSides135
+                                    SET diceCount = diceCount135
+                                    SET custom_int = custom_int135
+                                    SET position = position135
+                                    SET parameter1 = parameter1135
+                                    SET parameter2 = parameter2135
+                                    SPRINT resref ~%resref135%~
+
+                                    LPM ~add_opcode~
+                                END
+                            END
+                        END
+                    END
+                END
+            END
+        END
+
+	END
 END
 
 /* -------------------------- *
