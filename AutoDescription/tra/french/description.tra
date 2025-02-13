@@ -2194,23 +2194,23 @@
 
 // Opcode 67: Summon: Creature Summoning [67]
 
-@10670001 = ~Invoque une créature (%creatureName%)~
-@10670002 = ~Invoque une créature hostile (%creatureName%)~
-@10670003 = ~d'invoquer une créature (%creatureName%)~
-@10670004 = ~d'invoquer une créature hostile (%creatureName%)~
-@10670005 = ~Invoque une créature alliée (%creatureName%)~
-@10670006 = ~Invoque une créature neutre (%creatureName%)~
-@10670007 = ~d'invoquer une créature alliée (%creatureName%)~
-@10670008 = ~d'invoquer une créature neutre (%creatureName%)~
+@10670001 = ~Invoque 1 « %creatureName% »~
+@10670002 = ~Invoque 1 « %creatureName% » hostile~
+@10670003 = ~d'invoquer 1 « %creatureName% »~
+@10670004 = ~d'invoquer 1 « %creatureName% » hostile~
+@10670005 = ~Invoque 1 « %creatureName% » allié(e)~
+@10670006 = ~Invoque 1 « %creatureName% » neutre~
+@10670007 = ~d'invoquer 1 « %creatureName% » allié(e)~
+@10670008 = ~d'invoquer 1 « %creatureName% » neutre~
 
-@10670011 = ~Invoque %amount% créatures (%creatureName%)~
-@10670012 = ~Invoque %amount% créatures hostiles (%creatureName%)~
-@10670013 = ~d'invoquer %amount% créatures (%creatureName%)~
-@10670014 = ~d'invoquer %amount% créatures hostiles (%creatureName%)~
-@10670015 = ~Invoque %amount% créatures alliées (%creatureName%)~
-@10670016 = ~Invoque %amount% créatures neutres (%creatureName%)~
-@10670017 = ~d'invoquer %amount% créatures alliées (%creatureName%)~
-@10670018 = ~d'invoquer %amount% créatures neutres (%creatureName%)~
+@10670011 = ~Invoque %amount% « %creatureName% »~
+@10670012 = ~Invoque %amount% « %creatureName% » hostiles~
+@10670013 = ~d'invoquer %amount% « %creatureName% »~
+@10670014 = ~d'invoquer %amount% « %creatureName% » hostiles~
+@10670015 = ~Invoque %amount% « %creatureName% » alliées~
+@10670016 = ~Invoque %amount% « %creatureName% » neutres~
+@10670017 = ~d'invoquer %amount% « %creatureName% » alliées~
+@10670018 = ~d'invoquer %amount% « %creatureName% » neutres~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
