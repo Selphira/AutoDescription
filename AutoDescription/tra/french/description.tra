@@ -25,10 +25,13 @@
 @10010 = ~Passe à %value%~
 @10013 = ~%section% (%sectionType%)~
 @10014 = ~%diceCount%d%diceSides%~
-@10019 = ~[0-9]+ % de chances ~
 @10015 = ~Aucun~
 @10016 = ~Annule~
 @10017 = ~1/2~
+@10019 = ~[0-9]+ % de chances ~
+@10020 = ~ », « ~
+@10021 = ~ » %and% « ~
+
 @100001 = ~%name%%colon%%value%~
 @100002 = ~Poids~
 @100003 = ~PARAMÈTRES~

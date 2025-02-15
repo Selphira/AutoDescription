@@ -9945,7 +9945,9 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 		        END
 				SORT_ARRAY_INDICES spellList
 				SET opcode = 518
-				LPF ~implode~ STR_VAR array_name = ~spellList~ glue = ~ », « ~ final_glue = ~ » %and% « ~ RET custom_str = text END
+				SPRINT glue @10020 // ~ », « ~
+                SPRINT final_glue @10021 // ~ » %and% « ~
+				LPF ~implode~ STR_VAR array_name = ~spellList~ glue final_glue RET custom_str = text END
 				LPM ~add_opcode~
 			END
 		END
