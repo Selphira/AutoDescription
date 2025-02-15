@@ -2194,23 +2194,26 @@
 
 // Opcode 67: Summon: Creature Summoning [67]
 
-@10670001 = ~Invoque 1 « %creatureName% »~
-@10670002 = ~Invoque 1 « %creatureName% » hostile~
-@10670003 = ~d'invoquer 1 « %creatureName% »~
-@10670004 = ~d'invoquer 1 « %creatureName% » hostile~
-@10670005 = ~Invoque 1 « %creatureName% » allié(e)~
-@10670006 = ~Invoque 1 « %creatureName% » neutre~
-@10670007 = ~d'invoquer 1 « %creatureName% » allié(e)~
-@10670008 = ~d'invoquer 1 « %creatureName% » neutre~
+@10670001 = ~Invoque 1 « %creatureName% »%lifeDice%~
+@10670002 = ~Invoque 1 « %creatureName% » hostile%lifeDice%~
+@10670003 = ~d'invoquer 1 « %creatureName% »%lifeDice%~
+@10670004 = ~d'invoquer 1 « %creatureName% » hostile%lifeDice%~
+@10670005 = ~Invoque 1 « %creatureName% » allié(e)%lifeDice%~
+@10670006 = ~Invoque 1 « %creatureName% » neutre%lifeDice%~
+@10670007 = ~d'invoquer 1 « %creatureName% » allié(e)%lifeDice%~
+@10670008 = ~d'invoquer 1 « %creatureName% » neutre%lifeDice%~
 
-@10670011 = ~Invoque %amount% « %creatureName% »~
-@10670012 = ~Invoque %amount% « %creatureName% » hostiles~
-@10670013 = ~d'invoquer %amount% « %creatureName% »~
-@10670014 = ~d'invoquer %amount% « %creatureName% » hostiles~
-@10670015 = ~Invoque %amount% « %creatureName% » alliées~
-@10670016 = ~Invoque %amount% « %creatureName% » neutres~
-@10670017 = ~d'invoquer %amount% « %creatureName% » alliées~
-@10670018 = ~d'invoquer %amount% « %creatureName% » neutres~
+@10670011 = ~Invoque %amount% « %creatureName% »%lifeDice%~
+@10670012 = ~Invoque %amount% « %creatureName% » hostiles%lifeDice%~
+@10670013 = ~d'invoquer %amount% « %creatureName% »%lifeDice%~
+@10670014 = ~d'invoquer %amount% « %creatureName% » hostiles%lifeDice%~
+@10670015 = ~Invoque %amount% « %creatureName% » alliées%lifeDice%~
+@10670016 = ~Invoque %amount% « %creatureName% » neutres%lifeDice%~
+@10670017 = ~d'invoquer %amount% « %creatureName% » alliées%lifeDice%~
+@10670018 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~
+
+@10670020 = ~ de 1 dé de vie~
+@10670021 = ~ de %creatureLevel% dés de vie~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 

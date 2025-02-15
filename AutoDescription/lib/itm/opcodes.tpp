@@ -2899,6 +2899,9 @@ END
  * State: Unconsciousness [39] *
  * --------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
+
+// Adaptation opcode 39 https://www.baldursgateworld.fr/viewtopic.php?f=509&t=33168&p=519115#p519115
+
 	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
 		SPRINT description @10390001 // ~Endort %theTarget%~
 	END
@@ -3646,9 +3649,18 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LOCAL_SET strref = 0
 	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
-	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
+	LOCAL_SPRINT lifeDice ~~
+	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName creatureLevel = level allegiance END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+        PATCH_IF isSpell BEGIN
+            PATCH_IF creatureLevel == 1 BEGIN
+                SPRINT lifeDice @10670020 // ~ de 1 dé de vie~
+            END
+            ELSE BEGIN
+                SPRINT lifeDice @10670021 // ~ de %creatureLevel% dés de vie~
+            END
+        END
 		// Allégiance de la créature non modifiée, donc intéressant
 		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
 			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
@@ -3679,11 +3691,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	LOCAL_SET strref = 0
 	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
-	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
+	LOCAL_SPRINT lifeDice ~~
+	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName creatureLevel = level allegiance END
 
 	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+        PATCH_IF isSpell BEGIN
+            PATCH_IF creatureLevel == 1 BEGIN
+                SPRINT lifeDice @10670020 // ~ de 1 dé de vie~
+            END
+            ELSE BEGIN
+                SPRINT lifeDice @10670021 // ~ de %creatureLevel% dés de vie~
+            END
+        END
 		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
-			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
 				SET strref = 10670004 // ~d'invoquer une créature hostile (%creatureName%)~
 			END
@@ -15713,12 +15733,16 @@ DEFINE_PATCH_FUNCTION ~item_can_stack~ STR_VAR file = "" RET canStack BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName BEGIN
+DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName level allegiance BEGIN
 	SPRINT creatureName ~~
-	SPRINT itemFilename ~%SOURCE_FILE%~
+	SET level = 0
+	SET allegiance = 0
+	SPRINT itemFilename ~%SOURCE_FILE%~s
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
 		INNER_PATCH_FILE ~%file%.cre~ BEGIN
 			READ_LONG CRE_name spellNameRef
+			READ_BYTE CRE_level_first_class level
+			READ_BYTE CRE_allegiance allegiance
 			PATCH_IF spellNameRef > 0 BEGIN
 				READ_STRREF CRE_name creatureName
 			END
