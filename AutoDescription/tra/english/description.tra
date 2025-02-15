@@ -29,6 +29,9 @@
 @10016 = ~Neg.~
 @10017 = ~1/2~
 @10019 = ~[0-9]+% chance ~
+@10020 = ~, ~
+@10021 = ~ %and% ~
+
 @100001 = ~%name%%colon%%value%~
 @100002 = ~Weight~
 @100003 = ~STATISTICS~
@@ -69,6 +72,13 @@
 @101130 = ~between %amountMin% and %amountMax%~
 @101131 = ~Use~
 @101185 = ~%description% (not cumulative)~
+@103001 = ~Spells~
+@103002 = ~Breath~
+@103004 = ~Paralysis / Poison / Death~
+@103008 = ~Rods / Staves / Wands~
+@103016 = ~Petrification / Polymorph~
+@103100 = ~%saveType% (%savingThrow%)~
+@103101 = ~%saveType% at %value% (%savingThrow%)~
 
 // Niveau des sorts
 @101201 = ~1st~
@@ -95,6 +105,15 @@
 @101314 = ~druid~
 @101315 = ~priest/druid~
 
+@101320 = ~Special~
+@101321 = ~Wizard~
+@101322 = ~Priest/Druid~
+@101323 = ~Psionic~
+@101324 = ~Innate~
+@101325 = ~Song~
+@101326 = ~Priest~
+@101327 = ~Druid~
+
 // JS
 // FIXME: revoir l'ordre des strrefs, 101185 se trouve au milieu
 @101183 = ~save %saveTypeStr% half~
@@ -107,6 +126,10 @@
 @102124 = ~save %saveTypeStr% at %saveBonus% neg. and half if fail~
 // les dégâts sont réduits de moitié quelque soit le résultat du jet de sauvegarde
 @102125 = ~reduced by half~
+@102170 = ~ignore primary target~
+@102171 = ~ignore secondary target~
+@102172 = ~bypass mirror image~
+@102173 = ~ignore difficulty~
 
 @102003 = ~Proficiency Type~
 @102004 = ~Type~
@@ -135,8 +158,8 @@
 @102160 = ~%baseValue% + %value% on level %level%~
 @102161 = ~%value%/level~
 @102162 = ~%value%/%level% levels~
-@102163 = ~%value%/level/%levelMax%~
-@102164 = ~%value%/%level% levels/%levelMax%~
+@102163 = ~%value% per level/%levelMax%~
+@102164 = ~%value% per %level% levels/%levelMax%~
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
 
@@ -2159,23 +2182,26 @@
 
 // Opcode 67: Summon: Creature Summoning [67]
 
-@10670001 = ~Summon a creature (%creatureName%)~
-@10670002 = ~Summon hostile creature (%creatureName%)~
-@10670003 = ~to summon a creature (%creatureName%)~
-@10670004 = ~to summon a hostile creature (%creatureName%)~
-@10670005 = ~Summon allied creature (%creatureName%)~
-@10670006 = ~Summon neutral creature (%creatureName%)~
-@10670007 = ~to summon allied creature (%creatureName%)~
-@10670008 = ~To summon neutral creature (%creatureName%)~
+@10670001 = ~Summon a %creatureName%~
+@10670002 = ~Summon hostile %creatureName%~
+@10670003 = ~to summon a %creatureName%~
+@10670004 = ~to summon a hostile %creatureName%~
+@10670005 = ~Summon allied %creatureName%~
+@10670006 = ~Summon neutral %creatureName%~
+@10670007 = ~to summon allied %creatureName%~
+@10670008 = ~to summon neutral %creatureName%~
 
-@10670001 = ~Summon %amount% creatures (%creatureName%)~
-@10670002 = ~Summon %amount% hostiles creatures (%creatureName%)~
-@10670003 = ~to summon %amount% creatures (%creatureName%)~
-@10670004 = ~to summon %amount% hostiles creatures (%creatureName%)~
-@10670005 = ~Summon %amount% allied creatures (%creatureName%)~
-@10670006 = ~Summon %amount% neutral creatures (%creatureName%)~
-@10670007 = ~to summon %amount% allied creatures (%creatureName%)~
-@10670008 = ~To summon %amount% neutral creatures (%creatureName%)~
+@10670011 = ~Summon %amount% %creatureName%~
+@10670012 = ~Summon %amount% hostiles %creatureName%~
+@10670013 = ~to summon %amount% %creatureName%~
+@10670014 = ~to summon %amount% hostiles %creatureName%~
+@10670015 = ~Summon %amount% allied %creatureName%~
+@10670016 = ~Summon %amount% neutral %creatureName%~
+@10670017 = ~to summon %amount% allied %creatureName%~
+@10670018 = ~to summon %amount% neutral %creatureName%~
+
+@10670020 = ~~ // ~ de 1 dé de vie~
+@10670021 = ~~ // ~ de %creatureLevel% dés de vie~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
@@ -3006,18 +3032,18 @@
 
 // Opcode 201: Spell: Immunity (by Power Level, decrementing) [201]
 
-@12010001 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
-@12010002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
-@12010003 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
-@12010004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~
-@12010011 = ~Immunise jusqu'à %amount% niveaux de sorts~
-@12010012 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts~
-@12010013 = ~d'immuniser jusqu'à %amount% niveaux de sorts~
-@12010014 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts~
-@12010021 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
-@12010022 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
-@12010023 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
-@12010024 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~
+@12010001 = ~Immunize up to %amount% spell levels from those of %levelStr% level spells~
+@12010002 = ~Immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells~
+@12010003 = ~to immunize up to %amount% spell levels from those of %levelStr% level spells~
+@12010004 = ~to immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells~
+@12010011 = ~Immunize up to %amount% spell levels~
+@12010012 = ~Immunize %theTarget% up to %amount% spell levels~
+@12010013 = ~to immunize up to %amount% spell levels~
+@12010014 = ~to immunize %theTarget% up to %amount% spell levels~
+@12010021 = ~Immunize up to %amount% spell levels from those of %levelStr% level spells and below~
+@12010022 = ~Immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~
+@12010023 = ~d'immuniser up to %amount% spell levels from those of %levelStr% level spells and below~
+@12010024 = ~d'immuniser %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~
 
 // Opcode 202: Spell: Bounce (by School) [202]
 
@@ -3256,9 +3282,9 @@
 @12320306 = ~At nightfall, in every round~
 @12320307 = ~At daybreak, in every round~
 
-@12320400 = ~From level %minLevel%~
-@12320401 = ~Between level %minLevel% and %maxLevel%~
-@12320402 = ~At level %minLevel%~
+@12320400 = ~From level %minRequiredLevel%~
+@12320401 = ~Between level %minRequiredLevel% and %maxRequiredLevel%~
+@12320402 = ~At level %minRequiredLevel%~
 
 // Opcode 233: Stat: Proficiency Modifier [233]
 
