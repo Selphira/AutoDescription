@@ -1052,7 +1052,7 @@
 @400162 = ~à la dissipation de la paralysie~
 @400163 = ~à la modification de la vitesse de déplacement~
 @400164 = ~à la dissipation de l'ivresse~
-@400165 = ~aux combats mentaux~
+@400165 = ~aux figements~
 @400166 = ~à la modification de la résistance à la magie~
 @400167 = ~à la modification du TAC0 des armes de jet~
 @400168 = ~au bannissement des créatures invoquées~
@@ -1157,7 +1157,7 @@
 @400267 = ~~ // Opcode textuel
 @400268 = ~à la capacité d'exploration~
 @400269 = ~~ // Opcode visuel
-@400270 = ~à la dissipation des combats mentaux~
+@400270 = ~à la dissipation des figements~
 @400271 = ~~ // Opcode visuel
 @400272 = ~aux effets activant des sorts à intervalle régulier~
 @400273 = ~~ // Non pertinent
@@ -1190,7 +1190,7 @@
 @400300 = ~à la modification de la collision des personnages~
 @400301 = ~à la modification de la probabilité de porter un coup critique~
 @400302 = ~à la capacité Utilisation des objets~
-@400303 = ~au changement de la prise en compte du multiplicateur d'attaque sournoise~ // -_-"
+@400303 = ~au changement de la prise en compte d'attaque sournoise à chaque attaque~ // -_-"
 @400304 = ~~ // Non pertinent
 @400305 = ~à la modification du TAC0 de l'arme secondaire~
 @400306 = ~à la modification du TAC0 de l'arme principale~
@@ -1240,7 +1240,7 @@
 
 
 /* ------------------------------------- *
- * Opcode renvoi/dissipation *
+ * Opcode renvoi [198]/dissipation [337] *
  * ------------------------------------- */
 
 @401000 = ~les effets modifiant la classe d'armure~
@@ -1306,7 +1306,7 @@
 @401060 = ~les effets altérant l'échec d'incantation des sorts~
 @401061 = ~~ // Opcode visuel
 @401062 = ~les effets permettant la mémorisation de sorts divins et druidiques supplémentaires~
-@401063 = ~à l'infravision~
+@401063 = ~l'infravision~
 @401064 = ~les effets dissipant l'infravision~
 @401065 = ~~ // Opcode visuel
 @401066 = ~~ // Opcode visuel
@@ -1408,7 +1408,7 @@
 @401162 = ~les effets dissipant la paralysie~
 @401163 = ~les effets modifiant la vitesse de déplacement~
 @401164 = ~les effets dissipant l'ivresse~
-@401165 = ~les effets provoquant des combats mentaux~
+@401165 = ~les effets provoquant des figements~
 @401166 = ~les effets modifiant la résistance à la magie~
 @401167 = ~les effets modifiant le TAC0 des armes de jet~
 @401168 = ~les effets bannissant les créatures invoquées~
@@ -1513,7 +1513,7 @@
 @401267 = ~~ // Opcode textuel
 @401268 = ~les effets provoquant la capacité d'exploration~
 @401269 = ~~ // Opcode visuel
-@401270 = ~les effets dissipant les combats mentaux~
+@401270 = ~les effets dissipant les figements~
 @401271 = ~~ // Opcode visuel
 @401272 = ~les effets activant les sorts à intervalle régulier~
 @401273 = ~~ // Non pertinent
@@ -1546,7 +1546,7 @@
 @401300 = ~les effets modifiant la collision des personnages~
 @401301 = ~les effets modifiant la probabilité de porter un coup critique~
 @401302 = ~les effets de la capacité Utilisation des objets~
-@401303 = ~les effets activant la prise en compte du multiplicateur d'attaque sournoise~
+@401303 = ~les effets activant l'attaque sournoise à chaque attaque~
 @401304 = ~~ // Non pertinent
 @401305 = ~les effets modifiant le TAC0 de l'arme secondaire~
 @401306 = ~les effets modifiant le TAC0 de l'arme principale~
@@ -1599,8 +1599,13 @@
 /* -------------- *
  * State *
  * ------------- */
-// Complète la phrase : Lorsque %theTarget% est...
-// ou @13240639 = ~d'être effectif contre les créatures ...~
+// Complète les phrases :
+// @12320025 = ~Lorsque %theTarget% est %state%~
+// @13240139 = ~Effectif contre les créatures %descriptionState%~
+// @13240639 = ~d'être effectif contre les créatures %descriptionState%~
+// @13241138 = ~créatures %descriptionState%~
+// @13260138 = ~Si %theTarget% est %descriptionState%~
+// @13260139 = ~Si %theTarget% n'est pas %descriptionState%~
 // FIXME: problème d'accord potentiel selon le genre de la target
 
 @410000 = ~sous aucun effet~// libre de tout effet
@@ -1626,7 +1631,7 @@
 @410020 = ~sous l'effet de la maladie~
 @410021 = ~sous l'effet de la débilité mentale~
 @410022 = ~sous l'effet de « Non-détection »~
-@410023 = ~sous l'effet d'« Invisibilité améliorée »~
+@410023 = ~sous l'effet d'« Invisibilité majeure »~
 @410024 = ~sous l'effet de Bénédiction~
 @410025 = ~sous l'effet d'un cantique allié~
 @410026 = ~sous l'effet de « Puissance sacrée »~
@@ -1654,10 +1659,10 @@
 @420005 = ~« Bouclier de feu (rouge) »~
 @420006 = ~« Bouclier de feu (bleu) »~
 @420008 = ~« Protection contre la mort »~
-@420009 = ~« Puissance sacrée »~
+@420009 = ~« Sainte puissance »~
 @420021 = ~« Sphère résistante d'Otiluke »~
 @420024 = ~« Peau d'écorce »~
-@420031 = ~« Bouclier tempête »~
+@420031 = ~« Bouclier des tempêtes »~
 @420036 = ~un sommeil profond~
 @420038 = ~la surdité~
 @420040 = ~une protection contre les attaques sournoises~
@@ -1701,7 +1706,7 @@
 @420095 = ~« Forme spirituelle »~
 @420096 = ~« Élu des esprits »~
 @420097 = ~Arme critique~ // TODO?, sort sans nom : Coup critique +10% // une augmentation de 10 % du nombre de coups critiques // Chance de coup critique : +10 %
-@420098 = ~une potion de blocage de la magie~
+@420098 = ~une potion de blocage de magie~
 @420099 = ~une potion de clarté~
 @420100 = ~un parchemin de protection contre la magie~
 @420101 = ~un parchemin de protection contre les morts-vivants~
@@ -1956,11 +1961,11 @@
 // Opcode 20: State: Invisibility [20]
 
 @10200001 = ~Invisibilité~
-@10200002 = ~Invisibilité améliorée~
+@10200002 = ~Invisibilité majeure~
 @10200003 = ~de lancer « Invisibilité » sur %theTarget%~
-@10200004 = ~de lancer « Invisibilité améliorée » sur %theTarget%~
+@10200004 = ~de lancer « Invisibilité majeure » sur %theTarget%~
 @10200005 = ~Lance « Invisibilité » sur %theTarget%~
-@10200006 = ~Lance « Invisibilité améliorée » sur %theTarget%~
+@10200006 = ~Lance « Invisibilité majeure » sur %theTarget%~
 
 // Opcode 21: Stat: Lore Modifier [21]
 
@@ -2078,13 +2083,13 @@
 @10420002 = ~Permet de mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
 @10420003 = ~Suppression d'un sort profane de %levelStr% niveau~
 @10420004 = ~Suppression de %amount% sorts profanes de %levelStr% niveau~
-@10420005 = ~Double le nombre de sorts profanes mémorisables de %levelStr% niveau~
+@10420005 = ~Double la quantité de sorts profanes mémorisables de %levelStr% niveau~
 
 @10420011 = ~de pouvoir mémoriser un sort profane supplémentaire de %levelStr% niveau~
 @10420012 = ~de pouvoir mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
 @10420013 = ~de supprimer un sort profane de %levelStr% niveau~
 @10420014 = ~de supprimer %amount% sorts profanes de %levelStr% niveau~
-@10420015 = ~de doubler le nombre de sorts profanes mémorisables de %levelStr% niveau~
+@10420015 = ~de doubler la quantité de sorts profanes mémorisables de %levelStr% niveau~
 
 // Opcode 43: Cure: Stone to Flesh [43]
 
@@ -2174,13 +2179,13 @@
 @10620002 = ~Permet de mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
 @10620003 = ~Suppression d'un sort %spellType% de %levelStr% niveau~
 @10620004 = ~Suppression de %amount% sorts %spellType% de %levelStr% niveau~
-@10620005 = ~Double le nombre de sorts %spellType% mémorisables de %levelStr% niveau~
+@10620005 = ~Double la quantité de sorts %spellType% mémorisables de %levelStr% niveau~
 
 @10620011 = ~de pouvoir mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~
 @10620012 = ~de pouvoir mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
 @10620013 = ~de supprimer un sort %spellType% de %levelStr% niveau~
 @10620014 = ~de supprimer %amount% sorts %spellType% de %levelStr% niveau~
-@10620015 = ~de doubler le nombre de sorts %spellType% mémorisables de %levelStr% niveau~
+@10620015 = ~de doubler la quantité de sorts %spellType% mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
 
@@ -2621,7 +2626,7 @@
 @11240001 = ~Téléporte %theTarget%~
 @11240002 = ~Téléporte %theTarget% auprès de sa cible~
 @11240003 = ~Téléporte %theTarget% dans un endroit sûr~
-@11240004 = ~Permute %ofTheTarget% avec sa cible~
+@11240004 = ~Permute %theTarget% avec sa cible~
 @11240005 = ~Téléporte %theTarget% auprès du porteur~
 @11240006 = ~Permute %theTarget% avec le porteur~
 
@@ -2903,11 +2908,10 @@
 @11640003 = ~de dissiper l'état d'ébriété %ofTheTarget%~
 
 // Opcode 165: Pause Target [165]
-// TODO: trouver mieux
-@11650001 = ~Combat mental~
-@11650002 = ~Combat mental %ofTheTarget%~
-@11650003 = ~d'entrer dans un combat mental~
-@11650004 = ~de faire entrer %theTarget% dans un combat mental~
+@11650001 = ~Fige %theTarget%~
+@11650002 = ~Fige %theTarget%~
+@11650003 = ~de figer %theTarget%~
+@11650004 = ~de figer %theTarget%~
 
 // Opcode 166: Stat: Magic Resistance Modifier [166]
 
@@ -3434,11 +3438,11 @@
 @12610001 = ~Se remémore 1 sort %spellType% de niveau %spellLevel% ou inférieur~
 @12610002 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
 @12610003 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~
-@12610004 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
+@12610004 = ~de remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~
 @12610005 = ~Se remémore 1 sort %spellType% de niveau %spellLevel%~
 @12610006 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 @12610007 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~
-@12610008 = ~de remettre en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
+@12610008 = ~de remémorer 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~
 
 @12610010 = ~profane~ // ~%spellType%~
 @12610011 = ~divin~
@@ -3475,10 +3479,8 @@
 @12680001 = ~Permet %toTheTarget% d'explorer la carte~
 
 // Opcode 270: Cure: Unpause Target [270]
-
-// TODO: trouver mieux
-@12700001 = ~Libère %theTarget% de ses combats mentaux~
-@12700002 = ~de libérer %theTarget% de ses combats mentaux~
+@12700001 = ~Défige %theTarget%~
+@12700002 = ~de défiger %theTarget%~
 
 // Opcode 272: Spell: Apply Repeating EFF [272]
 
@@ -3613,8 +3615,8 @@
 // Opcode 300: NPC Bump [300]
 
 @13000001 = ~Permet %toTheTarget% de bousculer les créatures sur son passage~
-@13000002 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé~ // TODO: Trouver une autre tournure, la cible doit être accordée...
-@13000003 = ~Permet %toTheTarget% de ne plus pouvoir être bousculé et de bousculer les créatures sur son passage~
+@13000002 = ~Permet %toTheTarget% d'être inébranlable~ // TODO: Trouver une autre tournure, la cible doit être accordée...
+@13000003 = ~Permet %toTheTarget% d'être inébranlable et de bousculer les créatures sur son passage~
 
 // Opcode 301: Stat: Critical Hit Modifier [301]
 
@@ -3832,14 +3834,14 @@
 @13240131 = ~Inefficace contre les créatures possédant une sagesse inférieure à %value%~
 @13240132 = ~Inefficace contre les créatures possédant un charisme supérieur ou égal à %value%~
 @13240133 = ~Inefficace contre les créatures possédant un charisme inférieur à %value%~
-@13240134 = ~Inefficace si le nombre de créatures invoquées est supérieur ou égal à %value%~
-@13240135 = ~Inefficace si le nombre de créatures invoquées est inférieur à %value%~
+@13240134 = ~Inefficace si la quantité de créatures invoquées est supérieur ou égal à %value%~
+@13240135 = ~Inefficace si la quantité de créatures invoquées est inférieur à %value%~
 @13240136 = ~Inefficace si le chapitre en cours est supérieur ou égal au %value%~
 @13240137 = ~Inefficace si le chapitre en cours est inférieur à %value%~
 @13240138 = ~Inefficace contre les créatures %descriptionState%~
 @13240139 = ~Effectif contre les créatures %descriptionState%~
 @13240140 = ~Inefficace contre les créatures sous l'effet d'une invisibilité~
-@13240141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
+@13240141 = ~Inefficace contre les créatures sous l'effet d'une invisibilité majeure~
 @13240142 = ~Inefficace contre les créatures invisibles~
 @13240143 = ~Effectif contre les créatures invisibles~
 @13240144 = ~Inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
@@ -3956,14 +3958,14 @@
 @13240631 = ~d'être inefficace contre les créatures possédant une sagesse inférieure à %value%~
 @13240632 = ~d'être inefficace contre les créatures possédant un charisme supérieur ou égal à %value%~
 @13240633 = ~d'être inefficace contre les créatures possédant un charisme inférieur à %value%~
-@13240634 = ~d'être inefficace si le nombre de créatures invoquées est supérieur ou égal à %value%~
-@13240635 = ~d'être inefficace si le nombre de créatures invoquées est inférieur à %value%~
+@13240634 = ~d'être inefficace si la quantité de créatures invoquées est supérieur ou égal à %value%~
+@13240635 = ~d'être inefficace si la quantité de créatures invoquées est inférieur à %value%~
 @13240636 = ~d'être inefficace si le chapitre en cours est supérieur ou égal au %value%~
 @13240637 = ~d'être inefficace si le chapitre en cours est inférieur à %value%~
 @13240638 = ~d'être inefficace contre les créatures %descriptionState%~
 @13240639 = ~d'être effectif contre les créatures %descriptionState%~
 @13240640 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité~
-@13240641 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité améliorée~
+@13240641 = ~d'être inefficace contre les créatures sous l'effet d'une invisibilité majeure~
 @13240642 = ~d'être inefficace contre les créatures invisibles~
 @13240643 = ~d'être effectif contre les créatures invisibles~
 @13240644 = ~d'être inefficace contre les créatures dont les points de vie sont supérieurs ou égaux à %value%~
@@ -4028,13 +4030,13 @@
 @13241131 = ~créatures possédant une sagesse inférieure à %value%~
 @13241132 = ~créatures possédant un charisme supérieur ou égal à %value%~
 @13241133 = ~créatures possédant un charisme inférieur à %value%~
-@13241134 = ~si le nombre de créatures invoquées est supérieur ou égal à %value%~
-@13241135 = ~si le nombre de créatures invoquées est inférieur à %value%~
+@13241134 = ~si la quantité de créatures invoquées est supérieur ou égal à %value%~
+@13241135 = ~si la quantité de créatures invoquées est inférieur à %value%~
 @13241136 = ~si le chapitre en cours est supérieur ou égal au %value%~
 @13241137 = ~si le chapitre en cours est inférieur à %value%~
 @13241138 = ~créatures %descriptionState%~
 @13241140 = ~créatures sous l'effet d'une invisibilité~
-@13241141 = ~créatures sous l'effet d'une invisibilité améliorée~
+@13241141 = ~créatures sous l'effet d'une invisibilité majeure~
 @13241142 = ~créatures invisibles~
 @13241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~
 @13241145 = ~créatures dont les points de vie sont inférieurs à %value%~
@@ -4154,14 +4156,14 @@
 @13260131 = ~Si la sagesse %ofTheTarget% est inférieure à %value%~
 @13260132 = ~Si le charisme %ofTheTarget% est supérieur ou égal à %value%~
 @13260133 = ~Si le charisme %ofTheTarget% est inférieur à %value%~
-@13260134 = ~Si le nombre de créatures invoquées est supérieur ou égal à %value%~
-@13260135 = ~Si le nombre de créatures invoquées est inférieur à %value%~
+@13260134 = ~Si la quantité de créatures invoquées est supérieur ou égal à %value%~
+@13260135 = ~Si la quantité de créatures invoquées est inférieur à %value%~
 @13260136 = ~Si le chapitre en cours est supérieur ou égal au %value%~
 @13260137 = ~Si le chapitre en cours est inférieur à %value%~
 @13260138 = ~Si %theTarget% est %descriptionState%~
 @13260139 = ~Si %theTarget% n'est pas %descriptionState%~
 @13260140 = ~Si %theTarget% est sous l'effet d'une invisibilité~
-@13260141 = ~Si %theTarget% est sous l'effet d'une invisibilité améliorée~
+@13260141 = ~Si %theTarget% est sous l'effet d'une invisibilité majeure~
 @13260142 = ~Si %theTarget% est invisible~
 @13260143 = ~Si %theTarget% est visible~
 @13260144 = ~Si les points de vie %ofTheTarget% sont supérieurs ou égaux à %value%~
@@ -4363,8 +4365,8 @@
 @15100004 = ~Remet en mémoire 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~
 @15100005 = ~de se remémorer 1 sort %spellType% de chaque niveau~
 @15100006 = ~de se remémorer 1 sort %spellType% de %spellLevel% niveau~
-@15100007 = ~de remettre en mémoire 1 sort %spellType% de chaque niveau %toTheTarget%~
-@15100008 = ~de remettre en mémoire 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~
+@15100007 = ~de remémorer 1 sort %spellType% de chaque niveau %toTheTarget%~
+@15100008 = ~de remémorer 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~
 
 // Fake Opcode 511: Dissipe toutes les illusions
 
