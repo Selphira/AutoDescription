@@ -168,6 +168,7 @@
 @600171 = ~hit points~
 @600172 = ~point of damage~
 @600173 = ~points of damage~
+@600180 = ~hit points~
 
 @102677 = ~one-time use~
 @102678 = ~illimited use~
@@ -1925,6 +1926,8 @@
 @10170002 = ~Inflicts %value% %toTheTarget%~
 @10170003 = ~to heal %value% %toTheTarget%~
 @10170004 = ~to inflict %value% %toTheTarget%~
+@10170011 = ~Heals %value% %ofTheTarget%~
+@10170013 = ~to heal %value% %ofTheTarget%~
 
 @10170021 = ~Current hit points~
 @10170022 = ~the current hit points~

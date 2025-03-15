@@ -168,6 +168,7 @@
 @600171 = ~points de vie~
 @600172 = ~point de dégât~
 @600173 = ~points de dégâts~
+@600180 = ~des points de vie~
 
 @102677 = ~usage unique~
 @102678 = ~usage illimité~
@@ -1941,6 +1942,8 @@
 @10170002 = ~Inflige %value% %toTheTarget%~
 @10170003 = ~de restaurer %value% %toTheTarget%~
 @10170004 = ~d'infliger %value% %toTheTarget%~
+@10170011 = ~Restaure %value% %ofTheTarget%~
+@10170013 = ~de restaurer %value% %ofTheTarget%~
 
 @10170021 = ~Points de vie actuels~
 @10170022 = ~les points de vie actuels~
