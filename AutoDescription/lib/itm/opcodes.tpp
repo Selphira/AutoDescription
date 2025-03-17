@@ -13755,11 +13755,13 @@ BEGIN
 				END
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective(~%statType%~) BEGIN
-                SPRINT opcode_324_list $opcode_324_not_effective(~%statType%~)
-				WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
-					LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
-					LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-	                SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
+                PATCH_IF statType != 43 BEGIN //43  => ~12320200~ // ~le porteur~
+                    SPRINT opcode_324_list $opcode_324_not_effective(~%statType%~)
+                    WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
+                        LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+                        LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+                        SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
+                    END
 				END
             END
             ELSE PATCH_IF VARIABLE_IS_SET $opcode_324_not_effective_between(~%statType%~) BEGIN
