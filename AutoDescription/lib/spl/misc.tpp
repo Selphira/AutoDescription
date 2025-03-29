@@ -180,8 +180,9 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuration is_special BEGIN
+DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuration is_special has_duration BEGIN
 	SET base_duration = ~-1~
+	SET has_duration = 1
 	SET isValid = 1
 	SET is_special = 0
 	SET count_levels = 0
@@ -269,6 +270,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 			SPRINT duration @100033 // ~Spéciale~
 		END
 		PATCH_IF is_permanent BEGIN
+		    SET has_duration = 0
 			//FIXME: Gestion du permanent ! Dépend des opcodes utilisés par le sort...
 			//SPRINT duration @100037 // ~Permanente~
 			SPRINT duration @100038 // ~Instantanée~
@@ -1105,6 +1107,64 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 
 	LPF ~appendValue~ INT_VAR strref = 100036 STR_VAR value = ~%savingThrow%~ RET description END // ~Jet de sauvegarde~
 END
+
+
+/*
+	0 ⟶ Natural/Nonmagical
+    1 ⟶ Can be dispelled/Affected by resistance
+    2 ⟶ Cannot be dispelled/Ignores resistance
+    3 ⟶ Can be dispelled/Ignores resistance
+*/
+DEFINE_PATCH_FUNCTION ~spell_resistance~ RET description BEGIN
+	SET count = 0
+	SET isSpecial = 0
+	SET baseIsDispellable = 0 - 1
+	SET baseIgnoreResistance = 0 - 1
+
+	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
+		PATCH_IF isSpecial == 0 BEGIN
+			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+				PATCH_IF opcode >= 0 BEGIN
+				    LPM ~data_to_vars~
+				    PATCH_IF( NOT (opcode == 318 OR opcode == 321 OR opcode == 324) AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+                        SET isDispellable = (resistance == 1 OR resistance == 3) ? 1 : 0
+                        SET ignoreResistance = (resistance == 2 OR resistance == 3) ? 1 : 0
+
+                        PATCH_IF baseIsDispellable == 0 - 1 BEGIN
+                            SET baseIsDispellable = isDispellable
+                        END
+                        PATCH_IF baseIgnoreResistance == 0 - 1 BEGIN
+                            SET baseIgnoreResistance = ignoreResistance
+                        END
+                        PATCH_IF baseIsDispellable != isDispellable OR baseIgnoreResistance != ignoreResistance BEGIN
+                            SET isSpecial = 1
+                        END
+				    END
+				END
+		    END
+		END
+    END
+
+	PATCH_IF isSpecial == 0 BEGIN
+		PATCH_IF baseIsDispellable == 1 AND hasDuration == 1 BEGIN
+		    SPRINT isDispellable @100041 // ~Affecté~
+		END
+		ELSE BEGIN
+		    SPRINT isDispellable @100042 // ~Non-affecté~
+		END
+
+		PATCH_IF baseIgnoreResistance == 0 BEGIN
+		    SPRINT ignoreResistance @100041 // ~Affecté~
+		END
+		ELSE BEGIN
+		    SPRINT ignoreResistance @100042 // ~Non-affecté~
+		END
+
+	    LPF ~appendValue~ INT_VAR strref = 100039 STR_VAR value = ~%isDispellable%~ RET description END // ~Dissipation~
+	    LPF ~appendValue~ INT_VAR strref = 100040 STR_VAR value = ~%ignoreResistance%~ RET description END // ~Résistance à la magie~
+	END
+END
+
 
 DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_valid BEGIN
 	SPRINT complex_value ~~

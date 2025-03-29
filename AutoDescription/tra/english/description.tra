@@ -53,6 +53,10 @@
 @100036 = ~Saving Throw~
 @100037 = ~Permanent~
 @100038 = ~Instant~
+@100039 = ~Dissipation~
+@100040 = ~Magic resistance~
+@100041 = ~Affected~
+@100042 = ~Unaffected~
 @101074 = ~Single and multiclassed %classname%~
 @101079 = ~Bow~
 @101080 = ~Crossbow~
@@ -2504,17 +2508,17 @@
 
 // Opcode 106: Stat: Morale Break Modifier [106]
 
-@11060001 = ~Le moral %ofTheTarget% reste au plus haut~
-@11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
-@11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
+@11060001 = ~Morale %ofTheTarget% remains high~
+@11060002 = ~Morale %ofTheTarget% is strengthened by %value%~
+@11060003 = ~Morale %ofTheTarget% is weakened by %value%~
 @11060004 = ~Immunity to panic~
-@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %parameter1%~
+@11060005 = ~Morale breakpoint %ofTheTarget% changes to %parameter1%~
 
-@11060006 = ~de garder le moral %ofTheTarget% au plus haut~
-@11060007 = ~de renforcer le moral %ofTheTarget% de %value%~
-@11060008 = ~d'affaiblir le moral %ofTheTarget% de %value%~
-@11060009 = ~d'immuniser %theTarget% contre la rupture de moral~
-@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %parameter1%~
+@11060006 = ~to keep morale %ofTheTarget% high~
+@11060007 = ~to boost morale %ofTheTarget% by %value%~
+@11060008 = ~decrease morale %ofTheTarget% by %value%~
+@11060009 = ~to immunize %theTarget% against morale breakdown~
+@11060010 = ~to increase morale breakpoint %ofTheTarget% to %parameter1%~
 
 // Opcode 108: Stat: Reputation [108]
 

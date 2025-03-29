@@ -53,6 +53,10 @@
 @100036 = ~Jet de sauvegarde~
 @100037 = ~Permanente~
 @100038 = ~Instantanée~
+@100039 = ~Dissipation~
+@100040 = ~Résistance à la magie~
+@100041 = ~Affecté~
+@100042 = ~Non-affecté~
 @101074 = ~%classname% monoclassé et multiclassé~
 @101079 = ~Arc~
 @101080 = ~Arbalète~
@@ -1045,7 +1049,7 @@
 @400154 = ~à l'enchevêtrement~
 @400155 = ~~ // Opcode visuel
 @400156 = ~~ // Opcode visuel
-@400157 = ~aux toiles~
+@400157 = ~à l'empêtrement~
 @400158 = ~~ // Opcode visuel
 @400159 = ~à la modification du nombre d'image-miroir~
 @400160 = ~à la dissipation de Sanctuaire~
@@ -1401,7 +1405,7 @@
 @401154 = ~les effets provoquant l'enchevêtrement~
 @401155 = ~~ // Opcode visuel
 @401156 = ~~ // Opcode visuel
-@401157 = ~les effets de toiles~
+@401157 = ~les effets d'empêtrement~
 @401158 = ~~ // Opcode visuel
 @401159 = ~les effets modifiant la quantité d'image-miroir~
 @401160 = ~les effets dissipant Sanctuaire~
@@ -2867,8 +2871,8 @@
 
 // Opcode 157: State: Web Effect [157]
 
-@11570001 = ~Entoile %theTarget%~
-@11570002 = ~d'entoiler %theTarget%~
+@11570001 = ~Empêtre %theTarget%~
+@11570002 = ~d'empêtrer %theTarget%~
 
 // Opcode 159: Spell Effect: Mirror Image (Exact Number) [159]
 
