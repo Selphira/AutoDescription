@@ -185,6 +185,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 	SET has_duration = 1
 	SET isValid = 1
 	SET is_special = 0
+	SET is_instant = ~-1~
 	SET count_levels = 0
 	SPRINT strDuration ~~
 
@@ -200,8 +201,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
 				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
-				        /*
-	                    PATCH_IF opcode == 146 BEGIN
+	                    PATCH_IF opcode == 146 OR opcode == 232 BEGIN
 							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 									//lire les opcodes de l'item et les ajouter dans les opcodes actuels
@@ -215,23 +215,42 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 								END
 							END
 	                    END
-	                    */
 
 	                    PATCH_IF timingMode == TIMING_duration_ticks BEGIN
 	                        SET duration = duration / 15
 	                    END
 	                    ELSE PATCH_IF timingMode == TIMING_delayed BEGIN
 	                        SET duration = 0
+	                        PATCH_IF VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) OR VARIABLE_IS_SET $opcodes_cant_be_permanent(~%opcode%~) BEGIN
+	                            PATCH_IF is_instant == 0 - 1 BEGIN
+	                                SET is_instant = 1
+	                            END
+	                        END
+	                        ELSE PATCH_IF is_instant == 1 BEGIN
+	                            SET is_instant = 0
+	                        END
 	                    END
 						ELSE PATCH_IF timingMode == 5000 OR timingMode == 5001 BEGIN
 							SET duration = duration MODULO 10000
 						END
 	                    ELSE PATCH_IF timingMode != TIMING_duration AND timingMode != TIMING_duration_ticks AND timingMode != TIMING_delayed_duration BEGIN
 	                        SET duration = 0
+	                        PATCH_IF VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) OR VARIABLE_IS_SET $opcodes_cant_be_permanent(~%opcode%~) BEGIN
+	                            PATCH_IF is_instant == 0 - 1 BEGIN
+	                                SET is_instant = 1
+	                            END
+	                        END
+	                        ELSE PATCH_IF is_instant == 1 BEGIN
+	                            SET is_instant = 0
+	                        END
 	                    END
 
 	                    PATCH_IF opcode == 217 BEGIN
 	                        SET duration = 30
+	                    END
+
+	                    PATCH_IF opcode == 213 BEGIN
+	                        SET is_special = 1
 	                    END
 
 	                    PATCH_IF duration > 0 BEGIN
@@ -253,7 +272,10 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 		END
 	END
 
-	PATCH_IF isValid == 1 BEGIN
+    PATCH_IF is_special == 1 BEGIN
+        SPRINT duration @100033 // ~Spéciale~
+    END
+	ELSE PATCH_IF isValid == 1 BEGIN
 		LPF ~get_complex_duration~
 			STR_VAR
 				array_name = ~all_durations~
@@ -271,9 +293,13 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 		END
 		PATCH_IF is_permanent BEGIN
 		    SET has_duration = 0
-			//FIXME: Gestion du permanent ! Dépend des opcodes utilisés par le sort...
-			//SPRINT duration @100037 // ~Permanente~
-			SPRINT duration @100038 // ~Instantanée~
+
+		    PATCH_IF is_instant == 1 BEGIN
+			    SPRINT duration @100038 // ~Instantanée~
+		    END
+		    ELSE BEGIN
+			    SPRINT duration @100037 // ~Permanente~
+		    END
 		END
 	END
 	ELSE BEGIN
