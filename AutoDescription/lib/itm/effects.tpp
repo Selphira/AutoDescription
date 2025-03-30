@@ -308,8 +308,9 @@ DEFINE_PATCH_FUNCTION ~get_damage_value~ INT_VAR diceCount = 0 diceSides = 0 dam
 END
 
 
-DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value BEGIN
+DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value strDuration BEGIN
 	SPRINT value ~~
+	SPRINT strDuration ~~
 	// FIXME, il peut avoir certaines subtilités entre un vrai timing 1 et un timing X
 	// Il faudrait considérer un nouveau timing dont l'effet à mi-chemin entre le 1 et le 9
 	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration AND timingMode != 5000 AND timingMode != 5001 BEGIN

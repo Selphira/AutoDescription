@@ -1653,10 +1653,11 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	// Hack pour forcer l'affichage de la durée de l'augmentation des points de vie maximum
 	PATCH_IF upMaxHp BEGIN
 		SET timingMode = TIMING_duration
-		LPF ~get_duration_value~ INT_VAR duration RET duration = value END
+		LPF ~get_duration_value~ INT_VAR duration RET duration = value strDuration END
 
 		PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description ~%description% %duration%~
+		    SPRINT duration @100317 //~Tout point de vie au-delà du maximum disparaît après %strDuration%~
+			SPRINT description ~%description%. %duration%~
 			SET ignoreDuration = 1
 			PATCH_IF isNotCumulative BEGIN
 				LPM ~opcode_not_cumulative~

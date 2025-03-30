@@ -380,6 +380,7 @@
 @100314 = ~après %strDuration% et pendant %strDuration%~
 @100315 = ~%frequency% pendant %strDuration%~
 @100316 = ~%frequency% pendant %strDuration% après %afterStrDuration%~
+@100317 = ~Tout point de vie au-delà du maximum disparaît après %strDuration%~
 
 @100320 = ~par %strDuration%~
 @100321 = ~toutes les %strDuration%~
