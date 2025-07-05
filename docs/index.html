@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Liste des différences dans les descriptions des objets et sortilèges"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="content-language" content="fr-fr">
+    <meta name="keywords" content="Baldur's Gate, Mod">
+    <meta name="robots" content="index,nofollow">
+    <title>AutoDescription: Liste des différences</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rpg-awesome/css/rpg-awesome.min.css">
+</head>
+<body>
+<header>
+    <h1>AutoDescription: Liste des différences</h1>
+    <div class="filter_items">
+        <div id="game-icons" class="game-icon-list">
+            <button data-key="bgee" title="Baldur's Gate: Enhanced Edition" class="game-icon"><img src="static/img/ie_games_bgee.avif" alt="Baldur's Gate: Enhanced Edition" height="66" /></button>
+            <button data-key="bgeesod" title="Baldur's Gate: Siege of Dragonspear" class="game-icon"><img src="static/img/ie_games_sod.avif" alt="Baldur's Gate: Siege of Dragonspear" height="66" /></button>
+            <button data-key="tob" title="Baldur's Gate 2" class="game-icon"><img src="static/img/ie_games_bg2.avif" alt="Baldur's Gate 2" height="66" /></button>
+            <button data-key="bg2ee" title="Baldur's Gate 2: Enhanced Edition" class="game-icon active"><img src="static/img/ie_games_bg2ee.avif" alt="Baldur's Gate 2: Enhanced Edition" height="66" /></button>
+            <button data-key="eet" title="Baldur's Gate 2: Enhanced Edition Trilogy" class="game-icon"><img src="static/img/ie_games_eet.png" alt="Baldur's Gate 2: Enhanced Edition Trilogy" height="66" /></button>
+        </div>
+        <div>
+            <label for="mod">Mod</label>
+            <div id="mod" class="custom-select">
+                <div class="selected" aria-disabled="true">Chargement…</div>
+                <div class="options"></div>
+            </div>
+        </div>
+        <div>
+            <label for="language">Langue</label>
+            <div id="language" class="custom-select">
+                <div class="selected"><img src="static/img/flags/fr-32.png" class="flag"/> Français</div>
+                <div class="options">
+                    <div class="option active" data-value="french"><img src="static/img/flags/fr-32.png" class="flag"/> Français</div>
+                    <div class="option" data-value="english"><img src="static/img/flags/uk-32.png" class="flag"/> English</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label for="type">Type</label>
+            <div id="type" class="custom-select">
+                <div class="selected"><i class="ra ra-sword"></i>Objets</div>
+                <div class="options">
+                    <div class="option active" data-value="items"><i class="ra ra-sword"></i>Objets</div>
+                    <div class="option" data-value="spells"><i class="ra ra-scroll-unfurled"></i>Sortilèges</div>
+                </div>
+            </div>
+        </div>
+        <div id="object-filters" class="filter_items">
+            <div>
+                <label for="filter-item-type">Catégorie</label>
+                <div id="filter-item-type" class="custom-select" data-callback="onFilterTypeChange">
+                    <div class="selected">Tous</div>
+                    <div class="options">
+                        <div class="option active" data-value="">Toutes</div>
+                        <div class="option-group">Armes</div>
+                        <div class="option" data-value="27"><i class="ra ra-crossbow"></i>Arbalètes</div>
+                        <div class="option" data-value="15"><i class="ra ra-archer"></i>Arcs</div>
+                        <div class="option" data-value="28"><i class="ra ra-hand"></i>Armes de poings</div>
+                        <div class="option" data-value="35"><i class="ra ra-fairy-wand"></i>Baguettes</div>
+                        <div class="option" data-value="26"><i class="ra ra-crystal-wand"></i>Bâtons</div>
+                        <div class="option" data-value="16"><i class="ra ra-plain-dagger"></i>Dagues</div>
+                        <div class="option" data-value="19"><i class="ra ra-sword"></i>Épées courtes</div>
+                        <div class="option" data-value="20"><i class="ra ra-relic-blade"></i>Épées longues</div>
+                        <div class="option" data-value="22"><i class="ra ra-spiked-mace"></i>Étoiles du matin</div>
+                        <div class="option" data-value="23"><i class="ra ra-spiked-mace"></i>Fléaux</div>
+                        <div class="option" data-value="18"><i class="ra ra-musket"></i>Frondes</div>
+                        <div class="option" data-value="25"><i class="ra ra-axe"></i>Haches</div>
+                        <div class="option" data-value="30"><i class="ra ra-halberd"></i>Hallebardes</div>
+                        <div class="option" data-value="29"><i class="ra ra-spear-head"></i>Lances</div>
+                        <div class="option" data-value="21"><i class="ra ra-large-hammer"></i>Marteaux</div>
+                        <div class="option" data-value="17"><i class="ra ra-spiked-mace"></i>Masses</div>
+                        <div class="option-group">Protections</div>
+                        <div class="option" data-value="1"><i class="ra ra-gem-pendant"></i>Amulettes</div>
+                        <div class="option" data-value="10"><i class="ra ra-fire-ring"></i>Anneaux</div>
+                        <div class="option" data-value="2"><i class="ra ra-vest"></i>Armures</div>
+                        <div class="option" data-value="4"><i class="ra ra-boot-stomp"></i>Bottes</div>
+                        <div class="option" data-value="12"><i class="ra ra-shield"></i>Boucliers</div>
+                        <div class="option" data-value="6"><i class="ra ra-crown"></i>Bracelets</div>
+                        <div class="option" data-value="32"><i class="ra ra-kettlebell"></i>Capes</div>
+                        <div class="option" data-value="7"><i class="ra ra-helmet"></i>Casques</div>
+                        <div class="option" data-value="3"><i class="ra ra-crown-of-thorns"></i>Ceintures</div>
+                        <div class="option-group">Munitions</div>
+                        <div class="option" data-value="14"><i class="ra ra-ball"></i>Billes</div>
+                        <div class="option" data-value="31"><i class="ra ra-arrow-flights"></i>Carreaux</div>
+                        <div class="option" data-value="5"><i class="ra ra-arrow-cluster"></i>Flèches</div>
+                        <div class="option" data-value="24"><i class="ra ra-arrow-flights"></i>Fléchettes</div>
+                        <div class="option-group">Autres</div>
+                        <div class="option" data-value="8"><i class="ra ra-key"></i>Clés</div>
+                        <div class="option" data-value="34"><i class="ra ra-diamond"></i>Gemmes</div>
+                        <div class="option" data-value="0"><i class="ra ra-book"></i>Livres</div>
+                        <div class="option" data-value="13"><i class="ra ra-meat"></i>Nourritures</div>
+                        <div class="option" data-value="11"><i class="ra ra-scroll-unfurled"></i>Parchemins</div>
+                        <div class="option" data-value="9"><i class="ra ra-potion"></i>Potions</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="filter-item-enchant">Enchantement</label>
+                <div id="filter-item-enchant" class="custom-select" data-callback="onFilterTypeChange">
+                    <div class="selected">Tous</div>
+                    <div class="options">
+                        <div class="option active" data-value="">Tous</div>
+                        <div class="option" data-value="0">0</div>
+                        <div class="option" data-value="1">+1</div>
+                        <div class="option" data-value="2">+2</div>
+                        <div class="option" data-value="3">+3</div>
+                        <div class="option" data-value="4">+4</div>
+                        <div class="option" data-value="5">+5</div>
+                        <div class="option" data-value="6">+6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="spell-filters" class="filter_items hidden">
+            <div>
+                <label for="filter-spell-school">École</label>
+                <div id="filter-spell-school" class="custom-select" data-callback="onFilterTypeChange">
+                    <div class="selected">Toutes</div>
+                    <div class="options">
+                        <div class="option active" data-value="">Toutes</div>
+                        <div class="option" data-value="1"><i class="ra ra-fire-shield"></i>Abjuration</div>
+                        <div class="option" data-value="2"><i class="ra ra-wolf-head"></i>Conjuration</div>
+                        <div class="option" data-value="3"><i class="ra ra-bleeding-eye"></i>Divination</div>
+                        <div class="option" data-value="4"><i class="ra ra-aware"></i>Enchantement</div>
+                        <div class="option" data-value="10"><i class="ra ra-uncertainty"></i>Entropie</div>
+                        <div class="option" data-value="6"><i class="ra ra-burning-meteor"></i>Évocation</div>
+                        <div class="option" data-value="9"><i class="ra ra-fairy-wand"></i>Généraliste</div>
+                        <div class="option" data-value="5"><i class="ra ra-eyeball"></i>Illusion</div>
+                        <div class="option" data-value="7"><i class="ra ra-bone-bite"></i>Nécromancie</div>
+                        <div class="option" data-value="8"><i class="ra ra-doubled"></i>Altération</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="filter-spell-level">Niveau</label>
+                <div id="filter-spell-level" class="custom-select" data-callback="onFilterTypeChange">
+                    <div class="selected">Tous</div>
+                    <div class="options">
+                        <div class="option active" data-value="">Tous</div>
+                        <div class="option" data-value="0">0</div>
+                        <div class="option" data-value="1">1</div>
+                        <div class="option" data-value="2">2</div>
+                        <div class="option" data-value="3">3</div>
+                        <div class="option" data-value="4">4</div>
+                        <div class="option" data-value="5">5</div>
+                        <div class="option" data-value="6">6</div>
+                        <div class="option" data-value="7">7</div>
+                        <div class="option" data-value="8">8</div>
+                        <div class="option" data-value="9">9</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="filters">
+        <span id="entry-count" class="entry-count"><span>0</span> élément</span>
+        <input type="text" id="search" placeholder="Recherche...">
+        <button id="toggle-diffs" title="Afficher les différences"><i class="ra ra-scroll-unfurled"></i></button>
+    </div>
+</header>
+
+<main id="descriptions"></main>
+<div id="loading" class="loading hidden">Chargement des données…</div>
+
+<script src="https://unpkg.com/diff-match-patch@1.0.5/index.js"></script>
+<script src="static/js/app.js"></script>
+</body>
+</html>

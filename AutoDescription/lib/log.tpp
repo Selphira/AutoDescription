@@ -79,3 +79,46 @@ BEGIN
 		COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END
 END
+
+DEFINE_ACTION_FUNCTION ~write_js~
+BEGIN
+	<<<<<<<< .../AutoDescription/inlined/javascript.log
+window.loadedData = window.loadedData || {};
+>>>>>>>>
+	COPY ~.../AutoDescription/inlined/javascript.log~ ~docs/data/%log_filename%.js~
+    SILENT
+    APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = [~ KEEP_CRLF
+	ACTION_PHP_EACH ~allDescriptions~ AS line => _ BEGIN
+        OUTER_PATCH_SAVE line_2 ~%line_2%~ BEGIN
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
+        END
+        OUTER_PATCH_SAVE line_3 ~%line_3%~ BEGIN
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
+        END
+        APPEND_OUTER ~docs/data/%log_filename%.js~ ~{"id":"%line_0%","name":"%line_1%","type":%line_4%,"level":%line_5%,"original":"%line_2%","modded":"%line_3%"},~ KEEP_CRLF
+    END
+    APPEND_OUTER ~docs/data/%log_filename%.js~ ~{}];~ KEEP_CRLF
+    APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = window.loadedData["%log_filename%"].filter(entry => Object.keys(entry).length > 0);~ KEEP_CRLF
+    VERBOSE
+
+	<<<<<<<< .../AutoDescription/inlined/javascript.log
+window.loadedMods = [...new Set([
+>>>>>>>>
+	COPY ~.../AutoDescription/inlined/javascript.log~ ~docs/data/mods.js~
+    COPY GLOB ~docs/data~ ~override~
+        SPRINT filename "%SOURCE_RES%"
+
+        PATCH_IF (~%filename%~ STRING_MATCHES_REGEXP ~^[^-]+-[^-]+-\(.+\)-[^-]+$~ = 0) BEGIN
+	        INNER_PATCH ~%SOURCE_RES%~ BEGIN
+                REPLACE_EVALUATE ~^[^-]+-[^-]+-\(.+\)-[^-]+$~ BEGIN
+                    INNER_ACTION BEGIN
+                        APPEND_OUTER ~docs/data/mods.js~ ~"%MATCH1%",~ KEEP_CRLF
+                    END
+                END ~~
+            END
+        END
+	BUT_ONLY_IF_IT_CHANGES
+    APPEND_OUTER ~docs/data/mods.js~ ~"all"])];~ KEEP_CRLF
+END

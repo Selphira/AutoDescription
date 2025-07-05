@@ -1,8 +1,10 @@
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
+    ACTION_DEFINE_ARRAY allDescriptions BEGIN END
 	OUTER_SET totalItems = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 		LPM ~update_item_description~
 	BUT_ONLY_IF_IT_CHANGES
+	LAF ~write_js~ END
 END
 
 DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
@@ -11,7 +13,7 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 		PATCH_PRINT "%totalItems% items processed"
 	END
 	PATCH_TRY
-		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful RET_ARRAY allDescriptions END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -25,10 +27,13 @@ DEFINE_PATCH_FUNCTION ~update_item_description~
 		totalIgnoredNotMoveable
 		totalIgnoredType
 		totalSuccessful
+	RET_ARRAY
+	    allDescriptions
 BEGIN
 	PATCH_SILENT
 
 	READ_SHORT  ITM_type            itemType
+	READ_SHORT  ITM_enchantment     enchantment
 	READ_STRREF ITM_identified_desc originalDescription
 	READ_LONG   ITM_identified_desc originalDescriptionRef
 	READ_STRREF ITM_unidentified_desc originalUnidentifiedDescription
@@ -45,14 +50,12 @@ BEGIN
 		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
 
 		PATCH_IF ~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0 BEGIN
-			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription = ~%originalUnidentifiedDescription%~ RET description END
+			SPRINT originalDescription ~%originalUnidentifiedDescription%~
+			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
 			// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
 			PATCH_IF alter_item_files BEGIN
 				SAY UNIDENTIFIED_DESC ~%description%~
 			END
-			// Ecrire dans le fichier de comparaison
-			LPM ~get_item_name~
-			LPF ~add_compare_row~ STR_VAR itemName originalDescription = ~%originalUnidentifiedDescription%~ description END
 		END
 		ELSE BEGIN
 			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
@@ -60,11 +63,10 @@ BEGIN
 			PATCH_IF alter_item_files BEGIN
 				SAY DESC ~%description%~
 			END
-			// Ecrire dans le fichier de comparaison
-			LPM ~get_item_name~
-			LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
 		END
-
+        LPM ~get_item_name~
+		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
+        SET $allDescriptions(~%SOURCE_RES%~ ~%itemName%~ ~%originalDescription%~ ~%description%~ ~%itemType%~ ~%enchantment%~) = 1
 		SET totalSuccessful += 1
 	END
 END

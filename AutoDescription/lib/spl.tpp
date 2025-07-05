@@ -1,8 +1,10 @@
 DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
+    ACTION_DEFINE_ARRAY allDescriptions BEGIN END
 	OUTER_SET totalSpells = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
 		LPM ~update_spell_description~
 	BUT_ONLY_IF_IT_CHANGES
+	LAF ~write_js~ END
 END
 
 DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
@@ -11,7 +13,7 @@ DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
 		PATCH_PRINT "%totalSpells% spells processed"
 	END
 	PATCH_TRY
-		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful END
+		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful RET_ARRAY allDescriptions END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -24,11 +26,15 @@ DEFINE_PATCH_FUNCTION ~update_spell_description~
 		totalIgnoredWithoutDescription
 		totalInvalid
 		totalSuccessful
+	RET_ARRAY
+	    allDescriptions
 BEGIN
 	PATCH_SILENT
 
 	READ_STRREF SPL_unidentified_name spellName
 	READ_LONG   SPL_unidentified_name spellNameRef
+	READ_LONG   SPL_level spellLevel
+	READ_BYTE   SPL_school spellSchool
 	READ_STRREF SPL_unidentified_description originalDescription
 	READ_LONG   SPL_unidentified_description originalDescriptionRef
 
@@ -48,9 +54,8 @@ BEGIN
 			SAY SPL_unidentified_description ~%description%~
 		END
 
-		// Ecrire dans le fichier de comparaison
 		LPF ~add_compare_row~ STR_VAR itemName = ~%spellName%~ originalDescription description END
-
+        SET $allDescriptions(~%SOURCE_RES%~ ~%spellName%~ ~%originalDescription%~ ~%description%~ ~%spellSchool%~ ~%spellLevel%~) = 1
 		SET totalSuccessful += 1
 	END
 END

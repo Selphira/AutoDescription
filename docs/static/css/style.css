@@ -1,0 +1,366 @@
+:root {
+    --color-background: #655949;
+    --color-hover: #ff6600;
+    --color-modder: #adff2f;
+    --background-primary: url(../img/fond_descr_forum.jpg);
+    --color-primary: Goldenrod;
+    --background-secondary: url(../img/fond_entete_forum.avif);
+    --color-secondary: #96846e;
+    --color-secondary-contrast: #ffffd6;
+    --font-size-large: 16px;
+    --font-size-medium: 14px;
+    --font-size-small: 12px;
+    --color-translator: #e3aff6;
+}
+
+body {
+    background: #000000 url('../img/bg_lcc2.avif');
+    color: var(--color-secondary-contrast);
+    font-family: Verdana, Geneva, Lucida, "Lucida Grande", Arial, Helvetica, sans-serif;
+    margin-top: 0;
+    min-width: 1130px;
+    padding-inline: 70px;
+}
+
+header {
+    background: var(--background-primary);
+    border-color: var(--color-secondary);
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 8px 8px 15px black;
+    position: sticky;
+    top: 0;
+}
+
+header h1 {
+    background: var(--background-secondary) repeat-x;
+    border-block: dotted 2px var(--color-secondary);
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 170%;
+    margin-top: 20px;
+    padding: 0;
+    text-align: center;
+    text-indent: 30px;
+}
+
+header h1::first-letter {
+    background-color: transparent;
+    color: var(--color-primary);
+}
+
+header .filter_items label {
+    color: var(--color-secondary);
+    font-weight: bold;
+}
+
+header .filter_items label {
+    display: block;
+}
+
+header .filter_items {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: var(--font-size-large);
+    gap: 4px;
+    list-style-type: none;
+}
+
+header > .filter_items {
+    margin-bottom: 1em;
+    padding: 0 1em;
+}
+
+mark {
+    padding: 0.1em;
+    border-radius: 2px;
+}
+
+.game-icon-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.game-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    filter: grayscale(1);
+    padding: 0;
+    transition: filter 0.3s ease;
+}
+
+.game-icon.active {
+    filter: none;
+}
+
+.game-icon img {
+    object-fit: contain;
+}
+
+.filters {
+    align-items: center;
+    background: var(--background-secondary);
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    border-top: 1px solid var(--color-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
+    padding: 1em;
+}
+
+.filters input,
+.filter_items input {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-secondary);
+    border-radius: 5px;
+    color: var(--color-secondary-contrast);
+    font-weight: bold;
+    margin: 8px 0;
+    outline: none;
+    padding: 0.25em 0.5em;
+}
+
+.filters input {
+    background: var(--background-primary);
+    height: 35px;
+    width: 60%;
+}
+
+.filters input:disabled {
+    background-color: var(--color-background);
+    border-color: var(--color-secondary);
+    color: var(--color-secondary-contrast);
+    opacity: 0.5;
+}
+
+.filter_items.hidden {
+    display: none;
+}
+
+#toggle-diffs.active {
+    font-weight: bold;
+}
+
+#toggle-diffs {
+    align-items: center;
+    background: var(--background-primary);
+    border: 1px solid var(--color-secondary);
+    border-radius: 5px;
+    color: #757575;
+    cursor: pointer;
+    display: flex;
+    margin: 8px 0;
+    padding: 1em;
+}
+
+#toggle-diffs.active {
+    color: var(--color-primary);
+}
+
+#toggle-diffs:disabled {
+    opacity: 0.5;
+}
+
+main#descriptions {
+    background: var(--background-primary);
+    border-color: var(--color-secondary);
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 8px 8px 15px black;
+    margin: 1em auto;
+    padding-bottom: 1em;
+}
+
+.entry {
+    border-bottom: 1px solid var(--color-secondary);
+    padding: 1em;
+}
+
+.entry h2 {
+    color: var(--color-primary);
+    font-size: 1.2em;
+    margin-top: 0;
+}
+
+.entry h2 span {
+    color: var(--color-secondary-contrast);
+    float: right;
+    font-size: .75em;
+    font-weight: normal;
+}
+
+.entry pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.comparison {
+    display: flex;
+    gap: 1em;
+}
+
+.comparison .diff {
+    flex: 1;
+    white-space: pre-wrap;
+}
+
+.diff {
+    background: rgba(255, 255, 0, 0.5);
+    border-radius: 2px;
+    padding: 0.1em;
+}
+
+.diff.added {
+    background-color: rgba(144, 238, 144, 0.5);
+}
+
+.diff.removed {
+    background-color: rgba(255, 99, 71, 0.5);
+}
+
+.custom-select {
+    display: inline-block;
+    font-size: var(--font-size-medium);
+    margin: 8px 0;
+    min-width: 120px;
+    position: relative;
+    user-select: none;
+}
+
+.custom-select.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.custom-select.disabled .selected::after {
+    filter: grayscale(100%);
+}
+
+.custom-select .selected {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-secondary);
+    border-radius: 5px;
+    color: var(--color-secondary-contrast);
+    cursor: pointer;
+    font-weight: bold;
+    padding: 3px 6px;
+    padding-right: 1.5em;
+}
+
+.custom-select .selected::after {
+    content: "▾";
+    font-size: 0.75em;
+    pointer-events: none;
+    position: absolute;
+    right: 0.5em;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.custom-select .options {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-secondary);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    left: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 110%;
+    transform: scaleY(0.95);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    visibility: hidden;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.custom-select .options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-select .options::-webkit-scrollbar-thumb {
+    background-color: var(--color-secondary);
+    border-radius: 4px;
+}
+
+.custom-select .options.open {
+    max-height: 350px;
+    opacity: 1;
+    transform: scaleY(1);
+    visibility: visible;
+}
+
+.custom-select .option {
+    cursor: pointer;
+    padding: 0.4em 0.8em;
+}
+
+.custom-select .selected,
+.custom-select .option {
+    align-items: center;
+    display: flex;
+    gap: 0.5em;
+}
+
+.custom-select .option:hover {
+    color: var(--color-primary);
+}
+
+.custom-select .option.active {
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.custom-select .option-group {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-contrast);
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 0.4em 0.6em;
+    pointer-events: none;
+    user-select: none;
+}
+
+.custom-select .flag {
+    width: 15px;
+}
+
+.entry-count > span {
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+.loading {
+    background: var(--color-background);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    color: var(--color-secondary-contrast);
+    font-weight: bold;
+    left: 50%;
+    padding: 0.5em 1em;
+    position: fixed;
+    top: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+#mod {
+    max-width: 100px;
+}
+
+#type {
+    min-width: 130px;
+}

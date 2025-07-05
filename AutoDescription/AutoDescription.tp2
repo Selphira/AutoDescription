@@ -78,6 +78,7 @@ LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFi
 SILENT
 LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~%directory%~ RET log_filename END
 LAM ~init_item_statistics~
+ACTION_DEFINE_ARRAY allDescriptions BEGIN END
 OUTER_SET totalItems = 0
 ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
@@ -86,6 +87,7 @@ ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
+LAF ~write_js~ END
 LAM ~show_item_statistics~
 
 BEGIN @25 DESIGNATED 25
@@ -104,6 +106,7 @@ LAF getSpellsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY splFi
 SILENT
 LAF ~init_log_file~ STR_VAR type = ~spells~ mod = ~%directory%~ RET log_filename END
 LAM ~init_spell_statistics~
+ACTION_DEFINE_ARRAY allDescriptions BEGIN END
 OUTER_SET totalSpells = 0
 ACTION_PHP_EACH splFiles AS splFile => value BEGIN
 	ACTION_IF FILE_EXISTS_IN_GAME ~%splFile%~ BEGIN
@@ -112,4 +115,5 @@ ACTION_PHP_EACH splFiles AS splFile => value BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
+LAF ~write_js~ END
 LAM ~show_spell_statistics~
