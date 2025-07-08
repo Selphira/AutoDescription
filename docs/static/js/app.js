@@ -3,6 +3,7 @@ let currentType = 'items';
 let currentGame = 'bg2ee';
 let currentMod = 'all';
 let currentData = '';
+let filteredData = [];
 let filterItemType = "";
 let filterItemEnchant = "";
 let filterSpellLevel = "";
@@ -11,11 +12,83 @@ let data = [];
 let showDiffs = false;
 
 const gameIcons = document.getElementById('game-icons');
-const langSelect = document.getElementById('language');
 const searchInput = document.getElementById('search');
 const modInput = document.getElementById('mod');
 const descriptions = document.getElementById('descriptions');
 const toggleDiffsButton = document.getElementById('toggle-diffs');
+const filterSetup = {
+    language: value => {
+        currentLang = value;
+        showLoading(true);
+        setTimeout(() => loadData(), 0);
+    },
+    'filter-item-type': value => {
+        filterItemType = value;
+        render();
+    },
+    'filter-item-enchant': value => {
+        filterItemEnchant = value;
+        render();
+    },
+    'filter-spell-level': value => {
+        filterSpellLevel = value;
+        render();
+    },
+    'filter-spell-school': value => {
+        filterSpellSchool = value;
+        render();
+    },
+    type: value => {
+        currentType = value;
+        ['filter-item-type', 'filter-item-enchant', 'filter-spell-school', 'filter-spell-level'].forEach(resetCustomSelect);
+        filterItemType = filterItemEnchant = filterSpellLevel = filterSpellSchool = "";
+        document.getElementById('object-filters').classList.toggle('hidden', currentType !== 'items');
+        document.getElementById('spell-filters').classList.toggle('hidden', currentType !== 'spells');
+        loadData();
+    }
+};
+
+function processVisibleEntries() {
+    const query = searchInput.value.toLowerCase();
+    const viewportHeight = window.innerHeight;
+
+    document.querySelectorAll('.entry').forEach(entryEl => {
+        const rect = entryEl.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > viewportHeight) return;
+
+        const id = entryEl.dataset.id;
+        const entry = filteredData.find(e => e.id === id);
+
+        if (!entry) return;
+
+        const originalEl = entryEl.querySelector('.original pre');
+        const moddedEl = entryEl.querySelector('.modded pre');
+
+        entryEl.querySelector('h2').innerHTML = `${highlightQuery(entry.name, query)}<span>${entry.id}</span>`;
+
+        if (entryEl.dataset.diffed === "true") {
+            if (entryEl.dataset.highlighted !== query) {
+                originalEl.innerHTML = highlightQuery(entry.original, query);
+                moddedEl.innerHTML = highlightQuery(entry.modded, query);
+                entryEl.dataset.highlighted = query;
+            }
+            return;
+        }
+
+        if (!showDiffs) {
+            originalEl.innerHTML = highlightQuery(entry.original, query);
+            moddedEl.innerHTML = highlightQuery(entry.modded, query);
+            entryEl.dataset.highlighted = query;
+            return;
+        }
+
+        const [originalHTML, moddedHTML] = diffWords(entry.original, entry.modded);
+        originalEl.innerHTML = highlightQuery(originalHTML, query);
+        moddedEl.innerHTML = highlightQuery(moddedHTML, query);
+        entryEl.dataset.diffed = "true";
+        entryEl.dataset.highlighted = query;
+    });
+}
 
 function setupCustomSelect(containerId, callback) {
     const container = document.getElementById(containerId);
@@ -78,39 +151,6 @@ function resetCustomSelect(containerId) {
     }
 }
 
-const filterSetup = {
-    language: value => {
-        currentLang = value;
-        loadData();
-    },
-    'filter-item-type': value => {
-        filterItemType = value;
-        render();
-    },
-    'filter-item-enchant': value => {
-        filterItemEnchant = value;
-        render();
-    },
-    'filter-spell-level': value => {
-        filterSpellLevel = value;
-        render();
-    },
-    'filter-spell-school': value => {
-        filterSpellSchool = value;
-        render();
-    },
-    type: value => {
-        currentType = value;
-        ['filter-item-type', 'filter-item-enchant', 'filter-spell-school', 'filter-spell-level'].forEach(resetCustomSelect);
-        filterItemType = filterItemEnchant = filterSpellLevel = filterSpellSchool = "";
-        document.getElementById('object-filters').classList.toggle('hidden', currentType !== 'items');
-        document.getElementById('spell-filters').classList.toggle('hidden', currentType !== 'spells');
-        loadData();
-    }
-};
-
-Object.entries(filterSetup).forEach(([id, callback]) => setupCustomSelect(id, callback));
-
 function setFiltersEnabled(enabled) {
     [searchInput, toggleDiffsButton].forEach(input => input.disabled = !enabled);
     document.querySelectorAll('#filter-item-type, #filter-item-enchant, #filter-spell-school, #filter-spell-level')
@@ -133,9 +173,8 @@ function loadData() {
         setFiltersEnabled(true);
         return;
     }
-
-    data = [];
     showLoading(true);
+    data = [];
 
     if (!window.loadedData || !window.loadedData[key]) {
         const script = document.createElement('script');
@@ -144,6 +183,7 @@ function loadData() {
             data = window.loadedData[key] || [];
             setFiltersEnabled(true);
             render();
+            showLoading(false);
         };
         script.onerror = () => {
             descriptions.innerHTML = `<p style="padding:1em; color: red;">Fichier non trouvé : ${scriptPath}</p>`;
@@ -151,13 +191,13 @@ function loadData() {
             showLoading(false);
         };
         document.head.appendChild(script);
-        currentData = key;
     } else {
         data = window.loadedData[key];
         setFiltersEnabled(true);
         render();
-        currentData = key;
+        showLoading(false);
     }
+    currentData = key;
 }
 
 function showLoading(show) {
@@ -184,85 +224,105 @@ function highlightQuery(text, query) {
     return text.replace(regex, '<mark>$1</mark>');
 }
 
-function render() {
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            const query = searchInput.value.toLowerCase();
-            const filtered = data.filter(entry => {
-                if (query
-                    && !entry.name.toLowerCase().includes(query)
-                    && !entry.original.toLowerCase().includes(query)
-                    && !entry.modded.toLowerCase().includes(query)
-                ) return false;
+function render(resetScroll = true) {
+    const query = searchInput.value.toLowerCase();
+    if (resetScroll) {
+        descriptions.innerHTML = '';
+        requestAnimationFrame(() => window.scrollTo({top: 0}));
+    }
 
-                if (currentType === 'items') {
-                    if (filterItemType && String(entry.type) !== filterItemType) return false;
-                    if (filterItemEnchant && String(entry.level) !== filterItemEnchant) return false;
-                } else if (currentType === 'spells') {
-                    if (filterSpellSchool && String(entry.type) !== filterSpellSchool) return false;
-                    if (filterSpellLevel && String(entry.level) !== filterSpellLevel) return false;
-                }
+    filteredData = data.filter(entry => {
+        if (query &&
+            !entry.name.toLowerCase().includes(query) &&
+            !entry.original.toLowerCase().includes(query) &&
+            !entry.modded.toLowerCase().includes(query)
+        ) return false;
 
-                return true;
-            });
-
-            document.getElementById('entry-count').innerHTML = `<span>${filtered.length}</span> ${filtered.length === 1 ? 'élément' : 'éléments'}`;
-
-            descriptions.innerHTML = '';
-            filtered.forEach(entry => {
-                const div = document.createElement('div');
-                div.className = 'entry';
-                div.dataset.type = entry.type || '';
-                div.dataset.level = entry.level || '';
-                div.innerHTML = `
-            <h2>${highlightQuery(entry.name, query)}<span>${entry.id}</span></h2>
-            <div class="comparison">
-                <div class="original"><pre>${highlightQuery(entry.original, query)}</pre></div>
-                <div class="modded"><pre>${highlightQuery(entry.modded, query)}</pre></div>
-            </div>
-        `;
-                descriptions.appendChild(div);
-            });
-
-            observeVisibleEntries();
-            showLoading(false);
-        }, 10); // léger délai pour forcer l'affichage
-    });
-}
-
-function observeVisibleEntries() {
-    if (!showDiffs) return;
-    const observer = new IntersectionObserver(entries => {
-        for (let entry of entries) {
-            if (entry.isIntersecting && !entry.target.dataset.diffed) {
-                const el = entry.target;
-                const original = el.querySelector('.original pre');
-                const modded = el.querySelector('.modded pre');
-                const query = searchInput.value.toLowerCase();
-                const [originalHTML, moddedHTML] = diffWords(original.textContent, modded.textContent);
-                original.innerHTML = highlightQuery(originalHTML, query);
-                modded.innerHTML = highlightQuery(moddedHTML, query);
-                el.dataset.diffed = "true";
-            }
+        if (currentType === 'items') {
+            if (filterItemType && String(entry.type) !== filterItemType) return false;
+            if (filterItemEnchant && String(entry.level) !== filterItemEnchant) return false;
+        } else if (currentType === 'spells') {
+            if (filterSpellSchool && String(entry.type) !== filterSpellSchool) return false;
+            if (filterSpellLevel && String(entry.level) !== filterSpellLevel) return false;
         }
-    }, {threshold: 0.1});
 
-    document.querySelectorAll('.entry').forEach(entry => observer.observe(entry));
+        return true;
+    });
+
+    // Mise à jour DOM sans tout régénérer
+    const existingEntries = new Set();
+    filteredData.forEach(entry => {
+        let entryEl = document.querySelector(`.entry[data-id="${entry.id}"]`);
+        if (!entryEl) {
+            entryEl = document.createElement('div');
+            entryEl.className = 'entry';
+            entryEl.dataset.id = entry.id;
+            entryEl.dataset.type = entry.type || '';
+            entryEl.dataset.level = entry.level || '';
+            entryEl.innerHTML = `
+                <h2>${entry.name}<span>${entry.id}</span></h2>
+                <div class="comparison">
+                    <div class="original"><pre>${entry.original}</pre></div>
+                    <div class="modded"><pre>${entry.modded}</pre></div>
+                </div>
+            `;
+            descriptions.appendChild(entryEl);
+        }
+        entryEl.style.display = '';
+        existingEntries.add(entry.id);
+    });
+
+    document.querySelectorAll('.entry:not([style*="display: none"])').forEach(entryEl => {
+        if (!existingEntries.has(entryEl.dataset.id)) {
+            entryEl.style.display = 'none';
+        }
+    });
+
+    updateEntryCount();
+
+    if (!showDiffs) {
+        document.querySelectorAll('.entry[data-diffed]').forEach(entryEl => {
+            const entry = filteredData.find(e => e.id === entryEl.dataset.id);
+            if (!entry) return;
+
+            entryEl.querySelector('.original pre').textContent = entry.original;
+            entryEl.querySelector('.modded pre').textContent = entry.modded;
+            delete entryEl.dataset.diffed;
+            delete entryEl.dataset.highlighted;
+        });
+    }
+
+    if (searchInput.value || showDiffs) processVisibleEntries();
 }
 
-langSelect.addEventListener('change', () => {
-    currentLang = langSelect.value;
-    currentGame = '';
-    loadData();
+function updateEntryCount() {
+    const el = document.getElementById('entry-count');
+    if (el) {
+        el.innerHTML = `<span>${filteredData.length}</span> ${filteredData.length === 1 ? 'élément' : 'éléments'}`;
+    }
+}
+
+function debounce(fn, delay = 200) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+window.addEventListener('scroll', () => {
+    if (searchInput.value || showDiffs) processVisibleEntries();
 });
+
+Object.entries(filterSetup).forEach(([id, callback]) => setupCustomSelect(id, callback));
 
 toggleDiffsButton.addEventListener('click', () => {
     showDiffs = !showDiffs;
     toggleDiffsButton.classList.toggle('active', showDiffs);
-    render();
+    render(false);
 });
 
-searchInput.addEventListener('input', render);
+searchInput.addEventListener('input', debounce(render, 200));
 
 document.addEventListener('DOMContentLoaded', () => {
     const modScript = document.createElement('script');

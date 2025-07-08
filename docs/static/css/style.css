@@ -31,6 +31,7 @@ header {
     box-shadow: 8px 8px 15px black;
     position: sticky;
     top: 0;
+    z-index: 50;
 }
 
 header h1 {
@@ -203,6 +204,11 @@ main#descriptions {
 .comparison {
     display: flex;
     gap: 1em;
+}
+
+.comparison > div {
+    flex: 1 1 50%;
+    min-width: 0;
 }
 
 .comparison .diff {
