@@ -44,7 +44,8 @@ const filterSetup = {
         filterItemType = filterItemEnchant = filterSpellLevel = filterSpellSchool = "";
         document.getElementById('object-filters').classList.toggle('hidden', currentType !== 'items');
         document.getElementById('spell-filters').classList.toggle('hidden', currentType !== 'spells');
-        loadData();
+        showLoading(true);
+        setTimeout(() => loadData(), 0);
     }
 };
 
@@ -171,6 +172,7 @@ function loadData() {
 
     if (currentData == key) {
         setFiltersEnabled(true);
+        showLoading(false);
         return;
     }
     showLoading(true);
@@ -330,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modScript.onload = () => {
         const optionsContainer = modInput.querySelector('.options');
         const selected = modInput.querySelector('.selected');
+        const defaultMod = window.loadedMods[0] || 'all';
 
         optionsContainer.innerHTML = '';
         window.loadedMods.forEach(mod => {
@@ -337,15 +340,18 @@ document.addEventListener('DOMContentLoaded', () => {
             div.className = 'option';
             div.dataset.value = mod;
             div.textContent = mod;
+            if (mod === defaultMod) div.classList.add('active');
             optionsContainer.appendChild(div);
         });
 
-        selected.textContent = window.loadedMods[0] || 'all';
+        selected.textContent = defaultMod;
         selected.removeAttribute('aria-disabled');
-        modInput.dataset.value = window.loadedMods[0] || '';
+        modInput.dataset.value = defaultMod;
+        currentMod = defaultMod;
         setupCustomSelect('mod', value => {
             currentMod = value;
-            loadData();
+            showLoading(true);
+            setTimeout(() => loadData(), 0);
         });
         loadData();
     };
@@ -362,5 +368,4 @@ document.addEventListener('DOMContentLoaded', () => {
             loadData();
         }
     });
-    loadData();
 });
