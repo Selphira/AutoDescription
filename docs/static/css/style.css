@@ -359,6 +359,21 @@ main#descriptions {
     z-index: 100;
 }
 
+.message {
+    font-style: italic;
+    padding: 1em 1em 0;
+    text-align: center;
+}
+
+.message.error {
+    color: red;
+}
+
+.message.error .file {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
 .hidden {
     display: none;
 }

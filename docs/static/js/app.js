@@ -188,7 +188,7 @@ function loadData() {
             showLoading(false);
         };
         script.onerror = () => {
-            descriptions.innerHTML = `<p style="padding:1em; color: red;">Fichier non trouvé : ${scriptPath}</p>`;
+            descriptions.innerHTML = `<p class="message error"><strong>Erreur de chargement des données</strong><br/><br/>Le fichier <span class="file">${scriptPath}</span> est introuvable.</p>`;
             setFiltersEnabled(false);
             showLoading(false);
         };
@@ -250,6 +250,12 @@ function render(resetScroll = true) {
 
         return true;
     });
+
+    if (filteredData.length === 0) {
+        descriptions.innerHTML = `<p class="message">Aucun élément ne correspond à votre recherche ou à vos filtres.</p>`;
+        updateEntryCount();
+        return;
+    }
 
     // Mise à jour DOM sans tout régénérer
     const existingEntries = new Set();
