@@ -81,6 +81,8 @@ BEGIN
 END
 
 DEFINE_ACTION_FUNCTION ~write_js~
+	STR_VAR
+		array = ~~
 BEGIN
 	<<<<<<<< .../AutoDescription/inlined/javascript.log
 window.loadedData = window.loadedData || {};
@@ -88,7 +90,7 @@ window.loadedData = window.loadedData || {};
 	COPY ~.../AutoDescription/inlined/javascript.log~ ~docs/data/%log_filename%.js~
     SILENT
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = [~ KEEP_CRLF
-	ACTION_PHP_EACH ~allDescriptions~ AS line => _ BEGIN
+	ACTION_PHP_EACH ~%array%~ AS line => _ BEGIN
         OUTER_PATCH_SAVE line_2 ~%line_2%~ BEGIN
             REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
             REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~

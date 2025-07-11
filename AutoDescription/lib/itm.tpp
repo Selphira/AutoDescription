@@ -1,10 +1,10 @@
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
-    ACTION_DEFINE_ARRAY allDescriptions BEGIN END
+    ACTION_DEFINE_ARRAY allItemDescriptions BEGIN END
 	OUTER_SET totalItems = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 		LPM ~update_item_description~
 	BUT_ONLY_IF_IT_CHANGES
-	LAF ~write_js~ END
+	LAF ~write_js~ STR_VAR array = ~allItemDescriptions~ END
 END
 
 DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 		PATCH_PRINT "%totalItems% items processed"
 	END
 	PATCH_TRY
-		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful RET_ARRAY allDescriptions END
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful RET_ARRAY allItemDescriptions END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -28,7 +28,7 @@ DEFINE_PATCH_FUNCTION ~update_item_description~
 		totalIgnoredType
 		totalSuccessful
 	RET_ARRAY
-	    allDescriptions
+	    allItemDescriptions
 BEGIN
 	PATCH_SILENT
 
@@ -66,7 +66,7 @@ BEGIN
 		END
         LPM ~get_item_name~
 		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
-        SET $allDescriptions(~%SOURCE_RES%~ ~%itemName%~ ~%originalDescription%~ ~%description%~ ~%itemType%~ ~%enchantment%~) = 1
+        SET $allItemDescriptions(~%SOURCE_RES%~ ~%itemName%~ ~%originalDescription%~ ~%description%~ ~%itemType%~ ~%enchantment%~) = 1
 		SET totalSuccessful += 1
 	END
 END
