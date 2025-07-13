@@ -19,13 +19,12 @@ DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
+DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 opcode = 0 RET spellSecondaryTypeName BEGIN
 	SPRINT spellSecondaryTypeName ~~
 	PATCH_IF VARIABLE_IS_SET $msectype(~%secondaryType%~) BEGIN
 		SET strref = $msectype(~%secondaryType%~)
 		PATCH_IF strref > 0 BEGIN
 			LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END
-			SPRINT spellSecondaryTypeName ~%opcode% => spellSecondaryTypeName~
 		END
 	END
 	ELSE BEGIN

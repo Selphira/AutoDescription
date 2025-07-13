@@ -340,27 +340,27 @@
 @100130 = ~Entropie~
 
 // spellSecondaryTypeName
-@100200 = ~sans type secondaire~
-@100201 = ~de protection~
-@100202 = ~de protection spécifique~
-@100203 = ~de protection illusoire~
-@100204 = ~d'attaque magique~
-@100205 = ~d'attaque divinatrice~
-@100206 = ~de conjuration~
-@100207 = ~de protection de combat~
-@100208 = ~de contingences~
-@100209 = ~de champ de bataille~
-@100210 = ~de dégâts offensif~
-@100211 = ~invalidante~
-@100212 = ~de combinaison~
-@100213 = ~non offensive~
-@100220 = ~de potions~
-@100221 = ~de dissipation~
-@100222 = ~de pétrification~ // k1#Petrify => spell_rev
-@100223 = ~de lenteur~ // k1#Slow => spell_rev
-@100224 = ~de hâte~ // k1#Haste => spell_rev
-@100225 = ~de maladie~ // ~fl#Disease~    => atweaks
-@100226 = ~de peur~ // ~fl#Fear~    => atweaks
+@100200 = ~~
+@100201 = ~Protection de sort~
+@100202 = ~Protection spécifique~
+@100203 = ~Protection illusoire~
+@100204 = ~Attaque magique~
+@100205 = ~Attaque divinatrice~
+@100206 = ~Conjuration~
+@100207 = ~Protection de combat~
+@100208 = ~Contingence~
+@100209 = ~Champ de bataille~
+@100210 = ~Dégât offensif~
+@100211 = ~Invalidant~
+@100212 = ~Combinaison~
+@100213 = ~Non offensive~
+@100220 = ~Potion~
+@100221 = ~Dissipation~
+@100222 = ~Pétrification~ // k1#Petrify => spell_rev
+@100223 = ~Lenteur~ // k1#Slow => spell_rev
+@100224 = ~Hâte~ // k1#Haste => spell_rev
+@100225 = ~Maladie~ // ~fl#Disease~    => atweaks
+@100226 = ~Peur~ // ~fl#Fear~    => atweaks
 
 // duration
 @100300 = ~1 seconde~
@@ -3083,8 +3083,8 @@
 
 // Opcode 203: Spell: Bounce (by Secondary Type) [203]
 
-@12030001 = ~Renvoie les sorts %spellSecondaryTypeName%~
-@12030002 = ~de renvoyer les sorts %spellSecondaryTypeName%~
+@12030001 = ~Renvoie les sorts de type %spellSecondaryTypeName%~
+@12030002 = ~de renvoyer les sorts de type %spellSecondaryTypeName%~
 
 // Opcode 204: Spell: Protection from Spell (School) [204]
 
@@ -3095,10 +3095,10 @@
 
 // Opcode 205: Spell: Protection from Spell (Secondary Type) [205]
 
-@12050001 = ~Immunité aux sorts %spellSecondaryTypeName%~
-@12050002 = ~de résister aux sorts %spellSecondaryTypeName%~
-@12050003 = ~Immunise %theTarget% aux sorts %spellSecondaryTypeName%~
-@12050004 = ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
+@12050001 = ~Immunité aux sorts de type %spellSecondaryTypeName%~
+@12050002 = ~de résister aux sorts de type %spellSecondaryTypeName%~
+@12050003 = ~Immunise %theTarget% aux sorts de type %spellSecondaryTypeName%~
+@12050004 = ~d'immuniser %theTarget% aux sorts de type %spellSecondaryTypeName%~
 
 // Opcode 206: Spell: Protection from Spell [206]
 
@@ -3192,10 +3192,10 @@
 
 // Opcode 221: Removal: Remove Secondary Type [221]
 
-@12210001 = ~Dissipe tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12210002 = ~de dissiper tous les sorts %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12210003 = ~Dissipe tous les sorts %spellSecondaryTypeName% sur %theTarget%~
-@12210004 = ~de dissiper tous les sorts %spellSecondaryTypeName% sur %theTarget%~
+@12210001 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12210002 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12210003 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~
+@12210004 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~
 
 // Opcode 222: Spell Effect: Teleport Field [222]
 
@@ -3216,10 +3216,10 @@
 
 // Opcode 226: Spell: Immunity (by Secondary Type, decrementing) [226]
 
-@12260001 = ~Immunise jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
-@12260002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
-@12260003 = ~d'immuniser jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
-@12260004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
+@12260001 = ~Immunise jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12260002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12260003 = ~d'immuniser jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12260004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
 
 // Opcode 227: Spell: Bounce (by School, decrementing) [227]
 
@@ -3230,10 +3230,10 @@
 
 // Opcode 228: Spell: Bounce (by Secondary Type, decrementing) [228]
 
-@12280001 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
-@12280002 = ~Renvoie jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% ciblant %theTarget%~
-@12280003 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName%~
-@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de la sphère %spellSecondaryTypeName% ciblant %theTarget%~
+@12280001 = ~Renvoie jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12280002 = ~Renvoie jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~
+@12280003 = ~de renvoyer jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12280004 = ~de renvoyer jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~
 
 // Opcode 229: Removal: Remove One School [229]
 
@@ -3244,10 +3244,10 @@
 
 // Opcode 230: Removal: Remove One Secondary Type [230]
 
-@12300001 = ~Dissipe un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12300002 = ~de dissiper un sort de la sphère %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
-@12300003 = ~Dissipe un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
-@12300004 = ~de dissiper un sort de la sphère %spellSecondaryTypeName% sur %theTarget%~
+@12300001 = ~Dissipe un sort de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12300002 = ~de dissiper un sort de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~
+@12300003 = ~Dissipe un sort de type %spellSecondaryTypeName% sur %theTarget%~
+@12300004 = ~de dissiper un sort de type %spellSecondaryTypeName% sur %theTarget%~
 
 // Opcode 231: Spell Effect: Time Stop [231]
 

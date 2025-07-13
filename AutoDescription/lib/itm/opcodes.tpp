@@ -9674,7 +9674,7 @@ END
  * Spell: Bounce (by Secondary Type) [203] *
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_203~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12030001 // ~Renvoie les sorts %spellSecondaryTypeName%~
@@ -9682,7 +9682,7 @@ DEFINE_PATCH_MACRO ~opcode_self_203~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_203~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12030002 // ~de renvoyer les sorts %spellSecondaryTypeName%~
@@ -9722,7 +9722,7 @@ END
  * Spell: Protection from Spell (Secondary Type) [205] *
  * --------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_205~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12050001 // ~Immunité aux sorts %spellSecondaryTypeName%~
@@ -9730,7 +9730,7 @@ DEFINE_PATCH_MACRO ~opcode_self_205~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_205~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12050002 // ~de résister aux sorts %spellSecondaryTypeName%~
@@ -9738,7 +9738,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_205~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_205~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12050003 // ~Immunise %theTarget% aux sorts %spellSecondaryTypeName%~
@@ -9746,7 +9746,7 @@ DEFINE_PATCH_MACRO ~opcode_target_205~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_205~ BEGIN
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12050004 // ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
@@ -10531,7 +10531,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_221~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 	PATCH_TRY
-		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 		PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF spellLevel < 9 BEGIN
@@ -10550,7 +10550,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_221~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
 	PATCH_TRY
-		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+		LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 		PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF spellLevel < 9 BEGIN
@@ -10694,7 +10694,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_226_common~ BEGIN
 	LOCAL_SET amount = parameter1
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END
 	END
@@ -10820,7 +10820,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_230~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF spellLevel < 9 BEGIN
@@ -10835,7 +10835,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_230~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 
-	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 RET spellSecondaryTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF spellLevel < 9 BEGIN
@@ -15691,10 +15691,10 @@ DEFINE_PATCH_FUNCTION ~get_spell_school_name~ INT_VAR school = 0 opcode = 0 RET 
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSchoolName = string END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 RET spellSecondaryTypeName BEGIN
+DEFINE_PATCH_FUNCTION ~get_spell_secondary_type~ INT_VAR secondaryType = 0 opcode = 0 RET spellSecondaryTypeName BEGIN
 	SET strref = 100200 + secondaryType
 	PATCH_IF secondaryType > 13 OR secondaryType < 0 BEGIN
-		LPF ~get_spell_secondary_type_mod~ INT_VAR secondaryType RET spellSecondaryTypeName END
+		LPF ~get_spell_secondary_type_mod~ INT_VAR secondaryType opcode RET spellSecondaryTypeName END
 	END
 	ELSE BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET spellSecondaryTypeName = string END

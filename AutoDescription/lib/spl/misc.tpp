@@ -10,16 +10,28 @@ END
 
 DEFINE_PATCH_FUNCTION ~spell_school~ RET description BEGIN
 	READ_SHORT SPL_type spellType
+	READ_LONG SPL_sectype secondaryType
 	READ_BYTE SPL_school spellSchool
 
 	LPF ~get_spell_type_name~ INT_VAR type = spellType RET spellTypeName END
+	LPF ~get_spell_secondary_type~ INT_VAR secondaryType opcode = ~-1~ RET spellSecondaryTypeName END
 
 	PATCH_IF spellSchool > 0 BEGIN
 		LPF ~get_spell_school_name~ INT_VAR school = spellSchool RET spellSchoolName END
-		LPF ~appendLine~ STR_VAR string = ~(%spellTypeName% - %spellSchoolName%)~ RET description END
+		PATCH_IF STRING_LENGTH ~%spellSecondaryTypeName%~ > 0 BEGIN
+		    LPF ~appendLine~ STR_VAR string = ~(%spellTypeName% - %spellSchoolName%, %spellSecondaryTypeName%)~ RET description END
+		END
+		ELSE BEGIN
+		    LPF ~appendLine~ STR_VAR string = ~(%spellTypeName% - %spellSchoolName%)~ RET description END
+		END
 	END
 	ELSE BEGIN
-		LPF ~appendLine~ STR_VAR string = ~(%spellTypeName%)~ RET description END
+		PATCH_IF STRING_LENGTH ~%spellSecondaryTypeName%~ > 0 BEGIN
+		    LPF ~appendLine~ STR_VAR string = ~(%spellTypeName%, %spellSecondaryTypeName%)~ RET description END
+        END
+        ELSE BEGIN
+		    LPF ~appendLine~ STR_VAR string = ~(%spellTypeName%)~ RET description END
+		END
 	END
 END
 
