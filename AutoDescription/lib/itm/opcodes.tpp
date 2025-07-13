@@ -8995,14 +8995,15 @@ DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
 		SPRINT description @11800001 // ~Unique : Un seul exemple peut être équipé~
 	END
 	ELSE BEGIN
+		LPM ~get_item_name~
 		PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
-			SPRINT itemName ~%custom_str%~
+			SPRINT resItemName ~%custom_str%~
 		END
 		ELSE BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET resItemName = itemName END
 		END
-		PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-			SPRINT description @11800002 // ~Empêche d'utiliser %itemName%~
+		PATCH_IF NOT ~%resItemName%~ STRING_EQUAL ~~ AND NOT ~%resItemName%~ STRING_EQUAL ~%itemName%~ BEGIN
+			SPRINT description @11800002 // ~Empêche d'utiliser %resItemName%~
 		END
 	END
 END
