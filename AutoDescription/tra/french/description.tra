@@ -3150,6 +3150,8 @@
 @12140002 = ~Permet de lancer un sort de cette liste%colon%%spells%~
 @12140003 = ~Permet %toTheTarget% de lancer un sort du livre de sorts~
 @12140004 = ~Permet %toTheTarget% de lancer un sort de cette liste%colon%%spells%~
+@12140005 = ~de permettre de lancer un sort du livre de sorts~
+@12140006 = ~de permettre de lancer un sort de cette liste%colon%%spells%~
 
 // Opcode 216: Spell Effect: Level Drain [216]
 

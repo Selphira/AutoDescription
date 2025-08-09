@@ -10144,6 +10144,11 @@ DEFINE_PATCH_MACRO ~opcode_self_214~ BEGIN
 	LPM ~opcode_214_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_214~ BEGIN
+	LOCAL_SET strref = 12140005 // ~Permet de lancer un sort du livre de sorts~
+	LPM ~opcode_214_common~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_214~ BEGIN
 	LOCAL_SET strref = 12140003 // ~Permet %toTheTarget% de lancer un sort du livre de sorts~
 	LPM ~opcode_214_common~
