@@ -158,6 +158,8 @@
 @102095 = ~comme un lanceur de sorts de niveau %castingLevel%~
 @102126 = ~Maudit%colon%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
 @102127 = ~Permet de lancer des sorts profanes~
+@102128 = ~La zone d'effet peut être dissipée à l'aide d'un sort de Zone d'air pur.~
+@102129 = ~Le nuage peut être dissipé avec le sort Zone d'air pur.~ // Doit correspondre au texte ajouté par CorrectFR
 @102159 = ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~
 @102160 = ~%baseValue% + %value% au niveau %level%~
 @102161 = ~%value% par niveau~

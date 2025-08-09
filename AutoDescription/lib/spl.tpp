@@ -1,4 +1,5 @@
 DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
+	LAM ~load_clearair~
     ACTION_DEFINE_ARRAY allSpellDescriptions BEGIN END
 	OUTER_SET totalSpells = 0
 	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
@@ -103,6 +104,8 @@ BEGIN
 	LPF ~spell_resistance~ RET description END
 
 	SPRINT description ~%description%%crlf%%crlf%%roleplayDescription%~
+
+	LPF ~spell_dispellable_by_clearair~ RET description END
 
 	PATCH_IF add_statistics_section_to_spell_description BEGIN
 		LPF ~appendSection~ INT_VAR strref = 100003 RET description END // ~PARAMÈTRES~
@@ -213,4 +216,15 @@ Ignores : %totalIgnored%
 Total : %total%
 
 Opcodes a coder : %opcodeTodo%"
+END
+
+DEFINE_ACTION_MACRO ~load_clearair~ BEGIN
+    COPY_EXISTING ~clearair.2da~ ~override~
+        COUNT_2DA_ROWS ~2~ ~rows~
+        CLEAR_ARRAY ~clearair_projectiles~
+        FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
+            READ_2DA_ENTRY row 1 2 projectileId
+            SET $clearair_projectiles(~%projectileId%~) = projectileId
+        END
+    BUT_ONLY_IF_IT_CHANGES
 END

@@ -1376,3 +1376,34 @@ BEGIN
 		END
 	BUT_ONLY_IF_IT_CHANGES
 END
+
+DEFINE_PATCH_FUNCTION ~spell_dispellable_by_clearair~ RET description BEGIN
+	LPF ~is_dispellable_by_clearair~ RET is_dispellable_by_clearair = is_dispellable END
+
+	PATCH_IF is_dispellable_by_clearair BEGIN
+        // Supprime l'éventuel texte ajouté par CorrectFR pour éviter une redite
+        INNER_PATCH_SAVE description ~%description%~ BEGIN
+            SPRINT dispellableText (AT 102129)
+            REPLACE_TEXTUALLY ~%dispellableText%~ ~~
+        END
+        SPRINT dispellableText (AT 102128)
+	    SPRINT description ~%description%%crlf%%dispellableText%~
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~is_dispellable_by_clearair~
+    RET
+        is_dispellable
+BEGIN
+    SET is_dispellable = 0
+
+    GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
+    PHP_EACH headerOffsets AS _ => headerOffset BEGIN
+        READ_SHORT (headerOffset + SPL_HEAD_projectile) spellProjectile
+        SET spellProjectile -= 1
+
+        PATCH_IF VARIABLE_IS_SET $clearair_projectiles(~%spellProjectile%~) AND is_dispellable == 0 BEGIN
+            is_dispellable = 1
+        END
+    END
+END
