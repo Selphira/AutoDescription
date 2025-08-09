@@ -224,7 +224,9 @@ DEFINE_ACTION_MACRO ~load_clearair~ BEGIN
         CLEAR_ARRAY ~clearair_projectiles~
         FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
             READ_2DA_ENTRY row 1 2 projectileId
-            SET $clearair_projectiles(~%projectileId%~) = projectileId
+            PATCH_IF IS_AN_INT projectileId BEGIN
+                SET $clearair_projectiles(~%projectileId%~) = projectileId
+            END
         END
     BUT_ONLY_IF_IT_CHANGES
 END
