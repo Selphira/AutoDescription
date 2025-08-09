@@ -8084,7 +8084,7 @@ DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
 			READ_SHORT SPL_type spellType
 		END
 		PATCH_IF spellType == 1 OR spellType == 2 BEGIN
-			SET strref += spellType // sorts
+			SET strref += 1 // sorts
 		END
 		SPRINT description (AT strref)
 		// Hack pour forcer l'affichage de la durée / usage strictement interne
