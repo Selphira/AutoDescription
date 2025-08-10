@@ -6,6 +6,11 @@ OUTER_SET $entangleSpellList(~x#kispr~) = 1 // BG1 NPC Project v32
 OUTER_SET $slowSpellList(~finslow~) = 1 // Ascension v2.0.24
 OUTER_SET $slowSpellList(~mels545~) = 1 // Ascension v2.0.24
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignoredResref~ BEGIN
+    ~d5_nukt~ => 1  // npc_ee
+    ~meknockb~ => 1 // metweaks : Implementer un autre type d'animation de mort par eclatement
+END
+
 DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
 	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%splstate%~
 
@@ -79,6 +84,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_146_is_valid_mod~ BEGIN
 	PATCH_IF isValid == 1 BEGIN
 		SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
+	END
+	PATCH_IF isValid == 1 BEGIN
+	    TO_LOWER resref
+		SET isValid = NOT VARIABLE_IS_SET $ignoredResref(~%resref%~)
 	END
 END
 
@@ -157,9 +166,9 @@ DEFINE_PATCH_MACRO ~opcode_326_is_valid_mod~ BEGIN
 			DEFAULT SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
 		END
 	END
-	// npc_ee
 	PATCH_IF isValid == 1 BEGIN
-		SET isValid = NOT ~%resref%~ STRING_EQUAL_CASE "D5_NUKT"
+	    TO_LOWER resref
+		SET isValid = NOT VARIABLE_IS_SET $ignoredResref(~%resref%~)
 	END
 	// might_and_guile
 	PATCH_IF isValid == 1 BEGIN
