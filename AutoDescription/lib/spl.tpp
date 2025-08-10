@@ -107,6 +107,10 @@ BEGIN
 
 	LPF ~spell_dispellable_by_clearair~ RET description END
 
+	PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~sppr318~ BEGIN
+	    LPF ~spell_list_spells_dispellable_by_clearair~ RET description END
+	END
+
 	PATCH_IF add_statistics_section_to_spell_description BEGIN
 		LPF ~appendSection~ INT_VAR strref = 100003 RET description END // ~PARAMÈTRES~
         LPF ~appendLine~ RET description END

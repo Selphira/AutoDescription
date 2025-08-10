@@ -1391,6 +1391,29 @@ DEFINE_PATCH_FUNCTION ~spell_dispellable_by_clearair~ RET description BEGIN
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~spell_list_spells_dispellable_by_clearair~ RET description
+BEGIN
+    PATCH_DEFINE_ARRAY dispellableSpells BEGIN END
+    INNER_ACTION BEGIN
+        COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
+            READ_STRREF SPL_unidentified_name spellName
+	        READ_LONG   SPL_unidentified_name spellNameRef
+            PATCH_IF spellNameRef > 0 AND STRING_LENGTH ~%spellName%~ > 0 BEGIN
+	            LPF ~is_dispellable_by_clearair~ RET is_dispellable_by_clearair = is_dispellable END
+                PATCH_IF is_dispellable_by_clearair BEGIN
+                    SET $dispellableSpells(~%spellName%~) = 1
+                END
+            END
+        BUT_ONLY_IF_IT_CHANGES
+    END
+    SORT_ARRAY_INDICES ~dispellableSpells~ LEXICOGRAPHICALLY
+
+	SPRINT and @100021 // ~et~
+    LPF ~implode~ STR_VAR array_name = ~dispellableSpells~ glue = ~, ~ final_glue = ~ %and% ~ RET spellList = text END
+    SPRINT affectedSpellList @102130 // ~Les sorts et capacités affectés sont%colon%%spellList%~
+	SPRINT description ~%description%%crlf%%crlf%%affectedSpellList%'~
+END
+
 DEFINE_PATCH_FUNCTION ~is_dispellable_by_clearair~
     RET
         is_dispellable
