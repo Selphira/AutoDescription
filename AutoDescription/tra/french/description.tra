@@ -4272,10 +4272,10 @@
 
 // Opcode 343: HP Swap [343]
 
-@13430001 = ~Échange les points de vie du porteur et de la cible~
-@13430002 = ~Échange les points de vie du porteur et de la cible, si ceux du porteur sont supérieurs~
-@13430003 = ~d'échanger les points de vie du porteur et de la cible~
-@13430004 = ~d'échanger les points de vie du porteur et de la cible, si ceux du porteur sont supérieurs~
+@13430001 = ~Échange les points de vie %ofTheSource% et %ofTheTarget%~
+@13430002 = ~Échange les points de vie %ofTheSource% et %ofTheTarget%, si ceux %ofTheSource% sont supérieurs~
+@13430003 = ~d'échanger les points de vie %ofTheSource% et %ofTheTarget%~
+@13430004 = ~d'échanger les points de vie %ofTheSource% et %ofTheTarget%, si ceux %ofTheSource% sont supérieurs~
 
 // Opcode 344: Enchantment vs. creature type [344]
 
