@@ -13063,12 +13063,29 @@ END
  * Item: Can Use Any Item [302] *
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_302~ BEGIN
+	LOCAL_SET strref = 13020002 // ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+	LPM ~opcode_302_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_302~ BEGIN
+	LPM ~opcode_target_probability_302~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_302~ BEGIN
+	LOCAL_SET strref = 13020004 // ~Permet %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+	LPM ~opcode_302_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_302~ BEGIN
+	LOCAL_SET strref = 13020006 // ~de permettre %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+	LPM ~opcode_302_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_302_common~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @13020001 // ~Bloque la capacité d'utiliser n'importe quel objet~
+	    SET strref = strref - 1
 	END
-	ELSE BEGIN
-		SPRINT description @13020002 // ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
-	END
+	SPRINT description (AT strref)
 END
 
 /* -------------------------------------- *

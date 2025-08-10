@@ -3658,6 +3658,10 @@
 
 @13020001 = ~Bloque la capacité d'utiliser n'importe quel objet~
 @13020002 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+@13020003 = ~Bloque la capacité %ofTheTarget% d'utiliser n'importe quel objet~
+@13020004 = ~Permet %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
+@13020005 = ~de bloquer la capacité %ofTheTarget% d'utiliser n'importe quel objet~
+@13020006 = ~de permettre %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~
 
 // Opcode 303: Spell Effect: Backstab Every Hit [303]
 
