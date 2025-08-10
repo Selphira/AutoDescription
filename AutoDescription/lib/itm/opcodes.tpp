@@ -14246,7 +14246,7 @@ DEFINE_PATCH_MACRO ~opcode_331_common~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_331_is_valid~ BEGIN
-	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.2da~ BEGIN
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND NOT FILE_EXISTS_IN_GAME ~%resref%.2da~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : File %resref%.2da does not exist, the game may crash.~ END
 	END
