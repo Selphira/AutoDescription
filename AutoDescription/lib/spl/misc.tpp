@@ -213,7 +213,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
 				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
-	                    PATCH_IF opcode == 146 OR opcode == 232 BEGIN
+	                    PATCH_IF VARIABLE_IS_SET itemDuration AND (opcode == 146 OR opcode == 232) BEGIN
 							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 									//lire les opcodes de l'item et les ajouter dans les opcodes actuels
