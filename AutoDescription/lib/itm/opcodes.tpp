@@ -12951,52 +12951,39 @@ END
 // TODO: tester les valeurs : special > 3
 
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010002 // ~Chance de coup critique avec cette arme~
-	END
-	ELSE BEGIN
-		SPRINT name @13010001 // ~Chance de coup critique~
-	END
-	LPM ~opcode_301_common~
-END
-
-DEFINE_PATCH_MACRO ~opcode_self_probability_301~ BEGIN
-	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		SPRINT name @13010004 // ~la chance de coup critique avec cette arme~
-	END
-	ELSE BEGIN
-		SPRINT name @13010003 // ~la chance de coup critique~
-	END
-
-	LPM ~opcode_301_probability_common~
-END
-
-DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
+	LOCAL_SET nameStrref = 13010001 // ~Chance de coup critique~
 	LOCAL_SET value = 5 * parameter1
+
+	LPM ~opcode_301_common~
+
 	LPF ~signed_value~ INT_VAR value RET value END
 	SPRINT value @10002 // ~%value% %~
-	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
-		PATCH_IF isExternal AND parameter3 != 0 BEGIN
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
-		END
-	END
-	PATCH_IF is_ee AND special >= 1 BEGIN
-		SET strref = 13010010 + special // ~en mêlée~
-		LPF ~getTranslation~ INT_VAR strref opcode RET descriptionAdd = string END
-		TEXT_SPRINT name ~%name% %descriptionAdd%~
-	END
-	PATCH_IF is_ee AND parameter2 == 0 AND isExternal AND parameter3 != 0 BEGIN
-		SET strref = 230000 + parameter3
-		SPRINT weaponType (AT strref)
-		SPRINT strref @13010020 // ~avec des %weaponType%~
-		TEXT_SPRINT name ~%name% %strref%~
-	END
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_301_probability_common~ BEGIN
-	LOCAL_SET value = 5 * parameter1
+DEFINE_PATCH_MACRO ~opcode_self_probability_301~ BEGIN
+	LOCAL_SET nameStrref = 13010003 // ~la chance de coup critique~
+	LOCAL_SET desStrref = 102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
+
+	LPM ~opcode_301_common~
+	LPM ~opcode_301_target_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_301~ BEGIN
+	LOCAL_SET nameStrref = 13010003 // ~la chance de coup critique~
+	LOCAL_SET desStrref = 102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
+
+	LPM ~opcode_301_common~
+	LPM ~opcode_301_target_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
+	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
+	    SET nameStrref = nameStrref + 1
+	END
+
+	SPRINT name (AT nameStrref)
+
 	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
@@ -13014,16 +13001,19 @@ DEFINE_PATCH_MACRO ~opcode_301_probability_common~ BEGIN
 		SPRINT strref @13010020 // ~avec des %weaponType%~
 		TEXT_SPRINT name ~%name% %strref%~
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_target_common~ BEGIN
+	LOCAL_SET value = 5 * parameter1
 	SPRINT theStatistic ~%name%~
 	PATCH_IF value > 0 BEGIN
-		SPRINT value @10002 // ~%value% %~
-        SPRINT description @102544 // ~d'augmenter de %value% %theStatistic% %ofTheTarget%~
+		SET desStrref = desStrref + 1
 	END
 	ELSE BEGIN
 		SET value = ABS value
-		SPRINT value @10002 // ~%value% %~
-		SPRINT description @102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
 	END
+    SPRINT value @10002 // ~%value% %~
+    SPRINT description (AT desStrref)
 END
 
 /* ---------------------------- *
