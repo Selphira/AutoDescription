@@ -7467,7 +7467,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 				END
 				SET $recursive_resref(~%resref%~) = 1
 				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+				LPF ~get_item_spell_effects_description~ INT_VAR recursivity = VARIABLE_IS_SET recursivity ? recursivity + 1 : 0 castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
 					SPRINT regex @10019 // ~^[0-9]+ % de chance ~

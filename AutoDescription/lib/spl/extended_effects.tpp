@@ -238,6 +238,7 @@ DEFINE_PATCH_FUNCTION ~get_item_spell_effects_description~
 		castingLevel = 0
 		baseProbability = 100
 		ignoreDurationIfSameForAllEffect = 0
+		recursivity = 0
 	STR_VAR
 		file = ~~
 	RET
@@ -256,39 +257,41 @@ BEGIN
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.
 	LPM ~clear_opcodes~
 
-	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
-        INNER_PATCH_FILE ~%file%.spl~ BEGIN
-            SPRINT CURRENT_SOURCE_RES ~%file%~
-            SET isSpecialDuration = 0
-            SET isSubSpell = 1
+    PATCH_IF recursivity < 1 BEGIN
+        PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+            INNER_PATCH_FILE ~%file%.spl~ BEGIN
+                SPRINT CURRENT_SOURCE_RES ~%file%~
+                SET isSpecialDuration = 0
+                SET isSubSpell = 1
 
-			PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
-				LPM ~load_level_effects~
-	            LPF ~spell_duration~ RET ignoreDuration strDuration isSpecialDuration = is_special END
-				LPM ~clear_levels~
-			END
+                PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
+                    LPM ~load_level_effects~
+                    LPF ~spell_duration~ RET ignoreDuration strDuration isSpecialDuration = is_special END
+                    LPM ~clear_levels~
+                END
 
-            PATCH_IF castingLevel > 0 BEGIN
-                LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget ignoreDuration RET description totalLines END
+                PATCH_IF castingLevel > 0 BEGIN
+                    LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget ignoreDuration RET description totalLines END
+                END
+                ELSE BEGIN
+                    LPM ~load_level_effects~
+                    LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
+                END
+                PATCH_IF totalLines == 1 BEGIN
+                    INNER_PATCH_SAVE description ~%description%~ BEGIN
+                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
+                    END
+                END
+                ELSE PATCH_IF totalLines > 1 BEGIN
+                    INNER_PATCH_SAVE description ~%description%~ BEGIN
+                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+                    END
+                END
             END
-            ELSE BEGIN
-				LPM ~load_level_effects~
-                LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
-            END
-			PATCH_IF totalLines == 1 BEGIN
-				INNER_PATCH_SAVE description ~%description%~ BEGIN
-		            REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
-		        END
-	        END
-			ELSE PATCH_IF totalLines > 1 BEGIN
-				INNER_PATCH_SAVE description ~%description%~ BEGIN
-		            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
-		        END
-	        END
         END
-    END
-	ELSE BEGIN
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Resource %file%.spl doesn't exist.~ END
+        ELSE BEGIN
+            LPF ~add_log_error~ STR_VAR message = EVAL ~Resource %file%.spl doesn't exist.~ END
+        END
 	END
 END
 
@@ -1063,4 +1066,26 @@ END
 
 
 DEFINE_PATCH_MACRO ~group_spell_effects_by_damage~ BEGIN
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_is_in_multiple_level~
+    INT_VAR
+        match_opcode = 0
+    RET
+        inMultipleLevel
+BEGIN
+    SET value = 0
+	SET requiredLevel = $level_effects(~0~)
+	PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
+	    PATCH_IF match_opcode == opcode BEGIN
+		    PATCH_PHP_EACH level_effects AS _ => matchRequiredLevel BEGIN
+                PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
+                    PATCH_IF matchOpcode == opcode BEGIN
+                        SET value += 1
+                    END
+                END
+            END
+        END
+    END
+    SET inMultipleLevel = value > 1
 END
