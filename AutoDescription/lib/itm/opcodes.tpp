@@ -11527,7 +11527,7 @@ DEFINE_PATCH_MACRO ~opcode_target_246~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_246~ BEGIN
-	LPM ~opcode_target_probability_246~
+	LPM ~opcode_self_probability_246~
 END
 
 /* ------------------------------------------- *
