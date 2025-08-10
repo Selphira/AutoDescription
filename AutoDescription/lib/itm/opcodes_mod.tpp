@@ -42,10 +42,8 @@ DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 o
 END
 
 DEFINE_PATCH_MACRO ~opcode_67_is_valid_mod~ BEGIN
-	    PATCH_PRINT "opcode_67_is_valid_mod"
 	PATCH_IF isValid == 1 BEGIN
 	    TO_LOWER resref
-	    PATCH_PRINT "Ignore creature : %resref%"
 		SET isValid = NOT VARIABLE_IS_SET $ignoredCreature(~%resref%~)
 	END
 END
