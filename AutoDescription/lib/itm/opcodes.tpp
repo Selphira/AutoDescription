@@ -8409,21 +8409,24 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 			SET isExternal = 1
 
 			LPM ~read_external_effect_vars~
+			LPM ~opcode_is_valid~
 
-			LPF ~delete_opcode~
-                INT_VAR opcode = 177 match_position = position177
-                RET $opcodes(~177~) = count
-                RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
-            END
+			PATCH_IF isValid == 1 BEGIN
+                LPF ~delete_opcode~
+                    INT_VAR opcode = 177 match_position = position177
+                    RET $opcodes(~177~) = count
+                    RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
+                END
 
-			PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-				LPM ~opcode_177_replace_effect_vars~
+                PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+                    LPM ~opcode_177_replace_effect_vars~
 
-				PATCH_IF parameter1177 != 0 BEGIN
-					LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
-					SPRINT target_type "%parameter2177%:%string%"
-				END
-                LPM ~add_opcode~
+                    PATCH_IF parameter1177 != 0 BEGIN
+                        LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
+                        SPRINT target_type "%parameter2177%:%string%"
+                    END
+                    LPM ~add_opcode~
+                END
 			END
 		END
 	END
@@ -12366,22 +12369,22 @@ END
  * Remove: Specific Area Effect(Zone of Sweet Air) [273] *
  * ----------------------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_273~ BEGIN
-	SET strref = 12730001 // ~Zone d'air pur~
+	SET strref = 12730001 // ~Disperse les nuages dans la zone d'effet~
 	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_273~ BEGIN
-	SET strref = 12730003 // ~de lancer Zone d'air pur~
+	SET strref = 12730003 // ~de disperser les nuages dans la zone d'effet~
 	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_273~ BEGIN
-	SET strref = 12730002 // ~Lance Zone d'air pur sur %theTarget%~
+	SET strref = 12730002 // ~Disperse les nuages dans la zone d'effet %ofTheTarget%~
 	LPM ~opcode_273_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_273~ BEGIN
-	SET strref = 12730004 // ~de lancer Zone d'air pur sur %theTarget%~
+	SET strref = 12730004 // ~de disperser les nuages dans la zone d'effet %ofTheTarget%~
 	LPM ~opcode_273_common~
 END
 
