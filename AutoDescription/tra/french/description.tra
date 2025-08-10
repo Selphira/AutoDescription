@@ -3120,6 +3120,10 @@
 @12080002 = ~Les points de vie ne sont plus protégés~
 @12080003 = ~Les points de vie %ofTheTarget% ne peuvent passer en dessous de %value%~
 @12080004 = ~Les points de vie %ofTheTarget% ne sont plus protégés~
+@12080005 = ~d'empêcher les points de vie de passer en dessous de %value%~
+@12080006 = ~de ne plus protéger les points de vie~
+@12080007 = ~d'empêcher les points de vie %ofTheTarget% de passer en dessous de %value%~
+@12080008 = ~de ne plus protéger les points de vie %ofTheTarget%~
 
 // Opcode 209: Death: Kill 60HP [209]
 

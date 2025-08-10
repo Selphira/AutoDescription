@@ -10003,8 +10003,18 @@ DEFINE_PATCH_MACRO ~opcode_self_208~ BEGIN
     LPM ~opcode_208_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_208~ BEGIN
+    LOCAL_SET strref = 12080005 // ~d'empêcher les points de vie de passer en dessous de %value%~
+    LPM ~opcode_208_common~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_208~ BEGIN
     LOCAL_SET strref = 12080003 // ~Les points de vie %ofTheTarget% ne peuvent passer en dessous de %value%~
+    LPM ~opcode_208_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_208~ BEGIN
+    LOCAL_SET strref = 12080007 // ~d'empêcher les points de vie %ofTheTarget% de passer en dessous de %value%~
     LPM ~opcode_208_common~
 END
 
