@@ -15247,14 +15247,28 @@ DEFINE_PATCH_MACRO ~opcode_self_522~ BEGIN
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_self_probability_522~ BEGIN
+	LPM ~opcode_target_probability_522~
+END
+
 DEFINE_PATCH_MACRO ~opcode_target_522~ BEGIN
+	LOCAL_SET strref = 102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+	LPM ~opcode_522_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_522~ BEGIN
+	LOCAL_SET strref = 102545 // ~de passer à %value% %theStatistic% %ofTheTarget%~
+	LPM ~opcode_522_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_522_common~ BEGIN
 	LOCAL_SPRINT theStatistic @10440002 // ~la force~
 	LOCAL_SPRINT value ~~
 	PATCH_IF parameter2 == 100 BEGIN
 		SPRINT parameter2 ~00~
 	END
 	SPRINT value ~%parameter1%/%parameter2%~
-	SPRINT description @102287 // ~Passe %theStatistic% %ofTheTarget% à %value%~
+	SPRINT description (AT strref)
 END
 
 /* ------------------------ *
