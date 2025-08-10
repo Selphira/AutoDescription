@@ -12980,6 +12980,10 @@ DEFINE_PATCH_MACRO ~opcode_target_301~ BEGIN
 	LPM ~opcode_301_target_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_probability_301~ BEGIN
+	LPM ~opcode_self_probability_301~
+END
+
 DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
 	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
 	    SET nameStrref = nameStrref + 1
@@ -14264,18 +14268,20 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_332~ BEGIN
 	LOCAL_SET strref = 13320100 + parameter2
-	LOCAL_SET value = parameter1
+	LOCAL_SET desStrref = 102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
 
-	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
-    PATCH_IF value >= 0 BEGIN
-		SPRINT value @10002 // ~%value% %~
-        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
-    END
-    ELSE BEGIN
-        value = ABS value
-		SPRINT value @10002 // ~%value% %~
-        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
-    END
+	LPM ~opcode_332_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_332~ BEGIN
+	LOCAL_SET strref = 13320100 + parameter2
+	LOCAL_SET desStrref = 102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
+
+	LPM ~opcode_332_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_332~ BEGIN
+	LPM ~opcode_self_probability_332~
 END
 
 DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
@@ -14287,6 +14293,21 @@ DEFINE_PATCH_MACRO ~opcode_332_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Type %parameter2% (0-10 expected).~ END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_332_common~ BEGIN
+	LOCAL_SET value = parameter1
+
+	LPF ~getTranslation~ INT_VAR strref opcode RET theStatistic = string END
+
+    PATCH_IF value >= 0 BEGIN
+		SET desStrref = desStrref + 1
+    END
+    ELSE BEGIN
+        value = ABS value
+    END
+    SPRINT value @10002 // ~%value% %~
+    SPRINT description (AT desStrref)
 END
 
 DEFINE_PATCH_MACRO ~opcode_332_group~ BEGIN
@@ -14814,23 +14835,34 @@ END
  * Critical miss bonus [362] *
  * ------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_362~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT name @13620002 // ~Chance d'échec critique avec cette arme~
-	END
-	ELSE BEGIN
-		SPRINT name @13620001 // ~Chance d'échec critique~
-	END
+	LOCAL_SET nameStrref = 13620001 // ~Chance d'échec critique~
+	LOCAL_SET value = 5 * parameter1
+
 	LPM ~opcode_301_common~
+
+	LPF ~signed_value~ INT_VAR value RET value END
+	SPRINT value @10002 // ~%value% %~
+	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_362~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT name @13620004 // ~la chance d'échec critique avec cette arme~
-	END
-	ELSE BEGIN
-		SPRINT name @13620003 // ~la chance d'échec critique~
-	END
-	LPM ~opcode_301_probability_common~
+	LOCAL_SET nameStrref = 13620003 // ~la chance d'échec critique~
+	LOCAL_SET desStrref = 102543 // ~de réduire de %value% %theStatistic% %ofTheTarget%~
+
+	LPM ~opcode_301_common~
+	LPM ~opcode_301_target_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_362~ BEGIN
+	LOCAL_SET nameStrref = 13620003 // ~la chance d'échec critique~
+	LOCAL_SET desStrref = 102285 // ~Réduit de %value% %theStatistic% %ofTheTarget%~
+
+	LPM ~opcode_301_common~
+	LPM ~opcode_301_target_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_362~ BEGIN
+	LPM ~opcode_self_probability_362~
 END
 
 /* ------------------------ *
