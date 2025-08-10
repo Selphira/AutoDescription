@@ -9991,13 +9991,21 @@ END
  * HP: Minimum Limit [208] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_208~ BEGIN
-	PATCH_IF parameter1 != 0 BEGIN
-		SPRINT value ~%parameter1%~
-		SPRINT description @12080001 // ~Les points de vie ne peuvent passer en dessous de %value%~
+    LOCAL_SET strref = 12080001 // ~Les points de vie ne peuvent passer en dessous de %value%~
+    LPM ~opcode_208_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_208~ BEGIN
+    LOCAL_SET strref = 12080003 // ~Les points de vie %ofTheTarget% ne peuvent passer en dessous de %value%~
+    LPM ~opcode_208_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_208_common~ BEGIN
+	LOCAL_SPRINT value ~%parameter1%~
+	PATCH_IF parameter1 == 0 BEGIN
+	    SET strref = strref + 1
 	END
-	ELSE BEGIN
-		SPRINT description @12080002 // ~Les points de vie ne sont plus protégés~
-	END
+	SPRINT description (AT strref)
 END
 
 /* ---------------------- *

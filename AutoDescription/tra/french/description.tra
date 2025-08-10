@@ -3117,7 +3117,9 @@
 // Opcode 208: HP: Minimum Limit [208]
 
 @12080001 = ~Les points de vie ne peuvent passer en dessous de %value%~
-@12080002 = ~Les points de vie ne sont plus protégés~ // TODO
+@12080002 = ~Les points de vie ne sont plus protégés~
+@12080003 = ~Les points de vie %ofTheTarget% ne peuvent passer en dessous de %value%~
+@12080004 = ~Les points de vie %ofTheTarget% ne sont plus protégés~
 
 // Opcode 209: Death: Kill 60HP [209]
 
