@@ -6657,6 +6657,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_127~ BEGIN
 	LPM ~opcode_127_common~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target_127~ BEGIN
+	LPM ~opcode_self_127~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_127~ BEGIN
+	LPM ~opcode_self_probability_127~
+END
+
 DEFINE_PATCH_MACRO ~opcode_127_common~ BEGIN
 	LOCAL_SET amount    = parameter1
 	LOCAL_SET type      = parameter2
