@@ -11,6 +11,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignoredResref~ BEGIN
     ~meknockb~ => 1 // metweaks : Implementer un autre type d'animation de mort par eclatement
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignoredCreature~ BEGIN
+    ~dw#sweet~ => 1  // Stratagems
+END
+
 DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
 	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%splstate%~
 
@@ -34,6 +38,15 @@ DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 o
 	END
 	ELSE BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: type de sort secondaire non gere (%secondaryType%)~ END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_67_is_valid_mod~ BEGIN
+	    PATCH_PRINT "opcode_67_is_valid_mod"
+	PATCH_IF isValid == 1 BEGIN
+	    TO_LOWER resref
+	    PATCH_PRINT "Ignore creature : %resref%"
+		SET isValid = NOT VARIABLE_IS_SET $ignoredCreature(~%resref%~)
 	END
 END
 
