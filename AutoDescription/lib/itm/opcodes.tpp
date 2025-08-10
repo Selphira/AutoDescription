@@ -9474,6 +9474,16 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_199~ BEGIN
 	SPRINT description @11990002 // ~de renvoyer les sorts de niveau %spellLevel%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_target~ BEGIN
+	LOCAL_SET spellLevel = parameter1
+	SPRINT description @11990003 // ~Renvoie les sorts de niveau %spellLevel% ciblant %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_199~ BEGIN
+	LOCAL_SET spellLevel = parameter1
+	SPRINT description @11990004 // ~de renvoyer les sorts de niveau %spellLevel% ciblant %theTarget%~
+END
+
 DEFINE_PATCH_MACRO ~opcode_199_is_valid~ BEGIN
 	PATCH_IF parameter1 < 0 OR parameter1 > 9 BEGIN
 		isValid = 0

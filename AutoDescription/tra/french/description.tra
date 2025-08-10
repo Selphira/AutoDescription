@@ -3048,6 +3048,8 @@
 
 @11990001 = ~Renvoie les sorts de niveau %spellLevel%~
 @11990002 = ~de renvoyer les sorts de niveau %spellLevel%~
+@11990003 = ~Renvoie les sorts de niveau %spellLevel% ciblant %theTarget%~
+@11990004 = ~de renvoyer les sorts de niveau %spellLevel% ciblant %theTarget%~
 
 // Opcode 200: Spell: Bounce (by Power level, decrementing) [200]
 
