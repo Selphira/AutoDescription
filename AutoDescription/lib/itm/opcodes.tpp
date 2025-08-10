@@ -4843,7 +4843,7 @@ DEFINE_PATCH_MACRO ~opcode_target_100~ BEGIN
 	LPM ~opcode_100_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_probability_100~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_probability_100~ BEGIN
 	LPM ~opcode_self_probability_100~
 END
 
