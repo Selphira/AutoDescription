@@ -110,6 +110,10 @@ DEFINE_PATCH_FUNCTION ~appendProperty~ INT_VAR strref = 0 indentation_num = 0 ST
 	FOR (i = 0 ; i < indentation_num ; ++i ) BEGIN
 		SPRINT indentation ~%indentation%  ~
 	END
+    // Cas de l'opcode 146 qui peut retourner plusieurs lignes. Sans cela, seule la première est correctement indentée.
+    INNER_PATCH_SAVE name ~%name%~ BEGIN
+        REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%- ~ ~%crlf%%indentation%- ~
+    END
 
     SPRINT description "%description%%crlf%%indentation%- %name%"
 END
