@@ -7373,6 +7373,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	LOCAL_SET castingLevel = parameter1
+	LOCAL_SET ignoreDurationIfSameForAllEffect = 0
 	LOCAL_SET type = parameter2
 	LOCAL_SPRINT strDuration ~~
 	TO_UPPER resref
@@ -7382,11 +7383,11 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion BEGIN
-		PATCH_IF isItem == 1 AND type == 1 BEGIN
-			SET castingLevel = 0
-		END
-		LPF ~get_item_spell_effects_description~ INT_VAR castingLevel STR_VAR file = ~%resref%~ RET spellDescription = description END
-        SPRINT description ~%spellDescription%~
+        // Protection contre les boucles infinies
+        PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
+		    LPM ~opcode_146_get_spell_effects_description~
+        END
+        CLEAR_ARRAY recursive_resref
 	END
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
@@ -7413,12 +7414,8 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF isItem == 1 AND type == 1 BEGIN
-					SET castingLevel = 0
-				END
-				SET $recursive_resref(~%resref%~) = 1
-				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-				LPF ~get_item_spell_effects_description~ INT_VAR castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 STR_VAR file = ~%resref%~ RET description strDuration END
+	            SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
+				LPM ~opcode_146_get_spell_effects_description~
 
 				// Remplacer les "pendant 1 round" par "chaque round pendant x rounds"
 				SET frequency = (duration - (duration MODULO 10000)) / 10000
@@ -7448,6 +7445,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
+	LOCAL_SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
 	LOCAL_SET type = parameter2
 	LOCAL_SPRINT strDuration ~~
 	TO_UPPER resref
@@ -7470,12 +7468,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-				PATCH_IF NOT ((type == 2 OR type == 0) AND castingLevel > 0) BEGIN
-					//SET castingLevel = 0
-				END
-				SET $recursive_resref(~%resref%~) = 1
-				SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-				LPF ~get_item_spell_effects_description~ INT_VAR recursivity = VARIABLE_IS_SET recursivity ? recursivity + 1 : 0 castingLevel ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0 baseProbability = probability STR_VAR file = ~%resref%~ RET description END
+				LPM ~opcode_146_get_spell_effects_description~
 
 				INNER_PATCH_SAVE description ~%description%~ BEGIN
 					SPRINT regex @10019 // ~^[0-9]+ % de chance ~
@@ -7497,6 +7490,23 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_146_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_146_get_spell_effects_description~ BEGIN
+    PATCH_IF isItem == 1 AND type == 1 BEGIN
+        SET castingLevel = 0
+    END
+    PATCH_IF VARIABLE_IS_SET levelIndex BEGIN
+        SET maxRequiredLevel = levelIndex MODULO 100
+        SET minRequiredLevel = ((levelIndex - maxRequiredLevel) / 100) - 100
+        PATCH_IF minRequiredLevel == maxRequiredLevel OR maxRequiredLevel == 99 BEGIN
+            SET castingLevel = maxRequiredLevel
+        END
+        // TODO: Gérer le cas où minRequiredLevel != maxRequiredLevel AND maxRequiredLevel != 99
+    END
+    SET $recursive_resref(~%resref%~) = 1
+    SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+    LPF ~get_item_spell_effects_description~ INT_VAR recursivity = VARIABLE_IS_SET recursivity ? recursivity + 1 : 0 castingLevel ignoreDurationIfSameForAllEffect baseProbability = probability STR_VAR file = ~%resref%~ RET description strDuration END
 END
 
 DEFINE_PATCH_MACRO ~opcode_146_condition~ BEGIN
