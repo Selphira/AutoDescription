@@ -8417,25 +8417,24 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 			SET isExternal = 1
 
 			LPM ~read_external_effect_vars~
-			LPM ~opcode_is_valid~
+            LPF ~delete_opcode~
+                INT_VAR opcode = 177 match_position = position177
+                RET $opcodes(~177~) = count
+                RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
+            END
 
-			PATCH_IF isValid == 1 BEGIN
-                LPF ~delete_opcode~
-                    INT_VAR opcode = 177 match_position = position177
-                    RET $opcodes(~177~) = count
-                    RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
-                END
+            PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+                LPM ~opcode_177_replace_effect_vars~
+                LPM ~opcode_is_valid~
 
-                PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
-                    LPM ~opcode_177_replace_effect_vars~
-
+                PATCH_IF isValid == 1 BEGIN
                     PATCH_IF parameter1177 != 0 BEGIN
                         LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
                         SPRINT target_type "%parameter2177%:%string%"
                     END
                     LPM ~add_opcode~
                 END
-			END
+            END
 		END
 	END
 END
