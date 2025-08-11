@@ -89,6 +89,7 @@ window.loadedData = window.loadedData || {};
 >>>>>>>>
 	COPY ~.../AutoDescription/inlined/javascript.log~ ~docs/data/%log_filename%.js~
     SILENT
+    APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%-version"] = '%MOD_VERSION%';~ KEEP_CRLF
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = [~ KEEP_CRLF
 	ACTION_PHP_EACH ~%array%~ AS line => _ BEGIN
         OUTER_PATCH_SAVE line_2 ~%line_2%~ BEGIN

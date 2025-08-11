@@ -340,9 +340,14 @@ main#descriptions {
     width: 15px;
 }
 
-.entry-count > span {
+.entry-count > span,
+.version > span {
     color: var(--color-primary);
     font-weight: bold;
+}
+
+.additional-infos {
+    text-align: right;
 }
 
 .loading {

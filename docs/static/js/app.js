@@ -9,6 +9,7 @@ let filterItemEnchant = "";
 let filterSpellLevel = "";
 let filterSpellSchool = "";
 let data = [];
+let version = '';
 let showDiffs = false;
 
 const gameIcons = document.getElementById('game-icons');
@@ -177,12 +178,14 @@ function loadData() {
     }
     showLoading(true);
     data = [];
+    version = '';
 
     if (!window.loadedData || !window.loadedData[key]) {
         const script = document.createElement('script');
         script.src = scriptPath;
         script.onload = () => {
             data = window.loadedData[key] || [];
+            version = window.loadedData[`${key}-version`] || '';
             setFiltersEnabled(true);
             render();
             showLoading(false);
@@ -194,7 +197,8 @@ function loadData() {
         };
         document.head.appendChild(script);
     } else {
-        data = window.loadedData[key];
+        data = window.loadedData[key] || [];
+        version = window.loadedData[`${key}-version`] || '';
         setFiltersEnabled(true);
         render();
         showLoading(false);
@@ -254,6 +258,7 @@ function render(resetScroll = true) {
     if (filteredData.length === 0) {
         descriptions.innerHTML = `<p class="message">Aucun élément ne correspond à votre recherche ou à vos filtres.</p>`;
         updateEntryCount();
+        updateVersion();
         return;
     }
 
@@ -287,6 +292,7 @@ function render(resetScroll = true) {
     });
 
     updateEntryCount();
+    updateVersion();
 
     if (!showDiffs) {
         document.querySelectorAll('.entry[data-diffed]').forEach(entryEl => {
@@ -307,6 +313,13 @@ function updateEntryCount() {
     const el = document.getElementById('entry-count');
     if (el) {
         el.innerHTML = `<span>${filteredData.length}</span> ${filteredData.length === 1 ? 'élément' : 'éléments'}`;
+    }
+}
+
+function updateVersion() {
+    const el = document.getElementById('version');
+    if (el) {
+        el.innerHTML = version ? `v<span>${version}</span>` : '';
     }
 }
 
