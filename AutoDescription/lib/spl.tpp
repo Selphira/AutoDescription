@@ -162,7 +162,7 @@ BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" RET description BEGIN
-	SPRINT saving_throw @100036 // ~Jet de sauvegarde~
+	SPRINT saving_throw @10007 // ~\(Jet de sauvegarde\|Jets de sauvegarde\)+~
 
 	// Suppression des lignes techniques
 	INNER_PATCH ~%description%~ BEGIN
