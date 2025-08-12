@@ -2797,8 +2797,8 @@
 @11440014 = ~%action% l'utilisation des sorts innés~
 @11440015 = ~%action% l'utilisation de la détection des pièges et des illusions~
 @11440016 = ~%action% l'utilisation de l'inventaire~
-@11440020 = ~Empêche~ // Action
-@11440021 = ~d'empêcher~ // Action
+@11440050 = ~Empêche~ // Action
+@11440051 = ~d'empêcher~ // Action
 
 @11440021 = ~%action% d'utiliser le camouflage dans l'ombre~
 @11440022 = ~%action% d'utiliser les compétences de roublard~

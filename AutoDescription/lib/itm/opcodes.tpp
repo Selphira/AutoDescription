@@ -7216,13 +7216,13 @@ END
  * ---------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_144~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @11440020 // ~Empêche~
+	SPRINT action @11440050 // ~Empêche~
 	LPM ~opcode_144_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_144~ BEGIN
 	LOCAL_SET strref = 11440001 + parameter2
-	SPRINT action @11440021 // ~d'empêcher~
+	SPRINT action @11440051 // ~d'empêcher~
 	LPM ~opcode_144_common~
 END
 

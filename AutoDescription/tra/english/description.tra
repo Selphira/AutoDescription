@@ -2772,8 +2772,8 @@
 @11440014 = ~%action% the use of innate spells~
 @11440015 = ~%action% the use of Find traps~
 @11440016 = ~%action% the use of the inventory~
-@11440020 = ~Prevents~ // Action
-@11440021 = ~to prevent~ // Action
+@11440050 = ~Prevents~ // Action
+@11440051 = ~to prevent~ // Action
 
 @11440021 = ~%action% to use Hide in shadows~
 @11440022 = ~%action% to use thief skills~
