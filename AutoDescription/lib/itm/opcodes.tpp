@@ -5304,7 +5304,7 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 		//Toutes les immunités regroupées en un seul opcode
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
-			PATCH_IF probability == 100 AND target = TARGET_FX_self BEGIN
+			PATCH_IF probability == 100 AND (target = TARGET_FX_self OR target == TARGET_FX_original_caster) BEGIN
 				SET count += 1
 			END
 		END
@@ -5312,7 +5312,7 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 			PATCH_DEFINE_ARRAY ~immunitiesList~ BEGIN END
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 				LPM ~data_to_vars~
-				PATCH_IF probability == 100 AND target = TARGET_FX_self BEGIN
+				PATCH_IF probability == 100 AND (target = TARGET_FX_self OR target == TARGET_FX_original_caster) BEGIN
 					SET strref = 400000 + parameter2
 					LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 					PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
@@ -5323,6 +5323,15 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 							match_parameter2  = parameter2
 					        match_probability = 100
 					        match_target      = TARGET_FX_self
+						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
+						RET $opcodes(~101~) = count
+						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+					END
+					LPF ~delete_opcode~
+						INT_VAR opcode = 101
+							match_parameter2  = parameter2
+					        match_probability = 100
+					        match_target      = TARGET_FX_original_caster
 						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
 						RET $opcodes(~101~) = count
 						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
