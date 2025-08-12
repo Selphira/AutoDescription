@@ -3556,7 +3556,7 @@
 @12790020 = ~Permet~ // action
 @12790021 = ~de permettre~ // action
 @12790040 = ~Permet %toTheTarget%~ // action
-@12790040 = ~de permettre %toTheTarget%~ // action
+@12790041 = ~de permettre %toTheTarget%~ // action
 
 // Opcode 280: Spell Effect: Wild Magic [280]
 
