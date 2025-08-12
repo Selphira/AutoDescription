@@ -586,6 +586,19 @@ BEGIN
 	SET $opcodes(~%opcode%~) = count
 END
 
+DEFINE_PATCH_MACRO ~delete_opcode~ BEGIN
+    LPF ~delete_opcode~
+        INT_VAR opcode = opcode_to_delete match_position = position_to_delete
+        RET $opcodes(~%opcode_to_delete%~) = count
+        RET_ARRAY EVAL ~opcodes_%opcode_to_delete%~ = opcodes_xx
+    END
+    // Bug où il reste toujours un item dans le tableau si c'était le dernier
+    // N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+    PATCH_IF $opcodes(~%opcode_to_delete%~) == 0 BEGIN
+        CLEAR_ARRAY ~opcodes_%opcode_to_delete%~
+    END
+END
+
 DEFINE_PATCH_FUNCTION ~get_opcode_by_position~
 	INT_VAR
 		opcode = 0

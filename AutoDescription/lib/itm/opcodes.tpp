@@ -4243,16 +4243,23 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_83~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_83_common~ BEGIN
-	LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+    PATCH_IF STRING_LENGTH ~%custom_str%~ > 0 BEGIN
+        SPRINT projectiles ~%custom_str%~
+        LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+    END
+    ELSE BEGIN
+        LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
 
-	PATCH_IF projref > 0 BEGIN
-		LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
-	END
+        PATCH_IF projref > 0 BEGIN
+            LPF ~getTranslation~ INT_VAR strref = projref opcode RET projectiles = string END
+            LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+        END
+    END
 END
 
 DEFINE_PATCH_MACRO ~opcode_83_group~ BEGIN
 	LOCAL_SET projectile = 0
+    LOCAL_SET opcode_to_delete = 206
 	PATCH_PHP_EACH EVAL ~opcodes_83~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET projectile = parameter2 + 1
@@ -4263,21 +4270,33 @@ DEFINE_PATCH_MACRO ~opcode_83_group~ BEGIN
 				INNER_PATCH_FILE ~%match_resref%.spl~ BEGIN
 					READ_SHORT (0x72 + SPL_HEAD_projectile) match_projectile
 					PATCH_IF projectile == match_projectile BEGIN
-						LPF ~delete_opcode~
-							INT_VAR opcode = 206 match_position
-							RET $opcodes(~206~) = count
-							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
-						END
-						// Bug où il reste toujours un item dans le tableau si c'était le dernier
-						// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
-						PATCH_IF $opcodes(~206~) == 0 BEGIN
-				            CLEAR_ARRAY ~opcodes_206~
-				        END
+					    SET position_to_delete = match_position
+						LPM ~delete_opcode~
 					END
 				END
 			END
 		END
 	END
+	SET opcode_to_delete = 83
+	CLEAR_ARRAY ~opcode_83_projectiles_list~
+    PATCH_IF $opcodes(~83~) > 1 BEGIN
+        PATCH_PHP_EACH EVAL ~opcodes_83~ AS data => _ BEGIN
+            LPM ~data_to_vars~
+            LPF ~get_projectile_name~ INT_VAR projectile = parameter2 RET projref END
+
+            PATCH_IF projref > 0 BEGIN
+                LPF ~getTranslation~ INT_VAR strref = projref opcode = 83 RET projectiles = string END
+                SPRINT $opcode_83_projectiles_list(~%projectiles%~) ~%projectiles%~
+            END
+            SET position_to_delete = position
+            LPM ~delete_opcode~
+        END
+        SORT_ARRAY_INDICES ~opcode_83_projectiles_list~ LEXICOGRAPHICALLY
+        SPRINT the @11770200 // ~les~
+        SPRINT andThe @11770201 // ~et les~
+        LPF ~implode~ STR_VAR array_name = ~opcode_83_projectiles_list~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET custom_str = text END
+        LPM ~add_opcode~
+    END
 END
 
 /* ------------------------------------------- *
