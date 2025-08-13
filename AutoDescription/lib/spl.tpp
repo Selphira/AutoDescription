@@ -86,7 +86,7 @@ BEGIN
 	READ_SHORT SPL_extended_headers_count  headerCount
 
 	// On récupère la description roleplay de la description originale
-	LPF ~get_spell_roleplay_description~ STR_VAR description = ~%originalDescription%~ RET roleplayDescription = description END
+	LPF ~get_spell_roleplay_description~ STR_VAR description = ~%originalDescription%~ spellName RET roleplayDescription = description END
 
 	SET ignoreDuration = 0
 	SET ignoreSavingThrow = 0
@@ -99,7 +99,7 @@ BEGIN
 	LPF ~spell_range~ RET description END
 	LPF ~spell_duration~ RET description ignoreDuration isSpecialDuration = is_special hasDuration = has_duration END
 	LPF ~spell_casting_time~ RET description END
-	LPF ~spell_target~ RET description END
+	LPF ~spell_target~ RET description globalSpellTarget = spellTarget END
 	LPF ~spell_saving_throw~ RET description ignoreSavingThrow END
 	LPF ~spell_resistance~ RET description END
 
@@ -161,12 +161,16 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = "" RET description BEGIN
+DEFINE_PATCH_FUNCTION ~get_spell_roleplay_description~ STR_VAR description = ~~ spellName = ~~ RET description BEGIN
 	SPRINT saving_throw @10007 // ~\(Jet de sauvegarde\|Jets de sauvegarde\)+~
 
-	// Suppression des lignes techniques
+	// Suppression du nom du sort
+    INNER_PATCH_SAVE description ~%description%~ BEGIN
+        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%spellName%\([\.%MNL%%LNL%%WNL%]\)+~ ~~
+    END
+
 	INNER_PATCH ~%description%~ BEGIN
-		SPRINT regex ~\(.*\)%saving_throw%\(.*[%MNL%%LNL%%WNL%]*\)*~
+		SPRINT regex ~\(.*\)^%saving_throw%\(.*[%MNL%%LNL%%WNL%]*\)*~
 		SPRINT replace ~~
 		REPLACE_EVALUATE CASE_INSENSITIVE ~%regex%~ BEGIN
 			SPRINT description ~%MATCH0%~
