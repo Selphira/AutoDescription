@@ -11864,23 +11864,26 @@ END
  * ---------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_252~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12520001
+    LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_252~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12520002
+    LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_252~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12520003
+    LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_252~ BEGIN
-	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-	SPRINT description @12520004
+    LPM ~opcode_252_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_252_common~ BEGIN
+    LOCAL_SET type = 0
+    LOCAL_SET castingLevel = 0
+    LOCAL_SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
+    LPM ~opcode_146_get_spell_effects_description~
 END
 
 DEFINE_PATCH_MACRO ~opcode_252_is_valid~ BEGIN
