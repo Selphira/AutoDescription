@@ -23,9 +23,14 @@ BEGIN
     PATCH_PHP_EACH ~%arrayName%~ AS data => value BEGIN
         // Prise en compte des cas où un sort lancé depuis un opcode 146 (ou autre), génère plusieurs lignes...
         // Pas vraiment top de le faire ici...
-		INNER_PATCH_SAVE data_5 ~%data_5%~ BEGIN
-			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
-		END
+        INNER_PATCH_SAVE data_5 ~%data_5%~ BEGIN
+            found = INDEX_BUFFER (CASE_INSENSITIVE EVALUATE_REGEXP ~^%crlf%%crlf%~)
+            PATCH_IF found != "-1" BEGIN
+                REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%%crlf%~ ~~
+                SET value = 100
+            END
+        END
+
         PATCH_IF value == 100 BEGIN
             LPF ~appendLine~ STR_VAR string = EVAL ~%data_5%~ RET description END
         END
