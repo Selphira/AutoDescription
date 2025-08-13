@@ -23,6 +23,10 @@ BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
+                // Si c'est un sortilège personnel et que l'effet cible "une cible" (Cas de diverses capacités spéciales et innées)
+		        PATCH_IF NOT isSubSpell AND target == TARGET_FX_preset AND VARIABLE_IS_SET globalSpellTarget AND ~%globalSpellTarget%~ STRING_EQUAL ~self~ BEGIN
+		            SET target = TARGET_FX_self
+		        END
 
 				SET oldProbability = probability
 				PATCH_IF baseProbability != 100 BEGIN

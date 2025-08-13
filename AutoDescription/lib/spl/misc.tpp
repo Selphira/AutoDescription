@@ -822,8 +822,9 @@ DEFINE_PATCH_FUNCTION ~spell_casting_time~ RET description BEGIN
 	LPF ~appendValue~ INT_VAR strref = 11890001 STR_VAR value = ~%currentCastingTime%~ RET description END // ~Temps d'incantation~
 END
 
-DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
+DEFINE_PATCH_FUNCTION ~spell_target~ RET description spellTarget BEGIN
 	SET count = 0
+	SPRINT spellTarget ~area~
 
 	PATCH_DEFINE_ARRAY ~targets~ BEGIN END
 
@@ -838,14 +839,17 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 			PATCH_IF ~%areaTarget%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF target == TARGET_HEAD_self OR target == TARGET_HEAD_self_ignore_pause BEGIN
 					SPRINT areaTarget @102467 // ~Le lanceur~
+	                SPRINT spellTarget ~self~
 				END
 				ELSE PATCH_IF target == TARGET_HEAD_creature BEGIN
                     READ_BYTE (offset + SPL_HEAD_target_number) countTarget
                     PATCH_IF countTarget <= 1 BEGIN
                         SPRINT areaTarget @102466 // ~1 créature~
+	                    SPRINT spellTarget ~creature~
                     END
                     ELSE BEGIN
                         SPRINT areaTarget @102465 // ~%countTarget% créatures~
+	                    SPRINT spellTarget ~creatures~
                     END
                 END
 				ELSE PATCH_IF target == TARGET_HEAD_area BEGIN
@@ -853,6 +857,7 @@ DEFINE_PATCH_FUNCTION ~spell_target~ RET description BEGIN
 				END
 				ELSE PATCH_IF target == TARGET_HEAD_character_portrait BEGIN
 					SPRINT areaTarget @102466 // ~1 créature~
+	                SPRINT spellTarget ~creature~
 				END
 			END
 
