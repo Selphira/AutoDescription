@@ -35,7 +35,7 @@ BEGIN
 				LPF ~get_effect_description~ INT_VAR ignoreDuration ignoreSavingThrow forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET probability = oldProbability
-					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
+					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1 + (depthOfEffect * 2)
 					SET countLines += 1
 				END
 		    END
@@ -257,6 +257,7 @@ BEGIN
 	// 341 : Semble que ce soit toujours la cible de l'attaque
 	SET forceTarget = (opcode == 146 OR (opcode == 232 AND parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR opcode == 326) ? 1 : 0
 	SET totalLines = 0
+	SET depthOfEffect = recursivity
 	SPRINT strDuration ~~
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.
 	LPM ~clear_opcodes~
@@ -284,11 +285,6 @@ BEGIN
                 PATCH_IF totalLines == 1 BEGIN
                     INNER_PATCH_SAVE description ~%description%~ BEGIN
                         REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
-                    END
-                END
-                ELSE PATCH_IF totalLines > 1 BEGIN
-                    INNER_PATCH_SAVE description ~%description%~ BEGIN
-                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
                     END
                 END
             END

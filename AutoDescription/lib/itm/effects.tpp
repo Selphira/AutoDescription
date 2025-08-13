@@ -50,6 +50,9 @@ END
 
 DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+        INNER_PATCH_SAVE description ~%description%~ BEGIN
+            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+        END
 		SPRINT description ~%condition%%semicolon%%description%~
 	END
 END

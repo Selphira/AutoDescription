@@ -98,6 +98,7 @@ BEGIN
 	SET isItem = 1
 	SET isSpell = 0
 	SET isSubSpell = 0
+	SET depthOfEffect = 0
 
 	PATCH_IF itemType == ITM_TYPE_potion BEGIN
 		SPRINT theSource   @102451 // ~le buveur~

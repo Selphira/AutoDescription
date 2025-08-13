@@ -828,6 +828,9 @@ BEGIN
 				LPM ~%method%~
 				LPM ~set_opcode_sort~
 				PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+                    INNER_PATCH_SAVE description ~%description%~ BEGIN
+                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+                    END
 					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
 					SPRINT description @101125 // ~%probability% de chances %description%~
 				END

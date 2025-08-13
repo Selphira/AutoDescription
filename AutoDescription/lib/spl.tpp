@@ -75,6 +75,7 @@ BEGIN
 	SET isArmor = 0
 	SET isRobe = 0
 	SET isAmmo = 0
+	SET depthOfEffect = 0
 
 	SPRINT theSource   @102475 // ~le lanceur~
 	SPRINT ofTheSource @102476 // ~du lanceur~

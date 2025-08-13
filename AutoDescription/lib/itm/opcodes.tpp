@@ -7550,12 +7550,6 @@ DEFINE_PATCH_MACRO ~opcode_146_condition~ BEGIN
 					SPRINT condition ~%condition%, %strDuration%~
 				END
 				LPF ~ucfirst~ STR_VAR value = ~%condition%~ RET condition = string END
-		        PATCH_IF ~%description%~ STRING_MATCHES_REGEXP ~^%crlf%~ == 1 BEGIN
-					INNER_PATCH_SAVE description ~%description%~ BEGIN
-						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
-					END
-					SPRINT description ~%crlf%  - %description%~
-				END
 			END
 			SET ignoreDuration = 1
 			SET timingMode = TIMING_duration // La méthode add_duration a une exception pour les timings delayed...
