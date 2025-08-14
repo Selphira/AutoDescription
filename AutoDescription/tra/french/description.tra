@@ -4179,8 +4179,8 @@
 @13260125 = ~Si la force %ofTheTarget% est inférieure à %value%~
 @13260126 = ~Si la constitution %ofTheTarget% est supérieure ou égale à %value%~
 @13260127 = ~Si la constitution %ofTheTarget% est inférieure à %value%~
-@13260128 = ~Si la intelligence %ofTheTarget% est supérieure ou égale à %value%~
-@13260129 = ~Si la intelligence %ofTheTarget% est inférieure à %value%~
+@13260128 = ~Si l'intelligence %ofTheTarget% est supérieure ou égale à %value%~
+@13260129 = ~Si l'intelligence %ofTheTarget% est inférieure à %value%~
 @13260130 = ~Si la sagesse %ofTheTarget% est supérieure ou égale à %value%~
 @13260131 = ~Si la sagesse %ofTheTarget% est inférieure à %value%~
 @13260132 = ~Si le charisme %ofTheTarget% est supérieur ou égal à %value%~
