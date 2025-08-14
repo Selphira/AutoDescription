@@ -8779,7 +8779,11 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		WHILE ~%targetType%~ STRING_COMPARE ~~ BEGIN
 			LPF return_first_entry STR_VAR list = ~%targetType%~ RET entry targetType = list END
 			LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~:~ RET file = entry entry = list END
-            PATCH_IF ~%entry%~ STRING_EQUAL ~~ BEGIN
+			LPF return_first_entry STR_VAR list = ~%file%~ separator = ~;~ RET strref = entry value = list END
+			PATCH_IF STRING_LENGTH ~%strref%~ > 0 AND STRING_LENGTH ~%value%~ > 0 BEGIN
+                SPRINT idName (AT strref)
+			END
+            ELSE PATCH_IF ~%entry%~ STRING_EQUAL ~~ BEGIN
                 SPRINT idName (AT file)
             END
             ELSE BEGIN
@@ -14175,8 +14179,17 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	145 => ~13241145~ // ~créatures dont les points de vie sont inférieurs à %value%~
 END
 
+ACTION_DEFINE_ARRAY ~opcode_326_grouped_min_target_value~ BEGIN // >=
+    122 124 126 128 130 132 134 136 144
+END
+
+ACTION_DEFINE_ARRAY ~opcode_326_grouped_max_target_value~ BEGIN // <
+    123 125 127 129 131 133 135 137 145
+END
+
 DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 	PATCH_DEFINE_ARRAY target_types BEGIN END
+	PATCH_DEFINE_ARRAY target_values BEGIN END
 	PATCH_DEFINE_ARRAY positions BEGIN END
 	PATCH_DEFINE_ARRAY counts BEGIN END
 
@@ -14190,6 +14203,7 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 		PATCH_IF VARIABLE_IS_SET $opcode_326_targets(~%parameter2%~) BEGIN
 			PATCH_IF NOT VARIABLE_IS_SET $counts(~%resref%~) BEGIN
 				SET $counts(~%resref%~) = 0
+				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
 				SPRINT $positions(~%resref%~) ~~
 				SPRINT $target_types(~%resref%~) ~~
 			END
@@ -14197,6 +14211,18 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 			SPRINT tmp_positions $positions(~%resref%~)
 			SPRINT tmp_target_types $target_types(~%resref%~)
 			SPRINT $positions(~%resref%~) ~%tmp_positions% %position%~
+
+            INNER_PATCH_SAVE tmp_target_types ~%tmp_target_types%~ BEGIN
+                REPLACE_TEXTUALLY ~ %tmp_new_target_types%~ ~~
+                REPLACE_TEXTUALLY ~%tmp_new_target_types% ~ ~~
+            END
+			PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) > parameter1 BEGIN
+				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
+			END
+			PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_max_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) < parameter1 BEGIN
+				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
+			END
+
 			SPRINT $target_types(~%resref%~) ~%tmp_target_types% %tmp_new_target_types%~
 			SET $counts(~%resref%~) = $counts(~%resref%~) + 1
 		END
@@ -14219,6 +14245,18 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 
 	PATCH_PHP_EACH EVAL ~counts~ AS resref => count BEGIN
 		PATCH_IF count > 1 BEGIN
+	        PATCH_PHP_EACH EVAL ~target_values~ AS target_data => target_value BEGIN
+	            PATCH_PRINT "%abc% => %target_data_0% : %target_data_1% => %target_value%"
+	            PATCH_IF ~%resref%~ STRING_EQUAL ~%target_data_0%~ BEGIN
+	                SPRINT tmp_target_types $target_types(~%resref%~)
+	                SPRINT tmp_new_target_types $opcode_326_targets(~%target_data_1%~)
+                    INNER_PATCH_SAVE tmp_target_types ~%tmp_target_types%~ BEGIN
+                        REPLACE_TEXTUALLY ~%tmp_new_target_types%~ ~%tmp_new_target_types%;%target_value%~
+                    END
+	                SPRINT $target_types(~%resref%~) ~%tmp_target_types%~
+	            END
+		    END
+
 			SPRINT tmp_positions $positions(~%resref%~)
 			WHILE NOT ~%tmp_positions%~ STRING_EQUAL ~~ BEGIN
 				LPF return_first_entry STR_VAR list = ~%tmp_positions%~ RET position=entry EVAL tmp_positions = list END

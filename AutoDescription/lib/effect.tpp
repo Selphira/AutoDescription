@@ -475,6 +475,14 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_group_generic~ BEGIN
+    // Besoin d'un tableau contenant les valeurs qui DOIVENT rester identiques
+    // Besoin d'un tableau contenant les valeurs qui PEUVENT être différentes
+    // Générer une clé pour les valeurs identiques
+    // La position des lignes aux valeurs identiques est enregistrée dans un tableau
+    // Si ce tableau a une valeur de plus de 1, un regroupement est possible !
+END
+
 DEFINE_PATCH_FUNCTION ~has_opcode~
 	INT_VAR
 		opcode = 0
@@ -807,10 +815,7 @@ BEGIN
 			END
 		END
 
-		PATCH_IF NOT ~%target_type~ STRING_EQUAL ~~ BEGIN
-			LPM ~opcode_set_target_strings~
-		END
-
+		LPM ~opcode_set_target_strings~
 		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
