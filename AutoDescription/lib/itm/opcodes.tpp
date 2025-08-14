@@ -3734,7 +3734,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_67_group~ BEGIN
 	LOCAL_SET countProbabilityCreature = 0
-	LPM ~opcode_group_by_target~
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF probability == 100 BEGIN
@@ -6758,7 +6757,6 @@ DEFINE_PATCH_MACRO ~opcode_127_group~ BEGIN
 	LOCAL_SET amountMin = 0
 	LOCAL_SET amountMax = 0
 	LOCAL_SET totalProbability = 0
-	LPM ~opcode_group_by_target~
 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
@@ -8519,10 +8517,6 @@ DEFINE_PATCH_MACRO ~opcode_177_replace_effect_vars~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_177_group~ BEGIN
-	LPM ~opcode_group_by_target~
-END
-
 DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 	// Un problème fait qu'avec le add_opcode() l'opcode en cours de traitement est remis, bien qu'il ai été supprimé avant...
 	// On doit donc supprimer ces entrées une seconde fois à la fin du traitement
@@ -8986,10 +8980,6 @@ DEFINE_PATCH_MACRO ~opcode_178_is_valid~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~opcode_178_group~ BEGIN
-	LPM ~opcode_group_by_target~
-END
-
 /* ----------------------------------------------------- *
  * Spell Effect: Damage vs. Creature Type Modifier [179] *
  * ----------------------------------------------------- */
@@ -9021,10 +9011,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_179_is_valid~ BEGIN
 	LPM ~opcode_178_is_valid~
-END
-
-DEFINE_PATCH_MACRO ~opcode_179_group~ BEGIN
-	LPM ~opcode_group_by_target~
 END
 
 /* -------------------------- *
@@ -14764,10 +14750,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_344_is_valid~ BEGIN
 	LPM ~opcode_idscheck8_is_valid~
-END
-
-DEFINE_PATCH_MACRO ~opcode_344_group~ BEGIN
-	LPM ~opcode_group_by_target~
 END
 
 /* ----------------------- *
