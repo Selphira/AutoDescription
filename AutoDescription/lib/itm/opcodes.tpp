@@ -14179,12 +14179,28 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	145 => ~13241145~ // ~créatures dont les points de vie sont inférieurs à %value%~
 END
 
-ACTION_DEFINE_ARRAY ~opcode_326_grouped_min_target_value~ BEGIN // >=
-    122 124 126 128 130 132 134 136 144
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_grouped_min_target_value~ BEGIN // >=
+    122 => 1
+    124 => 1
+    126 => 1
+    128 => 1
+    130 => 1
+    132 => 1
+    134 => 1
+    136 => 1
+    144 => 1
 END
 
-ACTION_DEFINE_ARRAY ~opcode_326_grouped_max_target_value~ BEGIN // <
-    123 125 127 129 131 133 135 137 145
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_grouped_max_target_value~ BEGIN // <
+    123 => 1
+    125 => 1
+    127 => 1
+    129 => 1
+    131 => 1
+    133 => 1
+    135 => 1
+    137 => 1
+    145 => 1
 END
 
 DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
@@ -14201,27 +14217,32 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF VARIABLE_IS_SET $opcode_326_targets(~%parameter2%~) BEGIN
+			SPRINT tmp_new_target_types $opcode_326_targets(~%parameter2%~)
+
+			PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_max_target_value(~%parameter2%~) OR VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) BEGIN
+			    SPRINT tmp_new_target_types ~%tmp_new_target_types%;%parameter1%~
+			    SPRINT resref ~%resref%;%parameter1%;%parameter2%~
+
+                INNER_PATCH_SAVE tmp_target_types ~%tmp_target_types%~ BEGIN
+                    REPLACE_TEXTUALLY ~ %tmp_new_target_types%~ ~~
+                    REPLACE_TEXTUALLY ~%tmp_new_target_types% ~ ~~
+                END
+                PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) > parameter1 BEGIN
+                    SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
+                END
+                PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_max_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) < parameter1 BEGIN
+                    SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
+                END
+			END
+
 			PATCH_IF NOT VARIABLE_IS_SET $counts(~%resref%~) BEGIN
 				SET $counts(~%resref%~) = 0
-				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
 				SPRINT $positions(~%resref%~) ~~
 				SPRINT $target_types(~%resref%~) ~~
 			END
-			SPRINT tmp_new_target_types $opcode_326_targets(~%parameter2%~)
 			SPRINT tmp_positions $positions(~%resref%~)
 			SPRINT tmp_target_types $target_types(~%resref%~)
 			SPRINT $positions(~%resref%~) ~%tmp_positions% %position%~
-
-            INNER_PATCH_SAVE tmp_target_types ~%tmp_target_types%~ BEGIN
-                REPLACE_TEXTUALLY ~ %tmp_new_target_types%~ ~~
-                REPLACE_TEXTUALLY ~%tmp_new_target_types% ~ ~~
-            END
-			PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) > parameter1 BEGIN
-				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
-			END
-			PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_max_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) < parameter1 BEGIN
-				SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
-			END
 
 			SPRINT $target_types(~%resref%~) ~%tmp_target_types% %tmp_new_target_types%~
 			SET $counts(~%resref%~) = $counts(~%resref%~) + 1
@@ -14246,7 +14267,6 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~counts~ AS resref => count BEGIN
 		PATCH_IF count > 1 BEGIN
 	        PATCH_PHP_EACH EVAL ~target_values~ AS target_data => target_value BEGIN
-	            PATCH_PRINT "%abc% => %target_data_0% : %target_data_1% => %target_value%"
 	            PATCH_IF ~%resref%~ STRING_EQUAL ~%target_data_0%~ BEGIN
 	                SPRINT tmp_target_types $target_types(~%resref%~)
 	                SPRINT tmp_new_target_types $opcode_326_targets(~%target_data_1%~)
