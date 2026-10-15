@@ -1416,7 +1416,7 @@ BEGIN
 	SPRINT and @100021 // ~et~
     LPF ~implode~ STR_VAR array_name = ~dispellableSpells~ glue = ~, ~ final_glue = ~ %and% ~ RET spellList = text END
     SPRINT affectedSpellList @102130 // ~Les sorts et capacités affectés sont%colon%%spellList%~
-	SPRINT description ~%description%%crlf%%crlf%%affectedSpellList%'~
+	SPRINT description ~%description%%crlf%%crlf%%affectedSpellList%~
 END
 
 DEFINE_PATCH_FUNCTION ~is_dispellable_by_clearair~
