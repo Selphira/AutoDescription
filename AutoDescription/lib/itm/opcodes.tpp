@@ -6420,10 +6420,6 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_116~ BEGIN
 	LPM ~opcode_self_probability_116~ // ~de dissiper l'invisibilité %ofTheTarget%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_116_is_valid~ BEGIN
-	LPM ~opcode_47_is_valid~
-END
-
 DEFINE_PATCH_MACRO ~opcode_116_spell_level_match~ BEGIN
 	// Parameter #1: Irrevelant
 	// Parameter #2: Irrevelant
