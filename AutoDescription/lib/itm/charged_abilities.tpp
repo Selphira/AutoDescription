@@ -243,12 +243,12 @@ DEFINE_PATCH_FUNCTION ~get_charged_string~
 	RET
 		chargeStr
 BEGIN
-    PATCH_IF depletion == 1 BEGIN
+	PATCH_IF charges == 0 BEGIN
+		SPRINT chargeStr @102678 // ~usage illimité~
+	END
+    ELSE PATCH_IF depletion == 1 BEGIN
         PATCH_IF charges == 1 BEGIN
 			SPRINT chargeStr @102677 // ~usage unique~
-        END
-        ELSE PATCH_IF charges == 0 BEGIN
-			SPRINT chargeStr @102678 // ~usage illimité~
         END
         ELSE BEGIN
 			SPRINT chargeStr @102159 // ~%charges% charges, l'objet est détruit quand toutes les charges sont utilisées~

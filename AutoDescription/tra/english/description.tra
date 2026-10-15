@@ -2514,13 +2514,13 @@
 @11060002 = ~Morale %ofTheTarget% is strengthened by %value%~
 @11060003 = ~Morale %ofTheTarget% is weakened by %value%~
 @11060004 = ~Immunity to panic~
-@11060005 = ~Morale breakpoint %ofTheTarget% changes to %parameter1%~
+@11060005 = ~Morale breakpoint %ofTheTarget% changes to %value%~
 
 @11060006 = ~to keep morale %ofTheTarget% high~
 @11060007 = ~to boost morale %ofTheTarget% by %value%~
 @11060008 = ~decrease morale %ofTheTarget% by %value%~
 @11060009 = ~to immunize %theTarget% against morale breakdown~
-@11060010 = ~to increase morale breakpoint %ofTheTarget% to %parameter1%~
+@11060010 = ~to increase morale breakpoint %ofTheTarget% to %value%~
 
 // Opcode 108: Stat: Reputation [108]
 
@@ -2707,9 +2707,9 @@
 
 // Opcode 130: State: Bless [130]
 
-@11300001 = ~Bless~
-@11300002 = ~Casts Bless on %theTarget%~
-@11300003 = ~to cast Bless on %theTarget%~
+@11300001 = ~Bless (%value%)~
+@11300002 = ~Casts Bless (%value%) on %theTarget%~
+@11300003 = ~to cast Bless (%value%) on %theTarget%~
 
 // Opcode 132: State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
 
@@ -3378,8 +3378,9 @@
 
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Appease %theTarget%~
-@12470002 = ~to appease %theTarget%~
+@12470001 = ~Causes %theTarget% to go berserk~
+@12470002 = ~of causing %theTarget% to go berserk~
+@12470003 = ~In combat~
 
 // Opcode 248: Item: Set Melee Effect [248]
 

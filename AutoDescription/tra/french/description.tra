@@ -2538,13 +2538,13 @@
 @11060002 = ~Le moral %ofTheTarget% est renforcé de %value%~
 @11060003 = ~Le moral %ofTheTarget% est affaibli de %value%~
 @11060004 = ~Immunité à la panique~
-@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %parameter1%~
+@11060005 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~
 
 @11060006 = ~de garder le moral %ofTheTarget% au plus haut~
 @11060007 = ~de renforcer le moral %ofTheTarget% de %value%~
 @11060008 = ~d'affaiblir le moral %ofTheTarget% de %value%~
 @11060009 = ~d'immuniser %theTarget% contre la rupture de moral~
-@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %parameter1%~
+@11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
 
 // Opcode 108: Stat: Reputation [108]
 
@@ -2731,9 +2731,9 @@
 
 // Opcode 130: State: Bless [130]
 
-@11300001 = ~Bénédiction~
-@11300002 = ~Lance Bénédiction sur %theTarget%~
-@11300003 = ~de lancer Bénédiction sur %theTarget%~
+@11300001 = ~Bénédiction (%value%)~
+@11300002 = ~Lance Bénédiction (%value%) sur %theTarget%~
+@11300003 = ~de lancer Bénédiction (%value%) sur %theTarget%~
 
 // Opcode 132: State: Raise Strength, Constitution, & Dexterity Non-Cumulative [132]
 
@@ -3413,8 +3413,9 @@
 
 // Opcode 247: Spell Effect: Attack Nearest Creature [247]
 
-@12470001 = ~Apaise %theTarget%~
-@12470002 = ~d'apaiser %theTarget%~
+@12470001 = ~Provoque la folie du berserker chez %theTarget%~
+@12470002 = ~de provoquer la folie du berserker chez %theTarget%~
+@12470003 = ~En combat~
 
 // Opcode 248: Item: Set Melee Effect [248]
 
@@ -3636,6 +3637,12 @@
 @12990002 = ~Bloque les %amount% prochains hiatus entropiques %ofTheTarget%~
 @12990003 = ~de bloquer les %amount% prochains hiatus entropiques~
 @12990004 = ~de bloquer les %amount% prochains hiatus entropiques %ofTheTarget%~
+
+@12990011 = ~Dissipe le blocage des prochains hiatus entropiques~
+@12990012 = ~Dissipe le blocage des prochains hiatus entropiques %ofTheTarget%~
+@12990013 = ~de dissiper le blocage des prochains hiatus entropiques~
+@12990014 = ~de dissiper le blocage des prochains hiatus entropiques %ofTheTarget%~
+
 
 // Opcode 300: NPC Bump [300]
 

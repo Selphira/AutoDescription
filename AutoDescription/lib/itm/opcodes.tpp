@@ -457,8 +457,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~damage_types~ BEGIN
 	~%DAMAGETYPE_magic_fire%~  => 10120030 //  33554432 ~points de dégâts de feu magique~
 	~%DAMAGETYPE_magic_cold%~  => 10120031 //  67108864 ~points de dégâts de froid magique~
 	~%DAMAGETYPE_stunning%~    => 10120032 // 134217728 ~points de dégâts non létal~
-	~%DAMAGETYPE_soul_eater%~  => 101092   // 268435456 ~points de dégâts~
-	~%DAMAGETYPE_disease%~     => 101092   //1073741824 ~points de dégâts~
+	// ~%DAMAGETYPE_soul_eater%~  => 101092   // 268435456 ~points de dégâts~
+	// ~%DAMAGETYPE_disease%~     => 101092   //1073741824 ~points de dégâts~
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
@@ -1226,12 +1226,19 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_1~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
+	// FIXME: le résultat de SPSD02 n'est toujours pas correct (attaque impossible attendue)
 	LOCAL_SET is_negative = parameter1 < 0 ? 1 : 0
 	SET value = ABS parameter1
+	SET value &= 0xffff
 
-	// P2 = 1 ou P2 = 3: si P1 > 10 ou < 0 => P1 = 10
-	PATCH_IF (parameter2 == MOD_TYPE_flat OR parameter2 == 3) AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
-		SET value = 10
+	// P2 = 1 ou P2 = 3: si P1 > 10 → P1 = 10, si P1 < 0 → P1 = 0
+	PATCH_IF (parameter2 == MOD_TYPE_flat OR parameter2 == 3) BEGIN
+		PATCH_IF parameter1 < 0 BEGIN
+			SET value = 0
+		END
+		ELSE PATCH_IF value > 10 BEGIN
+			SET value = 10
+		END
 	END
 
 	SET parameter2 = (parameter2 == 3 AND NOT is_ee) ? MOD_TYPE_cumulative : parameter2
@@ -1257,7 +1264,7 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 		END
 	END
 
-	PATCH_IF parameter1 == 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
+	PATCH_IF parameter1 <= 0 AND (parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage OR parameter2 == 3) BEGIN
 		SET strref += 4 // ~Attaque impossible~
 	END
 	ELSE BEGIN
@@ -1284,16 +1291,17 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_1_is_valid~ BEGIN
 	LOCAL_SET value = ABS parameter1
+	SET value &= 0xffff
 
 	LPM ~opcode_modstat_is_valid~
 	PATCH_IF parameter2 < 0 OR parameter2 > 4 BEGIN
 		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unkwnow method : %parameter1%.~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown method : %parameter1%.~ END
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT VARIABLE_IS_SET $opcode_1_values(~%value%~) BEGIN
 		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1 value ([-10 10] expected).~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid parameter1 value : %parameter1% ([-10 10] expected).~ END
 	END
 
 	PATCH_IF parameter2 == 3
@@ -1328,6 +1336,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_2~ BEGIN
 	LPM ~opcode_self_probability_2~ // ~de réveiller %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_2_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* --------------------- *
@@ -1374,6 +1389,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_4~ BEGIN
 	LPM ~opcode_self_probability_4~ // ~d'apaiser %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_4_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ---------------------------------- *
@@ -1506,6 +1528,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_11~ BEGIN
 	LPM ~opcode_self_probability_11~
+END
+
+DEFINE_PATCH_MACRO ~opcode_11_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* --------------- *
@@ -1681,8 +1710,7 @@ DEFINE_PATCH_MACRO ~opcode_12_is_valid~ BEGIN
 	LOCAL_SET damage_type = parameter2 - mode
 
 	PATCH_IF NOT VARIABLE_IS_SET $damage_types(~%damage_type%~) BEGIN
-		// 	SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown damage type : %damage_type%.~ END
 	END
 	PATCH_IF mode > 3 OR mode < 0 BEGIN
 		SET isValid = 0
@@ -1758,6 +1786,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_13~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_13_is_valid~ BEGIN
+	// TODO: les autres valeurs ont tout de même un effet
 	PATCH_IF NOT VARIABLE_IS_SET $death_to_strref(~%parameter2%~) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown Death Type %parameter2%.~ END
@@ -1781,6 +1810,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_14~ BEGIN
 	LPM ~opcode_self_probability_14~
+END
+
+DEFINE_PATCH_MACRO ~opcode_14_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------------- *
@@ -2143,7 +2179,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_18_common~ BEGIN
 	// SET isCumulative = parameter2 != 6
 	SET damageAmount = parameter1
-	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND special != 0
+	SET healOnlyMaxPV = parameter2 >= 3 AND parameter2 <= 5 OR is_ee == 1 AND (special BAND BIT0) == 1
 	SET parameter2 = parameter2 MODULO 3
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
 		SPRINT value ~%complex_value%~
@@ -2197,7 +2233,6 @@ END
 /* ------------------------ *
  * State: Invisibility [20] *
  * ------------------------ */
- // TODO: parameter2 == 2 (EE)
 DEFINE_PATCH_MACRO ~opcode_self_20~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT description @10200001 // ~Invisibilité~
@@ -2257,6 +2292,14 @@ DEFINE_PATCH_MACRO ~opcode_20_group~ BEGIN
 		END
 	END
 END
+
+DEFINE_PATCH_MACRO ~opcode_20_is_valid~ BEGIN
+	 // TODO
+	PATCH_IF is_ee AND parameter2 != 0 AND parameter2 != 1 BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Type %parameter2% incomplet.~ END
+	END
+END
+
 
 /* ------------------------ *
  * Stat: Lore Modifier [21] *
@@ -2339,7 +2382,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_23~ BEGIN
 	LPM ~opcode_23_common~
 	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
-		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+		SPRINT description @10230003 // ~Rétabli le moral %ofTheTarget%~
 	END
 	ELSE BEGIN
 		LPF ~opcode_target~ INT_VAR strref = 10230002 RET description END // ~le moral~
@@ -2352,13 +2395,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_23_common~ BEGIN
 	PATCH_IF is_ee == 0 OR special == 0 BEGIN
-		//TODO: Pour ce cas, plutot avoir une phrase du genre: Le moral est à son maximum
 		SET parameter1 = 10
 		SET parameter2 = MOD_TYPE_flat
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 == 10 BEGIN
-		SPRINT description @10230003 // ~Le moral %ofTheTarget% ne peut flancher~
+		SPRINT description @10230003 // ~Rétabli le moral %ofTheTarget%~
 	END
 	ELSE BEGIN
 		LPF ~opcode_target~ INT_VAR strref = 10230002 RET description END // ~le moral~
@@ -2567,6 +2609,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_26~ BEGIN
 	LPM ~opcode_self_probability_26~ // ~de délivrer %theTarget% des malédictions~
 END
 
+DEFINE_PATCH_MACRO ~opcode_26_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------------------- *
  * Stat: Acid Resistance Modifier [27] *
  * ----------------------------------- */
@@ -2756,6 +2805,9 @@ END
 DEFINE_PATCH_MACRO ~opcode_33_is_valid~ BEGIN
 	PATCH_IF is_ee BEGIN
 		LPM ~opcode_modstat3_is_valid~
+		PATCH_IF opcode == 33 AND parameter2 == 3 AND !has_eeex BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : Type %parameter2% partially buggy. Use Type 0 instead or install EEex.~ END
+		END
 	END
 	ELSE BEGIN
 		LPM ~opcode_modstat2_is_valid~
@@ -2900,6 +2952,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_38~ BEGIN
 	LPM ~opcode_self_probability_38~ // ~de réduire %theTarget% au silence~
 END
 
+DEFINE_PATCH_MACRO ~opcode_38_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* --------------------------- *
  * State: Unconsciousness [39] *
  * --------------------------- */
@@ -2907,7 +2966,7 @@ DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
 
 // Adaptation opcode 39 https://www.baldursgateworld.fr/viewtopic.php?f=509&t=33168&p=519115#p519115
 
-	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+	PATCH_IF (is_ee == 0 OR parameter2 != 1) AND timingMode != TIMING_permanent AND timingMode != TIMING_delayed AND timingMode != 7 BEGIN
 		SPRINT description @10390001 // ~Endort %theTarget%~
 	END
 	ELSE BEGIN
@@ -2916,7 +2975,7 @@ DEFINE_PATCH_MACRO ~opcode_self_39~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_39~ BEGIN
-	PATCH_IF is_ee == 0 OR parameter2 != 1 BEGIN
+	PATCH_IF (is_ee == 0 OR parameter2 != 1) AND timingMode != TIMING_permanent AND timingMode != TIMING_delayed AND timingMode != 7 BEGIN
 		SPRINT description @10390002 // ~d'endormir %theTarget%~
 	END
 	ELSE BEGIN
@@ -2949,6 +3008,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_40~ BEGIN
 	LPM ~opcode_self_probability_40~ // ~d'infliger lenteur %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_40_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* --------------------------------------- *
@@ -3049,6 +3115,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_43~ BEGIN
 	LPM ~opcode_self_probability_43~ // ~de dépétrifier %theTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_43_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------------- *
  * Stat: Strength Modifier [44] *
  * ---------------------------- */
@@ -3096,6 +3169,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_45~ BEGIN
 	LPM ~opcode_self_probability_45~
 END
 
+DEFINE_PATCH_MACRO ~opcode_45_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------ *
  * Cure: Stun (Unstun) [46] *
  * ------------------------ */
@@ -3115,11 +3195,18 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_46~ BEGIN
 	LPM ~opcode_self_probability_46~ // ~de ranimer %theTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_46_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------- *
  * Cure: Invisibility [47] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_47~ BEGIN
-	SPRINT description @10470001 // ~Immunité à l'invisibilité~
+	SPRINT description @10470001 // ~Dissipation de l'invisibilité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_47~ BEGIN
@@ -3132,6 +3219,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_47~ BEGIN
 	LPM ~opcode_self_probability_47~ // ~de dissiper l'invisibilité %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_47_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------------- *
@@ -3151,6 +3245,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_48~ BEGIN
 	LPM ~opcode_self_probability_48~ // ~de rendre la parole %toTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_48_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------- *
@@ -3263,6 +3364,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_56~ BEGIN
 	LPM ~opcode_self_probability_56~ // ~d'inverser l'alignement %ofTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_56_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------- *
  * Alignment: Change [57] *
  * ---------------------- */
@@ -3312,7 +3420,8 @@ DEFINE_PATCH_MACRO ~opcode_57_is_valid~ BEGIN
 			 parameter2 > 19 AND parameter2 < 33 OR
 			 parameter2 > 35 AND parameter2 < 49
 			 BEGIN
-		SET isValid = 0
+		// l'opcode est valide même si l'alignement est inconnu
+		// SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown alignment %parameter2%.~ END
 	END
 END
@@ -3592,7 +3701,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_62~ BEGIN
 	LOCAL_SET amount = parameter1
 	LOCAL_SET level = parameter2
-	LOCAL_SET spellLevelMax = 9
+	LOCAL_SET spellLevelMax = 7
 	LOCAL_SET spellTypes = 1 << 1
 
 	LPF ~opcode_self_42_62~ INT_VAR level amount spellTypes startStrref = 10620011 RET description END
@@ -3621,6 +3730,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_63~ BEGIN
 	SPRINT description @10630031 // ~d'octroyer la capacité d'infravision %toTheTarget% ~
 END
 
+DEFINE_PATCH_MACRO ~opcode_63_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------------ *
  * State: Remove Infravision [64] *
  * ------------------------------ */
@@ -3638,6 +3754,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_64~ BEGIN
 	LPM ~opcode_self_probability_64~ // ~de neutraliser l'infravision %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_64_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------- *
@@ -3667,7 +3790,7 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
             END
         END
 		// Allégiance de la créature non modifiée, donc intéressant
-		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
+		PATCH_IF parameter2 != 0 AND parameter2 != 1 AND parameter2 != 3 AND parameter2 != 5 BEGIN
 			LPF ~get_creature_allegiance~ STR_VAR file = EVAL ~%resref%~ RET allegiance END
 			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
 				SET strref = 10670002 // ~Invoque une créature hostile (%creatureName%)~
@@ -3708,7 +3831,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
                 SPRINT lifeDice @10670021 // ~ de %creatureLevel% dés de vie~
             END
         END
-		PATCH_IF parameter2 == 2 OR parameter2 == 4 OR parameter2 >= 6 BEGIN
+		PATCH_IF parameter2 != 0 AND parameter2 != 1 AND parameter2 != 3 AND parameter2 != 5 BEGIN
 			PATCH_IF allegiance >= 200 BEGIN // EVILCUTOFF
 				SET strref = 10670004 // ~d'invoquer une créature hostile (%creatureName%)~
 			END
@@ -3821,6 +3944,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_69~ BEGIN
 	LPM ~opcode_self_probability_69~ // ~de lancer non-détection sur %theTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_69_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------ *
  * Cure: Non-Detection [70] *
  * ------------------------ */
@@ -3838,6 +3968,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_70~ BEGIN
 	SPRINT description @10700003 // ~de dissiper la non-détection %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_70_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* --------------- *
@@ -3927,6 +4064,11 @@ DEFINE_PATCH_MACRO ~opcode_74_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_74_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	SET match_parameter1 = parameter1
+END
+
 /* -------------------- *
  * Cure: Blindness [75] *
  * -------------------- */
@@ -3944,6 +4086,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_75~ BEGIN
 	LPM ~opcode_self_probability_75~ // ~de guérir la cécité %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_75_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* --------------------------- *
@@ -3965,6 +4114,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_76~ BEGIN
 	LPM ~opcode_self_probability_76~ // ~d'infliger Débilité mentale %toTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_76_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* --------------------------- *
  * Cure: Feeblemindedness [77] *
  * --------------------------- */
@@ -3982,6 +4138,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_77~ BEGIN
 	LPM ~opcode_self_probability_77~ // ~de guérir la Débilité mentale %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_77_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------- *
@@ -4159,6 +4322,13 @@ DEFINE_PATCH_MACRO ~opcode_79_group~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_79_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------- *
  * Deafness [80] *
  * ------------- */
@@ -4174,13 +4344,17 @@ DEFINE_PATCH_MACRO ~opcode_self_80~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_80~ BEGIN
+	// FIXME? : plutôt étrange que la version "not short" soit plus courte
+	// La version longue est plus explicite mais induit en erreur car la surdité n'est pas cumulable
+	// En plus on perd le lien avec l'opcode 81 : guérir de la surdité
+	// On pourrait conserver la version courte et faire une version longue qui ajoute l'impact (50% d'échec) sans passer par l'opcode 60
 	PATCH_IF NOT use_short_effect_description BEGIN
 		SPRINT description @10800003 // ~d'assourdir %theTarget%~
 	END
 	ELSE BEGIN
 		SET parameter1 = 50
 		SET custom_int = 3 // profanes et divins
-		LPM ~opcode_self_probability_60~
+		LPM ~opcode_target_probability_60~
 	END
 END
 
@@ -4197,6 +4371,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_80~ BEGIN
 	LPM ~opcode_self_probability_80~ // @~d'assourdir %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_80_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------- *
@@ -4216,6 +4397,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_81~ BEGIN
 	LPM ~opcode_self_probability_81~ // ~de guérir la surdité %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_81_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------------- *
@@ -5690,19 +5878,23 @@ END
  * Stat: Morale Break Modifier [106] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
-	// SET ignoreDuration = 1
 	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SET value = parameter1
 		PATCH_IF parameter1 < 0 BEGIN
-			SET parameter1 = 0
+			SET value = 0
 		END
-		PATCH_IF parameter1 == 0 BEGIN
+		ELSE PATCH_IF parameter1 > 20 BEGIN
+			SET value = 20
+		END
+		PATCH_IF value == 0 BEGIN
+			// FIXME: différencier le nom de l'effet de l'opcode 24, Immunité contre la rupture de moral
 			SPRINT description @11060004 // ~Immunité à la panique~
 		END
-		ELSE PATCH_IF parameter1 == 1 BEGIN
+		ELSE PATCH_IF value == 1 BEGIN
 			SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
 		END
 		ELSE BEGIN
-			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %parameter1%~
+			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %value%~
 		END
 	END
 	ELSE BEGIN
@@ -5720,19 +5912,22 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
-	// SET ignoreDuration = 1
-	PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 <= 1 BEGIN
+	PATCH_IF parameter2 == MOD_TYPE_flat BEGIN
+		SET value = parameter1
 		PATCH_IF parameter1 < 0 BEGIN
-			SET parameter1 = 0
+			SET value = 0
 		END
-		PATCH_IF parameter1 == 0 BEGIN
+		ELSE PATCH_IF parameter1 > 20 BEGIN
+			SET value = 20
+		END
+		PATCH_IF value == 0 BEGIN
 			SPRINT description @11060009 // ~d'immuniser %theTarget% contre la rupture de moral~ // Immunité contre la rupture de moral~
 		END
-		ELSE PATCH_IF parameter1 == 1 BEGIN
+		ELSE PATCH_IF value == 1 BEGIN
 			SPRINT description @11060006 // ~de garder le moral %ofTheTarget% au plus haut~
 		END
 		ELSE BEGIN
-			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %parameter1%~
+			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
 		END
 	END
 	ELSE BEGIN
@@ -5814,6 +6009,7 @@ END
  * State: Hold [109] *
  * ----------------- */
 DEFINE_PATCH_MACRO ~opcode_self_109~ BEGIN
+	LPM ~opcode_109_common~
 	SPRINT description @11090002 // ~Paralyse %theTarget%~
 	PATCH_IF parameter1 != 0 BEGIN
 		SPRINT idsFile $ids_files(~%parameter2%~)
@@ -5827,6 +6023,7 @@ DEFINE_PATCH_MACRO ~opcode_self_109~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_109~ BEGIN
+	LPM ~opcode_109_common~
 	SPRINT description @11090004 // ~de paralyser %theTarget%~
 	PATCH_IF parameter1 != 0 BEGIN
 		SPRINT idsFile $ids_files(~%parameter2%~)
@@ -5847,9 +6044,15 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_109~ BEGIN
 	LPM ~opcode_self_probability_109~
 END
 
-DEFINE_PATCH_MACRO ~opcode_109_is_valid~ BEGIN
-	// Cas particulier propre à l'opcode 109, non valable pour les 175 et 185
-	PATCH_IF parameter2 < 2 OR parameter2 > 9 BEGIN
+DEFINE_PATCH_MACRO ~opcode_109_common~ BEGIN
+	PATCH_IF opcode == 109 AND (parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND NOT is_ee)) BEGIN
+		// Fonctionnel mais inhabituel (et non documenté)
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown type %parameter2%.~ END
+		SET parameter2 = 2
+		SET parameter1 = 0
+	END
+	PATCH_IF opcode == 109 AND special != 0 AND is_ee BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown special %special%.~ END
 		SET parameter2 = 2
 		SET parameter1 = 0
 	END
@@ -6202,7 +6405,7 @@ END
  * Cure: (Remove) Invisibility [116] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_116~ BEGIN
-	LPM ~opcode_self_47~ // ~Immunité à l'invisibilité~
+	LPM ~opcode_self_47~ // ~Dissipation de l'invisibilité~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_116~ BEGIN
@@ -6219,6 +6422,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_116_is_valid~ BEGIN
 	LPM ~opcode_47_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_116_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------- *
@@ -6238,6 +6448,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_117~ BEGIN
 	LPM ~opcode_self_probability_117~
+END
+
+DEFINE_PATCH_MACRO ~opcode_117_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------------- *
@@ -6261,7 +6478,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_119_spell_level_match~ BEGIN
 	// Parameter #1: Irrelevant
-    // Parameter #2: Irrelevant
+	// Parameter #2: Irrevelant
 	SET match_parameter1 = parameter1
 	SET match_parameter2 = parameter2
 END
@@ -6523,6 +6740,13 @@ DEFINE_PATCH_MACRO ~opcode_123_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_123_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 
 /* --------------------------------------------- *
  * Spell Effect: Teleport (Dimension Door) [124] *
@@ -6584,6 +6808,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_125~ BEGIN
 	SPRINT description @11250002 // ~de déverrouiller la serrure ciblée~
+END
+
+DEFINE_PATCH_MACRO ~opcode_125_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------------- *
@@ -6831,6 +7062,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_128~ BEGIN
     LPM ~opcode_self_probability_128~ // ~d'infliger Confusion à la cible~
 END
 
+DEFINE_PATCH_MACRO ~opcode_128_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------- *
  * State: Aid [129] *
  * ---------------- */
@@ -6838,16 +7076,19 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_129~ BEGIN
 	LPM ~opcode_129_common~
     SPRINT description @11290001 // ~Aide (%value%)~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_129~ BEGIN
 	LPM ~opcode_129_common~
     SPRINT description @11290003 // ~de lancer Aide (%value%) sur %theTarget%~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_129~ BEGIN
 	LPM ~opcode_129_common~
     SPRINT description @11290002 // ~Lance Aide (%value%) sur %theTarget%~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_129~ BEGIN
@@ -6862,25 +7103,48 @@ DEFINE_PATCH_MACRO ~opcode_129_common~ BEGIN
 	LPF ~signed_value~ INT_VAR value = EVAL ~%parameter1%~ RET value END
 END
 
+DEFINE_PATCH_MACRO ~opcode_129_spell_level_match~ BEGIN
+	// Parameter #2: Irrevelant
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------ *
  * State: Bless [130] *
  * ------------------ */
 // TODO : split des effets
 DEFINE_PATCH_MACRO ~opcode_self_130~ BEGIN
-    SPRINT description @11300001 // ~Bénédiction~
+	LPM ~opcode_130_common~
+	SPRINT description @11300001 // ~Bénédiction (%value%)~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_130~ BEGIN
-    SPRINT description @11300003 // ~de lancer Bénédiction sur %theTarget%~
+	LPM ~opcode_130_common~
+	SPRINT description @11300003 // ~de lancer Bénédiction (%value%) sur %theTarget%~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_130~ BEGIN
-    SPRINT description @11300002 // ~Lance Bénédiction sur %theTarget%~
+	LPM ~opcode_130_common~
+	SPRINT description @11300002 // ~Lance Bénédiction (%value%) sur %theTarget%~
+	LPM ~opcode_not_cumulative~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_130~ BEGIN
-	LPM ~opcode_self_probability_130~ // ~de lancer Bénédiction sur %theTarget%~
+	LPM ~opcode_self_probability_130~ // ~de lancer Bénédiction (%value%) sur %theTarget%~
 END
+
+DEFINE_PATCH_MACRO ~opcode_130_common~ BEGIN
+	// Modifier only reads the first byte for its value, the last 3 bytes are ignored.
+	SET parameter1 = parameter1 BAND 255
+	LPF ~signed_value~ INT_VAR value = EVAL ~%parameter1%~ RET value END
+END
+
+DEFINE_PATCH_MACRO ~opcode_130_spell_level_match~ BEGIN
+	// Parameter #2: Irrevelant
+	SET match_parameter2 = parameter2
+END
+
 
 /* --------------------------- *
  * State: Positive Chant [131] *
@@ -6899,7 +7163,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_131~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_131~ BEGIN
-	SET parameter1 = parameter1 BAND 255
+	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
 	LPM ~opcode_target_22~ // ~la chance~
     LPM ~opcode_not_cumulative~
 END
@@ -6908,6 +7172,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_131~ BEGIN
 	SET parameter1 = parameter1 < 0 ? parameter1 : parameter1 BAND 255
     LPM ~opcode_target_probability_22~ // ~la chance~
     LPM ~opcode_not_cumulative~
+END
+
+DEFINE_PATCH_MACRO ~opcode_131_spell_level_match~ BEGIN
+	// Parameter #2: Irrevelant
+	SET match_parameter2 = parameter2
 END
 
 /* --------------------------------------------------------------------- *
@@ -6939,10 +7208,14 @@ DEFINE_PATCH_MACRO ~opcode_132_common~ BEGIN
 	// A negative value of Statistic Modifier sets the Strength, Constitution and Dexterity of the targeted creature(s) to 25.
 	// N'est pas à prendre au pied de la lettre : -1 est considéré comme 255, -10 comme 246, -255 comme 1...
 	SET parameter1 = parameter1 MODULO 256
-	PATCH_IF parameter1 >= 25 BEGIN
-		SET parameter2 = MOD_TYPE_flat
+	PATCH_IF parameter1 > 25 BEGIN
 		SET parameter1 = 25
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_132_spell_level_match~ BEGIN
+	// Parameter #2: Irrevelant
+	SET match_parameter2 = parameter2
 END
 
 /* --------------------------------------- *
@@ -6964,6 +7237,11 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_133~ BEGIN
 	LPM ~opcode_target_probability_131~
 END
 
+DEFINE_PATCH_MACRO ~opcode_133_spell_level_match~ BEGIN
+	// Parameter #2: Irrevelant
+	SET match_parameter2 = parameter2
+END
+
 /* -------------------------- *
  * State: Petrification [134] *
  * -------------------------- */
@@ -6981,6 +7259,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_134~ BEGIN
 	SPRINT description @11340004 // ~de pétrifier %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_134_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------------- *
@@ -7197,6 +7482,7 @@ END
  * Item: Create Item in Slot [143] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_143~ BEGIN
+	LPM ~opcode_143_common~
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~20~ RET slotName = idName END
 
@@ -7206,6 +7492,7 @@ DEFINE_PATCH_MACRO ~opcode_self_143~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_143~ BEGIN
+	LPM ~opcode_143_common~
 	LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
 	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~20~ RET slotName = idName END
 
@@ -7224,6 +7511,15 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_143_group~ BEGIN
 	LPM ~opcode_143_group_mod~
+END
+
+DEFINE_PATCH_MACRO ~opcode_143_common~ BEGIN
+	//  Note: When using a non-permanent timing mode, it applies a delayed opcode #123 effect based on the duration, but with an empty resource field, resulting in nothing being removed.
+	PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_while_equipped OR timingMode == TIMING_delayed_duration OR
+			 timingMode == 5 OR timingMode == 6 OR timingMode == 8 OR timingMode == TIMING_duration_ticks OR timingMode == TIMING_absolute_duration BEGIN 
+		timingMode = TIMING_permanent
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : non-permanent timing mode (%timingMode%) are permanent (bug).~ END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_143_is_valid~ BEGIN
@@ -7633,6 +7929,13 @@ DEFINE_PATCH_MACRO ~opcode_147_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_147_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------------------- *
  * Spell: Cast Spell (at Point) [148] *
  * ---------------------------------- */
@@ -7673,6 +7976,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_150~ BEGIN
 	SPRINT description @11500004 // ~que %theTarget% détecte les pièges~
+END
+
+DEFINE_PATCH_MACRO ~opcode_150_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------ *
@@ -7935,6 +8245,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_160~ BEGIN
 	LPM ~opcode_self_probability_160~
 END
 
+DEFINE_PATCH_MACRO ~opcode_160_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------ *
  * Cure: Horror [161] *
  * ------------------ */
@@ -7952,6 +8269,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_161~ BEGIN
 	LPM ~opcode_self_probability_161~ // ~de dissiper l'horreur %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_161_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ---------------- *
@@ -7973,6 +8297,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_162~ BEGIN
 	LPM ~opcode_self_probability_162~ // ~de guérir la paralysie %ofTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_162_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------------- *
  * Protection: Free Action [163] *
  * ----------------------------- */
@@ -7990,6 +8321,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_163~ BEGIN
 	LPM ~opcode_self_probability_163~ // ~de rétablir la vitesse de déplacement %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_163_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ---------------------- *
@@ -8011,6 +8349,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_164~ BEGIN
 	LPM ~opcode_self_probability_164~ // ~de dessoûler %theTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_164_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* -------------------------------- *
  * Spell Effect: Pause Target [165] *
  * -------------------------------- */
@@ -8028,6 +8373,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_165~ BEGIN
 	SPRINT description @11650004 // ~de faire entrer %theTarget% dans un combat mental~
+END
+
+DEFINE_PATCH_MACRO ~opcode_165_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------------- *
@@ -8137,6 +8489,13 @@ DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_171_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------- *
  * Spell: Remove Spell [172] *
  * ------------------------- */
@@ -8227,6 +8586,13 @@ DEFINE_PATCH_MACRO ~opcode_172_group~ BEGIN
 			END
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_172_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------------------- *
@@ -9344,6 +9710,13 @@ DEFINE_PATCH_MACRO ~opcode_self_196~ BEGIN
 	SPRINT description @11960001 // ~Empêche l'invocation du familier~
 END
 
+DEFINE_PATCH_MACRO ~opcode_196_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------------ *
  * Spell: Bounce Projectile [197] *
  * ------------------------------ */
@@ -10008,7 +10381,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_206_spell_level_match~ BEGIN
 	// Parameter #1: String Reference (sans importance pour AutoDescription)
-    // Parameter #2: Irrelevant
+	// Parameter #2: Irrevelant
 	SET match_parameter1 = parameter1
 	SET match_parameter2 = parameter2
 END
@@ -10024,6 +10397,13 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_207~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 	SPRINT description @12070002 // ~de renvoyer le sort %spellName%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_207_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ----------------------- *
@@ -10095,11 +10475,17 @@ DEFINE_PATCH_MACRO ~opcode_209_is_valid~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_209_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------------- *
  * Spell Effect: Stun 90HP [210] *
  * ----------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_210~ BEGIN
-	//TODO: Ajouter la durée ?
 	// 1 to 29 HP ⟶ stunned for 4d4 rounds
     // 30 to 59 HP ⟶ stunned for 2d4 rounds
     // 60 to 89 HP ⟶ stunned for 1d4 rounds
@@ -10116,6 +10502,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_210~ BEGIN
 	LPM ~opcode_self_probability_210~
+END
+
+DEFINE_PATCH_MACRO ~opcode_210_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------------- *
@@ -10150,6 +10543,13 @@ DEFINE_PATCH_MACRO ~opcode_211_group~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_211_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------ *
  * Protection: Freedom [212] *
  * ------------------------ */
@@ -10163,6 +10563,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_212~ BEGIN
 	LPM ~opcode_self_probability_212~ // ~de libérer %theTarget% des effets de l'emprisonnement et du labyrinthe~
+END
+
+DEFINE_PATCH_MACRO ~opcode_212_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------ *
@@ -10254,7 +10661,6 @@ DEFINE_PATCH_MACRO ~opcode_214_common~ BEGIN
 		END
 	END
 	ELSE BEGIN
-		//TODO: IF ee ajouter sauf SPWI110 et SPWI124 ?
         SPRINT description (AT strref) // ~Permet de lancer un sort du livre de sorts~
 	END
 END
@@ -10269,21 +10675,21 @@ END
  * Spell Effect: Level Drain [216] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_216~ BEGIN
-	SET strref = 12160001
+	SET strref = 12160001 // ~Draine 1 niveau %toTheTarget%~
 	LPM ~opcode_216_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_216~ BEGIN
-	SET strref = 12160011
+	SET strref = 12160011 // ~de drainer 1 niveau %toTheTarget%~
 	LPM ~opcode_216_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_216~ BEGIN
-	LPM ~opcode_self_216~ // ~Draîne 1 niveau %toTheTarget%~
+	LPM ~opcode_self_216~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_216~ BEGIN
-	LPM ~opcode_self_probability_216~ // ~de drainer 1 niveau %toTheTarget%~
+	LPM ~opcode_self_probability_216~
 END
 
 DEFINE_PATCH_MACRO ~opcode_216_common~ BEGIN
@@ -10731,6 +11137,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_224~ BEGIN
 	LPM ~opcode_self_probability_224~
 END
 
+DEFINE_PATCH_MACRO ~opcode_224_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------------------------------------- *
  * Spell: Immunity (by Secondary Type, decrementing) [226] *
  * ------------------------------------------------------- */
@@ -10942,6 +11355,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_231~ BEGIN
 	LPM ~opcode_self_probability_231~ // ~de lancer Arrêt du temps~
+END
+
+DEFINE_PATCH_MACRO ~opcode_231_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------------------- *
@@ -11234,6 +11654,7 @@ DEFINE_PATCH_MACRO ~opcode_233_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected. Proficiency %stat% += 0~ END
 	END
+	// FIXME: pas commun de voir cet appel dans is_valid, d'autant plus qu'il est à nouveau appelé dans les autres méthodes
 	LPM ~opcode_233_common~
 
 	PATCH_IF NOT VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~) BEGIN
@@ -11245,12 +11666,12 @@ END
  * Spell Effect: Wing Buffet [235] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_235~ BEGIN
-	LOCAL_SET strref = 12350000
+	LOCAL_SET strref = 12350001 // ~Repousse %theTarget% à %range% de l'endroit visé~
 	LPM ~opcode_235_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_235~ BEGIN
-	LOCAL_SET strref = 12350004
+	LOCAL_SET strref = 12350005 // ~de repousser %theTarget% à %range% %ofTheSource%~
 	LPM ~opcode_235_common~
 END
 
@@ -11263,7 +11684,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_235~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_235_common~ BEGIN
-	SET strref += parameter2 > 4 OR parameter2 < 1 ? 1 : parameter2
+	SET strref += parameter2 > 4 OR parameter2 < 1 ? 0 : parameter2 - 1
     LPF ~feets_to_meters~ INT_VAR range = parameter1 RET range = rangeToMeter END
 	SPRINT description (AT strref)
 END
@@ -11456,6 +11877,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_242~ BEGIN
 	LPM ~opcode_self_probability_242~
 END
 
+DEFINE_PATCH_MACRO ~opcode_242_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ------------------------------ *
  * Item: Drain Item Charges [243] *
  * ------------------------------ */
@@ -11481,7 +11909,7 @@ DEFINE_PATCH_MACRO ~opcode_243_common~ BEGIN
 	LOCAL_SET amount = parameter1
 	PATCH_IF is_ee == 1 BEGIN
 		// TODO: ? You can drain charges of a particular item if the resource field is used
-		// Inexistant en 2.5.16
+		// Inexistant en 2.5.16, pas vu en 2.6
 		PATCH_IF amount != 1 BEGIN
 			SET strref += 1 // ~Draine %amount% charges aux objets magiques %ofTheTarget%~
 		END
@@ -11541,7 +11969,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_244~ BEGIN
 	LPM ~opcode_self_probability_244~
 END
 
-DEFINE_PATCH_MACRO ~opcode_243_is_valid~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_244_is_valid~ BEGIN
 	PATCH_IF parameter1 <= 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No effect detected. 1 > Amount to Drain (%parameter1%)~ END
@@ -11591,21 +12019,13 @@ END
  * Spell Effect: Attack Nearest Creature [247] *
  * ------------------------------------------- */
  DEFINE_PATCH_MACRO ~opcode_self_247~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		LPM ~opcode_self_3~
-	END
-	ELSE BEGIN
-		SPRINT description @12470001 // ~Apaise %theTarget%~
-	END
+	LPM ~opcode_247_condition~
+	SPRINT description @12470001 // ~Provoque la rage du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_247~ BEGIN
-	PATCH_IF parameter2 != 0 BEGIN
-		LPM ~opcode_self_probability_3~
-	END
-	ELSE BEGIN
-		SPRINT description @12470002 // d'apaiser %theTarget%
-	END
+	LPM ~opcode_247_condition~
+	SPRINT description @12470002 // ~de provoquer la rage du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_247~ BEGIN
@@ -11614,6 +12034,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_247~ BEGIN
 	LPM ~opcode_self_probability_247~
+END
+
+DEFINE_PATCH_MACRO ~opcode_247_condition~ BEGIN
+	PATCH_IF parameter2 == 0 BEGIN
+		SPRINT condition @12470003 // En combat
+	END
 END
 
 /* ---------------------------- *
@@ -11791,6 +12217,13 @@ DEFINE_PATCH_MACRO ~opcode_249_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_249_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------------------- *
  * Spell Effect: Damage Modifier [250] *
  * ----------------------------------- */
@@ -11843,6 +12276,13 @@ DEFINE_PATCH_MACRO ~opcode_251_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_251_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------------- *
  * Spell Effect: Set Trap [252] *
  * ---------------------------- */
@@ -11872,6 +12312,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_252_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_252_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ---------------------------------------- *
@@ -12272,6 +12719,13 @@ DEFINE_PATCH_MACRO ~opcode_266_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_266_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------------------------- *
  * Spell Effect: Explore (Wizard Eye) [268] *
  * ---------------------------------------- */
@@ -12281,6 +12735,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_268~ BEGIN
 	LPM ~opcode_self_268~ // ~Permet %toTheTarget% d'explorer la carte~
+END
+
+DEFINE_PATCH_MACRO ~opcode_268_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------- *
@@ -12300,6 +12761,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_270~ BEGIN
 	SPRINT description @12700002 // ~de libérer des combats mentaux~
+END
+
+DEFINE_PATCH_MACRO ~opcode_270_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* -------------------------------- *
@@ -12975,28 +13443,48 @@ END
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_299~ BEGIN
 	LOCAL_SET amount = parameter1
-	SPRINT description @12990001 // ~Bloque %amount% hiatus entropiques~
+	PATCH_IF amount >= 1 BEGIN
+		SPRINT description @12990001 // ~Bloque %amount% hiatus entropiques~
+	END
+	ELSE BEGIN
+		SPRINT description @12990011 // ~Dissipe le blocage des prochains hiatus entropiques~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_299~ BEGIN
 	LOCAL_SET amount = parameter1
-	SPRINT description @12990002 // ~Bloque %amount% hiatus entropiques %ofTheTarget%~
+	PATCH_IF amount >= 1 BEGIN
+		SPRINT description @12990002 // ~Bloque %amount% hiatus entropiques %ofTheTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @12990012 // ~Dissipe le blocage des prochains hiatus entropiques %ofTheTarget%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_299~ BEGIN
 	LOCAL_SET amount = parameter1
-	SPRINT description @12990003 // ~de bloquer %amount% hiatus entropiques~
+	PATCH_IF amount >= 1 BEGIN
+		SPRINT description @12990003 // ~de bloquer %amount% hiatus entropiques~
+	END
+	ELSE BEGIN
+		SPRINT description @12990013 // ~de dissiper le blocage des prochains hiatus entropiques~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_299~ BEGIN
 	LOCAL_SET amount = parameter1
-	SPRINT description @12990004 // ~de bloquer %amount% hiatus entropiques %ofTheTarget%~
+	PATCH_IF amount >= 1 BEGIN
+		SPRINT description @12990004 // ~de bloquer %amount% hiatus entropiques %ofTheTarget%~
+	END
+	ELSE BEGIN
+		SPRINT description @12990014 // ~de dissiper le blocage des prochains hiatus entropiques %ofTheTarget%~
+	END
 END
 
 /* -------------- *
  * NPC Bump [300] *
  * -------------- */
-// TODO: à vérifier
+// FIXME: à compléter
 DEFINE_PATCH_MACRO ~opcode_self_300~ BEGIN
 	PATCH_IF parameter2 > 0 BEGIN
 		SET strref = 13000000 + parameter2
@@ -13011,8 +13499,6 @@ END
 /* --------------------------------- *
  * Stat: Critical Hit Modifier [301] *
  * --------------------------------- */
-// TODO: tester les valeurs : special > 3
-
 DEFINE_PATCH_MACRO ~opcode_self_301~ BEGIN
 	LOCAL_SET nameStrref = 13010001 // ~Chance de coup critique~
 	LOCAL_SET value = 5 * parameter1
@@ -13052,7 +13538,7 @@ DEFINE_PATCH_MACRO ~opcode_301_common~ BEGIN
 	SPRINT name (AT nameStrref)
 
 	PATCH_IF is_ee == 1 AND parameter2 != 0 BEGIN
-		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		// TODO
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
 		END
@@ -13081,6 +13567,21 @@ DEFINE_PATCH_MACRO ~opcode_301_target_common~ BEGIN
 	END
     SPRINT value @10002 // ~%value% %~
     SPRINT description (AT desStrref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_301_is_valid~ BEGIN
+	PATCH_IF is_ee AND special < 0 OR special > 3 BEGIN
+		isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid AttackType %special%.~ END
+	END
+	PATCH_IF is_ee AND isExternal AND (parameter3 < 0 OR parameter3 > 73) BEGIN
+		isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Item Type %parameter3%.~ END
+	END
+	PATCH_IF is_ee AND parameter1 == 0 AND (opcode == 301 OR opcode == 362) BEGIN
+		isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : No change detected: Modifier == %parameter1%.~ END
+	END
 END
 
 /* ---------------------------- *
@@ -13120,6 +13621,10 @@ DEFINE_PATCH_MACRO ~opcode_self_303~ BEGIN
 		SPRINT description @13030001 // ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~
 	END
 	ELSE BEGIN
+		// BIT0 inactif et (BIT1 ou BIT2 inactif)
+		PATCH_IF (parameter2 & 1 == 0) AND (parameter2 & 2 == 0 OR parameter2 & 4 == 0) BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: value %parameter2% : non gere.~ END
+		END
 		SPRINT description @13030011 // ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~
 	END
 END
@@ -13129,6 +13634,10 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_303~ BEGIN
 		SPRINT description @13030003 // ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
 	END
 	ELSE BEGIN
+		// BIT0 inactif et (BIT1 ou BIT2 inactif)
+		PATCH_IF (parameter2 & 1 == 0) AND (parameter2 & 2 == 0 OR parameter2 & 4 == 0) BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: value %parameter2% : non gere.~ END
+		END
 		SPRINT description @13030013 // ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 	END
 END
@@ -13138,6 +13647,10 @@ DEFINE_PATCH_MACRO ~opcode_target_303~ BEGIN
 		SPRINT description @13030002 // ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~
 	END
 	ELSE BEGIN
+		// BIT0 inactif et (BIT1 ou BIT2 inactif)
+		PATCH_IF (parameter2 & 1 == 0) AND (parameter2 & 2 == 0 OR parameter2 & 4 == 0) BEGIN
+			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: value %parameter2% : non gere.~ END
+		END
 		SPRINT description @13030012 // ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~
 	END
 END
@@ -13170,6 +13683,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_304~ BEGIN
 	SPRINT ofTheTarget @101088 // ~des membres du groupe~
 	SPRINT toTheTarget @101182 // ~aux membres du groupe~
 	LPM ~opcode_target_probability_32~
+END
+
+DEFINE_PATCH_MACRO ~opcode_304_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------------------------- *
@@ -13271,6 +13791,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_311~ BEGIN
 	LPM ~opcode_self_probability_311~
 END
 
+DEFINE_PATCH_MACRO ~opcode_311_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ----------------------------- *
  *  Spell: Golem Stoneskin [314] *
  * ----------------------------- */
@@ -13307,6 +13834,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_316~ BEGIN
 	LPM ~opcode_self_probability_316~ // ~de reposer %theTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_316_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
 END
 
 /* ------------------- *
@@ -13459,7 +13993,6 @@ END
  * Stat: Turn Undead Level [323] *
  * ----------------------------- */
 
-// TODO : à vérifier : pas de MOD_TYPE_percent dans 2.5.16
 // FIXME: special != 0 : P1 = P1 + niveau de la classe la plus élevée
 DEFINE_PATCH_MACRO ~opcode_self_323~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 13230001 STR_VAR value = ~%parameter1%~ complex_value RET description END // ~Niveau de repousser les morts-vivants~
@@ -14301,6 +14834,7 @@ END
 /* ------------------------------- *
  * Spell Effect: Slow Poison [329] *
  * ------------------------------- */
+// FIXME: n'abaisse pas forcément la virulence puisqu'elle écrase le multiplicateur initial de fréquence (souvent à 1, mais pas obligatoirement)
 DEFINE_PATCH_MACRO ~opcode_self_329~ BEGIN
 	LOCAL_SET amount = parameter1
 	SPRINT description @13290001 // ~Abaissement de la virulence de la plupart des poisons de %amount%~
@@ -14321,16 +14855,15 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_329~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_329_is_valid~ BEGIN
-	PATCH_IF parameter1 == 0 OR parameter1 == 1 BEGIN
+	PATCH_IF parameter1 == 0 BEGIN
 		SET isValid = 0
-		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Slow Factor == %parameter1% (>= 2 expected).~ END
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : With parameter1 == %parameter1%, the game may crash.~ END
 	END
 END
 
 /* -------------------------------------- *
  * Summon: Random Monster Summoning [331] *
  * -------------------------------------- */
-// FIXME: pas de test possible en 2.5.16
 DEFINE_PATCH_MACRO ~opcode_self_331~ BEGIN
 	LOCAL_SET strref = 13310001 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 	LPM ~opcode_331_common~
@@ -14689,6 +15222,13 @@ DEFINE_PATCH_MACRO ~opcode_340_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
 END
 
+DEFINE_PATCH_MACRO ~opcode_340_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* ---------------------------------------------- *
  * Spell Effect: Change Critical Hit Effect [341] *
  * ---------------------------------------------- */
@@ -14731,7 +15271,7 @@ DEFINE_PATCH_MACRO ~opcode_341_common~ BEGIN
 		TEXT_SPRINT condition ~%condition% %strref%~
 	END
 	ELSE PATCH_IF parameter2 != 0 BEGIN
-		//TODO : restriction du type d'arme si parameter2 != 0 (cela a-t-il un sens ?)
+		// TODO
 		PATCH_IF isExternal AND parameter3 != 0 BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Condition %parameter2% et Weapon Category %parameter3% non gere~ END
 		END
@@ -14755,6 +15295,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_341_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+	LPM ~opcode_301_is_valid~
 END
 
 /* ------------- *
@@ -14927,6 +15468,13 @@ DEFINE_PATCH_MACRO ~opcode_self_360~ BEGIN
 	SPRINT description @13600001 // ~Ne quitte plus le groupe si la réputation ne convient pas %toTheTarget%~
 END
 
+DEFINE_PATCH_MACRO ~opcode_360_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	// Parameter #2: Irrevelant
+	SET match_parameter1 = parameter1
+	SET match_parameter2 = parameter2
+END
+
 /* --------------------------------- *
  * Cast spell on critical miss [361] *
  * --------------------------------- */
@@ -14956,6 +15504,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_361_is_valid~ BEGIN
 	LPM ~opcode_resref_is_valid~
+	LPM ~opcode_301_is_valid~
 END
 
 /* ------------------------- *
@@ -14992,6 +15541,10 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_362~ BEGIN
 	LPM ~opcode_self_probability_362~
 END
 
+DEFINE_PATCH_MACRO ~opcode_362_is_valid~ BEGIN
+	LPM ~opcode_301_is_valid~
+END
+
 /* ------------------------ *
  * Minimum base stats [367] *
  * ------------------------ */
@@ -15015,6 +15568,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_367~ BEGIN
 	SET strref = parameter2 == 0 ? 13670031 : 13670032
 	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_367_spell_level_match~ BEGIN
+	// Parameter #1: Irrevelant
+	SET match_parameter1 = parameter1
 END
 
 /* --------------------------------- *
@@ -15858,11 +16416,21 @@ DEFINE_PATCH_FUNCTION ~get_spell_name~ INT_VAR showWarning = 1 STR_VAR file = ""
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_school~ INT_VAR school = 0 opcode = 0 RET spellSchoolName BEGIN
+	// TODO: améliorer la gestion
+	PATCH_IF school < 0 OR school > 10 BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : ecole non geree : %school%~ END
+		SET school = 0
+	END
 	SET strref = 100100 + school
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSchoolName = string END
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_school_name~ INT_VAR school = 0 opcode = 0 RET spellSchoolName BEGIN
+	// TODO: améliorer la gestion
+	PATCH_IF school < 0 OR school > 10 BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : ecole non geree : %school%~ END
+		SET school = 0
+	END
 	SET strref = 100120 + school
 	LPF ~getTranslation~ INT_VAR strref opcode RET spellSchoolName = string END
 END
