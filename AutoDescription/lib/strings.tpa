@@ -225,3 +225,4 @@ OUTER_SPRINT colon @10001   // ~ : ~
 OUTER_SPRINT semicolon @10004 // ~ ; ~
 OUTER_SPRINT meter @100005  // ~mètre~
 OUTER_SPRINT meters @100006 // ~mètres~
+OUTER_SPRINT outer_percent @10022 // ~ %~

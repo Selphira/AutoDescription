@@ -339,7 +339,7 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 							LPF ~get_probability~ INT_VAR probability1 = range_high probability2 = range_low RET probability END
 
 							INNER_PATCH_SAVE line2_6 ~%line2_6%~ BEGIN
-								REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%line2_3% %~ ~%probability% %~
+								REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%line2_3%%outer_percent%~ ~%probability%%outer_percent%~
 							END
 
 							SET EVAL ~count_ranges_%range%~ += 1
@@ -363,14 +363,6 @@ DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BE
 
 		PATCH_IF countRange == 1 BEGIN
 			PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
-				// en cas de chevauchement complexe, la probabilité est à mettre à jour
-				PATCH_IF mode == 2 BEGIN
-					INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
-						SPRINT regex ~^\([0-9][0-9]\)~
-						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~%line_3%~
-					END
-				END
-
 				SET $effects(~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value
 				SET count += 1
 			END
