@@ -13287,7 +13287,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_285~ BEGIN
 	LPM ~opcode_self_probability_285~
 END
 
-DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_285_is_valid~ BEGIN
 	LPM ~opcode_modstat2_is_valid~
 END
 
