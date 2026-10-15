@@ -11230,8 +11230,8 @@ DEFINE_PATCH_MACRO ~opcode_self_228~ BEGIN
 	LPM ~opcode_228_common~
 END
 
-DEFINE_PATCH_MACRO ~opcode_self_228~ BEGIN
-	SET strref = 12280002 // ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+DEFINE_PATCH_MACRO ~opcode_target_228~ BEGIN
+	SET strref = 12280002 // ~Renvoie jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~
 	SET strref_if_amount_0 = 110002
 	LPM ~opcode_228_common~
 END
@@ -11243,7 +11243,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_228~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_228~ BEGIN
-	SET strref = 12280004 // ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~
+	SET strref = 12280004 // ~de renvoyer jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~
 	SET strref_if_amount_0 = 110004
 	LPM ~opcode_228_common~
 END
