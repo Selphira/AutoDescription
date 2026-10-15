@@ -13261,7 +13261,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_284~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_284~ BEGIN
-	LPM ~opcode_self_probability_584~
+	LPM ~opcode_self_probability_284~
 END
 
 DEFINE_PATCH_MACRO ~opcode_284_is_valid~ BEGIN
