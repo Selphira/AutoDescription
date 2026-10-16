@@ -542,11 +542,13 @@ BEGIN
 	SET hasOpcode = 0
 	PATCH_IF VARIABLE_IS_SET $opcodes(~%opcode%~) AND $opcodes(~%opcode%~) > 0 BEGIN
 	    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
-	        LPM ~data_to_vars~
-			LPM ~%match_macro%~
-	        PATCH_IF match == 1 BEGIN
-	            SET hasOpcode = 1
-	        END
+	    	PATCH_IF hasOpcode == 0 BEGIN
+				LPM ~data_to_vars~
+				LPM ~%match_macro%~
+				PATCH_IF match == 1 BEGIN
+					SET hasOpcode = 1
+				END
+			END
 	    END
 	END
 END
