@@ -40,6 +40,7 @@ DEFINE_PATCH_FUNCTION ~needs_attribute~ INT_VAR value = 0 bonus = 0 strref = 0 R
 			PATCH_IF bonus == 100 BEGIN
 				SPRINT bonus ~00~
 			END
+			LPF ~str_pad_left~ INT_VAR min_length = 2 STR_VAR string = ~%bonus%~ RET bonus = string END
 			SPRINT $needs(~%name%~)  ~%value%/%bonus%~
 		END
 		ELSE BEGIN
