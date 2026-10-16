@@ -159,12 +159,13 @@ END
 DEFINE_PATCH_MACRO ~load_effect~
 BEGIN
 	SET isExternal = 0
-    LPM ~read_effect_vars~
     LPM ~load_opcode~
 END
 
 DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
+	READ_SHORT (offset) opcode
 	PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+    	LPM ~read_effect_vars~
 		SET position += 1
 		SET isValid = 1
 
@@ -219,21 +220,19 @@ END
  * ------------------------------------------------------------------------------------------------------------------ */
 DEFINE_PATCH_FUNCTION ~get_unique_effects~ RET count RET_ARRAY effects BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY ~effects~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~seen_effects~ BEGIN END
+
     SET count = 0
 
 	PATCH_PHP_EACH ~lines~ AS line => value BEGIN
-		SET found = 0
-		PATCH_PHP_EACH effects AS effect => _ BEGIN
-			SPRINT tmp1 ~%line_5%~
-			SPRINT tmp2 ~%effect_5%~
-			TO_LOWER tmp1
-			TO_LOWER tmp2
+		SPRINT normalizedDescription ~%line_5%~
+		TO_LOWER normalizedDescription
 
-			PATCH_IF ~%tmp1%~ STRING_EQUAL ~%tmp2%~ AND ~%line_3%~ == ~%effect_3%~ AND ~%line_4%~ == ~%effect_4%~ BEGIN
-				SET found = 1
-			END
-		END
-		PATCH_IF found == 0 BEGIN
+		// Clé composée des critères de déduplication actuels.
+		SPRINT effectKey ~%line_3%|%line_4%|%normalizedDescription%~
+
+		PATCH_IF NOT VARIABLE_IS_SET $seen_effects(~%effectKey%~) BEGIN
+			SET $seen_effects(~%effectKey%~) = 1
 			SET $effects(~%line_0%~ ~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~) = value
 			SET count += 1
 		END
