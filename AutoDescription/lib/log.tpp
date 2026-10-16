@@ -52,10 +52,24 @@ DEFINE_PATCH_FUNCTION ~add_compare_row~
 		originalDescription = ~~
 		description = ~~
 BEGIN
+	LPF html_escape STR_VAR text = ~%itemName%~            RET htmlItemName = text END
+	LPF html_escape STR_VAR text = ~%originalDescription%~ RET htmlOriginal = text END
+	LPF html_escape STR_VAR text = ~%description%~         RET htmlDescription = text END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_filename%-diff.html~ ~<tr><th class="title">%filename%<br/>%itemName%</th><td class="description before"><pre>%originalDescription%</pre></td><td class="description after"><pre>%description%</pre></td></tr>~ KEEP_CRLF
+		APPEND_OUTER ~AutoDescription/log/%log_filename%-diff.html~ ~<tr><th class="title">%filename%<br/>%htmlItemName%</th><td class="description before"><pre>%htmlOriginal%</pre></td><td class="description after"><pre>%htmlDescription%</pre></td></tr>~ KEEP_CRLF
 		VERBOSE
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~html_escape~
+	STR_VAR text = ~~
+	RET text
+BEGIN
+	INNER_PATCH_SAVE text ~%text%~ BEGIN
+		REPLACE_TEXTUALLY EXACT_MATCH ~&~ ~&amp;~
+		REPLACE_TEXTUALLY EXACT_MATCH ~<~ ~&lt;~
+		REPLACE_TEXTUALLY EXACT_MATCH ~>~ ~&gt;~
 	END
 END
 

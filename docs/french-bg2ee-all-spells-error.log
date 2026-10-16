@@ -141,7 +141,6 @@ SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
 SPPR403.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 SPPR403.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPPR403.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPSD02.SPL : Opcode 1: Invalid parameter1 value ([-10 10] expected).
 SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
