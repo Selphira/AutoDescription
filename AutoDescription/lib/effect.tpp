@@ -258,147 +258,188 @@ DEFINE_PATCH_FUNCTION ~get_unique_effects~ RET count RET_ARRAY effects BEGIN
 END
 
 DEFINE_PATCH_FUNCTION ~group_probability_effects~ RET count RET_ARRAY effects BEGIN
-    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~effects~ BEGIN END
-    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~probability_effects~ BEGIN END
-    PATCH_DEFINE_ARRAY ~ranges~ BEGIN END
-    PATCH_DEFINE_ARRAY ~count_ranges~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~effects~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~probability_effects~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~bounds~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~signatures~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~totals~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~duplicates~ BEGIN END
+	PATCH_DEFINE_ARRAY ~ranges~ BEGIN END
 
 	SET mode = use_complex_grouping_of_probability_ranges ? 2 : 1
-    SET count = 0
-    SET count_range = 0
+	SET count = 0
+	SET range_count = 0
+	// set_opcode_sort ne recalcule `sort` que si forceSort vaut 0
 	SET forceSort = 0
 	SET range = 0
 	SET range_low = ~-1~
 	SET range_high = ~-1~
 
-	// On place les effets à probabilité dans un tableau de travail.
 	PATCH_PHP_EACH ~lines~ AS line => value BEGIN
 		PATCH_IF line_2 == 100 BEGIN
 			SET $effects(~%line_0%~ ~%count%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~) = value
 			SET count += 1
 		END
 		ELSE BEGIN
-			LPF ~get_range_key~ INT_VAR probability1 = line_4 probability2 = line_3 RET rangeKey END
-			SET $probability_effects(~%rangeKey%~ ~%line_0%~ ~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~) = value
+			LPF ~get_range_key~ INT_VAR probability1 = line_4 probability2 = line_3 RET range_key = rangeKey END
+			SET $probability_effects(~%range_key%~ ~%line_0%~ ~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~) = value
 		END
 	END
 
 	SORT_ARRAY_INDICES probability_effects NUMERICALLY
 
 	PATCH_IF mode == 1 BEGIN
-		// On regroupe uniquement par range identiques
 		PATCH_PHP_EACH ~probability_effects~ AS line => value BEGIN
-			PATCH_IF line_4 != range_low OR line_5 != range_high BEGIN
-				// On commence un nouveau groupe de range
+			// Les plages du jeu s'arrêtent à 99 : sans plafonnement, 0-100 et 0-99 donneraient deux groupes de même clé
+			SET effect_high = line_5
+			PATCH_IF effect_high > 99 BEGIN SET effect_high = 99 END
+
+			PATCH_IF line_4 != range_low OR effect_high != range_high BEGIN
 				SPRINT range ~%line_0%~
-				SET count_range += 1
-				SPRINT $ranges(~%count_range%~) ~%range%~
-				SET EVAL ~count_ranges_%range%~ = 0
+				SET range_count += 1
+				SPRINT $ranges(~%range_count%~) ~%range%~
+				SET EVAL ~size_%range%~ = 0
 				SET range_low = line_4
-				SET range_high = line_5
+				SET range_high = effect_high
 			END
-			SET EVAL ~count_ranges_%range%~ += 1
+			SET EVAL ~size_%range%~ += 1
 			SET $EVAL ~range_effects_%range%~(~%line_0%~ ~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value
 		END
 	END
 	ELSE BEGIN
-		// Regroupement complexe avec gestion des chevauchements de probabilité
-		SET prev_range_low = ~-1~
-		SET prev_range_high = ~-1~
+		// Une plage vide (bas > haut) ou à borne basse négative ne s'active jamais : l'effet est ignoré
 		PATCH_PHP_EACH ~probability_effects~ AS line => value BEGIN
-			// On commence par déterminer quel sera le range de probabilité
-			// On boucle une première fois pour éventuellement diminuer le range haut suite au chevauchement de probabilité d'un autre effet.
-			SET range_low = line_4
-			SET range_high = line_5
+			SET effect_low = line_4
+			SET effect_high = line_5
+			PATCH_IF effect_high > 99 BEGIN SET effect_high = 99 END
 
-			PATCH_IF prev_range_low != range_low OR prev_range_high != range_high BEGIN
-				PATCH_IF prev_range_high > range_low BEGIN
-					SET range_low = prev_range_high + 1
-				END
+			PATCH_IF effect_low >= 0 AND effect_low <= effect_high BEGIN
+				SET $bounds(~%effect_low%~) = effect_low
+				SET effect_high += 1
+				SET $bounds(~%effect_high%~) = effect_high
+			END
+		END
+		SORT_ARRAY_INDICES bounds NUMERICALLY
 
-				PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
-					PATCH_IF prev_range_low != line2_4 OR prev_range_high != line2_5 BEGIN
-						PATCH_IF range_low < line2_5 AND range_high > line2_4 BEGIN
-							PATCH_IF range_low < line2_4 - 1 AND range_high > line2_4 BEGIN
-								SET range_high = line2_4 - 1
-							END
+		// Entre deux bornes consécutives l'ensemble des effets actifs est constant : chaque intervalle forme un groupe
+		SET previous_bound = ~-1~
+		PATCH_PHP_EACH ~bounds~ AS _ => bound BEGIN
+			PATCH_IF previous_bound >= 0 BEGIN
+				SET range_low = previous_bound
+				SET range_high = bound - 1
+
+				LPF ~get_range_key~ INT_VAR probability1 = range_high probability2 = range_low RET range = rangeKey END
+				LPF ~get_probability~ INT_VAR probability1 = range_high probability2 = range_low RET probability END
+				SET EVAL ~size_%range%~ = 0
+
+				PATCH_PHP_EACH ~probability_effects~ AS line => value BEGIN
+					SET effect_low = line_4
+					SET effect_high = line_5
+					PATCH_IF effect_high > 99 BEGIN SET effect_high = 99 END
+
+					PATCH_IF effect_low >= 0 AND effect_low <= range_low AND effect_high >= range_high BEGIN
+						INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
+							REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%line_3%%outer_percent%~ ~%probability%%outer_percent%~
 						END
+
+						SET EVAL ~size_%range%~ += 1
+						SET $EVAL ~range_effects_%range%~(~%range%~ ~%line_1%~ ~%line_2%~ ~%probability%~ ~%range_low%~ ~%range_high%~ ~%line_6%~) = value
 					END
 				END
 
-				// Ensuite on récupère tous les effets qui se trouvent dans le range calculé
-				// En cas de chevauchement, un même effet se retrouvera dans plusieurs groupes de range.
-				PATCH_IF range_low <= range_high BEGIN
-					LPF ~get_range_key~ INT_VAR probability1 = range_high probability2 = range_low RET range = rangeKey END
-					SET count_range += 1
-					SPRINT $ranges(~%count_range%~) ~%range%~
-					SET EVAL ~count_ranges_%range%~ = 0
-
-					PATCH_PHP_EACH ~probability_effects~ AS line2 => value2 BEGIN
-						PATCH_IF range_low >= line2_4 AND range_high <= line2_5 BEGIN
-							LPF ~get_probability~ INT_VAR probability1 = range_high probability2 = range_low RET probability END
-
-							INNER_PATCH_SAVE line2_6 ~%line2_6%~ BEGIN
-								REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%line2_3%%outer_percent%~ ~%probability%%outer_percent%~
-							END
-
-							SET EVAL ~count_ranges_%range%~ += 1
-							SET $EVAL ~range_effects_%range%~(~%range%~ ~%line2_1%~ ~%line2_2%~ ~%probability%~ ~%range_low%~ ~%range_high%~ ~%line2_6%~) = value2
-						END
-					END
+				SET range_size = EVAL ~size_%range%~
+				PATCH_IF range_size > 0 BEGIN
+					SET range_count += 1
+					SPRINT $ranges(~%range_count%~) ~%range%~
 				END
 			END
-
-			SET prev_range_low = range_low
-			SET prev_range_high = range_high
+			SET previous_bound = bound
 		END
 	END
 
-	SET cpt = 0
-	PATCH_IF VARIABLE_IS_SET $ranges(~1~) BEGIN
-		SET count = 0
-	END
-	PATCH_PHP_EACH ~ranges~ AS _ => range BEGIN
-		SET countRange = EVAL ~count_ranges_%range%~
-
-		PATCH_IF countRange == 1 BEGIN
+	// Les segments du mode complexe sont disjoints : les probabilités de groupes identiques s'additionnent sans erreur
+	PATCH_IF mode == 2 BEGIN
+		PATCH_PHP_EACH ~ranges~ AS _ => range BEGIN
+			SPRINT signature ~~
+			SET range_probability = 0
 			PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
-				SET $effects(~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value
-				SET count += 1
-			END
-		END
-		ELSE BEGIN
-			INNER_PATCH_SAVE probability2 ~%range%~ BEGIN
-				SPRINT regex ~\([0-9][0-9]\)$~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-			END
-			INNER_PATCH_SAVE probability1 ~%range%~ BEGIN
-				SPRINT regex ~^\([0-9][0-9]\)~
-				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-			END
-
-			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
-			LPM ~set_opcode_sort~
-			LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-			SPRINT description @101126 // ~%probability% de chance~
-			SET sort += cpt * 20 // Laisse une marge de 20 effets par groupe de range...
-			SET $effects(~%sort%~ ~%count%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%description%~) = 1
-			SET count += 1
-
-			PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
-				INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
+				SET range_probability = line_3
+				INNER_PATCH_SAVE tail ~%line_6%~ BEGIN
 					SPRINT regex @10009 // ~^[0-9]+ % de chance ~
 					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
-					SPRINT regex @10019 // ~[0-9]+ % de chance ~
-					SPRINT regex ~; %regex%~
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~; ~
 				END
-				SET sort += 1
-				SET $effects(~%sort%~ ~%count%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value + 2
-				SET count += 1
+				SPRINT signature ~%signature%|%tail%~
+			END
+
+			PATCH_IF VARIABLE_IS_SET $signatures(~%signature%~) BEGIN
+				SPRINT owner $signatures(~%signature%~)
+				SET $totals(~%owner%~) = $totals(~%owner%~) + range_probability
+				SET $duplicates(~%range%~) = 1
+			END
+			ELSE BEGIN
+				SPRINT $signatures(~%signature%~) ~%range%~
+				SET $totals(~%range%~) = range_probability
 			END
 		END
-		SET cpt += 1
+	END
+
+	SET group_index = 0
+	PATCH_PHP_EACH ~ranges~ AS _ => range BEGIN
+		PATCH_IF NOT VARIABLE_IS_SET $duplicates(~%range%~) BEGIN
+			SET range_size = EVAL ~size_%range%~
+
+			PATCH_IF range_size == 1 BEGIN
+				PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
+					PATCH_IF VARIABLE_IS_SET $totals(~%range%~) BEGIN
+						SET old_probability = line_3
+						SET new_probability = $totals(~%range%~)
+						PATCH_IF new_probability != old_probability BEGIN
+							INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
+								REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%old_probability%%outer_percent%~ ~%new_probability%%outer_percent%~
+							END
+							SET line_3 = new_probability
+						END
+					END
+					SET $effects(~%line_1%~ ~%line_2%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value
+					SET count += 1
+				END
+			END
+			ELSE BEGIN
+				INNER_PATCH_SAVE group_low ~%range%~ BEGIN
+					SPRINT regex ~\([0-9][0-9]\)$~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+				END
+				INNER_PATCH_SAVE group_high ~%range%~ BEGIN
+					SPRINT regex ~^\([0-9][0-9]\)~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+				END
+
+				LPF ~get_probability~ INT_VAR probability1 = group_high probability2 = group_low RET probability END
+				PATCH_IF VARIABLE_IS_SET $totals(~%range%~) BEGIN
+					SET probability = $totals(~%range%~)
+				END
+				LPM ~set_opcode_sort~
+				LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
+				SPRINT header_description @101126 // ~%probability% de chance~
+				SET sort += group_index * 20 // Laisse une marge de 20 effets par groupe de range...
+				SET $effects(~%sort%~ ~%count%~ ~%probability%~ ~%group_low%~ ~%group_high%~ ~%header_description%~) = 1
+				SET count += 1
+
+				PATCH_PHP_EACH ~range_effects_%range%~ AS line => value BEGIN
+					INNER_PATCH_SAVE line_6 ~%line_6%~ BEGIN
+						SPRINT regex @10009 // ~^[0-9]+ % de chance ~
+						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+						SPRINT regex @10019 // ~[0-9]+ % de chance ~
+						SPRINT regex ~; %regex%~
+						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~; ~
+					END
+					SET sort += 1
+					SET $effects(~%sort%~ ~%count%~ ~%line_3%~ ~%line_4%~ ~%line_5%~ ~%line_6%~) = value + 2
+					SET count += 1
+				END
+			END
+			SET group_index += 1
+		END
 	END
 END
 
