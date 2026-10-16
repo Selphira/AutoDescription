@@ -1,13 +1,3 @@
-DEFINE_PATCH_FUNCTION ~get_eff_effect_description~
-	STR_VAR
-		file = ~~
-	RET
-		description
-BEGIN
-	INNER_PATCH_FILE ~%file%.eff~ BEGIN
-	END
-END
-
 DEFINE_PATCH_MACRO ~read_effect_vars~ BEGIN
 	READ_SHORT (offset) opcode
 	READ_BYTE  (offset + EFF_target) target
@@ -170,13 +160,6 @@ DEFINE_PATCH_MACRO ~load_effect~
 BEGIN
 	SET isExternal = 0
     LPM ~read_effect_vars~
-    LPM ~load_opcode~
-END
-
-DEFINE_PATCH_MACRO ~load_external_effect~
-BEGIN
-	SET isExternal = 1
-    LPM ~read_external_effect_vars~
     LPM ~load_opcode~
 END
 

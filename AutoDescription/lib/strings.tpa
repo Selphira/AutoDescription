@@ -186,7 +186,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~string_from_strref~ BEGIN
 	~THIEF~    => 7202
 	~BARD~     => 7206
 	~MONK~     => 45851
-	~RANGER~   => 7200
 END
 
 ACTION_PHP_EACH string_from_strref AS name => strref BEGIN

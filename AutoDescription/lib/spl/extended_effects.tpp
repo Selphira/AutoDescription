@@ -210,33 +210,6 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_unique_spell_effects~ INT_VAR requiredLevel = 0 STR_VAR array_name = "" RET count RET_ARRAY newAbilities BEGIN
-	CLEAR_ARRAY newAbilities
-    PATCH_DEFINE_ASSOCIATIVE_ARRAY ~newAbilities~ BEGIN END
-    SET count = 0
-
-	PATCH_PHP_EACH ~%array_name%~ AS data => value BEGIN
-		PATCH_IF requiredLevel == data_3 BEGIN
-			SET found = 0
-			PATCH_PHP_EACH newAbilities AS ability => v BEGIN
-				PATCH_IF data_3 == ability_3 BEGIN
-					SPRINT tmp1 ~%data_2%~
-					SPRINT tmp2 ~%ability_2%~
-					TO_LOWER tmp1
-					TO_LOWER tmp2
-					PATCH_IF ~%tmp1%~ STRING_EQUAL ~%tmp2%~ BEGIN
-						SET found = 1
-					END
-				END
-			END
-			PATCH_IF found == 0 BEGIN
-				SET $newAbilities(~%data_0%~ ~%count%~ ~%data_2%~ ~%data_3%~ ~%data_4%~) = 1
-				SET count += 1
-			END
-		END
-	END
-END
-
 DEFINE_PATCH_FUNCTION ~get_item_spell_effects_description~
 	INT_VAR
 		castingLevel = 0

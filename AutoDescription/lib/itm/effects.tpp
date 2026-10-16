@@ -255,25 +255,6 @@ DEFINE_PATCH_MACRO ~add_target_exceptions~ BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ~block_to_vars~ BEGIN
-	READ_SHORT (blockOffset) opcode
-	READ_BYTE  (blockOffset + EFF_target) target
-	READ_BYTE  (blockOffset + EFF_power) power
-	READ_LONG  (blockOffset + EFF_parameter1) parameter1
-	READ_LONG  (blockOffset + EFF_parameter2) parameter2
-	READ_BYTE  (blockOffset + EFF_timing_mode) timingMode
-	READ_BYTE  (blockOffset + EFF_resistance) resistance
-	READ_LONG  (blockOffset + EFF_duration) duration
-	READ_BYTE  (blockOffset + EFF_probability1) probability1
-	READ_BYTE  (blockOffset + EFF_probability2) probability2
-	READ_ASCII (blockOffset + EFF_resref_key) resref
-	READ_LONG  (blockOffset + EFF_dice_count) diceCount
-	READ_LONG  (blockOffset + EFF_dice_sides) diceSides
-	READ_LONG  (blockOffset + EFF_save_type) saveType
-	READ_LONG  (blockOffset + EFF_save_bonus) saveBonus
-	READ_LONG  (blockOffset + 0x2c) special
-END
-
 
 DEFINE_PATCH_FUNCTION ~get_probability~ INT_VAR probability1 = 0 probability2 = 0 RET probability BEGIN
 	PATCH_IF probability1 > 99 OR probability1 < 0 BEGIN
