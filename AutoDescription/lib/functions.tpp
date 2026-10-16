@@ -233,15 +233,22 @@ DEFINE_PATCH_FUNCTION remove_elements_in_list
 	RET
 		list
 BEGIN
-	WHILE ~%elements%~ STRING_COMPARE ~~ BEGIN
-		LPF return_first_entry STR_VAR list = ~%elements%~ RET entry elements = list END
+	// Comparaison par éléments entiers : un retrait ne doit jamais toucher une sous-chaîne d'un autre élément
+	SPRINT kept ~~
 
-		INNER_PATCH_SAVE list ~%list%~ BEGIN
-			REPLACE_TEXTUALLY ~ %entry%~ ~~
-			REPLACE_TEXTUALLY ~%entry% ~ ~~
-			REPLACE_TEXTUALLY ~%entry%~ ~~
+	WHILE ~%list%~ STRING_COMPARE ~~ BEGIN
+		LPF return_first_entry STR_VAR list = ~%list%~ RET entry list END
+
+		PATCH_IF (INDEX(~ %entry% ~ ~ %elements% ~) < 0) BEGIN
+			PATCH_IF (~%kept%~ STRING_EQUAL ~~) BEGIN
+				SPRINT kept ~%entry%~
+			END ELSE BEGIN
+				SPRINT kept ~%kept% %entry%~
+			END
 		END
 	END
+
+	SPRINT list ~%kept%~
 END
 
 /* ==================================================================================== *
