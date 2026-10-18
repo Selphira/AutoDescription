@@ -712,7 +712,11 @@ BEGIN
 		END
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN
-		PATCH_TRY LPF ~opcode_%opcode%_typed_value~ INT_VAR value = delta_value RET strref END WITH DEFAULT strref = 0 END
+		SPRINT dispatch_typed_value ~opcode_%opcode%_typed_value~
+		PATCH_TRY LPF ~%dispatch_typed_value%~ INT_VAR value = delta_value RET strref END WITH DEFAULT
+			strref = 0
+			PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_typed_value%~ type = ~function~ error = ~%ERROR_MESSAGE%~ END END
+		END
 		SET last_value = value
 		SET value = ABS delta_value
 		SET complex_value_int = base_value
