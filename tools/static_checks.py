@@ -232,7 +232,7 @@ def check_tra_references(report, ids):
 NEW_ENTRY = re.compile(r"^@(\d+)\s*=\s*~([^~]*)~([^\n]*)", re.M)
 COPY_MARKER = re.compile(r"//\s*reprise de @(\d+)")
 # Fichiers du nouveau moteur où les globales en majuscules sont fixées.
-NEW_STARTUP_FILES = ("always.tpa", "startup.tpa")
+NEW_STARTUP_FILES = ("always.tpa", "startup.tpa", "catalog.tpa")
 
 
 def check_new_tra_rules(report):
@@ -356,6 +356,64 @@ def check_ignored_described(report, variants):
         report.add("AVERTISSEMENT", f"opcode {opcode} : dans ignored_opcodes (valeur {ignored[opcode]}) "
                    f"et décrit par {', '.join(sorted('opcode_' + v + '_' + str(opcode) for v in variants[opcode]))}")
     print(f"  {len(ignored)} entrées dans ignored_opcodes")
+
+
+# ---------------------------------------------------------------------------------------------
+# Catalogue des opcodes du nouveau moteur
+
+CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
+NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
+
+
+def check_catalog(report, definitions):
+    report.section("Catalogue des opcodes (2da/opcodes.2da)")
+    path = MOD / "2da" / "opcodes.2da"
+    lines = read_text(path).replace("\r\n", "\n").split("\n")
+    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "NAME"]:
+        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS NAME »")
+        return
+    rows = {}
+    previous = -1
+    for number, line in enumerate(lines[3:], start=4):
+        fields = line.split()
+        if not fields:
+            continue
+        where = f"{relative(path)}:{number}"
+        if len(fields) != 5 or not fields[0].isdigit():
+            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS NAME)")
+            continue
+        opcode = int(fields[0])
+        if opcode <= previous:
+            report.add("ERREUR", f"{where} : opcode {opcode} en double ou hors ordre")
+        previous = max(previous, opcode)
+        if fields[1] not in ("0", "1") or fields[2] not in ("0", "1"):
+            report.add("ERREUR", f"{where} : BG2 et EE valent 0 ou 1")
+        if fields[3] not in CATALOG_STATUSES:
+            report.add("ERREUR", f"{where} : statut {fields[3]} inconnu ({', '.join(CATALOG_STATUSES)})")
+        rows[opcode] = fields[3]
+
+    # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.
+    implemented = collections.defaultdict(list)
+    for (_, _, name), places in definitions.items():
+        match = NEW_OPCODE_MACRO.match(name)
+        if match and any(p.startswith(relative(NEW_LIB) + "/") for p in places):
+            implemented[int(match.group(1))].append(name)
+    for opcode in sorted(set(implemented) | {o for o, s in rows.items() if s == "DESCRIBED"}):
+        if rows.get(opcode) != "DESCRIBED":
+            report.add("ERREUR", f"opcode {opcode} : {', '.join(implemented[opcode])} défini mais statut "
+                       f"{rows.get(opcode, 'absent du catalogue')} au lieu de DESCRIBED")
+        elif not implemented[opcode]:
+            report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_* dans new-lib/")
+
+    # Point de départ repris de l'ancien moteur ; les écarts sont des décisions à documenter.
+    ignored_old = set(parse_ignored_opcodes() or {})
+    ignored_new = {o for o, s in rows.items() if s == "IGNORED"}
+    if ignored_old != ignored_new:
+        report.add("INFO", "IGNORED diffère de ignored_opcodes de l'ancien moteur : "
+                   f"seulement dans le catalogue {sorted(ignored_new - ignored_old)}, "
+                   f"seulement dans l'ancien {sorted(ignored_old - ignored_new)}")
+    counts = collections.Counter(rows.values())
+    print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES))
 
 
 # ---------------------------------------------------------------------------------------------
@@ -533,6 +591,7 @@ def main():
     definitions = check_duplicate_definitions(report)
     variants = check_opcode_variants(report, definitions)
     check_ignored_described(report, variants)
+    check_catalog(report, definitions)
     check_engine_separation(report, definitions)
     if not args.no_parse:
         if weidu.is_file():

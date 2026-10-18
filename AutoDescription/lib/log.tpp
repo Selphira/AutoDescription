@@ -124,8 +124,12 @@ BEGIN
 	END
 END
 
-// En modes 1 et 3, les ressources non couvertes sont aussi comptées parmi les ignorées.
+// En modes 1 et 3, les ressources non couvertes sont aussi comptées parmi les ignorées. Les quatre
+// composants appellent cette macro en fin de traitement : le nouveau moteur y clôt ses journaux.
 DEFINE_ACTION_MACRO ~show_engine_statistics~ BEGIN
+	ACTION_IF description_engine != 0 BEGIN
+		LAF ~ad_close_log~ STR_VAR log_name = ~%log_filename%~ END
+	END
 	ACTION_IF description_engine == 1 BEGIN
 		PRINT "Non couverts par le nouveau moteur (non modifies) : %totalEngineNotCovered%"
 	END

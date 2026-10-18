@@ -1,0 +1,16 @@
+// Catalogue des opcodes (2da/opcodes.2da), une ligne par opcode des jeux BG :
+// - BG2, EE : 1 si l'opcode existe dans le moteur (IESDP) ; BG2 vaut pour BG2/ToB et BGT ;
+// - STATUS : DESCRIBED (décrit par une macro ad_op_<N>_*), IGNORED (rien à décrire, ex. effet
+//   visuel), TODO (pas encore pris en charge : la ressource n'est pas couverte).
+// Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
+// décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
+OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
+COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
+	READ_2DA_ENTRIES_NOW ad_catalog 5
+	FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
+		READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
+		READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
+		READ_2DA_ENTRY_FORMER ad_catalog ad_row 3 ad_status
+		SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
+		SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
+	END

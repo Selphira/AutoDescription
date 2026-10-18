@@ -87,28 +87,6 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 	END
 END
 
-// Aucun opcode n'est encore pris en charge : la raison liste tous les opcodes présents, triés
-// (indicateur de couverture) ; une ressource sans effet attend le rendu.
-DEFINE_PATCH_MACRO ad_set_uncovered_reason BEGIN
-	PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
-		SPRINT uncovered_reason ~%fx_load_error%~
-	END
-	ELSE PATCH_IF fx_count == 0 BEGIN
-		SPRINT uncovered_reason ~not_implemented~
-	END
-	ELSE BEGIN
-		SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
-		SPRINT fx_missing ~~
-		PHP_EACH fx_opcode_count AS fx_missing_opcode => fx_occurrences BEGIN
-			SPRINT fx_missing ~%fx_missing% %fx_missing_opcode%~
-		END
-		INNER_PATCH_SAVE fx_missing ~%fx_missing%~ BEGIN
-			DELETE_BYTES 0 1
-		END
-		SPRINT uncovered_reason ~missing_opcodes:%fx_missing%~
-	END
-END
-
 // Lit fx_block_count effets à partir de l'index fx_block_index de la table d'effets. Une lecture
 // hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant.
 DEFINE_PATCH_MACRO ad_fx_load_block BEGIN

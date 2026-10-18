@@ -16,5 +16,5 @@ BEGIN
 	PATCH_IF AD_EFFECTS_DUMP BEGIN
 		LPM ad_fx_dump
 	END
-	LPM ad_set_uncovered_reason
+	LPM ad_set_coverage
 END
