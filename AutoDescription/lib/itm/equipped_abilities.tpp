@@ -54,10 +54,10 @@ BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY globalLines BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
-	LPM ~load_feature_effects~
-	LPM ~replace_effects~
-	LPM ~filter_effects~
-	LPM ~group_effects~
+	PATCH_TIME ~step:load_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~load_feature_effects~ END
+	PATCH_TIME ~step:replace_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~replace_effects~ END
+	PATCH_TIME ~step:filter_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~filter_effects~ END
+	PATCH_TIME ~step:group_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~group_effects~ END
 
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
@@ -74,7 +74,9 @@ BEGIN
 					SET isGlobal = 1
 				END
 
-				LPF ~get_effect_description~ RET effectDescription = description sort END
+				PATCH_TIME ~step:get_effect_description:item=%isItem%:subspell=%isSubSpell%~ BEGIN
+					LPF ~get_effect_description~ RET effectDescription = description sort END
+				END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					PATCH_IF isGlobal BEGIN
 						SET $globalLines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 100

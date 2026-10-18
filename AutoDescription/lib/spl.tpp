@@ -136,7 +136,9 @@ BEGIN
 	PATCH_IF canUpdateSpell BEGIN
 		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
 
-		LPF ~get_spell_description~ STR_VAR originalDescription spellName RET description END
+		PATCH_TIME ~step:spell_description~ BEGIN
+			LPF ~get_spell_description~ STR_VAR originalDescription spellName RET description END
+		END
 
 		// Si l'utilisateur a choisi d'enregistrer la description des sorts dans ses fichiers
 		PATCH_IF alter_spell_files BEGIN

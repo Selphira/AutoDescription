@@ -7831,7 +7831,9 @@ DEFINE_PATCH_MACRO ~opcode_146_get_spell_effects_description~ BEGIN
     END
     SET $recursive_resref(~%resref%~) = 1
     SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
-    LPF ~get_item_spell_effects_description~ INT_VAR recursivity = VARIABLE_IS_SET recursivity ? recursivity + 1 : 0 castingLevel ignoreDurationIfSameForAllEffect baseProbability = probability STR_VAR file = ~%resref%~ RET description strDuration END
+    PATCH_TIME ~step:subspell_description:item=%isItem%~ BEGIN
+        LPF ~get_item_spell_effects_description~ INT_VAR recursivity = VARIABLE_IS_SET recursivity ? recursivity + 1 : 0 castingLevel ignoreDurationIfSameForAllEffect baseProbability = probability STR_VAR file = ~%resref%~ RET description strDuration END
+    END
 END
 
 DEFINE_PATCH_MACRO ~opcode_146_condition~ BEGIN
