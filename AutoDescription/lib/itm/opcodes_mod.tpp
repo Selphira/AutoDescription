@@ -15,19 +15,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignoredCreature~ BEGIN
     ~dw#sweet~ => 1  // Stratagems
 END
 
-DEFINE_PATCH_FUNCTION ~get_splstate_name_mod~ INT_VAR splstate = 0 RET splstateName BEGIN
-	LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%splstate%~
-
-	PATCH_MATCH ~%splstateValue%~ WITH
-		// Pnp Potion
-		GT_UNDER_THE_EFFECTS_OF_A_POTION
-		BEGIN
-			SPRINT splstateName @230009 // ~potions~
-		END
-		DEFAULT SPRINT splstateName ~~
-	END
-END
-
 DEFINE_PATCH_FUNCTION ~get_spell_secondary_type_mod~ INT_VAR secondaryType = 0 opcode = 0 RET spellSecondaryTypeName BEGIN
 	SPRINT spellSecondaryTypeName ~~
 	PATCH_IF VARIABLE_IS_SET $msectype(~%secondaryType%~) BEGIN
@@ -176,6 +163,19 @@ DEFINE_PATCH_MACRO ~opcode_326_is_valid_mod~ BEGIN
 			END
 			DEFAULT SET isValid = ~%resref%~ STRING_MATCHES_REGEXP ~^[dD]5[zZ]~
 		END
+		PATCH_IF isValid == 1 BEGIN
+			SPRINT tmpstat $splprot_stats(~%parameter2%~)
+			PATCH_IF tmpstat = 274 BEGIN
+				LOOKUP_IDS_SYMBOL_OF_INT splstateName ~SPLSTATE~ ~%parameter1%~
+				PATCH_MATCH ~%splstateName%~ WITH
+					D5_SEMI_SORC D5_SEMI_REST
+					BEGIN
+						SET isValid = 0
+					END
+					DEFAULT
+				END
+			END
+		END
 	END
 	PATCH_IF isValid == 1 BEGIN
 	    TO_LOWER resref
@@ -192,11 +192,9 @@ END
  */
 DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
 	SPRINT splprot $splprots(~%statType%~)
-	PATCH_IF VARIABLE_IS_SET $splprotstats(~%statType%~) BEGIN
-		SPRINT proficiencyId $splprotstats(~%statType%~)
-	END
-	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%proficiencyId%~) BEGIN
-		SPRINT proficiency $tra_proficiencies(~%proficiencyId%~)
+	SPRINT splprot_stat $splprot_stats(~%statType%~)
+	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%splprot_stat%~) BEGIN
+		SPRINT proficiency $tra_proficiencies(~%splprot_stat%~)
 	END
 	PATCH_MATCH ~%splprot%~ WITH
 		//mo_2h_bonus BEGIN END
@@ -224,7 +222,7 @@ DEFINE_PATCH_MACRO ~opcode_326_condition_mod~ BEGIN
 			SET strref = 13261003 // ~Si la zone n'est pas extraplanaire~
 		END
 		DEFAULT
-			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: splprot %splprot% non gere~ END
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: splprot %splprot% (%splprot_stat%) non gere~ END
 	END
 	PATCH_MATCH ~%splprot%~ WITH
 		mo_armor_prof0 BEGIN SET value = 0 END

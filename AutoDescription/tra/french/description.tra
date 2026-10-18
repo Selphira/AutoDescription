@@ -698,6 +698,145 @@
 @205222 = ~trolls spectraux~
 @205223 = ~nécrophages~
 
+@205500 = ~?????~
+@205501 = ~mage~
+@205502 = ~guerrier~
+@205503 = ~clerc~
+@205504 = ~voleur~
+@205505 = ~barde~
+@205506 = ~paladin~
+@205507 = ~guerrier / mage~
+@205508 = ~guerrier / clerc~
+@205509 = ~guerrier / voleur~
+@205510 = ~guerrier / mage / voleur~
+@205511 = ~druide~
+@205512 = ~rôdeur~
+@205513 = ~mage / voleur~
+@205514 = ~clerc / mage~
+@205515 = ~clerc / voleur~
+@205516 = ~guerrier / druide~
+@205517 = ~guerrier / mage / clerc~
+@205518 = ~clerc / rôdeur~
+@205519 = ~sorcier~
+@205520 = ~moine~
+@205521 = ~chaman~
+@205601 = ~ankheg~
+@205602 = ~basilic mineur~
+@205603 = ~basilic majeur~
+@205604 = ~ours noir~
+@205605 = ~ours brun~
+@205606 = ~ours des cavernes~
+@205607 = ~ours de montagne~
+@205608 = ~vers charognard~
+@205609 = ~chien sauvage~
+@205610 = ~chien de guerre~
+@205611 = ~doppelgänger~
+@205612 = ~grand doppelgänger~
+@205613 = ~Drizzt~
+@205614 = ~Elminster~
+@205615 = ~ettercap~
+@205616 = ~goule~
+@205617 = ~revenant~
+@205618 = ~blême~
+@205619 = ~grouilleu~
+@205620 = ~gnoll~
+@205621 = ~hobgobelin~
+@205622 = ~kobold~
+@205623 = ~tasloi~
+@205624 = ~xvart~
+@205625 = ~ogre~
+@205626 = ~ogre-mage~
+@205627 = ~demi-ogre~
+@205628 = ~ogrillon~
+@205629 = ~Sarevok~
+@205630 = ~sirène~
+@205631 = ~dryade~
+@205633 = ~nymphe~
+@205634 = ~squelette~
+@205635 = ~combattant squelette~
+@205636 = ~garde funeste~
+@205637 = ~araignée géante~
+@205638 = ~araignée colossale~
+@205639 = ~araignée éclipsante~
+@205640 = ~araignée-sabre~
+@205641 = ~araignée-en-peine~
+@205642 = ~Volo~
+@205643 = ~loup~
+@205644 = ~worg~
+@205645 = ~loup noir~
+@205646 = ~loup des glaces~
+@205647 = ~loup vampirique~
+@205648 = ~loup effrayant~
+@205649 = ~wyverne~
+@205650 = ~limon olive~
+@205651 = ~gelée moutarde~
+@205652 = ~gelée ocre~
+@205653 = ~vase grise~
+@205654 = ~limon vert~
+@205655 = ~innocent~
+@205656 = ~poing enflammé~
+@205657 = ~loup-garou~
+@205658 = ~muloup~
+@205659 = ~chevalier de la mort~
+@205660 = ~tanar'ris~
+@205661 = ~spectateur~
+@205662 = ~flagelleur mental~
+@205663 = ~vampire~
+@205664 = ~vampyre~
+@205665 = ~otyugh~
+@205666 = ~rakshasa~
+@205667 = ~troll~
+@205668 = ~ombre des roches~
+@205669 = ~sahuagin~
+@205670 = ~ombre~
+@205671 = ~spectre~
+@205672 = ~nécrophage~
+@205673 = ~kuo-toa~
+@205674 = ~brume~
+@205675 = ~chat~
+@205676 = ~duergar~
+@205677 = ~méphite~
+@205678 = ~mimique~
+@205679 = ~diablotin~
+@205680 = ~géant~
+@205681 = ~orque~
+@205682 = ~golem de fer~
+@205683 = ~golem de chair~
+@205684 = ~golem de pierre~
+@205685 = ~golem d'argile~
+@205686 = ~élémentaire d'air~
+@205687 = ~élémentaire de feu~
+@205688 = ~élémentaire de terre~
+//@205689 = ~SPIDER_CENTEOL ???~
+@205690 = ~dragon rouge~
+@205691 = ~dragon noir~
+@205692 = ~dragon argenté~
+@205693 = ~djinn~
+@205694 = ~dao~
+@205695 = ~éfrit~
+@205696 = ~djinn noble~
+@205697 = ~éfrit noble~
+@205698 = ~zombie~
+@205699 = ~proie~
+@205700 = ~prédateur~
+@205701 = ~épée longue~
+@205702 = ~mage~
+@205703 = ~guerrier~
+@205704 = ~clerc~
+@205705 = ~voleur~
+@205706 = ~barde~
+@205707 = ~paladin~
+@205708 = ~druide~
+@205709 = ~rôdeur~
+@205710 = ~œil de magicien~
+@205711 = ~sentinelle~
+@205712 = ~soldat amnien~
+@205713 = ~garde de la ville~
+@205719 = ~élémentaire d'eau~
+@205720 = ~dragon vert~
+@205722 = ~troll spectral~
+@205723 = ~nécrophage~
+
 /* ------------ *
  * Specific.ids *
  * ------------ */
@@ -753,6 +892,22 @@
 @208049 = ~créatures chaotiques bonnes~
 @208050 = ~créatures chaotiques neutres~
 @208051 = ~créatures chaotiques mauvaises~
+
+@208500 = ~~
+@208501 = ~bon~
+@208502 = ~neutre~
+@208503 = ~mauvais~
+@208516 = ~loyal~
+@208517 = ~loyal bon~
+@208518 = ~loyal neutre~
+@208519 = ~loyal mauvais~
+@208533 = ~neutre bon~
+@208534 = ~neutre strict~
+@208535 = ~neutre mauvais~
+@208548 = ~chaotique~
+@208549 = ~chaotique bon~
+@208550 = ~chaotique neutre~
+@208551 = ~chaotique mauvais~
 
 /* ------- *
  * Kit.ids *
@@ -1585,7 +1740,7 @@
 @401325 = ~les effets modifiant tous les jets de sauvegarde~
 @401326 = ~les effets provoquant l'incantation de sort sur une cible d'un type spécifique~
 @401327 = ~~ // Opcode visuel
-//@401328 = ~~ // TODO: difficilement compréhensible pour un joueur
+@401328 = ~~ // TODO: difficilement compréhensible pour un joueur
 @401329 = ~les effets ralentissant du poison~
 @401330 = ~~ // Opcode textuel
 @401331 = ~~ // Invocation de créature, non pertinent
@@ -1803,6 +1958,11 @@
 @10000103 = ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
 @10000104 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~
 @10000105 = ~de passer la classe d'armure de base %ofTheTarget% à %value%~
+@10000200 = ~la classe d'armure~
+@10000201 = ~la classe d'armure contre les armes contondantes~
+@10000202 = ~la classe d'armure contre les projectiles~
+@10000204 = ~la classe d'armure contre les armes perforantes~
+@10000208 = ~la classe d'armure contre les armes tranchantes~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
@@ -1833,6 +1993,8 @@
 @10010101 = ~une demi~
 @10010102 = ~\1 et demi~
 @10010103 = ~une demi supplémentaire~
+
+@10010200 = ~le nombre d'attaque par round~
 
 // Opcode 2: Cure: Sleep [2]
 
@@ -2056,22 +2218,27 @@
 
 @10330001 = ~contre la paralysie, la mort et les poisons~
 @10330002 = ~les jets de sauvegarde %versus%~
+@10330003 = ~les jets de sauvegarde contre la paralysie, la mort et les poisons~
 
 // Opcode 34: Stat: Save vs. Wands Modifier [34]
 
 @10340001 = ~contre les baguettes, les sceptres et les bâtons~
+@10340002 = ~les jets de sauvegarde contre les baguettes, les sceptres et les bâtons~
 
 // Opcode 35: Stat: Save vs. Petrification/Polymorph Modifier [35]
 
 @10350001 = ~contre la pétrification et la métamorphose~
+@10350002 = ~les jets de sauvegarde contre la pétrification et la métamorphose~
 
 // Opcode 36: Stat: Save vs. Breath Weapons Modifier [36]
 
 @10360001 = ~contre les souffles~
+@10360002 = ~les jets de sauvegarde contre les souffles~
 
 // Opcode 37: Stat: Save vs. Spells Modifier [37]
 
 @10370001 = ~contre les sorts~
+@10370002 = ~les jets de sauvegarde contre les sorts~
 
 // Opcode 38: State: Silence [38]
 
@@ -3853,8 +4020,8 @@
 @13240091 = ~Inefficace contre les créatures paniquées~
 @13240092 = ~Effectif contre les créatures paniquées~
 
-@13240110 = ~Inefficace contre les créatures sous l'effet de %splstateName%~
-@13240111 = ~Effectif contre les créatures sous l'effet de %splstateName%~
+@13240110 = ~Inefficace contre les créatures affectées par %splstateName%~
+@13240111 = ~Effectif contre les créatures affectées par %splstateName%~
 
 @13240119 = ~Inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
 @13240120 = ~Inefficace contre les créatures protégées contre les morts-vivants~
@@ -3977,8 +4144,8 @@
 @13240591 = ~d'être inefficace contre les créatures paniquées~
 @13240592 = ~d'être effectif contre les créatures paniquées~
 
-@13240610 = ~d'être inefficace contre les créatures sous l'effet de %splstateName%~
-@13240611 = ~d'être effectif contre les créatures sous l'effet de %splstateName%~
+@13240610 = ~d'être inefficace contre les créatures affectées par %splstateName%~
+@13240611 = ~d'être effectif contre les créatures affectées par %splstateName%~
 
 @13240619 = ~d'être inefficace contre les humanoïdes et les animaux, mais effectif contre les demi-elfes~
 @13240620 = ~d'être inefficace contre les créatures protégées contre les morts-vivants~
@@ -4053,7 +4220,7 @@
 @13241089 = ~entre 6h et 20h~ // TODO: le jour
 @13241090 = ~entre 21h et 5h~ // TODO: la nuit
 @13241091 = ~créatures paniquées~
-@13241110 = ~créatures sous l'effet de %splstateName%~
+@13241110 = ~créatures affectées par %splstateName%~
 @13241120 = ~créatures protégées contre les morts-vivants~
 @13241122 = ~créatures possédant une dextérité supérieure ou égale à %value%~
 @13241123 = ~créatures possédant une dextérité inférieure à %value%~
@@ -4096,34 +4263,14 @@
 @13260000 = ~~
 @13260001 = ~Si %theTarget% est un mort-vivant~
 @13260002 = ~Si %theTarget% n'est pas un mort-vivant~
-@13260003 = ~Si %theTarget% est immunisé au feu~
-@13260004 = ~Si %theTarget% est sensible au feu~
 @13260005 = ~Si %theTarget% est un humanoïde~
 @13260006 = ~Si %theTarget% n'est pas un humanoïde~
 @13260007 = ~Si %theTarget% est un animal~
 @13260008 = ~Si %theTarget% n'est pas un animal~
-@13260009 = ~Si %theTarget% est un élémentaire~
-@13260010 = ~Si %theTarget% n'est pas un élémentaire~
-@13260011 = ~Si %theTarget% est un myconide~
-@13260012 = ~Si %theTarget% n'est pas un myconide~
-@13260013 = ~Si %theTarget% est gigantesque~
-@13260014 = ~Si %theTarget% n'est pas gigantesque~
-@13260015 = ~Si %theTarget% est un elfe~
-@13260016 = ~Si %theTarget% n'est pas un elfe~
-@13260017 = ~Si %theTarget% est une ombre des roches~
-@13260018 = ~Si %theTarget% n'est pas une ombre des roches~
-@13260019 = ~Si %theTarget% est un demi-elfe~
-@13260020 = ~Si %theTarget% n'est pas un demi-elfe~
 @13260021 = ~Si %theTarget% est un humanoïde ou un animal~
 @13260022 = ~Si %theTarget% n'est ni un humanoïde, ni un animal~
 @13260023 = ~Si %theTarget% est aveuglée~
 @13260024 = ~Si %theTarget% n'est pas aveuglée~
-@13260025 = ~Si %theTarget% est immunisé au froid~
-@13260026 = ~Si %theTarget% est sensible au froid~
-@13260027 = ~Si %theTarget% est un golem~
-@13260028 = ~Si %theTarget% n'est pas golem~
-@13260029 = ~Si %theTarget% est un minotaure~
-@13260030 = ~Si %theTarget% n'est pas un minotaure~
 @13260031 = ~Si %theTarget% est un mort-vivant ou un myconide~
 @13260032 = ~Si %theTarget% n'est ni un mort-vivant, ni un myconide~
 @13260033 = ~Si %theTarget% est neutre~
@@ -4152,66 +4299,139 @@
 @13260056 = ~Si %theTarget% n'est ni un mort-vivant, ni un golem~
 @13260057 = ~Si %theTarget% est un homme~
 @13260058 = ~Si %theTarget% est une femme~
-@13260064 = ~Si %theTarget% est un orque~
-@13260065 = ~Si %theTarget% n'est pas un orque~
 @13260066 = ~Si %theTarget% est sourd~
 @13260067 = ~Si %theTarget% n'est pas sourd~
 @13260074 = ~Si %theTarget% est mort~
 @13260075 = ~Si %theTarget% est vivant~
 @13260076 = ~~ // @13260110
-@13260077 = ~Si %theTarget% est immunisé aux poisons~
-@13260078 = ~Si %theTarget% est sensible aux poisons~
-@13260079 = ~Si %theTarget% est immunisé à l'acide~
-@13260080 = ~Si %theTarget% est sensible à l'acide~
-@13260081 = ~Si %theTarget% est immunisé à l'électricité~
-@13260082 = ~Si %theTarget% est sensible à l'électricité~
-@13260083 = ~Si %theTarget% est immunisé aux dégâts magiques~
-@13260084 = ~Si %theTarget% est sensible aux dégâts magiques~
-@13260085 = ~Si %theTarget% est un ankheg~
-@13260086 = ~Si %theTarget% n'est pas un ankheg~
-@13260087 = ~Si %theTarget% est une liche~
-@13260088 = ~Si %theTarget% n'est pas une liche~
-@13260089 = ~Entre 6h et 20h~
-@13260090 = ~Entre 21h et 5h~
 @13260091 = ~Si %theTarget% panique~
 @13260092 = ~Si %theTarget% ne panique pas~
 
-@13260110 = ~Si %theTarget% est sous l'effet de %splstateName%~
-@13260111 = ~Si %theTarget% n'est pas sous l'effet de %splstateName%~
+@13260110 = ~Si %theTarget% est affectée par %splstateName%~
+@13260111 = ~Si %theTarget% n'est pas affectée par %splstateName%~
 
 @13260119 = ~Si %theTarget% est un humanoïde ou un animal, mais pas un demi-elfe~
 @13260120 = ~Si %theTarget% est protégé contre les morts-vivants~
-@13260122 = ~Si la dextérité %ofTheTarget% est supérieure ou égale à %value%~
-@13260123 = ~Si la dextérité %ofTheTarget% est inférieure à %value%~
-@13260124 = ~Si la force %ofTheTarget% est supérieure ou égale à %value%~
-@13260125 = ~Si la force %ofTheTarget% est inférieure à %value%~
-@13260126 = ~Si la constitution %ofTheTarget% est supérieure ou égale à %value%~
-@13260127 = ~Si la constitution %ofTheTarget% est inférieure à %value%~
-@13260128 = ~Si l'intelligence %ofTheTarget% est supérieure ou égale à %value%~
-@13260129 = ~Si l'intelligence %ofTheTarget% est inférieure à %value%~
-@13260130 = ~Si la sagesse %ofTheTarget% est supérieure ou égale à %value%~
-@13260131 = ~Si la sagesse %ofTheTarget% est inférieure à %value%~
-@13260132 = ~Si le charisme %ofTheTarget% est supérieur ou égal à %value%~
-@13260133 = ~Si le charisme %ofTheTarget% est inférieur à %value%~
-@13260134 = ~Si la quantité de créatures invoquées est supérieur ou égal à %value%~
-@13260135 = ~Si la quantité de créatures invoquées est inférieur à %value%~
-@13260136 = ~Si le chapitre en cours est supérieur ou égal au %value%~
-@13260137 = ~Si le chapitre en cours est inférieur à %value%~
 @13260138 = ~Si %theTarget% est %descriptionState%~
 @13260139 = ~Si %theTarget% n'est pas %descriptionState%~
 @13260140 = ~Si %theTarget% est sous l'effet d'une invisibilité~
 @13260141 = ~Si %theTarget% est sous l'effet d'une invisibilité majeure~
 @13260142 = ~Si %theTarget% est invisible~
 @13260143 = ~Si %theTarget% est visible~
-@13260144 = ~Si les points de vie %ofTheTarget% sont supérieurs ou égaux à %value%~
-@13260145 = ~Si les points de vie %ofTheTarget% sont inférieurs à %value%~
 @13260146 = ~Si %theTarget% fait partie des %creatureType%~
 @13260147 = ~Si %theTarget% ne fait pas partie des %creatureType%~
 
-@13261000 = ~Si la compétence %proficiency% est supérieure ou égale à %value%~
-@13261001 = ~Si la compétence %proficiency% est égale à %value%~
-@13261002 = ~Si la compétence %proficiency% est inférieure à %value%~
 @13261003 = ~Si la zone n'est pas extraplanaire~
+
+@13268000 = ~la quantité de créatures invoquées~
+@13268001 = ~le chapitre en cours~
+@13268011 = ~minuscule~
+@13268012 = ~moyenne~
+@13268013 = ~grande~
+@13268014 = ~gigantesque~
+
+@13269000 = ~Si %theStatistic% %ofTheTarget% est inférieure ou égale à %value%~
+@13269001 = ~Si %theStatistic% %ofTheTarget% est égale à %value%~
+@13269002 = ~Si %theStatistic% %ofTheTarget% est inférieure à %value%~
+@13269003 = ~Si %theStatistic% %ofTheTarget% est supérieure à %value%~
+@13269004 = ~Si %theStatistic% %ofTheTarget% est supérieure ou égale à %value%~
+@13269005 = ~Si %theStatistic% %ofTheTarget% n'est pas égale à %value%~
+@13269020 = ~Si %theStatistic% %ofTheTarget% est inférieur ou égal à %value%~
+@13269021 = ~Si %theStatistic% %ofTheTarget% est égal à %value%~
+@13269022 = ~Si %theStatistic% %ofTheTarget% est inférieur à %value%~
+@13269023 = ~Si %theStatistic% %ofTheTarget% est supérieur à %value%~
+@13269024 = ~Si %theStatistic% %ofTheTarget% est supérieur ou égal à %value%~
+@13269025 = ~Si %theStatistic% %ofTheTarget% n'est pas égal à %value%~
+@13269040 = ~Si %theStatistic% %ofTheTarget% sont inférieures ou égales à %value%~
+@13269041 = ~Si %theStatistic% %ofTheTarget% sont égales à %value%~
+@13269042 = ~Si %theStatistic% %ofTheTarget% sont inférieures à %value%~
+@13269043 = ~Si %theStatistic% %ofTheTarget% sont supérieures à %value%~
+@13269044 = ~Si %theStatistic% %ofTheTarget% sont supérieures ou égales à %value%~
+@13269045 = ~Si %theStatistic% %ofTheTarget% ne sont pas égales à %value%~
+@13269060 = ~Si %theStatistic% %ofTheTarget% sont inférieurs ou égaux à %value%~
+@13269061 = ~Si %theStatistic% %ofTheTarget% sont égaux à %value%~
+@13269062 = ~Si %theStatistic% %ofTheTarget% sont inférieurs à %value%~
+@13269063 = ~Si %theStatistic% %ofTheTarget% sont supérieurs à %value%~
+@13269064 = ~Si %theStatistic% %ofTheTarget% sont supérieurs ou égaux à %value%~
+@13269065 = ~Si %theStatistic% %ofTheTarget% ne sont pas égaux à %value%~
+@13269081 = ~Si l'état %splstateName% est sur %theTarget%~
+@13269085 = ~Si l'état %splstateName% n'est pas sur %theTarget%~
+@13269101 = ~Si %theTarget% est de la race des %idName%~
+@13269105 = ~Si %theTarget% n'est pas de la race des %idName%~
+@13260101 = ~Si %theTarget% est une alliée~
+@13260105 = ~Si %theTarget% n'est pas une alliée~
+@13260121 = ~Si %theTarget% est une ennemie~
+@13260122 = ~Si %theTarget% n'est pas une ennemie~
+@13269140 = ~Si %theTarget% est immunisée %toTheElement%~ // Si %theTarget% a une immunité %toTheElement% // Si %theElement% est inefficace contre %theTarget%// Si %theElement% n'a aucun effet sur %theTarget%
+@13269141 = ~Si %theTarget% est sensible %toTheElement%~
+@13260161 = ~Si %theTarget% fait partie des %idName%~
+@13260165 = ~Si %theTarget% ne fait pas partie des %idName%~
+@13260181 = ~Si l'état %ofTheTarget% est « mort »~
+@13260185 = ~Si l'état %ofTheTarget% n'est pas « mort »~
+@13269201 = ~Si %theTarget% est métamorphosée~
+@13269205 = ~Si %theTarget% n'est pas métamorphosée~
+@13269220 = ~Si la compétence %proficiency% est inférieure ou égale à %value%~
+@13269221 = ~Si la compétence %proficiency% est égale à %value%~
+@13269222 = ~Si la compétence %proficiency% est inférieure à %value%~
+@13269223 = ~Si la compétence %proficiency% est supérieure à %value%~
+@13269224 = ~Si la compétence %proficiency% est supérieure ou égale à %value%~
+@13269225 = ~Si la compétence %proficiency% n'est pas égale à %value%~
+@13269241 = ~Si %theTarget% est du même alignement moral que la source~
+@13269245 = ~Si %theTarget% est d'un alignement moral différent de la source~
+@13269261 = ~Si la classe %ofTheTarget% est %className%~
+@13269265 = ~Si la classe %ofTheTarget% n'est pas %className%~
+@13269280 = ~Si %theStatistic% est inférieure ou égale à %value%~
+@13269281 = ~Si %theStatistic% est égale à %value%~
+@13269282 = ~Si %theStatistic% est inférieure à %value%~
+@13269283 = ~Si %theStatistic% est supérieure à %value%~
+@13269284 = ~Si %theStatistic% est supérieure ou égale à %value%~
+@13269285 = ~Si %theStatistic% n'est pas égale à %value%~
+@13269300 = ~Si %theStatistic% est inférieur ou égal à %value%~
+@13269301 = ~Si %theStatistic% est égal à %value%~
+@13269302 = ~Si %theStatistic% est inférieur à %value%~
+@13269303 = ~Si %theStatistic% est supérieur à %value%~
+@13269304 = ~Si %theStatistic% est supérieur ou égal à %value%~
+@13269305 = ~Si %theStatistic% n'est pas égal à %value%~
+
+@13269320 = ~Entre %startHour%h et %endHour%h~
+
+@13269341 = ~Si l'alignement %ofTheTarget% est %alignName%~
+@13269345 = ~Si l'alignement %ofTheTarget% n'est pas %alignName%~
+@13269348 = ~Si l'alignement %ofTheTarget% est %alignName%~
+@13269349 = ~Si l'alignement %ofTheTarget% n'est pas %alignName%~
+@13269361 = ~Si %theTarget% est %stateValue%~
+@13269365 = ~Si %theTarget% n'est pas %stateValue%~
+
+@13269380 = ~Si %theTarget% est de taille inférieure ou égale à %sizeName%~
+@13269381 = ~Si %theTarget% est de taille %sizeName%~
+@13269382 = ~Si %theTarget% est de taille inférieure à %sizeName%~
+@13269383 = ~Si %theTarget% est de taille supérieure à %sizeName%~
+@13269384 = ~Si %theTarget% est de taille supérieure ou égale à %sizeName%~
+@13269385 = ~Si %theTarget% n'est pas de taille %sizeName%~
+
+@13269800 = ~Si %theTarget% est sous l'effet d'une potion~
+
+@13260089 = ~Entre 6h et 20h~
+@13260090 = ~Entre 21h et 5h~
+// align.ids
+//
+/*
+@208500 = ~~
+@208501 = ~bon~
+@208502 = ~neutre~
+@208503 = ~mauvais~
+@208516 = ~loyal~
+@208517 = ~loyal bon~
+@208518 = ~loyal neutre~
+@208519 = ~loyal mauvais~
+@208533 = ~neutre bon~
+@208534 = ~neutre strict~
+@208535 = ~neutre mauvais~
+@208548 = ~chaotique~
+@208549 = ~chaotique bon~
+@208550 = ~chaotique neutre~
+@208551 = ~chaotique mauvais~
+*/
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 
@@ -4443,6 +4663,41 @@
 @15250001 = ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 @15250002 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 
+// STATS.ids
+// > A7-GolemConstruction
+@800000 = ~un golem parfait~
+@800001 = ~un golem majeur~
+@800002 = ~un golem normal~
+@800003 = ~un golem mineur~
+@800004 = ~un golem d'argile~
+@800005 = ~un golem de fer~
+@800006 = ~un golem de pierre~
+@800007 = ~un golem de chair~
+@800008 = ~un golem de glace~
+@800009 = ~un golem magique~
+@800010 = ~un golem de foudre~
+@800011 = ~un golem de rubis~
+@800012 = ~un golem de mithril~
+@800013 = ~un golem d'adamantine~
+@800014 = ~un golem d'os~
+@800015 = ~un golem cerveau~
+@800016 = ~une poupée d'os~
+@800017 = ~un golem poupée~
+@800018 = ~un golem de vers~
+
+// SPECIFIC.ids
+// > A7-GolemConstruction
+@810000 = ~un golem~
+/*
+@206000 = ~??????~
+@206005 = ~elfes noirs~
+@206100 = ~~
+@206150 = ~githyankis~
+@206200 = ~~
+@206243 = ~ménestrels~
+@206250 = ~esprits~
+*/
+
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ //
@@ -4462,7 +4717,7 @@
 @102485 = ~Draine 1d4 points de vie si la cible possède du sang et les transfère au porteur~ // Spécifique à Item Revision : DVVAMPIR
 @102486 = ~Réduit la classe d'armure de la cible de 1 pendant 2 rounds~ // Spécifique à Item Revision : DVSUNDER
 @102487 = ~Dissipation de la magie (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVDISPEL
-@102488 = ~d’immobiliser la cible pendant 1 round (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~ // Spécifique à Item Revision : DVFREEZE
+@102488 = ~d'immobiliser la cible pendant 1 round (jet de sauvegarde contre la pétrification et la métamorphose pour éviter)~ // Spécifique à Item Revision : DVFREEZE
 @102489 = ~d'infliger Horreur à la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVFEARSM
 @102490 = ~de ralentir la cible pendant 3 rounds (jet de sauvegarde contre les sorts pour éviter)~ // Spécifique à Item Revision : DVCHILL
 @102491 = ~de décapiter la cible (jet de sauvegarde contre la paralysie, la mort et les poisons à -2 pour éviter)~ // Spécifique à Item Revision : DVVORPAL

@@ -61,14 +61,54 @@ ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
 	COPY_EXISTING ~splprot.2da~ ~override~
 		COUNT_2DA_COLS cols // amount of columns
 		READ_2DA_ENTRIES_NOW rows cols // read all file into memory
-		FOR (row = 146; row < rows; ++row) BEGIN // iterate over rows
-			READ_2DA_ENTRY_FORMER rows row 0 ~id~ // read column value
-			READ_2DA_ENTRY_FORMER rows row 1 ~stat~ // read column value
-			SPRINT $splprots(~%row%~) ~%id%~
-			SPRINT $splprotstats(~%row%~) ~%stat%~
+		FOR (row = 0; row < rows; ++row) BEGIN // iterate over rows
+			READ_2DA_ENTRY_FORMER rows row 0 ~id~
+			READ_2DA_ENTRY_FORMER rows row 1 ~stat~
+			READ_2DA_ENTRY_FORMER rows row 2 ~value~
+			READ_2DA_ENTRY_FORMER rows row 3 ~relation~
+			PATCH_IF NOT ~%stat%~ STRING_EQUAL ~*~ BEGIN
+			    LPF TO_DEC_NUMBER STR_VAR hexNumber = ~%stat%~ RET stat = value END
+			END
+            SPRINT $splprots(~%row%~) ~%id%~
+            SPRINT $splprot_stats(~%row%~) ~%stat%~
+            SPRINT $splprot_values(~%row%~) ~%value%~
+            SPRINT $splprot_relations(~%row%~) ~%relation%~
 		END
 		BUT_ONLY_IF_IT_CHANGES
 END
+
+COPY ~AutoDescription/2da/stats.2da~ ~override~
+    READ_2DA_ENTRIES_NOW rows 6
+    FOR (row = 0; row < rows; ++row) BEGIN
+        READ_2DA_ENTRY_FORMER rows row 0 ~stat~
+        READ_2DA_ENTRY_FORMER rows row 1 ~stat_value~
+        READ_2DA_ENTRY_FORMER rows row 2 ~relation~
+        READ_2DA_ENTRY_FORMER rows row 3 ~desc_ref~
+        READ_2DA_ENTRY_FORMER rows row 4 ~stat_ref~
+        READ_2DA_ENTRY_FORMER rows row 5 ~target_ref~
+
+        SPRINT stat ~%stat%-%stat_value%-%relation%~
+        SPRINT $stats_relation(~%stat%~) ~%relation%~
+        SPRINT $stats_desc_ref(~%stat%~) ~%desc_ref%~
+        SPRINT $stats_stat_ref(~%stat%~) ~%stat_ref%~
+        SPRINT $stats_target_ref(~%stat%~) ~%target_ref%~
+    END
+BUT_ONLY_IF_IT_CHANGES
+
+COPY ~AutoDescription/2da/stats_mods.2da~ ~override~
+    READ_2DA_ENTRIES_NOW rows 5
+    FOR (row = 0; row < rows; ++row) BEGIN
+        READ_2DA_ENTRY_FORMER rows row 0 ~opcode~
+        READ_2DA_ENTRY_FORMER rows row 1 ~stat~
+        READ_2DA_ENTRY_FORMER rows row 2 ~relation~
+        READ_2DA_ENTRY_FORMER rows row 3 ~desc_ref~
+        READ_2DA_ENTRY_FORMER rows row 4 ~stat_ref~
+
+        SPRINT $~stats_%opcode%_mods_relation~(~%stat%~) ~%relation%~
+        SPRINT $~stats_%opcode%_mods_desc_ref~(~%stat%~) ~%desc_ref%~
+        SPRINT $~stats_%opcode%_mods_stat_ref~(~%stat%~) ~%stat_ref%~
+    END
+BUT_ONLY_IF_IT_CHANGES
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~msectypeMod~ BEGIN
 	~GT_PotionEffects~ => 100220 // pnp_potion
