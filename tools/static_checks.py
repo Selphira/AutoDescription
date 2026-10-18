@@ -16,14 +16,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = MOD = LIB = BGFORGE = SFO = TRA = OPCODES = None
+ROOT = MOD = LIB = NEW_LIB = BGFORGE = SFO = TRA = OPCODES = None
 
 
 def set_root(root):
-    global ROOT, MOD, LIB, BGFORGE, SFO, TRA, OPCODES
+    global ROOT, MOD, LIB, NEW_LIB, BGFORGE, SFO, TRA, OPCODES
     ROOT = root.resolve()
     MOD = ROOT / "AutoDescription"
     LIB = MOD / "lib"
+    NEW_LIB = MOD / "new-lib"
     BGFORGE = LIB / "bgforge"
     SFO = MOD / "sfo"
     TRA = MOD / "tra"
@@ -211,16 +212,19 @@ def check_tra(report):
 
 def check_tra_references(report, ids):
     report.section("Références @n littérales absentes des .tra français")
-    french = ids.get(("french", "description.tra"), set()) | ids.get(("french", "setup.tra"), set())
+    old = ids.get(("french", "description.tra"), set()) | ids.get(("french", "setup.tra"), set())
+    new = ids.get(("french", NEW_TRA), set())
     sources = [path for path in weidu_files() if BGFORGE not in path.parents and SFO not in path.parents]
     references = 0
     for path in sources:
+        # Chaque moteur n'utilise que son fichier de chaînes (§7.1, condition 8).
+        own, name = (new, NEW_TRA) if NEW_LIB in path.parents else (old, "description.tra/setup.tra")
         _, code = strip_weidu(read_text(path))
         for match in re.finditer(r"@(-?\d+)\b", code):
             references += 1
             identifier = int(match.group(1))
-            if identifier not in french:
-                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : @{identifier} absent")
+            if identifier not in own:
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : @{identifier} absent de {name}")
     # Les identifiants calculés (10000000 + parameter2, strref = 13269382…) échappent à ce contrôle.
     print(f"  {references} références littérales examinées (hors commentaires et chaînes)")
 
@@ -297,6 +301,125 @@ def check_ignored_described(report, variants):
 
 
 # ---------------------------------------------------------------------------------------------
+# Séparation des moteurs lib/ et new-lib/ (§7.1, condition 1)
+
+CALL = re.compile(r"\b(?:LPF|LAF|LPM|LAM|LAUNCH_(?:PATCH|ACTION)_(?:FUNCTION|MACRO))\s+[~\"]?([A-Za-z0-9_#-]+)")
+INCLUDE_PATH = re.compile(r"\b(?:PATCH_)?(?:RE)?INCLUDE\s+(~[^~]*~|\"[^\"]*\")")
+ASSIGNMENT = re.compile(
+    r"\b(?:OUTER_SET|OUTER_SPRINT|OUTER_TEXT_SPRINT|LOCAL_SET|LOCAL_SPRINT|SET|SPRINT|TEXT_SPRINT"
+    r"|(?:ACTION_|PATCH_)?DEFINE_(?:ASSOCIATIVE_)?ARRAY|ACTION_READLN|PATCH_READLN)"
+    r"[ \t]+[~\"]?([A-Za-z_][A-Za-z0-9_]*)")
+# READ_<type> décalage variable ; les READ_2DA_* ont une autre arité (non relevés).
+READ_ASSIGNMENT = re.compile(r"\bREAD_(?!2DA)[A-Z0-9_]+[ \t]+(?:\([^()\n]*\)|\S+)[ \t]+([A-Za-z_][A-Za-z0-9_]*)")
+# Paramètres et valeurs renvoyées, dans les définitions comme dans les appels.
+PARAMETERS = re.compile(r"\b(?:INT_VAR|STR_VAR|RET_ARRAY|RET)\b(.*?)(?=\b(?:BEGIN|END|INT_VAR|STR_VAR|RET_ARRAY|RET)\b)", re.S)
+NAMED = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)\s*=(?![=>])")
+PHP_EACH = re.compile(r"\bPHP_EACH\s+\S+\s+AS\s+([A-Za-z_][A-Za-z0-9_]*)\s*=>\s*([A-Za-z_][A-Za-z0-9_]*)")
+IDENTIFIER = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)(?![A-Za-z0-9_#-])")
+STRING_VARIABLE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
+NON_VARIABLES = {"EVAL", "BEGIN", "END"}
+# Seuls les points d'entrée de la boucle commune appellent le nouveau moteur.
+ENGINE_CALLERS = ("AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
+
+
+def assigned_variables(code):
+    """Noms de variables affectés ou déclarés (paramètres, RET) dans un code sans commentaires ni chaînes."""
+    names = set(ASSIGNMENT.findall(code)) | set(READ_ASSIGNMENT.findall(code))
+    for segment in PARAMETERS.findall(code):
+        # « nom = expression » ou liste de noms seuls : les expressions ne sont pas des noms affectés.
+        names |= set(NAMED.findall(segment))
+        first = NAMED.search(segment)
+        names |= set(IDENTIFIER.findall(segment[:first.start()] if first else segment))
+    for key, value in PHP_EACH.findall(code):
+        names |= {key, value}
+    return names - NON_VARIABLES
+
+
+def ini_keys():
+    text = read_text(MOD / "settings-default.ini")
+    return set(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=", text, re.M))
+
+
+def check_engine_separation(report, definitions):
+    report.section("Séparation des moteurs lib/ et new-lib/")
+    new_files = sorted(p for p in weidu_files() if NEW_LIB in p.parents)
+    if not new_files:
+        report.add("ERREUR", f"{relative(NEW_LIB)} : aucun fichier")
+        return
+    old_files = [p for p in weidu_files() if NEW_LIB not in p.parents and BGFORGE not in p.parents]
+
+    def owner(places):
+        return {("new" if p.startswith(relative(NEW_LIB) + "/") else
+                 "bgforge" if p.startswith(relative(BGFORGE) + "/") else "old") for p in places}
+
+    new_names, old_names = set(), set()
+    for (context, kind, name), places in definitions.items():
+        owners = owner(places)
+        if "new" in owners:
+            new_names.add(name)
+            if not name.startswith("ad_"):
+                report.add("ERREUR", f"{context}_{kind} {name} ({', '.join(places)}) : nom sans préfixe ad_")
+            if owners != {"new"}:
+                report.add("ERREUR", f"{context}_{kind} {name} défini dans new-lib/ et ailleurs : {', '.join(places)}")
+        if "old" in owners:
+            old_names.add(name)
+
+    # Variables de l'ancien code (lib/, sfo/, tp2, options) : une fonction voit les variables de
+    # son appelant (V7) ; si new-lib/ lit un de ces noms sans l'avoir affecté lui-même, il dépend
+    # de l'ancien moteur. Les constantes BGforge sont partagées en lecture seule.
+    bgforge_variables = set()
+    for path in weidu_files():
+        if BGFORGE in path.parents:
+            bgforge_variables |= assigned_variables(strip_weidu(read_text(path))[1])
+    old_variables = ini_keys()
+    for path in old_files:
+        old_variables |= assigned_variables(strip_weidu(read_text(path))[1])
+    old_variables -= bgforge_variables
+
+    new_variables, new_globals = set(), set()
+    parsed = {}
+    for path in new_files:
+        no_comments, code = strip_weidu(read_text(path))
+        parsed[path] = (no_comments, code)
+        new_variables |= assigned_variables(code)
+        new_globals |= set(re.findall(r"\bOUTER_(?:SET|SPRINT|TEXT_SPRINT)\s+([A-Za-z_][A-Za-z0-9_]*)", code))
+
+    for path, (no_comments, code) in parsed.items():
+        for match in CALL.finditer(no_comments):
+            if match.group(1) in old_names and match.group(1) not in new_names:
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : appel de {match.group(1)}, "
+                           "défini dans lib/ ou sfo/")
+        for match in INCLUDE_PATH.finditer(no_comments):
+            if "/new-lib/" not in match.group(1):
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion hors de new-lib/ "
+                           f"{match.group(1)}")
+        reported = set()
+        uses = [(m.start(), m.group(1)) for m in IDENTIFIER.finditer(code)]
+        uses += [(m.start(), m.group(1)) for m in STRING_VARIABLE.finditer(no_comments)]
+        for position, name in sorted(uses):
+            if name in old_variables and name not in new_variables and name not in reported:
+                reported.add(name)
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, position)} : lit la variable {name} "
+                           "de l'ancien code sans l'affecter")
+
+    for path in old_files:
+        no_comments, code = strip_weidu(read_text(path))
+        for match in CALL.finditer(no_comments):
+            if match.group(1) in new_names and relative(path) not in ENGINE_CALLERS:
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : appel de {match.group(1)} "
+                           f"(new-lib/) hors de la boucle commune ({', '.join(ENGINE_CALLERS)})")
+        if path.suffix != ".tp2":
+            for match in INCLUDE_PATH.finditer(no_comments):
+                if "/new-lib/" in match.group(1):
+                    report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion de new-lib/")
+        uses = {m.group(1) for m in IDENTIFIER.finditer(code)} | set(STRING_VARIABLE.findall(no_comments))
+        for name in sorted(uses & new_globals):
+            report.add("ERREUR", f"{relative(path)} : lit la variable globale {name} de new-lib/")
+    print(f"  {len(new_files)} fichiers dans new-lib/, {len(new_names)} fonctions ou macros, "
+          f"{len(old_variables)} noms de variables de l'ancien code relevés")
+
+
+# ---------------------------------------------------------------------------------------------
 # Analyse syntaxique WeiDU
 
 
@@ -345,6 +468,7 @@ def main():
     definitions = check_duplicate_definitions(report)
     variants = check_opcode_variants(report, definitions)
     check_ignored_described(report, variants)
+    check_engine_separation(report, definitions)
     if not args.no_parse:
         if weidu.is_file():
             check_parse(report, weidu)

@@ -8,3 +8,4 @@ Nom du dossier (ou 0 pour annuler)~
 @202 = ~Le dossier "%directory%" n'existe pas
 
 Nom du dossier (ou 0 pour annuler)~
+@203 = ~Valeur invalide pour l'option description_engine : "%description_engine%" (valeurs admises : 0, 1, 2 ou 3).~

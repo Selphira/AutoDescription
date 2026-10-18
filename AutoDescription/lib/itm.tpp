@@ -15,7 +15,7 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 		PATCH_PRINT "%totalItems% items processed"
 	END
 	PATCH_TRY
-		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful totalEngineIdentical totalEngineDifferent totalEngineNotCovered END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -32,6 +32,9 @@ DEFINE_PATCH_FUNCTION ~update_item_description~
 		totalIgnoredNotMoveable
 		totalIgnoredType
 		totalSuccessful
+		totalEngineIdentical
+		totalEngineDifferent
+		totalEngineNotCovered
 BEGIN
 	PATCH_SILENT
 
@@ -52,28 +55,49 @@ BEGIN
 	PATCH_IF canUpdateItem BEGIN
 		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
 
-		PATCH_IF ~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0 BEGIN
+		SET use_unidentified_description = ~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0
+		PATCH_IF use_unidentified_description BEGIN
 			SPRINT originalDescription ~%originalUnidentifiedDescription%~
+		END
+
+		SPRINT description ~~
+		PATCH_IF description_engine != 1 BEGIN
 			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
+		END
+		SET is_described = 1
+		PATCH_IF description_engine != 0 BEGIN
+			// Une erreur du nouveau moteur ne doit pas faire échouer la ressource pour l'ancien.
+			PATCH_TRY
+				LPF ~ad_describe_item~ STR_VAR original_description = ~%originalDescription%~ RET new_description = description covered uncovered_reason END
+			WITH DEFAULT
+				SET covered = 0
+				SPRINT uncovered_reason ~failed: %ERROR_MESSAGE%~
+				LPF ~add_log_error~ STR_VAR message = ~New engine failure: %ERROR_MESSAGE%~ END
+			END
+			LPF ~select_engine_description~ INT_VAR covered STR_VAR description new_description uncovered_reason RET description is_described totalEngineIdentical totalEngineDifferent totalEngineNotCovered END
+		END
+
+		PATCH_IF is_described BEGIN
 			// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
 			PATCH_IF alter_item_files BEGIN
-				SAY UNIDENTIFIED_DESC ~%description%~
+				PATCH_IF use_unidentified_description BEGIN
+					SAY UNIDENTIFIED_DESC ~%description%~
+				END
+				ELSE BEGIN
+					SAY DESC ~%description%~
+				END
+			END
+			LPM ~get_item_name~
+			LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
+			LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%itemName%~ type = ~%itemType%~ level = ~%enchantment%~ original = ~%originalDescription%~ modded = ~%description%~ END
+			SET totalSuccessful += 1
+			// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
+			PATCH_IF regression_dump BEGIN
+				LPF ~add_regression_dump_row~ STR_VAR description END
 			END
 		END
-		ELSE BEGIN
-			LPF ~get_item_description~ INT_VAR itemType flags STR_VAR originalDescription RET description END
-			// Si l'utilisateur a choisi d'enregistrer la description dans ses fichiers
-			PATCH_IF alter_item_files BEGIN
-				SAY DESC ~%description%~
-			END
-		END
-        LPM ~get_item_name~
-		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
-		LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%itemName%~ type = ~%itemType%~ level = ~%enchantment%~ original = ~%originalDescription%~ modded = ~%description%~ END
-		SET totalSuccessful += 1
-		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
-		PATCH_IF regression_dump BEGIN
-			LPF ~add_regression_dump_row~ STR_VAR description END
+		ELSE PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR status = ~ignored:not_covered~ END
 		END
 	END
 	ELSE PATCH_IF regression_dump BEGIN
@@ -286,6 +310,9 @@ DEFINE_ACTION_MACRO ~init_item_statistics~ BEGIN
 	OUTER_SET totalIgnoredWithoutDescription = 0
 	OUTER_SET totalIgnoredNotMoveable = 0
 	OUTER_SET totalIgnoredType = 0
+	OUTER_SET totalEngineIdentical = 0
+	OUTER_SET totalEngineDifferent = 0
+	OUTER_SET totalEngineNotCovered = 0
 	OUTER_SET opcodeTodo = 0
 END
 
@@ -297,6 +324,9 @@ DEFINE_ACTION_MACRO ~show_item_statistics~ BEGIN
 	END
 
 	OUTER_SET totalIgnored = totalIgnoredCursed + totalIgnoredWithoutDescription + totalIgnoredNotMoveable + totalIgnoredType
+	ACTION_IF description_engine == 1 OR description_engine == 3 BEGIN
+		OUTER_SET totalIgnored += totalEngineNotCovered
+	END
 	OUTER_SET total = totalIgnored + totalSuccessful + totalFailed
 
 	PRINT "Reussis : %totalSuccessful%
@@ -310,4 +340,5 @@ Ignores : %totalIgnored%
 Total : %total%
 
 Opcodes a coder : %opcodeTodo%"
+	LAM ~show_engine_statistics~
 END

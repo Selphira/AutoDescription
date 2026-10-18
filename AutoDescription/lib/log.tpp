@@ -62,24 +62,113 @@ BEGIN
 	END
 END
 
-// Format : RESREF<TAB>statut<TAB>texte. L'échappement (\\, \r, \n, \t) est réversible et garantit
-// une ressource par ligne. Les chaînes ~...~ sont littérales, mais la regexp et le texte de
-// remplacement sont interprétés par Str, où \\ désigne une seule barre oblique inverse.
+// L'échappement (\\, \r, \n, \t) est réversible et garantit une ressource par ligne. Les chaînes
+// ~...~ sont littérales, mais la regexp et le texte de remplacement sont interprétés par Str, où
+// \\ désigne une seule barre oblique inverse.
+DEFINE_PATCH_FUNCTION ~escape_dump_text~
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	INNER_PATCH_SAVE text ~%text%~ BEGIN
+		REPLACE_TEXTUALLY ~\\~ ~\\\\~
+		REPLACE_TEXTUALLY ~%MNL%~ ~\\r~
+		REPLACE_TEXTUALLY ~%LNL%~ ~\\n~
+		REPLACE_TEXTUALLY ~%TAB%~ ~\\t~
+	END
+END
+
+// Format : RESREF<TAB>statut<TAB>texte échappé.
 DEFINE_PATCH_FUNCTION ~add_regression_dump_row~
 	STR_VAR
 		resref = ~%SOURCE_RES%~
 		status = ~ok~
 		description = ~~
 BEGIN
-	INNER_PATCH_SAVE description ~%description%~ BEGIN
-		REPLACE_TEXTUALLY ~\\~ ~\\\\~
-		REPLACE_TEXTUALLY ~%MNL%~ ~\\r~
-		REPLACE_TEXTUALLY ~%LNL%~ ~\\n~
-		REPLACE_TEXTUALLY ~%TAB%~ ~\\t~
-	END
+	LPF ~escape_dump_text~ STR_VAR text = ~%description%~ RET description = text END
 	INNER_ACTION BEGIN
 		SILENT
 		APPEND_OUTER ~AutoDescription/log/%log_filename%-dump.txt~ ~%resref%%TAB%%status%%TAB%%description%~ KEEP_CRLF
+		VERBOSE
+	END
+END
+
+// Choisit la description enregistrée selon description_engine et, en modes 2 et 3, compare les
+// deux moteurs. Une ressource non couverte par le nouveau moteur est exclue de la comparaison et,
+// en modes 1 et 3, n'est pas décrite : un texte partiel ne doit jamais être enregistré.
+DEFINE_PATCH_FUNCTION ~select_engine_description~
+	INT_VAR
+		covered = 0
+	STR_VAR
+		description = ~~
+		new_description = ~~
+		uncovered_reason = ~~
+	RET
+		description
+		is_described
+		totalEngineIdentical
+		totalEngineDifferent
+		totalEngineNotCovered
+BEGIN
+	PATCH_IF NOT covered BEGIN
+		SET totalEngineNotCovered += 1
+	END
+	PATCH_IF description_engine >= 2 BEGIN
+		LPF ~add_engine_comparison_row~ INT_VAR covered STR_VAR old_description = ~%description%~ new_description uncovered_reason RET totalEngineIdentical totalEngineDifferent END
+	END
+	SET is_described = 1
+	PATCH_IF description_engine == 1 OR description_engine == 3 BEGIN
+		SPRINT description ~%new_description%~
+		SET is_described = covered
+	END
+END
+
+// En modes 1 et 3, les ressources non couvertes sont aussi comptées parmi les ignorées.
+DEFINE_ACTION_MACRO ~show_engine_statistics~ BEGIN
+	ACTION_IF description_engine == 1 BEGIN
+		PRINT "Non couverts par le nouveau moteur (non modifies) : %totalEngineNotCovered%"
+	END
+	ELSE ACTION_IF description_engine >= 2 BEGIN
+		PRINT "Comparaison des moteurs :
+   Identiques : %totalEngineIdentical%
+   Differents : %totalEngineDifferent%
+   Non couverts par le nouveau moteur : %totalEngineNotCovered%"
+	END
+END
+
+// Format : RESREF<TAB>identical | RESREF<TAB>not_covered<TAB>raison |
+// RESREF<TAB>different<TAB>ancien texte<TAB>nouveau texte, textes échappés comme dans le dump.
+// Comme toute copie par SPRINT ou STR_VAR, STRING_EQUAL substitue les %variables% contenues dans
+// les textes (weidu-reference.md V29), de la même façon des deux côtés.
+DEFINE_PATCH_FUNCTION ~add_engine_comparison_row~
+	INT_VAR
+		covered = 0
+	STR_VAR
+		old_description = ~~
+		new_description = ~~
+		uncovered_reason = ~~
+	RET
+		totalEngineIdentical
+		totalEngineDifferent
+BEGIN
+	PATCH_IF NOT covered BEGIN
+		LPF ~escape_dump_text~ STR_VAR text = ~%uncovered_reason%~ RET reason = text END
+		SPRINT row ~not_covered%TAB%%reason%~
+	END
+	ELSE PATCH_IF ~%old_description%~ STRING_EQUAL ~%new_description%~ BEGIN
+		SET totalEngineIdentical += 1
+		SPRINT row ~identical~
+	END
+	ELSE BEGIN
+		SET totalEngineDifferent += 1
+		LPF ~escape_dump_text~ STR_VAR text = ~%old_description%~ RET old_text = text END
+		LPF ~escape_dump_text~ STR_VAR text = ~%new_description%~ RET new_text = text END
+		SPRINT row ~different%TAB%%old_text%%TAB%%new_text%~
+	END
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~AutoDescription/log/%log_filename%-compare.txt~ ~%SOURCE_RES%%TAB%%row%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -126,6 +215,9 @@ BEGIN
 	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-error.log~
 	ACTION_IF regression_dump BEGIN
 		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-dump.txt~
+	END
+	ACTION_IF description_engine >= 2 BEGIN
+		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-compare.txt~
 	END
 	ACTION_IF is_ee BEGIN
 		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~

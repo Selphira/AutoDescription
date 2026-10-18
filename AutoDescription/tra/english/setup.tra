@@ -8,3 +8,4 @@ Folder name (or 0 to cancel)~
 @202 = ~The folder "%directory%" does not exist
 
 Folder name (or 0 to cancel)~
+@203 = ~Invalid value for the description_engine option: "%description_engine%" (allowed values: 0, 1, 2 or 3).~

@@ -16,7 +16,7 @@ DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
 		PATCH_PRINT "%totalSpells% spells processed"
 	END
 	PATCH_TRY
-		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful END
+		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful totalEngineIdentical totalEngineDifferent totalEngineNotCovered END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -32,6 +32,9 @@ DEFINE_PATCH_FUNCTION ~update_spell_description~
 		totalIgnoredWithoutDescription
 		totalInvalid
 		totalSuccessful
+		totalEngineIdentical
+		totalEngineDifferent
+		totalEngineNotCovered
 BEGIN
 	PATCH_SILENT
 
@@ -51,21 +54,41 @@ BEGIN
 	PATCH_IF canUpdateSpell BEGIN
 		SPRINT CURRENT_SOURCE_RES ~%SOURCE_RES%~
 
-		PATCH_TIME ~step:spell_description~ BEGIN
-			LPF ~get_spell_description~ STR_VAR originalDescription spellName RET description END
+		SPRINT description ~~
+		PATCH_IF description_engine != 1 BEGIN
+			PATCH_TIME ~step:spell_description~ BEGIN
+				LPF ~get_spell_description~ STR_VAR originalDescription spellName RET description END
+			END
+		END
+		SET is_described = 1
+		PATCH_IF description_engine != 0 BEGIN
+			// Une erreur du nouveau moteur ne doit pas faire échouer la ressource pour l'ancien.
+			PATCH_TRY
+				LPF ~ad_describe_spell~ STR_VAR original_description = ~%originalDescription%~ RET new_description = description covered uncovered_reason END
+			WITH DEFAULT
+				SET covered = 0
+				SPRINT uncovered_reason ~failed: %ERROR_MESSAGE%~
+				LPF ~add_log_error~ STR_VAR message = ~New engine failure: %ERROR_MESSAGE%~ END
+			END
+			LPF ~select_engine_description~ INT_VAR covered STR_VAR description new_description uncovered_reason RET description is_described totalEngineIdentical totalEngineDifferent totalEngineNotCovered END
 		END
 
-		// Si l'utilisateur a choisi d'enregistrer la description des sorts dans ses fichiers
-		PATCH_IF alter_spell_files BEGIN
-			SAY SPL_unidentified_description ~%description%~
-		END
+		PATCH_IF is_described BEGIN
+			// Si l'utilisateur a choisi d'enregistrer la description des sorts dans ses fichiers
+			PATCH_IF alter_spell_files BEGIN
+				SAY SPL_unidentified_description ~%description%~
+			END
 
-		LPF ~add_compare_row~ STR_VAR itemName = ~%spellName%~ originalDescription description END
-		LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%spellName%~ type = ~%spellSchool%~ level = ~%spellLevel%~ original = ~%originalDescription%~ modded = ~%description%~ END
-		SET totalSuccessful += 1
-		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
-		PATCH_IF regression_dump BEGIN
-			LPF ~add_regression_dump_row~ STR_VAR description END
+			LPF ~add_compare_row~ STR_VAR itemName = ~%spellName%~ originalDescription description END
+			LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%spellName%~ type = ~%spellSchool%~ level = ~%spellLevel%~ original = ~%originalDescription%~ modded = ~%description%~ END
+			SET totalSuccessful += 1
+			// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
+			PATCH_IF regression_dump BEGIN
+				LPF ~add_regression_dump_row~ STR_VAR description END
+			END
+		END
+		ELSE PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR status = ~ignored:not_covered~ END
 		END
 	END
 	ELSE PATCH_IF regression_dump BEGIN
@@ -220,6 +243,9 @@ DEFINE_ACTION_MACRO ~init_spell_statistics~ BEGIN
 	OUTER_SET totalIgnoredWithoutName = 0
 	OUTER_SET totalIgnoredWithoutDescription = 0
 	OUTER_SET totalInvalid = 0
+	OUTER_SET totalEngineIdentical = 0
+	OUTER_SET totalEngineDifferent = 0
+	OUTER_SET totalEngineNotCovered = 0
 	OUTER_SET opcodeTodo = 0
 END
 
@@ -231,6 +257,9 @@ DEFINE_ACTION_MACRO ~show_spell_statistics~ BEGIN
 	END
 
 	OUTER_SET totalIgnored = totalIgnoredWithoutName + totalIgnoredWithoutDescription + totalInvalid
+	ACTION_IF description_engine == 1 OR description_engine == 3 BEGIN
+		OUTER_SET totalIgnored += totalEngineNotCovered
+	END
 	OUTER_SET total = totalIgnored + totalSuccessful + totalFailed
 
 	PRINT "Reussis : %totalSuccessful%
@@ -243,6 +272,7 @@ Ignores : %totalIgnored%
 Total : %total%
 
 Opcodes a coder : %opcodeTodo%"
+	LAM ~show_engine_statistics~
 END
 
 DEFINE_ACTION_MACRO ~load_clearair~ BEGIN

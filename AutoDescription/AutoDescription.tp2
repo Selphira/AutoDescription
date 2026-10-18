@@ -16,6 +16,10 @@ ALWAYS
 		END
 	END
 
+	ACTION_IF description_engine < 0 OR description_engine > 3 BEGIN
+		FAIL @203 // ~Valeur invalide pour l'option description_engine : "%description_engine%" (valeurs admises : 0, 1, 2 ou 3).~
+	END
+
 	OUTER_SET is_ee    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
 	OUTER_SET has_eeex = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
 
@@ -50,6 +54,7 @@ ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
+    INCLUDE ~%MOD_FOLDER%/new-lib/always.tpa~
 END
 
 LANGUAGE ~Francais~ ~french~
