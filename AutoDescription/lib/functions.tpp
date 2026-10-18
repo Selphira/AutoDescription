@@ -151,6 +151,76 @@ BEGIN
 	END
 END
 
+/**
+ * Converts a hexadecimal value back into a decimal number.
+ * STR_VAR hexNumber  A string containing a hexadecimal number without prefix.
+ * RET value          The resulting decimal number as int value. Returns -1 on error.
+ */
+DEFINE_ACTION_FUNCTION TO_DEC_NUMBER
+STR_VAR
+    hexNumber  = ~~
+RET
+    value
+BEGIN
+    OUTER_SET value = "-1"
+
+    ACTION_IF (~%hexNumber%~ STRING_EQUAL ~~) BEGIN
+        OUTER_SET value = 0
+    END ELSE BEGIN
+        // checking for sign
+        ACTION_IF (~%hexNumber%~ STRING_MATCHES_REGEXP ~-.+~ = 0) BEGIN
+            OUTER_SET signed = 1
+            OUTER_PATCH_SAVE hexNumber ~%hexNumber%~ BEGIN REPLACE_TEXTUALLY ~^-~ ~~ END
+        END ELSE BEGIN
+            OUTER_SET signed = 0
+        END
+
+        // checking for prefix
+        ACTION_IF (~%hexNumber%~ STRING_MATCHES_REGEXP ~^0[xX].+~ = 0) BEGIN
+            OUTER_PATCH_SAVE hexNumber ~%hexNumber%~ BEGIN REPLACE_TEXTUALLY ~^0[xX]~ ~~ END
+            // converting number
+            OUTER_SET curValue = 0
+            OUTER_SET scale = 1
+            OUTER_SET strlen = STRING_LENGTH ~%hexNumber%~
+            OUTER_FOR (idx = strlen - 1; idx >= 0; --idx) BEGIN
+                OUTER_PATCH ~%hexNumber%~ BEGIN READ_BYTE idx hexDigit END
+                OUTER_SET hexDigit = hexDigit BAND 0xff
+                ACTION_IF (hexDigit >= 48 AND hexDigit <= 57) BEGIN // 0..9
+                    OUTER_SET digit = hexDigit - 48
+                END ELSE ACTION_IF (hexDigit >= 65 AND hexDigit <= 70) BEGIN  // A..F
+                    OUTER_SET digit = hexDigit - 55
+                END ELSE ACTION_IF (hexDigit >= 97 AND hexDigit <= 102) BEGIN // a..f
+                    OUTER_SET digit = hexDigit - 87
+                END ELSE BEGIN
+                    OUTER_SET digit = 0
+                END
+                OUTER_SET curValue += digit*scale
+                OUTER_SET scale = scale BLSL 4
+            END
+
+            ACTION_IF (signed) BEGIN
+                OUTER_SET curValue = 0 - curValue
+            END
+
+            OUTER_SET value = curValue
+        END
+        ELSE BEGIN
+            OUTER_SET value = hexNumber
+        END
+    END
+END
+
+DEFINE_PATCH_FUNCTION TO_DEC_NUMBER
+STR_VAR
+    hexNumber  = ~~
+RET
+    value
+BEGIN
+    INNER_ACTION BEGIN
+        LAF TO_DEC_NUMBER STR_VAR hexNumber = EVAL ~%hexNumber%~ RET value END
+    END
+END
+
 /* ===================================================== *
  * Retourne le nom du jeu sur lequel on installe le mod. *
  * ===================================================== */

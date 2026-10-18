@@ -1,8 +1,36 @@
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
     ACTION_DEFINE_ARRAY allItemDescriptions BEGIN END
 	OUTER_SET totalItems = 0
-	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-		LPM ~update_item_description~
+
+	COPY_EXISTING
+	    ~BDHAMM06.itm~ ~override~
+	    ~#LPOT01.itm~ ~override~
+	    ~#SBAGUE.itm~ ~override~
+	    /*
+	    ~#SILKAR.itm~ ~override~
+	    ~RODS03.itm~ ~override~
+	    ~AMUL18.itm~ ~override~
+	    ~DAGG09.itm~ ~override~
+	    ~HAMM04.itm~ ~override~
+	    ~OHBREW05.itm~ ~override~
+	    ~OHBSCRL3.itm~ ~override~
+	    ~SW1H18.itm~ ~override~
+	    ~SW1H24.itm~ ~override~
+	    ~SW1H31.itm~ ~override~
+	    ~WAMACE.itm~ ~override~
+
+	    ~AX1H10.itm~ ~override~
+	    ~BDAMUL02.itm~ ~override~
+	    ~BLUN12.itm~ ~override~
+	    ~PXL2DCER.itm~ ~override~
+	    ~BDBOW01.itm~ ~override~
+	    ~PXL2VISA.itm~ ~override~
+	    ~PXL2VISI.itm~ ~override~
+*/
+	//COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+	    PATCH_TIME ~%SOURCE_FILE%~ BEGIN
+		    LPM ~update_item_description~
+		END
 	BUT_ONLY_IF_IT_CHANGES
 	LAF ~write_js~ STR_VAR array = ~allItemDescriptions~ END
 END

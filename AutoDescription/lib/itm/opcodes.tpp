@@ -13,6 +13,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	123 => 6   // Item: Remove Inventory Item [123]
 	264 => 7   // Spell Effect: Drop Weapons in Panic [264]
 
+	 32 => 9   // Cure: Death (Raise Dead) [32]
+
 	// Modification des stats longue durée
 	283 => 10   // Use EFF File (Cursed) [283]
 	360 => 11   // Stat: Ignore Reputation Breaking Point [360]
@@ -126,7 +128,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 
 	304 => 199 // Mass Raise Dead [304]
 	 58 => 200 // Cure: Dispellable Effects (Dispel Magic) [58]
-	 32 => 201 // Cure: Death (Raise Dead) [32]
 	 43 => 201 // Cure: Stone to Flesh [43]
 	 14 => 202 // Graphics: Defrost [14]
 	 224 => 203 // Cure: Level Drain (Restoration) [224]
@@ -470,6 +471,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ids_files~ BEGIN
 	7 => ~gender~
 	8 => ~align~
 	9 => ~kit~
+   10 => ~splstate~
    20 => ~slots~
 END
 
@@ -7754,6 +7756,11 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 			CLEAR_ARRAY recursive_resref
 		END
 	END
+
+    INNER_PATCH_SAVE description ~%description%~ BEGIN
+        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
+    END
+
 	LPM ~opcode_146_condition~
 END
 
@@ -14075,6 +14082,18 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
 				SET strref = strref + statType
 			END
+/*
+            ELSE PATCH_IF is_ee AND statType > 145 BEGIN
+                //PATCH_PRINT "statType: %statType%"
+                SET strref = 0
+                LPM ~opcode_common_324_mod~
+                PATCH_IF strref > 0 BEGIN
+                    SET strref -= 19000
+                    LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
+                    SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
+                END
+            END
+*/
 			ELSE BEGIN
 				SET strref = strref + statType
 			END
@@ -14347,12 +14366,16 @@ BEGIN
         END
 		ELSE PATCH_IF is_ee AND statType > 145 BEGIN
 			SET strref = 0
-			LPM ~opcode_326_condition_mod~
-			PATCH_IF strref > 0 BEGIN
-				SET strref -= 19000
-				LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
-				SET $EVAL ~not_effective_if%key%~(~%creatureType%~) = 1
+			LPM ~opcode_326_condition~
+			PATCH_IF NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+				SET $EVAL ~not_effective_if%key%~(~%condition%~) = 1
+				SPRINT condition ~~
 			END
+			// TODO: Gérer dynamiquement les éventuels autres stats ???
+			// stat value relation strref
+			// 42 -1 1 13261004
+			// IF value < 0 alors utiliser parameter1
+			// Reprendre la condition générée par l'opcode 326 avec les mêms stats, et faire un "uclower" de la condition
 		END
         ELSE BEGIN
             PATCH_IF VARIABLE_IS_SET $opcode_324_effective(~%statType%~) BEGIN
@@ -14594,6 +14617,22 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_326~ BEGIN
 	LPM ~opcode_self_probability_326~
 END
 
+ACTION_DEFINE_ASSOCIATIVE_ARRAY opcode_326_resistances BEGIN
+    14 => 1
+    15 => 1
+    16 => 1
+    17 => 1
+    18 => 1
+    19 => 1
+    20 => 1
+    21 => 1
+    22 => 1
+    23 => 1
+    24 => 1
+    73 => 1
+    74 => 1
+END
+
 DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SET strref = 13260000
 	LOCAL_SET value = parameter1
@@ -14602,34 +14641,161 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
 	LOCAL_SPRINT proficiency ~~
 	LOCAL_SPRINT proficiencyId ~~
 
-	PATCH_IF statType >= 102 AND statType <= 109 BEGIN
-		SET idsId = statType - 100
-		SET strref = strref + 146 // ~Inefficace contre les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
+    SPRINT tmpid $splprots(~%statType%~)
+    SPRINT tmpstat $splprot_stats(~%statType%~)
+    SPRINT tmpvalue $splprot_values(~%statType%~)
+    SPRINT tmprelation $splprot_relations(~%statType%~)
+
+    PATCH_IF tmpvalue != "-1" BEGIN
+        SPRINT value ~%tmpvalue%~
+    END
+
+    SPRINT currentKey ~~
+
+    PATCH_DEFINE_ARRAY ~keys~ BEGIN
+        ~%tmpstat%-%value%-%tmprelation%~
+        ~%tmpstat%-%value%-*~
+        ~%tmpstat%-*-%tmprelation%~
+        ~%tmpstat%-*-*~
+    END
+
+	FOR (index = 0; index < 4; index += 1) BEGIN
+	    SPRINT key $keys(~%index%~)
+
+        PATCH_IF VARIABLE_IS_SET $stats_desc_ref(~%key%~) BEGIN
+	        SPRINT currentKey ~%key%~
+	        SET index = 4
+        END
 	END
-	ELSE PATCH_IF statType == 76 OR statType == 110 OR statType == 111 BEGIN // SplState
-		SET statType = statType == 76 ? 110 : statType
-		SET oldStrref = strref + statType
-		SET strref = 420000 + parameter1
-		LPF ~get_splstate_name~ INT_VAR strref opcode splstate = parameter1 RET splstateName END
-		SET strref = oldStrref
-	END
-	ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN
-		SET idsId = statType - 110
-		SET strref = strref + 147 // ~Effectif contre les %creatureType%~
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
-	END
-	ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
-		LPF ~get_states_str~ INT_VAR state = parameter1 RET descriptionState = descriptionState END
-		SET strref = strref + statType
-	END
-	ELSE PATCH_IF is_ee AND statType > 145 BEGIN
-		LPM ~opcode_326_condition_mod~
-	END
-	ELSE BEGIN
-		SET strref = strref + statType
-	END
-	LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+
+PATCH_TRY
+
+    PATCH_IF STRING_LENGTH ~%currentKey%~ > 0 BEGIN
+        SPRINT stat_strref $stats_stat_ref(~%currentKey%~)
+        SET strref = $stats_desc_ref(~%currentKey%~)
+
+        PATCH_IF $stats_relation(~%currentKey%~) STRING_EQUAL ~*~ BEGIN
+            SET strref += tmprelation
+        END
+
+        PATCH_IF tmpstat == 258 BEGIN
+            PATCH_IF tmprelation == 0 AND value < 4 BEGIN
+                SET strref = 13269382 // ~Si %theTarget% est de taille inférieure à %sizeName%~
+                SET value += 1
+            END
+            ELSE PATCH_IF tmprelation == 3 AND value == 3 BEGIN
+                SET strref = 13269381 // ~Si %theTarget% est de taille %sizeName%~
+                SET value += 1
+            END
+            ELSE
+            PATCH_IF tmprelation == 4 AND value > 1 BEGIN
+                SET strref = 13269383 // ~Si %theTarget% est de taille supérieure à %sizeName%~
+                SET value -= 1
+            END
+            SET size_strref = 13268010 + value
+            LPF ~getTranslation~ INT_VAR strref = size_strref opcode RET sizeName = string END
+        END
+        // 260 le OR
+        // 261 le NOT OR
+        ELSE PATCH_IF tmpstat == 263 BEGIN // heure du jour
+            SET startHour = tmpvalue
+            SET endHour = tmprelation
+        END
+        ELSE PATCH_IF tmpstat == 269 BEGIN // class.ids
+            LPF ~get_ids_strref~ INT_VAR entry = value file = ~5~ RET class_strref = strref END
+        	SET class_strref += 500 // mise au singulier
+        	LPF ~getTranslation~ INT_VAR strref = class_strref opcode RET className = string END
+        END
+        ELSE PATCH_IF tmpstat == 270 BEGIN // specific.ids
+            LOOKUP_IDS_SYMBOL_OF_INT specificName ~SPECIFIC~ ~%value%~
+            PATCH_PRINT "#### specificName : %specificName%"
+            PATCH_IF VARIABLE_IS_SET $stats_270_mods_relation(~%specificName%~) BEGIN
+                SET stat_strref = $stats_270_mods_stat_ref(~%specificName%~)
+                SPRINT stateValue (AT stat_strref)
+                SET strref = $stats_270_mods_desc_ref(~%specificName%~)
+                PATCH_PRINT "####>> TROUVE : stat_strref : %stateValue%"
+
+                PATCH_IF $stats_270_mods_relation(~%specificName%~) STRING_EQUAL ~*~ BEGIN
+                    SET strref += tmprelation
+                END
+            END
+            ELSE BEGIN
+                LPF ~add_log_warning~ STR_VAR message = ~SPLPROT a gerer (SPECIFIC %value% %splstateName%) : %statType% :: %tmpid% %tmpstat% %value% %tmprelation%~ END
+            END
+            LPF ~getTranslation~ INT_VAR strref = stat_strref opcode RET stateValue = string END
+        END
+        ELSE PATCH_IF tmpstat == 272 BEGIN // alignment.ids
+            PATCH_IF IS_AN_INT stat_strref BEGIN
+                SET align_strref = stat_strref
+            END
+            ELSE BEGIN
+                LPF ~get_ids_strref~ INT_VAR entry = value file = ~8~ RET align_strref = strref END
+                SET align_strref += 500 // mise au singulier
+            END
+            LPF ~getTranslation~ INT_VAR strref = align_strref opcode RET alignName = string END
+        END
+        ELSE PATCH_IF tmpstat == 274 BEGIN // splstate.ids
+            LPF ~get_splstate_name~ INT_VAR strref = 420000 + value opcode splstate = value RET splstateName END
+            PATCH_IF ~%splstateName%~ STRING_EQUAL ~~ BEGIN
+                LOOKUP_IDS_SYMBOL_OF_INT splstateName ~SPLSTATE~ ~%value%~
+
+                PATCH_IF VARIABLE_IS_SET $stats_274_mods_relation(~%splstateName%~) BEGIN
+                    SET stat_strref = $stats_274_mods_stat_ref(~%splstateName%~)
+					PATCH_IF stat_strref > 0 BEGIN
+						SPRINT stateValue (AT stat_strref)
+					END
+                    SET strref = $stats_274_mods_desc_ref(~%splstateName%~)
+
+                    PATCH_IF $stats_274_mods_relation(~%splstateName%~) STRING_EQUAL ~*~ BEGIN
+                        SET strref += tmprelation
+                    END
+                END
+                ELSE BEGIN
+                    LPF ~add_log_warning~ STR_VAR message = ~SPLPROT a gerer (SPLSTATE %value% %splstateName%) : %statType% :: %tmpid% %tmpstat% %value% %tmprelation%~ END
+                END
+            END
+            //@13269081 = ~Si %theTarget% est affectée par %splstateName%~
+            //@13269085 = ~Si %theTarget% n'est pas affectée par %splstateName%~
+            // ~À chaque round où %theTarget% est affecté par %splstate%~
+        END
+        ELSE PATCH_IF tmpstat == 262 OR (tmpstat >= 266 AND tmpstat < 274) BEGIN // Les types qui dépendent d'un fichier .ids pour récupérer leur valeur
+            SET idsId = tmpstat - 264
+            LPF ~get_ids_name~ INT_VAR entry = ~%value%~ file = ~%idsId%~ RET idName END
+        END
+        ELSE BEGIN
+        	PATCH_IF VARIABLE_IS_SET $splprot_stats(~%tmpstat%~) BEGIN
+        		SPRINT proficiencyId $splprot_stats(~%tmpstat%~)
+                PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%proficiencyId%~) BEGIN
+                    SPRINT proficiency $tra_proficiencies(~%proficiencyId%~)
+                END
+        	END
+
+            PATCH_IF IS_AN_INT stat_strref BEGIN
+                PATCH_IF VARIABLE_IS_SET $opcode_326_resistances(~%tmpStat%~) BEGIN
+                    SET stat_strref -= 1
+                END
+                SPRINT theStatistic (AT stat_strref)
+            END
+            //PATCH_PRINT "%SOURCE_RES% (MOTURN1.spl) > opcode_326_condition > %tmpid% (%statType%) %tmpstat% %value% %tmprelation% > %condition%"
+        END
+	    LPF ~getTranslation~ INT_VAR strref opcode RET condition = string END
+
+        PATCH_PRINT "%SOURCE_RES% - %currentKey%  : %strref% :  %condition%"
+    END
+    ELSE BEGIN
+        LPF ~add_log_warning~ STR_VAR message = ~SPLPROT a gerer (MISSING) : %statType% :: %tmpid% %tmpstat% %value% %tmprelation%~ END
+    END
+
+WITH DEFAULT
+
+    SPRINT tmpid $splprots(~%statType%~)
+    SPRINT tmpstat $splprot_stats(~%statType%~)
+    SPRINT tmpvalue $splprot_values(~%statType%~)
+    SPRINT tmprelation $splprot_relations(~%statType%~)
+
+    LPF ~add_log_warning~ STR_VAR message = ~SPLPROT a gerer (%ERROR_MESSAGE%) : %statType% :: %tmpid% %tmpstat% %value% %tmprelation%~ END
+END
+
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
@@ -14755,6 +14921,9 @@ DEFINE_PATCH_MACRO ~opcode_326_group~ BEGIN
                 INNER_PATCH_SAVE tmp_target_types ~%tmp_target_types%~ BEGIN
                     REPLACE_TEXTUALLY ~ %tmp_new_target_types%~ ~~
                     REPLACE_TEXTUALLY ~%tmp_new_target_types% ~ ~~
+                END
+                PATCH_IF (VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) OR VARIABLE_IS_SET $opcode_326_grouped_max_target_value(~%parameter2%~)) AND NOT VARIABLE_IS_SET $target_values(~%resref%~ ~%parameter2%~) BEGIN
+                    SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
                 END
                 PATCH_IF VARIABLE_IS_SET $opcode_326_grouped_min_target_value(~%parameter2%~) AND $target_values(~%resref%~ ~%parameter2%~) > parameter1 BEGIN
                     SET $target_values(~%resref%~ ~%parameter2%~) = parameter1
@@ -17116,8 +17285,12 @@ DEFINE_PATCH_FUNCTION ~get_spell_type_str~ INT_VAR value = 0 singular = 0 cleric
 END
 
 DEFINE_PATCH_FUNCTION ~get_splstate_name~ INT_VAR strref = 0 opcode = 0 splstate = 0 RET splstateName BEGIN
+	SPRINT splstateName ~~
 	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~)) BEGIN
-		LPF ~get_splstate_name_mod~ INT_VAR splstate RET splstateName END
+	    LOOKUP_IDS_SYMBOL_OF_INT splstateValue ~splstate~ ~%splstate%~
+	    PATCH_IF VARIABLE_IS_SET $splStateNameList(~%splstateValue%~) BEGIN
+	        SPRINT splstateName $splStateNameList(~%splstateValue%~)
+	    END
 	END
 	ELSE BEGIN
 		SPRINT splstateName (AT %strref%)

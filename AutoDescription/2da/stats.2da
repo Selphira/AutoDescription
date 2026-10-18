@@ -1,0 +1,116 @@
+STAT    STAT_VALUE    RELATION DESC_REF    STAT_REF    TARGET_REF  COMMENT
+0  *    *   13269060    10170022    *   les points de vie actuels
+1   *   *   13269060    10180002    *   les points de vie maximums
+2   *   *   13269000    10000200    *   la classe d'armure
+3   *   *   13269000    10000201    *   la classe d'armure contre les armes contondantes
+4   *   *   13269000    10000202    *   la classe d'armure contre les projectiles
+5   *   *   13269000    10000204    *   la classe d'armure contre les armes perforantes
+6   *   *   13269000    10000208    *   la classe d'armure contre les armes tranchantes
+7   *   *   13269020    10540002    *   le TAC0
+8   *   *   13269020    10010200    *   le nombre d'attaque par round
+9   *   *   13269060    10330003    *   les jets de sauvegarde contre la paralysie, la mort et les poisons
+9   *   *   13269060    10340002    *   les jets de sauvegarde contre les baguettes, les sceptres et les bâtons
+11  *   *   13269060    10350002    *   les jets de sauvegarde contre la pétrification et la métamorphose
+12  *   *   13269060    10360002    *   les jets de sauvegarde contre les souffles
+13  *   *   13269060    10370002    *   les jets de sauvegarde contre les sorts
+14  *   *   13269000    10300003    *   la résistance au feu
+15  *   *   13269000    10280003    *   la résistance au froid
+16  *   *   13269000    10290003    *   la résistance à l'électricité
+17  *   *   13269000    10270003    *   la résistance à l'acide
+18  *   *   13269000    11660003    *   la résistance à la magie
+19  *   *   13269000    10840003    *   la résistance au feu magique
+20  *   *   13269000    10850003    *   la résistance au froid magique
+21  *   *   13269000    10860003    *   la résistance aux dégâts tranchants
+22  *   *   13269000    10870003    *   la résistance aux dégâts contondants
+23  *   *   13269000    10880003    *   la résistance aux dégâts perforants
+24  *   *   13269000    10890003    *   la résistance aux dégâts de projectiles
+25  *   *   13269040    10210002    *   les connaissances
+26  *   *   13269020    10900002    *   le score de Crochetage de serrures
+27  *   *   13269020    10590002    *   le score de Déplacement silencieux
+28  *   *   13269020    10910002    *   le score de Détection et désamorçage des pièges
+29  *   *   13269020    10920002    *   le score de Vol à la tire
+30  *   *   13269000    10930002    *   la fatigue
+31  *   *   13269000    10940002    *   l'ébriété
+32  *   *   13269000    10220002    *   la chance
+33  *   *   13269020    10950002    *   le pistage
+34  *   *   13269020    10960002    *   le niveau
+
+36  *   *   13269000    10780164    *   la force
+37  *   *   13269000    10970002    *   la force exceptionnelle
+38  *   *   13269000    10780167    *   l'intelligence
+39  *   *   13269000    10780168    *   la sagesse
+40  *   *   13269000    10780165    *   la dextérité
+41  *   *   13269000    10780166    *   la constitution
+42  *   *   13269020    10780169    *   le charisme
+
+44  *   *   13269000    11040002    *   l'expérience
+45  *   *   13269000    11050001    *   la quantité de pièces d'or
+
+48  *   *   13269000    11080002    *   la réputation
+
+55  *   *   13269020    13230002    *   le niveau de Repousser les morts-vivants
+56  *   *   13269020    12630002    *   le multiplicateur d'attaque sournoise
+
+59  *   1   13269201    *    *   métamorphosé
+59  *   5   13269205    *    *   métamorphosé
+
+73  *   *   13269000    10310003    *   la résistance aux dégâts magiques
+74  *   *   13269000    11730003    *   la résistance aux poisons
+
+89  *   *   13269220    *    *   PROFICIENCYBASTARDSWORD
+90  *   *   13269220    *    *   PROFICIENCYLONGSWORD
+91  *   *   13269220    *    *   PROFICIENCYSHORTSWORD
+92  *   *   13269220    *    *   PROFICIENCYAXE
+93  *   *   13269220    *    *   PROFICIENCYTWOHANDEDSWORD
+94  *   *   13269220    *    *   PROFICIENCYKATANA
+95  *   *   13269220    *    *   PROFICIENCYSCIMITARWAKISASHININJATO
+96  *   *   13269220    *    *   PROFICIENCYDAGGER
+97  *   *   13269220    *    *   PROFICIENCYWARHAMMER
+98  *   *   13269220    *    *   PROFICIENCYSPEAR
+99  *   *   13269220    *    *   PROFICIENCYHALBERD
+100  *   *   13269220    *    *   PROFICIENCYFLAILMORNINGSTAR
+101  *   *   13269220    *    *   PROFICIENCYMACE
+102  *   *   13269220    *    *   PROFICIENCYQUARTERSTAFF
+103  *   *   13269220    *    *   PROFICIENCYCROSSBOW
+104  *   *   13269220    *    *   PROFICIENCYLONGBOW
+105  *   *   13269220    *    *   PROFICIENCYSHORTBOW
+106  *   *   13269220    *    *   PROFICIENCYDART
+107  *   *   13269220    *    *   PROFICIENCYSLING
+
+111  *   *   13269220    *    *   PROFICIENCY2HANDED
+112  *   *   13269220    *    *   PROFICIENCYSWORDANDSHIELD
+113  *   *   13269220    *    *   PROFICIENCYSINGLEWEAPON
+114  *   *   13269220    *    *   PROFICIENCY2WEAPON
+
+135  *   *   13269020    12750002    *   le score de Se cacher dans l'ombre
+136  *   *   13269020    12760002    *   le score de Détection des illusions
+137  *   *   13269020    12770002    *   le score de Pose de pièges
+
+258  *   *   13269380    *    *   circlesize
+
+261  *   1   13269241    *    *   source and target morale match
+261  *   5   13269245    *    *   source and target morale match
+
+263  *   *   13269320    *    *   heure du jour
+
+266  0   4   13260000    *    *   EA.ids
+267  *   *   13260160    *    *   GENERAL.ids
+267  3   1   13260181    *    *   GENERAL.ids : morts
+267  3   5   13260185    *    *   GENERAL.ids : morts
+268  *   1   13269101    *    *   RACE.ids
+268  *   5   13269105    *    *   RACE.ids
+269  *   *   13269260    *    *   CLASS.ids
+
+270  *   *   13269080    *    *   SPECIFIC.ids
+
+272  *   *   13269340    *    *   ALIGN.ids
+272  3   7   13269341    *    *   mauvais
+272  3   11   13269345    *    *   non mauvais
+
+274  *   *   13269080    *    *   SPLSTATE.ids
+275  1   1   13260101    *    *   source et cible alliées
+275  1   5   13260105    *    *   source et cible alliées
+276  1   1   13260121    *    *   source et cible ennemies
+276  1   5   13260125    *    *   source et cible ennemies
+277  *   *   13269280    13268000    *   la quantité de créatures invoquées
+278  *   *   13269300    13268001    *   le chapitre en cours

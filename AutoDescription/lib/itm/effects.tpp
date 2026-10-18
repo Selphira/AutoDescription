@@ -27,6 +27,7 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 	END
 
 	PATCH_IF timingMode == TIMING_duration AND duration <= 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
+	    // TODO: Si opcode == 166  : ignorer ?
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Timing mode == Instant/Limited and duration == 0~ END
 	END
