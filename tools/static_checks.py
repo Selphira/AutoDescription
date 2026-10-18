@@ -29,9 +29,11 @@ def set_root(root):
     TRA = MOD / "tra"
     OPCODES = LIB / "itm" / "opcodes.tpp"
 
-# Fichiers .tra convertis par HANDLE_CHARSETS : ils doivent être en Windows-1252 dans la copie
-# de travail. Les autres (setup.tra, noconvert_array du tp2) sont lus tels quels.
+# Fichiers .tra de l'ancien moteur convertis par HANDLE_CHARSETS : en Windows-1252 dans le dépôt.
+# Le nouveau fichier est en UTF-8 (converti en sens inverse) ; setup.tra est lu tel quel.
 CONVERTED_TRA = ("description.tra",)
+NEW_TRA = "description_new.tra"
+NEW_TRA_RANGES = ((1_000_000, 9_999_999), (20_000_000, 39_999_999))
 VARIANTS = ("self", "target", "self_probability", "target_probability")
 DEFINITION = re.compile(r"DEFINE_(PATCH|ACTION)_(MACRO|FUNCTION)\s+[~\"]?([A-Za-z0-9_#-]+)")
 OPCODE_VARIANT = re.compile(r"^opcode_(self|target)(_probability)?_(\d+)$")
@@ -113,38 +115,83 @@ def weidu_files():
 # Traductions
 
 
-def parse_tra(path):
-    """Renvoie la liste [(identifiant, ligne)] des entrées d'un fichier .tra."""
-    text, _ = strip_weidu(read_text(path))
+def parse_tra(text):
+    """Renvoie la liste [(identifiant, ligne, texte)] des entrées d'un contenu .tra."""
+    code, _ = strip_weidu(text)
     entries = []
-    for match in re.finditer(r"@(-?\d+)\s*=\s*(?:~~~~~.*?~~~~~|~[^~]*~|\"[^\"]*\")", text, re.S):
-        entries.append((int(match.group(1)), line_of(text, match.start())))
+    for match in re.finditer(r"@(-?\d+)\s*=\s*(~~~~~.*?~~~~~|~[^~]*~|\"[^\"]*\")", code, re.S):
+        delimiter = 5 if match.group(2).startswith("~~~~~") else 1
+        entries.append((int(match.group(1)), line_of(code, match.start()), match.group(2)[delimiter:-delimiter]))
     return entries
 
 
+def in_new_ranges(identifier):
+    return any(low <= identifier <= high for low, high in NEW_TRA_RANGES)
+
+
+def git_index_content(path):
+    """Contenu indexé par Git (ce qu'une extraction propre ou la CI produirait), ou None."""
+    try:
+        result = subprocess.run(["git", "show", f":{relative(path)}"], cwd=ROOT, capture_output=True)
+    except OSError:
+        return None
+    return result.stdout if result.returncode == 0 else None
+
+
+def check_tra_encoding(report, where, name, raw):
+    if raw.startswith(b"\xef\xbb\xbf"):
+        report.add("ERREUR", f"{where} : commence par un BOM UTF-8 (WeiDU refuse le fichier)")
+    if name in CONVERTED_TRA and any(b > 0x7F for b in raw):
+        try:
+            raw.decode("utf-8")
+            report.add("ERREUR", f"{where} : contenu UTF-8 au lieu de Windows-1252 "
+                       "(HANDLE_CHARSETS le convertirait une seconde fois sur EE)")
+        except UnicodeDecodeError:
+            pass
+    if name == NEW_TRA:
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            report.add("ERREUR", f"{where} : contenu non UTF-8 (le nouveau fichier doit être en UTF-8)")
+            return
+        # iconv -c supprime sans message les caractères absents de Windows-1252 (jeux classiques).
+        for identifier, line, string in parse_tra(text):
+            missing = sorted({char for char in string if char.encode("cp1252", errors="ignore") == b""})
+            if missing:
+                report.add("ERREUR", f"{where}:{line} : @{identifier} contient des caractères absents de "
+                           f"Windows-1252 : {' '.join(missing)}")
+
+
 def check_tra(report):
-    report.section("Fichiers .tra : encodage, doublons")
+    report.section("Fichiers .tra : encodage, doublons, plages")
     ids = {}
     for language in ("french", "english"):
         for path in sorted((TRA / language).glob("*.tra")):
             raw = path.read_bytes()
-            if raw.startswith(b"\xef\xbb\xbf"):
-                report.add("ERREUR", f"{relative(path)} : commence par un BOM UTF-8 (WeiDU refuse le fichier)")
-            if path.name in CONVERTED_TRA and any(b > 0x7F for b in raw):
-                try:
-                    raw.decode("utf-8")
-                    report.add("ERREUR", f"{relative(path)} : contenu UTF-8 au lieu de Windows-1252 "
-                               "(copie produite sans .gitattributes, ex. git archive ?)")
-                except UnicodeDecodeError:
-                    pass
-            entries = parse_tra(path)
-            counter = collections.Counter(identifier for identifier, _ in entries)
+            check_tra_encoding(report, relative(path), path.name, raw)
+            indexed = git_index_content(path)
+            if indexed is not None and indexed.replace(b"\r\n", b"\n") != raw.replace(b"\r\n", b"\n"):
+                check_tra_encoding(report, f"{relative(path)} (version indexée par Git)", path.name, indexed)
+            entries = parse_tra(raw.decode("latin-1"))
+            counter = collections.Counter(identifier for identifier, _, _ in entries)
             for identifier, count in sorted(counter.items()):
                 if count > 1:
-                    lines = ", ".join(str(line) for i, line in entries if i == identifier)
+                    lines = ", ".join(str(line) for i, line, _ in entries if i == identifier)
                     report.add("ERREUR", f"{relative(path)} : @{identifier} défini {count} fois (lignes {lines})")
+            # Plages disjointes : les deux fichiers sont chargés ensemble par LANGUAGE (§3.12).
+            for identifier in sorted(counter):
+                if (path.name == NEW_TRA) != in_new_ranges(identifier):
+                    expected = "dans les" if path.name == NEW_TRA else "hors des"
+                    report.add("ERREUR", f"{relative(path)} : @{identifier} doit être {expected} plages "
+                               "du nouveau moteur (1 000 000-9 999 999, 20 000 000-39 999 999)")
             ids[(language, path.name)] = set(counter)
             print(f"  {relative(path)} : {len(counter)} identifiants")
+    french_new = ids.get(("french", NEW_TRA), set())
+    english_new = ids.get(("english", NEW_TRA), set())
+    if french_new != english_new:
+        # Pour le nouveau fichier, le repli sur le français n'est pas admis (contrôle bloquant).
+        report.add("ERREUR", f"{NEW_TRA} : identifiants différents en français et en anglais : "
+                   + " ".join(f"@{i}" for i in sorted(french_new ^ english_new)))
 
     report.section("Fichiers .tra : français / anglais")
     for name in sorted({name for _, name in ids}):

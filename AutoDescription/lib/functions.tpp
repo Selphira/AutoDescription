@@ -64,7 +64,10 @@ DEFINE_PATCH_FUNCTION ~getTranslation~
 		exist
 BEGIN
 	SET exist = 1
-	PATCH_IF (NOT TRA_ENTRY_EXISTS (~%strref%~)) BEGIN
+	// Plages réservées à description_new.tra (nouveau moteur) : un identifiant calculé sur des
+	// données aberrantes (ex. 400000 + parameter2) ne doit pas afficher une chaîne du nouveau
+	// fichier ; il est traité comme une chaîne absente.
+	PATCH_IF (strref >= 1000000 AND strref <= 9999999) OR (strref >= 20000000 AND strref <= 39999999) OR (NOT TRA_ENTRY_EXISTS (~%strref%~)) BEGIN
 		SET exist = 0
 		PATCH_IF warning == 1 BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~opcode %opcode%: Traduction %strref% manquante~ END

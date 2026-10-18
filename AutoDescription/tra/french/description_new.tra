@@ -1,0 +1,6 @@
+/*
+ * Chaînes du nouveau moteur (new-lib/). Fichier en UTF-8 sans BOM ; uniquement des caractères
+ * représentables en Windows-1252 (convertis pour les jeux classiques par HANDLE_CHARSETS).
+ * Identifiants : 1 000 000-9 999 999 et 20 000 000-39 999 999 uniquement
+ * (.agents/refactoring-roadmap.md §3.12).
+ */
