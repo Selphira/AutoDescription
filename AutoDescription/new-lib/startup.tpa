@@ -1,0 +1,21 @@
+// Variables globales du nouveau moteur : fixées ici une fois par exécution, seulement lues
+// ensuite (noms en majuscules ; tools/static_checks.py refuse leur affectation ailleurs).
+
+// Même définition que l'ancien moteur, pour que la comparaison porte sur le même jeu. Les toutes
+// premières versions de BGEE, que HANDLE_CHARSETS traite comme des jeux classiques (pas de
+// bgee.lua), sont ici des jeux EE.
+OUTER_SET IS_EE    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
+OUTER_SET HAS_EEEX = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
+
+// COLON et SEMICOLON sont des mots réservés de WeiDU (V33).
+OUTER_SPRINT CRLF         @1000000 // saut de ligne
+OUTER_SPRINT AD_COLON     @1000001 // ~ : ~
+OUTER_SPRINT AD_SEMICOLON @1000002 // ~ ; ~
+OUTER_SPRINT PERCENT      @1000003 // ~ %~
+
+// Champs d'un effet du magasin (new-lib/effects.tpp), dans l'ordre des journaux.
+ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
+	~block~ ~header~ ~position~ ~opcode~ ~target~ ~power~ ~parameter1~ ~parameter2~ ~timing~
+	~resistance~ ~duration~ ~probability1~ ~probability2~ ~resource~ ~dice_count~ ~dice_sides~
+	~save_type~ ~save_bonus~ ~special~
+END

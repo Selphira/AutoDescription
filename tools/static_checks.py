@@ -217,7 +217,7 @@ def check_tra_references(report, ids):
     sources = [path for path in weidu_files() if BGFORGE not in path.parents and SFO not in path.parents]
     references = 0
     for path in sources:
-        # Chaque moteur n'utilise que son fichier de chaînes (§7.1, condition 8).
+        # Chaque moteur n'utilise que son fichier de chaînes.
         own, name = (new, NEW_TRA) if NEW_LIB in path.parents else (old, "description.tra/setup.tra")
         _, code = strip_weidu(read_text(path))
         for match in re.finditer(r"@(-?\d+)\b", code):
@@ -227,6 +227,64 @@ def check_tra_references(report, ids):
                 report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : @{identifier} absent de {name}")
     # Les identifiants calculés (10000000 + parameter2, strref = 13269382…) échappent à ce contrôle.
     print(f"  {references} références littérales examinées (hors commentaires et chaînes)")
+
+
+NEW_ENTRY = re.compile(r"^@(\d+)\s*=\s*~([^~]*)~([^\n]*)", re.M)
+COPY_MARKER = re.compile(r"//\s*reprise de @(\d+)")
+# Fichiers du nouveau moteur où les globales en majuscules sont fixées.
+NEW_STARTUP_FILES = ("always.tpa", "startup.tpa")
+
+
+def check_new_tra_rules(report):
+    report.section(f"Règles propres à {NEW_TRA} et aux références de new-lib/")
+    texts = {}
+    for language in ("french", "english"):
+        new = (TRA / language / NEW_TRA).read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n")
+        old_path = TRA / language / "description.tra"
+        old = {int(i): t for i, t, _ in NEW_ENTRY.findall(old_path.read_bytes().decode("cp1252", errors="replace").replace("\r\n", "\n"))}
+        entries = [(int(i), t, rest, line_of(new, m.start())) for m in NEW_ENTRY.finditer(new)
+                   for i, t, rest in [m.groups()]]
+        order = [i for i, _, _, _ in entries]
+        if order != sorted(order):
+            report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)} : identifiants non triés")
+        texts[language] = ({i: t for i, t, _, _ in entries}, order)
+        copies = 0
+        for identifier, text, rest, line in entries:
+            marker = COPY_MARKER.search(rest)
+            if marker:
+                copies += 1
+                source = int(marker.group(1))
+                # Recopie à l'identique : une reformulation est un changement distinct, à signaler.
+                if old.get(source) != text:
+                    report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)}:{line} : @{identifier} diffère de "
+                               f"@{source} de description.tra (« reprise de »)")
+        print(f"  {relative(TRA / language / NEW_TRA)} : {len(entries)} entrées, dont {copies} reprises")
+    if texts.get("french", (None, []))[1] != texts.get("english", (None, []))[1]:
+        report.add("ERREUR", f"{NEW_TRA} : identifiants dans un ordre différent en français et en anglais")
+
+    french = texts.get("french", ({}, []))[0]
+    for path in sorted(p for p in weidu_files() if NEW_LIB in p.parents):
+        raw = read_text(path)
+        _, code = strip_weidu(raw)
+        lines = raw.split("\n")
+        for match in re.finditer(r"@(\d+)\b", code):
+            identifier = int(match.group(1))
+            line = line_of(code, match.start())
+            comment = lines[line - 1].partition("//")[2]
+            # Règle du dépôt : chaque référence est suivie de son texte français en commentaire.
+            if not comment.strip():
+                report.add("ERREUR", f"{relative(path)}:{line} : @{identifier} sans commentaire du texte français")
+                continue
+            quoted = re.match(r"\s*~(.*)~\s*$", comment.rstrip("\r"))
+            expected = french.get(identifier, "").encode("utf-8").decode("latin-1")
+            if quoted and identifier in french and quoted.group(1) != expected:
+                report.add("ERREUR", f"{relative(path)}:{line} : commentaire de @{identifier} différent du texte "
+                           "français")
+        # Majuscules = globale fixée au démarrage, jamais modifiée pendant le traitement.
+        if path.name not in NEW_STARTUP_FILES:
+            for match in re.finditer(r"\b(?:OUTER_)?(?:SET|SPRINT|TEXT_SPRINT)[ \t]+([A-Z][A-Z0-9_]*)\b", code):
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : affectation de la globale "
+                           f"{match.group(1)} hors des fichiers de démarrage")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -471,6 +529,7 @@ def main():
     report = Report()
     ids = check_tra(report)
     check_tra_references(report, ids)
+    check_new_tra_rules(report)
     definitions = check_duplicate_definitions(report)
     variants = check_opcode_variants(report, definitions)
     check_ignored_described(report, variants)

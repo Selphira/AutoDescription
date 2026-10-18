@@ -1,6 +1,14 @@
 /*
  * Chaînes du nouveau moteur (new-lib/). Fichier en UTF-8 sans BOM ; uniquement des caractères
  * représentables en Windows-1252 (convertis pour les jeux classiques par HANDLE_CHARSETS).
- * Identifiants : 1 000 000-9 999 999 et 20 000 000-39 999 999 uniquement
- * (.agents/refactoring-roadmap.md §3.12).
+ * Identifiants : 1 000 000-9 999 999 et 20 000 000-39 999 999 uniquement, selon le plan de
+ * numérotation (.agents/tra-numbering.md). « reprise de @n » : texte identique à celui de
+ * description.tra, vérifié par tools/static_checks.py.
  */
+
+// Mise en forme : ponctuation et séparateurs (1 000 000-1 099 999)
+@1000000 = ~
+~ // reprise de @10000
+@1000001 = ~: ~ // reprise de @10001
+@1000002 = ~; ~ // reprise de @10004
+@1000003 = ~%~ // reprise de @10022
