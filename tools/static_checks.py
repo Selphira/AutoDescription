@@ -318,8 +318,11 @@ PHP_EACH = re.compile(r"\bPHP_EACH\s+\S+\s+AS\s+([A-Za-z_][A-Za-z0-9_]*)\s*=>\s*
 IDENTIFIER = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)(?![A-Za-z0-9_#-])")
 STRING_VARIABLE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
 NON_VARIABLES = {"EVAL", "BEGIN", "END"}
-# Seuls les points d'entrée de la boucle commune appellent le nouveau moteur.
-ENGINE_CALLERS = ("AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
+# Seuls les points d'entrée de la boucle commune appellent le nouveau moteur (initialisation des
+# journaux, boucles des objets et des sorts).
+ENGINE_CALLERS = ("AutoDescription/lib/log.tpp", "AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
+# Options de settings-default.ini réservées au nouveau moteur.
+NEW_OPTION_PREFIX = "AD_"
 
 
 def assigned_variables(code):
@@ -336,8 +339,11 @@ def assigned_variables(code):
 
 
 def ini_keys():
+    """(options de l'ancien moteur, options du nouveau moteur)."""
     text = read_text(MOD / "settings-default.ini")
-    return set(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=", text, re.M))
+    keys = set(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=", text, re.M))
+    new = {key for key in keys if key.startswith(NEW_OPTION_PREFIX)}
+    return keys - new, new
 
 
 def check_engine_separation(report, definitions):
@@ -371,12 +377,12 @@ def check_engine_separation(report, definitions):
     for path in weidu_files():
         if BGFORGE in path.parents:
             bgforge_variables |= assigned_variables(strip_weidu(read_text(path))[1])
-    old_variables = ini_keys()
+    old_variables, new_options = ini_keys()
     for path in old_files:
         old_variables |= assigned_variables(strip_weidu(read_text(path))[1])
     old_variables -= bgforge_variables
 
-    new_variables, new_globals = set(), set()
+    new_variables, new_globals = set(new_options), set(new_options)
     parsed = {}
     for path in new_files:
         no_comments, code = strip_weidu(read_text(path))

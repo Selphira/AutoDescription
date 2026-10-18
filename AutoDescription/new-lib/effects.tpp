@@ -1,0 +1,146 @@
+// Magasin d'effets d'une ressource : chaque effet reçoit un identifiant (fx_id, ordre de lecture)
+// et ses champs bruts sont rangés dans des tableaux parallèles fx_<champ>(fx_id). Les macros de
+// ce fichier s'exécutent dans la portée de ad_describe_item / ad_describe_spell : les tableaux
+// disparaissent avec la fonction (V7), rien ne passe d'une ressource à la suivante.
+//
+// Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
+// fx_parameter1, fx_parameter2, fx_timing, fx_resistance, fx_duration, fx_probability1,
+// fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
+// fx_special ; fx_opcode_count(opcode). Variables écrites : fx_count, fx_header_count,
+// fx_load_error (vide si la lecture a réussi).
+
+// Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
+// (sort), bloc d'effet 0x30.
+DEFINE_PATCH_MACRO ad_fx_reset BEGIN
+	SET fx_count = 0
+	SET fx_header_count = 0
+	SPRINT fx_load_error ~~
+	CLEAR_ARRAY fx_opcode_count
+END
+
+DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
+	LPM ad_fx_reset
+	READ_ASCII ITM_signature fx_signature (8)
+	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~ITM V1  ~) BEGIN
+		SPRINT fx_load_error ~unsupported_format~
+	END
+	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
+		SPRINT fx_load_error ~invalid_file~
+	END
+	ELSE BEGIN
+		READ_LONG  ITM_feature_blocks_offset   fx_table_offset
+		READ_LONG  ITM_extended_headers_offset fx_headers_offset
+		READ_SHORT ITM_extended_headers_count  fx_header_count
+		READ_SHORT ITM_feature_blocks_index    fx_block_index
+		READ_SHORT ITM_feature_blocks_count    fx_block_count
+		SPRINT fx_block_kind ~equipped~
+		SET fx_block_header = 0 - 1
+		LPM ad_fx_load_block
+		FOR (fx_h = 0; fx_h < fx_header_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_h) BEGIN
+			SET fx_header_offset = fx_headers_offset + fx_h * 0x38
+			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x38 > BUFFER_LENGTH BEGIN
+				SPRINT fx_load_error ~invalid_header~
+			END
+			ELSE BEGIN
+				READ_SHORT (fx_header_offset + ITM_HEAD_feature_block_count) fx_block_count
+				READ_SHORT (fx_header_offset + ITM_HEAD_feature_block_index) fx_block_index
+				SPRINT fx_block_kind ~ability~
+				SET fx_block_header = fx_h
+				LPM ad_fx_load_block
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
+	LPM ad_fx_reset
+	READ_ASCII SPL_signature fx_signature (8)
+	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~SPL V1  ~) BEGIN
+		SPRINT fx_load_error ~unsupported_format~
+	END
+	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
+		SPRINT fx_load_error ~invalid_file~
+	END
+	ELSE BEGIN
+		READ_LONG  SPL_feature_blocks_offset         fx_table_offset
+		READ_LONG  SPL_extended_headers_offset       fx_headers_offset
+		READ_SHORT SPL_extended_headers_count        fx_header_count
+		// Malgré leur nom BGforge, 0x6e et 0x20 sont des index dans la table d'effets (IESDP).
+		READ_SHORT SPL_casting_feature_blocks_offset fx_block_index
+		READ_SHORT SPL_casting_feature_blocks_count  fx_block_count
+		SPRINT fx_block_kind ~casting~
+		SET fx_block_header = 0 - 1
+		LPM ad_fx_load_block
+		FOR (fx_h = 0; fx_h < fx_header_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_h) BEGIN
+			SET fx_header_offset = fx_headers_offset + fx_h * 0x28
+			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x28 > BUFFER_LENGTH BEGIN
+				SPRINT fx_load_error ~invalid_header~
+			END
+			ELSE BEGIN
+				READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_count)  fx_block_count
+				READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_offset) fx_block_index
+				SPRINT fx_block_kind ~ability~
+				SET fx_block_header = fx_h
+				LPM ad_fx_load_block
+			END
+		END
+	END
+END
+
+// Aucun opcode n'est encore pris en charge : la raison liste tous les opcodes présents, triés
+// (indicateur de couverture) ; une ressource sans effet attend le rendu.
+DEFINE_PATCH_MACRO ad_set_uncovered_reason BEGIN
+	PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
+		SPRINT uncovered_reason ~%fx_load_error%~
+	END
+	ELSE PATCH_IF fx_count == 0 BEGIN
+		SPRINT uncovered_reason ~not_implemented~
+	END
+	ELSE BEGIN
+		SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
+		SPRINT fx_missing ~~
+		PHP_EACH fx_opcode_count AS fx_missing_opcode => fx_occurrences BEGIN
+			SPRINT fx_missing ~%fx_missing% %fx_missing_opcode%~
+		END
+		INNER_PATCH_SAVE fx_missing ~%fx_missing%~ BEGIN
+			DELETE_BYTES 0 1
+		END
+		SPRINT uncovered_reason ~missing_opcodes:%fx_missing%~
+	END
+END
+
+// Lit fx_block_count effets à partir de l'index fx_block_index de la table d'effets. Une lecture
+// hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant.
+DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
+	FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
+		SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
+		PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
+			SPRINT fx_load_error ~invalid_effect~
+		END
+		ELSE BEGIN
+			SET fx_id = fx_count
+			SPRINT $fx_block(~%fx_id%~) ~%fx_block_kind%~
+			SET $fx_header(~%fx_id%~)   = fx_block_header
+			SET $fx_position(~%fx_id%~) = fx_p
+			READ_SHORT (fx_offset + FX_opcode)       $fx_opcode(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_target)       $fx_target(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_power)        $fx_power(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_parameter1)   $fx_parameter1(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_parameter2)   $fx_parameter2(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_timing)       $fx_timing(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_resistance)   $fx_resistance(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_duration)     $fx_duration(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_probability1) $fx_probability1(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_probability2) $fx_probability2(~%fx_id%~)
+			READ_ASCII (fx_offset + FX_resource)     $fx_resource(~%fx_id%~) (8) NULL
+			READ_LONG  (fx_offset + FX_dice_thrown)  $fx_dice_count(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_dice_sides)   $fx_dice_sides(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_save_type)    $fx_save_type(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
+			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
+			SET fx_opcode = $fx_opcode(~%fx_id%~)
+			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
+			SET fx_count += 1
+		END
+	END
+END

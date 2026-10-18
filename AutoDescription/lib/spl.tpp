@@ -64,7 +64,7 @@ BEGIN
 		PATCH_IF description_engine != 0 BEGIN
 			// Une erreur du nouveau moteur ne doit pas faire échouer la ressource pour l'ancien.
 			PATCH_TRY
-				LPF ~ad_describe_spell~ STR_VAR original_description = ~%originalDescription%~ RET new_description = description covered uncovered_reason END
+				LPF ~ad_describe_spell~ STR_VAR original_description = ~%originalDescription%~ log_name = ~%log_filename%~ RET new_description = description covered uncovered_reason END
 			WITH DEFAULT
 				SET covered = 0
 				SPRINT uncovered_reason ~failed: %ERROR_MESSAGE%~
