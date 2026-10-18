@@ -161,10 +161,10 @@ BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY lines BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
-	LPM ~load_extended_effects~
-	LPM ~replace_effects~
-	LPM ~filter_effects~
-	LPM ~group_effects~
+	PATCH_TIME ~step:load_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~load_extended_effects~ END
+	PATCH_TIME ~step:replace_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~replace_effects~ END
+	PATCH_TIME ~step:filter_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~filter_effects~ END
+	PATCH_TIME ~step:group_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~group_effects~ END
 
 	PATCH_IF itemType == ITM_TYPE_potion BEGIN
 		SET isGlobalDuration = 1
@@ -201,7 +201,9 @@ BEGIN
 		            SET target = TARGET_FX_self
 		        END
 
-				LPF ~get_effect_description~ INT_VAR ignoreDuration projectile projectileTarget = headTarget projectileTargetNumber = headTargetNumber RET effectDescription = description sort END
+				PATCH_TIME ~step:get_effect_description:item=%isItem%:subspell=%isSubSpell%~ BEGIN
+					LPF ~get_effect_description~ INT_VAR ignoreDuration projectile projectileTarget = headTarget projectileTargetNumber = headTargetNumber RET effectDescription = description sort END
+				END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1
 					SET countLines += 1

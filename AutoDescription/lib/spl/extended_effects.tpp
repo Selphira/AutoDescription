@@ -32,7 +32,9 @@ BEGIN
 				PATCH_IF baseProbability != 100 BEGIN
 		            SET probability = probability * baseProbability / 100
 		        END
-				LPF ~get_effect_description~ INT_VAR ignoreDuration ignoreSavingThrow forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
+				PATCH_TIME ~step:get_effect_description:item=%isItem%:subspell=%isSubSpell%~ BEGIN
+					LPF ~get_effect_description~ INT_VAR ignoreDuration ignoreSavingThrow forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
+				END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET probability = oldProbability
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1 + (depthOfEffect * 2)
@@ -65,10 +67,10 @@ BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY leveled_opcodes BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
-	LPM ~load_extended_effects~
-	LPM ~replace_effects~
-	LPM ~filter_effects~
-	LPM ~group_effects~
+	PATCH_TIME ~step:load_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~load_extended_effects~ END
+	PATCH_TIME ~step:replace_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~replace_effects~ END
+	PATCH_TIME ~step:filter_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~filter_effects~ END
+	PATCH_TIME ~step:group_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~group_effects~ END
 
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
