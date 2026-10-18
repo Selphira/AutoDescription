@@ -1,96 +1,13 @@
 DEFINE_ACTION_MACRO ~update_spell_descriptions~ BEGIN
 	LAM ~load_clearair~
-    ACTION_DEFINE_ARRAY allSpellDescriptions BEGIN END
 	OUTER_SET totalSpells = 0
-
-/*
-	COPY_EXISTING
-	    ~CBBARDCT.spl~ ~override~
-	    ~CA#DS202.spl~ ~override~
-	    ~CA#DS104.spl~ ~override~
-	    ~ZPCL914.spl~ ~override~
-	    ~RAIS3.spl~ ~override~
-	    ~RACHACHA.spl~ ~override~
-	    ~CA#AF.spl~ ~override~
-	    ~RACHAPRE.spl~ ~override~
-	    ~PXW0MIRA.spl~ ~override~
-	    ~SPPR324.spl~ ~override~
-	    ~CBUAISP.spl~ ~override~
-	    ~PXW9INVX.spl~ ~override~
-	    ~RABD1.spl~ ~override~
-	    ~RADT1.spl~ ~override~
-	    ~SPCL908.spl~ ~override~
-	    ~PXFXGARG.spl~ ~override~
-	    ~PXFXMAIT.spl~ ~override~
-	    ~PXFXZAMG.spl~ ~override~
-	    ~PXFYCALG.spl~ ~override~
-	    ~A7_SP01.spl~ ~override~
-	    ~SPWI450.spl~ ~override~
-	    ~SPWI438.spl~ ~override~
-	    ~SPCL905.spl~ ~override~
-	    ~SPCL909.spl~ ~override~
-	    ~SPPR342.spl~ ~override~
-	    ~SPPR318.spl~ ~override~
-*/
-	COPY_EXISTING
-	    ~A7!GLR.SPL~ ~override~
-	    ~SPWISH24.spl~ ~override~
-	    ~A7!IN06.spl~ ~override~
-	    ~A7!IN13.spl~ ~override~
-	    ~A7#SH61.spl~ ~override~
-	    ~CTRLDEM.spl~ ~override~
-	    ~CA#DSTCL.spl~ ~override~
-	    ~D5ZPRP.spl~ ~override~
-	    ~RAHR1.spl~ ~override~
-	    ~SPCRYO01.spl~ ~override~
-	    ~SPIN891.spl~ ~override~
-	    ~SPPR429.spl~ ~override~
-	    ~SPWISH32.spl~ ~override~
-
-	    /*
-	    ~D5L42229.spl~ ~override~
-	    ~D5CSI7I.spl~ ~override~
-
-
-
-	    ~SPPR750.spl~ ~override~
-	    ~SPWI413.spl~ ~override~
-	    ~SPWI910.spl~ ~override~
-	    ~BHAAL4A.spl~ ~override~
-	    ~SPJA01.spl~ ~override~
-	    ~SPPR504.spl~ ~override~
-	    ~SPPR550.spl~ ~override~
-	    ~SPPR712.spl~ ~override~
-	    ~SPPR729.spl~ ~override~
-	    ~SPPR750.spl~ ~override~
-	    ~SPWI413.spl~ ~override~
-	    ~SPWI910.spl~ ~override~
-	    ~SPWISH10.spl~ ~override~
-	    ~MOTURN1.spl~ ~override~  // regroupement par durée + pourcentage
-	   //~BDHAMM06.itm~ ~override~  // regroupement par durée + pourcentage
-	    ~RR#PALCD.spl~ ~override~  // regroupement par durée + pourcentage
-	    ~SPPR450.spl~ ~override~  // regroupement par durée + pourcentage
-	    ~MOPALC3.spl~ ~override~  // regroupement par durée + pourcentage
-	    ~MOPSIC2.spl~ ~override~  // regroupement par durée + pourcentage
-	    ~PXW3CRAI.spl~ ~override~  // regroupement par durée + pourcentage
-	    ~SPCL412.spl~ ~override~  // indentation + tiret vide + effets du niveau 1 à 10 qui ne s'affiche pas !!!
-
-	    ~OHHDRAIN.spl~ ~override~ // regroupement opcode 10
-	    ~SPCL423.spl~ ~override~  // indentation
-	    ~SPJA01.spl~ ~override~  // indentation
-	    ~SPPR450.spl~ ~override~  // indentation
-	    ~SPWISH10.spl~ ~override~
-	    ~OHBBCLT4.spl~ ~override~
-	    ~OHTMPS2.spl~ ~override~
-	    ~SPCL121.spl~ ~override~
-	    */
-
-	//COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
+	LAF ~init_js_file~ END
+	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
 	    PATCH_TIME ~%SOURCE_FILE%~ BEGIN
 		    LPM ~update_spell_description~
 		END
 	BUT_ONLY_IF_IT_CHANGES
-	LAF ~write_js~ STR_VAR array = ~allSpellDescriptions~ END
+	LAF ~close_js_file~ END
 END
 
 DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
@@ -99,7 +16,7 @@ DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
 		PATCH_PRINT "%totalSpells% spells processed"
 	END
 	PATCH_TRY
-		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful RET_ARRAY allSpellDescriptions END
+		LPF ~update_spell_description~ RET totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid totalSuccessful END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -115,8 +32,6 @@ DEFINE_PATCH_FUNCTION ~update_spell_description~
 		totalIgnoredWithoutDescription
 		totalInvalid
 		totalSuccessful
-	RET_ARRAY
-	    allSpellDescriptions
 BEGIN
 	PATCH_SILENT
 
@@ -146,7 +61,7 @@ BEGIN
 		END
 
 		LPF ~add_compare_row~ STR_VAR itemName = ~%spellName%~ originalDescription description END
-        SET $allSpellDescriptions(~%SOURCE_RES%~ ~%spellName%~ ~%originalDescription%~ ~%description%~ ~%spellSchool%~ ~%spellLevel%~) = 1
+		LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%spellName%~ type = ~%spellSchool%~ level = ~%spellLevel%~ original = ~%originalDescription%~ modded = ~%description%~ END
 		SET totalSuccessful += 1
 		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
 		PATCH_IF regression_dump BEGIN

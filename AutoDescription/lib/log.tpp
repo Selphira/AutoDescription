@@ -135,10 +135,10 @@ BEGIN
 	END
 END
 
-DEFINE_ACTION_FUNCTION ~write_js~
-	STR_VAR
-		array = ~~
-BEGIN
+// Données JS écrites au fil de l'eau : accumuler les résultats dans un tableau renvoyé par
+// RET_ARRAY à chaque ressource coûte un temps quadratique, car chaque LPF copie aussi les
+// éléments des tableaux existants (refactoring-roadmap.md §3.2, mesures X1/X2).
+DEFINE_ACTION_FUNCTION ~init_js_file~ BEGIN
 	<<<<<<<< .../AutoDescription/inlined/javascript.log
 window.loadedData = window.loadedData || {};
 >>>>>>>>
@@ -146,17 +146,35 @@ window.loadedData = window.loadedData || {};
     SILENT
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%-version"] = '%MOD_VERSION%';~ KEEP_CRLF
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = [~ KEEP_CRLF
-	ACTION_PHP_EACH ~%array%~ AS line => _ BEGIN
-        OUTER_PATCH_SAVE line_2 ~%line_2%~ BEGIN
-            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
-            REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
-        END
-        OUTER_PATCH_SAVE line_3 ~%line_3%~ BEGIN
-            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
-            REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
-        END
-        APPEND_OUTER ~docs/data/%log_filename%.js~ ~{"id":"%line_0%","name":"%line_1%","type":%line_4%,"level":%line_5%,"original":"%line_2%","modded":"%line_3%"},~ KEEP_CRLF
-    END
+    VERBOSE
+END
+
+DEFINE_PATCH_FUNCTION ~add_js_row~
+	STR_VAR
+		id = ~~
+		name = ~~
+		type = ~~
+		level = ~~
+		original = ~~
+		modded = ~~
+BEGIN
+	INNER_PATCH_SAVE original ~%original%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
+	END
+	INNER_PATCH_SAVE modded ~%modded%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
+	END
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~docs/data/%log_filename%.js~ ~{"id":"%id%","name":"%name%","type":%type%,"level":%level%,"original":"%original%","modded":"%modded%"},~ KEEP_CRLF
+		VERBOSE
+	END
+END
+
+DEFINE_ACTION_FUNCTION ~close_js_file~ BEGIN
+    SILENT
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~{}];~ KEEP_CRLF
     APPEND_OUTER ~docs/data/%log_filename%.js~ ~window.loadedData["%log_filename%"] = window.loadedData["%log_filename%"].filter(entry => Object.keys(entry).length > 0);~ KEEP_CRLF
     VERBOSE
