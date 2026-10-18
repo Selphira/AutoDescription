@@ -6,8 +6,8 @@
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2, fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
-// fx_special ; fx_opcode_count(opcode). Variables écrites : fx_count, fx_header_count,
-// fx_load_error (vide si la lecture a réussi).
+// fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_opcode_count(opcode).
+// Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
 // Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
 // (sort), bloc d'effet 0x30.
@@ -116,6 +116,7 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_LONG  (fx_offset + FX_save_type)    $fx_save_type(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
+			LPM ad_fx_normalize
 			SET fx_opcode = $fx_opcode(~%fx_id%~)
 			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
 			SET fx_count += 1

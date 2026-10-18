@@ -4,9 +4,13 @@ Outil de développement : il relit lui-même les fichiers .itm/.spl (formats ITM
 IESDP), produit les lignes attendues et les compare à celles du journal
 AutoDescription/log/*-effects.txt écrit par new-lib/.
 
-Usage : python tools/check_effects_dump.py JOURNAL DOSSIER [DOSSIER ...]
+Les valeurs normalisées sont recalculées ici, indépendamment de new-lib/normalize.tpp, à partir
+des règles de l'IESDP (format des effets) et de la colonne DICE de 2da/opcodes.2da.
+
+Usage : python tools/check_effects_dump.py [--classic] JOURNAL DOSSIER [DOSSIER ...]
 Les dossiers contiennent les fichiers du jeu (par exemple extraits des BIFF avec
 weidu --biff-get, puis le dossier override) ; en cas de doublon, le dernier dossier l'emporte.
+--classic : journal produit sur un jeu classique (BG2, BGT) plutôt que sur un EE.
 Code de retour : 0 si tout concorde, 1 sinon.
 """
 
@@ -26,6 +30,54 @@ FORMATS = {
 }
 
 
+CATALOG = Path(__file__).resolve().parent.parent / "AutoDescription" / "2da" / "opcodes.2da"
+TIMINGS = {
+    # timing : (genre, délai en ticks, durée en ticks) en fonction de la durée brute d
+    0: ("limited", lambda d: 0, lambda d: d * 15),
+    1: ("permanent", lambda d: 0, lambda d: 0),
+    3: ("delayed_limited", lambda d: d * 15, lambda d: d * 15),
+    4: ("delayed_permanent", lambda d: d * 15, lambda d: 0),
+    5: ("delayed_while_equipped", lambda d: d * 15, lambda d: 0),
+    6: ("game_time_limited", lambda d: 0, lambda d: 0),
+    7: ("game_time_permanent", lambda d: 0, lambda d: 0),
+    8: ("game_time_while_equipped", lambda d: 0, lambda d: 0),
+    9: ("permanent_after_death", lambda d: 0, lambda d: 0),
+    10: ("limited", lambda d: 0, lambda d: d),
+    4096: ("absolute", lambda d: 0, lambda d: 0),
+}
+
+
+def read_dice_usage():
+    usage = {}
+    for line in CATALOG.read_text(encoding="ascii").splitlines()[3:]:
+        fields = line.split()
+        if fields:
+            usage[int(fields[0])] = fields[4]
+    return usage
+
+
+def normalize(block, values, dice_usage, is_ee):
+    """Valeurs normalisées d'un effet (mêmes colonnes que AD_FX_FIELDS après les champs bruts)."""
+    (opcode, _, _, _, parameter2, timing, _, duration, probability1, probability2, resource,
+     dice_count, dice_sides, save_type, _, _) = values
+    if timing == 2:
+        kind, delay, length = ("while_equipped" if block == "equipped" else "until_reload"), 0, 0
+    elif timing in TIMINGS:
+        kind, delay_of, length_of = TIMINGS[timing]
+        delay, length = delay_of(duration), length_of(duration)
+    else:
+        kind, delay, length = "unknown", 0, 0
+    # Tirage x dans 0-99 : l'effet a lieu si probabilité 2 <= x <= probabilité 1.
+    high = min(probability1, 99)
+    chance = high - probability2 + 1 if probability2 <= high else 0
+    usage = dice_usage.get(opcode, "LEVEL")
+    level = usage == "LEVEL" or (usage == "DICE_IF_P2_1_EE" and not (is_ee and parameter2 == 1))
+    # Minuscules ASCII seulement (les noms de ressources du jeu sont en ASCII).
+    lower = "".join(c.lower() if c.isascii() else c for c in resource)
+    return [kind, delay, length, probability2, high, chance, save_type & 0b11111, save_type & ~0b11111,
+            dice_sides if level else 0, dice_count if level else 0, lower]
+
+
 def short(data, offset):
     return struct.unpack_from("<H", data, offset)[0]
 
@@ -34,8 +86,8 @@ def long(data, offset):
     return struct.unpack_from("<i", data, offset)[0]
 
 
-def read_effects(data, kind):
-    """Renvoie (nombre d'en-têtes, [champs de chaque effet], erreur de lecture)."""
+def read_effects(data, kind, dice_usage, is_ee):
+    """Renvoie (nombre d'en-têtes, [champs bruts et normalisés de chaque effet], erreur de lecture)."""
     signature, header_size, count_at, index_at, global_block = FORMATS[kind]
     if data[:8] != signature:
         return 0, [], "unsupported_format"
@@ -52,9 +104,9 @@ def read_effects(data, kind):
             if offset < 0 or offset + 0x30 > len(data):
                 return "invalid_effect"
             values = list(EFFECT.unpack_from(data, offset))
-            values[10] = values[10].split(b"\0", 1)[0]
-            effects.append([block, str(header), str(position)] + [
-                value.decode("latin-1") if isinstance(value, bytes) else str(value) for value in values])
+            values[10] = values[10].split(b"\0", 1)[0].decode("latin-1")
+            effects.append([block, str(header), str(position)]
+                           + [str(value) for value in values + normalize(block, values, dice_usage, is_ee)])
         return ""
 
     error = load_block(global_block, -1, short(data, 0x6E), short(data, 0x70))
@@ -82,7 +134,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("dump", type=Path)
     parser.add_argument("directories", nargs="+", type=Path)
+    parser.add_argument("--classic", action="store_true", help="journal produit sur un jeu classique")
     args = parser.parse_args()
+    dice_usage = read_dice_usage()
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     kind = "SPL" if "-spells-" in args.dump.name else "ITM"
     files = index_files(args.directories)
@@ -102,7 +156,7 @@ def main():
             print(f"{resref} : fichier introuvable")
             problems += 1
             continue
-        header_count, effects, error = read_effects(path.read_bytes(), kind)
+        header_count, effects, error = read_effects(path.read_bytes(), kind, dice_usage, not args.classic)
         expected = [[rows[0][0], "resource", str(header_count), str(len(effects)), error]]
         expected += [[rows[0][0], "fx", str(i)] + effect for i, effect in enumerate(effects)]
         effects_checked += len(effects)

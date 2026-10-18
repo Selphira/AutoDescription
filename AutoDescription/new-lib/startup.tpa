@@ -18,4 +18,7 @@ ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
 	~block~ ~header~ ~position~ ~opcode~ ~target~ ~power~ ~parameter1~ ~parameter2~ ~timing~
 	~resistance~ ~duration~ ~probability1~ ~probability2~ ~resource~ ~dice_count~ ~dice_sides~
 	~save_type~ ~save_bonus~ ~special~
+	// Valeurs normalisées (new-lib/normalize.tpp).
+	~timing_kind~ ~delay_ticks~ ~duration_ticks~ ~probability_low~ ~probability_high~ ~probability~
+	~save_types~ ~save_flags~ ~level_min~ ~level_max~ ~resource_lower~
 END

@@ -362,6 +362,7 @@ def check_ignored_described(report, variants):
 # Catalogue des opcodes du nouveau moteur
 
 CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
+CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
 
 
@@ -369,8 +370,8 @@ def check_catalog(report, definitions):
     report.section("Catalogue des opcodes (2da/opcodes.2da)")
     path = MOD / "2da" / "opcodes.2da"
     lines = read_text(path).replace("\r\n", "\n").split("\n")
-    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "NAME"]:
-        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS NAME »")
+    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "NAME"]:
+        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE NAME »")
         return
     rows = {}
     previous = -1
@@ -379,8 +380,8 @@ def check_catalog(report, definitions):
         if not fields:
             continue
         where = f"{relative(path)}:{number}"
-        if len(fields) != 5 or not fields[0].isdigit():
-            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS NAME)")
+        if len(fields) != 6 or not fields[0].isdigit():
+            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE NAME)")
             continue
         opcode = int(fields[0])
         if opcode <= previous:
@@ -390,6 +391,8 @@ def check_catalog(report, definitions):
             report.add("ERREUR", f"{where} : BG2 et EE valent 0 ou 1")
         if fields[3] not in CATALOG_STATUSES:
             report.add("ERREUR", f"{where} : statut {fields[3]} inconnu ({', '.join(CATALOG_STATUSES)})")
+        if fields[4] not in CATALOG_DICE:
+            report.add("ERREUR", f"{where} : DICE {fields[4]} inconnu ({', '.join(CATALOG_DICE)})")
         rows[opcode] = fields[3]
 
     # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.
