@@ -1,38 +1,12 @@
 DEFINE_ACTION_MACRO ~update_item_descriptions~ BEGIN
-    ACTION_DEFINE_ARRAY allItemDescriptions BEGIN END
 	OUTER_SET totalItems = 0
-
-	COPY_EXISTING
-	    ~BDHAMM06.itm~ ~override~
-	    ~#LPOT01.itm~ ~override~
-	    ~#SBAGUE.itm~ ~override~
-	    /*
-	    ~#SILKAR.itm~ ~override~
-	    ~RODS03.itm~ ~override~
-	    ~AMUL18.itm~ ~override~
-	    ~DAGG09.itm~ ~override~
-	    ~HAMM04.itm~ ~override~
-	    ~OHBREW05.itm~ ~override~
-	    ~OHBSCRL3.itm~ ~override~
-	    ~SW1H18.itm~ ~override~
-	    ~SW1H24.itm~ ~override~
-	    ~SW1H31.itm~ ~override~
-	    ~WAMACE.itm~ ~override~
-
-	    ~AX1H10.itm~ ~override~
-	    ~BDAMUL02.itm~ ~override~
-	    ~BLUN12.itm~ ~override~
-	    ~PXL2DCER.itm~ ~override~
-	    ~BDBOW01.itm~ ~override~
-	    ~PXL2VISA.itm~ ~override~
-	    ~PXL2VISI.itm~ ~override~
-*/
-	//COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+	LAF ~init_js_file~ END
+	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
 	    PATCH_TIME ~%SOURCE_FILE%~ BEGIN
 		    LPM ~update_item_description~
 		END
 	BUT_ONLY_IF_IT_CHANGES
-	LAF ~write_js~ STR_VAR array = ~allItemDescriptions~ END
+	LAF ~close_js_file~ END
 END
 
 DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
@@ -41,7 +15,7 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 		PATCH_PRINT "%totalItems% items processed"
 	END
 	PATCH_TRY
-		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful RET_ARRAY allItemDescriptions END
+		LPF ~update_item_description~ RET totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType totalSuccessful END
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
@@ -58,8 +32,6 @@ DEFINE_PATCH_FUNCTION ~update_item_description~
 		totalIgnoredNotMoveable
 		totalIgnoredType
 		totalSuccessful
-	RET_ARRAY
-	    allItemDescriptions
 BEGIN
 	PATCH_SILENT
 
@@ -97,7 +69,7 @@ BEGIN
 		END
         LPM ~get_item_name~
 		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
-        SET $allItemDescriptions(~%SOURCE_RES%~ ~%itemName%~ ~%originalDescription%~ ~%description%~ ~%itemType%~ ~%enchantment%~) = 1
+		LPF ~add_js_row~ STR_VAR id = ~%SOURCE_RES%~ name = ~%itemName%~ type = ~%itemType%~ level = ~%enchantment%~ original = ~%originalDescription%~ modded = ~%description%~ END
 		SET totalSuccessful += 1
 		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
 		PATCH_IF regression_dump BEGIN
