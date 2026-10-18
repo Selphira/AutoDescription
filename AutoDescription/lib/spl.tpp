@@ -103,6 +103,9 @@ DEFINE_PATCH_MACRO ~update_spell_description~ BEGIN
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
+		PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR status = ~failed~ description = ~%ERROR_MESSAGE%~ END
+		END
 	END
 END
 
@@ -127,7 +130,7 @@ BEGIN
 	LPF ~can_update_spell~
 		INT_VAR originalDescriptionRef spellNameRef
 		STR_VAR originalDescription spellName
-		RET canUpdateSpell totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid
+		RET canUpdateSpell ignore_reason totalIgnoredWithoutName totalIgnoredWithoutDescription totalInvalid
 	END
 
 	PATCH_IF canUpdateSpell BEGIN
@@ -143,6 +146,13 @@ BEGIN
 		LPF ~add_compare_row~ STR_VAR itemName = ~%spellName%~ originalDescription description END
         SET $allSpellDescriptions(~%SOURCE_RES%~ ~%spellName%~ ~%originalDescription%~ ~%description%~ ~%spellSchool%~ ~%spellLevel%~) = 1
 		SET totalSuccessful += 1
+		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
+		PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR description END
+		END
+	END
+	ELSE PATCH_IF regression_dump BEGIN
+		LPF ~add_regression_dump_row~ STR_VAR status = ~ignored:%ignore_reason%~ END
 	END
 END
 
@@ -220,30 +230,36 @@ DEFINE_PATCH_FUNCTION ~can_update_spell~
 		spellName = ~~
 	RET
 		canUpdateSpell
+		ignore_reason
 		totalIgnoredWithoutName
 		totalIgnoredWithoutDescription
 		totalInvalid
 BEGIN
 	SET canUpdateSpell = 1
+	SPRINT ignore_reason ~~
 
 	// Evite un crash sur les sorts vides
 	PATCH_IF SOURCE_SIZE <= 0x71 BEGIN
 		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~invalid_file~
 		LPF ~add_log_error~ STR_VAR message = ~Invalid file.~ END
 	END
 	// Si l'utilisateur ne veut pas inclure les sorts sans description
 	ELSE PATCH_IF NOT include_spells_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) BEGIN
 		SET totalIgnoredWithoutDescription += 1
 		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~without_description~
 	END
 	// Si l'utilisateur ne veut pas inclure les sorts sans nom
 	ELSE PATCH_IF NOT include_spells_without_name AND (~%spellName%~ STRING_EQUAL ~~ OR spellNameRef <= 0) BEGIN
 		SET totalIgnoredWithoutName += 1
 		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~without_name~
 	END
 	ELSE PATCH_IF NOT ~%originalDescription%~ STRING_MATCHES_REGEXP ~<Invalid Strref -?[0-9]+>~ OR NOT ~%spellName%~ STRING_MATCHES_REGEXP ~<Invalid Strref -?[0-9]+>~ BEGIN
 		SET totalInvalid += 1
 		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~invalid_strref~
 	END
 END
 

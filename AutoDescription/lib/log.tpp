@@ -62,6 +62,28 @@ BEGIN
 	END
 END
 
+// Format : RESREF<TAB>statut<TAB>texte. L'échappement (\\, \r, \n, \t) est réversible et garantit
+// une ressource par ligne. Les chaînes ~...~ sont littérales, mais la regexp et le texte de
+// remplacement sont interprétés par Str, où \\ désigne une seule barre oblique inverse.
+DEFINE_PATCH_FUNCTION ~add_regression_dump_row~
+	STR_VAR
+		resref = ~%SOURCE_RES%~
+		status = ~ok~
+		description = ~~
+BEGIN
+	INNER_PATCH_SAVE description ~%description%~ BEGIN
+		REPLACE_TEXTUALLY ~\\~ ~\\\\~
+		REPLACE_TEXTUALLY ~%MNL%~ ~\\r~
+		REPLACE_TEXTUALLY ~%LNL%~ ~\\n~
+		REPLACE_TEXTUALLY ~%TAB%~ ~\\t~
+	END
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~AutoDescription/log/%log_filename%-dump.txt~ ~%resref%%TAB%%status%%TAB%%description%~ KEEP_CRLF
+		VERBOSE
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~html_escape~
 	STR_VAR text = ~~
 	RET text
@@ -86,6 +108,9 @@ BEGIN
 >>>>>>>>
 	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-warning.log~
 	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-error.log~
+	ACTION_IF regression_dump BEGIN
+		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-dump.txt~
+	END
 	ACTION_IF is_ee BEGIN
 		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END

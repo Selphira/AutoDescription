@@ -45,6 +45,9 @@ DEFINE_PATCH_MACRO ~update_item_description~ BEGIN
 	WITH DEFAULT
 		LPF ~add_log_warning~ STR_VAR message = ~FAILURE: %ERROR_MESSAGE%~ END
 		SET totalFailed += 1
+		PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR status = ~failed~ description = ~%ERROR_MESSAGE%~ END
+		END
 	END
 END
 
@@ -71,7 +74,7 @@ BEGIN
 	LPF ~can_update_item~
 		INT_VAR itemType originalDescriptionRef flags originalUnidentifiedDescriptionRef
 		STR_VAR originalDescription originalUnidentifiedDescription
-		RET canUpdateItem totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType
+		RET canUpdateItem ignore_reason totalIgnoredCursed totalIgnoredWithoutDescription totalIgnoredNotMoveable totalIgnoredType
 	END
 
 	PATCH_IF canUpdateItem BEGIN
@@ -96,6 +99,13 @@ BEGIN
 		LPF ~add_compare_row~ STR_VAR itemName originalDescription description END
         SET $allItemDescriptions(~%SOURCE_RES%~ ~%itemName%~ ~%originalDescription%~ ~%description%~ ~%itemType%~ ~%enchantment%~) = 1
 		SET totalSuccessful += 1
+		// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant
+		PATCH_IF regression_dump BEGIN
+			LPF ~add_regression_dump_row~ STR_VAR description END
+		END
+	END
+	ELSE PATCH_IF regression_dump BEGIN
+		LPF ~add_regression_dump_row~ STR_VAR status = ~ignored:%ignore_reason%~ END
 	END
 END
 
@@ -231,32 +241,38 @@ DEFINE_PATCH_FUNCTION ~can_update_item~
 		originalUnidentifiedDescription = ~~
 	RET
 		canUpdateItem
+		ignore_reason
 		totalIgnoredCursed
 		totalIgnoredWithoutDescription
 		totalIgnoredNotMoveable
 		totalIgnoredType
 BEGIN
 	SET canUpdateItem = 1
+	SPRINT ignore_reason ~~
 
 	// Evite un crash sur les objets vides
 	PATCH_IF SOURCE_SIZE <= 0x71 BEGIN
 		SET canUpdateItem = 0
+		SPRINT ignore_reason ~invalid_file~
 		LPF ~add_log_error~ STR_VAR message = ~Invalid file.~ END
 	END
 	// Si l'utilisateur ne veut pas modifier la description des objets maudits
 	ELSE PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) == BIT4 BEGIN
 		SET totalIgnoredCursed += 1
 		SET canUpdateItem = 0
+		SPRINT ignore_reason ~cursed~
 	END
 	// Si l'utilisateur ne veut pas inclure les objets sans description
 	ELSE PATCH_IF NOT include_items_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) AND (~%originalUnidentifiedDescription%~ STRING_EQUAL ~~ OR originalUnidentifiedDescriptionRef <= 0) BEGIN
 		SET totalIgnoredWithoutDescription += 1
 		SET canUpdateItem = 0
+		SPRINT ignore_reason ~without_description~
 	END
 	// Si l'utilisateur ne veut pas inclure les objets qui ne peuvent être déplacés (Ils ne sont pas accessibles au joueur)
 	ELSE PATCH_IF NOT include_non_moveable_items AND (flags BAND BIT2) == 0 BEGIN
 		SET totalIgnoredNotMoveable += 1
 		SET canUpdateItem = 0
+		SPRINT ignore_reason ~not_moveable~
 	END
     ELSE BEGIN
 		PATCH_MATCH itemType
@@ -278,6 +294,7 @@ BEGIN
 			DEFAULT
 				SET totalIgnoredType += 1
 				SET canUpdateItem = 0
+				SPRINT ignore_reason ~type~
 		END
     END
 END
