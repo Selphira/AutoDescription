@@ -452,7 +452,10 @@ END
 DEFINE_PATCH_MACRO ~replace_effects~ BEGIN
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
-			PATCH_TRY LPM ~opcode_%opcode%_replace~ WITH DEFAULT END
+			SPRINT dispatch_replace ~opcode_%opcode%_replace~
+			PATCH_TRY LPM ~%dispatch_replace%~ WITH DEFAULT
+				PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_replace%~ error = ~%ERROR_MESSAGE%~ END END
+			END
 		END
 	END
 END
@@ -465,7 +468,10 @@ END
 DEFINE_PATCH_MACRO ~filter_effects~ BEGIN
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		PATCH_IF count > 0 BEGIN
-			PATCH_TRY LPM ~opcode_%opcode%_filter~ WITH DEFAULT END
+			SPRINT dispatch_filter ~opcode_%opcode%_filter~
+			PATCH_TRY LPM ~%dispatch_filter%~ WITH DEFAULT
+				PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_filter%~ error = ~%ERROR_MESSAGE%~ END END
+			END
 		END
 	END
 END
@@ -485,14 +491,20 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 			PATCH_IF count > 0 BEGIN
 				LPM ~opcode_group_by_target~
 				LPM ~opcode_group_by_duration~
-				PATCH_TRY LPM ~opcode_%opcode%_group~ WITH DEFAULT END
+				SPRINT dispatch_group ~opcode_%opcode%_group~
+				PATCH_TRY LPM ~%dispatch_group%~ WITH DEFAULT
+					PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_group%~ error = ~%ERROR_MESSAGE%~ END END
+				END
 			END
 		END
 		// Second passe, pour les regroupements qui peuvent être affectés par le précécent regroupement.
 		// Notamment par la suppression d'opcodes.
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 0 BEGIN
-				PATCH_TRY LPM ~opcode_%opcode%_post_group~ WITH DEFAULT END
+				SPRINT dispatch_post_group ~opcode_%opcode%_post_group~
+				PATCH_TRY LPM ~%dispatch_post_group%~ WITH DEFAULT
+					PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_post_group%~ error = ~%ERROR_MESSAGE%~ END END
+				END
 			END
 		END
 	END

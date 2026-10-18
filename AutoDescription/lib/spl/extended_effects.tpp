@@ -143,7 +143,10 @@ BEGIN
 			        SET opcode = 0 - opcode - 1
 			    END
 
-				PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+				SPRINT dispatch_spell_level_match ~opcode_%opcode%_spell_level_match~
+				PATCH_TRY LPM ~%dispatch_spell_level_match%~ WITH DEFAULT
+					PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
+				END
 				LPM ~%match_macro%~
 
 				PATCH_IF match == 1 BEGIN
@@ -443,7 +446,10 @@ BEGIN
 						PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
 							PATCH_IF (matchOpcode == opcode OR opcode == 0 - matchOpcode - 1) AND matched == 0 BEGIN
 								LPM ~data_to_match_vars~
-								PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+								SPRINT dispatch_spell_level_match ~opcode_%opcode%_spell_level_match~
+								PATCH_TRY LPM ~%dispatch_spell_level_match%~ WITH DEFAULT
+									PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
+								END
 					            PATCH_IF ignoreDuration BEGIN
 					                LPM ~opcode_match_except_duration~
 					            END
@@ -559,7 +565,10 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 				PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
 					PATCH_IF matchOpcode == opcode AND inAllLevel == 1 BEGIN
 						LPM ~data_to_match_vars~
-						PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+						SPRINT dispatch_spell_level_match ~opcode_%opcode%_spell_level_match~
+						PATCH_TRY LPM ~%dispatch_spell_level_match%~ WITH DEFAULT
+							PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
+						END
 			            PATCH_IF ignoreDuration BEGIN
 			                LPM ~opcode_match_except_duration~
 			            END
@@ -617,7 +626,10 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 								PATCH_IF loop2 == 1 AND matchOpcode >= 0 BEGIN
 							        LPM ~data_to_match_vars~
 									PATCH_IF matchOpcode == opcode AND NOT VARIABLE_IS_SET $positions(~%matchRequiredLevel%-%match_position%~) BEGIN
-										PATCH_TRY LPM ~opcode_%opcode%_spell_level_match~ WITH DEFAULT END
+										SPRINT dispatch_spell_level_match ~opcode_%opcode%_spell_level_match~
+										PATCH_TRY LPM ~%dispatch_spell_level_match%~ WITH DEFAULT
+											PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
+										END
 							            PATCH_IF ignoreDuration BEGIN
 							                LPM ~opcode_match_except_duration~
 							            END

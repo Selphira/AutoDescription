@@ -84,6 +84,22 @@ BEGIN
 	END
 END
 
+// Le dispatch par PATCH_TRY sert à appeler une macro/fonction optionnelle, mais WITH DEFAULT
+// avale aussi les erreurs survenues dans une macro existante : seule l'absence de la ressource
+// dispatchée elle-même est normale. WeiDU met dans ERROR_MESSAGE le nom non évalué
+// (« opcode_%opcode%_group ») ; STRING_EQUAL le réévalue, d'où la comparaison avec le nom capturé
+// avant l'appel.
+DEFINE_PATCH_FUNCTION ~log_swallowed_error~
+	STR_VAR
+		name = ~~
+		type = ~macro~
+		error = ~~
+BEGIN
+	PATCH_IF NOT (~%error%~ STRING_EQUAL ~Failure("Unknown %type%: %name%")~) BEGIN
+		LPF ~add_log_error~ STR_VAR message = ~Swallowed error in %name%: %error%~ END
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~html_escape~
 	STR_VAR text = ~~
 	RET text

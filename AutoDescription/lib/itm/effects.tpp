@@ -5,8 +5,15 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 	END
 	ELSE BEGIN
 		// Si la macro n'existe pas, on considère comme valide
-		PATCH_TRY LPM ~opcode_%opcode%_is_valid~ WITH DEFAULT SET isValid = 1 END
-		PATCH_TRY LPM ~opcode_%opcode%_is_valid_mod~ WITH DEFAULT END
+		SPRINT dispatch_is_valid ~opcode_%opcode%_is_valid~
+		PATCH_TRY LPM ~%dispatch_is_valid%~ WITH DEFAULT
+			SET isValid = 1
+			PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_is_valid%~ error = ~%ERROR_MESSAGE%~ END END
+		END
+		SPRINT dispatch_is_valid_mod ~opcode_%opcode%_is_valid_mod~
+		PATCH_TRY LPM ~%dispatch_is_valid_mod%~ WITH DEFAULT
+			PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_is_valid_mod%~ error = ~%ERROR_MESSAGE%~ END END
+		END
 	END
 	
 	PATCH_IF probability <= 0 BEGIN
