@@ -12,3 +12,31 @@
 @1000001 = ~ : ~ // reprise de @10001
 @1000002 = ~ ; ~ // reprise de @10004
 @1000003 = ~ %~ // reprise de @10022
+
+// Mise en forme : valeurs (1 200 000-1 200 099)
+@1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
+
+// Mise en forme : titres de sections (1 300 000-1 300 099)
+@1300000 = ~PARAMÈTRES~ // reprise de @100003
+@1300001 = ~Capacités d'équipement~ // reprise de @100010
+@1300002 = ~Nécessite~ // reprise de @101032
+
+// Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
+@1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
+
+// Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
+@6000000 = ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~ // reprise de @102126
+@6000001 = ~Protection contre les coups critiques~ // reprise de @102679
+
+// Objets : nécessite, poids (6 200 000-6 200 099)
+@6200000 = ~%value% en %attribute%~ // reprise de @100019
+@6200001 = ~Poids~ // reprise de @100002
+
+// Listes indexées : noms des statistiques, 8 000 000 + valeur de stats.ids (8 000 000-8 009 999)
+@8000034 = ~Niveau~ // reprise de @10960001
+@8000036 = ~Force~ // reprise de @10440001
+@8000038 = ~Intelligence~ // reprise de @10190001
+@8000039 = ~Sagesse~ // reprise de @10490001
+@8000040 = ~Dextérité~ // reprise de @10150001
+@8000041 = ~Constitution~ // reprise de @10100001
+@8000042 = ~Charisme~ // reprise de @10060001

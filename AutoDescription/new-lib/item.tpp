@@ -17,4 +17,15 @@ BEGIN
 		LPM ad_fx_dump
 	END
 	LPM ad_set_coverage
+	PATCH_IF ~%uncovered_reason%~ STRING_EQUAL ~not_implemented~ BEGIN
+		LPM ad_item_render_support
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			LPM ad_item_render
+			SET covered = 1
+			SPRINT uncovered_reason ~~
+		END
+		ELSE BEGIN
+			SPRINT uncovered_reason ~%render_missing%~
+		END
+	END
 END

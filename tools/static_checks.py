@@ -233,6 +233,10 @@ NEW_ENTRY = re.compile(r"^@(\d+)\s*=\s*~([^~]*)~([^\n]*)", re.M)
 COPY_MARKER = re.compile(r"//\s*reprise de @(\d+)")
 # Fichiers du nouveau moteur où les globales en majuscules sont fixées.
 NEW_STARTUP_FILES = ("always.tpa", "startup.tpa", "catalog.tpa")
+# Variables de mise en forme de l'ancien moteur et leur équivalent dans le nouveau, pour les
+# chaînes reprises ; l'ancien nom est interdit dans description_new.tra.
+OLD_TO_NEW_VARIABLES = {"crlf": "CRLF", "colon": "AD_COLON", "semicolon": "AD_SEMICOLON", "outer_percent": "PERCENT"}
+OLD_GLOBALS = set(OLD_TO_NEW_VARIABLES) | {"meter", "meters"}
 
 
 def check_new_tra_rules(report):
@@ -254,10 +258,18 @@ def check_new_tra_rules(report):
             if marker:
                 copies += 1
                 source = int(marker.group(1))
-                # Recopie à l'identique : une reformulation est un changement distinct, à signaler.
-                if old.get(source) != text:
+                # Recopie à l'identique, au renommage près des variables de l'ancien moteur ; une
+                # reformulation est un changement distinct, à signaler.
+                expected = old.get(source)
+                for old_name, new_name in OLD_TO_NEW_VARIABLES.items():
+                    expected = expected.replace(f"%{old_name}%", f"%{new_name}%") if expected is not None else None
+                if expected != text:
                     report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)}:{line} : @{identifier} diffère de "
                                f"@{source} de description.tra (« reprise de »)")
+            # Le gabarit lirait la variable de l'ancien moteur (une fonction voit celles de son appelant).
+            for variable in sorted(set(re.findall(r"%([A-Za-z_][A-Za-z0-9_]*)%", text)) & OLD_GLOBALS):
+                report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)}:{line} : @{identifier} utilise la "
+                           f"variable {variable} de l'ancien moteur")
         print(f"  {relative(TRA / language / NEW_TRA)} : {len(entries)} entrées, dont {copies} reprises")
     if texts.get("french", (None, []))[1] != texts.get("english", (None, []))[1]:
         report.add("ERREUR", f"{NEW_TRA} : identifiants dans un ordre différent en français et en anglais")

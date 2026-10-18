@@ -13,6 +13,18 @@ OUTER_SPRINT AD_COLON     @1000001 // ~ : ~
 OUTER_SPRINT AD_SEMICOLON @1000002 // ~ ; ~
 OUTER_SPRINT PERCENT      @1000003 // ~ %~
 
+// Caractéristiques minimales d'un objet, dans l'ordre d'affichage : valeur de stats.ids => champ
+// de l'en-tête.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN
+	34 => ~%ITM_min_level%~
+	36 => ~%ITM_min_strength%~
+	40 => ~%ITM_min_dexterity%~
+	41 => ~%ITM_min_constitution%~
+	38 => ~%ITM_min_intelligence%~
+	39 => ~%ITM_min_wisdom%~
+	42 => ~%ITM_min_charisma%~
+END
+
 // Champs d'un effet du magasin (new-lib/effects.tpp), dans l'ordre des journaux.
 ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
 	~block~ ~header~ ~position~ ~opcode~ ~target~ ~power~ ~parameter1~ ~parameter2~ ~timing~

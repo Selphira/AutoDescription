@@ -2,8 +2,8 @@
 // effets. Un opcode TODO rend la ressource « non couverte » ; un opcode inconnu (absent du
 // catalogue ou du jeu courant) n'est pas décrit, sans empêcher la couverture. Les opcodes TODO et
 // inconnus sont journalisés dans …-opcodes.txt, synthétisé en fin de composant (ad_close_log).
-// Tant que le rendu n'existe pas, une ressource sans opcode TODO reste non couverte
-// (not_implemented).
+// Une ressource sans opcode TODO reçoit la raison not_implemented ; le point d'entrée la couvre
+// si son rendu sait la décrire entièrement.
 DEFINE_PATCH_MACRO ad_set_coverage BEGIN
 	PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
 		SPRINT uncovered_reason ~%fx_load_error%~
