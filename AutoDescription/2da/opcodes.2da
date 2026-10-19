@@ -60,7 +60,7 @@
 56       1        1        TODO      LEVEL            463    Alignment:_Invert
 57       1        1        TODO      LEVEL            462    Alignment:_Change
 58       1        1        TODO      LEVEL            200    Cure:_Dispellable_Effects_(Dispel_Magic)
-59       1        1        TODO      LEVEL            127    Stat:_Stealth_Modifier
+59       1        1        DESCRIBED LEVEL            127    Stat:_Stealth_Modifier
 60       1        1        TODO      LEVEL            92     Stat:_Miscast_Magic
 61       1        1        IGNORED   LEVEL            400    Creature_RGB_color_fade
 62       1        1        TODO      LEVEL            19     Spell:_Priest_Spell_Slots_Modifier
@@ -91,9 +91,9 @@
 87       1        1        DESCRIBED LEVEL            313    Stat:_Crushing_Resistance_Modifier
 88       1        1        DESCRIBED LEVEL            314    Stat:_Piercing_Resistance_Modifier
 89       1        1        DESCRIBED LEVEL            315    Stat:_Missiles_Resistance_Modifier
-90       1        1        TODO      LEVEL            122    Stat:_Open_Locks_Modifier
-91       1        1        TODO      LEVEL            124    Stat:_Find_Traps_Modifier
-92       1        1        TODO      LEVEL            121    Stat:_Pick_Pockets_Modifier
+90       1        1        DESCRIBED LEVEL            122    Stat:_Open_Locks_Modifier
+91       1        1        DESCRIBED LEVEL            124    Stat:_Find_Traps_Modifier
+92       1        1        DESCRIBED LEVEL            121    Stat:_Pick_Pockets_Modifier
 93       1        1        DESCRIBED LEVEL            427    Stat:_Fatigue_Modifier
 94       1        1        DESCRIBED LEVEL            429    Stat:_Drunkenness_Modifier
 95       1        1        DESCRIBED LEVEL            430    Stat:_Tracking_Skill_Modifier
@@ -276,9 +276,9 @@
 272      1        1        TODO      LEVEL            467    Spell:_Apply_Repeating_EFF
 273      1        1        TODO      LEVEL            227    Remove:_Specific_Area_Effect(Zone_of_Sweet_Air)
 274      1        1        TODO      LEVEL            454    Spell_Effect:_Teleport_to_Target
-275      1        1        TODO      LEVEL            126    Stat:_Hide_in_Shadows_Modifier
-276      1        1        TODO      LEVEL            123    Stat:_Detect_Illusion_Modifier
-277      1        1        TODO      LEVEL            125    Stat:_Set_Traps_Modifier
+275      1        1        DESCRIBED LEVEL            126    Stat:_Hide_in_Shadows_Modifier
+276      1        1        DESCRIBED LEVEL            123    Stat:_Detect_Illusion_Modifier
+277      1        1        DESCRIBED LEVEL            125    Stat:_Set_Traps_Modifier
 278      1        1        DESCRIBED LEVEL            61     Stat:_To_Hit_Modifier
 279      1        1        TODO      LEVEL            497    Button:_Enable_Button
 280      1        1        TODO      LEVEL            404    Spell_Effect:_Wild_Magic

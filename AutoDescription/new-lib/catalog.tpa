@@ -33,6 +33,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~ELEMENTAL_RESISTANCES~ => 301
 	~PHYSICAL_RESISTANCES~  => 302
 	~EXCEPTIONAL_STRENGTH~  => 400
+	~THIEF_SKILLS~          => 120
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
@@ -47,13 +48,20 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	44  => 8000036 // ~Force~
 	49  => 8000039 // ~Sagesse~
 	54  => 8000007 // ~TAC0~
+	59  => 8000027 // ~Déplacement silencieux~
 	73  => 20730000 // ~Dégâts~
+	90  => 8000026 // ~Crochetage de serrures~
+	91  => 8000028 // ~Détection et désamorçage des pièges~
+	92  => 8000029 // ~Vol à la tire~
 	93  => 8000030 // ~Fatigue~
 	94  => 8000031 // ~Ébriété~
 	95  => 8000033 // ~Pistage~
 	96  => 8000034 // ~Niveau~
 	97  => 8000037 // ~Force exceptionnelle~
 	104 => 8000044 // ~Expérience~
+	275 => 8000135 // ~Se cacher dans l'ombre~
+	276 => 8000136 // ~Détection des illusions~
+	277 => 8000137 // ~Pose de pièges~
 	278 => 8000007 // ~TAC0~
 	281 => 22810000 // ~Modificateur des hiatus entropiques~
 	284 => 22840000 // ~TAC0 des armes de mêlée~
@@ -63,4 +71,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	289 => 22890000 // ~Dégâts à mains nues~
 	305 => 23050000 // ~TAC0 de la main secondaire~
 	306 => 23060000 // ~TAC0 de la main principale~
+END
+
+// Modificateurs simples d'une statistique en pourcentage (« +20 % », « Passe à 50 % »), ancien
+// opcode_mod_percent.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_PERCENT BEGIN
+	59  => 1 // Déplacement silencieux
+	90  => 1 // Crochetage de serrures
+	91  => 1 // Détection et désamorçage des pièges
+	92  => 1 // Vol à la tire
+	275 => 1 // Se cacher dans l'ombre
+	276 => 1 // Détection des illusions
+	277 => 1 // Pose de pièges
 END

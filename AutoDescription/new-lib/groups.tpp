@@ -17,6 +17,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_exceptional_strength
 	END
+	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_THIEF_SKILLS BEGIN
+		LPM ad_group_thief_skills
+	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
@@ -45,6 +48,18 @@ DEFINE_PATCH_MACRO ad_group_saving_throws BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 34 35 36 37 END
 	SPRINT group_derived ~ALL_SAVES~
 	SPRINT group_name @5000000 // ~Jets de sauvegarde~
+	SPRINT group_line ~ad_group_modifier_line~
+	LPM ad_group_same_fields
+END
+
+// Sept compétences de voleur modifiées de la même façon (ancien opcode_59_group, opcode virtuel
+// 500).
+DEFINE_PATCH_MACRO ad_group_thief_skills BEGIN
+	SET group_anchor = 59
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 90 91 92 275 276 277 END
+	SPRINT group_derived ~THIEF_SKILLS~
+	SPRINT group_name @30090000 // ~Compétences de roublard~
 	SPRINT group_line ~ad_group_modifier_line~
 	LPM ad_group_same_fields
 END
@@ -162,9 +177,11 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 	END
 END
 
-// « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp).
+// « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp), en pourcentage
+// si l'opcode d'ancrage l'est.
 DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
-	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode RET value = text END
+	SET group_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%group_anchor%~)
+	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode percent = group_percent RET value = text END
 	SPRINT name ~%group_name%~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 END

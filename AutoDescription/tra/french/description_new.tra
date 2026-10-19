@@ -43,6 +43,10 @@
 // Listes indexées : noms des statistiques, 8 000 000 + valeur de stats.ids (8 000 000-8 009 999)
 @8000007 = ~TAC0~ // reprise de @10540001
 @8000025 = ~Connaissances~ // reprise de @10210001
+@8000026 = ~Crochetage de serrures~ // reprise de @10900001
+@8000027 = ~Déplacement silencieux~ // reprise de @10590001
+@8000028 = ~Détection et désamorçage des pièges~ // reprise de @10910001
+@8000029 = ~Vol à la tire~ // reprise de @10920001
 @8000030 = ~Fatigue~ // reprise de @10930001
 @8000031 = ~Ébriété~ // reprise de @10940001
 @8000032 = ~Chance~ // reprise de @10220001
@@ -56,6 +60,9 @@
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisme~ // reprise de @10060001
 @8000044 = ~Expérience~ // reprise de @11040001
+@8000135 = ~Se cacher dans l'ombre~ // reprise de @12750001
+@8000136 = ~Détection des illusions~ // reprise de @12760001
+@8000137 = ~Pose de pièges~ // reprise de @12770001
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
@@ -194,3 +201,6 @@
 // Effet dérivé 007, PHYSICAL_RESISTANCES : libellés (30 070 000-30 070 099)
 @30070000 = ~Résistance aux dégâts physiques~ // reprise de @15040001
 @30070001 = ~aux dégâts physiques~ // reprise de @15040002
+
+// Effet dérivé 009, THIEF_SKILLS : libellés (30 090 000-30 090 099)
+@30090000 = ~Compétences de roublard~ // reprise de @15000001

@@ -2,7 +2,9 @@
 // valeur, parameter2 = mode (0 ajoute la valeur, 1 fixe la statistique à la valeur, 2 la multiplie
 // par valeur %). Un opcode de la famille a une entrée dans AD_STAT_MODIFIER_NAMES
 // (new-lib/catalog.tpa) et son fichier new-lib/opcodes/<N>.tpp, dont les deux macros ad_op_<N>_*
-// fixent stat_opcode et stat_mode_3 puis appellent les macros ci-dessous ; un opcode sans mode
+// fixent stat_opcode et stat_mode_3 puis appellent les macros ci-dessous ; un opcode dont la
+// statistique est un pourcentage (compétences de voleur…) est listé dans AD_STAT_MODIFIER_PERCENT ;
+// un opcode sans mode
 // pourcentage fixe aussi stat_percentage à invalid, remis à valid après la prise en charge ; un
 // opcode dont le jeu ignore parameter2 fixe stat_forced_mode au mode qu'il applique réellement, écrit
 // dans l'effet avant toute validation pour que les passes suivantes lisent le vrai mode.
@@ -68,12 +70,13 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
 	SET stat_name_tra = $AD_STAT_MODIFIER_NAMES(~%stat_opcode%~)
+	SET stat_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%stat_opcode%~)
 	LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
 	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode RET value = text END
+			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
 			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			LPM ad_line_add
 		END
@@ -81,10 +84,13 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 END
 
 // « +2 », « Passe à 18 » ou « -30 % » (mode 2 : valeur exprimée en pourcentage de la statistique).
+// Statistique en pourcentage (percent = 1, ancien opcode_mod_percent_base) : « +20 % »,
+// « Passe à 50 % », « Multiplié par 50 % ».
 DEFINE_PATCH_FUNCTION ad_stat_modifier_value
 	INT_VAR
 		value = 0
 		mode = 0
+		percent = 0
 	RET
 		text
 BEGIN
@@ -92,11 +98,18 @@ BEGIN
 	PATCH_IF mode == MOD_TYPE_flat BEGIN
 		SPRINT text @1200002 // ~Passe à %value%~
 	END
+	ELSE PATCH_IF mode == MOD_TYPE_percentage AND percent BEGIN
+		SPRINT text @1200004 // ~Multiplié par %value%~
+	END
 	ELSE PATCH_IF mode == MOD_TYPE_percentage BEGIN
 		LPF ad_signed_value INT_VAR value = value - 100 RET value = text END
 		SPRINT text @1200003 // ~%value%%PERCENT%~
 	END
 	ELSE BEGIN
 		LPF ad_signed_value INT_VAR value RET text END
+	END
+	PATCH_IF percent BEGIN
+		SPRINT value ~%text%~
+		SPRINT text @1200003 // ~%value%%PERCENT%~
 	END
 END

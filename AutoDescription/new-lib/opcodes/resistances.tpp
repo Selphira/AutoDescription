@@ -33,16 +33,7 @@ BEGIN
 		SPRINT text @5000001 // ~Immunité %resistName%~
 	END
 	ELSE BEGIN
-		PATCH_IF mode == MOD_TYPE_flat BEGIN
-			SPRINT value @1200002 // ~Passe à %value%~
-		END
-		ELSE PATCH_IF mode == MOD_TYPE_percentage BEGIN
-			SPRINT value @1200004 // ~Multiplié par %value%~
-		END
-		ELSE BEGIN
-			LPF ad_signed_value INT_VAR value RET value = text END
-		END
-		SPRINT value @1200003 // ~%value%%PERCENT%~
+		LPF ad_stat_modifier_value INT_VAR value mode percent = 1 RET value = text END
 		LPF ad_tra INT_VAR tra_id = name_tra RET name = text END
 		SPRINT text @1200000 // ~%name%%AD_COLON%%value%~
 	END
