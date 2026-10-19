@@ -1,7 +1,9 @@
 // Passe 3 : regroupements entre opcodes, après la prise en charge de tous les opcodes et avant
 // leurs lignes. Un effet réuni à d'autres est marqué consommé (fx_consumed) : la macro
 // ad_op_<N>_lines de son opcode le saute, et la ligne est celle d'un effet dérivé. Les règles
-// s'appliquent dans l'ordre ci-dessous, indépendamment de l'ordre des opcodes.
+// s'appliquent dans l'ordre ci-dessous, indépendamment de l'ordre des opcodes. Une règle fixe
+// l'opcode d'ancrage, les opcodes membres, l'effet dérivé, le nom de la ligne et la macro qui
+// écrit la ligne (group_line), puis appelle ad_group_same_fields.
 //
 // Tableau écrit : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp).
 
@@ -12,6 +14,13 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_SAVES_THROWS BEGIN
 		LPM ad_group_saving_throws
 	END
+	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
+	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
+	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
+		LPM ad_group_all_resistances
+		LPM ad_group_elemental_resistances
+		LPM ad_group_physical_resistances
+	END
 END
 
 // Six caractéristiques modifiées de la même façon (ancien opcode_6_group, opcode virtuel 501).
@@ -21,6 +30,7 @@ DEFINE_PATCH_MACRO ad_group_abilities BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 10 15 19 44 49 END
 	SPRINT group_derived ~ABILITIES~
 	SPRINT group_name @30030000 // ~Caractéristiques~
+	SPRINT group_line ~ad_group_modifier_line~
 	LPM ad_group_same_fields
 END
 
@@ -32,13 +42,50 @@ DEFINE_PATCH_MACRO ad_group_saving_throws BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 34 35 36 37 END
 	SPRINT group_derived ~ALL_SAVES~
 	SPRINT group_name @5000000 // ~Jets de sauvegarde~
+	SPRINT group_line ~ad_group_modifier_line~
+	LPM ad_group_same_fields
+END
+
+// Onze résistances modifiées de la même façon (ancien opcode_group_all_resistances, opcode
+// virtuel 502).
+DEFINE_PATCH_MACRO ad_group_all_resistances BEGIN
+	SET group_anchor = 84
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 27 28 29 30 31 85 86 87 88 89 END
+	SPRINT group_derived ~ALL_RESISTANCES~
+	SET group_name_tra = 30050000 // ~Résistance aux dégâts~
+	SPRINT group_line ~ad_group_resistance_line~
+	LPM ad_group_same_fields
+END
+
+// Acide, froid, électricité, feu (ancien opcode_27_group, opcode virtuel 503).
+DEFINE_PATCH_MACRO ad_group_elemental_resistances BEGIN
+	SET group_anchor = 27
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 28 29 30 END
+	SPRINT group_derived ~ELEMENTAL_RESISTANCES~
+	SET group_name_tra = 30060000 // ~Résistance aux dégâts élémentaires~
+	SPRINT group_line ~ad_group_resistance_line~
+	LPM ad_group_same_fields
+END
+
+// Dégâts tranchants, contondants, perforants, de projectiles (ancien opcode_86_group, opcode
+// virtuel 504).
+DEFINE_PATCH_MACRO ad_group_physical_resistances BEGIN
+	SET group_anchor = 86
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 87 88 89 END
+	SPRINT group_derived ~PHYSICAL_RESISTANCES~
+	SET group_name_tra = 30070000 // ~Résistance aux dégâts physiques~
+	SPRINT group_line ~ad_group_resistance_line~
 	LPM ad_group_same_fields
 END
 
 // Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
 // group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
 // opcodes group_members qui a les mêmes champs (ad_fx_signature) ; s'ils sont tous trouvés, ils
-// sont consommés et forment une ligne « group_name : valeur » de l'effet dérivé group_derived.
+// sont consommés et la macro group_line écrit la ligne de l'effet dérivé group_derived, d'après
+// l'effet d'ancrage group_id.
 DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == group_anchor AND NOT $fx_consumed(~%group_id%~) BEGIN
@@ -62,17 +109,27 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 					SET group_other = $group_member(~%group_opcode%~)
 					SET $fx_consumed(~%group_other%~) = 1
 				END
-				SET group_value = $fx_parameter1(~%group_id%~)
-				SET group_mode = $fx_parameter2(~%group_id%~)
-				LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode RET value = text END
-				SPRINT name ~%group_name%~
 				SPRINT line_section ~equipped~
 				SET line_sort = $AD_DERIVED_SORT(~%group_derived%~)
-				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+				SET group_value = $fx_parameter1(~%group_id%~)
+				SET group_mode = $fx_parameter2(~%group_id%~)
+				LPM ~%group_line%~
 				LPM ad_line_add
 			END
 		END
 	END
+END
+
+// « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp).
+DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
+	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode RET value = text END
+	SPRINT name ~%group_name%~
+	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+END
+
+// Ligne de résistance (new-lib/opcodes/resistances.tpp), nom au libellé group_name_tra.
+DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
+	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra RET line_text = text END
 END
 
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur ; la cible

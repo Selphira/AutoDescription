@@ -18,6 +18,7 @@
 @1200001 = ~+%value%~ // reprise de @10003
 @1200002 = ~Passe à %value%~ // reprise de @10010
 @1200003 = ~%value%%PERCENT%~ // reprise de @10002
+@1200004 = ~Multiplié par %value%~ // reprise de @10006
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~PARAMÈTRES~ // reprise de @100003
@@ -29,6 +30,7 @@
 
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Jets de sauvegarde~ // reprise de @102034
+@5000001 = ~Immunité %resistName%~ // reprise de @102547
 
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~ // reprise de @102126
@@ -76,6 +78,26 @@
 @20001013 = ~contre les armes contondantes, tranchantes et perforantes~ // reprise de @10000013
 @20001014 = ~contre les armes tranchantes, perforantes et les projectiles~ // reprise de @10000014
 
+// Opcode 27 : libellés (20 270 000-20 270 099)
+@20270000 = ~Résistance à l'acide~ // reprise de @10270001
+@20270001 = ~à l'acide~ // reprise de @10270002
+
+// Opcode 28 : libellés (20 280 000-20 280 099)
+@20280000 = ~Résistance au froid~ // reprise de @10280001
+@20280001 = ~au froid~ // reprise de @10280002
+
+// Opcode 29 : libellés (20 290 000-20 290 099)
+@20290000 = ~Résistance à l'électricité~ // reprise de @10290001
+@20290001 = ~à l'électricité~ // reprise de @10290002
+
+// Opcode 30 : libellés (20 300 000-20 300 099)
+@20300000 = ~Résistance au feu~ // reprise de @10300001
+@20300001 = ~au feu~ // reprise de @10300002
+
+// Opcode 31 : libellés (20 310 000-20 310 099)
+@20310000 = ~Résistance aux dégâts magiques~ // reprise de @10310001
+@20310001 = ~aux dégâts magiques~ // reprise de @10310002
+
 // Opcode 33 : libellés (20 330 000-20 330 099)
 @20330000 = ~contre la paralysie, la mort et les poisons~ // reprise de @10330001
 
@@ -93,6 +115,30 @@
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001
+
+// Opcode 84 : libellés (20 840 000-20 840 099)
+@20840000 = ~Résistance aux dégâts de feu magiques~ // reprise de @10840001
+@20840001 = ~aux dégâts de feu magiques~ // reprise de @10840002
+
+// Opcode 85 : libellés (20 850 000-20 850 099)
+@20850000 = ~Résistance aux dégâts de froid magiques~ // reprise de @10850001
+@20850001 = ~aux dégâts de froid magiques~ // reprise de @10850002
+
+// Opcode 86 : libellés (20 860 000-20 860 099)
+@20860000 = ~Résistance aux dégâts tranchants~ // reprise de @10860001
+@20860001 = ~aux dégâts tranchants~ // reprise de @10860002
+
+// Opcode 87 : libellés (20 870 000-20 870 099)
+@20870000 = ~Résistance aux dégâts contondants~ // reprise de @10870001
+@20870001 = ~aux dégâts contondants~ // reprise de @10870002
+
+// Opcode 88 : libellés (20 880 000-20 880 099)
+@20880000 = ~Résistance aux dégâts perforants~ // reprise de @10880001
+@20880001 = ~aux dégâts perforants~ // reprise de @10880002
+
+// Opcode 89 : libellés (20 890 000-20 890 099)
+@20890000 = ~Résistance aux dégâts de projectiles~ // reprise de @10890001
+@20890001 = ~aux dégâts de projectiles~ // reprise de @10890002
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001
@@ -123,3 +169,15 @@
 
 // Effet dérivé 003, ABILITIES : libellés (30 030 000-30 030 099)
 @30030000 = ~Caractéristiques~ // reprise de @15010001
+
+// Effet dérivé 005, ALL_RESISTANCES : libellés (30 050 000-30 050 099)
+@30050000 = ~Résistance aux dégâts~ // reprise de @15020001
+@30050001 = ~aux dégâts~ // reprise de @15020002
+
+// Effet dérivé 006, ELEMENTAL_RESISTANCES : libellés (30 060 000-30 060 099)
+@30060000 = ~Résistance aux dégâts élémentaires~ // reprise de @15030001
+@30060001 = ~aux dégâts élémentaires~ // reprise de @15030002
+
+// Effet dérivé 007, PHYSICAL_RESISTANCES : libellés (30 070 000-30 070 099)
+@30070000 = ~Résistance aux dégâts physiques~ // reprise de @15040001
+@30070001 = ~aux dégâts physiques~ // reprise de @15040002

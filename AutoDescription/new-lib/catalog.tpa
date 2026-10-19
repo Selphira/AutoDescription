@@ -29,6 +29,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~AC_BY_ATTACK_TYPE~ => 35
 	~ABILITIES~         => 100
 	~ALL_SAVES~         => 70
+	~ALL_RESISTANCES~       => 300
+	~ELEMENTAL_RESISTANCES~ => 301
+	~PHYSICAL_RESISTANCES~  => 302
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
