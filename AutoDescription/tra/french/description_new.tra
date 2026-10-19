@@ -38,6 +38,7 @@
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~ // reprise de @102126
 @6000001 = ~Protection contre les coups critiques~ // reprise de @102679
+@6000002 = ~Permet de lancer des sorts profanes~ // reprise de @102127
 
 // Objets : nécessite, poids (6 200 000-6 200 099)
 @6200000 = ~%value% en %attribute%~ // reprise de @100019
@@ -542,6 +543,25 @@
 
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Immunité %opcodeStr%~ // reprise de @11010001
+
+// Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
+@21440100 = ~Empêche~ // reprise de @11440050
+@21441000 = ~%action% l'utilisation du camouflage dans l'ombre~ // reprise de @11440001
+@21441001 = ~%action% l'utilisation des compétences de roublard~ // reprise de @11440002
+@21441002 = ~%action% l'utilisation des sorts~ // reprise de @11440003
+@21441003 = ~%action% l'utilisation du premier sort rapide~ // reprise de @11440004
+@21441004 = ~%action% l'utilisation du second sort rapide~ // reprise de @11440005
+@21441005 = ~%action% l'utilisation du troisième sort rapide~ // reprise de @11440006
+@21441006 = ~%action% l'utilisation de Repousser les morts-vivants~ // reprise de @11440007
+@21441007 = ~%action% l'utilisation des discussions~ // reprise de @11440008
+@21441008 = ~%action% l'utilisation des objets~ // reprise de @11440009
+@21441009 = ~%action% l'utilisation du premier objet rapide~ // reprise de @11440010
+@21441010 = ~%action% l'utilisation des chants de barde et des danses de shaman~ // reprise de @11440011
+@21441011 = ~%action% l'utilisation du second objet rapide~ // reprise de @11440012
+@21441012 = ~%action% l'utilisation du troisième objet rapide~ // reprise de @11440013
+@21441013 = ~%action% l'utilisation des sorts innés~ // reprise de @11440014
+@21441014 = ~%action% l'utilisation de la détection des pièges et des illusions~ // reprise de @11440015
+@21441015 = ~%action% l'utilisation de l'inventaire~ // reprise de @11440016
 
 // Opcode 166 : libellés (21 660 000-21 660 099)
 @21660000 = ~Résistance à la magie~ // reprise de @11660001

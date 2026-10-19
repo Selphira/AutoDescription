@@ -3,7 +3,7 @@
 // rendu décrit entièrement sont couverts (ad_item_render_support).
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
-// en-têtes de capacités (charge, combat), sections propres aux armes, armures et munitions,
+// en-têtes de capacités (charge, combat), sections propres aux armes et munitions,
 // utilisabilité (affichée seulement sur les jeux classiques), cas d'un opcode décrit que sa
 // macro ad_op_<N>_support refuse.
 DEFINE_PATCH_MACRO ad_item_render_support BEGIN
@@ -12,7 +12,7 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	PATCH_IF fx_header_count > 0 BEGIN
 		SPRINT render_missing ~not_implemented:headers~
 	END
-	ELSE PATCH_IF (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm) OR item_type == ITM_TYPE_armor
+	ELSE PATCH_IF (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
 			OR item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts BEGIN
 		SPRINT render_missing ~not_implemented:item_type~
 	END
@@ -50,10 +50,17 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 			LPM ~ad_op_%render_opcode%_lines~
 		END
 	END
+	LPM ad_item_armor_lines
 	LPF ad_lines_section_text STR_VAR section = ~equipped~ RET equipped_lines = text END
 	PATCH_IF NOT (~%equipped_lines%~ STRING_EQUAL ~~) BEGIN
 		SPRINT title @1300001 // ~Capacités d'équipement~
 		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%equipped_lines%~
+	END
+	// Section de l'armure : lignes sans puce, après une ligne vide (ancien
+	// add_global_effects_to_description).
+	LPF ad_lines_section_text INT_VAR bullet = 0 STR_VAR section = ~armor~ RET armor_lines = text END
+	PATCH_IF NOT (~%armor_lines%~ STRING_EQUAL ~~) BEGIN
+		SPRINT description ~%description%%CRLF%%armor_lines%~
 	END
 	LPM ad_item_requirements_section
 	// Ligne vide avant le poids, comme dans l'ancien moteur.
@@ -143,4 +150,36 @@ DEFINE_PATCH_FUNCTION ad_item_usable_by
 BEGIN
 	READ_LONG ITM_usability_flags usability_flags
 	SET usable = (usability_flags BAND class_mask) != class_mask
+END
+
+// Une armure qui n'est pas une robe et n'empêche pas de lancer des sorts profanes (opcode 145,
+// parameter2 = 0) le dit, avec AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS ; ligne ajoutée après celles des
+// effets, comme dans l'ancien moteur.
+DEFINE_PATCH_MACRO ad_item_armor_lines BEGIN
+	PATCH_IF item_type == ITM_TYPE_armor AND AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS BEGIN
+		LPF ad_item_is_robe RET armor_is_robe = is_robe END
+		SET armor_blocks_arcane = 0
+		FOR (armor_id = 0; armor_id < fx_count; ++armor_id) BEGIN
+			SPRINT armor_block $fx_block(~%armor_id%~)
+			PATCH_IF $fx_opcode(~%armor_id%~) == 145 AND $fx_parameter2(~%armor_id%~) == 0 AND $fx_probability(~%armor_id%~) == 100
+					AND ~%armor_block%~ STRING_EQUAL ~equipped~ BEGIN
+				SET armor_blocks_arcane = 1
+			END
+		END
+		PATCH_IF NOT armor_is_robe AND NOT armor_blocks_arcane BEGIN
+			SPRINT line_section ~equipped~
+			SET line_sort = $AD_OPCODE_SORT(~145~)
+			SPRINT line_text @6000002 // ~Permet de lancer des sorts profanes~
+			LPM ad_line_add
+		END
+	END
+END
+
+// Robe : armure dont l'animation est celle d'une robe de mage (2W, 3W, 4W), comme l'ancien is_robe.
+DEFINE_PATCH_FUNCTION ad_item_is_robe
+	RET
+		is_robe
+BEGIN
+	READ_ASCII ITM_animation robe_animation (2)
+	SET is_robe = ~%robe_animation%~ STRING_EQUAL ~2W~ OR ~%robe_animation%~ STRING_EQUAL ~3W~ OR ~%robe_animation%~ STRING_EQUAL ~4W~
 END

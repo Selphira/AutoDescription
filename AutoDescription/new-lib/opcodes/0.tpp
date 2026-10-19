@@ -2,8 +2,10 @@
 // (0 toutes ; masque 1 contondantes, 2 projectiles, 4 perforantes, 8 tranchantes), ou 16 = CA de
 // base fixée à parameter1. Le moteur du jeu cumule les modificateurs.
 //
-// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé, d'un objet
-// qui n'est pas une armure.
+// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé. Sur une armure,
+// avec AD_ENABLE_SHRINKAGE et AD_SHRINK_CLASS_ARMOR, la CA de base et ses écarts par type d'attaque
+// forment la ligne de la section de l'armure (« Classe d'armure : 5 (3 contre les armes
+// tranchantes) »), et les modificateurs contre toutes les attaques restent des lignes séparées.
 //
 // CLEAR_ARRAY laisse lisibles les anciennes entrées (V36) : chaque entrée des tableaux de travail
 // est remise à zéro avant d'être combinée.
@@ -14,6 +16,7 @@
 DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	LOCAL_SET ac_base_count = 0
 	LOCAL_SET ac_modifier_count = 0
+	LOCAL_SET ac_all_count = 0
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
@@ -31,10 +34,6 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 					OR $fx_probability(~%ac_id%~) != 100 BEGIN
 				SPRINT render_missing ~not_implemented:opcode0:effect_kind~
 			END
-			// L'ancien moteur intègre la CA d'une armure à un attribut de l'objet.
-			ELSE PATCH_IF item_type == ITM_TYPE_armor BEGIN
-				SPRINT render_missing ~not_implemented:opcode0:armor~
-			END
 			ELSE PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				SET ac_base_count += 1
 			END
@@ -45,6 +44,9 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			END
 			ELSE BEGIN
 				SET ac_modifier_count += 1
+				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
+					SET ac_all_count += 1
+				END
 				// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					PATCH_IF $ac_seen_all(~%ac_value%~) BEGIN
@@ -66,8 +68,16 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			END
 		END
 	END
-	// L'ancien moteur ajoute la ligne regroupée après celle de la CA de base : ordre non vérifié.
-	PATCH_IF ac_base_count > 1 OR (ac_base_count > 0 AND ac_modifier_count > 0) BEGIN
+	// L'ancien moteur ajoute la ligne regroupée après celle de la CA de base : ordre non vérifié ;
+	// la CA de base d'une armure, réunie à ses écarts, n'a pas ce problème.
+	SET ac_armor_line = item_type == ITM_TYPE_armor AND AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR
+	// Sur une armure sans CA de base, l'ordre que donne l'ancien moteur aux modificateurs contre toutes
+	// les attaques et à la ligne réunie des types d'attaque dépend de la place des effets dans le
+	// fichier, sans règle établie.
+	PATCH_IF ac_armor_line AND ac_base_count == 0 AND ac_all_count > 0 AND ac_all_count < ac_modifier_count BEGIN
+		SPRINT render_missing ~not_implemented:opcode0:armor_order~
+	END
+	ELSE PATCH_IF ac_base_count > 1 OR (ac_base_count > 0 AND ac_modifier_count > 0 AND NOT ac_armor_line) BEGIN
 		SPRINT render_missing ~not_implemented:opcode0:base_with_other~
 	END
 END
@@ -91,8 +101,13 @@ END
 
 // Total contre toutes les attaques, puis total contre chaque type d'attaque qui en diffère ; les
 // types dont le total est nul forment la ligne « Ne protège pas » (effet dérivé AC_NO_PROTECTION).
+// Sur une armure (ancien isArmor), les modificateurs contre toutes les attaques ne sont pas
+// totalisés, et une CA de base donne la ligne de la section de l'armure.
 DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	LOCAL_SET ac_all = 0
+	LOCAL_SET ac_base = 0
+	LOCAL_SET ac_has_base = 0
+	LOCAL_SET ac_armor = item_type == ITM_TYPE_armor
 	LOCAL_SPRINT ac_values ~~
 	LOCAL_SPRINT ac_unprotected ~~
 	// Clé opposée au modificateur : les types d'attaque viennent du plus grand bonus au plus petit,
@@ -110,8 +125,16 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
-			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
+			PATCH_IF ac_type == AC_MOD_TYPE_set_base AND ac_armor BEGIN
+				SET ac_base = ac_value
+				SET ac_has_base = 1
+			END
+			ELSE PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				LPM ad_op_0_base_line
+			END
+			ELSE PATCH_IF ac_type == AC_MOD_TYPE_all AND ac_armor BEGIN
+				SET ac_mask = AC_MOD_TYPE_all
+				LPM ad_op_0_modifier_line
 			END
 			ELSE PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 				SET ac_all += ac_value
@@ -126,6 +149,9 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		LPF ad_signed_value INT_VAR value = ac_all RET ac_values = text END
 	END
 	SORT_ARRAY_INDICES ac_masks NUMERICALLY
+	PATCH_IF ac_has_base BEGIN
+		LPM ad_op_0_armor_line
+	END
 	PHP_EACH ac_masks AS ac_key => ac_mask BEGIN
 		LPF ad_tra INT_VAR tra_id = 20001000 + ac_mask tra_block_start = 20001000 tra_block_size = 16 RET versus = text END
 		SET ac_total = ac_all - ac_key
@@ -143,7 +169,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			SPRINT ac_values ~%ac_values%%ac_total_text% %versus%~
 		END
 	END
-	PATCH_IF NOT (~%ac_values%~ STRING_EQUAL ~~) BEGIN
+	PATCH_IF NOT (~%ac_values%~ STRING_EQUAL ~~) AND NOT ac_has_base BEGIN
 		SPRINT name @20000000 // ~Classe d'armure~
 		SPRINT value ~%ac_values%~
 		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
@@ -194,6 +220,29 @@ END
 
 // ---------------------------------------------------------------------------------------------
 // Texte d'une ligne (ancien opcode_self_0)
+
+// Ligne de la section de l'armure : CA de base ac_base, puis la CA obtenue contre chaque type
+// d'attaque modifié (ac_masks, du plus grand bonus au plus petit).
+DEFINE_PATCH_MACRO ad_op_0_armor_line BEGIN
+	LOCAL_SPRINT ac_armor_values ~~
+	PHP_EACH ac_masks AS ac_key => ac_mask BEGIN
+		LPF ad_tra INT_VAR tra_id = 20001000 + ac_mask tra_block_start = 20001000 tra_block_size = 16 RET versus = text END
+		SET ac_armor_value = ac_base + ac_key
+		PATCH_IF NOT (~%ac_armor_values%~ STRING_EQUAL ~~) BEGIN
+			SPRINT ac_armor_values ~%ac_armor_values%, ~
+		END
+		SPRINT ac_armor_values ~%ac_armor_values%%ac_armor_value% %versus%~
+	END
+	SPRINT value ~%ac_base%~
+	PATCH_IF NOT (~%ac_armor_values%~ STRING_EQUAL ~~) BEGIN
+		SPRINT value ~%value% (%ac_armor_values%)~
+	END
+	SPRINT name @20000000 // ~Classe d'armure~
+	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+	SPRINT line_section ~armor~
+	LPM ad_line_add
+	SPRINT line_section ~equipped~
+END
 
 DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 	SPRINT name @20000001 // ~Classe d'armure de base~

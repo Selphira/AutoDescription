@@ -57,6 +57,8 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/97.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/101.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/104.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/144.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/145.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/166.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/173.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/206.tpp~

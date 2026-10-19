@@ -145,8 +145,8 @@
 141      1        1        IGNORED   LEVEL            400    Graphics:_Lighting_Effects
 142      1        1        IGNORED   LEVEL            400    Graphics:_Display_Special_Effect_Icon
 143      1        1        TODO      LEVEL            481    Item:_Create_Item_in_Slot
-144      1        1        TODO      LEVEL            496    Button:_Disable_Button
-145      1        1        TODO      LEVEL            495    Spell:_Disable_Spell_Casting_Abilities
+144      1        1        DESCRIBED LEVEL            496    Button:_Disable_Button
+145      1        1        DESCRIBED LEVEL            495    Spell:_Disable_Spell_Casting_Abilities
 146      1        1        TODO      LEVEL            465    Spell:_Cast_Spell_(at_Creature)
 147      1        1        IGNORED   LEVEL            400    Spell:_Learn_Spell
 148      1        1        TODO      LEVEL            466    Spell:_Cast_Spell_(at_Point)
