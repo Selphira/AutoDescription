@@ -78,6 +78,10 @@
 @20001013 = ~contre les armes contondantes, tranchantes et perforantes~ // reprise de @10000013
 @20001014 = ~contre les armes tranchantes, perforantes et les projectiles~ // reprise de @10000014
 
+// Opcode 18 : libellés (20 180 000-20 180 099)
+@20180000 = ~Points de vie maximums~ // reprise de @10180001
+@20180001 = ~Points de vie~ // reprise de @10180003
+
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Résistance à l'acide~ // reprise de @10270001
 @20270001 = ~à l'acide~ // reprise de @10270002

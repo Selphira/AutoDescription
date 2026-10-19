@@ -18,6 +18,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/6.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/10.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/15.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/18.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/19.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/21.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/22.tpp~

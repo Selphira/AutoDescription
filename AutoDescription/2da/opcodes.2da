@@ -19,7 +19,7 @@
 15       1        1        DESCRIBED LEVEL            104    Stat:_Dexterity_Modifier
 16       1        1        TODO      LEVEL            384    State:_Haste
 17       1        1        TODO      DICE             84     HP:_Current_HP_Modifier
-18       1        1        TODO      DICE             82     HP:_Maximum_HP_Modifier
+18       1        1        DESCRIBED DICE             82     HP:_Maximum_HP_Modifier
 19       1        1        DESCRIBED LEVEL            106    Stat:_Intelligence_Modifier
 20       1        1        TODO      LEVEL            388    State:_Invisibility
 21       1        1        DESCRIBED LEVEL            425    Stat:_Lore_Modifier

@@ -78,6 +78,10 @@
 @20001013 = ~vs. crushing, slashing and piercing attacks~ // reprise de @10000013
 @20001014 = ~vs. slashing, piercing and missile attacks~ // reprise de @10000014
 
+// Opcode 18 : libellés (20 180 000-20 180 099)
+@20180000 = ~Maximum hit points~ // reprise de @10180001
+@20180001 = ~Hit points~ // reprise de @10180003
+
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Acid Resistance~ // reprise de @10270001
 @20270001 = ~from acid~ // reprise de @10270002
