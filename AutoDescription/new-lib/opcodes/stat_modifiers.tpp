@@ -2,7 +2,11 @@
 // valeur, parameter2 = mode (0 ajoute la valeur, 1 fixe la statistique à la valeur, 2 la multiplie
 // par valeur %). Un opcode de la famille a une entrée dans AD_STAT_MODIFIER_NAMES
 // (new-lib/catalog.tpa) et son fichier new-lib/opcodes/<N>.tpp, dont les deux macros ad_op_<N>_*
-// fixent stat_opcode puis appellent les macros ci-dessous.
+// fixent stat_opcode et stat_mode_3 puis appellent les macros ci-dessous.
+//
+// Mode 3 (EE seulement ; sur un jeu classique, il est invalide pour tous les opcodes), selon
+// stat_mode_3 : added (traité comme un ajout, ex. jets de sauvegarde), unsupported (pas encore
+// décrit), invalid.
 //
 // Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé.
 
@@ -27,12 +31,13 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 					OR $fx_probability(~%stat_id%~) != 100 BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:effect_kind~
 			END
-			// Mode 3 de la Force et de la Dextérité (EE) : l'ancien moteur le traite selon CLSSPLAB.2da.
-			ELSE PATCH_IF stat_mode == 3 AND IS_EE AND (stat_opcode == 15 OR stat_opcode == 44) BEGIN
+			ELSE PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END
-			// L'ancien moteur écarte un mode inconnu ou un effet sans changement (erreur journalisée).
-			ELSE PATCH_IF stat_mode < MOD_TYPE_cumulative OR stat_mode > MOD_TYPE_percentage
+			// L'ancien moteur écarte un mode inconnu ou un effet sans changement (erreur journalisée) ;
+			// en mode 3, une valeur nulle n'est pas écartée.
+			ELSE PATCH_IF ((stat_mode < MOD_TYPE_cumulative OR stat_mode > MOD_TYPE_percentage)
+					AND NOT (stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~added~)))
 					OR (stat_mode == MOD_TYPE_cumulative AND stat_value == 0)
 					OR (stat_mode == MOD_TYPE_percentage AND stat_value == 100) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
@@ -75,6 +80,7 @@ DEFINE_PATCH_FUNCTION ad_stat_modifier_value
 	RET
 		text
 BEGIN
+	// Le mode 3 n'arrive ici que s'il vaut un ajout (stat_mode_3 = added).
 	PATCH_IF mode == MOD_TYPE_flat BEGIN
 		SPRINT text @1200002 // ~Passe à %value%~
 	END

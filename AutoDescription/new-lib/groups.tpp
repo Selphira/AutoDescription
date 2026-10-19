@@ -9,18 +9,42 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_ABILITIES BEGIN
 		LPM ad_group_abilities
 	END
+	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_SAVES_THROWS BEGIN
+		LPM ad_group_saving_throws
+	END
 END
 
-// Six caractéristiques modifiées de la même façon (ancien opcode_6_group, opcode virtuel 501) :
-// une ligne « Caractéristiques » (effet dérivé ABILITIES). Chaque effet de Charisme (6), dans
-// l'ordre du fichier, est réuni au premier effet non consommé de chacune des cinq autres
-// caractéristiques qui a les mêmes champs (ad_fx_signature).
+// Six caractéristiques modifiées de la même façon (ancien opcode_6_group, opcode virtuel 501).
 DEFINE_PATCH_MACRO ad_group_abilities BEGIN
+	SET group_anchor = 6
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 10 15 19 44 49 END
+	SPRINT group_derived ~ABILITIES~
+	SPRINT group_name @30030000 // ~Caractéristiques~
+	LPM ad_group_same_fields
+END
+
+// Cinq jets de sauvegarde modifiés de la même façon (ancien opcode_33_group, qui produit un effet
+// de l'opcode 325 « tous les jets de sauvegarde »).
+DEFINE_PATCH_MACRO ad_group_saving_throws BEGIN
+	SET group_anchor = 33
+	CLEAR_ARRAY group_members
+	PATCH_DEFINE_ARRAY group_members BEGIN 34 35 36 37 END
+	SPRINT group_derived ~ALL_SAVES~
+	SPRINT group_name @5000000 // ~Jets de sauvegarde~
+	LPM ad_group_same_fields
+END
+
+// Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
+// group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
+// opcodes group_members qui a les mêmes champs (ad_fx_signature) ; s'ils sont tous trouvés, ils
+// sont consommés et forment une ligne « group_name : valeur » de l'effet dérivé group_derived.
+DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 6 BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == group_anchor AND NOT $fx_consumed(~%group_id%~) BEGIN
 			LPF ad_fx_signature INT_VAR fx_id = group_id RET group_signature = signature END
 			SET group_found = 1
-			PATCH_FOR_EACH group_opcode IN 10 15 19 44 49 BEGIN
+			PHP_EACH group_members AS _ => group_opcode BEGIN
 				SET $group_member(~%group_opcode%~) = 0 - 1
 				FOR (group_other = 0; group_found AND group_other < fx_count AND $group_member(~%group_opcode%~) < 0; ++group_other) BEGIN
 					PATCH_IF $fx_opcode(~%group_other%~) == group_opcode AND NOT $fx_consumed(~%group_other%~) BEGIN
@@ -34,16 +58,16 @@ DEFINE_PATCH_MACRO ad_group_abilities BEGIN
 			END
 			PATCH_IF group_found BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
-				PATCH_FOR_EACH group_opcode IN 10 15 19 44 49 BEGIN
+				PHP_EACH group_members AS _ => group_opcode BEGIN
 					SET group_other = $group_member(~%group_opcode%~)
 					SET $fx_consumed(~%group_other%~) = 1
 				END
 				SET group_value = $fx_parameter1(~%group_id%~)
 				SET group_mode = $fx_parameter2(~%group_id%~)
 				LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode RET value = text END
-				SPRINT name @30030000 // ~Caractéristiques~
+				SPRINT name ~%group_name%~
 				SPRINT line_section ~equipped~
-				SET line_sort = $AD_DERIVED_SORT(~ABILITIES~)
+				SET line_sort = $AD_DERIVED_SORT(~%group_derived%~)
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				LPM ad_line_add
 			END

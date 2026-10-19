@@ -28,6 +28,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~AC_NO_PROTECTION~  => 37
 	~AC_BY_ATTACK_TYPE~ => 35
 	~ABILITIES~         => 100
+	~ALL_SAVES~         => 70
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom

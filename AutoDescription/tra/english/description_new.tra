@@ -27,6 +27,9 @@
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
 
+// Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
+@5000000 = ~Saving Throws~ // reprise de @102034
+
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~May only be removed with a Remove Curse spell~ // reprise de @102126
 @6000001 = ~Protects against critical hits~ // reprise de @102679
@@ -65,6 +68,21 @@
 @20001012 = ~vs. slashing and piercing attacks~ // reprise de @10000012
 @20001013 = ~vs. crushing, slashing and piercing attacks~ // reprise de @10000013
 @20001014 = ~vs. slashing, piercing and missile attacks~ // reprise de @10000014
+
+// Opcode 33 : libellés (20 330 000-20 330 099)
+@20330000 = ~vs. Death~ // reprise de @10330001
+
+// Opcode 34 : libellés (20 340 000-20 340 099)
+@20340000 = ~vs. Wands~ // reprise de @10340001
+
+// Opcode 35 : libellés (20 350 000-20 350 099)
+@20350000 = ~vs. Petrification/Polymorph~ // reprise de @10350001
+
+// Opcode 36 : libellés (20 360 000-20 360 099)
+@20360000 = ~vs. Breath~ // reprise de @10360001
+
+// Opcode 37 : libellés (20 370 000-20 370 099)
+@20370000 = ~vs. Spells~ // reprise de @10370001
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~No protection %versus%~ // reprise de @15210001

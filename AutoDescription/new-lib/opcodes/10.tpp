@@ -3,6 +3,7 @@
 
 DEFINE_PATCH_MACRO ad_op_10_support BEGIN
 	SET stat_opcode = 10
+	SPRINT stat_mode_3 ~invalid~
 	LPM ad_stat_modifier_support
 END
 
