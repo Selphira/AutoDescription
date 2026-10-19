@@ -15,6 +15,7 @@
 
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
+@1200001 = ~+%value%~ // reprise de @10003
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
@@ -40,3 +41,28 @@
 @8000040 = ~Dexterity~ // reprise de @10150001
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisma~ // reprise de @10060001
+
+// Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
+@20000000 = ~Armor Class~ // reprise de @10000099
+@20000001 = ~Base Armor Class~ // reprise de @10000100
+@20000002 = ~%value% bonus~ // reprise de @10000101
+@20000003 = ~%value% penalty~ // reprise de @10000102
+
+// Opcode 0 : types d'attaque, 20 001 000 + masque de parameter2 (20 001 000-20 001 015)
+@20001001 = ~vs. crushing attacks~ // reprise de @10000001
+@20001002 = ~vs. missile attacks~ // reprise de @10000002
+@20001003 = ~vs. crushing and missile attacks~ // reprise de @10000003
+@20001004 = ~vs. piercing attacks~ // reprise de @10000004
+@20001005 = ~vs. crushing and piercing attacks~ // reprise de @10000005
+@20001006 = ~vs. piercing and missile attacks~ // reprise de @10000006
+@20001007 = ~vs. crushing, piercing and missile attacks~ // reprise de @10000007
+@20001008 = ~vs. slashing attacks~ // reprise de @10000008
+@20001009 = ~vs. crushing and slashing attacks~ // reprise de @10000009
+@20001010 = ~vs. slashing and missile attacks~ // reprise de @10000010
+@20001011 = ~vs. crushing, slashing and missile attacks~ // reprise de @10000011
+@20001012 = ~vs. slashing and piercing attacks~ // reprise de @10000012
+@20001013 = ~vs. crushing, slashing and piercing attacks~ // reprise de @10000013
+@20001014 = ~vs. slashing, piercing and missile attacks~ // reprise de @10000014
+
+// Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
+@30010100 = ~No protection %versus%~ // reprise de @15210001

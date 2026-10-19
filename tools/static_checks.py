@@ -357,6 +357,14 @@ def parse_ignored_opcodes():
     return {int(key): int(value) for key, value in re.findall(r"(-?\d+)\s*=>\s*(-?\d+)", block.group(1))}
 
 
+def parse_sort_opcodes():
+    text, _ = strip_weidu(read_text(OPCODES))
+    block = re.search(r"ACTION_DEFINE_ASSOCIATIVE_ARRAY\s+~sort_opcodes~\s+BEGIN(.*?)\bEND\b", text, re.S)
+    if not block:
+        return None
+    return {int(key): int(value) for key, value in re.findall(r"(-?\d+)\s*=>\s*(-?\d+)", block.group(1))}
+
+
 def check_ignored_described(report, variants):
     report.section("Opcodes ignorés mais décrits")
     ignored = parse_ignored_opcodes()
@@ -376,15 +384,20 @@ def check_ignored_described(report, variants):
 CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
+# Macros appelées par le rendu pour chaque opcode DESCRIBED (new-lib/item_render.tpp).
+NEW_OPCODE_ROLES = ("support", "lines")
+# Rang par défaut de l'ancien moteur pour un opcode absent de sort_opcodes (set_opcode_sort).
+OLD_DEFAULT_SORT = 400
 
 
 def check_catalog(report, definitions):
     report.section("Catalogue des opcodes (2da/opcodes.2da)")
     path = MOD / "2da" / "opcodes.2da"
     lines = read_text(path).replace("\r\n", "\n").split("\n")
-    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "NAME"]:
-        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE NAME »")
+    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "NAME"]:
+        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT NAME »")
         return
+    old_sort = parse_sort_opcodes() or {}
     rows = {}
     previous = -1
     for number, line in enumerate(lines[3:], start=4):
@@ -392,8 +405,8 @@ def check_catalog(report, definitions):
         if not fields:
             continue
         where = f"{relative(path)}:{number}"
-        if len(fields) != 6 or not fields[0].isdigit():
-            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE NAME)")
+        if len(fields) != 7 or not fields[0].isdigit():
+            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE SORT NAME)")
             continue
         opcode = int(fields[0])
         if opcode <= previous:
@@ -405,6 +418,12 @@ def check_catalog(report, definitions):
             report.add("ERREUR", f"{where} : statut {fields[3]} inconnu ({', '.join(CATALOG_STATUSES)})")
         if fields[4] not in CATALOG_DICE:
             report.add("ERREUR", f"{where} : DICE {fields[4]} inconnu ({', '.join(CATALOG_DICE)})")
+        # Même ordre d'affichage que l'ancien moteur, tant que la comparaison des moteurs sert de référence.
+        if not re.fullmatch(r"-?\d+", fields[5]):
+            report.add("ERREUR", f"{where} : SORT {fields[5]} n'est pas un entier")
+        elif int(fields[5]) != old_sort.get(opcode, OLD_DEFAULT_SORT):
+            report.add("ERREUR", f"{where} : SORT {fields[5]} au lieu de {old_sort.get(opcode, OLD_DEFAULT_SORT)} "
+                       "(sort_opcodes de l'ancien moteur)")
         rows[opcode] = fields[3]
 
     # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.
@@ -417,8 +436,10 @@ def check_catalog(report, definitions):
         if rows.get(opcode) != "DESCRIBED":
             report.add("ERREUR", f"opcode {opcode} : {', '.join(implemented[opcode])} défini mais statut "
                        f"{rows.get(opcode, 'absent du catalogue')} au lieu de DESCRIBED")
-        elif not implemented[opcode]:
-            report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_* dans new-lib/")
+        else:
+            for role in NEW_OPCODE_ROLES:
+                if f"ad_op_{opcode}_{role}" not in implemented[opcode]:
+                    report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_{role} dans new-lib/")
 
     # Point de départ repris de l'ancien moteur ; les écarts sont des décisions à documenter.
     ignored_old = set(parse_ignored_opcodes() or {})

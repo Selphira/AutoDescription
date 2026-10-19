@@ -3,18 +3,28 @@
 // - STATUS : DESCRIBED (décrit par une macro ad_op_<N>_*), IGNORED (rien à décrire, ex. effet
 //   visuel), TODO (pas encore pris en charge : la ressource n'est pas couverte) ;
 // - DICE : sens des champs « dés » de l'effet (IESDP) : LEVEL (niveau maximum / minimum de la
-//   cible), DICE (vrais dés), DICE_IF_P2_1_EE (dés si parameter2 = 1 sur EE, sinon niveaux).
+//   cible), DICE (vrais dés), DICE_IF_P2_1_EE (dés si parameter2 = 1 sur EE, sinon niveaux) ;
+// - SORT : rang d'affichage des lignes de l'opcode dans une section (le plus petit d'abord).
 // Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
 // décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
 OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
 COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_catalog 6
+	READ_2DA_ENTRIES_NOW ad_catalog 7
 	FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 3 ad_status
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 4 ad_dice
+		READ_2DA_ENTRY_FORMER ad_catalog ad_row 5 ad_sort
 		SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
 		SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
 		SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
+		SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
 	END
+
+// Rang d'affichage des effets dérivés (lignes produites par un regroupement d'effets, sans
+// opcode propre), comparable à la colonne SORT.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
+	~AC_NO_PROTECTION~  => 37
+	~AC_BY_ATTACK_TYPE~ => 35
+END

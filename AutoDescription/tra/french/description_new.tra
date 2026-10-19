@@ -15,6 +15,7 @@
 
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
+@1200001 = ~+%value%~ // reprise de @10003
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~PARAMÈTRES~ // reprise de @100003
@@ -40,3 +41,28 @@
 @8000040 = ~Dextérité~ // reprise de @10150001
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisme~ // reprise de @10060001
+
+// Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
+@20000000 = ~Classe d'armure~ // reprise de @10000099
+@20000001 = ~Classe d'armure de base~ // reprise de @10000100
+@20000002 = ~Bonus de %value%~ // reprise de @10000101
+@20000003 = ~Malus de %value%~ // reprise de @10000102
+
+// Opcode 0 : types d'attaque, 20 001 000 + masque de parameter2 (20 001 000-20 001 015)
+@20001001 = ~contre les armes contondantes~ // reprise de @10000001
+@20001002 = ~contre les projectiles~ // reprise de @10000002
+@20001003 = ~contre les armes contondantes et les projectiles~ // reprise de @10000003
+@20001004 = ~contre les armes perforantes~ // reprise de @10000004
+@20001005 = ~contre les armes contondantes et perforantes~ // reprise de @10000005
+@20001006 = ~contre les armes perforantes et les projectiles~ // reprise de @10000006
+@20001007 = ~contre les armes contondantes, perforantes et les projectiles~ // reprise de @10000007
+@20001008 = ~contre les armes tranchantes~ // reprise de @10000008
+@20001009 = ~contre les armes contondantes et tranchantes~ // reprise de @10000009
+@20001010 = ~contre les armes tranchantes et les projectiles~ // reprise de @10000010
+@20001011 = ~contre les armes contondantes, tranchantes et les projectiles~ // reprise de @10000011
+@20001012 = ~contre les armes tranchantes et perforantes~ // reprise de @10000012
+@20001013 = ~contre les armes contondantes, tranchantes et perforantes~ // reprise de @10000013
+@20001014 = ~contre les armes tranchantes, perforantes et les projectiles~ // reprise de @10000014
+
+// Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
+@30010100 = ~Ne protège pas %versus%~ // reprise de @15210001

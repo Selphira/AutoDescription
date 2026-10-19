@@ -1,10 +1,11 @@
-// Premier rendu des objets : partie roleplay d'origine, titre « PARAMÈTRES », lignes fixes des
-// capacités d'équipement (maudit, protection contre les coups critiques), « Nécessite », poids.
-// Seuls les objets que ce rendu décrit entièrement sont couverts (ad_item_render_support).
+// Rendu des objets : partie roleplay d'origine, titre « PARAMÈTRES », capacités d'équipement
+// (lignes fixes et lignes des opcodes décrits), « Nécessite », poids. Seuls les objets que ce
+// rendu décrit entièrement sont couverts (ad_item_render_support).
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
 // en-têtes de capacités (charge, combat), sections propres aux armes, armures et munitions,
-// utilisabilité (affichée seulement sur les jeux classiques).
+// utilisabilité (affichée seulement sur les jeux classiques), cas d'un opcode décrit que sa
+// macro ad_op_<N>_support refuse.
 DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	READ_SHORT ITM_type item_type
 	SPRINT render_missing ~~
@@ -18,11 +19,41 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	ELSE PATCH_IF NOT IS_EE BEGIN
 		SPRINT render_missing ~not_implemented:usability~
 	END
+	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			LPM ad_opcode_is_described
+			PATCH_IF opcode_described BEGIN
+				LPM ~ad_op_%render_opcode%_support~
+			END
+		END
+	END
+END
+
+// Un opcode inconnu (absent du catalogue ou du jeu courant) n'est jamais décrit.
+DEFINE_PATCH_MACRO ad_opcode_is_described BEGIN
+	SET opcode_described = 0
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%render_opcode%~) BEGIN
+		SPRINT opcode_status $AD_OPCODE_STATUS(~%render_opcode%~)
+		SET opcode_described = $AD_OPCODE_AVAILABLE(~%render_opcode%~) AND (~%opcode_status%~ STRING_EQUAL ~DESCRIBED~)
+	END
 END
 
 DEFINE_PATCH_MACRO ad_item_render BEGIN
 	LPF ad_strip_technical_part STR_VAR text = ~%original_description%~ RET description = text END
-	LPM ad_item_equipped_section
+	LPM ad_lines_reset
+	LPM ad_item_equipped_lines
+	// fx_opcode_count est trié (ad_set_coverage) : l'ordre des ajouts ne dépend pas du fichier.
+	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
+		LPM ad_opcode_is_described
+		PATCH_IF opcode_described BEGIN
+			LPM ~ad_op_%render_opcode%_lines~
+		END
+	END
+	LPF ad_lines_section_text STR_VAR section = ~equipped~ RET equipped_lines = text END
+	PATCH_IF NOT (~%equipped_lines%~ STRING_EQUAL ~~) BEGIN
+		SPRINT title @1300001 // ~Capacités d'équipement~
+		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%equipped_lines%~
+	END
 	LPM ad_item_requirements_section
 	// Ligne vide avant le poids, comme dans l'ancien moteur.
 	SPRINT description ~%description%%CRLF%~
@@ -53,22 +84,21 @@ BEGIN
 	END
 END
 
-// Le moteur EE protège des coups critiques les casques sans le drapeau 25 et les autres objets
-// qui l'ont.
-DEFINE_PATCH_MACRO ad_item_equipped_section BEGIN
+// Lignes fixes, avant celles des effets (rangs inférieurs à toute valeur SORT du catalogue). Le
+// moteur EE protège des coups critiques les casques sans le drapeau 25 et les autres objets qui
+// l'ont.
+DEFINE_PATCH_MACRO ad_item_equipped_lines BEGIN
 	READ_LONG ITM_flags item_flags
-	SPRINT equipped_lines ~~
+	SPRINT line_section ~equipped~
 	PATCH_IF (item_flags BAND BIT4) != 0 BEGIN
-		SPRINT line @6000000 // ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
-		SPRINT equipped_lines ~%equipped_lines%%CRLF%- %line%~
+		SET line_sort = 0 - 2
+		SPRINT line_text @6000000 // ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~
+		LPM ad_line_add
 	END
 	PATCH_IF IS_EE AND (((item_flags BAND BIT25) == 0 AND item_type == ITM_TYPE_helm) OR ((item_flags BAND BIT25) != 0 AND item_type != ITM_TYPE_helm)) BEGIN
-		SPRINT line @6000001 // ~Protection contre les coups critiques~
-		SPRINT equipped_lines ~%equipped_lines%%CRLF%- %line%~
-	END
-	PATCH_IF NOT (~%equipped_lines%~ STRING_EQUAL ~~) BEGIN
-		SPRINT title @1300001 // ~Capacités d'équipement~
-		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%equipped_lines%~
+		SET line_sort = 0 - 1
+		SPRINT line_text @6000001 // ~Protection contre les coups critiques~
+		LPM ad_line_add
 	END
 END
 
