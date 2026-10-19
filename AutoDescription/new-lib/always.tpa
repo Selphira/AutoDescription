@@ -14,6 +14,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/stat_modifiers.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/saving_throws.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/resistances.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/spell_slots.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/0.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/6.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/10.tpp~
@@ -32,10 +33,12 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/35.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/36.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/37.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/42.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/44.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/49.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/54.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/59.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/62.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/73.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/84.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/85.tpp~

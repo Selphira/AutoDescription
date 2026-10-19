@@ -43,7 +43,7 @@
 39       1        1        TODO      LEVEL            377    State:_Unconsciousness
 40       1        1        TODO      LEVEL            386    State:_Slow
 41       1        1        IGNORED   LEVEL            400    Graphics:_Sparkle
-42       1        1        TODO      LEVEL            17     Spell:_Wizard_Spell_Slots_Modifier
+42       1        1        DESCRIBED LEVEL            17     Spell:_Wizard_Spell_Slots_Modifier
 43       1        1        TODO      LEVEL            201    Cure:_Stone_to_Flesh
 44       1        1        DESCRIBED LEVEL            102    Stat:_Strength_Modifier
 45       1        1        TODO      LEVEL            370    State:_Stun
@@ -63,7 +63,7 @@
 59       1        1        DESCRIBED LEVEL            127    Stat:_Stealth_Modifier
 60       1        1        TODO      LEVEL            92     Stat:_Miscast_Magic
 61       1        1        IGNORED   LEVEL            400    Creature_RGB_color_fade
-62       1        1        TODO      LEVEL            19     Spell:_Priest_Spell_Slots_Modifier
+62       1        1        DESCRIBED LEVEL            19     Spell:_Priest_Spell_Slots_Modifier
 63       1        1        TODO      LEVEL            392    State:_Infravision
 64       1        1        TODO      LEVEL            221    State:_Remove_Infravision
 65       1        1        IGNORED   LEVEL            391    Overlay:_Blur

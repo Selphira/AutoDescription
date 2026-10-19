@@ -12,6 +12,7 @@
 @1000001 = ~ : ~ // reprise de @10001
 @1000002 = ~ ; ~ // reprise de @10004
 @1000003 = ~ %~ // reprise de @10022
+@1000004 = ~et~ // reprise de @100021
 
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
@@ -63,6 +64,25 @@
 @8000135 = ~Se cacher dans l'ombre~ // reprise de @12750001
 @8000136 = ~Détection des illusions~ // reprise de @12760001
 @8000137 = ~Pose de pièges~ // reprise de @12770001
+
+// Listes indexées : niveaux de sort (ordinaux), 8 010 000 + niveau (8 010 000-8 019 999)
+@8010001 = ~1er~ // reprise de @101201
+@8010002 = ~2ème~ // reprise de @101202
+@8010003 = ~3ème~ // reprise de @101203
+@8010004 = ~4ème~ // reprise de @101204
+@8010005 = ~5ème~ // reprise de @101205
+@8010006 = ~6ème~ // reprise de @101206
+@8010007 = ~7ème~ // reprise de @101207
+@8010008 = ~8ème~ // reprise de @101208
+@8010009 = ~9ème~ // reprise de @101209
+
+// Listes indexées : types de sort, 8 020 000 + index, + 10 au singulier (8 020 000-8 029 999)
+@8020001 = ~divins~ // reprise de @101301
+@8020004 = ~druidiques~ // reprise de @101304
+@8020005 = ~divins/druidiques~ // reprise de @101305
+@8020011 = ~divin~ // reprise de @101311
+@8020014 = ~druidique~ // reprise de @101314
+@8020015 = ~divin/druidique~ // reprise de @101315
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
@@ -124,6 +144,18 @@
 
 // Opcode 37 : libellés (20 370 000-20 370 099)
 @20370000 = ~contre les sorts~ // reprise de @10370001
+
+// Opcode 42 : phrases (20 420 100-20 420 999)
+@20420100 = ~Permet de mémoriser un sort profane supplémentaire de %levelStr% niveau~ // reprise de @10420001
+@20420110 = ~Permet de mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~ // reprise de @10420002
+@20420120 = ~Suppression d'un sort profane de %levelStr% niveau~ // reprise de @10420003
+@20420140 = ~Double la quantité de sorts profanes mémorisables de %levelStr% niveau~ // reprise de @10420005
+
+// Opcode 62 : phrases (20 620 100-20 620 999)
+@20620100 = ~Permet de mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~ // reprise de @10620001
+@20620110 = ~Permet de mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~ // reprise de @10620002
+@20620120 = ~Suppression d'un sort %spellType% de %levelStr% niveau~ // reprise de @10620003
+@20620140 = ~Double la quantité de sorts %spellType% mémorisables de %levelStr% niveau~ // reprise de @10620005
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001

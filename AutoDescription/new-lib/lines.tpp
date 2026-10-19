@@ -62,3 +62,30 @@ BEGIN
 		SPRINT text @1200001 // ~+%value%~
 	END
 END
+
+// Éléments du tableau array_name, dans l'ordre d'ajout : « a », « a et b », « a, b et c ».
+DEFINE_PATCH_FUNCTION ad_join
+	STR_VAR
+		array_name = ~~
+	RET
+		text
+BEGIN
+	SET join_count = 0
+	PHP_EACH ~%array_name%~ AS _ => _ BEGIN
+		SET join_count += 1
+	END
+	SPRINT text ~~
+	SET join_index = 0
+	PHP_EACH ~%array_name%~ AS _ => join_item BEGIN
+		SET join_index += 1
+		PATCH_IF join_index == 1 BEGIN
+			SPRINT text ~%join_item%~
+		END
+		ELSE PATCH_IF join_index < join_count BEGIN
+			SPRINT text ~%text%, %join_item%~
+		END
+		ELSE BEGIN
+			SPRINT text ~%text% %AD_AND% %join_item%~
+		END
+	END
+END

@@ -12,6 +12,7 @@
 @1000001 = ~: ~ // reprise de @10001
 @1000002 = ~; ~ // reprise de @10004
 @1000003 = ~%~ // reprise de @10022
+@1000004 = ~and~ // reprise de @100021
 
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
@@ -63,6 +64,25 @@
 @8000135 = ~Hide in Shadows~ // reprise de @12750001
 @8000136 = ~Detect Illusion~ // reprise de @12760001
 @8000137 = ~Set Traps~ // reprise de @12770001
+
+// Listes indexées : niveaux de sort (ordinaux), 8 010 000 + niveau (8 010 000-8 019 999)
+@8010001 = ~1st~ // reprise de @101201
+@8010002 = ~2nd~ // reprise de @101202
+@8010003 = ~3rd~ // reprise de @101203
+@8010004 = ~4th~ // reprise de @101204
+@8010005 = ~5th~ // reprise de @101205
+@8010006 = ~6th~ // reprise de @101206
+@8010007 = ~7th~ // reprise de @101207
+@8010008 = ~8th~ // reprise de @101208
+@8010009 = ~9th~ // reprise de @101209
+
+// Listes indexées : types de sort, 8 020 000 + index, + 10 au singulier (8 020 000-8 029 999)
+@8020001 = ~priest~ // reprise de @101301
+@8020004 = ~druid~ // reprise de @101304
+@8020005 = ~priest/druid~ // reprise de @101305
+@8020011 = ~priest~ // reprise de @101311
+@8020014 = ~druid~ // reprise de @101314
+@8020015 = ~priest/druid~ // reprise de @101315
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
@@ -124,6 +144,18 @@
 
 // Opcode 37 : libellés (20 370 000-20 370 099)
 @20370000 = ~vs. Spells~ // reprise de @10370001
+
+// Opcode 42 : phrases (20 420 100-20 420 999)
+@20420100 = ~Can memorise an extra %levelStr% level wizard spell~ // reprise de @10420001
+@20420110 = ~Can memorise %amount% extra %levelStr% level wizard spell~ // reprise de @10420002
+@20420120 = ~Remove a of %levelStr% level wizard spell~ // reprise de @10420003
+@20420140 = ~Double the amount of %levelStr% level wizard spells that can be memorized~ // reprise de @10420005
+
+// Opcode 62 : phrases (20 620 100-20 620 999)
+@20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
+@20620110 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~ // reprise de @10620002
+@20620120 = ~Remove a %spellType% spell of %levelStr% level~ // reprise de @10620003
+@20620140 = ~Double the amount of %spellType% spells of %levelStr% level that can be memorized~ // reprise de @10620005
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Damage~ // reprise de @10730001

@@ -131,3 +131,16 @@ DEFINE_PATCH_MACRO ad_item_requirements_section BEGIN
 		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%requirement_lines%~
 	END
 END
+
+// L'objet est utilisable par au moins une classe du groupe class_mask (bits d'exclusion des classes
+// dans les drapeaux d'utilisabilité, ex. AD_USABILITY_CLERICS) ; les exclusions de kits ne sont pas
+// lues, comme dans l'ancien moteur.
+DEFINE_PATCH_FUNCTION ad_item_usable_by
+	INT_VAR
+		class_mask = 0
+	RET
+		usable
+BEGIN
+	READ_LONG ITM_usability_flags usability_flags
+	SET usable = (usability_flags BAND class_mask) != class_mask
+END

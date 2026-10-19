@@ -84,3 +84,10 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_PERCENT BEGIN
 	276 => 1 // Détection des illusions
 	277 => 1 // Pose de pièges
 END
+
+// Groupes de classes, en bits d'exclusion des drapeaux d'utilisabilité d'un objet (IESDP) : un
+// objet est utilisable par le groupe si l'un de ces bits est à 0.
+// Clerc, clerc/mage, clerc/voleur, clerc/rôdeur, guerrier/clerc, guerrier/mage/clerc.
+OUTER_SET AD_USABILITY_CLERICS = BIT7 BOR BIT8 BOR BIT9 BOR BIT10 BOR BIT14 BOR BIT15
+// Guerrier/druide, druide.
+OUTER_SET AD_USABILITY_DRUIDS = BIT12 BOR BIT30
