@@ -99,7 +99,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	// comme dans l'ancien moteur.
 	CLEAR_ARRAY ac_masks
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
 				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_key = 0 - $fx_parameter1(~%ac_id%~)
 			SET $ac_masks(~%ac_key%~) = 0
@@ -107,7 +107,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
@@ -163,7 +163,7 @@ END
 DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	CLEAR_ARRAY ac_type_groups
 	FOR (ac_id = 0; ac_id < fx_count AND AD_ENABLE_SHRINKAGE; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
 				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET $ac_type_groups(~%ac_value%~) = 0
@@ -171,7 +171,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN

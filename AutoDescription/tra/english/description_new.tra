@@ -16,6 +16,8 @@
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
 @1200001 = ~+%value%~ // reprise de @10003
+@1200002 = ~Set to %value%~ // reprise de @10010
+@1200003 = ~%value%%~ // reprise de @10002
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
@@ -66,3 +68,6 @@
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~No protection %versus%~ // reprise de @15210001
+
+// Effet dérivé 003, ABILITIES : libellés (30 030 000-30 030 099)
+@30030000 = ~Abilities~ // reprise de @15010001

@@ -27,4 +27,16 @@ COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~AC_NO_PROTECTION~  => 37
 	~AC_BY_ATTACK_TYPE~ => 35
+	~ABILITIES~         => 100
+END
+
+// Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
+// de la statistique, dans la liste indexée des statistiques (8 000 000 + valeur de stats.ids).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
+	6  => 8000042 // ~Charisme~
+	10 => 8000041 // ~Constitution~
+	15 => 8000040 // ~Dextérité~
+	19 => 8000038 // ~Intelligence~
+	44 => 8000036 // ~Force~
+	49 => 8000039 // ~Sagesse~
 END
