@@ -3,7 +3,9 @@
 // par valeur %). Un opcode de la famille a une entrée dans AD_STAT_MODIFIER_NAMES
 // (new-lib/catalog.tpa) et son fichier new-lib/opcodes/<N>.tpp, dont les deux macros ad_op_<N>_*
 // fixent stat_opcode et stat_mode_3 puis appellent les macros ci-dessous ; un opcode sans mode
-// pourcentage fixe aussi stat_percentage à invalid, remis à valid après la prise en charge.
+// pourcentage fixe aussi stat_percentage à invalid, remis à valid après la prise en charge ; un
+// opcode dont le jeu ignore parameter2 fixe stat_forced_mode au mode qu'il applique réellement, écrit
+// dans l'effet avant toute validation pour que les passes suivantes lisent le vrai mode.
 //
 // Mode 3 (EE seulement ; sur un jeu classique, il est invalide pour tous les opcodes), selon
 // stat_mode_3 : added (traité comme un ajout, ex. jets de sauvegarde), unsupported (pas encore
@@ -17,6 +19,9 @@
 DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode BEGIN
+			PATCH_IF IS_AN_INT ~%stat_forced_mode%~ BEGIN
+				SET $fx_parameter2(~%stat_id%~) = stat_forced_mode
+			END
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SET $stat_seen(~%stat_value%~ ~%stat_mode%~) = 0
@@ -53,6 +58,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 		END
 	END
 	SPRINT stat_percentage ~valid~
+	SPRINT stat_forced_mode ~~
 END
 
 // ---------------------------------------------------------------------------------------------

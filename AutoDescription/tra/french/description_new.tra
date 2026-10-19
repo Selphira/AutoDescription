@@ -149,6 +149,10 @@
 @21660000 = ~Résistance à la magie~ // reprise de @11660001
 @21660001 = ~à la magie~ // reprise de @11660002
 
+// Opcode 173 : libellés (21 730 000-21 730 099)
+@21730000 = ~Résistance aux poisons~ // reprise de @11730001
+@21730001 = ~aux poisons~ // reprise de @11730002
+
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001
 
