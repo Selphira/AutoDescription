@@ -140,6 +140,10 @@
 @20890000 = ~Résistance aux dégâts de projectiles~ // reprise de @10890001
 @20890001 = ~aux dégâts de projectiles~ // reprise de @10890002
 
+// Opcode 166 : libellés (21 660 000-21 660 099)
+@21660000 = ~Résistance à la magie~ // reprise de @11660001
+@21660001 = ~à la magie~ // reprise de @11660002
+
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001
 

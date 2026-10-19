@@ -167,7 +167,7 @@
 163      1        1        TODO      LEVEL            284    Protection:_Free_Action
 164      1        1        TODO      LEVEL            219    Cure:_Drunkeness
 165      1        1        TODO      LEVEL            373    Spell_Effect:_Pause_Target
-166      1        1        TODO      LEVEL            303    Stat:_Magic_Resistance_Modifier
+166      1        1        DESCRIBED LEVEL            303    Stat:_Magic_Resistance_Modifier
 167      1        1        TODO      LEVEL            66     Stat:_THAC0_Modifier_with_Missile_Weapons
 168      1        1        IGNORED   LEVEL            400    Summon:_Remove_Creature
 169      1        1        IGNORED   LEVEL            400    Graphics:_Prevent_Special_Effect_Icon
