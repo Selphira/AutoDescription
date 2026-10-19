@@ -98,7 +98,7 @@
 94       1        1        DESCRIBED LEVEL            429    Stat:_Drunkenness_Modifier
 95       1        1        DESCRIBED LEVEL            430    Stat:_Tracking_Skill_Modifier
 96       1        1        DESCRIBED LEVEL            13     Stat:_Level_Change
-97       1        1        TODO      LEVEL            103    Stat:_Exceptional_Strength_Modifier
+97       1        1        DESCRIBED LEVEL            103    Stat:_Exceptional_Strength_Modifier
 98       1        1        TODO      LEVEL            83     HP:_Regeneration
 99       1        1        TODO      LEVEL            91     Spell_Effect:_Duration_Modifier
 100      1        1        TODO      LEVEL            280    Protection:_from_Creature_Type

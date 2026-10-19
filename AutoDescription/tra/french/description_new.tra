@@ -49,6 +49,7 @@
 @8000033 = ~Pistage~ // reprise de @10950001
 @8000034 = ~Niveau~ // reprise de @10960001
 @8000036 = ~Force~ // reprise de @10440001
+@8000037 = ~Force exceptionnelle~ // reprise de @10970001
 @8000038 = ~Intelligence~ // reprise de @10190001
 @8000039 = ~Sagesse~ // reprise de @10490001
 @8000040 = ~Dextérité~ // reprise de @10150001

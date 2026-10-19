@@ -32,6 +32,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~ALL_RESISTANCES~       => 300
 	~ELEMENTAL_RESISTANCES~ => 301
 	~PHYSICAL_RESISTANCES~  => 302
+	~EXCEPTIONAL_STRENGTH~  => 400
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
@@ -51,6 +52,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	94  => 8000031 // ~Ébriété~
 	95  => 8000033 // ~Pistage~
 	96  => 8000034 // ~Niveau~
+	97  => 8000037 // ~Force exceptionnelle~
 	104 => 8000044 // ~Expérience~
 	278 => 8000007 // ~TAC0~
 	281 => 22810000 // ~Modificateur des hiatus entropiques~

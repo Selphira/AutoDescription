@@ -14,6 +14,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_SAVES_THROWS BEGIN
 		LPM ad_group_saving_throws
 	END
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_exceptional_strength
+	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
@@ -81,6 +84,45 @@ DEFINE_PATCH_MACRO ad_group_physical_resistances BEGIN
 	LPM ad_group_same_fields
 END
 
+// Force exceptionnelle fixée et Force fixée (ancien opcode_97_group, opcode virtuel 522) :
+// « Force : Passe à 18/50 » (effet dérivé EXCEPTIONAL_STRENGTH). Chaque effet 97 de valeur fixée,
+// dans l'ordre du fichier, est réuni au premier effet 44 de valeur fixée non consommé qui a les
+// mêmes champs sauf parameter1.
+DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 97 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT $fx_consumed(~%group_id%~) BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 RET group_signature = signature END
+			SET group_other = 0 - 1
+			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 44 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 RET group_other_signature = signature END
+					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+						SET group_other = group_candidate
+					END
+				END
+			END
+			PATCH_IF group_other >= 0 BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
+				SET $fx_consumed(~%group_other%~) = 1
+				SET strength = $fx_parameter1(~%group_other%~)
+				SET strength_bonus = $fx_parameter1(~%group_id%~)
+				SPRINT bonus ~%strength_bonus%~
+				// Seul 100 est écrit sur deux chiffres (« 18/00 ») : l'ancien moteur écrit « 18/5 ».
+				PATCH_IF strength_bonus == 100 BEGIN
+					SPRINT bonus ~00~
+				END
+				SPRINT value ~%strength%/%bonus%~
+				SPRINT value @1200002 // ~Passe à %value%~
+				SPRINT name @8000036 // ~Force~
+				SPRINT line_section ~equipped~
+				SET line_sort = $AD_DERIVED_SORT(~EXCEPTIONAL_STRENGTH~)
+				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+				LPM ad_line_add
+			END
+		END
+	END
+END
+
 // Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
 // group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
 // opcodes group_members qui a les mêmes champs (ad_fx_signature) ; s'ils sont tous trouvés, ils
@@ -134,14 +176,16 @@ END
 
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur ; la cible
 // n'en fait pas partie, l'ancien moteur la remplaçant par « soi » pour un effet d'équipement.
+// with_parameter1 = 0 : parameter1 non comparé.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
+		with_parameter1 = 1
 	RET
 		signature
 BEGIN
 	SET sig_power        = $fx_power(~%fx_id%~)
-	SET sig_parameter1   = $fx_parameter1(~%fx_id%~)
+	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
 	SET sig_parameter2   = $fx_parameter2(~%fx_id%~)
 	SET sig_timing       = $fx_timing(~%fx_id%~)
 	SET sig_resistance   = $fx_resistance(~%fx_id%~)

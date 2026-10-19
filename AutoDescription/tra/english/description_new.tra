@@ -49,6 +49,7 @@
 @8000033 = ~Tracking~ // reprise de @10950001
 @8000034 = ~Level~ // reprise de @10960001
 @8000036 = ~Strength~ // reprise de @10440001
+@8000037 = ~Exceptional Strength~ // reprise de @10970001
 @8000038 = ~Intelligence~ // reprise de @10190001
 @8000039 = ~Wisdom~ // reprise de @10490001
 @8000040 = ~Dexterity~ // reprise de @10150001
