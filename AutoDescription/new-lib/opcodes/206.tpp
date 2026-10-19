@@ -3,22 +3,17 @@
 // vide. Une immunité à l'opcode que le sort inflige peut l'absorber (ad_group_immunities,
 // new-lib/groups.tpp).
 //
-// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé.
+// Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
+// new-lib/application.tpp).
 
 DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 	SET spell_psionic_count = 0
 	FOR (spell_id = 0; spell_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++spell_id) BEGIN
 		PATCH_IF $fx_opcode(~%spell_id%~) == 206 BEGIN
-			SPRINT spell_block $fx_block(~%spell_id%~)
-			SPRINT spell_timing_kind $fx_timing_kind(~%spell_id%~)
 			SPRINT spell_resref $fx_resource(~%spell_id%~)
 			TO_UPPER spell_resref
-			PATCH_IF NOT (~%spell_block%~ STRING_EQUAL ~equipped~) OR NOT (~%spell_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR $fx_probability(~%spell_id%~) != 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode206:effect_kind~
-			END
 			// L'ancien moteur écarte un effet sans ressource (erreur journalisée).
-			ELSE PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
 				SPRINT render_missing ~not_implemented:opcode206:invalid~
 			END
 			ELSE PATCH_IF VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~505 %spell_resref%~) BEGIN
@@ -82,8 +77,9 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SET spell_group_id = $spell_group(~%spell_id%~)
 			SPRINT spellName $spell_name(~%spell_id%~)
 			PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND (spell_group_id < 0 OR $spell_group_size(~%spell_group_id%~) < 2) BEGIN
-				SPRINT line_text @22060100 // ~Immunité au sort « %spellName% »~
-				LPM ad_line_add
+				SET line_phrase = 22060100 // ~Immunité au sort « %spellName% »~
+				SET line_fx = spell_id
+				LPM ad_effect_line
 			END
 		END
 	END
@@ -91,10 +87,14 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 	FOR (spell_group_id = 0; spell_group_id < spell_group_count; ++spell_group_id) BEGIN
 		PATCH_IF $spell_group_size(~%spell_group_id%~) >= 2 BEGIN
 			CLEAR_ARRAY spell_group_names
+			SET spell_first = 0 - 1
 			FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
 				PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) == spell_group_id BEGIN
 					SPRINT spell_name $spell_name(~%spell_id%~)
 					SPRINT $spell_group_names(~%spell_name%~) ~%spell_name%~
+					PATCH_IF spell_first < 0 BEGIN
+						SET spell_first = spell_id
+					END
 				END
 			END
 			SORT_ARRAY_INDICES spell_group_names
@@ -102,8 +102,9 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SPRINT spell_glue @1000005 // ~ », « ~
 			SPRINT spell_final_glue @1000006 // ~ » %and% « ~
 			LPF ad_join STR_VAR array_name = ~spell_group_names~ glue = ~%spell_glue%~ final_glue = ~%spell_final_glue%~ RET spellNames = text END
-			SPRINT line_text @30100100 // ~Immunité aux sorts « %spellNames% »~
-			LPM ad_line_add
+			SET line_phrase = 30100100 // ~Immunité aux sorts « %spellNames% »~
+			SET line_fx = spell_first
+			LPM ad_effect_line
 		END
 	END
 END

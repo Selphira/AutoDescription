@@ -5,7 +5,8 @@
 // slots_priest (1 : type de sort selon les clercs et druides qui peuvent utiliser l'objet).
 // Phrases du bloc de l'opcode : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0140 doublement.
 //
-// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé.
+// Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
+// new-lib/application.tpp).
 
 // ---------------------------------------------------------------------------------------------
 // Prise en charge (l'ancien moteur n'a pas de macro opcode_42_is_valid ni opcode_62_is_valid)
@@ -21,20 +22,14 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 	END
 	FOR (slots_id = 0; slots_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++slots_id) BEGIN
 		PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode BEGIN
-			SPRINT slots_block $fx_block(~%slots_id%~)
-			SPRINT slots_timing_kind $fx_timing_kind(~%slots_id%~)
 			SET slots_amount = $fx_parameter1(~%slots_id%~)
 			SET slots_levels = $fx_parameter2(~%slots_id%~)
 			// Les doublements et les ajouts d'un même nombre sont réunis séparément.
 			SET slots_doubling = slots_levels == 0
 			SET slots_levels_used = slots_doubling ? slots_all_levels : slots_levels
-			PATCH_IF NOT (~%slots_block%~ STRING_EQUAL ~equipped~) OR NOT (~%slots_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR $fx_probability(~%slots_id%~) != 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%slots_opcode%:effect_kind~
-			END
 			// Valeurs que l'ancien moteur décrit mal ou pas (aucun texte, niveaux non écrits, BIT9 =
 			// doublement d'un seul niveau, écrit « de 3 niveau »).
-			ELSE PATCH_IF slots_amount == 0 OR slots_amount > 32767 OR slots_amount < 0 - 32768
+			PATCH_IF slots_amount == 0 OR slots_amount > 32767 OR slots_amount < 0 - 32768
 					OR (slots_levels == 0 AND slots_amount < 0)
 					OR (slots_levels BAND (BNOT slots_all_levels)) != 0 BEGIN
 				SPRINT render_missing ~not_implemented:opcode%slots_opcode%:invalid~
@@ -131,6 +126,7 @@ DEFINE_PATCH_MACRO ad_spell_slots_line BEGIN
 		LPF ad_tra INT_VAR tra_id = 8020000 + slots_priest_type + (slots_singular ? 10 : 0) RET spellType = text END
 	END
 	SET slots_phrase = slots_levels == 0 ? 140 : (amount == 1 ? 100 : (amount > 1 ? 110 : 120))
-	LPF ad_tra INT_VAR tra_id = 20000000 + slots_opcode * 10000 + slots_phrase RET line_text = text END
-	LPM ad_line_add
+	SET line_phrase = 20000000 + slots_opcode * 10000 + slots_phrase
+	SET line_fx = slots_id
+	LPM ad_effect_line
 END

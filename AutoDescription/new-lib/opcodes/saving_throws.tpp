@@ -23,7 +23,8 @@ DEFINE_PATCH_MACRO ad_saving_throw_lines BEGIN
 				SPRINT value ~%value% %versus%~
 			END
 			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-			LPM ad_line_add
+			SET line_fx = stat_id
+			LPM ad_effect_line
 		END
 	END
 END

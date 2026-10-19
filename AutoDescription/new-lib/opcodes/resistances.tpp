@@ -13,7 +13,8 @@ DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			LPF ad_resistance_text INT_VAR value = stat_value mode = stat_mode name_tra = 20000000 + stat_opcode * 10000 RET line_text = text END
-			LPM ad_line_add
+			SET line_fx = stat_id
+			LPM ad_effect_line
 		END
 	END
 END

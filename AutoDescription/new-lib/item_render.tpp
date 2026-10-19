@@ -19,6 +19,9 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	ELSE PATCH_IF NOT IS_EE BEGIN
 		SPRINT render_missing ~not_implemented:usability~
 	END
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_application_support
+	END
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_opcode_is_described

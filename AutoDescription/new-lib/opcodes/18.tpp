@@ -18,15 +18,9 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 	END
 	FOR (hp_id = 0; hp_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hp_id) BEGIN
 		PATCH_IF $fx_opcode(~%hp_id%~) == 18 BEGIN
-			SPRINT hp_block $fx_block(~%hp_id%~)
-			SPRINT hp_timing_kind $fx_timing_kind(~%hp_id%~)
 			LPM ad_op_18_value
-			PATCH_IF NOT (~%hp_block%~ STRING_EQUAL ~equipped~) OR NOT (~%hp_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR $fx_probability(~%hp_id%~) != 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode18:effect_kind~
-			END
 			// L'ancien moteur écarte un mode inconnu (erreur journalisée).
-			ELSE PATCH_IF hp_type < 0 OR hp_type > 6 OR (hp_type == 6 AND NOT IS_EE) BEGIN
+			PATCH_IF hp_type < 0 OR hp_type > 6 OR (hp_type == 6 AND NOT IS_EE) BEGIN
 				SPRINT render_missing ~not_implemented:opcode18:invalid~
 			END
 			// L'ancien moteur ignore les dés d'un effet d'équipement mais les compte ailleurs, et
@@ -67,7 +61,8 @@ DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 			END
 			LPF ad_stat_modifier_value INT_VAR value = hp_value mode = hp_mode RET value = text END
 			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-			LPM ad_line_add
+			SET line_fx = hp_id
+			LPM ad_effect_line
 		END
 	END
 END

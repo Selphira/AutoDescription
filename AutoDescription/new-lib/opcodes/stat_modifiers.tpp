@@ -13,7 +13,8 @@
 // stat_mode_3 : added (traité comme un ajout, ex. jets de sauvegarde), unsupported (pas encore
 // décrit), invalid.
 //
-// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé.
+// Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
+// new-lib/application.tpp).
 
 // ---------------------------------------------------------------------------------------------
 // Prise en charge (ancien opcode_modstat2_is_valid / opcode_modstat3_is_valid)
@@ -31,15 +32,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 	END
 	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode BEGIN
-			SPRINT stat_block $fx_block(~%stat_id%~)
-			SPRINT stat_timing_kind $fx_timing_kind(~%stat_id%~)
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			PATCH_IF NOT (~%stat_block%~ STRING_EQUAL ~equipped~) OR NOT (~%stat_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR $fx_probability(~%stat_id%~) != 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:effect_kind~
-			END
-			ELSE PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
+			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END
 			// L'ancien moteur écarte un mode inconnu ou un effet sans changement (erreur journalisée) ;
@@ -78,7 +73,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
 			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-			LPM ad_line_add
+			SET line_fx = stat_id
+			LPM ad_effect_line
 		END
 	END
 END

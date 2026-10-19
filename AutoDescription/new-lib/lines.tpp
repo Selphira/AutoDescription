@@ -7,6 +7,7 @@
 
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
+	SET line_phrase = 0
 END
 
 // Ajoute la ligne line_text à la section line_section, au rang line_sort. Une ligne de même texte

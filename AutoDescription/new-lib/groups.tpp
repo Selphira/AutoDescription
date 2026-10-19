@@ -135,7 +135,8 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				SPRINT line_section ~equipped~
 				SET line_sort = $AD_DERIVED_SORT(~EXCEPTIONAL_STRENGTH~)
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-				LPM ad_line_add
+				SET line_fx = group_id
+				LPM ad_effect_line
 			END
 		END
 	END
@@ -238,7 +239,8 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 				SET group_value = $fx_parameter1(~%group_id%~)
 				SET group_mode = $fx_parameter2(~%group_id%~)
 				LPM ~%group_line%~
-				LPM ad_line_add
+				SET line_fx = group_id
+				LPM ad_effect_line
 			END
 		END
 	END

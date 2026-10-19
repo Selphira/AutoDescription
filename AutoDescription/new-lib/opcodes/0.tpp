@@ -2,7 +2,8 @@
 // (0 toutes ; masque 1 contondantes, 2 projectiles, 4 perforantes, 8 tranchantes), ou 16 = CA de
 // base fixée à parameter1. Le moteur du jeu cumule les modificateurs.
 //
-// Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé. Sur une armure,
+// Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
+// new-lib/application.tpp). Sur une armure,
 // avec AD_ENABLE_SHRINKAGE et AD_SHRINK_CLASS_ARMOR, la CA de base et ses écarts par type d'attaque
 // forment la ligne de la section de l'armure (« Classe d'armure : 5 (3 contre les armes
 // tranchantes) »), et les modificateurs contre toutes les attaques restent des lignes séparées.
@@ -26,15 +27,9 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	END
 	FOR (ac_id = 0; ac_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++ac_id) BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
-			SPRINT ac_block $fx_block(~%ac_id%~)
-			SPRINT ac_timing_kind $fx_timing_kind(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_type = $fx_parameter2(~%ac_id%~)
-			PATCH_IF NOT (~%ac_block%~ STRING_EQUAL ~equipped~) OR NOT (~%ac_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR $fx_probability(~%ac_id%~) != 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode0:effect_kind~
-			END
-			ELSE PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
+			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				SET ac_base_count += 1
 			END
 			// L'ancien moteur écarte un modificateur nul ou un type inconnu (erreur journalisée).
@@ -121,10 +116,14 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
+	SET ac_line_fx = 0 - 1
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
+			PATCH_IF ac_line_fx < 0 BEGIN
+				SET ac_line_fx = ac_id
+			END
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base AND ac_armor BEGIN
 				SET ac_base = ac_value
 				SET ac_has_base = 1
@@ -134,6 +133,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			END
 			ELSE PATCH_IF ac_type == AC_MOD_TYPE_all AND ac_armor BEGIN
 				SET ac_mask = AC_MOD_TYPE_all
+				SET ac_line_fx = ac_id
 				LPM ad_op_0_modifier_line
 			END
 			ELSE PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
@@ -173,13 +173,15 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		SPRINT name @20000000 // ~Classe d'armure~
 		SPRINT value ~%ac_values%~
 		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-		LPM ad_line_add
+		SET line_fx = ac_line_fx
+		LPM ad_effect_line
 	END
 	PATCH_IF NOT (~%ac_unprotected%~ STRING_EQUAL ~~) BEGIN
 		SPRINT versus ~%ac_unprotected%~
 		SET line_sort = $AD_DERIVED_SORT(~AC_NO_PROTECTION~)
-		SPRINT line_text @30010100 // ~Ne protège pas %versus%~
-		LPM ad_line_add
+		SET line_phrase = 30010100 // ~Ne protège pas %versus%~
+		SET line_fx = ac_line_fx
+		LPM ad_effect_line
 	END
 END
 
@@ -193,6 +195,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET $ac_type_groups(~%ac_value%~) = 0
+			SET $ac_type_group_fx(~%ac_value%~) = 0 - 1
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
@@ -200,6 +203,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
+			SET ac_line_fx = ac_id
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				LPM ad_op_0_base_line
 			END
@@ -209,11 +213,15 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 			END
 			ELSE BEGIN
 				SET $ac_type_groups(~%ac_value%~) = $ac_type_groups(~%ac_value%~) BOR ac_type
+				PATCH_IF $ac_type_group_fx(~%ac_value%~) < 0 BEGIN
+					SET $ac_type_group_fx(~%ac_value%~) = ac_id
+				END
 			END
 		END
 	END
 	SET line_sort = $AD_DERIVED_SORT(~AC_BY_ATTACK_TYPE~)
 	PHP_EACH ac_type_groups AS ac_value => ac_mask BEGIN
+		SET ac_line_fx = $ac_type_group_fx(~%ac_value%~)
 		LPM ad_op_0_modifier_line
 	END
 END
@@ -240,7 +248,8 @@ DEFINE_PATCH_MACRO ad_op_0_armor_line BEGIN
 	SPRINT name @20000000 // ~Classe d'armure~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 	SPRINT line_section ~armor~
-	LPM ad_line_add
+	SET line_fx = ac_line_fx
+	LPM ad_effect_line
 	SPRINT line_section ~equipped~
 END
 
@@ -248,7 +257,8 @@ DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 	SPRINT name @20000001 // ~Classe d'armure de base~
 	SPRINT value ~%ac_value%~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-	LPM ad_line_add
+	SET line_fx = ac_id
+	LPM ad_effect_line
 END
 
 // Modificateur ac_value contre les attaques du masque ac_mask (0 : toutes) : « +2 », ou « Bonus
@@ -271,5 +281,6 @@ DEFINE_PATCH_MACRO ad_op_0_modifier_line BEGIN
 	END
 	SPRINT name @20000000 // ~Classe d'armure~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-	LPM ad_line_add
+	SET line_fx = ac_line_fx
+	LPM ad_effect_line
 END
