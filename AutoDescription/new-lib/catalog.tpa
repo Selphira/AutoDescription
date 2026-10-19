@@ -34,6 +34,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~PHYSICAL_RESISTANCES~  => 302
 	~EXCEPTIONAL_STRENGTH~  => 400
 	~THIEF_SKILLS~          => 120
+	~SPELL_IMMUNITIES~      => 256
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
@@ -91,3 +92,62 @@ END
 OUTER_SET AD_USABILITY_CLERICS = BIT7 BOR BIT8 BOR BIT9 BOR BIT10 BOR BIT14 BOR BIT15
 // Guerrier/druide, druide.
 OUTER_SET AD_USABILITY_DRUIDS = BIT12 BOR BIT30
+
+// Effets qu'une immunité à un opcode (101) rend sans objet (2da/immunity_absorbs.2da, ancien
+// opcode_101_group) : IMMUNITY (opcode P de l'immunité), OPCODE absorbé, bornes de parameter1
+// (P1_MIN, P1_MAX), parameter2 (P2) ; * : sans condition. CURE : 1 si la ligne dépend de
+// AD_SHRINK_CURE_WITH_IMMUNITIES ; RELABEL : libellé de l'immunité si elle absorbe l'effet.
+COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
+	READ_2DA_ENTRIES_NOW ad_absorbs 7
+	SET AD_IMMUNITY_ABSORB_COUNT = ad_absorbs
+	FOR (ad_row = 0; ad_row < ad_absorbs; ++ad_row) BEGIN
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 0 ad_immunity
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 1 ad_opcode
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 2 ad_p1_min
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 3 ad_p1_max
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 4 ad_p2
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 5 ad_cure
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 6 ad_relabel
+		SET $AD_IMMUNITY_ABSORB_IMMUNITY(~%ad_row%~) = ad_immunity
+		SET $AD_IMMUNITY_ABSORB_OPCODE(~%ad_row%~) = ad_opcode
+		SET $AD_IMMUNITY_ABSORB_P1_MIN(~%ad_row%~) = IS_AN_INT ad_p1_min ? ad_p1_min : 0 - 2147483647
+		SET $AD_IMMUNITY_ABSORB_P1_MAX(~%ad_row%~) = IS_AN_INT ad_p1_max ? ad_p1_max : 2147483647
+		SET $AD_IMMUNITY_ABSORB_ANY_P2(~%ad_row%~) = NOT IS_AN_INT ad_p2
+		SET $AD_IMMUNITY_ABSORB_P2(~%ad_row%~) = IS_AN_INT ad_p2 ? ad_p2 : 0
+		SET $AD_IMMUNITY_ABSORB_CURE(~%ad_row%~) = ad_cure
+		SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
+	END
+
+// Sorts qui infligent l'effet d'un opcode (2da/immunity_spells.2da, anciennes listes
+// <état>SpellList ; 505 : capacités psioniques) : $AD_IMMUNITY_SPELLS(~opcode RESREF~), ressource
+// en majuscules.
+COPY - ~%MOD_FOLDER%/2da/immunity_spells.2da~ ~override~
+	READ_2DA_ENTRIES_NOW ad_spells 2
+	FOR (ad_row = 0; ad_row < ad_spells; ++ad_row) BEGIN
+		READ_2DA_ENTRY_FORMER ad_spells ad_row 0 ad_resref
+		READ_2DA_ENTRY_FORMER ad_spells ad_row 1 ad_immunity
+		TO_UPPER ad_resref
+		SET $AD_IMMUNITY_SPELLS(~%ad_immunity% %ad_resref%~) = 1
+	END
+
+// Noms de sorts imposés (ancien tableau spellnames), ressource en minuscules => chaîne ; @7100000
+// (vide) : sort à ne pas citer, redondant avec les effets qui l'accompagnent ou sans effet concret.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SPELL_NAMES BEGIN
+	~tb#petri~ => 7100001 // ~Pétrification~
+	~tb#depet~ => 7100002 // ~Transmutation de la pierre en chair~
+	~tb#impri~ => 7100003 // ~Emprisonnement~
+	~x#kispr~  => 7100004 // ~Enchevêtrement~
+	~dventgl~  => 7100004 // ~Enchevêtrement~
+	~blakblad~ => 7100005 // ~Lame noire du désastre~
+	~fl#glor2~ => 7100000 // ~~
+	~fl#glord~ => 7100000 // ~~
+	~fl#gmum~  => 7100000 // ~~
+	~fl#gmumn~ => 7100000 // ~~
+	~fl#mum~   => 7100000 // ~~
+	~fl#mumfh~ => 7100000 // ~~
+	~fl#mumfn~ => 7100000 // ~~
+	~fl#zomsd~ => 7100000 // ~~
+	~spwi604d~ => 7100000 // ~~
+	~lcarmor~  => 7100000 // ~~
+	~lcrobe~   => 7100000 // ~~
+END

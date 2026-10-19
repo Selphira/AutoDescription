@@ -20,6 +20,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_THIEF_SKILLS BEGIN
 		LPM ad_group_thief_skills
 	END
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_immunities
+	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
@@ -136,6 +139,70 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 			END
 		END
 	END
+END
+
+// Immunités (ancien opcode_101_group) : chaque immunité à l'opcode P (101), dans l'ordre du fichier,
+// absorbe les effets qu'elle rend sans objet, s'ils ont la même cible, les mêmes probabilités et le
+// même jet de sauvegarde :
+// - ceux des lignes de 2da/immunity_absorbs.2da pour P (soins de l'état, autres immunités ; une
+//   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES) ; une ligne RELABEL donne à
+//   l'immunité ce libellé et la place après les autres, comme l'effet que l'ancien moteur ajoute ;
+// - les protections contre un sort (206, 321) qui inflige P selon 2da/immunity_spells.2da, si elles
+//   ont aussi les mêmes dés et la même puissance (321 : la même résistance).
+DEFINE_PATCH_MACRO ad_group_immunities BEGIN
+	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
+		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
+			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
+				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
+						AND (NOT $AD_IMMUNITY_ABSORB_CURE(~%absorb_row%~) OR AD_SHRINK_CURE_WITH_IMMUNITIES) BEGIN
+					SET absorb_opcode = $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~)
+					SET absorb_found = 0
+					FOR (absorb_id = 0; absorb_id < fx_count; ++absorb_id) BEGIN
+						PATCH_IF $fx_opcode(~%absorb_id%~) == absorb_opcode AND NOT $fx_consumed(~%absorb_id%~) AND absorb_id != immunity_id BEGIN
+							SET absorb_parameter1 = $fx_parameter1(~%absorb_id%~)
+							LPM ad_immunity_same_fields
+							PATCH_IF absorb_same AND absorb_parameter1 >= $AD_IMMUNITY_ABSORB_P1_MIN(~%absorb_row%~)
+									AND absorb_parameter1 <= $AD_IMMUNITY_ABSORB_P1_MAX(~%absorb_row%~)
+									AND ($AD_IMMUNITY_ABSORB_ANY_P2(~%absorb_row%~) OR $fx_parameter2(~%absorb_id%~) == $AD_IMMUNITY_ABSORB_P2(~%absorb_row%~)) BEGIN
+								SET $fx_consumed(~%absorb_id%~) = 1
+								SET absorb_found = 1
+							END
+						END
+					END
+					PATCH_IF absorb_found AND $AD_IMMUNITY_ABSORB_RELABEL(~%absorb_row%~) >= 0 BEGIN
+						SET $fx_immunity_label(~%immunity_id%~) = $AD_IMMUNITY_ABSORB_RELABEL(~%absorb_row%~)
+						SET $fx_immunity_late(~%immunity_id%~) = 1
+					END
+				END
+			END
+			FOR (absorb_id = 0; absorb_id < fx_count; ++absorb_id) BEGIN
+				SET absorb_opcode = $fx_opcode(~%absorb_id%~)
+				PATCH_IF (absorb_opcode == 206 OR absorb_opcode == 321) AND NOT $fx_consumed(~%absorb_id%~) BEGIN
+					SPRINT absorb_resref $fx_resource(~%absorb_id%~)
+					TO_UPPER absorb_resref
+					LPM ad_immunity_same_fields
+					PATCH_IF absorb_same AND VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~%immunity_opcode% %absorb_resref%~)
+							AND $fx_dice_count(~%absorb_id%~) == $fx_dice_count(~%immunity_id%~)
+							AND $fx_dice_sides(~%absorb_id%~) == $fx_dice_sides(~%immunity_id%~)
+							AND $fx_power(~%absorb_id%~) == $fx_power(~%immunity_id%~)
+							AND (absorb_opcode == 206 OR $fx_resistance(~%absorb_id%~) == $fx_resistance(~%immunity_id%~)) BEGIN
+						SET $fx_consumed(~%absorb_id%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+// absorb_same : l'effet absorb_id a la même cible, les mêmes probabilités et le même jet de
+// sauvegarde que l'immunité immunity_id.
+DEFINE_PATCH_MACRO ad_immunity_same_fields BEGIN
+	SET absorb_same = $fx_effective_target(~%absorb_id%~) == $fx_effective_target(~%immunity_id%~)
+		AND $fx_probability1(~%absorb_id%~) == $fx_probability1(~%immunity_id%~)
+		AND $fx_probability2(~%absorb_id%~) == $fx_probability2(~%immunity_id%~)
+		AND $fx_save_type(~%absorb_id%~) == $fx_save_type(~%immunity_id%~)
+		AND $fx_save_bonus(~%absorb_id%~) == $fx_save_bonus(~%immunity_id%~)
 END
 
 // Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode

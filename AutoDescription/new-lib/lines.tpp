@@ -9,12 +9,25 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
 END
 
-// Ajoute la ligne line_text à la section line_section, au rang line_sort.
+// Ajoute la ligne line_text à la section line_section, au rang line_sort. Une ligne de même texte
+// (casse ignorée) déjà dans la section n'est pas ajoutée : l'ancien moteur garde la première
+// (get_unique_effects).
 DEFINE_PATCH_MACRO ad_line_add BEGIN
-	SPRINT $line_section(~%line_count%~) ~%line_section%~
-	SET $line_sort(~%line_count%~) = line_sort
-	SPRINT $line_text(~%line_count%~) ~%line_text%~
-	SET line_count += 1
+	SPRINT line_new_text ~%line_text%~
+	TO_LOWER line_new_text
+	SET line_duplicate = 0
+	FOR (line_id = 0; line_id < line_count AND NOT line_duplicate; ++line_id) BEGIN
+		SPRINT line_old_section $line_section(~%line_id%~)
+		SPRINT line_old_text $line_text(~%line_id%~)
+		TO_LOWER line_old_text
+		SET line_duplicate = (~%line_old_section%~ STRING_EQUAL ~%line_section%~) AND (~%line_old_text%~ STRING_EQUAL ~%line_new_text%~)
+	END
+	PATCH_IF NOT line_duplicate BEGIN
+		SPRINT $line_section(~%line_count%~) ~%line_section%~
+		SET $line_sort(~%line_count%~) = line_sort
+		SPRINT $line_text(~%line_count%~) ~%line_text%~
+		SET line_count += 1
+	END
 END
 
 // Lignes de la section, une puce par ligne, chacune précédée d'un saut de ligne ; vide si la
@@ -63,13 +76,19 @@ BEGIN
 	END
 END
 
-// Éléments du tableau array_name, dans l'ordre d'ajout : « a », « a et b », « a, b et c ».
+// Éléments du tableau array_name, dans l'ordre d'ajout : « a », « a et b », « a, b et c » ;
+// séparateurs glue et final_glue (vide : « et » entouré d'espaces).
 DEFINE_PATCH_FUNCTION ad_join
 	STR_VAR
 		array_name = ~~
+		glue = ~, ~
+		final_glue = ~~
 	RET
 		text
 BEGIN
+	PATCH_IF ~%final_glue%~ STRING_EQUAL ~~ BEGIN
+		SPRINT final_glue ~ %AD_AND% ~
+	END
 	SET join_count = 0
 	PHP_EACH ~%array_name%~ AS _ => _ BEGIN
 		SET join_count += 1
@@ -82,10 +101,10 @@ BEGIN
 			SPRINT text ~%join_item%~
 		END
 		ELSE PATCH_IF join_index < join_count BEGIN
-			SPRINT text ~%text%, %join_item%~
+			SPRINT text ~%text%%glue%%join_item%~
 		END
 		ELSE BEGIN
-			SPRINT text ~%text% %AD_AND% %join_item%~
+			SPRINT text ~%text%%final_glue%%join_item%~
 		END
 	END
 END

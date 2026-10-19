@@ -102,7 +102,7 @@
 98       1        1        TODO      LEVEL            83     HP:_Regeneration
 99       1        1        TODO      LEVEL            91     Spell_Effect:_Duration_Modifier
 100      1        1        TODO      LEVEL            280    Protection:_from_Creature_Type
-101      1        1        TODO      LEVEL            283    Protection:_from_Opcode
+101      1        1        DESCRIBED LEVEL            283    Protection:_from_Opcode
 102      1        1        TODO      LEVEL            250    Spell:_Immunity_(by_Power_Level)
 103      1        1        IGNORED   LEVEL            400    Text:_Change_Name
 104      1        1        DESCRIBED LEVEL            424    Stat:_Experience_Points
@@ -207,7 +207,7 @@
 203      1        1        TODO      LEVEL            243    Spell:_Bounce_(by_Secondary_Type)
 204      1        1        TODO      LEVEL            252    Spell:_Protection_(by_School)
 205      1        1        TODO      LEVEL            253    Spell:_Protection_(by_Secondary_Type)
-206      1        1        TODO      LEVEL            256    Spell:_Protection_from_Spell
+206      1        1        DESCRIBED LEVEL            256    Spell:_Protection_from_Spell
 207      1        1        TODO      LEVEL            247    Spell:_Bounce_(by_Resource)
 208      1        1        TODO      LEVEL            86     HP:_Minimum_Limit
 209      1        1        TODO      LEVEL            355    Death:_Kill_60HP

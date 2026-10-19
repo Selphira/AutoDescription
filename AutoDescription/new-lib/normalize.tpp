@@ -10,7 +10,8 @@
 // - fx_probability_low, fx_probability_high, fx_probability : bornes du tirage et pourcentage ;
 // - fx_save_types (bits 0-4 : un jet contre le meilleur des types cochés), fx_save_flags (le reste) ;
 // - fx_level_min, fx_level_max : restriction de niveau de la cible (0 = aucune) ;
-// - fx_resource_lower.
+// - fx_resource_lower ;
+// - fx_effective_target : cible réelle (le porteur pour un effet d'équipement d'objet).
 DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	SET fx_timing   = $fx_timing(~%fx_id%~)
 	SET fx_duration = $fx_duration(~%fx_id%~)
@@ -89,6 +90,12 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	END
 	SET $fx_level_max(~%fx_id%~) = fx_level_restriction ? $fx_dice_count(~%fx_id%~) : 0
 	SET $fx_level_min(~%fx_id%~) = fx_level_restriction ? $fx_dice_sides(~%fx_id%~) : 0
+
+	// L'effet d'équipement d'un objet touche toujours le porteur : sa cible est sans objet.
+	SET $fx_effective_target(~%fx_id%~) = $fx_target(~%fx_id%~)
+	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~equipped~ BEGIN
+		SET $fx_effective_target(~%fx_id%~) = TARGET_FX_self
+	END
 
 	SPRINT fx_resource_lower $fx_resource(~%fx_id%~)
 	TO_LOWER fx_resource_lower

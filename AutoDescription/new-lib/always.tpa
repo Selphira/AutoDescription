@@ -6,6 +6,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/startup.tpa~
 	INCLUDE ~%MOD_FOLDER%/new-lib/catalog.tpa~
 	INCLUDE ~%MOD_FOLDER%/new-lib/translation.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/resources.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/effects.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/normalize.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/coverage.tpp~
@@ -54,9 +55,11 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/95.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/96.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/97.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/101.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/104.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/166.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/173.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/206.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/275.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/276.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/277.tpp~
