@@ -34,10 +34,28 @@ END
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
 // de la statistique, dans la liste indexée des statistiques (8 000 000 + valeur de stats.ids).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
-	6  => 8000042 // ~Charisme~
-	10 => 8000041 // ~Constitution~
-	15 => 8000040 // ~Dextérité~
-	19 => 8000038 // ~Intelligence~
-	44 => 8000036 // ~Force~
-	49 => 8000039 // ~Sagesse~
+	6   => 8000042 // ~Charisme~
+	10  => 8000041 // ~Constitution~
+	15  => 8000040 // ~Dextérité~
+	19  => 8000038 // ~Intelligence~
+	21  => 8000025 // ~Connaissances~
+	22  => 8000032 // ~Chance~
+	44  => 8000036 // ~Force~
+	49  => 8000039 // ~Sagesse~
+	54  => 8000007 // ~TAC0~
+	73  => 20730000 // ~Dégâts~
+	93  => 8000030 // ~Fatigue~
+	94  => 8000031 // ~Ébriété~
+	95  => 8000033 // ~Pistage~
+	96  => 8000034 // ~Niveau~
+	104 => 8000044 // ~Expérience~
+	278 => 8000007 // ~TAC0~
+	281 => 22810000 // ~Modificateur des hiatus entropiques~
+	284 => 22840000 // ~TAC0 des armes de mêlée~
+	285 => 22850000 // ~Dégâts des armes de mêlée~
+	286 => 22860000 // ~Dégâts des armes à projectiles~
+	288 => 22880000 // ~TAC0 à mains nues~
+	289 => 22890000 // ~Dégâts à mains nues~
+	305 => 23050000 // ~TAC0 de la main secondaire~
+	306 => 23060000 // ~TAC0 de la main principale~
 END

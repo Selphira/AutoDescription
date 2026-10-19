@@ -39,6 +39,12 @@
 @6200001 = ~Weight~ // reprise de @100002
 
 // Listes indexées : noms des statistiques, 8 000 000 + valeur de stats.ids (8 000 000-8 009 999)
+@8000007 = ~THAC0~ // reprise de @10540001
+@8000025 = ~Lore~ // reprise de @10210001
+@8000030 = ~Fatigue~ // reprise de @10930001
+@8000031 = ~Drunkenness~ // reprise de @10940001
+@8000032 = ~Luck~ // reprise de @10220001
+@8000033 = ~Tracking~ // reprise de @10950001
 @8000034 = ~Level~ // reprise de @10960001
 @8000036 = ~Strength~ // reprise de @10440001
 @8000038 = ~Intelligence~ // reprise de @10190001
@@ -46,6 +52,7 @@
 @8000040 = ~Dexterity~ // reprise de @10150001
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisma~ // reprise de @10060001
+@8000044 = ~Experience~ // reprise de @11040001
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
@@ -83,6 +90,33 @@
 
 // Opcode 37 : libellés (20 370 000-20 370 099)
 @20370000 = ~vs. Spells~ // reprise de @10370001
+
+// Opcode 73 : libellés (20 730 000-20 730 099)
+@20730000 = ~Damage~ // reprise de @10730001
+
+// Opcode 281 : libellés (22 810 000-22 810 099)
+@22810000 = ~Probability that a wild surge will have positive effect~ // reprise de @12810001
+
+// Opcode 284 : libellés (22 840 000-22 840 099)
+@22840000 = ~Melee THAC0~ // reprise de @12840001
+
+// Opcode 285 : libellés (22 850 000-22 850 099)
+@22850000 = ~Melee Weapon Damage~ // reprise de @12850001
+
+// Opcode 286 : libellés (22 860 000-22 860 099)
+@22860000 = ~Missile Weapon Damage~ // reprise de @12860001
+
+// Opcode 288 : libellés (22 880 000-22 880 099)
+@22880000 = ~Unarmed THAC0~ // reprise de @12880001
+
+// Opcode 289 : libellés (22 890 000-22 890 099)
+@22890000 = ~Unarmed Damage~ // reprise de @12890001
+
+// Opcode 305 : libellés (23 050 000-23 050 099)
+@23050000 = ~THAC0 with the off hand~ // reprise de @13050001
+
+// Opcode 306 : libellés (23 060 000-23 060 099)
+@23060000 = ~THAC0 with the on hand~ // reprise de @13060001
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~No protection %versus%~ // reprise de @15210001

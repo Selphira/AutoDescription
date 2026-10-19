@@ -452,6 +452,27 @@ def check_catalog(report, definitions):
     print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES))
 
 
+def check_opcode_includes(report):
+    """Fichiers de new-lib/opcodes/ : code commun d'abord, puis un fichier par opcode dans l'ordre numérique."""
+    report.section("Inclusions des fichiers d'opcode (new-lib/always.tpa)")
+    path = NEW_LIB / "always.tpa"
+    code, _ = strip_weidu(read_text(path))
+    included = re.findall(r"INCLUDE\s+~%MOD_FOLDER%/new-lib/opcodes/([^~]+)~", code)
+    numbers = [int(name[:-4]) for name in included if re.fullmatch(r"\d+\.tpp", name)]
+    first_number = next((i for i, name in enumerate(included) if re.fullmatch(r"\d+\.tpp", name)), len(included))
+    for name in included[first_number:]:
+        if not re.fullmatch(r"\d+\.tpp", name):
+            report.add("ERREUR", f"{relative(path)} : {name} (code commun) inclus après un fichier d'opcode")
+    if numbers != sorted(set(numbers)):
+        report.add("ERREUR", f"{relative(path)} : fichiers d'opcode hors de l'ordre numérique ou en double")
+    present = sorted(q.name for q in (NEW_LIB / "opcodes").glob("*.tpp"))
+    for name in sorted(set(present) - set(included)):
+        report.add("ERREUR", f"{relative(NEW_LIB)}/opcodes/{name} : non inclus par always.tpa")
+    for name in sorted(set(included) - set(present)):
+        report.add("ERREUR", f"{relative(path)} : inclut new-lib/opcodes/{name}, absent")
+    print(f"  {len(included)} fichiers inclus, dont {len(numbers)} fichiers d'opcode")
+
+
 # ---------------------------------------------------------------------------------------------
 # Séparation des moteurs lib/ et new-lib/ (§7.1, condition 1)
 
@@ -628,6 +649,7 @@ def main():
     variants = check_opcode_variants(report, definitions)
     check_ignored_described(report, variants)
     check_catalog(report, definitions)
+    check_opcode_includes(report)
     check_engine_separation(report, definitions)
     if not args.no_parse:
         if weidu.is_file():
