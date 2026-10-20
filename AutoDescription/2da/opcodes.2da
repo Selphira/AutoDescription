@@ -84,7 +84,7 @@
 80       1        1        DESCRIBED LEVEL            395    SHOWN           State:_Deafness
 81       1        1        DESCRIBED LEVEL            215    IGNORED         Cure:_Deafness
 82       1        1        IGNORED   LEVEL            400    SHOWN           Set_AI_Script
-83       1        1        TODO      LEVEL            282    SHOWN           Protection:_From_Projectile
+83       1        1        DESCRIBED LEVEL            282    SHOWN           Protection:_From_Projectile
 84       1        1        DESCRIBED LEVEL            310    SHOWN           Stat:_Magical_Fire_Resistance_Modifier
 85       1        1        DESCRIBED LEVEL            311    SHOWN           Stat:_Magical_Cold_Resistance_Modifier
 86       1        1        DESCRIBED LEVEL            312    SHOWN           Stat:_Slashing_Resistance_Modifier
@@ -144,7 +144,7 @@
 140      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Casting_Glow
 141      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Lighting_Effects
 142      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Display_Special_Effect_Icon
-143      1        1        TODO      LEVEL            481    SHOWN           Item:_Create_Item_in_Slot
+143      1        1        DESCRIBED LEVEL            481    SHOWN           Item:_Create_Item_in_Slot
 144      1        1        DESCRIBED LEVEL            496    SHOWN           Button:_Disable_Button
 145      1        1        DESCRIBED LEVEL            495    SHOWN           Spell:_Disable_Spell_Casting_Abilities
 146      1        1        TODO      LEVEL            465    NOT_PERMANENT   Spell:_Cast_Spell_(at_Creature)
@@ -181,7 +181,7 @@
 177      1        1        TODO      LEVEL            472    HIDDEN          Use_EFF_File
 178      1        1        TODO      LEVEL            62     SHOWN           Spell_Effect:_THAC0_vs._Creature_Type_Modifier
 179      1        1        TODO      LEVEL            43     SHOWN           Spell_Effect:_Damage_vs._Creature_Type_Modifier
-180      1        1        TODO      LEVEL            486    SHOWN           Item:_Can't_Use_Item
+180      1        1        DESCRIBED LEVEL            486    SHOWN           Item:_Can't_Use_Item
 181      1        1        TODO      LEVEL            487    SHOWN           Item:_Can't_Use_Itemtype
 182      1        1        IGNORED   LEVEL            400    SHOWN           Use_EFF_file_if/while_item_resource_equipped
 183      1        1        TODO      LEVEL            473    HIDDEN          Item:_Apply_Effect_Itemtype
@@ -281,9 +281,9 @@
 277      1        1        DESCRIBED LEVEL            125    SHOWN           Stat:_Set_Traps_Modifier
 278      1        1        DESCRIBED LEVEL            61     SHOWN           Stat:_To_Hit_Modifier
 279      1        1        TODO      LEVEL            497    SHOWN           Button:_Enable_Button
-280      1        1        TODO      LEVEL            404    NOT_PERMANENT   Spell_Effect:_Wild_Magic
+280      1        1        DESCRIBED LEVEL            404    NOT_PERMANENT   Spell_Effect:_Wild_Magic
 281      1        1        DESCRIBED LEVEL            420    SHOWN           Stat:_Wild_Magic
-282      1        1        TODO      LEVEL            999    SHOWN           Script:_Scripting_State_Modifier
+282      1        1        DESCRIBED LEVEL            999    SHOWN           Script:_Scripting_State_Modifier
 283      1        1        TODO      LEVEL            10     HIDDEN          Use_EFF_File_(Cursed)
 284      1        1        DESCRIBED LEVEL            65     SHOWN           Stat:_Melee_THAC0_Modifier
 285      1        1        DESCRIBED LEVEL            44     SHOWN           Stat:_Melee_Weapon_Damage_Modifier

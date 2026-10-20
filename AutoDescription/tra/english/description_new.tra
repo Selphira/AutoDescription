@@ -626,6 +626,47 @@
 @8070218 = ~disintegration~ // reprise de @300218
 @8070227 = ~insect swarms~ // reprise de @300227
 
+// Noms des emplacements d'objet, 8 080 000 + valeur de slots.ids (8 080 000-8 080 038)
+@8080000 = ~the amulet~ // reprise de @220000
+@8080001 = ~the armor~ // reprise de @220001
+@8080002 = ~the belt~ // reprise de @220002
+@8080003 = ~the boots~ // reprise de @220003
+@8080004 = ~the cloak~ // reprise de @220004
+@8080005 = ~the gloves~ // reprise de @220005
+@8080006 = ~the helmet~ // reprise de @220006
+@8080007 = ~the left ring~ // reprise de @220007
+@8080008 = ~the right ring~ // reprise de @220008
+@8080009 = ~the shield~ // reprise de @220009
+@8080010 = ~the fists~ // reprise de @220010
+@8080011 = ~the ammunition (1)~ // reprise de @220011
+@8080012 = ~the ammunition (2)~ // reprise de @220012
+@8080013 = ~the ammunition (3)~ // reprise de @220013
+@8080014 = ~the ammunition (4)~ // reprise de @220014
+@8080015 = ~miscs (1)~ // reprise de @220015
+@8080016 = ~miscs (2)~ // reprise de @220016
+@8080017 = ~miscs (3)~ // reprise de @220017
+@8080018 = ~miscs (4)~ // reprise de @220018
+@8080019 = ~miscs (5)~ // reprise de @220019
+@8080020 = ~miscs (6)~ // reprise de @220020
+@8080021 = ~miscs (7)~ // reprise de @220021
+@8080022 = ~miscs (8)~ // reprise de @220022
+@8080023 = ~miscs (9)~ // reprise de @220023
+@8080024 = ~miscs (10)~ // reprise de @220024
+@8080025 = ~miscs (11)~ // reprise de @220025
+@8080026 = ~miscs (12)~ // reprise de @220026
+@8080027 = ~miscs (13)~ // reprise de @220027
+@8080028 = ~miscs (14)~ // reprise de @220028
+@8080029 = ~miscs (15)~ // reprise de @220029
+@8080030 = ~miscs (16)~ // reprise de @220030
+@8080031 = ~miscs (17)~ // reprise de @220031
+@8080032 = ~miscs (18)~ // reprise de @220032
+@8080033 = ~miscs (19)~ // reprise de @220033
+@8080034 = ~the magic weapon~ // reprise de @220034
+@8080035 = ~the weapon (1)~ // reprise de @220035
+@8080036 = ~the weapon (2)~ // reprise de @220036
+@8080037 = ~the weapon (3)~ // reprise de @220037
+@8080038 = ~the weapon (4)~ // reprise de @220038
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
 @20000001 = ~Base Armor Class~ // reprise de @10000100
@@ -1058,6 +1099,12 @@
 @20810102 = ~to cure the deafness %ofTheTarget%~ // reprise de @10810003
 @20810103 = ~to cure the deafness %ofTheTarget%~ // reprise de @10810003
 
+// Opcode 83 : Immunité aux projectiles : phrases 0100 (20 830 000-20 830 999)
+@20830100 = ~Protects from %projectiles%~ // reprise de @10830001
+@20830101 = ~Protects %theTarget% from %projectiles%~ // reprise de @10830003
+@20830102 = ~to be protected from %projectiles%~ // reprise de @10830002
+@20830103 = ~to protect %theTarget% from %projectiles%~ // reprise de @10830004
+
 // Opcode 84 : libellés (20 840 000-20 840 099)
 @20840000 = ~Magical Fire Resistance~ // reprise de @10840001
 @20840001 = ~from magical fire damage~ // reprise de @10840002
@@ -1194,6 +1241,12 @@
 @21340102 = ~to be transmuted to stone~ // reprise de @11340003
 @21340103 = ~to transmute %theTarget% to stone~ // reprise de @11340004
 
+// Opcode 143 : Objet créé dans un emplacement : phrases 0100 (21 430 000-21 430 999)
+@21430100 = ~Creates 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430001
+@21430101 = ~Creates 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430001
+@21430102 = ~to create 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430002
+@21430103 = ~to create 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430002
+
 // Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
 @21440100 = ~Prevents~ // reprise de @11440050
 @21441000 = ~%action% the use of Hide in shadows~ // reprise de @11440001
@@ -1263,6 +1316,9 @@
 @21730000 = ~Poison Resistance~ // reprise de @11730001
 @21730001 = ~to poison~ // reprise de @11730002
 
+// Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
+@21800100 = ~Unique : Only one copy can be equipped~ // reprise de @11800001
+
 // Opcode 189 : Temps d'incantation : 0000 nom, 0002 statistique ; 0003 temps maximal, 0005 sa statistique (21 890 000-21 890 999)
 @21890000 = ~Casting time~ // reprise de @11890001
 @21890002 = ~the casting time~ // reprise de @11890002
@@ -1303,6 +1359,20 @@
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Proficiency %proficiency%~ // reprise de @12330001
 @22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
+
+// Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
+@22800100 = ~The next spell cast by %theTarget% treated as wild surges~ // reprise de @12800001
+@22800101 = ~The next spell cast by %theTarget% treated as wild surges~ // reprise de @12800001
+@22800102 = ~that the next spell cast by %theTarget% treated as wild surges~ // reprise de @12800004
+@22800103 = ~that the next spell cast by %theTarget% treated as wild surges~ // reprise de @12800004
+@22800110 = ~All spells cast by %theTarget% treated as wild surges~ // reprise de @12800002
+@22800111 = ~All spells cast by %theTarget% treated as wild surges~ // reprise de @12800002
+@22800112 = ~that all spells cast %theTarget% treated as wild surges~ // reprise de @12800005
+@22800113 = ~that all spells cast %theTarget% treated as wild surges~ // reprise de @12800005
+@22800120 = ~Dispels effects that force wild surges triggers~ // reprise de @12800003
+@22800121 = ~Dispels effects that force wild surges triggers~ // reprise de @12800003
+@22800122 = ~to dispel effects that force wild surges triggers~ // reprise de @12800006
+@22800123 = ~to dispel effects that force wild surges triggers~ // reprise de @12800006
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Probability that a wild surge will have positive effect~ // reprise de @12810001

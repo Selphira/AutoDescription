@@ -24,6 +24,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_thief_skills
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_projectile_spells
 		LPM ad_group_morale
 		LPM ad_group_immunities
 	END
@@ -183,6 +184,36 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				SET line_fx = group_id
 				LPM ad_effect_line
+			END
+		END
+	END
+END
+
+// Immunités aux projectiles (ancien opcode_83_group) : une immunité au projectile P (83) absorbe
+// les immunités à un sort (206) de son bloc dont le premier en-tête utilise P ; l'ancien moteur lit
+// cet en-tête juste après celui du fichier (0x72), et la valeur du .spl vaut celle de projectl.ids
+// plus 1.
+DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 83 BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			SET group_projectile = $fx_parameter2(~%group_id%~) + 1
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SPRINT group_spell $fx_resource(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 206 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+					SET group_spell_projectile = 0 - 1
+					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+						PATCH_IF BUFFER_LENGTH >= 0x72 + SPL_HEAD_projectile + 2 BEGIN
+							READ_SHORT (0x72 + SPL_HEAD_projectile) group_spell_projectile
+						END
+					END
+					PATCH_IF group_spell_projectile == group_projectile BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
 			END
 		END
 	END

@@ -149,3 +149,17 @@ BEGIN
 		END
 	END
 END
+
+// Nom d'un projectile (valeur de projectl.ids) : liste @8070000 indexée par AD_PROJECTILE_NAMES
+// (new-lib/catalog.tpa) ; vide pour un projectile sans nom connu.
+DEFINE_PATCH_FUNCTION ad_projectile_name
+	INT_VAR
+		projectile = 0
+	RET
+		name
+BEGIN
+	SPRINT name ~~
+	PATCH_IF VARIABLE_IS_SET $AD_PROJECTILE_NAMES(~%projectile%~) BEGIN
+		LPF ad_tra INT_VAR tra_id = 8070000 + $AD_PROJECTILE_NAMES(~%projectile%~) tra_block_start = 8070000 tra_block_size = 1000 RET name = text END // ~flèches~
+	END
+END
