@@ -11,6 +11,9 @@
 // pour qui un pourcentage de 100 a un sens fixe stat_percent_100 à valid. Un opcode aux cas
 // particuliers fixe stat_line_macro : appelée pour chaque effet line_fx (forme dans line_form), elle
 // peut changer le nom (stat_name_tra) ou écrire elle-même la ligne (stat_line_done à 1).
+// Un opcode dont la statistique dépend d'un autre champ que la valeur et le mode (type de sort,
+// compétence) l'écrit dans fx_stat_subject, pour que deux effets de statistiques différentes ne
+// passent pas pour le même effet.
 //
 // Mode 3 (EE seulement ; sur un jeu classique, il est invalide pour tous les opcodes), selon
 // stat_mode_3 : added (traité comme un ajout, ex. jets de sauvegarde), unsupported (pas encore
@@ -31,7 +34,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
-			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) = 0
+			LPM ad_stat_modifier_subject
+			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) = 0
 		END
 	END
 	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
@@ -39,6 +43,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
+			LPM ad_stat_modifier_subject
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END
@@ -52,17 +57,24 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
-			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) BEGIN
+			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:same_effect_twice~
 			END
 			ELSE BEGIN
-				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) = 1
+				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) = 1
 			END
 		END
 	END
 	SPRINT stat_percentage ~valid~
 	SPRINT stat_percent_100 ~~
 	SPRINT stat_forced_mode ~~
+END
+
+DEFINE_PATCH_MACRO ad_stat_modifier_subject BEGIN
+	SPRINT stat_subject ~~
+	PATCH_IF VARIABLE_IS_SET $fx_stat_subject(~%stat_id%~) BEGIN
+		SPRINT stat_subject $fx_stat_subject(~%stat_id%~)
+	END
 END
 
 // ---------------------------------------------------------------------------------------------

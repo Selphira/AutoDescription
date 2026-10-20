@@ -145,6 +145,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	19  => 8000038 // ~Intelligence~
 	21  => 8000025 // ~Connaissances~
 	22  => 8000032 // ~Chance~
+	23  => 20230000 // ~Moral~
 	44  => 8000036 // ~Force~
 	49  => 8000039 // ~Sagesse~
 	54  => 8000007 // ~TAC0~
@@ -162,6 +163,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	126 => 21260000 // ~Vitesse de déplacement~
 	167 => 21670000 // ~TAC0~
 	189 => 21890000 // ~Temps d'incantation~
+	191 => 21910000 // ~Niveau de lanceur de sorts %spellType%~
+	233 => 22330000 // ~Compétence martiale %proficiency%~
 	275 => 8000135 // ~Se cacher dans l'ombre~
 	276 => 8000136 // ~Détection des illusions~
 	277 => 8000137 // ~Pose de pièges~

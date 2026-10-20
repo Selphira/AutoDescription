@@ -796,6 +796,14 @@
 @20200112 = ~to cast Improved invisibility on %theTarget%~ // reprise de @10200004
 @20200113 = ~to cast Improved invisibility on %theTarget%~ // reprise de @10200004
 
+// Opcode 23 : Moral : 0000 nom, 0002 statistique ; phrase 0110 moral rétabli (20 230 000-20 230 999)
+@20230000 = ~Morale~ // reprise de @10230001
+@20230002 = ~the morale~ // reprise de @10230002
+@20230110 = ~Restore %theTarget%'s morale~ // reprise de @10230003
+@20230111 = ~Restore %theTarget%'s morale~ // reprise de @10230003
+@20230112 = ~of restoring %theTarget%'s morale~ // reprise de @10230004
+@20230113 = ~of restoring %theTarget%'s morale~ // reprise de @10230004
+
 // Opcode 24 : Horreur (20 240 000-20 240 999)
 @20240100 = ~Inflicts Horror on %theTarget%~ // reprise de @10240001
 @20240101 = ~Inflicts Horror on %theTarget%~ // reprise de @10240001
@@ -1025,6 +1033,28 @@
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Protects %theTarget% from %opcodeStr%~ // reprise de @11010002
 
+// Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
+@21060100 = ~Immunity to panic~ // reprise de @11060004
+@21060101 = ~Immunity to panic~ // reprise de @11060004
+@21060102 = ~to immunize %theTarget% against morale breakdown~ // reprise de @11060009
+@21060103 = ~to immunize %theTarget% against morale breakdown~ // reprise de @11060009
+@21060110 = ~Morale %ofTheTarget% remains high~ // reprise de @11060001
+@21060111 = ~Morale %ofTheTarget% remains high~ // reprise de @11060001
+@21060112 = ~to keep morale %ofTheTarget% high~ // reprise de @11060006
+@21060113 = ~to keep morale %ofTheTarget% high~ // reprise de @11060006
+@21060120 = ~Morale breakpoint %ofTheTarget% changes to %value%~ // reprise de @11060005
+@21060121 = ~Morale breakpoint %ofTheTarget% changes to %value%~ // reprise de @11060005
+@21060122 = ~to increase morale breakpoint %ofTheTarget% to %value%~ // reprise de @11060010
+@21060123 = ~to increase morale breakpoint %ofTheTarget% to %value%~ // reprise de @11060010
+@21060130 = ~Morale %ofTheTarget% is strengthened by %value%~ // reprise de @11060002
+@21060131 = ~Morale %ofTheTarget% is strengthened by %value%~ // reprise de @11060002
+@21060132 = ~to boost morale %ofTheTarget% by %value%~ // reprise de @11060007
+@21060133 = ~to boost morale %ofTheTarget% by %value%~ // reprise de @11060007
+@21060140 = ~Morale %ofTheTarget% is weakened by %value%~ // reprise de @11060003
+@21060141 = ~Morale %ofTheTarget% is weakened by %value%~ // reprise de @11060003
+@21060142 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
+@21060143 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
+
 // Opcode 109 : Paralysie (21 090 000-21 090 999)
 @21090100 = ~Hold %theTarget%~ // reprise de @11090002
 @21090101 = ~Hold %theTarget%~ // reprise de @11090002
@@ -1124,6 +1154,10 @@
 @21890003 = ~Maximum casting time~ // reprise de @11890003
 @21890005 = ~the maximum casting time~ // reprise de @11890004
 
+// Opcode 191 : Niveau de lanceur de sorts : 0000 nom, 0002 statistique (21 910 000-21 910 999)
+@21910000 = ~%spellType% Caster Level~ // reprise de @11910001
+@21910002 = ~the %spellType% Caster Level~ // reprise de @11910003
+
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Protects from %spellName% spell~ // reprise de @12060001
 
@@ -1144,6 +1178,10 @@
 @22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+
+// Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
+@22330000 = ~Proficiency %proficiency%~ // reprise de @12330001
+@22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Probability that a wild surge will have positive effect~ // reprise de @12810001

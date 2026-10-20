@@ -24,6 +24,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_thief_skills
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_morale
 		LPM ad_group_immunities
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
@@ -179,6 +180,55 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				SET line_fx = group_id
 				LPM ad_effect_line
+			END
+		END
+	END
+END
+
+// Moral (ancien opcode_23_group) : dans chaque bloc, le premier rétablissement du moral (23, moral
+// fixé à 10) disparaît si le bloc immunise aussi contre la modification du moral et contre la
+// panique (101 sur 23 et sur 106 ; la première de ces immunités fixe la durée des suivantes, une
+// durée nulle les acceptant toutes). Sont aussi consommés l'immunité à la modification du moral,
+// la dernière lue avant que les deux immunités ne soient trouvées, et les points de rupture de moral
+// fixés à 1 (106) du bloc ; l'immunité à la panique reste. Les rétablissements suivants du bloc
+// restent : l'ancien moteur n'en réunit qu'un.
+DEFINE_PATCH_MACRO ad_group_morale BEGIN
+	CLEAR_ARRAY morale_done
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		SPRINT group_scope $fx_scope(~%group_id%~)
+		PATCH_IF $fx_opcode(~%group_id%~) == 23 AND NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 10
+				AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT VARIABLE_IS_SET $morale_done(~%group_scope%~) BEGIN
+			SET $morale_done(~%group_scope%~) = 1
+			SET morale_found = 0
+			SET morale_duration = 0
+			SET morale_immunity = 0 - 1
+			FOR (group_candidate = 0; group_candidate < fx_count AND morale_found != 3; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SET morale_protected = $fx_parameter2(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 101 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND (morale_protected == 23 OR morale_protected == 106)
+						AND (morale_duration == 0 OR morale_duration == $fx_duration(~%group_candidate%~)) BEGIN
+					SET morale_duration = $fx_duration(~%group_candidate%~)
+					PATCH_IF morale_protected == 23 BEGIN
+						SET morale_found = morale_found BOR 1
+						SET morale_immunity = group_candidate
+					END
+					ELSE BEGIN
+						SET morale_found = morale_found BOR 2
+					END
+				END
+			END
+			PATCH_IF morale_found == 3 BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
+				SET $fx_consumed(~%morale_immunity%~) = 1
+				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+					SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+					PATCH_IF $fx_opcode(~%group_candidate%~) == 106 AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+							AND $fx_parameter1(~%group_candidate%~) == 1 AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_flat BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
 			END
 		END
 	END
@@ -514,7 +564,9 @@ END
 // new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
 // comparés ; with_special = 0 : special non comparé ; with_power, with_dice, with_resistance = 0 :
-// puissance, dés, résistance à la dissipation non comparés.
+// puissance, dés, résistance à la dissipation non comparés. L'ancien moteur compare parameter2 tel
+// que lu, avant que la prise en charge d'un opcode n'y range un mode (191, 233 : la statistique
+// visée y disparaît).
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
@@ -531,7 +583,7 @@ DEFINE_PATCH_FUNCTION ad_fx_signature
 BEGIN
 	SET sig_power        = with_power ? $fx_power(~%fx_id%~) : 0
 	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
-	SET sig_parameter2   = with_parameter2 ? $fx_parameter2(~%fx_id%~) : 0
+	SET sig_parameter2   = with_parameter2 ? $fx_parameter2_raw(~%fx_id%~) : 0
 	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
 	SET sig_resistance   = with_save AND with_resistance ? $fx_resistance(~%fx_id%~) : 0
 	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0

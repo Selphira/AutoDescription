@@ -796,6 +796,14 @@
 @20200112 = ~de lancer « Invisibilité majeure » sur %theTarget%~ // reprise de @10200004
 @20200113 = ~de lancer « Invisibilité majeure » sur %theTarget%~ // reprise de @10200004
 
+// Opcode 23 : Moral : 0000 nom, 0002 statistique ; phrase 0110 moral rétabli (20 230 000-20 230 999)
+@20230000 = ~Moral~ // reprise de @10230001
+@20230002 = ~le moral~ // reprise de @10230002
+@20230110 = ~Rétabli le moral %ofTheTarget%~ // reprise de @10230003
+@20230111 = ~Rétabli le moral %ofTheTarget%~ // reprise de @10230003
+@20230112 = ~de rétablir le moral %ofTheTarget%~ // reprise de @10230004
+@20230113 = ~de rétablir le moral %ofTheTarget%~ // reprise de @10230004
+
 // Opcode 24 : Horreur (20 240 000-20 240 999)
 @20240100 = ~Inflige Horreur %toTheTarget%~ // reprise de @10240001
 @20240101 = ~Inflige Horreur %toTheTarget%~ // reprise de @10240001
@@ -1025,6 +1033,28 @@
 @21010100 = ~Immunité %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Immunise %theTarget% %opcodeStr%~ // reprise de @11010002
 
+// Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
+@21060100 = ~Immunité à la panique~ // reprise de @11060004
+@21060101 = ~Immunité à la panique~ // reprise de @11060004
+@21060102 = ~d'immuniser %theTarget% contre la rupture de moral~ // reprise de @11060009
+@21060103 = ~d'immuniser %theTarget% contre la rupture de moral~ // reprise de @11060009
+@21060110 = ~Le moral %ofTheTarget% reste au plus haut~ // reprise de @11060001
+@21060111 = ~Le moral %ofTheTarget% reste au plus haut~ // reprise de @11060001
+@21060112 = ~de garder le moral %ofTheTarget% au plus haut~ // reprise de @11060006
+@21060113 = ~de garder le moral %ofTheTarget% au plus haut~ // reprise de @11060006
+@21060120 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~ // reprise de @11060005
+@21060121 = ~Le point de rupture de moral %ofTheTarget% passe à %value%~ // reprise de @11060005
+@21060122 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~ // reprise de @11060010
+@21060123 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~ // reprise de @11060010
+@21060130 = ~Le moral %ofTheTarget% est renforcé de %value%~ // reprise de @11060002
+@21060131 = ~Le moral %ofTheTarget% est renforcé de %value%~ // reprise de @11060002
+@21060132 = ~de renforcer le moral %ofTheTarget% de %value%~ // reprise de @11060007
+@21060133 = ~de renforcer le moral %ofTheTarget% de %value%~ // reprise de @11060007
+@21060140 = ~Le moral %ofTheTarget% est affaibli de %value%~ // reprise de @11060003
+@21060141 = ~Le moral %ofTheTarget% est affaibli de %value%~ // reprise de @11060003
+@21060142 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
+@21060143 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
+
 // Opcode 109 : Paralysie (21 090 000-21 090 999)
 @21090100 = ~Paralyse %theTarget%~ // reprise de @11090002
 @21090101 = ~Paralyse %theTarget%~ // reprise de @11090002
@@ -1124,6 +1154,10 @@
 @21890003 = ~Temps d'incantation maximal~ // reprise de @11890003
 @21890005 = ~le temps d'incantation maximal~ // reprise de @11890004
 
+// Opcode 191 : Niveau de lanceur de sorts : 0000 nom, 0002 statistique (21 910 000-21 910 999)
+@21910000 = ~Niveau de lanceur de sorts %spellType%~ // reprise de @11910001
+@21910002 = ~le niveau de lanceur de sorts %spellType%~ // reprise de @11910003
+
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Immunité au sort « %spellName% »~ // reprise de @12060001
 
@@ -1144,6 +1178,10 @@
 @22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+
+// Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
+@22330000 = ~Compétence martiale %proficiency%~ // reprise de @12330001
+@22330002 = ~la compétence martiale %proficiency%~ // reprise de @12330002
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001

@@ -24,7 +24,7 @@
 20       1        1        DESCRIBED LEVEL            388    NOT_PERMANENT   State:_Invisibility
 21       1        1        DESCRIBED LEVEL            425    SHOWN           Stat:_Lore_Modifier
 22       1        1        DESCRIBED LEVEL            110    SHOWN           Stat:_Cumulative_Luck_Bonus
-23       1        1        TODO      LEVEL            422    IGNORED         Stat:_Morale_Modifier
+23       1        1        DESCRIBED LEVEL            422    IGNORED         Stat:_Morale_Modifier
 24       1        1        DESCRIBED LEVEL            393    NOT_AFTER_DEATH State:_Horror
 25       1        1        DESCRIBED LEVEL            24     NOT_AFTER_DEATH State:_Poison
 26       1        1        TODO      LEVEL            489    IGNORED         Item:_Remove_Curse
@@ -107,7 +107,7 @@
 103      1        1        IGNORED   LEVEL            400    SHOWN           Text:_Change_Name
 104      1        1        DESCRIBED LEVEL            424    SHOWN           Stat:_Experience_Points
 105      1        1        TODO      LEVEL            431    IGNORED         Stat:_Gold
-106      1        1        TODO      LEVEL            299    SHOWN           Stat:_Morale_Break_Modifier
+106      1        1        DESCRIBED LEVEL            299    SHOWN           Stat:_Morale_Break_Modifier
 107      1        1        IGNORED   LEVEL            400    SHOWN           Portrait_Change
 108      1        1        TODO      LEVEL            428    IGNORED         Stat:_Reputation
 109      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Paralyze
@@ -192,7 +192,7 @@
 188      1        1        TODO      LEVEL            401    SHOWN           Spell_Effect:_Aura_Cleansing
 189      1        1        DESCRIBED LEVEL            93     SHOWN           Stat:_Casting_Time_Modifier
 190      1        1        TODO      LEVEL            94     SHOWN           Stat:_Attack_Speed_Factor
-191      1        1        TODO      LEVEL            15     SHOWN           Spell:_Casting_Level_Modifier
+191      1        1        DESCRIBED LEVEL            15     SHOWN           Spell:_Casting_Level_Modifier
 192      1        1        TODO      LEVEL            479    SHOWN           Spell_Effect:_Find_Familiar
 193      1        1        TODO      LEVEL            405    SHOWN           Spell_Effect:_Invisible_Detection_by_Script
 194      1        1        IGNORED   LEVEL            400    SHOWN           Ignore_Dialog_Pause
@@ -234,7 +234,7 @@
 230      1        1        TODO      LEVEL            226    IGNORED         Removal:_Remove_One_Secondary_Type
 231      1        1        TODO      LEVEL            350    SHOWN           Spell_Effect:_Time_Stop
 232      1        1        TODO      LEVEL            468    SHOWN           Spell_Effect:_Cast_Spell_on_Condition
-233      1        1        TODO      LEVEL            14     SHOWN           Stat:_Proficiency_Modifier
+233      1        1        DESCRIBED LEVEL            14     SHOWN           Stat:_Proficiency_Modifier
 234      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Contingency_Creation
 235      1        1        TODO      LEVEL            450    SHOWN           Spell_Effect:_Wing_Buffet
 236      1        1        TODO      LEVEL            459    NOT_PERMANENT   Spell_Effect:_Image_Projection
