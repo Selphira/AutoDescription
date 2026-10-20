@@ -24,6 +24,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_immunities
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_improved_invisibility
+	END
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
 		LPM ad_group_damage_halves
 	END
@@ -202,6 +205,26 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	END
 END
 
+// Invisibilité améliorée (ancien opcode_20_group) : un effet 20 de parameter2 1 remplace les autres
+// effets 20 qui ont les mêmes champs, parameter2 mis à part.
+DEFINE_PATCH_MACRO ad_group_improved_invisibility BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 20 AND $fx_parameter2(~%group_id%~) == 1 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter2 = 0 RET group_signature = signature END
+			SPRINT group_resource $fx_resource_lower(~%group_id%~)
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 20 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter2 = 0 RET group_other_signature = signature END
+					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
 // Répétitions d'un effet (ancien opcode_group_by_duration), trouvées par la prise en charge
 // (ad_application_series_support, new-lib/application.tpp) : les effets différés de la série sont
 // consommés, la ligne est celle de l'effet de tête, écrite après les autres effets de son opcode
@@ -319,13 +342,14 @@ END
 
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
 // (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
-// new-lib/normalize.tpp). with_parameter1 = 0 : parameter1 non comparé ; with_save = 0 : jet de
+// new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
 // comparés.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
 		with_parameter1 = 1
+		with_parameter2 = 1
 		with_save = 1
 		with_timing = 1
 	RET
@@ -333,7 +357,7 @@ DEFINE_PATCH_FUNCTION ad_fx_signature
 BEGIN
 	SET sig_power        = $fx_power(~%fx_id%~)
 	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
-	SET sig_parameter2   = $fx_parameter2(~%fx_id%~)
+	SET sig_parameter2   = with_parameter2 ? $fx_parameter2(~%fx_id%~) : 0
 	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
 	SET sig_resistance   = with_save ? $fx_resistance(~%fx_id%~) : 0
 	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0

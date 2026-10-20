@@ -18,6 +18,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SPRINT line_core ~~
 	SET line_nested = 0
 	SPRINT line_suffix ~~
+	SPRINT line_condition ~~
 	SET line_save_for_half = 0
 	SET line_fail_for_half = 0
 END

@@ -36,7 +36,11 @@
 
 // Mise en forme : phrases des modificateurs simples, séries de 10 (+0 soi, +1 cible…) : 0110 augmentation, 0120 réduction (1 210 000-1 210 999)
 @1210111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
+@1210112 = ~to increase %theStatistic% %ofTheTarget% by %value%~ // reprise de @102544
+@1210113 = ~to increase %theStatistic% %ofTheTarget% by %value%~ // reprise de @102544
 @1210121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
+@1210122 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
+@1210123 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
@@ -54,6 +58,9 @@
 @2000020 = ~the target~ // reprise de @102471
 @2000021 = ~of the target~ // reprise de @101085
 @2000022 = ~to the target~ // reprise de @101181
+@2000050 = ~the non-group creatures~ // reprise de @101191
+@2000051 = ~of the non-group creatures~ // reprise de @101192
+@2000052 = ~to the non-group creatures~ // reprise de @101193
 @2000100 = ~the wearer~ // reprise de @102472
 @2000101 = ~of the wearer~ // reprise de @101086
 @2000102 = ~to the wearer~ // reprise de @101180
@@ -80,6 +87,7 @@
 @3000002 = ~permanently, persists after death~ // reprise de @100313
 @3000003 = ~%frequency% for %strDuration%~ // reprise de @100315
 @3000004 = ~%frequency% for %strDuration% after %afterStrDuration%~ // reprise de @100316
+@3000005 = ~after %strDuration%~ // reprise de @100310
 
 // Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
 @3010000 = ~1 second~ // reprise de @100300
@@ -583,6 +591,7 @@
 @8060007 = ~the THAC0~ // reprise de @10540002
 @8060039 = ~the Wisdom~ // reprise de @10490002
 @8060040 = ~the Dexterity~ // reprise de @10150002
+@8060042 = ~the charisma~ // reprise de @10060002
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
@@ -621,6 +630,13 @@
 // Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
 @20010140 = ~Unable to attack~ // reprise de @10010005
 
+// Opcode 3 : État : rage du berserker (20 030 000-20 030 999)
+@20030001 = ~In combat~ // reprise de @10030003
+@20030100 = ~Causes %theTarget% to go berserk~ // reprise de @10030001
+@20030101 = ~Causes %theTarget% to go berserk~ // reprise de @10030001
+@20030102 = ~of causing %theTarget% to go berserk~ // reprise de @10030002
+@20030103 = ~of causing %theTarget% to go berserk~ // reprise de @10030002
+
 // Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
 @20120001 = ~%damage% %damageType%~ // reprise de @102166
 @20120010 = ~damage~ // reprise de @101092
@@ -647,9 +663,91 @@
 @20120103 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Drains %damage% %toTheTarget%~ // reprise de @10120004
 
+// Opcode 13 : Mort : phrases 0100 + 10 × type (AD_DEATH_TYPES) (20 130 000-20 130 999)
+@20130110 = ~Dissolve %theTarget%~ // reprise de @500001
+@20130111 = ~Dissolve %theTarget%~ // reprise de @500001
+@20130112 = ~to dissolve %theTarget%~ // reprise de @500101
+@20130113 = ~to dissolve %theTarget%~ // reprise de @500101
+@20130120 = ~Carbonize %theTarget%~ // reprise de @500002
+@20130121 = ~Carbonize %theTarget%~ // reprise de @500002
+@20130122 = ~to carbonize %theTarget%~ // reprise de @500102
+@20130123 = ~to carbonize %theTarget%~ // reprise de @500102
+@20130130 = ~Dismantles %theTarget%~ // reprise de @500003
+@20130131 = ~Dismantles %theTarget%~ // reprise de @500003
+@20130132 = ~to dismember %theTarget%~ // reprise de @500103
+@20130133 = ~to dismember %theTarget%~ // reprise de @500103
+@20130140 = ~Instantly slays %theTarget%~ // reprise de @500004
+@20130141 = ~Instantly slays %theTarget%~ // reprise de @500004
+@20130142 = ~to kill instantly %theTarget%~ // reprise de @500104
+@20130143 = ~to kill instantly %theTarget%~ // reprise de @500104
+@20130150 = ~Decapitates %theTarget%~ // reprise de @500005
+@20130151 = ~Decapitates %theTarget%~ // reprise de @500005
+@20130152 = ~to decapitate %theTarget%~ // reprise de @500105
+@20130153 = ~to decapitate %theTarget%~ // reprise de @500105
+@20130160 = ~Petrifies %theTarget%~ // reprise de @500006
+@20130161 = ~Petrifies %theTarget%~ // reprise de @500006
+@20130162 = ~to petrify %theTarget%~ // reprise de @500106
+@20130163 = ~to petrify %theTarget%~ // reprise de @500106
+@20130170 = ~Freezes %theTarget%~ // reprise de @500007
+@20130171 = ~Freezes %theTarget%~ // reprise de @500007
+@20130172 = ~to freeze %theTarget%~ // reprise de @500107
+@20130173 = ~to freeze %theTarget%~ // reprise de @500107
+@20130200 = ~Fatal electrocution %theTarget%~ // reprise de @500010
+@20130201 = ~Fatal electrocution %theTarget%~ // reprise de @500010
+@20130202 = ~to fatally electrocute %theTarget%~ // reprise de @500110
+@20130203 = ~to fatally electrocute %theTarget%~ // reprise de @500110
+@20130210 = ~Disintegrates %theTarget%~ // reprise de @500011
+@20130211 = ~Disintegrates %theTarget%~ // reprise de @500011
+@20130212 = ~to disintegrate %theTarget%~ // reprise de @500111
+@20130213 = ~to disintegrate %theTarget%~ // reprise de @500111
+@20130220 = ~Destroy %theTarget%~ // reprise de @500012
+@20130221 = ~Destroy %theTarget%~ // reprise de @500012
+@20130222 = ~to destroy %theTarget%~ // reprise de @500112
+@20130223 = ~to destroy %theTarget%~ // reprise de @500112
+
+// Opcode 16 : Hâte : 0100 hâte, 0110 améliorée (forme « cible » absente, BUG-023), 0120 sans attaque supplémentaire ; 0130-0150 versions courtes (AD_USE_SHORT_EFFECT_DESCRIPTION) (20 160 000-20 160 999)
+@20160100 = ~Double movement speed and grants one additional attack per round~ // reprise de @10160011
+@20160101 = ~Double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160017
+@20160102 = ~to double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160014
+@20160103 = ~to double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160014
+@20160110 = ~Double the movement speed and the number of attacks per round~ // reprise de @10160012
+@20160112 = ~to double movement speed and the number of attacks per round %ofTheTarget%~ // reprise de @10160015
+@20160113 = ~to double movement speed and the number of attacks per round %ofTheTarget%~ // reprise de @10160015
+@20160120 = ~Double the movement speed~ // reprise de @10160013
+@20160121 = ~Double the movement speed %ofTheTarget%~ // reprise de @10160019
+@20160122 = ~to double movement speed %ofTheTarget%~ // reprise de @10160016
+@20160123 = ~to double movement speed %ofTheTarget%~ // reprise de @10160016
+@20160130 = ~Haste~ // reprise de @10160001
+@20160131 = ~Cast Haste on %theTarget%~ // reprise de @10160007
+@20160132 = ~to cast Haste on %theTarget%~ // reprise de @10160004
+@20160133 = ~to cast Haste on %theTarget%~ // reprise de @10160004
+@20160140 = ~Improved haste~ // reprise de @10160002
+@20160142 = ~to cast Improved haste on %theTarget%~ // reprise de @10160005
+@20160143 = ~to cast Improved haste on %theTarget%~ // reprise de @10160005
+@20160150 = ~Haste (without APR bonus)~ // reprise de @10160003
+@20160151 = ~Cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160009
+@20160152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
+@20160153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
+
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Maximum hit points~ // reprise de @10180001
 @20180001 = ~Hit points~ // reprise de @10180003
+
+// Opcode 20 : Invisibilité : 0100 invisibilité, 0110 améliorée (20 200 000-20 200 999)
+@20200100 = ~Invisibility~ // reprise de @10200001
+@20200101 = ~Cast Invisibility on %theTarget%~ // reprise de @10200005
+@20200102 = ~to cast Invisibility on %theTarget%~ // reprise de @10200003
+@20200103 = ~to cast Invisibility on %theTarget%~ // reprise de @10200003
+@20200110 = ~Improved invisibility~ // reprise de @10200002
+@20200111 = ~Cast Improved invisibility on %theTarget%~ // reprise de @10200006
+@20200112 = ~to cast Improved invisibility on %theTarget%~ // reprise de @10200004
+@20200113 = ~to cast Improved invisibility on %theTarget%~ // reprise de @10200004
+
+// Opcode 24 : Horreur (20 240 000-20 240 999)
+@20240100 = ~Inflicts Horror on %theTarget%~ // reprise de @10240001
+@20240101 = ~Inflicts Horror on %theTarget%~ // reprise de @10240001
+@20240102 = ~to inflict Horror on %theTarget%~ // reprise de @10240002
+@20240103 = ~to inflict Horror on %theTarget%~ // reprise de @10240002
 
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Acid Resistance~ // reprise de @10270001
@@ -690,11 +788,39 @@
 // Opcode 37 : libellés (20 370 000-20 370 099)
 @20370000 = ~vs. Spells~ // reprise de @10370001
 
+// Opcode 38 : Silence (20 380 000-20 380 999)
+@20380100 = ~Silence~ // reprise de @10380001
+@20380101 = ~Silences  %theTarget%~ // reprise de @10380003
+@20380102 = ~to silence %theTarget%~ // reprise de @10380002
+@20380103 = ~to silence %theTarget%~ // reprise de @10380002
+
+// Opcode 39 : Inconscience : 0100 sommeil, 0110 sommeil profond (20 390 000-20 390 999)
+@20390100 = ~Sleeps %theTarget%~ // reprise de @10390001
+@20390101 = ~Sleeps %theTarget%~ // reprise de @10390001
+@20390102 = ~to sleep %theTarget%~ // reprise de @10390002
+@20390103 = ~to sleep %theTarget%~ // reprise de @10390002
+@20390110 = ~Renders %theTarget% unconscious~ // reprise de @10390003
+@20390111 = ~Renders %theTarget% unconscious~ // reprise de @10390003
+@20390112 = ~to render %theTarget% unconscious~ // reprise de @10390004
+@20390113 = ~to render %theTarget% unconscious~ // reprise de @10390004
+
+// Opcode 40 : Lenteur (20 400 000-20 400 999)
+@20400100 = ~Slow~ // reprise de @10400001
+@20400101 = ~Slows %theTarget%~ // reprise de @10400003
+@20400102 = ~of slowing %theTarget%~ // reprise de @10400002
+@20400103 = ~of slowing %theTarget%~ // reprise de @10400002
+
 // Opcode 42 : phrases (20 420 100-20 420 999)
 @20420100 = ~Can memorise an extra %levelStr% level wizard spell~ // reprise de @10420001
 @20420110 = ~Can memorise %amount% extra %levelStr% level wizard spell~ // reprise de @10420002
 @20420120 = ~Remove a of %levelStr% level wizard spell~ // reprise de @10420003
 @20420140 = ~Double the amount of %levelStr% level wizard spells that can be memorized~ // reprise de @10420005
+
+// Opcode 45 : Étourdissement (20 450 000-20 450 999)
+@20450100 = ~Stuns %theTarget%~ // reprise de @10450001
+@20450101 = ~Stuns %theTarget%~ // reprise de @10450001
+@20450102 = ~to stun %theTarget%~ // reprise de @10450002
+@20450103 = ~to stun %theTarget%~ // reprise de @10450002
 
 // Opcode 62 : phrases (20 620 100-20 620 999)
 @20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
@@ -702,8 +828,32 @@
 @20620120 = ~Remove a %spellType% spell of %levelStr% level~ // reprise de @10620003
 @20620140 = ~Double the amount of %spellType% spells of %levelStr% level that can be memorized~ // reprise de @10620005
 
+// Opcode 63 : Infravision (20 630 000-20 630 999)
+@20630100 = ~Infravision~ // reprise de @10630001
+@20630101 = ~Grant infravision %toTheTarget%~ // reprise de @10630011
+@20630102 = ~to grant infravision~ // reprise de @10630021
+@20630103 = ~to grant infravision %toTheTarget% ~ // reprise de @10630031
+
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Damage~ // reprise de @10730001
+
+// Opcode 74 : Cécité (20 740 000-20 740 999)
+@20740100 = ~Blindness~ // reprise de @10740001
+@20740101 = ~Blinds %theTarget%~ // reprise de @10740002
+@20740102 = ~to blind %theTarget%~ // reprise de @10740003
+@20740103 = ~to blind %theTarget%~ // reprise de @10740003
+
+// Opcode 76 : Débilité mentale (20 760 000-20 760 999)
+@20760100 = ~Feeblemindedness~ // reprise de @10760001
+@20760101 = ~Inflicts Feeblemindedness on %theTarget%~ // reprise de @10760002
+@20760102 = ~to inflict Feeblemindedness on %theTarget%~ // reprise de @10760003
+@20760103 = ~to inflict Feeblemindedness on %theTarget%~ // reprise de @10760003
+
+// Opcode 80 : Surdité (version longue seulement) (20 800 000-20 800 999)
+@20800100 = ~Deafness~ // reprise de @10800001
+@20800101 = ~Deafens %theTarget%~ // reprise de @10800002
+@20800102 = ~to deafen %theTarget%~ // reprise de @10800003
+@20800103 = ~to deafen %theTarget%~ // reprise de @10800003
 
 // Opcode 84 : libellés (20 840 000-20 840 099)
 @20840000 = ~Magical Fire Resistance~ // reprise de @10840001
@@ -732,6 +882,24 @@
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Protects %theTarget% from %opcodeStr%~ // reprise de @11010002
+
+// Opcode 109 : Paralysie (21 090 000-21 090 999)
+@21090100 = ~Hold %theTarget%~ // reprise de @11090002
+@21090101 = ~Hold %theTarget%~ // reprise de @11090002
+@21090102 = ~to hold %theTarget%~ // reprise de @11090004
+@21090103 = ~to hold %theTarget%~ // reprise de @11090004
+
+// Opcode 128 : Confusion (21 280 000-21 280 999)
+@21280100 = ~Confusion~ // reprise de @11280001
+@21280101 = ~Confusing %toTheTarget%~ // reprise de @11280002
+@21280102 = ~to confuse %theTarget%~ // reprise de @11280003
+@21280103 = ~to confuse %theTarget%~ // reprise de @11280003
+
+// Opcode 134 : Pétrification (21 340 000-21 340 999)
+@21340100 = ~Turn to Stone~ // reprise de @11340001
+@21340101 = ~Transmutes %theTarget% to stone~ // reprise de @11340002
+@21340102 = ~to be transmuted to stone~ // reprise de @11340003
+@21340103 = ~to transmute %theTarget% to stone~ // reprise de @11340004
 
 // Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
 @21440100 = ~Prevents~ // reprise de @11440050
@@ -787,6 +955,30 @@
 
 // Opcode 306 : libellés (23 060 000-23 060 099)
 @23060000 = ~THAC0 with the on hand~ // reprise de @13060001
+
+// Opcode 317 : Hâte (2) : comme l'opcode 16 (23 170 000-23 170 999)
+@23170100 = ~Double movement speed and grants one additional attack per round~ // reprise de @10160011
+@23170101 = ~Double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160017
+@23170102 = ~to double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160014
+@23170103 = ~to double movement speed and grants one additional attack per round %toTheTarget%~ // reprise de @10160014
+@23170110 = ~Double the movement speed and the number of attacks per round~ // reprise de @10160012
+@23170112 = ~to double movement speed and the number of attacks per round %ofTheTarget%~ // reprise de @10160015
+@23170113 = ~to double movement speed and the number of attacks per round %ofTheTarget%~ // reprise de @10160015
+@23170120 = ~Double the movement speed~ // reprise de @10160013
+@23170121 = ~Double the movement speed %ofTheTarget%~ // reprise de @10160019
+@23170122 = ~to double movement speed %ofTheTarget%~ // reprise de @10160016
+@23170123 = ~to double movement speed %ofTheTarget%~ // reprise de @10160016
+@23170130 = ~Haste~ // reprise de @10160001
+@23170131 = ~Cast Haste on %theTarget%~ // reprise de @10160007
+@23170132 = ~to cast Haste on %theTarget%~ // reprise de @10160004
+@23170133 = ~to cast Haste on %theTarget%~ // reprise de @10160004
+@23170140 = ~Improved haste~ // reprise de @10160002
+@23170142 = ~to cast Improved haste on %theTarget%~ // reprise de @10160005
+@23170143 = ~to cast Improved haste on %theTarget%~ // reprise de @10160005
+@23170150 = ~Haste (without APR bonus)~ // reprise de @10160003
+@23170151 = ~Cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160009
+@23170152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
+@23170153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~No protection %versus%~ // reprise de @15210001

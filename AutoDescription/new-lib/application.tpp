@@ -153,9 +153,12 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		SPRINT render_missing ~not_implemented:application:ticks~
 	END
 	// Timing 2 d'un en-tête : l'ancien moteur n'écrit pas de durée, comme pour un effet d'équipement.
+	// Effet différé sans délai : l'ancien moteur le décrit comme permanent, sans le dire.
+	ELSE PATCH_IF app_timing == TIMING_delayed AND app_duration <= 0 AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
+		SPRINT render_missing ~not_implemented:application:no_delay~
+	END
 	ELSE PATCH_IF app_timing != TIMING_duration AND app_timing != TIMING_duration_ticks AND app_timing != TIMING_permanent
-			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped
-			AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
+			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed BEGIN
 		SPRINT render_missing ~not_implemented:application:timing~
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -231,8 +234,13 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 			SPRINT app_duration_text @3000004 // ~%frequency% pendant %strDuration% après %afterStrDuration%~
 		END
 	END
+	// Un délai est toujours écrit, comme une répétition.
+	ELSE PATCH_IF app_timing == TIMING_delayed AND NOT (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~) BEGIN
+		LPF ad_duration_text INT_VAR seconds = app_duration RET strDuration = text END
+		SPRINT app_duration_text @3000005 // ~après %strDuration%~
+	END
 	ELSE PATCH_IF (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)
-			OR $charged_global_duration(~%app_header%~) > 0 OR app_timing == TIMING_while_equipped BEGIN
+			OR $charged_global_duration(~%app_header%~) > 0 OR app_timing == TIMING_while_equipped OR app_timing == TIMING_delayed BEGIN
 		SPRINT app_duration_text ~~
 	END
 	ELSE PATCH_IF app_timing == TIMING_permanent OR app_timing == TIMING_permanent_after_death BEGIN
@@ -379,8 +387,9 @@ END
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
 // la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
-// (ad_application_save) ; les trois sont remis à zéro après la ligne. Forme ou cible sans texte :
-// render_late_missing, et pas de ligne.
+// (ad_application_save) ; line_condition (« En combat ») précède toute la ligne, séparée par
+// AD_SEMICOLON (ancien add_condition) ; tous sont remis à zéro après la ligne. Forme ou cible sans
+// texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_application_form
 	SET app_line_ok = 1
@@ -437,6 +446,15 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SET line_probability_low = $fx_probability_low(~%line_fx%~)
 		SET line_probability_high = $fx_probability_high(~%line_fx%~)
 	END
+	PATCH_IF NOT (~%line_condition%~ STRING_EQUAL ~~) BEGIN
+		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
+		// placé après la condition.
+		PATCH_IF app_probability < 100 BEGIN
+			SPRINT render_late_missing ~not_implemented:application:condition_probability~
+			SET app_line_ok = 0
+		END
+		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~
+	END
 	PATCH_IF app_line_ok BEGIN
 		LPM ad_line_add
 	END
@@ -445,6 +463,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0
 	SPRINT line_suffix ~~
+	SPRINT line_condition ~~
 	SET line_save_for_half = 0
 	SET line_fail_for_half = 0
 END
