@@ -6,10 +6,11 @@
 // ligne d'effet probable garde sa probabilité (line_probability, 0 pour une autre ligne), sa plage
 // (line_probability_low, line_probability_high) et son texte sans « N % de chances » (line_core),
 // pour le regroupement par plage (ad_lines_probability_groups) ; line_nested : ligne en retrait sous
-// le titre de son groupe.
+// le titre de son groupe ; line_effect : effet (line_fx) d'une ligne probable.
 //
 // Tableaux écrits : line_section, line_sort, line_text, line_order, line_probability,
-// line_probability_low, line_probability_high, line_core, line_nested ; variable écrite : line_count.
+// line_probability_low, line_probability_high, line_core, line_nested, line_effect ; variable écrite :
+// line_count.
 
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
@@ -55,6 +56,9 @@ DEFINE_PATCH_MACRO ad_line_append BEGIN
 	SET $line_probability(~%line_count%~) = line_probability
 	SET $line_probability_low(~%line_count%~) = line_probability > 0 ? line_probability_low : 0
 	SET $line_probability_high(~%line_count%~) = line_probability > 0 ? line_probability_high : 0
+	PATCH_IF line_probability > 0 BEGIN
+		SET $line_effect(~%line_count%~) = line_fx
+	END
 	SPRINT $line_core(~%line_count%~) ~%line_core%~
 	SET $line_nested(~%line_count%~) = line_nested
 	SET line_count += 1
@@ -63,19 +67,48 @@ END
 // Regroupement par probabilité des lignes probables de la section prob_section (ancien
 // group_probability_effects, pour les capacités de combat) : ces lignes sont retirées puis
 // réécrites après les autres, segment par segment. Le tri de l'ancien moteur les range par plage
-// (borne basse, puis haute), égalités dans l'ordre inverse de la section (V37). Segments : une plage
+// (borne basse, puis haute), égalités dans l'ordre inverse de ses lignes (V37), produites opcode par
+// opcode dans l'ordre où chacun apparaît d'abord dans le bloc (ad_lines_opcode_rank), puis dans
+// l'ordre de la section. Segments : une plage
 // par couple de bornes ; avec AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES, chaque intervalle entre
 // deux bornes consécutives, avec les effets actifs sur tout l'intervalle (un effet peut être dans
 // plusieurs), les segments aux mêmes effets réunis en additionnant leurs probabilités. Un segment
 // d'un effet garde sa ligne (avec la probabilité du segment) ; un segment de plusieurs a un titre
 // « 11 % de chances » suivi de ses effets en retrait.
+// Rang prob_rank de l'opcode de la ligne probable prob_id parmi les opcodes de son bloc, dans l'ordre
+// de leur premier effet lu (ordre du tableau des opcodes de l'ancien moteur).
+DEFINE_PATCH_MACRO ad_lines_opcode_rank BEGIN
+	SET prob_fx = $line_effect(~%prob_id%~)
+	SET prob_opcode = $fx_opcode(~%prob_fx%~)
+	SPRINT prob_scope $fx_scope(~%prob_fx%~)
+	// Marque propre à cet appel : CLEAR_ARRAY ne défait pas les éléments que VARIABLE_IS_SET teste (V36).
+	SET prob_rank_call = VARIABLE_IS_SET prob_rank_call ? prob_rank_call + 1 : 1
+	SET prob_rank = 0
+	FOR (prob_other = 0; prob_other < fx_count AND prob_rank >= 0; ++prob_other) BEGIN
+		SPRINT prob_other_scope $fx_scope(~%prob_other%~)
+		SET prob_other_opcode = $fx_opcode(~%prob_other%~)
+		PATCH_IF ~%prob_other_scope%~ STRING_EQUAL ~%prob_scope%~ BEGIN
+			PATCH_IF prob_other_opcode == prob_opcode BEGIN
+				SET prob_final_rank = prob_rank
+				SET prob_rank = 0 - 1
+			END
+			ELSE PATCH_IF NOT VARIABLE_IS_SET $prob_rank_seen(~%prob_other_opcode%~) OR $prob_rank_seen(~%prob_other_opcode%~) != prob_rank_call BEGIN
+				SET $prob_rank_seen(~%prob_other_opcode%~) = prob_rank_call
+				SET prob_rank += 1
+			END
+		END
+	END
+	SET prob_rank = prob_final_rank > 99 ? 99 : prob_final_rank
+END
+
 DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 	CLEAR_ARRAY prob_keys
 	FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 		SPRINT prob_line_section $line_section(~%prob_id%~)
 		PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_probability(~%prob_id%~) > 0 BEGIN
-			SET prob_key = ($line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~)) * 1000
-				+ 999 - $line_order(~%prob_id%~)
+			LPM ad_lines_opcode_rank
+			SET prob_key = ($line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~)) * 100000
+				+ (99 - prob_rank) * 1000 + 999 - $line_order(~%prob_id%~)
 			SET $prob_keys(~%prob_key%~) = prob_id
 			SPRINT $line_section(~%prob_id%~) ~~
 		END

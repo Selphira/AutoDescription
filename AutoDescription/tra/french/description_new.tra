@@ -16,6 +16,7 @@
 @1000005 = ~ », « ~ // reprise de @10020
 @1000006 = ~ » %and% « ~ // reprise de @10021
 @1000007 = ~ou~ // reprise de @100004
+@1000008 = ~les~ // reprise de @100020
 
 // Mise en forme : distances, 1 100 000 + pluriel + 2 × demi-unité ; le .tra choisit l'unité (%distance_units% mètres entiers, %distance_feet% pieds) (1 100 000-1 100 099)
 @1100000 = ~%distance_units% mètre~
@@ -607,6 +608,24 @@
 @8060040 = ~la dextérité~ // reprise de @10150002
 @8060042 = ~le charisme~ // reprise de @10060002
 
+// Noms des projectiles, 8 070 000 + index (AD_PROJECTILE_NAMES) (8 070 000-8 070 999)
+@8070001 = ~flèches~ // reprise de @300001
+@8070006 = ~haches de jet~ // reprise de @300006
+@8070011 = ~carreaux~ // reprise de @300011
+@8070016 = ~billes~ // reprise de @300016
+@8070023 = ~orbes chromatiques~ // reprise de @300023
+@8070026 = ~dagues de jet~ // reprise de @300026
+@8070031 = ~fléchettes~ // reprise de @300031
+@8070036 = ~projectiles magiques~ // reprise de @300036
+@8070039 = ~éclairs~ // reprise de @300039
+@8070055 = ~lances de jet~ // reprise de @300055
+@8070062 = ~toiles d'araignées~ // reprise de @300062
+@8070064 = ~attaques de regard~ // reprise de @300064
+@8070094 = ~nuages puants~ // reprise de @300094
+@8070208 = ~rayons des spectateurs~ // reprise de @300208
+@8070218 = ~désintégrations~ // reprise de @300218
+@8070227 = ~nuées d'insectes~ // reprise de @300227
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
 @20000001 = ~Classe d'armure de base~ // reprise de @10000100
@@ -984,6 +1003,16 @@
 @20670172 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
 @20670173 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
 
+// Opcode 69 : Non-détection : phrases 0100, 0110 version courte (20 690 000-20 690 999)
+@20690100 = ~Rend %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~ // reprise de @10690004
+@20690101 = ~Rend %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~ // reprise de @10690004
+@20690102 = ~de rendre %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~ // reprise de @10690005
+@20690103 = ~de rendre %theTarget% indétectable par des moyens magiques tels que la « Détection de l'invisibilité » et autres divinations~ // reprise de @10690005
+@20690110 = ~Non-détection~ // reprise de @10690001
+@20690111 = ~Lance « Non-détection » sur %theTarget%~ // reprise de @10690002
+@20690112 = ~de lancer « Non-détection » sur %theTarget%~ // reprise de @10690003
+@20690113 = ~de lancer « Non-détection » sur %theTarget%~ // reprise de @10690003
+
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001
 
@@ -1107,6 +1136,34 @@
 @21160102 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
 @21160103 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
 
+// Opcode 119 : Image miroir (21 190 000-21 190 999)
+@21190100 = ~Image miroir~ // reprise de @11190001
+@21190101 = ~Lance Image miroir sur %theTarget%~ // reprise de @11190002
+@21190102 = ~de lancer Image miroir sur %theTarget%~ // reprise de @11190003
+@21190103 = ~de lancer Image miroir sur %theTarget%~ // reprise de @11190003
+
+// Opcode 120 : Immunité aux armes : 0010 + parameter2 types d'armes ; phrases 0100 armes enchantées, 0110 autres types (21 200 000-21 200 999)
+@21200010 = ~armes enchantées~ // reprise de @11200010
+@21200011 = ~armes magiques~ // reprise de @11200011
+@21200012 = ~armes non-magiques~ // reprise de @11200012
+@21200013 = ~armes en argent~ // reprise de @11200013
+@21200014 = ~armes qui ne sont pas en argent~ // reprise de @11200014
+@21200015 = ~armes enchantées +0 exceptées celles en argent~ // reprise de @11200015
+@21200016 = ~armes à 2 mains~ // reprise de @11200016
+@21200017 = ~armes à 1 main~ // reprise de @11200017
+@21200018 = ~armes maudites~ // reprise de @11200018
+@21200019 = ~armes non-maudites~ // reprise de @11200019
+@21200020 = ~armes en fer froid~ // reprise de @11200020
+@21200021 = ~armes qui ne sont pas en fer froid~ // reprise de @11200021
+@21200100 = ~Immunité contre les %weaponType% %enchantment% et inférieures~ // reprise de @11200001
+@21200101 = ~Immunise %theTarget% contre les %weaponType% %enchantment% et inférieures~ // reprise de @11200003
+@21200102 = ~d'immuniser %theTarget% contre les %weaponType% %enchantment% et inférieures~ // reprise de @11200005
+@21200103 = ~d'immuniser %theTarget% contre les %weaponType% %enchantment% et inférieures~ // reprise de @11200005
+@21200110 = ~Immunité contre les %weaponType%~ // reprise de @11200002
+@21200111 = ~Immunise %theTarget% contre les %weaponType%~ // reprise de @11200004
+@21200112 = ~d'immuniser %theTarget% contre les %weaponType%~ // reprise de @11200006
+@21200113 = ~d'immuniser %theTarget% contre les %weaponType%~ // reprise de @11200006
+
 // Opcode 122 : Création d'objet : phrases 0100 (21 220 000-21 220 999)
 @21220100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @21220101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
@@ -1156,6 +1213,18 @@
 @21441014 = ~%action% l'utilisation de la détection des pièges et des illusions~ // reprise de @11440015
 @21441015 = ~%action% l'utilisation de l'inventaire~ // reprise de @11440016
 
+// Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
+@21540100 = ~Enchevêtrement~ // reprise de @11540001
+@21540101 = ~Enchevêtre %theTarget%~ // reprise de @11540002
+@21540102 = ~d'enchevêtrer %theTarget%~ // reprise de @11540003
+@21540103 = ~d'enchevêtrer %theTarget%~ // reprise de @11540003
+
+// Opcode 157 : Toile d'araignée (21 570 000-21 570 999)
+@21570100 = ~Empêtre %theTarget%~ // reprise de @11570001
+@21570101 = ~Empêtre %theTarget%~ // reprise de @11570001
+@21570102 = ~d'empêtrer %theTarget%~ // reprise de @11570002
+@21570103 = ~d'empêtrer %theTarget%~ // reprise de @11570002
+
 // Opcode 161 : Soin : peur (21 610 000-21 610 999)
 @21610100 = ~Dissipation de la peur~ // reprise de @11610001
 @21610101 = ~Dissipe la peur %ofTheTarget%~ // reprise de @11610002
@@ -1204,6 +1273,12 @@
 @21910000 = ~Niveau de lanceur de sorts %spellType%~ // reprise de @11910001
 @21910002 = ~le niveau de lanceur de sorts %spellType%~ // reprise de @11910003
 
+// Opcode 197 : Renvoi des projectiles : phrases 0100 (21 970 000-21 970 999)
+@21970100 = ~Renvoie %the% %projectiles%~ // reprise de @11970001
+@21970101 = ~Renvoie %the% %projectiles% visant %theTarget%~ // reprise de @11970002
+@21970102 = ~de renvoyer %the% %projectiles%~ // reprise de @11970003
+@21970103 = ~de renvoyer %the% %projectiles% visant %theTarget%~ // reprise de @11970004
+
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Immunité au sort « %spellName% »~ // reprise de @12060001
 
@@ -1246,6 +1321,16 @@
 
 // Opcode 289 : libellés (22 890 000-22 890 099)
 @22890000 = ~Dégâts à mains nues~ // reprise de @12890001
+
+// Opcode 292 : Attaques sournoises : phrases 0100 immunité, 0110 sensibilité (22 920 000-22 920 999)
+@22920100 = ~Immunité aux attaques sournoises~ // reprise de @12920001
+@22920101 = ~Immunise %theTarget% aux attaques sournoises~ // reprise de @12920002
+@22920102 = ~de résister aux attaques sournoises~ // reprise de @12920003
+@22920103 = ~d'immuniser %theTarget% aux attaques sournoises~ // reprise de @12920004
+@22920110 = ~Sensible aux attaques sournoises~ // reprise de @12920011
+@22920111 = ~Rend %theTarget% sensible aux attaques sournoises~ // reprise de @12920012
+@22920112 = ~d'être sensible aux attaques sournoises~ // reprise de @12920013
+@22920113 = ~de rendre %theTarget% sensible aux attaques sournoises~ // reprise de @12920014
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~TAC0 de la main secondaire~ // reprise de @13050001

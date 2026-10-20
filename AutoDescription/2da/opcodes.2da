@@ -70,7 +70,7 @@
 66       1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Transparency_Fade
 67       1        1        DESCRIBED LEVEL            130    SHOWN           Summon:_Creature_Summoning
 68       1        1        TODO      LEVEL            354    IGNORED         Summon:_Unsummon_Creature
-69       1        1        TODO      LEVEL            290    SHOWN           Protection:_From_Detection_(Non-Detection)
+69       1        1        DESCRIBED LEVEL            290    SHOWN           Protection:_From_Detection_(Non-Detection)
 70       1        1        TODO      LEVEL            220    IGNORED         Cure:_Non-Detection
 71       1        1        TODO      LEVEL            464    SHOWN           IDS:_Sex_Change
 72       1        1        IGNORED   LEVEL            400    SHOWN           IDS:_Set_IDS_State
@@ -120,8 +120,8 @@
 116      1        1        DESCRIBED LEVEL            218    IGNORED         State:_Cure_Invisibility
 117      1        1        TODO      LEVEL            458    SHOWN           Spell_Effect:_Reveal_Area
 118      1        1        TODO      LEVEL            400    SHOWN           Empty:
-119      1        1        TODO      LEVEL            402    SHOWN           Spell_Effect:_Mirror_Image
-120      1        1        TODO      LEVEL            281    SHOWN           Protection:_from_Weapons
+119      1        1        DESCRIBED LEVEL            402    SHOWN           Spell_Effect:_Mirror_Image
+120      1        1        DESCRIBED LEVEL            281    SHOWN           Protection:_from_Weapons
 121      1        1        TODO      LEVEL            400    SHOWN           Empty:
 122      1        1        DESCRIBED LEVEL            482    NOT_PERMANENT   Item:_Create_Inventory_Item
 123      1        1        TODO      LEVEL            6      IGNORED         Item:_Remove_Inventory_Item
@@ -155,10 +155,10 @@
 151      1        1        TODO      LEVEL            133    IGNORED         Summon:_Replace_Creature
 152      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Play_Movie
 153      1        1        TODO      LEVEL            398    SHOWN           Overlay:_Sanctuary
-154      1        1        TODO      LEVEL            374    SHOWN           Overlay:_Entangle
+154      1        1        DESCRIBED LEVEL            374    SHOWN           Overlay:_Entangle
 155      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Minor_Globe
 156      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Protection_from_Normal_Missiles_Cylinder
-157      1        1        TODO      LEVEL            373    NOT_AFTER_DEATH State:_Web_Effect
+157      1        1        DESCRIBED LEVEL            373    NOT_AFTER_DEATH State:_Web_Effect
 158      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Grease
 159      1        1        TODO      LEVEL            403    SHOWN           Spell_Effect:_Mirror_Image_(Exact_Number)
 160      1        1        TODO      LEVEL            216    IGNORED         Remove_Sanctuary
@@ -198,7 +198,7 @@
 194      1        1        IGNORED   LEVEL            400    SHOWN           Ignore_Dialog_Pause
 195      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Death_Dependent_Constitution_Loss_(Familiar_Bond)
 196      1        1        TODO      LEVEL            485    SHOWN           Spell_Effect:_Familiar_Block
-197      1        1        TODO      LEVEL            246    SHOWN           Spell:_Bounce_(by_Impact_Projectile)
+197      1        1        DESCRIBED LEVEL            246    SHOWN           Spell:_Bounce_(by_Impact_Projectile)
 198      1        1        TODO      LEVEL            239    SHOWN           Spell:_Bounce_(by_Opcode)
 199      1        1        TODO      LEVEL            240    SHOWN           Spell:_Bounce_(by_Power_Level)
 200      1        1        TODO      LEVEL            241    SHOWN           Spell:_Bounce_(by_Power_level,_decrementing)
@@ -293,7 +293,7 @@
 289      1        1        DESCRIBED LEVEL            46     SHOWN           Stat:_Fist_Damage_Modifier
 290      1        1        IGNORED   LEVEL            400    SHOWN           Text:_Change_Title
 291      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Disable_Visual_Effect
-292      1        1        TODO      LEVEL            287    SHOWN           Protection:_Backstab
+292      1        1        DESCRIBED LEVEL            287    SHOWN           Protection:_Backstab
 293      1        1        IGNORED   LEVEL            400    SHOWN           Script:_Enable_Offscreen_AI
 294      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Existance_Delay_Override
 295      1        1        TODO      LEVEL            291    SHOWN           Graphics:_Disable_Permanent_Death

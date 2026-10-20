@@ -31,6 +31,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_improved_invisibility
 		LPM ad_group_dispel_cures
 		LPM ad_group_movement_restored
+		LPM ad_group_entangle
 		LPM ad_group_free_action
 		LPM ad_group_spell_failure
 		LPM ad_group_item_return
@@ -350,6 +351,34 @@ DEFINE_PATCH_MACRO ad_group_movement_restored BEGIN
 						AND $fx_probability2(~%group_candidate%~) == $fx_probability2(~%group_id%~) BEGIN
 					SET $fx_consumed(~%group_candidate%~) = 1
 				END
+			END
+		END
+	END
+END
+
+// Enchevêtrement (ancien opcode_154_group) : un enchevêtrement (154) absorbe les immobilisations de
+// son bloc (126 de parameter1 0, parameter2 lu 1, 2 ou 5) qui ont les mêmes cible, timing, durée,
+// probabilités, dés, puissance, jet de sauvegarde et résistance à la dissipation ; sans elles, il
+// n'est pas écrit.
+DEFINE_PATCH_MACRO ad_group_entangle BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 154 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_special = 0 RET group_key = signature END
+			SET group_absorbed = 0
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SET group_movement_mode = $fx_parameter2_raw(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 126 AND NOT $fx_consumed(~%group_candidate%~)
+						AND $fx_parameter1(~%group_candidate%~) == 0
+						AND (group_movement_mode == 1 OR group_movement_mode == 2 OR group_movement_mode == 5) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_special = 0 RET group_other_key = signature END
+					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET group_absorbed = 1
+					END
+				END
+			END
+			PATCH_IF NOT group_absorbed BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
 			END
 		END
 	END
