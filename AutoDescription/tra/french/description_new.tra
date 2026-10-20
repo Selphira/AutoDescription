@@ -48,6 +48,12 @@
 @2000020 = ~la cible~ // reprise de @102471
 @2000021 = ~de la cible~ // reprise de @101085
 @2000022 = ~à la cible~ // reprise de @101181
+@2000100 = ~le porteur~ // reprise de @102472
+@2000101 = ~du porteur~ // reprise de @101086
+@2000102 = ~au porteur~ // reprise de @101180
+@2000110 = ~le buveur~ // reprise de @102451
+@2000111 = ~du buveur~ // reprise de @102452
+@2000112 = ~au buveur~ // reprise de @102453
 
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~pendant %strDuration%~ // reprise de @100311
@@ -73,6 +79,13 @@
 @5000012 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~ // reprise de @102122
 @5000020 = ~ignore la cible principale~ // reprise de @102170
 @5000021 = ~ignore la cible secondaire~ // reprise de @102171
+@5000022 = ~ignore les images miroir~ // reprise de @102172
+@5000023 = ~ignore la difficulté~ // reprise de @102173
+@5000030 = ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~ // reprise de @101183
+@5000032 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~ // reprise de @101184
+@5000040 = ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~ // reprise de @102123
+@5000042 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~ // reprise de @102124
+@5000050 = ~réduits de moitié~ // reprise de @102125
 @5000111 = ~Augmente de %value% %theStatistic% %ofTheTarget%~ // reprise de @102286
 @5000121 = ~Réduit de %value% %theStatistic% %ofTheTarget%~ // reprise de @102285
 
@@ -564,6 +577,30 @@
 
 // Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
 @20010140 = ~Attaque impossible~ // reprise de @10010005
+
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+@20120001 = ~%damage% %damageType%~ // reprise de @102166
+@20120010 = ~points de dégâts~ // reprise de @101092
+@20120020 = ~points de dégâts contondants~ // reprise de @10120020
+@20120021 = ~points de dégâts d'acide~ // reprise de @10120021
+@20120022 = ~points de dégâts de froid~ // reprise de @10120022
+@20120023 = ~points de dégâts d'électricité~ // reprise de @10120023
+@20120024 = ~points de dégâts de feu~ // reprise de @10120024
+@20120025 = ~points de dégâts perforants~ // reprise de @10120025
+@20120026 = ~points de dégâts de poison~ // reprise de @10120026
+@20120027 = ~points de dégâts magiques~ // reprise de @10120027
+@20120028 = ~points de dégâts de projectiles~ // reprise de @10120028
+@20120029 = ~points de dégâts tranchants~ // reprise de @10120029
+@20120030 = ~points de dégâts de feu magique~ // reprise de @10120030
+@20120031 = ~points de dégâts de froid magique~ // reprise de @10120031
+@20120032 = ~points de dégâts non létal~ // reprise de @10120032
+@20120040 = ~ne réveille pas la cible~ // reprise de @10120040
+@20120041 = ~efficace si la source est désarmée~ // reprise de @10120041
+
+// Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums
+@20120100 = ~Inflige %damage% %toTheTarget%~ // reprise de @10120001
+@20120101 = ~Inflige %damage% %toTheTarget%~ // reprise de @10120002
+@20120111 = ~Draine %damage% %toTheTarget%~ // reprise de @10120004
 
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Points de vie maximums~ // reprise de @10180001

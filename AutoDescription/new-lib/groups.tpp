@@ -23,6 +23,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_immunities
 	END
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_damage_halves
+	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
@@ -198,6 +201,39 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	END
 END
 
+// Moitié des dégâts au jet de sauvegarde (ancien opcode_12_group) : chaque effet 12 sans jet de
+// sauvegarde, dans l'ordre du fichier, est réuni au premier autre effet 12 non consommé qui a les mêmes
+// champs, hors jet de sauvegarde et résistance à la dissipation : la ligne additionne leurs dés et
+// prend le jet de l'autre, réussi pour moitié des dégâts (bit 8 de special, lu sur EE). L'effet
+// réuni est écrit après les autres effets 12 (fx_damage_late), comme celui que l'ancien moteur ajoute.
+DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 12 AND NOT $fx_consumed(~%group_id%~) AND $fx_save_type(~%group_id%~) == 0 BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_save = 0 RET group_signature = signature END
+			SET group_other = 0 - 1
+			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
+				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 12 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_save = 0 RET group_other_signature = signature END
+					SPRINT group_resource $fx_resource_lower(~%group_id%~)
+					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+						SET group_other = group_candidate
+					END
+				END
+			END
+			PATCH_IF group_other >= 0 BEGIN
+				SET $fx_consumed(~%group_other%~) = 1
+				SET $fx_dice_count(~%group_id%~) = $fx_dice_count(~%group_id%~) + $fx_dice_count(~%group_other%~)
+				SET $fx_special(~%group_id%~) = $fx_special(~%group_id%~) BOR BIT8
+				SET $fx_save_type(~%group_id%~) = $fx_save_type(~%group_other%~)
+				SET $fx_save_types(~%group_id%~) = $fx_save_types(~%group_other%~)
+				SET $fx_save_flags(~%group_id%~) = $fx_save_flags(~%group_other%~)
+				SET $fx_damage_late(~%group_id%~) = 1
+			END
+		END
+	END
+END
+
 // absorb_same : l'effet absorb_id a la même portée, la même cible, les mêmes probabilités et le même
 // jet de sauvegarde que l'immunité immunity_id.
 DEFINE_PATCH_MACRO ad_immunity_same_fields BEGIN
@@ -267,11 +303,13 @@ END
 
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
 // (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
-// new-lib/normalize.tpp). with_parameter1 = 0 : parameter1 non comparé.
+// new-lib/normalize.tpp). with_parameter1 = 0 : parameter1 non comparé ; with_save = 0 : jet de
+// sauvegarde et résistance à la dissipation non comparés.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
 		with_parameter1 = 1
+		with_save = 1
 	RET
 		signature
 BEGIN
@@ -279,14 +317,14 @@ BEGIN
 	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
 	SET sig_parameter2   = $fx_parameter2(~%fx_id%~)
 	SET sig_timing       = $fx_timing(~%fx_id%~)
-	SET sig_resistance   = $fx_resistance(~%fx_id%~)
+	SET sig_resistance   = with_save ? $fx_resistance(~%fx_id%~) : 0
 	SET sig_duration     = $fx_duration(~%fx_id%~)
 	SET sig_probability1 = $fx_probability1(~%fx_id%~)
 	SET sig_probability2 = $fx_probability2(~%fx_id%~)
 	SET sig_dice_count   = $fx_dice_count(~%fx_id%~)
 	SET sig_dice_sides   = $fx_dice_sides(~%fx_id%~)
-	SET sig_save_type    = $fx_save_type(~%fx_id%~)
-	SET sig_save_bonus   = $fx_save_bonus(~%fx_id%~)
+	SET sig_save_type    = with_save ? $fx_save_type(~%fx_id%~) : 0
+	SET sig_save_bonus   = with_save ? $fx_save_bonus(~%fx_id%~) : 0
 	SET sig_special      = $fx_special(~%fx_id%~)
 	SET sig_target       = $fx_group_target(~%fx_id%~)
 	SPRINT sig_scope $fx_scope(~%fx_id%~)

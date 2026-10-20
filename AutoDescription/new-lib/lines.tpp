@@ -1,13 +1,17 @@
 // Lignes d'une description, rangées avant le rendu : section, rang de tri, texte. Le texte n'est
-// assemblé qu'au rendu de la section, dans l'ordre des rangs ; à rang égal, la dernière ligne
-// ajoutée vient en premier, comme dans l'ancien moteur (son tri ne compare que le rang et inverse
-// l'ordre d'insertion des égalités, V37).
+// assemblé qu'au rendu de la section, dans l'ordre des rangs ; à rang égal, la ligne qui vient en
+// dernier dans la section vient en premier, comme dans l'ancien moteur (son tri ne compare que le
+// rang et inverse l'ordre des égalités, V37). L'ordre d'une section est celui des ajouts, sauf après
+// un passage de tri (ad_lines_sort_pass), pour une section que l'ancien moteur trie deux fois.
 //
-// Tableaux écrits : line_section, line_sort, line_text ; variable écrite : line_count.
+// Tableaux écrits : line_section, line_sort, line_text, line_order ; variable écrite : line_count.
 
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
 	SET line_phrase = 0
+	SPRINT line_suffix ~~
+	SET line_save_for_half = 0
+	SET line_fail_for_half = 0
 END
 
 // Ajoute la ligne line_text à la section line_section, au rang line_sort. Une ligne de même texte
@@ -24,10 +28,33 @@ DEFINE_PATCH_MACRO ad_line_add BEGIN
 		SET line_duplicate = (~%line_old_section%~ STRING_EQUAL ~%line_section%~) AND (~%line_old_text%~ STRING_EQUAL ~%line_new_text%~)
 	END
 	PATCH_IF NOT line_duplicate BEGIN
+		SET $line_order(~%line_count%~) = line_count
 		SPRINT $line_section(~%line_count%~) ~%line_section%~
 		SET $line_sort(~%line_count%~) = line_sort
 		SPRINT $line_text(~%line_count%~) ~%line_text%~
 		SET line_count += 1
+	END
+END
+
+// Passage de tri de la section line_pass_section : ses lignes prennent l'ordre que leur donne un tri
+// de l'ancien moteur (rang croissant, égalités inversées) ; une ligne ajoutée ensuite vient après
+// elles.
+DEFINE_PATCH_MACRO ad_lines_sort_pass BEGIN
+	CLEAR_ARRAY line_pass_keys
+	SET line_pass_count = 0
+	FOR (line_pass_id = 0; line_pass_id < line_count; ++line_pass_id) BEGIN
+		SPRINT line_pass_line_section $line_section(~%line_pass_id%~)
+		PATCH_IF ~%line_pass_line_section%~ STRING_EQUAL ~%line_pass_section%~ BEGIN
+			SET line_pass_key = ($line_sort(~%line_pass_id%~) + 100) * 1000 + 999 - $line_order(~%line_pass_id%~)
+			SET $line_pass_keys(~%line_pass_key%~) = line_pass_id
+			SET line_pass_count += 1
+		END
+	END
+	SORT_ARRAY_INDICES line_pass_keys NUMERICALLY
+	SET line_pass_order = 0
+	PHP_EACH line_pass_keys AS _ => line_pass_id BEGIN
+		SET $line_order(~%line_pass_id%~) = line_pass_order
+		SET line_pass_order += 1
 	END
 END
 
@@ -65,7 +92,7 @@ BEGIN
 			PATCH_IF line_sort < 0 - 100 OR line_sort > 2000000 BEGIN
 				PATCH_FAIL ~New engine: line sort %line_sort% out of bounds~
 			END
-			SET line_key = (line_sort + 100) * 1000 + 999 - line_id
+			SET line_key = (line_sort + 100) * 1000 + 999 - $line_order(~%line_id%~)
 			SET $section_lines(~%line_key%~) = line_id
 		END
 	END
@@ -87,6 +114,38 @@ BEGIN
 	SPRINT text ~%value%~
 	PATCH_IF value > 0 BEGIN
 		SPRINT text @1200001 // ~+%value%~
+	END
+END
+
+// Dés de dégâts (ancien get_damage_value) : « 1d8 », « 1d6 +2 », « +3 » ; un dé à une face compte
+// comme un bonus ; vide sans dé ni bonus.
+DEFINE_PATCH_FUNCTION ad_dice_text
+	INT_VAR
+		dice_count = 0
+		dice_sides = 0
+		bonus = 0
+	RET
+		text
+BEGIN
+	SPRINT text ~~
+	PATCH_IF dice_count > 0 BEGIN
+		PATCH_IF dice_sides <= 1 BEGIN
+			SET bonus += dice_count
+		END
+		ELSE BEGIN
+			SET diceCount = dice_count
+			SET diceSides = dice_sides
+			SPRINT text @1200005 // ~%diceCount%d%diceSides%~
+		END
+	END
+	PATCH_IF bonus != 0 BEGIN
+		LPF ad_signed_value INT_VAR value = bonus RET dice_bonus = text END
+		PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
+			SPRINT text ~%dice_bonus%~
+		END
+		ELSE BEGIN
+			SPRINT text ~%text% %dice_bonus%~
+		END
 	END
 END
 

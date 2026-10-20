@@ -140,11 +140,18 @@ END
 
 // Jet de sauvegarde de l'effet line_fx (ancien add_save), vide sans type de jet : « (jet de
 // sauvegarde contre les sorts ou contre les souffles pour annuler) », avec son bonus, et sur EE
-// les cibles qu'un projectile de ligne ignore. Les moitiés de dégâts ne concernent que l'opcode 12.
+// les cibles qu'un projectile de ligne ignore, les images miroir et la difficulté
+// (AD_SAVE_MIRROR_OPCODES, AD_SAVE_DIFFICULTY_OPCODES). Moitié des dégâts, fixée par l'opcode
+// (line_save_for_half : jet réussi ; line_fail_for_half : jet raté) : « pour réduire de moitié »,
+// « pour annuler et pour moitié en cas d'échec », ou « (réduits de moitié) » sans jet possible.
 DEFINE_PATCH_MACRO ad_application_save BEGIN
 	SPRINT app_save_text ~~
 	SET app_save_types = $fx_save_types(~%line_fx%~)
-	PATCH_IF app_save_types != 0 BEGIN
+	PATCH_IF line_fail_for_half AND (app_save_types == 0 OR line_save_for_half) BEGIN
+		SPRINT app_save_text @5000050 // ~réduits de moitié~
+		SPRINT app_save_text ~(%app_save_text%)~
+	END
+	ELSE PATCH_IF app_save_types != 0 BEGIN
 		SPRINT saveTypeStr ~~
 		SPRINT app_or @1000007 // ~ou~
 		PHP_EACH AD_SAVE_TYPES AS app_save_bit => app_save_opcode BEGIN
@@ -159,9 +166,21 @@ DEFINE_PATCH_MACRO ad_application_save BEGIN
 			END
 		END
 		SET app_save_bonus = $fx_save_bonus(~%line_fx%~)
-		PATCH_IF app_save_bonus != 0 BEGIN
-			LPF ad_signed_value INT_VAR value = app_save_bonus RET saveBonus = text END
+		LPF ad_signed_value INT_VAR value = app_save_bonus RET saveBonus = text END
+		PATCH_IF app_save_bonus != 0 AND line_save_for_half BEGIN
+			SPRINT app_save_text @5000032 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
+		END
+		ELSE PATCH_IF app_save_bonus != 0 AND line_fail_for_half BEGIN
+			SPRINT app_save_text @5000042 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~
+		END
+		ELSE PATCH_IF app_save_bonus != 0 BEGIN
 			SPRINT app_save_text @5000012 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
+		END
+		ELSE PATCH_IF line_save_for_half BEGIN
+			SPRINT app_save_text @5000030 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
+		END
+		ELSE PATCH_IF line_fail_for_half BEGIN
+			SPRINT app_save_text @5000040 // ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~
 		END
 		ELSE BEGIN
 			SPRINT app_save_text @5000010 // ~jet de sauvegarde %saveTypeStr% pour annuler~
@@ -175,20 +194,35 @@ DEFINE_PATCH_MACRO ad_application_save BEGIN
 			SPRINT app_save_extra @5000021 // ~ignore la cible secondaire~
 			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
 		END
+		SET app_opcode = $fx_opcode(~%line_fx%~)
+		PATCH_IF IS_EE AND VARIABLE_IS_SET $AD_SAVE_MIRROR_OPCODES(~%app_opcode%~)
+				AND (app_save_flags BAND FLAG_SAVINGTHROW_bypass_mirror_image_EE) != 0 BEGIN
+			SPRINT app_save_extra @5000022 // ~ignore les images miroir~
+			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+		END
+		PATCH_IF IS_EE AND VARIABLE_IS_SET $AD_SAVE_DIFFICULTY_OPCODES(~%app_opcode%~)
+				AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_difficulty_EE) != 0 BEGIN
+			SPRINT app_save_extra @5000023 // ~ignore la difficulté~
+			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+		END
 		SPRINT app_save_text ~(%app_save_text%)~
 	END
 END
 
-// Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget), pour une phrase
-// à la forme « cible » ; app_target_missing si le .tra ne les a pas.
+// Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget) ; app_target_missing
+// si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
+// get_effect_description) : le buveur d'une potion, le porteur d'un autre objet.
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
+	PATCH_IF app_target == TARGET_FX_self OR app_target == TARGET_FX_original_caster BEGIN
+		SET app_target_tra = item_type == ITM_TYPE_potion ? 2000110 : 2000100
+	END
 	SET app_target_missing = NOT TRA_ENTRY_EXISTS (~%app_target_tra%~)
 	PATCH_IF NOT app_target_missing BEGIN
-		LPF ad_tra INT_VAR tra_id = app_target_tra     tra_block_start = 2000000 tra_block_size = 100 RET theTarget = text END
-		LPF ad_tra INT_VAR tra_id = app_target_tra + 1 tra_block_start = 2000000 tra_block_size = 100 RET ofTheTarget = text END
-		LPF ad_tra INT_VAR tra_id = app_target_tra + 2 tra_block_start = 2000000 tra_block_size = 100 RET toTheTarget = text END
+		LPF ad_tra INT_VAR tra_id = app_target_tra     tra_block_start = 2000000 tra_block_size = 1000 RET theTarget = text END
+		LPF ad_tra INT_VAR tra_id = app_target_tra + 1 tra_block_start = 2000000 tra_block_size = 1000 RET ofTheTarget = text END
+		LPF ad_tra INT_VAR tra_id = app_target_tra + 2 tra_block_start = 2000000 tra_block_size = 1000 RET toTheTarget = text END
 	END
 END
 
@@ -197,16 +231,17 @@ END
 // ou line_text déjà rédigé à la forme « soi » ; line_section et line_sort comme pour ad_line_add.
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
-// durée. Forme ou cible sans texte : render_late_missing, et pas de ligne.
+// durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
+// la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
+// (ad_application_save) ; les trois sont remis à zéro après la ligne. Forme ou cible sans texte :
+// render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_application_form
 	SET app_line_ok = 1
-	PATCH_IF line_form MODULO 2 == 1 BEGIN
-		LPM ad_application_target_strings
-		PATCH_IF app_target_missing BEGIN
-			SPRINT render_late_missing ~not_implemented:application:target%app_target%~
-			SET app_line_ok = 0
-		END
+	LPM ad_application_target_strings
+	PATCH_IF app_target_missing BEGIN
+		SPRINT render_late_missing ~not_implemented:application:target%app_target%~
+		SET app_line_ok = 0
 	END
 	PATCH_IF line_phrase > 0 AND app_line_ok BEGIN
 		SET line_phrase_tra = line_phrase + line_form
@@ -222,6 +257,9 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SET app_opcode = $fx_opcode(~%line_fx%~)
 		SPRINT render_late_missing ~not_implemented:opcode%app_opcode%:form%line_form%~
 		SET app_line_ok = 0
+	END
+	PATCH_IF NOT (~%line_suffix%~ STRING_EQUAL ~~) BEGIN
+		SPRINT line_text ~%line_text% %line_suffix%~
 	END
 	SPRINT app_saved_section ~%line_section%~
 	SPRINT app_block $fx_block(~%line_fx%~)
@@ -241,4 +279,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0
+	SPRINT line_suffix ~~
+	SET line_save_for_half = 0
+	SET line_fail_for_half = 0
 END

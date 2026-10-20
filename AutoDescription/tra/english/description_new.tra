@@ -48,6 +48,12 @@
 @2000020 = ~the target~ // reprise de @102471
 @2000021 = ~of the target~ // reprise de @101085
 @2000022 = ~to the target~ // reprise de @101181
+@2000100 = ~the wearer~ // reprise de @102472
+@2000101 = ~of the wearer~ // reprise de @101086
+@2000102 = ~to the wearer~ // reprise de @101180
+@2000110 = ~the drinker~ // reprise de @102451
+@2000111 = ~of the drinker~ // reprise de @102452
+@2000112 = ~to the drinker~ // reprise de @102453
 
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~for %strDuration%~ // reprise de @100311
@@ -73,6 +79,13 @@
 @5000012 = ~save %saveTypeStr% at %saveBonus% neg.~ // reprise de @102122
 @5000020 = ~ignore primary target~ // reprise de @102170
 @5000021 = ~ignore secondary target~ // reprise de @102171
+@5000022 = ~bypass mirror image~ // reprise de @102172
+@5000023 = ~ignore difficulty~ // reprise de @102173
+@5000030 = ~save %saveTypeStr% half~ // reprise de @101183
+@5000032 = ~save %saveTypeStr% at %saveBonus% half~ // reprise de @101184
+@5000040 = ~save %saveTypeStr% neg. and half if fail~ // reprise de @102123
+@5000042 = ~save %saveTypeStr% at %saveBonus% neg. and half if fail~ // reprise de @102124
+@5000050 = ~reduced by half~ // reprise de @102125
 @5000111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
 @5000121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
 
@@ -564,6 +577,30 @@
 
 // Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
 @20010140 = ~Unable to attack~ // reprise de @10010005
+
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+@20120001 = ~%damage% %damageType%~ // reprise de @102166
+@20120010 = ~damage~ // reprise de @101092
+@20120020 = ~crushing damage~ // reprise de @10120020
+@20120021 = ~acid damage~ // reprise de @10120021
+@20120022 = ~cold damage~ // reprise de @10120022
+@20120023 = ~electrical damage~ // reprise de @10120023
+@20120024 = ~fire damage~ // reprise de @10120024
+@20120025 = ~piercing damage~ // reprise de @10120025
+@20120026 = ~poison damage~ // reprise de @10120026
+@20120027 = ~magic damage~ // reprise de @10120027
+@20120028 = ~missile damage~ // reprise de @10120028
+@20120029 = ~slashing damage~ // reprise de @10120029
+@20120030 = ~magic fire damage~ // reprise de @10120030
+@20120031 = ~magic cold damage~ // reprise de @10120031
+@20120032 = ~stunning damage~ // reprise de @10120032
+@20120040 = ~does not wake up the target~ // reprise de @10120040
+@20120041 = ~effective if the source is disarmed~ // reprise de @10120041
+
+// Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums
+@20120100 = ~Inflicts %damage% %toTheTarget%~ // reprise de @10120001
+@20120101 = ~Inflicts %damage% %toTheTarget%~ // reprise de @10120002
+@20120111 = ~Drains %damage% %toTheTarget%~ // reprise de @10120004
 
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Maximum hit points~ // reprise de @10180001

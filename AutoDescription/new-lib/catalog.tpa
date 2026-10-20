@@ -65,6 +65,34 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ATTACKS_PER_ROUND BEGIN
 	10 => 45
 END
 
+// Opcodes dont le jet de sauvegarde peut ignorer les images miroir (bit 24, EE), ou la difficulté
+// (bit 25, EE), selon l'ancien add_save.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_MIRROR_OPCODES BEGIN
+	12 => 1 // dégâts
+	25 => 1 // poison
+END
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_DIFFICULTY_OPCODES BEGIN
+	12 => 1 // dégâts
+END
+
+// Types de dégâts de l'opcode 12 (parameter2 sans son mode) => libellé du bloc de l'opcode ; un
+// autre type est nommé « points de dégâts » (@20120010), comme dans l'ancien moteur.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DAMAGE_TYPES BEGIN
+	0         => 20120020 // contondants
+	65536     => 20120021 // acide
+	131072    => 20120022 // froid
+	262144    => 20120023 // électricité
+	524288    => 20120024 // feu
+	1048576   => 20120025 // perforants
+	2097152   => 20120026 // poison
+	4194304   => 20120027 // magiques
+	8388608   => 20120028 // projectiles
+	16777216  => 20120029 // tranchants
+	33554432  => 20120030 // feu magique
+	67108864  => 20120031 // froid magique
+	134217728 => 20120032 // non létal
+END
+
 // Unités de durée en secondes, de la plus petite à la plus grande (ancien tableau durations) ; leurs
 // noms sont dans le bloc 3 010 000 de description_new.tra.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DURATION_UNITS BEGIN

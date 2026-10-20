@@ -64,26 +64,7 @@ DEFINE_PATCH_MACRO ad_item_combat_damage BEGIN
 	READ_BYTE   (combat_offset + ITM_HEAD_dice_sides)   combat_dice_sides
 	READ_SSHORT (combat_offset + ITM_HEAD_damage_bonus) combat_damage_bonus
 	SET combat_damage_none = combat_dice_thrown == 0 AND combat_dice_sides == 0 AND combat_damage_bonus == 0
-	SPRINT combat_damage ~~
-	PATCH_IF combat_dice_thrown > 0 BEGIN
-		PATCH_IF combat_dice_sides <= 1 BEGIN
-			SET combat_damage_bonus += combat_dice_thrown
-		END
-		ELSE BEGIN
-			SET diceCount = combat_dice_thrown
-			SET diceSides = combat_dice_sides
-			SPRINT combat_damage @1200005 // ~%diceCount%d%diceSides%~
-		END
-	END
-	PATCH_IF combat_damage_bonus != 0 BEGIN
-		LPF ad_signed_value INT_VAR value = combat_damage_bonus RET combat_bonus_text = text END
-		PATCH_IF ~%combat_damage%~ STRING_EQUAL ~~ BEGIN
-			SPRINT combat_damage ~%combat_bonus_text%~
-		END
-		ELSE BEGIN
-			SPRINT combat_damage ~%combat_damage% %combat_bonus_text%~
-		END
-	END
+	LPF ad_dice_text INT_VAR dice_count = combat_dice_thrown dice_sides = combat_dice_sides bonus = combat_damage_bonus RET combat_damage = text END
 	SPRINT $combat_damage(~%combat_id%~) ~%combat_damage%~
 	SPRINT $combat_damage_key(~%combat_id%~) ~%combat_damage%~
 	PATCH_IF combat_damage_none BEGIN
@@ -245,6 +226,9 @@ DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
 			SPRINT combat_special ~%line_text%~
 			LPM ad_line_add
 		END
+		// L'ancien moteur trie ici les lignes de l'en-tête, puis de nouveau au rendu de la section.
+		SPRINT line_pass_section ~%combat_sec%~
+		LPM ad_lines_sort_pass
 		LPF ad_lines_section_text STR_VAR section = ~%combat_sec%~ RET combat_line_text = text combat_lines_now = count END
 		SET $combat_line_count(~%combat_id%~) = combat_lines_now
 	END

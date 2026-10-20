@@ -13,7 +13,7 @@
 9        1        1        IGNORED   LEVEL            400    SHOWN           Colour:_Glow_Pulse
 10       1        1        DESCRIBED LEVEL            105    SHOWN           Stat:_Constitution_Modifier
 11       1        1        TODO      LEVEL            208    IGNORED         Cure:_Poison
-12       1        1        TODO      DICE             22     IGNORED         HP:_Damage
+12       1        1        DESCRIBED DICE             22     IGNORED         HP:_Damage
 13       1        1        TODO      LEVEL            351    IGNORED         Death:_Instant_Death
 14       1        1        TODO      LEVEL            202    IGNORED         Graphics:_Defrost
 15       1        1        DESCRIBED LEVEL            104    SHOWN           Stat:_Dexterity_Modifier
