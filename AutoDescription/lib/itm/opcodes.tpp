@@ -3238,11 +3238,11 @@ DEFINE_PATCH_MACRO ~opcode_self_48~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_48~ BEGIN
-	SPRINT description @10470002 // ~de rendre la parole %toTheTarget%~
+	SPRINT description @10480002 // ~de rendre la parole %toTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_48~ BEGIN
-	SPRINT description @10470003 // ~Rend la parole %ofTheTarget%~
+	SPRINT description @10480003 // ~Rend la parole %ofTheTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_48~ BEGIN
