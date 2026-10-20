@@ -42,7 +42,7 @@ COPY_EXISTING ~kitlist.2da~  ~override~
  * ---------------------------------------------------------------- */
 COPY_EXISTING ~tooltip.2da~ ~override~
 	COUNT_2DA_ROWS ~4~ ~rows~
-	FOR ( row = 1 ; row < rows ; row = row + 1 ) BEGIN
+	FOR ( row = 0 ; row < rows ; row = row + 1 ) BEGIN
 		READ_2DA_ENTRY row 0 4 itemId
 		READ_2DA_ENTRY row 1 4 strref0
 		READ_2DA_ENTRY row 2 4 strref1
