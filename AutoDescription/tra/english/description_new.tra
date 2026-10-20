@@ -22,11 +22,13 @@
 @1200002 = ~Set to %value%~ // reprise de @10010
 @1200003 = ~%value%%~ // reprise de @10002
 @1200004 = ~Multiplied by %value%~ // reprise de @10006
+@1200005 = ~%diceCount%d%diceSides%~ // reprise de @10014
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
 @1300001 = ~Equipped abilities~ // reprise de @100010
 @1300002 = ~Requires~ // reprise de @101032
+@1300003 = ~Combat abilities~ // reprise de @100011
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
@@ -39,6 +41,29 @@
 @6000000 = ~May only be removed with a Remove Curse spell~ // reprise de @102126
 @6000001 = ~Protects against critical hits~ // reprise de @102679
 @6000002 = ~Allows arcane spellcasting~ // reprise de @102127
+
+// Objets : lignes fixes des capacités de combat (6 010 000-6 010 099)
+@6010000 = ~Returns to the wielder's hand when thrown~ // reprise de @102269
+@6010001 = ~Requires no ammunition~ // reprise de @102270
+@6010002 = ~Unlimited ammunition~ // reprise de @102271
+@6010010 = ~Bonuses to hit and damage based on Strength apply to this weapon~ // reprise de @102263
+@6010012 = ~The Strength-based hit bonus applies to this weapon~ // reprise de @102265
+@6010013 = ~Bonuses to hit and damage based on Strength do not apply to this weapon~ // reprise de @102266
+@6010014 = ~The Strength-based hit bonus does not apply to this weapon~ // reprise de @102267
+
+// Objets : attributs d'arme (6 100 000-6 100 099)
+@6100000 = ~Enchantment~ // reprise de @13440001
+@6100001 = ~THAC0~ // reprise de @10540001
+@6100002 = ~Damage~ // reprise de @10730001
+@6100003 = ~Damage Type~ // reprise de @102005
+@6100004 = ~Speed Factor~ // reprise de @11900001
+@6100005 = ~Launcher~ // reprise de @101082
+@6100006 = ~Proficiency Type~ // reprise de @102003
+@6100007 = ~Type~ // reprise de @102004
+@6100010 = ~One-Handed~ // reprise de @101083
+@6100011 = ~Two-Handed~ // reprise de @101084
+@6100020 = ~Melee~ // reprise de @100013
+@6100021 = ~Thrown~ // reprise de @100014
 
 // Objets : nécessite, poids (6 200 000-6 200 099)
 @6200000 = ~%value% %attribute%~ // reprise de @100019
@@ -440,6 +465,23 @@
 @8030346 = ~Save vs. school bonus modifier~ // reprise de @400346
 @8030505 = ~psionic abilities~ // reprise de @400505
 @8030507 = ~poisoning~ // reprise de @400507
+
+// Listes indexées : types de dégâts, 8 040 000 + type de dégâts de l'en-tête (8 040 000-8 049 999)
+@8040000 = ~Crushing~ // reprise de @102010
+@8040001 = ~Piercing~ // reprise de @102011
+@8040002 = ~Crushing~ // reprise de @102012
+@8040003 = ~Slashing~ // reprise de @102013
+@8040004 = ~Missile~ // reprise de @102014
+@8040005 = ~Fists~ // reprise de @102015
+@8040006 = ~Piercing/Crushing~ // reprise de @102016
+@8040007 = ~Piercing/Slashing~ // reprise de @102017
+@8040008 = ~Crushing/Slashing~ // reprise de @102018
+@8040009 = ~Blunt Missile~ // reprise de @102019
+
+// Listes indexées : armes de trait des munitions, 8 050 000 + arme requise de l'en-tête (8 050 000-8 059 999)
+@8050001 = ~Bow~ // reprise de @101079
+@8050002 = ~Crossbow~ // reprise de @101080
+@8050003 = ~Sling~ // reprise de @101081
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099

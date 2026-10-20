@@ -22,11 +22,13 @@
 @1200002 = ~Passe à %value%~ // reprise de @10010
 @1200003 = ~%value%%PERCENT%~ // reprise de @10002
 @1200004 = ~Multiplié par %value%~ // reprise de @10006
+@1200005 = ~%diceCount%d%diceSides%~ // reprise de @10014
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~PARAMÈTRES~ // reprise de @100003
 @1300001 = ~Capacités d'équipement~ // reprise de @100010
 @1300002 = ~Nécessite~ // reprise de @101032
+@1300003 = ~Capacités de combat~ // reprise de @100011
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
@@ -39,6 +41,29 @@
 @6000000 = ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~ // reprise de @102126
 @6000001 = ~Protection contre les coups critiques~ // reprise de @102679
 @6000002 = ~Permet de lancer des sorts profanes~ // reprise de @102127
+
+// Objets : lignes fixes des capacités de combat (6 010 000-6 010 099)
+@6010000 = ~Revient dans la main de son porteur après avoir été lancée~ // reprise de @102269
+@6010001 = ~Ne nécessite pas de munitions~ // reprise de @102270
+@6010002 = ~Munition à usage illimité~ // reprise de @102271
+@6010010 = ~Les bonus au toucher et aux dégâts liés à la force s'appliquent à cette arme~ // reprise de @102263
+@6010012 = ~Le bonus au toucher lié à la force s'applique à cette arme~ // reprise de @102265
+@6010013 = ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~ // reprise de @102266
+@6010014 = ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~ // reprise de @102267
+
+// Objets : attributs d'arme (6 100 000-6 100 099)
+@6100000 = ~Niveau d'enchantement~ // reprise de @13440001
+@6100001 = ~TAC0~ // reprise de @10540001
+@6100002 = ~Dégâts~ // reprise de @10730001
+@6100003 = ~Type de dégâts~ // reprise de @102005
+@6100004 = ~Facteur de vitesse~ // reprise de @11900001
+@6100005 = ~Arme de trait~ // reprise de @101082
+@6100006 = ~Type de compétence~ // reprise de @102003
+@6100007 = ~Type~ // reprise de @102004
+@6100010 = ~Arme à 1 main~ // reprise de @101083
+@6100011 = ~Arme à 2 mains~ // reprise de @101084
+@6100020 = ~au corps à corps~ // reprise de @100013
+@6100021 = ~à distance~ // reprise de @100014
 
 // Objets : nécessite, poids (6 200 000-6 200 099)
 @6200000 = ~%value% en %attribute%~ // reprise de @100019
@@ -440,6 +465,23 @@
 @8030346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~ // reprise de @400346
 @8030505 = ~aux capacités psioniques~ // reprise de @400505
 @8030507 = ~à l'empoisonnement~ // reprise de @400507
+
+// Listes indexées : types de dégâts, 8 040 000 + type de dégâts de l'en-tête (8 040 000-8 049 999)
+@8040000 = ~Contondant~ // reprise de @102010
+@8040001 = ~Perforant~ // reprise de @102011
+@8040002 = ~Contondant~ // reprise de @102012
+@8040003 = ~Tranchant~ // reprise de @102013
+@8040004 = ~Projectile~ // reprise de @102014
+@8040005 = ~Mains nues~ // reprise de @102015
+@8040006 = ~Perforant / Contondant~ // reprise de @102016
+@8040007 = ~Perforant / Tranchant~ // reprise de @102017
+@8040008 = ~Contondant / Tranchant~ // reprise de @102018
+@8040009 = ~Projectile écrasant~ // reprise de @102019
+
+// Listes indexées : armes de trait des munitions, 8 050 000 + arme requise de l'en-tête (8 050 000-8 059 999)
+@8050001 = ~Arc~ // reprise de @101079
+@8050002 = ~Arbalète~ // reprise de @101080
+@8050003 = ~Fronde~ // reprise de @101081
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
