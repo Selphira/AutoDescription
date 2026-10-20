@@ -73,10 +73,42 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
-			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			SET line_fx = stat_id
+			LPM ad_application_form
+			PATCH_IF line_form == 0 BEGIN
+				LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
+				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+			END
+			ELSE BEGIN
+				LPM ad_stat_modifier_target_phrase
+			END
 			LPM ad_effect_line
+		END
+	END
+END
+
+// Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target) : line_phrase, identifiant de
+// base d'une série de 1 210 1x0 selon le mode (10 augmentation, 20 réduction, 30 valeur fixée, 40
+// multiplication), et ses variables value et theStatistic. La statistique (« la dextérité ») suit le
+// nom : liste 8 060 000 + valeur de stats.ids pour un nom de la liste des statistiques, libellé
+// 2OOO0002 pour un nom 2OOO0000 ; sans statistique dans le .tra, pas de phrase.
+DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
+	SET stat_statistic_tra = stat_name_tra < 9000000 ? stat_name_tra + 60000 : stat_name_tra + 2
+	SET line_phrase = 0
+	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
+		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
+		SET value = ABS stat_value
+		PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
+			SET line_phrase = 1210130
+		END
+		ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
+			SET line_phrase = 1210140
+		END
+		ELSE PATCH_IF stat_value >= 0 BEGIN
+			SET line_phrase = 1210110 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+		END
+		ELSE BEGIN
+			SET line_phrase = 1210120 // ~Réduit de %value% %theStatistic% %ofTheTarget%~ (+1)
 		END
 	END
 END

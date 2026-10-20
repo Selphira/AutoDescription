@@ -15,6 +15,7 @@
 @1000004 = ~and~ // reprise de @100021
 @1000005 = ~, ~ // reprise de @10020
 @1000006 = ~ %and% ~ // reprise de @10021
+@1000007 = ~or~ // reprise de @100004
 
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
@@ -23,6 +24,12 @@
 @1200003 = ~%value%%~ // reprise de @10002
 @1200004 = ~Multiplied by %value%~ // reprise de @10006
 @1200005 = ~%diceCount%d%diceSides%~ // reprise de @10014
+@1200010 = ~%name%%AD_COLON%%value%~ // reprise de @100001
+@1200011 = ~%name% %ofTheTarget%%AD_COLON%%value%~ // reprise de @100007
+
+// Mise en forme : phrases des modificateurs simples, séries de 10 (+0 soi, +1 cible…) : 0110 augmentation, 0120 réduction (1 210 000-1 210 999)
+@1210111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
+@1210121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
@@ -61,6 +68,10 @@
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Saving Throws~ // reprise de @102034
 @5000001 = ~Protects %resistName%~ // reprise de @102547
+@5000010 = ~save %saveTypeStr% neg.~ // reprise de @102121
+@5000012 = ~save %saveTypeStr% at %saveBonus% neg.~ // reprise de @102122
+@5000020 = ~ignore primary target~ // reprise de @102170
+@5000021 = ~ignore secondary target~ // reprise de @102171
 @5000111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
 @5000121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
 
@@ -517,6 +528,11 @@
 @8050002 = ~Crossbow~ // reprise de @101080
 @8050003 = ~Sling~ // reprise de @101081
 
+// Listes indexées : statistique d'une phrase à la forme « cible », 8 060 000 + valeur de stats.ids (8 060 000-8 069 999)
+@8060007 = ~the THAC0~ // reprise de @10540002
+@8060039 = ~the Wisdom~ // reprise de @10490002
+@8060040 = ~the Dexterity~ // reprise de @10150002
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
 @20000001 = ~Base Armor Class~ // reprise de @10000100
@@ -647,6 +663,7 @@
 // Opcode 166 : libellés (21 660 000-21 660 099)
 @21660000 = ~Magic Resistance~ // reprise de @11660001
 @21660001 = ~from magic~ // reprise de @11660002
+@21660002 = ~the Magic Resistance~ // reprise de @11660003
 
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Poison Resistance~ // reprise de @11730001

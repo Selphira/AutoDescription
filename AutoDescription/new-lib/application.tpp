@@ -4,9 +4,9 @@
 //
 // Formes d'une phrase (identifiant de base de la série + forme) : 0 soi,
 // 1 cible, 2 soi probable, 3 cible probable. Pris en charge pour l'instant : effets d'équipement
-// certains, actifs tant que l'objet est équipé ; effets certains des en-têtes d'objet, sans jet de
-// sauvegarde ni restriction de niveau, d'une durée limitée ou permanents (forme 0 ou 1, suivie de
-// la durée). Une forme absente du .tra rend l'objet non couvert après son rendu
+// certains, actifs tant que l'objet est équipé ; effets certains des en-têtes d'objet, sans
+// restriction de niveau, d'une durée limitée ou permanents (forme 0 ou 1, suivie de la durée). La
+// ligne finit par le jet de sauvegarde de l'effet (ancien add_save). Une forme absente du .tra rend l'objet non couvert après son rendu
 // (render_late_missing), comme une cible sans chaînes (bloc 2 000 000 de description_new.tra).
 
 // Prise en charge commune (passe 2, avant celle des opcodes), pour chaque effet d'un opcode décrit.
@@ -46,9 +46,6 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	END
 	ELSE PATCH_IF $fx_probability(~%app_id%~) != 100 BEGIN
 		SPRINT render_missing ~not_implemented:application:probability~
-	END
-	ELSE PATCH_IF $fx_save_types(~%app_id%~) != 0 BEGIN
-		SPRINT render_missing ~not_implemented:application:save~
 	END
 	ELSE PATCH_IF $fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1 BEGIN
 		SPRINT render_missing ~not_implemented:application:level~
@@ -141,6 +138,47 @@ BEGIN
 	END
 END
 
+// Jet de sauvegarde de l'effet line_fx (ancien add_save), vide sans type de jet : « (jet de
+// sauvegarde contre les sorts ou contre les souffles pour annuler) », avec son bonus, et sur EE
+// les cibles qu'un projectile de ligne ignore. Les moitiés de dégâts ne concernent que l'opcode 12.
+DEFINE_PATCH_MACRO ad_application_save BEGIN
+	SPRINT app_save_text ~~
+	SET app_save_types = $fx_save_types(~%line_fx%~)
+	PATCH_IF app_save_types != 0 BEGIN
+		SPRINT saveTypeStr ~~
+		SPRINT app_or @1000007 // ~ou~
+		PHP_EACH AD_SAVE_TYPES AS app_save_bit => app_save_opcode BEGIN
+			PATCH_IF (app_save_types BAND app_save_bit) != 0 BEGIN
+				LPF ad_tra INT_VAR tra_id = 20000000 + app_save_opcode * 10000 RET app_save_name = text END
+				PATCH_IF ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
+					SPRINT saveTypeStr ~%app_save_name%~
+				END
+				ELSE BEGIN
+					SPRINT saveTypeStr ~%saveTypeStr% %app_or% %app_save_name%~
+				END
+			END
+		END
+		SET app_save_bonus = $fx_save_bonus(~%line_fx%~)
+		PATCH_IF app_save_bonus != 0 BEGIN
+			LPF ad_signed_value INT_VAR value = app_save_bonus RET saveBonus = text END
+			SPRINT app_save_text @5000012 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
+		END
+		ELSE BEGIN
+			SPRINT app_save_text @5000010 // ~jet de sauvegarde %saveTypeStr% pour annuler~
+		END
+		SET app_save_flags = $fx_save_type(~%line_fx%~)
+		PATCH_IF IS_EE AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_primary_target_EE) != 0 BEGIN
+			SPRINT app_save_extra @5000020 // ~ignore la cible principale~
+			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+		END
+		PATCH_IF IS_EE AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_secondary_target_EE) != 0 BEGIN
+			SPRINT app_save_extra @5000021 // ~ignore la cible secondaire~
+			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+		END
+		SPRINT app_save_text ~(%app_save_text%)~
+	END
+END
+
 // Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget), pour une phrase
 // à la forme « cible » ; app_target_missing si le .tra ne les a pas.
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
@@ -193,6 +231,10 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~
 		END
+	END
+	LPM ad_application_save
+	PATCH_IF NOT (~%app_save_text%~ STRING_EQUAL ~~) BEGIN
+		SPRINT line_text ~%line_text% %app_save_text%~
 	END
 	PATCH_IF app_line_ok BEGIN
 		LPM ad_line_add

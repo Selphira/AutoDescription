@@ -1,19 +1,21 @@
 // Armes et munitions : en-têtes de combat, section « Capacités de combat », attributs d'arme et
 // compétence (anciens add_combat_abilities, add_weapon_attributes_to_description, proficiency).
-// Pris en charge : en-têtes de combat sans effet ; un en-tête à charges a aussi sa capacité de
-// charge (new-lib/item_charged.tpp).
+// Pris en charge : effets des en-têtes de combat sans charges, dans leur section « Capacités de
+// combat » (section ability<h> du magasin de lignes, comme les autres effets d'en-tête) ; un en-tête à
+// charges a aussi sa capacité de charge (new-lib/item_charged.tpp), sans effet pour l'instant.
 //
 // Tableaux écrits (en-tête de combat combat_id, dans l'ordre du fichier) : combat_header (index
 // de l'en-tête dans l'objet), combat_attack_type, combat_location, combat_charges,
 // combat_depletion, combat_flags, combat_tooltip, combat_section_type (infobulle, ou « au corps à
 // corps » / « à distance » pour une arme en main), combat_tac0, combat_damage (vide : aucun dégât),
 // combat_damage_type, combat_speed, combat_launcher ; variables écrites : combat_count,
-// combat_other_count (en-têtes d'un autre type), combat_effect_count.
+// combat_other_count (en-têtes d'un autre type), combat_charged_effects (effets des en-têtes à
+// charges ou utilisés depuis l'objet).
 
 DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 	SET combat_count = 0
 	SET combat_other_count = 0
-	SET combat_effect_count = 0
+	SET combat_charged_effects = 0
 	SPRINT combat_resref ~%SOURCE_RES%~
 	TO_LOWER combat_resref
 	READ_LONG  ITM_extended_headers_offset combat_headers_offset
@@ -22,7 +24,6 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 		SET combat_offset = combat_headers_offset + combat_h * 0x38
 		READ_BYTE  (combat_offset + ITM_HEAD_attack_type)        combat_attack_type
 		READ_SHORT (combat_offset + ITM_HEAD_feature_block_count) combat_effects
-		SET combat_effect_count += combat_effects
 		PATCH_IF combat_attack_type == ITM_ATTACK_TYPE_melee OR combat_attack_type == ITM_ATTACK_TYPE_projectile
 				OR combat_attack_type == ITM_ATTACK_TYPE_launcher BEGIN
 			SET combat_id = combat_count
@@ -36,6 +37,9 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			READ_SHORT  (combat_offset + ITM_HEAD_damage_type)     $combat_damage_type(~%combat_id%~)
 			READ_BYTE   (combat_offset + ITM_HEAD_speed)           $combat_speed(~%combat_id%~)
 			READ_BYTE   (combat_offset + ITM_HEAD_projectile_type) $combat_launcher(~%combat_id%~)
+			PATCH_IF $combat_charges(~%combat_id%~) > 0 OR $combat_location(~%combat_id%~) == 3 BEGIN
+				SET combat_charged_effects += combat_effects
+			END
 			LPM ad_item_combat_damage
 			LPM ad_item_combat_tooltip
 			SET combat_count += 1
@@ -107,7 +111,7 @@ END
 DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	SET combat_is_ammo = item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	LPM ad_item_combat_load
-	PATCH_IF combat_count == 0 OR combat_other_count > 0 OR combat_effect_count > 0 BEGIN
+	PATCH_IF combat_count == 0 OR combat_other_count > 0 OR combat_charged_effects > 0 BEGIN
 		SPRINT render_missing ~not_implemented:headers~
 	END
 	ELSE PATCH_IF combat_is_ammo AND combat_count > 1 BEGIN
@@ -178,16 +182,20 @@ DEFINE_PATCH_MACRO ad_item_strength_bonus BEGIN
 	END
 END
 
-// Lignes de la section « Capacités de combat » de chaque en-tête (section combat<combat_id> du
-// magasin de lignes ; combat_line_count(combat_id)) : projectile sans munition ou qui revient, et
-// bonus de Force d'une arme à un seul en-tête.
+// Lignes ajoutées à la section « Capacités de combat » de chaque en-tête (section ability<h>, après
+// celles de ses effets ; combat_line_count(combat_id) les compte toutes) : projectile sans munition
+// ou qui revient, et bonus de Force d'une arme à un seul en-tête. combat_same_abilities : les
+// en-têtes qui ont des lignes d'effet ont les mêmes (ancien has_same_combat_abilities, avant ces
+// ajouts) ; combat_special : la dernière ligne de projectile écrite.
 DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
+	LPM ad_item_combat_same_abilities
+	SPRINT combat_special ~~
 	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
-		SET $combat_line_count(~%combat_id%~) = 0
+		SET combat_h = $combat_header(~%combat_id%~)
 		SET combat_charges = $combat_charges(~%combat_id%~)
 		PATCH_IF $combat_attack_type(~%combat_id%~) == ITM_ATTACK_TYPE_projectile
 				AND (combat_charges == 0 OR ($combat_depletion(~%combat_id%~) >= 3 AND combat_charges == 1 AND combat_is_ammo)) BEGIN
-			SPRINT line_section ~combat%combat_id%~
+			SPRINT line_section ~ability%combat_h%~
 			SET line_sort = 0
 			PATCH_IF combat_is_ammo BEGIN
 				SPRINT line_text @6010002 // ~Munition à usage illimité~
@@ -198,26 +206,68 @@ DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
 			ELSE BEGIN
 				SPRINT line_text @6010000 // ~Revient dans la main de son porteur après avoir été lancée~
 			END
+			SPRINT combat_special ~%line_text%~
 			LPM ad_line_add
-			SET $combat_line_count(~%combat_id%~) += 1
 		END
+		LPF ad_lines_section_text STR_VAR section = ~ability%combat_h%~ RET combat_line_text = text combat_lines_now = count END
+		SET $combat_line_count(~%combat_id%~) = combat_lines_now
 	END
 	PATCH_IF NOT combat_is_ammo AND combat_count == 1 BEGIN
 		LPM ad_item_strength_bonus
 		PATCH_IF strength_bonus_tra > 0 BEGIN
-			SPRINT line_section ~combat0~
+			SET combat_h = $combat_header(~0~)
+			SPRINT line_section ~ability%combat_h%~
 			SET line_sort = 0
 			LPF ad_tra INT_VAR tra_id = strength_bonus_tra RET line_text = text END
 			LPM ad_line_add
-			SET $combat_line_count(~0~) += 1
 		END
 	END
 END
 
-// Section « Capacités de combat » : une seule si les en-têtes ont mêmes TAC0, dégâts et facteur de
-// vitesse (lignes de l'en-tête qui en a le plus), sinon une par en-tête, titrée de son type.
+// combat_same_abilities (ancien has_same_combat_abilities) : chaque en-tête qui a des lignes d'effet en
+// a autant que le premier, et chaque ligne du premier s'y trouve ; si le premier n'en a aucune, aucun
+// autre n'en a. Les en-têtes sans ligne ne comptent pas.
+DEFINE_PATCH_MACRO ad_item_combat_same_abilities BEGIN
+	SET combat_same_abilities = 1
+	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
+		SET combat_h = $combat_header(~%combat_id%~)
+		LPF ad_lines_section_text STR_VAR section = ~ability%combat_h%~ RET combat_line_text = text combat_effect_lines = count END
+		SET $combat_effect_lines(~%combat_id%~) = combat_effect_lines
+	END
+	SET combat_first_h = $combat_header(~0~)
+	FOR (combat_id = 1; combat_id < combat_count; ++combat_id) BEGIN
+		SET combat_h = $combat_header(~%combat_id%~)
+		SET combat_other_lines = $combat_effect_lines(~%combat_id%~)
+		PATCH_IF combat_other_lines > 0 BEGIN
+			PATCH_IF $combat_effect_lines(~0~) != combat_other_lines BEGIN
+				SET combat_same_abilities = 0
+			END
+			FOR (combat_line = 0; combat_line < line_count; ++combat_line) BEGIN
+				SPRINT combat_line_section $line_section(~%combat_line%~)
+				PATCH_IF ~%combat_line_section%~ STRING_EQUAL ~ability%combat_first_h%~ BEGIN
+					SPRINT combat_line_text $line_text(~%combat_line%~)
+					SET combat_found = 0
+					FOR (combat_other = 0; combat_other < line_count; ++combat_other) BEGIN
+						SPRINT combat_other_section $line_section(~%combat_other%~)
+						SPRINT combat_other_text $line_text(~%combat_other%~)
+						PATCH_IF (~%combat_other_section%~ STRING_EQUAL ~ability%combat_h%~) AND (~%combat_other_text%~ STRING_EQUAL ~%combat_line_text%~) BEGIN
+							SET combat_found = 1
+						END
+					END
+					PATCH_IF NOT combat_found BEGIN
+						SET combat_same_abilities = 0
+					END
+				END
+			END
+		END
+	END
+END
+
+// Section « Capacités de combat » : une seule si les en-têtes ont mêmes capacités, TAC0, dégâts et
+// facteur de vitesse (lignes de l'en-tête qui en a le plus, plus la ligne de projectile), sinon une
+// par en-tête, titrée de son type.
 DEFINE_PATCH_MACRO ad_item_combat_section BEGIN
-	SET combat_same = 1
+	SET combat_same = combat_same_abilities
 	FOR (combat_id = 1; combat_id < combat_count; ++combat_id) BEGIN
 		SPRINT combat_damage_first $combat_damage(~0~)
 		SPRINT combat_damage $combat_damage(~%combat_id%~)
@@ -234,14 +284,22 @@ DEFINE_PATCH_MACRO ad_item_combat_section BEGIN
 				SET combat_selected = combat_id
 			END
 		END
-		LPF ad_lines_section_text STR_VAR section = ~combat%combat_selected%~ RET combat_lines = text END
+		SET combat_h = $combat_header(~%combat_selected%~)
+		PATCH_IF NOT (~%combat_special%~ STRING_EQUAL ~~) BEGIN
+			SPRINT line_section ~ability%combat_h%~
+			SET line_sort = 0
+			SPRINT line_text ~%combat_special%~
+			LPM ad_line_add
+		END
+		LPF ad_lines_section_text STR_VAR section = ~ability%combat_h%~ RET combat_lines = text END
 		PATCH_IF NOT (~%combat_lines%~ STRING_EQUAL ~~) BEGIN
 			SPRINT description ~%description%%CRLF%%CRLF%%combat_title%%AD_COLON%%combat_lines%~
 		END
 	END
 	ELSE BEGIN
 		FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
-			LPF ad_lines_section_text STR_VAR section = ~combat%combat_id%~ RET combat_lines = text END
+			SET combat_h = $combat_header(~%combat_id%~)
+			LPF ad_lines_section_text STR_VAR section = ~ability%combat_h%~ RET combat_lines = text END
 			PATCH_IF NOT (~%combat_lines%~ STRING_EQUAL ~~) BEGIN
 				SPRINT combat_section_type $combat_section_type(~%combat_id%~)
 				SPRINT combat_header_title ~%combat_title% (%combat_section_type%)~

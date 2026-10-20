@@ -39,6 +39,16 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
 	206 => 1 // protections contre des sorts
 END
 
+// Types de jet de sauvegarde d'un effet (bits 0-4, IESDP) => opcode dont le libellé 2OOO0000 les
+// nomme (« contre les sorts »), dans l'ordre de l'ancien saveType_to_strref.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_TYPES BEGIN
+	1  => 37 // sorts
+	2  => 36 // souffles
+	4  => 33 // paralysie, mort et poisons
+	8  => 34 // baguettes, sceptres et bâtons
+	16 => 35 // pétrification et métamorphose
+END
+
 // Unités de durée en secondes, de la plus petite à la plus grande (ancien tableau durations) ; leurs
 // noms sont dans le bloc 3 010 000 de description_new.tra.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DURATION_UNITS BEGIN
