@@ -6,7 +6,7 @@
 2        1        1        DESCRIBED LEVEL            212    IGNORED         Cure:_Sleep
 3        1        1        DESCRIBED LEVEL            380    SHOWN           State:_Berserking
 4        1        1        DESCRIBED LEVEL            211    IGNORED         Cure:_Berserking
-5        1        1        TODO      LEVEL            369    SHOWN           Charm:_Charm_Specific_Creature
+5        1        1        DESCRIBED LEVEL            369    SHOWN           Charm:_Charm_Specific_Creature
 6        1        1        DESCRIBED LEVEL            108    SHOWN           Stat:_Charisma_Modifier
 7        1        1        IGNORED   LEVEL            400    SHOWN           Colour:_Set_Character_colours_by_Palette
 8        1        1        IGNORED   LEVEL            400    SHOWN           Colour:_Change_by_RGB
@@ -57,7 +57,7 @@
 53       1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Animation_Change
 54       1        1        DESCRIBED LEVEL            60     SHOWN           Stat:_THAC0_Modifier
 55       1        1        DESCRIBED LEVEL            352    IGNORED         Death:_Kill_Creature_Type
-56       1        1        TODO      LEVEL            463    SHOWN           Alignment:_Invert
+56       1        1        DESCRIBED LEVEL            463    SHOWN           Alignment:_Invert
 57       1        1        TODO      LEVEL            462    SHOWN           Alignment:_Change
 58       1        1        DESCRIBED LEVEL            200    IGNORED         Cure:_Dispellable_Effects_(Dispel_Magic)
 59       1        1        DESCRIBED LEVEL            127    SHOWN           Stat:_Stealth_Modifier
@@ -72,7 +72,7 @@
 68       1        1        TODO      LEVEL            354    IGNORED         Summon:_Unsummon_Creature
 69       1        1        DESCRIBED LEVEL            290    SHOWN           Protection:_From_Detection_(Non-Detection)
 70       1        1        TODO      LEVEL            220    IGNORED         Cure:_Non-Detection
-71       1        1        TODO      LEVEL            464    SHOWN           IDS:_Sex_Change
+71       1        1        DESCRIBED LEVEL            464    SHOWN           IDS:_Sex_Change
 72       1        1        IGNORED   LEVEL            400    SHOWN           IDS:_Set_IDS_State
 73       1        1        DESCRIBED LEVEL            42     SHOWN           Stat:_Extra_Damage_Modifier
 74       1        1        DESCRIBED LEVEL            396    SHOWN           State:_Blindness
@@ -101,7 +101,7 @@
 97       1        1        DESCRIBED LEVEL            103    SHOWN           Stat:_Exceptional_Strength_Modifier
 98       1        1        DESCRIBED LEVEL            83     SHOWN           HP:_Regeneration
 99       1        1        TODO      LEVEL            91     SHOWN           Spell_Effect:_Duration_Modifier
-100      1        1        TODO      LEVEL            280    SHOWN           Protection:_from_Creature_Type
+100      1        1        DESCRIBED LEVEL            280    SHOWN           Protection:_from_Creature_Type
 101      1        1        DESCRIBED LEVEL            283    SHOWN           Protection:_from_Opcode
 102      1        1        TODO      LEVEL            250    SHOWN           Spell:_Immunity_(by_Power_Level)
 103      1        1        IGNORED   LEVEL            400    SHOWN           Text:_Change_Name
@@ -136,7 +136,7 @@
 132      1        1        TODO      LEVEL            101    SHOWN           State:_Raise_Strength,_Constitution,_&_Dexterity_Non-Cumulative
 133      1        1        TODO      LEVEL            111    SHOWN           Spell_Effect:_Luck_Non-Cumulative
 134      1        1        DESCRIBED LEVEL            368    IGNORED         State:_Petrification
-135      1        1        TODO      LEVEL            1      SHOWN           Graphics:_Polymorph_into_Specific
+135      1        1        DESCRIBED LEVEL            1      SHOWN           Graphics:_Polymorph_into_Specific
 136      1        1        TODO      LEVEL            397    IGNORED         State:_Force_Visible
 137      1        1        TODO      LEVEL            113    SHOWN           State:_Negative_Chant
 138      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Character_Animation_Change
@@ -219,7 +219,7 @@
 215      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Play_3D_Effect
 216      1        1        DESCRIBED LEVEL            32     SHOWN           Spell_Effect:_Level_Drain
 217      1        1        TODO      LEVEL            378    SHOWN           Spell_Effect:_Unconsciousness_20HP
-218      1        1        TODO      DICE_IF_P2_1_EE  406    NOT_PERMANENT   Protection:_Stoneskin
+218      1        1        DESCRIBED DICE_IF_P2_1_EE  406    NOT_PERMANENT   Protection:_Stoneskin
 219      1        1        TODO      LEVEL            400    SHOWN           Stat:_AC_vs._Creature_Type_Modifier
 220      1        1        TODO      LEVEL            223    IGNORED         Removal:_Remove_School
 221      1        1        TODO      LEVEL            224    IGNORED         Removal:_Remove_Secondary_Type
@@ -256,7 +256,7 @@
 252      1        1        TODO      LEVEL            471    IGNORED         Spell_Effect:_Set_Trap
 253      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Add_Map_Marker
 254      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Remove_Map_Marker
-255      1        1        TODO      LEVEL            483    SHOWN           Item:_Create_Inventory_Item_(days)
+255      1        1        DESCRIBED LEVEL            483    SHOWN           Item:_Create_Inventory_Item_(days)
 256      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Active
 257      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Creation
 258      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
@@ -333,7 +333,7 @@
 329      0        1        TODO      LEVEL            399    SHOWN           Spell_Effect:_Slow_Poison
 330      0        1        IGNORED   LEVEL            400    SHOWN           Text:_Float_Text
 331      0        1        TODO      DICE             132    NOT_PERMANENT   Summon:_Random_Monster_Summoning
-332      0        1        TODO      LEVEL            48     SHOWN           Stat:_Specific_Damage_Modifier
+332      0        1        DESCRIBED LEVEL            48     SHOWN           Stat:_Specific_Damage_Modifier
 333      0        1        TODO      DICE             473    SHOWN           Spell_Effect:_Static_Charge
 334      0        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Turn_Undead
 335      0        1        TODO      LEVEL            493    SHOWN           Spell_Effect:_Seven_Eyes

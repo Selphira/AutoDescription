@@ -29,6 +29,12 @@ COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
 		SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
 	END
 
+// Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
+// durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN
+	255 => 7200 // jours
+END
+
 // Opcodes dont les lignes réunissent des effets sans tenir compte de leur portée (new-lib/normalize.tpp,
 // fx_scope) : leurs effets d'en-tête ne sont pas encore pris en charge (ad_application_support).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN

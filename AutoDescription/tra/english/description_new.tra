@@ -1020,6 +1020,13 @@
 @20040102 = ~to soothe %theTarget%~ // reprise de @10040002
 @20040103 = ~to soothe %theTarget%~ // reprise de @10040002
 
+// Opcode 5 : Charme : phrases 0100 charme (forme « cible » : du type nommé), 0110 sans restriction ; pas de forme « soi » probable, comme dans l'ancien moteur (20 050 000-20 050 999)
+@20050100 = ~Charm %theTarget%~ // reprise de @10050001
+@20050101 = ~Charm %theTarget%~ // reprise de @10050001
+@20050103 = ~to charm %theTarget%~ // reprise de @10050002
+@20050111 = ~Universal charm on %theTarget%~ // reprise de @10050003
+@20050113 = ~to charm %theTarget%~ // reprise de @10050002
+
 // Opcode 11 : Soin : poison (20 110 000-20 110 999)
 @20110100 = ~Neutralize Poison~ // reprise de @10110001
 @20110101 = ~Neutralizes poisons infecting %theTarget%~ // reprise de @10110002
@@ -1280,6 +1287,12 @@
 @20550102 = ~to kill instantly %theTarget%~ // reprise de @500104
 @20550103 = ~to kill instantly %theTarget%~ // reprise de @500104
 
+// Opcode 56 : Inversion de l'alignement : phrases 0100 (20 560 000-20 560 999)
+@20560100 = ~Reverse the alignment %ofTheTarget%~ // reprise de @10560001
+@20560101 = ~Reverse the alignment %ofTheTarget%~ // reprise de @10560001
+@20560102 = ~to reverse the alignment %ofTheTarget%~ // reprise de @10560002
+@20560103 = ~to reverse the alignment %ofTheTarget%~ // reprise de @10560002
+
 // Opcode 58 : Dissipation de la magie : 0001 niveau du lanceur, 0002-0003 armes invoquées ; phrases 0100, 0110 inéluctable (20 580 000-20 580 999)
 @20580001 = ~as a level %castingLevel% spellcaster~ // reprise de @102095
 @20580002 = ~summoned weapons are not dispelled~ // reprise de @10580005
@@ -1356,6 +1369,12 @@
 @20690111 = ~Casts Non-detection on %theTarget%~ // reprise de @10690002
 @20690112 = ~to cast Non-detection on %theTarget%~ // reprise de @10690003
 @20690113 = ~to cast Non-detection on %theTarget%~ // reprise de @10690003
+
+// Opcode 71 : Inversion du sexe : phrases 0100 (20 710 000-20 710 999)
+@20710100 = ~Changes the gender %ofTheTarget%~ // reprise de @10710001
+@20710101 = ~Changes the gender %ofTheTarget%~ // reprise de @10710001
+@20710102 = ~to change the gender %ofTheTarget%~ // reprise de @10710011
+@20710103 = ~to change the gender %ofTheTarget%~ // reprise de @10710011
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Damage~ // reprise de @10730001
@@ -1441,6 +1460,16 @@
 @20980111 = ~Regenerates %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980007
 @20980112 = ~to regenerate %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980012
 @20980113 = ~to regenerate %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980012
+
+// Opcode 100 : Protection contre un type de créature : phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
+@21000100 = ~Protects from %creatureType% attacks and spells~ // reprise de @11000001
+@21000101 = ~Protects %theTarget% from %creatureType% attacks and spells~ // reprise de @11000003
+@21000102 = ~to protect from %creatureType% attacks and spells~ // reprise de @11000005
+@21000103 = ~to protect from %creatureType% attacks and spells~ // reprise de @11000005
+@21000110 = ~Protects from attacks and spells of all creatures~ // reprise de @11000002
+@21000111 = ~Protects %theTarget% from attacks and spells of all creatures~ // reprise de @11000004
+@21000112 = ~to protect from attacks and spells of all creatures~ // reprise de @11000006
+@21000113 = ~to protect from attacks and spells of all creatures~ // reprise de @11000006
 
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
@@ -1579,6 +1608,17 @@
 @21340102 = ~to be transmuted to stone~ // reprise de @11340003
 @21340103 = ~to transmute %theTarget% to stone~ // reprise de @11340004
 
+// Opcode 135 : Métamorphose : 0000 créature sans nom, phrases 0100 métamorphose, 0110 déguisement (21 350 000-21 350 999)
+@21350000 = ~nameless creature~ // reprise de @11350100
+@21350100 = ~Transform into %creatureName%~ // reprise de @11350001
+@21350101 = ~Transform %theTarget% into %creatureName%~ // reprise de @11350011
+@21350102 = ~to transform into %creatureName%~ // reprise de @11350021
+@21350103 = ~to transform %theTarget% into %creatureName%~ // reprise de @11350031
+@21350110 = ~Disguise into %creatureName%~ // reprise de @11350002
+@21350111 = ~Disguise %theTarget% into %creatureName%~ // reprise de @11350012
+@21350112 = ~to disguise into %creatureName%~ // reprise de @11350022
+@21350113 = ~to disguise %theTarget% int %creatureName%~ // reprise de @11350032
+
 // Opcode 143 : Objet créé dans un emplacement : phrases 0100 (21 430 000-21 430 999)
 @21430100 = ~Creates 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430001
 @21430101 = ~Creates 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430001
@@ -1694,9 +1734,24 @@
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 
+// Opcode 218 : Peau de pierre : 0000 nombre et type, 0001-0002 type au singulier et au pluriel, phrases 0100 (22 180 000-22 180 999)
+@22180000 = ~%value% %valueType%~ // reprise de @102165
+@22180001 = ~stone skin~ // reprise de @12180101
+@22180002 = ~stone skins~ // reprise de @12180102
+@22180100 = ~Creates %amount%~ // reprise de @12180001
+@22180101 = ~Creates %amount% on %theTarget%~ // reprise de @12180003
+@22180102 = ~to create %amount% on %theTarget%~ // reprise de @12180002
+@22180103 = ~to create %amount% on %theTarget%~ // reprise de @12180002
+
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Proficiency %proficiency%~ // reprise de @12330001
 @22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
+
+// Opcode 255 : Création d'objet (en jours) : phrases 0100 (22 550 000-22 550 999)
+@22550100 = ~Creates %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220001
+@22550101 = ~Creates %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220001
+@22550102 = ~to create %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220004
+@22550103 = ~to create %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220004
 
 // Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
 @22800100 = ~The next spell cast by %theTarget% treated as wild surges~ // reprise de @12800001
@@ -1769,6 +1824,19 @@
 @23170151 = ~Cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160009
 @23170152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 @23170153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
+
+// Opcode 332 : Modificateur de dégâts d'un type : 0000-0010 noms (« Dégâts de feu ») (23 320 000-23 320 999)
+@23320000 = ~Damage~ // reprise de @13320000
+@23320001 = ~Fire Damage~ // reprise de @13320001
+@23320002 = ~Cold Damage~ // reprise de @13320002
+@23320003 = ~Elextricity Damage~ // reprise de @13320003
+@23320004 = ~Acid Damage~ // reprise de @13320004
+@23320005 = ~Magic Damage~ // reprise de @13320005
+@23320006 = ~Poison Damage~ // reprise de @13320006
+@23320007 = ~Slashing Damage~ // reprise de @13320007
+@23320008 = ~Piercing Damage~ // reprise de @13320008
+@23320009 = ~Crushing Damage~ // reprise de @13320009
+@23320010 = ~Missile Damage~ // reprise de @13320010
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~No protection %versus%~ // reprise de @15210001
