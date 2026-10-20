@@ -18,7 +18,7 @@
 14       1        1        TODO      LEVEL            202    IGNORED         Graphics:_Defrost
 15       1        1        DESCRIBED LEVEL            104    SHOWN           Stat:_Dexterity_Modifier
 16       1        1        DESCRIBED LEVEL            384    SHOWN           State:_Haste
-17       1        1        TODO      DICE             84     IGNORED         HP:_Current_HP_Modifier
+17       1        1        DESCRIBED DICE             84     IGNORED         HP:_Current_HP_Modifier
 18       1        1        DESCRIBED DICE             82     SHOWN           HP:_Maximum_HP_Modifier
 19       1        1        DESCRIBED LEVEL            106    SHOWN           Stat:_Intelligence_Modifier
 20       1        1        DESCRIBED LEVEL            388    NOT_PERMANENT   State:_Invisibility
@@ -26,7 +26,7 @@
 22       1        1        DESCRIBED LEVEL            110    SHOWN           Stat:_Cumulative_Luck_Bonus
 23       1        1        TODO      LEVEL            422    IGNORED         Stat:_Morale_Modifier
 24       1        1        DESCRIBED LEVEL            393    NOT_AFTER_DEATH State:_Horror
-25       1        1        TODO      LEVEL            24     NOT_AFTER_DEATH State:_Poison
+25       1        1        DESCRIBED LEVEL            24     NOT_AFTER_DEATH State:_Poison
 26       1        1        TODO      LEVEL            489    IGNORED         Item:_Remove_Curse
 27       1        1        DESCRIBED LEVEL            308    SHOWN           Stat:_Acid_Resistance_Modifier
 28       1        1        DESCRIBED LEVEL            305    SHOWN           Stat:_Cold_Resistance_Modifier
@@ -61,7 +61,7 @@
 57       1        1        TODO      LEVEL            462    SHOWN           Alignment:_Change
 58       1        1        DESCRIBED LEVEL            200    IGNORED         Cure:_Dispellable_Effects_(Dispel_Magic)
 59       1        1        DESCRIBED LEVEL            127    SHOWN           Stat:_Stealth_Modifier
-60       1        1        TODO      LEVEL            92     SHOWN           Stat:_Miscast_Magic
+60       1        1        DESCRIBED LEVEL            92     SHOWN           Stat:_Miscast_Magic
 61       1        1        IGNORED   LEVEL            400    SHOWN           Creature_RGB_color_fade
 62       1        1        DESCRIBED LEVEL            19     SHOWN           Spell:_Priest_Spell_Slots_Modifier
 63       1        1        DESCRIBED LEVEL            392    SHOWN           State:_Infravision
@@ -99,7 +99,7 @@
 95       1        1        DESCRIBED LEVEL            430    SHOWN           Stat:_Tracking_Skill_Modifier
 96       1        1        DESCRIBED LEVEL            13     SHOWN           Stat:_Level_Change
 97       1        1        DESCRIBED LEVEL            103    SHOWN           Stat:_Exceptional_Strength_Modifier
-98       1        1        TODO      LEVEL            83     SHOWN           HP:_Regeneration
+98       1        1        DESCRIBED LEVEL            83     SHOWN           HP:_Regeneration
 99       1        1        TODO      LEVEL            91     SHOWN           Spell_Effect:_Duration_Modifier
 100      1        1        TODO      LEVEL            280    SHOWN           Protection:_from_Creature_Type
 101      1        1        DESCRIBED LEVEL            283    SHOWN           Protection:_from_Opcode
@@ -127,7 +127,7 @@
 123      1        1        TODO      LEVEL            6      IGNORED         Item:_Remove_Inventory_Item
 124      1        1        TODO      LEVEL            453    IGNORED         Spell_Effect:_Teleport_(Dimension_Door)
 125      1        1        TODO      LEVEL            452    IGNORED         Spell_Effect:_Unlock_(Knock)
-126      1        1        TODO      LEVEL            80     SHOWN           Stat:_Movement_Modifier
+126      1        1        DESCRIBED LEVEL            80     SHOWN           Stat:_Movement_Modifier
 127      1        1        TODO      LEVEL            131    NOT_PERMANENT   Summon:_Monster_Summoning
 128      1        1        DESCRIBED LEVEL            379    SHOWN           State:_Confusion
 129      1        1        TODO      LEVEL            390    SHOWN           State:_Aid
@@ -168,7 +168,7 @@
 164      1        1        DESCRIBED LEVEL            219    IGNORED         Cure:_Drunkeness
 165      1        1        TODO      LEVEL            373    SHOWN           Spell_Effect:_Pause_Target
 166      1        1        DESCRIBED LEVEL            303    SHOWN           Stat:_Magic_Resistance_Modifier
-167      1        1        TODO      LEVEL            66     SHOWN           Stat:_THAC0_Modifier_with_Missile_Weapons
+167      1        1        DESCRIBED LEVEL            66     SHOWN           Stat:_THAC0_Modifier_with_Missile_Weapons
 168      1        1        IGNORED   LEVEL            400    SHOWN           Summon:_Remove_Creature
 169      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Prevent_Special_Effect_Icon
 170      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Play_Damage_Animation
@@ -190,7 +190,7 @@
 186      1        1        IGNORED   LEVEL            400    SHOWN           Script:_MoveToArea
 187      1        1        IGNORED   LEVEL            400    SHOWN           Script:_Store_Local_Variable
 188      1        1        TODO      LEVEL            401    SHOWN           Spell_Effect:_Aura_Cleansing
-189      1        1        TODO      LEVEL            93     SHOWN           Stat:_Casting_Time_Modifier
+189      1        1        DESCRIBED LEVEL            93     SHOWN           Stat:_Casting_Time_Modifier
 190      1        1        TODO      LEVEL            94     SHOWN           Stat:_Attack_Speed_Factor
 191      1        1        TODO      LEVEL            15     SHOWN           Spell:_Casting_Level_Modifier
 192      1        1        TODO      LEVEL            479    SHOWN           Spell_Effect:_Find_Familiar
@@ -217,7 +217,7 @@
 213      1        1        TODO      LEVEL            367    SHOWN           Spell_Effect:_Maze
 214      1        1        TODO      LEVEL            12     NOT_PERMANENT   Spell_Effect:_Select_Spell
 215      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Play_3D_Effect
-216      1        1        TODO      LEVEL            32     SHOWN           Spell_Effect:_Level_Drain
+216      1        1        DESCRIBED LEVEL            32     SHOWN           Spell_Effect:_Level_Drain
 217      1        1        TODO      LEVEL            378    SHOWN           Spell_Effect:_Unconsciousness_20HP
 218      1        1        TODO      DICE_IF_P2_1_EE  406    NOT_PERMANENT   Protection:_Stoneskin
 219      1        1        TODO      LEVEL            400    SHOWN           Stat:_AC_vs._Creature_Type_Modifier

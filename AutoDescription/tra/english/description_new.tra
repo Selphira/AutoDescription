@@ -113,6 +113,18 @@
 @3020008 = ~every day~
 @3020009 = ~every %amount% days~
 
+// Durées : fréquences « par round », 3 030 000 + 2 × unité + pluriel ; unités de 3 010 000 (3 030 000-3 030 009)
+@3030000 = ~per second~
+@3030001 = ~every %amount% seconds~
+@3030002 = ~per round~
+@3030003 = ~every %amount% rounds~
+@3030004 = ~per turn~
+@3030005 = ~every %amount% turns~
+@3030006 = ~per hour~
+@3030007 = ~every %amount% hours~
+@3030008 = ~per day~
+@3030009 = ~every %amount% days~
+
 // Probabilités : 4 000 000 préfixe d'un effet, 4 000 001 titre d'un groupe de même probabilité (4 000 000-4 000 099)
 @4000000 = ~%probability% chance %description%~ // reprise de @101125
 @4000001 = ~%probability% chance~ // reprise de @101126
@@ -217,7 +229,9 @@
 @8010009 = ~9th~ // reprise de @101209
 
 // Listes indexées : types de sort, 8 020 000 + index, + 10 au singulier (8 020 000-8 029 999)
+@8020000 = ~wizard~ // reprise de @101300
 @8020001 = ~priest~ // reprise de @101301
+@8020002 = ~innate~ // reprise de @101302
 @8020004 = ~druid~ // reprise de @101304
 @8020005 = ~priest/druid~ // reprise de @101305
 @8020011 = ~priest~ // reprise de @101311
@@ -747,6 +761,27 @@
 @20160152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 @20160153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 
+// Opcode 17 : Points de vie actuels : 0000 nom, 0001-0004 point(s) de vie, de dégâts, 0005 des points de vie, 0006 valeur et unité ; phrases 0100 soin, 0110 dégâts, 0120 soin en pourcentage (20 170 000-20 170 999)
+@20170000 = ~Current hit points~ // reprise de @10170021
+@20170001 = ~hit point~ // reprise de @600170
+@20170002 = ~hit points~ // reprise de @600171
+@20170003 = ~point of damage~ // reprise de @600172
+@20170004 = ~points of damage~ // reprise de @600173
+@20170005 = ~hit points~ // reprise de @600180
+@20170006 = ~%value% %valueType%~ // reprise de @102165
+@20170100 = ~Heals %value% %toTheTarget%~ // reprise de @10170001
+@20170101 = ~Heals %value% %toTheTarget%~ // reprise de @10170001
+@20170102 = ~to heal %value% %toTheTarget%~ // reprise de @10170003
+@20170103 = ~to heal %value% %toTheTarget%~ // reprise de @10170003
+@20170110 = ~Inflicts %value% %toTheTarget%~ // reprise de @10170002
+@20170111 = ~Inflicts %value% %toTheTarget%~ // reprise de @10170002
+@20170112 = ~to inflict %value% %toTheTarget%~ // reprise de @10170004
+@20170113 = ~to inflict %value% %toTheTarget%~ // reprise de @10170004
+@20170120 = ~Heals %value% %ofTheTarget%~ // reprise de @10170011
+@20170121 = ~Heals %value% %ofTheTarget%~ // reprise de @10170011
+@20170122 = ~to heal %value% %ofTheTarget%~ // reprise de @10170013
+@20170123 = ~to heal %value% %ofTheTarget%~ // reprise de @10170013
+
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Maximum hit points~ // reprise de @10180001
 @20180001 = ~Hit points~ // reprise de @10180003
@@ -766,6 +801,16 @@
 @20240101 = ~Inflicts Horror on %theTarget%~ // reprise de @10240001
 @20240102 = ~to inflict Horror on %theTarget%~ // reprise de @10240002
 @20240103 = ~to inflict Horror on %theTarget%~ // reprise de @10240002
+
+// Opcode 25 : Poison : phrases 0100 un point, 0110 plusieurs (20 250 000-20 250 999)
+@20250100 = ~Poisons %theTarget%, inflicting 1 damage %strDuration%~ // reprise de @10250001
+@20250101 = ~Poisons %theTarget%, inflicting 1 damage %strDuration%~ // reprise de @10250001
+@20250102 = ~to poison %theTarget%, inflicting 1 damage %strDuration%~ // reprise de @10250005
+@20250103 = ~to poison %theTarget%, inflicting 1 damage %strDuration%~ // reprise de @10250005
+@20250110 = ~Poisons %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250002
+@20250111 = ~Poisons %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250002
+@20250112 = ~to poison %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250006
+@20250113 = ~to poison %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250006
 
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Acid Resistance~ // reprise de @10270001
@@ -877,6 +922,14 @@
 @20580112 = ~of removing all magical effects from %theTarget%~ // reprise de @10580004
 @20580113 = ~of removing all magical effects from %theTarget%~ // reprise de @10580004
 
+// Opcode 60 : Échec des sorts : phrases 0100 tous les sorts, 0110 un type (forme « soi probable » absente, comme dans l'ancien moteur) (20 600 000-20 600 999)
+@20600100 = ~%percent% chance of spellcasting failure~ // reprise de @10600001
+@20600101 = ~%percent% chance of spellcasting failure for %theTarget%~ // reprise de @10600003
+@20600103 = ~of causing %percent% chance of spellcasting failure for %theTarget%~ // reprise de @10600005
+@20600110 = ~%percent% chance of spellcasting failure (%spellType%)~ // reprise de @10600002
+@20600111 = ~%percent% chance of spellcasting failure (%spellType%) for %theTarget%~ // reprise de @10600004
+@20600113 = ~of causing %percent% chance of spellcasting failure (%spellType%) for %theTarget%~ // reprise de @10600006
+
 // Opcode 62 : phrases (20 620 100-20 620 999)
 @20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
 @20620110 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~ // reprise de @10620002
@@ -958,6 +1011,16 @@
 @20890000 = ~Missile Damage Resistance~ // reprise de @10890001
 @20890001 = ~from missile damage~ // reprise de @10890002
 
+// Opcode 98 : Régénération : phrases 0100 un point, 0110 plusieurs (20 980 000-20 980 999)
+@20980100 = ~Regenerates 1 hit point %strDuration%~ // reprise de @10980001
+@20980101 = ~Regenerates 1 hit point %strDuration% %toTheTarget%~ // reprise de @10980006
+@20980102 = ~to regenerate 1 hit point %strDuration% %toTheTarget%~ // reprise de @10980011
+@20980103 = ~to regenerate 1 hit point %strDuration% %toTheTarget%~ // reprise de @10980011
+@20980110 = ~Regenerates %amount% hit points %strDuration%~ // reprise de @10980002
+@20980111 = ~Regenerates %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980007
+@20980112 = ~to regenerate %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980012
+@20980113 = ~to regenerate %amount% hit points %strDuration% %toTheTarget%~ // reprise de @10980012
+
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Protects %theTarget% from %opcodeStr%~ // reprise de @11010002
@@ -973,6 +1036,18 @@
 @21160101 = ~Dispel %theTarget%'s invisibility~ // reprise de @10470003
 @21160102 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
 @21160103 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
+
+// Opcode 126 : Vitesse de déplacement : 0000 nom, 0002 statistique ; phrases 0110 immobilisation, 0120 vitesse rétablie (21 260 000-21 260 999)
+@21260000 = ~Movement rate~ // reprise de @11260001
+@21260002 = ~the Movement rate~ // reprise de @11260002
+@21260110 = ~Immobilize~ // reprise de @11260011
+@21260111 = ~Immobilize %theTarget%~ // reprise de @11260012
+@21260112 = ~to immobilize %theTarget%~ // reprise de @11260013
+@21260113 = ~to immobilize %theTarget%~ // reprise de @11260013
+@21260120 = ~Restoration of movement rate~ // reprise de @11260021
+@21260121 = ~Restores %theTarget%'s movement rate~ // reprise de @11260022
+@21260122 = ~to restore %theTarget%'s movement rate~ // reprise de @11260023
+@21260123 = ~to restore %theTarget%'s movement rate~ // reprise de @11260023
 
 // Opcode 128 : Confusion (21 280 000-21 280 999)
 @21280100 = ~Confusion~ // reprise de @11280001
@@ -1034,12 +1109,41 @@
 @21660001 = ~from magic~ // reprise de @11660002
 @21660002 = ~the Magic Resistance~ // reprise de @11660003
 
+// Opcode 167 : TAC0 avec les armes de trait : 0000 nom, 0001 valeur, 0002 statistique (21 670 000-21 670 999)
+@21670000 = ~THAC0~ // reprise de @10540001
+@21670001 = ~%value% with Missile Weapons~ // reprise de @11670001
+@21670002 = ~the Missile Weapons THAC0~ // reprise de @11670002
+
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Poison Resistance~ // reprise de @11730001
 @21730001 = ~to poison~ // reprise de @11730002
 
+// Opcode 189 : Temps d'incantation : 0000 nom, 0002 statistique ; 0003 temps maximal, 0005 sa statistique (21 890 000-21 890 999)
+@21890000 = ~Casting time~ // reprise de @11890001
+@21890002 = ~the casting time~ // reprise de @11890002
+@21890003 = ~Maximum casting time~ // reprise de @11890003
+@21890005 = ~the maximum casting time~ // reprise de @11890004
+
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Protects from %spellName% spell~ // reprise de @12060001
+
+// Opcode 216 : Drain de niveaux : phrases 0100 un niveau, 0110 plusieurs, 0120 passage de niveau inhibé, 0130 un niveau injecté (22 160 000-22 160 999)
+@22160100 = ~Drains 1 level from %theTarget%~ // reprise de @12160001
+@22160101 = ~Drains 1 level from %theTarget%~ // reprise de @12160001
+@22160102 = ~to drain 1 level from %theTarget%~ // reprise de @12160011
+@22160103 = ~to drain 1 level from %theTarget%~ // reprise de @12160011
+@22160110 = ~Drains %amount% levels from %theTarget%~ // reprise de @12160002
+@22160111 = ~Drains %amount% levels from %theTarget%~ // reprise de @12160002
+@22160112 = ~to drain %amount% levels from %theTarget%~ // reprise de @12160012
+@22160113 = ~to drain %amount% levels from %theTarget%~ // reprise de @12160012
+@22160120 = ~Inhibe le passage au niveau supérieur %ofTheTarget%~ // reprise de @12160003
+@22160121 = ~Inhibe le passage au niveau supérieur %ofTheTarget%~ // reprise de @12160003
+@22160122 = ~d'inhiber le passage au niveau supérieur %ofTheTarget%~ // reprise de @12160013
+@22160123 = ~d'inhiber le passage au niveau supérieur %ofTheTarget%~ // reprise de @12160013
+@22160130 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
+@22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
+@22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+@22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Probability that a wild surge will have positive effect~ // reprise de @12810001
@@ -1112,3 +1216,6 @@
 
 // Effet dérivé 010, SPELL_IMMUNITIES : phrases (30 100 100-30 100 999)
 @30100100 = ~Protects from %spellNames% spells~ // reprise de @15180001
+
+// Effet dérivé 011, FREE_ACTION : phrases (30 110 100-30 110 999)
+@30110100 = ~Free action~ // reprise de @15200001

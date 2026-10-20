@@ -29,6 +29,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_improved_invisibility
 		LPM ad_group_dispel_cures
+		LPM ad_group_movement_restored
+		LPM ad_group_free_action
+		LPM ad_group_spell_failure
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
@@ -187,6 +190,8 @@ END
 // - ceux des lignes de 2da/immunity_absorbs.2da pour P (soins de l'état, autres immunités ; une
 //   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES) ; une ligne RELABEL donne à
 //   l'immunité ce libellé et la place après les autres, comme l'effet que l'ancien moteur ajoute ;
+//   la colonne P2 est comparée à la valeur lue (fx_parameter2_raw), que l'ancien moteur teste avant
+//   toute correction du mode ;
 // - les protections contre un sort (206, 321) qui inflige P selon 2da/immunity_spells.2da, si elles
 //   ont aussi les mêmes dés et la même puissance (321 : la même résistance).
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
@@ -206,7 +211,7 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 							LPM ad_immunity_same_fields
 							PATCH_IF absorb_same AND absorb_parameter1 >= $AD_IMMUNITY_ABSORB_P1_MIN(~%absorb_row%~)
 									AND absorb_parameter1 <= $AD_IMMUNITY_ABSORB_P1_MAX(~%absorb_row%~)
-									AND ($AD_IMMUNITY_ABSORB_ANY_P2(~%absorb_row%~) OR $fx_parameter2(~%absorb_id%~) == $AD_IMMUNITY_ABSORB_P2(~%absorb_row%~)) BEGIN
+									AND ($AD_IMMUNITY_ABSORB_ANY_P2(~%absorb_row%~) OR $fx_parameter2_raw(~%absorb_id%~) == $AD_IMMUNITY_ABSORB_P2(~%absorb_row%~)) BEGIN
 								SET $fx_consumed(~%absorb_id%~) = 1
 								SET absorb_found = 1
 							END
@@ -273,6 +278,117 @@ DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END
+			END
+		END
+	END
+END
+
+// Vitesse de déplacement rétablie (ancien opcode_126_group : opcode 126 à 100 %) : elle absorbe
+// l'action libre (opcode 163) de même portée et de mêmes probabilités.
+DEFINE_PATCH_MACRO ad_group_movement_restored BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 126 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_percentage
+				AND $fx_parameter1(~%group_id%~) == 100 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 163 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND $fx_probability1(~%group_candidate%~) == $fx_probability1(~%group_id%~)
+						AND $fx_probability2(~%group_candidate%~) == $fx_probability2(~%group_id%~) BEGIN
+					SET $fx_consumed(~%group_candidate%~) = 1
+				END
+			END
+		END
+	END
+END
+
+// Action libre (ancien opcode_101_group, opcode virtuel 520 ; capacités d'équipement) : une immunité
+// à la modification de la vitesse de déplacement (101 sur 126), avec l'action libre (163) ou la
+// vitesse rétablie (126 à 100 %) et les immunités à la hâte, à la lenteur, à la paralysie, à
+// l'enchevêtrement, à la toile d'araignée et à l'immobilisation (101 sur 16, 40, 109, 154, 157, 175)
+// de mêmes probabilités, cible et jet de sauvegarde, s'écrivent « Action libre » (effet dérivé
+// FREE_ACTION). Ces effets, l'action libre, la vitesse et les soins de l'étourdissement et de la
+// paralysie (46, 162) sont consommés. L'ancien moteur vérifie la présence de ces effets même si un
+// autre regroupement les a déjà absorbés.
+DEFINE_PATCH_MACRO ad_group_free_action BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 101 AND $fx_parameter2(~%group_id%~) == 126 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			PATCH_IF ~%group_scope%~ STRING_EQUAL ~equipped~ BEGIN
+				LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_key = signature END
+				CLEAR_ARRAY group_needed
+				SET group_restore = 0
+				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_other_key = signature END
+					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
+						PATCH_IF group_candidate_opcode == 163 OR (group_candidate_opcode == 126 AND $fx_parameter1(~%group_candidate%~) == 100
+								AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_percentage) BEGIN
+							SET group_restore = 1
+						END
+						ELSE PATCH_IF group_candidate_opcode == 101 BEGIN
+							SET group_needed_immunity = $fx_parameter2(~%group_candidate%~)
+							SET $group_needed(~%group_needed_immunity%~) = 1
+						END
+					END
+				END
+				SET group_complete = group_restore
+				PATCH_FOR_EACH group_immunity IN 16 40 109 154 157 175 BEGIN
+					PATCH_IF NOT VARIABLE_IS_SET $group_needed(~%group_immunity%~) BEGIN
+						SET group_complete = 0
+					END
+				END
+				PATCH_IF group_complete BEGIN
+					FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+						LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_other_key = signature END
+						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
+						SET group_candidate_parameter2 = $fx_parameter2(~%group_candidate%~)
+						PATCH_IF (~%group_other_key%~ STRING_EQUAL ~%group_key%~) AND (group_candidate_opcode == 46
+								OR group_candidate_opcode == 126 OR group_candidate_opcode == 162 OR group_candidate_opcode == 163
+								OR (group_candidate_opcode == 101 AND (group_candidate_parameter2 == 16 OR group_candidate_parameter2 == 40
+									OR group_candidate_parameter2 == 109 OR group_candidate_parameter2 == 126 OR group_candidate_parameter2 == 154
+									OR group_candidate_parameter2 == 157 OR group_candidate_parameter2 == 175))) BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+						END
+					END
+					SPRINT line_section ~equipped~
+					SET line_sort = $AD_DERIVED_SORT(~FREE_ACTION~)
+					SET line_phrase = 30110100 // ~Action libre~
+					SET line_fx = group_id
+					LPM ad_effect_line
+				END
+			END
+		END
+	END
+END
+
+// Échec des sorts (ancien opcode_60_group) : chaque effet 60 réunit les autres effets 60 de types de
+// sort 0 à 2 qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni (fx_spell_types : masque
+// des types) est écrit après les autres, comme celui que l'ancien moteur ajoute en fin de liste.
+DEFINE_PATCH_MACRO ad_group_spell_failure BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 60 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			SET group_type = $fx_parameter2(~%group_id%~)
+			SET group_types = 1 << (group_type > 2 ? group_type - 3 : group_type)
+			SET group_merged = 0
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter2 = 0 RET group_signature = signature END
+			SPRINT group_resource $fx_resource_lower(~%group_id%~)
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SET group_other_type = $fx_parameter2(~%group_candidate%~)
+				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 60 AND NOT $fx_consumed(~%group_candidate%~)
+						AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter2 = 0 RET group_other_signature = signature END
+					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET group_types = group_types BOR (1 << group_other_type)
+						SET group_merged = 1
+					END
+				END
+			END
+			PATCH_IF group_merged BEGIN
+				SET $fx_spell_types(~%group_id%~) = group_types
+				SET $fx_late(~%group_id%~) = 1
 			END
 		END
 	END
@@ -397,7 +513,8 @@ END
 // (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
 // new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
-// comparés ; with_special = 0 : special non comparé.
+// comparés ; with_special = 0 : special non comparé ; with_power, with_dice, with_resistance = 0 :
+// puissance, dés, résistance à la dissipation non comparés.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
@@ -406,19 +523,22 @@ DEFINE_PATCH_FUNCTION ad_fx_signature
 		with_save = 1
 		with_timing = 1
 		with_special = 1
+		with_power = 1
+		with_dice = 1
+		with_resistance = 1
 	RET
 		signature
 BEGIN
-	SET sig_power        = $fx_power(~%fx_id%~)
+	SET sig_power        = with_power ? $fx_power(~%fx_id%~) : 0
 	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
 	SET sig_parameter2   = with_parameter2 ? $fx_parameter2(~%fx_id%~) : 0
 	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
-	SET sig_resistance   = with_save ? $fx_resistance(~%fx_id%~) : 0
+	SET sig_resistance   = with_save AND with_resistance ? $fx_resistance(~%fx_id%~) : 0
 	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0
 	SET sig_probability1 = $fx_probability1(~%fx_id%~)
 	SET sig_probability2 = $fx_probability2(~%fx_id%~)
-	SET sig_dice_count   = $fx_dice_count(~%fx_id%~)
-	SET sig_dice_sides   = $fx_dice_sides(~%fx_id%~)
+	SET sig_dice_count   = with_dice ? $fx_dice_count(~%fx_id%~) : 0
+	SET sig_dice_sides   = with_dice ? $fx_dice_sides(~%fx_id%~) : 0
 	SET sig_save_type    = with_save ? $fx_save_type(~%fx_id%~) : 0
 	SET sig_save_bonus   = with_save ? $fx_save_bonus(~%fx_id%~) : 0
 	SET sig_special      = with_special ? $fx_special(~%fx_id%~) : 0

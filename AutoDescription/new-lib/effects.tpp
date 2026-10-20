@@ -4,7 +4,8 @@
 // disparaissent avec la fonction (V7), rien ne passe d'une ressource à la suivante.
 //
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
-// fx_parameter1, fx_parameter2, fx_timing, fx_resistance, fx_duration, fx_probability1,
+// fx_parameter1, fx_parameter2 (fx_parameter2_raw : valeur lue, qu'une prise en charge ne réécrit
+// pas), fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
 // fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
 // fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
@@ -135,6 +136,7 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_BYTE  (fx_offset + FX_power)        $fx_power(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_parameter1)   $fx_parameter1(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_parameter2)   $fx_parameter2(~%fx_id%~)
+			SET $fx_parameter2_raw(~%fx_id%~) = $fx_parameter2(~%fx_id%~)
 			READ_BYTE  (fx_offset + FX_timing)       $fx_timing(~%fx_id%~)
 			READ_BYTE  (fx_offset + FX_resistance)   $fx_resistance(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_duration)     $fx_duration(~%fx_id%~)

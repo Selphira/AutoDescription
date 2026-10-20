@@ -1,7 +1,7 @@
 // États, soins et autres effets à phrase fixe : états (opcodes 3, 13, 16, 20, 24, 38, 39, 40, 45,
 // 63, 74, 76, 80, 109, 128, 134, 317), soins et dissipations (2, 4, 11, 43, 46, 47, 48, 58, 75, 77,
-// 79, 81, 116, 161-164) ; une phrase sans valeur par variante de l'opcode, « Réduit la cible au
-// silence ».
+// 79, 81, 116, 161-164), drain de niveaux (216) ; une phrase par variante de l'opcode, « Réduit la
+// cible au silence ».
 // Chaque fichier d'opcode fixe state_opcode et state_variant_macro (vide si l'opcode n'a qu'une
 // variante) ; cette macro choisit state_variant pour l'effet line_fx et peut fixer line_condition.
 // Phrase : 20 000 000 + opcode × 10 000 + 100 + 10 × variante, plus la forme (ad_effect_line,

@@ -7,7 +7,10 @@
 // un opcode sans mode
 // pourcentage fixe aussi stat_percentage à invalid, remis à valid après la prise en charge ; un
 // opcode dont le jeu ignore parameter2 fixe stat_forced_mode au mode qu'il applique réellement, écrit
-// dans l'effet avant toute validation pour que les passes suivantes lisent le vrai mode.
+// dans l'effet avant toute validation pour que les passes suivantes lisent le vrai mode. Un opcode
+// pour qui un pourcentage de 100 a un sens fixe stat_percent_100 à valid. Un opcode aux cas
+// particuliers fixe stat_line_macro : appelée pour chaque effet line_fx (forme dans line_form), elle
+// peut changer le nom (stat_name_tra) ou écrire elle-même la ligne (stat_line_done à 1).
 //
 // Mode 3 (EE seulement ; sur un jeu classique, il est invalide pour tous les opcodes), selon
 // stat_mode_3 : added (traité comme un ajout, ex. jets de sauvegarde), unsupported (pas encore
@@ -44,7 +47,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			ELSE PATCH_IF ((stat_mode < MOD_TYPE_cumulative OR stat_mode > MOD_TYPE_percentage)
 					AND NOT (stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~added~)))
 					OR (stat_mode == MOD_TYPE_cumulative AND stat_value == 0)
-					OR (stat_mode == MOD_TYPE_percentage AND (stat_value == 100 OR (~%stat_percentage%~ STRING_EQUAL ~invalid~))) BEGIN
+					OR (stat_mode == MOD_TYPE_percentage AND ((stat_value == 100 AND NOT (~%stat_percent_100%~ STRING_EQUAL ~valid~))
+					OR (~%stat_percentage%~ STRING_EQUAL ~invalid~))) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
@@ -57,6 +61,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 		END
 	END
 	SPRINT stat_percentage ~valid~
+	SPRINT stat_percent_100 ~~
 	SPRINT stat_forced_mode ~~
 END
 
@@ -66,25 +71,33 @@ END
 DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
-	SET stat_name_tra = $AD_STAT_MODIFIER_NAMES(~%stat_opcode%~)
+	SET stat_base_name_tra = $AD_STAT_MODIFIER_NAMES(~%stat_opcode%~)
 	SET stat_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%stat_opcode%~)
-	LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
 	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
+			SET stat_name_tra = stat_base_name_tra
 			SET line_fx = stat_id
 			LPM ad_application_form
-			PATCH_IF line_form == 0 BEGIN
-				LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
-				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+			SET stat_line_done = 0
+			PATCH_IF NOT (~%stat_line_macro%~ STRING_EQUAL ~~) BEGIN
+				LPM ~%stat_line_macro%~
 			END
-			ELSE BEGIN
-				LPM ad_stat_modifier_target_phrase
+			PATCH_IF NOT stat_line_done BEGIN
+				LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
+				PATCH_IF line_form == 0 BEGIN
+					LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
+					SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+				END
+				ELSE BEGIN
+					LPM ad_stat_modifier_target_phrase
+				END
+				LPM ad_effect_line
 			END
-			LPM ad_effect_line
 		END
 	END
+	SPRINT stat_line_macro ~~
 END
 
 // Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target) : line_phrase, identifiant de
