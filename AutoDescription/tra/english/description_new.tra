@@ -17,6 +17,12 @@
 @1000006 = ~ %and% ~ // reprise de @10021
 @1000007 = ~or~ // reprise de @100004
 
+// Mise en forme : distances, 1 100 000 + pluriel + 2 × demi-unité ; le .tra choisit l'unité (%distance_units% mètres entiers, %distance_feet% pieds) (1 100 000-1 100 099)
+@1100000 = ~%distance_feet% feet~
+@1100001 = ~%distance_feet% feet~
+@1100002 = ~%distance_feet% feet~
+@1100003 = ~%distance_feet% feet~
+
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
 @1200001 = ~+%value%~ // reprise de @10003
@@ -55,10 +61,25 @@
 @2000111 = ~of the drinker~ // reprise de @102452
 @2000112 = ~to the drinker~ // reprise de @102453
 
+// Cibles d'une zone nommées d'après le projectile : 2 001 000 + 10 × créatures visées (0 toutes, 1 hostiles, 2 alliées) + forme (0 sujet, 1 « de… », 2 « à… ») ; 2 001 100 zone, 2 001 102 cône (2 001 000-2 001 199)
+@2001000 = ~the creatures~ // reprise de @102700
+@2001001 = ~of creatures~ // reprise de @102710
+@2001002 = ~to creatures~ // reprise de @102720
+@2001010 = ~the enemies~ // reprise de @102701
+@2001011 = ~of enemies~ // reprise de @102711
+@2001012 = ~to enemies~ // reprise de @102721
+@2001020 = ~the allies~ // reprise de @102702
+@2001021 = ~of allies~ // reprise de @102712
+@2001022 = ~to allies~ // reprise de @102722
+@2001100 = ~%target% within a radius of %range%~ // reprise de @102800
+@2001102 = ~%target% within a %range% cone on a %angle%° arc~ // reprise de @102802
+
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~for %strDuration%~ // reprise de @100311
 @3000001 = ~permanently~ // reprise de @100312
 @3000002 = ~permanently, persists after death~ // reprise de @100313
+@3000003 = ~%frequency% for %strDuration%~ // reprise de @100315
+@3000004 = ~%frequency% for %strDuration% after %afterStrDuration%~ // reprise de @100316
 
 // Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
 @3010000 = ~1 second~ // reprise de @100300
@@ -71,6 +92,22 @@
 @3010007 = ~%amount% hours~ // reprise de @100307
 @3010008 = ~1 day~ // reprise de @100308
 @3010009 = ~%amount% days~ // reprise de @100309
+
+// Durées : fréquences, 3 020 000 + 2 × unité + pluriel ; unités de 3 010 000 (3 020 000-3 020 009)
+@3020000 = ~every second~
+@3020001 = ~every %amount% seconds~
+@3020002 = ~every round~
+@3020003 = ~every %amount% rounds~
+@3020004 = ~every turn~
+@3020005 = ~every %amount% turns~
+@3020006 = ~every hour~
+@3020007 = ~every %amount% hours~
+@3020008 = ~every day~
+@3020009 = ~every %amount% days~
+
+// Probabilités : 4 000 000 préfixe d'un effet, 4 000 001 titre d'un groupe de même probabilité (4 000 000-4 000 099)
+@4000000 = ~%probability% chance %description%~ // reprise de @101125
+@4000001 = ~%probability% chance~ // reprise de @101126
 
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Saving Throws~ // reprise de @102034
@@ -553,6 +590,12 @@
 @20000002 = ~%value% bonus~ // reprise de @10000101
 @20000003 = ~%value% penalty~ // reprise de @10000102
 
+// Opcode 0 : phrases (20 000 100-20 000 999) : 0110 bonus, 0120 malus (formes probables seulement)
+@20000112 = ~to grant a bonus of %value% to the armour class %ofTheTarget%~ // reprise de @10000103
+@20000113 = ~to grant a bonus of %value% to the armour class %ofTheTarget%~ // reprise de @10000103
+@20000122 = ~to inflict a penalty of %value% to the armour class %ofTheTarget%~ // reprise de @10000104
+@20000123 = ~to inflict a penalty of %value% to the armour class %ofTheTarget%~ // reprise de @10000104
+
 // Opcode 0 : types d'attaque, 20 001 000 + masque de parameter2 (20 001 000-20 001 015)
 @20001001 = ~vs. crushing attacks~ // reprise de @10000001
 @20001002 = ~vs. missile attacks~ // reprise de @10000002
@@ -600,6 +643,8 @@
 // Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums
 @20120100 = ~Inflicts %damage% %toTheTarget%~ // reprise de @10120001
 @20120101 = ~Inflicts %damage% %toTheTarget%~ // reprise de @10120002
+@20120102 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120011
+@20120103 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Drains %damage% %toTheTarget%~ // reprise de @10120004
 
 // Opcode 18 : libellés (20 180 000-20 180 099)

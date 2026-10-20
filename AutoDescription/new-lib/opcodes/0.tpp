@@ -301,9 +301,15 @@ DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 END
 
 // Modificateur ac_value contre les attaques du masque ac_mask (0 : toutes) : « +2 », ou « Bonus
-// de 2 » avec AD_ARMOR_CLASS_SHOW_BONUS_MALUS.
+// de 2 » avec AD_ARMOR_CLASS_SHOW_BONUS_MALUS ; un effet probable a sa phrase (« d'infliger un malus
+// de 1 à la classe d'armure de la cible »).
 DEFINE_PATCH_MACRO ad_op_0_modifier_line BEGIN
-	PATCH_IF NOT AD_ARMOR_CLASS_SHOW_BONUS_MALUS BEGIN
+	SET line_fx = ac_line_fx
+	LPM ad_application_form
+	PATCH_IF line_form >= 2 BEGIN
+		SET value = ABS ac_value
+	END
+	ELSE PATCH_IF NOT AD_ARMOR_CLASS_SHOW_BONUS_MALUS BEGIN
 		LPF ad_signed_value INT_VAR value = ac_value RET value = text END
 	END
 	ELSE PATCH_IF ac_value >= 0 BEGIN
@@ -320,6 +326,9 @@ DEFINE_PATCH_MACRO ad_op_0_modifier_line BEGIN
 	END
 	SPRINT name @20000000 // ~Classe d'armure~
 	SET line_phrase = 1200010 // ~%name%%AD_COLON%%value%~ (+1 : ~%name% %ofTheTarget%%AD_COLON%%value%~)
+	PATCH_IF line_form >= 2 BEGIN
+		SET line_phrase = ac_value > 0 ? 20000110 : 20000120 // ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~
+	END
 	SET line_fx = ac_line_fx
 	LPM ad_effect_line
 END

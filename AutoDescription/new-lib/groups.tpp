@@ -24,6 +24,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_immunities
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_delayed_series
 		LPM ad_group_damage_halves
 	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
@@ -201,11 +202,26 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	END
 END
 
+// Répétitions d'un effet (ancien opcode_group_by_duration), trouvées par la prise en charge
+// (ad_application_series_support, new-lib/application.tpp) : les effets différés de la série sont
+// consommés, la ligne est celle de l'effet de tête, écrite après les autres effets de son opcode
+// (fx_late) comme celui que l'ancien moteur ajoute en fin de liste.
+DEFINE_PATCH_MACRO ad_group_delayed_series BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_series_of(~%group_id%~) >= 0 BEGIN
+			SET $fx_consumed(~%group_id%~) = 1
+		END
+		PATCH_IF $fx_series_anchor(~%group_id%~) BEGIN
+			SET $fx_late(~%group_id%~) = 1
+		END
+	END
+END
+
 // Moitié des dégâts au jet de sauvegarde (ancien opcode_12_group) : chaque effet 12 sans jet de
 // sauvegarde, dans l'ordre du fichier, est réuni au premier autre effet 12 non consommé qui a les mêmes
 // champs, hors jet de sauvegarde et résistance à la dissipation : la ligne additionne leurs dés et
 // prend le jet de l'autre, réussi pour moitié des dégâts (bit 8 de special, lu sur EE). L'effet
-// réuni est écrit après les autres effets 12 (fx_damage_late), comme celui que l'ancien moteur ajoute.
+// réuni est écrit après les autres effets 12 (fx_late), comme celui que l'ancien moteur ajoute.
 DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 12 AND NOT $fx_consumed(~%group_id%~) AND $fx_save_type(~%group_id%~) == 0 BEGIN
@@ -228,7 +244,7 @@ DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 				SET $fx_save_type(~%group_id%~) = $fx_save_type(~%group_other%~)
 				SET $fx_save_types(~%group_id%~) = $fx_save_types(~%group_other%~)
 				SET $fx_save_flags(~%group_id%~) = $fx_save_flags(~%group_other%~)
-				SET $fx_damage_late(~%group_id%~) = 1
+				SET $fx_late(~%group_id%~) = 1
 			END
 		END
 	END
@@ -304,21 +320,23 @@ END
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
 // (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
 // new-lib/normalize.tpp). with_parameter1 = 0 : parameter1 non comparé ; with_save = 0 : jet de
-// sauvegarde et résistance à la dissipation non comparés.
+// sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
+// comparés.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
 		with_parameter1 = 1
 		with_save = 1
+		with_timing = 1
 	RET
 		signature
 BEGIN
 	SET sig_power        = $fx_power(~%fx_id%~)
 	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
 	SET sig_parameter2   = $fx_parameter2(~%fx_id%~)
-	SET sig_timing       = $fx_timing(~%fx_id%~)
+	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
 	SET sig_resistance   = with_save ? $fx_resistance(~%fx_id%~) : 0
-	SET sig_duration     = $fx_duration(~%fx_id%~)
+	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0
 	SET sig_probability1 = $fx_probability1(~%fx_id%~)
 	SET sig_probability2 = $fx_probability2(~%fx_id%~)
 	SET sig_dice_count   = $fx_dice_count(~%fx_id%~)

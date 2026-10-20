@@ -15,9 +15,6 @@
 // Prise en charge (ancien opcode_12_is_valid, plus les cas que ce moteur ne décrit pas encore)
 
 DEFINE_PATCH_MACRO ad_op_12_support BEGIN
-	FOR (damage_id = 0; damage_id < fx_count; ++damage_id) BEGIN
-		SET $fx_damage_late(~%damage_id%~) = 0
-	END
 	FOR (damage_id = 0; damage_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++damage_id) BEGIN
 		PATCH_IF $fx_opcode(~%damage_id%~) == 12 BEGIN
 			LPM ad_op_12_value
@@ -45,7 +42,7 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~12~)
 	FOR (damage_late = 0; damage_late <= 1; ++damage_late) BEGIN
 		FOR (damage_id = 0; damage_id < fx_count; ++damage_id) BEGIN
-			PATCH_IF $fx_opcode(~%damage_id%~) == 12 AND NOT $fx_consumed(~%damage_id%~) AND $fx_damage_late(~%damage_id%~) == damage_late BEGIN
+			PATCH_IF $fx_opcode(~%damage_id%~) == 12 AND NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
 				LPM ad_op_12_value
 				SPRINT damage ~%damage_text%~
 				PATCH_IF damage_mode == 0 BEGIN

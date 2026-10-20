@@ -1,8 +1,8 @@
 // Armes et munitions : en-têtes de combat, section « Capacités de combat », attributs d'arme et
 // compétence (anciens add_combat_abilities, add_weapon_attributes_to_description, proficiency).
 // Pris en charge : effets des en-têtes de combat sans charges, dans leur section « Capacités de
-// combat » (section ability<h> du magasin de lignes, comme les autres effets d'en-tête) ; un en-tête à
-// charges a aussi sa capacité de charge (new-lib/item_charged.tpp), sans effet pour l'instant.
+// combat » (section ability<h> du magasin de lignes, comme les autres effets d'en-tête) ; les effets
+// d'un en-tête à charges vont à sa capacité de charge (new-lib/item_charged.tpp).
 //
 // Tableaux écrits (en-tête de combat combat_id, dans l'ordre du fichier) : combat_header (index
 // de l'en-tête dans l'objet), combat_section (section de ses lignes), combat_attack_type,
@@ -10,13 +10,11 @@
 // combat_section_type (infobulle, ou « au corps à corps » / « à distance » pour une arme en main),
 // combat_tac0, combat_damage (vide : aucun dégât), combat_damage_type, combat_speed,
 // combat_launcher ; variables écrites : combat_count,
-// combat_other_count (en-têtes d'un autre type), combat_charged_effects (effets des en-têtes à
-// charges ou utilisés depuis l'objet).
+// combat_other_count (en-têtes d'un autre type que l'ancien moteur prend pour des en-têtes de combat).
 
 DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 	SET combat_count = 0
 	SET combat_other_count = 0
-	SET combat_charged_effects = 0
 	SPRINT combat_resref ~%SOURCE_RES%~
 	TO_LOWER combat_resref
 	READ_LONG  ITM_extended_headers_offset combat_headers_offset
@@ -24,7 +22,6 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 	FOR (combat_h = 0; combat_h < combat_header_count; ++combat_h) BEGIN
 		SET combat_offset = combat_headers_offset + combat_h * 0x38
 		READ_BYTE  (combat_offset + ITM_HEAD_attack_type)        combat_attack_type
-		READ_SHORT (combat_offset + ITM_HEAD_feature_block_count) combat_effects
 		PATCH_IF combat_attack_type == ITM_ATTACK_TYPE_melee OR combat_attack_type == ITM_ATTACK_TYPE_projectile
 				OR combat_attack_type == ITM_ATTACK_TYPE_launcher BEGIN
 			SET combat_id = combat_count
@@ -42,15 +39,20 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			// effets allant à sa capacité de charge (new-lib/item_charged.tpp).
 			SPRINT $combat_section(~%combat_id%~) ~ability%combat_h%~
 			PATCH_IF ($combat_charges(~%combat_id%~) > 0 OR $combat_location(~%combat_id%~) == 3) AND item_type != ITM_TYPE_dart BEGIN
-				SET combat_charged_effects += combat_effects
 				SPRINT $combat_section(~%combat_id%~) ~combat%combat_h%~
 			END
 			LPM ad_item_combat_damage
 			LPM ad_item_combat_tooltip
 			SET combat_count += 1
 		END
+		// Un en-tête d'un autre type sans charges hors de l'objet est une capacité de combat pour l'ancien
+		// moteur ; à charges, c'est seulement une capacité de charge (new-lib/item_charged.tpp).
 		ELSE BEGIN
-			SET combat_other_count += 1
+			READ_BYTE  (combat_offset + ITM_HEAD_location) combat_other_location
+			READ_SHORT (combat_offset + ITM_HEAD_charges)  combat_other_charges
+			PATCH_IF combat_other_charges == 0 AND combat_other_location != 3 BEGIN
+				SET combat_other_count += 1
+			END
 		END
 	END
 END
@@ -102,7 +104,7 @@ END
 DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	SET combat_is_ammo = item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	LPM ad_item_combat_load
-	PATCH_IF combat_count == 0 OR combat_other_count > 0 OR combat_charged_effects > 0 BEGIN
+	PATCH_IF combat_count == 0 OR combat_other_count > 0 BEGIN
 		SPRINT render_missing ~not_implemented:headers~
 	END
 	ELSE PATCH_IF combat_is_ammo AND combat_count > 1 BEGIN
@@ -205,6 +207,14 @@ END
 // en-têtes qui ont des lignes d'effet ont les mêmes (ancien has_same_combat_abilities, avant ces
 // ajouts) ; combat_special : la dernière ligne de projectile écrite.
 DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
+	// Seules les lignes des en-têtes de combat sont regroupées par probabilité ; celles d'un en-tête à
+	// charges sont dans sa capacité de charge.
+	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
+		SPRINT prob_section $combat_section(~%combat_id%~)
+		PATCH_IF INDEX (EXACT_MATCH ~ability~ ~%prob_section%~) == 0 BEGIN
+			LPM ad_lines_probability_groups
+		END
+	END
 	LPM ad_item_combat_same_abilities
 	SPRINT combat_special ~~
 	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN

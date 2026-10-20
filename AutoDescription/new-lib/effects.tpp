@@ -8,7 +8,11 @@
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
 // fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
 // fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
-// d'un en-tête d'objet) ; fx_consumed (0 à la lecture,
+// d'un en-tête d'objet) ; fx_area_target (0 à la lecture, 1 pour un effet dont les cibles sont
+// nommées d'après la zone du projectile, new-lib/application.tpp) ; fx_late (0 à la lecture, 1 pour
+// un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
+// fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
+// fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
@@ -148,6 +152,10 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			SET $fx_header_target_count(~%fx_id%~) = 0
 			SET $fx_header_projectile(~%fx_id%~) = 0
 			SET $fx_potion_drinker(~%fx_id%~) = 0
+			SET $fx_area_target(~%fx_id%~) = 0
+			SET $fx_late(~%fx_id%~) = 0
+			SET $fx_series_of(~%fx_id%~) = 0 - 1
+			SET $fx_series_anchor(~%fx_id%~) = 0
 			SET fx_opcode = $fx_opcode(~%fx_id%~)
 			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
 			SET fx_count += 1
