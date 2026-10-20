@@ -5,8 +5,7 @@
 // entièrement sont couverts (ad_item_render_support).
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
-// fléchettes (ligne « Utilisation »), cas que ad_item_combat_support ou ad_item_charged_support
-// refuse, utilisabilité (affichée seulement sur les jeux classiques), cas
+// cas que ad_item_combat_support ou ad_item_charged_support refuse, utilisabilité (affichée seulement sur les jeux classiques), cas
 // d'un opcode décrit que sa macro ad_op_<N>_support refuse.
 DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	READ_SHORT ITM_type item_type
@@ -14,13 +13,10 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	SET combat_is_ammo = 0
 	SET item_has_combat = (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
 		OR item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
-	PATCH_IF item_type == ITM_TYPE_dart BEGIN
-		SPRINT render_missing ~not_implemented:item_type~
-	END
-	ELSE PATCH_IF item_has_combat BEGIN
+	PATCH_IF item_has_combat BEGIN
 		LPM ad_item_combat_support
 	END
-	SET item_has_charged = fx_header_count > 0 AND item_type != ITM_TYPE_dart
+	SET item_has_charged = fx_header_count > 0
 	PATCH_IF item_has_charged BEGIN
 		LPM ad_item_charged_support
 	END

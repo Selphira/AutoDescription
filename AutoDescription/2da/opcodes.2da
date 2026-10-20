@@ -2,7 +2,7 @@
 *
          BG2      EE       STATUS    DICE             SORT   DURATION        NAME
 0        1        1        DESCRIBED LEVEL            34     SHOWN           Stat:_AC_vs._Damage_Type_Modifier
-1        1        1        TODO      LEVEL            38     SHOWN           Stat:_Attacks_Per_Round_Modifier
+1        1        1        DESCRIBED LEVEL            38     SHOWN           Stat:_Attacks_Per_Round_Modifier
 2        1        1        TODO      LEVEL            212    IGNORED         Cure:_Sleep
 3        1        1        TODO      LEVEL            380    SHOWN           State:_Berserking
 4        1        1        TODO      LEVEL            211    IGNORED         Cure:_Berserking

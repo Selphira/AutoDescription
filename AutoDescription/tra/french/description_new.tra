@@ -24,6 +24,7 @@
 @1200003 = ~%value%%PERCENT%~ // reprise de @10002
 @1200004 = ~Multiplié par %value%~ // reprise de @10006
 @1200005 = ~%diceCount%d%diceSides%~ // reprise de @10014
+@1200006 = ~Fixée à %value%~
 @1200010 = ~%name%%AD_COLON%%value%~ // reprise de @100001
 @1200011 = ~%name% %ofTheTarget%%AD_COLON%%value%~ // reprise de @100007
 
@@ -554,6 +555,15 @@
 @20001012 = ~contre les armes tranchantes et perforantes~ // reprise de @10000012
 @20001013 = ~contre les armes contondantes, tranchantes et perforantes~ // reprise de @10000013
 @20001014 = ~contre les armes tranchantes, perforantes et les projectiles~ // reprise de @10000014
+
+// Opcode 1 : libellés (20 010 000-20 010 099)
+@20010000 = ~Attaque par round~
+@20010001 = ~une demi~ // reprise de @10010101
+@20010002 = ~\1 et demi~ // reprise de @10010102
+@20010003 = ~une demi supplémentaire~ // reprise de @10010103
+
+// Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
+@20010140 = ~Attaque impossible~ // reprise de @10010005
 
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Points de vie maximums~ // reprise de @10180001

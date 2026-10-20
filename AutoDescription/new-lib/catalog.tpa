@@ -49,6 +49,22 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_TYPES BEGIN
 	16 => 35 // pétrification et métamorphose
 END
 
+// Attaques par round de l'opcode 1, en dixièmes, selon parameter1 (ancien opcode_1_values) : 0 à 5
+// attaques, puis 6 à 10 pour ½, 1½, 2½, 3½, 4½.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ATTACKS_PER_ROUND BEGIN
+	0 => 0
+	1 => 10
+	2 => 20
+	3 => 30
+	4 => 40
+	5 => 50
+	6 => 5
+	7 => 15
+	8 => 25
+	9 => 35
+	10 => 45
+END
+
 // Unités de durée en secondes, de la plus petite à la plus grande (ancien tableau durations) ; leurs
 // noms sont dans le bloc 3 010 000 de description_new.tra.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DURATION_UNITS BEGIN

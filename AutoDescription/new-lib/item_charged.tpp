@@ -143,10 +143,11 @@ END
 
 // Section des capacités de charge, après les capacités d'équipement. Les lignes de l'unique en-tête
 // à charges d'une munition vont dans « Capacités de combat » : sans effet d'en-tête pris en charge
-// (new-lib/item_combat.tpp), elle n'en a aucune.
+// (new-lib/item_combat.tpp), elle n'en a aucune. Celles d'une fléchette y sont déjà
+// (ad_item_dart_support).
 DEFINE_PATCH_MACRO ad_item_charged_section BEGIN
 	SPRINT charged_text ~~
-	PATCH_IF combat_is_ammo AND charged_count == 1 AND item_has_combat BEGIN
+	PATCH_IF (combat_is_ammo OR item_type == ITM_TYPE_dart) AND charged_count == 1 AND item_has_combat BEGIN
 		SET charged_count = 0
 	END
 	SET charged_multiple = charged_count > 1

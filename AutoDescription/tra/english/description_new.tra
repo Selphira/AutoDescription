@@ -24,6 +24,7 @@
 @1200003 = ~%value%%~ // reprise de @10002
 @1200004 = ~Multiplied by %value%~ // reprise de @10006
 @1200005 = ~%diceCount%d%diceSides%~ // reprise de @10014
+@1200006 = ~Fixed at %value%~
 @1200010 = ~%name%%AD_COLON%%value%~ // reprise de @100001
 @1200011 = ~%name% %ofTheTarget%%AD_COLON%%value%~ // reprise de @100007
 
@@ -554,6 +555,15 @@
 @20001012 = ~vs. slashing and piercing attacks~ // reprise de @10000012
 @20001013 = ~vs. crushing, slashing and piercing attacks~ // reprise de @10000013
 @20001014 = ~vs. slashing, piercing and missile attacks~ // reprise de @10000014
+
+// Opcode 1 : libellés (20 010 000-20 010 099)
+@20010000 = ~Attacks per round~
+@20010001 = ~a half~ // reprise de @10010101
+@20010002 = ~\1 and a half~ // reprise de @10010102
+@20010003 = ~an extra 1/2~ // reprise de @10010103
+
+// Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
+@20010140 = ~Unable to attack~ // reprise de @10010005
 
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Maximum hit points~ // reprise de @10180001
