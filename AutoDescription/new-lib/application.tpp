@@ -205,6 +205,38 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 	END
 END
 
+// Effet drop_id que l'ancien moteur écarte dès sa lecture, sans rien écrire (validation d'un opcode) :
+// consommé. La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
+// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée ou si un
+// autre effet décrit du même en-tête a la même durée.
+DEFINE_PATCH_MACRO ad_application_drop BEGIN
+	SPRINT drop_scope $fx_scope(~%drop_id%~)
+	SET drop_timing = $fx_timing(~%drop_id%~)
+	PATCH_IF NOT (~%drop_scope%~ STRING_EQUAL ~equipped~)
+			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) BEGIN
+		SET drop_twin = 0
+		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
+			SET render_opcode = $fx_opcode(~%drop_other%~)
+			SPRINT drop_other_scope $fx_scope(~%drop_other%~)
+			LPM ad_opcode_is_described
+			PATCH_IF drop_other != drop_id AND opcode_described AND NOT $fx_consumed(~%drop_other%~)
+					AND (~%drop_other_scope%~ STRING_EQUAL ~%drop_scope%~)
+					AND $fx_timing(~%drop_other%~) == drop_timing
+					AND $fx_duration(~%drop_other%~) == $fx_duration(~%drop_id%~) BEGIN
+				SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+				PATCH_IF NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
+					SET drop_twin = 1
+				END
+			END
+		END
+		PATCH_IF NOT drop_twin BEGIN
+			SET drop_opcode = $fx_opcode(~%drop_id%~)
+			SPRINT render_missing ~not_implemented:opcode%drop_opcode%:dropped_duration~
+		END
+	END
+	SET $fx_consumed(~%drop_id%~) = 1
+END
+
 // Forme de la phrase de l'effet line_fx : 0 soi, 1 cible, 2 soi probable, 3 cible probable.
 DEFINE_PATCH_MACRO ad_application_form BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)

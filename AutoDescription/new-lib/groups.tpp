@@ -33,6 +33,8 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_movement_restored
 		LPM ad_group_free_action
 		LPM ad_group_spell_failure
+		LPM ad_group_item_return
+		LPM ad_group_replace_item
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
@@ -413,6 +415,68 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 	END
 END
 
+// Objet rendu (ancien opcode_112_group, second cas) : un retrait d'objet (112) sans délai ni durée
+// limitée suivi de la création du même objet après un délai (122, timing 4) dans le même bloc
+// devient un retrait pour la durée de ce délai ; la création est consommée. L'ancien moteur ne
+// prévoit qu'une création par retrait : plusieurs sont refusées.
+DEFINE_PATCH_MACRO ad_group_item_return BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		SET group_timing = $fx_timing(~%group_id%~)
+		PATCH_IF $fx_opcode(~%group_id%~) == 112 AND NOT $fx_consumed(~%group_id%~)
+				AND (group_timing <= TIMING_while_equipped OR group_timing >= TIMING_permanent_after_death) BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			SPRINT group_resource $fx_resource_lower(~%group_id%~)
+			SET group_returns = 0
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 122 AND NOT $fx_consumed(~%group_candidate%~)
+						AND $fx_timing(~%group_candidate%~) == TIMING_delayed AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+					SET group_returns += 1
+					SET $fx_consumed(~%group_candidate%~) = 1
+					SET $fx_item_return(~%group_id%~) = $fx_duration(~%group_candidate%~)
+				END
+			END
+			PATCH_IF group_returns > 1 BEGIN
+				SPRINT render_late_missing ~not_implemented:opcode112:several_returns~
+			END
+		END
+	END
+END
+
+// Objet remplacé (ancien opcode_122_group, opcode virtuel 525) : chaque création d'objet (122) est
+// réunie au premier retrait d'objet (112) du même bloc qui a les mêmes cible, timing, durée,
+// probabilités, jet de sauvegarde, résistance à la dissipation et special : « Remplace « Lance +3 »
+// par « Sceptre de puissance altière » » (effet dérivé REPLACE_ITEM).
+DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 122 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_power = 0 with_dice = 0 RET group_key = signature END
+			SET group_removal = 0 - 1
+			FOR (group_candidate = 0; group_candidate < fx_count AND group_removal < 0; ++group_candidate) BEGIN
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 112 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_power = 0 with_dice = 0 RET group_other_key = signature END
+					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+						SET group_removal = group_candidate
+					END
+				END
+			END
+			PATCH_IF group_removal >= 0 BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
+				SET $fx_consumed(~%group_removal%~) = 1
+				SPRINT itemName $fx_item_name(~%group_removal%~)
+				SPRINT itemName2 $fx_item_name(~%group_id%~)
+				SPRINT line_section ~equipped~
+				SET line_sort = $AD_DERIVED_SORT(~REPLACE_ITEM~)
+				SET line_phrase = 30120100 // ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
+				SET line_fx = group_id
+				LPM ad_effect_line
+			END
+		END
+	END
+END
+
 // Échec des sorts (ancien opcode_60_group) : chaque effet 60 réunit les autres effets 60 de types de
 // sort 0 à 2 qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni (fx_spell_types : masque
 // des types) est écrit après les autres, comme celui que l'ancien moteur ajoute en fin de liste.
@@ -564,7 +628,8 @@ END
 // new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
 // comparés ; with_special = 0 : special non comparé ; with_power, with_dice, with_resistance = 0 :
-// puissance, dés, résistance à la dissipation non comparés. L'ancien moteur compare parameter2 tel
+// puissance, dés, résistance à la dissipation non comparés ; with_probability = 0 : probabilités non
+// comparées. L'ancien moteur compare parameter2 tel
 // que lu, avant que la prise en charge d'un opcode n'y range un mode (191, 233 : la statistique
 // visée y disparaît).
 DEFINE_PATCH_FUNCTION ad_fx_signature
@@ -578,6 +643,7 @@ DEFINE_PATCH_FUNCTION ad_fx_signature
 		with_power = 1
 		with_dice = 1
 		with_resistance = 1
+		with_probability = 1
 	RET
 		signature
 BEGIN
@@ -587,8 +653,8 @@ BEGIN
 	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
 	SET sig_resistance   = with_save AND with_resistance ? $fx_resistance(~%fx_id%~) : 0
 	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0
-	SET sig_probability1 = $fx_probability1(~%fx_id%~)
-	SET sig_probability2 = $fx_probability2(~%fx_id%~)
+	SET sig_probability1 = with_probability ? $fx_probability1(~%fx_id%~) : 0
+	SET sig_probability2 = with_probability ? $fx_probability2(~%fx_id%~) : 0
 	SET sig_dice_count   = with_dice ? $fx_dice_count(~%fx_id%~) : 0
 	SET sig_dice_sides   = with_dice ? $fx_dice_sides(~%fx_id%~) : 0
 	SET sig_save_type    = with_save ? $fx_save_type(~%fx_id%~) : 0

@@ -134,6 +134,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~THIEF_SKILLS~          => 120
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
+	~REPLACE_ITEM~          => 400
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom

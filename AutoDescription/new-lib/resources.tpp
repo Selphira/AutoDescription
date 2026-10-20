@@ -74,3 +74,78 @@ BEGIN
 		END
 	END
 END
+
+// Objet resref (ancien get_item_name, item_can_stack) : nom identifié, sinon non identifié (vide si
+// l'objet n'existe pas ou n'a pas de nom), strref du nom identifié, empilable (taille de pile
+// supérieure à 1).
+DEFINE_PATCH_FUNCTION ad_item_info
+	STR_VAR
+		resref = ~~
+	RET
+		name
+		name_ref
+		stackable
+BEGIN
+	SPRINT name ~~
+	SET name_ref = 0
+	SET stackable = 0
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
+		INNER_PATCH_FILE ~%resref%.itm~ BEGIN
+			READ_LONG ITM_identified_name name_ref
+			READ_LONG ITM_unidentified_name item_unidentified_ref
+			READ_BYTE ITM_stack_amount item_stack
+			PATCH_IF name_ref > 0 BEGIN
+				READ_STRREF ITM_identified_name name
+			END
+			ELSE PATCH_IF item_unidentified_ref > 0 BEGIN
+				READ_STRREF ITM_unidentified_name name
+			END
+			SET stackable = item_stack > 1
+		END
+	END
+END
+
+// L'objet resref est un trésor aléatoire (RNDTRE01 à RNDTRE05, ou ligne de rndtres.2da), que le
+// jeu remplace à sa création par un objet tiré au sort.
+DEFINE_PATCH_FUNCTION ad_item_is_random_treasure
+	STR_VAR
+		resref = ~~
+	RET
+		random
+BEGIN
+	SPRINT random_key ~%resref%~
+	TO_LOWER random_key
+	SET random = (~%random_key%~ STRING_MATCHES_REGEXP ~^rndtre0[1-5]$~) == 0
+	PATCH_IF NOT random AND FILE_EXISTS_IN_GAME ~rndtres.2da~ BEGIN
+		INNER_PATCH_FILE ~rndtres.2da~ BEGIN
+			COUNT_2DA_ROWS 2 random_rows
+			FOR (random_row = 0; random_row < random_rows AND NOT random; ++random_row) BEGIN
+				READ_2DA_ENTRY random_row 0 2 random_label
+				TO_LOWER random_label
+				SET random = ~%random_label%~ STRING_EQUAL ~%random_key%~
+			END
+		END
+	END
+END
+
+// Créature resref (ancien get_creature_name, get_creature_allegiance) : nom (vide si la créature
+// n'existe pas ou n'a pas de nom) et allégeance (ea.ids).
+DEFINE_PATCH_FUNCTION ad_creature_info
+	STR_VAR
+		resref = ~~
+	RET
+		name
+		allegiance
+BEGIN
+	SPRINT name ~~
+	SET allegiance = 0
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
+		INNER_PATCH_FILE ~%resref%.cre~ BEGIN
+			READ_LONG CRE_name creature_name_ref
+			READ_BYTE CRE_allegiance allegiance
+			PATCH_IF creature_name_ref > 0 BEGIN
+				READ_STRREF CRE_name name
+			END
+		END
+	END
+END

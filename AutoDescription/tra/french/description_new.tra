@@ -950,6 +950,40 @@
 @20630102 = ~d'octroyer la capacité d'infravision~ // reprise de @10630021
 @20630103 = ~d'octroyer la capacité d'infravision %toTheTarget% ~ // reprise de @10630031
 
+// Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures) (20 670 000-20 670 999)
+@20670100 = ~Invoque 1 « %creatureName% »%lifeDice%~ // reprise de @10670001
+@20670101 = ~Invoque 1 « %creatureName% »%lifeDice%~ // reprise de @10670001
+@20670102 = ~d'invoquer 1 « %creatureName% »%lifeDice%~ // reprise de @10670003
+@20670103 = ~d'invoquer 1 « %creatureName% »%lifeDice%~ // reprise de @10670003
+@20670110 = ~Invoque 1 « %creatureName% » hostile%lifeDice%~ // reprise de @10670002
+@20670111 = ~Invoque 1 « %creatureName% » hostile%lifeDice%~ // reprise de @10670002
+@20670112 = ~d'invoquer 1 « %creatureName% » hostile%lifeDice%~ // reprise de @10670004
+@20670113 = ~d'invoquer 1 « %creatureName% » hostile%lifeDice%~ // reprise de @10670004
+@20670120 = ~Invoque 1 « %creatureName% » allié(e)%lifeDice%~ // reprise de @10670005
+@20670121 = ~Invoque 1 « %creatureName% » allié(e)%lifeDice%~ // reprise de @10670005
+@20670122 = ~d'invoquer 1 « %creatureName% » allié(e)%lifeDice%~ // reprise de @10670007
+@20670123 = ~d'invoquer 1 « %creatureName% » allié(e)%lifeDice%~ // reprise de @10670007
+@20670130 = ~Invoque 1 « %creatureName% » neutre%lifeDice%~ // reprise de @10670006
+@20670131 = ~Invoque 1 « %creatureName% » neutre%lifeDice%~ // reprise de @10670006
+@20670132 = ~d'invoquer 1 « %creatureName% » neutre%lifeDice%~ // reprise de @10670008
+@20670133 = ~d'invoquer 1 « %creatureName% » neutre%lifeDice%~ // reprise de @10670008
+@20670140 = ~Invoque %amount% « %creatureName% »%lifeDice%~ // reprise de @10670011
+@20670141 = ~Invoque %amount% « %creatureName% »%lifeDice%~ // reprise de @10670011
+@20670142 = ~d'invoquer %amount% « %creatureName% »%lifeDice%~ // reprise de @10670013
+@20670143 = ~d'invoquer %amount% « %creatureName% »%lifeDice%~ // reprise de @10670013
+@20670150 = ~Invoque %amount% « %creatureName% » hostiles%lifeDice%~ // reprise de @10670012
+@20670151 = ~Invoque %amount% « %creatureName% » hostiles%lifeDice%~ // reprise de @10670012
+@20670152 = ~d'invoquer %amount% « %creatureName% » hostiles%lifeDice%~ // reprise de @10670014
+@20670153 = ~d'invoquer %amount% « %creatureName% » hostiles%lifeDice%~ // reprise de @10670014
+@20670160 = ~Invoque %amount% « %creatureName% » alliées%lifeDice%~ // reprise de @10670015
+@20670161 = ~Invoque %amount% « %creatureName% » alliées%lifeDice%~ // reprise de @10670015
+@20670162 = ~d'invoquer %amount% « %creatureName% » alliées%lifeDice%~ // reprise de @10670017
+@20670163 = ~d'invoquer %amount% « %creatureName% » alliées%lifeDice%~ // reprise de @10670017
+@20670170 = ~Invoque %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670016
+@20670171 = ~Invoque %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670016
+@20670172 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
+@20670173 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
+
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001
 
@@ -1061,11 +1095,23 @@
 @21090102 = ~de paralyser %theTarget%~ // reprise de @11090004
 @21090103 = ~de paralyser %theTarget%~ // reprise de @11090004
 
+// Opcode 112 : Retrait d'objet : phrases 0100 (21 120 000-21 120 999)
+@21120100 = ~Retire « %itemName% » de l'inventaire~ // reprise de @11120001
+@21120101 = ~Retire « %itemName% » de l'inventaire %ofTheTarget%~ // reprise de @11120002
+@21120102 = ~de retirer « %itemName% » de l'inventaire %ofTheTarget%~ // reprise de @11120005
+@21120103 = ~de retirer « %itemName% » de l'inventaire %ofTheTarget%~ // reprise de @11120005
+
 // Opcode 116 : Soin : invisibilité (2) (21 160 000-21 160 999)
 @21160100 = ~Dissipation de l'invisibilité~ // reprise de @10470001
 @21160101 = ~Dissipe l'invisibilité %ofTheTarget%~ // reprise de @10470003
 @21160102 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
 @21160103 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
+
+// Opcode 122 : Création d'objet : phrases 0100 (21 220 000-21 220 999)
+@21220100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
+@21220101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
+@21220102 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
+@21220103 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
 
 // Opcode 126 : Vitesse de déplacement : 0000 nom, 0002 statistique ; phrases 0110 immobilisation, 0120 vitesse rétablie (21 260 000-21 260 999)
 @21260000 = ~Vitesse de déplacement~ // reprise de @11260001
@@ -1257,3 +1303,9 @@
 
 // Effet dérivé 011, FREE_ACTION : phrases (30 110 100-30 110 999)
 @30110100 = ~Action libre~ // reprise de @15200001
+
+// Effet dérivé 012, REPLACE_ITEM : phrases (30 120 100-30 120 999)
+@30120100 = ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~ // reprise de @15250001
+@30120101 = ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~ // reprise de @15250001
+@30120102 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~ // reprise de @15250002
+@30120103 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~ // reprise de @15250002

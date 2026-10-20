@@ -1,0 +1,48 @@
+// Opcode 112 (Item: Remove Item) : retire l'objet resource de l'inventaire : « Retire « Ras +2 » de
+// l'inventaire ». Avec AD_ENABLE_SHRINKAGE, il se combine aux créations d'objet (opcode 122) :
+// ad_group_item_return et ad_group_replace_item (new-lib/groups.tpp).
+
+// Comme l'ancien opcode_112_is_valid, le retrait d'une arme nommée « Attaquer » ou « Morgenstern »
+// (armes des métamorphoses) est écarté sans rien écrire. Refus : ressource vide, objet sans nom.
+DEFINE_PATCH_MACRO ad_op_112_support BEGIN
+	FOR (remove_id = 0; remove_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++remove_id) BEGIN
+		PATCH_IF $fx_opcode(~%remove_id%~) == 112 BEGIN
+			SPRINT remove_resref $fx_resource(~%remove_id%~)
+			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref END
+			SET $fx_item_return(~%remove_id%~) = 0
+			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
+				SPRINT render_missing ~not_implemented:opcode112:invalid~
+			END
+			ELSE PATCH_IF remove_name_ref == 25615 OR remove_name_ref == 10966 OR remove_name_ref == 6854 BEGIN
+				SET drop_id = remove_id
+				LPM ad_application_drop
+			END
+			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ BEGIN
+				SPRINT render_missing ~not_implemented:opcode112:no_name~
+			END
+			ELSE BEGIN
+				SPRINT $fx_item_name(~%remove_id%~) ~%remove_name%~
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_op_112_lines BEGIN
+	SPRINT line_section ~equipped~
+	SET line_sort = $AD_OPCODE_SORT(~112~)
+	FOR (remove_id = 0; remove_id < fx_count; ++remove_id) BEGIN
+		PATCH_IF $fx_opcode(~%remove_id%~) == 112 AND NOT $fx_consumed(~%remove_id%~) BEGIN
+			SPRINT itemName $fx_item_name(~%remove_id%~)
+			SET line_fx = remove_id
+			LPM ad_application_form
+			// Objet rendu après un délai (ad_group_item_return) : l'ancien opcode_self_112 écrit la durée
+			// du retrait, à la forme « soi » seulement.
+			PATCH_IF line_form == 0 AND $fx_item_return(~%remove_id%~) > 0 BEGIN
+				LPF ad_duration_text INT_VAR seconds = $fx_item_return(~%remove_id%~) RET strDuration = text END
+				SPRINT line_suffix @3000000 // ~pendant %strDuration%~
+			END
+			SET line_phrase = 21120100 // ~Retire « %itemName% » de l'inventaire~ (+1 : ~Retire « %itemName% » de l'inventaire %ofTheTarget%~)
+			LPM ad_effect_line
+		END
+	END
+END

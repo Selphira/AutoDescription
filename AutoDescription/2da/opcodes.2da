@@ -68,7 +68,7 @@
 64       1        1        TODO      LEVEL            221    IGNORED         State:_Remove_Infravision
 65       1        1        IGNORED   LEVEL            391    SHOWN           Overlay:_Blur
 66       1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Transparency_Fade
-67       1        1        TODO      LEVEL            130    SHOWN           Summon:_Creature_Summoning
+67       1        1        DESCRIBED LEVEL            130    SHOWN           Summon:_Creature_Summoning
 68       1        1        TODO      LEVEL            354    IGNORED         Summon:_Unsummon_Creature
 69       1        1        TODO      LEVEL            290    SHOWN           Protection:_From_Detection_(Non-Detection)
 70       1        1        TODO      LEVEL            220    IGNORED         Cure:_Non-Detection
@@ -113,7 +113,7 @@
 109      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Paralyze
 110      1        1        IGNORED   LEVEL            400    SHOWN           Empty:
 111      1        1        TODO      LEVEL            480    SHOWN           Item:_Create_Magical_Weapon
-112      1        1        TODO      LEVEL            5      IGNORED         Item:_Remove_Item
+112      1        1        DESCRIBED LEVEL            5      IGNORED         Item:_Remove_Item
 113      1        1        TODO      LEVEL            400    SHOWN           Empty:
 114      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Dither
 115      1        1        TODO      LEVEL            461    SHOWN           Detect:_Alignment
@@ -123,7 +123,7 @@
 119      1        1        TODO      LEVEL            402    SHOWN           Spell_Effect:_Mirror_Image
 120      1        1        TODO      LEVEL            281    SHOWN           Protection:_from_Weapons
 121      1        1        TODO      LEVEL            400    SHOWN           Empty:
-122      1        1        TODO      LEVEL            482    NOT_PERMANENT   Item:_Create_Inventory_Item
+122      1        1        DESCRIBED LEVEL            482    NOT_PERMANENT   Item:_Create_Inventory_Item
 123      1        1        TODO      LEVEL            6      IGNORED         Item:_Remove_Inventory_Item
 124      1        1        TODO      LEVEL            453    IGNORED         Spell_Effect:_Teleport_(Dimension_Door)
 125      1        1        TODO      LEVEL            452    IGNORED         Spell_Effect:_Unlock_(Knock)
