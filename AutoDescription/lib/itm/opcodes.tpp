@@ -2017,7 +2017,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 RET d
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 				PATCH_IF type == 2 BEGIN
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~%outer_percent%~
 				END
 			END
 
@@ -2029,7 +2029,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 RET d
 					LPF ~getTranslation~ INT_VAR strref = 600180 opcode RET valueType = string END // ~des points de vie~
 					SET strref_1 += 10
 				END
-				ELSE PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+				ELSE PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1%outer_percent%~ BEGIN
 					LPF ~getTranslation~ INT_VAR strref = 600170 opcode RET valueType = string END // ~point de vie~
 				END
 				ELSE BEGIN
@@ -2044,7 +2044,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 RET d
 			INNER_PATCH_SAVE value ~%value%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
 				PATCH_IF type == 2 BEGIN
-					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~ %~
+					REPLACE_TEXTUALLY EVALUATE_REGEXP ~$~ ~%outer_percent%~
 				END
 			END
 
@@ -2052,7 +2052,7 @@ DEFINE_PATCH_FUNCTION ~opcode_17_common~ INT_VAR strref_1 = 0 strref_2 = 0 RET d
 				SPRINT value ~%complex_value%~
 			END
 			ELSE BEGIN
-				PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1 %~ BEGIN
+				PATCH_IF ~%value%~ STRING_EQUAL ~1~ OR ~%value%~ STRING_EQUAL ~1%outer_percent%~ BEGIN
 					LPF ~getTranslation~ INT_VAR strref = 600172 opcode RET valueType = string END // ~point de dégât~
 				END
 				ELSE BEGIN
