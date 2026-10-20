@@ -56,7 +56,7 @@
 52       1        1        IGNORED   LEVEL            400    SHOWN           Colour:_Very_Bright_by_RGB
 53       1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Animation_Change
 54       1        1        DESCRIBED LEVEL            60     SHOWN           Stat:_THAC0_Modifier
-55       1        1        TODO      LEVEL            352    IGNORED         Death:_Kill_Creature_Type
+55       1        1        DESCRIBED LEVEL            352    IGNORED         Death:_Kill_Creature_Type
 56       1        1        TODO      LEVEL            463    SHOWN           Alignment:_Invert
 57       1        1        TODO      LEVEL            462    SHOWN           Alignment:_Change
 58       1        1        DESCRIBED LEVEL            200    IGNORED         Cure:_Dispellable_Effects_(Dispel_Magic)
@@ -128,7 +128,7 @@
 124      1        1        TODO      LEVEL            453    IGNORED         Spell_Effect:_Teleport_(Dimension_Door)
 125      1        1        TODO      LEVEL            452    IGNORED         Spell_Effect:_Unlock_(Knock)
 126      1        1        DESCRIBED LEVEL            80     SHOWN           Stat:_Movement_Modifier
-127      1        1        TODO      LEVEL            131    NOT_PERMANENT   Summon:_Monster_Summoning
+127      1        1        DESCRIBED LEVEL            131    NOT_PERMANENT   Summon:_Monster_Summoning
 128      1        1        DESCRIBED LEVEL            379    SHOWN           State:_Confusion
 129      1        1        TODO      LEVEL            390    SHOWN           State:_Aid
 130      1        1        TODO      LEVEL            389    SHOWN           State:_Bless

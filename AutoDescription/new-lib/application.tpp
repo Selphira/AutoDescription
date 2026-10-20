@@ -397,7 +397,8 @@ END
 // Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget) ; app_target_missing
 // si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
 // get_effect_description) : le buveur d'une potion, le porteur d'un autre objet. La zone d'un
-// projectile (ad_application_area_target) remplace l'une et l'autre.
+// projectile (ad_application_area_target) remplace l'une et l'autre ; line_the_target, la cible que
+// nomme l'opcode (« les rakshasas »), remplace le tout à la forme sujet.
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
@@ -416,6 +417,10 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		SPRINT ofTheTarget $fx_area_text(~%line_fx% 1~)
 		SPRINT toTheTarget $fx_area_text(~%line_fx% 2~)
 	END
+	PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) BEGIN
+		SET app_target_missing = 0
+		SPRINT theTarget ~%line_the_target%~
+	END
 END
 
 // Ligne de l'effet line_fx (pour une ligne qui en réunit plusieurs, l'un d'eux, de même application
@@ -426,7 +431,8 @@ END
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
 // la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
 // (ad_application_save) ; line_condition (« En combat ») précède toute la ligne, séparée par
-// AD_SEMICOLON (ancien add_condition) ; tous sont remis à zéro après la ligne. Forme ou cible sans
+// AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ; tous
+// sont remis à zéro après la ligne. Forme ou cible sans
 // texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_application_form
@@ -502,6 +508,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET line_phrase = 0
 	SPRINT line_suffix ~~
 	SPRINT line_condition ~~
+	SPRINT line_the_target ~~
 	SET line_save_for_half = 0
 	SET line_fail_for_half = 0
 END
