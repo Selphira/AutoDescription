@@ -630,12 +630,30 @@
 // Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
 @20010140 = ~Unable to attack~ // reprise de @10010005
 
+// Opcode 2 : Soin : réveil (20 020 000-20 020 999)
+@20020100 = ~Wake up %theTarget%~ // reprise de @10020001
+@20020101 = ~Wake up %theTarget%~ // reprise de @10020001
+@20020102 = ~of waking up %theTarget%~ // reprise de @10020002
+@20020103 = ~of waking up %theTarget%~ // reprise de @10020002
+
 // Opcode 3 : État : rage du berserker (20 030 000-20 030 999)
 @20030001 = ~In combat~ // reprise de @10030003
 @20030100 = ~Causes %theTarget% to go berserk~ // reprise de @10030001
 @20030101 = ~Causes %theTarget% to go berserk~ // reprise de @10030001
 @20030102 = ~of causing %theTarget% to go berserk~ // reprise de @10030002
 @20030103 = ~of causing %theTarget% to go berserk~ // reprise de @10030002
+
+// Opcode 4 : Soin : rage du berserker (20 040 000-20 040 999)
+@20040100 = ~Soothes %theTarget%~ // reprise de @10040001
+@20040101 = ~Soothes %theTarget%~ // reprise de @10040001
+@20040102 = ~to soothe %theTarget%~ // reprise de @10040002
+@20040103 = ~to soothe %theTarget%~ // reprise de @10040002
+
+// Opcode 11 : Soin : poison (20 110 000-20 110 999)
+@20110100 = ~Neutralize Poison~ // reprise de @10110001
+@20110101 = ~Neutralizes poisons infecting %theTarget%~ // reprise de @10110002
+@20110102 = ~of neutralizing poisons infecting %theTarget%~ // reprise de @10110003
+@20110103 = ~of neutralizing poisons infecting %theTarget%~ // reprise de @10110003
 
 // Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
 @20120001 = ~%damage% %damageType%~ // reprise de @102166
@@ -816,11 +834,48 @@
 @20420120 = ~Remove a of %levelStr% level wizard spell~ // reprise de @10420003
 @20420140 = ~Double the amount of %levelStr% level wizard spells that can be memorized~ // reprise de @10420005
 
+// Opcode 43 : Soin : pétrification (20 430 000-20 430 999)
+@20430100 = ~Stone to Flesh~ // reprise de @10430001
+@20430101 = ~Stone to Flesh %theTarget%~ // reprise de @10430003
+@20430102 = ~of stone to flesh %theTarget%~ // reprise de @10430002
+@20430103 = ~of stone to flesh %theTarget%~ // reprise de @10430002
+
 // Opcode 45 : Étourdissement (20 450 000-20 450 999)
 @20450100 = ~Stuns %theTarget%~ // reprise de @10450001
 @20450101 = ~Stuns %theTarget%~ // reprise de @10450001
 @20450102 = ~to stun %theTarget%~ // reprise de @10450002
 @20450103 = ~to stun %theTarget%~ // reprise de @10450002
+
+// Opcode 46 : Soin : étourdissement (20 460 000-20 460 999)
+@20460100 = ~Unstun~ // reprise de @10460001
+@20460101 = ~Unstuns %theTarget%~ // reprise de @10460003
+@20460102 = ~to unstun %theTarget%~ // reprise de @10460002
+@20460103 = ~to unstun %theTarget%~ // reprise de @10460002
+
+// Opcode 47 : Soin : invisibilité (20 470 000-20 470 999)
+@20470100 = ~Dispelling invisibility~ // reprise de @10470001
+@20470101 = ~Dispel %theTarget%'s invisibility~ // reprise de @10470003
+@20470102 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
+@20470103 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
+
+// Opcode 48 : Soin : silence (20 480 000-20 480 999)
+@20480100 = ~Vocalize~ // reprise de @10480001
+@20480101 = ~Restores %theTarget%'s voice~ // reprise de @10480003
+@20480102 = ~of restoring %theTarget%'s voice~ // reprise de @10480002
+@20480103 = ~of restoring %theTarget%'s voice~ // reprise de @10480002
+
+// Opcode 58 : Dissipation de la magie : 0001 niveau du lanceur, 0002-0003 armes invoquées ; phrases 0100, 0110 inéluctable (20 580 000-20 580 999)
+@20580001 = ~as a level %castingLevel% spellcaster~ // reprise de @102095
+@20580002 = ~summoned weapons are not dispelled~ // reprise de @10580005
+@20580003 = ~summoned weapons are always dispelled~ // reprise de @10580006
+@20580100 = ~Removes all magical effects from %theTarget%~ // reprise de @10580001
+@20580101 = ~Removes all magical effects from %theTarget%~ // reprise de @10580001
+@20580102 = ~of removing all magical effects from %theTarget%~ // reprise de @10580003
+@20580103 = ~of removing all magical effects from %theTarget%~ // reprise de @10580003
+@20580110 = ~Removes all magical effects from %theTarget%~ // reprise de @10580002
+@20580111 = ~Removes all magical effects from %theTarget%~ // reprise de @10580002
+@20580112 = ~of removing all magical effects from %theTarget%~ // reprise de @10580004
+@20580113 = ~of removing all magical effects from %theTarget%~ // reprise de @10580004
 
 // Opcode 62 : phrases (20 620 100-20 620 999)
 @20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
@@ -843,17 +898,41 @@
 @20740102 = ~to blind %theTarget%~ // reprise de @10740003
 @20740103 = ~to blind %theTarget%~ // reprise de @10740003
 
+// Opcode 75 : Soin : cécité (20 750 000-20 750 999)
+@20750100 = ~Cure blindness~ // reprise de @10750001
+@20750101 = ~Cure blindness on %theTarget%~ // reprise de @10750002
+@20750102 = ~To cure blindness on %theTarget%~ // reprise de @10750003
+@20750103 = ~To cure blindness on %theTarget%~ // reprise de @10750003
+
 // Opcode 76 : Débilité mentale (20 760 000-20 760 999)
 @20760100 = ~Feeblemindedness~ // reprise de @10760001
 @20760101 = ~Inflicts Feeblemindedness on %theTarget%~ // reprise de @10760002
 @20760102 = ~to inflict Feeblemindedness on %theTarget%~ // reprise de @10760003
 @20760103 = ~to inflict Feeblemindedness on %theTarget%~ // reprise de @10760003
 
+// Opcode 77 : Soin : débilité mentale (20 770 000-20 770 999)
+@20770100 = ~Cure Feeblemindedness~ // reprise de @10770001
+@20770101 = ~Cure Feeblemindedness on %theTarget%~ // reprise de @10770002
+@20770102 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
+@20770103 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
+
+// Opcode 79 : Soin : maladies (20 790 000-20 790 999)
+@20790100 = ~Cure Disease~ // reprise de @10790001
+@20790101 = ~Cures the diseases %ofTheTarget%~ // reprise de @10790002
+@20790102 = ~to cure the diseases %ofTheTarget%~ // reprise de @10790003
+@20790103 = ~to cure the diseases %ofTheTarget%~ // reprise de @10790003
+
 // Opcode 80 : Surdité (version longue seulement) (20 800 000-20 800 999)
 @20800100 = ~Deafness~ // reprise de @10800001
 @20800101 = ~Deafens %theTarget%~ // reprise de @10800002
 @20800102 = ~to deafen %theTarget%~ // reprise de @10800003
 @20800103 = ~to deafen %theTarget%~ // reprise de @10800003
+
+// Opcode 81 : Soin : surdité (20 810 000-20 810 999)
+@20810100 = ~Cures deafness~ // reprise de @10810001
+@20810101 = ~Cures the deafness %ofTheTarget%~ // reprise de @10810002
+@20810102 = ~to cure the deafness %ofTheTarget%~ // reprise de @10810003
+@20810103 = ~to cure the deafness %ofTheTarget%~ // reprise de @10810003
 
 // Opcode 84 : libellés (20 840 000-20 840 099)
 @20840000 = ~Magical Fire Resistance~ // reprise de @10840001
@@ -889,6 +968,12 @@
 @21090102 = ~to hold %theTarget%~ // reprise de @11090004
 @21090103 = ~to hold %theTarget%~ // reprise de @11090004
 
+// Opcode 116 : Soin : invisibilité (2) (21 160 000-21 160 999)
+@21160100 = ~Dispelling invisibility~ // reprise de @10470001
+@21160101 = ~Dispel %theTarget%'s invisibility~ // reprise de @10470003
+@21160102 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
+@21160103 = ~to dispel %theTarget%'s invisibility~ // reprise de @10470002
+
 // Opcode 128 : Confusion (21 280 000-21 280 999)
 @21280100 = ~Confusion~ // reprise de @11280001
 @21280101 = ~Confusing %toTheTarget%~ // reprise de @11280002
@@ -919,6 +1004,30 @@
 @21441013 = ~%action% the use of innate spells~ // reprise de @11440014
 @21441014 = ~%action% the use of Find traps~ // reprise de @11440015
 @21441015 = ~%action% the use of the inventory~ // reprise de @11440016
+
+// Opcode 161 : Soin : peur (21 610 000-21 610 999)
+@21610100 = ~Cure horror~ // reprise de @11610001
+@21610101 = ~Cure horror on %theTarget%~ // reprise de @11610002
+@21610102 = ~to cure horror on %theTarget%~ // reprise de @11610003
+@21610103 = ~to cure horror on %theTarget%~ // reprise de @11610003
+
+// Opcode 162 : Soin : paralysie (21 620 000-21 620 999)
+@21620100 = ~Cure paralysis~ // reprise de @11620001
+@21620101 = ~Cure paralysis on %theTarget%~ // reprise de @11620002
+@21620102 = ~to cure of paralysis on %theTarget%~ // reprise de @11620003
+@21620103 = ~to cure of paralysis on %theTarget%~ // reprise de @11620003
+
+// Opcode 163 : Action libre (21 630 000-21 630 999)
+@21630100 = ~Free action~ // reprise de @11630001
+@21630101 = ~Free action on %theTarget%~ // reprise de @11630002
+@21630102 = ~to Free action on %theTarget%~ // reprise de @11630003
+@21630103 = ~to Free action on %theTarget%~ // reprise de @11630003
+
+// Opcode 164 : Soin : ivresse (21 640 000-21 640 999)
+@21640100 = ~Cure Drunkeness~ // reprise de @11640001
+@21640101 = ~Sobering up %theTarget%~ // reprise de @11640002
+@21640102 = ~to sober up %theTarget%~ // reprise de @11640003
+@21640103 = ~to sober up %theTarget%~ // reprise de @11640003
 
 // Opcode 166 : libellés (21 660 000-21 660 099)
 @21660000 = ~Magic Resistance~ // reprise de @11660001

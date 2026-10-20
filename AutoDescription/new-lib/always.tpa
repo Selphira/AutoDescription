@@ -20,9 +20,12 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/states.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/0.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/1.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/2.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/3.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/4.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/6.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/10.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/11.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/12.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/13.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/15.tpp~
@@ -47,17 +50,26 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/39.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/40.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/42.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/43.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/44.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/45.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/46.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/47.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/48.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/49.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/54.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/58.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/59.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/62.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/63.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/73.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/74.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/75.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/76.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/77.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/79.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/80.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/81.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/84.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/85.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/86.tpp~
@@ -75,10 +87,15 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/101.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/104.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/109.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/116.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/128.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/134.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/144.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/145.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/161.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/162.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/163.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/164.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/166.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/173.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/206.tpp~

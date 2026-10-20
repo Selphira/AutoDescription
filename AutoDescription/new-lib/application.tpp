@@ -23,7 +23,13 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 			SPRINT app_block $fx_block(~%app_id%~)
 			SPRINT app_timing_kind $fx_timing_kind(~%app_id%~)
 			PATCH_IF ~%app_block%~ STRING_EQUAL ~equipped~ BEGIN
-				PATCH_IF NOT (~%app_timing_kind%~ STRING_EQUAL ~while_equipped~) OR $fx_probability(~%app_id%~) != 100 BEGIN
+				SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+				// Effet d'équipement permanent : l'ancien moteur l'écrit comme un effet tant que l'objet est
+				// équipé quand la durée de l'opcode n'est jamais affichée.
+				SET app_equipped_timing = (~%app_timing_kind%~ STRING_EQUAL ~while_equipped~)
+					OR ((~%app_timing_kind%~ STRING_EQUAL ~permanent~)
+						AND ((~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)))
+				PATCH_IF NOT app_equipped_timing OR $fx_probability(~%app_id%~) != 100 BEGIN
 					SPRINT render_missing ~not_implemented:opcode%render_opcode%:effect_kind~
 				END
 			END

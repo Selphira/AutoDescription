@@ -8,6 +8,9 @@
 // Tableau écrit : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp).
 
 DEFINE_PATCH_MACRO ad_cross_groups BEGIN
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_group_identical_effects
+	END
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_ABILITIES BEGIN
 		LPM ad_group_abilities
 	END
@@ -25,6 +28,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_improved_invisibility
+		LPM ad_group_dispel_cures
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
@@ -36,6 +40,34 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_all_resistances
 		LPM ad_group_elemental_resistances
 		LPM ad_group_physical_resistances
+	END
+END
+
+// Effets identiques (ancien opcode_group_by_target, le premier regroupement de chaque opcode) : les
+// effets d'un même opcode dont tous les champs sont égaux n'en font qu'un, écrit après les autres
+// effets de son opcode (fx_late), comme celui que l'ancien moteur remet en fin de liste ;
+// fx_identical_count en garde le nombre.
+DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		SET $fx_identical_count(~%group_id%~) = 1
+	END
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
+			SET group_opcode = $fx_opcode(~%group_id%~)
+			LPF ad_fx_signature INT_VAR fx_id = group_id RET group_signature = signature END
+			SPRINT group_resource $fx_resource_lower(~%group_id%~)
+			FOR (group_candidate = group_id + 1; group_candidate < fx_count; ++group_candidate) BEGIN
+				PATCH_IF $fx_opcode(~%group_candidate%~) == group_opcode AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate RET group_other_signature = signature END
+					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
+						SET $fx_late(~%group_id%~) = 1
+					END
+				END
+			END
+		END
 	END
 END
 
@@ -225,6 +257,27 @@ DEFINE_PATCH_MACRO ad_group_improved_invisibility BEGIN
 	END
 END
 
+// Dissipation de la magie (ancien opcode_58_group) : elle dissipe aussi la surdité et la débilité
+// mentale ; les guérisons de ces états (opcodes 77, 81) de même portée, avec les mêmes dés, puissance,
+// probabilités, résistance, cible et jet de sauvegarde (paramètres, timing, durée et special mis à
+// part), sont consommées.
+DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 58 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 RET group_signature = signature END
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
+				PATCH_IF (group_candidate_opcode == 77 OR group_candidate_opcode == 81) AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 RET group_other_signature = signature END
+					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
 // Répétitions d'un effet (ancien opcode_group_by_duration), trouvées par la prise en charge
 // (ad_application_series_support, new-lib/application.tpp) : les effets différés de la série sont
 // consommés, la ligne est celle de l'effet de tête, écrite après les autres effets de son opcode
@@ -344,7 +397,7 @@ END
 // (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
 // new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
-// comparés.
+// comparés ; with_special = 0 : special non comparé.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
@@ -352,6 +405,7 @@ DEFINE_PATCH_FUNCTION ad_fx_signature
 		with_parameter2 = 1
 		with_save = 1
 		with_timing = 1
+		with_special = 1
 	RET
 		signature
 BEGIN
@@ -367,7 +421,7 @@ BEGIN
 	SET sig_dice_sides   = $fx_dice_sides(~%fx_id%~)
 	SET sig_save_type    = with_save ? $fx_save_type(~%fx_id%~) : 0
 	SET sig_save_bonus   = with_save ? $fx_save_bonus(~%fx_id%~) : 0
-	SET sig_special      = $fx_special(~%fx_id%~)
+	SET sig_special      = with_special ? $fx_special(~%fx_id%~) : 0
 	SET sig_target       = $fx_group_target(~%fx_id%~)
 	SPRINT sig_scope $fx_scope(~%fx_id%~)
 	SPRINT signature ~%sig_scope% %sig_target% %sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special%~

@@ -2,7 +2,8 @@
 // Libellé « au silence » dans la liste @8030000 (8 030 000 + opcode ; libellé vide : immunité non
 // décrite, comme dans l'ancien moteur). La passe des regroupements (ad_group_immunities,
 // new-lib/groups.tpp) lui fait absorber les effets qu'elle rend sans objet et peut changer son
-// libellé (fx_immunity_label) en le plaçant après les autres (fx_immunity_late).
+// libellé (fx_immunity_label) en le plaçant après les autres (fx_immunity_late, comme un effet
+// identique à un autre, fx_late).
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp). Dans un en-tête, l'ancien moteur n'applique pas les absorptions des
@@ -76,7 +77,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 	FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
 		FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
 			PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
-					AND $fx_immunity_late(~%immunity_id%~) == immunity_late BEGIN
+					AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 				LPM ad_immunity_class
 				PATCH_IF NOT $immunity_class_merged(~%immunity_class%~) BEGIN
 					LPM ad_immunity_label
@@ -98,7 +99,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 			FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
 				FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
 					PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
-							AND $fx_immunity_late(~%immunity_id%~) == immunity_late BEGIN
+							AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 						LPM ad_immunity_class
 						PATCH_IF immunity_class == immunity_merged_class BEGIN
 							LPM ad_immunity_label
