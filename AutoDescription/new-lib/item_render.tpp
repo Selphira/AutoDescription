@@ -1,15 +1,17 @@
 // Rendu des objets : partie roleplay d'origine, titre « PARAMÈTRES », capacités d'équipement
-// (lignes fixes et lignes des opcodes décrits), capacités de combat et attributs des armes et
-// munitions (new-lib/item_combat.tpp), « Nécessite », poids. Seuls les objets que ce rendu décrit
+// (lignes fixes et lignes des opcodes décrits), capacités de charge (new-lib/item_charged.tpp),
+// capacités de combat et attributs des armes et munitions (new-lib/item_combat.tpp), « Nécessite »,
+// poids. Seuls les objets que ce rendu décrit
 // entièrement sont couverts (ad_item_render_support).
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
-// en-têtes de capacités hors armes et munitions, fléchettes (ligne « Utilisation »), cas que
-// ad_item_combat_support refuse, utilisabilité (affichée seulement sur les jeux classiques), cas
+// fléchettes (ligne « Utilisation »), cas que ad_item_combat_support ou ad_item_charged_support
+// refuse, utilisabilité (affichée seulement sur les jeux classiques), cas
 // d'un opcode décrit que sa macro ad_op_<N>_support refuse.
 DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	READ_SHORT ITM_type item_type
 	SPRINT render_missing ~~
+	SET combat_is_ammo = 0
 	SET item_has_combat = (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
 		OR item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	PATCH_IF item_type == ITM_TYPE_dart BEGIN
@@ -18,8 +20,9 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	ELSE PATCH_IF item_has_combat BEGIN
 		LPM ad_item_combat_support
 	END
-	ELSE PATCH_IF fx_header_count > 0 BEGIN
-		SPRINT render_missing ~not_implemented:headers~
+	SET item_has_charged = fx_header_count > 0 AND item_type != ITM_TYPE_dart
+	PATCH_IF item_has_charged BEGIN
+		LPM ad_item_charged_support
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT IS_EE BEGIN
 		SPRINT render_missing ~not_implemented:usability~
@@ -67,12 +70,15 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 		SPRINT title @1300001 // ~Capacités d'équipement~
 		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%equipped_lines%~
 	END
+	PATCH_IF item_has_charged BEGIN
+		LPM ad_item_charged_section
+	END
 	PATCH_IF item_has_combat BEGIN
 		LPM ad_item_combat_section
 	END
 	// Section de l'armure : lignes sans puce, après une ligne vide (ancien
 	// add_global_effects_to_description).
-	LPF ad_lines_section_text INT_VAR bullet = 0 STR_VAR section = ~armor~ RET armor_lines = text END
+	LPF ad_lines_section_text INT_VAR level = 0 STR_VAR section = ~armor~ RET armor_lines = text END
 	PATCH_IF NOT (~%armor_lines%~ STRING_EQUAL ~~) BEGIN
 		SPRINT description ~%description%%CRLF%%armor_lines%~
 	END

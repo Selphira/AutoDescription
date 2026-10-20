@@ -29,13 +29,40 @@
 @1300001 = ~Equipped abilities~ // reprise de @100010
 @1300002 = ~Requires~ // reprise de @101032
 @1300003 = ~Combat abilities~ // reprise de @100011
+@1300004 = ~Charge abilities~ // reprise de @100012
+@1300005 = ~Charge ability~ // reprise de @100015
+@1300006 = ~Ability %abilityNumber%~ // reprise de @101124
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
 
+// Cibles, 2 000 000 + 10 × cible effective de l'effet + forme (0 sujet, 1 « de… », 2 « à… ») (2 000 000-2 000 099)
+@2000020 = ~the target~ // reprise de @102471
+@2000021 = ~of the target~ // reprise de @101085
+@2000022 = ~to the target~ // reprise de @101181
+
+// Durées : formules (3 000 000-3 000 099)
+@3000000 = ~for %strDuration%~ // reprise de @100311
+@3000001 = ~permanently~ // reprise de @100312
+@3000002 = ~permanently, persists after death~ // reprise de @100313
+
+// Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
+@3010000 = ~1 second~ // reprise de @100300
+@3010001 = ~%amount% seconds~ // reprise de @100301
+@3010002 = ~1 round~ // reprise de @100302
+@3010003 = ~%amount% rounds~ // reprise de @100303
+@3010004 = ~1 turn~ // reprise de @100304
+@3010005 = ~%amount% turns~ // reprise de @100305
+@3010006 = ~1 hour~ // reprise de @100306
+@3010007 = ~%amount% hours~ // reprise de @100307
+@3010008 = ~1 day~ // reprise de @100308
+@3010009 = ~%amount% days~ // reprise de @100309
+
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Saving Throws~ // reprise de @102034
 @5000001 = ~Protects %resistName%~ // reprise de @102547
+@5000111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
+@5000121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
 
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~May only be removed with a Remove Curse spell~ // reprise de @102126
@@ -50,6 +77,12 @@
 @6010012 = ~The Strength-based hit bonus applies to this weapon~ // reprise de @102265
 @6010013 = ~Bonuses to hit and damage based on Strength do not apply to this weapon~ // reprise de @102266
 @6010014 = ~The Strength-based hit bonus does not apply to this weapon~ // reprise de @102267
+
+// Objets : capacités de charge, nombre d'utilisations (6 020 000-6 020 099)
+@6020000 = ~illimited use~ // reprise de @102678
+@6020001 = ~one-time use~ // reprise de @102677
+@6020002 = ~%charges% charges, the item is destroyed when all charges are used~ // reprise de @102159
+@6020003 = ~%charges%x per day~ // reprise de @102094
 
 // Objets : attributs d'arme (6 100 000-6 100 099)
 @6100000 = ~Enchantment~ // reprise de @13440001
@@ -68,6 +101,7 @@
 // Objets : nécessite, poids (6 200 000-6 200 099)
 @6200000 = ~%value% %attribute%~ // reprise de @100019
 @6200001 = ~Weight~ // reprise de @100002
+@6200002 = ~Duration~ // reprise de @100031
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150
@@ -512,18 +546,22 @@
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Acid Resistance~ // reprise de @10270001
 @20270001 = ~from acid~ // reprise de @10270002
+@20270002 = ~the Acid Resistance~ // reprise de @10270003
 
 // Opcode 28 : libellés (20 280 000-20 280 099)
 @20280000 = ~Cold Resistance~ // reprise de @10280001
 @20280001 = ~from cold~ // reprise de @10280002
+@20280002 = ~the Cold Resistance~ // reprise de @10280003
 
 // Opcode 29 : libellés (20 290 000-20 290 099)
 @20290000 = ~Electric Resistance~ // reprise de @10290001
 @20290001 = ~from electricity~ // reprise de @10290002
+@20290002 = ~the Electric Resistance~ // reprise de @10290003
 
 // Opcode 30 : libellés (20 300 000-20 300 099)
 @20300000 = ~Fire Resistance~ // reprise de @10300001
 @20300001 = ~from fire~ // reprise de @10300002
+@20300002 = ~the Fire Resistance~ // reprise de @10300003
 
 // Opcode 31 : libellés (20 310 000-20 310 099)
 @20310000 = ~Magic Damage Resistance~ // reprise de @10310001
@@ -585,6 +623,7 @@
 
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
+@21010101 = ~Protects %theTarget% from %opcodeStr%~ // reprise de @11010002
 
 // Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
 @21440100 = ~Prevents~ // reprise de @11440050

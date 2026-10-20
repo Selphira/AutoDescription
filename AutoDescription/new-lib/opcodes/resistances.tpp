@@ -1,7 +1,8 @@
 // Code commun des modificateurs de résistance (27-31, 84-89) : modificateurs simples (prise en
 // charge par ad_stat_modifier_support, new-lib/opcodes/stat_modifiers.tpp) d'une résistance en
 // pourcentage. Libellés du bloc de l'opcode : 2OOO0000 nom (« Résistance à l'acide »), 2OOO0001
-// complément d'une immunité (« à l'acide ») ; un effet dérivé suit la même convention (3NNN0000).
+// complément d'une immunité (« à l'acide »), 2OOO0002 statistique d'une phrase à la forme « cible »
+// (« la résistance à l'acide ») ; un effet dérivé suit la même convention (3NNN0000).
 
 // Lignes (ancien opcode_self_<N> et opcode_self_resist) : une par effet non consommé par un
 // regroupement.
@@ -12,9 +13,44 @@ DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			LPF ad_resistance_text INT_VAR value = stat_value mode = stat_mode name_tra = 20000000 + stat_opcode * 10000 RET line_text = text END
 			SET line_fx = stat_id
+			LPM ad_application_form
+			PATCH_IF line_form == 0 BEGIN
+				LPF ad_resistance_text INT_VAR value = stat_value mode = stat_mode name_tra = 20000000 + stat_opcode * 10000 RET line_text = text END
+			END
+			ELSE BEGIN
+				LPM ad_resistance_target_phrase
+			END
 			LPM ad_effect_line
+		END
+	END
+END
+
+// Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target_resist) : line_phrase,
+// identifiant de base d'une série de 5 000 1x0 selon le mode (10 augmentation, 20 réduction, 30
+// valeur fixée, 40 multiplication, 50 immunité), et ses variables value et theStatistic ; sans
+// statistique dans le .tra, pas de phrase.
+DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
+	SET stat_statistic_tra = 20000000 + stat_opcode * 10000 + 2
+	SET line_phrase = 0
+	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
+		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
+		SET value = ABS stat_value
+		SPRINT value @1200003 // ~%value%%PERCENT%~
+		PATCH_IF stat_mode == MOD_TYPE_flat AND stat_value == 100 BEGIN
+			SET line_phrase = 5000150
+		END
+		ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
+			SET line_phrase = 5000130
+		END
+		ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
+			SET line_phrase = 5000140
+		END
+		ELSE PATCH_IF stat_value >= 0 BEGIN
+			SET line_phrase = 5000110 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+		END
+		ELSE BEGIN
+			SET line_phrase = 5000120 // ~Réduit de %value% %theStatistic% %ofTheTarget%~ (+1)
 		END
 	END
 END

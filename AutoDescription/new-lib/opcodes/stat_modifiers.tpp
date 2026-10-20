@@ -27,13 +27,15 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			END
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			SET $stat_seen(~%stat_value%~ ~%stat_mode%~) = 0
+			SPRINT stat_scope $fx_scope(~%stat_id%~)
+			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) = 0
 		END
 	END
 	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
 		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
+			SPRINT stat_scope $fx_scope(~%stat_id%~)
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END
@@ -46,11 +48,11 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
-			ELSE PATCH_IF $stat_seen(~%stat_value%~ ~%stat_mode%~) BEGIN
+			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:same_effect_twice~
 			END
 			ELSE BEGIN
-				SET $stat_seen(~%stat_value%~ ~%stat_mode%~) = 1
+				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~) = 1
 			END
 		END
 	END

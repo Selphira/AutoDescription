@@ -13,12 +13,14 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 	FOR (hp_id = 0; hp_id < fx_count; ++hp_id) BEGIN
 		PATCH_IF $fx_opcode(~%hp_id%~) == 18 BEGIN
 			LPM ad_op_18_value
-			SET $hp_seen(~%hp_value%~ ~%hp_type%~) = 0
+			SPRINT hp_scope $fx_scope(~%hp_id%~)
+			SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 0
 		END
 	END
 	FOR (hp_id = 0; hp_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hp_id) BEGIN
 		PATCH_IF $fx_opcode(~%hp_id%~) == 18 BEGIN
 			LPM ad_op_18_value
+			SPRINT hp_scope $fx_scope(~%hp_id%~)
 			// L'ancien moteur écarte un mode inconnu (erreur journalisée).
 			PATCH_IF hp_type < 0 OR hp_type > 6 OR (hp_type == 6 AND NOT IS_EE) BEGIN
 				SPRINT render_missing ~not_implemented:opcode18:invalid~
@@ -34,11 +36,11 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 				SPRINT render_missing ~not_implemented:opcode18:no_change~
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
-			ELSE PATCH_IF $hp_seen(~%hp_value%~ ~%hp_type%~) BEGIN
+			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode18:same_effect_twice~
 			END
 			ELSE BEGIN
-				SET $hp_seen(~%hp_value%~ ~%hp_type%~) = 1
+				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 1
 			END
 		END
 	END

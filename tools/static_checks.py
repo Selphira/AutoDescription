@@ -365,6 +365,26 @@ def parse_sort_opcodes():
     return {int(key): int(value) for key, value in re.findall(r"(-?\d+)\s*=>\s*(-?\d+)", block.group(1))}
 
 
+def parse_opcode_table(name):
+    text, _ = strip_weidu(read_text(OPCODES))
+    block = re.search(r"ACTION_DEFINE_ASSOCIATIVE_ARRAY\s+~" + name + r"~\s+BEGIN(.*?)\bEND\b", text, re.S)
+    return {int(key) for key in re.findall(r"(-?\d+)\s*=>", block.group(1))} if block else set()
+
+
+def old_duration_kinds():
+    """Colonne DURATION attendue d'après les listes de l'ancien moteur (la première qui contient l'opcode)."""
+    kinds = {}
+    for opcode in parse_opcode_table("opcodes_cant_be_permanent_after_death"):
+        kinds[opcode] = "NOT_AFTER_DEATH"
+    for opcode in parse_opcode_table("opcodes_cant_be_permanent"):
+        kinds[opcode] = "NOT_PERMANENT"
+    for opcode in OLD_HIDDEN_DURATION:
+        kinds[opcode] = "HIDDEN"
+    for opcode in parse_opcode_table("opcodes_ignore_duration"):
+        kinds[opcode] = "IGNORED"
+    return kinds
+
+
 def check_ignored_described(report, variants):
     report.section("Opcodes ignorés mais décrits")
     ignored = parse_ignored_opcodes()
@@ -383,6 +403,9 @@ def check_ignored_described(report, variants):
 
 CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
+CATALOG_DURATIONS = ("SHOWN", "IGNORED", "HIDDEN", "NOT_PERMANENT", "NOT_AFTER_DEATH")
+# Opcodes dont add_duration n'écrit jamais la durée, sans être dans opcodes_ignore_duration.
+OLD_HIDDEN_DURATION = (177, 183, 283)
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
 # Macros appelées par le rendu pour chaque opcode DESCRIBED (new-lib/item_render.tpp).
 NEW_OPCODE_ROLES = ("support", "lines")
@@ -394,10 +417,11 @@ def check_catalog(report, definitions):
     report.section("Catalogue des opcodes (2da/opcodes.2da)")
     path = MOD / "2da" / "opcodes.2da"
     lines = read_text(path).replace("\r\n", "\n").split("\n")
-    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "NAME"]:
-        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT NAME »")
+    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "DURATION", "NAME"]:
+        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT DURATION NAME »")
         return
     old_sort = parse_sort_opcodes() or {}
+    old_duration = old_duration_kinds()
     rows = {}
     previous = -1
     for number, line in enumerate(lines[3:], start=4):
@@ -405,8 +429,8 @@ def check_catalog(report, definitions):
         if not fields:
             continue
         where = f"{relative(path)}:{number}"
-        if len(fields) != 7 or not fields[0].isdigit():
-            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE SORT NAME)")
+        if len(fields) != 8 or not fields[0].isdigit():
+            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE SORT DURATION NAME)")
             continue
         opcode = int(fields[0])
         if opcode <= previous:
@@ -424,6 +448,12 @@ def check_catalog(report, definitions):
         elif int(fields[5]) != old_sort.get(opcode, OLD_DEFAULT_SORT):
             report.add("ERREUR", f"{where} : SORT {fields[5]} au lieu de {old_sort.get(opcode, OLD_DEFAULT_SORT)} "
                        "(sort_opcodes de l'ancien moteur)")
+        # Mêmes durées affichées que l'ancien moteur, tant que la comparaison des moteurs sert de référence.
+        if fields[6] not in CATALOG_DURATIONS:
+            report.add("ERREUR", f"{where} : DURATION {fields[6]} inconnu ({', '.join(CATALOG_DURATIONS)})")
+        elif fields[6] != old_duration.get(opcode, "SHOWN"):
+            report.add("ERREUR", f"{where} : DURATION {fields[6]} au lieu de {old_duration.get(opcode, 'SHOWN')} "
+                       "(listes de durée de l'ancien moteur)")
         rows[opcode] = fields[3]
 
     # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.

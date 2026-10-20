@@ -20,9 +20,11 @@ BEGIN
 	PATCH_IF ~%uncovered_reason%~ STRING_EQUAL ~not_implemented~ BEGIN
 		LPM ad_item_render_support
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			SPRINT render_late_missing ~~
 			LPM ad_item_render
-			SET covered = 1
-			SPRINT uncovered_reason ~~
+			// Une forme de phrase absente n'apparaît qu'au rendu des lignes (new-lib/application.tpp).
+			SET covered = ~%render_late_missing%~ STRING_EQUAL ~~
+			SPRINT uncovered_reason ~%render_late_missing%~
 		END
 		ELSE BEGIN
 			SPRINT uncovered_reason ~%render_missing%~

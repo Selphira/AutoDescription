@@ -5,7 +5,10 @@
 // libellé (fx_immunity_label) en le plaçant après les autres (fx_immunity_late).
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
-// new-lib/application.tpp).
+// new-lib/application.tpp). Dans un en-tête, l'ancien moteur n'applique pas les absorptions des
+// soins (delete_cure_linked_to_specific_immunity) ni celle de l'action libre, et la ligne unique
+// qu'il y forme prend la durée du dernier effet réuni : une immunité d'en-tête n'est prise en charge
+// que seule dans son en-tête, sans effet qu'elle pourrait absorber.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	FOR (immunity_id = 0; immunity_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++immunity_id) BEGIN
@@ -19,13 +22,37 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 			ELSE BEGIN
 				SET $fx_immunity_label(~%immunity_id%~) = immunity_opcode
 				SET $fx_immunity_late(~%immunity_id%~) = 0
+				SPRINT immunity_scope $fx_scope(~%immunity_id%~)
+				PATCH_IF NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
+					LPM ad_op_101_ability_support
+				END
+			END
+		END
+	END
+END
+
+// Immunité immunity_id d'un en-tête : aucun autre effet de son en-tête n'est une immunité ou un effet
+// qu'une immunité à immunity_opcode absorbe dans un bloc d'équipement.
+DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
+	FOR (immunity_other = 0; immunity_other < fx_count; ++immunity_other) BEGIN
+		SPRINT immunity_other_scope $fx_scope(~%immunity_other%~)
+		SET immunity_other_opcode = $fx_opcode(~%immunity_other%~)
+		PATCH_IF immunity_other != immunity_id AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
+			PATCH_IF immunity_other_opcode == 101 OR immunity_other_opcode == 206 OR immunity_other_opcode == 321 BEGIN
+				SPRINT render_missing ~not_implemented:opcode101:ability_group~
+			END
+			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
+				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
+						AND $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~) == immunity_other_opcode BEGIN
+					SPRINT render_missing ~not_implemented:opcode101:ability_group~
+				END
 			END
 		END
 	END
 END
 
 // Lignes (ancien opcode_self_101 et opcode_101_post_group) : avec AD_SHRINK_IMMUNITIES_SINGLE_LINE,
-// les immunités d'une même classe de cible (soi ou lanceur d'origine ; cible prédéfinie) sont
+// les immunités d'équipement d'une même classe de cible (soi ou lanceur d'origine ; cible prédéfinie) sont
 // réunies en une ligne si elles sont plusieurs, libellés identiques fusionnés ; les lignes réunies
 // viennent après les autres, comme les effets que l'ancien moteur ajoute en fin de liste.
 DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
@@ -55,7 +82,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 					LPM ad_immunity_label
 					PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
 						SPRINT opcodeStr ~%immunity_label%~
-						SET line_phrase = 21010100 // ~Immunité %opcodeStr%~
+						SET line_phrase = 21010100 // ~Immunité %opcodeStr%~ (+1 : ~Immunise %theTarget% %opcodeStr%~)
 						SET line_fx = immunity_id
 						LPM ad_effect_line
 					END
@@ -97,11 +124,15 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 END
 
 // Classe de cible de l'effet immunity_id pour la ligne unique : 1 soi ou lanceur d'origine, 2 cible
-// prédéfinie, 0 jamais réunie.
+// prédéfinie, 0 jamais réunie (dont toute immunité d'en-tête).
 DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	SET immunity_target = $fx_effective_target(~%immunity_id%~)
+	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 	SET immunity_class = (immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
 		: (immunity_target == TARGET_FX_preset ? 2 : 0)
+	PATCH_IF NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
+		SET immunity_class = 0
+	END
 END
 
 DEFINE_PATCH_MACRO ad_immunity_label BEGIN

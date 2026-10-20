@@ -1,19 +1,17 @@
 // Armes et munitions : en-têtes de combat, section « Capacités de combat », attributs d'arme et
 // compétence (anciens add_combat_abilities, add_weapon_attributes_to_description, proficiency).
-// Pris en charge : en-têtes de combat sans effet ; un en-tête à charges n'est décrit que s'il
-// n'a pas d'infobulle (sans quoi l'ancien moteur lui donne un titre de capacité de charge), ou
-// s'il est l'unique en-tête à charges d'une munition.
+// Pris en charge : en-têtes de combat sans effet ; un en-tête à charges a aussi sa capacité de
+// charge (new-lib/item_charged.tpp).
 //
 // Tableaux écrits (en-tête de combat combat_id, dans l'ordre du fichier) : combat_header (index
 // de l'en-tête dans l'objet), combat_attack_type, combat_location, combat_charges,
 // combat_depletion, combat_flags, combat_tooltip, combat_section_type (infobulle, ou « au corps à
 // corps » / « à distance » pour une arme en main), combat_tac0, combat_damage (vide : aucun dégât),
 // combat_damage_type, combat_speed, combat_launcher ; variables écrites : combat_count,
-// combat_charged_count, combat_other_count (en-têtes d'un autre type), combat_effect_count.
+// combat_other_count (en-têtes d'un autre type), combat_effect_count.
 
 DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 	SET combat_count = 0
-	SET combat_charged_count = 0
 	SET combat_other_count = 0
 	SET combat_effect_count = 0
 	SPRINT combat_resref ~%SOURCE_RES%~
@@ -38,9 +36,6 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			READ_SHORT  (combat_offset + ITM_HEAD_damage_type)     $combat_damage_type(~%combat_id%~)
 			READ_BYTE   (combat_offset + ITM_HEAD_speed)           $combat_speed(~%combat_id%~)
 			READ_BYTE   (combat_offset + ITM_HEAD_projectile_type) $combat_launcher(~%combat_id%~)
-			PATCH_IF $combat_charges(~%combat_id%~) > 0 OR $combat_location(~%combat_id%~) == 3 BEGIN
-				SET combat_charged_count += 1
-			END
 			LPM ad_item_combat_damage
 			LPM ad_item_combat_tooltip
 			SET combat_count += 1
@@ -119,13 +114,8 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 		SPRINT render_missing ~not_implemented:combat:ammo_headers~
 	END
 	FOR (combat_id = 0; combat_id < combat_count AND ~%render_missing%~ STRING_EQUAL ~~; ++combat_id) BEGIN
-		SPRINT combat_tooltip $combat_tooltip(~%combat_id%~)
 		SPRINT combat_section_type $combat_section_type(~%combat_id%~)
-		PATCH_IF ($combat_charges(~%combat_id%~) > 0 OR $combat_location(~%combat_id%~) == 3)
-				AND NOT (combat_is_ammo AND combat_charged_count == 1) AND NOT (~%combat_tooltip%~ STRING_EQUAL ~~) BEGIN
-			SPRINT render_missing ~not_implemented:combat:charged_ability~
-		END
-		ELSE PATCH_IF $combat_damage_invalid(~%combat_id%~) BEGIN
+		PATCH_IF $combat_damage_invalid(~%combat_id%~) BEGIN
 			SPRINT render_missing ~not_implemented:combat:damage~
 		END
 		ELSE PATCH_IF $combat_damage_type(~%combat_id%~) > 9 BEGIN

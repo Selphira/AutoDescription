@@ -6,7 +6,9 @@
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2, fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
-// fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_consumed (0 à la lecture,
+// fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
+// fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
+// d'un en-tête d'objet) ; fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
@@ -47,8 +49,31 @@ DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
 				READ_SHORT (fx_header_offset + ITM_HEAD_feature_block_index) fx_block_index
 				SPRINT fx_block_kind ~ability~
 				SET fx_block_header = fx_h
+				SET fx_first_id = fx_count
 				LPM ad_fx_load_block
+				LPM ad_fx_header_fields
 			END
+		END
+	END
+END
+
+// Champs de l'en-tête d'objet des effets qui viennent d'être lus. Une potion dont l'en-tête vise
+// son utilisateur (cible 5) est bue par lui : ses effets le touchent, quelle que soit leur cible
+// (ancien load_charged_abilities). L'ancien moteur lit la cible et le nombre de cibles comme un
+// seul mot de 16 bits (BUG-020) : fx_header_target_count garde ce nombre pour que la prise en
+// charge refuse les cas où il en tient compte à tort.
+DEFINE_PATCH_MACRO ad_fx_header_fields BEGIN
+	READ_SHORT ITM_type fx_item_type
+	READ_BYTE  (fx_header_offset + ITM_HEAD_target)               fx_header_target
+	READ_BYTE  (fx_header_offset + ITM_HEAD_target_count)         fx_header_target_count
+	READ_SHORT (fx_header_offset + ITM_HEAD_projectile_animation) fx_header_projectile
+	FOR (fx_id = fx_first_id; fx_id < fx_count; ++fx_id) BEGIN
+		SET $fx_header_target(~%fx_id%~) = fx_header_target
+		SET $fx_header_target_count(~%fx_id%~) = fx_header_target_count
+		SET $fx_header_projectile(~%fx_id%~) = fx_header_projectile
+		SET $fx_potion_drinker(~%fx_id%~) = fx_item_type == ITM_TYPE_potion AND fx_header_target == TARGET_HEAD_self
+		PATCH_IF $fx_potion_drinker(~%fx_id%~) BEGIN
+			SET $fx_effective_target(~%fx_id%~) = TARGET_FX_self
 		END
 	END
 END
@@ -119,6 +144,10 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
 			LPM ad_fx_normalize
 			SET $fx_consumed(~%fx_id%~) = 0
+			SET $fx_header_target(~%fx_id%~) = 0
+			SET $fx_header_target_count(~%fx_id%~) = 0
+			SET $fx_header_projectile(~%fx_id%~) = 0
+			SET $fx_potion_drinker(~%fx_id%~) = 0
 			SET fx_opcode = $fx_opcode(~%fx_id%~)
 			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
 			SET fx_count += 1

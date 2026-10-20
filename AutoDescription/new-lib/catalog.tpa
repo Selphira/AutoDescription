@@ -4,23 +4,50 @@
 //   visuel), TODO (pas encore pris en charge : la ressource n'est pas couverte) ;
 // - DICE : sens des champs « dés » de l'effet (IESDP) : LEVEL (niveau maximum / minimum de la
 //   cible), DICE (vrais dés), DICE_IF_P2_1_EE (dés si parameter2 = 1 sur EE, sinon niveaux) ;
-// - SORT : rang d'affichage des lignes de l'opcode dans une section (le plus petit d'abord).
+// - SORT : rang d'affichage des lignes de l'opcode dans une section (le plus petit d'abord) ;
+// - DURATION : durée d'un effet d'en-tête (anciennes listes opcodes_ignore_duration,
+//   opcodes_cant_be_permanent, opcodes_cant_be_permanent_after_death) : SHOWN (affichée), IGNORED
+//   (jamais affichée, ni comptée dans la durée commune d'une potion), HIDDEN (jamais affichée mais
+//   comptée), NOT_PERMANENT (affichée, sauf « de manière permanente »), NOT_AFTER_DEATH (affichée ;
+//   un effet qui persiste après la mort est seulement dit permanent).
 // Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
 // décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
 OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
 COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_catalog 7
+	READ_2DA_ENTRIES_NOW ad_catalog 8
 	FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 3 ad_status
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 4 ad_dice
 		READ_2DA_ENTRY_FORMER ad_catalog ad_row 5 ad_sort
+		READ_2DA_ENTRY_FORMER ad_catalog ad_row 6 ad_duration
 		SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
 		SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
 		SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
 		SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
+		SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
 	END
+
+// Opcodes dont les lignes réunissent des effets sans tenir compte de leur portée (new-lib/normalize.tpp,
+// fx_scope) : leurs effets d'en-tête ne sont pas encore pris en charge (ad_application_support).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
+	42  => 1 // emplacements de sorts profanes
+	62  => 1 // emplacements de sorts divins
+	144 => 1 // boutons désactivés
+	145 => 1 // lancement de sorts désactivé
+	206 => 1 // protections contre des sorts
+END
+
+// Unités de durée en secondes, de la plus petite à la plus grande (ancien tableau durations) ; leurs
+// noms sont dans le bloc 3 010 000 de description_new.tra.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DURATION_UNITS BEGIN
+	0 => 1    // seconde
+	1 => 6    // round
+	2 => 60   // tour
+	3 => 300  // heure
+	4 => 7200 // jour
+END
 
 // Rang d'affichage des effets dérivés (lignes produites par un regroupement d'effets, sans
 // opcode propre), comparable à la colonne SORT.
@@ -155,7 +182,7 @@ END
 // Infobulles des en-têtes d'objets (tooltip.2da du jeu) : $AD_TOOLTIPS(~resref index~) = strref
 // de l'en-tête index (0-2), ressource en minuscules ; une valeur qui n'est pas un strref positif
 // n'est pas une infobulle. Une ressource répétée garde sa dernière ligne, comme dans l'ancien
-// moteur ; la première ligne est lue, contrairement à l'ancien moteur (BUG-017).
+// moteur.
 ACTION_IF FILE_EXISTS_IN_GAME ~tooltip.2da~ BEGIN
 	COPY_EXISTING - ~tooltip.2da~ ~override~
 		READ_2DA_ENTRIES_NOW ad_tooltips 4

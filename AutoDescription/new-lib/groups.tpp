@@ -152,7 +152,9 @@ END
 //   ont aussi les mêmes dés et la même puissance (321 : la même résistance).
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
-		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
+		// L'ancien moteur n'absorbe que dans un bloc d'équipement (new-lib/opcodes/101.tpp).
+		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) AND (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
 				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
@@ -196,10 +198,13 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	END
 END
 
-// absorb_same : l'effet absorb_id a la même cible, les mêmes probabilités et le même jet de
-// sauvegarde que l'immunité immunity_id.
+// absorb_same : l'effet absorb_id a la même portée, la même cible, les mêmes probabilités et le même
+// jet de sauvegarde que l'immunité immunity_id.
 DEFINE_PATCH_MACRO ad_immunity_same_fields BEGIN
-	SET absorb_same = $fx_effective_target(~%absorb_id%~) == $fx_effective_target(~%immunity_id%~)
+	SPRINT absorb_scope $fx_scope(~%absorb_id%~)
+	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
+	SET absorb_same = (~%absorb_scope%~ STRING_EQUAL ~%immunity_scope%~)
+		AND $fx_group_target(~%absorb_id%~) == $fx_group_target(~%immunity_id%~)
 		AND $fx_probability1(~%absorb_id%~) == $fx_probability1(~%immunity_id%~)
 		AND $fx_probability2(~%absorb_id%~) == $fx_probability2(~%immunity_id%~)
 		AND $fx_save_type(~%absorb_id%~) == $fx_save_type(~%immunity_id%~)
@@ -260,9 +265,9 @@ DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
 	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra RET line_text = text END
 END
 
-// Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur ; la cible
-// n'en fait pas partie, l'ancien moteur la remplaçant par « soi » pour un effet d'équipement.
-// with_parameter1 = 0 : parameter1 non comparé.
+// Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
+// (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
+// new-lib/normalize.tpp). with_parameter1 = 0 : parameter1 non comparé.
 DEFINE_PATCH_FUNCTION ad_fx_signature
 	INT_VAR
 		fx_id = 0
@@ -283,5 +288,7 @@ BEGIN
 	SET sig_save_type    = $fx_save_type(~%fx_id%~)
 	SET sig_save_bonus   = $fx_save_bonus(~%fx_id%~)
 	SET sig_special      = $fx_special(~%fx_id%~)
-	SPRINT signature ~%sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special%~
+	SET sig_target       = $fx_group_target(~%fx_id%~)
+	SPRINT sig_scope $fx_scope(~%fx_id%~)
+	SPRINT signature ~%sig_scope% %sig_target% %sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special%~
 END

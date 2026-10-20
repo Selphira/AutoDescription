@@ -3,7 +3,9 @@
 // base fixée à parameter1. Le moteur du jeu cumule les modificateurs.
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
-// new-lib/application.tpp). Sur une armure,
+// new-lib/application.tpp). Les totaux et regroupements ne portent que sur les effets d'équipement :
+// l'ancien moteur ne les applique qu'aux effets actifs tant que l'objet est équipé ; un effet d'en-tête
+// a sa propre ligne (ad_op_0_ability_lines). Sur une armure,
 // avec AD_ENABLE_SHRINKAGE et AD_SHRINK_CLASS_ARMOR, la CA de base et ses écarts par type d'attaque
 // forment la ligne de la section de l'armure (« Classe d'armure : 5 (3 contre les armes
 // tranchantes) »), et les modificateurs contre toutes les attaques restent des lignes séparées.
@@ -21,16 +23,19 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
-			SET $ac_seen_all(~%ac_value%~) = 0
-			SET $ac_seen_types(~%ac_value%~) = 0
+			SPRINT ac_scope $fx_scope(~%ac_id%~)
+			SET $ac_seen_all(~%ac_scope% %ac_value%~) = 0
+			SET $ac_seen_types(~%ac_scope% %ac_value%~) = 0
 		END
 	END
 	FOR (ac_id = 0; ac_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++ac_id) BEGIN
 		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_type = $fx_parameter2(~%ac_id%~)
+			SPRINT ac_scope $fx_scope(~%ac_id%~)
+			SET ac_equipped = ~%ac_scope%~ STRING_EQUAL ~equipped~
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
-				SET ac_base_count += 1
+				SET ac_base_count += ac_equipped
 			END
 			// L'ancien moteur écarte un modificateur nul ou un type inconnu (erreur journalisée).
 			ELSE PATCH_IF ac_value == 0 OR (ac_type != AC_MOD_TYPE_all AND ac_type != AC_MOD_TYPE_crushing
@@ -38,25 +43,26 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 				SPRINT render_missing ~not_implemented:opcode0:invalid~
 			END
 			ELSE BEGIN
-				SET ac_modifier_count += 1
+				SET ac_modifier_count += ac_equipped
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
-					SET ac_all_count += 1
+					SET ac_all_count += ac_equipped
 				END
 				// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
-					PATCH_IF $ac_seen_all(~%ac_value%~) BEGIN
+					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value%~) BEGIN
 						SPRINT render_missing ~not_implemented:opcode0:same_effect_twice~
 					END
-					SET $ac_seen_all(~%ac_value%~) = 1
+					SET $ac_seen_all(~%ac_scope% %ac_value%~) = 1
 				END
 				ELSE BEGIN
-					SET ac_mask = $ac_seen_types(~%ac_value%~)
+					SET ac_mask = $ac_seen_types(~%ac_scope% %ac_value%~)
 					PATCH_IF (ac_mask BAND ac_type) != 0 BEGIN
 						SPRINT render_missing ~not_implemented:opcode0:same_effect_twice~
 					END
-					SET $ac_seen_types(~%ac_value%~) = ac_mask BOR ac_type
-					// Les quatre types à la fois : l'ancien moteur n'a pas de texte pour ce cas.
-					PATCH_IF $ac_seen_types(~%ac_value%~) == 15 BEGIN
+					SET $ac_seen_types(~%ac_scope% %ac_value%~) = ac_mask BOR ac_type
+					// Les quatre types à la fois : l'ancien moteur n'a pas de texte pour ce cas (seulement
+					// quand il les réunit, pour les effets d'équipement).
+					PATCH_IF $ac_seen_types(~%ac_scope% %ac_value%~) == 15 AND ac_equipped BEGIN
 						SPRINT render_missing ~not_implemented:opcode0:all_attack_types~
 					END
 				END
@@ -86,6 +92,11 @@ END
 
 DEFINE_PATCH_MACRO ad_op_0_lines BEGIN
 	SPRINT line_section ~equipped~
+	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
+		SPRINT ac_scope $fx_scope(~%ac_id%~)
+		SET $ac_equipped(~%ac_id%~) = ~%ac_scope%~ STRING_EQUAL ~equipped~
+	END
+	LPM ad_op_0_ability_lines
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR BEGIN
 		LPM ad_op_0_group_totals
 	END
@@ -109,7 +120,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	// comme dans l'ancien moteur.
 	CLEAR_ARRAY ac_masks
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
 				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_key = 0 - $fx_parameter1(~%ac_id%~)
 			SET $ac_masks(~%ac_key%~) = 0
@@ -118,7 +129,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	SET ac_line_fx = 0 - 1
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			PATCH_IF ac_line_fx < 0 BEGIN
@@ -191,7 +202,7 @@ END
 DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	CLEAR_ARRAY ac_type_groups
 	FOR (ac_id = 0; ac_id < fx_count AND AD_ENABLE_SHRINKAGE; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
 				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET $ac_type_groups(~%ac_value%~) = 0
@@ -200,7 +211,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_line_fx = ac_id
@@ -223,6 +234,25 @@ DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	PHP_EACH ac_type_groups AS ac_value => ac_mask BEGIN
 		SET ac_line_fx = $ac_type_group_fx(~%ac_value%~)
 		LPM ad_op_0_modifier_line
+	END
+END
+
+// Une ligne par effet d'en-tête, dans l'ordre du fichier.
+DEFINE_PATCH_MACRO ad_op_0_ability_lines BEGIN
+	SET line_sort = $AD_OPCODE_SORT(~0~)
+	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND NOT $ac_equipped(~%ac_id%~) BEGIN
+			SET ac_type = $fx_parameter2(~%ac_id%~)
+			SET ac_value = $fx_parameter1(~%ac_id%~)
+			SET ac_line_fx = ac_id
+			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
+				LPM ad_op_0_base_line
+			END
+			ELSE BEGIN
+				SET ac_mask = ac_type
+				LPM ad_op_0_modifier_line
+			END
+		END
 	END
 END
 

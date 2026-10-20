@@ -11,7 +11,14 @@
 // - fx_save_types (bits 0-4 : un jet contre le meilleur des types cochés), fx_save_flags (le reste) ;
 // - fx_level_min, fx_level_max : restriction de niveau de la cible (0 = aucune) ;
 // - fx_resource_lower ;
-// - fx_effective_target : cible réelle (le porteur pour un effet d'équipement d'objet).
+// - fx_effective_target : cible réelle (le porteur pour un effet d'équipement d'objet ; une potion
+//   bue par son porteur est corrigée par ad_fx_load_item) ;
+// - fx_scope : portée de l'effet, equipped, casting ou ability<h> (en-tête h) ; les lignes, les
+//   regroupements et les contrôles de doublons ne réunissent que des effets de même portée, comme
+//   l'ancien moteur qui traite chaque bloc séparément ;
+// - fx_group_target : cible comparée par les regroupements, celle que l'ancien moteur compare : « soi »
+//   pour un effet d'équipement (remplacée à la lecture), la cible du fichier sinon (une potion n'est
+//   corrigée qu'après ses regroupements).
 DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	SET fx_timing   = $fx_timing(~%fx_id%~)
 	SET fx_duration = $fx_duration(~%fx_id%~)
@@ -95,6 +102,12 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	SET $fx_effective_target(~%fx_id%~) = $fx_target(~%fx_id%~)
 	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~equipped~ BEGIN
 		SET $fx_effective_target(~%fx_id%~) = TARGET_FX_self
+	END
+	SET $fx_group_target(~%fx_id%~) = $fx_effective_target(~%fx_id%~)
+
+	SPRINT $fx_scope(~%fx_id%~) ~%fx_block_kind%~
+	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~ability~ BEGIN
+		SPRINT $fx_scope(~%fx_id%~) ~ability%fx_block_header%~
 	END
 
 	SPRINT fx_resource_lower $fx_resource(~%fx_id%~)

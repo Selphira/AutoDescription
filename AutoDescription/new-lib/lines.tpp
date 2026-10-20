@@ -31,20 +31,26 @@ DEFINE_PATCH_MACRO ad_line_add BEGIN
 	END
 END
 
-// Lignes de la section, chacune précédée d'un saut de ligne et d'une puce (sans puce si bullet = 0) ;
-// vide si la section n'a aucune ligne.
+// Lignes de la section, chacune précédée d'un saut de ligne et de la marque de son niveau (ancien
+// add_items_section_to_description) : 1 puce, 2 retrait sous un titre, 0 rien ; vide si la section
+// n'a aucune ligne. count : nombre de lignes.
 DEFINE_PATCH_FUNCTION ad_lines_section_text
 	INT_VAR
-		bullet = 1
+		level = 1
 	STR_VAR
 		section = ~~
 	RET
 		text
+		count
 BEGIN
 	SPRINT text ~~
+	SET count = 0
 	SPRINT line_prefix ~~
-	PATCH_IF bullet BEGIN
+	PATCH_IF level == 1 BEGIN
 		SPRINT line_prefix ~- ~
+	END
+	ELSE PATCH_IF level == 2 BEGIN
+		SPRINT line_prefix ~  ~
 	END
 	// Clé numérique unique (rang, ordre d'ajout inversé) ; le décalage rend les rangs négatifs
 	// triables.
@@ -67,6 +73,7 @@ BEGIN
 	PHP_EACH section_lines AS _ => line_id BEGIN
 		SPRINT line_text $line_text(~%line_id%~)
 		SPRINT text ~%text%%CRLF%%line_prefix%%line_text%~
+		SET count += 1
 	END
 END
 
