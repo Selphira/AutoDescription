@@ -14,7 +14,9 @@
 // un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
 // fx_consumed (0 à la lecture,
-// mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_external (1 pour un effet 177
+// mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
+// pour un effet écarté, ad_application_drop) ; fx_exception et fx_exception_count (exceptions de
+// cible des opcodes 318 et 324, ad_fx_mark_target_exception, new-lib/opcodes/target_exceptions.tpp) ; fx_external (1 pour un effet 177
 // remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_versus_file et
 // fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
@@ -123,6 +125,7 @@ END
 // Lit fx_block_count effets à partir de l'index fx_block_index de la table d'effets. Une lecture
 // hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant.
 DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
+	SET fx_block_exceptions = 0
 	FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
 		SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
 		PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
@@ -160,6 +163,7 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			END
 			LPM ad_fx_normalize
 			SET $fx_consumed(~%fx_id%~) = 0
+			SET $fx_dropped(~%fx_id%~) = 0
 			SET $fx_header_target(~%fx_id%~) = 0
 			SET $fx_header_target_count(~%fx_id%~) = 0
 			SET $fx_header_projectile(~%fx_id%~) = 0
@@ -168,6 +172,7 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			SET $fx_late(~%fx_id%~) = 0
 			SET $fx_series_of(~%fx_id%~) = 0 - 1
 			SET $fx_series_anchor(~%fx_id%~) = 0
+			LPM ad_fx_mark_target_exception
 			SET fx_opcode = $fx_opcode(~%fx_id%~)
 			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
 			PATCH_IF $fx_external(~%fx_id%~) BEGIN

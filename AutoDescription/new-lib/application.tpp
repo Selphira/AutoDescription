@@ -11,7 +11,8 @@
 // ligne finit par le jet de sauvegarde de l'effet (ancien add_save). Une forme absente du .tra rend l'objet non couvert après son rendu
 // (render_late_missing), comme une cible sans chaînes (bloc 2 000 000 de description_new.tra).
 
-// Prise en charge commune (passe 2, avant celle des opcodes), pour chaque effet d'un opcode décrit.
+// Prise en charge commune (passe 2, avant celle des opcodes), pour chaque effet d'un opcode décrit
+// qui n'est pas déjà écarté.
 DEFINE_PATCH_MACRO ad_application_support BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_application_series_support
@@ -19,7 +20,7 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 	FOR (app_id = 0; app_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++app_id) BEGIN
 		SET render_opcode = $fx_opcode(~%app_id%~)
 		LPM ad_opcode_is_described
-		PATCH_IF opcode_described BEGIN
+		PATCH_IF opcode_described AND NOT $fx_consumed(~%app_id%~) BEGIN
 			SPRINT app_block $fx_block(~%app_id%~)
 			SPRINT app_timing_kind $fx_timing_kind(~%app_id%~)
 			PATCH_IF ~%app_block%~ STRING_EQUAL ~equipped~ BEGIN
@@ -207,12 +208,15 @@ END
 
 // Effet drop_id que l'ancien moteur écarte dès sa lecture, sans rien écrire (validation d'un opcode) :
 // consommé. La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
-// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée ou si un
-// autre effet décrit du même en-tête a la même durée.
+// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée, si la
+// durée de son opcode n'y est jamais comptée (colonne DURATION à IGNORED) ou si un autre effet décrit
+// du même en-tête a la même durée.
 DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SPRINT drop_scope $fx_scope(~%drop_id%~)
 	SET drop_timing = $fx_timing(~%drop_id%~)
-	PATCH_IF NOT (~%drop_scope%~ STRING_EQUAL ~equipped~)
+	SET drop_opcode = $fx_opcode(~%drop_id%~)
+	SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_opcode%~)
+	PATCH_IF NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
 			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
@@ -230,11 +234,11 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 			END
 		END
 		PATCH_IF NOT drop_twin BEGIN
-			SET drop_opcode = $fx_opcode(~%drop_id%~)
 			SPRINT render_missing ~not_implemented:opcode%drop_opcode%:dropped_duration~
 		END
 	END
 	SET $fx_consumed(~%drop_id%~) = 1
+	SET $fx_dropped(~%drop_id%~) = 1
 END
 
 // Forme de la phrase de l'effet line_fx : 0 soi, 1 cible, 2 soi probable, 3 cible probable.
@@ -515,7 +519,9 @@ END
 // la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
 // (ad_application_save) ; line_condition (« En combat ») précède toute la ligne, séparée par
 // AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ;
-// line_only_for (ad_application_versus) finit la ligne, entre parenthèses ; tous sont remis à zéro
+// line_only_for (ad_application_versus), puis les exceptions de cible de l'effet
+// (ad_application_target_exceptions, new-lib/opcodes/target_exceptions.tpp) finissent la ligne, entre
+// parenthèses ; tous sont remis à zéro
 // après la ligne. Forme ou cible sans
 // texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
@@ -559,6 +565,12 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~
+	END
+	PATCH_IF $fx_exception_count(~%line_fx%~) > 0 BEGIN
+		LPM ad_application_target_exceptions
+		PATCH_IF NOT (~%app_exceptions_text%~ STRING_EQUAL ~~) BEGIN
+			SPRINT line_text ~%line_text% (%app_exceptions_text%)~
+		END
 	END
 	// Effet probable : « 26 % de chances » devant la ligne entière (ancien get_effect_description),
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).

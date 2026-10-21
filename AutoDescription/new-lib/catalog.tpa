@@ -329,6 +329,29 @@ COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
 		SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
 	END
 
+// Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux
+// opcode_324_effective, _not_effective, _between et _if) : pour une ligne de splprot.2da (parameter2),
+// KIND (EFFECTIVE, NOT_EFFECTIVE, BETWEEN, IF), puis les types de créatures (IDS1-IDS3 : 1 000 ×
+// fichier IDS + valeur, nommés par ad_ids_name), ou un nom du bloc @23240000 (TEXT : xxxx).
+COPY - ~%MOD_FOLDER%/2da/target_exceptions.2da~ ~override~
+	READ_2DA_ENTRIES_NOW ad_exceptions 6
+	FOR (ad_row = 0; ad_row < ad_exceptions; ++ad_row) BEGIN
+		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 0 ad_stat
+		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 1 ad_kind
+		SPRINT $AD_TARGET_EXCEPTION_KIND(~%ad_stat%~) ~%ad_kind%~
+		SET ad_ids_count = 0
+		FOR (ad_column = 2; ad_column <= 4; ++ad_column) BEGIN
+			READ_2DA_ENTRY_FORMER ad_exceptions ad_row ad_column ad_ids
+			PATCH_IF IS_AN_INT ad_ids BEGIN
+				SET $AD_TARGET_EXCEPTION_IDS(~%ad_stat%~ ~%ad_ids_count%~) = ad_ids
+				SET ad_ids_count += 1
+			END
+		END
+		SET $AD_TARGET_EXCEPTION_IDS_COUNT(~%ad_stat%~) = ad_ids_count
+		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 5 ad_text
+		SET $AD_TARGET_EXCEPTION_TEXT(~%ad_stat%~) = IS_AN_INT ad_text ? 23240000 + ad_text : 0
+	END
+
 // Sorts qui infligent l'effet d'un opcode (2da/immunity_spells.2da, anciennes listes
 // <état>SpellList ; 505 : capacités psioniques) : $AD_IMMUNITY_SPELLS(~opcode RESREF~), ressource
 // en majuscules.
