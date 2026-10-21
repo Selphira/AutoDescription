@@ -147,9 +147,9 @@
 143      1        1        DESCRIBED LEVEL            481    SHOWN           Item:_Create_Item_in_Slot
 144      1        1        DESCRIBED LEVEL            496    SHOWN           Button:_Disable_Button
 145      1        1        DESCRIBED LEVEL            495    SHOWN           Spell:_Disable_Spell_Casting_Abilities
-146      1        1        TODO      LEVEL            465    NOT_PERMANENT   Spell:_Cast_Spell_(at_Creature)
+146      1        1        DESCRIBED LEVEL            465    NOT_PERMANENT   Spell:_Cast_Spell_(at_Creature)
 147      1        1        IGNORED   LEVEL            400    IGNORED         Spell:_Learn_Spell
-148      1        1        TODO      LEVEL            466    NOT_PERMANENT   Spell:_Cast_Spell_(at_Point)
+148      1        1        DESCRIBED LEVEL            466    NOT_PERMANENT   Spell:_Cast_Spell_(at_Point)
 149      1        1        TODO      LEVEL            400    SHOWN           (Identify)
 150      1        1        TODO      LEVEL            456    IGNORED         Spell_Effect:_Find_Traps
 151      1        1        TODO      LEVEL            133    IGNORED         Summon:_Replace_Creature

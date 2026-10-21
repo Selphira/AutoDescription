@@ -29,6 +29,65 @@ COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
 		SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
 	END
 
+// Sorts d'Item Revision que l'ancien moteur décrit par un texte propre au lieu de les citer (anciens
+// opcode_target_146_item_revision et opcode_target_probability_146_item_revision) : refusés par les
+// opcodes 146 et 148 (new-lib/opcodes/cast_spell.tpp). Clés en minuscules.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REVISION_SPELLS BEGIN
+	dvafflic => 1
+	dvbanish => 1
+	dvbleed0 => 1
+	dvbleed2 => 1
+	dvbleed5 => 1
+	dvbonebr => 1
+	dvboom => 1
+	dvbram => 1
+	dvbrnwnd => 1
+	dvchill => 1
+	dvcorros => 1
+	dvcrippl => 1
+	dvcutthr => 1
+	dvdeton => 1
+	dvdispel => 1
+	dvdoom => 1
+	dvenfebl => 1
+	dvfearsm => 1
+	dvffire => 1
+	dvflbrst => 1
+	dvflwhip => 1
+	dvfrbolt => 1
+	dvfreeze => 1
+	dvholdun => 1
+	dvhoples => 1
+	dvhseek => 1
+	dvhsmite => 1
+	dvillban => 1
+	dvknback => 1
+	dvmindbr => 1
+	dvnamarr => 1
+	dvpin => 1
+	dvprlyze => 1
+	dvreson => 1
+	dvsburst => 1
+	dvshake => 1
+	dvsharp => 1
+	dvsingsw => 1
+	dvsleep => 1
+	dvspabsr => 1
+	dvspdrnk => 1
+	dvstag => 1
+	dvstdust => 1
+	dvstnhld => 1
+	dvstun => 1
+	dvsunder => 1
+	dvswave => 1
+	dvthclap => 1
+	dvvampir => 1
+	dvvorpal => 1
+	dvvtrsph => 1
+	dvweb => 1
+	dvwhirls => 1
+END
+
 // Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
 // durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN

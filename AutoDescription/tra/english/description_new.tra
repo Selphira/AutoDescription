@@ -1659,6 +1659,44 @@
 @21441014 = ~%action% the use of Find traps~ // reprise de @11440015
 @21441015 = ~%action% the use of the inventory~ // reprise de @11440016
 
+// Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
+@21460000 = ~as a level %castingLevel% spellcaster~ // reprise de @102095
+@21460100 = ~%spellName%~
+@21460101 = ~%spellName%~
+@21460102 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21460103 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21460110 = ~%spellName% (instant)~ // reprise de @11460005
+@21460111 = ~%spellName% (instant)~ // reprise de @11460005
+@21460112 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21460113 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21460120 = ~Casts %spellName% on %theTarget%~ // reprise de @11460001
+@21460121 = ~Casts %spellName% on %theTarget%~ // reprise de @11460001
+@21460122 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21460123 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21460130 = ~Instantly cast %spellName% on %theTarget%~ // reprise de @11460002
+@21460131 = ~Instantly cast %spellName% on %theTarget%~ // reprise de @11460002
+@21460132 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21460133 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+
+// Opcode 148 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 480 000-21 480 999)
+@21480000 = ~as a level %castingLevel% spellcaster~ // reprise de @102095
+@21480100 = ~%spellName%~
+@21480101 = ~%spellName%~
+@21480102 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21480103 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21480110 = ~%spellName% (instant)~ // reprise de @11460005
+@21480111 = ~%spellName% (instant)~ // reprise de @11460005
+@21480112 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21480113 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21480120 = ~Casts %spellName% on %theTarget%~ // reprise de @11460001
+@21480121 = ~Casts %spellName% on %theTarget%~ // reprise de @11460001
+@21480122 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21480123 = ~to cast %spellName% on %theTarget%~ // reprise de @11460003
+@21480130 = ~Instantly cast %spellName% on %theTarget%~ // reprise de @11460002
+@21480131 = ~Instantly cast %spellName% on %theTarget%~ // reprise de @11460002
+@21480132 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+@21480133 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
+
 // Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
 @21540100 = ~Entanglement~ // reprise de @11540001
 @21540101 = ~Entangles %theTarget%~ // reprise de @11540002

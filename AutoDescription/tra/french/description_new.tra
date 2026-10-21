@@ -1659,6 +1659,44 @@
 @21441014 = ~%action% l'utilisation de la détection des pièges et des illusions~ // reprise de @11440015
 @21441015 = ~%action% l'utilisation de l'inventaire~ // reprise de @11440016
 
+// Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
+@21460000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
+@21460100 = ~%spellName%~
+@21460101 = ~%spellName%~
+@21460102 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21460103 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21460110 = ~%spellName% (instantané)~ // reprise de @11460005
+@21460111 = ~%spellName% (instantané)~ // reprise de @11460005
+@21460112 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21460113 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21460120 = ~Lance « %spellName% » sur %theTarget%~ // reprise de @11460001
+@21460121 = ~Lance « %spellName% » sur %theTarget%~ // reprise de @11460001
+@21460122 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21460123 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21460130 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
+@21460131 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
+@21460132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21460133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+
+// Opcode 148 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 480 000-21 480 999)
+@21480000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
+@21480100 = ~%spellName%~
+@21480101 = ~%spellName%~
+@21480102 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21480103 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21480110 = ~%spellName% (instantané)~ // reprise de @11460005
+@21480111 = ~%spellName% (instantané)~ // reprise de @11460005
+@21480112 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21480113 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21480120 = ~Lance « %spellName% » sur %theTarget%~ // reprise de @11460001
+@21480121 = ~Lance « %spellName% » sur %theTarget%~ // reprise de @11460001
+@21480122 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21480123 = ~de lancer le sort « %spellName% » sur %theTarget%~ // reprise de @11460003
+@21480130 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
+@21480131 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
+@21480132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21480133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+
 // Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
 @21540100 = ~Enchevêtrement~ // reprise de @11540001
 @21540101 = ~Enchevêtre %theTarget%~ // reprise de @11540002
