@@ -14,8 +14,8 @@
 // aux autres champs différents (l'ancien moteur les réunit et garde ceux du dernier effet lu).
 DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 	SPRINT power_own_spell ~~
-	PATCH_IF IS_EE AND STRING_LENGTH ~%SOURCE_RES%~ <= 7 BEGIN
-		LPF ad_spell_name STR_VAR resref = EVAL ~%SOURCE_RES%B~ RET power_own_spell = name END
+	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
+		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET power_own_spell = name END
 	END
 	FOR (power_id = 0; power_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++power_id) BEGIN
 		PATCH_IF $fx_opcode(~%power_id%~) == power_opcode BEGIN

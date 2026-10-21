@@ -80,7 +80,9 @@
 @2001021 = ~of allies~ // reprise de @102712
 @2001022 = ~to allies~ // reprise de @102722
 @2001100 = ~%target% within a radius of %range%~ // reprise de @102800
+@2001101 = ~%target% within a radius of %range% around %ofTheTarget%~ // reprise de @102801
 @2001102 = ~%target% within a %range% cone on a %angle%° arc~ // reprise de @102802
+@2001103 = ~%main_target% and %target% within a radius of %range%~ // reprise de @102803
 
 // Type de créature visé par un effet d'un 177 : 0000-0005 liaisons de la liste (« les », « et les », « des »…), 0010-0012 cible (« les %targetType% », « des… », « aux… »), 0020 « contre », 0030 « uniquement pour » (2 002 000-2 002 099)
 @2002000 = ~the~ // reprise de @11770200
@@ -159,6 +161,7 @@
 @5000050 = ~reduced by half~ // reprise de @102125
 @5000111 = ~Increases %theStatistic% %ofTheTarget% by %value%~ // reprise de @102286
 @5000121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
+@5000151 = ~Protects %theTarget% %resistName%~ // reprise de @102552
 
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~May only be removed with a Remove Curse spell~ // reprise de @102126
@@ -617,6 +620,7 @@
 
 // Listes indexées : statistique d'une phrase à la forme « cible », 8 060 000 + valeur de stats.ids (8 060 000-8 069 999)
 @8060007 = ~the THAC0~ // reprise de @10540002
+@8060036 = ~the Strength~ // reprise de @10440002
 @8060039 = ~the Wisdom~ // reprise de @10490002
 @8060040 = ~the Dexterity~ // reprise de @10150002
 @8060042 = ~the charisma~ // reprise de @10060002

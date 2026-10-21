@@ -83,7 +83,8 @@ END
 // Durée commune des effets de chaque en-tête d'une potion (ancien load_charged_abilities) : les
 // effets d'une durée limitée (timing 0 ou 10) ont tous la même durée brute, comparée sans tenir
 // compte de l'unité ; elle remplace alors toutes les durées de l'en-tête. Les effets des opcodes
-// ignorés ou dont la durée n'est jamais comptée (colonne DURATION à IGNORED) n'y participent pas.
+// ignorés ou dont la durée n'est jamais comptée (colonne DURATION à IGNORED) n'y participent pas, ni
+// ceux de l'opcode 146, que l'ancien moteur écarte sans regarder les effets du sort lancé.
 DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 	SET charged_global_timing = 0 - 1
 	FOR (charged_id = 0; charged_id < charged_count; ++charged_id) BEGIN
@@ -95,7 +96,7 @@ DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 			SET render_opcode = $fx_opcode(~%charged_fx%~)
 			SPRINT charged_scope $fx_scope(~%charged_fx%~)
 			LPM ad_opcode_is_described
-			PATCH_IF opcode_described AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
+			PATCH_IF opcode_described AND render_opcode != 146 AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
 				SPRINT charged_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
 				SET charged_fx_timing = $fx_timing(~%charged_fx%~)
 				PATCH_IF NOT (~%charged_duration_kind%~ STRING_EQUAL ~IGNORED~)

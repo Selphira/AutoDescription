@@ -12,7 +12,7 @@ DEFINE_PATCH_MACRO ad_op_321_support BEGIN
 			PATCH_IF $fx_external(~%removal_id%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode321:external~
 			END
-			ELSE PATCH_IF ~%removal_resource%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+			ELSE PATCH_IF ~%removal_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~ BEGIN
 				SPRINT render_missing ~not_implemented:opcode321:not_cumulative~
 			END
 			ELSE PATCH_IF NOT (~%removal_resource%~ STRING_EQUAL ~~) BEGIN

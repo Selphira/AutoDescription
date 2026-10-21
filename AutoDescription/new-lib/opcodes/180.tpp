@@ -5,11 +5,11 @@
 // Refus : ressource vide ou parameter2 non nul (écartés par l'ancien opcode_180_is_valid) ; objet
 // d'un autre nom : l'ancien moteur y écrit le nom de l'objet décrit (BUG-031).
 DEFINE_PATCH_MACRO ad_op_180_support BEGIN
-	LPF ad_item_info STR_VAR resref = ~%SOURCE_RES%~ RET forbid_own_name = name END
+	LPF ad_item_info STR_VAR resref = ~%ctx_resource%~ RET forbid_own_name = name END
 	FOR (forbid_id = 0; forbid_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++forbid_id) BEGIN
 		PATCH_IF $fx_opcode(~%forbid_id%~) == 180 BEGIN
 			SPRINT forbid_resref $fx_resource(~%forbid_id%~)
-			SET $fx_forbid_unique(~%forbid_id%~) = ~%forbid_resref%~ STRING_EQUAL_CASE ~%SOURCE_RES%~
+			SET $fx_forbid_unique(~%forbid_id%~) = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
 			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
 			PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ OR $fx_parameter2(~%forbid_id%~) != 0 BEGIN
 				SPRINT render_missing ~not_implemented:opcode180:invalid~

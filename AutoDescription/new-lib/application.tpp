@@ -252,8 +252,9 @@ END
 
 // Durée de l'effet line_fx d'un en-tête (ancien add_duration et get_duration_value), vide si elle
 // n'est pas affichée : colonne DURATION du catalogue, ou durée commune de la potion
-// (charged_global_duration, new-lib/item_charged.tpp), qui remplace toutes celles de l'en-tête ; unité
-// de l'opcode dans AD_OPCODE_DURATION_SCALE.
+// (charged_global_duration, new-lib/item_charged.tpp), qui remplace toutes celles de l'en-tête, et
+// dans un sous-sort qu'elle couvre (ctx_ignore_duration, new-lib/recursion.tpp) ; unité de l'opcode
+// dans AD_OPCODE_DURATION_SCALE.
 DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	SPRINT app_duration_text ~~
 	SET app_opcode = $fx_opcode(~%line_fx%~)
@@ -286,7 +287,7 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		SPRINT app_duration_text @3000005 // ~après %strDuration%~
 	END
 	ELSE PATCH_IF (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)
-			OR $charged_global_duration(~%app_header%~) > 0 OR app_timing == TIMING_while_equipped OR app_timing == TIMING_delayed BEGIN
+			OR $charged_global_duration(~%app_header%~) > 0 OR ctx_ignore_duration OR app_timing == TIMING_while_equipped OR app_timing == TIMING_delayed BEGIN
 		SPRINT app_duration_text ~~
 	END
 	ELSE PATCH_IF app_timing == TIMING_permanent OR app_timing == TIMING_permanent_after_death BEGIN
@@ -404,10 +405,12 @@ END
 
 // Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget) ; app_target_missing
 // si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
-// get_effect_description) : le buveur d'une potion, le porteur d'un autre objet. La zone d'un
-// projectile (ad_application_area_target) remplace l'une et l'autre ; line_the_target, la cible que
-// nomme l'opcode (« les rakshasas »), remplace le tout à la forme sujet ; puis le type de créature
-// d'un effet d'un 177 (ad_application_versus).
+// get_effect_description) : le buveur d'une potion, le porteur d'un autre objet. Un sous-effet qui
+// hérite de la cible du parent prend ses chaînes (ctx_force_target, new-lib/recursion.tpp). La zone
+// d'un projectile (ad_application_area_target, ou celle d'un sous-sort, ad_recursion_area_strings)
+// remplace l'une et l'autre ; line_the_target, la cible que nomme l'opcode (« les rakshasas »),
+// remplace le tout à la forme sujet ; puis le type de créature d'un effet d'un 177
+// (ad_application_versus).
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
@@ -419,6 +422,15 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		LPF ad_tra INT_VAR tra_id = app_target_tra     tra_block_start = 2000000 tra_block_size = 1000 RET theTarget = text END
 		LPF ad_tra INT_VAR tra_id = app_target_tra + 1 tra_block_start = 2000000 tra_block_size = 1000 RET ofTheTarget = text END
 		LPF ad_tra INT_VAR tra_id = app_target_tra + 2 tra_block_start = 2000000 tra_block_size = 1000 RET toTheTarget = text END
+	END
+	PATCH_IF ctx_force_target BEGIN
+		SET app_target_missing = 0
+		SPRINT theTarget   ~%ctx_the_target%~
+		SPRINT ofTheTarget ~%ctx_of_the_target%~
+		SPRINT toTheTarget ~%ctx_to_the_target%~
+	END
+	PATCH_IF ctx_area_phrase > 0 AND NOT app_target_missing BEGIN
+		LPM ad_recursion_area_strings
 	END
 	PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
 		SET app_target_missing = 0
@@ -512,7 +524,8 @@ END
 
 // Ligne de l'effet line_fx (pour une ligne qui en réunit plusieurs, l'un d'eux, de même application
 // que les autres) : phrase line_phrase (identifiant de base de la série, la forme y est ajoutée),
-// ou line_text déjà rédigé à la forme « soi » ; line_section et line_sort comme pour ad_line_add.
+// ou line_text déjà rédigé à la forme « soi » (à toute forme avec line_any_form : lignes d'un
+// sous-sort, qui nomment déjà leurs cibles) ; line_section et line_sort comme pour ad_line_add.
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
@@ -542,7 +555,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SET app_line_ok = 0
 		END
 	END
-	ELSE PATCH_IF line_form != 0 AND app_line_ok BEGIN
+	ELSE PATCH_IF line_form != 0 AND app_line_ok AND NOT line_any_form BEGIN
 		SET app_opcode = $fx_opcode(~%line_fx%~)
 		SPRINT render_late_missing ~not_implemented:opcode%app_opcode%:form%line_form%~
 		SET app_line_ok = 0
@@ -605,6 +618,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET line_probability = 0
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0
+	SET line_any_form = 0
 	SPRINT line_suffix ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~

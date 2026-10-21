@@ -8,6 +8,7 @@ BEGIN
 	<<<<<<<< .../AutoDescription/inlined/ad_empty.txt
 >>>>>>>>
 	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-opcodes.txt~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-recursion.txt~
 	ACTION_IF AD_EFFECTS_DUMP BEGIN
 		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-effects.txt~
 	END
@@ -62,6 +63,17 @@ BEGIN
 		VERBOSE
 	END
 	PRINT "Nouveau moteur : %cov_todo_count% opcodes a prendre en charge, %cov_unknown_count% opcodes inconnus (AutoDescription/log/%log_name%-opcodes.txt)"
+END
+
+// Sous-ressource que la récursion ne décrit pas (ad_recursion_allowed, new-lib/recursion.tpp) :
+// chaîne des ressources<TAB>sous-ressource<TAB>raison (depth : au-delà de AD_RECURSION_MAX_DEPTH ;
+// loop : déjà dans la chaîne).
+DEFINE_PATCH_MACRO ad_log_recursion BEGIN
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~AutoDescription/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+		VERBOSE
+	END
 END
 
 // Format (une ligne par ressource, puis une par effet) :

@@ -18,7 +18,7 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
 	PATCH_IF (exception_opcode == 318 OR exception_opcode == 324) AND NOT $fx_external(~%fx_id%~) BEGIN
 		SPRINT exception_resource $fx_resource(~%fx_id%~)
-		PATCH_IF ~%exception_resource%~ STRING_EQUAL_CASE ~%SOURCE_RES%~ BEGIN
+		PATCH_IF ~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~ BEGIN
 			PATCH_IF $fx_parameter1(~%fx_id%~) != 0 OR $fx_parameter2_raw(~%fx_id%~) != 0 BEGIN
 				SET $fx_exception(~%fx_id%~) = 1
 				SET fx_block_exceptions += 1
@@ -45,7 +45,7 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 			ELSE PATCH_IF exception_opcode == 318 AND NOT IS_EE BEGIN
 				SPRINT render_missing ~not_implemented:opcode318:classic~
 			END
-			ELSE PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%SOURCE_RES%~) BEGIN
+			ELSE PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%exception_opcode%:resource~
 			END
 			ELSE BEGIN

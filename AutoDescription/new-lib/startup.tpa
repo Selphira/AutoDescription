@@ -14,6 +14,10 @@ OUTER_SPRINT AD_SEMICOLON @1000002 // ~ ; ~
 OUTER_SPRINT PERCENT      @1000003 // ~ %~
 OUTER_SPRINT AD_AND       @1000004 // ~et~
 
+// Profondeur maximale des sous-ressources décrites (new-lib/recursion.tpp) : un sort lancé par un
+// effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
+OUTER_SET AD_RECURSION_MAX_DEPTH = 1
+
 // Caractéristiques minimales d'un objet, dans l'ordre d'affichage : valeur de stats.ids => champ
 // de l'en-tête.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN

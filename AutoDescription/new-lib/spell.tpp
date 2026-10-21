@@ -10,6 +10,7 @@ DEFINE_PATCH_FUNCTION ad_describe_spell
 BEGIN
 	SPRINT description ~~
 	SET covered = 0
+	LPM ad_recursion_reset
 	LPM ad_fx_load_spell
 	PATCH_IF AD_EFFECTS_DUMP BEGIN
 		LPM ad_fx_dump

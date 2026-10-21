@@ -28,7 +28,8 @@ END
 
 // Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target_resist) : line_phrase,
 // identifiant de base d'une série de 5 000 1x0 selon le mode (10 augmentation, 20 réduction, 30
-// valeur fixée, 40 multiplication, 50 immunité), et ses variables value et theStatistic ; sans
+// valeur fixée, 40 multiplication, 50 immunité), et ses variables value et theStatistic (resistName
+// pour une immunité) ; sans
 // statistique dans le .tra, pas de phrase.
 DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 	SET stat_statistic_tra = 20000000 + stat_opcode * 10000 + 2
@@ -38,7 +39,8 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 		SET value = ABS stat_value
 		SPRINT value @1200003 // ~%value%%PERCENT%~
 		PATCH_IF stat_mode == MOD_TYPE_flat AND stat_value == 100 BEGIN
-			SET line_phrase = 5000150
+			LPF ad_tra INT_VAR tra_id = stat_statistic_tra - 1 RET resistName = text END
+			SET line_phrase = 5000150 // ~Immunise %theTarget% %resistName%~ (+1)
 		END
 		ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
 			SET line_phrase = 5000130
