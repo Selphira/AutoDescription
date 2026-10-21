@@ -56,7 +56,9 @@ END
 // Effets identiques (ancien opcode_group_by_target, le premier regroupement de chaque opcode) : les
 // effets d'un même opcode dont tous les champs sont égaux n'en font qu'un, écrit après les autres
 // effets de son opcode (fx_late), comme celui que l'ancien moteur remet en fin de liste ;
-// fx_identical_count en garde le nombre.
+// fx_identical_count en garde le nombre, fx_identical_anchor(id) l'effet qui les représente (initialisé
+// à id à la lecture, new-lib/effects.tpp) ; l'ancien moteur ne compare pas le type de créature
+// d'un effet d'un 177, qui réunit leurs noms (ad_application_versus, new-lib/application.tpp).
 DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		SET $fx_identical_count(~%group_id%~) = 1
@@ -72,6 +74,7 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
 					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
+						SET $fx_identical_anchor(~%group_candidate%~) = group_id
 						SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
 						SET $fx_late(~%group_id%~) = 1
 					END

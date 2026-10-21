@@ -5,7 +5,7 @@
 //
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2 (fx_parameter2_raw : valeur lue, qu'une prise en charge ne réécrit
-// pas), fx_timing, fx_resistance, fx_duration, fx_probability1,
+// pas), fx_parameter3 (0 : seul un EFF en a un, new-lib/opcodes/177.tpp), fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
 // fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
 // fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
@@ -15,7 +15,8 @@
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_external (1 pour un effet 177
-// remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp) ; fx_opcode_count(opcode).
+// remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_versus_file et
+// fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
 // Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
@@ -150,6 +151,10 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
 			SET $fx_external(~%fx_id%~) = 0
+			SET $fx_versus_file(~%fx_id%~) = 0
+			SET $fx_versus_value(~%fx_id%~) = 0
+			SET $fx_parameter3(~%fx_id%~) = 0
+			SET $fx_identical_anchor(~%fx_id%~) = fx_id
 			PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
 				LPM ad_fx_substitute_177
 			END

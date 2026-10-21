@@ -1,19 +1,22 @@
 // Opcode 177 (Use EFF File) : applique l'effet du fichier EFF resource. Comme l'ancien
 // opcode_177_replace, l'effet 177 est remplacé dès la lecture (ad_fx_substitute_177, appelée par
 // ad_fx_load_block, new-lib/effects.tpp) par celui de l'EFF, qui est ensuite décrit comme les autres
-// effets de son opcode : opcode, puissance, paramètres, ressource, résistance et special de l'EFF ;
+// effets de son opcode : opcode, puissance, paramètres (parameter3 compris, fx_parameter3), ressource,
+// résistance et special de l'EFF ;
 // cible, timing et durée du 177 ; dés du 177 s'ils donnent des niveaux (colonne DICE de l'opcode de
 // l'EFF), de l'EFF sinon ; jet de sauvegarde de l'EFF, ou du 177 si l'EFF n'en a pas, ou les deux
 // types réunis à bonus égal ; probabilité de l'EFF, ou du 177 si celle de l'EFF est certaine.
 // L'effet remplacé est marqué fx_external : les regroupements ne le réunissent pas à un effet du
 // fichier, comme l'ancien moteur qui compare isExternal. Il compte pour son opcode et pour le 177
-// (fx_opcode_count), pour que la prise en charge ci-dessous vérifie son ordre.
+// (fx_opcode_count), pour que la prise en charge ci-dessous vérifie son ordre. Le type de créature
+// visé (parameter2 : fichier IDS, parameter1 : valeur, 0 sans filtre) devient fx_versus_file et
+// fx_versus_value, écrits « contre les X » ou « (uniquement pour les X) » par
+// ad_application_versus (new-lib/application.tpp).
 
 // Remplace l'effet fx_id (opcode 177) par celui de son EFF, ou y laisse la raison de son refus
 // (fx_substitution_error) : drop pour un effet que l'ancien moteur écarte sans rien écrire
 // (opcode_177_is_valid : fichier IDS hors de 2-9, 2-8 sur un jeu classique, valeur 100 de ea.ids,
-// EFF absent) ; EFF d'un autre format, EFF d'un 177 ; filtre de type de
-// créature (parameter1, à venir) ; opcode de l'EFF que l'ancien moteur décrit autrement pour un
+// EFF absent) ; EFF d'un autre format, EFF d'un 177 ; type de créature d'un kit (kit.ids, sur EE) ; opcode de l'EFF que l'ancien moteur décrit autrement pour un
 // effet externe (AD_OPCODES_EFF_FIELDS) ; niveaux minimum et maximum de l'EFF (l'ancien moteur lit
 // ceux du dernier EFF lu) ; probabilités incertaines des deux côtés (l'ancien moteur multiplie l'une
 // et garde les bornes de l'autre).
@@ -22,12 +25,13 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 	SPRINT substitute_resref $fx_resource(~%fx_id%~)
 	SET substitute_ok = 0
 	SET substitute_file = $fx_parameter2(~%fx_id%~)
+	SET substitute_versus = $fx_parameter1(~%fx_id%~)
 	PATCH_IF substitute_file < 2 OR substitute_file > (IS_EE ? 9 : 8) OR (substitute_file == 2 AND $fx_parameter1(~%fx_id%~) == 100)
 			OR ~%substitute_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%substitute_resref%.eff~ BEGIN
 		SPRINT $fx_substitution_error(~%fx_id%~) ~drop~
 	END
-	ELSE PATCH_IF $fx_parameter1(~%fx_id%~) != 0 BEGIN
-		SPRINT $fx_substitution_error(~%fx_id%~) ~creature_type~
+	ELSE PATCH_IF substitute_file == 9 AND $fx_parameter1(~%fx_id%~) != 0 BEGIN
+		SPRINT $fx_substitution_error(~%fx_id%~) ~kit~
 	END
 	ELSE BEGIN
 		INNER_PATCH_FILE ~%substitute_resref%.eff~ BEGIN
@@ -50,6 +54,7 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 				READ_LONG  EFF2_save_bonus        substitute_save_bonus
 				READ_LONG  EFF2_stacking_id_tobex substitute_special
 				READ_LONG  EFF2_resistance        substitute_resistance
+				READ_LONG  EFF2_parameter3        substitute_parameter3
 				READ_LONG  0x54                   substitute_level_min
 				READ_LONG  0x58                   substitute_level_max
 			END
@@ -108,6 +113,11 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 			SET $fx_special(~%fx_id%~)        = substitute_special
 			SET $fx_resistance(~%fx_id%~)     = substitute_resistance
 			SET $fx_external(~%fx_id%~)       = 1
+			SET $fx_parameter3(~%fx_id%~)     = substitute_parameter3
+			PATCH_IF substitute_versus != 0 BEGIN
+				SET $fx_versus_file(~%fx_id%~)  = substitute_file
+				SET $fx_versus_value(~%fx_id%~) = substitute_versus
+			END
 			SPRINT $fx_parent_resource(~%fx_id%~) ~%substitute_resref%~
 		END
 	END
@@ -143,4 +153,13 @@ DEFINE_PATCH_MACRO ad_op_177_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_177_lines BEGIN END
+// Un effet qui vise un type de créature et qu'un regroupement autre que celui des effets identiques
+// a consommé perdrait ce type : refusé.
+DEFINE_PATCH_MACRO ad_op_177_lines BEGIN
+	FOR (substitute_id = 0; substitute_id < fx_count; ++substitute_id) BEGIN
+		PATCH_IF $fx_versus_file(~%substitute_id%~) > 0 AND $fx_consumed(~%substitute_id%~)
+				AND $fx_identical_anchor(~%substitute_id%~) == substitute_id BEGIN
+			SPRINT render_late_missing ~not_implemented:opcode177:versus_group~
+		END
+	END
+END

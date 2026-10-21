@@ -97,14 +97,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
 	25  => 1 // poison, types 4 et parameter4
 	122 => 1 // objet créé, resource2 sur EE
 	127 => 1 // invocation de monstres, dés
-	178 => 1
+	344 => 1 // enchantement, parameter3 et parameter4
 	232 => 1
 	248 => 1
 	272 => 1
 	301 => 1
 	331 => 1
 	341 => 1
-	344 => 1
 	345 => 1
 END
 

@@ -179,8 +179,8 @@
 175      1        1        TODO      LEVEL            372    NOT_AFTER_DEATH State:_Hold
 176      1        1        TODO      LEVEL            81     SHOWN           Stat:_Movement_Modifier_(II)
 177      1        1        DESCRIBED LEVEL            472    HIDDEN          Use_EFF_File
-178      1        1        TODO      LEVEL            62     SHOWN           Spell_Effect:_THAC0_vs._Creature_Type_Modifier
-179      1        1        TODO      LEVEL            43     SHOWN           Spell_Effect:_Damage_vs._Creature_Type_Modifier
+178      1        1        DESCRIBED LEVEL            62     SHOWN           Spell_Effect:_THAC0_vs._Creature_Type_Modifier
+179      1        1        DESCRIBED LEVEL            43     SHOWN           Spell_Effect:_Damage_vs._Creature_Type_Modifier
 180      1        1        DESCRIBED LEVEL            486    SHOWN           Item:_Can't_Use_Item
 181      1        1        TODO      LEVEL            487    SHOWN           Item:_Can't_Use_Itemtype
 182      1        1        IGNORED   LEVEL            400    SHOWN           Use_EFF_file_if/while_item_resource_equipped
@@ -345,7 +345,7 @@
 341      0        1        TODO      LEVEL            476    SHOWN           Spell_Effect:_Change_Critical_Hit_Effect
 342      0        1        IGNORED   LEVEL            400    SHOWN           Animation:_Override_Data
 343      0        1        TODO      LEVEL            85     IGNORED         HP_Swap
-344      0        1        TODO      LEVEL            31     SHOWN           Enchantment_vs._creature_type
+344      0        1        DESCRIBED LEVEL            31     SHOWN           Enchantment_vs._creature_type
 345      0        1        TODO      LEVEL            30     SHOWN           Enchantment_bonus
 346      0        1        TODO      LEVEL            77     SHOWN           Save_vs._school_bonus
 347      0        1        TODO      LEVEL            400    SHOWN           Unused

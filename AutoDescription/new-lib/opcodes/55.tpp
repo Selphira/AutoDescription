@@ -7,7 +7,8 @@
 // ajoute en fin de liste.
 
 // Refus : fichier hors de 2-8 (l'ancien moteur écarte les autres, sauf kit.ids sur EE, et la valeur
-// 100 de ea.ids, opcode_modstat_is_valid) ; valeur sans nom.
+// 100 de ea.ids, opcode_modstat_is_valid) ; valeur sans nom ; effet d'un 177 qui vise un type de
+// créature (l'ancien moteur remplace alors le nom de l'opcode par celui du 177).
 DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 	FOR (kill_id = 0; kill_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++kill_id) BEGIN
 		PATCH_IF $fx_opcode(~%kill_id%~) == 55 BEGIN
@@ -20,6 +21,9 @@ DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 			END
 			ELSE PATCH_IF kill_value != 0 AND ~%kill_name%~ STRING_EQUAL ~~ BEGIN
 				SPRINT render_missing ~not_implemented:opcode55:ids_name~
+			END
+			ELSE PATCH_IF $fx_versus_file(~%kill_id%~) > 0 BEGIN
+				SPRINT render_missing ~not_implemented:opcode55:versus~
 			END
 		END
 	END

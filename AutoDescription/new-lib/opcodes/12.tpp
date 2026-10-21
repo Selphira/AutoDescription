@@ -7,9 +7,8 @@
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp). La durée n'est pas affichée (colonne DURATION). Un drain ou un transfert
 // d'une durée limitée augmente les points de vie maximums pendant ce temps : l'ancien moteur le dit
-// à part, pas encore repris. L'ancien moteur choisit aussi un texte « contre … » selon une variable
-// versus laissée par les opcodes qui visent un type de créature (177, 178, 344…) : non repris,
-// ces opcodes n'étant pas encore décrits.
+// à part, pas encore repris. Des dégâts qui visent un type de créature (effet d'un 177) s'écrivent
+// « contre les X » à la forme « cible » (versus, ad_application_versus, new-lib/application.tpp).
 
 // ---------------------------------------------------------------------------------------------
 // Prise en charge (ancien opcode_12_is_valid, plus les cas que ce moteur ne décrit pas encore)
@@ -55,6 +54,11 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 					LPF ad_tra INT_VAR tra_id = damage_type_tra RET damageType = text END
 					SPRINT damage @20120001 // ~%damage% %damageType%~
 					SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
+					SET damage_target = $fx_effective_target(~%damage_id%~)
+					PATCH_IF line_phrase == 20120100 AND $fx_versus_file(~%damage_id%~) > 0
+							AND damage_target != TARGET_FX_self AND damage_target != TARGET_FX_original_caster BEGIN
+						SET line_phrase = 20120160 // ~Inflige %damage% %versus%~ (+1)
+					END
 				END
 				ELSE PATCH_IF damage_mode == 1 BEGIN
 					PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN

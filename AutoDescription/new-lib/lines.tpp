@@ -21,6 +21,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SPRINT line_suffix ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~
+	SPRINT line_only_for ~~
 	SPRINT stat_line_macro ~~
 	SPRINT stat_percent_100 ~~
 	SET line_save_for_half = 0

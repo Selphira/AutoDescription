@@ -402,7 +402,8 @@ END
 // si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
 // get_effect_description) : le buveur d'une potion, le porteur d'un autre objet. La zone d'un
 // projectile (ad_application_area_target) remplace l'une et l'autre ; line_the_target, la cible que
-// nomme l'opcode (« les rakshasas »), remplace le tout à la forme sujet.
+// nomme l'opcode (« les rakshasas »), remplace le tout à la forme sujet ; puis le type de créature
+// d'un effet d'un 177 (ad_application_versus).
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
@@ -425,6 +426,84 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		SET app_target_missing = 0
 		SPRINT theTarget ~%line_the_target%~
 	END
+	LPM ad_application_versus
+END
+
+// Type de créature visé par l'effet line_fx d'un 177 (fx_versus_file, new-lib/opcodes/177.tpp) et par
+// les effets identiques qu'il réunit (fx_identical_anchor), comme l'ancien opcode_set_target_strings :
+// noms sans doublon dans l'ordre des effets ; la cible devient « les X, les Y et les Z » (« des… »,
+// « aux… »), y compris dans une phrase à la forme « soi », versus « contre les X… » ; à la forme
+// « soi », line_only_for « uniquement pour les X… » finit la ligne (ancien add_only_for) ; versus
+// n'est écrit que pour un tel effet (la ligne de classe d'armure de l'opcode 0 a le sien). Refus
+// (render_late_missing) : effet réuni à un effet sans type de créature (l'ancien moteur l'écrirait
+// pour les deux) ; valeur sans nom ; classes que l'ancien moteur réunit sous un seul nom (mages,
+// voleurs, monoclassés et multiclassés) ; cible d'une zone (l'ancien moteur y écrit la zone, comme
+// BUG-032) ; restriction de niveau.
+DEFINE_PATCH_MACRO ad_application_versus BEGIN
+	SET app_versus_count = 0
+	SET app_versus_plain = 0
+	SET app_versus_mages = 0
+	SET app_versus_thieves = 0
+	CLEAR_ARRAY app_versus_names
+	FOR (app_member = line_fx; app_member < fx_count; ++app_member) BEGIN
+		PATCH_IF $fx_identical_anchor(~%app_member%~) == line_fx BEGIN
+			SET app_versus_file = $fx_versus_file(~%app_member%~)
+			SET app_versus_value = $fx_versus_value(~%app_member%~)
+			PATCH_IF app_versus_file == 0 BEGIN
+				SET app_versus_plain = 1
+			END
+			ELSE BEGIN
+				LPF ad_ids_name INT_VAR ids_file = app_versus_file entry = app_versus_value RET app_versus_name = name END
+				PATCH_IF ~%app_versus_name%~ STRING_EQUAL ~~ BEGIN
+					SPRINT render_late_missing ~not_implemented:versus:ids_name~
+				END
+				ELSE BEGIN
+					SPRINT $app_versus_names(~%app_versus_name%~) ~%app_versus_name%~
+					SET app_versus_count += 1
+				END
+				PATCH_IF app_versus_file == 5 BEGIN
+					SET app_versus_mages = app_versus_mages BOR ((app_versus_value == 1) + 2 * (app_versus_value == 7) + 4 * (app_versus_value == 10)
+						+ 8 * (app_versus_value == 13) + 16 * (app_versus_value == 14) + 32 * (app_versus_value == 17))
+					SET app_versus_thieves = app_versus_thieves BOR ((app_versus_value == 4) + 2 * (app_versus_value == 9) + 4 * (app_versus_value == 10)
+						+ 8 * (app_versus_value == 13) + 16 * (app_versus_value == 15))
+				END
+			END
+		END
+	END
+	PATCH_IF app_versus_count > 0 BEGIN
+		PATCH_IF app_versus_plain BEGIN
+			SPRINT render_late_missing ~not_implemented:versus:mixed~
+		END
+		ELSE PATCH_IF app_versus_mages == 63 OR app_versus_thieves == 31 BEGIN
+			SPRINT render_late_missing ~not_implemented:versus:class_group~
+		END
+		ELSE PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
+			SPRINT render_late_missing ~not_implemented:versus:area~
+		END
+		ELSE PATCH_IF $fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1 BEGIN
+			SPRINT render_late_missing ~not_implemented:versus:level~
+		END
+		ELSE BEGIN
+			SPRINT app_versus_the    @2002000 // ~les~
+			SPRINT app_versus_and_the @2002001 // ~et les~
+			SPRINT app_versus_of     @2002002 // ~des~
+			SPRINT app_versus_and_of @2002003 // ~et des~
+			SPRINT app_versus_to     @2002004 // ~aux~
+			SPRINT app_versus_and_to @2002005 // ~et aux~
+			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_the% ~ final_glue = EVAL ~ %app_versus_and_the% ~ RET targetType = text END
+			SPRINT versus @2002020 // ~contre les %targetType%~
+			SPRINT app_versus_only_for @2002030 // ~uniquement pour les %targetType%~
+			SPRINT theTarget @2002010 // ~les %targetType%~
+			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_of% ~ final_glue = EVAL ~ %app_versus_and_of% ~ RET targetType = text END
+			SPRINT ofTheTarget @2002011 // ~des %targetType%~
+			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_to% ~ final_glue = EVAL ~ %app_versus_and_to% ~ RET targetType = text END
+			SPRINT toTheTarget @2002012 // ~aux %targetType%~
+			SET app_target_missing = 0
+			PATCH_IF line_form == 0 OR line_form == 2 BEGIN
+				SPRINT line_only_for ~%app_versus_only_for%~
+			END
+		END
+	END
 END
 
 // Ligne de l'effet line_fx (pour une ligne qui en réunit plusieurs, l'un d'eux, de même application
@@ -435,8 +514,9 @@ END
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
 // la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
 // (ad_application_save) ; line_condition (« En combat ») précède toute la ligne, séparée par
-// AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ; tous
-// sont remis à zéro après la ligne. Forme ou cible sans
+// AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ;
+// line_only_for (ad_application_versus) finit la ligne, entre parenthèses ; tous sont remis à zéro
+// après la ligne. Forme ou cible sans
 // texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_application_form
@@ -477,6 +557,9 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	PATCH_IF NOT (~%app_save_text%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% %app_save_text%~
 	END
+	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
+		SPRINT line_text ~%line_text% (%line_only_for%)~
+	END
 	// Effet probable : « 26 % de chances » devant la ligne entière (ancien get_effect_description),
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).
 	SET app_saved_sort = line_sort
@@ -513,6 +596,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SPRINT line_suffix ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~
+	SPRINT line_only_for ~~
 	SET line_save_for_half = 0
 	SET line_fail_for_half = 0
 END

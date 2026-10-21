@@ -82,6 +82,19 @@
 @2001100 = ~%target% dans un rayon de %range%~ // reprise de @102800
 @2001102 = ~%target% dans un cône de %range% sur un arc de %angle%°~ // reprise de @102802
 
+// Type de créature visé par un effet d'un 177 : 0000-0005 liaisons de la liste (« les », « et les », « des »…), 0010-0012 cible (« les %targetType% », « des… », « aux… »), 0020 « contre », 0030 « uniquement pour » (2 002 000-2 002 099)
+@2002000 = ~les~ // reprise de @11770200
+@2002001 = ~et les~ // reprise de @11770201
+@2002002 = ~des~ // reprise de @11770202
+@2002003 = ~et des~ // reprise de @11770203
+@2002004 = ~aux~ // reprise de @11770204
+@2002005 = ~et aux~ // reprise de @11770205
+@2002010 = ~les %targetType%~ // reprise de @102384
+@2002011 = ~des %targetType%~ // reprise de @102385
+@2002012 = ~aux %targetType%~ // reprise de @102386
+@2002020 = ~contre les %targetType%~ // reprise de @102387
+@2002030 = ~uniquement pour les %targetType%~ // reprise de @11770001
+
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~pendant %strDuration%~ // reprise de @100311
 @3000001 = ~de manière permanente~ // reprise de @100312
@@ -1067,12 +1080,14 @@
 @20120040 = ~ne réveille pas la cible~ // reprise de @10120040
 @20120041 = ~efficace si la source est désarmée~ // reprise de @10120041
 
-// Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums
+// Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums, 0160 dégâts contre un type de créature (formes « cible » seulement)
 @20120100 = ~Inflige %damage% %toTheTarget%~ // reprise de @10120001
 @20120101 = ~Inflige %damage% %toTheTarget%~ // reprise de @10120002
 @20120102 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120011
 @20120103 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Draine %damage% %toTheTarget%~ // reprise de @10120004
+@20120161 = ~Inflige %damage% %versus%~ // reprise de @10120003
+@20120163 = ~d'infliger %damage% %versus%~ // reprise de @10120013
 
 // Opcode 13 : Mort : phrases 0100 + 10 × type (AD_DEATH_TYPES) (20 130 000-20 130 999)
 @20130110 = ~Dissout %theTarget%~ // reprise de @500001
@@ -1747,6 +1762,12 @@
 @21730000 = ~Résistance aux poisons~ // reprise de @11730001
 @21730001 = ~aux poisons~ // reprise de @11730002
 
+// Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique (21 780 000-21 780 999)
+@21780000 = ~TAC0~ // reprise de @10540001
+
+// Opcode 179 : Dégâts contre un type de créature : 0000 nom de la statistique (21 790 000-21 790 999)
+@21790000 = ~Dégâts~ // reprise de @10730001
+
 // Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
 @21800100 = ~Unique%AD_COLON%Un seul exemplaire peut être équipé~ // reprise de @11800001
 
@@ -1938,6 +1959,9 @@
 @23320008 = ~Dégâts perforants~ // reprise de @13320008
 @23320009 = ~Dégâts contondants~ // reprise de @13320009
 @23320010 = ~Dégâts de projectiles~ // reprise de @13320010
+
+// Opcode 344 : Enchantement contre un type de créature : 0000 nom (23 440 000-23 440 999)
+@23440000 = ~Niveau d'enchantement~ // reprise de @13440001
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~Ne protège pas %versus%~ // reprise de @15210001
