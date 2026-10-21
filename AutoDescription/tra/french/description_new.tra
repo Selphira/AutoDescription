@@ -964,6 +964,21 @@
 @8098050 = ~créatures chaotiques neutres~ // reprise de @208050
 @8098051 = ~créatures chaotiques mauvaises~ // reprise de @208051
 
+// Noms des types secondaires de sorts, 8 100 000 + valeur de msectype.ids (1-13) (8 100 000-8 100 013)
+@8100001 = ~Protection de sort~ // reprise de @100201
+@8100002 = ~Protection spécifique~ // reprise de @100202
+@8100003 = ~Protection illusoire~ // reprise de @100203
+@8100004 = ~Attaque magique~ // reprise de @100204
+@8100005 = ~Attaque divinatrice~ // reprise de @100205
+@8100006 = ~Convocation~ // reprise de @100206
+@8100007 = ~Protection de combat~ // reprise de @100207
+@8100008 = ~Contingence~ // reprise de @100208
+@8100009 = ~Champ de bataille~ // reprise de @100209
+@8100010 = ~Dégâts offensifs~ // reprise de @100210
+@8100011 = ~Invalidant~ // reprise de @100211
+@8100012 = ~Combinaison~ // reprise de @100212
+@8100013 = ~Non-offensif~ // reprise de @100213
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
 @20000001 = ~Classe d'armure de base~ // reprise de @10000100
@@ -1713,8 +1728,46 @@
 @21970102 = ~de renvoyer %the% %projectiles%~ // reprise de @11970003
 @21970103 = ~de renvoyer %the% %projectiles% visant %theTarget%~ // reprise de @11970004
 
+// Opcode 200 : Renvoi décroissant par niveau de sort : phrases 0100 liste de niveaux, 0110 tous les niveaux, 0120 du 1er au N-ième (22 000 000-22 000 999)
+@22000100 = ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12000001
+@22000101 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~ // reprise de @12000002
+@22000102 = ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12000003
+@22000103 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau~ // reprise de @12000004
+@22000110 = ~Renvoie jusqu'à %amount% niveaux de sorts~ // reprise de @12000011
+@22000111 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget%~ // reprise de @12000012
+@22000112 = ~de renvoyer jusqu'à %amount% niveaux de sorts~ // reprise de @12000013
+@22000113 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget%~ // reprise de @12000014
+@22000120 = ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12000021
+@22000121 = ~Renvoie jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12000022
+@22000122 = ~de renvoyer jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12000023
+@22000123 = ~de renvoyer jusqu'à %amount% niveaux de sorts ciblant %theTarget% parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12000024
+
+// Opcode 201 : Immunité décroissante par niveau de sort : phrases 0100 liste de niveaux, 0110 tous les niveaux, 0120 du 1er au N-ième (22 010 000-22 010 999)
+@22010100 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12010001
+@22010101 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12010002
+@22010102 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12010003
+@22010103 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12010004
+@22010110 = ~Immunise jusqu'à %amount% niveaux de sorts~ // reprise de @12010011
+@22010111 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts~ // reprise de @12010012
+@22010112 = ~d'immuniser jusqu'à %amount% niveaux de sorts~ // reprise de @12010013
+@22010113 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts~ // reprise de @12010014
+@22010120 = ~Immunise jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010021
+@22010121 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010022
+@22010122 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010023
+@22010123 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010024
+
+// Opcode 205 : Immunité à un type secondaire de sort : phrases 0100 (22 050 000-22 050 999)
+@22050100 = ~Immunité aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050001
+@22050101 = ~Immunise %theTarget% aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050003
+@22050102 = ~de résister aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050002
+@22050103 = ~d'immuniser %theTarget% aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050004
+
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Immunité au sort « %spellName% »~ // reprise de @12060001
+
+// Opcode 207 : Renvoi d'un sort : phrases 0100, formes « soi » seulement, comme dans l'ancien moteur (22 070 000-22 070 999)
+@22070100 = ~Renvoie le sort « %spellName% »~ // reprise de @12070001
+@22070102 = ~de renvoyer le sort « %spellName% »~ // reprise de @12070002
 
 // Opcode 216 : Drain de niveaux : phrases 0100 un niveau, 0110 plusieurs, 0120 passage de niveau inhibé, 0130 un niveau injecté (22 160 000-22 160 999)
 @22160100 = ~Draine 1 niveau %toTheTarget%~ // reprise de @12160001
@@ -1746,6 +1799,16 @@
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Compétence martiale %proficiency%~ // reprise de @12330001
 @22330002 = ~la compétence martiale %proficiency%~ // reprise de @12330002
+
+// Opcode 244 : Drain de sorts profanes : phrases 0100 un sort, 0110 plusieurs (22 440 000-22 440 999)
+@22440100 = ~Draine 1 sort profane de la mémoire %ofTheTarget%~ // reprise de @12440001
+@22440101 = ~Draine 1 sort profane de la mémoire %ofTheTarget%~ // reprise de @12440001
+@22440102 = ~de drainer 1 sort profane de la mémoire %ofTheTarget%~ // reprise de @12440003
+@22440103 = ~de drainer 1 sort profane de la mémoire %ofTheTarget%~ // reprise de @12440003
+@22440110 = ~Draine %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440002
+@22440111 = ~Draine %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440002
+@22440112 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
+@22440113 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
 
 // Opcode 255 : Création d'objet (en jours) : phrases 0100 (22 550 000-22 550 999)
 @22550100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001

@@ -3,8 +3,8 @@
 // AD_PROJECTILE_NAMES (ad_projectile_name, new-lib/resources.tpp) ; un projectile sans nom connu
 // n'écrit rien, comme dans l'ancien moteur. Avec AD_ENABLE_SHRINKAGE, les renvois d'un même bloc, s'ils sont plusieurs, n'en
 // font qu'un (ancien opcode_197_group) : noms réunis sans doublon dans l'ordre du fichier, ligne de
-// l'effet lu en dernier. L'ancien moteur réunit aussi les renvois aux protections contre un sort
-// (opcode 207) de même projectile, qui n'est pas encore décrit.
+// l'effet lu en dernier ; ils absorbent les renvois d'un sort (opcode 207) qui utilise le même
+// projectile (ad_group_bounce_spells, new-lib/groups.tpp).
 
 DEFINE_PATCH_MACRO ad_op_197_support BEGIN END
 

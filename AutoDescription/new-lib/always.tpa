@@ -20,6 +20,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/states.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/hp_over_time.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/create_item.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/spell_power.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/0.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/1.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/2.tpp~
@@ -129,10 +130,15 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/189.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/191.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/197.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/200.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/201.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/205.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/206.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/207.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/216.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/218.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/233.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/244.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/255.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/275.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/276.tpp~

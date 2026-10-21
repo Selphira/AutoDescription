@@ -25,6 +25,8 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_projectile_spells
+		LPM ad_group_secondary_type_spells
+		LPM ad_group_bounce_spells
 		LPM ad_group_morale
 		LPM ad_group_immunities
 	END
@@ -211,6 +213,70 @@ DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
 						END
 					END
 					PATCH_IF group_spell_projectile == group_projectile BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+// Immunités à un type secondaire de sort (ancien opcode_205_group) : une immunité au type T (205)
+// absorbe les immunités à un sort (206) de son bloc dont le sort est de type T ; l'ancien moteur lit
+// le type sur quatre octets.
+DEFINE_PATCH_MACRO ad_group_secondary_type_spells BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		SET group_sectype = $fx_parameter2(~%group_id%~)
+		PATCH_IF $fx_opcode(~%group_id%~) == 205 AND group_sectype > 0 BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SPRINT group_spell $fx_resource(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 206 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+					SET group_spell_sectype = 0 - 1
+					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+						PATCH_IF BUFFER_LENGTH >= SPL_sectype + 4 BEGIN
+							READ_LONG SPL_sectype group_spell_sectype
+						END
+					END
+					PATCH_IF group_spell_sectype == group_sectype BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+// Renvois d'un projectile (ancien opcode_197_group) : un renvoi du projectile P (197) absorbe les
+// renvois d'un sort (207) de son bloc dont l'un des en-têtes utilise P ; la valeur du .spl vaut
+// celle de projectl.ids plus 1.
+DEFINE_PATCH_MACRO ad_group_bounce_spells BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 197 BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			SET group_projectile = $fx_parameter2(~%group_id%~) + 1
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SPRINT group_spell $fx_resource(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 207 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+					SET group_spell_match = 0
+					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+						READ_LONG  SPL_extended_headers_offset group_headers_offset
+						READ_SHORT SPL_extended_headers_count  group_headers_count
+						FOR (group_header = 0; group_header < group_headers_count; ++group_header) BEGIN
+							SET group_header_offset = group_headers_offset + 0x28 * group_header + SPL_HEAD_projectile
+							PATCH_IF BUFFER_LENGTH >= group_header_offset + 2 BEGIN
+								READ_SHORT group_header_offset group_spell_projectile
+								SET group_spell_match = group_spell_match OR group_spell_projectile == group_projectile
+							END
+						END
+					END
+					PATCH_IF group_spell_match BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END

@@ -181,3 +181,18 @@ BEGIN
 		LPF ad_tra INT_VAR tra_id = ids_name_tra tra_block_start = 8090000 tra_block_size = 10000 RET name = text END // ~rakshasas~ (@8094128)
 	END
 END
+
+// Nom d'un type secondaire de sort (msectype.ids, 1-13 : « Dégâts offensifs ») : liste @8100000 ;
+// vide pour une autre valeur (type sans nom ou ajouté par un mod).
+DEFINE_PATCH_FUNCTION ad_spell_secondary_type_name
+	INT_VAR
+		secondary_type = 0
+	RET
+		name
+BEGIN
+	SPRINT name ~~
+	SET sectype_name_tra = 8100000 + secondary_type
+	PATCH_IF secondary_type >= 1 AND secondary_type <= 13 AND TRA_ENTRY_EXISTS (~%sectype_name_tra%~) BEGIN
+		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100000 tra_block_size = 14 RET name = text END // ~Dégâts offensifs~ (@8100010)
+	END
+END

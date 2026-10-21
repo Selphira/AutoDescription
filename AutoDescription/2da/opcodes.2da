@@ -201,14 +201,14 @@
 197      1        1        DESCRIBED LEVEL            246    SHOWN           Spell:_Bounce_(by_Impact_Projectile)
 198      1        1        TODO      LEVEL            239    SHOWN           Spell:_Bounce_(by_Opcode)
 199      1        1        TODO      LEVEL            240    SHOWN           Spell:_Bounce_(by_Power_Level)
-200      1        1        TODO      LEVEL            241    SHOWN           Spell:_Bounce_(by_Power_level,_decrementing)
-201      1        1        TODO      LEVEL            251    SHOWN           Spell:_Immunity_(by_Power_Level,_decrementing)
+200      1        1        DESCRIBED LEVEL            241    SHOWN           Spell:_Bounce_(by_Power_level,_decrementing)
+201      1        1        DESCRIBED LEVEL            251    SHOWN           Spell:_Immunity_(by_Power_Level,_decrementing)
 202      1        1        TODO      LEVEL            242    SHOWN           Spell:_Bounce_(by_School)
 203      1        1        TODO      LEVEL            243    SHOWN           Spell:_Bounce_(by_Secondary_Type)
 204      1        1        TODO      LEVEL            252    SHOWN           Spell:_Protection_(by_School)
-205      1        1        TODO      LEVEL            253    SHOWN           Spell:_Protection_(by_Secondary_Type)
+205      1        1        DESCRIBED LEVEL            253    SHOWN           Spell:_Protection_(by_Secondary_Type)
 206      1        1        DESCRIBED LEVEL            256    SHOWN           Spell:_Protection_from_Spell
-207      1        1        TODO      LEVEL            247    SHOWN           Spell:_Bounce_(by_Resource)
+207      1        1        DESCRIBED LEVEL            247    SHOWN           Spell:_Bounce_(by_Resource)
 208      1        1        TODO      LEVEL            86     SHOWN           HP:_Minimum_Limit
 209      1        1        TODO      LEVEL            355    IGNORED         Death:_Kill_60HP
 210      1        1        TODO      LEVEL            371    IGNORED         Spell_Effect:_Stun_90HP
@@ -245,7 +245,7 @@
 241      1        1        TODO      LEVEL            369    SHOWN           Charm:_Control_Creature
 242      1        1        TODO      LEVEL            209    IGNORED         Cure:_Confusion
 243      1        1        TODO      LEVEL            488    IGNORED         Item:_Drain_Item_Charges
-244      1        1        TODO      LEVEL            376    IGNORED         Spell:_Drain_Wizard_Spell
+244      1        1        DESCRIBED LEVEL            376    IGNORED         Spell:_Drain_Wizard_Spell
 245      1        1        TODO      LEVEL            432    SHOWN           Check_For_Berserk
 246      1        1        TODO      LEVEL            33     SHOWN           Spell_Effect:_Berserking
 247      1        1        TODO      LEVEL            381    SHOWN           Spell_Effect:_Attack_Nearest_Creature
