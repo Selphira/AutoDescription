@@ -14,7 +14,8 @@
 // un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
 // fx_consumed (0 à la lecture,
-// mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_opcode_count(opcode).
+// mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_external (1 pour un effet 177
+// remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
 // Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
@@ -148,6 +149,10 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_LONG  (fx_offset + FX_save_type)    $fx_save_type(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
+			SET $fx_external(~%fx_id%~) = 0
+			PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
+				LPM ad_fx_substitute_177
+			END
 			LPM ad_fx_normalize
 			SET $fx_consumed(~%fx_id%~) = 0
 			SET $fx_header_target(~%fx_id%~) = 0
@@ -160,6 +165,9 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			SET $fx_series_anchor(~%fx_id%~) = 0
 			SET fx_opcode = $fx_opcode(~%fx_id%~)
 			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
+			PATCH_IF $fx_external(~%fx_id%~) BEGIN
+				SET $fx_opcode_count(~177~) = VARIABLE_IS_SET $fx_opcode_count(~177~) ? $fx_opcode_count(~177~) + 1 : 1
+			END
 			SET fx_count += 1
 		END
 	END

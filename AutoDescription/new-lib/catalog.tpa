@@ -88,6 +88,26 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REVISION_SPELLS BEGIN
 	dvwhirls => 1
 END
 
+// Opcodes que l'ancien moteur décrit autrement pour un effet d'un fichier EFF (isExternal : champs
+// propres au format EFF, comme parameter3 ou resource2) : un effet 177 vers l'un d'eux n'est pas
+// remplacé (new-lib/opcodes/177.tpp). Les opcodes non décrits sont listés pour leur prise en charge.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
+	1   => 1 // attaques par round, mode 3
+	15  => 1 // dextérité, mode 3
+	25  => 1 // poison, types 4 et parameter4
+	122 => 1 // objet créé, resource2 sur EE
+	127 => 1 // invocation de monstres, dés
+	178 => 1
+	232 => 1
+	248 => 1
+	272 => 1
+	301 => 1
+	331 => 1
+	341 => 1
+	344 => 1
+	345 => 1
+END
+
 // Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
 // durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN

@@ -750,8 +750,9 @@ DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
 END
 
 // Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
-// (il regroupe chaque bloc séparément) et la cible de regroupement (fx_group_target,
-// new-lib/normalize.tpp). with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
+// (il regroupe chaque bloc séparément), la cible de regroupement (fx_group_target,
+// new-lib/normalize.tpp) et l'origine de l'effet (fx_external : effet d'un EFF, opcode 177).
+// with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
 // sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
 // comparés ; with_special = 0 : special non comparé ; with_power, with_dice, with_resistance = 0 :
 // puissance, dés, résistance à la dissipation non comparés ; with_probability = 0 : probabilités non
@@ -787,6 +788,7 @@ BEGIN
 	SET sig_save_bonus   = with_save ? $fx_save_bonus(~%fx_id%~) : 0
 	SET sig_special      = with_special ? $fx_special(~%fx_id%~) : 0
 	SET sig_target       = $fx_group_target(~%fx_id%~)
+	SET sig_external     = $fx_external(~%fx_id%~)
 	SPRINT sig_scope $fx_scope(~%fx_id%~)
-	SPRINT signature ~%sig_scope% %sig_target% %sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special%~
+	SPRINT signature ~%sig_scope% %sig_target% %sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special% %sig_external%~
 END
