@@ -1,5 +1,5 @@
 // Récursion : effets d'un sort lancé par un effet (opcodes 146 et 148 sans nom ou d'une potion, 232,
-// 341) ou effet d'un fichier EFF appliqué sous une condition (248, 249, 272), décrits par les passes du moteur (chargement, prise en charge commune et par opcode,
+// 326, 341) ou effet d'un fichier EFF appliqué sous une condition (248, 249, 272), décrits par les passes du moteur (chargement, prise en charge commune et par opcode,
 // regroupements, lignes) dans la portée de ad_describe_subresource : le magasin d'effets et les
 // lignes de la ressource parente sont rétablis au retour (V32). Ce qui distingue une sous-ressource
 // passe par les variables ctx_*, lues par les passes communes :
@@ -45,13 +45,13 @@ END
 // ne retire pas non plus les ressources déjà décrites de sa liste (V36) : un second sort décrit
 // par la même ressource, ou le sort qui porte le nom de la ressource après un autre, n'écrit rien
 // selon un ordre de traitement qui n'est pas reproduit (recursion_repeated, refusé par l'appelant) ;
-// seuls les opcodes 146 et 148 tiennent cette liste (recursion_tracked).
+// seuls les opcodes 146, 148 et 326 tiennent cette liste (recursion_tracked).
 DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	SPRINT recursion_upper ~%recursion_resref%~
 	TO_UPPER recursion_upper
 	SET recursion_allowed = 1
 	SET recursion_repeated = 0
-	PATCH_IF ~%recursion_kind%~ STRING_EQUAL ~spl~ AND ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
+	PATCH_IF ~%recursion_kind%~ STRING_EQUAL ~spl~ AND NOT recursion_depth_reset AND ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
 	END
@@ -82,7 +82,9 @@ END
 // durée commune d'une potion) ; recursion_series (répétitions de l'effet acceptées) ;
 // recursion_tracked (ad_recursion_allowed) ; recursion_versus_set et recursion_versus (ctx_versus_set,
 // ctx_versus) ; recursion_kind (spl ou eff) ; recursion_parent_dice (effet d'un EFF : dés de l'effet
-// recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides). Au-delà de la
+// recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides) ; recursion_depth_reset
+// (sort décrit hors de la limite de profondeur, et ses propres sous-sorts comme ceux d'un premier
+// sous-sort : ancien appel sans recursivity, opcode 326). Au-delà de la
 // profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
 // effet probable (l'ancien moteur multiplie les probabilités et retire « N % de chances » des
 // sous-lignes) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
@@ -130,7 +132,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				END
 				LPF ad_describe_subresource
 					INT_VAR
-						ctx_depth = ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
+						ctx_depth = recursion_depth_reset ? 1 : ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
 						ctx_casting_level = recursion_casting_level
 						ctx_parent_dice = recursion_parent_dice
 						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)

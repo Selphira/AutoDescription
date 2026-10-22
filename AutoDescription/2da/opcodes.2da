@@ -33,7 +33,7 @@
 29       1        1        DESCRIBED LEVEL            306    SHOWN           Stat:_Electricity_Resistance_Modifier
 30       1        1        DESCRIBED LEVEL            304    SHOWN           Stat:_Fire_Resistance_Modifier
 31       1        1        DESCRIBED LEVEL            309    SHOWN           Stat:_Magic_Damage_Resistance_Modifier
-32       1        1        TODO      LEVEL            9      IGNORED         Cure:_Death_(Raise_Dead)
+32       1        1        DESCRIBED LEVEL            9      IGNORED         Cure:_Death_(Raise_Dead)
 33       1        1        DESCRIBED LEVEL            72     SHOWN           Stat:_Save_vs._Death_Modifier
 34       1        1        DESCRIBED LEVEL            73     SHOWN           Stat:_Save_vs._Wands_Modifier
 35       1        1        DESCRIBED LEVEL            74     SHOWN           Stat:_Save_vs._Petrification/Polymorph_Modifier
@@ -327,7 +327,7 @@
 323      0        1        TODO      LEVEL            421    SHOWN           Stat:_Turn_Undead_Level
 324      0        1        DESCRIBED LEVEL            3      IGNORED         Protection:_Immunity_to_Resource_and_Message
 325      0        1        TODO      LEVEL            70     SHOWN           Stat:_Save_vs._all
-326      0        1        TODO      LEVEL            469    SHOWN           Apply_Effects_List
+326      0        1        DESCRIBED LEVEL            469    SHOWN           Apply_Effects_List
 327      0        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Icewind_Visual_Spell_Hit_(plays_sound)
 328      0        1        IGNORED   LEVEL            400    SHOWN           State:_Set_Extended_or_Spell_State
 329      0        1        TODO      LEVEL            399    SHOWN           Spell_Effect:_Slow_Poison

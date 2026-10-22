@@ -242,10 +242,16 @@ OLD_GLOBALS = set(OLD_TO_NEW_VARIABLES) | {"meter", "meters"}
 def check_new_tra_rules(report):
     report.section(f"Règles propres à {NEW_TRA} et aux références de new-lib/")
     texts = {}
+    old_french = {}
     for language in ("french", "english"):
         new = (TRA / language / NEW_TRA).read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n")
         old_path = TRA / language / "description.tra"
         old = {int(i): t for i, t, _ in NEW_ENTRY.findall(old_path.read_bytes().decode("cp1252", errors="replace").replace("\r\n", "\n"))}
+        # Une chaîne absente de l'ancien fichier anglais s'affiche en français (cascade des .tra, TRA-002) :
+        # sa reprise anglaise reprend ce texte.
+        old = {**old_french, **old}
+        if language == "french":
+            old_french = old
         entries = [(int(i), t, rest, line_of(new, m.start())) for m in NEW_ENTRY.finditer(new)
                    for i, t, rest in [m.groups()]]
         order = [i for i, _, _, _ in entries]

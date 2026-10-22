@@ -53,6 +53,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				SPRINT recursion_to_the_target ~%toTheTarget%~
 				SET recursion_series = 0
 				SET recursion_tracked = 0
+				SET recursion_depth_reset = 0
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
 				LPM ad_recursion_support

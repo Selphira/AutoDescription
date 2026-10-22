@@ -1351,6 +1351,12 @@
 @20310000 = ~Résistance aux dégâts magiques~ // reprise de @10310001
 @20310001 = ~aux dégâts magiques~ // reprise de @10310002
 
+// Opcode 32 : Soin : résurrection (20 320 000-20 320 999)
+@20320100 = ~Ressuscite %theTarget%~ // reprise de @10320001
+@20320101 = ~Ressuscite %theTarget%~ // reprise de @10320001
+@20320102 = ~de ressusciter %theTarget%~ // reprise de @10320002
+@20320103 = ~de ressusciter %theTarget%~ // reprise de @10320002
+
 // Opcode 33 : libellés (20 330 000-20 330 099)
 @20330000 = ~contre la paralysie, la mort et les poisons~ // reprise de @10330001
 
@@ -2187,6 +2193,84 @@
 @23241142 = ~créatures invisibles~ // reprise de @13241142
 @23241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~ // reprise de @13241144
 @23241145 = ~créatures dont les points de vie sont inférieurs à %value%~ // reprise de @13241145
+
+// Opcode 326 : conditions (stats.2da), reprises de @13260000-@13269999 qui n'utilisent que les chaînes
+// de cible et idName (23 260 000-23 269 999)
+@23260000 = ~~ // reprise de @13260000
+@23260001 = ~Si %theTarget% est un mort-vivant~ // reprise de @13260001
+@23260002 = ~Si %theTarget% n'est pas un mort-vivant~ // reprise de @13260002
+@23260005 = ~Si %theTarget% est un humanoïde~ // reprise de @13260005
+@23260006 = ~Si %theTarget% n'est pas un humanoïde~ // reprise de @13260006
+@23260007 = ~Si %theTarget% est un animal~ // reprise de @13260007
+@23260008 = ~Si %theTarget% n'est pas un animal~ // reprise de @13260008
+@23260021 = ~Si %theTarget% est un humanoïde ou un animal~ // reprise de @13260021
+@23260022 = ~Si %theTarget% n'est ni un humanoïde, ni un animal~ // reprise de @13260022
+@23260023 = ~Si %theTarget% est aveuglée~ // reprise de @13260023
+@23260024 = ~Si %theTarget% n'est pas aveuglée~ // reprise de @13260024
+@23260031 = ~Si %theTarget% est un mort-vivant ou un myconide~ // reprise de @13260031
+@23260032 = ~Si %theTarget% n'est ni un mort-vivant, ni un myconide~ // reprise de @13260032
+@23260033 = ~Si %theTarget% est neutre~ // reprise de @13260033
+@23260034 = ~Si %theTarget% est bon ou mauvais~ // reprise de @13260034
+@23260035 = ~Si %theTarget% est bon~ // reprise de @13260035
+@23260036 = ~Si %theTarget% est neutre ou mauvais~ // reprise de @13260036
+@23260037 = ~Si %theTarget% est mauvais~ // reprise de @13260037
+@23260038 = ~Si %theTarget% est neutre ou bon~ // reprise de @13260038
+@23260039 = ~Si %theTarget% est un paladin~ // reprise de @13260039
+@23260040 = ~Si %theTarget% n'est pas un paladin~ // reprise de @13260040
+@23260041 = ~Si %theTarget% est du même alignement que le porteur~ // reprise de @13260041
+@23260042 = ~Si %theTarget% est d'un alignement différent du porteur~ // reprise de @13260042
+@23260043 = ~~ // reprise de @13260043
+@23260044 = ~~ // reprise de @13260044
+@23260047 = ~Si %theTarget% est un golem, un mort-vivant ou un myconide~ // reprise de @13260047
+@23260048 = ~Si %theTarget% n'est ni un golem, ni un mort-vivant, ni un myconide~ // reprise de @13260048
+@23260049 = ~Si %theTarget% est une alliée~ // reprise de @13260049
+@23260050 = ~Si %theTarget% n'est pas une alliée~ // reprise de @13260050
+@23260051 = ~Si %theTarget% est une ennemie~ // reprise de @13260051
+@23260052 = ~Si %theTarget% n'est pas une ennemie~ // reprise de @13260052
+@23260053 = ~Si %theTarget% est immunisé au feu ou au froid~ // reprise de @13260053
+@23260054 = ~Si %theTarget% est sensible au feu ou au froid~ // reprise de @13260054
+@23260055 = ~Si %theTarget% est un mort-vivant ou un golem~ // reprise de @13260055
+@23260056 = ~Si %theTarget% n'est ni un mort-vivant, ni un golem~ // reprise de @13260056
+@23260057 = ~Si %theTarget% est un homme~ // reprise de @13260057
+@23260058 = ~Si %theTarget% est une femme~ // reprise de @13260058
+@23260066 = ~Si %theTarget% est sourd~ // reprise de @13260066
+@23260067 = ~Si %theTarget% n'est pas sourd~ // reprise de @13260067
+@23260074 = ~Si %theTarget% est mort~ // reprise de @13260074
+@23260075 = ~Si %theTarget% est vivant~ // reprise de @13260075
+@23260076 = ~~ // reprise de @13260076
+@23260089 = ~Entre 6h et 20h~ // reprise de @13260089
+@23260090 = ~Entre 21h et 5h~ // reprise de @13260090
+@23260091 = ~Si %theTarget% panique~ // reprise de @13260091
+@23260092 = ~Si %theTarget% ne panique pas~ // reprise de @13260092
+@23260101 = ~Si %theTarget% est une alliée~ // reprise de @13260101
+@23260105 = ~Si %theTarget% n'est pas une alliée~ // reprise de @13260105
+@23260119 = ~Si %theTarget% est un humanoïde ou un animal, mais pas un demi-elfe~ // reprise de @13260119
+@23260120 = ~Si %theTarget% est protégé contre les morts-vivants~ // reprise de @13260120
+@23260121 = ~Si %theTarget% est une ennemie~ // reprise de @13260121
+@23260140 = ~Si %theTarget% est sous l'effet d'une invisibilité~ // reprise de @13260140
+@23260141 = ~Si %theTarget% est sous l'effet d'une invisibilité majeure~ // reprise de @13260141
+@23260142 = ~Si %theTarget% est invisible~ // reprise de @13260142
+@23260143 = ~Si %theTarget% est visible~ // reprise de @13260143
+@23260161 = ~Si %theTarget% fait partie des %idName%~ // reprise de @13260161
+@23260165 = ~Si %theTarget% ne fait pas partie des %idName%~ // reprise de @13260165
+@23260181 = ~Si l'état %ofTheTarget% est « mort »~ // reprise de @13260181
+@23260185 = ~Si l'état %ofTheTarget% n'est pas « mort »~ // reprise de @13260185
+@23260545 = ~Si %theTarget% est un githyanki~ // reprise de @13260545
+@23260546 = ~Si %theTarget% n'est pas un githyanki~ // reprise de @13260546
+@23261003 = ~Si la zone n'est pas extraplanaire~ // reprise de @13261003
+@23268000 = ~la quantité de créatures invoquées~ // reprise de @13268000
+@23268001 = ~le chapitre en cours~ // reprise de @13268001
+@23268011 = ~minuscule~ // reprise de @13268011
+@23268012 = ~moyenne~ // reprise de @13268012
+@23268013 = ~grande~ // reprise de @13268013
+@23268014 = ~gigantesque~ // reprise de @13268014
+@23269101 = ~Si %theTarget% est de la race des %idName%~ // reprise de @13269101
+@23269105 = ~Si %theTarget% n'est pas de la race des %idName%~ // reprise de @13269105
+@23269201 = ~Si %theTarget% est métamorphosée~ // reprise de @13269201
+@23269205 = ~Si %theTarget% n'est pas métamorphosée~ // reprise de @13269205
+@23269241 = ~Si %theTarget% est du même alignement moral que la source~ // reprise de @13269241
+@23269245 = ~Si %theTarget% est d'un alignement moral différent de la source~ // reprise de @13269245
+@23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
 // Opcode 332 : Modificateur de dégâts d'un type : 0000-0010 noms (« Dégâts de feu ») (23 320 000-23 320 999)
 @23320000 = ~Dégâts~ // reprise de @13320000

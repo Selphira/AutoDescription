@@ -385,6 +385,42 @@ COPY - ~%MOD_FOLDER%/2da/target_exceptions.2da~ ~override~
 		SET $AD_TARGET_EXCEPTION_TEXT(~%ad_stat%~) = IS_AN_INT ad_text ? 23240000 + ad_text : 0
 	END
 
+// Lignes de splprot.2da du jeu (EE), conditions de l'opcode 326, numérotées comme dans l'ancien moteur
+// (rang de la ligne, sans son identifiant) : $AD_SPLPROT_STAT(ligne), statistique en décimal ;
+// $AD_SPLPROT_VALUE(ligne) (- 1 : parameter1) et $AD_SPLPROT_RELATION(ligne), texte de la table ; « * »
+// pour une ligne inutilisée.
+ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
+	COPY_EXISTING - ~splprot.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_splprot 4
+		FOR (ad_row = 0; ad_row < ad_splprot; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_splprot ad_row 1 ad_stat
+			READ_2DA_ENTRY_FORMER ad_splprot ad_row 2 ad_value
+			READ_2DA_ENTRY_FORMER ad_splprot ad_row 3 ad_relation
+			PATCH_IF IS_AN_INT ad_stat BEGIN
+				SET ad_stat = ad_stat // écrite en hexadécimal
+			END
+			SPRINT $AD_SPLPROT_STAT(~%ad_row%~) ~%ad_stat%~
+			SPRINT $AD_SPLPROT_VALUE(~%ad_row%~) ~%ad_value%~
+			SPRINT $AD_SPLPROT_RELATION(~%ad_row%~) ~%ad_relation%~
+		END
+END
+
+// Conditions d'une statistique (2da/stats.2da, ancien tableau stats_desc_ref) :
+// $AD_STAT_CONDITION(~stat-valeur-relation~) = chaîne de l'ancien fichier (« * » pour toute valeur ou
+// toute relation) ; $AD_STAT_CONDITION_ADD_RELATION(clé) : la relation s'ajoute à la chaîne.
+COPY - ~%MOD_FOLDER%/2da/stats.2da~ ~override~
+	READ_2DA_ENTRIES_NOW ad_stats 6
+	FOR (ad_row = 0; ad_row < ad_stats; ++ad_row) BEGIN
+		READ_2DA_ENTRY_FORMER ad_stats ad_row 0 ad_stat
+		READ_2DA_ENTRY_FORMER ad_stats ad_row 1 ad_value
+		READ_2DA_ENTRY_FORMER ad_stats ad_row 2 ad_relation
+		READ_2DA_ENTRY_FORMER ad_stats ad_row 3 ad_condition
+		PATCH_IF IS_AN_INT ad_stat AND IS_AN_INT ad_condition BEGIN
+			SET $AD_STAT_CONDITION(~%ad_stat%-%ad_value%-%ad_relation%~) = ad_condition
+			SET $AD_STAT_CONDITION_ADD_RELATION(~%ad_stat%-%ad_value%-%ad_relation%~) = ~%ad_relation%~ STRING_EQUAL ~*~
+		END
+	END
+
 // Sorts qui infligent l'effet d'un opcode (2da/immunity_spells.2da, anciennes listes
 // <état>SpellList ; 505 : capacités psioniques) : $AD_IMMUNITY_SPELLS(~opcode RESREF~), ressource
 // en majuscules.

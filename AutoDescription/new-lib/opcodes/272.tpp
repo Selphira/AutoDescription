@@ -38,6 +38,7 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 				SET recursion_ignore_duration = repeat_hide
 				SET recursion_series = 0
 				SET recursion_tracked = 0
+				SET recursion_depth_reset = 0
 				SET recursion_versus_set = 0
 				SPRINT recursion_versus ~~
 				LPM ad_recursion_support
