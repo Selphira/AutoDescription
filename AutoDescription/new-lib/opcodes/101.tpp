@@ -7,9 +7,12 @@
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp). Dans un en-tête, l'ancien moteur n'applique pas les absorptions des
-// soins (delete_cure_linked_to_specific_immunity) ni celle de l'action libre, et la ligne unique
-// qu'il y forme prend la durée du dernier effet réuni : une immunité d'en-tête n'est prise en charge
-// que seule dans son en-tête, sans effet qu'elle pourrait absorber.
+// soins (delete_cure_linked_to_specific_immunity, lignes EQUIPPED de 2da/immunity_absorbs.2da) ni
+// celle de l'action libre ; la ligne unique qu'il y forme prend les champs (durée, jet de
+// sauvegarde…) de la dernière immunité de l'en-tête.
+
+// Refus : opcode sans libellé ; dans un en-tête dont une classe de cible a plusieurs immunités (ligne
+// unique), immunités aux champs différents, parameter2 mis à part.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	FOR (immunity_id = 0; immunity_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++immunity_id) BEGIN
@@ -24,7 +27,7 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 				SET $fx_immunity_label(~%immunity_id%~) = immunity_opcode
 				SET $fx_immunity_late(~%immunity_id%~) = 0
 				SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-				PATCH_IF NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
+				PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
 					LPM ad_op_101_ability_support
 				END
 			END
@@ -32,54 +35,59 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	END
 END
 
-// Immunité immunity_id d'un en-tête : aucun autre effet de son en-tête n'est une immunité ou un effet
-// qu'une immunité à immunity_opcode absorbe dans un bloc d'équipement.
+// Immunité immunity_id d'un en-tête : si une autre immunité de l'en-tête est de la même classe de
+// cible (ad_immunity_class), toutes les immunités de l'en-tête ont les mêmes champs, parameter2 mis à
+// part.
 DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
-	FOR (immunity_other = 0; immunity_other < fx_count; ++immunity_other) BEGIN
-		SPRINT immunity_other_scope $fx_scope(~%immunity_other%~)
-		SET immunity_other_opcode = $fx_opcode(~%immunity_other%~)
-		PATCH_IF immunity_other != immunity_id AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
-			PATCH_IF immunity_other_opcode == 101 OR immunity_other_opcode == 206 OR immunity_other_opcode == 321 BEGIN
-				SPRINT render_missing ~not_implemented:opcode101:ability_group~
-			END
-			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
-				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
-						AND $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~) == immunity_other_opcode BEGIN
-					SPRINT render_missing ~not_implemented:opcode101:ability_group~
-				END
-			END
+	LPM ad_immunity_class
+	SET immunity_own_class = immunity_class
+	LPF ad_fx_signature INT_VAR fx_id = immunity_id with_parameter2 = 0 RET immunity_signature = signature END
+	SET immunity_same_class = 0
+	SET immunity_different = 0
+	SET immunity_self = immunity_id
+	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
+		SPRINT immunity_other_scope $fx_scope(~%immunity_id%~)
+		PATCH_IF immunity_id != immunity_self AND $fx_opcode(~%immunity_id%~) == 101 AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
+			LPM ad_immunity_class
+			SET immunity_same_class = immunity_same_class OR (immunity_own_class > 0 AND immunity_class == immunity_own_class)
+			LPF ad_fx_signature INT_VAR fx_id = immunity_id with_parameter2 = 0 RET immunity_other_signature = signature END
+			SET immunity_different = immunity_different OR NOT (~%immunity_other_signature%~ STRING_EQUAL ~%immunity_signature%~)
 		END
+	END
+	SET immunity_id = immunity_self
+	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
+	PATCH_IF immunity_same_class AND immunity_different BEGIN
+		SPRINT render_missing ~not_implemented:opcode101:ability_group_fields~
 	END
 END
 
 // Lignes (ancien opcode_self_101 et opcode_101_post_group) : avec AD_SHRINK_IMMUNITIES_SINGLE_LINE,
-// les immunités d'équipement d'une même classe de cible (soi ou lanceur d'origine ; cible prédéfinie) sont
-// réunies en une ligne si elles sont plusieurs, libellés identiques fusionnés ; les lignes réunies
-// viennent après les autres, comme les effets que l'ancien moteur ajoute en fin de liste.
+// les immunités certaines d'un même bloc et d'une même classe de cible (soi ou lanceur d'origine ;
+// cible prédéfinie) sont réunies en une ligne si elles sont plusieurs, libellés identiques fusionnés ;
+// les lignes réunies viennent après les autres, comme les effets que l'ancien moteur ajoute en fin de
+// liste.
 DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~101~)
-	SET $immunity_class_count(~1~) = 0
-	SET $immunity_class_count(~2~) = 0
+	CLEAR_ARRAY immunity_key_count
 	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
 		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
 			LPM ad_immunity_class
 			PATCH_IF immunity_class > 0 BEGIN
-				SET $immunity_class_count(~%immunity_class%~) = $immunity_class_count(~%immunity_class%~) + 1
+				PATCH_IF NOT VARIABLE_IS_SET $immunity_key_count(~%immunity_key%~) BEGIN
+					SET $immunity_key_count(~%immunity_key%~) = 0
+				END
+				SET $immunity_key_count(~%immunity_key%~) += 1
 			END
 		END
 	END
-	FOR (immunity_class = 1; immunity_class <= 2; ++immunity_class) BEGIN
-		SET $immunity_class_merged(~%immunity_class%~) = AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE
-			AND $immunity_class_count(~%immunity_class%~) > 1
-	END
-	SET $immunity_class_merged(~0~) = 0
 	FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
 		FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
 			PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
 					AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 				LPM ad_immunity_class
-				PATCH_IF NOT $immunity_class_merged(~%immunity_class%~) BEGIN
+				LPM ad_immunity_merged
+				PATCH_IF NOT immunity_merged BEGIN
 					LPM ad_immunity_label
 					PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
 						SPRINT opcodeStr ~%immunity_label%~
@@ -91,8 +99,8 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 			END
 		END
 	END
-	FOR (immunity_merged_class = 1; immunity_merged_class <= 2; ++immunity_merged_class) BEGIN
-		PATCH_IF $immunity_class_merged(~%immunity_merged_class%~) BEGIN
+	PHP_EACH immunity_key_count AS immunity_merged_key => immunity_merged_count BEGIN
+		PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND immunity_merged_count > 1 BEGIN
 			CLEAR_ARRAY immunity_labels
 			SET immunity_label_count = 0
 			SET immunity_first = 0 - 1
@@ -101,7 +109,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 					PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
 							AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 						LPM ad_immunity_class
-						PATCH_IF immunity_class == immunity_merged_class BEGIN
+						PATCH_IF immunity_class > 0 AND (~%immunity_key%~ STRING_EQUAL ~%immunity_merged_key%~) BEGIN
 							LPM ad_immunity_label
 							PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
 								SPRINT $immunity_labels(~%immunity_label%~) ~%immunity_label%~
@@ -125,14 +133,23 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 END
 
 // Classe de cible de l'effet immunity_id pour la ligne unique : 1 soi ou lanceur d'origine, 2 cible
-// prédéfinie, 0 jamais réunie (dont toute immunité d'en-tête).
+// prédéfinie, 0 jamais réunie (immunité probable, autre cible) ; immunity_key : classe dans sa portée
+// (une ligne unique par bloc).
 DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	SET immunity_target = $fx_effective_target(~%immunity_id%~)
-	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-	SET immunity_class = (immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
-		: (immunity_target == TARGET_FX_preset ? 2 : 0)
-	PATCH_IF NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
-		SET immunity_class = 0
+	SET immunity_class = $fx_probability(~%immunity_id%~) < 100 ? 0
+		: ((immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
+		: (immunity_target == TARGET_FX_preset ? 2 : 0))
+	SPRINT immunity_key_scope $fx_scope(~%immunity_id%~)
+	SPRINT immunity_key ~%immunity_key_scope% %immunity_class%~
+END
+
+// L'immunité immunity_id (classe et clé de ad_immunity_class) est-elle dans une ligne unique ?
+DEFINE_PATCH_MACRO ad_immunity_merged BEGIN
+	SET immunity_merged = AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND immunity_class > 0
+		AND VARIABLE_IS_SET $immunity_key_count(~%immunity_key%~)
+	PATCH_IF immunity_merged BEGIN
+		SET immunity_merged = $immunity_key_count(~%immunity_key%~) > 1
 	END
 END
 

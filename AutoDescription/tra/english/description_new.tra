@@ -59,6 +59,9 @@
 @2000020 = ~the target~ // reprise de @102471
 @2000021 = ~of the target~ // reprise de @101085
 @2000022 = ~to the target~ // reprise de @101181
+@2000030 = ~party members~ // reprise de @102473
+@2000031 = ~of party members~ // reprise de @101088
+@2000032 = ~to party members~ // reprise de @101182
 @2000050 = ~the non-group creatures~ // reprise de @101191
 @2000051 = ~of the non-group creatures~ // reprise de @101192
 @2000052 = ~to the non-group creatures~ // reprise de @101193

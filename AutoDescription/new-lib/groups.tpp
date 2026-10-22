@@ -392,7 +392,8 @@ END
 // absorbe les effets qu'elle rend sans objet, s'ils ont la même cible, les mêmes probabilités et le
 // même jet de sauvegarde :
 // - ceux des lignes de 2da/immunity_absorbs.2da pour P (soins de l'état, autres immunités ; une
-//   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES) ; une ligne RELABEL donne à
+//   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES, une ligne EQUIPPED seulement dans un
+//   bloc d'équipement, comme l'ancien delete_cure_linked_to_specific_immunity) ; une ligne RELABEL donne à
 //   l'immunité ce libellé et la place après les autres, comme l'effet que l'ancien moteur ajoute ;
 //   la colonne P2 est comparée à la valeur lue (fx_parameter2_raw), que l'ancien moteur teste avant
 //   toute correction du mode ;
@@ -401,12 +402,13 @@ END
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-		// L'ancien moteur n'absorbe que dans un bloc d'équipement (new-lib/opcodes/101.tpp).
-		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) AND (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
+		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~)
+		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
 				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
-						AND (NOT $AD_IMMUNITY_ABSORB_CURE(~%absorb_row%~) OR AD_SHRINK_CURE_WITH_IMMUNITIES) BEGIN
+						AND (NOT $AD_IMMUNITY_ABSORB_CURE(~%absorb_row%~) OR AD_SHRINK_CURE_WITH_IMMUNITIES)
+						AND (NOT $AD_IMMUNITY_ABSORB_EQUIPPED(~%absorb_row%~) OR immunity_equipped) BEGIN
 					SET absorb_opcode = $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~)
 					SET absorb_found = 0
 					FOR (absorb_id = 0; absorb_id < fx_count; ++absorb_id) BEGIN

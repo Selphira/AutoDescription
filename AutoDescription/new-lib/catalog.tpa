@@ -343,9 +343,11 @@ OUTER_SET AD_USABILITY_DRUIDS = BIT12 BOR BIT30
 // Effets qu'une immunité à un opcode (101) rend sans objet (2da/immunity_absorbs.2da, ancien
 // opcode_101_group) : IMMUNITY (opcode P de l'immunité), OPCODE absorbé, bornes de parameter1
 // (P1_MIN, P1_MAX), parameter2 (P2) ; * : sans condition. CURE : 1 si la ligne dépend de
-// AD_SHRINK_CURE_WITH_IMMUNITIES ; RELABEL : libellé de l'immunité si elle absorbe l'effet.
+// AD_SHRINK_CURE_WITH_IMMUNITIES ; RELABEL : libellé de l'immunité si elle absorbe l'effet ;
+// EQUIPPED : 1 si l'absorption n'a lieu que dans un bloc d'équipement (soins supprimés par l'ancien
+// delete_cure_linked_to_specific_immunity), 0 dans toute portée.
 COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_absorbs 7
+	READ_2DA_ENTRIES_NOW ad_absorbs 8
 	SET AD_IMMUNITY_ABSORB_COUNT = ad_absorbs
 	FOR (ad_row = 0; ad_row < ad_absorbs; ++ad_row) BEGIN
 		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 0 ad_immunity
@@ -355,6 +357,7 @@ COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
 		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 4 ad_p2
 		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 5 ad_cure
 		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 6 ad_relabel
+		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 7 ad_equipped
 		SET $AD_IMMUNITY_ABSORB_IMMUNITY(~%ad_row%~) = ad_immunity
 		SET $AD_IMMUNITY_ABSORB_OPCODE(~%ad_row%~) = ad_opcode
 		SET $AD_IMMUNITY_ABSORB_P1_MIN(~%ad_row%~) = IS_AN_INT ad_p1_min ? ad_p1_min : 0 - 2147483647
@@ -363,6 +366,7 @@ COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
 		SET $AD_IMMUNITY_ABSORB_P2(~%ad_row%~) = IS_AN_INT ad_p2 ? ad_p2 : 0
 		SET $AD_IMMUNITY_ABSORB_CURE(~%ad_row%~) = ad_cure
 		SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
+		SET $AD_IMMUNITY_ABSORB_EQUIPPED(~%ad_row%~) = ad_equipped
 	END
 
 // Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux

@@ -59,6 +59,9 @@
 @2000020 = ~la cible~ // reprise de @102471
 @2000021 = ~de la cible~ // reprise de @101085
 @2000022 = ~à la cible~ // reprise de @101181
+@2000030 = ~les membres du groupe~ // reprise de @102473
+@2000031 = ~des membres du groupe~ // reprise de @101088
+@2000032 = ~aux membres du groupe~ // reprise de @101182
 @2000050 = ~les créatures externes au groupe~ // reprise de @101191
 @2000051 = ~des créatures externes au groupe~ // reprise de @101192
 @2000052 = ~aux créatures externes au groupe~ // reprise de @101193
