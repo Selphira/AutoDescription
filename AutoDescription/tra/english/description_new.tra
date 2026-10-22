@@ -1942,6 +1942,21 @@
 @21480132 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
 @21480133 = ~to instantly cast %spellName% on %theTarget%~ // reprise de @11460004
 
+// Opcode 151 : phrases 0100 remplacement, 0110 la cible est tuée, 0120 invocation sur la cible
+// (21 510 000-21 510 999)
+@21510100 = ~Replace %theTarget% by %creatureName%~ // reprise de @11510001
+@21510101 = ~Replace %theTarget% by %creatureName%~ // reprise de @11510001
+@21510102 = ~to replace %theTarget% by %creatureName%~ // reprise de @11510004
+@21510103 = ~to replace %theTarget% by %creatureName%~ // reprise de @11510004
+@21510110 = ~Kill and replace %theTarget% by %creatureName%~ // reprise de @11510002
+@21510111 = ~Kill and replace %theTarget% by %creatureName%~ // reprise de @11510002
+@21510112 = ~to kill and replace %theTarget% by %creatureName%~ // reprise de @11510005
+@21510113 = ~to kill and replace %theTarget% by %creatureName%~ // reprise de @11510005
+@21510120 = ~Summon %creatureName% on %theTarget%~ // reprise de @11510003
+@21510121 = ~Summon %creatureName% on %theTarget%~ // reprise de @11510003
+@21510122 = ~to summon %creatureName% on %theTarget%~ // reprise de @11510006
+@21510123 = ~to summon %creatureName% on %theTarget%~ // reprise de @11510006
+
 // Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
 @21540100 = ~Entanglement~ // reprise de @11540001
 @21540101 = ~Entangles %theTarget%~ // reprise de @11540002
@@ -2001,6 +2016,12 @@
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Poison Resistance~ // reprise de @11730001
 @21730001 = ~to poison~ // reprise de @11730002
+
+// Opcode 175 : paralysie, phrase du 109 (21 750 000-21 750 999)
+@21750100 = ~Hold %theTarget%~ // reprise de @11090002
+@21750101 = ~Hold %theTarget%~ // reprise de @11090002
+@21750102 = ~to hold %theTarget%~ // reprise de @11090004
+@21750103 = ~to hold %theTarget%~ // reprise de @11090004
 
 // Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique (21 780 000-21 780 999)
 @21780000 = ~THAC0~ // reprise de @10540001
@@ -2215,6 +2236,12 @@
 @22720013 = ~%amount% times per %strDuration%~ // reprise de @12720013
 @22720014 = ~%amount% times every %strDuration%~ // reprise de @12720014
 @22720015 = ~%amount% times every %strDuration%~ // reprise de @12720015
+
+// Opcode 274 : téléportation auprès d'un ennemi (22 740 000-22 740 999)
+@22740100 = ~Randomly teleports %theTarget% to an enemy in visual range~ // reprise de @12740001
+@22740101 = ~Randomly teleports %theTarget% to an enemy in visual range~ // reprise de @12740001
+@22740102 = ~to randomly teleport %theTarget% to an enemy in visual range~ // reprise de @12740002
+@22740103 = ~to randomly teleport %theTarget% to an enemy in visual range~ // reprise de @12740002
 
 // Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
 @22800100 = ~The next spell cast by %theTarget% treated as wild surges~ // reprise de @12800001

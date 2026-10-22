@@ -1942,6 +1942,21 @@
 @21480132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
 @21480133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
 
+// Opcode 151 : phrases 0100 remplacement, 0110 la cible est tuée, 0120 invocation sur la cible
+// (21 510 000-21 510 999)
+@21510100 = ~Remplace %theTarget% par %creatureName%~ // reprise de @11510001
+@21510101 = ~Remplace %theTarget% par %creatureName%~ // reprise de @11510001
+@21510102 = ~de remplacer %theTarget% par %creatureName%~ // reprise de @11510004
+@21510103 = ~de remplacer %theTarget% par %creatureName%~ // reprise de @11510004
+@21510110 = ~Tue et remplace %theTarget% par %creatureName%~ // reprise de @11510002
+@21510111 = ~Tue et remplace %theTarget% par %creatureName%~ // reprise de @11510002
+@21510112 = ~de tuer et remplacer %theTarget% par %creatureName%~ // reprise de @11510005
+@21510113 = ~de tuer et remplacer %theTarget% par %creatureName%~ // reprise de @11510005
+@21510120 = ~Invoque %creatureName% sur %theTarget%~ // reprise de @11510003
+@21510121 = ~Invoque %creatureName% sur %theTarget%~ // reprise de @11510003
+@21510122 = ~d'invoquer %creatureName% sur %theTarget%~ // reprise de @11510006
+@21510123 = ~d'invoquer %creatureName% sur %theTarget%~ // reprise de @11510006
+
 // Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
 @21540100 = ~Enchevêtrement~ // reprise de @11540001
 @21540101 = ~Enchevêtre %theTarget%~ // reprise de @11540002
@@ -2001,6 +2016,12 @@
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Résistance aux poisons~ // reprise de @11730001
 @21730001 = ~aux poisons~ // reprise de @11730002
+
+// Opcode 175 : paralysie, phrase du 109 (21 750 000-21 750 999)
+@21750100 = ~Paralyse %theTarget%~ // reprise de @11090002
+@21750101 = ~Paralyse %theTarget%~ // reprise de @11090002
+@21750102 = ~de paralyser %theTarget%~ // reprise de @11090004
+@21750103 = ~de paralyser %theTarget%~ // reprise de @11090004
 
 // Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique (21 780 000-21 780 999)
 @21780000 = ~TAC0~ // reprise de @10540001
@@ -2215,6 +2236,12 @@
 @22720013 = ~%amount% fois par %strDuration%~ // reprise de @12720013
 @22720014 = ~%amount% fois toutes les %strDuration%~ // reprise de @12720014
 @22720015 = ~%amount% fois tous les %strDuration%~ // reprise de @12720015
+
+// Opcode 274 : téléportation auprès d'un ennemi (22 740 000-22 740 999)
+@22740100 = ~Téléporte aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740001
+@22740101 = ~Téléporte aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740001
+@22740102 = ~de téléporter aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740002
+@22740103 = ~de téléporter aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740002
 
 // Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
 @22800100 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~ // reprise de @12800001

@@ -152,7 +152,7 @@
 148      1        1        DESCRIBED LEVEL            466    NOT_PERMANENT   Spell:_Cast_Spell_(at_Point)
 149      1        1        TODO      LEVEL            400    SHOWN           (Identify)
 150      1        1        TODO      LEVEL            456    IGNORED         Spell_Effect:_Find_Traps
-151      1        1        TODO      LEVEL            133    IGNORED         Summon:_Replace_Creature
+151      1        1        DESCRIBED LEVEL            133    IGNORED         Summon:_Replace_Creature
 152      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Play_Movie
 153      1        1        TODO      LEVEL            398    SHOWN           Overlay:_Sanctuary
 154      1        1        DESCRIBED LEVEL            374    SHOWN           Overlay:_Entangle
@@ -176,7 +176,7 @@
 172      1        1        IGNORED   LEVEL            400    IGNORED         Spell:_Remove_Spell
 173      1        1        DESCRIBED LEVEL            316    SHOWN           Stat:_Poison_Resistance_Modifier
 174      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Play_Sound_Effect
-175      1        1        TODO      LEVEL            372    NOT_AFTER_DEATH State:_Hold
+175      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Hold
 176      1        1        DESCRIBED LEVEL            81     SHOWN           Stat:_Movement_Modifier_(II)
 177      1        1        DESCRIBED LEVEL            472    HIDDEN          Use_EFF_File
 178      1        1        DESCRIBED LEVEL            62     SHOWN           Spell_Effect:_THAC0_vs._Creature_Type_Modifier
@@ -275,7 +275,7 @@
 271      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Avatar_Removal
 272      1        1        DESCRIBED LEVEL            467    SHOWN           Spell:_Apply_Repeating_EFF
 273      1        1        TODO      LEVEL            227    IGNORED         Remove:_Specific_Area_Effect(Zone_of_Sweet_Air)
-274      1        1        TODO      LEVEL            454    NOT_PERMANENT   Spell_Effect:_Teleport_to_Target
+274      1        1        DESCRIBED LEVEL            454    NOT_PERMANENT   Spell_Effect:_Teleport_to_Target
 275      1        1        DESCRIBED LEVEL            126    SHOWN           Stat:_Hide_in_Shadows_Modifier
 276      1        1        DESCRIBED LEVEL            123    SHOWN           Stat:_Detect_Illusion_Modifier
 277      1        1        DESCRIBED LEVEL            125    SHOWN           Stat:_Set_Traps_Modifier
