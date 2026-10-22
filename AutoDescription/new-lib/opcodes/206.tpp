@@ -4,10 +4,13 @@
 // new-lib/groups.tpp).
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
-// new-lib/application.tpp).
+// new-lib/application.tpp). Avec AD_ENABLE_SHRINKAGE, cinq protections psioniques d'un bloc
+// deviennent « Immunité aux capacités psioniques » (ad_group_psionic_immunity, new-lib/groups.tpp).
 
+// Refus : effet sans ressource ; dans un en-tête, avec la ligne unique des immunités, immunité aux
+// capacités psioniques dont les champs (ceux de la cinquième protection) diffèrent de ceux d'une
+// autre immunité de l'en-tête, parameter2 mis à part (ad_op_101_ability_support).
 DEFINE_PATCH_MACRO ad_op_206_support BEGIN
-	SET spell_psionic_count = 0
 	FOR (spell_id = 0; spell_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++spell_id) BEGIN
 		PATCH_IF $fx_opcode(~%spell_id%~) == 206 BEGIN
 			SPRINT spell_resref $fx_resource(~%spell_id%~)
@@ -16,15 +19,38 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 			PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
 				SPRINT render_missing ~not_implemented:opcode206:invalid~
 			END
-			ELSE PATCH_IF VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~505 %spell_resref%~) BEGIN
-				SET spell_psionic_count += 1
-			END
 		END
 	END
-	// À partir de cinq capacités psioniques, l'ancien moteur les remplace par « Immunité aux capacités
-	// psioniques » (ancien opcode_206_group), effet dérivé pas encore repris.
-	PATCH_IF spell_psionic_count >= 5 AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		SPRINT render_missing ~not_implemented:opcode206:psionic~
+	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE BEGIN
+		LPM ad_op_206_psionic_support
+	END
+END
+
+// Cinquième protection psionique de chaque en-tête qui en a au moins cinq : mêmes champs que les
+// immunités (101) de l'en-tête.
+DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
+	CLEAR_ARRAY spell_psionic_count
+	FOR (spell_id = 0; spell_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++spell_id) BEGIN
+		SPRINT spell_scope $fx_scope(~%spell_id%~)
+		SPRINT spell_resref $fx_resource(~%spell_id%~)
+		TO_UPPER spell_resref
+		PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~505 %spell_resref%~)
+				AND NOT (~%spell_scope%~ STRING_EQUAL ~equipped~) BEGIN
+			SET spell_psionic_total = VARIABLE_IS_SET $spell_psionic_count(~%spell_scope%~) ? $spell_psionic_count(~%spell_scope%~) + 1 : 1
+			SET $spell_psionic_count(~%spell_scope%~) = spell_psionic_total
+			PATCH_IF spell_psionic_total == 5 BEGIN
+				LPF ad_fx_signature INT_VAR fx_id = spell_id with_parameter2 = 0 RET spell_psionic_signature = signature END
+				FOR (spell_other = 0; spell_other < fx_count; ++spell_other) BEGIN
+					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
+					PATCH_IF $fx_opcode(~%spell_other%~) == 101 AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
+						LPF ad_fx_signature INT_VAR fx_id = spell_other with_parameter2 = 0 RET spell_other_signature = signature END
+						PATCH_IF NOT (~%spell_other_signature%~ STRING_EQUAL ~%spell_psionic_signature%~) BEGIN
+							SPRINT render_missing ~not_implemented:opcode206:psionic_fields~
+						END
+					END
+				END
+			END
+		END
 	END
 END
 

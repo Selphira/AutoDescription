@@ -30,6 +30,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_bounce_spells
 		LPM ad_group_morale
 		LPM ad_group_immunities
+		LPM ad_group_psionic_immunity
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_improved_invisibility
@@ -445,6 +446,63 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 				END
 			END
 		END
+	END
+END
+
+// Capacités psioniques (ancien opcode_206_group, après les absorptions des immunités) : à partir de
+// cinq protections contre une capacité psionique (206 d'un sort de type 505 de
+// 2da/immunity_spells.2da) non consommées dans un bloc, la cinquième, dans l'ordre du fichier, devient
+// l'immunité « aux capacités psioniques » (101 de parameter2 505, placée après les autres comme
+// l'effet que l'ancien moteur ajoute) et toutes les protections psioniques du bloc sont consommées,
+// quels que soient leurs champs.
+DEFINE_PATCH_MACRO ad_group_psionic_immunity BEGIN
+	CLEAR_ARRAY psionic_scope_done
+	FOR (psionic_id = 0; psionic_id < fx_count; ++psionic_id) BEGIN
+		SPRINT psionic_scope $fx_scope(~%psionic_id%~)
+		LPM ad_psionic_protection
+		PATCH_IF psionic_protection AND NOT VARIABLE_IS_SET $psionic_scope_done(~%psionic_scope%~) BEGIN
+			SET $psionic_scope_done(~%psionic_scope%~) = 1
+			SET psionic_found = 0
+			SET psionic_fifth = 0 - 1
+			SET psionic_self = psionic_id
+			FOR (psionic_id = psionic_self; psionic_id < fx_count; ++psionic_id) BEGIN
+				SPRINT psionic_other_scope $fx_scope(~%psionic_id%~)
+				LPM ad_psionic_protection
+				PATCH_IF psionic_protection AND (~%psionic_other_scope%~ STRING_EQUAL ~%psionic_scope%~) BEGIN
+					SET psionic_found += 1
+					PATCH_IF psionic_found == 5 BEGIN
+						SET psionic_fifth = psionic_id
+					END
+				END
+			END
+			PATCH_IF psionic_fifth >= 0 BEGIN
+				FOR (psionic_id = psionic_self; psionic_id < fx_count; ++psionic_id) BEGIN
+					SPRINT psionic_other_scope $fx_scope(~%psionic_id%~)
+					LPM ad_psionic_protection
+					PATCH_IF psionic_protection AND (~%psionic_other_scope%~ STRING_EQUAL ~%psionic_scope%~) BEGIN
+						SET $fx_consumed(~%psionic_id%~) = 1
+					END
+				END
+				SET $fx_opcode(~%psionic_fifth%~) = 101
+				SET $fx_parameter2(~%psionic_fifth%~) = 505
+				SET $fx_parameter2_raw(~%psionic_fifth%~) = 505
+				SET $fx_immunity_label(~%psionic_fifth%~) = 505
+				SET $fx_immunity_late(~%psionic_fifth%~) = 1
+				SET $fx_consumed(~%psionic_fifth%~) = 0
+				SET $fx_opcode_count(~101~) = VARIABLE_IS_SET $fx_opcode_count(~101~) ? $fx_opcode_count(~101~) + 1 : 1
+			END
+			SET psionic_id = psionic_self
+		END
+	END
+END
+
+// L'effet psionic_id est-il une protection non consommée contre une capacité psionique ?
+DEFINE_PATCH_MACRO ad_psionic_protection BEGIN
+	SET psionic_protection = 0
+	PATCH_IF $fx_opcode(~%psionic_id%~) == 206 AND NOT $fx_consumed(~%psionic_id%~) BEGIN
+		SPRINT psionic_resref $fx_resource(~%psionic_id%~)
+		TO_UPPER psionic_resref
+		SET psionic_protection = VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~505 %psionic_resref%~)
 	END
 END
 

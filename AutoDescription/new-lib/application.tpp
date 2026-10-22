@@ -30,7 +30,13 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 				SET app_equipped_timing = (~%app_timing_kind%~ STRING_EQUAL ~while_equipped~)
 					OR ((~%app_timing_kind%~ STRING_EQUAL ~permanent~)
 						AND ((~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)))
-				PATCH_IF NOT app_equipped_timing OR $fx_probability(~%app_id%~) != 100 BEGIN
+				// Durée limitée nulle : l'ancien opcode_is_valid écarte l'effet (avertissement journalisé).
+				PATCH_IF $fx_timing(~%app_id%~) == TIMING_duration AND $fx_duration(~%app_id%~) <= 0
+						AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
+					SET drop_id = app_id
+					LPM ad_application_drop
+				END
+				ELSE PATCH_IF NOT app_equipped_timing OR $fx_probability(~%app_id%~) != 100 BEGIN
 					SPRINT render_missing ~not_implemented:opcode%render_opcode%:effect_kind~
 				END
 			END
