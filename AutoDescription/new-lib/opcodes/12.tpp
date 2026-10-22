@@ -55,7 +55,7 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 					SPRINT damage @20120001 // ~%damage% %damageType%~
 					SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
 					SET damage_target = $fx_effective_target(~%damage_id%~)
-					PATCH_IF line_phrase == 20120100 AND $fx_versus_file(~%damage_id%~) > 0
+					PATCH_IF line_phrase == 20120100 AND ($fx_versus_file(~%damage_id%~) > 0 OR ctx_versus_set)
 							AND damage_target != TARGET_FX_self AND damage_target != TARGET_FX_original_caster BEGIN
 						SET line_phrase = 20120160 // ~Inflige %damage% %versus%~ (+1)
 					END

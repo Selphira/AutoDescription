@@ -144,6 +144,7 @@
 // Probabilités : 4 000 000 préfixe d'un effet, 4 000 001 titre d'un groupe de même probabilité (4 000 000-4 000 099)
 @4000000 = ~%probability% chance %description%~ // reprise de @101125
 @4000001 = ~%probability% chance~ // reprise de @101126
+@4000010 = ~not cumulative~ // reprise de @102682
 
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Saving Throws~ // reprise de @102034
@@ -1967,6 +1968,44 @@
 @22180102 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 @22180103 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 
+// Opcode 232 : sort lancé sous condition : 0001 sort nommé à plusieurs lignes, 0010 + parameter2 conditions
+// (0020 chaque round, 0024 distance, 0029-0030 points de vie, 0031 état de sort), 1000 + 10 × forme + parameter1
+// cibles, 1100 + moment de la journée sur un effet d'équipement, 1104 + moment ailleurs (22 320 000-22 329 999)
+@22320001 = ~Cast %spellName% on %theTarget%~ // reprise de @12320001
+@22320010 = ~Each time the wearer is hit~ // reprise de @12320010
+@22320011 = ~When an opponent enters the field of vision~ // reprise de @12320011
+@22320017 = ~Each time the wearer is attacked~ // reprise de @12320017
+@22320020 = ~Every round~ // reprise de @12320020
+@22320021 = ~When the wearer takes damage~ // reprise de @12320021
+@22320022 = ~When the wearer kills the target~ // reprise de @12320022
+@22320024 = ~When the target is less than %range%~ // reprise de @12320024
+@22320026 = ~When the wearer dies~ // reprise de @12320026
+@22320027 = ~When a creature dies~ // reprise de @12320027
+@22320028 = ~When %theTarget% is repelled by a cleric or paladin~ // reprise de @12320028
+@22320029 = ~When the wearer's hit points fall below %value%~ // reprise de @12320029
+@22320030 = ~When the wearer's hit points fall below %percent%~ // reprise de @12320030
+@22320031 = ~In every round where %theTarget% is affected by %splstate%~ // reprise de @12320031
+@22321000 = ~the wearer~ // reprise de @12320200
+@22321001 = ~the attacker~ // reprise de @12320201
+@22321002 = ~the nearest opponent~ // reprise de @12320202
+@22321003 = ~the nearest creature~ // reprise de @12320203
+@22321010 = ~of the wearer~ // reprise de @12320210
+@22321011 = ~of the attacker~ // reprise de @12320211
+@22321012 = ~of the nearest opponent~ // reprise de @12320212
+@22321013 = ~of the nearest creature~ // reprise de @12320213
+@22321020 = ~to the wearer~ // reprise de @12320220
+@22321021 = ~to the attacker~ // reprise de @12320221
+@22321022 = ~to nearest opponent~ // reprise de @12320222
+@22321023 = ~to nearest creature~ // reprise de @12320223
+@22321100 = ~During the day~ // reprise de @12320300
+@22321101 = ~At sunset~ // reprise de @12320301
+@22321102 = ~At nightfall~ // reprise de @12320302
+@22321103 = ~At daybreak~ // reprise de @12320303
+@22321104 = ~During the day, in every round~ // reprise de @12320304
+@22321105 = ~At sunset, in every round~ // reprise de @12320305
+@22321106 = ~At nightfall, in every round~ // reprise de @12320306
+@22321107 = ~At daybreak, in every round~ // reprise de @12320307
+
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Proficiency %proficiency%~ // reprise de @12330001
 @22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
@@ -2136,6 +2175,11 @@
 @23320008 = ~Piercing Damage~ // reprise de @13320008
 @23320009 = ~Crushing Damage~ // reprise de @13320009
 @23320010 = ~Missile Damage~ // reprise de @13320010
+
+// Opcode 341 : coup critique : 0001-0003 conditions (23 410 000-23 410 099)
+@23410001 = ~On a critical hit~ // reprise de @13410001
+@23410002 = ~On a critical hit %ofTheTarget%~ // reprise de @13410002
+@23410003 = ~On a critical hit caused by this weapon~ // reprise de @13410003
 
 // Opcode 344 : Enchantement contre un type de créature : 0000 nom (23 440 000-23 440 999)
 @23440000 = ~Enchantment~ // reprise de @13440001

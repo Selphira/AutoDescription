@@ -49,72 +49,26 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 	END
 END
 
-// Sort cast_id décrit par ses effets (ancien opcode_146_get_spell_effects_description) : niveau de
-// lancement parameter1, aucun pour un sort lancé instantanément (parameter2 1) ; cible héritée
-// pour l'opcode 146 ; durées des sous-effets non écrites sous la durée commune d'une potion. Au-delà
-// de la profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé.
-// Refus : effet probable (l'ancien moteur multiplie les probabilités et retire « N % de chances »
-// des sous-lignes ; une potion y cite le sort par son nom) ; effet différé (l'ancien moteur en fait
-// une condition) ; répétitions d'un sort sans nom (l'ancien moteur réécrit la durée des sous-lignes) ;
-// effet d'un 177 contre un type de créature ; sort déjà décrit par la ressource
-// (recursion_repeated) ; cible sans chaînes ; refus de la sous-description.
+// Sort cast_id décrit par ses effets (ancien opcode_146_get_spell_effects_description,
+// ad_recursion_support) : niveau de lancement parameter1, aucun pour un sort lancé instantanément
+// (parameter2 1) ; cible héritée pour l'opcode 146. Refus : répétitions d'un sort sans nom hors d'une
+// potion (l'ancien moteur réécrit la durée des sous-lignes).
 DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
+	SET recursion_fx = cast_id
 	SPRINT recursion_resref ~%cast_resref%~
-	LPM ad_recursion_allowed
-	PATCH_IF recursion_allowed BEGIN
-		PATCH_IF $fx_probability(~%cast_id%~) < 100 BEGIN
-			SPRINT render_missing ~not_implemented:recursion:probability~
-		END
-		ELSE PATCH_IF $fx_timing(~%cast_id%~) == TIMING_delayed AND NOT $fx_series_anchor(~%cast_id%~) BEGIN
-			SPRINT render_missing ~not_implemented:recursion:delayed~
-		END
-		ELSE PATCH_IF $fx_series_anchor(~%cast_id%~) AND item_type != ITM_TYPE_potion BEGIN
-			SPRINT render_missing ~not_implemented:recursion:series~
-		END
-		ELSE PATCH_IF $fx_versus_file(~%cast_id%~) > 0 BEGIN
-			SPRINT render_missing ~not_implemented:recursion:versus~
-		END
-		ELSE PATCH_IF recursion_repeated BEGIN
-			SPRINT render_missing ~not_implemented:recursion:repeated~
-		END
-		ELSE BEGIN
-			SET line_fx = cast_id
-			SPRINT line_the_target ~~
-			LPM ad_application_form
-			LPM ad_application_target_strings
-			SPRINT line_only_for ~~
-			PATCH_IF app_target_missing BEGIN
-				SPRINT render_missing ~not_implemented:recursion:target~
-			END
-			ELSE BEGIN
-				SET cast_casting_level = $fx_parameter2(~%cast_id%~) == 1 ? 0 : $fx_parameter1(~%cast_id%~)
-				SET cast_ignore_duration = ctx_ignore_duration
-				PATCH_IF item_type == ITM_TYPE_potion AND cast_h >= 0 BEGIN
-					SET cast_ignore_duration = cast_ignore_duration OR $charged_global_duration(~%cast_h%~) > 0
-				END
-				LPF ad_describe_subresource
-					INT_VAR
-						ctx_depth = ctx_depth + 1
-						ctx_casting_level = cast_casting_level
-						ctx_force_target = (cast_opcode == 146)
-						ctx_ignore_duration = cast_ignore_duration
-					STR_VAR
-						resref = ~%cast_resref%~
-						ctx_chain = ~%ctx_chain%~
-						ctx_the_target = ~%theTarget%~
-						ctx_of_the_target = ~%ofTheTarget%~
-						ctx_to_the_target = ~%toTheTarget%~
-					RET
-						cast_sub_missing = sub_missing
-						cast_sub_count = sub_count
-						cast_sub_text = sub_text
-				END
-				SPRINT render_missing ~%cast_sub_missing%~
-				SET $fx_sub_count(~%cast_id%~) = cast_sub_count
-				SPRINT $fx_sub_text(~%cast_id%~) ~%cast_sub_text%~
-			END
-		END
+	SET recursion_casting_level = $fx_parameter2(~%cast_id%~) == 1 ? 0 : $fx_parameter1(~%cast_id%~)
+	PATCH_IF cast_opcode == 146 BEGIN
+		SPRINT recursion_targets ~effect~
 	END
+	ELSE BEGIN
+		SPRINT recursion_targets ~own~
+	END
+	SET recursion_ignore_duration = 0
+	SET recursion_series = item_type == ITM_TYPE_potion
+	SET recursion_tracked = 1
+	SET recursion_versus_set = 0
+	SPRINT recursion_versus ~~
+	LPM ad_recursion_support
 END
 
 // Phrase : cast_phrase + 10 × variante + forme ; variante 0 nom seul (capacité de charge), 1 nom

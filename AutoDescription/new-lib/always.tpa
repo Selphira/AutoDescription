@@ -146,6 +146,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/207.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/216.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/218.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/232.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/233.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/244.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/255.tpp~
@@ -169,6 +170,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/321.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/324.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/332.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/341.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/344.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/groups.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/item_combat.tpp~

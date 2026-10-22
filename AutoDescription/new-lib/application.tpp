@@ -486,6 +486,14 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			END
 		END
 	END
+	// Sous-effet d'un sort lancé par l'opcode 232 : l'ancien moteur y fixe versus à la cible de l'opcode,
+	// ou à vide pour une condition de distance (BUG-038).
+	PATCH_IF ctx_versus_set BEGIN
+		SPRINT versus ~%ctx_versus%~
+		PATCH_IF app_versus_count > 0 BEGIN
+			SPRINT render_late_missing ~not_implemented:recursion:versus_mixed~
+		END
+	END
 	PATCH_IF app_versus_count > 0 BEGIN
 		PATCH_IF app_versus_plain BEGIN
 			SPRINT render_late_missing ~not_implemented:versus:mixed~
@@ -530,7 +538,8 @@ END
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
 // la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
-// (ad_application_save) ; line_condition (« En combat ») précède toute la ligne, séparée par
+// (ad_application_save), suivi de « (non cumulatif) » pour un effet lu après un 321 sur la ressource
+// elle-même (fx_not_cumulative) ; line_condition (« En combat ») précède toute la ligne, séparée par
 // AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ;
 // line_only_for (ad_application_versus), puis les exceptions de cible de l'effet
 // (ad_application_target_exceptions, new-lib/opcodes/target_exceptions.tpp) finissent la ligne, entre
@@ -575,6 +584,11 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_application_save
 	PATCH_IF NOT (~%app_save_text%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% %app_save_text%~
+	END
+	SET app_opcode = $fx_opcode(~%line_fx%~)
+	PATCH_IF $fx_not_cumulative(~%line_fx%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_ALWAYS_CUMULATIVE(~%app_opcode%~) BEGIN
+		SPRINT app_not_cumulative @4000010 // ~non cumulatif~
+		SPRINT line_text ~%line_text% (%app_not_cumulative%)~
 	END
 	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~

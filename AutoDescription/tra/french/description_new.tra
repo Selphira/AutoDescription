@@ -144,6 +144,7 @@
 // Probabilités : 4 000 000 préfixe d'un effet, 4 000 001 titre d'un groupe de même probabilité (4 000 000-4 000 099)
 @4000000 = ~%probability% de chances %description%~ // reprise de @101125
 @4000001 = ~%probability% de chances~ // reprise de @101126
+@4000010 = ~non cumulatif~ // reprise de @102682
 
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Jets de sauvegarde~ // reprise de @102034
@@ -1967,6 +1968,44 @@
 @22180102 = ~de créer %amount% sur %theTarget%~ // reprise de @12180002
 @22180103 = ~de créer %amount% sur %theTarget%~ // reprise de @12180002
 
+// Opcode 232 : sort lancé sous condition : 0001 sort nommé à plusieurs lignes, 0010 + parameter2 conditions
+// (0020 chaque round, 0024 distance, 0029-0030 points de vie, 0031 état de sort), 1000 + 10 × forme + parameter1
+// cibles, 1100 + moment de la journée sur un effet d'équipement, 1104 + moment ailleurs (22 320 000-22 329 999)
+@22320001 = ~Lance le sort « %spellName% » sur %theTarget%~ // reprise de @12320001
+@22320010 = ~Lorsque le porteur est touché~ // reprise de @12320010
+@22320011 = ~Lorsqu'un adversaire entre dans le champ de vision~ // reprise de @12320011
+@22320017 = ~Lorsque le porteur est attaqué~ // reprise de @12320017
+@22320020 = ~À chaque round~ // reprise de @12320020
+@22320021 = ~Lorsque le porteur subit des dégâts~ // reprise de @12320021
+@22320022 = ~Lorsque le porteur tue la cible~ // reprise de @12320022
+@22320024 = ~Lorsque la cible se trouve à moins de %range%~ // reprise de @12320024
+@22320026 = ~Lorsque le porteur meurt~ // reprise de @12320026
+@22320027 = ~Lorsqu'une créature meurt~ // reprise de @12320027
+@22320028 = ~Lorsque %theTarget% est repoussé par un clerc ou un paladin~ // reprise de @12320028
+@22320029 = ~Lorsque les points de vie du porteur tombent en dessous de %value%~ // reprise de @12320029
+@22320030 = ~Lorsque les points de vie du porteur tombent sous les %percent%~ // reprise de @12320030
+@22320031 = ~À chaque round où %theTarget% est affecté par %splstate%~ // reprise de @12320031
+@22321000 = ~le porteur~ // reprise de @12320200
+@22321001 = ~l'attaquant~ // reprise de @12320201
+@22321002 = ~l'adversaire le plus proche~ // reprise de @12320202
+@22321003 = ~la créature la plus proche~ // reprise de @12320203
+@22321010 = ~du porteur~ // reprise de @12320210
+@22321011 = ~de l'attaquant~ // reprise de @12320211
+@22321012 = ~de l'adversaire le plus proche~ // reprise de @12320212
+@22321013 = ~de la créature la plus proche~ // reprise de @12320213
+@22321020 = ~au porteur~ // reprise de @12320220
+@22321021 = ~à l'attaquant~ // reprise de @12320221
+@22321022 = ~à l'adversaire le plus proche~ // reprise de @12320222
+@22321023 = ~à la créature la plus proche~ // reprise de @12320223
+@22321100 = ~Durant la journée~ // reprise de @12320300
+@22321101 = ~À la tombée de la nuit~ // reprise de @12320301
+@22321102 = ~À la nuit tombée~ // reprise de @12320302
+@22321103 = ~Au lever du jour~ // reprise de @12320303
+@22321104 = ~Durant la journée, à chaque round~ // reprise de @12320304
+@22321105 = ~À la tombée de la nuit, à chaque round~ // reprise de @12320305
+@22321106 = ~À la nuit tombée, à chaque round~ // reprise de @12320306
+@22321107 = ~Au lever du jour, à chaque round~ // reprise de @12320307
+
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Compétence martiale %proficiency%~ // reprise de @12330001
 @22330002 = ~la compétence martiale %proficiency%~ // reprise de @12330002
@@ -2136,6 +2175,11 @@
 @23320008 = ~Dégâts perforants~ // reprise de @13320008
 @23320009 = ~Dégâts contondants~ // reprise de @13320009
 @23320010 = ~Dégâts de projectiles~ // reprise de @13320010
+
+// Opcode 341 : coup critique : 0001-0003 conditions (23 410 000-23 410 099)
+@23410001 = ~À chaque coup critique~ // reprise de @13410001
+@23410002 = ~À chaque coup critique %ofTheTarget%~ // reprise de @13410002
+@23410003 = ~À chaque coup critique provoqué avec cette arme~ // reprise de @13410003
 
 // Opcode 344 : Enchantement contre un type de créature : 0000 nom (23 440 000-23 440 999)
 @23440000 = ~Niveau d'enchantement~ // reprise de @13440001

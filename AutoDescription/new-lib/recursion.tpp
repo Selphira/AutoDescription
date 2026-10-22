@@ -15,6 +15,8 @@
 // - ctx_ignore_duration : durées des sous-effets non écrites, hors délais et répétitions (ancien
 //   ignoreDuration hérité de la durée commune d'une potion) ;
 // - ctx_casting_level : niveau de lancement, qui choisit l'en-tête du sous-sort ;
+// - ctx_versus_set, ctx_versus : l'ancien moteur fixe versus (opcode 232), que les dégâts écrivent à la
+//   place de leur cible (« à l'attaquant »), même vide (BUG-038) ;
 // - ctx_resource : ressource décrite, dont les opcodes comparent les effets à elle-même (exceptions
 //   de cible, opcodes 180, 200, 201, 321), comme l'ancien CURRENT_SOURCE_RES.
 // Les règles propres aux objets (équipement, capacités de combat, en-têtes à charges) ne
@@ -28,6 +30,8 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_area_phrase = 0
 	SET ctx_ignore_duration = 0
 	SET ctx_casting_level = 0
+	SET ctx_versus_set = 0
+	SPRINT ctx_versus ~~
 	SPRINT ctx_resource ~%SOURCE_RES%~
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
@@ -39,7 +43,8 @@ END
 // rien (recursivity, recursive_resref) : aucune ligne, journalisé (…-recursion.txt). L'ancien moteur
 // ne retire pas non plus les ressources déjà décrites de sa liste (V36) : un second sort décrit
 // par la même ressource, ou le sort qui porte le nom de la ressource après un autre, n'écrit rien
-// selon un ordre de traitement qui n'est pas reproduit (recursion_repeated, refusé par l'appelant).
+// selon un ordre de traitement qui n'est pas reproduit (recursion_repeated, refusé par l'appelant) ;
+// seuls les opcodes 146 et 148 tiennent cette liste (recursion_tracked).
 DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	SPRINT recursion_upper ~%recursion_resref%~
 	TO_UPPER recursion_upper
@@ -56,13 +61,108 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	PATCH_IF NOT recursion_allowed BEGIN
 		LPM ad_log_recursion
 	END
-	ELSE BEGIN
+	ELSE PATCH_IF recursion_tracked BEGIN
 		SPRINT recursion_source ~%ctx_resource%~
 		TO_UPPER recursion_source
 		SET recursion_repeated = VARIABLE_IS_SET $recursion_seen(~%recursion_upper%~)
 			OR (recursion_done AND ~%recursion_upper%~ STRING_EQUAL ~%recursion_source%~)
 		SET $recursion_seen(~%recursion_upper%~) = 1
 		SET recursion_done = 1
+	END
+END
+
+// Sous-description du sort recursion_resref lancé par l'effet recursion_fx, pour la prise en charge
+// de son opcode : résultat dans fx_sub_count et fx_sub_text (ad_describe_subresource), refus dans
+// render_missing. L'appelant fixe recursion_casting_level ; recursion_targets : effect (les
+// sous-effets reprennent les chaînes de cible de l'effet), given (celles de recursion_the_target,
+// recursion_of_the_target, recursion_to_the_target), own (chacun les siennes) ;
+// recursion_ignore_duration (durées masquées par l'opcode lui-même ; elles le sont aussi sous la
+// durée commune d'une potion) ; recursion_series (répétitions de l'effet acceptées) ;
+// recursion_tracked (ad_recursion_allowed) ; recursion_versus_set et recursion_versus (ctx_versus_set,
+// ctx_versus). Au-delà de la
+// profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
+// effet probable (l'ancien moteur multiplie les probabilités et retire « N % de chances » des
+// sous-lignes) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
+// effet d'un 177 contre un type de créature ; sort déjà décrit par la ressource (recursion_repeated) ;
+// cible sans chaînes ; refus de la sous-description.
+DEFINE_PATCH_MACRO ad_recursion_support BEGIN
+	SET $fx_sub_count(~%recursion_fx%~) = 0
+	SPRINT $fx_sub_text(~%recursion_fx%~) ~~
+	LPM ad_recursion_allowed
+	PATCH_IF recursion_allowed BEGIN
+		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 BEGIN
+			SPRINT render_missing ~not_implemented:recursion:probability~
+		END
+		ELSE PATCH_IF $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~) BEGIN
+			SPRINT render_missing ~not_implemented:recursion:delayed~
+		END
+		ELSE PATCH_IF $fx_series_anchor(~%recursion_fx%~) AND NOT recursion_series BEGIN
+			SPRINT render_missing ~not_implemented:recursion:series~
+		END
+		ELSE PATCH_IF $fx_versus_file(~%recursion_fx%~) > 0 BEGIN
+			SPRINT render_missing ~not_implemented:recursion:versus~
+		END
+		ELSE PATCH_IF recursion_repeated BEGIN
+			SPRINT render_missing ~not_implemented:recursion:repeated~
+		END
+		ELSE BEGIN
+			PATCH_IF ~%recursion_targets%~ STRING_EQUAL ~effect~ BEGIN
+				SET line_fx = recursion_fx
+				SPRINT line_the_target ~~
+				LPM ad_application_form
+				LPM ad_application_target_strings
+				SPRINT line_only_for ~~
+				PATCH_IF app_target_missing BEGIN
+					SPRINT render_missing ~not_implemented:recursion:target~
+				END
+				SPRINT recursion_the_target ~%theTarget%~
+				SPRINT recursion_of_the_target ~%ofTheTarget%~
+				SPRINT recursion_to_the_target ~%toTheTarget%~
+			END
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+				SET recursion_h = $fx_header(~%recursion_fx%~)
+				SET recursion_hide = ctx_ignore_duration OR recursion_ignore_duration
+				PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
+					SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
+				END
+				LPF ad_describe_subresource
+					INT_VAR
+						ctx_depth = ctx_depth + 1
+						ctx_casting_level = recursion_casting_level
+						ctx_force_target = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
+						ctx_ignore_duration = recursion_hide
+						ctx_versus_set = recursion_versus_set
+					STR_VAR
+						resref = ~%recursion_resref%~
+						ctx_chain = ~%ctx_chain%~
+						ctx_the_target = ~%recursion_the_target%~
+						ctx_of_the_target = ~%recursion_of_the_target%~
+						ctx_to_the_target = ~%recursion_to_the_target%~
+						ctx_versus = ~%recursion_versus%~
+					RET
+						recursion_sub_missing = sub_missing
+						recursion_sub_count = sub_count
+						recursion_sub_text = sub_text
+				END
+				SPRINT render_missing ~%recursion_sub_missing%~
+				SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
+				SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
+			END
+		END
+	END
+END
+
+// Texte de la ligne de l'effet recursion_fx, dont le sous-sort est décrit sous une condition (opcodes
+// 232, 341) : la sous-ligne seule ; plusieurs, chacune sur sa ligne, en retrait, après la condition
+// (ancien add_condition, qui décale les sauts de ligne d'une description commencée par un saut de
+// ligne).
+DEFINE_PATCH_MACRO ad_recursion_condition_text BEGIN
+	SPRINT line_text $fx_sub_text(~%recursion_fx%~)
+	PATCH_IF $fx_sub_count(~%recursion_fx%~) > 1 BEGIN
+		SPRINT line_text ~%CRLF%- %line_text%~
+		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+		END
 	END
 END
 
@@ -83,12 +183,14 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_casting_level = 0
 		ctx_force_target = 0
 		ctx_ignore_duration = 0
+		ctx_versus_set = 0
 	STR_VAR
 		resref = ~~
 		ctx_chain = ~~
 		ctx_the_target = ~~
 		ctx_of_the_target = ~~
 		ctx_to_the_target = ~~
+		ctx_versus = ~~
 	RET
 		sub_missing
 		sub_count
@@ -240,7 +342,11 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SET $charged_global_duration(~%sub_header%~) = 0
 	SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
 	SPRINT sub_todo ~~
+	SPRINT sub_versus_opcode ~~
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
+		PATCH_IF ctx_versus_set AND VARIABLE_IS_SET $AD_OPCODES_READ_VERSUS(~%render_opcode%~) BEGIN
+			SPRINT sub_versus_opcode ~%render_opcode%~
+		END
 		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%render_opcode%~) BEGIN
 			SPRINT sub_status $AD_OPCODE_STATUS(~%render_opcode%~)
 			PATCH_IF $AD_OPCODE_AVAILABLE(~%render_opcode%~) AND (~%sub_status%~ STRING_EQUAL ~TODO~) BEGIN
@@ -250,7 +356,10 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	SPRINT render_missing ~~
 	SPRINT render_late_missing ~~
-	PATCH_IF NOT (~%sub_todo%~ STRING_EQUAL ~~) BEGIN
+	PATCH_IF NOT (~%sub_versus_opcode%~ STRING_EQUAL ~~) BEGIN
+		SPRINT render_missing ~not_implemented:versus_opcode%sub_versus_opcode%~
+	END
+	ELSE PATCH_IF NOT (~%sub_todo%~ STRING_EQUAL ~~) BEGIN
 		INNER_PATCH_SAVE sub_todo ~%sub_todo%~ BEGIN
 			DELETE_BYTES 0 1
 		END

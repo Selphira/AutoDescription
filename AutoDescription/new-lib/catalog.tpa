@@ -107,6 +107,39 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
 	345 => 1
 END
 
+// Opcodes dont l'ancien moteur écrit autrement les lignes quand versus est fixé (sous-effets d'un sort
+// lancé par l'opcode 232, new-lib/recursion.tpp) ; l'opcode 12 le prend en charge.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_READ_VERSUS BEGIN
+	55  => 1
+	178 => 1
+	179 => 1
+	344 => 1
+END
+
+// Opcodes dont les lignes ne disent jamais « non cumulatif » (ancien opcodes_ignore_not_cumulable,
+// application d'un 321 sur la ressource elle-même, new-lib/opcodes/321.tpp).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
+	11  => 1
+	12  => 1
+	16  => 1
+	39  => 1
+	40  => 1
+	46  => 1
+	77  => 1
+	79  => 1
+	101 => 1
+	161 => 1
+	177 => 1
+	206 => 1
+	208 => 1
+	221 => 1
+	224 => 1
+	235 => 1
+	242 => 1
+	335 => 1
+	337 => 1
+END
+
 // Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
 // durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN

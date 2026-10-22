@@ -233,7 +233,7 @@
 229      1        1        TODO      LEVEL            225    IGNORED         Removal:_Remove_One_School
 230      1        1        TODO      LEVEL            226    IGNORED         Removal:_Remove_One_Secondary_Type
 231      1        1        TODO      LEVEL            350    SHOWN           Spell_Effect:_Time_Stop
-232      1        1        TODO      LEVEL            468    SHOWN           Spell_Effect:_Cast_Spell_on_Condition
+232      1        1        DESCRIBED LEVEL            468    SHOWN           Spell_Effect:_Cast_Spell_on_Condition
 233      1        1        DESCRIBED LEVEL            14     SHOWN           Stat:_Proficiency_Modifier
 234      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Contingency_Creation
 235      1        1        TODO      LEVEL            450    SHOWN           Spell_Effect:_Wing_Buffet
@@ -342,7 +342,7 @@
 338      0        1        IGNORED   LEVEL            400    SHOWN           Disable_Rest
 339      0        1        IGNORED   LEVEL            400    SHOWN           Alter_Animation
 340      0        1        TODO      LEVEL            478    SHOWN           Spell_Effect:_Change_Backstab_Effect
-341      0        1        TODO      LEVEL            476    SHOWN           Spell_Effect:_Change_Critical_Hit_Effect
+341      0        1        DESCRIBED LEVEL            476    SHOWN           Spell_Effect:_Change_Critical_Hit_Effect
 342      0        1        IGNORED   LEVEL            400    SHOWN           Animation:_Override_Data
 343      0        1        TODO      LEVEL            85     IGNORED         HP_Swap
 344      0        1        DESCRIBED LEVEL            31     SHOWN           Enchantment_vs._creature_type
