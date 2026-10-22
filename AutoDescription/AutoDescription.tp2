@@ -23,22 +23,10 @@ ALWAYS
 	OUTER_SET is_ee    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
 	OUTER_SET has_eeex = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
 
-    // Deux appels de sens opposés : l'ancien fichier est en Windows-1252 (converti en UTF-8 sur
-    // EE), le nouveau en UTF-8 (converti en Windows-1252 sur les jeux classiques). convert_array
-    // limite chaque appel à son fichier ; setup.tra (UTF-8) n'est jamais converti.
-    ACTION_DEFINE_ARRAY convert_old_tra BEGIN ~description~ END
-    LAF HANDLE_CHARSETS
-        INT_VAR
-            infer_charsets = 1
-        STR_VAR
-            default_language = ~french~
-            tra_path = ~AutoDescription/tra~
-            out_path = ~weidu_external/Lang/AutoDescription~
-            convert_array = convert_old_tra
-            reload_array = convert_old_tra
-    END
-
-    ACTION_DEFINE_ARRAY convert_new_tra BEGIN ~description_new~ END
+    // Les deux fichiers sont en UTF-8 : convertis en Windows-1252 sur les jeux classiques, laissés
+    // tels quels sur EE. convert_array limite la conversion à ces fichiers ; setup.tra (UTF-8)
+    // n'est jamais converti.
+    ACTION_DEFINE_ARRAY convert_tra BEGIN ~description~ ~description_new~ END
     LAF HANDLE_CHARSETS
         INT_VAR
             infer_charsets = 1
@@ -46,9 +34,9 @@ ALWAYS
         STR_VAR
             default_language = ~french~
             tra_path = ~AutoDescription/tra~
-            out_path = ~weidu_external/Lang/AutoDescription_new~
-            convert_array = convert_new_tra
-            reload_array = convert_new_tra
+            out_path = ~weidu_external/Lang/AutoDescription~
+            convert_array = convert_tra
+            reload_array = convert_tra
     END
 
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"

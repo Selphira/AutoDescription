@@ -30,10 +30,10 @@ def set_root(root):
     TRA = MOD / "tra"
     OPCODES = LIB / "itm" / "opcodes.tpp"
 
-# Fichiers .tra de l'ancien moteur convertis par HANDLE_CHARSETS : en Windows-1252 dans le dépôt.
-# Le nouveau fichier est en UTF-8 (converti en sens inverse) ; setup.tra est lu tel quel.
-CONVERTED_TRA = ("description.tra",)
 NEW_TRA = "description_new.tra"
+# Fichiers .tra en UTF-8 convertis en Windows-1252 par HANDLE_CHARSETS sur les jeux classiques ;
+# setup.tra est lu tel quel.
+CONVERTED_TRA = ("description.tra", NEW_TRA)
 NEW_TRA_RANGES = ((1_000_000, 9_999_999), (20_000_000, 39_999_999))
 VARIANTS = ("self", "target", "self_probability", "target_probability")
 DEFINITION = re.compile(r"DEFINE_(PATCH|ACTION)_(MACRO|FUNCTION)\s+[~\"]?([A-Za-z0-9_#-]+)")
@@ -142,18 +142,12 @@ def git_index_content(path):
 def check_tra_encoding(report, where, name, raw):
     if raw.startswith(b"\xef\xbb\xbf"):
         report.add("ERREUR", f"{where} : commence par un BOM UTF-8 (WeiDU refuse le fichier)")
-    if name in CONVERTED_TRA and any(b > 0x7F for b in raw):
-        try:
-            raw.decode("utf-8")
-            report.add("ERREUR", f"{where} : contenu UTF-8 au lieu de Windows-1252 "
-                       "(HANDLE_CHARSETS le convertirait une seconde fois sur EE)")
-        except UnicodeDecodeError:
-            pass
-    if name == NEW_TRA:
+    if name in CONVERTED_TRA:
         try:
             text = raw.decode("utf-8")
         except UnicodeDecodeError:
-            report.add("ERREUR", f"{where} : contenu non UTF-8 (le nouveau fichier doit être en UTF-8)")
+            report.add("ERREUR", f"{where} : contenu non UTF-8 (HANDLE_CHARSETS le convertirait à tort "
+                       "sur les jeux classiques)")
             return
         # iconv -c supprime sans message les caractères absents de Windows-1252 (jeux classiques).
         for identifier, line, string in parse_tra(text):
@@ -246,7 +240,7 @@ def check_new_tra_rules(report):
     for language in ("french", "english"):
         new = (TRA / language / NEW_TRA).read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n")
         old_path = TRA / language / "description.tra"
-        old = {int(i): t for i, t, _ in NEW_ENTRY.findall(old_path.read_bytes().decode("cp1252", errors="replace").replace("\r\n", "\n"))}
+        old = {int(i): t for i, t, _ in NEW_ENTRY.findall(old_path.read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n"))}
         # Une chaîne absente de l'ancien fichier anglais s'affiche en français (cascade des .tra, TRA-002) :
         # sa reprise anglaise reprend ce texte.
         old = {**old_french, **old}
