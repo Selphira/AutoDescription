@@ -853,12 +853,14 @@ BEGIN
 		END
 
 		LPM ~opcode_set_target_strings~
-		LPM ~add_target_level~
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF projectile > 1 BEGIN
 				LPF ~get_target_by_projectile~ INT_VAR projectile target = projectileTarget targetNumber = projectileTargetNumber STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
 			END
+			// Après la zone du projectile, qui remplace les chaînes de la cible : sinon la restriction de
+			// niveau disparaît (WAND13 : « Tue instantanément les créatures dans un rayon de 4,5 mètres »).
+			LPM ~add_target_level~
 			SET thisOpcode = opcode
 			PATCH_IF probability >= 100 BEGIN
 				SPRINT method ~opcode%opcode_target%_%opcode%~
