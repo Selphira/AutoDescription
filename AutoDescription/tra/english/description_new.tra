@@ -1552,6 +1552,86 @@
 @20770102 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
 @20770103 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
 
+// Opcode 78 : maladie : phrases 0100 + 10 × décalage de la chaîne de l'ancien moteur (0-1 dégâts, 4-9
+// caractéristique réduite, 10 lenteur, 13 contagion, 14-19 et 23 augmentées, 30-31 dégâts de poison
+// sur EE) (20 780 000-20 780 999)
+@20780100 = ~Causes a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780000
+@20780101 = ~Causes a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780000
+@20780102 = ~cause a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780100
+@20780103 = ~cause a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780100
+@20780110 = ~Causes a condition that inflicts %amount% points of damage %strDuration% %toTheTarget%~ // reprise de @10780001
+@20780111 = ~Causes a condition that inflicts %amount% points of damage %strDuration% %toTheTarget%~ // reprise de @10780001
+@20780112 = ~cause a condition that inflicts %amount% points of damage %strDuration% %toTheTarget%~ // reprise de @10780101
+@20780113 = ~cause a condition that inflicts %amount% points of damage %strDuration% %toTheTarget%~ // reprise de @10780101
+@20780140 = ~Causes a condition that decreases by %amount% the strength %ofTheTarget%~ // reprise de @10780004
+@20780141 = ~Causes a condition that decreases by %amount% the strength %ofTheTarget%~ // reprise de @10780004
+@20780142 = ~cause a condition that decreases by %amount% the strength %ofTheTarget%~ // reprise de @10780104
+@20780143 = ~cause a condition that decreases by %amount% the strength %ofTheTarget%~ // reprise de @10780104
+@20780150 = ~Causes a condition that decreases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780005
+@20780151 = ~Causes a condition that decreases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780005
+@20780152 = ~cause a condition that decreases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780105
+@20780153 = ~cause a condition that decreases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780105
+@20780160 = ~Causes a condition that decreases by %amount% the constitution %ofTheTarget%~ // reprise de @10780006
+@20780161 = ~Causes a condition that decreases by %amount% the constitution %ofTheTarget%~ // reprise de @10780006
+@20780162 = ~cause a condition that decreases by %amount% the constitution %ofTheTarget%~ // reprise de @10780106
+@20780163 = ~cause a condition that decreases by %amount% the constitution %ofTheTarget%~ // reprise de @10780106
+@20780170 = ~Causes a condition that decreases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780007
+@20780171 = ~Causes a condition that decreases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780007
+@20780172 = ~cause a condition that decreases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780107
+@20780173 = ~cause a condition that decreases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780107
+@20780180 = ~Causes a condition that decreases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780008
+@20780181 = ~Causes a condition that decreases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780008
+@20780182 = ~cause a condition that decreases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780108
+@20780183 = ~cause a condition that decreases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780108
+@20780190 = ~Causes a condition that decreases by %amount% the charisma %ofTheTarget%~ // reprise de @10780009
+@20780191 = ~Causes a condition that decreases by %amount% the charisma %ofTheTarget%~ // reprise de @10780009
+@20780192 = ~cause a condition that decreases by %amount% the charisma %ofTheTarget%~ // reprise de @10780109
+@20780193 = ~cause a condition that decreases by %amount% the charisma %ofTheTarget%~ // reprise de @10780109
+@20780200 = ~Causes a condition that slows down %theTarget%~ // reprise de @10780010
+@20780201 = ~Causes a condition that slows down %theTarget%~ // reprise de @10780010
+@20780202 = ~cause a condition that slows down %theTarget%~ // reprise de @10780110
+@20780203 = ~cause a condition that slows down %theTarget%~ // reprise de @10780110
+@20780230 = ~Causes a condition that slows down and increases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780013
+@20780231 = ~Causes a condition that slows down and increases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780013
+@20780232 = ~cause a condition that slows down and decreases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780113
+@20780233 = ~cause a condition that slows down and decreases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780113
+@20780240 = ~Causes a condition that increases by %amount% the strength %ofTheTarget%~ // reprise de @10780014
+@20780241 = ~Causes a condition that increases by %amount% the strength %ofTheTarget%~ // reprise de @10780014
+@20780242 = ~cause a condition that increases by %amount% the strength %ofTheTarget%~ // reprise de @10780114
+@20780243 = ~cause a condition that increases by %amount% the strength %ofTheTarget%~ // reprise de @10780114
+@20780250 = ~Causes a condition that increases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780015
+@20780251 = ~Causes a condition that increases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780015
+@20780252 = ~cause a condition that increases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780115
+@20780253 = ~cause a condition that increases by %amount% the dexterity %ofTheTarget%~ // reprise de @10780115
+@20780260 = ~Causes a condition that increases by %amount% the constitution %ofTheTarget%~ // reprise de @10780016
+@20780261 = ~Causes a condition that increases by %amount% the constitution %ofTheTarget%~ // reprise de @10780016
+@20780262 = ~cause a condition that increases by %amount% la constitution %ofTheTarget%~ // reprise de @10780116
+@20780263 = ~cause a condition that increases by %amount% la constitution %ofTheTarget%~ // reprise de @10780116
+@20780270 = ~Causes a condition that increases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780017
+@20780271 = ~Causes a condition that increases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780017
+@20780272 = ~cause a condition that increases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780117
+@20780273 = ~cause a condition that increases by %amount% the intelligence %ofTheTarget%~ // reprise de @10780117
+@20780280 = ~Causes a condition that increases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780018
+@20780281 = ~Causes a condition that increases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780018
+@20780282 = ~cause a condition that increases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780118
+@20780283 = ~cause a condition that increases by %amount% the wisdom %ofTheTarget%~ // reprise de @10780118
+@20780290 = ~Causes a condition that increases by %amount% the charisma %ofTheTarget%~ // reprise de @10780019
+@20780291 = ~Causes a condition that increases by %amount% the charisma %ofTheTarget%~ // reprise de @10780019
+@20780292 = ~cause a condition that increases by %amount% the charisma %ofTheTarget%~ // reprise de @10780119
+@20780293 = ~cause a condition that increases by %amount% the charisma %ofTheTarget%~ // reprise de @10780119
+@20780330 = ~Causes a condition that slows down and decreases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780023
+@20780331 = ~Causes a condition that slows down and decreases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780023
+@20780332 = ~cause a condition that slows down and increases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780123
+@20780333 = ~cause a condition that slows down and increases by %amount% the strength, the dexterity and the charisma %ofTheTarget%~ // reprise de @10780123
+@20780400 = ~Causes a condition that inflicts 1 point of poison damage %strDuration% %toTheTarget%~ // reprise de @10780030
+@20780401 = ~Causes a condition that inflicts 1 point of poison damage %strDuration% %toTheTarget%~ // reprise de @10780030
+@20780402 = ~cause a condition that inflicts 1 point of poison damage %strDuration% %toTheTarget%~ // reprise de @10780130
+@20780403 = ~cause a condition that inflicts 1 point of poison damage %strDuration% %toTheTarget%~ // reprise de @10780130
+@20780410 = ~Causes a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780031
+@20780411 = ~Causes a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780031
+@20780412 = ~cause a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780131
+@20780413 = ~cause a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780131
+
 // Opcode 79 : Soin : maladies (20 790 000-20 790 999)
 @20790100 = ~Cure Disease~ // reprise de @10790001
 @20790101 = ~Cures the diseases %ofTheTarget%~ // reprise de @10790002
@@ -1775,6 +1855,12 @@
 @21280101 = ~Confusing %toTheTarget%~ // reprise de @11280002
 @21280102 = ~to confuse %theTarget%~ // reprise de @11280003
 @21280103 = ~to confuse %theTarget%~ // reprise de @11280003
+
+// Opcode 130 : bénédiction (21 300 000-21 300 999)
+@21300100 = ~Bless (%value%)~ // reprise de @11300001
+@21300101 = ~Casts Bless (%value%) on %theTarget%~ // reprise de @11300002
+@21300102 = ~to cast Bless (%value%) on %theTarget%~ // reprise de @11300003
+@21300103 = ~to cast Bless (%value%) on %theTarget%~ // reprise de @11300003
 
 // Opcode 134 : Pétrification (21 340 000-21 340 999)
 @21340100 = ~Turn to Stone~ // reprise de @11340001
@@ -2009,6 +2095,26 @@
 @22180102 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 @22180103 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 
+// Opcode 221 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 210 000-22 210 999)
+@22210100 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210001
+@22210101 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210001
+@22210102 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210002
+@22210103 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210002
+@22210110 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
+@22210111 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
+@22210112 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
+@22210113 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
+
+// Opcode 230 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 300 000-22 300 999)
+@22300100 = ~Dispels one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~ // reprise de @12300001
+@22300101 = ~Dispels one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~ // reprise de @12300001
+@22300102 = ~to dispel one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~ // reprise de @12300002
+@22300103 = ~to dispel one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~ // reprise de @12300002
+@22300110 = ~Dispels one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300003
+@22300111 = ~Dispels one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300003
+@22300112 = ~to dispel one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300004
+@22300113 = ~to dispel one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300004
+
 // Opcode 232 : sort lancé sous condition : 0001 sort nommé à plusieurs lignes, 0010 + parameter2 conditions
 // (0020 chaque round, 0024 distance, 0029-0030 points de vie, 0031 état de sort), 1000 + 10 × forme + parameter1
 // cibles, 1100 + moment de la journée sur un effet d'équipement, 1104 + moment ailleurs (22 320 000-22 329 999)
@@ -2050,6 +2156,24 @@
 // Opcode 233 : Compétence martiale : 0000 nom, 0002 statistique (22 330 000-22 330 999)
 @22330000 = ~Proficiency %proficiency%~ // reprise de @12330001
 @22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
+
+// Opcode 235 : phrases 0100 + 10 × (direction - 1) (22 350 000-22 350 999)
+@22350100 = ~Knock down %theTarget% and push it %range% away~ // reprise de @12350001
+@22350101 = ~Knock down %theTarget% and push it %range% away~ // reprise de @12350001
+@22350102 = ~to knock down %theTarget% and push it %range% away~ // reprise de @12350005
+@22350103 = ~to knock down %theTarget% and push it %range% away~ // reprise de @12350005
+@22350110 = ~Knock down %theTarget% %range% away from %theSource%~ // reprise de @12350002
+@22350111 = ~Knock down %theTarget% %range% away from %theSource%~ // reprise de @12350002
+@22350112 = ~to knock down %theTarget% %range% away from %theSource%~ // reprise de @12350006
+@22350113 = ~to knock down %theTarget% %range% away from %theSource%~ // reprise de @12350006
+@22350120 = ~Attracts %theTarget% %range% to the target area~ // reprise de @12350003
+@22350121 = ~Attracts %theTarget% %range% to the target area~ // reprise de @12350003
+@22350122 = ~to attract %theTarget% %range% to the target area~ // reprise de @12350007
+@22350123 = ~to attract %theTarget% %range% to the target area~ // reprise de @12350007
+@22350130 = ~Attracts %theTarget% %range% %toTheSource%~ // reprise de @12350004
+@22350131 = ~Attracts %theTarget% %range% %toTheSource%~ // reprise de @12350004
+@22350132 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
+@22350133 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
 
 // Opcode 244 : Drain de sorts profanes : phrases 0100 un sort, 0110 plusieurs (22 440 000-22 440 999)
 @22440100 = ~Drains 1 wizard spell %ofTheTarget%~ // reprise de @12440001
@@ -2133,6 +2257,16 @@
 @22920111 = ~Rend %theTarget% sensible aux attaques sournoises~ // reprise de @12920012
 @22920112 = ~d'être sensible aux attaques sournoises~ // reprise de @12920013
 @22920113 = ~de rendre %theTarget% sensible aux attaques sournoises~ // reprise de @12920014
+
+// Opcode 301 : libellés 0001-0004 (« soi », « cible » ; + 1 avec cette arme), 0011-0013 type d'attaque
+// (23 010 000-23 010 099)
+@23010001 = ~Critical Hit Chance~ // reprise de @13010001
+@23010002 = ~Critical Hit Chance with this weapon~ // reprise de @13010002
+@23010003 = ~la chance de coup critique~ // reprise de @13010003
+@23010004 = ~la chance de coup critique avec cette arme~ // reprise de @13010004
+@23010011 = ~melee~ // reprise de @13010011
+@23010012 = ~ranged~ // reprise de @13010012
+@23010013 = ~magic~ // reprise de @13010013
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~THAC0 with the off hand~ // reprise de @13050001

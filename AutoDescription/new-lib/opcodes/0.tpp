@@ -180,6 +180,19 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			SPRINT ac_values ~%ac_values%%ac_total_text% %versus%~
 		END
 	END
+	// CA contre un type de créature (219, fx_ac_merged, new-lib/opcodes/219.tpp) : total contre toutes
+	// les attaques plus 2, après les types d'attaque (ancien opcode_219000_CA_values).
+	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
+		PATCH_IF $fx_opcode(~%ac_id%~) == 219 AND NOT $fx_consumed(~%ac_id%~) AND $fx_ac_merged(~%ac_id%~) BEGIN
+			SPRINT targetType $fx_creature_type(~%ac_id%~)
+			SPRINT versus @2002020 // ~contre les %targetType%~
+			LPF ad_signed_value INT_VAR value = ac_all + 2 RET ac_total_text = text END
+			PATCH_IF NOT (~%ac_values%~ STRING_EQUAL ~~) BEGIN
+				SPRINT ac_values ~%ac_values%, ~
+			END
+			SPRINT ac_values ~%ac_values%%ac_total_text% %versus%~
+		END
+	END
 	PATCH_IF NOT (~%ac_values%~ STRING_EQUAL ~~) AND NOT ac_has_base BEGIN
 		SPRINT name @20000000 // ~Classe d'armure~
 		SPRINT value ~%ac_values%~

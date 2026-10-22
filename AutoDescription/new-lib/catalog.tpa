@@ -270,6 +270,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~EXCEPTIONAL_STRENGTH~  => 400
 	~THIEF_SKILLS~          => 120
 	~SPELL_LEVELS~          => 249
+	~AC_VS_CREATURE~        => 36
+	~SAVES_VS_CREATURE~     => 71
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
 	~REPLACE_ITEM~          => 400
@@ -300,6 +302,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	97  => 8000037 // ~Force exceptionnelle~
 	104 => 8000044 // ~Expérience~
 	126 => 21260000 // ~Vitesse de déplacement~
+	176 => 21260000 // ~Vitesse de déplacement~
 	167 => 21670000 // ~TAC0~
 	189 => 21890000 // ~Temps d'incantation~
 	191 => 21910000 // ~Niveau de lanceur de sorts %spellType%~

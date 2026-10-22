@@ -4,7 +4,8 @@
 // n'écrit rien, comme dans l'ancien moteur. Avec AD_ENABLE_SHRINKAGE, les immunités d'un même bloc, si elles sont plusieurs,
 // n'en font qu'une (ancien opcode_83_group) : noms réunis sans doublon et triés, ligne de l'effet lu
 // en dernier ; les immunités aux sorts de même projectile sont absorbées
-// (ad_group_projectile_spells, new-lib/groups.tpp).
+// (ad_group_projectile_spells, new-lib/groups.tpp). Une immunité consommée par un regroupement (effets
+// identiques, immunité à l'état qu'apporte le projectile) n'est pas écrite.
 
 DEFINE_PATCH_MACRO ad_op_83_support BEGIN END
 
@@ -17,13 +18,13 @@ DEFINE_PATCH_MACRO ad_op_83_lines BEGIN
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		FOR (missile_id = 0; missile_id < fx_count; ++missile_id) BEGIN
-			PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $missile_done(~%missile_id%~) BEGIN
+			PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
 				LPM ad_op_83_merged_line
 			END
 		END
 	END
 	FOR (missile_id = 0; missile_id < fx_count; ++missile_id) BEGIN
-		PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $missile_done(~%missile_id%~) BEGIN
+		PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
 			LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%missile_id%~) RET missile_name = name END
 			PATCH_IF NOT (~%missile_name%~ STRING_EQUAL ~~) BEGIN
 				SPRINT projectiles ~%missile_name%~
@@ -41,7 +42,7 @@ DEFINE_PATCH_MACRO ad_op_83_merged_line BEGIN
 	SET missile_count = 0
 	FOR (missile_other = 0; missile_other < fx_count; ++missile_other) BEGIN
 		SPRINT missile_other_scope $fx_scope(~%missile_other%~)
-		PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
+		PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
 			SET missile_count += 1
 		END
 	END
@@ -50,7 +51,7 @@ DEFINE_PATCH_MACRO ad_op_83_merged_line BEGIN
 		SET missile_last = 0 - 1
 		FOR (missile_other = 0; missile_other < fx_count; ++missile_other) BEGIN
 			SPRINT missile_other_scope $fx_scope(~%missile_other%~)
-			PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
+			PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
 				SET $missile_done(~%missile_other%~) = 1
 				SET missile_last = missile_other
 				LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%missile_other%~) RET missile_name = name END

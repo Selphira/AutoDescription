@@ -154,10 +154,10 @@ DEFINE_PATCH_MACRO ad_op_177_support BEGIN
 END
 
 // Un effet qui vise un type de créature et qu'un regroupement autre que celui des effets identiques
-// a consommé perdrait ce type : refusé.
+// a consommé perdrait ce type : refusé. Un effet écarté sans rien écrire (fx_dropped) n'en perd aucun.
 DEFINE_PATCH_MACRO ad_op_177_lines BEGIN
 	FOR (substitute_id = 0; substitute_id < fx_count; ++substitute_id) BEGIN
-		PATCH_IF $fx_versus_file(~%substitute_id%~) > 0 AND $fx_consumed(~%substitute_id%~)
+		PATCH_IF $fx_versus_file(~%substitute_id%~) > 0 AND $fx_consumed(~%substitute_id%~) AND NOT $fx_dropped(~%substitute_id%~)
 				AND $fx_identical_anchor(~%substitute_id%~) == substitute_id BEGIN
 			SPRINT render_late_missing ~not_implemented:opcode177:versus_group~
 		END
