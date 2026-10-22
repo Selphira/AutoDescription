@@ -21,7 +21,7 @@
 @10004 = ~; ~
 @10006 = ~Multiplied by %value%~
 @10007 = ~\(Saving Throw\)+~
-@10008 = ~^[ %TAB%]*\(CARACT…RISTIQUES\|CaractÈristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAM»TRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|CapacitÈ de combat\|CapacitÈs spÈciales\|CapacitÈ d'Èquipement\|CapacitÈs d'Èquipement\|CapacitÈs de charge\|CapacitÈs de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
+@10008 = ~^[ %TAB%]*\(CARACT√âRISTIQUES\|Caract√©ristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAM√àTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacit√© de combat\|Capacit√©s sp√©ciales\|Capacit√© d'√©quipement\|Capacit√©s d'√©quipement\|Capacit√©s de charge\|Capacit√©s de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~
 @10009 = ~^[0-9]+% chance ~
 @10010 = ~Set to %value%~
 @10013 = ~%section% (%sectionType%)~
@@ -127,10 +127,10 @@
 @102121 = ~save %saveTypeStr% neg.~
 @102122 = ~save %saveTypeStr% at %saveBonus% neg.~
 // v0.9.19
-// en cas de jet de sauvegarde rÈussi, l'effet est annulÈ, en cas d'Èchec, les dÈg‚ts sont divisÈs par deux
+// en cas de jet de sauvegarde r√©ussi, l'effet est annul√©, en cas d'√©chec, les d√©g√¢ts sont divis√©s par deux
 @102123 = ~save %saveTypeStr% neg. and half if fail~
 @102124 = ~save %saveTypeStr% at %saveBonus% neg. and half if fail~
-// les dÈg‚ts sont rÈduits de moitiÈ quelque soit le rÈsultat du jet de sauvegarde
+// les d√©g√¢ts sont r√©duits de moiti√© quelque soit le r√©sultat du jet de sauvegarde
 @102125 = ~reduced by half~
 @102170 = ~ignore primary target~
 @102171 = ~ignore secondary target~
@@ -143,7 +143,7 @@
 @102006 = ~Range~
 @102007 = ~Attacks per Round~
 @102008 = ~Armor Class~
-// @102009 = ~CompÈtence martiale~
+// @102009 = ~Comp√©tence martiale~
 @102010 = ~Crushing~ // Deals Crushing damage, uses base AC (ignores all 4 specific AC)
 @102011 = ~Piercing~
 @102012 = ~Crushing~
@@ -169,7 +169,7 @@
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
 
-/* Type de dÈg‚ts */
+/* Type de d√©g√¢ts */
 @600170 = ~hit point~
 @600171 = ~hit points~
 @600172 = ~point of damage~
@@ -209,8 +209,8 @@
 @102552 = ~Protects %theTarget% %resistName%~
 
 
-// Les diffÈrentes cibles
-// FIXME: mettre de l'ordre dans les n∞
+// Les diff√©rentes cibles
+// FIXME: mettre de l'ordre dans les n¬∞
 @102451 = ~the drinker~
 @102452 = ~of the drinker~
 @102453 = ~to the drinker~
@@ -226,9 +226,9 @@
 @102465 = ~%countTarget% creatures~
 @102462 = ~Point in the visual range of the caster~
 @102461 = ~Visual range of the caster~
-@102460 = ~Allies within a %range% cone on a %angle%∞ arc~
-@102459 = ~Enemies within a %range% cone on a %angle%∞ arc~
-@102458 = ~%range% cone on a %angle%∞ arc~
+@102460 = ~Allies within a %range% cone on a %angle%¬∞ arc~
+@102459 = ~Enemies within a %range% cone on a %angle%¬∞ arc~
+@102458 = ~%range% cone on a %angle%¬∞ arc~
 @102457 = ~Allies within a radius of %range% around %ofTheTarget%~
 @102456 = ~Enemies within a radius of %range% around %ofTheTarget%~
 @102455 = ~radius of %range% around %theTarget%~
@@ -278,7 +278,7 @@
 @102725 = ~to %countTarget% allies~
 @102800 = ~%target% within a radius of %range%~
 @102801 = ~%target% within a radius of %range% around %ofTheTarget%~
-@102802 = ~%target% within a %range% cone on a %angle%∞ arc~
+@102802 = ~%target% within a %range% cone on a %angle%¬∞ arc~
 @102803 = ~%main_target% and %target% within a radius of %range%~
 @102386 = ~to the %targetType%~
 @102387 = ~vs. %targetType%~
@@ -426,7 +426,7 @@
 @203005 = ~giants~
 @203006 = ~frozen~
 @203007 = ~plants~
-@203008 = ~~ // Ne correspond ‡ aucune entrÈe mais utilisÈe par HELMLIFE.ITM
+@203008 = ~~ // Ne correspond √† aucune entr√©e mais utilis√©e par HELMLIFE.ITM
 @203255 = ~monsters~
 
 /* -------- *
@@ -906,7 +906,7 @@
 @400022 = ~cumulative luck bonus~
 @400023 = ~morale modifier~
 @400024 = ~horror~
-@400025 = ~poisoning~ // l'immunitÈ aux poisons Ètant une rÈsistance de 100% au poison
+@400025 = ~poisoning~ // l'immunit√© aux poisons √©tant une r√©sistance de 100% au poison
 @400026 = ~remove curses~
 @400027 = ~acid resistance modifier~
 @400028 = ~cold resistance modifier~
@@ -948,7 +948,7 @@
 @400064 = ~remove infravision~
 @400065 = ~~ // Opcode visuel
 @400066 = ~~ // Opcode visuel
-@400067 = ~~ // Invocation de crÈature, non pertinent
+@400067 = ~~ // Invocation de cr√©ature, non pertinent
 @400068 = ~banishment~
 @400069 = ~non-detection~
 @400070 = ~cure non-detection~
@@ -974,7 +974,7 @@
 @400090 = ~Open locks modifier~
 @400091 = ~Find traps modifier~
 @400092 = ~Pick Pockets modifier~
-@400093 = ~Fatigue modifier~ // ‡ la modification du score de fatigue
+@400093 = ~Fatigue modifier~ // √† la modification du score de fatigue
 @400094 = ~drunkenness modifier~
 @400095 = ~Tracking skill modifier~
 @400096 = ~level change~
@@ -1008,10 +1008,10 @@
 @400124 = ~teleport~
 @400125 = ~unlock~
 @400126 = ~movement modifier~
-@400127 = ~~ // Invocation de crÈature, non pertinent
+@400127 = ~~ // Invocation de cr√©ature, non pertinent
 @400128 = ~confusion~
 @400129 = ~Aid~
-@400130 = ~Bless~ // ~aux bÈnÈdictions~
+@400130 = ~Bless~ // ~aux b√©n√©dictions~
 @400131 = ~Positive Chant~
 @400132 = ~Holy power~
 @400133 = ~Luck non-cumulative~
@@ -1058,7 +1058,7 @@
 @400174 = ~~ // Opcode sonore
 @400175 = ~hold~
 @400176 = ~movement modifier~
-//@400177 = ~~ // TODO: trop variable, > ‡ tous les effets lancÈs depuis l'opcode 177...
+//@400177 = ~~ // TODO: trop variable, > √† tous les effets lanc√©s depuis l'opcode 177...
 @400178 = ~THAC0 against a creature type modifier~
 @400179 = ~damage against a creature type modifier~
 @400180 = ~can't use item~
@@ -1090,15 +1090,15 @@
 @400206 = ~protection from spell~
 @400207 = ~spell bounce~
 @400208 = ~minimum hit points modifier~
-@400209 = ~Death Finger~ // LimitÈ au Doigt de mort
-@400210 = ~Power Word: Stun~ // LimitÈ au Mot de pouvoir : …tourdissement
+@400209 = ~Death Finger~ // Limit√© au Doigt de mort
+@400210 = ~Power Word: Stun~ // Limit√© au Mot de pouvoir : √âtourdissement
 @400211 = ~imprisonment~
 @400212 = ~~ // Non fonctionnel
 @400213 = ~maze~
 @400214 = ~spell selection~
 @400215 = ~~ // Opcode visuel
 @400216 = ~level drain~
-@400217 = ~Power Word: Sleep~ // LimitÈ au Mot de pouvoir : Sommeil
+@400217 = ~Power Word: Sleep~ // Limit√© au Mot de pouvoir : Sommeil
 @400218 = ~Stoneskin~
 @400219 = ~AC vs. creature type modifier~
 @400220 = ~dispel by school~ // Removal: Remove School [220]
@@ -1209,10 +1209,10 @@
 @400325 = ~Save vs. all modifier~
 @400326 = ~apply effects list~
 @400327 = ~~ // Opcode visuel
-//@400328 = ~~ // TODO: difficilement comprÈhensible pour un joueur
+//@400328 = ~~ // TODO: difficilement compr√©hensible pour un joueur
 @400329 = ~slow poison~
 @400330 = ~~ // Opcode textuel
-@400331 = ~~ // Invocation de crÈature, non pertinent
+@400331 = ~~ // Invocation de cr√©ature, non pertinent
 @400332 = ~specific damage modifier~
 @400333 = ~Static charge~
 @400334 = ~Turn Undead~
@@ -1262,7 +1262,7 @@
 @401022 = ~effects modifying luck~
 @401023 = ~effects modifying morale~
 @401024 = ~horror effects~
-@401025 = ~poisoning effects~ // l'immunitÈ aux poisons Ètant une rÈsistance de 100% au poison
+@401025 = ~poisoning effects~ // l'immunit√© aux poisons √©tant une r√©sistance de 100% au poison
 @401026 = ~the effects that dispel curses~
 @401027 = ~effects modifying acid resistance~
 @401028 = ~effects modifying cold resistance~
@@ -1304,7 +1304,7 @@
 @401064 = ~effects that dispel infravision~
 @401065 = ~~ // Opcode visuel
 @401066 = ~~ // Opcode visuel
-@401067 = ~~ // Invocation de crÈature, non pertinent
+@401067 = ~~ // Invocation de cr√©ature, non pertinent
 @401068 = ~banishment effects~
 @401069 = ~non-detection effects~
 @401070 = ~effects dispelling non-detection~
@@ -1343,13 +1343,13 @@
 @401103 = ~~ // Opcode visuel
 @401104 = ~effects modifying experience~
 @401105 = ~effects modifying gold~
-@401106 = ~~ // FIXME: Rupture de moral, ‡ grouper avec ImmunitÈ ‡ la panique qui peut se produire de deux faÁons : abaissement du moral ou hausse du niveau de rupture
+@401106 = ~~ // FIXME: Rupture de moral, √† grouper avec Immunit√© √† la panique qui peut se produire de deux fa√ßons : abaissement du moral ou hausse du niveau de rupture
 @401107 = ~~ // Opcode visuel
 @401108 = ~effects modifying reputation~
 @401109 = ~paralysis effects~
 @401110 = ~~ // Sans effet
 @401111 = ~effects that create magic weapons~
-@401112 = ~effects that remove equipped objects~ // UtilisÈ comme Áa mais l'opcode n'est pas limitÈ ‡ cette utilitÈ
+@401112 = ~effects that remove equipped objects~ // Utilis√© comme √ßa mais l'opcode n'est pas limit√© √† cette utilit√©
 @401113 = ~~ // Sans effet
 @401114 = ~~ // Non pertinent
 @401115 = ~effects detecting alignment~
@@ -1364,7 +1364,7 @@
 @401124 = ~effects causing teleportation to a target~
 @401125 = ~effects modifying the Lock Picking score~
 @401126 = ~effects modifying movement speed~
-@401127 = ~~ // Invocation de crÈature, non pertinent
+@401127 = ~~ // Invocation de cr√©ature, non pertinent
 @401128 = ~confusion~
 @401129 = ~Aid~
 @401130 = ~Bless~
@@ -1414,7 +1414,7 @@
 @401174 = ~~ // Opcode sonore
 @401175 = ~paralyzing effects~
 @401176 = ~effects modifying movement speed~
-//@401177 = ~~ // TODO: trop variable, > ‡ tous les effets lancÈs depuis l'opcode 177...
+//@401177 = ~~ // TODO: trop variable, > √† tous les effets lanc√©s depuis l'opcode 177...
 @401178 = ~effects modifying THAC0 against a specific creature type~
 @401179 = ~effects modifying damage against a specific type of creature~
 @401180 = ~effects blocking the use of specific items~
@@ -1564,10 +1564,10 @@
 @401325 = ~effects modifying all saving throws~
 @401326 = ~effects causing spells to be cast on a specific type of target~
 @401327 = ~~ // Opcode visuel
-//@401328 = ~~ // TODO: difficilement comprÈhensible pour un joueur
+//@401328 = ~~ // TODO: difficilement compr√©hensible pour un joueur
 @401329 = ~slow poison~
 @401330 = ~~ // Opcode textuel
-@401331 = ~~ // Invocation de crÈature, non pertinent
+@401331 = ~~ // Invocation de cr√©ature, non pertinent
 @401332 = ~effects modifying specific damage modifier~
 @401333 = ~Static Charge~
 @401334 = ~Turn Undead~
@@ -1592,14 +1592,14 @@
 /* -------------- *
  * State *
  * ------------- */
-// ComplËte la phrase :
+// Compl√®te la phrase :
 // @12320025 = ~When %theTarget% is %state%~
 // @13240139 = ~Effective against creatures %descriptionState%~
 // @13240639 = ~to be effective against creatures %descriptionState%~
 // @13241138 = ~creatures %descriptionState%~
 // @13260138 = ~If %theTarget% is %descriptionState%~
 // @13260139 = ~If %theTarget% is not %descriptionState%~
-// FIXME: problËme d'accord potentiel selon le genre de la target
+// FIXME: probl√®me d'accord potentiel selon le genre de la target
 
 @410000 = ~subject to no effect~ // free of any effect
 @410001 = ~subject to sleep~
@@ -1641,11 +1641,11 @@
  * SplState *
  * ------------- */
 
-// BasÈ sur Vanilla, ne sont remplis que les SplState utilisÈs
-// Rien n'oblige ‡ utiliser PROTECTION_FROM_EVIL pour une Protection contre le Mal
-// Ceux commenÁant par une Majuscule sont des SplState propre ‡ un unique sort ou objet
+// Bas√© sur Vanilla, ne sont remplis que les SplState utilis√©s
+// Rien n'oblige √† utiliser PROTECTION_FROM_EVIL pour une Protection contre le Mal
+// Ceux commen√ßant par une Majuscule sont des SplState propre √† un unique sort ou objet
 
-// ComplËte la phrase @12320031 = ~In every round where %theTarget% is affected by %splstate%~
+// Compl√®te la phrase @12320031 = ~In every round where %theTarget% is affected by %splstate%~
 
 @420000 = ~Emotion~
 @420002 = ~Armor of Faith~
@@ -1753,7 +1753,7 @@
 
 
 /* ------------------------------ *
- * SpÈcifiques ‡ certains opcodes *
+ * Sp√©cifiques √† certains opcodes *
  * ------------------------------ */
 
 // Opcode 0: Stat: AC vs. Damage Type Modifier [0]
@@ -1771,7 +1771,7 @@
 @10000010 = ~vs. slashing and missile attacks~
 @10000011 = ~vs. crushing, slashing and missile attacks~
 @10000012 = ~vs. slashing and piercing attacks~
-@10000013 = ~vs. crushing, slashing and piercing attacks~ // FIXME: contre les armes de mÍlÈe ?
+@10000013 = ~vs. crushing, slashing and piercing attacks~ // FIXME: contre les armes de m√™l√©e ?
 @10000014 = ~vs. slashing, piercing and missile attacks~
 @10000015 = ~~
 
@@ -1859,7 +1859,7 @@
 @10120005 = ~Transfer %damage% %toTheTarget%~
 @10120006 = ~Change %theTarget%'s hit points to %damage%~
 @10120007 = ~Change %theTarget%'s hit points to %damage%%~
-@10120008 = ~Inflicts %damage%% of maximum hit points %toTheTarget%~// dÈj‡ vu aussi mais Inflige %damage%% du maximum de points de vie %toTheTarget%
+@10120008 = ~Inflicts %damage%% of maximum hit points %toTheTarget%~// d√©j√† vu aussi mais Inflige %damage%% du maximum de points de vie %toTheTarget%
 
 @10120011 = ~to inflict %damage% %toTheTarget%~
 @10120012 = ~to inflict %damage% %toTheTarget%~
@@ -2103,8 +2103,8 @@
 
 // Opcode 46: Cure: Stun (Unstun) [46]
 
-@10460001 = ~Unstun~ // AttÈnuation de l'Ètourdissement ??
-@10460002 = ~to unstun %theTarget%~ // Ranime ou RÈanime (dÈj‡ vu) ??
+@10460001 = ~Unstun~ // Att√©nuation de l'√©tourdissement ??
+@10460002 = ~to unstun %theTarget%~ // Ranime ou R√©anime (d√©j√† vu) ??
 @10460003 = ~Unstuns %theTarget%~
 
 // Opcode 47: Cure: Invisibility [47]
@@ -2214,8 +2214,8 @@
 @10670017 = ~to summon %amount% allied %creatureName%~
 @10670018 = ~to summon %amount% neutral %creatureName%~
 
-@10670020 = ~~ // ~ de 1 dÈ de vie~
-@10670021 = ~~ // ~ de %creatureLevel% dÈs de vie~
+@10670020 = ~~ // ~ de 1 d√© de vie~
+@10670021 = ~~ // ~ de %creatureLevel% d√©s de vie~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
@@ -2340,7 +2340,7 @@
 
 // Opcode 80: Deafness [80]
 
-// TODO: PrÈciser l'effet de la surditÈ ? ~Provoque l'Èchec de 50% des sorts profanes et divins~
+// TODO: Pr√©ciser l'effet de la surdit√© ? ~Provoque l'√©chec de 50% des sorts profanes et divins~
 @10800001 = ~Deafness~
 @10800002 = ~Deafens %theTarget%~
 @10800003 = ~to deafen %theTarget%~
@@ -2596,7 +2596,7 @@
 @11200012 = ~normal weapons~
 @11200013 = ~silver weapons~
 @11200014 = ~non-silver weapons~
-@11200015 = ~enchanted weapons +0 except silver ones~ // le plus 0 est-il nÈcessaire, si l'arme est enchantÈe c'est implicite ?
+@11200015 = ~enchanted weapons +0 except silver ones~ // le plus 0 est-il n√©cessaire, si l'arme est enchant√©e c'est implicite ?
 @11200016 = ~two-handed weapons~
 @11200017 = ~one-handed weapons~
 @11200018 = ~cursed weapons~
@@ -2651,9 +2651,9 @@
 
 // Opcode 127: Summon: Monster Summoning [127]
 
-@11270001 = ~Summon monsters for a total of %amount% levels (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est Ègal ‡ %amount% niveaux (%creatures%) ??
+@11270001 = ~Summon monsters for a total of %amount% levels (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est √©gal √† %amount% niveaux (%creatures%) ??
 @11270002 = ~Summon animals for a total of %amount% levels (%creatures%)~
-@11270003 = ~Summon monsters for a total of levels equal to the caster's level (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est Ègal ‡ celui du lanceur (%creatures%)
+@11270003 = ~Summon monsters for a total of levels equal to the caster's level (%creatures%)~ // Invoque un nombre de monstres dont le niveau total est √©gal √† celui du lanceur (%creatures%)
 @11270004 = ~Summon animals for a total of levels equal to the caster's level (%creatures%)~//...
 @11270005 = ~Summon 1 monster (%creatures%)~
 @11270006 = ~Summon 1 animal (%creatures%)~
@@ -3134,13 +3134,13 @@
 
 @12160001 = ~Drains 1 level from %theTarget%~
 @12160002 = ~Drains %amount% levels from %theTarget%~
-@12160003 = ~Inhibe le passage au niveau supÈrieur %ofTheTarget%~
+@12160003 = ~Inhibe le passage au niveau sup√©rieur %ofTheTarget%~
 @12160004 = ~Injecte 1 niveau %toTheTarget%~
 @12160005 = ~Injecte %amount% niveaux %toTheTarget%~
 
 @12160011 = ~to drain 1 level from %theTarget%~
 @12160012 = ~to drain %amount% levels from %theTarget%~
-@12160013 = ~d'inhiber le passage au niveau supÈrieur %ofTheTarget%~
+@12160013 = ~d'inhiber le passage au niveau sup√©rieur %ofTheTarget%~
 @12160014 = ~d'injecter 1 niveau %toTheTarget%~
 @12160015 = ~d'injecter %amount% niveaux %toTheTarget%~
 
@@ -3148,8 +3148,8 @@
 // Opcode 217: Spell Effect: Unconsciousness 20HP [217]
 
 @12170001 = ~%description% if its hit points are below 20~
-//@12170001 = ~Endort %theTarget% si ses points de vie sont infÈrieurs ‡ 20~
-//@12170002 = ~d'endormir %theTarget% si ses points de vie sont infÈrieurs ‡ 20~
+//@12170001 = ~Endort %theTarget% si ses points de vie sont inf√©rieurs √† 20~
+//@12170002 = ~d'endormir %theTarget% si ses points de vie sont inf√©rieurs √† 20~
 
 // Opcode 218: Protection: Stoneskin [218]
 
@@ -3262,7 +3262,7 @@
 @12320020 = ~Every round~
 @12320021 = ~When the wearer takes damage~
 @12320022 = ~When the wearer kills the target~
-@12320023 = ~~ // Cas particulier, moment de la journÈe
+@12320023 = ~~ // Cas particulier, moment de la journ√©e
 @12320024 = ~When the target is less than %range%~
 @12320025 = ~When %theTarget% is %state%~
 @12320026 = ~When the wearer dies~
@@ -3305,16 +3305,14 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Knock down %theTarget%~
-@12350002 = ~to knock down %theTarget%~
 @12350001 = ~Knock down %theTarget% and push it %range% away~
 @12350002 = ~Knock down %theTarget% %range% away from %theSource%~
 @12350003 = ~Attracts %theTarget% %range% to the target area~
 @12350004 = ~Attracts %theTarget% %range% %toTheSource%~
-@12350005 = ~to knock down %theTarget% %range% away from %theSource%~
-@12350006 = ~to knock down %theTarget% and push it %range% away~
-@12350007 = ~to attract %theTarget% %range% %toTheSource%~
-@12350008 = ~to attract %theTarget% %range% to the target area~
+@12350005 = ~to knock down %theTarget% and push it %range% away~
+@12350006 = ~to knock down %theTarget% %range% away from %theSource%~
+@12350007 = ~to attract %theTarget% %range% to the target area~
+@12350008 = ~to attract %theTarget% %range% %toTheSource%~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 
@@ -3459,7 +3457,7 @@
 @12640003 = ~to drop %objectType% in Panic~
 @12640004 = ~to make %theTarget% drop %objectType%~
 
-// En rÈalitÈ il va jeter le premier objet trouvÈ, selon l'ordre dÈfini dans SLOTS.ids (donc probablement une piËce de l'Èquipement) - aucun alÈatoire
+// En r√©alit√© il va jeter le premier objet trouv√©, selon l'ordre d√©fini dans SLOTS.ids (donc probablement une pi√®ce de l'√©quipement) - aucun al√©atoire
 @12640010 = ~an object from his inventory~ // %objectType%
 @12640011 = ~an equipped weapon~
 
@@ -3582,12 +3580,12 @@
 
 @12920011 = ~Sensible aux attaques sournoises~
 @12920012 = ~Rend %theTarget% sensible aux attaques sournoises~
-@12920013 = ~d'Ítre sensible aux attaques sournoises~
+@12920013 = ~d'√™tre sensible aux attaques sournoises~
 @12920014 = ~de rendre %theTarget% sensible aux attaques sournoises~
 
 // Opcode 295: Graphics: Disable Permanent Death [295]
 
-// FIXME : "protection" contre la mort dÈfinitive : la mort est toujours douce mais elle est toujours l‡ => le personnage peut toujours Ítre ressuscitÈ
+// FIXME : "protection" contre la mort d√©finitive : la mort est toujours douce mais elle est toujours l√† => le personnage peut toujours √™tre ressuscit√©
 
 @12950001 = ~Protects against permanent death~
 @12950002 = ~Protects %theTarget% against permanent death~
@@ -3773,7 +3771,7 @@
 @13240055 = ~Ineffective against undead and golems~
 @13240056 = ~Effective against undead and golems~
 @13240057 = ~Ineffective against men~
-@13240058 = ~Ineffective against women~ // FIXME : erronÈ : non-homme, donc les femmes, les illusions, les dÈmons invoquÈs, les anges etc
+@13240058 = ~Ineffective against women~ // FIXME : erron√© : non-homme, donc les femmes, les illusions, les d√©mons invoqu√©s, les anges etc
 //@13240059 ALIGNMENTBITS=MASK_LCNEUTRAL
 //@13240060 ALIGNMENTBITS!=MASK_LCNEUTRAL
 //@13240061 ALIGNMENTBITS>=MASK_CHAOTIC
@@ -3790,7 +3788,7 @@
 //@13240072 SPLSTATE=SHROUD_OF_FLAME > jamais vu
 //@13240073 SPLSTATE!=SHROUD_OF_FLAME > jamais vu
 @13240074 = ~Ineffective against dead creatures~
-@13240075 = ~Ineffective against living creatures~ // FIXME: tendancieux : les morts-vivants sont touchÈs
+@13240075 = ~Ineffective against living creatures~ // FIXME: tendancieux : les morts-vivants sont touch√©s
 @13240076 = ~~ // @13240110
 @13240077 = ~Ineffective against targets immune to poison~
 @13240078 = ~Ineffective against poison-sensitive creatures~
@@ -4253,7 +4251,7 @@
 
 // Opcode 346: Save vs. school bonus [346]
 
-//FIXME: rÈpÈtition avec spellSchoolName @100100
+//FIXME: r√©p√©tition avec spellSchoolName @100100
 @13460010 = ~~
 @13460011 = ~vs. Abjuration spells~
 @13460012 = ~vs. Conjuration spells~
@@ -4296,35 +4294,35 @@
 @13670031 = ~to sensitize %theTarget% to death by absorption of characteristic~
 @13670032 = ~to protect %theTarget% from death by characteristic absorption~
 
-// Fake Opcode 500: Stat: CompÈtences de voleur [500]
+// Fake Opcode 500: Stat: Comp√©tences de voleur [500]
 
 @15000001 = ~Thief skills~
 @15000002 = ~the Thief skills~
 
-// Fake Opcode 501: Stat: CaractÈristiques [501]
+// Fake Opcode 501: Stat: Caract√©ristiques [501]
 
 @15010001 = ~Abilities~
 @15010002 = ~the Abilities~
 
-// Fake Opcode 502: Stat: RÈsistance aux dÈg‚ts [502]
+// Fake Opcode 502: Stat: R√©sistance aux d√©g√¢ts [502]
 
 @15020001 = ~Damage Resistance~
 @15020002 = ~from damage~
 @15020003 = ~the Damage Resistance~
 
-// Fake Opcode 503: Stat: RÈsistance aux dÈg‚ts ÈlÈmentaires [503]
+// Fake Opcode 503: Stat: R√©sistance aux d√©g√¢ts √©l√©mentaires [503]
 
 @15030001 = ~Elemental Damage Resistance~
 @15030002 = ~from elemental damage~
 @15030003 = ~the Elemental Damage Resistance~
 
-// Fake Opcode 504: Stat: RÈsistance aux dÈg‚ts physiques [504]
+// Fake Opcode 504: Stat: R√©sistance aux d√©g√¢ts physiques [504]
 
 @15040001 = ~Physical Damage Resistance~
 @15040002 = ~from physical damage~
 @15040003 = ~the Physical Damage Resistance~
 
-// Fake Opcode 509 : ImmunitÈ aux sorts (par niveau) (cumulatif) [509]
+// Fake Opcode 509 : Immunit√© aux sorts (par niveau) (cumulatif) [509]
 
 @15090001 = ~Protects from spells~
 @15090002 = ~to protect from spells~
@@ -4346,13 +4344,13 @@
 @15110001 = ~Dispels all illusionary protection spells on %theTarget%~
 @15110002 = ~to dispel all illusionary protection spells on %theTarget%~
 
-// Fake Opcode 518: ImmunitÈ aux sorts
+// Fake Opcode 518: Immunit√© aux sorts
 
 @15180001 = ~Protects from %spellNames% spells~
 @15180002 = ~Protecs %theTarget% from %spellNames% spells~
 @15180003 = ~to protect %theTarget% from %spellNames% spells~
 
-// Fake Opcode 519: Arme brisÈe
+// Fake Opcode 519: Arme bris√©e
 
 @15190001 = ~of breaking~
 
@@ -4380,7 +4378,7 @@
 @15250002 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
-// SpÈcifiques ‡ certains mods, ces chaÓnes disparaitront ‡ terme, lorsque le mod sera plus ÈvoluÈ. ||
+// Sp√©cifiques √† certains mods, ces cha√Ænes disparaitront √† terme, lorsque le mod sera plus √©volu√©. ||
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ //
 
 @102150 = ~~
@@ -4388,63 +4386,63 @@
 @102356 = ~Transmutation from stone to flesh~
 @102468 = ~Entanglement~
 @102469 = ~Imprisonment~
-@102470 = ~Lame noire du dÈsastre~
+@102470 = ~Lame noire du d√©sastre~
 @102478 = ~Vitesse d'incantation des sorts profanes~
 @102479 = ~Vitesse d'incantation des sorts divins~
-@102480 = ~exceptÈ pour les bardes~
-@102482 = ~RÈduit les points de vie maximum des crÈatures vertÈbrÈes de 3 pendant 1 tour~ // SpÈcifique ‡ Item Revision : DVBONEBR
-@102483 = ~DÈtruit les crÈatures convoquÈes~ // SpÈcifique ‡ Item Revision : DVBANISH
-@102484 = ~Emprisonne la cible dans les flammes pendant 2 rounds (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVFLWHIP
-@102485 = ~Draine 1d4 points de vie si la cible possËde du sang et les transfËre au porteur~ // SpÈcifique ‡ Item Revision : DVVAMPIR
-@102486 = ~RÈduit la classe d'armure de la cible de 1 pendant 2 rounds~ // SpÈcifique ‡ Item Revision : DVSUNDER
-@102487 = ~Dissipation de la magie (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVDISPEL
-@102488 = ~díimmobiliser la cible pendant 1 round (jet de sauvegarde contre petrification and polymorph pour Èviter)~ // SpÈcifique ‡ Item Revision : DVFREEZE
-@102489 = ~d'infliger Horreur ‡ la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVFEARSM
-@102490 = ~de ralentir la cible pendant 3 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVCHILL
-@102491 = ~de dÈcapiter la cible (jet de sauvegarde contre paralysis, poison and death ‡ -2 pour Èviter)~ // SpÈcifique ‡ Item Revision : DVVORPAL
-@102492 = ~Renverse et sonne la cible (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVKNBACK
-@102493 = ~d'endormir la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSLEEP
-@102494 = ~Inflige 2d6 points de dÈg‚ts de feu supplÈmentaires aux adversaires dans un rayon d'un mËtre et demi (jet de sauvegarde contre breath pour moitiÈ)~ // SpÈcifique ‡ Item Revision : DVFRBOLT
-@102495 = ~Ralentit et inflige 1 point de dÈg‚ts toutes les 3 secondes pendants 4 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVAFFLIC
-@102496 = ~Fait oublier 1 sort profane ‡ la cible tandis que le porteur se remÈmore 1 sort de niveau 4 maximum (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSPABSR
-@102497 = ~d'infliger DÈbilitÈ mentale ‡ la cible (jet de sauvegarde contre les sorts ‡ -4 pour Èviter)~ // SpÈcifique ‡ Item Revision : DVMINDBR
-@102498 = ~de paralyser la cible pendant 2 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVPRLYZE
-@102499 = ~RÈduit la force et la dextÈritÈ de 1 pendant 5 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSHARP
-@102500 = ~…tourdit la cible durant 1 round (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVBOOM
-@102501 = ~d'infliger 4d6 points de dÈg‚ts de feu supplÈmentaires ‡ la cible ainsi qu'aux adversaires dans un rayon d'un mËtre et demi~ // SpÈcifique ‡ Item Revision : DVFLBRST
-@102502 = ~Inflige 2d6 points de dÈg‚ts contondants supplÈmentaires ‡ la cible, la renverse et la sonne pendant 1 round (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVBRAM
-@102503 = ~RÈduit les jets de sauvegarde, le THAC0 et les dÈg‚ts de la cible de 1 pendant 4 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVDOOM
-@102504 = ~de renverser, de sonner et d'infliger 4d6 points de dÈg‚ts contondants supplÈmentaires ‡ la cible ainsi qu'aux adversaires dans un rayon d'un mËtre et demi (jet de sauvegarde contre breath pour Èviter d'Ítre renversÈ et sonnÈ)~ // SpÈcifique ‡ Item Revision : DVSWAVE
-@102505 = ~Porte l'attaque par round de la cible ‡ une demi et rÈduit sa vitesse d'incantation des sorts de 4 (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSTAG
-@102506 = ~de rÈduire le THAC0 et la classe d'armure de la cible de 2 pendant 5 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVHOPLES
-@102507 = ~Inflige 1 point de dÈg‚ts de poison ‡ chaque round pendant 5 rounds~ // SpÈcifique ‡ Item Revision : DVBLEED5
-@102508 = ~d'aveugler tous les adversaires dans un rayon de 1,50 mËtre pendant 4 rounds (jet de sauvegarde contre breath ‡ -4 pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSTDUST
-@102509 = ~Inflige 1 point de dÈg‚ts de poison ‡ chaque round pendant 2 rounds~ // SpÈcifique ‡ Item Revision : DVBLEED2
-@102510 = ~d'entoiler la cible pendant 2 rounds (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVWEB
-@102511 = ~de rÈduire de moitiÈ la vitesse de dÈplacement de la cible pendant 4 rounds~ // SpÈcifique ‡ Item Revision : DVCRIPPL
-@102512 = ~de dissiper les protections et les invocations illusoires~ // SpÈcifique ‡ Item Revision : DVILLBAN
-@102513 = ~de tuer instantanÈment la cible (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVHSEEK
-@102514 = ~d'infliger 6d6 points de dÈg‚ts de feu ‡ la cible et aux adversaires dans un rayon de 4,5 mËtres~ // SpÈcifique ‡ Item Revision : DVDETON
-@102515 = ~d'infliger 4d4 points de dÈg‚ts d'acide ‡ la cible et aux adversaires dans un rayon de 1,50 mËtre~ // SpÈcifique ‡ Item Revision : DVVTRSPH
-@102516 = ~Ralentit et rÈduit le THAC0 et la classe d'armure de la cible de 1 pendant 1 round (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVENFEBL
-@102517 = ~Augmente le THAC0, les dÈg‚ts et les jets de sauvegarde contre les sorts des alliÈs dans un rayon de 6 mËtres de 1~ // SpÈcifique ‡ Item Revision : DVSINGSW
-@102518 = ~RÈduit le THAC0 de la cible de 1 et inflige 1 point de dÈg‚ts de feu supplÈmentaire ‡ chaque round pendant 3 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVBRNWND
-@102519 = ~Inflige 1 point de dÈg‚ts de poison ‡ chaque round pendant 1 tour~ // SpÈcifique ‡ Item Revision : DVBLEED0
-@102520 = ~RÈduit au silence la cible ainsi que les adversaires dans un rayon de 4,5 mËtres pendant 2 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVNAMARR
-@102521 = ~Fait oublier 1 sort profane ‡ la cible tandis que les points de vie du porteur sont augmentÈs de 2 pendant 1 heure (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSPDRNK
-@102522 = ~RÈduit la classe d'armure de la cible de 2 et l'empÍche de se cacher pendant 4 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVFFIRE
-@102523 = ~RÈduit au silence et inflige 1 point de dÈg‚ts de poison toutes les 3 secondes ‡ la cible pendant 3 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVCUTTHR
-@102524 = ~Immobilise les cibles mort-vivantes pendant 2 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVHOLDUN
-@102525 = ~de pÈtrifier la cible pendant 2 rounds (jet de sauvegarde contre petrification and polymorph pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSTNHLD
-@102526 = ~d'infliger 1d6 +2 points de dÈg‚ts contondants aux adversaires dans un rayon d'1,50 mËtre~ // SpÈcifique ‡ Item Revision : DVWHIRLS
-@102527 = ~d'Ètourdir la cible et les adversaires dans un rayon d'1,50 mËtre pendant 1 round (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVTHCLAP
-@102528 = ~de renverser la cible et les adversaires dans un rayon d'1,50 mËtre pendant 1 round (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVSHAKE
-@102529 = ~Immobilise et inflige 1d4 +5 points de dÈg‚ts perforants supplÈmentaires ‡ chaque round ‡ la cible pendant 2 rounds (jet de sauvegarde contre paralysis, poison and death pour Èviter)~ // SpÈcifique ‡ Item Revision : DVPIN
-@102530 = ~d'infliger 4d4 points de dÈg‚ts contondants aux adversaires dans un rayon de 3 mËtres et de les Ètourdir pendant 1 round (jet de sauvegarde contre les sorts pour Èviter d'Ítre Ètourdi)~ // SpÈcifique ‡ Item Revision : DVSBURST
-@102531 = ~…tourdit les adversaires dans un rayon d'1,50 mËtre pendant 1 round (jet de sauvegarde contre breath pour Èviter)~ // SpÈcifique ‡ Item Revision : DVTHCLAP
-@102532 = ~d'infliger 5d4 points de dÈg‚ts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique ‡ Item Revision : DVHSMITE
-@102533 = ~de rÈduire la classe d'armure de la cible de 1 pendant 2 rounds~ // SpÈcifique ‡ Item Revision : DVCORROS
-@102534 = ~d'infliger 4d4 points de dÈg‚ts contondants aux adversaires dans un rayon de 3 mËtres~ // SpÈcifique ‡ Item Revision : DVRESON
-@102602 = ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour Èviter, les spectateurs ont une pÈnalitÈ de -5)~ // SpÈcifique ‡ Rogue Rebalancing : RR#BBOW
-@102603 = ~d'Ètourdir la cible pendant 1 round~ // SpÈcifique ‡ Rogue Rebalancing : RR#SCAXE
-@102604 = ~Inflige Horreur ‡ la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour Èviter)~ // SpÈcifique : DVFEARSM
+@102480 = ~except√© pour les bardes~
+@102482 = ~R√©duit les points de vie maximum des cr√©atures vert√©br√©es de 3 pendant 1 tour~ // Sp√©cifique √† Item Revision : DVBONEBR
+@102483 = ~D√©truit les cr√©atures convoqu√©es~ // Sp√©cifique √† Item Revision : DVBANISH
+@102484 = ~Emprisonne la cible dans les flammes pendant 2 rounds (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVFLWHIP
+@102485 = ~Draine 1d4 points de vie si la cible poss√®de du sang et les transf√®re au porteur~ // Sp√©cifique √† Item Revision : DVVAMPIR
+@102486 = ~R√©duit la classe d'armure de la cible de 1 pendant 2 rounds~ // Sp√©cifique √† Item Revision : DVSUNDER
+@102487 = ~Dissipation de la magie (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVDISPEL
+@102488 = ~d‚Äôimmobiliser la cible pendant 1 round (jet de sauvegarde contre petrification and polymorph pour √©viter)~ // Sp√©cifique √† Item Revision : DVFREEZE
+@102489 = ~d'infliger Horreur √† la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVFEARSM
+@102490 = ~de ralentir la cible pendant 3 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVCHILL
+@102491 = ~de d√©capiter la cible (jet de sauvegarde contre paralysis, poison and death √† -2 pour √©viter)~ // Sp√©cifique √† Item Revision : DVVORPAL
+@102492 = ~Renverse et sonne la cible (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVKNBACK
+@102493 = ~d'endormir la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVSLEEP
+@102494 = ~Inflige 2d6 points de d√©g√¢ts de feu suppl√©mentaires aux adversaires dans un rayon d'un m√®tre et demi (jet de sauvegarde contre breath pour moiti√©)~ // Sp√©cifique √† Item Revision : DVFRBOLT
+@102495 = ~Ralentit et inflige 1 point de d√©g√¢ts toutes les 3 secondes pendants 4 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVAFFLIC
+@102496 = ~Fait oublier 1 sort profane √† la cible tandis que le porteur se rem√©more 1 sort de niveau 4 maximum (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVSPABSR
+@102497 = ~d'infliger D√©bilit√© mentale √† la cible (jet de sauvegarde contre les sorts √† -4 pour √©viter)~ // Sp√©cifique √† Item Revision : DVMINDBR
+@102498 = ~de paralyser la cible pendant 2 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVPRLYZE
+@102499 = ~R√©duit la force et la dext√©rit√© de 1 pendant 5 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVSHARP
+@102500 = ~√âtourdit la cible durant 1 round (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVBOOM
+@102501 = ~d'infliger 4d6 points de d√©g√¢ts de feu suppl√©mentaires √† la cible ainsi qu'aux adversaires dans un rayon d'un m√®tre et demi~ // Sp√©cifique √† Item Revision : DVFLBRST
+@102502 = ~Inflige 2d6 points de d√©g√¢ts contondants suppl√©mentaires √† la cible, la renverse et la sonne pendant 1 round (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVBRAM
+@102503 = ~R√©duit les jets de sauvegarde, le THAC0 et les d√©g√¢ts de la cible de 1 pendant 4 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVDOOM
+@102504 = ~de renverser, de sonner et d'infliger 4d6 points de d√©g√¢ts contondants suppl√©mentaires √† la cible ainsi qu'aux adversaires dans un rayon d'un m√®tre et demi (jet de sauvegarde contre breath pour √©viter d'√™tre renvers√© et sonn√©)~ // Sp√©cifique √† Item Revision : DVSWAVE
+@102505 = ~Porte l'attaque par round de la cible √† une demi et r√©duit sa vitesse d'incantation des sorts de 4 (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVSTAG
+@102506 = ~de r√©duire le THAC0 et la classe d'armure de la cible de 2 pendant 5 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVHOPLES
+@102507 = ~Inflige 1 point de d√©g√¢ts de poison √† chaque round pendant 5 rounds~ // Sp√©cifique √† Item Revision : DVBLEED5
+@102508 = ~d'aveugler tous les adversaires dans un rayon de 1,50 m√®tre pendant 4 rounds (jet de sauvegarde contre breath √† -4 pour √©viter)~ // Sp√©cifique √† Item Revision : DVSTDUST
+@102509 = ~Inflige 1 point de d√©g√¢ts de poison √† chaque round pendant 2 rounds~ // Sp√©cifique √† Item Revision : DVBLEED2
+@102510 = ~d'entoiler la cible pendant 2 rounds (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVWEB
+@102511 = ~de r√©duire de moiti√© la vitesse de d√©placement de la cible pendant 4 rounds~ // Sp√©cifique √† Item Revision : DVCRIPPL
+@102512 = ~de dissiper les protections et les invocations illusoires~ // Sp√©cifique √† Item Revision : DVILLBAN
+@102513 = ~de tuer instantan√©ment la cible (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVHSEEK
+@102514 = ~d'infliger 6d6 points de d√©g√¢ts de feu √† la cible et aux adversaires dans un rayon de 4,5 m√®tres~ // Sp√©cifique √† Item Revision : DVDETON
+@102515 = ~d'infliger 4d4 points de d√©g√¢ts d'acide √† la cible et aux adversaires dans un rayon de 1,50 m√®tre~ // Sp√©cifique √† Item Revision : DVVTRSPH
+@102516 = ~Ralentit et r√©duit le THAC0 et la classe d'armure de la cible de 1 pendant 1 round (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVENFEBL
+@102517 = ~Augmente le THAC0, les d√©g√¢ts et les jets de sauvegarde contre les sorts des alli√©s dans un rayon de 6 m√®tres de 1~ // Sp√©cifique √† Item Revision : DVSINGSW
+@102518 = ~R√©duit le THAC0 de la cible de 1 et inflige 1 point de d√©g√¢ts de feu suppl√©mentaire √† chaque round pendant 3 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVBRNWND
+@102519 = ~Inflige 1 point de d√©g√¢ts de poison √† chaque round pendant 1 tour~ // Sp√©cifique √† Item Revision : DVBLEED0
+@102520 = ~R√©duit au silence la cible ainsi que les adversaires dans un rayon de 4,5 m√®tres pendant 2 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVNAMARR
+@102521 = ~Fait oublier 1 sort profane √† la cible tandis que les points de vie du porteur sont augment√©s de 2 pendant 1 heure (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVSPDRNK
+@102522 = ~R√©duit la classe d'armure de la cible de 2 et l'emp√™che de se cacher pendant 4 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVFFIRE
+@102523 = ~R√©duit au silence et inflige 1 point de d√©g√¢ts de poison toutes les 3 secondes √† la cible pendant 3 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVCUTTHR
+@102524 = ~Immobilise les cibles mort-vivantes pendant 2 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVHOLDUN
+@102525 = ~de p√©trifier la cible pendant 2 rounds (jet de sauvegarde contre petrification and polymorph pour √©viter)~ // Sp√©cifique √† Item Revision : DVSTNHLD
+@102526 = ~d'infliger 1d6 +2 points de d√©g√¢ts contondants aux adversaires dans un rayon d'1,50 m√®tre~ // Sp√©cifique √† Item Revision : DVWHIRLS
+@102527 = ~d'√©tourdir la cible et les adversaires dans un rayon d'1,50 m√®tre pendant 1 round (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVTHCLAP
+@102528 = ~de renverser la cible et les adversaires dans un rayon d'1,50 m√®tre pendant 1 round (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVSHAKE
+@102529 = ~Immobilise et inflige 1d4 +5 points de d√©g√¢ts perforants suppl√©mentaires √† chaque round √† la cible pendant 2 rounds (jet de sauvegarde contre paralysis, poison and death pour √©viter)~ // Sp√©cifique √† Item Revision : DVPIN
+@102530 = ~d'infliger 4d4 points de d√©g√¢ts contondants aux adversaires dans un rayon de 3 m√®tres et de les √©tourdir pendant 1 round (jet de sauvegarde contre les sorts pour √©viter d'√™tre √©tourdi)~ // Sp√©cifique √† Item Revision : DVSBURST
+@102531 = ~√âtourdit les adversaires dans un rayon d'1,50 m√®tre pendant 1 round (jet de sauvegarde contre breath pour √©viter)~ // Sp√©cifique √† Item Revision : DVTHCLAP
+@102532 = ~d'infliger 5d4 points de d√©g√¢ts magiques, et d'aveugler %theTarget% pendant 1 round (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique √† Item Revision : DVHSMITE
+@102533 = ~de r√©duire la classe d'armure de la cible de 1 pendant 2 rounds~ // Sp√©cifique √† Item Revision : DVCORROS
+@102534 = ~d'infliger 4d4 points de d√©g√¢ts contondants aux adversaires dans un rayon de 3 m√®tres~ // Sp√©cifique √† Item Revision : DVRESON
+@102602 = ~d'aveugler %theTarget% pendant 3 rounds (jet de sauvegarde contre les sorts pour √©viter, les spectateurs ont une p√©nalit√© de -5)~ // Sp√©cifique √† Rogue Rebalancing : RR#BBOW
+@102603 = ~d'√©tourdir la cible pendant 1 round~ // Sp√©cifique √† Rogue Rebalancing : RR#SCAXE
+@102604 = ~Inflige Horreur √† la cible pendant 2 rounds (jet de sauvegarde contre les sorts pour √©viter)~ // Sp√©cifique : DVFEARSM

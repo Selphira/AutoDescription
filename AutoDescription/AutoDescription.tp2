@@ -19,18 +19,20 @@ ALWAYS
 	OUTER_SET is_ee    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
 	OUTER_SET has_eeex = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
 
-    ACTION_DEFINE_ARRAY arrayNoConvert BEGIN ~setup~ END
-    ACTION_DEFINE_ARRAY arrayReload BEGIN ~description~ END
-
+    // Les deux fichiers sont en UTF-8 : convertis en Windows-1252 sur les jeux classiques, laissés
+    // tels quels sur EE. convert_array limite la conversion à ces fichiers ; setup.tra (UTF-8)
+    // n'est jamais converti.
+    ACTION_DEFINE_ARRAY convert_tra BEGIN ~description~ END
     LAF HANDLE_CHARSETS
         INT_VAR
             infer_charsets = 1
+            from_utf8 = 1
         STR_VAR
             default_language = ~french~
             tra_path = ~AutoDescription/tra~
             out_path = ~weidu_external/Lang/AutoDescription~
-            noconvert_array = arrayNoConvert
-            reload_array = arrayReload
+            convert_array = convert_tra
+            reload_array = convert_tra
     END
 
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
