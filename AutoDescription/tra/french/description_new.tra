@@ -218,6 +218,7 @@
 @6200000 = ~%value% en %attribute%~ // reprise de @100019
 @6200001 = ~Poids~ // reprise de @100002
 @6200002 = ~Durée~ // reprise de @100031
+@6200003 = ~Utilisation~ // reprise de @101131
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150

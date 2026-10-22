@@ -141,29 +141,17 @@ END
 
 // Fléchette (ancien add_combat_abilities et add_charged_abilities) : tous ses en-têtes sont des
 // capacités de combat, avec leurs effets, même s'ils ont des charges ; sa capacité de charge n'a pas
-// de section si elle est seule (sinon refusée, ses effets seraient écrits deux fois). La ligne
-// « Utilisation » d'un unique en-tête à charges (ancien uses), sauf usage unique, n'est pas encore
-// reprise.
+// de section si elle est seule (sinon refusée, ses effets seraient écrits deux fois). Sa ligne
+// « Utilisation » est celle des potions (ad_item_uses_support, new-lib/item_charged.tpp).
 DEFINE_PATCH_MACRO ad_item_dart_support BEGIN
 	SET dart_charged = 0
-	SET dart_with_charges = 0
 	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
-		SET dart_charges = $combat_charges(~%combat_id%~)
-		PATCH_IF dart_charges > 0 OR $combat_location(~%combat_id%~) == 3 BEGIN
+		PATCH_IF $combat_charges(~%combat_id%~) > 0 OR $combat_location(~%combat_id%~) == 3 BEGIN
 			SET dart_charged += 1
-		END
-		PATCH_IF dart_charges > 0 BEGIN
-			SET dart_with_charges += 1
-			SET dart_uses_id = combat_id
 		END
 	END
 	PATCH_IF dart_charged > 1 BEGIN
 		SPRINT render_missing ~not_implemented:combat:dart_charges~
-	END
-	ELSE PATCH_IF dart_with_charges == 1 BEGIN
-		PATCH_IF $combat_charges(~%dart_uses_id%~) != 1 OR $combat_depletion(~%dart_uses_id%~) != 1 BEGIN
-			SPRINT render_missing ~not_implemented:combat:dart_uses~
-		END
 	END
 END
 

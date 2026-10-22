@@ -8,7 +8,7 @@
 // charged_depletion, charged_tooltip ; charged_global_duration(h) (pour chaque en-tête h : durée
 // commune des effets d'une potion, 0 sans durée commune), charged_other(h) (1 pour un en-tête sans
 // charges hors de l'objet) ; variables écrites : charged_count, charged_global_timing (timing de la
-// durée commune du premier en-tête).
+// durée commune du premier en-tête), charged_uses_id (ad_item_uses_support).
 
 DEFINE_PATCH_MACRO ad_item_charged_load BEGIN
 	SET charged_count = 0
@@ -63,21 +63,44 @@ DEFINE_PATCH_MACRO ad_item_charged_support BEGIN
 	END
 	PATCH_IF item_type == ITM_TYPE_potion BEGIN
 		LPM ad_item_potion_durations
-		// Ligne « Utilisation » de l'ancien moteur (uses) : potion à un seul en-tête à charges, sauf
-		// usage unique ; pas encore reprise.
+	END
+	LPM ad_item_uses_support
+END
+
+// Ligne « Utilisation » (ancien uses) d'une potion ou d'une fléchette dont un seul en-tête a des
+// charges, sauf usage unique : charged_uses_id est cet en-tête, -1 sans ligne. L'ancien moteur lit
+// les charges du dernier en-tête du fichier et non de celui qu'il a compté : refusé si ce ne sont
+// pas les mêmes (BUG-047).
+DEFINE_PATCH_MACRO ad_item_uses_support BEGIN
+	SET charged_uses_id = 0 - 1
+	PATCH_IF item_type == ITM_TYPE_potion OR item_type == ITM_TYPE_dart BEGIN
 		SET charged_with_charges = 0
 		FOR (charged_id = 0; charged_id < charged_count; ++charged_id) BEGIN
 			PATCH_IF $charged_charges(~%charged_id%~) > 0 BEGIN
 				SET charged_with_charges += 1
-				SET charged_uses_id = charged_id
+				SET charged_uses_found = charged_id
 			END
 		END
 		PATCH_IF charged_with_charges == 1 BEGIN
-			PATCH_IF $charged_charges(~%charged_uses_id%~) != 1 OR $charged_depletion(~%charged_uses_id%~) != 1 BEGIN
-				SPRINT render_missing ~not_implemented:charged:uses~
+			PATCH_IF $charged_header(~%charged_uses_found%~) != charged_header_count - 1 BEGIN
+				SPRINT render_missing ~not_implemented:charged:uses_not_last_header~
+			END
+			ELSE PATCH_IF $charged_charges(~%charged_uses_found%~) != 1 OR $charged_depletion(~%charged_uses_found%~) != 1 BEGIN
+				SET charged_uses_id = charged_uses_found
 			END
 		END
 	END
+END
+
+// « Utilisation : 20 charges, l'objet est détruit quand toutes les charges sont utilisées », avant le
+// poids. L'en-tête a des charges : le texte commence par leur nombre, sans majuscule à ajouter.
+DEFINE_PATCH_MACRO ad_item_uses_line BEGIN
+	SET charged_id = charged_uses_id
+	LPM ad_item_charged_uses
+	SPRINT name @6200003 // ~Utilisation~
+	SPRINT value ~%charged_uses%~
+	SPRINT line @1200000 // ~%name%%AD_COLON%%value%~
+	SPRINT description ~%description%%CRLF%%line%~
 END
 
 // Durée commune des effets de chaque en-tête d'une potion (ancien load_charged_abilities) : les

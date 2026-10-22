@@ -1,7 +1,7 @@
 // Rendu des objets : partie roleplay d'origine, titre « PARAMÈTRES », capacités d'équipement
 // (lignes fixes et lignes des opcodes décrits), capacités de charge (new-lib/item_charged.tpp),
 // capacités de combat et attributs des armes et munitions (new-lib/item_combat.tpp), « Nécessite »,
-// poids. Seuls les objets que ce rendu décrit
+// utilisation (new-lib/item_charged.tpp), poids. Seuls les objets que ce rendu décrit
 // entièrement sont couverts (ad_item_render_support).
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
@@ -11,6 +11,7 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	READ_SHORT ITM_type item_type
 	SPRINT render_missing ~~
 	SET combat_is_ammo = 0
+	SET charged_uses_id = 0 - 1
 	SET item_has_combat = (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
 		OR item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	PATCH_IF item_has_combat BEGIN
@@ -84,6 +85,9 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 	LPM ad_item_requirements_section
 	// Ligne vide avant le poids, comme dans l'ancien moteur.
 	SPRINT description ~%description%%CRLF%~
+	PATCH_IF charged_uses_id >= 0 BEGIN
+		LPM ad_item_uses_line
+	END
 	READ_LONG ITM_weight value
 	SPRINT name @6200001 // ~Poids~
 	SPRINT line @1200000 // ~%name%%AD_COLON%%value%~
