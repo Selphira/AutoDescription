@@ -8027,6 +8027,13 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_151~ BEGIN
 	END
 END
 
+DEFINE_PATCH_MACRO ~opcode_151_is_valid~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Creature file %resref%.cre doesn't exist.~ END
+	END
+END
+
 /* ----------------------- *
  * Overlay: Sanctuary [153] *
  * ----------------------- */
