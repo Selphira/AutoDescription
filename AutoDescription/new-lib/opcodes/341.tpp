@@ -35,6 +35,8 @@ DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 				SET recursion_ignore_duration = 0
 				SET recursion_series = 0
 				SET recursion_tracked = 0
+				SPRINT recursion_kind ~spl~
+				SET recursion_parent_dice = 0
 				SET recursion_versus_set = 0
 				SPRINT recursion_versus ~~
 				LPM ad_recursion_support

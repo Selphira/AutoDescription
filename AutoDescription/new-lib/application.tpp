@@ -533,7 +533,8 @@ END
 // Ligne de l'effet line_fx (pour une ligne qui en réunit plusieurs, l'un d'eux, de même application
 // que les autres) : phrase line_phrase (identifiant de base de la série, la forme y est ajoutée),
 // ou line_text déjà rédigé à la forme « soi » (à toute forme avec line_any_form : lignes d'un
-// sous-sort, qui nomment déjà leurs cibles) ; line_section et line_sort comme pour ad_line_add.
+// sous-sort, qui nomment déjà leurs cibles) ; line_section et line_sort comme pour ad_line_add ;
+// line_no_duration : durée de l'effet non écrite (déjà dans la condition).
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
 // durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
@@ -577,7 +578,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	PATCH_IF ~%app_block%~ STRING_EQUAL ~ability~ BEGIN
 		SPRINT line_section $fx_scope(~%line_fx%~)
 		LPM ad_application_duration
-		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) BEGIN
+		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) AND NOT line_no_duration BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~
 		END
 	END
@@ -633,6 +634,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0
 	SET line_any_form = 0
+	SET line_no_duration = 0
 	SPRINT line_suffix ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~

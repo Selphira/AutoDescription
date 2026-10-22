@@ -25,6 +25,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/cast_spell.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/versus_modifiers.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/target_exceptions.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/hit_effects.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/0.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/1.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/2.tpp~
@@ -149,7 +150,10 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/232.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/233.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/244.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/248.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/249.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/255.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/272.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/275.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/276.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/277.tpp~

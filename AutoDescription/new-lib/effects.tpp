@@ -156,32 +156,38 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
 			SET $fx_external(~%fx_id%~) = 0
-			SET $fx_versus_file(~%fx_id%~) = 0
-			SET $fx_versus_value(~%fx_id%~) = 0
 			SET $fx_parameter3(~%fx_id%~) = 0
-			SET $fx_identical_anchor(~%fx_id%~) = fx_id
-			PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
-				LPM ad_fx_substitute_177
-			END
-			LPM ad_fx_normalize
-			SET $fx_consumed(~%fx_id%~) = 0
-			SET $fx_dropped(~%fx_id%~) = 0
-			SET $fx_header_target(~%fx_id%~) = 0
-			SET $fx_header_target_count(~%fx_id%~) = 0
-			SET $fx_header_projectile(~%fx_id%~) = 0
-			SET $fx_potion_drinker(~%fx_id%~) = 0
-			SET $fx_area_target(~%fx_id%~) = 0
-			SET $fx_late(~%fx_id%~) = 0
-			SET $fx_series_of(~%fx_id%~) = 0 - 1
-			SET $fx_series_anchor(~%fx_id%~) = 0
-			LPM ad_fx_mark_target_exception
-			LPM ad_fx_mark_not_cumulative
-			SET fx_opcode = $fx_opcode(~%fx_id%~)
-			SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
-			PATCH_IF $fx_external(~%fx_id%~) BEGIN
-				SET $fx_opcode_count(~177~) = VARIABLE_IS_SET $fx_opcode_count(~177~) ? $fx_opcode_count(~177~) + 1 : 1
-			END
-			SET fx_count += 1
+			LPM ad_fx_add_effect
 		END
 	END
+END
+
+// Fin de la lecture de l'effet fx_id, dont les champs bruts sont lus (fx_external et fx_parameter3
+// compris) : remplacement d'un 177, valeurs normalisées, marques des passes, compte de l'opcode.
+DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
+	SET $fx_versus_file(~%fx_id%~) = 0
+	SET $fx_versus_value(~%fx_id%~) = 0
+	SET $fx_identical_anchor(~%fx_id%~) = fx_id
+	PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
+		LPM ad_fx_substitute_177
+	END
+	LPM ad_fx_normalize
+	SET $fx_consumed(~%fx_id%~) = 0
+	SET $fx_dropped(~%fx_id%~) = 0
+	SET $fx_header_target(~%fx_id%~) = 0
+	SET $fx_header_target_count(~%fx_id%~) = 0
+	SET $fx_header_projectile(~%fx_id%~) = 0
+	SET $fx_potion_drinker(~%fx_id%~) = 0
+	SET $fx_area_target(~%fx_id%~) = 0
+	SET $fx_late(~%fx_id%~) = 0
+	SET $fx_series_of(~%fx_id%~) = 0 - 1
+	SET $fx_series_anchor(~%fx_id%~) = 0
+	LPM ad_fx_mark_target_exception
+	LPM ad_fx_mark_not_cumulative
+	SET fx_opcode = $fx_opcode(~%fx_id%~)
+	SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
+	PATCH_IF $fx_external(~%fx_id%~) BEGIN
+		SET $fx_opcode_count(~177~) = VARIABLE_IS_SET $fx_opcode_count(~177~) ? $fx_opcode_count(~177~) + 1 : 1
+	END
+	SET fx_count += 1
 END

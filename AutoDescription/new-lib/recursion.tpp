@@ -1,9 +1,10 @@
-// Récursion : effets d'un sort lancé par un effet (opcodes 146 et 148 sans nom ou d'une potion),
-// décrits par les passes du moteur (chargement, prise en charge commune et par opcode,
+// Récursion : effets d'un sort lancé par un effet (opcodes 146 et 148 sans nom ou d'une potion, 232,
+// 341) ou effet d'un fichier EFF appliqué sous une condition (248, 249, 272), décrits par les passes du moteur (chargement, prise en charge commune et par opcode,
 // regroupements, lignes) dans la portée de ad_describe_subresource : le magasin d'effets et les
 // lignes de la ressource parente sont rétablis au retour (V32). Ce qui distingue une sous-ressource
 // passe par les variables ctx_*, lues par les passes communes :
-// - ctx_depth : profondeur (0 pour la ressource décrite), limitée à AD_RECURSION_MAX_DEPTH ;
+// - ctx_depth : profondeur en sorts (0 pour la ressource décrite), limitée à AD_RECURSION_MAX_DEPTH ;
+//   l'effet d'un EFF ne la compte pas, comme dans l'ancien moteur (get_res_description) ;
 // - ctx_chain : ressources de la chaîne au-dessus de la sous-ressource, « |RES1|RES2| » (vide pour
 //   la ressource décrite : l'ancien moteur n'y ajoute la ressource parente qu'à sa première
 //   sous-description, recursive_resref) ;
@@ -50,7 +51,7 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	TO_UPPER recursion_upper
 	SET recursion_allowed = 1
 	SET recursion_repeated = 0
-	PATCH_IF ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
+	PATCH_IF ~%recursion_kind%~ STRING_EQUAL ~spl~ AND ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
 	END
@@ -72,14 +73,16 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 END
 
 // Sous-description du sort recursion_resref lancé par l'effet recursion_fx, pour la prise en charge
-// de son opcode : résultat dans fx_sub_count et fx_sub_text (ad_describe_subresource), refus dans
+// de son opcode : résultat dans fx_sub_count, fx_sub_text et fx_sub_opcode (opcode de l'effet d'un
+// EFF, 0 - 1 pour un sort ; ad_describe_subresource), refus dans
 // render_missing. L'appelant fixe recursion_casting_level ; recursion_targets : effect (les
 // sous-effets reprennent les chaînes de cible de l'effet), given (celles de recursion_the_target,
 // recursion_of_the_target, recursion_to_the_target), own (chacun les siennes) ;
 // recursion_ignore_duration (durées masquées par l'opcode lui-même ; elles le sont aussi sous la
 // durée commune d'une potion) ; recursion_series (répétitions de l'effet acceptées) ;
 // recursion_tracked (ad_recursion_allowed) ; recursion_versus_set et recursion_versus (ctx_versus_set,
-// ctx_versus). Au-delà de la
+// ctx_versus) ; recursion_kind (spl ou eff) ; recursion_parent_dice (effet d'un EFF : dés de l'effet
+// recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides). Au-delà de la
 // profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
 // effet probable (l'ancien moteur multiplie les probabilités et retire « N % de chances » des
 // sous-lignes) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
@@ -127,13 +130,17 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				END
 				LPF ad_describe_subresource
 					INT_VAR
-						ctx_depth = ctx_depth + 1
+						ctx_depth = ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
 						ctx_casting_level = recursion_casting_level
+						ctx_parent_dice = recursion_parent_dice
+						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
+						ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
 						ctx_force_target = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
 						ctx_ignore_duration = recursion_hide
 						ctx_versus_set = recursion_versus_set
 					STR_VAR
 						resref = ~%recursion_resref%~
+						kind = ~%recursion_kind%~
 						ctx_chain = ~%ctx_chain%~
 						ctx_the_target = ~%recursion_the_target%~
 						ctx_of_the_target = ~%recursion_of_the_target%~
@@ -143,10 +150,12 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 						recursion_sub_missing = sub_missing
 						recursion_sub_count = sub_count
 						recursion_sub_text = sub_text
+						recursion_sub_opcode = sub_opcode
 				END
 				SPRINT render_missing ~%recursion_sub_missing%~
 				SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
 				SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
+				SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
 			END
 		END
 	END
@@ -170,12 +179,12 @@ END
 // en tête du fichier) : sub_count lignes, rendues comme l'ancien moteur les insère dans la ligne
 // parente (sub_text : la première sans puce, les suivantes après un saut de ligne et une puce) ;
 // sub_missing, raison de non-couverture (not_implemented:recursion:<raison>), vide si le sort est
-// décrit. En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
+// décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
 // ce niveau (le premier à égalité, ancien get_spell_headeroffset_for_level) ; sans, l'unique
 // en-tête. Refus : sort absent ou illisible ; aucun en-tête de ce niveau (l'ancien moteur lit alors
 // le début du fichier comme un en-tête, BUG-037) ; plusieurs en-têtes sans niveau de lancement
 // (rendu par niveaux du sort) ; effets de lancement ; opcode à prendre en charge ; tout refus des
-// passes ; ligne probable (l'ancien moteur regroupe les lignes probables du sous-sort) ; ligne hors
+// passes ; ligne probable d'un sort (l'ancien moteur regroupe les lignes probables du sous-sort) ; ligne hors
 // de la section de l'en-tête.
 DEFINE_PATCH_FUNCTION ad_describe_subresource
 	INT_VAR
@@ -184,8 +193,12 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_force_target = 0
 		ctx_ignore_duration = 0
 		ctx_versus_set = 0
+		ctx_parent_dice = 0
+		ctx_dice_count = 0
+		ctx_dice_sides = 0
 	STR_VAR
 		resref = ~~
+		kind = ~spl~
 		ctx_chain = ~~
 		ctx_the_target = ~~
 		ctx_of_the_target = ~~
@@ -195,7 +208,9 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		sub_missing
 		sub_count
 		sub_text
+		sub_opcode
 BEGIN
+	SET sub_opcode = 0 - 1
 	SPRINT sub_missing ~~
 	SET sub_count = 0
 	SPRINT sub_text ~~
@@ -204,8 +219,13 @@ BEGIN
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
 	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
-	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.spl~ BEGIN
+	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.%kind%~ BEGIN
 		SPRINT sub_missing ~not_implemented:recursion:missing_file~
+	END
+	ELSE PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
+		INNER_PATCH_FILE ~%sub_resref%.eff~ BEGIN
+			LPM ad_recursion_load_eff
+		END
 	END
 	ELSE BEGIN
 		SPRINT ctx_resource ~%sub_resref%~
@@ -275,6 +295,77 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		LPM ad_fx_load_block
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
 			SPRINT sub_missing ~not_implemented:recursion:%fx_load_error%~
+		END
+	END
+END
+
+// Effet unique de l'EFF ouvert (ancien get_res_description), dans l'en-tête 0 du magasin : ses champs,
+// dont sa cible, son timing et sa durée ; avec ctx_parent_dice, les dés de l'effet parent quand ceux
+// de l'opcode donnent des niveaux (ancien get_res_description_248, règle du 177,
+// new-lib/opcodes/177.tpp). C'est un effet externe (fx_external) : ni exception de cible ni 321 sur la
+// ressource elle-même. Refus : autre format ; opcode que l'ancien moteur décrit autrement pour un effet
+// d'un EFF (AD_OPCODES_EFF_FIELDS) ; niveaux minimum et maximum de l'EFF.
+DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
+	SPRINT sub_signature ~~
+	PATCH_IF BUFFER_LENGTH >= 0x110 BEGIN
+		READ_ASCII EFF2_signature sub_signature (8)
+	END
+	PATCH_IF NOT (~%sub_signature%~ STRING_EQUAL ~EFF V2.0~) BEGIN
+		SPRINT sub_missing ~not_implemented:recursion:unsupported_format~
+	END
+	ELSE BEGIN
+		LPM ad_fx_reset
+		SET fx_header_count = 1
+		SPRINT fx_block_kind ~ability~
+		SET fx_block_header = 0
+		SET fx_block_exceptions = 0
+		SET fx_block_not_cumulative = 0
+		SET sub_header = 0
+		SET sub_projectile = 0
+		SET fx_id = 0
+		SPRINT $fx_block(~0~) ~ability~
+		SET $fx_header(~0~) = 0
+		SET $fx_position(~0~) = 0
+		READ_SHORT EFF2_opcode            $fx_opcode(~0~)
+		READ_BYTE  EFF2_target            $fx_target(~0~)
+		READ_BYTE  EFF2_power             $fx_power(~0~)
+		READ_LONG  EFF2_parameter1        $fx_parameter1(~0~)
+		READ_LONG  EFF2_parameter2        $fx_parameter2(~0~)
+		SET $fx_parameter2_raw(~0~) = $fx_parameter2(~0~)
+		READ_BYTE  EFF2_timing            $fx_timing(~0~)
+		READ_LONG  EFF2_resistance        $fx_resistance(~0~)
+		READ_LONG  EFF2_duration          $fx_duration(~0~)
+		READ_BYTE  EFF2_probability1      $fx_probability1(~0~)
+		READ_BYTE  EFF2_probability2      $fx_probability2(~0~)
+		READ_ASCII EFF2_resource          $fx_resource(~0~) (8) NULL
+		READ_LONG  EFF2_dice_thrown       $fx_dice_count(~0~)
+		READ_LONG  EFF2_dice_sides        $fx_dice_sides(~0~)
+		READ_LONG  EFF2_save_type         $fx_save_type(~0~)
+		READ_LONG  EFF2_save_bonus        $fx_save_bonus(~0~)
+		READ_LONG  EFF2_stacking_id_tobex $fx_special(~0~)
+		READ_LONG  EFF2_parameter3        $fx_parameter3(~0~)
+		READ_LONG  0x54                   sub_level_min
+		READ_LONG  0x58                   sub_level_max
+		SET $fx_external(~0~) = 1
+		SET sub_opcode = $fx_opcode(~0~)
+		PATCH_IF ctx_parent_dice BEGIN
+			SPRINT sub_dice ~LEVEL~
+			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DICE(~%sub_opcode%~) BEGIN
+				SPRINT sub_dice $AD_OPCODE_DICE(~%sub_opcode%~)
+			END
+			PATCH_IF NOT ((~%sub_dice%~ STRING_EQUAL ~DICE~)
+					OR ((~%sub_dice%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND $fx_parameter2(~0~) != 0)) BEGIN
+				SET $fx_dice_count(~0~) = ctx_dice_count
+				SET $fx_dice_sides(~0~) = ctx_dice_sides
+			END
+		END
+		LPM ad_fx_add_effect
+		SET sub_opcode = $fx_opcode(~0~)
+		PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EFF_FIELDS(~%sub_opcode%~) BEGIN
+			SPRINT sub_missing ~not_implemented:recursion:eff_fields~
+		END
+		ELSE PATCH_IF sub_level_min != 0 OR sub_level_max != 0 BEGIN
+			SPRINT sub_missing ~not_implemented:recursion:eff_level~
 		END
 	END
 END
@@ -392,7 +483,8 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		PATCH_IF sub_count != line_count BEGIN
 			SPRINT render_missing ~not_implemented:section~
 		END
-		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
+		// Effet d'un EFF : une seule ligne, sans regroupement par probabilité.
+		FOR (sub_line = 0; sub_line < line_count AND ~%kind%~ STRING_EQUAL ~spl~; ++sub_line) BEGIN
 			PATCH_IF $line_probability(~%sub_line%~) > 0 BEGIN
 				SPRINT render_missing ~not_implemented:probability~
 			END
@@ -407,8 +499,10 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) BEGIN
 		SPRINT sub_missing ~%render_missing%~
-		INNER_PATCH_SAVE sub_missing ~%sub_missing%~ BEGIN
-			REPLACE_TEXTUALLY ~^not_implemented:~ ~not_implemented:recursion:~
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~not_implemented:recursion:~ ~%sub_missing%~) != 0 BEGIN
+			INNER_PATCH_SAVE sub_missing ~%sub_missing%~ BEGIN
+				REPLACE_TEXTUALLY ~^not_implemented:~ ~not_implemented:recursion:~
+			END
 		END
 		SET sub_count = 0
 		SPRINT sub_text ~~

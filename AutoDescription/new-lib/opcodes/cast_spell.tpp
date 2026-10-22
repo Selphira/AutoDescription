@@ -66,6 +66,8 @@ DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SET recursion_ignore_duration = 0
 	SET recursion_series = item_type == ITM_TYPE_potion
 	SET recursion_tracked = 1
+	SPRINT recursion_kind ~spl~
+	SET recursion_parent_dice = 0
 	SET recursion_versus_set = 0
 	SPRINT recursion_versus ~~
 	LPM ad_recursion_support

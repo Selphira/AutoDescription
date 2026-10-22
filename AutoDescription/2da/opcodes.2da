@@ -249,8 +249,8 @@
 245      1        1        TODO      LEVEL            432    SHOWN           Check_For_Berserk
 246      1        1        TODO      LEVEL            33     SHOWN           Spell_Effect:_Berserking
 247      1        1        TODO      LEVEL            381    SHOWN           Spell_Effect:_Attack_Nearest_Creature
-248      1        1        TODO      LEVEL            474    SHOWN           Item:_Set_Melee_Effect
-249      1        1        TODO      LEVEL            475    SHOWN           Item:_Set_Ranged_Effect
+248      1        1        DESCRIBED LEVEL            474    SHOWN           Item:_Set_Melee_Effect
+249      1        1        DESCRIBED LEVEL            475    SHOWN           Item:_Set_Ranged_Effect
 250      1        1        TODO      LEVEL            49     SHOWN           Spell_Effect:_Damage_Modifier
 251      1        1        TODO      LEVEL            494    IGNORED         Spell_Effect:_Change_Bard_Song_Effect
 252      1        1        TODO      LEVEL            471    IGNORED         Spell_Effect:_Set_Trap
@@ -273,7 +273,7 @@
 269      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Shake_Window
 270      1        1        TODO      LEVEL            205    IGNORED         Cure:_Unpause_Target
 271      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Avatar_Removal
-272      1        1        TODO      LEVEL            467    SHOWN           Spell:_Apply_Repeating_EFF
+272      1        1        DESCRIBED LEVEL            467    SHOWN           Spell:_Apply_Repeating_EFF
 273      1        1        TODO      LEVEL            227    IGNORED         Remove:_Specific_Area_Effect(Zone_of_Sweet_Air)
 274      1        1        TODO      LEVEL            454    NOT_PERMANENT   Spell_Effect:_Teleport_to_Target
 275      1        1        DESCRIBED LEVEL            126    SHOWN           Stat:_Hide_in_Shadows_Modifier

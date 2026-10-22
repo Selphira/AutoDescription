@@ -16,6 +16,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
 	SET line_phrase = 0
 	SET line_any_form = 0
+	SET line_no_duration = 0
 	SET line_probability = 0
 	SPRINT line_core ~~
 	SET line_nested = 0

@@ -2020,11 +2020,36 @@
 @22440112 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
 @22440113 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
 
+// Opcode 248 : effet à chaque attaque de mêlée réussie : 0001-0006 conditions (0002, 0004, 0006 à mains nues ;
+// 0003-0004 d'une cible, 0005-0006 probables), 0010-0012 attaque réussie avec l'opcode 249 (22 480 000-22 480 099)
+@22480001 = ~À chaque attaque de mêlée réussie~ // reprise de @12480001
+@22480002 = ~À chaque attaque à mains nues réussie~ // reprise de @12480002
+@22480003 = ~À chaque attaque de mêlée réussie par %theTarget%~ // reprise de @12480003
+@22480004 = ~À chaque attaque à mains nues réussie par %theTarget%~ // reprise de @12480004
+@22480005 = ~par attaque de mêlée réussie par %theTarget%~ // reprise de @12480005
+@22480006 = ~par attaque à mains nues réussie par %theTarget%~ // reprise de @12480006
+@22480010 = ~À chaque attaque réussie~ // reprise de @15240001
+@22480011 = ~À chaque attaque réussie par %theTarget%~ // reprise de @15240002
+@22480012 = ~par attaque réussie par %theTarget%~ // reprise de @15240003
+
+// Opcode 249 : effet à chaque attaque à distance réussie : 0001-0003 conditions (22 490 000-22 490 099)
+@22490001 = ~À chaque attaque à distance réussie~ // reprise de @12490001
+@22490002 = ~À chaque attaque à distance réussie par %theTarget%~ // reprise de @12490002
+@22490003 = ~par attaque à distance réussie par %theTarget%~ // reprise de @12490003
+
 // Opcode 255 : Création d'objet (en jours) : phrases 0100 (22 550 000-22 550 999)
 @22550100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @22550101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @22550102 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
 @22550103 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
+
+// Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
+@22720010 = ~À chaque %strDuration%~ // reprise de @12720010
+@22720011 = ~Toutes les %strDuration%~ // reprise de @12720011
+@22720012 = ~Tous les %strDuration%~ // reprise de @12720012
+@22720013 = ~%amount% fois par %strDuration%~ // reprise de @12720013
+@22720014 = ~%amount% fois toutes les %strDuration%~ // reprise de @12720014
+@22720015 = ~%amount% fois tous les %strDuration%~ // reprise de @12720015
 
 // Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
 @22800100 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~ // reprise de @12800001
