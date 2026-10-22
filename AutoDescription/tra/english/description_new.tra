@@ -42,6 +42,9 @@
 @1210121 = ~Reduces %theStatistic% %ofTheTarget% by %value%~ // reprise de @102285
 @1210122 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 @1210123 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
+@1210131 = ~Change %theStatistic% %ofTheTarget% to %value%~ // reprise de @102287
+@1210132 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
+@1210133 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~STATISTICS~ // reprise de @100003
@@ -62,6 +65,9 @@
 @2000030 = ~party members~ // reprise de @102473
 @2000031 = ~of party members~ // reprise de @101088
 @2000032 = ~to party members~ // reprise de @101182
+@2000040 = ~the creatures in the area of effect~ // reprise de @102474
+@2000041 = ~of the creatures in the area of effect~ // reprise de @101089
+@2000042 = ~to the creatures in the area of effect~ // reprise de @101190
 @2000050 = ~the non-group creatures~ // reprise de @101191
 @2000051 = ~of the non-group creatures~ // reprise de @101192
 @2000052 = ~to the non-group creatures~ // reprise de @101193
@@ -99,6 +105,12 @@
 @2002012 = ~to the %targetType%~ // reprise de @102386
 @2002020 = ~vs. %targetType%~ // reprise de @102387
 @2002030 = ~only for %targetType%~ // reprise de @11770001
+
+// Restriction de niveau de la cible (ancien add_target_level) : 0 un niveau, 1 au plus, 2 au moins, 3 de… à… (2 003 000-2 003 009)
+@2003000 = ~%target% (of level %levelMin%)~ // reprise de @101186
+@2003001 = ~%target% (of level %levelMax% or lower)~ // reprise de @101187
+@2003002 = ~%target% (of level %levelMin% or higher)~ // reprise de @101188
+@2003003 = ~%target% (from level %levelMin% to %levelMax%)~ // reprise de @101189
 
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~for %strDuration%~ // reprise de @100311
@@ -152,6 +164,7 @@
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Saving Throws~ // reprise de @102034
 @5000001 = ~Protects %resistName%~ // reprise de @102547
+@5000002 = ~save vs. all~ // reprise de @13250002
 @5000010 = ~save %saveTypeStr% neg.~ // reprise de @102121
 @5000012 = ~save %saveTypeStr% at %saveBonus% neg.~ // reprise de @102122
 @5000020 = ~ignore primary target~ // reprise de @102170
@@ -1195,6 +1208,7 @@
 @20120032 = ~stunning damage~ // reprise de @10120032
 @20120040 = ~does not wake up the target~ // reprise de @10120040
 @20120041 = ~effective if the source is disarmed~ // reprise de @10120041
+@20120042 = ~Any hit points above the maximum disappear after %strDuration%~ // reprise de @100317
 
 // Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums, 0160 dégâts contre un type de créature (formes « cible » seulement)
 @20120100 = ~Inflicts %damage% %toTheTarget%~ // reprise de @10120001
@@ -1202,6 +1216,18 @@
 @20120102 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120011
 @20120103 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Drains %damage% %toTheTarget%~ // reprise de @10120004
+@20120130 = ~Change %theTarget%'s hit points to %damage%~ // reprise de @10120006
+@20120131 = ~Change %theTarget%'s hit points to %damage%~ // reprise de @10120006
+@20120132 = ~to change %theTarget%'s hit points to %damage%~ // reprise de @10120016
+@20120133 = ~to change %theTarget%'s hit points to %damage%~ // reprise de @10120016
+@20120140 = ~Change %theTarget%'s hit points to %damage%%~ // reprise de @10120007
+@20120141 = ~Change %theTarget%'s hit points to %damage%%~ // reprise de @10120007
+@20120142 = ~to change %theTarget%'s hit points to %damage%%~ // reprise de @10120017
+@20120143 = ~to change %theTarget%'s hit points to %damage%%~ // reprise de @10120017
+@20120150 = ~Inflicts %damage%% of maximum hit points %toTheTarget%~ // reprise de @10120008
+@20120151 = ~Inflicts %damage%% of maximum hit points %toTheTarget%~ // reprise de @10120008
+@20120152 = ~to inflict %damage%% of maximum hit points %toTheTarget%~ // reprise de @10120018
+@20120153 = ~to inflict %damage%% of maximum hit points %toTheTarget%~ // reprise de @10120018
 @20120161 = ~Inflicts %damage% %versus%~ // reprise de @10120003
 @20120163 = ~to inflict %damage% %versus%~ // reprise de @10120013
 
@@ -1906,6 +1932,16 @@
 @21441013 = ~%action% the use of innate spells~ // reprise de @11440014
 @21441014 = ~%action% the use of Find traps~ // reprise de @11440015
 @21441015 = ~%action% the use of the inventory~ // reprise de @11440016
+
+// Opcode 145 : phrases 0100 types de sort nommés, 0110 tous les sorts (21 450 000-21 450 999)
+@21450100 = ~Disables %theTarget% to cast %spellType% spells~ // reprise de @11450000
+@21450101 = ~Disables %theTarget% to cast %spellType% spells~ // reprise de @11450000
+@21450102 = ~to disable %theTarget% to cast %spellType% spells~ // reprise de @11450050
+@21450103 = ~to disable %theTarget% to cast %spellType% spells~ // reprise de @11450050
+@21450110 = ~Disables %theTarget% to cast spells~ // reprise de @11450001
+@21450111 = ~Disables %theTarget% to cast spells~ // reprise de @11450001
+@21450112 = ~to disable %theTarget% to cast spells~ // reprise de @11450051
+@21450113 = ~to disable %theTarget% to cast spells~ // reprise de @11450051
 
 // Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
 @21460000 = ~as a level %castingLevel% spellcaster~ // reprise de @102095

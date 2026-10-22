@@ -149,7 +149,10 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
 		SPRINT render_missing ~not_implemented:application:probability_empty~
 	END
-	ELSE PATCH_IF $fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1 BEGIN
+	// Restriction de niveau d'un effet d'un EFF (l'ancien moteur y prend celle du parent) ou sans
+	// effet (minimum au-dessus du maximum, erreur journalisée par l'ancien moteur).
+	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND ($fx_external(~%app_id%~)
+			OR ($fx_level_max(~%app_id%~) > 0 AND $fx_level_min(~%app_id%~) > $fx_level_max(~%app_id%~))) BEGIN
 		SPRINT render_missing ~not_implemented:application:level~
 	END
 	ELSE PATCH_IF app_target == TARGET_FX_none OR app_target > TARGET_FX_original_caster BEGIN
@@ -449,6 +452,32 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		SPRINT theTarget ~%line_the_target%~
 	END
 	LPM ad_application_versus
+	PATCH_IF NOT app_target_missing BEGIN
+		LPM ad_application_target_level
+	END
+END
+
+// Restriction de niveau de l'effet line_fx (ancien add_target_level), après la zone du projectile
+// qui remplace les chaînes de la cible (l'ancien moteur la perdait, BUG-045) : « les créatures dans
+// un rayon de 4,5 mètres (de niveau 4 ou inférieur) ». Sur EE, l'ancien moteur n'en écrit pas pour
+// le 127 ni pour le 218 de parameter2 non nul. Refus (render_late_missing) : cible propre à l'opcode
+// (line_the_target).
+DEFINE_PATCH_MACRO ad_application_target_level BEGIN
+	SET levelMin = $fx_level_min(~%line_fx%~)
+	SET levelMax = $fx_level_max(~%line_fx%~)
+	SET app_opcode = $fx_opcode(~%line_fx%~)
+	PATCH_IF (levelMax > 0 OR levelMin > 1) AND NOT (IS_EE AND (app_opcode == 127 OR (app_opcode == 218 AND $fx_parameter2(~%line_fx%~) != 0))) BEGIN
+		PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) BEGIN
+			SPRINT render_late_missing ~not_implemented:application:level_target~
+		END
+		SET app_level_tra = levelMin == levelMax ? 2003000 : (levelMin <= 1 ? 2003001 : (levelMax == 0 ? 2003002 : 2003003)) // ~%target% (de niveau %levelMin%)~
+		SPRINT target ~%theTarget%~
+		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET theTarget = text END
+		SPRINT target ~%ofTheTarget%~
+		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET ofTheTarget = text END
+		SPRINT target ~%toTheTarget%~
+		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET toTheTarget = text END
+	END
 END
 
 // Type de créature visé par l'effet line_fx d'un 177 (fx_versus_file, new-lib/opcodes/177.tpp) et par
@@ -543,8 +572,8 @@ END
 // line_no_duration : durée de l'effet non écrite (déjà dans la condition).
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
-// durée. line_suffix (précisions de l'opcode, « (ne réveille pas la cible) ») suit le texte, avant
-// la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
+// durée. line_sentence (phrase ajoutée par l'opcode) suit le texte après un point ; line_suffix
+// (précisions de l'opcode, « (ne réveille pas la cible) ») les suit, avant la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
 // (ad_application_save), suivi de « (non cumulatif) » pour un effet lu après un 321 sur la ressource
 // elle-même (fx_not_cumulative) ; line_condition (« En combat ») précède toute la ligne, séparée par
 // AD_SEMICOLON (ancien add_condition) ; line_the_target, voir ad_application_target_strings ;
@@ -575,6 +604,9 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SET app_opcode = $fx_opcode(~%line_fx%~)
 		SPRINT render_late_missing ~not_implemented:opcode%app_opcode%:form%line_form%~
 		SET app_line_ok = 0
+	END
+	PATCH_IF NOT (~%line_sentence%~ STRING_EQUAL ~~) BEGIN
+		SPRINT line_text ~%line_text%. %line_sentence%~
 	END
 	PATCH_IF NOT (~%line_suffix%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% %line_suffix%~
@@ -642,6 +674,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET line_any_form = 0
 	SET line_no_duration = 0
 	SPRINT line_suffix ~~
+	SPRINT line_sentence ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~
 	SPRINT line_only_for ~~

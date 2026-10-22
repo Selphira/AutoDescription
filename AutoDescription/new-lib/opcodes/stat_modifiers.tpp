@@ -35,7 +35,10 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
 			LPM ad_stat_modifier_subject
-			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) = 0
+			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
+			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
+			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value%~
+			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
 		END
 	END
 	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
@@ -44,6 +47,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
 			LPM ad_stat_modifier_subject
+			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
+			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
+			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value%~
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END
@@ -56,12 +62,13 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 					OR (~%stat_percentage%~ STRING_EQUAL ~invalid~))) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
 			END
-			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
-			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) BEGIN
+			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler ; un effet d'un 177
+			// contre un type de créature n'est pas identique à celui qui vaut pour tous.
+			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:same_effect_twice~
 			END
 			ELSE BEGIN
-				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~) = 1
+				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 1
 			END
 		END
 	END

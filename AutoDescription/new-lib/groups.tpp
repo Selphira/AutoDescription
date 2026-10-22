@@ -8,6 +8,7 @@
 // Tableau écrit : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp).
 
 DEFINE_PATCH_MACRO ad_cross_groups BEGIN
+	SET group_statistic_tra = 0
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_identical_effects
 	END
@@ -38,7 +39,10 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		LPM ad_group_movement_restored
 		LPM ad_group_entangle
 		LPM ad_group_free_action
-		LPM ad_group_spell_failure
+		SET group_spell_opcode = 60
+		LPM ad_group_spell_types
+		SET group_spell_opcode = 145
+		LPM ad_group_spell_types
 		LPM ad_group_item_return
 		LPM ad_group_replace_item
 	END
@@ -106,8 +110,10 @@ DEFINE_PATCH_MACRO ad_group_saving_throws BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 34 35 36 37 END
 	SPRINT group_derived ~ALL_SAVES~
 	SPRINT group_name @5000000 // ~Jets de sauvegarde~
+	SET group_statistic_tra = 5000002 // ~les jets de sauvegarde~
 	SPRINT group_line ~ad_group_modifier_line~
 	LPM ad_group_same_fields
+	SET group_statistic_tra = 0
 END
 
 // Sept compétences de voleur modifiées de la même façon (ancien opcode_59_group, opcode virtuel
@@ -717,12 +723,14 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 	END
 END
 
-// Échec des sorts (ancien opcode_60_group) : chaque effet 60 réunit les autres effets 60 de types de
-// sort 0 à 2 qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni (fx_spell_types : masque
-// des types) est écrit après les autres, comme celui que l'ancien moteur ajoute en fin de liste.
-DEFINE_PATCH_MACRO ad_group_spell_failure BEGIN
+// Types de sort (anciens opcode_60_group et opcode_145_group, échec des sorts et lancement de sorts
+// empêché) : chaque effet de l'opcode group_spell_opcode réunit les autres effets de cet opcode de
+// types de sort 0 à 2 qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni
+// (fx_spell_types : masque des types) est écrit après les autres, comme celui que l'ancien moteur
+// ajoute en fin de liste.
+DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 60 AND NOT $fx_consumed(~%group_id%~) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == group_spell_opcode AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SET group_type = $fx_parameter2(~%group_id%~)
 			SET group_types = 1 << (group_type > 2 ? group_type - 3 : group_type)
 			SET group_merged = 0
@@ -730,7 +738,7 @@ DEFINE_PATCH_MACRO ad_group_spell_failure BEGIN
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_other_type = $fx_parameter2(~%group_candidate%~)
-				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 60 AND NOT $fx_consumed(~%group_candidate%~)
+				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == group_spell_opcode AND NOT $fx_consumed(~%group_candidate%~)
 						AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
 					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter2 = 0 RET group_other_signature = signature END
 					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
@@ -888,12 +896,21 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 END
 
 // « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp), en pourcentage
-// si l'opcode d'ancrage l'est.
+// si l'opcode d'ancrage l'est. Sur une autre cible que soi, avec un libellé de la statistique
+// (group_statistic_tra), la phrase à la forme « cible » des modificateurs (ancien opcode_target) :
+// « Augmente de 2 les jets de sauvegarde du porteur » ; le mode 3 des jeux EE y est un ajout.
 DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 	SET group_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%group_anchor%~)
 	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode percent = group_percent RET value = text END
 	SPRINT name ~%group_name%~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+	SET group_target = $fx_effective_target(~%group_id%~)
+	PATCH_IF group_statistic_tra > 0 AND group_target != TARGET_FX_self AND group_target != TARGET_FX_original_caster BEGIN
+		LPF ad_tra INT_VAR tra_id = group_statistic_tra RET theStatistic = text END
+		SET value = ABS group_value
+		SET line_phrase = group_mode == MOD_TYPE_flat ? 1210130 : (group_mode == MOD_TYPE_percentage ? 1210140
+			: (group_value >= 0 ? 1210110 : 1210120)) // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
 END
 
 // Ligne de résistance (new-lib/opcodes/resistances.tpp), nom au libellé group_name_tra.

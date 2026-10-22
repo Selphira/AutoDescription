@@ -7583,10 +7583,10 @@ DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
 	ELSE BEGIN
 		LPF ~get_spell_type_str~ INT_VAR value RET spellType END
 
-		PATCH_IF (parameter2 == 0 OR custom_int == 1) AND (NOT armor_show_allows_to_cast_spells OR (armor_show_allows_to_cast_spells AND VARIABLE_IS_SET isRobe AND isRobe)) BEGIN
-			SPRINT description @11450000 // ~Empêche %theTarget% de lancer des sorts %spellType%~
-		END
-		ELSE PATCH_IF parameter2 != 0 AND custom_int != 1 BEGIN
+		// Une armure qui n'est pas une robe le dit déjà en n'écrivant pas « Permet de lancer des sorts
+		// profanes » (add_equipped_abilities) ; toute autre ressource garde la ligne (PLYMSTAR).
+		PATCH_IF NOT ((parameter2 == 0 OR custom_int == 1) AND armor_show_allows_to_cast_spells
+				AND VARIABLE_IS_SET isArmor AND isArmor AND NOT (VARIABLE_IS_SET isRobe AND isRobe)) BEGIN
 			SPRINT description @11450000 // ~Empêche %theTarget% de lancer des sorts %spellType%~
 		END
 	END
@@ -16664,7 +16664,7 @@ DEFINE_PATCH_FUNCTION ~get_creature_name~ STR_VAR file = "" RET creatureName lev
 	SPRINT creatureName ~~
 	SET level = 0
 	SET allegiance = 0
-	SPRINT itemFilename ~%SOURCE_FILE%~s
+	SPRINT itemFilename ~%SOURCE_FILE%~
 	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.cre~ BEGIN
 		INNER_PATCH_FILE ~%file%.cre~ BEGIN
 			READ_LONG CRE_name spellNameRef

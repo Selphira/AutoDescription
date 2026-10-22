@@ -7,7 +7,9 @@
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp). La durée n'est pas affichée (colonne DURATION). Un drain ou un transfert
 // d'une durée limitée augmente les points de vie maximums pendant ce temps : l'ancien moteur le dit
-// à part, pas encore repris. Des dégâts qui visent un type de créature (effet d'un 177) s'écrivent
+// à la suite (« Tout point de vie au-delà du maximum disparaît après 1 tour »), la durée lue en
+// secondes quel que soit le timing (l'ancien moteur le force à « durée »), suivi de
+// « (non cumulatif) » pour les bits 3-4 de special. Des dégâts qui visent un type de créature (effet d'un 177) s'écrivent
 // « contre les X » à la forme « cible » (versus, ad_application_versus, new-lib/application.tpp).
 
 // ---------------------------------------------------------------------------------------------
@@ -20,12 +22,10 @@ DEFINE_PATCH_MACRO ad_op_12_support BEGIN
 			PATCH_IF damage_mode > 3 BEGIN
 				SPRINT render_missing ~not_implemented:opcode12:invalid~
 			END
-			// Dégâts sans dé ni valeur : l'ancien moteur n'écrit pas de ligne.
+			// Dégâts sans dé ni valeur : l'ancien moteur n'écrit pas de ligne ; écarté.
 			ELSE PATCH_IF (damage_mode == 0 OR damage_mode == 2) AND ~%damage_text%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode12:no_damage~
-			END
-			ELSE PATCH_IF (damage_drain OR damage_transfer) AND $fx_duration(~%damage_id%~) > 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode12:max_hp~
+				SET drop_id = damage_id
+				LPM ad_application_drop
 			END
 		END
 	END
@@ -72,9 +72,23 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 				ELSE BEGIN
 					SET line_phrase = 20120150
 				END
+				PATCH_IF damage_max_hp BEGIN
+					LPF ad_duration_text INT_VAR seconds = $fx_duration(~%damage_id%~) RET strDuration = text END
+					SPRINT line_sentence @20120042 // ~Tout point de vie au-delà du maximum disparaît après %strDuration%~
+					SET line_no_duration = 1
+					PATCH_IF (damage_special BAND (BIT3 BOR BIT4)) != 0 AND NOT $fx_not_cumulative(~%damage_id%~) BEGIN
+						SPRINT damage_note @4000010 // ~non cumulatif~
+						SPRINT line_suffix ~(%damage_note%)~
+					END
+				END
 				PATCH_IF damage_dont_wake BEGIN
 					SPRINT damage_note @20120040 // ~ne réveille pas la cible~
-					SPRINT line_suffix ~(%damage_note%)~
+					PATCH_IF ~%line_suffix%~ STRING_EQUAL ~~ BEGIN
+						SPRINT line_suffix ~(%damage_note%)~
+					END
+					ELSE BEGIN
+						SPRINT line_suffix ~%line_suffix% (%damage_note%)~
+					END
 				END
 				PATCH_IF damage_fist BEGIN
 					SPRINT damage_note @20120041 // ~efficace si la source est désarmée~
@@ -112,4 +126,5 @@ DEFINE_PATCH_MACRO ad_op_12_value BEGIN
 	SET damage_save_for_half = (damage_special BAND BIT8) != 0 AND damage_mode == 0
 	SET damage_fail_for_half = (damage_special BAND BIT9) != 0 AND damage_mode == 0
 	SET damage_dont_wake = (damage_special BAND BIT10) != 0
+	SET damage_max_hp = (damage_drain OR damage_transfer) AND $fx_duration(~%damage_id%~) > 0
 END

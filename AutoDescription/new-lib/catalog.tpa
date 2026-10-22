@@ -151,7 +151,6 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
 	42  => 1 // emplacements de sorts profanes
 	62  => 1 // emplacements de sorts divins
-	144 => 1 // boutons désactivés
 	145 => 1 // lancement de sorts désactivé
 END
 

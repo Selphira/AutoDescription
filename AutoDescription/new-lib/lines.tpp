@@ -21,6 +21,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SPRINT line_core ~~
 	SET line_nested = 0
 	SPRINT line_suffix ~~
+	SPRINT line_sentence ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~
 	SPRINT line_only_for ~~

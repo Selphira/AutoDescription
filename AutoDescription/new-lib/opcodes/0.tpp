@@ -37,10 +37,11 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				SET ac_base_count += ac_equipped
 			END
-			// L'ancien moteur écarte un modificateur nul ou un type inconnu (erreur journalisée).
+			// L'ancien moteur écarte un modificateur nul ou un type inconnu (erreur journalisée) : écarté.
 			ELSE PATCH_IF ac_value == 0 OR (ac_type != AC_MOD_TYPE_all AND ac_type != AC_MOD_TYPE_crushing
 					AND ac_type != AC_MOD_TYPE_missile AND ac_type != AC_MOD_TYPE_piercing AND ac_type != AC_MOD_TYPE_slashing) BEGIN
-				SPRINT render_missing ~not_implemented:opcode0:invalid~
+				SET drop_id = ac_id
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				SET ac_modifier_count += ac_equipped

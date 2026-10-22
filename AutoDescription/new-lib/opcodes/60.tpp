@@ -1,7 +1,7 @@
 // Opcode 60 (Stat: Miscast Magic) : parameter1, octet de poids faible = pourcentage d'échec ;
 // parameter2 0 sorts profanes, 1 divins, 2 innés (3 à 5 : les mêmes, sans retour visuel) ; « Provoque
 // l'échec de 50 % des sorts profanes ». Avec AD_ENABLE_SHRINKAGE, les effets qui ne diffèrent que par
-// le type de sort sont réunis (ad_group_spell_failure, new-lib/groups.tpp, fx_spell_types). L'ancien
+// le type de sort sont réunis (ad_group_spell_types, new-lib/groups.tpp, fx_spell_types). L'ancien
 // moteur n'a pas de phrase à la forme « soi » probable : l'effet est alors refusé.
 
 DEFINE_PATCH_MACRO ad_op_60_support BEGIN

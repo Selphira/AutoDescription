@@ -42,6 +42,9 @@
 @1210121 = ~Réduit de %value% %theStatistic% %ofTheTarget%~ // reprise de @102285
 @1210122 = ~de réduire de %value% %theStatistic% %ofTheTarget%~ // reprise de @102543
 @1210123 = ~de réduire de %value% %theStatistic% %ofTheTarget%~ // reprise de @102543
+@1210131 = ~Porte à %value% %theStatistic% %ofTheTarget%~ // reprise de @102287
+@1210132 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
+@1210133 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~PARAMÈTRES~ // reprise de @100003
@@ -62,6 +65,9 @@
 @2000030 = ~les membres du groupe~ // reprise de @102473
 @2000031 = ~des membres du groupe~ // reprise de @101088
 @2000032 = ~aux membres du groupe~ // reprise de @101182
+@2000040 = ~les créatures dans la zone d'effet~ // reprise de @102474
+@2000041 = ~des créatures dans la zone d'effet~ // reprise de @101089
+@2000042 = ~aux créatures dans la zone d'effet~ // reprise de @101190
 @2000050 = ~les créatures externes au groupe~ // reprise de @101191
 @2000051 = ~des créatures externes au groupe~ // reprise de @101192
 @2000052 = ~aux créatures externes au groupe~ // reprise de @101193
@@ -99,6 +105,12 @@
 @2002012 = ~aux %targetType%~ // reprise de @102386
 @2002020 = ~contre les %targetType%~ // reprise de @102387
 @2002030 = ~uniquement pour les %targetType%~ // reprise de @11770001
+
+// Restriction de niveau de la cible (ancien add_target_level) : 0 un niveau, 1 au plus, 2 au moins, 3 de… à… (2 003 000-2 003 009)
+@2003000 = ~%target% (de niveau %levelMin%)~ // reprise de @101186
+@2003001 = ~%target% (de niveau %levelMax% ou inférieur)~ // reprise de @101187
+@2003002 = ~%target% (de niveau %levelMin% ou supérieur)~ // reprise de @101188
+@2003003 = ~%target% (de niveau %levelMin% à %levelMax%)~ // reprise de @101189
 
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~pendant %strDuration%~ // reprise de @100311
@@ -152,6 +164,7 @@
 // Jets de sauvegarde et résistances : libellés (5 000 000-5 000 099)
 @5000000 = ~Jets de sauvegarde~ // reprise de @102034
 @5000001 = ~Immunité %resistName%~ // reprise de @102547
+@5000002 = ~les jets de sauvegarde~ // reprise de @13250002
 @5000010 = ~jet de sauvegarde %saveTypeStr% pour annuler~ // reprise de @102121
 @5000012 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~ // reprise de @102122
 @5000020 = ~ignore la cible principale~ // reprise de @102170
@@ -1195,6 +1208,7 @@
 @20120032 = ~points de dégâts non létal~ // reprise de @10120032
 @20120040 = ~ne réveille pas la cible~ // reprise de @10120040
 @20120041 = ~efficace si la source est désarmée~ // reprise de @10120041
+@20120042 = ~Tout point de vie au-delà du maximum disparaît après %strDuration%~ // reprise de @100317
 
 // Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums, 0160 dégâts contre un type de créature (formes « cible » seulement)
 @20120100 = ~Inflige %damage% %toTheTarget%~ // reprise de @10120001
@@ -1202,6 +1216,18 @@
 @20120102 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120011
 @20120103 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Draine %damage% %toTheTarget%~ // reprise de @10120004
+@20120130 = ~Passe les points de vie %ofTheTarget% à %damage%~ // reprise de @10120006
+@20120131 = ~Passe les points de vie %ofTheTarget% à %damage%~ // reprise de @10120006
+@20120132 = ~de faire passer les points de vie %ofTheTarget% à %damage%~ // reprise de @10120016
+@20120133 = ~de faire passer les points de vie %ofTheTarget% à %damage%~ // reprise de @10120016
+@20120140 = ~Passe les points de vie %ofTheTarget% à %damage% %~ // reprise de @10120007
+@20120141 = ~Passe les points de vie %ofTheTarget% à %damage% %~ // reprise de @10120007
+@20120142 = ~de faire passer les points de vie %ofTheTarget% à %damage% %~ // reprise de @10120017
+@20120143 = ~de faire passer les points de vie %ofTheTarget% à %damage% %~ // reprise de @10120017
+@20120150 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~ // reprise de @10120008
+@20120151 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~ // reprise de @10120008
+@20120152 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~ // reprise de @10120018
+@20120153 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~ // reprise de @10120018
 @20120161 = ~Inflige %damage% %versus%~ // reprise de @10120003
 @20120163 = ~d'infliger %damage% %versus%~ // reprise de @10120013
 
@@ -1906,6 +1932,16 @@
 @21441013 = ~%action% l'utilisation des sorts innés~ // reprise de @11440014
 @21441014 = ~%action% l'utilisation de la détection des pièges et des illusions~ // reprise de @11440015
 @21441015 = ~%action% l'utilisation de l'inventaire~ // reprise de @11440016
+
+// Opcode 145 : phrases 0100 types de sort nommés, 0110 tous les sorts (21 450 000-21 450 999)
+@21450100 = ~Empêche %theTarget% de lancer des sorts %spellType%~ // reprise de @11450000
+@21450101 = ~Empêche %theTarget% de lancer des sorts %spellType%~ // reprise de @11450000
+@21450102 = ~d'empêcher %theTarget% de lancer des sorts %spellType%~ // reprise de @11450050
+@21450103 = ~d'empêcher %theTarget% de lancer des sorts %spellType%~ // reprise de @11450050
+@21450110 = ~Empêche %theTarget% de lancer des sorts~ // reprise de @11450001
+@21450111 = ~Empêche %theTarget% de lancer des sorts~ // reprise de @11450001
+@21450112 = ~d'empêcher %theTarget% de lancer des sorts~ // reprise de @11450051
+@21450113 = ~d'empêcher %theTarget% de lancer des sorts~ // reprise de @11450051
 
 // Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
 @21460000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
