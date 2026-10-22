@@ -153,7 +153,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
 	62  => 1 // emplacements de sorts divins
 	144 => 1 // boutons désactivés
 	145 => 1 // lancement de sorts désactivé
-	206 => 1 // protections contre des sorts
 END
 
 // Types de jet de sauvegarde d'un effet (bits 0-4, IESDP) => opcode dont le libellé 2OOO0000 les
@@ -270,6 +269,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~PHYSICAL_RESISTANCES~  => 302
 	~EXCEPTIONAL_STRENGTH~  => 400
 	~THIEF_SKILLS~          => 120
+	~SPELL_LEVELS~          => 249
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
 	~REPLACE_ITEM~          => 400

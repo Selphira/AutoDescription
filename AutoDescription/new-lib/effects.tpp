@@ -163,13 +163,18 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 END
 
 // Fin de la lecture de l'effet fx_id, dont les champs bruts sont lus (fx_external et fx_parameter3
-// compris) : remplacement d'un 177, valeurs normalisées, marques des passes, compte de l'opcode.
+// compris) : remplacement d'un 177 ou d'un 111, valeurs normalisées, marques des passes, compte de
+// l'opcode.
 DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_versus_file(~%fx_id%~) = 0
 	SET $fx_versus_value(~%fx_id%~) = 0
 	SET $fx_identical_anchor(~%fx_id%~) = fx_id
+	SET $fx_from_111(~%fx_id%~) = 0
 	PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
 		LPM ad_fx_substitute_177
+	END
+	ELSE PATCH_IF $fx_opcode(~%fx_id%~) == 111 BEGIN
+		LPM ad_fx_substitute_111
 	END
 	LPM ad_fx_normalize
 	SET $fx_consumed(~%fx_id%~) = 0

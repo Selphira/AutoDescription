@@ -1624,6 +1624,17 @@
 @21010100 = ~Protects from %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Protects %theTarget% from %opcodeStr%~ // reprise de @11010002
 
+// Opcode 102 : immunité par niveau de sort, réunie (ancien opcode 509) : phrases 0110 niveaux 1 à N,
+// 0120 tous les niveaux (21 020 000-21 020 999)
+@21020110 = ~Protects from spells of %spellLevel% level and below~ // reprise de @11020002
+@21020111 = ~Protects %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020004
+@21020112 = ~to protect %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020006
+@21020113 = ~to protect %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020006
+@21020120 = ~Protects from spells~ // reprise de @15090001
+@21020121 = ~to protect %theTarget% from spells~ // reprise de @15090003
+@21020122 = ~to protect from spells~ // reprise de @15090002
+@21020123 = ~to protect from spells~ // reprise de @15090002
+
 // Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
 @21060100 = ~Immunity to panic~ // reprise de @11060004
 @21060101 = ~Immunity to panic~ // reprise de @11060004
@@ -1651,6 +1662,20 @@
 @21090101 = ~Hold %theTarget%~ // reprise de @11090002
 @21090102 = ~to hold %theTarget%~ // reprise de @11090004
 @21090103 = ~to hold %theTarget%~ // reprise de @11090004
+
+// Opcode 111 : arme magique créée : 0001-0002 « arme magique », « armes magiques », 0003 nombre et
+// libellé ; phrases 0100 une arme, 0110 plusieurs (21 110 000-21 110 999)
+@21110001 = ~magical weapon~ // reprise de @11110101
+@21110002 = ~magical weapons~ // reprise de @11110102
+@21110003 = ~%value% %valueType%~ // reprise de @102165
+@21110100 = ~Equips %theTarget% with %amount% (%itemName%)~ // reprise de @11110002
+@21110101 = ~Equips %theTarget% with %amount% (%itemName%)~ // reprise de @11110002
+@21110102 = ~d'équiper %theTarget% d'%amount% (%itemName%)~ // reprise de @11110003
+@21110103 = ~d'équiper %theTarget% d'%amount% (%itemName%)~ // reprise de @11110003
+@21110110 = ~Equips %theTarget% with %amount% (%itemName%)~ // reprise de @11110012
+@21110111 = ~Equips %theTarget% with %amount% (%itemName%)~ // reprise de @11110012
+@21110112 = ~d'équiper %theTarget% de %amount% (%itemName%)~ // reprise de @11110013
+@21110113 = ~d'équiper %theTarget% de %amount% (%itemName%)~ // reprise de @11110013
 
 // Opcode 112 : Retrait d'objet : phrases 0100 (21 120 000-21 120 999)
 @21120100 = ~Remove "%itemName%" from inventory~ // reprise de @11120001
@@ -1876,6 +1901,16 @@
 @21670000 = ~THAC0~ // reprise de @10540001
 @21670001 = ~%value% with Missile Weapons~ // reprise de @11670001
 @21670002 = ~the Missile Weapons THAC0~ // reprise de @11670002
+
+// Opcode 171 : capacité ajoutée : phrases 0100 capacité, 0110 sort du livre de sorts (21 710 000-21 710 999)
+@21710100 = ~Learns the spell %spellName% for %theTarget%~ // reprise de @11710001
+@21710101 = ~Learns the spell %spellName% for %theTarget%~ // reprise de @11710001
+@21710102 = ~d'ajouter la capacité « %spellName% »~ // reprise de @11710011
+@21710103 = ~d'ajouter la capacité « %spellName% »~ // reprise de @11710011
+@21710110 = ~to teach the spell %spellName% %toTheTarget%~ // reprise de @11710002
+@21710111 = ~to teach the spell %spellName% %toTheTarget%~ // reprise de @11710002
+@21710112 = ~d'ajouter le sort « %spellName% » dans le livre de sorts~ // reprise de @11710012
+@21710113 = ~d'ajouter le sort « %spellName% » dans le livre de sorts~ // reprise de @11710012
 
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Poison Resistance~ // reprise de @11730001

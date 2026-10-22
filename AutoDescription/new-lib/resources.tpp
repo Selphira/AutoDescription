@@ -205,3 +205,61 @@ BEGIN
 		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100000 tra_block_size = 14 RET name = text END // ~Dégâts offensifs~ (@8100010)
 	END
 END
+
+// Le sort resref a-t-il, dans l'un de ses en-têtes (effets de lancement exclus, comme l'ancien
+// SPL_V10_HEAD_EFFECTS), un effet de l'opcode opcode (0 - 1 : tout opcode) et de la ressource
+// resource (vide : toute ressource, casse ignorée) ? found : 1 si oui ; 0 si le sort n'existe pas.
+DEFINE_PATCH_FUNCTION ad_spell_has_effect
+	INT_VAR
+		opcode = 0 - 1
+	STR_VAR
+		resref = ~~
+		resource = ~~
+	RET
+		found
+BEGIN
+	SET found = 0
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG  SPL_extended_headers_offset spell_headers_offset
+				READ_SHORT SPL_extended_headers_count  spell_header_count
+				READ_LONG  SPL_feature_blocks_offset   spell_table_offset
+				FOR (spell_h = 0; spell_h < spell_header_count AND NOT found; ++spell_h) BEGIN
+					SET spell_header_offset = spell_headers_offset + spell_h * 0x28
+					PATCH_IF spell_header_offset >= 0 AND spell_header_offset + 0x28 <= BUFFER_LENGTH BEGIN
+						READ_SHORT (spell_header_offset + SPL_HEAD_feature_blocks_count)  spell_fx_count
+						READ_SHORT (spell_header_offset + SPL_HEAD_feature_blocks_offset) spell_fx_index
+						FOR (spell_p = 0; spell_p < spell_fx_count AND NOT found; ++spell_p) BEGIN
+							SET spell_fx_offset = spell_table_offset + (spell_fx_index + spell_p) * 0x30
+							PATCH_IF spell_fx_offset >= 0 AND spell_fx_offset + 0x30 <= BUFFER_LENGTH BEGIN
+								READ_SHORT (spell_fx_offset + FX_opcode) spell_fx_opcode
+								READ_ASCII (spell_fx_offset + FX_resource) spell_fx_resource (8) NULL
+								SET found = (opcode < 0 OR spell_fx_opcode == opcode)
+									AND (~%resource%~ STRING_EQUAL ~~ OR ~%spell_fx_resource%~ STRING_EQUAL_CASE ~%resource%~)
+							END
+						END
+					END
+				END
+			END
+		END
+	END
+END
+
+// Niveau du sort resref (champ du fichier lu sur quatre octets, comme l'ancien moteur) ; 0 - 1 si le
+// sort n'existe pas.
+DEFINE_PATCH_FUNCTION ad_spell_level
+	STR_VAR
+		resref = ~~
+	RET
+		level
+BEGIN
+	SET level = 0 - 1
+	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			PATCH_IF BUFFER_LENGTH >= SPL_level + 4 BEGIN
+				READ_LONG SPL_level level
+			END
+		END
+	END
+END

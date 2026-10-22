@@ -25,6 +25,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_projectile_spells
+		LPM ad_group_spell_levels
 		LPM ad_group_secondary_type_spells
 		LPM ad_group_bounce_spells
 		LPM ad_group_morale
@@ -43,6 +44,7 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
 		LPM ad_group_damage_halves
+		LPM ad_group_polymorph
 	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
@@ -217,6 +219,55 @@ DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
 					END
 					PATCH_IF group_spell_projectile == group_projectile BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+// Immunités par niveau de sort (ancien opcode_102_group, opcode virtuel 509) : les 102 d'une même
+// portée, aux mêmes champs (ad_op_102_support), sont réunis dans le premier, qui reçoit le masque
+// des niveaux (fx_spell_levels) ; il absorbe les immunités à un sort (206) de sa portée dont le
+// niveau ne dépasse pas le plus haut réuni ; pour les neuf niveaux (ancien opcode_509_post_group),
+// aussi les immunités à une école ou un type secondaire de sort (204, 205) de même cible, puissance,
+// résistance, probabilités, dés et jet de sauvegarde.
+DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 102 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			SET group_mask = 0
+			SET group_top = 0
+			FOR (group_candidate = group_id; group_candidate < fx_count; ++group_candidate) BEGIN
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				PATCH_IF $fx_opcode(~%group_candidate%~) == 102 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+					SET group_level = $fx_parameter1(~%group_candidate%~)
+					SET group_mask = group_mask BOR (1 << (group_level - 1))
+					SET group_top = group_level > group_top ? group_level : group_top
+					SET $fx_consumed(~%group_candidate%~) = group_candidate != group_id
+				END
+			END
+			SET $fx_spell_levels(~%group_id%~) = group_mask
+			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0
+				RET group_signature = signature END
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+					PATCH_IF group_other_opcode == 206 BEGIN
+						SPRINT group_spell $fx_resource(~%group_candidate%~)
+						LPF ad_spell_level STR_VAR resref = ~%group_spell%~ RET group_spell_level = level END
+						PATCH_IF group_spell_level >= 0 AND group_spell_level <= group_top BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+						END
+					END
+					ELSE PATCH_IF group_mask == 0x1FF AND (group_other_opcode == 204 OR group_other_opcode == 205) BEGIN
+						LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0
+							RET group_other_signature = signature END
+						PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+						END
 					END
 				END
 			END
@@ -648,6 +699,44 @@ DEFINE_PATCH_MACRO ad_group_delayed_series BEGIN
 		END
 		PATCH_IF $fx_series_anchor(~%group_id%~) BEGIN
 			SET $fx_late(~%group_id%~) = 1
+		END
+	END
+END
+
+// Métamorphose (ancien opcode_135_post_group) : dans la portée d'une métamorphose (135), le retour à
+// la forme naturelle est retiré : capacité ajoutée (171) dont le sort joue l'animation POLYBACK
+// (215) ; sort lancé avec un délai (146) dont le sort retire SPWI491, « Métamorphose forme
+// naturelle », si la métamorphose dure autant ; une métamorphose permanente prend alors la durée de
+// ce délai et est écrite après les autres, comme celle que l'ancien moteur ajoute. L'ancien moteur
+// reconnaît ces sorts à ces ressources.
+DEFINE_PATCH_MACRO ad_group_polymorph BEGIN
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF $fx_opcode(~%group_id%~) == 135 AND NOT $fx_consumed(~%group_id%~) BEGIN
+			SPRINT group_scope $fx_scope(~%group_id%~)
+			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
+				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+				SPRINT group_spell $fx_resource(~%group_candidate%~)
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+					PATCH_IF group_other_opcode == 171 BEGIN
+						LPF ad_spell_has_effect INT_VAR opcode = 215 STR_VAR resref = ~%group_spell%~ resource = ~POLYBACK~ RET group_found = found END
+						SET $fx_consumed(~%group_candidate%~) = group_found
+					END
+					ELSE PATCH_IF group_other_opcode == 146 AND $fx_timing(~%group_candidate%~) == TIMING_delayed BEGIN
+						LPF ad_spell_has_effect STR_VAR resref = ~%group_spell%~ resource = ~SPWI491~ RET group_found = found END
+						PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_duration
+								AND $fx_duration(~%group_id%~) == $fx_duration(~%group_candidate%~) BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+						END
+						ELSE PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_permanent BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+							SET $fx_timing(~%group_id%~) = TIMING_duration
+							SET $fx_duration(~%group_id%~) = $fx_duration(~%group_candidate%~)
+							SET $fx_late(~%group_id%~) = 1
+						END
+					END
+				END
+			END
 		END
 	END
 END

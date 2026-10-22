@@ -103,7 +103,7 @@
 99       1        1        TODO      LEVEL            91     SHOWN           Spell_Effect:_Duration_Modifier
 100      1        1        DESCRIBED LEVEL            280    SHOWN           Protection:_from_Creature_Type
 101      1        1        DESCRIBED LEVEL            283    SHOWN           Protection:_from_Opcode
-102      1        1        TODO      LEVEL            250    SHOWN           Spell:_Immunity_(by_Power_Level)
+102      1        1        DESCRIBED LEVEL            250    SHOWN           Spell:_Immunity_(by_Power_Level)
 103      1        1        IGNORED   LEVEL            400    SHOWN           Text:_Change_Name
 104      1        1        DESCRIBED LEVEL            424    SHOWN           Stat:_Experience_Points
 105      1        1        TODO      LEVEL            431    IGNORED         Stat:_Gold
@@ -112,7 +112,7 @@
 108      1        1        TODO      LEVEL            428    IGNORED         Stat:_Reputation
 109      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Paralyze
 110      1        1        IGNORED   LEVEL            400    SHOWN           Empty:
-111      1        1        TODO      LEVEL            480    SHOWN           Item:_Create_Magical_Weapon
+111      1        1        DESCRIBED LEVEL            480    SHOWN           Item:_Create_Magical_Weapon
 112      1        1        DESCRIBED LEVEL            5      IGNORED         Item:_Remove_Item
 113      1        1        TODO      LEVEL            400    SHOWN           Empty:
 114      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Dither
@@ -172,7 +172,7 @@
 168      1        1        IGNORED   LEVEL            400    SHOWN           Summon:_Remove_Creature
 169      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Prevent_Special_Effect_Icon
 170      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Play_Damage_Animation
-171      1        1        TODO      LEVEL            492    IGNORED         Spell:_Give_Ability
+171      1        1        DESCRIBED LEVEL            492    IGNORED         Spell:_Give_Ability
 172      1        1        IGNORED   LEVEL            400    IGNORED         Spell:_Remove_Spell
 173      1        1        DESCRIBED LEVEL            316    SHOWN           Stat:_Poison_Resistance_Modifier
 174      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Play_Sound_Effect

@@ -29,7 +29,8 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 END
 
 // Lignes (ancien opcode_self_206 et opcode_206_post_group) : avec AD_ENABLE_SHRINKAGE, les
-// immunités d'une même cible à au moins deux sorts de noms différents sont réunies en une ligne
+// immunités d'une même cible et d'une même portée (l'ancien moteur décrit chaque bloc à part) à au
+// moins deux sorts de noms différents sont réunies en une ligne
 // (effet dérivé SPELL_IMMUNITIES), noms triés ; les lignes réunies viennent après les autres.
 DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -46,10 +47,13 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 		FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
 			PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) < 0 BEGIN
 				SET spell_target = $fx_effective_target(~%spell_id%~)
+				SPRINT spell_scope $fx_scope(~%spell_id%~)
 				SET spell_name_count = 0
 				FOR (spell_other = spell_id; spell_other < fx_count; ++spell_other) BEGIN
+					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
 					PATCH_IF $fx_opcode(~%spell_other%~) == 206 AND NOT $fx_consumed(~%spell_other%~)
-							AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target BEGIN
+							AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target
+							AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
 							SET spell_name_new = 1
