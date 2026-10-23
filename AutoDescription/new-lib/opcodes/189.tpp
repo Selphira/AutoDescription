@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ad_op_189_support BEGIN
 			SET $fx_cast_maximum(~%stat_id%~) = 0
 			// Sans changement : écarté par l'ancien moteur.
 			PATCH_IF (cast_value BAND 255) == 0 AND cast_mode == 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode189:invalid~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode189:invalid~ message = ~no change (casting time modifier of 0)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				PATCH_IF cast_mode > 2 OR cast_mode < 0 OR (cast_mode == 2 AND NOT IS_EE) BEGIN

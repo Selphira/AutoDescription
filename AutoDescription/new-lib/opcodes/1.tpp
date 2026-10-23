@@ -30,15 +30,15 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 					OR (apr_mode == MOD_TYPE_percentage AND apr_parameter1 == 100)
 					OR (apr_mode == 3 AND (apr_timing == TIMING_duration OR apr_timing == TIMING_delayed_duration OR apr_timing == 6
 						OR apr_timing == TIMING_permanent_after_death OR apr_timing == TIMING_duration_ticks)) BEGIN
-				SPRINT render_missing ~not_implemented:opcode1:invalid~
+				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~file_error:opcode1:invalid~ message = ~invalid or ineffective number of attacks (mode %apr_mode%, value %apr_value%)~ RET render_missing = refusal END
 			END
 			// Une demi-attaque retirée : l'ancien moteur écrit « -5 » (BUG-021).
 			ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND apr_parameter1 < 0 AND apr_value == 6 BEGIN
-				SPRINT render_missing ~not_implemented:opcode1:half_removed~
+				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:half_removed~ message = ~half attack removed (BUG-021)~ RET render_missing = refusal END
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
 			ELSE PATCH_IF $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode1:same_effect_twice~
+				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) = 1

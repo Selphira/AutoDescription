@@ -20,12 +20,21 @@ DEFINE_PATCH_MACRO ad_op_12_support BEGIN
 		PATCH_IF $fx_opcode(~%damage_id%~) == 12 BEGIN
 			LPM ad_op_12_value
 			PATCH_IF damage_mode > 3 BEGIN
-				SPRINT render_missing ~not_implemented:opcode12:invalid~
+				LPF ad_refusal INT_VAR fx_id = damage_id STR_VAR reason = ~file_error:opcode12:invalid~ message = ~damage mode %damage_mode% (expected 0-3)~ RET render_missing = refusal END
 			END
 			// Dégâts sans dé ni valeur : l'ancien moteur n'écrit pas de ligne ; écarté.
 			ELSE PATCH_IF (damage_mode == 0 OR damage_mode == 2) AND ~%damage_text%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = damage_id
+				SPRINT ignored_reason ~file_error:opcode12:no_damage~
+				SPRINT ignored_message ~no damage (no dice and an amount of 0)~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF damage_mode == 0 AND NOT VARIABLE_IS_SET $AD_DAMAGE_TYPES(~%damage_type%~) BEGIN
+				SET ignored_fx = damage_id
+				SPRINT ignored_reason ~file_error:opcode12:damage_type~
+				SPRINT ignored_message ~unknown damage type %damage_type%, described as damage without a type~
+				SPRINT ignored_consequence ~kept~
+				LPM ad_log_ignored
 			END
 		END
 	END

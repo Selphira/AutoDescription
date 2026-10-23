@@ -10,10 +10,16 @@ DEFINE_PATCH_MACRO ad_op_123_support BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
 			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name END
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode123:invalid~
+				LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~file_error:opcode123:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = remove_id
+				SPRINT ignored_reason ~not_implemented:opcode123:no_name~
+				SPRINT ignored_message ~item %remove_resref%.ITM has no name~
+				PATCH_IF NOT FILE_EXISTS_IN_GAME ~%remove_resref%.itm~ BEGIN
+					SPRINT ignored_reason ~file_error:opcode123:missing_item~
+					SPRINT ignored_message ~item %remove_resref%.ITM does not exist~
+				END
 				LPM ad_application_drop
 			END
 			ELSE BEGIN

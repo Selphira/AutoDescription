@@ -57,7 +57,7 @@ DEFINE_PATCH_MACRO ad_item_charged_support BEGIN
 		LPM ad_opcode_is_described
 		PATCH_IF opcode_described AND charged_h >= 0 BEGIN
 			PATCH_IF $charged_other(~%charged_h%~) BEGIN
-				SPRINT render_missing ~not_implemented:headers~
+				LPF ad_refusal INT_VAR fx_id = charged_fx STR_VAR reason = ~not_implemented:headers~ message = ~ability %charged_h% is neither a charged ability nor described as one~ RET render_missing = refusal END
 			END
 		END
 	END
@@ -83,7 +83,7 @@ DEFINE_PATCH_MACRO ad_item_uses_support BEGIN
 		END
 		PATCH_IF charged_with_charges == 1 BEGIN
 			PATCH_IF $charged_header(~%charged_uses_found%~) != charged_header_count - 1 BEGIN
-				SPRINT render_missing ~not_implemented:charged:uses_not_last_header~
+				LPF ad_refusal INT_VAR fx_id = charged_id STR_VAR reason = ~not_implemented:charged:uses_not_last_header~ message = ~uses line for an ability that is not the last one~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $charged_charges(~%charged_uses_found%~) != 1 OR $charged_depletion(~%charged_uses_found%~) != 1 BEGIN
 				SET charged_uses_id = charged_uses_found
@@ -138,7 +138,7 @@ DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 			SET $charged_global_duration(~%charged_h%~) = charged_global
 			// Moins de 15 ticks : l'ancien moteur écrit une ligne « Durée » vide.
 			PATCH_IF charged_timing == TIMING_duration_ticks AND charged_global < 15 BEGIN
-				SPRINT render_missing ~not_implemented:charged:ticks~
+				LPF ad_refusal INT_VAR fx_id = charged_fx STR_VAR reason = ~not_implemented:charged:ticks~ message = ~potion duration of %charged_global% ticks, under one second~ RET render_missing = refusal END
 			END
 		END
 		PATCH_IF charged_id == 0 BEGIN

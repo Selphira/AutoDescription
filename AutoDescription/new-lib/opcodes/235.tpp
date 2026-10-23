@@ -9,7 +9,7 @@ DEFINE_PATCH_MACRO ad_op_235_support BEGIN
 		PATCH_IF $fx_opcode(~%buffet_id%~) == 235 AND NOT $fx_consumed(~%buffet_id%~) BEGIN
 			LPF ad_distance_text INT_VAR feet = $fx_parameter1(~%buffet_id%~) RET buffet_range = text END
 			PATCH_IF ~%buffet_range%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode235:range~
+				LPF ad_refusal INT_VAR fx_id = buffet_id STR_VAR reason = ~not_implemented:opcode235:range~ message = ~no text for this distance~ RET render_missing = refusal END
 			END
 		END
 	END

@@ -5,7 +5,7 @@
 DEFINE_PATCH_MACRO ad_op_216_support BEGIN
 	FOR (state_id = 0; state_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++state_id) BEGIN
 		PATCH_IF $fx_opcode(~%state_id%~) == 216 AND $fx_parameter1(~%state_id%~) < 0 - 1 BEGIN
-			SPRINT render_missing ~not_implemented:opcode216:levels_added~
+			LPF ad_refusal INT_VAR fx_id = state_id STR_VAR reason = ~not_implemented:opcode216:levels_added~ message = ~levels drained instead of restored~ RET render_missing = refusal END
 		END
 	END
 END

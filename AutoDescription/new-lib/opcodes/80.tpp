@@ -4,7 +4,7 @@
 // (opcode 60), pas encore décrit.
 DEFINE_PATCH_MACRO ad_op_80_support BEGIN
 	PATCH_IF AD_USE_SHORT_EFFECT_DESCRIPTION BEGIN
-		SPRINT render_missing ~not_implemented:opcode80:short~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:opcode80:short~ message = ~short text of the effect (AD_USE_SHORT_EFFECT_DESCRIPTION)~ RET render_missing = refusal END
 	END
 END
 

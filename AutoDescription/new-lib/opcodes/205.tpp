@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ad_op_205_support BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = $fx_parameter2(~%sectype_id%~) RET sectype_name = name END
 			SPRINT $fx_sectype_name(~%sectype_id%~) ~%sectype_name%~
 			PATCH_IF ~%sectype_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode205:no_name~
+				LPF ad_refusal INT_VAR fx_id = sectype_id STR_VAR reason = ~not_implemented:opcode205:no_name~ message = ~secondary type (parameter2) has no name~ RET render_missing = refusal END
 			END
 		END
 	END

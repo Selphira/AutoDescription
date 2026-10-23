@@ -19,7 +19,11 @@
 // - ctx_versus_set, ctx_versus : l'ancien moteur fixe versus (opcode 232), que les dégâts écrivent à la
 //   place de leur cible (« à l'attaquant »), même vide (BUG-038) ;
 // - ctx_resource : ressource décrite, dont les opcodes comparent les effets à elle-même (exceptions
-//   de cible, opcodes 180, 200, 201, 321), comme l'ancien CURRENT_SOURCE_RES.
+//   de cible, opcodes 180, 200, 201, 321), comme l'ancien CURRENT_SOURCE_RES ;
+// - ctx_origin : chemin de la sous-ressource pour les journaux, chaque effet parent avec son opcode,
+//   « equipped effect 0 (opcode 232) > BDDRAGBL.SPL » (vide pour la ressource décrite ;
+//   ad_fx_location, new-lib/log.tpp) ; ctx_single_effect : sous-ressource à effet unique (EFF), dont
+//   l'effet n'a pas d'emplacement propre.
 // Les règles propres aux objets (équipement, capacités de combat, en-têtes à charges) ne
 // s'appliquent pas aux sous-effets.
 
@@ -36,6 +40,8 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SPRINT ctx_resource ~%SOURCE_RES%~
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
+	SPRINT ctx_origin ~~
+	SET ctx_single_effect = 0
 	SET recursion_done = 0
 END
 
@@ -97,19 +103,19 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	PATCH_IF recursion_allowed BEGIN
 		SET recursion_opcode = $fx_opcode(~%recursion_fx%~)
 		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) BEGIN
-			SPRINT render_missing ~not_implemented:recursion:probability~
+			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:probability~ message = ~probable effect casting a spell~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~) BEGIN
-			SPRINT render_missing ~not_implemented:recursion:delayed~
+			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:delayed~ message = ~delayed effect casting a spell (the old engine writes it as a condition)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_series_anchor(~%recursion_fx%~) AND NOT recursion_series BEGIN
-			SPRINT render_missing ~not_implemented:recursion:series~
+			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:series~ message = ~repeated effect casting a spell~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_versus_file(~%recursion_fx%~) > 0 BEGIN
-			SPRINT render_missing ~not_implemented:recursion:versus~
+			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:versus~ message = ~spell cast against a creature type (opcode 177)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF recursion_repeated BEGIN
-			SPRINT render_missing ~not_implemented:recursion:repeated~
+			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:repeated~ message = ~spell already described by this resource~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
 			PATCH_IF ~%recursion_targets%~ STRING_EQUAL ~effect~ BEGIN
@@ -119,7 +125,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				LPM ad_application_target_strings
 				SPRINT line_only_for ~~
 				PATCH_IF app_target_missing BEGIN
-					SPRINT render_missing ~not_implemented:recursion:target~
+					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:target~ message = ~no text for the target of the effect~ RET render_missing = refusal END
 				END
 				SPRINT recursion_the_target ~%theTarget%~
 				SPRINT recursion_of_the_target ~%ofTheTarget%~
@@ -131,6 +137,9 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
 					SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
 				END
+				LPF ad_fx_location INT_VAR fx_id = recursion_fx with_opcode = 1 RET recursion_origin = location END
+				SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
+				TO_UPPER recursion_origin_resource
 				LPF ad_describe_subresource
 					INT_VAR
 						ctx_depth = recursion_depth_reset ? 1 : ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
@@ -148,6 +157,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 						resref = ~%recursion_resref%~
 						kind = ~%recursion_kind%~
 						ctx_chain = ~%ctx_chain%~
+						ctx_origin = ~%recursion_origin% > %recursion_origin_resource%~
 						ctx_the_target = ~%recursion_the_target%~
 						ctx_of_the_target = ~%recursion_of_the_target%~
 						ctx_to_the_target = ~%recursion_to_the_target%~
@@ -158,7 +168,10 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 						recursion_sub_text = sub_text
 						recursion_sub_opcode = sub_opcode
 				END
-				SPRINT render_missing ~%recursion_sub_missing%~
+				SPRINT render_missing ~~
+				PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
+					LPF ad_refusal_nest INT_VAR fx_id = recursion_fx STR_VAR refusal = ~%recursion_sub_missing%~ RET render_missing = refusal END
+				END
 				SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
 				SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
 				SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
@@ -185,8 +198,8 @@ END
 // Lignes du sort resref lancé par un effet du parent (ctx_* : contexte de la sous-ressource, voir
 // en tête du fichier) : sub_count lignes, rendues comme l'ancien moteur les insère dans la ligne
 // parente (sub_text : la première sans puce, les suivantes après un saut de ligne et une puce) ;
-// sub_missing, raison de non-couverture (not_implemented:recursion:<raison>), vide si le sort est
-// décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
+// sub_missing, refus (ad_refusal, new-lib/log.tpp ; l'appelant le rattache à son effet par
+// ad_refusal_nest, qui préfixe sa raison de recursion:), vide si le sort est décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
 // ce niveau (le premier à égalité, ancien get_spell_headeroffset_for_level) ; sans, l'unique
 // en-tête. Refus : sort absent ou illisible ; aucun en-tête de ce niveau (l'ancien moteur lit alors
 // le début du fichier comme un en-tête, BUG-037) ; plusieurs en-têtes sans niveau de lancement
@@ -210,6 +223,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		resref = ~~
 		kind = ~spl~
 		ctx_chain = ~~
+		ctx_origin = ~~
 		ctx_the_target = ~~
 		ctx_of_the_target = ~~
 		ctx_to_the_target = ~~
@@ -229,8 +243,11 @@ BEGIN
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
 	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
+	SET ctx_single_effect = ~%kind%~ STRING_EQUAL ~eff~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.%kind%~ BEGIN
-		SPRINT sub_missing ~not_implemented:recursion:missing_file~
+		SPRINT sub_file ~%sub_resref%.%kind%~
+		TO_UPPER sub_file
+		LPF ad_refusal STR_VAR reason = ~file_error:recursion:missing_file~ message = ~%sub_file% does not exist~ RET sub_missing = refusal END
 	END
 	ELSE PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
 		INNER_PATCH_FILE ~%sub_resref%.eff~ BEGIN
@@ -260,7 +277,7 @@ END
 DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 	FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
 		PATCH_IF $fx_probability(~%sub_fx%~) < 100 BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:probability_product~
+			LPF ad_refusal INT_VAR fx_id = sub_fx STR_VAR reason = ~not_implemented:recursion:probability_product~ message = ~probable effect under a probable parent effect~ RET sub_missing = refusal END
 		END
 		ELSE BEGIN
 			SET $fx_probability(~%sub_fx%~) = ctx_base_probability
@@ -277,17 +294,17 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		READ_ASCII SPL_signature sub_signature (8)
 	END
 	PATCH_IF NOT (~%sub_signature%~ STRING_EQUAL ~SPL V1  ~) BEGIN
-		SPRINT sub_missing ~not_implemented:recursion:unsupported_format~
+		LPF ad_refusal STR_VAR reason = ~file_error:recursion:unsupported_format~ message = ~signature "%sub_signature%" (expected "SPL V1  ")~ RET sub_missing = refusal END
 	END
 	ELSE BEGIN
 		READ_LONG  SPL_extended_headers_offset     sub_headers_offset
 		READ_SHORT SPL_extended_headers_count      sub_header_count
 		READ_SHORT SPL_casting_feature_blocks_count sub_casting_count
 		PATCH_IF sub_headers_offset < 0 OR sub_headers_offset + sub_header_count * 0x28 > BUFFER_LENGTH BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:invalid_header~
+			LPF ad_refusal STR_VAR reason = ~file_error:recursion:invalid_header~ message = ~abilities at offset %sub_headers_offset% lie outside the file (%BUFFER_LENGTH% bytes)~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF sub_casting_count > 0 BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:casting_effects~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:casting_effects~ message = ~spell with casting effects~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF ctx_casting_level > 0 BEGIN
 			SET sub_header_level = 0
@@ -299,11 +316,11 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 				END
 			END
 			PATCH_IF sub_header < 0 AND sub_header_count > 0 BEGIN
-				SPRINT sub_missing ~not_implemented:recursion:header_level~
+				LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:header_level~ message = ~no ability for casting level %ctx_casting_level%~ RET sub_missing = refusal END
 			END
 		END
 		ELSE PATCH_IF sub_header_count > 1 BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:headers~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:headers~ message = ~%sub_header_count% abilities and no casting level (level rendering not supported yet)~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF sub_header_count == 1 BEGIN
 			SET sub_header = 0
@@ -323,7 +340,7 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		SET fx_block_header = sub_header
 		LPM ad_fx_load_block
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:%fx_load_error%~
+			LPF ad_refusal STR_VAR reason = ~file_error:recursion:%fx_load_error%~ message = ~%fx_load_message%~ RET sub_missing = refusal END
 		END
 	END
 END
@@ -340,7 +357,7 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		READ_ASCII EFF2_signature sub_signature (8)
 	END
 	PATCH_IF NOT (~%sub_signature%~ STRING_EQUAL ~EFF V2.0~) BEGIN
-		SPRINT sub_missing ~not_implemented:recursion:unsupported_format~
+		LPF ad_refusal STR_VAR reason = ~file_error:recursion:unsupported_format~ message = ~signature "%sub_signature%" (expected "EFF V2.0")~ RET sub_missing = refusal END
 	END
 	ELSE BEGIN
 		LPM ad_fx_reset
@@ -373,6 +390,9 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		READ_LONG  EFF2_save_bonus        $fx_save_bonus(~0~)
 		READ_LONG  EFF2_stacking_id_tobex $fx_special(~0~)
 		READ_LONG  EFF2_parameter3        $fx_parameter3(~0~)
+		READ_LONG  EFF2_parameter4        $fx_parameter4(~0~)
+		READ_ASCII EFF2_resource2         $fx_resource2(~0~) (8) NULL
+		READ_ASCII EFF2_resource3         $fx_resource3(~0~) (8) NULL
 		READ_LONG  0x54                   sub_level_min
 		READ_LONG  0x58                   sub_level_max
 		SET $fx_external(~0~) = 1
@@ -394,10 +414,10 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		SET eff_fields_parameter2 = $fx_parameter2_raw(~0~)
 		LPM ad_eff_fields_differ
 		PATCH_IF eff_fields_differ BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:eff_fields~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:eff_fields~ message = ~opcode %sub_opcode% of an EFF file, which the old engine describes differently~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF sub_level_min != 0 OR sub_level_max != 0 BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:eff_level~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:eff_level~ message = ~EFF file with a level restriction~ RET sub_missing = refusal END
 		END
 	END
 END
@@ -413,12 +433,12 @@ DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 		ctx_area_creatures = area_creatures sub_area_feet = area_feet ctx_area_angle = area_angle
 		sub_area_cone = area_cone sub_area_ignore = area_ignore_target END
 	PATCH_IF sub_area_shape < 0 BEGIN
-		SPRINT sub_missing ~not_implemented:recursion:projectile_target~
+		LPF ad_refusal STR_VAR reason = ~file_error:recursion:projectile_target~ message = ~area projectile of the ability has a .PRO file too short to be read~ RET sub_missing = refusal END
 	END
 	ELSE PATCH_IF sub_area_shape > 0 BEGIN
 		LPF ad_distance_text INT_VAR feet = sub_area_feet RET ctx_area_range = text END
 		PATCH_IF ~%ctx_area_range%~ STRING_EQUAL ~~ BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:area_range~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:area_range~ message = ~no text for the area radius of the projectile~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF sub_area_cone BEGIN
 			SET ctx_area_phrase = sub_area_shape == 2 ? 2001102 : 2001100 // ~%target% dans un rayon de %range%~
@@ -433,7 +453,7 @@ DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 			SET ctx_area_phrase = 2001100 // ~%target% dans un rayon de %range%~
 		END
 		ELSE BEGIN
-			SPRINT sub_missing ~not_implemented:recursion:area_target~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:area_target~ message = ~area ability whose projectile has no area~ RET sub_missing = refusal END
 		END
 	END
 END
@@ -480,13 +500,13 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SPRINT render_missing ~~
 	SPRINT render_late_missing ~~
 	PATCH_IF NOT (~%sub_versus_opcode%~ STRING_EQUAL ~~) BEGIN
-		SPRINT render_missing ~not_implemented:versus_opcode%sub_versus_opcode%~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:versus_opcode%sub_versus_opcode%~ message = ~opcode %sub_versus_opcode% of an EFF file under a creature type set by opcode 232~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF NOT (~%sub_todo%~ STRING_EQUAL ~~) BEGIN
 		INNER_PATCH_SAVE sub_todo ~%sub_todo%~ BEGIN
 			DELETE_BYTES 0 1
 		END
-		SPRINT render_missing ~not_implemented:missing_opcodes:%sub_todo%~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:missing_opcodes:%sub_todo%~ message = ~opcodes not supported yet: %sub_todo%~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		LPM ad_application_support
@@ -522,7 +542,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 		PATCH_IF sub_probable AND ctx_base_probability < 100 BEGIN
 			PATCH_IF line_count > 1 BEGIN
-				SPRINT render_missing ~not_implemented:probability_lines~
+				LPF ad_refusal STR_VAR reason = ~not_implemented:probability_lines~ message = ~several lines in a spell cast by a probable effect~ RET render_missing = refusal END
 			END
 		END
 		ELSE PATCH_IF sub_probable BEGIN
@@ -537,7 +557,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
 			SPRINT sub_line_section $line_section(~%sub_line%~)
 			PATCH_IF NOT (~%sub_line_section%~ STRING_EQUAL ~~) AND NOT (~%sub_line_section%~ STRING_EQUAL ~ability%sub_header%~) BEGIN
-				SPRINT render_missing ~not_implemented:section~
+				LPF ad_refusal STR_VAR reason = ~not_implemented:section~ message = ~line outside the section of the ability~ RET render_missing = refusal END
 			END
 		END
 		// L'ancien moteur retire la puce de la première ligne, qui prend la place de la ligne parente.
@@ -550,11 +570,6 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) BEGIN
 		SPRINT sub_missing ~%render_missing%~
-		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~not_implemented:recursion:~ ~%sub_missing%~) != 0 BEGIN
-			INNER_PATCH_SAVE sub_missing ~%sub_missing%~ BEGIN
-				REPLACE_TEXTUALLY ~^not_implemented:~ ~not_implemented:recursion:~
-			END
-		END
 		SET sub_count = 0
 		SPRINT sub_text ~~
 	END

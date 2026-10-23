@@ -16,16 +16,16 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 			SET repeat_value = $fx_parameter1(~%repeat_id%~)
 			SPRINT repeat_resref $fx_resource_lower(~%repeat_id%~)
 			PATCH_IF $fx_external(~%repeat_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode272:external~
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (repeat_type != 0 AND repeat_type != 2 AND repeat_type != 3) OR ~%repeat_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode272:invalid~
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~file_error:opcode272:invalid~ message = ~invalid frequency type %repeat_type% (expected 0, 2 or 3) or empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (repeat_type == 0 OR repeat_type == 2) AND repeat_value <= 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode272:amount~
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~file_error:opcode272:amount~ message = ~frequency of 0 or less~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_probability(~%repeat_id%~) < 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode272:probability~
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:probability~ message = ~probable effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPM ad_op_272_condition
@@ -43,7 +43,7 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 				SPRINT recursion_versus ~~
 				LPM ad_recursion_support
 				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%repeat_id%~) > 1 BEGIN
-					SPRINT render_missing ~not_implemented:opcode272:lines~
+					LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:lines~ message = ~several lines in the applied EFF file~ RET render_missing = refusal END
 				END
 			END
 		END

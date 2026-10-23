@@ -13,7 +13,12 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance END
 			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode67:no_name~
+				PATCH_IF FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~not_implemented:opcode67:no_name~ message = ~creature %summon_resref%.CRE has no name~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~file_error:opcode67:missing_creature~ message = ~creature %summon_resref%.CRE does not exist~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SPRINT $fx_creature_name(~%summon_id%~) ~%summon_name%~
@@ -36,7 +41,7 @@ DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 			LPF ad_fx_signature INT_VAR fx_id = summon_other with_probability = 0 RET summon_other_signature = signature END
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
 			PATCH_IF (~%summon_other_signature%~ STRING_EQUAL ~%summon_signature%~) AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode67:random_amount~
+				LPF ad_refusal INT_VAR fx_id = summon_other STR_VAR reason = ~not_implemented:opcode67:random_amount~ message = ~random number of creatures~ RET render_missing = refusal END
 			END
 		END
 	END

@@ -27,7 +27,7 @@ DEFINE_PATCH_MACRO ad_op_321_support BEGIN
 		PATCH_IF $fx_opcode(~%removal_id%~) == 321 AND NOT $fx_consumed(~%removal_id%~) BEGIN
 			SPRINT removal_resource $fx_resource(~%removal_id%~)
 			PATCH_IF $fx_external(~%removal_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode321:external~
+				LPF ad_refusal INT_VAR fx_id = removal_id STR_VAR reason = ~not_implemented:opcode321:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%removal_resource%~ STRING_EQUAL ~~) BEGIN
 				SPRINT removal_scope $fx_scope(~%removal_id%~)
@@ -37,12 +37,16 @@ DEFINE_PATCH_MACRO ad_op_321_support BEGIN
 					SPRINT removal_other_resource $fx_resource(~%removal_other%~)
 					PATCH_IF (removal_other_opcode == 146 OR removal_other_opcode == 148) AND (~%removal_other_scope%~ STRING_EQUAL ~%removal_scope%~)
 							AND (~%removal_other_resource%~ STRING_EQUAL_CASE ~%removal_resource%~) BEGIN
-						SPRINT render_missing ~not_implemented:opcode321:cast_spell~
+						LPF ad_refusal INT_VAR fx_id = removal_other STR_VAR reason = ~not_implemented:opcode321:cast_spell~ message = ~spell cast by opcode 146 or 148 and removed by opcode 321~ RET render_missing = refusal END
 					END
 				END
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = removal_id
+				PATCH_IF ~%removal_resource%~ STRING_EQUAL ~~ BEGIN
+					SPRINT ignored_reason ~file_error:opcode321:invalid~
+					SPRINT ignored_message ~empty resource field~
+				END
 				LPM ad_application_drop
 			END
 		END

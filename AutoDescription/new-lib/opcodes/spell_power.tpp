@@ -26,16 +26,16 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%power_resref%~ RET power_spell = name END
 			END
 			PATCH_IF power_level < 1 OR power_level > 9 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%power_opcode%:level~
+				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~file_error:opcode%power_opcode%:level~ message = ~spell level %power_level% (expected 1-9)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_parameter1(~%power_id%~) < 1 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%power_opcode%:amount~
+				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~file_error:opcode%power_opcode%:amount~ message = ~amount of 0 or less~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF IS_EE AND NOT (~%power_spell%~ STRING_EQUAL ~~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%power_opcode%:spell~
+				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~not_implemented:opcode%power_opcode%:spell~ message = ~spell given in the resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT AD_ENABLE_SHRINKAGE AND power_level > 2 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%power_opcode%:level_mask~
+				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~not_implemented:opcode%power_opcode%:level_mask~ message = ~spell level above 2 without AD_ENABLE_SHRINKAGE~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 				LPM ad_spell_power_group_support
@@ -53,7 +53,7 @@ DEFINE_PATCH_MACRO ad_spell_power_group_support BEGIN
 				AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
 			LPF ad_fx_signature INT_VAR fx_id = power_other with_parameter2 = 0 with_special = 0 RET power_other_signature = signature END
 			PATCH_IF NOT (~%power_other_signature%~ STRING_EQUAL ~%power_signature%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%power_opcode%:group_fields~
+				LPF ad_refusal INT_VAR fx_id = power_other STR_VAR reason = ~not_implemented:opcode%power_opcode%:group_fields~ message = ~effects with different fields~ RET render_missing = refusal END
 			END
 		END
 	END

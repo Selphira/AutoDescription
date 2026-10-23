@@ -9,7 +9,7 @@ DEFINE_PATCH_MACRO ad_op_60_support BEGIN
 		PATCH_IF $fx_opcode(~%failure_id%~) == 60 BEGIN
 			SET $fx_spell_types(~%failure_id%~) = 0
 			PATCH_IF ($fx_parameter1(~%failure_id%~) BAND 255) == 0 OR $fx_parameter2(~%failure_id%~) < 0 OR $fx_parameter2(~%failure_id%~) > 5 BEGIN
-				SPRINT render_missing ~not_implemented:opcode60:invalid~
+				LPF ad_refusal INT_VAR fx_id = failure_id STR_VAR reason = ~file_error:opcode60:invalid~ message = ~failure chance of 0 or spell type (parameter2) outside 0-5~ RET render_missing = refusal END
 			END
 		END
 	END

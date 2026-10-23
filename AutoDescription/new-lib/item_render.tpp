@@ -22,7 +22,7 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 		LPM ad_item_charged_support
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT IS_EE BEGIN
-		SPRINT render_missing ~not_implemented:usability~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:usability~ message = ~usability is only written on classic games: not supported yet~ RET render_missing = refusal END
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_application_support

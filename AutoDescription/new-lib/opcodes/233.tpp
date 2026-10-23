@@ -13,12 +13,12 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 			SET proficiency_stat = $fx_parameter2(~%stat_id%~) BAND 65535
 			SET proficiency_mode = IS_EE ? $fx_parameter2(~%stat_id%~) BLSR 16 : 0
 			PATCH_IF proficiency_stat < 89 OR proficiency_stat > 134 OR proficiency_mode > 1 BEGIN
-				SPRINT render_missing ~not_implemented:opcode233:invalid~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode233:invalid~ message = ~proficiency %proficiency_stat% (expected 89-134) or mode %proficiency_mode% (expected 0-1)~ RET render_missing = refusal END
 			END
 			// Ajout (EE) : l'ancien moteur perd le mode dès la validation et écrit une valeur fixée
 			// (BUG-028).
 			ELSE PATCH_IF proficiency_mode == 1 BEGIN
-				SPRINT render_missing ~not_implemented:opcode233:increment~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode233:increment~ message = ~proficiency increment (mode 1)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $fx_stat_subject(~%stat_id%~) = proficiency_stat
@@ -36,6 +36,8 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 			SET proficiency_stat = $fx_stat_subject(~%stat_id%~)
 			PATCH_IF NOT VARIABLE_IS_SET $AD_PROFICIENCY_NAMES(~%proficiency_stat%~) BEGIN
 				SET drop_id = stat_id
+				SPRINT ignored_reason ~not_implemented:opcode233:no_name~
+				SPRINT ignored_message ~proficiency %proficiency_stat% has no name~
 				LPM ad_application_drop
 			END
 		END

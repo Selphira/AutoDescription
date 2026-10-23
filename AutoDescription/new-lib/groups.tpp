@@ -685,7 +685,7 @@ DEFINE_PATCH_MACRO ad_group_item_return BEGIN
 				END
 			END
 			PATCH_IF group_returns > 1 BEGIN
-				SPRINT render_late_missing ~not_implemented:opcode112:several_returns~
+				LPF ad_refusal INT_VAR fx_id = group_candidate STR_VAR reason = ~not_implemented:opcode112:several_returns~ message = ~several items returned by opcode 112 in one block~ RET render_late_missing = refusal END
 			END
 		END
 	END

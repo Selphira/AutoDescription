@@ -18,13 +18,13 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 			SPRINT hit_resref $fx_resource_lower(~%hit_id%~)
 			SET $fx_hit_any(~%hit_id%~) = 0
 			PATCH_IF $fx_external(~%hit_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hit_opcode%:external~
+				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%hit_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hit_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~file_error:opcode%hit_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_probability(~%hit_id%~) < 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hit_opcode%:probability~
+				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:probability~ message = ~probable effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				PATCH_IF hit_opcode == 248 AND AD_ENABLE_SHRINKAGE BEGIN
@@ -45,7 +45,7 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 					SPRINT recursion_versus ~~
 					LPM ad_recursion_support
 					PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%hit_id%~) > 1 BEGIN
-						SPRINT render_missing ~not_implemented:opcode%hit_opcode%:lines~
+						LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:lines~ message = ~several lines in the applied EFF file~ RET render_missing = refusal END
 					END
 				END
 			END
@@ -74,10 +74,10 @@ DEFINE_PATCH_MACRO ad_hit_effect_group BEGIN
 		END
 	END
 	PATCH_IF hit_matches > 1 OR (hit_matches == 1 AND hit_match_opcode == 248) BEGIN
-		SPRINT render_missing ~not_implemented:opcode248:group~
+		LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode248:group~ message = ~on-hit effect grouped with another one~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF hit_matches == 1 AND IS_EE AND ($fx_parameter2(~%hit_id%~) BAND BIT2) != 0 BEGIN
-		SPRINT render_missing ~not_implemented:opcode248:group_fist~
+		LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode248:group_fist~ message = ~on-hit effect of fists grouped with another one~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF hit_matches == 1 BEGIN
 		SET $fx_consumed(~%hit_match%~) = 1

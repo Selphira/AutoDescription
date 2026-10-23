@@ -18,20 +18,20 @@ DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 			SET hp_id = disease_id
 			LPM ad_hp_over_time_value
 			PATCH_IF disease_type < 0 OR disease_type > 13 OR (disease_type > 10 AND NOT IS_EE) BEGIN
-				SPRINT render_missing ~not_implemented:opcode78:invalid~
+				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:invalid~ message = ~disease type %disease_type% (expected 0-13, 0-10 on classic games)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF disease_type <= 3 AND (disease_timing == TIMING_permanent OR disease_timing == TIMING_delayed OR disease_timing == 7
 					OR disease_timing == TIMING_permanent_after_death) AND $fx_duration(~%disease_id%~) == 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode78:timing~
+				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:timing~ message = ~damage over time with a permanent or delayed timing and no duration~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF disease_type <= 3 AND hp_amount <= 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode78:no_effect~
+				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:no_effect~ message = ~damage amount of 0 or less~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF disease_type == 11 OR disease_type == 12 BEGIN
-				SPRINT render_missing ~not_implemented:opcode78:mold_touch~
+				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~not_implemented:opcode78:mold_touch~ message = ~mold touch~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ((disease_type >= 4 AND disease_type <= 9) OR disease_type == 13) AND disease_amount == 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode78:no_effect~
+				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:no_effect~ message = ~amount of 0~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF disease_type >= 4 AND disease_type <= 9 AND AD_ENABLE_SHRINKAGE BEGIN
 				LPF ad_fx_signature INT_VAR fx_id = disease_id with_parameter2 = 0 RET disease_signature = signature END
@@ -40,7 +40,7 @@ DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 					PATCH_IF disease_other != disease_id AND $fx_opcode(~%disease_other%~) == 78 AND disease_other_type >= 4 AND disease_other_type <= 9 BEGIN
 						LPF ad_fx_signature INT_VAR fx_id = disease_other with_parameter2 = 0 RET disease_other_signature = signature END
 						PATCH_IF ~%disease_other_signature%~ STRING_EQUAL ~%disease_signature%~ BEGIN
-							SPRINT render_missing ~not_implemented:opcode78:group~
+							LPF ad_refusal INT_VAR fx_id = disease_other STR_VAR reason = ~not_implemented:opcode78:group~ message = ~identical diseases~ RET render_missing = refusal END
 						END
 					END
 				END

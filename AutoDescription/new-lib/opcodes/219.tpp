@@ -22,13 +22,19 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 			LPF ad_ids_name INT_VAR ids_file = creature_ac_file entry = $fx_parameter1(~%creature_ac_id%~) RET creature_ac_name = name END
 			SPRINT creature_ac_scope $fx_scope(~%creature_ac_id%~)
 			PATCH_IF creature_ac_file < 2 OR creature_ac_file > 8 OR (creature_ac_file == 2 AND $fx_parameter1(~%creature_ac_id%~) == 100) BEGIN
-				SPRINT render_missing ~not_implemented:opcode219:invalid~
+				SET creature_ac_value = $fx_parameter1(~%creature_ac_id%~)
+				PATCH_IF creature_ac_file < 2 OR creature_ac_file > (IS_EE ? 9 : 8) BEGIN
+					LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~file_error:opcode219:invalid~ message = ~IDS file %creature_ac_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:invalid~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %creature_ac_file%, value %creature_ac_value%)~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF ~%creature_ac_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode219:no_name~
+				LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:no_name~ message = ~creature type has no name~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_probability(~%creature_ac_id%~) < 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode219:probability~
+				LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:probability~ message = ~probable effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT $fx_creature_type(~%creature_ac_id%~) ~%creature_ac_name%~
@@ -54,13 +60,13 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 					END
 				END
 				PATCH_IF AD_ENABLE_SHRINKAGE AND creature_ac_others > 0 BEGIN
-					SPRINT render_missing ~not_implemented:opcode219:several~
+					LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:several~ message = ~several creature types~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR AND creature_ac_zero
 						AND (~%creature_ac_scope%~ STRING_EQUAL ~equipped~) AND $fx_timing(~%creature_ac_id%~) == TIMING_while_equipped
 						AND $fx_effective_target(~%creature_ac_id%~) == TARGET_FX_self BEGIN
 					PATCH_IF item_type == ITM_TYPE_armor OR creature_ac_two OR creature_ac_all + 2 == 0 BEGIN
-						SPRINT render_missing ~not_implemented:opcode219:class_armor~
+						LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:class_armor~ message = ~armor, two bonuses or all creatures: the old engine writes it differently~ RET render_missing = refusal END
 					END
 					ELSE BEGIN
 						SET $fx_ac_merged(~%creature_ac_id%~) = 1

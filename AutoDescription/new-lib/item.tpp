@@ -31,4 +31,7 @@ BEGIN
 			SPRINT uncovered_reason ~%render_missing%~
 		END
 	END
+	PATCH_IF NOT covered BEGIN
+		LPF ad_log_event STR_VAR event = ~%uncovered_reason%~ RET uncovered_reason = reason END
+	END
 END

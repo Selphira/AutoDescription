@@ -23,21 +23,21 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 			SPRINT hp_scope $fx_scope(~%hp_id%~)
 			// L'ancien moteur écarte un mode inconnu (erreur journalisée).
 			PATCH_IF hp_type < 0 OR hp_type > 6 OR (hp_type == 6 AND NOT IS_EE) BEGIN
-				SPRINT render_missing ~not_implemented:opcode18:invalid~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode18:invalid~ message = ~modifier type %hp_type% (expected 0-5, 0-6 on enhanced editions)~ RET render_missing = refusal END
 			END
 			// L'ancien moteur ignore les dés d'un effet d'équipement mais les compte ailleurs, et
 			// l'IESDP ne les mentionne pas pour cet opcode (EDGE-008) ; sans dé lancé, les faces sont
 			// ignorées partout.
 			ELSE PATCH_IF $fx_dice_count(~%hp_id%~) > 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode18:dice~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode18:dice~ message = ~maximum hit points given by dice~ RET render_missing = refusal END
 			END
 			// Ajout nul : l'ancien moteur n'écrit pas de ligne ; pourcentage 100 : il écrit « 100 ».
 			ELSE PATCH_IF (hp_mode == MOD_TYPE_cumulative AND hp_value == 0) OR (hp_mode == MOD_TYPE_percentage AND hp_value == 100) BEGIN
-				SPRINT render_missing ~not_implemented:opcode18:no_change~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode18:no_change~ message = ~no change (mode %hp_mode%, value %hp_value%)~ RET render_missing = refusal END
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
 			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode18:same_effect_twice~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode18:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 1

@@ -16,4 +16,8 @@ BEGIN
 		LPM ad_fx_dump
 	END
 	LPM ad_set_coverage
+	PATCH_IF ~%uncovered_reason%~ STRING_EQUAL ~not_implemented~ BEGIN
+		LPF ad_refusal STR_VAR reason = ~not_implemented:spell~ message = ~spell descriptions are not supported yet~ RET uncovered_reason = refusal END
+	END
+	LPF ad_log_event STR_VAR event = ~%uncovered_reason%~ RET uncovered_reason = reason END
 END

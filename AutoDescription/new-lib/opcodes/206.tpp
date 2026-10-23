@@ -17,7 +17,21 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 			TO_UPPER spell_resref
 			// L'ancien moteur écarte un effet sans ressource (erreur journalisée).
 			PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode206:invalid~
+				LPF ad_refusal INT_VAR fx_id = spell_id STR_VAR reason = ~file_error:opcode206:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+			END
+			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur.
+			ELSE BEGIN
+				LPF ad_spell_name STR_VAR resref = ~%spell_resref%~ RET spell_support_name = name END
+				PATCH_IF ~%spell_support_name%~ STRING_EQUAL ~~ BEGIN
+					SET ignored_fx = spell_id
+					SPRINT ignored_reason ~not_implemented:opcode206:no_name~
+					SPRINT ignored_message ~spell %spell_resref%.SPL has no name~
+					PATCH_IF NOT FILE_EXISTS_IN_GAME ~%spell_resref%.spl~ BEGIN
+						SPRINT ignored_reason ~file_error:opcode206:missing_spell~
+						SPRINT ignored_message ~spell %spell_resref%.SPL does not exist~
+					END
+					LPM ad_log_ignored
+				END
 			END
 		END
 	END
@@ -45,7 +59,7 @@ DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
 					PATCH_IF $fx_opcode(~%spell_other%~) == 101 AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						LPF ad_fx_signature INT_VAR fx_id = spell_other with_parameter2 = 0 RET spell_other_signature = signature END
 						PATCH_IF NOT (~%spell_other_signature%~ STRING_EQUAL ~%spell_psionic_signature%~) BEGIN
-							SPRINT render_missing ~not_implemented:opcode206:psionic_fields~
+							LPF ad_refusal INT_VAR fx_id = spell_other STR_VAR reason = ~not_implemented:opcode206:psionic_fields~ message = ~psionic protections and immunities of the ability with different fields~ RET render_missing = refusal END
 						END
 					END
 				END

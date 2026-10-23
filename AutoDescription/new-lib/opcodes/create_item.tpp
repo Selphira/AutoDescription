@@ -12,13 +12,18 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 			LPF ad_item_is_random_treasure STR_VAR resref = ~%create_resref%~ RET create_random = random END
 			LPF ad_item_info STR_VAR resref = ~%create_resref%~ RET create_name = name create_stackable = stackable END
 			PATCH_IF ~%create_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%create_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~file_error:opcode%create_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF create_random BEGIN
-				SPRINT render_missing ~not_implemented:opcode%create_opcode%:random_treasure~
+				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref%~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%create_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%create_opcode%:no_name~
+				PATCH_IF FILE_EXISTS_IN_GAME ~%create_resref%.itm~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:no_name~ message = ~item %create_resref%.ITM has no name~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~file_error:opcode%create_opcode%:missing_item~ message = ~item %create_resref%.ITM does not exist~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SET create_amount = $fx_parameter1(~%create_id%~)

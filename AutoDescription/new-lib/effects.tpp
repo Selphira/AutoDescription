@@ -5,7 +5,8 @@
 //
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2 (fx_parameter2_raw : valeur lue, qu'une prise en charge ne réécrit
-// pas), fx_parameter3 (0 : seul un EFF en a un, new-lib/opcodes/177.tpp), fx_timing, fx_resistance, fx_duration, fx_probability1,
+// pas), fx_parameter3, fx_parameter4, fx_resource2, fx_resource3 (0 ou vides : seul un EFF en a,
+// new-lib/opcodes/177.tpp), fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
 // fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
 // fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
@@ -22,7 +23,8 @@
 // (1 pour un effet dont la probabilité est écrite dans les lignes de son sort, new-lib/recursion.tpp), fx_versus_file et
 // fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre),
 // fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_opcode_count(opcode).
-// Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
+// Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi) et
+// fx_load_message (son explication, en anglais, pour les journaux).
 
 // Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
 // (sort), bloc d'effet 0x30.
@@ -30,6 +32,10 @@ DEFINE_PATCH_MACRO ad_fx_reset BEGIN
 	SET fx_count = 0
 	SET fx_header_count = 0
 	SPRINT fx_load_error ~~
+	SPRINT fx_load_message ~~
+	SPRINT ignored_reason ~~
+	SPRINT ignored_message ~~
+	SPRINT ignored_consequence ~ignored~
 	CLEAR_ARRAY fx_opcode_count
 END
 
@@ -38,9 +44,11 @@ DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
 	READ_ASCII ITM_signature fx_signature (8)
 	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~ITM V1  ~) BEGIN
 		SPRINT fx_load_error ~unsupported_format~
+		SPRINT fx_load_message ~signature "%fx_signature%" (expected "ITM V1  ")~
 	END
 	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
 		SPRINT fx_load_error ~invalid_file~
+		SPRINT fx_load_message ~file of %BUFFER_LENGTH% bytes, shorter than the ITM V1 header (114 bytes)~
 	END
 	ELSE BEGIN
 		READ_LONG  ITM_feature_blocks_offset   fx_table_offset
@@ -55,6 +63,7 @@ DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
 			SET fx_header_offset = fx_headers_offset + fx_h * 0x38
 			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x38 > BUFFER_LENGTH BEGIN
 				SPRINT fx_load_error ~invalid_header~
+				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
 			END
 			ELSE BEGIN
 				READ_SHORT (fx_header_offset + ITM_HEAD_feature_block_count) fx_block_count
@@ -95,9 +104,11 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 	READ_ASCII SPL_signature fx_signature (8)
 	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~SPL V1  ~) BEGIN
 		SPRINT fx_load_error ~unsupported_format~
+		SPRINT fx_load_message ~signature "%fx_signature%" (expected "SPL V1  ")~
 	END
 	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
 		SPRINT fx_load_error ~invalid_file~
+		SPRINT fx_load_message ~file of %BUFFER_LENGTH% bytes, shorter than the SPL V1 header (114 bytes)~
 	END
 	ELSE BEGIN
 		READ_LONG  SPL_feature_blocks_offset         fx_table_offset
@@ -113,6 +124,7 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 			SET fx_header_offset = fx_headers_offset + fx_h * 0x28
 			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x28 > BUFFER_LENGTH BEGIN
 				SPRINT fx_load_error ~invalid_header~
+				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
 			END
 			ELSE BEGIN
 				READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_count)  fx_block_count
@@ -143,6 +155,11 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
 	PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
 		SPRINT fx_load_error ~invalid_effect~
+		SPRINT fx_load_message ~%fx_block_kind% effect %fx_p%~
+		PATCH_IF fx_block_header >= 0 BEGIN
+			SPRINT fx_load_message ~ability %fx_block_header%, effect %fx_p%~
+		END
+		SPRINT fx_load_message ~%fx_load_message% at offset %fx_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
 	END
 	ELSE BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
@@ -170,6 +187,9 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
 			SET $fx_external(~%fx_id%~) = 0
 			SET $fx_parameter3(~%fx_id%~) = 0
+			SET $fx_parameter4(~%fx_id%~) = 0
+			SPRINT $fx_resource2(~%fx_id%~) ~~
+			SPRINT $fx_resource3(~%fx_id%~) ~~
 			LPM ad_fx_add_effect
 		END
 	END
@@ -207,6 +227,14 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	ELSE PATCH_IF $fx_opcode(~%fx_id%~) == 111 BEGIN
 		LPM ad_fx_substitute_111
 	END
+	// Valeurs lues des champs que des passes réécrivent ensuite (regroupements, opcodes 23, 143, 189),
+	// pour les journaux (ad_fx_data, new-lib/log.tpp), comme fx_parameter2_raw.
+	SET $fx_parameter1_raw(~%fx_id%~) = $fx_parameter1(~%fx_id%~)
+	SET $fx_timing_raw(~%fx_id%~) = $fx_timing(~%fx_id%~)
+	SET $fx_duration_raw(~%fx_id%~) = $fx_duration(~%fx_id%~)
+	SET $fx_dice_count_raw(~%fx_id%~) = $fx_dice_count(~%fx_id%~)
+	SET $fx_special_raw(~%fx_id%~) = $fx_special(~%fx_id%~)
+	SET $fx_save_type_raw(~%fx_id%~) = $fx_save_type(~%fx_id%~)
 	LPM ad_fx_normalize
 	SET $fx_consumed(~%fx_id%~) = 0
 	SET $fx_dropped(~%fx_id%~) = 0

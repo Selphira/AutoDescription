@@ -222,7 +222,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 			ELSE BEGIN
 				SET prob_band = 100 - $seg_probability(~%seg_s%~)
 				PATCH_IF VARIABLE_IS_SET $prob_band_titles(~%prob_band%~) BEGIN
-					SPRINT render_late_missing ~not_implemented:application:probability_order~
+					LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable lines whose order the old engine sets differently~ RET render_late_missing = refusal END
 				END
 				SET $prob_band_titles(~%prob_band%~) = 1
 			END
@@ -230,7 +230,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 	END
 	PHP_EACH prob_band_titles AS prob_band => _ BEGIN
 		PATCH_IF VARIABLE_IS_SET $prob_band_lines(~%prob_band%~) BEGIN
-			SPRINT render_late_missing ~not_implemented:application:probability_order~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable lines whose order the old engine sets differently~ RET render_late_missing = refusal END
 		END
 	END
 

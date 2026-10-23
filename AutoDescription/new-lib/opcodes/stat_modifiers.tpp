@@ -55,7 +55,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
 			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:mode3~ message = ~mode 3 not supported for this opcode~ RET render_missing = refusal END
 			END
 			// L'ancien moteur écarte un mode inconnu ou un effet sans changement (erreur journalisée) ;
 			// en mode 3, une valeur nulle n'est pas écartée.
@@ -64,12 +64,12 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 					OR (stat_mode == MOD_TYPE_cumulative AND stat_value == 0)
 					OR (stat_mode == MOD_TYPE_percentage AND ((stat_value == 100 AND NOT (~%stat_percent_100%~ STRING_EQUAL ~valid~))
 					OR (~%stat_percentage%~ STRING_EQUAL ~invalid~))) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode%stat_opcode%:invalid~ message = ~invalid mode or no change (mode %stat_mode%, value %stat_value%)~ RET render_missing = refusal END
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler ; un effet d'un 177
 			// contre un type de créature n'est pas identique à celui qui vaut pour tous.
 			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:same_effect_twice~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 1

@@ -9,7 +9,7 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 		PATCH_IF $fx_opcode(~%ability_id%~) == 171 AND NOT $fx_consumed(~%ability_id%~) BEGIN
 			SPRINT ability_resref $fx_resource(~%ability_id%~)
 			PATCH_IF ~%ability_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%ability_resref%.spl~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode171:invalid~
+				LPF ad_refusal INT_VAR fx_id = ability_id STR_VAR reason = ~file_error:opcode171:invalid~ message = ~spell %ability_resref%.SPL does not exist~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%ability_resref%~ RET ability_name = name END
@@ -20,7 +20,7 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 					END
 				END
 				PATCH_IF ~%ability_name%~ STRING_EQUAL ~~ BEGIN
-					SPRINT render_missing ~not_implemented:opcode171:no_name~
+					LPF ad_refusal INT_VAR fx_id = ability_id STR_VAR reason = ~not_implemented:opcode171:no_name~ message = ~spell %ability_resref%.SPL has no name~ RET render_missing = refusal END
 				END
 				SPRINT $fx_spell_name(~%ability_id%~) ~%ability_name%~
 				SET $fx_spell_book(~%ability_id%~) = ability_type == 1 OR ability_type == 2

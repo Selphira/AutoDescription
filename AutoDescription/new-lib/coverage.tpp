@@ -3,10 +3,11 @@
 // catalogue ou du jeu courant) n'est pas décrit, sans empêcher la couverture. Les opcodes TODO et
 // inconnus sont journalisés dans …-opcodes.txt, synthétisé en fin de composant (ad_close_log).
 // Une ressource sans opcode TODO reçoit la raison not_implemented ; le point d'entrée la couvre
-// si son rendu sait la décrire entièrement.
+// si son rendu sait la décrire entièrement. Les autres raisons sont des refus (ad_refusal,
+// new-lib/log.tpp).
 DEFINE_PATCH_MACRO ad_set_coverage BEGIN
 	PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
-		SPRINT uncovered_reason ~%fx_load_error%~
+		LPF ad_refusal STR_VAR reason = ~file_error:load:%fx_load_error%~ message = ~%fx_load_message%~ RET uncovered_reason = refusal END
 	END
 	ELSE BEGIN
 		SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
@@ -42,7 +43,7 @@ DEFINE_PATCH_MACRO ad_set_coverage BEGIN
 			INNER_PATCH_SAVE cov_todo ~%cov_todo%~ BEGIN
 				DELETE_BYTES 0 1
 			END
-			SPRINT uncovered_reason ~missing_opcodes:%cov_todo%~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:missing_opcodes:%cov_todo%~ message = ~opcodes not supported yet: %cov_todo%~ RET uncovered_reason = refusal END
 		END
 		PATCH_IF NOT (~%cov_lines%~ STRING_EQUAL ~~) BEGIN
 			INNER_ACTION BEGIN

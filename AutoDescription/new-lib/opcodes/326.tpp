@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 		PATCH_IF $fx_opcode(~%apply_id%~) == 326 AND NOT $fx_consumed(~%apply_id%~) BEGIN
 			SPRINT apply_resref $fx_resource_lower(~%apply_id%~)
 			PATCH_IF $fx_external(~%apply_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode326:external~
+				LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 				SPRINT apply_scope $fx_scope(~%apply_id%~)
@@ -22,7 +22,7 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 					SPRINT apply_other_resref $fx_resource_lower(~%apply_other%~)
 					PATCH_IF $fx_opcode(~%apply_other%~) == 326 AND apply_other != apply_id AND NOT $fx_consumed(~%apply_other%~)
 							AND (~%apply_other_scope%~ STRING_EQUAL ~%apply_scope%~) AND (~%apply_other_resref%~ STRING_EQUAL ~%apply_resref%~) BEGIN
-						SPRINT render_missing ~not_implemented:opcode326:group~
+						LPF ad_refusal INT_VAR fx_id = apply_other STR_VAR reason = ~not_implemented:opcode326:group~ message = ~several opcode 326 casting the same spell~ RET render_missing = refusal END
 					END
 				END
 			END
@@ -44,7 +44,7 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				SPRINT recursion_versus ~~
 				LPM ad_recursion_support
 				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%apply_id%~) > 1 AND ~%apply_condition%~ STRING_EQUAL ~~ BEGIN
-					SPRINT render_missing ~not_implemented:opcode326:no_condition~
+					LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:no_condition~ message = ~several lines without a condition text~ RET render_missing = refusal END
 				END
 			END
 		END
@@ -73,7 +73,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 	END
 	SPRINT apply_condition ~~
 	PATCH_IF NOT IS_AN_INT apply_stat OR NOT IS_AN_INT apply_value OR NOT IS_AN_INT apply_relation BEGIN
-		SPRINT render_missing ~not_implemented:opcode326:splprot~
+		LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~file_error:opcode326:splprot~ message = ~row %apply_row% of SPLPROT.2DA is missing or unused~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		PATCH_IF apply_value == 0 - 1 BEGIN
@@ -91,16 +91,16 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		END
 		SPRINT idName ~~
 		PATCH_IF NOT VARIABLE_IS_SET $AD_STAT_CONDITION(~%apply_key%~) BEGIN
-			SPRINT render_missing ~not_implemented:opcode326:condition~
+			LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:condition~ message = ~no condition text for SPLPROT.2DA row %apply_row% (stat %apply_stat%, value %apply_value%, relation %apply_relation%)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF apply_stat == 258 OR apply_stat == 262 OR apply_stat == 263 OR apply_stat == 269 OR apply_stat == 270
 				OR apply_stat == 272 OR apply_stat == 274 BEGIN
-			SPRINT render_missing ~not_implemented:opcode326:condition_stat~
+			LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:condition_stat~ message = ~stat %apply_stat% of SPLPROT.2DA row %apply_row% written differently by the old engine~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF apply_stat >= 266 AND apply_stat <= 273 BEGIN
 			LPF ad_ids_name INT_VAR ids_file = apply_stat - 264 entry = apply_value RET idName = name END
 			PATCH_IF ~%idName%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode326:ids~
+				LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:ids~ message = ~value %apply_value% of stat %apply_stat% has no name~ RET render_missing = refusal END
 			END
 		END
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -109,7 +109,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 				SET apply_tra += apply_relation
 			END
 			PATCH_IF NOT TRA_ENTRY_EXISTS (~%apply_tra%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode326:condition_text~
+				LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:condition_text~ message = ~no condition sentence %apply_tra%~ RET render_missing = refusal END
 			END
 		END
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN

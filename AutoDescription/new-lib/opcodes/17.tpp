@@ -14,19 +14,19 @@ DEFINE_PATCH_MACRO ad_op_17_support BEGIN
 			LPF ad_dice_text INT_VAR dice_count = $fx_dice_count(~%hp_id%~) dice_sides = $fx_dice_sides(~%hp_id%~)
 				bonus = $fx_parameter1(~%hp_id%~) RET hp_value = text END
 			PATCH_IF hp_type < 0 OR hp_type > 2 BEGIN
-				SPRINT render_missing ~not_implemented:opcode17:invalid~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode17:invalid~ message = ~healing type %hp_type% (expected 0-2)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%hp_value%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode17:no_value~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode17:no_value~ message = ~no text for this amount~ RET render_missing = refusal END
 			END
 			// Avec AD_ENABLE_SHRINKAGE, l'ancien moteur ajoute un effet de résurrection (opcode 32), pas
 			// encore décrit (opcode_17_group).
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (hp_subtype BAND BIT0) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode17:raise_dead~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode17:raise_dead~ message = ~healing that also raises the dead~ RET render_missing = refusal END
 			END
 			// Valeur fixée probable : l'ancien moteur écrit « les points de vie actuels : … ».
 			ELSE PATCH_IF hp_type == 1 AND $fx_probability(~%hp_id%~) < 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode17:probable_set~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode17:probable_set~ message = ~probable healing to a set value~ RET render_missing = refusal END
 			END
 		END
 	END

@@ -40,13 +40,13 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 		PATCH_IF $fx_opcode(~%exception_id%~) == exception_opcode AND NOT $fx_consumed(~%exception_id%~) BEGIN
 			SPRINT exception_resource $fx_resource(~%exception_id%~)
 			PATCH_IF $fx_external(~%exception_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%exception_opcode%:external~
+				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF exception_opcode == 318 AND NOT IS_EE BEGIN
-				SPRINT render_missing ~not_implemented:opcode318:classic~
+				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode318:classic~ message = ~opcode 318 on classic games~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%exception_opcode%:resource~
+				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPM ad_target_exception_names
@@ -108,7 +108,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		LPM ad_target_exception_add_name
 	END
 	ELSE PATCH_IF IS_EE AND exception_stat > 145 BEGIN
-		SPRINT render_missing ~not_implemented:opcode%exception_opcode%:condition~
+		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:condition~ message = ~condition %exception_stat% (above 145) not supported~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $AD_TARGET_EXCEPTION_KIND(~%exception_stat%~) BEGIN
 		SPRINT exception_kind $AD_TARGET_EXCEPTION_KIND(~%exception_stat%~)
@@ -132,7 +132,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		END
 	END
 	ELSE BEGIN
-		SPRINT render_missing ~not_implemented:opcode%exception_opcode%:stat~
+		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:stat~ message = ~condition %exception_stat% not supported~ RET render_missing = refusal END
 	END
 	SPRINT $fx_exception_kind(~%exception_id%~) ~%exception_kind%~
 	SET $fx_exception_name_count(~%exception_id%~) = exception_name_count
@@ -140,7 +140,7 @@ END
 
 DEFINE_PATCH_MACRO ad_target_exception_add_name BEGIN
 	PATCH_IF ~%exception_name%~ STRING_EQUAL ~~ BEGIN
-		SPRINT render_missing ~not_implemented:opcode%exception_opcode%:name~
+		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:name~ message = ~no name for the excepted creatures~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		SPRINT $fx_exception_name(~%exception_id%~ ~%exception_name_count%~) ~%exception_name%~
@@ -343,11 +343,11 @@ DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 			SPRINT exception_anchor_scope $fx_scope(~%exception_anchor%~)
 			PATCH_IF exception_count != $fx_exception_count(~%exception_anchor%~)
 					OR (exception_count > 0 AND NOT (~%exception_scope%~ STRING_EQUAL ~%exception_anchor_scope%~)) BEGIN
-				SPRINT render_late_missing ~not_implemented:opcode%exception_opcode%:exceptions_identical~
+				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_identical~ message = ~identical effects with different exceptions~ RET render_late_missing = refusal END
 			END
 		END
 		ELSE PATCH_IF $fx_consumed(~%exception_id%~) AND NOT $fx_dropped(~%exception_id%~) AND VARIABLE_IS_SET $exception_scopes(~%exception_scope%~) BEGIN
-			SPRINT render_late_missing ~not_implemented:opcode%exception_opcode%:exceptions_group~
+			LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_group~ message = ~grouped effect with exceptions~ RET render_late_missing = refusal END
 		END
 	END
 END

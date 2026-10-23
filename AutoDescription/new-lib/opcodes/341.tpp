@@ -13,19 +13,19 @@ DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 			SPRINT critical_resref $fx_resource_lower(~%critical_id%~)
 			SET critical_target = $fx_effective_target(~%critical_id%~)
 			PATCH_IF $fx_external(~%critical_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode341:external~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode341:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%critical_resref%~ STRING_EQUAL ~~ OR $fx_parameter2(~%critical_id%~) < 0 OR $fx_parameter2(~%critical_id%~) > 1 BEGIN
-				SPRINT render_missing ~not_implemented:opcode341:invalid~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~file_error:opcode341:invalid~ message = ~empty resource field or parameter2 outside 0-1~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_special(~%critical_id%~) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode341:attack_type~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode341:attack_type~ message = ~attack type (special) other than 0~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF critical_target != TARGET_FX_self AND critical_target != TARGET_FX_original_caster BEGIN
-				SPRINT render_missing ~not_implemented:opcode341:target~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode341:target~ message = ~target other than self~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ctx_depth > 0 BEGIN
-				SPRINT render_missing ~not_implemented:recursion:nested_condition~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:recursion:nested_condition~ message = ~condition in a spell already cast by another effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET recursion_fx = critical_id

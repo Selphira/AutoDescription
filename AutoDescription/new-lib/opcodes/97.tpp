@@ -13,11 +13,11 @@ DEFINE_PATCH_MACRO ad_op_97_support BEGIN
 		FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
 			PATCH_IF $fx_opcode(~%stat_id%~) == 97 AND $fx_parameter2(~%stat_id%~) == MOD_TYPE_flat BEGIN
 				PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~6~) BEGIN
-					SPRINT render_missing ~not_implemented:opcode97:with_abilities~
+					LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode97:with_abilities~ message = ~exceptional strength with other abilities~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~44~) BEGIN
 					PATCH_IF $fx_opcode_count(~44~) > 1 BEGIN
-						SPRINT render_missing ~not_implemented:opcode97:several_strength~
+						LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode97:several_strength~ message = ~several strength modifiers~ RET render_missing = refusal END
 					END
 				END
 			END

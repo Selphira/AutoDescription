@@ -12,10 +12,10 @@ DEFINE_PATCH_MACRO ad_dispel_type_support BEGIN
 		PATCH_IF $fx_opcode(~%dispel_id%~) == dispel_type_opcode AND NOT $fx_consumed(~%dispel_id%~) BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = $fx_parameter2(~%dispel_id%~) RET dispel_name = name END
 			PATCH_IF $fx_parameter1(~%dispel_id%~) < 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%dispel_type_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = dispel_id STR_VAR reason = ~file_error:opcode%dispel_type_opcode%:invalid~ message = ~negative secondary type~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%dispel_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%dispel_type_opcode%:no_name~
+				LPF ad_refusal INT_VAR fx_id = dispel_id STR_VAR reason = ~not_implemented:opcode%dispel_type_opcode%:no_name~ message = ~secondary type has no name~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT $fx_secondary_type_name(~%dispel_id%~) ~%dispel_name%~

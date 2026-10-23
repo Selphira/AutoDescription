@@ -18,7 +18,7 @@ DEFINE_PATCH_MACRO ad_op_79_support BEGIN
 					SET disease_other_opcode = $fx_opcode(~%disease_other%~)
 					PATCH_IF (~%disease_other_scope%~ STRING_EQUAL ~%disease_scope%~)
 							AND (disease_other_opcode == 58 OR (disease_other_opcode == 101 AND $fx_parameter2(~%disease_other%~) == 76)) BEGIN
-						SPRINT render_missing ~not_implemented:opcode79:feeblemind_cure_order~
+						LPF ad_refusal INT_VAR fx_id = disease_other STR_VAR reason = ~not_implemented:opcode79:feeblemind_cure_order~ message = ~feeblemind cure in an order the old engine writes differently~ RET render_missing = refusal END
 					END
 				END
 			END

@@ -28,20 +28,27 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			SET versus_target = $fx_effective_target(~%versus_id%~)
 			PATCH_IF versus_opcode != 344 AND versus_amount == 0 BEGIN
 				SET drop_id = versus_id
+				SPRINT ignored_reason ~file_error:opcode%versus_opcode%:no_change~
+				SPRINT ignored_message ~modifier of 0~
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF versus_file < 2 OR versus_file > 8 OR (versus_file == 2 AND versus_value == 100) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:ids_file~
+				PATCH_IF versus_file < 2 OR versus_file > (IS_EE ? 9 : 8) BEGIN
+					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~file_error:opcode%versus_opcode%:ids_file~ message = ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %versus_file%, value %versus_value%)~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF ~%versus_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:ids_name~
+				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:ids_name~ message = ~value %versus_value% of IDS file %versus_file% has no name~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (versus_opcode == 344 AND versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
 					OR $fx_probability(~%versus_id%~) < 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:form~
+				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:form~ message = ~effect on another target, or probable~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_versus_file(~%versus_id%~) > 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:double_versus~
+				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:double_versus~ message = ~creature type also set by opcode 177~ RET render_missing = refusal END
 			END
 		END
 	END
@@ -102,7 +109,7 @@ DEFINE_PATCH_MACRO ad_versus_modifier_line BEGIN
 		END
 	END
 	PATCH_IF versus_mages == 63 OR versus_thieves == 31 BEGIN
-		SPRINT render_late_missing ~not_implemented:opcode%versus_opcode%:class_group~
+		LPF ad_refusal INT_VAR fx_id = versus_member STR_VAR reason = ~not_implemented:opcode%versus_opcode%:class_group~ message = ~creature types covering all mage or thief classes~ RET render_late_missing = refusal END
 	END
 	LPF ad_join STR_VAR array_name = ~versus_names~ glue = EVAL ~, %the% ~ final_glue = EVAL ~ %and_the% ~ RET targetType = text END
 	SPRINT line_suffix @2002020 // ~contre les %targetType%~

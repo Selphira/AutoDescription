@@ -7,10 +7,10 @@ DEFINE_PATCH_MACRO ad_op_218_support BEGIN
 	FOR (skin_id = 0; skin_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++skin_id) BEGIN
 		PATCH_IF $fx_opcode(~%skin_id%~) == 218 BEGIN
 			PATCH_IF IS_EE AND $fx_parameter2(~%skin_id%~) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode218:dice~
+				LPF ad_refusal INT_VAR fx_id = skin_id STR_VAR reason = ~not_implemented:opcode218:dice~ message = ~number of skins given by dice~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_parameter1(~%skin_id%~) <= 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode218:invalid~
+				LPF ad_refusal INT_VAR fx_id = skin_id STR_VAR reason = ~file_error:opcode218:invalid~ message = ~number of skins of 0 or less~ RET render_missing = refusal END
 			END
 		END
 	END

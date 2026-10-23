@@ -34,18 +34,20 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 				PATCH_IF $fx_timing(~%app_id%~) == TIMING_duration AND $fx_duration(~%app_id%~) <= 0
 						AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 					SET drop_id = app_id
+					SPRINT ignored_reason ~file_error:application:no_duration~
+					SPRINT ignored_message ~limited duration (timing 0) of 0 seconds: the effect ends at once~
 					LPM ad_application_drop
 				END
 				ELSE PATCH_IF NOT app_equipped_timing
 						OR ($fx_probability(~%app_id%~) != 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%render_opcode%~)) BEGIN
-					SPRINT render_missing ~not_implemented:opcode%render_opcode%:effect_kind~
+					LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:effect_kind~ message = ~equipped effect of this opcode with this timing or probability not supported~ RET render_missing = refusal END
 				END
 			END
 			ELSE PATCH_IF ~%app_block%~ STRING_EQUAL ~ability~ BEGIN
 				LPM ad_application_ability_support
 			END
 			ELSE BEGIN
-				SPRINT render_missing ~not_implemented:opcode%render_opcode%:effect_kind~
+				LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:effect_kind~ message = ~effect of this opcode outside an equipped block or an ability not supported~ RET render_missing = refusal END
 			END
 		END
 	END
@@ -89,7 +91,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 							AND (~%series_other_resource%~ STRING_EQUAL ~%series_resource%~) BEGIN
 						// L'ancien moteur reprendrait cet effet dans une seconde série.
 						PATCH_IF $fx_series_compared(~%series_other%~) BEGIN
-							SPRINT render_missing ~not_implemented:application:series_overlap~
+							LPF ad_refusal INT_VAR fx_id = series_other STR_VAR reason = ~not_implemented:application:series_overlap~ message = ~delayed effect that would belong to two series of repetitions~ RET render_missing = refusal END
 						END
 						SET $series_members(~%series_count%~) = series_other
 						SET series_count += 1
@@ -115,7 +117,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 				END
 				SET $fx_series_compared(~%series_id%~) = 1
 				PATCH_IF series_valid AND (series_delta <= 0 OR series_previous <= 0) BEGIN
-					SPRINT render_missing ~not_implemented:application:series_delay~
+					LPF ad_refusal INT_VAR fx_id = series_id STR_VAR reason = ~not_implemented:application:series_delay~ message = ~repetitions with a delay of 0~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF series_valid BEGIN
 					SET $fx_series_anchor(~%series_id%~) = 1
@@ -144,39 +146,51 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_duration = $fx_duration(~%app_id%~)
 	SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EQUIPPED_ONLY(~%render_opcode%~) BEGIN
-		SPRINT render_missing ~not_implemented:opcode%render_opcode%:ability~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:ability~ message = ~opcode %render_opcode% is only described as an equipped effect~ RET render_missing = refusal END
 	END
 	// Plage vide : l'effet n'a jamais lieu.
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
-		SPRINT render_missing ~not_implemented:application:probability_empty~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:probability_empty~ message = ~empty probability range (probability2 above probability1): the effect never occurs~ RET render_missing = refusal END
 	END
 	// Restriction de niveau d'un effet d'un EFF (l'ancien moteur y prend celle du parent) ou sans
 	// effet (minimum au-dessus du maximum, erreur journalisée par l'ancien moteur).
 	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND ($fx_external(~%app_id%~)
 			OR ($fx_level_max(~%app_id%~) > 0 AND $fx_level_min(~%app_id%~) > $fx_level_max(~%app_id%~))) BEGIN
-		SPRINT render_missing ~not_implemented:application:level~
+		PATCH_IF $fx_external(~%app_id%~) BEGIN
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:level~ message = ~level restriction of an effect from an EFF file not supported~ RET render_missing = refusal END
+		END
+		ELSE BEGIN
+			SET app_level_min = $fx_level_min(~%app_id%~)
+			SET app_level_max = $fx_level_max(~%app_id%~)
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:level~ message = ~minimum level %app_level_min% above maximum level %app_level_max%: the effect never applies~ RET render_missing = refusal END
+		END
 	END
 	ELSE PATCH_IF app_target == TARGET_FX_none OR app_target > TARGET_FX_original_caster BEGIN
-		SPRINT render_missing ~not_implemented:application:target~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:target~ message = ~target %app_target% (expected 1-9)~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF $fx_potion_drinker(~%app_id%~) AND $fx_header_target_count(~%app_id%~) != 0
 			AND app_target != TARGET_FX_self AND app_target != TARGET_FX_original_caster BEGIN
-		SPRINT render_missing ~not_implemented:application:potion_target~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:potion_target~ message = ~potion effect with target %app_target% while the ability has a number of targets (BUG-020)~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF app_timing == TIMING_duration AND app_duration <= 0 AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
-		SPRINT render_missing ~not_implemented:application:no_duration~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:no_duration~ message = ~limited duration (timing 0) of 0 seconds: the effect ends at once~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF app_timing == TIMING_duration_ticks AND app_duration > 0 AND app_duration < 15 BEGIN
-		SPRINT render_missing ~not_implemented:application:ticks~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:ticks~ message = ~duration of %app_duration% ticks, under one second~ RET render_missing = refusal END
 	END
 	// Timing 2 d'un en-tête : l'ancien moteur n'écrit pas de durée, comme pour un effet d'équipement.
 	// Effet différé sans délai : l'ancien moteur le décrit comme permanent, sans le dire.
 	ELSE PATCH_IF app_timing == TIMING_delayed AND app_duration <= 0 AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
-		SPRINT render_missing ~not_implemented:application:no_delay~
+		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:no_delay~ message = ~delayed effect (timing 4) with a delay of 0~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF app_timing != TIMING_duration AND app_timing != TIMING_duration_ticks AND app_timing != TIMING_permanent
 			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed BEGIN
-		SPRINT render_missing ~not_implemented:application:timing~
+		PATCH_IF app_timing >= 0 AND (app_timing <= 10 OR app_timing == 4096) BEGIN
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:timing~ message = ~timing %app_timing% not supported in an ability~ RET render_missing = refusal END
+		END
+		ELSE BEGIN
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
+		END
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_application_area_target
@@ -195,12 +209,13 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 		LPF ad_projectile_area INT_VAR projectile = $fx_header_projectile(~%app_id%~) RET app_area_shape = area_shape
 			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle END
 		PATCH_IF app_area_shape < 0 BEGIN
-			SPRINT render_missing ~not_implemented:application:projectile_target~
+			SET app_projectile = $fx_header_projectile(~%app_id%~) - 1
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:projectile_target~ message = ~area projectile %app_projectile% of the ability (PROJECTL.IDS) has a .PRO file too short to be read~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF app_area_shape > 0 BEGIN
 			LPF ad_distance_text INT_VAR feet = app_area_feet RET range = text END
 			PATCH_IF ~%range%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:application:area_range~
+				LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:area_range~ message = ~no text for an area radius of %app_area_feet% feet~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET app_area_phrase = app_area_shape == 2 ? 2001102 : 2001100 // ~%target% dans un rayon de %range%~
@@ -217,7 +232,8 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 END
 
 // Effet drop_id que l'ancien moteur écarte dès sa lecture, sans rien écrire (validation d'un opcode) :
-// consommé. La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
+// consommé ; journalisé si l'appelant en a fixé la raison (ignored_reason, ignored_message :
+// ad_log_ignored, new-lib/log.tpp). La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
 // new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée, si la
 // durée de son opcode n'y est jamais comptée (colonne DURATION à IGNORED) ou si un autre effet décrit
 // du même en-tête a la même durée.
@@ -244,11 +260,15 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 			END
 		END
 		PATCH_IF NOT drop_twin BEGIN
-			SPRINT render_missing ~not_implemented:opcode%drop_opcode%:dropped_duration~
+			LPF ad_refusal INT_VAR fx_id = drop_id STR_VAR reason = ~not_implemented:opcode%drop_opcode%:dropped_duration~ message = ~ignored effect whose duration the old engine would give to the whole ability~ RET render_missing = refusal END
 		END
 	END
 	SET $fx_consumed(~%drop_id%~) = 1
 	SET $fx_dropped(~%drop_id%~) = 1
+	PATCH_IF NOT (~%ignored_reason%~ STRING_EQUAL ~~) BEGIN
+		SET ignored_fx = drop_id
+		LPM ad_log_ignored
+	END
 END
 
 // Forme de la phrase de l'effet line_fx : 0 soi, 1 cible, 2 soi probable, 3 cible probable.
@@ -469,7 +489,7 @@ DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 	SET app_opcode = $fx_opcode(~%line_fx%~)
 	PATCH_IF (levelMax > 0 OR levelMin > 1) AND NOT (IS_EE AND (app_opcode == 127 OR (app_opcode == 218 AND $fx_parameter2(~%line_fx%~) != 0))) BEGIN
 		PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) BEGIN
-			SPRINT render_late_missing ~not_implemented:application:level_target~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:level_target~ message = ~level restriction on an opcode-specific target~ RET render_late_missing = refusal END
 		END
 		SET app_level_tra = levelMin == levelMax ? 2003000 : (levelMin <= 1 ? 2003001 : (levelMax == 0 ? 2003002 : 2003003)) // ~%target% (de niveau %levelMin%)~
 		SPRINT target ~%theTarget%~
@@ -524,7 +544,7 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 					END
 				END
 				PATCH_IF ~%app_versus_name%~ STRING_EQUAL ~~ BEGIN
-					SPRINT render_late_missing ~not_implemented:versus:ids_name~
+					LPF ad_refusal INT_VAR fx_id = app_member STR_VAR reason = ~not_implemented:versus:ids_name~ message = ~value %app_versus_value% of IDS file %app_versus_file% has no name~ RET render_late_missing = refusal END
 				END
 				ELSE BEGIN
 					SPRINT $app_versus_names(~%app_versus_name%~) ~%app_versus_name%~
@@ -544,28 +564,28 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 	PATCH_IF ctx_versus_set BEGIN
 		SPRINT versus ~%ctx_versus%~
 		PATCH_IF app_versus_count > 0 BEGIN
-			SPRINT render_late_missing ~not_implemented:recursion:versus_mixed~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:recursion:versus_mixed~ message = ~creature type in a spell cast by opcode 232, whose target the old engine sets~ RET render_late_missing = refusal END
 		END
 	END
 	PATCH_IF app_versus_count > 0 BEGIN
 		PATCH_IF app_versus_plain BEGIN
-			SPRINT render_late_missing ~not_implemented:versus:mixed~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:mixed~ message = ~identical effects with and without a creature type~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF app_versus_mages == 63 OR app_versus_thieves == 31 BEGIN
-			SPRINT render_late_missing ~not_implemented:versus:class_group~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:class_group~ message = ~creature types covering all mage or thief classes~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
-			SPRINT render_late_missing ~not_implemented:versus:area~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:area~ message = ~creature type with targets named after the area of the projectile~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1 BEGIN
-			SPRINT render_late_missing ~not_implemented:versus:level~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:level~ message = ~creature type with a level restriction~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF app_versus_kits > 0 BEGIN
 			PATCH_IF app_versus_kits < app_versus_count BEGIN
-				SPRINT render_late_missing ~not_implemented:versus:kit_mixed~
+				LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:kit_mixed~ message = ~kits mixed with other creature types~ RET render_late_missing = refusal END
 			END
 			ELSE PATCH_IF line_form != 0 BEGIN
-				SPRINT render_late_missing ~not_implemented:versus:kit_form~
+				LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:kit_form~ message = ~kit restriction on an effect on the target or probable~ RET render_late_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT app_versus_and @2002006 // ~et~
@@ -623,7 +643,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET app_line_ok = 1
 	LPM ad_application_target_strings
 	PATCH_IF app_target_missing BEGIN
-		SPRINT render_late_missing ~not_implemented:application:target%app_target%~
+		LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:target%app_target%~ message = ~no text for target %app_target%~ RET render_late_missing = refusal END
 		SET app_line_ok = 0
 	END
 	PATCH_IF line_phrase > 0 AND app_line_ok BEGIN
@@ -632,13 +652,13 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			LPF ad_tra INT_VAR tra_id = line_phrase_tra RET line_text = text END
 		END
 		ELSE BEGIN
-			SPRINT render_late_missing ~not_implemented:phrase%line_phrase%:form%line_form%~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:phrase%line_phrase%:form%line_form%~ message = ~no sentence %line_phrase_tra% for this form (target or probable effect)~ RET render_late_missing = refusal END
 			SET app_line_ok = 0
 		END
 	END
 	ELSE PATCH_IF line_form != 0 AND app_line_ok AND NOT line_any_form BEGIN
 		SET app_opcode = $fx_opcode(~%line_fx%~)
-		SPRINT render_late_missing ~not_implemented:opcode%app_opcode%:form%line_form%~
+		LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:opcode%app_opcode%:form%line_form%~ message = ~no text for form %line_form% (1 target, 2 probable, 3 probable on the target)~ RET render_late_missing = refusal END
 		SET app_line_ok = 0
 	END
 	PATCH_IF NOT (~%line_sentence%~ STRING_EQUAL ~~) BEGIN
@@ -701,7 +721,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
 		// placé après la condition.
 		PATCH_IF app_probability < 100 BEGIN
-			SPRINT render_late_missing ~not_implemented:application:condition_probability~
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition~ RET render_late_missing = refusal END
 			SET app_line_ok = 0
 		END
 		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~

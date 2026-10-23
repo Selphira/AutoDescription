@@ -41,6 +41,11 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			ELSE PATCH_IF ac_value == 0 OR (ac_type != AC_MOD_TYPE_all AND ac_type != AC_MOD_TYPE_crushing
 					AND ac_type != AC_MOD_TYPE_missile AND ac_type != AC_MOD_TYPE_piercing AND ac_type != AC_MOD_TYPE_slashing) BEGIN
 				SET drop_id = ac_id
+				SPRINT ignored_reason ~file_error:opcode0:invalid~
+				SPRINT ignored_message ~modifier type %ac_type% (expected 0, 1, 2, 4 or 8)~
+				PATCH_IF ac_value == 0 BEGIN
+					SPRINT ignored_message ~modifier of 0~
+				END
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
@@ -51,20 +56,20 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 				// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value%~) BEGIN
-						SPRINT render_missing ~not_implemented:opcode0:same_effect_twice~
+						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
 					END
 					SET $ac_seen_all(~%ac_scope% %ac_value%~) = 1
 				END
 				ELSE BEGIN
 					SET ac_mask = $ac_seen_types(~%ac_scope% %ac_value%~)
 					PATCH_IF (ac_mask BAND ac_type) != 0 BEGIN
-						SPRINT render_missing ~not_implemented:opcode0:same_effect_twice~
+						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
 					END
 					SET $ac_seen_types(~%ac_scope% %ac_value%~) = ac_mask BOR ac_type
 					// Les quatre types à la fois : l'ancien moteur n'a pas de texte pour ce cas (seulement
 					// quand il les réunit, pour les effets d'équipement).
 					PATCH_IF $ac_seen_types(~%ac_scope% %ac_value%~) == 15 AND ac_equipped BEGIN
-						SPRINT render_missing ~not_implemented:opcode0:all_attack_types~
+						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:all_attack_types~ message = ~armor class modifiers against all four attack types in one ability~ RET render_missing = refusal END
 					END
 				END
 			END
@@ -77,10 +82,10 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	// les attaques et à la ligne réunie des types d'attaque dépend de la place des effets dans le
 	// fichier, sans règle établie.
 	PATCH_IF ac_armor_line AND ac_base_count == 0 AND ac_all_count > 0 AND ac_all_count < ac_modifier_count BEGIN
-		SPRINT render_missing ~not_implemented:opcode0:armor_order~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:opcode0:armor_order~ message = ~armor without base armor class: line order of the old engine not established~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF ac_base_count > 1 OR (ac_base_count > 0 AND ac_modifier_count > 0 AND NOT ac_armor_line) BEGIN
-		SPRINT render_missing ~not_implemented:opcode0:base_with_other~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:opcode0:base_with_other~ message = ~base armor class with other armor class modifiers~ RET render_missing = refusal END
 	END
 END
 

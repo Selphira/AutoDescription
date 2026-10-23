@@ -11,14 +11,19 @@ DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref END
 			SET $fx_item_return(~%remove_id%~) = 0
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode112:invalid~
+				LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~file_error:opcode112:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF remove_name_ref == 25615 OR remove_name_ref == 10966 OR remove_name_ref == 6854 BEGIN
 				SET drop_id = remove_id
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode112:no_name~
+				PATCH_IF FILE_EXISTS_IN_GAME ~%remove_resref%.itm~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~not_implemented:opcode112:no_name~ message = ~item %remove_resref%.ITM has no name~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~file_error:opcode112:missing_item~ message = ~item %remove_resref%.ITM does not exist~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SPRINT $fx_item_name(~%remove_id%~) ~%remove_name%~

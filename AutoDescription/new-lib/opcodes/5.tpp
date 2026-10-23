@@ -17,15 +17,15 @@ DEFINE_PATCH_MACRO ad_op_5_support BEGIN
 			LPF ad_ids_name INT_VAR ids_file = 3 entry = charm_value RET charm_name = name END
 			SPRINT $fx_charm_name(~%charm_id%~) ~%charm_name%~
 			PATCH_IF NOT ((charm_type >= 0 AND charm_type <= 5) OR (charm_type >= 1000 AND charm_type <= 1005)) BEGIN
-				SPRINT render_missing ~not_implemented:opcode5:invalid~
+				LPF ad_refusal INT_VAR fx_id = charm_id STR_VAR reason = ~file_error:opcode5:invalid~ message = ~charm type %charm_type% (expected 0-5 or 1000-1005)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF charm_value != 0 AND charm_target != TARGET_FX_self AND charm_target != TARGET_FX_original_caster
 					AND $fx_versus_file(~%charm_id%~) == 0 BEGIN
 				PATCH_IF charm_target != TARGET_FX_preset OR $fx_area_target(~%charm_id%~) BEGIN
-					SPRINT render_missing ~not_implemented:opcode5:target~
+					LPF ad_refusal INT_VAR fx_id = charm_id STR_VAR reason = ~not_implemented:opcode5:target~ message = ~target other than preset, or area target~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF ~%charm_name%~ STRING_EQUAL ~~ BEGIN
-					SPRINT render_missing ~not_implemented:opcode5:ids_name~
+					LPF ad_refusal INT_VAR fx_id = charm_id STR_VAR reason = ~not_implemented:opcode5:ids_name~ message = ~creature type has no name~ RET render_missing = refusal END
 				END
 			END
 		END

@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_176_support BEGIN
 				SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_percentage
 			END
 			PATCH_IF $fx_parameter2(~%stat_id%~) == MOD_TYPE_percentage AND $fx_parameter1(~%stat_id%~) == 100 BEGIN
-				SPRINT render_missing ~not_implemented:opcode176:restored~
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode176:restored~ message = ~movement rate restored to its normal value (100 percent)~ RET render_missing = refusal END
 			END
 		END
 	END

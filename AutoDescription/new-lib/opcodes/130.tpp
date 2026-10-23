@@ -7,7 +7,7 @@
 DEFINE_PATCH_MACRO ad_op_130_support BEGIN
 	FOR (bless_id = 0; bless_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++bless_id) BEGIN
 		PATCH_IF $fx_opcode(~%bless_id%~) == 130 AND $fx_not_cumulative(~%bless_id%~) BEGIN
-			SPRINT render_missing ~not_implemented:opcode130:not_cumulative~
+			LPF ad_refusal INT_VAR fx_id = bless_id STR_VAR reason = ~not_implemented:opcode130:not_cumulative~ message = ~non-cumulative effect (opcode 321)~ RET render_missing = refusal END
 		END
 	END
 END

@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ad_op_332_support BEGIN
 		PATCH_IF $fx_opcode(~%damage_mod_id%~) == 332 BEGIN
 			SET damage_mod_type = $fx_parameter2(~%damage_mod_id%~)
 			PATCH_IF $fx_parameter1(~%damage_mod_id%~) == 0 OR damage_mod_type < 0 OR damage_mod_type > 10 BEGIN
-				SPRINT render_missing ~not_implemented:opcode332:invalid~
+				LPF ad_refusal INT_VAR fx_id = damage_mod_id STR_VAR reason = ~file_error:opcode332:invalid~ message = ~modifier of 0 or damage type %damage_mod_type% (expected 0-10)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (damage_mod_type == 1 OR damage_mod_type == 7) BEGIN
 				LPM ad_op_332_group_support
@@ -34,7 +34,7 @@ DEFINE_PATCH_MACRO ad_op_332_group_support BEGIN
 		END
 	END
 	PATCH_IF damage_mod_found == 7 BEGIN
-		SPRINT render_missing ~not_implemented:opcode332:group~
+		LPF ad_refusal INT_VAR fx_id = damage_mod_other STR_VAR reason = ~not_implemented:opcode332:group~ message = ~group of damage modifiers~ RET render_missing = refusal END
 	END
 END
 
@@ -56,7 +56,7 @@ DEFINE_PATCH_MACRO ad_op_332_lines BEGIN
 				LPM ad_effect_line
 			END
 			ELSE BEGIN
-				SPRINT render_late_missing ~not_implemented:opcode332:form%line_form%~
+				LPF ad_refusal INT_VAR fx_id = damage_mod_id STR_VAR reason = ~not_implemented:opcode332:form%line_form%~ message = ~no text for form %line_form%~ RET render_late_missing = refusal END
 			END
 		END
 	END

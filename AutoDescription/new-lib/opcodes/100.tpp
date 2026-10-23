@@ -13,10 +13,15 @@ DEFINE_PATCH_MACRO ad_op_100_support BEGIN
 			LPF ad_ids_name INT_VAR ids_file = versus_file entry = versus_value RET versus_name = name END
 			SPRINT $fx_versus_name(~%versus_id%~) ~%versus_name%~
 			PATCH_IF versus_file < 2 OR versus_file > 8 OR (versus_file == 2 AND versus_value == 100) BEGIN
-				SPRINT render_missing ~not_implemented:opcode100:ids_file~
+				PATCH_IF versus_file < 2 OR versus_file > (IS_EE ? 9 : 8) BEGIN
+					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~file_error:opcode100:ids_file~ message = ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode100:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %versus_file%, value %versus_value%)~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF versus_value != 0 AND ~%versus_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode100:ids_name~
+				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode100:ids_name~ message = ~value %versus_value% of IDS file %versus_file% has no name~ RET render_missing = refusal END
 			END
 		END
 	END

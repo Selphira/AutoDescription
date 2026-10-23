@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_144_support BEGIN
 			SET button = $fx_parameter2(~%button_id%~)
 			// IESDP : boutons 0 à 15 ; 10 et 15 n'existent que sur EE.
 			PATCH_IF button < 0 OR button > 15 OR (NOT IS_EE AND (button == 10 OR button == 15)) BEGIN
-				SPRINT render_missing ~not_implemented:opcode144:invalid~
+				LPF ad_refusal INT_VAR fx_id = button_id STR_VAR reason = ~file_error:opcode144:invalid~ message = ~button %button% (expected 0-15; 10 and 15 only on enhanced editions)~ RET render_missing = refusal END
 			END
 		END
 	END

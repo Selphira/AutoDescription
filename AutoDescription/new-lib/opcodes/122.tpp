@@ -12,7 +12,7 @@ DEFINE_PATCH_MACRO ad_op_122_support BEGIN
 		SPRINT create_resref $fx_resource(~%create_id%~)
 		PATCH_IF $fx_opcode(~%create_id%~) == 122 AND AD_ENABLE_SHRINKAGE
 				AND (~%create_resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%create_resref%~ STRING_EQUAL_CASE ~MISC56_~) BEGIN
-			SPRINT render_missing ~not_implemented:opcode122:broken_weapon~
+			LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode122:broken_weapon~ message = ~item replacing a broken weapon~ RET render_missing = refusal END
 		END
 	END
 END

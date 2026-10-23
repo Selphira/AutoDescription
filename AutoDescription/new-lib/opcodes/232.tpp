@@ -21,15 +21,15 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			SET condition_special = $fx_special(~%condition_id%~)
 			SPRINT condition_resref $fx_resource_lower(~%condition_id%~)
 			PATCH_IF $fx_external(~%condition_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode232:external~
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF condition_target < 0 OR condition_target > 3 OR condition_type < 0 OR condition_type > (IS_EE ? 21 : 11)
 					OR (condition_type == 13 AND condition_target != 0) OR (condition_type == 10 AND condition_special == 0)
 					OR ~%condition_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode232:invalid~
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:invalid~ message = ~invalid target (%condition_target%, expected 0-3), condition (%condition_type%, expected 0-21, 0-11 on classic games) or resource~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ctx_depth > 0 BEGIN
-				SPRINT render_missing ~not_implemented:recursion:nested_condition~
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:recursion:nested_condition~ message = ~condition in a spell already cast by another effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPM ad_op_232_targets
@@ -59,7 +59,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				LPM ad_recursion_support
 				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%condition_id%~) > 1
 						AND ~%condition_name%~ STRING_EQUAL ~~ AND ~%condition_text%~ STRING_EQUAL ~~ BEGIN
-					SPRINT render_missing ~not_implemented:opcode232:no_condition~
+					LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:no_condition~ message = ~several lines without a condition text~ RET render_missing = refusal END
 				END
 			END
 		END
@@ -109,7 +109,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	ELSE PATCH_IF condition_type == 8 OR condition_type == 9 OR condition_type == 14 BEGIN
 		LPF ad_distance_text INT_VAR feet = condition_type == 8 ? 4 : condition_type == 9 ? 10 : condition_special RET range = text END
 		PATCH_IF ~%range%~ STRING_EQUAL ~~ BEGIN
-			SPRINT render_missing ~not_implemented:opcode232:range~
+			LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:range~ message = ~no text for this distance~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
 			SPRINT condition_text @22320024 // ~Lorsque la cible se trouve à moins de %range%~
@@ -117,7 +117,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	END
 	ELSE PATCH_IF condition_type == 13 BEGIN
 		PATCH_IF condition_special < 0 OR condition_special > 3 BEGIN
-			SPRINT render_missing ~not_implemented:opcode232:time_of_day~
+			LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:time_of_day~ message = ~time of day %condition_special% (expected 0-3)~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
 			SET recursion_ignore_duration = condition_equipped
@@ -127,7 +127,12 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	ELSE PATCH_IF condition_type == 21 BEGIN
 		SET condition_splstate_tra = 8120000 + condition_special
 		PATCH_IF condition_special < 0 OR condition_special > 255 OR NOT TRA_ENTRY_EXISTS (~%condition_splstate_tra%~) BEGIN
-			SPRINT render_missing ~not_implemented:opcode232:splstate~
+			PATCH_IF condition_special < 0 OR condition_special > 255 BEGIN
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:splstate~ message = ~spell state %condition_special% (expected 0-255)~ RET render_missing = refusal END
+			END
+			ELSE BEGIN
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:splstate~ message = ~spell state %condition_special% has no name~ RET render_missing = refusal END
+			END
 		END
 		ELSE BEGIN
 			LPF ad_tra INT_VAR tra_id = condition_splstate_tra tra_block_start = 8120000 tra_block_size = 256 RET splstate = text END // ~la folie du berserker~ (@8120104)
@@ -135,7 +140,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 		END
 	END
 	ELSE BEGIN
-		SPRINT render_missing ~not_implemented:opcode232:state~
+		LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:state~ message = ~condition %condition_type% not supported~ RET render_missing = refusal END
 	END
 	SPRINT $fx_condition_text(~%condition_id%~) ~%condition_text%~
 END

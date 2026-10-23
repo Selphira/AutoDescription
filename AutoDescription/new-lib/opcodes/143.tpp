@@ -14,11 +14,19 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 			SET slot_index = $fx_parameter1(~%slot_id%~)
 			LPF ad_item_info STR_VAR resref = ~%slot_resref%~ RET slot_item_name = name END
 			PATCH_IF ~%slot_item_name%~ STRING_EQUAL ~~ OR slot_index < 0 OR slot_index > 38 BEGIN
-				SPRINT render_missing ~not_implemented:opcode143:invalid~
+				PATCH_IF slot_index < 0 OR slot_index > 38 BEGIN
+					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~file_error:opcode143:invalid~ message = ~slot %slot_index% (expected 0-38)~ RET render_missing = refusal END
+				END
+				ELSE PATCH_IF ~%slot_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%slot_resref%.itm~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~file_error:opcode143:missing_item~ message = ~item %slot_resref%.ITM does not exist~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:no_name~ message = ~item %slot_resref%.ITM has no name~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (~%slot_resref%~ STRING_EQUAL_CASE ~MISC57~ OR ~%slot_resref%~ STRING_EQUAL_CASE ~MISC58~
 					OR ~%slot_resref%~ STRING_EQUAL_CASE ~CDDELHLM~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode143:broken_weapon~
+				LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:broken_weapon~ message = ~item replacing a broken weapon~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT $fx_item_name(~%slot_id%~) ~%slot_item_name%~
@@ -27,6 +35,11 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 						OR slot_timing == 5 OR slot_timing == 6 OR slot_timing == 8 OR slot_timing == TIMING_duration_ticks
 						OR slot_timing == TIMING_absolute_duration BEGIN
 					SET $fx_timing(~%slot_id%~) = TIMING_permanent
+					SET ignored_fx = slot_id
+					SPRINT ignored_reason ~file_error:opcode143:timing~
+					SPRINT ignored_message ~timing %slot_timing% with a limited duration: the game never removes the item, described as permanent~
+					SPRINT ignored_consequence ~kept~
+					LPM ad_log_ignored
 				END
 			END
 		END

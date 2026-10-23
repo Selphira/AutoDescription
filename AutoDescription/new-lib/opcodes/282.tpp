@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_282_support BEGIN
 			PATCH_IF (script_state >= 10 AND script_state <= 12) OR script_state == 14 OR script_state == 15
 					OR script_shifted == 20 OR (script_shifted >= 31 AND script_shifted <= 38)
 					OR script_shifted == 41 OR script_shifted == 43 BEGIN
-				SPRINT render_missing ~not_implemented:opcode282:converted~
+				LPF ad_refusal INT_VAR fx_id = script_id STR_VAR reason = ~not_implemented:opcode282:converted~ message = ~script state that the old engine converts to another opcode~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET drop_id = script_id

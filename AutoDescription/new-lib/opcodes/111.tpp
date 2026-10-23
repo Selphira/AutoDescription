@@ -67,16 +67,21 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 			SPRINT weapon_error $fx_substitution_error(~%weapon_id%~)
 			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name END
 			PATCH_IF $fx_external(~%weapon_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode111:external~
+				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%weapon_error%~ STRING_EQUAL ~~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode111:%weapon_error%~
+				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:%weapon_error%~ message = ~weapon %weapon_resref%.ITM with several polymorph effects~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%weapon_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode111:invalid~
+				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode111:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%weapon_name%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode111:no_name~
+				PATCH_IF FILE_EXISTS_IN_GAME ~%weapon_resref%.itm~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:no_name~ message = ~item %weapon_resref%.ITM has no name~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode111:missing_item~ message = ~item %weapon_resref%.ITM does not exist~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SPRINT $fx_item_name(~%weapon_id%~) ~%weapon_name%~
@@ -86,7 +91,7 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 					SPRINT weapon_other_resref $fx_resource(~%weapon_other%~)
 					PATCH_IF $fx_opcode(~%weapon_other%~) == 112 AND $fx_timing(~%weapon_other%~) == TIMING_delayed
 							AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
-						SPRINT render_missing ~not_implemented:opcode111:remove_group~
+						LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:remove_group~ message = ~weapon removed later by opcode 112~ RET render_missing = refusal END
 					END
 				END
 			END

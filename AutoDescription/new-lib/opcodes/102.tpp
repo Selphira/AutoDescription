@@ -15,13 +15,13 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 			SET levels_level = $fx_parameter1(~%levels_id%~)
 			SET $fx_spell_levels(~%levels_id%~) = 0
 			PATCH_IF $fx_external(~%levels_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode102:external~
+				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF levels_level < 1 OR levels_level > 9 BEGIN
-				SPRINT render_missing ~not_implemented:opcode102:invalid~
+				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~file_error:opcode102:invalid~ message = ~spell level %levels_level% (expected 1-9)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT AD_ENABLE_SHRINKAGE BEGIN
-				SPRINT render_missing ~not_implemented:opcode102:single~
+				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:single~ message = ~single spell level without AD_ENABLE_SHRINKAGE~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPF ad_fx_signature INT_VAR fx_id = levels_id with_parameter1 = 0 with_parameter2 = 0 RET levels_signature = signature END
@@ -34,7 +34,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 						LPF ad_fx_signature INT_VAR fx_id = levels_other with_parameter1 = 0 with_parameter2 = 0 RET levels_other_signature = signature END
 						SET levels_other_level = $fx_parameter1(~%levels_other%~)
 						PATCH_IF NOT (~%levels_other_signature%~ STRING_EQUAL ~%levels_signature%~) BEGIN
-							SPRINT render_missing ~not_implemented:opcode102:group_fields~
+							LPF ad_refusal INT_VAR fx_id = levels_other STR_VAR reason = ~not_implemented:opcode102:group_fields~ message = ~spell level immunities with different fields~ RET render_missing = refusal END
 						END
 						ELSE PATCH_IF levels_other_level >= 1 AND levels_other_level <= 9 BEGIN
 							SET levels_mask = levels_mask BOR (1 << (levels_other_level - 1))
@@ -42,7 +42,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 					END
 				END
 				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND levels_mask != 0x1FF AND (levels_mask == 1 OR (levels_mask BAND (levels_mask + 1)) != 0) BEGIN
-					SPRINT render_missing ~not_implemented:opcode102:levels~
+					LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:levels~ message = ~spell levels that are not a range~ RET render_missing = refusal END
 				END
 			END
 		END

@@ -10,10 +10,10 @@ DEFINE_PATCH_MACRO ad_op_301_support BEGIN
 	FOR (critical_id = 0; critical_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++critical_id) BEGIN
 		PATCH_IF $fx_opcode(~%critical_id%~) == 301 AND NOT $fx_consumed(~%critical_id%~) BEGIN
 			PATCH_IF $fx_external(~%critical_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode301:external~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode301:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_special(~%critical_id%~) < 0 OR $fx_special(~%critical_id%~) > 3 OR $fx_parameter1(~%critical_id%~) == 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode301:invalid~
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~file_error:opcode301:invalid~ message = ~invalid weapon type (special, expected 0-3) or modifier of 0~ RET render_missing = refusal END
 			END
 		END
 	END

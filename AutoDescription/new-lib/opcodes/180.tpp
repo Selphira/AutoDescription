@@ -12,11 +12,16 @@ DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 			SET $fx_forbid_unique(~%forbid_id%~) = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
 			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
 			PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ OR $fx_parameter2(~%forbid_id%~) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode180:invalid~
+				PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~file_error:opcode180:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~not_implemented:opcode180:invalid~ message = ~parameter2 other than 0 not supported~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF NOT $fx_forbid_unique(~%forbid_id%~) AND NOT (~%forbid_name%~ STRING_EQUAL ~~)
 					AND NOT (~%forbid_name%~ STRING_EQUAL ~%forbid_own_name%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode180:other_item~
+				LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~not_implemented:opcode180:other_item~ message = ~forbidden item with another name (BUG-031)~ RET render_missing = refusal END
 			END
 		END
 	END

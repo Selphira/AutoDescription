@@ -6,7 +6,7 @@ DEFINE_PATCH_MACRO ad_op_13_support BEGIN
 	FOR (state_id = 0; state_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++state_id) BEGIN
 		SET state_death_type = $fx_parameter2(~%state_id%~)
 		PATCH_IF $fx_opcode(~%state_id%~) == 13 AND NOT VARIABLE_IS_SET $AD_DEATH_TYPES(~%state_death_type%~) BEGIN
-			SPRINT render_missing ~not_implemented:opcode13:death_type~
+			LPF ad_refusal INT_VAR fx_id = state_id STR_VAR reason = ~not_implemented:opcode13:death_type~ message = ~death type %state_death_type% not supported~ RET render_missing = refusal END
 		END
 	END
 END

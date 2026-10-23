@@ -8,7 +8,7 @@
 DEFINE_PATCH_MACRO ad_op_120_support BEGIN
 	FOR (weapon_id = 0; weapon_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++weapon_id) BEGIN
 		PATCH_IF $fx_opcode(~%weapon_id%~) == 120 AND ($fx_parameter2(~%weapon_id%~) < 0 OR $fx_parameter2(~%weapon_id%~) > 11) BEGIN
-			SPRINT render_missing ~not_implemented:opcode120:invalid~
+			LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode120:invalid~ message = ~weapon type (parameter2) outside 0-11~ RET render_missing = refusal END
 		END
 	END
 END

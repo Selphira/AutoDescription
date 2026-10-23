@@ -20,10 +20,15 @@ DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
 			PATCH_IF $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~) OR monster_table < 0 OR monster_table > 9 BEGIN
-				SPRINT render_missing ~not_implemented:opcode127:table~
+				PATCH_IF (monster_table < 0 OR monster_table > 9) AND $fx_special(~%monster_id%~) == 0 AND ~%monster_resref%~ STRING_EQUAL ~~ BEGIN
+					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:table~ message = ~monster table %monster_table% (expected 0-9)~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:table~ message = ~custom table or special value not supported~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF $fx_parameter1(~%monster_id%~) < 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode127:level~
+				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:level~ message = ~negative total level~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				LPM ad_op_127_table
@@ -64,7 +69,7 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	SET monster_max = 0
 	CLEAR_ARRAY monster_names
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%monster_file%.2da~ BEGIN
-		SPRINT render_missing ~not_implemented:opcode127:no_table~
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:no_table~ message = ~table %monster_file%.2DA does not exist~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		INNER_PATCH_FILE ~%monster_file%.2da~ BEGIN
@@ -80,7 +85,7 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	SPRINT monster_or @1000007 // ~ou~
 	LPF ad_join STR_VAR array_name = ~monster_names~ final_glue = EVAL ~ %monster_or% ~ RET monster_creatures = text END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND (monster_max == 0 OR ~%monster_creatures%~ STRING_EQUAL ~~) BEGIN
-		SPRINT render_missing ~not_implemented:opcode127:no_creature~
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:no_creature~ message = ~no named creature in table %monster_file%.2DA~ RET render_missing = refusal END
 	END
 	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
 	SET $fx_monster_min(~%monster_id%~) = monster_min
@@ -97,10 +102,10 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 	LPF ad_creature_info STR_VAR resref = ~%monster_resref%~ RET monster_name = name END
 	// Genres SUMMONED (6) et SUMMONED_DEMON (9) de gender.ids, allégeance FAMILIAR (3) de ea.ids.
 	PATCH_IF monster_allegiance > 15 OR monster_allegiance == 3 OR (monster_gender != 6 AND monster_gender != 9) BEGIN
-		SPRINT render_missing ~not_implemented:opcode127:limit~
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:limit~ message = ~creature %monster_resref%.CRE that does not count towards the summoning limit~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF monster_power <= 0 BEGIN
-		SPRINT render_missing ~not_implemented:opcode127:power~
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:power~ message = ~creature %monster_resref%.CRE with a power level of %monster_power%~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		// L'ancien moteur arrondit au dixième, puis au-dessus.
@@ -108,7 +113,7 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 		SET monster_tenths = monster_count MODULO 10
 		SET monster_count = monster_count / 10 + (monster_tenths > 0 ? 1 : 0)
 		PATCH_IF monster_count != (monster_total + monster_power - 1) / monster_power BEGIN
-			SPRINT render_missing ~not_implemented:opcode127:rounding~
+			LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:rounding~ message = ~number of creatures rounded differently by the old engine~ RET render_missing = refusal END
 		END
 		SET monster_count = (monster_count < 1) ? 1 : monster_count
 		SET monster_count = (monster_count > monster_limit) ? monster_limit : monster_count
@@ -116,7 +121,7 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 		SET monster_max = (monster_max < monster_count) ? monster_count : monster_max
 	END
 	PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
-		SPRINT render_missing ~not_implemented:opcode127:name~
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
 		SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
@@ -133,7 +138,7 @@ DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN
 			SPRINT monster_other_resref $fx_resource(~%monster_other%~)
 			PATCH_IF (~%monster_other_similar%~ STRING_EQUAL ~%monster_similar%~) AND NOT (~%monster_other_signature%~ STRING_EQUAL ~%monster_signature%~)
 					AND ~%monster_other_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode127:similar~
+				LPF ad_refusal INT_VAR fx_id = monster_other STR_VAR reason = ~not_implemented:opcode127:similar~ message = ~similar summonings with different fields~ RET render_missing = refusal END
 			END
 		END
 	END

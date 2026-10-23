@@ -30,20 +30,20 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 				SET $fx_cast_charge(~%cast_id%~) = NOT $charged_other(~%cast_h%~)
 			END
 			PATCH_IF ~%cast_resref%~ STRING_EQUAL ~~ BEGIN
-				SPRINT render_missing ~not_implemented:opcode%cast_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~file_error:opcode%cast_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF VARIABLE_IS_SET $AD_ITEM_REVISION_SPELLS(~%cast_resref%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%cast_opcode%:item_revision~
+				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:item_revision~ message = ~spell %cast_resref% from Item Revisions~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode%cast_opcode%:dart~
+				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:dart~ message = ~dart casting a spell on each charge~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF item_type == ITM_TYPE_potion OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
 				SET $fx_recursion(~%cast_id%~) = 1
 				LPM ad_cast_spell_recursion_support
 			END
 			ELSE PATCH_IF ctx_depth > 0 BEGIN
-				SPRINT render_missing ~not_implemented:recursion:nested_cast~
+				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:recursion:nested_cast~ message = ~spell cast by a spell already cast by another effect~ RET render_missing = refusal END
 			END
 		END
 	END

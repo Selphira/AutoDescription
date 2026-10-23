@@ -17,7 +17,7 @@ DEFINE_PATCH_MACRO ad_op_145_support BEGIN
 		PATCH_IF $fx_opcode(~%spellcasting_id%~) == 145 BEGIN
 			SET $fx_spell_types(~%spellcasting_id%~) = 0
 			PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 2 BEGIN
-				SPRINT render_missing ~not_implemented:opcode145:spell_types~
+				LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:spell_types~ message = ~spell type (parameter2) not supported~ RET render_missing = refusal END
 			END
 		END
 	END

@@ -32,16 +32,16 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 			PATCH_IF slots_amount == 0 OR slots_amount > 32767 OR slots_amount < 0 - 32768
 					OR (slots_levels == 0 AND slots_amount < 0)
 					OR (slots_levels BAND (BNOT slots_all_levels)) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%slots_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~file_error:opcode%slots_opcode%:invalid~ message = ~invalid amount %slots_amount% or spell levels~ RET render_missing = refusal END
 			END
 			// L'ancien moteur écrit le nombre négatif : « Suppression de -2 sorts ».
 			ELSE PATCH_IF slots_amount < 0 - 1 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%slots_opcode%:removal~
+				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:removal~ message = ~several spell slots removed~ RET render_missing = refusal END
 			END
 			// En réunissant les effets d'un même nombre, l'ancien moteur fusionne les niveaux
 			// communs (ou deux doublements identiques) au lieu de cumuler leurs emplacements.
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND ($slots_seen_levels(~%slots_amount% %slots_doubling%~) BAND slots_levels_used) != 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%slots_opcode%:overlapping_levels~
+				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:overlapping_levels~ message = ~overlapping spell levels~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $slots_seen_levels(~%slots_amount% %slots_doubling%~) = $slots_seen_levels(~%slots_amount% %slots_doubling%~) BOR slots_levels_used
@@ -51,7 +51,7 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 	PATCH_IF slots_priest AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_spell_slots_priest_type
 		PATCH_IF slots_priest_type < 0 BEGIN
-			SPRINT render_missing ~not_implemented:opcode%slots_opcode%:no_priest~
+			LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:no_priest~ message = ~no priest class in this game~ RET render_missing = refusal END
 		END
 	END
 END

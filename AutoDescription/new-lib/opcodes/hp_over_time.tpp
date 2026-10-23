@@ -13,13 +13,13 @@ DEFINE_PATCH_MACRO ad_hp_over_time_support BEGIN
 			LPM ad_hp_over_time_value
 			PATCH_IF (hp_timing == TIMING_permanent OR hp_timing == TIMING_delayed OR hp_timing == 7
 					OR hp_timing == TIMING_permanent_after_death) AND $fx_duration(~%hp_id%~) == 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hp_opcode%:timing~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode%hp_opcode%:timing~ message = ~effect over time with a permanent or delayed timing and no duration~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_parameter2(~%hp_id%~) < 0 OR $fx_parameter2(~%hp_id%~) > 3 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hp_opcode%:invalid~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode%hp_opcode%:invalid~ message = ~frequency type (parameter2) outside 0-3~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF hp_amount <= 0 BEGIN
-				SPRINT render_missing ~not_implemented:opcode%hp_opcode%:no_effect~
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode%hp_opcode%:no_effect~ message = ~amount of 0 or less~ RET render_missing = refusal END
 			END
 		END
 	END

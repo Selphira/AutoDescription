@@ -21,7 +21,12 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 			SET immunity_label_tra = 8030000 + immunity_opcode
 			// Opcode sans libellé : l'ancien moteur échoue sur la chaîne absente.
 			PATCH_IF immunity_opcode < 0 OR immunity_opcode > 999 OR NOT TRA_ENTRY_EXISTS (~%immunity_label_tra%~) BEGIN
-				SPRINT render_missing ~not_implemented:opcode101:unknown_opcode~
+				PATCH_IF immunity_opcode < 0 OR immunity_opcode > 999 BEGIN
+					LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~file_error:opcode101:unknown_opcode~ message = ~opcode %immunity_opcode% does not exist (expected 0-999)~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode101:unknown_opcode~ message = ~no name for opcode %immunity_opcode%~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SET $fx_immunity_label(~%immunity_id%~) = immunity_opcode
@@ -57,7 +62,7 @@ DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
 	SET immunity_id = immunity_self
 	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 	PATCH_IF immunity_same_class AND immunity_different BEGIN
-		SPRINT render_missing ~not_implemented:opcode101:ability_group_fields~
+		LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode101:ability_group_fields~ message = ~immunities of the ability with different fields~ RET render_missing = refusal END
 	END
 END
 

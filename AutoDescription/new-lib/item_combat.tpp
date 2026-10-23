@@ -105,21 +105,23 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	SET combat_is_ammo = item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	LPM ad_item_combat_load
 	PATCH_IF combat_count == 0 OR combat_other_count > 0 BEGIN
-		SPRINT render_missing ~not_implemented:headers~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:headers~ message = ~weapon without a combat ability, or with abilities of another type~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF combat_is_ammo AND combat_count > 1 BEGIN
-		SPRINT render_missing ~not_implemented:combat:ammo_headers~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:combat:ammo_headers~ message = ~ammunition with several combat abilities (BUG-019)~ RET render_missing = refusal END
 	END
 	FOR (combat_id = 0; combat_id < combat_count AND ~%render_missing%~ STRING_EQUAL ~~; ++combat_id) BEGIN
 		SPRINT combat_section_type $combat_section_type(~%combat_id%~)
 		PATCH_IF $combat_damage_type(~%combat_id%~) > 9 BEGIN
-			SPRINT render_missing ~not_implemented:combat:damage_type~
+			SET combat_value = $combat_damage_type(~%combat_id%~)
+			LPF ad_refusal STR_VAR reason = ~file_error:combat:damage_type~ message = ~damage type %combat_value% of combat ability %combat_id% (expected 0-9)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF combat_is_ammo AND ($combat_launcher(~%combat_id%~) < 1 OR $combat_launcher(~%combat_id%~) > 3) BEGIN
-			SPRINT render_missing ~not_implemented:combat:launcher~
+			SET combat_value = $combat_launcher(~%combat_id%~)
+			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:launcher~ message = ~launcher %combat_value% of ammunition ability %combat_id% (expected 1-3)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF combat_count > 1 AND ~%combat_section_type%~ STRING_EQUAL ~~ BEGIN
-			SPRINT render_missing ~not_implemented:combat:section_type~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:section_type~ message = ~combat ability %combat_id% without a section title~ RET render_missing = refusal END
 		END
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND item_type == ITM_TYPE_dart BEGIN
@@ -128,12 +130,12 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT combat_is_ammo BEGIN
 		READ_BYTE ITM_weapon_proficiency combat_proficiency
 		PATCH_IF NOT VARIABLE_IS_SET $AD_PROFICIENCY_NAMES(~%combat_proficiency%~) BEGIN
-			SPRINT render_missing ~not_implemented:combat:proficiency~
+			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:proficiency~ message = ~proficiency %combat_proficiency% has no name~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF combat_count == 1 BEGIN
 			LPM ad_item_strength_bonus
 			PATCH_IF strength_bonus_invalid BEGIN
-				SPRINT render_missing ~not_implemented:combat:strength_bonus~
+				LPF ad_refusal STR_VAR reason = ~not_implemented:combat:strength_bonus~ message = ~strength bonus that the old engine describes wrongly (BUG-018)~ RET render_missing = refusal END
 			END
 		END
 	END
@@ -151,7 +153,7 @@ DEFINE_PATCH_MACRO ad_item_dart_support BEGIN
 		END
 	END
 	PATCH_IF dart_charged > 1 BEGIN
-		SPRINT render_missing ~not_implemented:combat:dart_charges~
+		LPF ad_refusal STR_VAR reason = ~not_implemented:combat:dart_charges~ message = ~dart with several charged abilities~ RET render_missing = refusal END
 	END
 END
 
