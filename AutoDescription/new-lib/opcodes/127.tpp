@@ -15,8 +15,8 @@
 // moteur y coupe la liste) ; avec AD_ENABLE_SHRINKAGE, invocations du même bloc qui ne diffèrent que
 // par parameter1 ou leur probabilité (l'ancien opcode_127_group en écrit le nombre « entre 0 et N »).
 DEFINE_PATCH_MACRO ad_op_127_support BEGIN
-	FOR (monster_id = 0; monster_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++monster_id) BEGIN
-		PATCH_IF $fx_opcode(~%monster_id%~) == 127 BEGIN
+	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
 			PATCH_IF $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~) OR monster_table < 0 OR monster_table > 9 BEGIN
@@ -130,8 +130,8 @@ END
 
 DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN
 	SET same_id = monster_id
-	FOR (monster_other = 0; monster_other < fx_count; ++monster_other) BEGIN
-		PATCH_IF monster_other != monster_id AND $fx_opcode(~%monster_other%~) == 127 BEGIN
+	PHP_EACH fx_ids_127 AS _ => monster_other BEGIN
+		PATCH_IF monster_other != monster_id BEGIN
 			SET same_other = monster_other
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
 			LPM ad_fx_same_fields
@@ -153,8 +153,8 @@ DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~127~)
 	FOR (monster_late = 0; monster_late <= 1; ++monster_late) BEGIN
-		FOR (monster_id = 0; monster_id < fx_count; ++monster_id) BEGIN
-			PATCH_IF $fx_opcode(~%monster_id%~) == 127 AND NOT $fx_consumed(~%monster_id%~) AND $fx_late(~%monster_id%~) == monster_late BEGIN
+		PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%monster_id%~) AND $fx_late(~%monster_id%~) == monster_late BEGIN
 				SET monster_copies = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%monster_id%~) : 1
 				SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
 				SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies

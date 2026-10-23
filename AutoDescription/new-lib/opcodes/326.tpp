@@ -9,19 +9,18 @@
 // (ancien opcode_326_group, qui réunit leurs conditions) ; condition refusée (ad_op_326_condition) ;
 // plusieurs lignes sous une condition vide ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_326_support BEGIN
-	FOR (apply_id = 0; apply_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++apply_id) BEGIN
-		PATCH_IF $fx_opcode(~%apply_id%~) == 326 AND NOT $fx_consumed(~%apply_id%~) BEGIN
+	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%apply_id%~) BEGIN
 			SPRINT apply_resref $fx_resource_lower(~%apply_id%~)
 			PATCH_IF $fx_external(~%apply_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 				SPRINT apply_scope $fx_scope(~%apply_id%~)
-				FOR (apply_other = 0; apply_other < fx_count; ++apply_other) BEGIN
+				PHP_EACH fx_ids_326 AS _ => apply_other BEGIN
 					SPRINT apply_other_scope $fx_scope(~%apply_other%~)
 					SPRINT apply_other_resref $fx_resource_lower(~%apply_other%~)
-					PATCH_IF $fx_opcode(~%apply_other%~) == 326 AND apply_other != apply_id AND NOT $fx_consumed(~%apply_other%~)
-							AND (~%apply_other_scope%~ STRING_EQUAL ~%apply_scope%~) AND (~%apply_other_resref%~ STRING_EQUAL ~%apply_resref%~) BEGIN
+					PATCH_IF apply_other != apply_id AND NOT $fx_consumed(~%apply_other%~) AND (~%apply_other_scope%~ STRING_EQUAL ~%apply_scope%~) AND (~%apply_other_resref%~ STRING_EQUAL ~%apply_resref%~) BEGIN
 						LPF ad_refusal INT_VAR fx_id = apply_other STR_VAR reason = ~not_implemented:opcode326:group~ message = ~several opcode 326 casting the same spell~ RET render_missing = refusal END
 					END
 				END
@@ -128,8 +127,8 @@ END
 DEFINE_PATCH_MACRO ad_op_326_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~326~)
-	FOR (apply_id = 0; apply_id < fx_count; ++apply_id) BEGIN
-		PATCH_IF $fx_opcode(~%apply_id%~) == 326 AND NOT $fx_consumed(~%apply_id%~) AND $fx_sub_count(~%apply_id%~) > 0 BEGIN
+	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%apply_id%~) AND $fx_sub_count(~%apply_id%~) > 0 BEGIN
 			SET recursion_fx = apply_id
 			LPM ad_recursion_condition_text
 			SPRINT line_condition $fx_condition_text(~%apply_id%~)

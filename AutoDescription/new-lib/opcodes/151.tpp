@@ -6,8 +6,8 @@
 // Refus : créature absente (aucun remplacement en jeu ; l'ancien opcode_151_is_valid écarte l'effet,
 // erreur journalisée) ; créature sans nom.
 DEFINE_PATCH_MACRO ad_op_151_support BEGIN
-	FOR (replace_id = 0; replace_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++replace_id) BEGIN
-		PATCH_IF $fx_opcode(~%replace_id%~) == 151 AND NOT $fx_consumed(~%replace_id%~) BEGIN
+	PHP_EACH fx_ids_151 AS _ => replace_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%replace_id%~) BEGIN
 			SPRINT replace_resref $fx_resource(~%replace_id%~)
 			PATCH_IF ~%replace_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%replace_resref%.cre~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = replace_id STR_VAR reason = ~file_error:opcode151:missing_creature~ message = ~creature %replace_resref%.CRE does not exist~ RET render_missing = refusal END

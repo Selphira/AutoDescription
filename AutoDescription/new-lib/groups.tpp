@@ -212,8 +212,8 @@ END
 // dans l'ordre du fichier, est réuni au premier effet 44 de valeur fixée non consommé qui a les
 // mêmes champs sauf parameter1.
 DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 97 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_97 AS _ => group_id BEGIN
+		PATCH_IF $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1
 			SET group_other = 0 - 1
@@ -254,25 +254,21 @@ END
 // cet en-tête juste après celui du fichier (0x72), et la valeur du .spl vaut celle de projectl.ids
 // plus 1.
 DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 83 BEGIN
-			SPRINT group_scope $fx_scope(~%group_id%~)
-			SET group_projectile = $fx_parameter2(~%group_id%~) + 1
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				SPRINT group_spell $fx_resource(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 206 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
-					SET group_spell_projectile = 0 - 1
-					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
-						PATCH_IF BUFFER_LENGTH >= 0x72 + SPL_HEAD_projectile + 2 BEGIN
-							READ_SHORT (0x72 + SPL_HEAD_projectile) group_spell_projectile
-						END
+	PHP_EACH fx_ids_83 AS _ => group_id BEGIN
+		SPRINT group_scope $fx_scope(~%group_id%~)
+		SET group_projectile = $fx_parameter2(~%group_id%~) + 1
+		PHP_EACH fx_ids_206 AS _ => group_candidate BEGIN
+			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+			SPRINT group_spell $fx_resource(~%group_candidate%~)
+			PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+				SET group_spell_projectile = 0 - 1
+				INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+					PATCH_IF BUFFER_LENGTH >= 0x72 + SPL_HEAD_projectile + 2 BEGIN
+						READ_SHORT (0x72 + SPL_HEAD_projectile) group_spell_projectile
 					END
-					PATCH_IF group_spell_projectile == group_projectile BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-					END
+				END
+				PATCH_IF group_spell_projectile == group_projectile BEGIN
+					SET $fx_consumed(~%group_candidate%~) = 1
 				END
 			END
 		END
@@ -286,15 +282,14 @@ END
 // aussi les immunités à une école ou un type secondaire de sort (204, 205) de même cible, puissance,
 // résistance, probabilités, dés et jet de sauvegarde.
 DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 102 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_102 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
 			SET group_mask = 0
 			SET group_top = 0
-			FOR (group_candidate = group_id; group_candidate < fx_count; ++group_candidate) BEGIN
+			PHP_EACH fx_ids_102 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 102 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+				PATCH_IF group_candidate >= group_id AND NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
 					SET group_level = $fx_parameter1(~%group_candidate%~)
 					SET group_mask = group_mask BOR (1 << (group_level - 1))
 					SET group_top = group_level > group_top ? group_level : group_top
@@ -332,16 +327,14 @@ END
 // absorbe les immunités à un sort (206) de son bloc dont le sort est de type T ; l'ancien moteur lit
 // le type sur quatre octets.
 DEFINE_PATCH_MACRO ad_group_secondary_type_spells BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+	PHP_EACH fx_ids_205 AS _ => group_id BEGIN
 		SET group_sectype = $fx_parameter2(~%group_id%~)
-		PATCH_IF $fx_opcode(~%group_id%~) == 205 AND group_sectype > 0 BEGIN
+		PATCH_IF group_sectype > 0 BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+			PHP_EACH fx_ids_206 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 				SPRINT group_spell $fx_resource(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 206 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
 					SET group_spell_sectype = 0 - 1
 					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
 						PATCH_IF BUFFER_LENGTH >= SPL_sectype + 4 BEGIN
@@ -361,31 +354,27 @@ END
 // renvois d'un sort (207) de son bloc dont l'un des en-têtes utilise P ; la valeur du .spl vaut
 // celle de projectl.ids plus 1.
 DEFINE_PATCH_MACRO ad_group_bounce_spells BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 197 BEGIN
-			SPRINT group_scope $fx_scope(~%group_id%~)
-			SET group_projectile = $fx_parameter2(~%group_id%~) + 1
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				SPRINT group_spell $fx_resource(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 207 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
-					SET group_spell_match = 0
-					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
-						READ_LONG  SPL_extended_headers_offset group_headers_offset
-						READ_SHORT SPL_extended_headers_count  group_headers_count
-						FOR (group_header = 0; group_header < group_headers_count; ++group_header) BEGIN
-							SET group_header_offset = group_headers_offset + 0x28 * group_header + SPL_HEAD_projectile
-							PATCH_IF BUFFER_LENGTH >= group_header_offset + 2 BEGIN
-								READ_SHORT group_header_offset group_spell_projectile
-								SET group_spell_match = group_spell_match OR group_spell_projectile == group_projectile
-							END
+	PHP_EACH fx_ids_197 AS _ => group_id BEGIN
+		SPRINT group_scope $fx_scope(~%group_id%~)
+		SET group_projectile = $fx_parameter2(~%group_id%~) + 1
+		PHP_EACH fx_ids_207 AS _ => group_candidate BEGIN
+			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+			SPRINT group_spell $fx_resource(~%group_candidate%~)
+			PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
+				SET group_spell_match = 0
+				INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+					READ_LONG  SPL_extended_headers_offset group_headers_offset
+					READ_SHORT SPL_extended_headers_count  group_headers_count
+					FOR (group_header = 0; group_header < group_headers_count; ++group_header) BEGIN
+						SET group_header_offset = group_headers_offset + 0x28 * group_header + SPL_HEAD_projectile
+						PATCH_IF BUFFER_LENGTH >= group_header_offset + 2 BEGIN
+							READ_SHORT group_header_offset group_spell_projectile
+							SET group_spell_match = group_spell_match OR group_spell_projectile == group_projectile
 						END
 					END
-					PATCH_IF group_spell_match BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-					END
+				END
+				PATCH_IF group_spell_match BEGIN
+					SET $fx_consumed(~%group_candidate%~) = 1
 				END
 			END
 		END
@@ -401,21 +390,17 @@ END
 // restent : l'ancien moteur n'en réunit qu'un.
 DEFINE_PATCH_MACRO ad_group_morale BEGIN
 	CLEAR_ARRAY morale_done
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+	PHP_EACH fx_ids_23 AS _ => group_id BEGIN
 		SPRINT group_scope $fx_scope(~%group_id%~)
-		PATCH_IF $fx_opcode(~%group_id%~) == 23 AND NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 10
-				AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT VARIABLE_IS_SET $morale_done(~%group_scope%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 10 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT VARIABLE_IS_SET $morale_done(~%group_scope%~) BEGIN
 			SET $morale_done(~%group_scope%~) = 1
 			SET morale_found = 0
 			SET morale_duration = 0
 			SET morale_immunity = 0 - 1
-			FOR (group_candidate = 0; group_candidate < fx_count AND morale_found != 3; ++group_candidate) BEGIN
+			PHP_EACH fx_ids_101 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 				SET morale_protected = $fx_parameter2(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 101 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND (morale_protected == 23 OR morale_protected == 106)
-						AND (morale_duration == 0 OR morale_duration == $fx_duration(~%group_candidate%~)) BEGIN
+				PATCH_IF morale_found != 3 AND NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND (morale_protected == 23 OR morale_protected == 106) AND (morale_duration == 0 OR morale_duration == $fx_duration(~%group_candidate%~)) BEGIN
 					SET morale_duration = $fx_duration(~%group_candidate%~)
 					PATCH_IF morale_protected == 23 BEGIN
 						SET morale_found = morale_found BOR 1
@@ -429,10 +414,9 @@ DEFINE_PATCH_MACRO ad_group_morale BEGIN
 			PATCH_IF morale_found == 3 BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
 				SET $fx_consumed(~%morale_immunity%~) = 1
-				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+				PHP_EACH fx_ids_106 AS _ => group_candidate BEGIN
 					SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-					PATCH_IF $fx_opcode(~%group_candidate%~) == 106 AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-							AND $fx_parameter1(~%group_candidate%~) == 1 AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_flat BEGIN
+					PATCH_IF (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_parameter1(~%group_candidate%~) == 1 AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_flat BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END
@@ -453,10 +437,10 @@ END
 // - les protections contre un sort (206, 321) qui inflige P selon 2da/immunity_spells.2da, si elles
 //   ont aussi les mêmes dés et la même puissance (321 : la même résistance).
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
-	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
+	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~)
-		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
 				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
@@ -464,8 +448,8 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 						AND (NOT $AD_IMMUNITY_ABSORB_EQUIPPED(~%absorb_row%~) OR immunity_equipped) BEGIN
 					SET absorb_opcode = $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~)
 					SET absorb_found = 0
-					FOR (absorb_id = 0; absorb_id < fx_count; ++absorb_id) BEGIN
-						PATCH_IF $fx_opcode(~%absorb_id%~) == absorb_opcode AND NOT $fx_consumed(~%absorb_id%~) AND absorb_id != immunity_id BEGIN
+					PHP_EACH ~fx_ids_%absorb_opcode%~ AS _ => absorb_id BEGIN
+						PATCH_IF NOT $fx_consumed(~%absorb_id%~) AND absorb_id != immunity_id BEGIN
 							SET absorb_parameter1 = $fx_parameter1(~%absorb_id%~)
 							LPM ad_immunity_same_fields
 							PATCH_IF absorb_same AND absorb_parameter1 >= $AD_IMMUNITY_ABSORB_P1_MIN(~%absorb_row%~)
@@ -542,6 +526,9 @@ DEFINE_PATCH_MACRO ad_group_psionic_immunity BEGIN
 				SET $fx_immunity_late(~%psionic_fifth%~) = 1
 				SET $fx_consumed(~%psionic_fifth%~) = 0
 				SET $fx_opcode_count(~101~) = VARIABLE_IS_SET $fx_opcode_count(~101~) ? $fx_opcode_count(~101~) + 1 : 1
+				PATCH_FOR_EACH index_opcode IN 101 206 BEGIN
+					LPM ad_fx_index_opcode
+				END
 			END
 			SET psionic_id = psionic_self
 		END
@@ -561,13 +548,13 @@ END
 // Invisibilité améliorée (ancien opcode_20_group) : un effet 20 de parameter2 1 remplace les autres
 // effets 20 qui ont les mêmes champs, parameter2 mis à part.
 DEFINE_PATCH_MACRO ad_group_improved_invisibility BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 20 AND $fx_parameter2(~%group_id%~) == 1 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_20 AS _ => group_id BEGIN
+		PATCH_IF $fx_parameter2(~%group_id%~) == 1 AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER2
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 20 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+			PHP_EACH fx_ids_20 AS _ => group_candidate BEGIN
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
@@ -585,8 +572,8 @@ END
 // probabilités, résistance, cible et jet de sauvegarde (paramètres, timing, durée et special mis à
 // part), sont consommées.
 DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 58 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_58 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
@@ -606,16 +593,12 @@ END
 // Vitesse de déplacement rétablie (ancien opcode_126_group : opcode 126 à 100 %) : elle absorbe
 // l'action libre (opcode 163) de même portée et de mêmes probabilités.
 DEFINE_PATCH_MACRO ad_group_movement_restored BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 126 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_percentage
-				AND $fx_parameter1(~%group_id%~) == 100 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_126 AS _ => group_id BEGIN
+		PATCH_IF $fx_parameter2(~%group_id%~) == MOD_TYPE_percentage AND $fx_parameter1(~%group_id%~) == 100 AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+			PHP_EACH fx_ids_163 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 163 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND $fx_probability1(~%group_candidate%~) == $fx_probability1(~%group_id%~)
-						AND $fx_probability2(~%group_candidate%~) == $fx_probability2(~%group_id%~) BEGIN
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_probability1(~%group_candidate%~) == $fx_probability1(~%group_id%~) AND $fx_probability2(~%group_candidate%~) == $fx_probability2(~%group_id%~) BEGIN
 					SET $fx_consumed(~%group_candidate%~) = 1
 				END
 			END
@@ -628,16 +611,14 @@ END
 // probabilités, dés, puissance, jet de sauvegarde et résistance à la dissipation ; sans elles, il
 // n'est pas écrit.
 DEFINE_PATCH_MACRO ad_group_entangle BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 154 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_154 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
 			SET group_absorbed = 0
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+			PHP_EACH fx_ids_126 AS _ => group_candidate BEGIN
 				SET group_movement_mode = $fx_parameter2_raw(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 126 AND NOT $fx_consumed(~%group_candidate%~)
-						AND $fx_parameter1(~%group_candidate%~) == 0
-						AND (group_movement_mode == 1 OR group_movement_mode == 2 OR group_movement_mode == 5) BEGIN
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND $fx_parameter1(~%group_candidate%~) == 0 AND (group_movement_mode == 1 OR group_movement_mode == 2 OR group_movement_mode == 5) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
@@ -662,8 +643,8 @@ END
 // paralysie (46, 162) sont consommés. L'ancien moteur vérifie la présence de ces effets même si un
 // autre regroupement les a déjà absorbés.
 DEFINE_PATCH_MACRO ad_group_free_action BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 101 AND $fx_parameter2(~%group_id%~) == 126 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_101 AS _ => group_id BEGIN
+		PATCH_IF $fx_parameter2(~%group_id%~) == 126 AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
 			PATCH_IF ~%group_scope%~ STRING_EQUAL ~equipped~ BEGIN
 				SET same_id = group_id
@@ -722,10 +703,9 @@ END
 // devient un retrait pour la durée de ce délai ; la création est consommée. L'ancien moteur ne
 // prévoit qu'une création par retrait : plusieurs sont refusées.
 DEFINE_PATCH_MACRO ad_group_item_return BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+	PHP_EACH fx_ids_112 AS _ => group_id BEGIN
 		SET group_timing = $fx_timing(~%group_id%~)
-		PATCH_IF $fx_opcode(~%group_id%~) == 112 AND NOT $fx_consumed(~%group_id%~)
-				AND (group_timing <= TIMING_while_equipped OR group_timing >= TIMING_permanent_after_death) BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND (group_timing <= TIMING_while_equipped OR group_timing >= TIMING_permanent_after_death) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
 			SET group_returns = 0
@@ -752,13 +732,13 @@ END
 // probabilités, jet de sauvegarde, résistance à la dissipation et special : « Remplace « Lance +3 »
 // par « Sceptre de puissance altière » » (effet dérivé REPLACE_ITEM).
 DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 122 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_122 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_POWER BOR AD_SAME_DICE
 			SET group_removal = 0 - 1
-			FOR (group_candidate = 0; group_candidate < fx_count AND group_removal < 0; ++group_candidate) BEGIN
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 112 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+			PHP_EACH fx_ids_112 AS _ => group_candidate BEGIN
+				PATCH_IF group_removal < 0 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
@@ -787,18 +767,17 @@ END
 // (fx_spell_types : masque des types) est écrit après les autres, comme celui que l'ancien moteur
 // ajoute en fin de liste.
 DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == group_spell_opcode AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH ~fx_ids_%group_spell_opcode%~ AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET group_type = $fx_parameter2(~%group_id%~)
 			SET group_types = 1 << (group_type > 2 ? group_type - 3 : group_type)
 			SET group_merged = 0
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER2
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+			PHP_EACH ~fx_ids_%group_spell_opcode%~ AS _ => group_candidate BEGIN
 				SET group_other_type = $fx_parameter2(~%group_candidate%~)
-				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == group_spell_opcode AND NOT $fx_consumed(~%group_candidate%~)
-						AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
@@ -838,8 +817,8 @@ END
 // ce délai et est écrite après les autres, comme celle que l'ancien moteur ajoute. L'ancien moteur
 // reconnaît ces sorts à ces ressources.
 DEFINE_PATCH_MACRO ad_group_polymorph BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 135 AND NOT $fx_consumed(~%group_id%~) BEGIN
+	PHP_EACH fx_ids_135 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
@@ -875,8 +854,8 @@ END
 // prend le jet de l'autre, réussi pour moitié des dégâts (bit 8 de special, lu sur EE). L'effet
 // réuni est écrit après les autres effets 12 (fx_late), comme celui que l'ancien moteur ajoute.
 DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == 12 AND NOT $fx_consumed(~%group_id%~) AND $fx_save_type(~%group_id%~) == 0 BEGIN
+	PHP_EACH fx_ids_12 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_save_type(~%group_id%~) == 0 BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_SAVE
 			SET group_other = 0 - 1

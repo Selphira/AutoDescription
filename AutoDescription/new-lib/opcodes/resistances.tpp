@@ -9,8 +9,8 @@
 DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SET line_fx = stat_id

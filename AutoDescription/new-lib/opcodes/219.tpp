@@ -15,8 +15,8 @@
 // modificateur de 2 contre un type d'attaque, ou qui l'annule (cas de l'ancien opcode_0_group non
 // repris).
 DEFINE_PATCH_MACRO ad_op_219_support BEGIN
-	FOR (creature_ac_id = 0; creature_ac_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++creature_ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%creature_ac_id%~) == 219 AND NOT $fx_consumed(~%creature_ac_id%~) BEGIN
+	PHP_EACH fx_ids_219 AS _ => creature_ac_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%creature_ac_id%~) BEGIN
 			SET creature_ac_file = $fx_parameter2(~%creature_ac_id%~)
 			SET $fx_ac_merged(~%creature_ac_id%~) = 0
 			LPF ad_ids_name INT_VAR ids_file = creature_ac_file entry = $fx_parameter1(~%creature_ac_id%~) RET creature_ac_name = name END
@@ -81,8 +81,8 @@ END
 // sauvegarde.
 DEFINE_PATCH_MACRO ad_op_219_lines BEGIN
 	SPRINT line_section ~equipped~
-	FOR (creature_ac_id = 0; creature_ac_id < fx_count; ++creature_ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%creature_ac_id%~) == 219 AND NOT $fx_consumed(~%creature_ac_id%~) BEGIN
+	PHP_EACH fx_ids_219 AS _ => creature_ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%creature_ac_id%~) BEGIN
 			SPRINT targetType $fx_creature_type(~%creature_ac_id%~)
 			SPRINT versus @2002020 // ~contre les %targetType%~
 			LPF ad_signed_value INT_VAR value = 2 RET value = text END

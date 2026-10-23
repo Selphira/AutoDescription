@@ -8,8 +8,8 @@
 // L'ancien moteur lit l'octet de poids faible de parameter1 (un bonus négatif devient 255) et
 // écarte un type inconnu.
 DEFINE_PATCH_MACRO ad_op_191_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == 191 BEGIN
+	PHP_EACH fx_ids_191 AS _ => stat_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET caster_type = $fx_parameter2(~%stat_id%~)
 			SET caster_bonus = $fx_parameter1(~%stat_id%~)
 			PATCH_IF caster_type < 0 OR caster_type > 1 OR caster_bonus < 0 OR caster_bonus > 255 BEGIN

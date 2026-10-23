@@ -23,8 +23,8 @@ END
 // Ressource vide : écarté (opcode_321_is_valid). Refus : effet d'un EFF ; un 146 ou un 148 de la même
 // portée lance ce sort.
 DEFINE_PATCH_MACRO ad_op_321_support BEGIN
-	FOR (removal_id = 0; removal_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++removal_id) BEGIN
-		PATCH_IF $fx_opcode(~%removal_id%~) == 321 AND NOT $fx_consumed(~%removal_id%~) BEGIN
+	PHP_EACH fx_ids_321 AS _ => removal_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%removal_id%~) BEGIN
 			SPRINT removal_resource $fx_resource(~%removal_id%~)
 			PATCH_IF $fx_external(~%removal_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = removal_id STR_VAR reason = ~not_implemented:opcode321:external~ message = ~effect from an EFF file~ RET render_missing = refusal END

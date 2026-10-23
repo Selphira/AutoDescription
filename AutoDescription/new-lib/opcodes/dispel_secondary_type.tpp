@@ -8,8 +8,8 @@
 // Refus : niveau négatif (l'ancien opcode_221_is_valid l'écarte) ; type sans nom (type 0, nommé en
 // anglais mais pas en français ; type ajouté par un mod).
 DEFINE_PATCH_MACRO ad_dispel_type_support BEGIN
-	FOR (dispel_id = 0; dispel_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++dispel_id) BEGIN
-		PATCH_IF $fx_opcode(~%dispel_id%~) == dispel_type_opcode AND NOT $fx_consumed(~%dispel_id%~) BEGIN
+	PHP_EACH ~fx_ids_%dispel_type_opcode%~ AS _ => dispel_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%dispel_id%~) BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = $fx_parameter2(~%dispel_id%~) RET dispel_name = name END
 			PATCH_IF $fx_parameter1(~%dispel_id%~) < 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = dispel_id STR_VAR reason = ~file_error:opcode%dispel_type_opcode%:invalid~ message = ~negative secondary type~ RET render_missing = refusal END
@@ -27,8 +27,8 @@ END
 DEFINE_PATCH_MACRO ad_dispel_type_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%dispel_type_opcode%~)
-	FOR (dispel_id = 0; dispel_id < fx_count; ++dispel_id) BEGIN
-		PATCH_IF $fx_opcode(~%dispel_id%~) == dispel_type_opcode AND NOT $fx_consumed(~%dispel_id%~) BEGIN
+	PHP_EACH ~fx_ids_%dispel_type_opcode%~ AS _ => dispel_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%dispel_id%~) BEGIN
 			SPRINT spellSecondaryTypeName $fx_secondary_type_name(~%dispel_id%~)
 			SET spellLevel = $fx_parameter1(~%dispel_id%~)
 			SET line_fx = dispel_id

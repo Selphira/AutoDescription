@@ -5,8 +5,8 @@
 
 // Refus : sort absent (l'ancien moteur n'écrit rien) ; sort sans nom.
 DEFINE_PATCH_MACRO ad_op_171_support BEGIN
-	FOR (ability_id = 0; ability_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++ability_id) BEGIN
-		PATCH_IF $fx_opcode(~%ability_id%~) == 171 AND NOT $fx_consumed(~%ability_id%~) BEGIN
+	PHP_EACH fx_ids_171 AS _ => ability_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%ability_id%~) BEGIN
 			SPRINT ability_resref $fx_resource(~%ability_id%~)
 			PATCH_IF ~%ability_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%ability_resref%.spl~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = ability_id STR_VAR reason = ~file_error:opcode171:invalid~ message = ~spell %ability_resref%.SPL does not exist~ RET render_missing = refusal END

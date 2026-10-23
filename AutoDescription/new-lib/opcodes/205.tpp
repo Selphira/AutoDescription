@@ -6,8 +6,8 @@
 
 // Refus : type sans nom (l'ancien moteur n'écrit rien) ou ajouté par un mod (au-delà de 13).
 DEFINE_PATCH_MACRO ad_op_205_support BEGIN
-	FOR (sectype_id = 0; sectype_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++sectype_id) BEGIN
-		PATCH_IF $fx_opcode(~%sectype_id%~) == 205 BEGIN
+	PHP_EACH fx_ids_205 AS _ => sectype_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = $fx_parameter2(~%sectype_id%~) RET sectype_name = name END
 			SPRINT $fx_sectype_name(~%sectype_id%~) ~%sectype_name%~
 			PATCH_IF ~%sectype_name%~ STRING_EQUAL ~~ BEGIN

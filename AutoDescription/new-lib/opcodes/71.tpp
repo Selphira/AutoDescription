@@ -5,8 +5,8 @@
 // Un autre mode : l'ancien moteur écarte l'effet (opcode_71_is_valid). Refus : sexe fixé (le nom au
 // singulier n'est pas encore repris).
 DEFINE_PATCH_MACRO ad_op_71_support BEGIN
-	FOR (gender_id = 0; gender_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++gender_id) BEGIN
-		PATCH_IF $fx_opcode(~%gender_id%~) == 71 BEGIN
+	PHP_EACH fx_ids_71 AS _ => gender_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET gender_mode = $fx_parameter2(~%gender_id%~)
 			PATCH_IF gender_mode == MOD_TYPE_flat BEGIN
 				LPF ad_refusal INT_VAR fx_id = gender_id STR_VAR reason = ~not_implemented:opcode71:gender_set~ message = ~gender set to a given value~ RET render_missing = refusal END

@@ -7,8 +7,8 @@
 // façon (l'ancien opcode_332_group en fait « Dégâts élémentaires », « Dégâts physiques ») ; forme
 // « cible » (l'ancien .tra anglais n'a pas ses noms « les dégâts de feu »).
 DEFINE_PATCH_MACRO ad_op_332_support BEGIN
-	FOR (damage_mod_id = 0; damage_mod_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++damage_mod_id) BEGIN
-		PATCH_IF $fx_opcode(~%damage_mod_id%~) == 332 BEGIN
+	PHP_EACH fx_ids_332 AS _ => damage_mod_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET damage_mod_type = $fx_parameter2(~%damage_mod_id%~)
 			PATCH_IF $fx_parameter1(~%damage_mod_id%~) == 0 OR damage_mod_type < 0 OR damage_mod_type > 10 BEGIN
 				LPF ad_refusal INT_VAR fx_id = damage_mod_id STR_VAR reason = ~file_error:opcode332:invalid~ message = ~modifier of 0 or damage type %damage_mod_type% (expected 0-10)~ RET render_missing = refusal END
@@ -44,8 +44,8 @@ END
 DEFINE_PATCH_MACRO ad_op_332_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~332~)
-	FOR (damage_mod_id = 0; damage_mod_id < fx_count; ++damage_mod_id) BEGIN
-		PATCH_IF $fx_opcode(~%damage_mod_id%~) == 332 AND NOT $fx_consumed(~%damage_mod_id%~) BEGIN
+	PHP_EACH fx_ids_332 AS _ => damage_mod_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%damage_mod_id%~) BEGIN
 			SET damage_mod_type = $fx_parameter2(~%damage_mod_id%~)
 			SET damage_mod_value = $fx_parameter1(~%damage_mod_id%~)
 			SET line_fx = damage_mod_id

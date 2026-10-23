@@ -8,8 +8,8 @@
 // leurs probabilités, dont une certaine (l'ancien opcode_67_group en écrit le nombre « entre 1 et
 // 2 »).
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
-	FOR (summon_id = 0; summon_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++summon_id) BEGIN
-		PATCH_IF $fx_opcode(~%summon_id%~) == 67 BEGIN
+	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance END
 			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ BEGIN
@@ -37,8 +37,8 @@ END
 DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 	SET same_id = summon_id
 	SET same_ignored = AD_SAME_PROBABILITY
-	FOR (summon_other = 0; summon_other < fx_count; ++summon_other) BEGIN
-		PATCH_IF summon_other != summon_id AND $fx_opcode(~%summon_other%~) == 67 AND $fx_probability(~%summon_other%~) < 100 BEGIN
+	PHP_EACH fx_ids_67 AS _ => summon_other BEGIN
+		PATCH_IF summon_other != summon_id AND $fx_probability(~%summon_other%~) < 100 BEGIN
 			SET same_other = summon_other
 			LPM ad_fx_same_fields
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
@@ -54,8 +54,8 @@ END
 DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~67~)
-	FOR (summon_id = 0; summon_id < fx_count; ++summon_id) BEGIN
-		PATCH_IF $fx_opcode(~%summon_id%~) == 67 AND NOT $fx_consumed(~%summon_id%~) BEGIN
+	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%summon_id%~) BEGIN
 			SPRINT creatureName $fx_creature_name(~%summon_id%~)
 			SET amount = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%summon_id%~) : 1
 			// L'ancien moteur n'ajoute les dés de vie de la créature qu'à la description d'un sort.

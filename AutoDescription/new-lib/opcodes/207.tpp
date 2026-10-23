@@ -5,8 +5,8 @@
 
 // Refus : sort sans nom (l'ancien moteur écrit « « » »).
 DEFINE_PATCH_MACRO ad_op_207_support BEGIN
-	FOR (bounce_spell_id = 0; bounce_spell_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++bounce_spell_id) BEGIN
-		PATCH_IF $fx_opcode(~%bounce_spell_id%~) == 207 BEGIN
+	PHP_EACH fx_ids_207 AS _ => bounce_spell_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT bounce_spell_resref $fx_resource(~%bounce_spell_id%~)
 			LPF ad_spell_name STR_VAR resref = ~%bounce_spell_resref%~ RET bounce_spell_name = name END
 			SPRINT $fx_spell_name(~%bounce_spell_id%~) ~%bounce_spell_name%~

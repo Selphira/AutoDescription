@@ -36,8 +36,8 @@ END
 // ressource (l'ancien moteur en fait une immunité au sort ou à l'objet, ou des exceptions des
 // effets de cette ressource).
 DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
-	FOR (exception_id = 0; exception_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++exception_id) BEGIN
-		PATCH_IF $fx_opcode(~%exception_id%~) == exception_opcode AND NOT $fx_consumed(~%exception_id%~) BEGIN
+	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => exception_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%exception_id%~) BEGIN
 			SPRINT exception_resource $fx_resource(~%exception_id%~)
 			PATCH_IF $fx_external(~%exception_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END

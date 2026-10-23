@@ -5,8 +5,8 @@
 // Comme l'ancien opcode_112_is_valid, le retrait d'une arme nommée « Attaquer » ou « Morgenstern »
 // (armes des métamorphoses) est écarté sans rien écrire. Refus : ressource vide, objet sans nom.
 DEFINE_PATCH_MACRO ad_op_112_support BEGIN
-	FOR (remove_id = 0; remove_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++remove_id) BEGIN
-		PATCH_IF $fx_opcode(~%remove_id%~) == 112 BEGIN
+	PHP_EACH fx_ids_112 AS _ => remove_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
 			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref END
 			SET $fx_item_return(~%remove_id%~) = 0
@@ -35,8 +35,8 @@ END
 DEFINE_PATCH_MACRO ad_op_112_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~112~)
-	FOR (remove_id = 0; remove_id < fx_count; ++remove_id) BEGIN
-		PATCH_IF $fx_opcode(~%remove_id%~) == 112 AND NOT $fx_consumed(~%remove_id%~) BEGIN
+	PHP_EACH fx_ids_112 AS _ => remove_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%remove_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%remove_id%~)
 			SET line_fx = remove_id
 			LPM ad_application_form

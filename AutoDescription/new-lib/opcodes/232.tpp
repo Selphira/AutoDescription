@@ -14,8 +14,8 @@
 // d'un état (5, 6, 15) ; condition de distance trop courte, moment de la journée ou état de sort sans
 // nom ; plusieurs lignes d'un sort sans nom sous une condition vide ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_232_support BEGIN
-	FOR (condition_id = 0; condition_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++condition_id) BEGIN
-		PATCH_IF $fx_opcode(~%condition_id%~) == 232 AND NOT $fx_consumed(~%condition_id%~) BEGIN
+	PHP_EACH fx_ids_232 AS _ => condition_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%condition_id%~) BEGIN
 			SET condition_target = $fx_parameter1(~%condition_id%~)
 			SET condition_type = $fx_parameter2(~%condition_id%~)
 			SET condition_special = $fx_special(~%condition_id%~)
@@ -150,8 +150,8 @@ END
 DEFINE_PATCH_MACRO ad_op_232_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~232~)
-	FOR (condition_id = 0; condition_id < fx_count; ++condition_id) BEGIN
-		PATCH_IF $fx_opcode(~%condition_id%~) == 232 AND NOT $fx_consumed(~%condition_id%~) AND $fx_sub_count(~%condition_id%~) > 0 BEGIN
+	PHP_EACH fx_ids_232 AS _ => condition_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%condition_id%~) AND $fx_sub_count(~%condition_id%~) > 0 BEGIN
 			SET recursion_fx = condition_id
 			SPRINT spellName $fx_spell_name(~%condition_id%~)
 			PATCH_IF $fx_sub_count(~%condition_id%~) > 1 AND NOT (~%spellName%~ STRING_EQUAL ~~) BEGIN

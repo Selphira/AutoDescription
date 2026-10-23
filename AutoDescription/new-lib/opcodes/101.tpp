@@ -15,8 +15,8 @@
 // unique), immunités aux champs différents, parameter2 mis à part.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
-	FOR (immunity_id = 0; immunity_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++immunity_id) BEGIN
-		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 BEGIN
+	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			SET immunity_label_tra = 8030000 + immunity_opcode
 			// Opcode sans libellé : l'ancien moteur échoue sur la chaîne absente.
@@ -51,9 +51,9 @@ DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
 	SET immunity_same_class = 0
 	SET immunity_different = 0
 	SET immunity_self = immunity_id
-	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
+	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_other_scope $fx_scope(~%immunity_id%~)
-		PATCH_IF immunity_id != immunity_self AND $fx_opcode(~%immunity_id%~) == 101 AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
+		PATCH_IF immunity_id != immunity_self AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
 			LPM ad_immunity_class
 			SET immunity_same_class = immunity_same_class OR (immunity_own_class > 0 AND immunity_class == immunity_own_class)
 			SET same_other = immunity_id
@@ -77,8 +77,8 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~101~)
 	CLEAR_ARRAY immunity_key_count
-	FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
-		PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			LPM ad_immunity_class
 			PATCH_IF immunity_class > 0 BEGIN
 				PATCH_IF NOT VARIABLE_IS_SET $immunity_key_count(~%immunity_key%~) BEGIN
@@ -89,9 +89,8 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 		END
 	END
 	FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
-		FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
-			PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
-					AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
+		PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 				LPM ad_immunity_class
 				LPM ad_immunity_merged
 				PATCH_IF NOT immunity_merged BEGIN
@@ -112,9 +111,8 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 			SET immunity_label_count = 0
 			SET immunity_first = 0 - 1
 			FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
-				FOR (immunity_id = 0; immunity_id < fx_count; ++immunity_id) BEGIN
-					PATCH_IF $fx_opcode(~%immunity_id%~) == 101 AND NOT $fx_consumed(~%immunity_id%~)
-							AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
+				PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+					PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
 						LPM ad_immunity_class
 						PATCH_IF immunity_class > 0 AND (~%immunity_key%~ STRING_EQUAL ~%immunity_merged_key%~) BEGIN
 							LPM ad_immunity_label

@@ -5,8 +5,8 @@
 // moral et à la panique (ad_group_morale, new-lib/groups.tpp).
 
 DEFINE_PATCH_MACRO ad_op_23_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == 23 AND (NOT IS_EE OR $fx_special(~%stat_id%~) == 0) BEGIN
+	PHP_EACH fx_ids_23 AS _ => stat_id BEGIN
+		PATCH_IF (NOT IS_EE OR $fx_special(~%stat_id%~) == 0) BEGIN
 			SET $fx_parameter1(~%stat_id%~) = 10
 			SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_flat
 		END

@@ -10,8 +10,8 @@
 // que l'ancien moteur n'écrit pas ; caractéristique inchangée ; avec AD_ENABLE_SHRINKAGE, deux
 // caractéristiques réduites aux mêmes champs (ancien opcode_78_group, qui les réunit).
 DEFINE_PATCH_MACRO ad_op_78_support BEGIN
-	FOR (disease_id = 0; disease_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++disease_id) BEGIN
-		PATCH_IF $fx_opcode(~%disease_id%~) == 78 AND NOT $fx_consumed(~%disease_id%~) BEGIN
+	PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%disease_id%~) BEGIN
 			SET disease_type = $fx_parameter2(~%disease_id%~)
 			SET disease_amount = $fx_parameter1(~%disease_id%~)
 			SET disease_timing = $fx_timing(~%disease_id%~)
@@ -36,9 +36,9 @@ DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 			ELSE PATCH_IF disease_type >= 4 AND disease_type <= 9 AND AD_ENABLE_SHRINKAGE BEGIN
 				SET same_id = disease_id
 				SET same_ignored = AD_SAME_PARAMETER2
-				FOR (disease_other = 0; disease_other < fx_count; ++disease_other) BEGIN
+				PHP_EACH fx_ids_78 AS _ => disease_other BEGIN
 					SET disease_other_type = $fx_parameter2(~%disease_other%~)
-					PATCH_IF disease_other != disease_id AND $fx_opcode(~%disease_other%~) == 78 AND disease_other_type >= 4 AND disease_other_type <= 9 BEGIN
+					PATCH_IF disease_other != disease_id AND disease_other_type >= 4 AND disease_other_type <= 9 BEGIN
 						SET same_other = disease_other
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
@@ -54,8 +54,8 @@ END
 DEFINE_PATCH_MACRO ad_op_78_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~78~)
-	FOR (disease_id = 0; disease_id < fx_count; ++disease_id) BEGIN
-		PATCH_IF $fx_opcode(~%disease_id%~) == 78 AND NOT $fx_consumed(~%disease_id%~) BEGIN
+	PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%disease_id%~) BEGIN
 			SET disease_type = $fx_parameter2(~%disease_id%~)
 			SET amount = $fx_parameter1(~%disease_id%~)
 			PATCH_IF disease_type <= 3 BEGIN

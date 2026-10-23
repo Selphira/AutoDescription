@@ -182,10 +182,9 @@ DEFINE_PATCH_MACRO ad_item_armor_lines BEGIN
 	PATCH_IF item_type == ITM_TYPE_armor AND AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS BEGIN
 		LPF ad_item_is_robe RET armor_is_robe = is_robe END
 		SET armor_blocks_arcane = 0
-		FOR (armor_id = 0; armor_id < fx_count; ++armor_id) BEGIN
+		PHP_EACH fx_ids_145 AS _ => armor_id BEGIN
 			SPRINT armor_block $fx_block(~%armor_id%~)
-			PATCH_IF $fx_opcode(~%armor_id%~) == 145 AND $fx_parameter2(~%armor_id%~) == 0 AND $fx_probability(~%armor_id%~) == 100
-					AND ~%armor_block%~ STRING_EQUAL ~equipped~ BEGIN
+			PATCH_IF $fx_parameter2(~%armor_id%~) == 0 AND $fx_probability(~%armor_id%~) == 100 AND ~%armor_block%~ STRING_EQUAL ~equipped~ BEGIN
 				SET armor_blocks_arcane = 1
 			END
 		END

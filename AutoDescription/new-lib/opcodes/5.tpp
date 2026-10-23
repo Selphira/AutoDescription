@@ -9,8 +9,8 @@
 // (aucune ligne) ou cible autre que « la cible » (l'ancien moteur garde alors un nom lu pour un effet
 // précédent).
 DEFINE_PATCH_MACRO ad_op_5_support BEGIN
-	FOR (charm_id = 0; charm_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++charm_id) BEGIN
-		PATCH_IF $fx_opcode(~%charm_id%~) == 5 BEGIN
+	PHP_EACH fx_ids_5 AS _ => charm_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET charm_type = $fx_parameter2(~%charm_id%~)
 			SET charm_value = $fx_parameter1(~%charm_id%~)
 			SET charm_target = $fx_effective_target(~%charm_id%~)

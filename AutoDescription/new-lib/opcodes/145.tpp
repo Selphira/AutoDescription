@@ -13,8 +13,8 @@
 // Refus : type de sort hors de 0-2 (l'ancien opcode_145_is_valid écarte un type hors de 0-3 ; le
 // type 3 n'a pas de nom).
 DEFINE_PATCH_MACRO ad_op_145_support BEGIN
-	FOR (spellcasting_id = 0; spellcasting_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++spellcasting_id) BEGIN
-		PATCH_IF $fx_opcode(~%spellcasting_id%~) == 145 BEGIN
+	PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET $fx_spell_types(~%spellcasting_id%~) = 0
 			PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 2 BEGIN
 				LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:spell_types~ message = ~spell type (parameter2) not supported~ RET render_missing = refusal END
@@ -28,8 +28,8 @@ DEFINE_PATCH_MACRO ad_op_145_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~145~)
 	LPF ad_item_is_robe RET spellcasting_robe = is_robe END
 	FOR (spellcasting_late = 0; spellcasting_late <= 1; ++spellcasting_late) BEGIN
-		FOR (spellcasting_id = 0; spellcasting_id < fx_count; ++spellcasting_id) BEGIN
-			PATCH_IF $fx_opcode(~%spellcasting_id%~) == 145 AND NOT $fx_consumed(~%spellcasting_id%~) AND $fx_late(~%spellcasting_id%~) == spellcasting_late BEGIN
+		PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%spellcasting_id%~) AND $fx_late(~%spellcasting_id%~) == spellcasting_late BEGIN
 				SET spellcasting_types = $fx_spell_types(~%spellcasting_id%~)
 				PATCH_IF spellcasting_types == 0 BEGIN
 					SET spellcasting_types = 1 << $fx_parameter2(~%spellcasting_id%~)

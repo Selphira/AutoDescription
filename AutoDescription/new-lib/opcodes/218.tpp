@@ -4,8 +4,8 @@
 // Refus : aucune peau (écartée par l'ancien opcode_218_is_valid) ; sur EE, nombre tiré aux dés
 // (parameter2 non nul).
 DEFINE_PATCH_MACRO ad_op_218_support BEGIN
-	FOR (skin_id = 0; skin_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++skin_id) BEGIN
-		PATCH_IF $fx_opcode(~%skin_id%~) == 218 BEGIN
+	PHP_EACH fx_ids_218 AS _ => skin_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF IS_EE AND $fx_parameter2(~%skin_id%~) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = skin_id STR_VAR reason = ~not_implemented:opcode218:dice~ message = ~number of skins given by dice~ RET render_missing = refusal END
 			END

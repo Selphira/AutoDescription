@@ -8,10 +8,9 @@
 DEFINE_PATCH_MACRO ad_op_122_support BEGIN
 	SET create_opcode = 122
 	LPM ad_create_item_support
-	FOR (create_id = 0; create_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++create_id) BEGIN
+	PHP_EACH fx_ids_122 AS _ => create_id BEGIN
 		SPRINT create_resref $fx_resource(~%create_id%~)
-		PATCH_IF $fx_opcode(~%create_id%~) == 122 AND AD_ENABLE_SHRINKAGE
-				AND (~%create_resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%create_resref%~ STRING_EQUAL_CASE ~MISC56_~) BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND AD_ENABLE_SHRINKAGE AND (~%create_resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%create_resref%~ STRING_EQUAL_CASE ~MISC56_~) BEGIN
 			LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode122:broken_weapon~ message = ~item replacing a broken weapon~ RET render_missing = refusal END
 		END
 	END

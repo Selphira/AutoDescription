@@ -6,8 +6,8 @@
 // Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid), trésor aléatoire (l'ancien
 // moteur énumère les objets possibles), objet sans nom (aucune ligne).
 DEFINE_PATCH_MACRO ad_create_item_support BEGIN
-	FOR (create_id = 0; create_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++create_id) BEGIN
-		PATCH_IF $fx_opcode(~%create_id%~) == create_opcode BEGIN
+	PHP_EACH ~fx_ids_%create_opcode%~ AS _ => create_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT create_resref $fx_resource(~%create_id%~)
 			LPF ad_item_is_random_treasure STR_VAR resref = ~%create_resref%~ RET create_random = random END
 			LPF ad_item_info STR_VAR resref = ~%create_resref%~ RET create_name = name create_stackable = stackable END
@@ -37,8 +37,8 @@ END
 DEFINE_PATCH_MACRO ad_create_item_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%create_opcode%~)
-	FOR (create_id = 0; create_id < fx_count; ++create_id) BEGIN
-		PATCH_IF $fx_opcode(~%create_id%~) == create_opcode AND NOT $fx_consumed(~%create_id%~) BEGIN
+	PHP_EACH ~fx_ids_%create_opcode%~ AS _ => create_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%create_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%create_id%~)
 			SET amount = $fx_item_amount(~%create_id%~)
 			SET line_phrase = create_phrase

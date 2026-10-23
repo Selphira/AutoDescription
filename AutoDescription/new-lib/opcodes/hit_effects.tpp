@@ -13,8 +13,8 @@
 // réunion avec plusieurs effets possibles ou d'un 248 à mains nues (l'ancien moteur y lirait la forme
 // « cible ») ; plusieurs lignes ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
-	FOR (hit_id = 0; hit_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hit_id) BEGIN
-		PATCH_IF $fx_opcode(~%hit_id%~) == hit_opcode AND NOT $fx_consumed(~%hit_id%~) BEGIN
+	PHP_EACH ~fx_ids_%hit_opcode%~ AS _ => hit_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%hit_id%~) BEGIN
 			SPRINT hit_resref $fx_resource_lower(~%hit_id%~)
 			SET $fx_hit_any(~%hit_id%~) = 0
 			PATCH_IF $fx_external(~%hit_id%~) BEGIN
@@ -101,8 +101,8 @@ END
 // hit_condition_target (« … par %theTarget% »), + 1 à mains nues pour l'opcode 248.
 DEFINE_PATCH_MACRO ad_hit_effect_lines BEGIN
 	SPRINT line_section ~equipped~
-	FOR (hit_id = 0; hit_id < fx_count; ++hit_id) BEGIN
-		PATCH_IF $fx_opcode(~%hit_id%~) == hit_opcode AND NOT $fx_consumed(~%hit_id%~) AND $fx_sub_count(~%hit_id%~) > 0 BEGIN
+	PHP_EACH ~fx_ids_%hit_opcode%~ AS _ => hit_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%hit_id%~) AND $fx_sub_count(~%hit_id%~) > 0 BEGIN
 			SET hit_sub_opcode = $fx_sub_opcode(~%hit_id%~)
 			SET line_sort = $AD_OPCODE_SORT(~%hit_sub_opcode%~)
 			SET line_fx = hit_id

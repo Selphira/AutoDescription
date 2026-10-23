@@ -3,10 +3,8 @@
 // l'ancien moteur ne lit que le mot de poids faible de parameter2.
 
 DEFINE_PATCH_MACRO ad_op_167_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == 167 BEGIN
-			SET $fx_parameter2(~%stat_id%~) = $fx_parameter2(~%stat_id%~) BAND 65535
-		END
+	PHP_EACH fx_ids_167 AS _ => stat_id BEGIN
+		SET $fx_parameter2(~%stat_id%~) = $fx_parameter2(~%stat_id%~) BAND 65535
 	END
 	SET stat_opcode = 167
 	SPRINT stat_mode_3 ~invalid~

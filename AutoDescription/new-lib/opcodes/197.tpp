@@ -16,14 +16,14 @@ DEFINE_PATCH_MACRO ad_op_197_lines BEGIN
 		SET $bounce_done(~%bounce_id%~) = 0
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (bounce_id = 0; bounce_id < fx_count; ++bounce_id) BEGIN
-			PATCH_IF $fx_opcode(~%bounce_id%~) == 197 AND NOT $bounce_done(~%bounce_id%~) BEGIN
+		PHP_EACH fx_ids_197 AS _ => bounce_id BEGIN
+			PATCH_IF NOT $bounce_done(~%bounce_id%~) BEGIN
 				LPM ad_op_197_merged_line
 			END
 		END
 	END
-	FOR (bounce_id = 0; bounce_id < fx_count; ++bounce_id) BEGIN
-		PATCH_IF $fx_opcode(~%bounce_id%~) == 197 AND NOT $bounce_done(~%bounce_id%~) BEGIN
+	PHP_EACH fx_ids_197 AS _ => bounce_id BEGIN
+		PATCH_IF NOT $bounce_done(~%bounce_id%~) BEGIN
 			LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%bounce_id%~) RET bounce_name = name END
 			PATCH_IF NOT (~%bounce_name%~ STRING_EQUAL ~~) BEGIN
 				SPRINT projectiles ~%bounce_name%~
@@ -39,9 +39,9 @@ END
 DEFINE_PATCH_MACRO ad_op_197_merged_line BEGIN
 	SPRINT bounce_scope $fx_scope(~%bounce_id%~)
 	SET bounce_count = 0
-	FOR (bounce_other = 0; bounce_other < fx_count; ++bounce_other) BEGIN
+	PHP_EACH fx_ids_197 AS _ => bounce_other BEGIN
 		SPRINT bounce_other_scope $fx_scope(~%bounce_other%~)
-		PATCH_IF $fx_opcode(~%bounce_other%~) == 197 AND (~%bounce_other_scope%~ STRING_EQUAL ~%bounce_scope%~) BEGIN
+		PATCH_IF (~%bounce_other_scope%~ STRING_EQUAL ~%bounce_scope%~) BEGIN
 			SET bounce_count += 1
 		END
 	END
@@ -49,9 +49,9 @@ DEFINE_PATCH_MACRO ad_op_197_merged_line BEGIN
 		CLEAR_ARRAY bounce_names
 		SET bounce_name_count = 0
 		SET bounce_last = 0 - 1
-		FOR (bounce_other = 0; bounce_other < fx_count; ++bounce_other) BEGIN
+		PHP_EACH fx_ids_197 AS _ => bounce_other BEGIN
 			SPRINT bounce_other_scope $fx_scope(~%bounce_other%~)
-			PATCH_IF $fx_opcode(~%bounce_other%~) == 197 AND (~%bounce_other_scope%~ STRING_EQUAL ~%bounce_scope%~) BEGIN
+			PATCH_IF (~%bounce_other_scope%~ STRING_EQUAL ~%bounce_scope%~) BEGIN
 				SET $bounce_done(~%bounce_other%~) = 1
 				SET bounce_last = bounce_other
 				LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%bounce_other%~) RET bounce_name = name END

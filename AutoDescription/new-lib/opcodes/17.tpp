@@ -6,8 +6,8 @@
 // « cible ».
 
 DEFINE_PATCH_MACRO ad_op_17_support BEGIN
-	FOR (hp_id = 0; hp_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == 17 BEGIN
+	PHP_EACH fx_ids_17 AS _ => hp_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET hp_type = $fx_parameter2(~%hp_id%~) BAND 65535
 			// L'ancien moteur divise par 65 535, et non 65 536.
 			SET hp_subtype = $fx_parameter2(~%hp_id%~) / 65535
@@ -35,8 +35,8 @@ END
 DEFINE_PATCH_MACRO ad_op_17_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~17~)
-	FOR (hp_id = 0; hp_id < fx_count; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == 17 AND NOT $fx_consumed(~%hp_id%~) BEGIN
+	PHP_EACH fx_ids_17 AS _ => hp_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%hp_id%~) BEGIN
 			SET hp_type = $fx_parameter2(~%hp_id%~) BAND 65535
 			LPF ad_dice_text INT_VAR dice_count = $fx_dice_count(~%hp_id%~) dice_sides = $fx_dice_sides(~%hp_id%~)
 				bonus = $fx_parameter1(~%hp_id%~) RET value = text END

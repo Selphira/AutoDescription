@@ -87,9 +87,8 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 			SET same_id = series_id
 			SPRINT series_resource $fx_resource_lower(~%series_id%~)
 			SET series_matched = 0
-			FOR (series_other = 0; series_other < fx_count; ++series_other) BEGIN
-				PATCH_IF series_other != series_id AND $fx_opcode(~%series_other%~) == series_opcode
-						AND $fx_timing(~%series_other%~) == TIMING_delayed BEGIN
+			PHP_EACH ~fx_ids_%series_opcode%~ AS _ => series_other BEGIN
+				PATCH_IF series_other != series_id AND $fx_timing(~%series_other%~) == TIMING_delayed BEGIN
 					SET same_other = series_other
 					LPM ad_fx_same_fields
 					SPRINT series_other_resource $fx_resource_lower(~%series_other%~)

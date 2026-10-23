@@ -26,25 +26,23 @@
 // Prise en charge (ancien opcode_modstat2_is_valid / opcode_modstat3_is_valid)
 
 DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode BEGIN
-			PATCH_IF IS_AN_INT ~%stat_forced_mode%~ BEGIN
-				SET $fx_parameter2(~%stat_id%~) = stat_forced_mode
-			END
-			SET stat_value = $fx_parameter1(~%stat_id%~)
-			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			SPRINT stat_scope $fx_scope(~%stat_id%~)
-			LPM ad_stat_modifier_subject
-			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
-			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
-			SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
-			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
-			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
-			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF IS_AN_INT ~%stat_forced_mode%~ BEGIN
+			SET $fx_parameter2(~%stat_id%~) = stat_forced_mode
 		END
+		SET stat_value = $fx_parameter1(~%stat_id%~)
+		SET stat_mode = $fx_parameter2(~%stat_id%~)
+		SPRINT stat_scope $fx_scope(~%stat_id%~)
+		LPM ad_stat_modifier_subject
+		SET stat_versus_file = $fx_versus_file(~%stat_id%~)
+		SET stat_versus_value = $fx_versus_value(~%stat_id%~)
+		SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
+		SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
+		SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
+		SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
 	END
-	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode BEGIN
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
@@ -96,8 +94,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
 	SET stat_base_name_tra = $AD_STAT_MODIFIER_NAMES(~%stat_opcode%~)
 	SET stat_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%stat_opcode%~)
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SET stat_name_tra = stat_base_name_tra

@@ -13,8 +13,8 @@
 DEFINE_PATCH_MACRO ad_state_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%state_opcode%~)
-	FOR (state_id = 0; state_id < fx_count; ++state_id) BEGIN
-		PATCH_IF $fx_opcode(~%state_id%~) == state_opcode AND NOT $fx_consumed(~%state_id%~) BEGIN
+	PHP_EACH ~fx_ids_%state_opcode%~ AS _ => state_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%state_id%~) BEGIN
 			SET line_fx = state_id
 			SET state_variant = 0
 			PATCH_IF NOT (~%state_variant_macro%~ STRING_EQUAL ~~) BEGIN

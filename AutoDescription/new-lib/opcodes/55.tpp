@@ -10,8 +10,8 @@
 // 100 de ea.ids, opcode_modstat_is_valid) ; valeur sans nom ; effet d'un 177 qui vise un type de
 // créature (l'ancien moteur remplace alors le nom de l'opcode par celui du 177).
 DEFINE_PATCH_MACRO ad_op_55_support BEGIN
-	FOR (kill_id = 0; kill_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++kill_id) BEGIN
-		PATCH_IF $fx_opcode(~%kill_id%~) == 55 BEGIN
+	PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET kill_file = $fx_parameter2(~%kill_id%~)
 			SET kill_value = $fx_parameter1(~%kill_id%~)
 			LPF ad_ids_name INT_VAR ids_file = kill_file entry = kill_value RET kill_name = name END
@@ -42,12 +42,12 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 		SET $kill_anchor(~%kill_id%~) = kill_id
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (kill_id = 0; kill_id < fx_count; ++kill_id) BEGIN
-			PATCH_IF $fx_opcode(~%kill_id%~) == 55 AND NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id BEGIN
+		PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id BEGIN
 				SET same_id = kill_id
 				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
-				FOR (kill_other = kill_id + 1; kill_other < fx_count; ++kill_other) BEGIN
-					PATCH_IF $fx_opcode(~%kill_other%~) == 55 AND NOT $fx_consumed(~%kill_other%~) BEGIN
+				PHP_EACH fx_ids_55 AS _ => kill_other BEGIN
+					PATCH_IF kill_other >= kill_id + 1 AND NOT $fx_consumed(~%kill_other%~) BEGIN
 						SET same_other = kill_other
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
@@ -60,9 +60,8 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 		END
 	END
 	FOR (kill_late = 0; kill_late <= 1; ++kill_late) BEGIN
-		FOR (kill_id = 0; kill_id < fx_count; ++kill_id) BEGIN
-			PATCH_IF $fx_opcode(~%kill_id%~) == 55 AND NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id
-					AND $fx_late(~%kill_id%~) == kill_late BEGIN
+		PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id AND $fx_late(~%kill_id%~) == kill_late BEGIN
 				LPM ad_op_55_target
 				SET line_phrase = 20550100 // ~Tue instantanément %theTarget%~
 				SET line_fx = kill_id
@@ -82,8 +81,8 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	SET kill_zero = 0
 	SET kill_mages = 0
 	SET kill_thieves = 0
-	FOR (kill_member = kill_id; kill_member < fx_count; ++kill_member) BEGIN
-		PATCH_IF $fx_opcode(~%kill_member%~) == 55 AND NOT $fx_consumed(~%kill_member%~) AND $kill_anchor(~%kill_member%~) == kill_id BEGIN
+	PHP_EACH fx_ids_55 AS _ => kill_member BEGIN
+		PATCH_IF kill_member >= kill_id AND NOT $fx_consumed(~%kill_member%~) AND $kill_anchor(~%kill_member%~) == kill_id BEGIN
 			SET kill_members += 1
 			SPRINT kill_name $fx_kill_name(~%kill_member%~)
 			PATCH_IF NOT (~%kill_name%~ STRING_EQUAL ~~) BEGIN

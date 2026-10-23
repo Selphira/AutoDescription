@@ -4,8 +4,8 @@
 // vaut 0 ; sur EE, parameter2 2 fixe le temps d'incantation maximal.
 
 DEFINE_PATCH_MACRO ad_op_189_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == 189 BEGIN
+	PHP_EACH fx_ids_189 AS _ => stat_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET cast_value = $fx_parameter1(~%stat_id%~)
 			SET cast_mode = $fx_parameter2(~%stat_id%~)
 			SET $fx_cast_maximum(~%stat_id%~) = 0

@@ -6,8 +6,8 @@
 
 // Type inconnu : écarté par l'ancien opcode_120_is_valid.
 DEFINE_PATCH_MACRO ad_op_120_support BEGIN
-	FOR (weapon_id = 0; weapon_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++weapon_id) BEGIN
-		PATCH_IF $fx_opcode(~%weapon_id%~) == 120 AND ($fx_parameter2(~%weapon_id%~) < 0 OR $fx_parameter2(~%weapon_id%~) > 11) BEGIN
+	PHP_EACH fx_ids_120 AS _ => weapon_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ($fx_parameter2(~%weapon_id%~) < 0 OR $fx_parameter2(~%weapon_id%~) > 11) BEGIN
 			LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode120:invalid~ message = ~weapon type (parameter2) outside 0-11~ RET render_missing = refusal END
 		END
 	END
@@ -15,14 +15,12 @@ END
 
 DEFINE_PATCH_MACRO ad_op_120_lines BEGIN
 	PATCH_IF IS_EE AND AD_ENABLE_SHRINKAGE BEGIN
-		FOR (weapon_id = 0; weapon_id < fx_count; ++weapon_id) BEGIN
-			PATCH_IF $fx_opcode(~%weapon_id%~) == 120 AND $fx_parameter2(~%weapon_id%~) == 0 AND NOT $fx_consumed(~%weapon_id%~) BEGIN
+		PHP_EACH fx_ids_120 AS _ => weapon_id BEGIN
+			PATCH_IF $fx_parameter2(~%weapon_id%~) == 0 AND NOT $fx_consumed(~%weapon_id%~) BEGIN
 				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
-				FOR (weapon_other = 0; weapon_other < fx_count; ++weapon_other) BEGIN
+				PHP_EACH fx_ids_120 AS _ => weapon_other BEGIN
 					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
-					PATCH_IF $fx_opcode(~%weapon_other%~) == 120 AND $fx_parameter2(~%weapon_other%~) == 0
-							AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~)
-							AND $fx_parameter1(~%weapon_other%~) > $fx_parameter1(~%weapon_id%~) BEGIN
+					PATCH_IF $fx_parameter2(~%weapon_other%~) == 0 AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND $fx_parameter1(~%weapon_other%~) > $fx_parameter1(~%weapon_id%~) BEGIN
 						SET $fx_consumed(~%weapon_id%~) = 1
 					END
 				END

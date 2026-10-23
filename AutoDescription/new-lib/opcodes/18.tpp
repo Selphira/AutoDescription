@@ -10,15 +10,13 @@
 // Prise en charge (ancien opcode_18_is_valid, plus les cas que ce moteur ne décrit pas encore)
 
 DEFINE_PATCH_MACRO ad_op_18_support BEGIN
-	FOR (hp_id = 0; hp_id < fx_count; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == 18 BEGIN
-			LPM ad_op_18_value
-			SPRINT hp_scope $fx_scope(~%hp_id%~)
-			SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 0
-		END
+	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
+		LPM ad_op_18_value
+		SPRINT hp_scope $fx_scope(~%hp_id%~)
+		SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 0
 	END
-	FOR (hp_id = 0; hp_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == 18 BEGIN
+	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_op_18_value
 			SPRINT hp_scope $fx_scope(~%hp_id%~)
 			// L'ancien moteur écarte un mode inconnu (erreur journalisée).
@@ -52,8 +50,8 @@ END
 DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~18~)
-	FOR (hp_id = 0; hp_id < fx_count; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == 18 AND NOT $fx_consumed(~%hp_id%~) BEGIN
+	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%hp_id%~) BEGIN
 			LPM ad_op_18_value
 			PATCH_IF (hp_type >= 3 AND hp_type <= 5) OR (IS_EE AND ($fx_special(~%hp_id%~) BAND BIT0) != 0) BEGIN
 				SPRINT name @20180000 // ~Points de vie maximums~

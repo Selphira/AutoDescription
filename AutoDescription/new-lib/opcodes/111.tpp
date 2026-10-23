@@ -61,8 +61,8 @@ END
 // AD_ENABLE_SHRINKAGE, retrait différé de la même arme (112), qui fixe la durée du 111 (ancien
 // opcode_112_group).
 DEFINE_PATCH_MACRO ad_op_111_support BEGIN
-	FOR (weapon_id = 0; weapon_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++weapon_id) BEGIN
-		PATCH_IF $fx_opcode(~%weapon_id%~) == 111 AND NOT $fx_consumed(~%weapon_id%~) BEGIN
+	PHP_EACH fx_ids_111 AS _ => weapon_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%weapon_id%~) BEGIN
 			SPRINT weapon_resref $fx_resource(~%weapon_id%~)
 			SPRINT weapon_error $fx_substitution_error(~%weapon_id%~)
 			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name END
@@ -86,11 +86,10 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 			ELSE BEGIN
 				SPRINT $fx_item_name(~%weapon_id%~) ~%weapon_name%~
 				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
-				FOR (weapon_other = 0; weapon_other < fx_count AND AD_ENABLE_SHRINKAGE; ++weapon_other) BEGIN
+				PHP_EACH fx_ids_112 AS _ => weapon_other BEGIN
 					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
 					SPRINT weapon_other_resref $fx_resource(~%weapon_other%~)
-					PATCH_IF $fx_opcode(~%weapon_other%~) == 112 AND $fx_timing(~%weapon_other%~) == TIMING_delayed
-							AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
+					PATCH_IF AD_ENABLE_SHRINKAGE AND $fx_timing(~%weapon_other%~) == TIMING_delayed AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
 						LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:remove_group~ message = ~weapon removed later by opcode 112~ RET render_missing = refusal END
 					END
 				END
@@ -103,8 +102,8 @@ END
 DEFINE_PATCH_MACRO ad_op_111_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~111~)
-	FOR (weapon_id = 0; weapon_id < fx_count; ++weapon_id) BEGIN
-		PATCH_IF $fx_opcode(~%weapon_id%~) == 111 AND NOT $fx_consumed(~%weapon_id%~) BEGIN
+	PHP_EACH fx_ids_111 AS _ => weapon_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%weapon_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%weapon_id%~)
 			SET value = $fx_parameter1(~%weapon_id%~) > 0 ? $fx_parameter1(~%weapon_id%~) : 1
 			LPF ad_tra INT_VAR tra_id = value > 1 ? 21110002 : 21110001 RET valueType = text END // ~arme magique~

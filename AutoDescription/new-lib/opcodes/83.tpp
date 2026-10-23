@@ -17,14 +17,14 @@ DEFINE_PATCH_MACRO ad_op_83_lines BEGIN
 		SET $missile_done(~%missile_id%~) = 0
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (missile_id = 0; missile_id < fx_count; ++missile_id) BEGIN
-			PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
+		PHP_EACH fx_ids_83 AS _ => missile_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
 				LPM ad_op_83_merged_line
 			END
 		END
 	END
-	FOR (missile_id = 0; missile_id < fx_count; ++missile_id) BEGIN
-		PATCH_IF $fx_opcode(~%missile_id%~) == 83 AND NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
+	PHP_EACH fx_ids_83 AS _ => missile_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%missile_id%~) AND NOT $missile_done(~%missile_id%~) BEGIN
 			LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%missile_id%~) RET missile_name = name END
 			PATCH_IF NOT (~%missile_name%~ STRING_EQUAL ~~) BEGIN
 				SPRINT projectiles ~%missile_name%~
@@ -40,18 +40,18 @@ END
 DEFINE_PATCH_MACRO ad_op_83_merged_line BEGIN
 	SPRINT missile_scope $fx_scope(~%missile_id%~)
 	SET missile_count = 0
-	FOR (missile_other = 0; missile_other < fx_count; ++missile_other) BEGIN
+	PHP_EACH fx_ids_83 AS _ => missile_other BEGIN
 		SPRINT missile_other_scope $fx_scope(~%missile_other%~)
-		PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
 			SET missile_count += 1
 		END
 	END
 	PATCH_IF missile_count > 1 BEGIN
 		CLEAR_ARRAY missile_names
 		SET missile_last = 0 - 1
-		FOR (missile_other = 0; missile_other < fx_count; ++missile_other) BEGIN
+		PHP_EACH fx_ids_83 AS _ => missile_other BEGIN
 			SPRINT missile_other_scope $fx_scope(~%missile_other%~)
-			PATCH_IF $fx_opcode(~%missile_other%~) == 83 AND NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
+			PATCH_IF NOT $fx_consumed(~%missile_other%~) AND (~%missile_other_scope%~ STRING_EQUAL ~%missile_scope%~) BEGIN
 				SET $missile_done(~%missile_other%~) = 1
 				SET missile_last = missile_other
 				LPF ad_projectile_name INT_VAR projectile = $fx_parameter2(~%missile_other%~) RET missile_name = name END

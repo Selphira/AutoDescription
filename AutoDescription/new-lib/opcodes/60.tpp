@@ -5,8 +5,8 @@
 // moteur n'a pas de phrase à la forme « soi » probable : l'effet est alors refusé.
 
 DEFINE_PATCH_MACRO ad_op_60_support BEGIN
-	FOR (failure_id = 0; failure_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++failure_id) BEGIN
-		PATCH_IF $fx_opcode(~%failure_id%~) == 60 BEGIN
+	PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET $fx_spell_types(~%failure_id%~) = 0
 			PATCH_IF ($fx_parameter1(~%failure_id%~) BAND 255) == 0 OR $fx_parameter2(~%failure_id%~) < 0 OR $fx_parameter2(~%failure_id%~) > 5 BEGIN
 				LPF ad_refusal INT_VAR fx_id = failure_id STR_VAR reason = ~file_error:opcode60:invalid~ message = ~failure chance of 0 or spell type (parameter2) outside 0-5~ RET render_missing = refusal END
@@ -19,8 +19,8 @@ DEFINE_PATCH_MACRO ad_op_60_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~60~)
 	FOR (failure_late = 0; failure_late <= 1; ++failure_late) BEGIN
-		FOR (failure_id = 0; failure_id < fx_count; ++failure_id) BEGIN
-			PATCH_IF $fx_opcode(~%failure_id%~) == 60 AND NOT $fx_consumed(~%failure_id%~) AND $fx_late(~%failure_id%~) == failure_late BEGIN
+		PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%failure_id%~) AND $fx_late(~%failure_id%~) == failure_late BEGIN
 				SET failure_types = $fx_spell_types(~%failure_id%~)
 				PATCH_IF failure_types == 0 BEGIN
 					SET failure_type = $fx_parameter2(~%failure_id%~)

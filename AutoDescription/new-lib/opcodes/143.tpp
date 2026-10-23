@@ -8,8 +8,8 @@
 // avec AD_ENABLE_SHRINKAGE, objet qui remplace une arme brisée (MISC57, MISC58, CDDELHLM : opcode
 // virtuel 519 de l'ancien opcode_143_group_mod).
 DEFINE_PATCH_MACRO ad_op_143_support BEGIN
-	FOR (slot_id = 0; slot_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++slot_id) BEGIN
-		PATCH_IF $fx_opcode(~%slot_id%~) == 143 BEGIN
+	PHP_EACH fx_ids_143 AS _ => slot_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT slot_resref $fx_resource(~%slot_id%~)
 			SET slot_index = $fx_parameter1(~%slot_id%~)
 			LPF ad_item_info STR_VAR resref = ~%slot_resref%~ RET slot_item_name = name END
@@ -49,8 +49,8 @@ END
 DEFINE_PATCH_MACRO ad_op_143_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~143~)
-	FOR (slot_id = 0; slot_id < fx_count; ++slot_id) BEGIN
-		PATCH_IF $fx_opcode(~%slot_id%~) == 143 AND NOT $fx_consumed(~%slot_id%~) BEGIN
+	PHP_EACH fx_ids_143 AS _ => slot_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%slot_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%slot_id%~)
 			LPF ad_tra INT_VAR tra_id = 8080000 + $fx_parameter1(~%slot_id%~) tra_block_start = 8080000 tra_block_size = 39 RET slotName = text END // ~de l'armure~
 			SET line_phrase = 21430100 // ~Crée 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~

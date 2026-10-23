@@ -6,8 +6,8 @@
 // Refus : fichier hors de 2-8 et valeur 100 de ea.ids (écartés par l'ancien opcode_idscheck8_is_valid) ;
 // valeur sans nom.
 DEFINE_PATCH_MACRO ad_op_100_support BEGIN
-	FOR (versus_id = 0; versus_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++versus_id) BEGIN
-		PATCH_IF $fx_opcode(~%versus_id%~) == 100 BEGIN
+	PHP_EACH fx_ids_100 AS _ => versus_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET versus_file = $fx_parameter2(~%versus_id%~)
 			SET versus_value = $fx_parameter1(~%versus_id%~)
 			LPF ad_ids_name INT_VAR ids_file = versus_file entry = versus_value RET versus_name = name END

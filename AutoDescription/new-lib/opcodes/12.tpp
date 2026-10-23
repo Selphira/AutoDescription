@@ -16,8 +16,8 @@
 // Prise en charge (ancien opcode_12_is_valid, plus les cas que ce moteur ne décrit pas encore)
 
 DEFINE_PATCH_MACRO ad_op_12_support BEGIN
-	FOR (damage_id = 0; damage_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++damage_id) BEGIN
-		PATCH_IF $fx_opcode(~%damage_id%~) == 12 BEGIN
+	PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_op_12_value
 			PATCH_IF damage_mode > 3 BEGIN
 				LPF ad_refusal INT_VAR fx_id = damage_id STR_VAR reason = ~file_error:opcode12:invalid~ message = ~damage mode %damage_mode% (expected 0-3)~ RET render_missing = refusal END
@@ -49,8 +49,8 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~12~)
 	FOR (damage_late = 0; damage_late <= 1; ++damage_late) BEGIN
-		FOR (damage_id = 0; damage_id < fx_count; ++damage_id) BEGIN
-			PATCH_IF $fx_opcode(~%damage_id%~) == 12 AND NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
+		PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
 				LPM ad_op_12_value
 				SPRINT damage ~%damage_text%~
 				PATCH_IF damage_mode == 0 BEGIN

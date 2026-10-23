@@ -23,6 +23,10 @@
 // (1 pour un effet dont la probabilité est écrite dans les lignes de son sort, new-lib/recursion.tpp), fx_versus_file et
 // fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre),
 // fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_opcode_count(opcode).
+// Index par opcode : fx_ids_<opcode>, les effets de l'opcode dans l'ordre de lecture (clé et valeur :
+// fx_id), parcouru par PHP_EACH ~fx_ids_%opcode%~ AS _ => id ; un opcode absent n'a pas de tableau
+// et la boucle ne fait rien. Une passe qui change l'opcode d'un effet reconstruit les deux tableaux
+// (ad_fx_index_opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi) et
 // fx_load_message (son explication, en anglais, pour les journaux).
 
@@ -36,7 +40,22 @@ DEFINE_PATCH_MACRO ad_fx_reset BEGIN
 	SPRINT ignored_reason ~~
 	SPRINT ignored_message ~~
 	SPRINT ignored_consequence ~ignored~
+	// Une sous-ressource hérite des tableaux de l'appelant (V7).
+	PHP_EACH fx_opcode_count AS fx_reset_opcode => _ BEGIN
+		CLEAR_ARRAY ~fx_ids_%fx_reset_opcode%~
+	END
 	CLEAR_ARRAY fx_opcode_count
+END
+
+// Reconstruit l'index de l'opcode index_opcode, dans l'ordre des effets : parcourt tout le magasin,
+// pas l'index qu'il remplace.
+DEFINE_PATCH_MACRO ad_fx_index_opcode BEGIN
+	CLEAR_ARRAY ~fx_ids_%index_opcode%~
+	FOR (index_id = 0; index_id < fx_count; ++index_id) BEGIN
+		PATCH_IF $fx_opcode(~%index_id%~) == index_opcode BEGIN
+			SET $EVAL ~fx_ids_%index_opcode%~(~%index_id%~) = index_id
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
@@ -260,6 +279,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	LPM ad_fx_mark_not_cumulative
 	SET fx_opcode = $fx_opcode(~%fx_id%~)
 	SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
+	SET $EVAL ~fx_ids_%fx_opcode%~(~%fx_id%~) = fx_id
 	PATCH_IF $fx_external(~%fx_id%~) BEGIN
 		SET $fx_opcode_count(~177~) = VARIABLE_IS_SET $fx_opcode_count(~177~) ? $fx_opcode_count(~177~) + 1 : 1
 	END

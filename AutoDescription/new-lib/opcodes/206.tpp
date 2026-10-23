@@ -11,8 +11,8 @@
 // capacités psioniques dont les champs (ceux de la cinquième protection) diffèrent de ceux d'une
 // autre immunité de l'en-tête, parameter2 mis à part (ad_op_101_ability_support).
 DEFINE_PATCH_MACRO ad_op_206_support BEGIN
-	FOR (spell_id = 0; spell_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++spell_id) BEGIN
-		PATCH_IF $fx_opcode(~%spell_id%~) == 206 BEGIN
+	PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT spell_resref $fx_resource(~%spell_id%~)
 			TO_UPPER spell_resref
 			// L'ancien moteur écarte un effet sans ressource (erreur journalisée).
@@ -55,9 +55,9 @@ DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
 			PATCH_IF spell_psionic_total == 5 BEGIN
 				SET same_id = spell_id
 				SET same_ignored = AD_SAME_PARAMETER2
-				FOR (spell_other = 0; spell_other < fx_count; ++spell_other) BEGIN
+				PHP_EACH fx_ids_101 AS _ => spell_other BEGIN
 					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
-					PATCH_IF $fx_opcode(~%spell_other%~) == 101 AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
+					PATCH_IF (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						SET same_other = spell_other
 						LPM ad_fx_same_fields
 						PATCH_IF NOT fx_same BEGIN
@@ -86,16 +86,14 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 	END
 	SET spell_group_count = 0
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
-			PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) < 0 BEGIN
+		PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) < 0 BEGIN
 				SET spell_target = $fx_effective_target(~%spell_id%~)
 				SPRINT spell_scope $fx_scope(~%spell_id%~)
 				SET spell_name_count = 0
-				FOR (spell_other = spell_id; spell_other < fx_count; ++spell_other) BEGIN
+				PHP_EACH fx_ids_206 AS _ => spell_other BEGIN
 					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
-					PATCH_IF $fx_opcode(~%spell_other%~) == 206 AND NOT $fx_consumed(~%spell_other%~)
-							AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target
-							AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
+					PATCH_IF spell_other >= spell_id AND NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
 							SET spell_name_new = 1
@@ -118,8 +116,8 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~206~)
-	FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
-		PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) BEGIN
+	PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%spell_id%~) BEGIN
 			SET spell_group_id = $spell_group(~%spell_id%~)
 			SPRINT spellName $spell_name(~%spell_id%~)
 			PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND (spell_group_id < 0 OR $spell_group_size(~%spell_group_id%~) < 2) BEGIN
@@ -134,8 +132,8 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 		PATCH_IF $spell_group_size(~%spell_group_id%~) >= 2 BEGIN
 			CLEAR_ARRAY spell_group_names
 			SET spell_first = 0 - 1
-			FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
-				PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) == spell_group_id BEGIN
+			PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
+				PATCH_IF NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) == spell_group_id BEGIN
 					SPRINT spell_name $spell_name(~%spell_id%~)
 					SPRINT $spell_group_names(~%spell_name%~) ~%spell_name%~
 					PATCH_IF spell_first < 0 BEGIN

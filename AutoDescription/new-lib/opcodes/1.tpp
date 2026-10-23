@@ -12,14 +12,12 @@
 // Prise en charge (ancien opcode_1_is_valid, plus les cas que ce moteur ne décrit pas encore)
 
 DEFINE_PATCH_MACRO ad_op_1_support BEGIN
-	FOR (apr_id = 0; apr_id < fx_count; ++apr_id) BEGIN
-		PATCH_IF $fx_opcode(~%apr_id%~) == 1 BEGIN
-			LPM ad_op_1_value
-			SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) = 0
-		END
+	PHP_EACH fx_ids_1 AS _ => apr_id BEGIN
+		LPM ad_op_1_value
+		SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) = 0
 	END
-	FOR (apr_id = 0; apr_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++apr_id) BEGIN
-		PATCH_IF $fx_opcode(~%apr_id%~) == 1 BEGIN
+	PHP_EACH fx_ids_1 AS _ => apr_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_op_1_value
 			SET apr_timing = $fx_timing(~%apr_id%~)
 			// L'ancien moteur écarte un mode inconnu, un effet sans changement, un ajout hors de la table
@@ -55,8 +53,8 @@ DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~1~)
 	SPRINT apr_half @20010001 // ~une demi~
 	SPRINT apr_and_half @20010002 // ~\1 et demi~
-	FOR (apr_id = 0; apr_id < fx_count; ++apr_id) BEGIN
-		PATCH_IF $fx_opcode(~%apr_id%~) == 1 AND NOT $fx_consumed(~%apr_id%~) BEGIN
+	PHP_EACH fx_ids_1 AS _ => apr_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%apr_id%~) BEGIN
 			LPM ad_op_1_value
 			PATCH_IF apr_mode == MOD_TYPE_flat OR apr_mode == 3 BEGIN
 				SET apr_value = apr_parameter1 < 0 ? 0 : (apr_value > 10 ? 10 : apr_value)

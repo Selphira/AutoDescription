@@ -5,8 +5,8 @@
 // (ad_group_movement_restored, new-lib/groups.tpp).
 
 DEFINE_PATCH_MACRO ad_op_126_support BEGIN
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == 126 AND IS_EE AND $fx_parameter2(~%stat_id%~) == 5 BEGIN
+	PHP_EACH fx_ids_126 AS _ => stat_id BEGIN
+		PATCH_IF IS_EE AND $fx_parameter2(~%stat_id%~) == 5 BEGIN
 			SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_percentage
 		END
 	END

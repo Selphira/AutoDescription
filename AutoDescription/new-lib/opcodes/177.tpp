@@ -249,8 +249,8 @@ END
 // (raison de ad_fx_substitute_177). Les 177 sont lus en fin de bloc (ad_fx_load_block,
 // new-lib/effects.tpp) : l'effet remplacé est écrit après les effets du fichier de même opcode.
 DEFINE_PATCH_MACRO ad_op_177_support BEGIN
-	FOR (substitute_id = 0; substitute_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++substitute_id) BEGIN
-		PATCH_IF $fx_opcode(~%substitute_id%~) == 177 BEGIN
+	PHP_EACH fx_ids_177 AS _ => substitute_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT substitute_error $fx_substitution_error(~%substitute_id%~)
 			PATCH_IF ~%substitute_error%~ STRING_EQUAL ~drop~ BEGIN
 				SET drop_id = substitute_id

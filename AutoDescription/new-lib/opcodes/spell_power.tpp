@@ -17,8 +17,8 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
 		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET power_own_spell = name END
 	END
-	FOR (power_id = 0; power_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++power_id) BEGIN
-		PATCH_IF $fx_opcode(~%power_id%~) == power_opcode BEGIN
+	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET power_level = $fx_parameter2(~%power_id%~)
 			SPRINT power_resref $fx_resource(~%power_id%~)
 			SPRINT power_spell ~%power_own_spell%~
@@ -48,10 +48,9 @@ DEFINE_PATCH_MACRO ad_spell_power_group_support BEGIN
 	SET same_id = power_id
 	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
 	SPRINT power_scope $fx_scope(~%power_id%~)
-	FOR (power_other = 0; power_other < fx_count; ++power_other) BEGIN
+	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
 		SPRINT power_other_scope $fx_scope(~%power_other%~)
-		PATCH_IF $fx_opcode(~%power_other%~) == power_opcode AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~)
-				AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
+		PATCH_IF (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
 			SET same_other = power_other
 			LPM ad_fx_same_fields
 			PATCH_IF NOT fx_same BEGIN
@@ -70,25 +69,23 @@ DEFINE_PATCH_MACRO ad_spell_power_lines BEGIN
 		SET $power_anchor(~%power_id%~) = power_id
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (power_id = 0; power_id < fx_count; ++power_id) BEGIN
+		PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
 			SPRINT power_scope $fx_scope(~%power_id%~)
-			PATCH_IF $fx_opcode(~%power_id%~) == power_opcode AND NOT $fx_consumed(~%power_id%~) AND $power_anchor(~%power_id%~) == power_id BEGIN
-				FOR (power_other = power_id + 1; power_other < fx_count; ++power_other) BEGIN
+			PATCH_IF NOT $fx_consumed(~%power_id%~) AND $power_anchor(~%power_id%~) == power_id BEGIN
+				PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
 					SPRINT power_other_scope $fx_scope(~%power_other%~)
-					PATCH_IF $fx_opcode(~%power_other%~) == power_opcode AND NOT $fx_consumed(~%power_other%~)
-							AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~)
-							AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
+					PATCH_IF power_other >= power_id + 1 AND NOT $fx_consumed(~%power_other%~) AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
 						SET $power_anchor(~%power_other%~) = power_id
 					END
 				END
 			END
 		END
 	END
-	FOR (power_id = 0; power_id < fx_count; ++power_id) BEGIN
-		PATCH_IF $fx_opcode(~%power_id%~) == power_opcode AND NOT $fx_consumed(~%power_id%~) AND $power_anchor(~%power_id%~) == power_id BEGIN
+	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%power_id%~) AND $power_anchor(~%power_id%~) == power_id BEGIN
 			SET power_mask = 0
-			FOR (power_member = power_id; power_member < fx_count; ++power_member) BEGIN
-				PATCH_IF $fx_opcode(~%power_member%~) == power_opcode AND NOT $fx_consumed(~%power_member%~) AND $power_anchor(~%power_member%~) == power_id BEGIN
+			PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_member BEGIN
+				PATCH_IF power_member >= power_id AND NOT $fx_consumed(~%power_member%~) AND $power_anchor(~%power_member%~) == power_id BEGIN
 					SET power_bit = 1
 					FOR (power_shift = 1; power_shift < $fx_parameter2(~%power_member%~); ++power_shift) BEGIN
 						SET power_bit *= 2

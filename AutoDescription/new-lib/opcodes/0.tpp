@@ -20,16 +20,14 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	LOCAL_SET ac_base_count = 0
 	LOCAL_SET ac_modifier_count = 0
 	LOCAL_SET ac_all_count = 0
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
-			SET ac_value = $fx_parameter1(~%ac_id%~)
-			SPRINT ac_scope $fx_scope(~%ac_id%~)
-			SET $ac_seen_all(~%ac_scope% %ac_value%~) = 0
-			SET $ac_seen_types(~%ac_scope% %ac_value%~) = 0
-		END
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		SET ac_value = $fx_parameter1(~%ac_id%~)
+		SPRINT ac_scope $fx_scope(~%ac_id%~)
+		SET $ac_seen_all(~%ac_scope% %ac_value%~) = 0
+		SET $ac_seen_types(~%ac_scope% %ac_value%~) = 0
 	END
-	FOR (ac_id = 0; ac_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SPRINT ac_scope $fx_scope(~%ac_id%~)
@@ -125,17 +123,16 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	// Clé opposée au modificateur : les types d'attaque viennent du plus grand bonus au plus petit,
 	// comme dans l'ancien moteur.
 	CLEAR_ARRAY ac_masks
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
-				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_key = 0 - $fx_parameter1(~%ac_id%~)
 			SET $ac_masks(~%ac_key%~) = 0
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	SET ac_line_fx = 0 - 1
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			PATCH_IF ac_line_fx < 0 BEGIN
@@ -188,8 +185,8 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	END
 	// CA contre un type de créature (219, fx_ac_merged, new-lib/opcodes/219.tpp) : total contre toutes
 	// les attaques plus 2, après les types d'attaque (ancien opcode_219000_CA_values).
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 219 AND NOT $fx_consumed(~%ac_id%~) AND $fx_ac_merged(~%ac_id%~) BEGIN
+	PHP_EACH fx_ids_219 AS _ => ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $fx_ac_merged(~%ac_id%~) BEGIN
 			SPRINT targetType $fx_creature_type(~%ac_id%~)
 			SPRINT versus @2002020 // ~contre les %targetType%~
 			LPF ad_signed_value INT_VAR value = ac_all + 2 RET ac_total_text = text END
@@ -220,17 +217,16 @@ END
 // AC_BY_ATTACK_TYPE), dans l'ordre de première apparition du modificateur.
 DEFINE_PATCH_MACRO ad_op_0_group_attack_types BEGIN
 	CLEAR_ARRAY ac_type_groups
-	FOR (ac_id = 0; ac_id < fx_count AND AD_ENABLE_SHRINKAGE; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base
-				AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF AD_ENABLE_SHRINKAGE AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET $ac_type_groups(~%ac_value%~) = 0
 			SET $ac_type_group_fx(~%ac_value%~) = 0 - 1
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_line_fx = ac_id
@@ -259,8 +255,8 @@ END
 // Une ligne par effet d'en-tête, dans l'ordre du fichier.
 DEFINE_PATCH_MACRO ad_op_0_ability_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~0~)
-	FOR (ac_id = 0; ac_id < fx_count; ++ac_id) BEGIN
-		PATCH_IF $fx_opcode(~%ac_id%~) == 0 AND NOT $fx_consumed(~%ac_id%~) AND NOT $ac_equipped(~%ac_id%~) BEGIN
+	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND NOT $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			SET ac_line_fx = ac_id

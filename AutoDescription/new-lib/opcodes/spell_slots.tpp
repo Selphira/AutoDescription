@@ -13,12 +13,10 @@
 
 DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 	SET slots_all_levels = (1 << slots_max_level) - 1
-	FOR (slots_id = 0; slots_id < fx_count; ++slots_id) BEGIN
-		PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode BEGIN
-			SET slots_amount = $fx_parameter1(~%slots_id%~)
-			SET slots_doubling = $fx_parameter2(~%slots_id%~) == 0
-			SET $slots_seen_levels(~%slots_amount% %slots_doubling%~) = 0
-		END
+	PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
+		SET slots_amount = $fx_parameter1(~%slots_id%~)
+		SET slots_doubling = $fx_parameter2(~%slots_id%~) == 0
+		SET $slots_seen_levels(~%slots_amount% %slots_doubling%~) = 0
 	END
 	FOR (slots_id = 0; slots_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++slots_id) BEGIN
 		PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode BEGIN
@@ -81,8 +79,8 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 		SET $slots_done(~%slots_id%~) = 0
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (slots_id = 0; slots_id < fx_count; ++slots_id) BEGIN
-			PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode AND $fx_parameter2(~%slots_id%~) == 0 BEGIN
+		PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
+			PATCH_IF $fx_parameter2(~%slots_id%~) == 0 BEGIN
 				SET $slots_done(~%slots_id%~) = 1
 				SET slots_amount = $fx_parameter1(~%slots_id%~)
 				SET slots_levels = 0
@@ -90,15 +88,14 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 			END
 		END
 	END
-	FOR (slots_id = 0; slots_id < fx_count; ++slots_id) BEGIN
-		PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode AND NOT $slots_done(~%slots_id%~) BEGIN
+	PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
+		PATCH_IF NOT $slots_done(~%slots_id%~) BEGIN
 			SET $slots_done(~%slots_id%~) = 1
 			SET slots_amount = $fx_parameter1(~%slots_id%~)
 			SET slots_levels = $fx_parameter2(~%slots_id%~)
 			PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-				FOR (slots_other = slots_id + 1; slots_other < fx_count; ++slots_other) BEGIN
-					PATCH_IF $fx_opcode(~%slots_other%~) == slots_opcode AND NOT $slots_done(~%slots_other%~)
-							AND $fx_parameter1(~%slots_other%~) == slots_amount BEGIN
+				PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_other BEGIN
+					PATCH_IF slots_other >= slots_id + 1 AND NOT $slots_done(~%slots_other%~) AND $fx_parameter1(~%slots_other%~) == slots_amount BEGIN
 						SET $slots_done(~%slots_other%~) = 1
 						SET slots_levels = slots_levels BOR $fx_parameter2(~%slots_other%~)
 					END

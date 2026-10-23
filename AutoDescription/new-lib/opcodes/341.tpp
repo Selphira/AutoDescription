@@ -8,8 +8,8 @@
 // chaque coup critique de la cible ») ; effet d'un sous-sort (l'ancien moteur n'y limite pas la
 // profondeur) ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_341_support BEGIN
-	FOR (critical_id = 0; critical_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++critical_id) BEGIN
-		PATCH_IF $fx_opcode(~%critical_id%~) == 341 AND NOT $fx_consumed(~%critical_id%~) BEGIN
+	PHP_EACH fx_ids_341 AS _ => critical_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
 			SPRINT critical_resref $fx_resource_lower(~%critical_id%~)
 			SET critical_target = $fx_effective_target(~%critical_id%~)
 			PATCH_IF $fx_external(~%critical_id%~) BEGIN
@@ -50,8 +50,8 @@ END
 DEFINE_PATCH_MACRO ad_op_341_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~341~)
-	FOR (critical_id = 0; critical_id < fx_count; ++critical_id) BEGIN
-		PATCH_IF $fx_opcode(~%critical_id%~) == 341 AND NOT $fx_consumed(~%critical_id%~) AND $fx_sub_count(~%critical_id%~) > 0 BEGIN
+	PHP_EACH fx_ids_341 AS _ => critical_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%critical_id%~) AND $fx_sub_count(~%critical_id%~) > 0 BEGIN
 			SET recursion_fx = critical_id
 			LPM ad_recursion_condition_text
 			PATCH_IF $fx_parameter2(~%critical_id%~) == 0 BEGIN

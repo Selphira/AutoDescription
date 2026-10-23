@@ -14,8 +14,8 @@
 // effet d'un 177 qui vise lui-même un type de créature (l'ancien moteur remplace alors celui de
 // l'opcode).
 DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
-	FOR (versus_id = 0; versus_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++versus_id) BEGIN
-		PATCH_IF $fx_opcode(~%versus_id%~) == versus_opcode BEGIN
+	PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET versus_file = $fx_parameter2(~%versus_id%~)
 			SET versus_value = $fx_parameter1(~%versus_id%~)
 			SET versus_amount = versus_opcode == 344 ? $fx_special(~%versus_id%~) : $fx_parameter3(~%versus_id%~)
@@ -63,13 +63,12 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 		SET $versus_anchor(~%versus_id%~) = versus_id
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		FOR (versus_id = 0; versus_id < fx_count; ++versus_id) BEGIN
-			PATCH_IF $fx_opcode(~%versus_id%~) == versus_opcode AND NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id BEGIN
+		PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id BEGIN
 				SET same_id = versus_id
 				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
-				FOR (versus_other = versus_id + 1; versus_other < fx_count; ++versus_other) BEGIN
-					PATCH_IF $fx_opcode(~%versus_other%~) == versus_opcode AND NOT $fx_consumed(~%versus_other%~)
-							AND $fx_parameter3(~%versus_other%~) == $fx_parameter3(~%versus_id%~) BEGIN
+				PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_other BEGIN
+					PATCH_IF versus_other >= versus_id + 1 AND NOT $fx_consumed(~%versus_other%~) AND $fx_parameter3(~%versus_other%~) == $fx_parameter3(~%versus_id%~) BEGIN
 						SET same_other = versus_other
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
@@ -82,9 +81,8 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 		END
 	END
 	FOR (versus_late = 0; versus_late <= 1; ++versus_late) BEGIN
-		FOR (versus_id = 0; versus_id < fx_count; ++versus_id) BEGIN
-			PATCH_IF $fx_opcode(~%versus_id%~) == versus_opcode AND NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id
-					AND $fx_late(~%versus_id%~) == versus_late BEGIN
+		PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id AND $fx_late(~%versus_id%~) == versus_late BEGIN
 				LPM ad_versus_modifier_line
 			END
 		END

@@ -10,8 +10,8 @@
 // avec les champs du dernier lu) ; niveaux réunis qui ne vont pas de 1 à N (l'ancien moteur en
 // écrit la liste par une fonction non reproduite) ou niveau 1 seul.
 DEFINE_PATCH_MACRO ad_op_102_support BEGIN
-	FOR (levels_id = 0; levels_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++levels_id) BEGIN
-		PATCH_IF $fx_opcode(~%levels_id%~) == 102 AND NOT $fx_consumed(~%levels_id%~) BEGIN
+	PHP_EACH fx_ids_102 AS _ => levels_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%levels_id%~) BEGIN
 			SET levels_level = $fx_parameter1(~%levels_id%~)
 			SET $fx_spell_levels(~%levels_id%~) = 0
 			PATCH_IF $fx_external(~%levels_id%~) BEGIN
@@ -28,10 +28,9 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
 				SPRINT levels_scope $fx_scope(~%levels_id%~)
 				SET levels_mask = 0
-				FOR (levels_other = 0; levels_other < fx_count; ++levels_other) BEGIN
+				PHP_EACH fx_ids_102 AS _ => levels_other BEGIN
 					SPRINT levels_other_scope $fx_scope(~%levels_other%~)
-					PATCH_IF $fx_opcode(~%levels_other%~) == 102 AND NOT $fx_consumed(~%levels_other%~)
-							AND (~%levels_other_scope%~ STRING_EQUAL ~%levels_scope%~) BEGIN
+					PATCH_IF NOT $fx_consumed(~%levels_other%~) AND (~%levels_other_scope%~ STRING_EQUAL ~%levels_scope%~) BEGIN
 						SET same_other = levels_other
 						LPM ad_fx_same_fields
 						SET levels_other_level = $fx_parameter1(~%levels_other%~)
@@ -55,8 +54,8 @@ END
 DEFINE_PATCH_MACRO ad_op_102_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_DERIVED_SORT(~SPELL_LEVELS~)
-	FOR (levels_id = 0; levels_id < fx_count; ++levels_id) BEGIN
-		PATCH_IF $fx_opcode(~%levels_id%~) == 102 AND NOT $fx_consumed(~%levels_id%~) AND $fx_spell_levels(~%levels_id%~) > 0 BEGIN
+	PHP_EACH fx_ids_102 AS _ => levels_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%levels_id%~) AND $fx_spell_levels(~%levels_id%~) > 0 BEGIN
 			SET levels_mask = $fx_spell_levels(~%levels_id%~)
 			SET line_fx = levels_id
 			PATCH_IF levels_mask == 0x1FF BEGIN

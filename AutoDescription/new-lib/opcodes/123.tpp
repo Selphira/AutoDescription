@@ -5,8 +5,8 @@
 
 // Refus : ressource vide (l'ancien opcode_123_is_valid l'écarte, erreur journalisée).
 DEFINE_PATCH_MACRO ad_op_123_support BEGIN
-	FOR (remove_id = 0; remove_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++remove_id) BEGIN
-		PATCH_IF $fx_opcode(~%remove_id%~) == 123 AND NOT $fx_consumed(~%remove_id%~) BEGIN
+	PHP_EACH fx_ids_123 AS _ => remove_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%remove_id%~) BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
 			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name END
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
@@ -32,8 +32,8 @@ END
 DEFINE_PATCH_MACRO ad_op_123_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~123~)
-	FOR (remove_id = 0; remove_id < fx_count; ++remove_id) BEGIN
-		PATCH_IF $fx_opcode(~%remove_id%~) == 123 AND NOT $fx_consumed(~%remove_id%~) BEGIN
+	PHP_EACH fx_ids_123 AS _ => remove_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%remove_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%remove_id%~)
 			SET line_fx = remove_id
 			SET line_phrase = 21120100 // ~Retire « %itemName% » de l'inventaire~ (+1 : ~Retire « %itemName% » de l'inventaire %ofTheTarget%~)

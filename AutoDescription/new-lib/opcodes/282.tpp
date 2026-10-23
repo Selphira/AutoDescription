@@ -5,8 +5,8 @@
 
 // Les conversions de l'ancien moteur ne sont pas reprises : refusées.
 DEFINE_PATCH_MACRO ad_op_282_support BEGIN
-	FOR (script_id = 0; script_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++script_id) BEGIN
-		PATCH_IF $fx_opcode(~%script_id%~) == 282 AND AD_ENABLE_SHRINKAGE BEGIN
+	PHP_EACH fx_ids_282 AS _ => script_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND AD_ENABLE_SHRINKAGE BEGIN
 			SET script_state = $fx_parameter2(~%script_id%~)
 			// Sur un jeu classique, l'ancien moteur décale de 1 les états qui suivent.
 			SET script_shifted = script_state + (IS_EE ? 0 : 1)

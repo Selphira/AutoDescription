@@ -7,8 +7,8 @@
 
 // Ancien opcode_25_is_valid, et effets sans dégât ni soin, que l'ancien moteur n'écrit pas.
 DEFINE_PATCH_MACRO ad_hp_over_time_support BEGIN
-	FOR (hp_id = 0; hp_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == hp_opcode BEGIN
+	PHP_EACH ~fx_ids_%hp_opcode%~ AS _ => hp_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET hp_timing = $fx_timing(~%hp_id%~)
 			LPM ad_hp_over_time_value
 			PATCH_IF (hp_timing == TIMING_permanent OR hp_timing == TIMING_delayed OR hp_timing == 7
@@ -28,8 +28,8 @@ END
 DEFINE_PATCH_MACRO ad_hp_over_time_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%hp_opcode%~)
-	FOR (hp_id = 0; hp_id < fx_count; ++hp_id) BEGIN
-		PATCH_IF $fx_opcode(~%hp_id%~) == hp_opcode AND NOT $fx_consumed(~%hp_id%~) BEGIN
+	PHP_EACH ~fx_ids_%hp_opcode%~ AS _ => hp_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%hp_id%~) BEGIN
 			LPM ad_hp_over_time_value
 			SET amount = hp_amount
 			LPF ad_duration_text INT_VAR seconds = hp_frequency tra_base = 3030000 RET strDuration = text END // ~par round~

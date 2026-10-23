@@ -6,8 +6,8 @@
 // d'un autre nom : l'ancien moteur y écrit le nom de l'objet décrit (BUG-031).
 DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 	LPF ad_item_info STR_VAR resref = ~%ctx_resource%~ RET forbid_own_name = name END
-	FOR (forbid_id = 0; forbid_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++forbid_id) BEGIN
-		PATCH_IF $fx_opcode(~%forbid_id%~) == 180 BEGIN
+	PHP_EACH fx_ids_180 AS _ => forbid_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT forbid_resref $fx_resource(~%forbid_id%~)
 			SET $fx_forbid_unique(~%forbid_id%~) = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
 			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
@@ -30,8 +30,8 @@ END
 // L'ancien moteur n'a de phrase qu'à la forme « soi ».
 DEFINE_PATCH_MACRO ad_op_180_lines BEGIN
 	SPRINT line_section ~equipped~
-	FOR (forbid_id = 0; forbid_id < fx_count; ++forbid_id) BEGIN
-		PATCH_IF $fx_opcode(~%forbid_id%~) == 180 AND NOT $fx_consumed(~%forbid_id%~) AND $fx_forbid_unique(~%forbid_id%~) BEGIN
+	PHP_EACH fx_ids_180 AS _ => forbid_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%forbid_id%~) AND $fx_forbid_unique(~%forbid_id%~) BEGIN
 			SET line_sort = 0
 			SET line_phrase = 21800100 // ~Unique%AD_COLON%Un seul exemplaire peut être équipé~
 			SET line_fx = forbid_id

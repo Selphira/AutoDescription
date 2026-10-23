@@ -9,8 +9,8 @@ DEFINE_PATCH_MACRO ad_saving_throw_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
 	LPF ad_tra INT_VAR tra_id = 20000000 + stat_opcode * 10000 RET versus = text END
 	SPRINT saves_name @5000000 // ~Jets de sauvegarde~
-	FOR (stat_id = 0; stat_id < fx_count; ++stat_id) BEGIN
-		PATCH_IF $fx_opcode(~%stat_id%~) == stat_opcode AND NOT $fx_consumed(~%stat_id%~) BEGIN
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode RET value = text END

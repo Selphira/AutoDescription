@@ -7,8 +7,8 @@
 // Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme) ; type d'attaque
 // hors de 0-3 ou valeur nulle (l'ancien opcode_301_is_valid les écarte).
 DEFINE_PATCH_MACRO ad_op_301_support BEGIN
-	FOR (critical_id = 0; critical_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++critical_id) BEGIN
-		PATCH_IF $fx_opcode(~%critical_id%~) == 301 AND NOT $fx_consumed(~%critical_id%~) BEGIN
+	PHP_EACH fx_ids_301 AS _ => critical_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
 			PATCH_IF $fx_external(~%critical_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode301:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
@@ -22,8 +22,8 @@ END
 DEFINE_PATCH_MACRO ad_op_301_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~301~)
-	FOR (critical_id = 0; critical_id < fx_count; ++critical_id) BEGIN
-		PATCH_IF $fx_opcode(~%critical_id%~) == 301 AND NOT $fx_consumed(~%critical_id%~) BEGIN
+	PHP_EACH fx_ids_301 AS _ => critical_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%critical_id%~) BEGIN
 			SET line_fx = critical_id
 			LPM ad_application_form
 			SET critical_value = 5 * $fx_parameter1(~%critical_id%~)

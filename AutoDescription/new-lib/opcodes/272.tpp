@@ -10,8 +10,8 @@
 // 3 ; aucune application (parameter2 0 ou 2, parameter1 nul) ; effet probable ; plusieurs lignes ;
 // refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_272_support BEGIN
-	FOR (repeat_id = 0; repeat_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++repeat_id) BEGIN
-		PATCH_IF $fx_opcode(~%repeat_id%~) == 272 AND NOT $fx_consumed(~%repeat_id%~) BEGIN
+	PHP_EACH fx_ids_272 AS _ => repeat_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%repeat_id%~) BEGIN
 			SET repeat_type = $fx_parameter2(~%repeat_id%~)
 			SET repeat_value = $fx_parameter1(~%repeat_id%~)
 			SPRINT repeat_resref $fx_resource_lower(~%repeat_id%~)
@@ -105,8 +105,8 @@ END
 
 DEFINE_PATCH_MACRO ad_op_272_lines BEGIN
 	SPRINT line_section ~equipped~
-	FOR (repeat_id = 0; repeat_id < fx_count; ++repeat_id) BEGIN
-		PATCH_IF $fx_opcode(~%repeat_id%~) == 272 AND NOT $fx_consumed(~%repeat_id%~) AND $fx_sub_count(~%repeat_id%~) > 0 BEGIN
+	PHP_EACH fx_ids_272 AS _ => repeat_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%repeat_id%~) AND $fx_sub_count(~%repeat_id%~) > 0 BEGIN
 			SET repeat_sub_opcode = $fx_sub_opcode(~%repeat_id%~)
 			SET line_sort = $AD_OPCODE_SORT(~%repeat_sub_opcode%~)
 			SET line_fx = repeat_id
