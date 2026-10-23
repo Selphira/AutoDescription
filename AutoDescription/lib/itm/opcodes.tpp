@@ -8831,14 +8831,43 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
                 RET_ARRAY EVAL ~opcodes_177~ = opcodes_xx
             END
 
-            PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+			// EFF qui est lui-même un 177 : son EFF est lu à la suite (sinon le 177 intérieur, ajouté à la liste
+			// en cours de parcours, est remplacé de façon imprévisible, BUG-039) ; chaque type de créature
+			// restreint le précédent : « contre les démons qui sont aussi des diablotins ».
+			SPRINT nestedTypes ~~
+			SET nestedValid = 1
+			SET nestedDepth = 0
+			WHILE opcode == 177 AND nestedValid BEGIN
+				SET nestedDepth += 1
+				PATCH_IF nestedDepth > 5 OR parameter2 < 2 OR parameter2 > 9 OR (parameter2 > 8 AND is_ee == 0) OR NOT FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+					SET nestedValid = 0
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode 177 : Nested resource %resref%.eff is invalid.~ END
+				END
+				ELSE BEGIN
+					PATCH_IF parameter1 != 0 BEGIN
+						LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1%~ RET string END
+						SPRINT nestedTypes ~%nestedTypes%&%parameter2%:%string%~
+					END
+					SPRINT nestedResref ~%resref%~
+					INNER_PATCH_FILE ~%nestedResref%.eff~ BEGIN
+						LPM ~read_external_effect_vars~
+					END
+				END
+			END
+
+            PATCH_IF nestedValid AND NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
                 LPM ~opcode_177_replace_effect_vars~
                 LPM ~opcode_is_valid~
 
                 PATCH_IF isValid == 1 BEGIN
                     PATCH_IF parameter1177 != 0 BEGIN
                         LPF ~str_pad_left~ INT_VAR min_length = 3 STR_VAR string = ~%parameter1177%~ RET string END
-                        SPRINT target_type "%parameter2177%:%string%"
+                        SPRINT target_type "%parameter2177%:%string%%nestedTypes%"
+                    END
+                    ELSE PATCH_IF NOT ~%nestedTypes%~ STRING_EQUAL ~~ BEGIN
+                        INNER_PATCH_SAVE target_type ~%nestedTypes%~ BEGIN
+                            DELETE_BYTES 0 1
+                        END
                     END
                     LPM ~add_opcode~
                 END
@@ -9130,11 +9159,15 @@ END
 DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~targetTypes~ BEGIN END
 	CLEAR_ARRAY ~targetTypes~
+	SET kitTypes = 0
+	SET otherTypes = 0
 
 	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 			SET $targetTypes(~%targetType%~) = 1
+			SET kitTypes += parameter2 == 9
+			SET otherTypes += parameter2 != 9
 		END
 	END
 	ELSE PATCH_IF NOT ~%target_type%~ STRING_EQUAL ~~ BEGIN
@@ -9156,6 +9189,11 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 
 		WHILE ~%targetType%~ STRING_COMPARE ~~ BEGIN
 			LPF return_first_entry STR_VAR list = ~%targetType%~ RET entry targetType = list END
+			// Types d'un 177 imbriqué (opcode_177_replace), séparés par « & » : chacun restreint le précédent.
+			SPRINT nestedEntries ~~
+			PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~&~ ~%entry%~) >= 0 BEGIN
+				LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~&~ RET entry nestedEntries = list END
+			END
 			LPF return_first_entry STR_VAR list = ~%entry%~ separator = ~:~ RET file = entry entry = list END
 			LPF return_first_entry STR_VAR list = ~%file%~ separator = ~;~ RET strref = entry value = list END
 			PATCH_IF STRING_LENGTH ~%strref%~ > 0 AND STRING_LENGTH ~%value%~ > 0 BEGIN
@@ -9167,8 +9205,27 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
             ELSE BEGIN
 				LPF ~get_ids_name~ INT_VAR entry file RET idName END
             END
+			WHILE NOT ~%nestedEntries%~ STRING_EQUAL ~~ AND NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
+				LPF return_first_entry STR_VAR list = ~%nestedEntries%~ separator = ~&~ RET nestedEntry = entry nestedEntries = list END
+				LPF return_first_entry STR_VAR list = ~%nestedEntry%~ separator = ~:~ RET nestedFile = entry nestedEntry = list END
+				LPF ~get_ids_name~ INT_VAR entry = nestedEntry file = nestedFile RET innerType = idName END
+				PATCH_IF ~%innerType%~ STRING_EQUAL ~~ BEGIN
+					SPRINT idName ~~
+				END
+				ELSE BEGIN
+					SPRINT outerType ~%idName%~
+					SPRINT idName @11770210 // ~%outerType% qui sont aussi des %innerType%~
+					SPRINT file ~nested~
+				END
+			END
 			PATCH_IF NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
 				SET $targetTypes(~%idName%~) = 1
+				PATCH_IF ~%file%~ STRING_EQUAL ~9~ BEGIN
+					SET kitTypes += 1
+				END
+				ELSE BEGIN
+					SET otherTypes += 1
+				END
 			END
 		END
 	END
@@ -9188,11 +9245,29 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		PATCH_IF NOT (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
 			SPRINT onlyForTarget @11770001 // ~uniquement pour les %targetType%~
 		END
-		SPRINT theTarget     @102384 // ~les %targetType%~
-		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
-		SPRINT ofTheTarget @102385 // ~des %targetType%~
-		LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %to% ~ final_glue = ~ %andTo% ~ RET targetType = text END
-		SPRINT toTheTarget @102386 // ~aux %targetType%~
+		// Le type de créature propre à un 178, 179 ou 344 est celui de l'adversaire : la cible de l'effet
+		// reste la sienne (OHBSCRL3 : « le TAC0 de la cible contre les planétaires déchus »). Un kit est
+		// celui du porteur : la cible reste la sienne aussi.
+		SET onlyKits = kitTypes > 0 AND otherTypes == 0
+		PATCH_IF onlyKits BEGIN
+			// Le nom d'un kit est au singulier : « uniquement pour le kit Archer », « uniquement pour les
+			// kits Bretteur et Maître-lames ».
+			SPRINT andKit @11770206 // ~et~
+			LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, ~ final_glue = ~ %andKit% ~ RET targetType = text END
+			PATCH_IF count == 1 BEGIN
+				SPRINT onlyForTarget @11770002 // ~uniquement pour le kit %targetType%~
+			END
+			ELSE BEGIN
+				SPRINT onlyForTarget @11770003 // ~uniquement pour les kits %targetType%~
+			END
+		END
+		ELSE PATCH_IF NOT (opcode == 178 OR opcode == 179 OR opcode == 344) OR NOT ~%target_type%~ STRING_EQUAL ~~ BEGIN
+			SPRINT theTarget     @102384 // ~les %targetType%~
+			LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
+			SPRINT ofTheTarget @102385 // ~des %targetType%~
+			LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %to% ~ final_glue = ~ %andTo% ~ RET targetType = text END
+			SPRINT toTheTarget @102386 // ~aux %targetType%~
+		END
 	END
 END
 
