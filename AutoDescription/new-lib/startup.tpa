@@ -39,3 +39,15 @@ ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
 	~timing_kind~ ~delay_ticks~ ~duration_ticks~ ~probability_low~ ~probability_high~ ~probability~
 	~save_types~ ~save_flags~ ~level_min~ ~level_max~ ~resource_lower~ ~effective_target~
 END
+
+// Champs que la comparaison de deux effets peut laisser de côté (same_ignored de ad_fx_same_fields,
+// new-lib/groups.tpp), combinables par BOR.
+OUTER_SET AD_SAME_PARAMETER1  = BIT0
+OUTER_SET AD_SAME_PARAMETER2  = BIT1
+OUTER_SET AD_SAME_SAVE        = BIT2
+OUTER_SET AD_SAME_TIMING      = BIT3
+OUTER_SET AD_SAME_SPECIAL     = BIT4
+OUTER_SET AD_SAME_POWER       = BIT5
+OUTER_SET AD_SAME_DICE        = BIT6
+OUTER_SET AD_SAME_RESISTANCE  = BIT7
+OUTER_SET AD_SAME_PROBABILITY = BIT8

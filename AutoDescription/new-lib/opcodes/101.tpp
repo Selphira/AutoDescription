@@ -46,7 +46,8 @@ END
 DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
 	LPM ad_immunity_class
 	SET immunity_own_class = immunity_class
-	LPF ad_fx_signature INT_VAR fx_id = immunity_id with_parameter2 = 0 RET immunity_signature = signature END
+	SET same_id = immunity_id
+	SET same_ignored = AD_SAME_PARAMETER2
 	SET immunity_same_class = 0
 	SET immunity_different = 0
 	SET immunity_self = immunity_id
@@ -55,8 +56,9 @@ DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
 		PATCH_IF immunity_id != immunity_self AND $fx_opcode(~%immunity_id%~) == 101 AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
 			LPM ad_immunity_class
 			SET immunity_same_class = immunity_same_class OR (immunity_own_class > 0 AND immunity_class == immunity_own_class)
-			LPF ad_fx_signature INT_VAR fx_id = immunity_id with_parameter2 = 0 RET immunity_other_signature = signature END
-			SET immunity_different = immunity_different OR NOT (~%immunity_other_signature%~ STRING_EQUAL ~%immunity_signature%~)
+			SET same_other = immunity_id
+			LPM ad_fx_same_fields
+			SET immunity_different = immunity_different OR NOT fx_same
 		END
 	END
 	SET immunity_id = immunity_self

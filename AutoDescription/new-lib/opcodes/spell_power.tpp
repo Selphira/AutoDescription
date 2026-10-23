@@ -45,14 +45,16 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_spell_power_group_support BEGIN
-	LPF ad_fx_signature INT_VAR fx_id = power_id with_parameter2 = 0 with_special = 0 RET power_signature = signature END
+	SET same_id = power_id
+	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
 	SPRINT power_scope $fx_scope(~%power_id%~)
 	FOR (power_other = 0; power_other < fx_count; ++power_other) BEGIN
 		SPRINT power_other_scope $fx_scope(~%power_other%~)
 		PATCH_IF $fx_opcode(~%power_other%~) == power_opcode AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~)
 				AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = power_other with_parameter2 = 0 with_special = 0 RET power_other_signature = signature END
-			PATCH_IF NOT (~%power_other_signature%~ STRING_EQUAL ~%power_signature%~) BEGIN
+			SET same_other = power_other
+			LPM ad_fx_same_fields
+			PATCH_IF NOT fx_same BEGIN
 				LPF ad_refusal INT_VAR fx_id = power_other STR_VAR reason = ~not_implemented:opcode%power_opcode%:group_fields~ message = ~effects with different fields~ RET render_missing = refusal END
 			END
 		END

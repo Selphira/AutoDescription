@@ -56,7 +56,8 @@ END
 // Le 249 de même portée et de mêmes champs que le 248 hit_id, hors parameter1 et parameter2 : consommé,
 // et le 248 vaut pour toute attaque (fx_hit_any).
 DEFINE_PATCH_MACRO ad_hit_effect_group BEGIN
-	LPF ad_fx_signature INT_VAR fx_id = hit_id with_parameter1 = 0 with_parameter2 = 0 RET hit_signature = signature END
+	SET same_id = hit_id
+	SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
 	SPRINT hit_scope $fx_scope(~%hit_id%~)
 	SET hit_matches = 0
 	FOR (hit_other = 0; hit_other < fx_count; ++hit_other) BEGIN
@@ -64,9 +65,10 @@ DEFINE_PATCH_MACRO ad_hit_effect_group BEGIN
 		SPRINT hit_other_scope $fx_scope(~%hit_other%~)
 		PATCH_IF (hit_other_opcode == 248 OR hit_other_opcode == 249) AND hit_other != hit_id AND NOT $fx_consumed(~%hit_other%~)
 				AND (~%hit_other_scope%~ STRING_EQUAL ~%hit_scope%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = hit_other with_parameter1 = 0 with_parameter2 = 0 RET hit_other_signature = signature END
+			SET same_other = hit_other
+			LPM ad_fx_same_fields
 			SPRINT hit_other_resref $fx_resource_lower(~%hit_other%~)
-			PATCH_IF (~%hit_other_signature%~ STRING_EQUAL ~%hit_signature%~) AND (~%hit_other_resref%~ STRING_EQUAL ~%hit_resref%~) BEGIN
+			PATCH_IF fx_same AND (~%hit_other_resref%~ STRING_EQUAL ~%hit_resref%~) BEGIN
 				SET hit_matches += 1
 				SET hit_match = hit_other
 				SET hit_match_opcode = hit_other_opcode

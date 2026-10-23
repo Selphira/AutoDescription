@@ -65,12 +65,14 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		FOR (versus_id = 0; versus_id < fx_count; ++versus_id) BEGIN
 			PATCH_IF $fx_opcode(~%versus_id%~) == versus_opcode AND NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = versus_id with_parameter1 = 0 with_parameter2 = 0 RET versus_signature = signature END
+				SET same_id = versus_id
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
 				FOR (versus_other = versus_id + 1; versus_other < fx_count; ++versus_other) BEGIN
 					PATCH_IF $fx_opcode(~%versus_other%~) == versus_opcode AND NOT $fx_consumed(~%versus_other%~)
 							AND $fx_parameter3(~%versus_other%~) == $fx_parameter3(~%versus_id%~) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = versus_other with_parameter1 = 0 with_parameter2 = 0 RET versus_other_signature = signature END
-						PATCH_IF ~%versus_other_signature%~ STRING_EQUAL ~%versus_signature%~ BEGIN
+						SET same_other = versus_other
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
 							SET $versus_anchor(~%versus_other%~) = versus_id
 							SET $fx_late(~%versus_id%~) = 1
 						END

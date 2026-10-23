@@ -197,6 +197,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	SET exc_base_high = $fx_probability1(~%line_fx%~)
 	SET exc_base_low = $fx_probability2(~%line_fx%~)
 	SPRINT exc_scope $fx_scope(~%line_fx%~)
+	CLEAR_ARRAY exc_keys
 	FOR (exc_id = 0; exc_id < line_fx; ++exc_id) BEGIN
 		SPRINT exc_id_scope $fx_scope(~%exc_id%~)
 		PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) BEGIN
@@ -214,7 +215,11 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 					SET exc_probability = (exc_common_low <= exc_common_high ? exc_common_high - exc_common_low + 1 : 0) * 100 / exc_base
 				END
 			END
-			SET $exc_key(~%exc_id%~) = 100 - exc_probability
+			SET exc_rank = 100 - exc_probability
+			SET $exc_key(~%exc_id%~) = exc_rank
+			PATCH_IF exc_rank >= 0 AND exc_rank <= 100 BEGIN
+				SET $exc_keys(~%exc_rank%~) = 1
+			END
 		END
 	END
 	CLEAR_ARRAY exc_effective_all
@@ -222,7 +227,10 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	CLEAR_ARRAY exc_between_all
 	CLEAR_ARRAY exc_if_all
 	CLEAR_ARRAY exc_effective_if_all
-	FOR (exc_key = 0; exc_key <= 100; ++exc_key) BEGIN
+	// Clés présentes seulement, par probabilité décroissante ; la clé de boucle ne s'appelle pas
+	// exc_key, car PHP_EACH écrit aussi <clé>_0, qui serait $exc_key(~0~).
+	SORT_ARRAY_INDICES exc_keys NUMERICALLY
+	PHP_EACH exc_keys AS exc_rank => _ BEGIN
 		CLEAR_ARRAY exc_EFFECTIVE
 		CLEAR_ARRAY exc_NOT_EFFECTIVE
 		CLEAR_ARRAY exc_BETWEEN
@@ -232,7 +240,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 		FOR (exc_id = 0; exc_id < line_fx; ++exc_id) BEGIN
 			SPRINT exc_id_scope $fx_scope(~%exc_id%~)
 			PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) BEGIN
-				PATCH_IF $exc_key(~%exc_id%~) == exc_key BEGIN
+				PATCH_IF $exc_key(~%exc_id%~) == exc_rank BEGIN
 					SET exc_found = 1
 					SPRINT exc_kind $fx_exception_kind(~%exc_id%~)
 					FOR (exc_n = 0; exc_n < $fx_exception_name_count(~%exc_id%~); ++exc_n) BEGIN
@@ -243,7 +251,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 			END
 		END
 		PATCH_IF exc_found BEGIN
-			SET probability = 100 - exc_key
+			SET probability = 100 - exc_rank
 			SPRINT exc_prefix ~~
 			PATCH_IF probability < 100 BEGIN
 				SPRINT exc_prefix @23240004 // ~à %probability% % ~

@@ -34,12 +34,14 @@ DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:no_effect~ message = ~amount of 0~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF disease_type >= 4 AND disease_type <= 9 AND AD_ENABLE_SHRINKAGE BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = disease_id with_parameter2 = 0 RET disease_signature = signature END
+				SET same_id = disease_id
+				SET same_ignored = AD_SAME_PARAMETER2
 				FOR (disease_other = 0; disease_other < fx_count; ++disease_other) BEGIN
 					SET disease_other_type = $fx_parameter2(~%disease_other%~)
 					PATCH_IF disease_other != disease_id AND $fx_opcode(~%disease_other%~) == 78 AND disease_other_type >= 4 AND disease_other_type <= 9 BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = disease_other with_parameter2 = 0 RET disease_other_signature = signature END
-						PATCH_IF ~%disease_other_signature%~ STRING_EQUAL ~%disease_signature%~ BEGIN
+						SET same_other = disease_other
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
 							LPF ad_refusal INT_VAR fx_id = disease_other STR_VAR reason = ~not_implemented:opcode78:group~ message = ~identical diseases~ RET render_missing = refusal END
 						END
 					END

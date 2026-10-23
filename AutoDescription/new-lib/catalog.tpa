@@ -12,22 +12,34 @@
 //   un effet qui persiste après la mort est seulement dit permanent).
 // Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
 // décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
-OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
-COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_catalog 8
-	FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row 3 ad_status
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row 4 ad_dice
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row 5 ad_sort
-		READ_2DA_ENTRY_FORMER ad_catalog ad_row 6 ad_duration
-		SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
-		SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
-		SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
-		SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
-		SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
-	END
+//
+// Chaque table 2DA de ce fichier est lue dans une fonction, qui ne rend que ses tableaux AD_*
+// (RET_ARRAY) : READ_2DA_ENTRIES_NOW laisse une variable par cellule, qui disparaît au retour de
+// la fonction (V7). Chaque variable restante renchérit tous les LPF de l'installation, qui copient
+// toutes les variables.
+DEFINE_ACTION_FUNCTION ad_read_opcode_catalog
+	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+BEGIN
+	OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
+	COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_catalog 8
+		FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 3 ad_status
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 4 ad_dice
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 5 ad_sort
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 6 ad_duration
+			SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
+			SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
+			SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
+			SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
+			SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
+		END
+END
+LAF ad_read_opcode_catalog
+	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+END
 
 // Sorts d'Item Revision que l'ancien moteur décrit par un texte propre au lieu de les citer (anciens
 // opcode_target_146_item_revision et opcode_target_probability_146_item_revision) : refusés par les
@@ -353,118 +365,158 @@ OUTER_SET AD_USABILITY_DRUIDS = BIT12 BOR BIT30
 // AD_SHRINK_CURE_WITH_IMMUNITIES ; RELABEL : libellé de l'immunité si elle absorbe l'effet ;
 // EQUIPPED : 1 si l'absorption n'a lieu que dans un bloc d'équipement (soins supprimés par l'ancien
 // delete_cure_linked_to_specific_immunity), 0 dans toute portée.
-COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_absorbs 8
-	SET AD_IMMUNITY_ABSORB_COUNT = ad_absorbs
-	FOR (ad_row = 0; ad_row < ad_absorbs; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 0 ad_immunity
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 1 ad_opcode
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 2 ad_p1_min
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 3 ad_p1_max
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 4 ad_p2
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 5 ad_cure
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 6 ad_relabel
-		READ_2DA_ENTRY_FORMER ad_absorbs ad_row 7 ad_equipped
-		SET $AD_IMMUNITY_ABSORB_IMMUNITY(~%ad_row%~) = ad_immunity
-		SET $AD_IMMUNITY_ABSORB_OPCODE(~%ad_row%~) = ad_opcode
-		SET $AD_IMMUNITY_ABSORB_P1_MIN(~%ad_row%~) = IS_AN_INT ad_p1_min ? ad_p1_min : 0 - 2147483647
-		SET $AD_IMMUNITY_ABSORB_P1_MAX(~%ad_row%~) = IS_AN_INT ad_p1_max ? ad_p1_max : 2147483647
-		SET $AD_IMMUNITY_ABSORB_ANY_P2(~%ad_row%~) = NOT IS_AN_INT ad_p2
-		SET $AD_IMMUNITY_ABSORB_P2(~%ad_row%~) = IS_AN_INT ad_p2 ? ad_p2 : 0
-		SET $AD_IMMUNITY_ABSORB_CURE(~%ad_row%~) = ad_cure
-		SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
-		SET $AD_IMMUNITY_ABSORB_EQUIPPED(~%ad_row%~) = ad_equipped
-	END
+DEFINE_ACTION_FUNCTION ad_read_immunity_absorbs
+	RET AD_IMMUNITY_ABSORB_COUNT
+	RET_ARRAY AD_IMMUNITY_ABSORB_IMMUNITY AD_IMMUNITY_ABSORB_OPCODE AD_IMMUNITY_ABSORB_P1_MIN AD_IMMUNITY_ABSORB_P1_MAX
+		AD_IMMUNITY_ABSORB_ANY_P2 AD_IMMUNITY_ABSORB_P2 AD_IMMUNITY_ABSORB_CURE AD_IMMUNITY_ABSORB_RELABEL
+		AD_IMMUNITY_ABSORB_EQUIPPED
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_absorbs 8
+		SET AD_IMMUNITY_ABSORB_COUNT = ad_absorbs
+		FOR (ad_row = 0; ad_row < ad_absorbs; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 0 ad_immunity
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 1 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 2 ad_p1_min
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 3 ad_p1_max
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 4 ad_p2
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 5 ad_cure
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 6 ad_relabel
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 7 ad_equipped
+			SET $AD_IMMUNITY_ABSORB_IMMUNITY(~%ad_row%~) = ad_immunity
+			SET $AD_IMMUNITY_ABSORB_OPCODE(~%ad_row%~) = ad_opcode
+			SET $AD_IMMUNITY_ABSORB_P1_MIN(~%ad_row%~) = IS_AN_INT ad_p1_min ? ad_p1_min : 0 - 2147483647
+			SET $AD_IMMUNITY_ABSORB_P1_MAX(~%ad_row%~) = IS_AN_INT ad_p1_max ? ad_p1_max : 2147483647
+			SET $AD_IMMUNITY_ABSORB_ANY_P2(~%ad_row%~) = NOT IS_AN_INT ad_p2
+			SET $AD_IMMUNITY_ABSORB_P2(~%ad_row%~) = IS_AN_INT ad_p2 ? ad_p2 : 0
+			SET $AD_IMMUNITY_ABSORB_CURE(~%ad_row%~) = ad_cure
+			SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
+			SET $AD_IMMUNITY_ABSORB_EQUIPPED(~%ad_row%~) = ad_equipped
+		END
+END
+LAF ad_read_immunity_absorbs
+	RET AD_IMMUNITY_ABSORB_COUNT
+	RET_ARRAY AD_IMMUNITY_ABSORB_IMMUNITY AD_IMMUNITY_ABSORB_OPCODE AD_IMMUNITY_ABSORB_P1_MIN AD_IMMUNITY_ABSORB_P1_MAX
+		AD_IMMUNITY_ABSORB_ANY_P2 AD_IMMUNITY_ABSORB_P2 AD_IMMUNITY_ABSORB_CURE AD_IMMUNITY_ABSORB_RELABEL
+		AD_IMMUNITY_ABSORB_EQUIPPED
+END
 
 // Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux
 // opcode_324_effective, _not_effective, _between et _if) : pour une ligne de splprot.2da (parameter2),
 // KIND (EFFECTIVE, NOT_EFFECTIVE, BETWEEN, IF), puis les types de créatures (IDS1-IDS3 : 1 000 ×
 // fichier IDS + valeur, nommés par ad_ids_name), ou un nom du bloc @23240000 (TEXT : xxxx).
-COPY - ~%MOD_FOLDER%/2da/target_exceptions.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_exceptions 6
-	FOR (ad_row = 0; ad_row < ad_exceptions; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 0 ad_stat
-		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 1 ad_kind
-		SPRINT $AD_TARGET_EXCEPTION_KIND(~%ad_stat%~) ~%ad_kind%~
-		SET ad_ids_count = 0
-		FOR (ad_column = 2; ad_column <= 4; ++ad_column) BEGIN
-			READ_2DA_ENTRY_FORMER ad_exceptions ad_row ad_column ad_ids
-			PATCH_IF IS_AN_INT ad_ids BEGIN
-				SET $AD_TARGET_EXCEPTION_IDS(~%ad_stat%~ ~%ad_ids_count%~) = ad_ids
-				SET ad_ids_count += 1
+DEFINE_ACTION_FUNCTION ad_read_target_exceptions
+	RET_ARRAY AD_TARGET_EXCEPTION_KIND AD_TARGET_EXCEPTION_IDS AD_TARGET_EXCEPTION_IDS_COUNT AD_TARGET_EXCEPTION_TEXT
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/target_exceptions.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_exceptions 6
+		FOR (ad_row = 0; ad_row < ad_exceptions; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_exceptions ad_row 0 ad_stat
+			READ_2DA_ENTRY_FORMER ad_exceptions ad_row 1 ad_kind
+			SPRINT $AD_TARGET_EXCEPTION_KIND(~%ad_stat%~) ~%ad_kind%~
+			SET ad_ids_count = 0
+			FOR (ad_column = 2; ad_column <= 4; ++ad_column) BEGIN
+				READ_2DA_ENTRY_FORMER ad_exceptions ad_row ad_column ad_ids
+				PATCH_IF IS_AN_INT ad_ids BEGIN
+					SET $AD_TARGET_EXCEPTION_IDS(~%ad_stat%~ ~%ad_ids_count%~) = ad_ids
+					SET ad_ids_count += 1
+				END
 			END
+			SET $AD_TARGET_EXCEPTION_IDS_COUNT(~%ad_stat%~) = ad_ids_count
+			READ_2DA_ENTRY_FORMER ad_exceptions ad_row 5 ad_text
+			SET $AD_TARGET_EXCEPTION_TEXT(~%ad_stat%~) = IS_AN_INT ad_text ? 23240000 + ad_text : 0
 		END
-		SET $AD_TARGET_EXCEPTION_IDS_COUNT(~%ad_stat%~) = ad_ids_count
-		READ_2DA_ENTRY_FORMER ad_exceptions ad_row 5 ad_text
-		SET $AD_TARGET_EXCEPTION_TEXT(~%ad_stat%~) = IS_AN_INT ad_text ? 23240000 + ad_text : 0
-	END
+END
+LAF ad_read_target_exceptions
+	RET_ARRAY AD_TARGET_EXCEPTION_KIND AD_TARGET_EXCEPTION_IDS AD_TARGET_EXCEPTION_IDS_COUNT AD_TARGET_EXCEPTION_TEXT
+END
 
 // Lignes de splprot.2da du jeu (EE), conditions de l'opcode 326, numérotées comme dans l'ancien moteur
 // (rang de la ligne, sans son identifiant) : $AD_SPLPROT_STAT(ligne), statistique en décimal ;
 // $AD_SPLPROT_VALUE(ligne) (- 1 : parameter1) et $AD_SPLPROT_RELATION(ligne), texte de la table ; « * »
 // pour une ligne inutilisée.
-ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
-	COPY_EXISTING - ~splprot.2da~ ~override~
-		READ_2DA_ENTRIES_NOW ad_splprot 4
-		FOR (ad_row = 0; ad_row < ad_splprot; ++ad_row) BEGIN
-			READ_2DA_ENTRY_FORMER ad_splprot ad_row 1 ad_stat
-			READ_2DA_ENTRY_FORMER ad_splprot ad_row 2 ad_value
-			READ_2DA_ENTRY_FORMER ad_splprot ad_row 3 ad_relation
-			PATCH_IF IS_AN_INT ad_stat BEGIN
-				SET ad_stat = ad_stat // écrite en hexadécimal
+DEFINE_ACTION_FUNCTION ad_read_splprot
+	RET_ARRAY AD_SPLPROT_STAT AD_SPLPROT_VALUE AD_SPLPROT_RELATION
+BEGIN
+	ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
+		COPY_EXISTING - ~splprot.2da~ ~override~
+			READ_2DA_ENTRIES_NOW ad_splprot 4
+			FOR (ad_row = 0; ad_row < ad_splprot; ++ad_row) BEGIN
+				READ_2DA_ENTRY_FORMER ad_splprot ad_row 1 ad_stat
+				READ_2DA_ENTRY_FORMER ad_splprot ad_row 2 ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot ad_row 3 ad_relation
+				PATCH_IF IS_AN_INT ad_stat BEGIN
+					SET ad_stat = ad_stat // écrite en hexadécimal
+				END
+				SPRINT $AD_SPLPROT_STAT(~%ad_row%~) ~%ad_stat%~
+				SPRINT $AD_SPLPROT_VALUE(~%ad_row%~) ~%ad_value%~
+				SPRINT $AD_SPLPROT_RELATION(~%ad_row%~) ~%ad_relation%~
 			END
-			SPRINT $AD_SPLPROT_STAT(~%ad_row%~) ~%ad_stat%~
-			SPRINT $AD_SPLPROT_VALUE(~%ad_row%~) ~%ad_value%~
-			SPRINT $AD_SPLPROT_RELATION(~%ad_row%~) ~%ad_relation%~
-		END
+	END
 END
+LAF ad_read_splprot RET_ARRAY AD_SPLPROT_STAT AD_SPLPROT_VALUE AD_SPLPROT_RELATION END
 
 // Noms des kits du jeu (EE, kitlist.2da, ancien tableau kits) : $AD_KIT_NAMES(valeur de kit.ids) =
 // nom de la colonne MIXED, au singulier (« Archer »).
-ACTION_IF IS_EE AND FILE_EXISTS_IN_GAME ~kitlist.2da~ BEGIN
-	COPY_EXISTING - ~kitlist.2da~ ~override~
-		READ_2DA_ENTRIES_NOW ad_kitlist 10
-		FOR (ad_row = 0; ad_row < ad_kitlist; ++ad_row) BEGIN
-			READ_2DA_ENTRY_FORMER ad_kitlist ad_row 3 ad_kit_strref
-			READ_2DA_ENTRY_FORMER ad_kitlist ad_row 9 ad_kit_ids
-			// 4294967296 : pas de nom (texte de la table, comparé comme l'ancien moteur).
-			PATCH_IF IS_AN_INT ad_kit_strref AND IS_AN_INT ad_kit_ids AND NOT (~%ad_kit_strref%~ STRING_EQUAL ~4294967296~) BEGIN
-				PATCH_IF ad_kit_strref > 0 BEGIN
-					SET ad_kit_value = ad_kit_ids
-					GET_STRREF ad_kit_strref ad_kit_name
-					SPRINT $AD_KIT_NAMES(~%ad_kit_value%~) ~%ad_kit_name%~
+DEFINE_ACTION_FUNCTION ad_read_kit_names
+	RET_ARRAY AD_KIT_NAMES
+BEGIN
+	ACTION_IF IS_EE AND FILE_EXISTS_IN_GAME ~kitlist.2da~ BEGIN
+		COPY_EXISTING - ~kitlist.2da~ ~override~
+			READ_2DA_ENTRIES_NOW ad_kitlist 10
+			FOR (ad_row = 0; ad_row < ad_kitlist; ++ad_row) BEGIN
+				READ_2DA_ENTRY_FORMER ad_kitlist ad_row 3 ad_kit_strref
+				READ_2DA_ENTRY_FORMER ad_kitlist ad_row 9 ad_kit_ids
+				// 4294967296 : pas de nom (texte de la table, comparé comme l'ancien moteur).
+				PATCH_IF IS_AN_INT ad_kit_strref AND IS_AN_INT ad_kit_ids AND NOT (~%ad_kit_strref%~ STRING_EQUAL ~4294967296~) BEGIN
+					PATCH_IF ad_kit_strref > 0 BEGIN
+						SET ad_kit_value = ad_kit_ids
+						GET_STRREF ad_kit_strref ad_kit_name
+						SPRINT $AD_KIT_NAMES(~%ad_kit_value%~) ~%ad_kit_name%~
+					END
 				END
 			END
-		END
+	END
 END
+LAF ad_read_kit_names RET_ARRAY AD_KIT_NAMES END
 
 // Conditions d'une statistique (2da/stats.2da, ancien tableau stats_desc_ref) :
 // $AD_STAT_CONDITION(~stat-valeur-relation~) = chaîne de l'ancien fichier (« * » pour toute valeur ou
 // toute relation) ; $AD_STAT_CONDITION_ADD_RELATION(clé) : la relation s'ajoute à la chaîne.
-COPY - ~%MOD_FOLDER%/2da/stats.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_stats 6
-	FOR (ad_row = 0; ad_row < ad_stats; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_stats ad_row 0 ad_stat
-		READ_2DA_ENTRY_FORMER ad_stats ad_row 1 ad_value
-		READ_2DA_ENTRY_FORMER ad_stats ad_row 2 ad_relation
-		READ_2DA_ENTRY_FORMER ad_stats ad_row 3 ad_condition
-		PATCH_IF IS_AN_INT ad_stat AND IS_AN_INT ad_condition BEGIN
-			SET $AD_STAT_CONDITION(~%ad_stat%-%ad_value%-%ad_relation%~) = ad_condition
-			SET $AD_STAT_CONDITION_ADD_RELATION(~%ad_stat%-%ad_value%-%ad_relation%~) = ~%ad_relation%~ STRING_EQUAL ~*~
+DEFINE_ACTION_FUNCTION ad_read_stat_conditions
+	RET_ARRAY AD_STAT_CONDITION AD_STAT_CONDITION_ADD_RELATION
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/stats.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_stats 6
+		FOR (ad_row = 0; ad_row < ad_stats; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 0 ad_stat
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 1 ad_value
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 2 ad_relation
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 3 ad_condition
+			PATCH_IF IS_AN_INT ad_stat AND IS_AN_INT ad_condition BEGIN
+				SET $AD_STAT_CONDITION(~%ad_stat%-%ad_value%-%ad_relation%~) = ad_condition
+				SET $AD_STAT_CONDITION_ADD_RELATION(~%ad_stat%-%ad_value%-%ad_relation%~) = ~%ad_relation%~ STRING_EQUAL ~*~
+			END
 		END
-	END
+END
+LAF ad_read_stat_conditions RET_ARRAY AD_STAT_CONDITION AD_STAT_CONDITION_ADD_RELATION END
 
 // Sorts qui infligent l'effet d'un opcode (2da/immunity_spells.2da, anciennes listes
 // <état>SpellList ; 505 : capacités psioniques) : $AD_IMMUNITY_SPELLS(~opcode RESREF~), ressource
 // en majuscules.
-COPY - ~%MOD_FOLDER%/2da/immunity_spells.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_spells 2
-	FOR (ad_row = 0; ad_row < ad_spells; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_spells ad_row 0 ad_resref
-		READ_2DA_ENTRY_FORMER ad_spells ad_row 1 ad_immunity
-		TO_UPPER ad_resref
-		SET $AD_IMMUNITY_SPELLS(~%ad_immunity% %ad_resref%~) = 1
-	END
+DEFINE_ACTION_FUNCTION ad_read_immunity_spells
+	RET_ARRAY AD_IMMUNITY_SPELLS
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/immunity_spells.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_spells 2
+		FOR (ad_row = 0; ad_row < ad_spells; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_spells ad_row 0 ad_resref
+			READ_2DA_ENTRY_FORMER ad_spells ad_row 1 ad_immunity
+			TO_UPPER ad_resref
+			SET $AD_IMMUNITY_SPELLS(~%ad_immunity% %ad_resref%~) = 1
+		END
+END
+LAF ad_read_immunity_spells RET_ARRAY AD_IMMUNITY_SPELLS END
 
 // Noms de sorts imposés (ancien tableau spellnames), ressource en minuscules => chaîne ; @7100000
 // (vide) : sort à ne pas citer, redondant avec les effets qui l'accompagnent ou sans effet concret.
@@ -492,31 +544,41 @@ END
 // de l'en-tête index (0-2), ressource en minuscules ; une valeur qui n'est pas un strref positif
 // n'est pas une infobulle. Une ressource répétée garde sa dernière ligne, comme dans l'ancien
 // moteur.
-ACTION_IF FILE_EXISTS_IN_GAME ~tooltip.2da~ BEGIN
-	COPY_EXISTING - ~tooltip.2da~ ~override~
-		READ_2DA_ENTRIES_NOW ad_tooltips 4
-		FOR (ad_row = 0; ad_row < ad_tooltips; ++ad_row) BEGIN
-			READ_2DA_ENTRY_FORMER ad_tooltips ad_row 0 ad_resref
-			TO_LOWER ad_resref
-			FOR (ad_index = 0; ad_index < 3; ++ad_index) BEGIN
-				READ_2DA_ENTRY_FORMER ad_tooltips ad_row (ad_index + 1) ad_strref
-				SPRINT $AD_TOOLTIPS(~%ad_resref% %ad_index%~) ~%ad_strref%~
+DEFINE_ACTION_FUNCTION ad_read_tooltips
+	RET_ARRAY AD_TOOLTIPS
+BEGIN
+	ACTION_IF FILE_EXISTS_IN_GAME ~tooltip.2da~ BEGIN
+		COPY_EXISTING - ~tooltip.2da~ ~override~
+			READ_2DA_ENTRIES_NOW ad_tooltips 4
+			FOR (ad_row = 0; ad_row < ad_tooltips; ++ad_row) BEGIN
+				READ_2DA_ENTRY_FORMER ad_tooltips ad_row 0 ad_resref
+				TO_LOWER ad_resref
+				FOR (ad_index = 0; ad_index < 3; ++ad_index) BEGIN
+					READ_2DA_ENTRY_FORMER ad_tooltips ad_row (ad_index + 1) ad_strref
+					SPRINT $AD_TOOLTIPS(~%ad_resref% %ad_index%~) ~%ad_strref%~
+				END
 			END
-		END
+	END
 END
+LAF ad_read_tooltips RET_ARRAY AD_TOOLTIPS END
 
 // Noms des types de compétence (weapprof.2da du jeu) : $AD_PROFICIENCY_NAMES(ID) = nom, dans la
 // langue du jeu. La ligne des titres de colonnes, sans ID numérique, et les compétences sans nom
 // (strref 4294967296 de l'EE) sont écartées.
-COPY_EXISTING - ~weapprof.2da~ ~override~
-	READ_2DA_ENTRIES_NOW ad_proficiencies 3
-	FOR (ad_row = 0; ad_row < ad_proficiencies; ++ad_row) BEGIN
-		READ_2DA_ENTRY_FORMER ad_proficiencies ad_row 1 ad_id
-		READ_2DA_ENTRY_FORMER ad_proficiencies ad_row 2 ad_strref
-		PATCH_IF IS_AN_INT ad_id AND IS_AN_INT ad_strref AND NOT (~%ad_strref%~ STRING_EQUAL ~4294967296~) BEGIN
-			PATCH_IF ad_strref >= 0 BEGIN
-				GET_STRREF ad_strref ad_name
-				SPRINT $AD_PROFICIENCY_NAMES(~%ad_id%~) ~%ad_name%~
+DEFINE_ACTION_FUNCTION ad_read_proficiency_names
+	RET_ARRAY AD_PROFICIENCY_NAMES
+BEGIN
+	COPY_EXISTING - ~weapprof.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_proficiencies 3
+		FOR (ad_row = 0; ad_row < ad_proficiencies; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_proficiencies ad_row 1 ad_id
+			READ_2DA_ENTRY_FORMER ad_proficiencies ad_row 2 ad_strref
+			PATCH_IF IS_AN_INT ad_id AND IS_AN_INT ad_strref AND NOT (~%ad_strref%~ STRING_EQUAL ~4294967296~) BEGIN
+				PATCH_IF ad_strref >= 0 BEGIN
+					GET_STRREF ad_strref ad_name
+					SPRINT $AD_PROFICIENCY_NAMES(~%ad_id%~) ~%ad_name%~
+				END
 			END
 		END
-	END
+END
+LAF ad_read_proficiency_names RET_ARRAY AD_PROFICIENCY_NAMES END

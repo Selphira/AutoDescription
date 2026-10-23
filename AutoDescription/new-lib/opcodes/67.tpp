@@ -35,12 +35,14 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
-	LPF ad_fx_signature INT_VAR fx_id = summon_id with_probability = 0 RET summon_signature = signature END
+	SET same_id = summon_id
+	SET same_ignored = AD_SAME_PROBABILITY
 	FOR (summon_other = 0; summon_other < fx_count; ++summon_other) BEGIN
 		PATCH_IF summon_other != summon_id AND $fx_opcode(~%summon_other%~) == 67 AND $fx_probability(~%summon_other%~) < 100 BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = summon_other with_probability = 0 RET summon_other_signature = signature END
+			SET same_other = summon_other
+			LPM ad_fx_same_fields
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
-			PATCH_IF (~%summon_other_signature%~ STRING_EQUAL ~%summon_signature%~) AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
+			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = summon_other STR_VAR reason = ~not_implemented:opcode67:random_amount~ message = ~random number of creatures~ RET render_missing = refusal END
 			END
 		END

@@ -22,13 +22,15 @@ END
 
 // Les trois types qui suivent damage_mod_type, modifiés comme l'effet damage_mod_id.
 DEFINE_PATCH_MACRO ad_op_332_group_support BEGIN
-	LPF ad_fx_signature INT_VAR fx_id = damage_mod_id with_parameter2 = 0 RET damage_mod_signature = signature END
+	SET same_id = damage_mod_id
+	SET same_ignored = AD_SAME_PARAMETER2
 	SET damage_mod_found = 0
 	FOR (damage_mod_other = 0; damage_mod_other < fx_count; ++damage_mod_other) BEGIN
 		SET damage_mod_offset = $fx_parameter2(~%damage_mod_other%~) - damage_mod_type
 		PATCH_IF $fx_opcode(~%damage_mod_other%~) == 332 AND damage_mod_offset >= 1 AND damage_mod_offset <= 3 BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = damage_mod_other with_parameter2 = 0 RET damage_mod_other_signature = signature END
-			PATCH_IF ~%damage_mod_other_signature%~ STRING_EQUAL ~%damage_mod_signature%~ BEGIN
+			SET same_other = damage_mod_other
+			LPM ad_fx_same_fields
+			PATCH_IF fx_same BEGIN
 				SET damage_mod_found = damage_mod_found BOR (damage_mod_offset == 1 ? 1 : (damage_mod_offset == 2 ? 2 : 4))
 			END
 		END

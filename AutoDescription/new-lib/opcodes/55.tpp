@@ -44,11 +44,13 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		FOR (kill_id = 0; kill_id < fx_count; ++kill_id) BEGIN
 			PATCH_IF $fx_opcode(~%kill_id%~) == 55 AND NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = kill_id with_parameter1 = 0 with_parameter2 = 0 RET kill_signature = signature END
+				SET same_id = kill_id
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
 				FOR (kill_other = kill_id + 1; kill_other < fx_count; ++kill_other) BEGIN
 					PATCH_IF $fx_opcode(~%kill_other%~) == 55 AND NOT $fx_consumed(~%kill_other%~) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = kill_other with_parameter1 = 0 with_parameter2 = 0 RET kill_other_signature = signature END
-						PATCH_IF ~%kill_other_signature%~ STRING_EQUAL ~%kill_signature%~ BEGIN
+						SET same_other = kill_other
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
 							SET $kill_anchor(~%kill_other%~) = kill_id
 							SET $fx_late(~%kill_id%~) = 1
 						END

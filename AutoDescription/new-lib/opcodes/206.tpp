@@ -53,12 +53,14 @@ DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
 			SET spell_psionic_total = VARIABLE_IS_SET $spell_psionic_count(~%spell_scope%~) ? $spell_psionic_count(~%spell_scope%~) + 1 : 1
 			SET $spell_psionic_count(~%spell_scope%~) = spell_psionic_total
 			PATCH_IF spell_psionic_total == 5 BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = spell_id with_parameter2 = 0 RET spell_psionic_signature = signature END
+				SET same_id = spell_id
+				SET same_ignored = AD_SAME_PARAMETER2
 				FOR (spell_other = 0; spell_other < fx_count; ++spell_other) BEGIN
 					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
 					PATCH_IF $fx_opcode(~%spell_other%~) == 101 AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = spell_other with_parameter2 = 0 RET spell_other_signature = signature END
-						PATCH_IF NOT (~%spell_other_signature%~ STRING_EQUAL ~%spell_psionic_signature%~) BEGIN
+						SET same_other = spell_other
+						LPM ad_fx_same_fields
+						PATCH_IF NOT fx_same BEGIN
 							LPF ad_refusal INT_VAR fx_id = spell_other STR_VAR reason = ~not_implemented:opcode206:psionic_fields~ message = ~psionic protections and immunities of the ability with different fields~ RET render_missing = refusal END
 						END
 					END

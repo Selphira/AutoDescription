@@ -140,14 +140,20 @@ END
 // Lit fx_block_count effets à partir de l'index fx_block_index de la table d'effets. Une lecture
 // hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant. Les 177
 // sont lus après les autres effets du bloc : l'ancien moteur (opcode_177_replace) ajoute l'effet de
-// leur EFF en fin de liste, il est donc écrit après les effets du fichier de même opcode.
+// leur EFF en fin de liste, il est donc écrit après les effets du fichier de même opcode. La
+// première passe note leurs positions (fx_deferred) : la seconde ne relit qu'eux.
 DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	SET fx_block_exceptions = 0
 	SET fx_block_not_cumulative = 0
-	FOR (fx_pass = 0; fx_pass < 2; ++fx_pass) BEGIN
-		FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
-			LPM ad_fx_load_block_effect
-		END
+	SET fx_deferred_count = 0
+	SET fx_pass = 0
+	FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
+		LPM ad_fx_load_block_effect
+	END
+	SET fx_pass = 1
+	FOR (fx_k = 0; fx_k < fx_deferred_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_k) BEGIN
+		SET fx_p = $fx_deferred(~%fx_k%~)
+		LPM ad_fx_load_block_effect
 	END
 END
 
@@ -163,7 +169,11 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	END
 	ELSE BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
-		PATCH_IF (fx_pass_opcode == 177) == (fx_pass == 1) BEGIN
+		PATCH_IF fx_pass_opcode == 177 AND fx_pass == 0 BEGIN
+			SET $fx_deferred(~%fx_deferred_count%~) = fx_p
+			SET fx_deferred_count += 1
+		END
+		ELSE BEGIN
 			SET fx_id = fx_count
 			SPRINT $fx_block(~%fx_id%~) ~%fx_block_kind%~
 			SET $fx_header(~%fx_id%~)   = fx_block_header

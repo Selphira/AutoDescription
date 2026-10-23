@@ -66,10 +66,15 @@ END
 // fx_series_anchor (1 pour l'effet de tête), fx_series_delta (pas, en secondes), fx_series_last
 // (dernier délai), fx_series_instant (l'effet de tête est immédiat).
 DEFINE_PATCH_MACRO ad_application_series_support BEGIN
+	// Une série compte au moins un effet différé, d'un opcode lu plusieurs fois.
+	SET series_possible = 0
 	FOR (series_id = 0; series_id < fx_count; ++series_id) BEGIN
 		SET $fx_series_compared(~%series_id%~) = 0
+		SET series_opcode = $fx_opcode(~%series_id%~)
+		SET series_possible = series_possible OR ($fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
 	END
-	FOR (series_id = 0; series_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++series_id) BEGIN
+	SET same_ignored = AD_SAME_TIMING
+	FOR (series_id = 0; series_possible AND series_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++series_id) BEGIN
 		PATCH_IF NOT $fx_series_compared(~%series_id%~) BEGIN
 			SET series_opcode = $fx_opcode(~%series_id%~)
 			SET series_delayed = $fx_timing(~%series_id%~) == TIMING_delayed
@@ -79,16 +84,16 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 				SET $series_members(~%series_count%~) = series_id
 				SET series_count += 1
 			END
-			LPF ad_fx_signature INT_VAR fx_id = series_id with_timing = 0 RET series_signature = signature END
+			SET same_id = series_id
 			SPRINT series_resource $fx_resource_lower(~%series_id%~)
 			SET series_matched = 0
 			FOR (series_other = 0; series_other < fx_count; ++series_other) BEGIN
 				PATCH_IF series_other != series_id AND $fx_opcode(~%series_other%~) == series_opcode
 						AND $fx_timing(~%series_other%~) == TIMING_delayed BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = series_other with_timing = 0 RET series_other_signature = signature END
+					SET same_other = series_other
+					LPM ad_fx_same_fields
 					SPRINT series_other_resource $fx_resource_lower(~%series_other%~)
-					PATCH_IF (~%series_other_signature%~ STRING_EQUAL ~%series_signature%~)
-							AND (~%series_other_resource%~ STRING_EQUAL ~%series_resource%~) BEGIN
+					PATCH_IF fx_same AND (~%series_other_resource%~ STRING_EQUAL ~%series_resource%~) BEGIN
 						// L'ancien moteur reprendrait cet effet dans une seconde série.
 						PATCH_IF $fx_series_compared(~%series_other%~) BEGIN
 							LPF ad_refusal INT_VAR fx_id = series_other STR_VAR reason = ~not_implemented:application:series_overlap~ message = ~delayed effect that would belong to two series of repetitions~ RET render_missing = refusal END

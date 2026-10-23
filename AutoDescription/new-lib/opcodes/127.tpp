@@ -129,15 +129,17 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN
-	LPF ad_fx_signature INT_VAR fx_id = monster_id RET monster_signature = signature END
-	LPF ad_fx_signature INT_VAR fx_id = monster_id with_parameter1 = 0 with_probability = 0 RET monster_similar = signature END
+	SET same_id = monster_id
 	FOR (monster_other = 0; monster_other < fx_count; ++monster_other) BEGIN
 		PATCH_IF monster_other != monster_id AND $fx_opcode(~%monster_other%~) == 127 BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = monster_other RET monster_other_signature = signature END
-			LPF ad_fx_signature INT_VAR fx_id = monster_other with_parameter1 = 0 with_probability = 0 RET monster_other_similar = signature END
+			SET same_other = monster_other
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
+			LPM ad_fx_same_fields
+			SET monster_other_similar = fx_same
+			SET same_ignored = 0
+			LPM ad_fx_same_fields
 			SPRINT monster_other_resref $fx_resource(~%monster_other%~)
-			PATCH_IF (~%monster_other_similar%~ STRING_EQUAL ~%monster_similar%~) AND NOT (~%monster_other_signature%~ STRING_EQUAL ~%monster_signature%~)
-					AND ~%monster_other_resref%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF monster_other_similar AND NOT fx_same AND ~%monster_other_resref%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = monster_other STR_VAR reason = ~not_implemented:opcode127:similar~ message = ~similar summonings with different fields~ RET render_missing = refusal END
 			END
 		END

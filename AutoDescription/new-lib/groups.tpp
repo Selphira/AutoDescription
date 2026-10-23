@@ -6,6 +6,9 @@
 // écrit la ligne (group_line), puis appelle ad_group_same_fields.
 //
 // Tableau écrit : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp).
+//
+// Une règle n'est appliquée que si l'objet a les opcodes sans lesquels elle ne réunit rien
+// (fx_opcode_count) : chacune parcourt tous les effets, souvent plusieurs fois.
 
 DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	SET group_statistic_tra = 0
@@ -18,38 +21,69 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_SAVES_THROWS BEGIN
 		LPM ad_group_saving_throws
 	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+	PATCH_IF AD_ENABLE_SHRINKAGE AND VARIABLE_IS_SET $fx_opcode_count(~97~) AND VARIABLE_IS_SET $fx_opcode_count(~44~) BEGIN
 		LPM ad_group_exceptional_strength
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_THIEF_SKILLS BEGIN
 		LPM ad_group_thief_skills
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		LPM ad_group_projectile_spells
-		LPM ad_group_spell_levels
-		LPM ad_group_secondary_type_spells
-		LPM ad_group_bounce_spells
-		LPM ad_group_morale
-		LPM ad_group_immunities
-		LPM ad_group_psionic_immunity
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~83~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
+			LPM ad_group_projectile_spells
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~102~) BEGIN
+			LPM ad_group_spell_levels
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~205~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
+			LPM ad_group_secondary_type_spells
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~197~) AND VARIABLE_IS_SET $fx_opcode_count(~207~) BEGIN
+			LPM ad_group_bounce_spells
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~23~) AND VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
+			LPM ad_group_morale
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
+			LPM ad_group_immunities
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
+			LPM ad_group_psionic_immunity
+		END
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		LPM ad_group_improved_invisibility
-		LPM ad_group_dispel_cures
-		LPM ad_group_movement_restored
-		LPM ad_group_entangle
-		LPM ad_group_free_action
-		SET group_spell_opcode = 60
-		LPM ad_group_spell_types
-		SET group_spell_opcode = 145
-		LPM ad_group_spell_types
-		LPM ad_group_item_return
-		LPM ad_group_replace_item
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~20~) BEGIN
+			LPM ad_group_improved_invisibility
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~58~) AND (VARIABLE_IS_SET $fx_opcode_count(~77~) OR VARIABLE_IS_SET $fx_opcode_count(~81~)) BEGIN
+			LPM ad_group_dispel_cures
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~126~) AND VARIABLE_IS_SET $fx_opcode_count(~163~) BEGIN
+			LPM ad_group_movement_restored
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~154~) BEGIN
+			LPM ad_group_entangle
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
+			LPM ad_group_free_action
+		END
+		PATCH_FOR_EACH group_spell_opcode IN 60 145 BEGIN
+			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%group_spell_opcode%~) BEGIN
+				LPM ad_group_spell_types
+			END
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~112~) AND VARIABLE_IS_SET $fx_opcode_count(~122~) BEGIN
+			LPM ad_group_item_return
+			LPM ad_group_replace_item
+		END
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
-		LPM ad_group_damage_halves
-		LPM ad_group_polymorph
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~12~) BEGIN
+			LPM ad_group_damage_halves
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~135~) BEGIN
+			LPM ad_group_polymorph
+		END
 	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
@@ -66,24 +100,34 @@ END
 // fx_identical_count en garde le nombre, fx_identical_anchor(id) l'effet qui les représente (initialisé
 // à id à la lecture, new-lib/effects.tpp) ; l'ancien moteur ne compare pas le type de créature
 // d'un effet d'un 177, qui réunit leurs noms (ad_application_versus, new-lib/application.tpp).
+// identical_left(opcode) : effets de l'opcode qui suivent group_id (au plus : fx_opcode_count compte
+// aussi les 177 remplacés) ; la recherche s'arrête quand il n'en reste plus.
 DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
+	PHP_EACH fx_opcode_count AS identical_opcode => identical_total BEGIN
+		SET $identical_left(~%identical_opcode%~) = identical_total
+	END
+	SET same_ignored = 0
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		SET $fx_identical_count(~%group_id%~) = 1
-	END
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
-			SET group_opcode = $fx_opcode(~%group_id%~)
-			LPF ad_fx_signature INT_VAR fx_id = group_id RET group_signature = signature END
+		SET group_opcode = $fx_opcode(~%group_id%~)
+		SET group_left = $identical_left(~%group_opcode%~) - 1
+		SET $identical_left(~%group_opcode%~) = group_left
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_left > 0 BEGIN
+			SET same_id = group_id
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			FOR (group_candidate = group_id + 1; group_candidate < fx_count; ++group_candidate) BEGIN
-				PATCH_IF $fx_opcode(~%group_candidate%~) == group_opcode AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate RET group_other_signature = signature END
-					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-						SET $fx_identical_anchor(~%group_candidate%~) = group_id
-						SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
-						SET $fx_late(~%group_id%~) = 1
+			FOR (group_candidate = group_id + 1; group_left > 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
+				PATCH_IF $fx_opcode(~%group_candidate%~) == group_opcode BEGIN
+					SET group_left -= 1
+					PATCH_IF NOT $fx_consumed(~%group_candidate%~) BEGIN
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
+						SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+						PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+							SET $fx_identical_anchor(~%group_candidate%~) = group_id
+							SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
+							SET $fx_late(~%group_id%~) = 1
+						END
 					END
 				END
 			END
@@ -170,12 +214,14 @@ END
 DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 97 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1
 			SET group_other = 0 - 1
 			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
 				PATCH_IF $fx_opcode(~%group_candidate%~) == 44 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 RET group_other_signature = signature END
-					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET group_other = group_candidate
 					END
 				END
@@ -256,8 +302,8 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 				END
 			END
 			SET $fx_spell_levels(~%group_id%~) = group_mask
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0
-				RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
@@ -270,9 +316,9 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 						END
 					END
 					ELSE PATCH_IF group_mask == 0x1FF AND (group_other_opcode == 204 OR group_other_opcode == 205) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0
-							RET group_other_signature = signature END
-						PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
 							SET $fx_consumed(~%group_candidate%~) = 1
 						END
 					END
@@ -517,13 +563,15 @@ END
 DEFINE_PATCH_MACRO ad_group_improved_invisibility BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 20 AND $fx_parameter2(~%group_id%~) == 1 AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter2 = 0 RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER2
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 20 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter2 = 0 RET group_other_signature = signature END
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
 					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+					PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END
@@ -539,12 +587,14 @@ END
 DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 58 AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
 				PATCH_IF (group_candidate_opcode == 77 OR group_candidate_opcode == 81) AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 RET group_other_signature = signature END
-					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END
@@ -580,15 +630,17 @@ END
 DEFINE_PATCH_MACRO ad_group_entangle BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 154 AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_special = 0 RET group_key = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
 			SET group_absorbed = 0
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_movement_mode = $fx_parameter2_raw(~%group_candidate%~)
 				PATCH_IF $fx_opcode(~%group_candidate%~) == 126 AND NOT $fx_consumed(~%group_candidate%~)
 						AND $fx_parameter1(~%group_candidate%~) == 0
 						AND (group_movement_mode == 1 OR group_movement_mode == 2 OR group_movement_mode == 5) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_special = 0 RET group_other_key = signature END
-					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 						SET group_absorbed = 1
 					END
@@ -614,12 +666,15 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 101 AND $fx_parameter2(~%group_id%~) == 126 AND NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
 			PATCH_IF ~%group_scope%~ STRING_EQUAL ~equipped~ BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_key = signature END
+				SET same_id = group_id
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
+					BOR AD_SAME_POWER BOR AD_SAME_DICE BOR AD_SAME_RESISTANCE
 				CLEAR_ARRAY group_needed
 				SET group_restore = 0
 				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_other_key = signature END
-					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
 						PATCH_IF group_candidate_opcode == 163 OR (group_candidate_opcode == 126 AND $fx_parameter1(~%group_candidate%~) == 100
 								AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_percentage) BEGIN
@@ -639,10 +694,11 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 				END
 				PATCH_IF group_complete BEGIN
 					FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_timing = 0 with_special = 0 with_power = 0 with_dice = 0 with_resistance = 0 RET group_other_key = signature END
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
 						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
 						SET group_candidate_parameter2 = $fx_parameter2(~%group_candidate%~)
-						PATCH_IF (~%group_other_key%~ STRING_EQUAL ~%group_key%~) AND (group_candidate_opcode == 46
+						PATCH_IF fx_same AND (group_candidate_opcode == 46
 								OR group_candidate_opcode == 126 OR group_candidate_opcode == 162 OR group_candidate_opcode == 163
 								OR (group_candidate_opcode == 101 AND (group_candidate_parameter2 == 16 OR group_candidate_parameter2 == 40
 									OR group_candidate_parameter2 == 109 OR group_candidate_parameter2 == 126 OR group_candidate_parameter2 == 154
@@ -698,12 +754,14 @@ END
 DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 122 AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter1 = 0 with_parameter2 = 0 with_power = 0 with_dice = 0 RET group_key = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_POWER BOR AD_SAME_DICE
 			SET group_removal = 0 - 1
 			FOR (group_candidate = 0; group_candidate < fx_count AND group_removal < 0; ++group_candidate) BEGIN
 				PATCH_IF $fx_opcode(~%group_candidate%~) == 112 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter1 = 0 with_parameter2 = 0 with_power = 0 with_dice = 0 RET group_other_key = signature END
-					PATCH_IF ~%group_other_key%~ STRING_EQUAL ~%group_key%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET group_removal = group_candidate
 					END
 				END
@@ -734,14 +792,16 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 			SET group_type = $fx_parameter2(~%group_id%~)
 			SET group_types = 1 << (group_type > 2 ? group_type - 3 : group_type)
 			SET group_merged = 0
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_parameter2 = 0 RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER2
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
 			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
 				SET group_other_type = $fx_parameter2(~%group_candidate%~)
 				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == group_spell_opcode AND NOT $fx_consumed(~%group_candidate%~)
 						AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_parameter2 = 0 RET group_other_signature = signature END
-					PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 						SET group_types = group_types BOR (1 << group_other_type)
 						SET group_merged = 1
@@ -817,14 +877,16 @@ END
 DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == 12 AND NOT $fx_consumed(~%group_id%~) AND $fx_save_type(~%group_id%~) == 0 BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id with_save = 0 RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_SAVE
 			SET group_other = 0 - 1
 			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
 				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 12 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					LPF ad_fx_signature INT_VAR fx_id = group_candidate with_save = 0 RET group_other_signature = signature END
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
 					SPRINT group_resource $fx_resource_lower(~%group_id%~)
 					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-					PATCH_IF (~%group_other_signature%~ STRING_EQUAL ~%group_signature%~) AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+					PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
 						SET group_other = group_candidate
 					END
 				END
@@ -857,20 +919,26 @@ END
 
 // Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
 // group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
-// opcodes group_members qui a les mêmes champs (ad_fx_signature) ; s'ils sont tous trouvés, ils
+// opcodes group_members qui a les mêmes champs (ad_fx_same_fields) ; s'ils sont tous trouvés, ils
 // sont consommés et la macro group_line écrit la ligne de l'effet dérivé group_derived, d'après
 // l'effet d'ancrage group_id.
 DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
-	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+	SET group_possible = VARIABLE_IS_SET $fx_opcode_count(~%group_anchor%~)
+	PHP_EACH group_members AS _ => group_opcode BEGIN
+		SET group_possible = group_possible AND VARIABLE_IS_SET $fx_opcode_count(~%group_opcode%~)
+	END
+	FOR (group_id = 0; group_possible AND group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_opcode(~%group_id%~) == group_anchor AND NOT $fx_consumed(~%group_id%~) BEGIN
-			LPF ad_fx_signature INT_VAR fx_id = group_id RET group_signature = signature END
+			SET same_id = group_id
+			SET same_ignored = 0
 			SET group_found = 1
 			PHP_EACH group_members AS _ => group_opcode BEGIN
 				SET $group_member(~%group_opcode%~) = 0 - 1
 				FOR (group_other = 0; group_found AND group_other < fx_count AND $group_member(~%group_opcode%~) < 0; ++group_other) BEGIN
 					PATCH_IF $fx_opcode(~%group_other%~) == group_opcode AND NOT $fx_consumed(~%group_other%~) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = group_other RET group_other_signature = signature END
-						PATCH_IF ~%group_other_signature%~ STRING_EQUAL ~%group_signature%~ BEGIN
+						SET same_other = group_other
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
 							SET $group_member(~%group_opcode%~) = group_other
 						END
 					END
@@ -918,46 +986,35 @@ DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
 	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra RET line_text = text END
 END
 
-// Champs qui doivent être égaux pour réunir deux effets, comme dans l'ancien moteur : la portée
-// (il regroupe chaque bloc séparément), la cible de regroupement (fx_group_target,
-// new-lib/normalize.tpp) et l'origine de l'effet (fx_external : effet d'un EFF, opcode 177).
-// with_parameter1 = 0 (with_parameter2 = 0) : parameter1 (parameter2) non comparé ; with_save = 0 : jet de
-// sauvegarde et résistance à la dissipation non comparés ; with_timing = 0 : timing et durée non
-// comparés ; with_special = 0 : special non comparé ; with_power, with_dice, with_resistance = 0 :
-// puissance, dés, résistance à la dissipation non comparés ; with_probability = 0 : probabilités non
-// comparées. L'ancien moteur compare parameter2 tel
-// que lu, avant que la prise en charge d'un opcode n'y range un mode (191, 233 : la statistique
-// visée y disparaît).
-DEFINE_PATCH_FUNCTION ad_fx_signature
-	INT_VAR
-		fx_id = 0
-		with_parameter1 = 1
-		with_parameter2 = 1
-		with_save = 1
-		with_timing = 1
-		with_special = 1
-		with_power = 1
-		with_dice = 1
-		with_resistance = 1
-		with_probability = 1
-	RET
-		signature
-BEGIN
-	SET sig_power        = with_power ? $fx_power(~%fx_id%~) : 0
-	SET sig_parameter1   = with_parameter1 ? $fx_parameter1(~%fx_id%~) : 0
-	SET sig_parameter2   = with_parameter2 ? $fx_parameter2_raw(~%fx_id%~) : 0
-	SET sig_timing       = with_timing ? $fx_timing(~%fx_id%~) : 0
-	SET sig_resistance   = with_save AND with_resistance ? $fx_resistance(~%fx_id%~) : 0
-	SET sig_duration     = with_timing ? $fx_duration(~%fx_id%~) : 0
-	SET sig_probability1 = with_probability ? $fx_probability1(~%fx_id%~) : 0
-	SET sig_probability2 = with_probability ? $fx_probability2(~%fx_id%~) : 0
-	SET sig_dice_count   = with_dice ? $fx_dice_count(~%fx_id%~) : 0
-	SET sig_dice_sides   = with_dice ? $fx_dice_sides(~%fx_id%~) : 0
-	SET sig_save_type    = with_save ? $fx_save_type(~%fx_id%~) : 0
-	SET sig_save_bonus   = with_save ? $fx_save_bonus(~%fx_id%~) : 0
-	SET sig_special      = with_special ? $fx_special(~%fx_id%~) : 0
-	SET sig_target       = $fx_group_target(~%fx_id%~)
-	SET sig_external     = $fx_external(~%fx_id%~)
-	SPRINT sig_scope $fx_scope(~%fx_id%~)
-	SPRINT signature ~%sig_scope% %sig_target% %sig_power% %sig_parameter1% %sig_parameter2% %sig_timing% %sig_resistance% %sig_duration% %sig_probability1% %sig_probability2% %sig_dice_count% %sig_dice_sides% %sig_save_type% %sig_save_bonus% %sig_special% %sig_external%~
+// fx_same : les effets same_id et same_other ont les champs qui doivent être égaux pour être réunis,
+// comme dans l'ancien moteur : la portée (il regroupe chaque bloc séparément), la cible de
+// regroupement (fx_group_target, new-lib/normalize.tpp), l'origine de l'effet (fx_external : effet
+// d'un EFF, opcode 177), et ceux que same_ignored (bits AD_SAME_*, new-lib/startup.tpa) ne laisse
+// pas de côté : AD_SAME_PARAMETER1, AD_SAME_PARAMETER2, AD_SAME_SAVE (jet de sauvegarde et
+// résistance à la dissipation), AD_SAME_TIMING (timing et durée), AD_SAME_SPECIAL, AD_SAME_POWER,
+// AD_SAME_DICE, AD_SAME_RESISTANCE, AD_SAME_PROBABILITY. L'ancien moteur compare parameter2 tel que
+// lu, avant que la prise en charge d'un opcode n'y range un mode (191, 233 : la statistique visée
+// y disparaît). Macro, appelée pour des paires d'effets : un LPF y coûterait la copie de toutes les
+// variables, magasin d'effets compris ; AND n'évalue pas son second terme si le premier est faux.
+DEFINE_PATCH_MACRO ad_fx_same_fields BEGIN
+	SET fx_same = $fx_group_target(~%same_id%~) == $fx_group_target(~%same_other%~)
+		AND $fx_external(~%same_id%~) == $fx_external(~%same_other%~)
+		AND ((same_ignored BAND AD_SAME_PARAMETER1) != 0 OR $fx_parameter1(~%same_id%~) == $fx_parameter1(~%same_other%~))
+		AND ((same_ignored BAND AD_SAME_PARAMETER2) != 0 OR $fx_parameter2_raw(~%same_id%~) == $fx_parameter2_raw(~%same_other%~))
+		AND ((same_ignored BAND AD_SAME_TIMING) != 0 OR ($fx_timing(~%same_id%~) == $fx_timing(~%same_other%~)
+			AND $fx_duration(~%same_id%~) == $fx_duration(~%same_other%~)))
+		AND ((same_ignored BAND AD_SAME_POWER) != 0 OR $fx_power(~%same_id%~) == $fx_power(~%same_other%~))
+		AND ((same_ignored BAND (AD_SAME_SAVE BOR AD_SAME_RESISTANCE)) != 0 OR $fx_resistance(~%same_id%~) == $fx_resistance(~%same_other%~))
+		AND ((same_ignored BAND AD_SAME_PROBABILITY) != 0 OR ($fx_probability1(~%same_id%~) == $fx_probability1(~%same_other%~)
+			AND $fx_probability2(~%same_id%~) == $fx_probability2(~%same_other%~)))
+		AND ((same_ignored BAND AD_SAME_DICE) != 0 OR ($fx_dice_count(~%same_id%~) == $fx_dice_count(~%same_other%~)
+			AND $fx_dice_sides(~%same_id%~) == $fx_dice_sides(~%same_other%~)))
+		AND ((same_ignored BAND AD_SAME_SAVE) != 0 OR ($fx_save_type(~%same_id%~) == $fx_save_type(~%same_other%~)
+			AND $fx_save_bonus(~%same_id%~) == $fx_save_bonus(~%same_other%~)))
+		AND ((same_ignored BAND AD_SAME_SPECIAL) != 0 OR $fx_special(~%same_id%~) == $fx_special(~%same_other%~))
+	PATCH_IF fx_same BEGIN
+		SPRINT same_scope $fx_scope(~%same_id%~)
+		SPRINT same_other_scope $fx_scope(~%same_other%~)
+		SET fx_same = ~%same_scope%~ STRING_EQUAL ~%same_other_scope%~
+	END
 END

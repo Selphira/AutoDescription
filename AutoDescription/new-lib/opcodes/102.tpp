@@ -24,16 +24,18 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:single~ message = ~single spell level without AD_ENABLE_SHRINKAGE~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				LPF ad_fx_signature INT_VAR fx_id = levels_id with_parameter1 = 0 with_parameter2 = 0 RET levels_signature = signature END
+				SET same_id = levels_id
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
 				SPRINT levels_scope $fx_scope(~%levels_id%~)
 				SET levels_mask = 0
 				FOR (levels_other = 0; levels_other < fx_count; ++levels_other) BEGIN
 					SPRINT levels_other_scope $fx_scope(~%levels_other%~)
 					PATCH_IF $fx_opcode(~%levels_other%~) == 102 AND NOT $fx_consumed(~%levels_other%~)
 							AND (~%levels_other_scope%~ STRING_EQUAL ~%levels_scope%~) BEGIN
-						LPF ad_fx_signature INT_VAR fx_id = levels_other with_parameter1 = 0 with_parameter2 = 0 RET levels_other_signature = signature END
+						SET same_other = levels_other
+						LPM ad_fx_same_fields
 						SET levels_other_level = $fx_parameter1(~%levels_other%~)
-						PATCH_IF NOT (~%levels_other_signature%~ STRING_EQUAL ~%levels_signature%~) BEGIN
+						PATCH_IF NOT fx_same BEGIN
 							LPF ad_refusal INT_VAR fx_id = levels_other STR_VAR reason = ~not_implemented:opcode102:group_fields~ message = ~spell level immunities with different fields~ RET render_missing = refusal END
 						END
 						ELSE PATCH_IF levels_other_level >= 1 AND levels_other_level <= 9 BEGIN
