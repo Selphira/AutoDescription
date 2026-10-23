@@ -1,6 +1,7 @@
 // Code commun des modificateurs contre un type de créature (opcodes 178, 179, 344) : valeur
 // contre les créatures de la valeur parameter1 du fichier IDS parameter2 (ad_ids_name,
-// new-lib/resources.tpp) : « TAC0 : +2 contre les lycanthropes ». Valeur : parameter3 d'un effet
+// new-lib/resources.tpp) : « TAC0 : +2 contre les lycanthropes », à la forme « cible » « Augmente de 5
+// le TAC0 de la cible contre les planétaires déchus ». Valeur : parameter3 d'un effet
 // d'un EFF (178, 179), sinon special sur EE (ancien opcode_178_common) ; special pour le 344. Avec
 // AD_ENABLE_SHRINKAGE, les effets d'un même bloc qui ne diffèrent que par parameter1 et parameter2
 // n'en font qu'un (ancien opcode_group_by_target) : noms réunis sans doublon dans l'ordre des effets,
@@ -9,7 +10,7 @@
 
 // Un 178 ou un 179 sans valeur : l'ancien moteur l'écarte (opcode_178_is_valid). Refus : fichier
 // hors de 2-8 et valeur 100 de ea.ids (opcode_idscheck8_is_valid du 344 ; kit.ids non repris) ;
-// valeur sans nom ; formes autres que « soi » certaine (l'ancien moteur n'en a pas pour le 344) ;
+// valeur sans nom ; effet probable ; forme « cible » du 344 (l'ancien moteur n'en a pas) ;
 // effet d'un 177 qui vise lui-même un type de créature (l'ancien moteur remplace alors celui de
 // l'opcode).
 DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
@@ -35,7 +36,8 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			ELSE PATCH_IF ~%versus_name%~ STRING_EQUAL ~~ BEGIN
 				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:ids_name~
 			END
-			ELSE PATCH_IF (versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster) OR $fx_probability(~%versus_id%~) < 100 BEGIN
+			ELSE PATCH_IF (versus_opcode == 344 AND versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
+					OR $fx_probability(~%versus_id%~) < 100 BEGIN
 				SPRINT render_missing ~not_implemented:opcode%versus_opcode%:form~
 			END
 			ELSE PATCH_IF $fx_versus_file(~%versus_id%~) > 0 BEGIN
@@ -104,9 +106,19 @@ DEFINE_PATCH_MACRO ad_versus_modifier_line BEGIN
 	END
 	LPF ad_join STR_VAR array_name = ~versus_names~ glue = EVAL ~, %the% ~ final_glue = EVAL ~ %and_the% ~ RET targetType = text END
 	SPRINT line_suffix @2002020 // ~contre les %targetType%~
-	LPF ad_tra INT_VAR tra_id = versus_name_tra RET name = text END // ~TAC0~
-	LPF ad_signed_value INT_VAR value = $fx_versus_amount(~%versus_id%~) RET value = text END
-	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 	SET line_fx = versus_id
+	LPM ad_application_form
+	SET versus_amount = $fx_versus_amount(~%versus_id%~)
+	// Forme « cible » (ancien opcode_target) : « Augmente de 5 le TAC0 de la cible contre les X ».
+	PATCH_IF line_form == 1 BEGIN
+		LPF ad_tra INT_VAR tra_id = versus_name_tra + 2 RET theStatistic = text END // ~le TAC0~
+		SET value = ABS versus_amount
+		SET line_phrase = versus_amount >= 0 ? 1210110 : 1210120 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
+	ELSE BEGIN
+		LPF ad_tra INT_VAR tra_id = versus_name_tra RET name = text END // ~TAC0~
+		LPF ad_signed_value INT_VAR value = versus_amount RET value = text END
+		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+	END
 	LPM ad_effect_line
 END

@@ -18,8 +18,10 @@
 // pour un effet écarté, ad_application_drop) ; fx_exception et fx_exception_count (exceptions de
 // cible des opcodes 318 et 324, ad_fx_mark_target_exception, new-lib/opcodes/target_exceptions.tpp) ; fx_not_cumulative (effet lu après un
 // 321 sur la ressource elle-même dans son bloc, ad_fx_mark_not_cumulative, new-lib/opcodes/321.tpp) ; fx_external (1 pour un effet 177
-// remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_versus_file et
-// fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre) ; fx_opcode_count(opcode).
+// remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_probability_in_sub
+// (1 pour un effet dont la probabilité est écrite dans les lignes de son sort, new-lib/recursion.tpp), fx_versus_file et
+// fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre),
+// fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_opcode_count(opcode).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi).
 
 // Tailles fixes des formats ITM V1 et SPL V1 (IESDP) : en-tête étendu 0x38 (objet) ou 0x28
@@ -124,21 +126,32 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 END
 
 // Lit fx_block_count effets à partir de l'index fx_block_index de la table d'effets. Une lecture
-// hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant.
+// hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant. Les 177
+// sont lus après les autres effets du bloc : l'ancien moteur (opcode_177_replace) ajoute l'effet de
+// leur EFF en fin de liste, il est donc écrit après les effets du fichier de même opcode.
 DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	SET fx_block_exceptions = 0
 	SET fx_block_not_cumulative = 0
-	FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
-		SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
-		PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
-			SPRINT fx_load_error ~invalid_effect~
+	FOR (fx_pass = 0; fx_pass < 2; ++fx_pass) BEGIN
+		FOR (fx_p = 0; fx_p < fx_block_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_p) BEGIN
+			LPM ad_fx_load_block_effect
 		END
-		ELSE BEGIN
+	END
+END
+
+DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
+	SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
+	PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
+		SPRINT fx_load_error ~invalid_effect~
+	END
+	ELSE BEGIN
+		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
+		PATCH_IF (fx_pass_opcode == 177) == (fx_pass == 1) BEGIN
 			SET fx_id = fx_count
 			SPRINT $fx_block(~%fx_id%~) ~%fx_block_kind%~
 			SET $fx_header(~%fx_id%~)   = fx_block_header
 			SET $fx_position(~%fx_id%~) = fx_p
-			READ_SHORT (fx_offset + FX_opcode)       $fx_opcode(~%fx_id%~)
+			SET $fx_opcode(~%fx_id%~)   = fx_pass_opcode
 			READ_BYTE  (fx_offset + FX_target)       $fx_target(~%fx_id%~)
 			READ_BYTE  (fx_offset + FX_power)        $fx_power(~%fx_id%~)
 			READ_LONG  (fx_offset + FX_parameter1)   $fx_parameter1(~%fx_id%~)
@@ -162,14 +175,32 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	END
 END
 
+// Un effet d'un fichier EFF de l'opcode eff_fields_opcode et du parameter2 eff_fields_parameter2
+// est-il décrit autrement par l'ancien moteur (AD_OPCODES_EFF_FIELDS) ? eff_fields_differ : 1 si oui.
+DEFINE_PATCH_MACRO ad_eff_fields_differ BEGIN
+	SET eff_fields_differ = 0
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EFF_FIELDS(~%eff_fields_opcode%~) BEGIN
+		SPRINT eff_fields_mode $AD_OPCODES_EFF_FIELDS(~%eff_fields_opcode%~)
+		PATCH_IF ~%eff_fields_mode%~ STRING_EQUAL ~ALL~ BEGIN
+			SET eff_fields_differ = 1
+		END
+		ELSE BEGIN
+			SET eff_fields_differ = eff_fields_mode == eff_fields_parameter2
+		END
+	END
+END
+
 // Fin de la lecture de l'effet fx_id, dont les champs bruts sont lus (fx_external et fx_parameter3
 // compris) : remplacement d'un 177 ou d'un 111, valeurs normalisées, marques des passes, compte de
 // l'opcode.
 DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_versus_file(~%fx_id%~) = 0
 	SET $fx_versus_value(~%fx_id%~) = 0
+	SET $fx_versus_inner_file(~%fx_id%~) = 0
+	SET $fx_versus_inner_value(~%fx_id%~) = 0
 	SET $fx_identical_anchor(~%fx_id%~) = fx_id
 	SET $fx_from_111(~%fx_id%~) = 0
+	SET $fx_probability_in_sub(~%fx_id%~) = 0
 	PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
 		LPM ad_fx_substitute_177
 	END

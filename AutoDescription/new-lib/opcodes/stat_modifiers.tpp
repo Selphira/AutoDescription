@@ -37,7 +37,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			LPM ad_stat_modifier_subject
 			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
 			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
-			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value%~
+			SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
+			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
+			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
 			SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
 		END
 	END
@@ -49,7 +51,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			LPM ad_stat_modifier_subject
 			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
 			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
-			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value%~
+			SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
+			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
+			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				SPRINT render_missing ~not_implemented:opcode%stat_opcode%:mode3~
 			END

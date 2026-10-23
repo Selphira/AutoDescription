@@ -90,21 +90,22 @@ END
 
 // Opcodes que l'ancien moteur décrit autrement pour un effet d'un fichier EFF (isExternal : champs
 // propres au format EFF, comme parameter3 ou resource2) : un effet 177 vers l'un d'eux n'est pas
-// remplacé (new-lib/opcodes/177.tpp). Les opcodes non décrits sont listés pour leur prise en charge.
+// remplacé (new-lib/opcodes/177.tpp, ad_eff_fields_differ). Valeur : parameter2 concerné, ou ALL pour
+// tout effet de l'opcode. Les opcodes non décrits sont listés pour leur prise en charge.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
-	1   => 1 // attaques par round, mode 3
-	15  => 1 // dextérité, mode 3
-	25  => 1 // poison, types 4 et parameter4
-	122 => 1 // objet créé, resource2 sur EE
-	127 => 1 // invocation de monstres, dés
-	344 => 1 // enchantement, parameter3 et parameter4
-	232 => 1
-	248 => 1
-	272 => 1
-	301 => 1
-	331 => 1
-	341 => 1
-	345 => 1
+	1   => 3   // attaques par round, mode 3
+	15  => 3   // dextérité, mode 3
+	25  => ALL // poison, types 4 et parameter4
+	122 => ALL // objet créé, resource2 sur EE
+	127 => ALL // invocation de monstres, dés
+	344 => ALL // enchantement, parameter3 et parameter4
+	232 => ALL
+	248 => ALL
+	272 => ALL
+	301 => ALL
+	331 => ALL
+	341 => ALL
+	345 => ALL
 END
 
 // Opcodes dont l'ancien moteur écrit autrement les lignes quand versus est fixé (sous-effets d'un sort
@@ -152,6 +153,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
 	42  => 1 // emplacements de sorts profanes
 	62  => 1 // emplacements de sorts divins
 	145 => 1 // lancement de sorts désactivé
+END
+
+// Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien
+// baseProbability : « Lorsque le porteur est touché ; 6 % de chances d'immuniser… »
+// (new-lib/recursion.tpp).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_SUB_PROBABILITY BEGIN
+	232 => 1 // sort lancé sous une condition
 END
 
 // Types de jet de sauvegarde d'un effet (bits 0-4, IESDP) => opcode dont le libellé 2OOO0000 les
@@ -408,6 +416,25 @@ ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
 			SPRINT $AD_SPLPROT_STAT(~%ad_row%~) ~%ad_stat%~
 			SPRINT $AD_SPLPROT_VALUE(~%ad_row%~) ~%ad_value%~
 			SPRINT $AD_SPLPROT_RELATION(~%ad_row%~) ~%ad_relation%~
+		END
+END
+
+// Noms des kits du jeu (EE, kitlist.2da, ancien tableau kits) : $AD_KIT_NAMES(valeur de kit.ids) =
+// nom de la colonne MIXED, au singulier (« Archer »).
+ACTION_IF IS_EE AND FILE_EXISTS_IN_GAME ~kitlist.2da~ BEGIN
+	COPY_EXISTING - ~kitlist.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_kitlist 10
+		FOR (ad_row = 0; ad_row < ad_kitlist; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_kitlist ad_row 3 ad_kit_strref
+			READ_2DA_ENTRY_FORMER ad_kitlist ad_row 9 ad_kit_ids
+			// 4294967296 : pas de nom (texte de la table, comparé comme l'ancien moteur).
+			PATCH_IF IS_AN_INT ad_kit_strref AND IS_AN_INT ad_kit_ids AND NOT (~%ad_kit_strref%~ STRING_EQUAL ~4294967296~) BEGIN
+				PATCH_IF ad_kit_strref > 0 BEGIN
+					SET ad_kit_value = ad_kit_ids
+					GET_STRREF ad_kit_strref ad_kit_name
+					SPRINT $AD_KIT_NAMES(~%ad_kit_value%~) ~%ad_kit_name%~
+				END
+			END
 		END
 END
 

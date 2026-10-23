@@ -2936,6 +2936,8 @@
 // Opcode 177: Use EFF File [177]
 
 @11770001 = ~only for %targetType%~
+@11770002 = ~only for the %targetType% kit~
+@11770003 = ~only for the %targetType% kits~
 @11770100 = ~single and multiclassed mages~
 @11770101 = ~single and multiclassed thieves~
 @11770200 = ~the~
@@ -2944,6 +2946,8 @@
 @11770203 = ~and of~
 @11770204 = ~to~
 @11770205 = ~and to~
+@11770206 = ~and~
+@11770210 = ~%outerType% that are also %innerType%~
 
 // Opcode 178: Effect: THAC0 vs. Creature Type Modifier [178]
 

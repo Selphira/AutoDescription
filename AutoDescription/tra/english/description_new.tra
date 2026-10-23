@@ -100,11 +100,15 @@
 @2002003 = ~and of~ // reprise de @11770203
 @2002004 = ~to~ // reprise de @11770204
 @2002005 = ~and to~ // reprise de @11770205
+@2002006 = ~and~ // reprise de @11770206
 @2002010 = ~the %targetType%~ // reprise de @102384
 @2002011 = ~of the %targetType%~ // reprise de @102385
 @2002012 = ~to the %targetType%~ // reprise de @102386
 @2002020 = ~vs. %targetType%~ // reprise de @102387
 @2002030 = ~only for %targetType%~ // reprise de @11770001
+@2002031 = ~only for the %targetType% kit~ // reprise de @11770002
+@2002032 = ~only for the %targetType% kits~ // reprise de @11770003
+@2002040 = ~%outerType% that are also %innerType%~ // reprise de @11770210
 
 // Restriction de niveau de la cible (ancien add_target_level) : 0 un niveau, 1 au plus, 2 au moins, 3 de… à… (2 003 000-2 003 009)
 @2003000 = ~%target% (of level %levelMin%)~ // reprise de @101186
@@ -2063,11 +2067,13 @@
 @21750102 = ~to hold %theTarget%~ // reprise de @11090004
 @21750103 = ~to hold %theTarget%~ // reprise de @11090004
 
-// Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique (21 780 000-21 780 999)
+// Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique, 0002 libellé de la forme « cible » (21 780 000-21 780 999)
 @21780000 = ~THAC0~ // reprise de @10540001
+@21780002 = ~the THAC0~ // reprise de @10540002
 
-// Opcode 179 : Dégâts contre un type de créature : 0000 nom de la statistique (21 790 000-21 790 999)
+// Opcode 179 : Dégâts contre un type de créature : 0000 nom de la statistique, 0002 libellé de la forme « cible » (21 790 000-21 790 999)
 @21790000 = ~Damage~ // reprise de @10730001
+@21790002 = ~the damage~ // reprise de @10730002
 
 // Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
 @21800100 = ~Unique : Only one copy can be equipped~ // reprise de @11800001

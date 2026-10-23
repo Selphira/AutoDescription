@@ -36,7 +36,8 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 					SET drop_id = app_id
 					LPM ad_application_drop
 				END
-				ELSE PATCH_IF NOT app_equipped_timing OR $fx_probability(~%app_id%~) != 100 BEGIN
+				ELSE PATCH_IF NOT app_equipped_timing
+						OR ($fx_probability(~%app_id%~) != 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%render_opcode%~)) BEGIN
 					SPRINT render_missing ~not_implemented:opcode%render_opcode%:effect_kind~
 				END
 			END
@@ -489,9 +490,12 @@ END
 // (render_late_missing) : effet réuni à un effet sans type de créature (l'ancien moteur l'écrirait
 // pour les deux) ; valeur sans nom ; classes que l'ancien moteur réunit sous un seul nom (mages,
 // voleurs, monoclassés et multiclassés) ; cible d'une zone (l'ancien moteur y écrit la zone, comme
-// BUG-032) ; restriction de niveau.
+// BUG-032) ; restriction de niveau. Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
+// garde ses chaînes et la ligne finit par « uniquement pour le kit Archer » (« … les kits Bretteur et
+// Maître-lames ») ; refusé à une autre forme que « soi » ou avec un autre type de créature.
 DEFINE_PATCH_MACRO ad_application_versus BEGIN
 	SET app_versus_count = 0
+	SET app_versus_kits = 0
 	SET app_versus_plain = 0
 	SET app_versus_mages = 0
 	SET app_versus_thieves = 0
@@ -505,6 +509,20 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			END
 			ELSE BEGIN
 				LPF ad_ids_name INT_VAR ids_file = app_versus_file entry = app_versus_value RET app_versus_name = name END
+				PATCH_IF app_versus_file == 9 AND VARIABLE_IS_SET $AD_KIT_NAMES(~%app_versus_value%~) BEGIN
+					SPRINT app_versus_name $AD_KIT_NAMES(~%app_versus_value%~)
+					SET app_versus_kits += 1
+				END
+				// Type d'un 177 imbriqué : il restreint le premier (« démons qui sont aussi des diablotins »).
+				SET app_versus_inner_file = $fx_versus_inner_file(~%app_member%~)
+				PATCH_IF app_versus_inner_file > 0 AND NOT (~%app_versus_name%~ STRING_EQUAL ~~) BEGIN
+					LPF ad_ids_name INT_VAR ids_file = app_versus_inner_file entry = $fx_versus_inner_value(~%app_member%~) RET innerType = name END
+					SPRINT outerType ~%app_versus_name%~
+					SPRINT app_versus_name ~~
+					PATCH_IF NOT (~%innerType%~ STRING_EQUAL ~~) BEGIN
+						SPRINT app_versus_name @2002040 // ~%outerType% qui sont aussi des %innerType%~
+					END
+				END
 				PATCH_IF ~%app_versus_name%~ STRING_EQUAL ~~ BEGIN
 					SPRINT render_late_missing ~not_implemented:versus:ids_name~
 				END
@@ -541,6 +559,24 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 		END
 		ELSE PATCH_IF $fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1 BEGIN
 			SPRINT render_late_missing ~not_implemented:versus:level~
+		END
+		ELSE PATCH_IF app_versus_kits > 0 BEGIN
+			PATCH_IF app_versus_kits < app_versus_count BEGIN
+				SPRINT render_late_missing ~not_implemented:versus:kit_mixed~
+			END
+			ELSE PATCH_IF line_form != 0 BEGIN
+				SPRINT render_late_missing ~not_implemented:versus:kit_form~
+			END
+			ELSE BEGIN
+				SPRINT app_versus_and @2002006 // ~et~
+				LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = ~, ~ final_glue = EVAL ~ %app_versus_and% ~ RET targetType = text END
+				SET app_versus_distinct = 0
+				PHP_EACH app_versus_names AS app_versus_key => app_versus_text BEGIN
+					SET app_versus_distinct += 1
+				END
+				SET app_versus_kit_tra = app_versus_distinct == 1 ? 2002031 : 2002032
+				LPF ad_tra INT_VAR tra_id = app_versus_kit_tra RET line_only_for = text END // ~uniquement pour le kit %targetType%~
+			END
 		END
 		ELSE BEGIN
 			SPRINT app_versus_the    @2002000 // ~les~
@@ -642,6 +678,12 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).
 	SET app_saved_sort = line_sort
 	SET app_probability = $fx_probability(~%line_fx%~)
+	// Probabilité déjà écrite dans les lignes du sort lancé (AD_OPCODES_SUB_PROBABILITY) : seul le
+	// rang de la ligne en dépend.
+	PATCH_IF $fx_probability_in_sub(~%line_fx%~) BEGIN
+		SET line_sort += (100 - app_probability) * 10000
+		SET app_probability = 100
+	END
 	PATCH_IF app_probability < 100 BEGIN
 		SPRINT line_core ~%line_text%~
 		SET value = app_probability

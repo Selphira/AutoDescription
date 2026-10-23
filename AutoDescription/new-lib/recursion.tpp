@@ -86,8 +86,8 @@ END
 // (sort décrit hors de la limite de profondeur, et ses propres sous-sorts comme ceux d'un premier
 // sous-sort : ancien appel sans recursivity, opcode 326). Au-delà de la
 // profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
-// effet probable (l'ancien moteur multiplie les probabilités et retire « N % de chances » des
-// sous-lignes) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
+// effet probable, sauf pour un opcode de AD_OPCODES_SUB_PROBABILITY, dont la probabilité passe aux
+// sous-effets (ctx_base_probability) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
 // effet d'un 177 contre un type de créature ; sort déjà décrit par la ressource (recursion_repeated) ;
 // cible sans chaînes ; refus de la sous-description.
 DEFINE_PATCH_MACRO ad_recursion_support BEGIN
@@ -95,7 +95,8 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SPRINT $fx_sub_text(~%recursion_fx%~) ~~
 	LPM ad_recursion_allowed
 	PATCH_IF recursion_allowed BEGIN
-		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 BEGIN
+		SET recursion_opcode = $fx_opcode(~%recursion_fx%~)
+		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) BEGIN
 			SPRINT render_missing ~not_implemented:recursion:probability~
 		END
 		ELSE PATCH_IF $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~) BEGIN
@@ -140,6 +141,9 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 						ctx_force_target = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
 						ctx_ignore_duration = recursion_hide
 						ctx_versus_set = recursion_versus_set
+						ctx_base_probability = $fx_probability(~%recursion_fx%~)
+						ctx_base_low = $fx_probability_low(~%recursion_fx%~)
+						ctx_base_high = $fx_probability_high(~%recursion_fx%~)
 					STR_VAR
 						resref = ~%recursion_resref%~
 						kind = ~%recursion_kind%~
@@ -158,6 +162,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
 				SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
 				SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
+				SET $fx_probability_in_sub(~%recursion_fx%~) = $fx_probability(~%recursion_fx%~) < 100
 			END
 		END
 	END
@@ -198,6 +203,9 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_parent_dice = 0
 		ctx_dice_count = 0
 		ctx_dice_sides = 0
+		ctx_base_probability = 100
+		ctx_base_low = 0
+		ctx_base_high = 99
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -235,11 +243,30 @@ BEGIN
 			LPM ad_recursion_load_spell
 		END
 	END
+	PATCH_IF ~%sub_missing%~ STRING_EQUAL ~~ AND sub_header >= 0 AND ctx_base_probability < 100 BEGIN
+		LPM ad_recursion_base_probability
+	END
 	PATCH_IF ~%sub_missing%~ STRING_EQUAL ~~ AND sub_header >= 0 BEGIN
 		LPM ad_recursion_area
 	END
 	PATCH_IF ~%sub_missing%~ STRING_EQUAL ~~ AND sub_header >= 0 BEGIN
 		LPM ad_recursion_render
+	END
+END
+
+// Probabilité du parent (ctx_base_probability, sa plage ctx_base_low-ctx_base_high) donnée aux
+// sous-effets certains : l'ancien moteur la multiplie par la leur (baseProbability). Refus : sous-effet
+// probable (l'ancien moteur garde alors sa plage pour le regroupement, mais écrit le produit).
+DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
+	FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
+		PATCH_IF $fx_probability(~%sub_fx%~) < 100 BEGIN
+			SPRINT sub_missing ~not_implemented:recursion:probability_product~
+		END
+		ELSE BEGIN
+			SET $fx_probability(~%sub_fx%~) = ctx_base_probability
+			SET $fx_probability_low(~%sub_fx%~) = ctx_base_low
+			SET $fx_probability_high(~%sub_fx%~) = ctx_base_high
+		END
 	END
 END
 
@@ -363,7 +390,10 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		END
 		LPM ad_fx_add_effect
 		SET sub_opcode = $fx_opcode(~0~)
-		PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EFF_FIELDS(~%sub_opcode%~) BEGIN
+		SET eff_fields_opcode = sub_opcode
+		SET eff_fields_parameter2 = $fx_parameter2_raw(~0~)
+		LPM ad_eff_fields_differ
+		PATCH_IF eff_fields_differ BEGIN
 			SPRINT sub_missing ~not_implemented:recursion:eff_fields~
 		END
 		ELSE PATCH_IF sub_level_min != 0 OR sub_level_max != 0 BEGIN
@@ -480,15 +510,34 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 		SPRINT render_missing ~%render_late_missing%~
 	END
+	// Lignes probables d'un sort : regroupées par plage comme celles des capacités de combat (ancien
+	// group_probability_effects, appelé aussi pour un sous-sort). Sous la probabilité du parent, une
+	// seule ligne est reprise.
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%kind%~ STRING_EQUAL ~spl~ BEGIN
+		SET sub_probable = 0
+		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
+			PATCH_IF $line_probability(~%sub_line%~) > 0 BEGIN
+				SET sub_probable = 1
+			END
+		END
+		PATCH_IF sub_probable AND ctx_base_probability < 100 BEGIN
+			PATCH_IF line_count > 1 BEGIN
+				SPRINT render_missing ~not_implemented:probability_lines~
+			END
+		END
+		ELSE PATCH_IF sub_probable BEGIN
+			SPRINT prob_section ~ability%sub_header%~
+			LPM ad_lines_probability_groups
+			SPRINT render_missing ~%render_late_missing%~
+		END
+	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_lines_section_text STR_VAR section = EVAL ~ability%sub_header%~ RET sub_text = text sub_count = count END
-		PATCH_IF sub_count != line_count BEGIN
-			SPRINT render_missing ~not_implemented:section~
-		END
-		// Effet d'un EFF : une seule ligne, sans regroupement par probabilité.
-		FOR (sub_line = 0; sub_line < line_count AND ~%kind%~ STRING_EQUAL ~spl~; ++sub_line) BEGIN
-			PATCH_IF $line_probability(~%sub_line%~) > 0 BEGIN
-				SPRINT render_missing ~not_implemented:probability~
+		// Toute ligne est dans la section de l'en-tête (les lignes probables regroupées en sont retirées).
+		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
+			SPRINT sub_line_section $line_section(~%sub_line%~)
+			PATCH_IF NOT (~%sub_line_section%~ STRING_EQUAL ~~) AND NOT (~%sub_line_section%~ STRING_EQUAL ~ability%sub_header%~) BEGIN
+				SPRINT render_missing ~not_implemented:section~
 			END
 		END
 		// L'ancien moteur retire la puce de la première ligne, qui prend la place de la ligne parente.
