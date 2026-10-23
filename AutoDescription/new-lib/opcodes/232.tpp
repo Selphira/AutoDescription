@@ -7,12 +7,14 @@
 // écrivent même sous une zone de projectile (ctx_versus) ;
 // un sort nommé dont les effets donnent plusieurs lignes est cité par son nom.
 
-// Refus : effet d'un EFF (l'ancien moteur y lit aussi resource2 et resource3) ; valeurs que l'ancien
+// Refus : effet d'un EFF (l'ancien moteur y lit aussi resource2 et resource3), sauf pour l'en-tête
+// d'un sort seul, qui ne dépend ni de la condition ni du sous-sort ; valeurs que l'ancien
 // opcode_232_is_valid écarte (cible hors de 0-3, condition hors de 0-21, ou de 0-11 sur un jeu
 // classique, moment de la journée sur une autre cible que le porteur, condition 10 sans special,
-// ressource vide) ; effet d'un sous-sort (l'ancien moteur n'y limite pas la profondeur) ; condition
-// d'un état (5, 6, 15) ; condition de distance trop courte, moment de la journée ou état de sort sans
-// nom ; plusieurs lignes d'un sort sans nom sous une condition vide ; refus de ad_recursion_support.
+// ressource vide, ainsi que resource2 et resource3 pour un effet d'un EFF) ; effet d'un sous-sort
+// (l'ancien moteur n'y limite pas la profondeur) ; condition d'un état (5, 6, 15) ; condition de
+// distance trop courte, moment de la journée ou état de sort sans nom ; plusieurs lignes d'un sort
+// sans nom sous une condition vide ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 	PHP_EACH fx_ids_232 AS _ => condition_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%condition_id%~) BEGIN
@@ -20,13 +22,22 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			SET condition_type = $fx_parameter2(~%condition_id%~)
 			SET condition_special = $fx_special(~%condition_id%~)
 			SPRINT condition_resref $fx_resource_lower(~%condition_id%~)
-			PATCH_IF $fx_external(~%condition_id%~) BEGIN
+			SET condition_external = $fx_external(~%condition_id%~)
+			SET condition_no_resource = ~%condition_resref%~ STRING_EQUAL ~~
+			PATCH_IF condition_external AND condition_no_resource BEGIN
+				SPRINT condition_resref2 $fx_resource2(~%condition_id%~)
+				SPRINT condition_resref3 $fx_resource3(~%condition_id%~)
+				SET condition_no_resource = ~%condition_resref2%~ STRING_EQUAL ~~ AND ~%condition_resref3%~ STRING_EQUAL ~~
+			END
+			PATCH_IF condition_external AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF condition_target < 0 OR condition_target > 3 OR condition_type < 0 OR condition_type > (IS_EE ? 21 : 11)
 					OR (condition_type == 13 AND condition_target != 0) OR (condition_type == 10 AND condition_special == 0)
-					OR ~%condition_resref%~ STRING_EQUAL ~~ BEGIN
+					OR condition_no_resource BEGIN
 				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:invalid~ message = ~invalid target (%condition_target%, expected 0-3), condition (%condition_type%, expected 0-21, 0-11 on classic games) or resource~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF support_header_only BEGIN
 			END
 			ELSE PATCH_IF ctx_depth > 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:recursion:nested_condition~ message = ~condition in a spell already cast by another effect~ RET render_missing = refusal END
@@ -35,7 +46,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				LPM ad_op_232_targets
 				LPM ad_op_232_condition
 			END
-			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%condition_resref%~ RET condition_name = name END
 				SPRINT $fx_spell_name(~%condition_id%~) ~%condition_name%~
 				SET recursion_fx = condition_id

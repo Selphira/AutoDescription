@@ -14,12 +14,26 @@
 // arrondi diffère de l'arrondi au-dessus (BUG-033) ou dont le nom contient une virgule (l'ancien
 // moteur y coupe la liste) ; avec AD_ENABLE_SHRINKAGE, invocations du même bloc qui ne diffèrent que
 // par parameter1 ou leur probabilité (l'ancien opcode_127_group en écrit le nombre « entre 0 et N »).
+// Pour l'en-tête d'un sort seul, seuls comptent l'ancien opcode_127_is_valid, qui écarte l'effet
+// d'une table resource absente, et ces regroupements (ad_op_127_header_group).
 DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
-			PATCH_IF $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~) OR monster_table < 0 OR monster_table > 9 BEGIN
+			SET monster_custom = $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~)
+			PATCH_IF support_header_only BEGIN
+				PATCH_IF monster_custom AND NOT FILE_EXISTS_IN_GAME ~%monster_resref%.2da~ BEGIN
+					SET drop_id = monster_id
+					SPRINT ignored_reason ~file_error:opcode127:no_table~
+					SPRINT ignored_message ~table %monster_resref%.2DA does not exist~
+					LPM ad_application_drop
+				END
+				ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND NOT monster_custom AND NOT $fx_consumed(~%monster_id%~) BEGIN
+					LPM ad_op_127_header_group
+				END
+			END
+			ELSE PATCH_IF $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~) OR monster_table < 0 OR monster_table > 9 BEGIN
 				PATCH_IF (monster_table < 0 OR monster_table > 9) AND $fx_special(~%monster_id%~) == 0 AND ~%monster_resref%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:table~ message = ~monster table %monster_table% (expected 0-9)~ RET render_missing = refusal END
 				END
@@ -126,6 +140,24 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 	ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
 		SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
 	END
+END
+
+// L'ancien opcode_127_group remplace les invocations semblables à monster_id par un seul effet, de
+// ses champs, ajouté après les autres effets 127.
+DEFINE_PATCH_MACRO ad_op_127_header_group BEGIN
+	SET same_id = monster_id
+	SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
+	PHP_EACH fx_ids_127 AS _ => monster_other BEGIN
+		PATCH_IF monster_other != monster_id AND NOT $fx_consumed(~%monster_other%~) BEGIN
+			SET same_other = monster_other
+			LPM ad_fx_same_fields
+			PATCH_IF fx_same BEGIN
+				SET $fx_consumed(~%monster_other%~) = 1
+				SET $fx_late(~%monster_id%~) = 1
+			END
+		END
+	END
+	SET same_ignored = 0
 END
 
 DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN

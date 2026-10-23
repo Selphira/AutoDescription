@@ -5,15 +5,19 @@
 // ne concernent pas un effet d'objet. Phrase : 0100 un point, 0110 plusieurs (+ forme), fréquence
 // dans %strDuration%.
 
-// Ancien opcode_25_is_valid, et effets sans dégât ni soin, que l'ancien moteur n'écrit pas.
+// Ancien opcode_25_is_valid, et effets sans dégât ni soin, que l'ancien moteur n'écrit pas. Le type 4
+// d'un fichier EFF, que l'ancien moteur garde, ne compte que pour l'en-tête d'un sort seul.
 DEFINE_PATCH_MACRO ad_hp_over_time_support BEGIN
 	PHP_EACH ~fx_ids_%hp_opcode%~ AS _ => hp_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET hp_timing = $fx_timing(~%hp_id%~)
 			LPM ad_hp_over_time_value
+			SET hp_eff_type = $fx_external(~%hp_id%~) AND $fx_parameter2(~%hp_id%~) == 4
 			PATCH_IF (hp_timing == TIMING_permanent OR hp_timing == TIMING_delayed OR hp_timing == 7
 					OR hp_timing == TIMING_permanent_after_death) AND $fx_duration(~%hp_id%~) == 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode%hp_opcode%:timing~ message = ~effect over time with a permanent or delayed timing and no duration~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF hp_eff_type AND support_header_only BEGIN
 			END
 			ELSE PATCH_IF $fx_parameter2(~%hp_id%~) < 0 OR $fx_parameter2(~%hp_id%~) > 3 BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode%hp_opcode%:invalid~ message = ~frequency type (parameter2) outside 0-3~ RET render_missing = refusal END

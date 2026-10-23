@@ -13,7 +13,8 @@ DEFINE_PATCH_FUNCTION ad_describe_spell
 BEGIN
 	SPRINT description ~~
 	SET covered = 0
-	SET support_header_only = 0
+	// Fixé dès la lecture des effets : le remplacement d'un 177 en dépend (ad_fx_substitute_177).
+	SET support_header_only = NOT AD_ADD_STATISTICS_SECTION_TO_SPELL_DESCRIPTION
 	SET group_spell_as_equipped = 1
 	// Un sort n'a pas de type d'objet (prises en charge partagées avec les objets).
 	SET item_type = 0 - 1

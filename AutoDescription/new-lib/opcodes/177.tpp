@@ -19,7 +19,8 @@
 // (fx_substitution_error, expliquée en anglais pour les journaux dans fx_substitution_message) : drop pour un effet que l'ancien moteur écarte sans rien écrire
 // (opcode_177_is_valid : fichier IDS hors de 2-9, 2-8 sur un jeu classique, valeur 100 de ea.ids,
 // EFF absent) ; EFF d'un autre format ; refus de ad_fx_substitute_nested ; opcode de l'EFF que l'ancien moteur décrit autrement pour un
-// effet externe (AD_OPCODES_EFF_FIELDS) ; niveaux minimum et maximum de l'EFF (l'ancien moteur lit
+// effet externe (AD_OPCODES_EFF_FIELDS), sauf pour l'en-tête d'un sort seul (support_header_only),
+// qui ne lit que les champs communs ; niveaux minimum et maximum de l'EFF (l'ancien moteur lit
 // ceux du dernier EFF lu) ; probabilités incertaines des deux côtés (l'ancien moteur multiplie l'une
 // et garde les bornes de l'autre).
 DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
@@ -60,7 +61,7 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 		SET eff_fields_opcode = substitute_opcode
 		SET eff_fields_parameter2 = substitute_parameter2
 		LPM ad_eff_fields_differ
-		PATCH_IF eff_fields_differ BEGIN
+		PATCH_IF eff_fields_differ AND NOT support_header_only BEGIN
 			SPRINT $fx_substitution_error(~%fx_id%~) ~eff_fields~
 			SPRINT $fx_substitution_message(~%fx_id%~) ~opcode %substitute_opcode% of %substitute_resref%.EFF, which the old engine describes differently~
 		END
