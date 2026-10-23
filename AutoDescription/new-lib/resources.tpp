@@ -30,7 +30,9 @@ END
 // zone, 0 - 1 fichier illisible) ; area_creatures 0 toutes, 1 hostiles, 2 drapeaux « hostiles » et
 // « alliées » ensemble (bits 6 et 7) ; area_feet rayon en pieds ; area_angle arc du cône ; area_cone
 // forme de cône (bit 11, rayon s'il n'a pas d'arc) ; area_ignore_target : le projectile ne touche pas
-// sa cible (bit 4 des drapeaux d'étincelles).
+// sa cible (bit 4 des drapeaux d'étincelles) ; area_size, area_delay, area_triggers : taille de la
+// zone, délai entre deux explosions (100 par round) et nombre d'explosions lus dans le fichier ;
+// area_file_missing : projectl.ids nomme un fichier .pro absent.
 DEFINE_PATCH_FUNCTION ad_projectile_area
 	INT_VAR
 		projectile = 0
@@ -41,6 +43,10 @@ DEFINE_PATCH_FUNCTION ad_projectile_area
 		area_angle
 		area_cone
 		area_ignore_target
+		area_size
+		area_delay
+		area_triggers
+		area_file_missing
 BEGIN
 	SET area_shape = 0
 	SET area_creatures = 0
@@ -48,6 +54,10 @@ BEGIN
 	SET area_angle = 0
 	SET area_cone = 0
 	SET area_ignore_target = 0
+	SET area_size = 0
+	SET area_delay = 0
+	SET area_triggers = 0
+	SET area_file_missing = 0
 	PATCH_IF projectile > 1 BEGIN
 		LOOKUP_IDS_SYMBOL_OF_INT area_file ~projectl~ (projectile - 1)
 		PATCH_IF NOT IS_AN_INT area_file BEGIN
@@ -59,6 +69,8 @@ BEGIN
 						READ_LONG  0xc   area_sparking_flags
 						READ_SHORT 0x206 area_size
 						READ_SHORT 0x224 area_angle
+						READ_SHORT 0x210 area_delay
+						READ_BYTE  0x216 area_triggers
 						SET area_hostile = (area_flags BAND BIT6) != 0
 						SET area_allied = (area_flags BAND BIT7) != 0
 						SET area_creatures = area_hostile AND area_allied ? 2 : (area_hostile ? 1 : 0)
@@ -79,6 +91,9 @@ BEGIN
 						SET area_shape = 0 - 1
 					END
 				END
+			END
+			ELSE BEGIN
+				SET area_file_missing = 1
 			END
 		END
 	END

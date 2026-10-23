@@ -101,7 +101,8 @@ END
 // à id à la lecture, new-lib/effects.tpp) ; l'ancien moteur ne compare pas le type de créature
 // d'un effet d'un 177, qui réunit leurs noms (ad_application_versus, new-lib/application.tpp).
 // identical_left(opcode) : effets de l'opcode qui suivent group_id (au plus : fx_opcode_count compte
-// aussi les 177 remplacés) ; la recherche s'arrête quand il n'en reste plus.
+// aussi les 177 remplacés) ; la recherche s'arrête quand il n'en reste plus, ou à la fin du bloc de
+// group_id (les effets d'un bloc se suivent dans le magasin, et deux portées ne sont jamais réunies).
 DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 	PHP_EACH fx_opcode_count AS identical_opcode => identical_total BEGIN
 		SET $identical_left(~%identical_opcode%~) = identical_total
@@ -115,7 +116,8 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_left > 0 BEGIN
 			SET same_id = group_id
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			FOR (group_candidate = group_id + 1; group_left > 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
+			SET group_header = $fx_header(~%group_id%~)
+			FOR (group_candidate = group_id + 1; group_left > 0 AND group_candidate < fx_count AND $fx_header(~%group_candidate%~) == group_header; ++group_candidate) BEGIN
 				PATCH_IF $fx_opcode(~%group_candidate%~) == group_opcode BEGIN
 					SET group_left -= 1
 					PATCH_IF NOT $fx_consumed(~%group_candidate%~) BEGIN
@@ -240,6 +242,11 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				SPRINT value @1200002 // ~Passe à %value%~
 				SPRINT name @8000036 // ~Force~
 				SPRINT line_section ~equipped~
+				PATCH_IF support_header_only BEGIN
+					SET derived_id = group_id
+					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~EXCEPTIONAL_STRENGTH~)
+					LPM ad_spell_header_derive
+				END
 				SET line_sort = $AD_DERIVED_SORT(~EXCEPTIONAL_STRENGTH~)
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				SET line_fx = group_id
@@ -439,7 +446,9 @@ END
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~)
+		// Dans un sort, l'ancien moteur applique aussi les règles des effets d'équipement (abilityType
+		// négatif, ancien delete_cure_linked_to_specific_immunity).
+		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR group_spell_as_equipped
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
@@ -449,7 +458,7 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 					SET absorb_opcode = $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~)
 					SET absorb_found = 0
 					PHP_EACH ~fx_ids_%absorb_opcode%~ AS _ => absorb_id BEGIN
-						PATCH_IF NOT $fx_consumed(~%absorb_id%~) AND absorb_id != immunity_id BEGIN
+						PATCH_IF NOT $fx_consumed(~%absorb_id%~) AND absorb_id != immunity_id AND $fx_header(~%absorb_id%~) == $fx_header(~%immunity_id%~) BEGIN
 							SET absorb_parameter1 = $fx_parameter1(~%absorb_id%~)
 							LPM ad_immunity_same_fields
 							PATCH_IF absorb_same AND absorb_parameter1 >= $AD_IMMUNITY_ABSORB_P1_MIN(~%absorb_row%~)
@@ -466,9 +475,9 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 					END
 				END
 			END
-			FOR (absorb_id = 0; absorb_id < fx_count; ++absorb_id) BEGIN
-				SET absorb_opcode = $fx_opcode(~%absorb_id%~)
-				PATCH_IF (absorb_opcode == 206 OR absorb_opcode == 321) AND NOT $fx_consumed(~%absorb_id%~) BEGIN
+			// Un autre en-tête est une autre portée (ad_immunity_same_fields), testé d'abord.
+			PATCH_FOR_EACH absorb_opcode IN 206 321 BEGIN PHP_EACH ~fx_ids_%absorb_opcode%~ AS _ => absorb_id BEGIN
+				PATCH_IF NOT $fx_consumed(~%absorb_id%~) AND $fx_header(~%absorb_id%~) == $fx_header(~%immunity_id%~) BEGIN
 					SPRINT absorb_resref $fx_resource(~%absorb_id%~)
 					TO_UPPER absorb_resref
 					LPM ad_immunity_same_fields
@@ -480,7 +489,7 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 						SET $fx_consumed(~%absorb_id%~) = 1
 					END
 				END
-			END
+			END END
 		END
 	END
 END
@@ -688,6 +697,11 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 						END
 					END
 					SPRINT line_section ~equipped~
+					PATCH_IF support_header_only BEGIN
+						SET derived_id = group_id
+						SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~FREE_ACTION~)
+						LPM ad_spell_header_derive
+					END
 					SET line_sort = $AD_DERIVED_SORT(~FREE_ACTION~)
 					SET line_phrase = 30110100 // ~Action libre~
 					SET line_fx = group_id
@@ -752,6 +766,11 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 				SPRINT itemName $fx_item_name(~%group_removal%~)
 				SPRINT itemName2 $fx_item_name(~%group_id%~)
 				SPRINT line_section ~equipped~
+				PATCH_IF support_header_only BEGIN
+					SET derived_id = group_id
+					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~REPLACE_ITEM~)
+					LPM ad_spell_header_derive
+				END
 				SET line_sort = $AD_DERIVED_SORT(~REPLACE_ITEM~)
 				SET line_phrase = 30120100 // ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 				SET line_fx = group_id
@@ -934,6 +953,11 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 				SET line_sort = $AD_DERIVED_SORT(~%group_derived%~)
 				SET group_value = $fx_parameter1(~%group_id%~)
 				SET group_mode = $fx_parameter2(~%group_id%~)
+				PATCH_IF support_header_only BEGIN
+					SET derived_id = group_id
+					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~%group_derived%~)
+					LPM ad_spell_header_derive
+				END
 				LPM ~%group_line%~
 				SET line_fx = group_id
 				LPM ad_effect_line

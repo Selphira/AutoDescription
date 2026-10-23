@@ -32,7 +32,7 @@ DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 				SPRINT polymorph_name @21350000 // ~créature sans nom~
 			END
 			SPRINT $fx_creature_name(~%polymorph_id%~) ~%polymorph_name%~
-			PATCH_IF ~%polymorph_resref%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF ~%polymorph_resref%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = polymorph_id STR_VAR reason = ~not_implemented:opcode135:natural_form~ message = ~polymorph back to natural form~ RET render_missing = refusal END
 			END
 		END

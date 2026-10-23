@@ -9,7 +9,9 @@ DEFINE_PATCH_MACRO ad_op_71_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET gender_mode = $fx_parameter2(~%gender_id%~)
 			PATCH_IF gender_mode == MOD_TYPE_flat BEGIN
-				LPF ad_refusal INT_VAR fx_id = gender_id STR_VAR reason = ~not_implemented:opcode71:gender_set~ message = ~gender set to a given value~ RET render_missing = refusal END
+				PATCH_IF NOT support_header_only BEGIN
+					LPF ad_refusal INT_VAR fx_id = gender_id STR_VAR reason = ~not_implemented:opcode71:gender_set~ message = ~gender set to a given value~ RET render_missing = refusal END
+				END
 			END
 			ELSE PATCH_IF gender_mode != MOD_TYPE_cumulative BEGIN
 				SET drop_id = gender_id

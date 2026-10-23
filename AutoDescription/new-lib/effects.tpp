@@ -27,6 +27,7 @@
 // fx_id), parcouru par PHP_EACH ~fx_ids_%opcode%~ AS _ => id ; un opcode absent n'a pas de tableau
 // et la boucle ne fait rien. Une passe qui change l'opcode d'un effet reconstruit les deux tableaux
 // (ad_fx_index_opcode).
+// Variable lue par ad_fx_load_spell : fx_with_casting (0 : le bloc de lancement n'est pas lu).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi) et
 // fx_load_message (son explication, en anglais, pour les journaux).
 
@@ -138,7 +139,9 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 		READ_SHORT SPL_casting_feature_blocks_count  fx_block_count
 		SPRINT fx_block_kind ~casting~
 		SET fx_block_header = 0 - 1
-		LPM ad_fx_load_block
+		PATCH_IF fx_with_casting BEGIN
+			LPM ad_fx_load_block
+		END
 		FOR (fx_h = 0; fx_h < fx_header_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_h) BEGIN
 			SET fx_header_offset = fx_headers_offset + fx_h * 0x28
 			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x28 > BUFFER_LENGTH BEGIN

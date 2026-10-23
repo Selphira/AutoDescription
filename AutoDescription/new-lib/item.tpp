@@ -12,6 +12,8 @@ DEFINE_PATCH_FUNCTION ad_describe_item
 BEGIN
 	SPRINT description ~~
 	SET covered = 0
+	SET support_header_only = 0
+	SET group_spell_as_equipped = 0
 	LPM ad_recursion_reset
 	LPM ad_fx_load_item
 	PATCH_IF AD_EFFECTS_DUMP BEGIN

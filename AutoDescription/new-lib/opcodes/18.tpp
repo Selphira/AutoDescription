@@ -33,8 +33,9 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 			ELSE PATCH_IF (hp_mode == MOD_TYPE_cumulative AND hp_value == 0) OR (hp_mode == MOD_TYPE_percentage AND hp_value == 100) BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~file_error:opcode18:no_change~ message = ~no change (mode %hp_mode%, value %hp_value%)~ RET render_missing = refusal END
 			END
-			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
-			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) BEGIN
+			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler (leurs lignes seulement :
+			// l'en-tête d'un sort compte les deux).
+			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode18:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN

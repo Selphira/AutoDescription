@@ -14,10 +14,11 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 			PATCH_IF ~%create_resref%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~file_error:opcode%create_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF create_random BEGIN
+			ELSE PATCH_IF create_random AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref%~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF ~%create_name%~ STRING_EQUAL ~~ BEGIN
+			// En-tête d'un sort seul : seul compte un objet absent, que l'ancien moteur écarte.
+			ELSE PATCH_IF ~%create_name%~ STRING_EQUAL ~~ AND (NOT support_header_only OR NOT FILE_EXISTS_IN_GAME ~%create_resref%.itm~) BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%create_resref%.itm~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:no_name~ message = ~item %create_resref%.ITM has no name~ RET render_missing = refusal END
 				END

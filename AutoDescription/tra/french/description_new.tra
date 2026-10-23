@@ -24,6 +24,10 @@
 @1100002 = ~%distance_units%,5 mètre~
 @1100003 = ~%distance_units%,5 mètres~
 
+// Mise en forme : distances en deçà d'un mètre, écrites comme l'ancien feets_to_meters (nombre de décimètres en français, de pieds en anglais) : 1 100 010 + pluriel
+@1100010 = ~%distance_decimeters% mètre~
+@1100011 = ~%distance_decimeters% mètres~
+
 // Mise en forme : valeurs (1 200 000-1 200 099)
 @1200000 = ~%name%%AD_COLON%%value%~ // reprise de @100001
 @1200001 = ~+%value%~ // reprise de @10003
@@ -57,6 +61,7 @@
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
+@1900001 = ~\(Jet de sauvegarde\|Jets de sauvegarde\)+~ // reprise de @10007
 
 // Cibles, 2 000 000 + 10 × cible effective de l'effet + forme (0 sujet, 1 « de… », 2 « à… ») (2 000 000-2 000 099)
 @2000020 = ~la cible~ // reprise de @102471
@@ -124,6 +129,11 @@
 @3000004 = ~%frequency% pendant %strDuration% après %afterStrDuration%~ // reprise de @100316
 @3000005 = ~après %strDuration%~ // reprise de @100310
 
+// Durées : progressions selon le niveau (en-tête des sorts)
+@3000010 = ~%baseValue% + %value% au niveau %level%~ // reprise de @102160
+@3000011 = ~%value% par niveau~ // reprise de @102161
+@3000012 = ~%value% par tranche de %level% niveaux~ // reprise de @102162
+
 // Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
 @3010000 = ~1 seconde~ // reprise de @100300
 @3010001 = ~%amount% secondes~ // reprise de @100301
@@ -180,6 +190,11 @@
 @5000040 = ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~ // reprise de @102123
 @5000042 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~ // reprise de @102124
 @5000050 = ~réduits de moitié~ // reprise de @102125
+@5000061 = ~Sorts~ // reprise de @103001
+@5000062 = ~Souffles~ // reprise de @103002
+@5000064 = ~Paralysie, mort et poisons~ // reprise de @103004
+@5000068 = ~Baguettes, sceptres et bâtons~ // reprise de @103008
+@5000076 = ~Pétrification et métamorphose~ // reprise de @103016
 @5000111 = ~Augmente de %value% %theStatistic% %ofTheTarget%~ // reprise de @102286
 @5000121 = ~Réduit de %value% %theStatistic% %ofTheTarget%~ // reprise de @102285
 @5000151 = ~Immunise %theTarget% %resistName%~ // reprise de @102552
@@ -223,6 +238,56 @@
 @6200001 = ~Poids~ // reprise de @100002
 @6200002 = ~Durée~ // reprise de @100031
 @6200003 = ~Utilisation~ // reprise de @101131
+
+// Sorts : en-tête, libellés et valeurs (7 000 000-7 000 099)
+@7000000 = ~Niveau~ // reprise de @10960001
+@7000001 = ~Portée~ // reprise de @102006
+@7000002 = ~Durée~ // reprise de @100031
+@7000003 = ~Temps d'incantation~ // reprise de @11890001
+@7000004 = ~Zone d'effet~ // reprise de @100035
+@7000005 = ~Jet de sauvegarde~ // reprise de @100036
+@7000006 = ~Dissipation~ // reprise de @100039
+@7000007 = ~Résistance à la magie~ // reprise de @100040
+@7000010 = ~Spécial~ // reprise de @100032
+@7000011 = ~Spéciale~ // reprise de @100033
+@7000012 = ~Contact~ // reprise de @100034
+@7000013 = ~Permanente~ // reprise de @100037
+@7000014 = ~Instantanée~ // reprise de @100038
+@7000015 = ~Affecté~ // reprise de @100041
+@7000016 = ~Non-affecté~ // reprise de @100042
+@7000017 = ~Aucun~ // reprise de @10015
+@7000018 = ~Annule~ // reprise de @10016
+@7000019 = ~1/2~ // reprise de @10017
+@7000020 = ~%saveType% (%savingThrow%)~ // reprise de @103100
+@7000021 = ~%saveType% à %value% (%savingThrow%)~ // reprise de @103101
+@7000030 = ~La zone d'effet peut être dissipée à l'aide d'un sort de Zone d'air pur.~ // reprise de @102128
+@7000031 = ~Le nuage peut être dissipé avec le sort Zone d'air pur.~ // reprise de @102129
+@7000032 = ~Les sorts et capacités affectés sont%AD_COLON%%spellList%~ // reprise de @102130
+@7000040 = ~%deltaRange% par niveau~
+@7000041 = ~%deltaRange% par tranche de %level% niveaux~
+
+// Sorts : zones d'effet, 7 001 000 + 10 × forme + créatures visées (formes : 0 rayon, 1 une créature et rayon, 2 le lanceur et rayon, 3 rayon autour, 4 cône ; créatures : 0 toutes, 1 hostiles, 2 alliées), puis cibles d'en-tête (7 001 000-7 001 199)
+@7001000 = ~Rayon de %range%~ // reprise de @102442
+@7001001 = ~Les créatures hostiles dans un rayon de %range%~ // reprise de @102443
+@7001002 = ~Les créatures alliées dans un rayon de %range%~ // reprise de @102444
+@7001010 = ~1 créature et toute créature dans un rayon de %range%~ // reprise de @102445
+@7001011 = ~1 créature et toute créature hostile dans un rayon de %range%~ // reprise de @102446
+@7001012 = ~1 créature et toute créature alliée dans un rayon de %range%~ // reprise de @102447
+@7001020 = ~Le lanceur et toute créature dans un rayon de %range%~ // reprise de @102448
+@7001021 = ~Le lanceur et toute créature hostile dans un rayon de %range%~ // reprise de @102449
+@7001022 = ~Le lanceur et toute créature alliée dans un rayon de %range%~ // reprise de @102450
+@7001030 = ~Rayon de %range% autour %ofTheTarget%~ // reprise de @102455
+@7001031 = ~Les créatures hostiles dans un rayon de %range% autour %ofTheTarget%~ // reprise de @102456
+@7001032 = ~Les créatures alliées dans un rayon de %range% autour %ofTheTarget%~ // reprise de @102457
+@7001040 = ~Cône de %range% sur un arc de %angle%°~ // reprise de @102458
+@7001041 = ~Les créatures hostiles dans un cône de %range% sur un arc de %angle%°~ // reprise de @102459
+@7001042 = ~Les créatures alliées dans un cône de %range% sur un arc de %angle%°~ // reprise de @102460
+@7001100 = ~Le lanceur~ // reprise de @102467
+@7001101 = ~1 créature~ // reprise de @102466
+@7001102 = ~%countTarget% créatures~ // reprise de @102465
+@7001103 = ~Point dans le champ visuel du lanceur~ // reprise de @102462
+@7001110 = ~du lanceur~ // reprise de @102476
+@7001111 = ~de la cible~ // reprise de @101085
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150
@@ -1004,6 +1069,7 @@
 @8098051 = ~créatures chaotiques mauvaises~ // reprise de @208051
 
 // Noms des types secondaires de sorts, 8 100 000 + valeur de msectype.ids (1-13) (8 100 000-8 100 013)
+@8100000 = ~~ // reprise de @100200
 @8100001 = ~Protection de sort~ // reprise de @100201
 @8100002 = ~Protection spécifique~ // reprise de @100202
 @8100003 = ~Protection illusoire~ // reprise de @100203
@@ -1125,6 +1191,29 @@
 @8120125 = ~le mode histoire~ // reprise de @420125
 @8120126 = ~« Bouclier »~ // reprise de @420126
 @8120250 = ~la maladie~ // reprise de @420250
+
+// Listes : types de sort (en-tête), 8 130 000 + type (6 divin, 7 druidique)
+@8130000 = ~Spécial~ // reprise de @101320
+@8130001 = ~Profane~ // reprise de @101321
+@8130002 = ~Divin/Druidique~ // reprise de @101322
+@8130003 = ~Psionique~ // reprise de @101323
+@8130004 = ~Inné~ // reprise de @101324
+@8130005 = ~Chant~ // reprise de @101325
+@8130006 = ~Divin~ // reprise de @101326
+@8130007 = ~Druidique~ // reprise de @101327
+
+// Listes : écoles de magie, 8 140 000 + école
+@8140000 = ~Aucune~ // reprise de @100120
+@8140001 = ~Abjuration~ // reprise de @100121
+@8140002 = ~Conjuration~ // reprise de @100122
+@8140003 = ~Divination~ // reprise de @100123
+@8140004 = ~Enchantement~ // reprise de @100124
+@8140005 = ~Illusion~ // reprise de @100125
+@8140006 = ~Évocation~ // reprise de @100126
+@8140007 = ~Nécromancie~ // reprise de @100127
+@8140008 = ~Altération~ // reprise de @100128
+@8140009 = ~Généraliste~ // reprise de @100129
+@8140010 = ~Entropie~ // reprise de @100130
 
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099

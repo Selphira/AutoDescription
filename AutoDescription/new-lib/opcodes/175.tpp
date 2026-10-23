@@ -12,7 +12,7 @@ DEFINE_PATCH_MACRO ad_op_175_support BEGIN
 			PATCH_IF hold_ids < 2 OR hold_ids > 9 OR (hold_ids == 9 AND NOT IS_EE) OR (hold_ids == 2 AND $fx_parameter1(~%hold_id%~) == 100) BEGIN
 				LPF ad_refusal INT_VAR fx_id = hold_id STR_VAR reason = ~file_error:opcode175:invalid~ message = ~IDS file %hold_ids% is not a creature type (expected 2-9: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN, KIT (enhanced editions))~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF $fx_parameter1(~%hold_id%~) != 0 BEGIN
+			ELSE PATCH_IF $fx_parameter1(~%hold_id%~) != 0 AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = hold_id STR_VAR reason = ~not_implemented:opcode175:creature_type~ message = ~hold of a creature type~ RET render_missing = refusal END
 			END
 		END

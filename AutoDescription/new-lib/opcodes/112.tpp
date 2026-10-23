@@ -17,7 +17,8 @@ DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 				SET drop_id = remove_id
 				LPM ad_application_drop
 			END
-			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ BEGIN
+			// En-tête d'un sort seul : seul compte un objet absent, que l'ancien moteur écarte.
+			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ AND (NOT support_header_only OR NOT FILE_EXISTS_IN_GAME ~%remove_resref%.itm~) BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%remove_resref%.itm~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~not_implemented:opcode112:no_name~ message = ~item %remove_resref%.ITM has no name~ RET render_missing = refusal END
 				END

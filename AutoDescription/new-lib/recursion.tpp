@@ -99,7 +99,11 @@ END
 DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SET $fx_sub_count(~%recursion_fx%~) = 0
 	SPRINT $fx_sub_text(~%recursion_fx%~) ~~
-	LPM ad_recursion_allowed
+	// Le sous-sort ne compte que pour les lignes, pas pour l'en-tête d'un sort seul.
+	SET recursion_allowed = 0
+	PATCH_IF NOT support_header_only BEGIN
+		LPM ad_recursion_allowed
+	END
 	PATCH_IF recursion_allowed BEGIN
 		SET recursion_opcode = $fx_opcode(~%recursion_fx%~)
 		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) BEGIN

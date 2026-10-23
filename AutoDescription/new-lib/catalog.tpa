@@ -167,6 +167,17 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
 	145 => 1 // lancement de sorts désactivé
 END
 
+// Opcodes pas encore pris en charge (TODO) dont l'ancien moteur écarte, remplace ou réunit des effets
+// avant de les décrire (opcode_<N>_is_valid, _replace, _group ou _post_group) : sans leur prise en
+// charge, on ne sait pas quels effets il garde, ni donc l'en-tête d'un sort qui en a
+// (new-lib/spell_header.tpp). Un opcode qui passe à DESCRIBED sort de cette liste.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
+	57 => 1 99 => 1 105 => 1 108 => 1 115 => 1 159 => 1 181 => 1 183 => 1 185 => 1 199 => 1 209 => 1
+	211 => 1 214 => 1 220 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 238 => 1 241 => 1 243 => 1
+	250 => 1 251 => 1 252 => 1 259 => 1 261 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
+	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 346 => 1 361 => 1 362 => 1
+END
+
 // Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien
 // baseProbability : « Lorsque le porteur est touché ; 6 % de chances d'immuniser… »
 // (new-lib/recursion.tpp).
@@ -294,6 +305,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
 	~REPLACE_ITEM~          => 400
+END
+
+// Opcode virtuel de l'effet que l'ancien moteur crée pour un effet dérivé, ajouté après les autres
+// effets de l'en-tête : il compte pour l'en-tête d'un sort (new-lib/spell_header.tpp).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
+	~ABILITIES~             => 501
+	~ALL_SAVES~             => 325
+	~THIEF_SKILLS~          => 500
+	~ALL_RESISTANCES~       => 502
+	~ELEMENTAL_RESISTANCES~ => 503
+	~PHYSICAL_RESISTANCES~  => 504
+	~SPELL_IMMUNITIES~      => 518
+	~EXCEPTIONAL_STRENGTH~  => 522
+	~FREE_ACTION~           => 520
+	~REPLACE_ITEM~          => 525
 END
 
 // Famille des modificateurs simples (new-lib/opcodes/stat_modifiers.tpp) : opcode => chaîne du nom
@@ -582,3 +608,54 @@ BEGIN
 		END
 END
 LAF ad_read_proficiency_names RET_ARRAY AD_PROFICIENCY_NAMES END
+
+// Premier niveau de lanceur qui donne un emplacement de sort de chaque niveau (tables mxsplwiz,
+// mxsplprs, mxspldru du jeu, comme l'ancien get_first_caster_level_list) : niveau de sort =>
+// niveau de lanceur (rang de la première ligne non nulle de sa colonne, 0 si aucune).
+DEFINE_ACTION_FUNCTION ad_read_first_caster_levels
+	STR_VAR
+		table = ~~
+	RET_ARRAY
+		levels
+BEGIN
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY levels BEGIN END
+	COPY_EXISTING - ~%table%.2da~ ~override~
+		COUNT_2DA_COLS ad_columns
+		COUNT_2DA_ROWS ad_columns ad_rows
+		READ_2DA_ENTRIES_NOW ad_table ad_columns
+		FOR (ad_level = 1; ad_level < ad_columns; ++ad_level) BEGIN
+			SET $levels(~%ad_level%~) = 0
+		END
+		FOR (ad_row = 0; ad_row < ad_rows; ++ad_row) BEGIN
+			FOR (ad_level = 1; ad_level < ad_columns; ++ad_level) BEGIN
+				PATCH_IF $levels(~%ad_level%~) == 0 BEGIN
+					READ_2DA_ENTRY_FORMER ad_table ad_row ad_level ad_slots
+					PATCH_IF ad_slots > 0 BEGIN
+						SET $levels(~%ad_level%~) = ad_row + 1
+					END
+				END
+			END
+		END
+END
+LAF ad_read_first_caster_levels STR_VAR table = ~mxsplwiz~ RET_ARRAY AD_FIRST_CASTER_LEVEL_WIZARD = levels END
+LAF ad_read_first_caster_levels STR_VAR table = ~mxsplprs~ RET_ARRAY AD_FIRST_CASTER_LEVEL_PRIEST = levels END
+LAF ad_read_first_caster_levels STR_VAR table = ~mxspldru~ RET_ARRAY AD_FIRST_CASTER_LEVEL_DRUID = levels END
+
+// Projectiles qu'un sort de Zone d'air pur dissipe (clearair.2da du jeu, comme l'ancien
+// load_clearair) : $AD_CLEARAIR_PROJECTILES(valeur de projectl.ids) = 1.
+DEFINE_ACTION_FUNCTION ad_read_clearair_projectiles
+	RET_ARRAY AD_CLEARAIR_PROJECTILES
+BEGIN
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_CLEARAIR_PROJECTILES BEGIN END
+	ACTION_IF FILE_EXISTS_IN_GAME ~clearair.2da~ BEGIN
+		COPY_EXISTING - ~clearair.2da~ ~override~
+			COUNT_2DA_ROWS 2 ad_rows
+			FOR (ad_row = 1; ad_row < ad_rows; ++ad_row) BEGIN
+				READ_2DA_ENTRY ad_row 1 2 ad_projectile
+				PATCH_IF IS_AN_INT ad_projectile BEGIN
+					SET $AD_CLEARAIR_PROJECTILES(~%ad_projectile%~) = 1
+				END
+			END
+	END
+END
+LAF ad_read_clearair_projectiles RET_ARRAY AD_CLEARAIR_PROJECTILES END

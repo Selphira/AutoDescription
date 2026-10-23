@@ -42,7 +42,7 @@ DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 			SET same_other = summon_other
 			LPM ad_fx_same_fields
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
-			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
+			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = summon_other STR_VAR reason = ~not_implemented:opcode67:random_amount~ message = ~random number of creatures~ RET render_missing = refusal END
 			END
 		END

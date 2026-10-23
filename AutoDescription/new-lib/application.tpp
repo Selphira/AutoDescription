@@ -88,7 +88,8 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 			SPRINT series_resource $fx_resource_lower(~%series_id%~)
 			SET series_matched = 0
 			PHP_EACH ~fx_ids_%series_opcode%~ AS _ => series_other BEGIN
-				PATCH_IF series_other != series_id AND $fx_timing(~%series_other%~) == TIMING_delayed BEGIN
+				// Un autre en-tête est une autre portée (ad_fx_same_fields), testé d'abord parce que moins coûteux.
+				PATCH_IF series_other != series_id AND $fx_timing(~%series_other%~) == TIMING_delayed AND $fx_header(~%series_other%~) == $fx_header(~%series_id%~) BEGIN
 					SET same_other = series_other
 					LPM ad_fx_same_fields
 					SPRINT series_other_resource $fx_resource_lower(~%series_other%~)
@@ -120,7 +121,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 					SET series_previous = series_delay
 				END
 				SET $fx_series_compared(~%series_id%~) = 1
-				PATCH_IF series_valid AND (series_delta <= 0 OR series_previous <= 0) BEGIN
+				PATCH_IF series_valid AND (series_delta <= 0 OR series_previous <= 0) AND NOT support_header_only BEGIN
 					LPF ad_refusal INT_VAR fx_id = series_id STR_VAR reason = ~not_implemented:application:series_delay~ message = ~repetitions with a delay of 0~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF series_valid BEGIN
@@ -149,7 +150,14 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_timing = $fx_timing(~%app_id%~)
 	SET app_duration = $fx_duration(~%app_id%~)
 	SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
-	PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EQUIPPED_ONLY(~%render_opcode%~) BEGIN
+	// En-tête d'un sort seul (new-lib/spell_header.tpp) : seuls comptent les effets gardés et leurs
+	// champs, pas leur phrase ; l'ancien moteur garde un effet de timing invalide.
+	PATCH_IF support_header_only BEGIN
+		PATCH_IF NOT (app_timing >= 0 AND (app_timing <= 10 OR app_timing == 4096)) BEGIN
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
+		END
+	END
+	ELSE PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EQUIPPED_ONLY(~%render_opcode%~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:ability~ message = ~opcode %render_opcode% is only described as an equipped effect~ RET render_missing = refusal END
 	END
 	// Plage vide : l'effet n'a jamais lieu.
@@ -196,7 +204,7 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
 		END
 	END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 		LPM ad_application_area_target
 	END
 END
@@ -246,7 +254,8 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SET drop_timing = $fx_timing(~%drop_id%~)
 	SET drop_opcode = $fx_opcode(~%drop_id%~)
 	SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_opcode%~)
-	PATCH_IF NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
+	// L'en-tête d'un sort se lit après l'écart (new-lib/spell_header.tpp).
+	PATCH_IF NOT support_header_only AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
 			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN

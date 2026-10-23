@@ -65,8 +65,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode%stat_opcode%:invalid~ message = ~invalid mode or no change (mode %stat_mode%, value %stat_value%)~ RET render_missing = refusal END
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler ; un effet d'un 177
-			// contre un type de créature n'est pas identique à celui qui vaut pour tous.
-			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) BEGIN
+			// contre un type de créature n'est pas identique à celui qui vaut pour tous. Il ne fusionne
+			// que leurs lignes : l'en-tête d'un sort compte les deux.
+			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN

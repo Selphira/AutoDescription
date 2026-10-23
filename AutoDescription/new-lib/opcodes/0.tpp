@@ -51,16 +51,17 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					SET ac_all_count += ac_equipped
 				END
-				// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler.
+				// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler (leurs lignes
+				// seulement : l'en-tête d'un sort compte les deux).
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
-					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value%~) BEGIN
+					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value%~) AND NOT support_header_only BEGIN
 						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
 					END
 					SET $ac_seen_all(~%ac_scope% %ac_value%~) = 1
 				END
 				ELSE BEGIN
 					SET ac_mask = $ac_seen_types(~%ac_scope% %ac_value%~)
-					PATCH_IF (ac_mask BAND ac_type) != 0 BEGIN
+					PATCH_IF (ac_mask BAND ac_type) != 0 AND NOT support_header_only BEGIN
 						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
 					END
 					SET $ac_seen_types(~%ac_scope% %ac_value%~) = ac_mask BOR ac_type

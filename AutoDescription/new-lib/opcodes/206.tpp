@@ -19,8 +19,9 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 			PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = spell_id STR_VAR reason = ~file_error:opcode206:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
-			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur.
-			ELSE BEGIN
+			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur ; sans
+			// objet pour l'en-tête d'un sort seul.
+			ELSE PATCH_IF NOT support_header_only BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%spell_resref%~ RET spell_support_name = name END
 				PATCH_IF ~%spell_support_name%~ STRING_EQUAL ~~ BEGIN
 					SET ignored_fx = spell_id
@@ -149,6 +150,77 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SET line_phrase = 30100100 // ~Immunité aux sorts « %spellNames% »~
 			SET line_fx = spell_first
 			LPM ad_effect_line
+		END
+	END
+END
+
+// En-tête d'un sort seul (new-lib/spell_header.tpp), après les regroupements (ancien
+// opcode_206_post_group, seconde partie) : dans chaque en-tête, les immunités de même cible et, sauf
+// si la première dure tant que l'objet est porté, de même timing et même durée, à au moins deux sorts
+// de noms différents disparaissent (avec la première, même sans nom) au profit d'un effet 518. Comme
+// dans l'ancien moteur, celui-ci prend les champs de la dernière immunité qui reste dans l'en-tête,
+// réunie ou non (ad_spell_header_derive).
+DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
+	SET immunity_serial = 0
+	FOR (immunity_h = 0; immunity_h < fx_header_count; ++immunity_h) BEGIN
+		SET immunity_size = 0
+		FOR (immunity_late = 0; immunity_late < 2; ++immunity_late) BEGIN
+			PHP_EACH fx_ids_206 AS _ => immunity_id BEGIN
+				PATCH_IF $fx_header(~%immunity_id%~) == immunity_h AND NOT $fx_consumed(~%immunity_id%~) AND $fx_late(~%immunity_id%~) == immunity_late BEGIN
+					SET $immunity_order(~%immunity_size%~) = immunity_id
+					SET $immunity_checked(~%immunity_size%~) = 0
+					SPRINT immunity_resref $fx_resource(~%immunity_id%~)
+					LPF ad_spell_name STR_VAR resref = ~%immunity_resref%~ RET immunity_name = name END
+					SPRINT $immunity_names(~%immunity_size%~) ~%immunity_name%~
+					SET immunity_size += 1
+				END
+			END
+		END
+		FOR (immunity_k = 0; immunity_k < immunity_size; ++immunity_k) BEGIN
+			SET immunity_id = $immunity_order(~%immunity_k%~)
+			PATCH_IF NOT $immunity_checked(~%immunity_k%~) AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+				SET immunity_target = $fx_target(~%immunity_id%~)
+				SET immunity_timing = $fx_timing(~%immunity_id%~)
+				SET immunity_duration = $fx_duration(~%immunity_id%~)
+				// Noms déjà vus du groupe : clé préfixée par son numéro, CLEAR_ARRAY ne les oubliant pas (V36).
+				SET immunity_serial += 1
+				SET immunity_name_count = 0
+				SET immunity_member_count = 0
+				SET $immunity_members(~0~) = immunity_k
+				SET immunity_member_count = 1
+				SET immunity_last = 0 - 1
+				FOR (immunity_j = 0; immunity_j < immunity_size; ++immunity_j) BEGIN
+					SET immunity_other = $immunity_order(~%immunity_j%~)
+					PATCH_IF NOT $fx_consumed(~%immunity_other%~) BEGIN
+						SET immunity_last = immunity_other
+						PATCH_IF NOT $immunity_checked(~%immunity_j%~) AND $fx_target(~%immunity_other%~) == immunity_target
+								AND (immunity_timing == TIMING_while_equipped OR ($fx_timing(~%immunity_other%~) == immunity_timing AND $fx_duration(~%immunity_other%~) == immunity_duration)) BEGIN
+							SPRINT immunity_name $immunity_names(~%immunity_j%~)
+							PATCH_IF NOT (~%immunity_name%~ STRING_EQUAL ~~) BEGIN
+								PATCH_IF NOT VARIABLE_IS_SET $immunity_group_names(~%immunity_serial% %immunity_name%~) BEGIN
+									SET immunity_name_count += 1
+								END
+								SET $immunity_group_names(~%immunity_serial% %immunity_name%~) = 1
+								SET $immunity_checked(~%immunity_j%~) = 1
+								PATCH_IF immunity_j != immunity_k BEGIN
+									SET $immunity_members(~%immunity_member_count%~) = immunity_j
+									SET immunity_member_count += 1
+								END
+							END
+						END
+					END
+				END
+				PATCH_IF immunity_name_count > 1 BEGIN
+					FOR (immunity_m = 0; immunity_m < immunity_member_count; ++immunity_m) BEGIN
+						SET immunity_member = $immunity_members(~%immunity_m%~)
+						SET immunity_member_id = $immunity_order(~%immunity_member%~)
+						SET $fx_consumed(~%immunity_member_id%~) = 1
+					END
+					SET derived_id = immunity_last
+					SET derived_opcode = 518
+					LPM ad_spell_header_derive
+				END
+			END
 		END
 	END
 END

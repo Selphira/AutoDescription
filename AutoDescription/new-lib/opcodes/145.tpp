@@ -16,7 +16,14 @@ DEFINE_PATCH_MACRO ad_op_145_support BEGIN
 	PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET $fx_spell_types(~%spellcasting_id%~) = 0
-			PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 2 BEGIN
+			// En-tête d'un sort seul : l'ancien opcode_145_is_valid n'écarte qu'un type hors de 0-3.
+			PATCH_IF support_header_only BEGIN
+				PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 3 BEGIN
+					SET drop_id = spellcasting_id
+					LPM ad_application_drop
+				END
+			END
+			ELSE PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 2 BEGIN
 				LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:spell_types~ message = ~spell type (parameter2) not supported~ RET render_missing = refusal END
 			END
 		END
