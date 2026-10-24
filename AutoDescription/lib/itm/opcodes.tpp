@@ -11262,6 +11262,11 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_226_common~ BEGIN
 	LOCAL_SET amount = parameter1
+	// Un total de 1 est épuisé par le premier sort bloqué, quel que soit son niveau : « contre le prochain
+	// sort » (l'opcode 228, qui reprend cette macro, n'a pas ces phrases).
+	PATCH_IF amount == 1 AND opcode == 226 BEGIN
+		SET strref += 10
+	END
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
 		LPF ~side_spell~ INT_VAR strref strref_if_amount_0 amount RET description = string END

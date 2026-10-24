@@ -3205,6 +3205,10 @@
 @12260002 = ~Immunises %theTarget% up to %amount% levels of %spellSecondaryTypeName% spells~
 @12260003 = ~to immunise up to %amount% levels of %spellSecondaryTypeName% spells~
 @12260004 = ~to immunise %theTarget% up to %amount% levels of %spellSecondaryTypeName% spells~
+@12260011 = ~Immunises against the next %spellSecondaryTypeName% spell~
+@12260012 = ~Immunises %theTarget% against the next %spellSecondaryTypeName% spell~
+@12260013 = ~to immunise against the next %spellSecondaryTypeName% spell~
+@12260014 = ~to immunise %theTarget% against the next %spellSecondaryTypeName% spell~
 
 // Opcode 227: Spell: Bounce (by School, decrementing) [227]
 
