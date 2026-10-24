@@ -9697,15 +9697,17 @@ DEFINE_PATCH_MACRO ~opcode_self_190~ BEGIN
 	LPF ~opcode_mod~ INT_VAR strref = 11900001 STR_VAR value RET description END
 END
 
+// Un bonus (parameter1 positif) réduit le facteur de vitesse ; opcode_probability et opcode_target
+// lisent parameter1.
 DEFINE_PATCH_MACRO ~opcode_self_probability_190~ BEGIN
-	LOCAL_SET value = parameter1 * ~-1~
+	LOCAL_SET parameter1 = 0 - parameter1
 	SET cumulable = 0
 	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_probability~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_190~ BEGIN
-	LOCAL_SET value = parameter1 * ~-1~
+	LOCAL_SET parameter1 = 0 - parameter1
 	SET cumulable = 0
 	SET parameter2 = MOD_TYPE_cumulative
 	LPF ~opcode_target~ INT_VAR strref = 11900002 RET description END // ~le facteur de vitesse~
@@ -16723,6 +16725,9 @@ END
 DEFINE_PATCH_MACRO ~opcode_not_cumulative~ BEGIN
     SPRINT notCumulative @102682 // ~non cumulatif~
     SPRINT description ~%description% (%notCumulative%)~
+    // Déjà dit non cumulatif : add_cumulable ne le redit pas pour un effet lu après un 321 sur la
+    // ressource elle-même.
+    SET cumulable = 1
 END
 
 // Rajout d'un paramètre pour bloquer l'affichage du warning (dans le cas où l'objet n'a pas besoin d'exister (opcode 321))
