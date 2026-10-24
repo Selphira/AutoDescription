@@ -723,6 +723,7 @@
 
 // Listes indexées : statistique d'une phrase à la forme « cible », 8 060 000 + valeur de stats.ids (8 060 000-8 069 999)
 @8060007 = ~le TAC0~ // reprise de @10540002
+@8060032 = ~la chance~ // reprise de @10220002
 @8060036 = ~la force~ // reprise de @10440002
 @8060039 = ~la sagesse~ // reprise de @10490002
 @8060040 = ~la dextérité~ // reprise de @10150002
@@ -2369,11 +2370,21 @@
 @21280102 = ~d'infliger Confusion %toTheTarget%~ // reprise de @11280003
 @21280103 = ~d'infliger Confusion %toTheTarget%~ // reprise de @11280003
 
+// Opcode 129 : Aide : phrases 0100 (21 290 000-21 290 999)
+@21290100 = ~Aide (%value%)~ // reprise de @11290001
+@21290101 = ~Lance Aide (%value%) sur %theTarget%~ // reprise de @11290002
+@21290102 = ~de lancer Aide (%value%) sur %theTarget%~ // reprise de @11290003
+@21290103 = ~de lancer Aide (%value%) sur %theTarget%~ // reprise de @11290003
+
 // Opcode 130 : bénédiction (21 300 000-21 300 999)
 @21300100 = ~Bénédiction (%value%)~ // reprise de @11300001
 @21300101 = ~Lance Bénédiction (%value%) sur %theTarget%~ // reprise de @11300002
 @21300102 = ~de lancer Bénédiction (%value%) sur %theTarget%~ // reprise de @11300003
 @21300103 = ~de lancer Bénédiction (%value%) sur %theTarget%~ // reprise de @11300003
+
+// Opcode 132 : Force, dextérité et constitution non cumulatives : 0000 nom, 0002 statistique (21 320 000-21 320 999)
+@21320000 = ~Force, dextérité et constitution~ // reprise de @11320001
+@21320002 = ~la force, la dextérité et la constitution~ // reprise de @11320002
 
 // Opcode 134 : Pétrification (21 340 000-21 340 999)
 @21340100 = ~Pétrification~ // reprise de @11340001
@@ -2593,6 +2604,12 @@
 @21890003 = ~Temps d'incantation maximal~ // reprise de @11890003
 @21890005 = ~le temps d'incantation maximal~ // reprise de @11890004
 
+// Opcode 190 : Facteur de vitesse : 0000 nom, 0002 statistique, 0010 bonus, 0011 malus (21 900 000-21 900 999)
+@21900000 = ~Facteur de vitesse~ // reprise de @11900001
+@21900002 = ~le facteur de vitesse~ // reprise de @11900002
+@21900010 = ~Bonus de %value%~ // reprise de @10000101
+@21900011 = ~Malus de %value%~ // reprise de @10000102
+
 // Opcode 191 : Niveau de lanceur de sorts : 0000 nom, 0002 statistique (21 910 000-21 910 999)
 @21910000 = ~Niveau de lanceur de sorts %spellType%~ // reprise de @11910001
 @21910002 = ~le niveau de lanceur de sorts %spellType%~ // reprise de @11910003
@@ -2643,6 +2660,16 @@
 // Opcode 207 : Renvoi d'un sort : phrases 0100, formes « soi » seulement, comme dans l'ancien moteur (22 070 000-22 070 999)
 @22070100 = ~Renvoie le sort « %spellName% »~ // reprise de @12070001
 @22070102 = ~de renvoyer le sort « %spellName% »~ // reprise de @12070002
+
+// Opcode 208 : Points de vie minimums : phrases 0100 minimum, 0110 plus protégés (22 080 000-22 080 999)
+@22080100 = ~Les points de vie ne peuvent passer en dessous de %value%~ // reprise de @12080001
+@22080101 = ~Les points de vie %ofTheTarget% ne peuvent passer en dessous de %value%~ // reprise de @12080003
+@22080102 = ~d'empêcher les points de vie de passer en dessous de %value%~ // reprise de @12080005
+@22080103 = ~d'empêcher les points de vie %ofTheTarget% de passer en dessous de %value%~ // reprise de @12080007
+@22080110 = ~Les points de vie ne sont plus protégés~ // reprise de @12080002
+@22080111 = ~Les points de vie %ofTheTarget% ne sont plus protégés~ // reprise de @12080004
+@22080112 = ~de ne plus protéger les points de vie~ // reprise de @12080006
+@22080113 = ~de ne plus protéger les points de vie %ofTheTarget%~ // reprise de @12080008
 
 // Opcode 209 : Mort à moins de 60 points de vie : 0001 condition, phrases 0100 (22 090 000-22 090 999)
 @22090001 = ~si ses points de vie sont inférieurs à 60~ // reprise de @12090001
@@ -2866,6 +2893,10 @@
 @22490002 = ~À chaque attaque à distance réussie par %theTarget%~ // reprise de @12490002
 @22490003 = ~par attaque à distance réussie par %theTarget%~ // reprise de @12490003
 
+// Opcode 250 : Dégâts minimums : 0000 nom, 0002 statistique (22 500 000-22 500 999)
+@22500000 = ~Dégâts minimums~ // reprise de @12500001
+@22500002 = ~les dégâts minimums~ // reprise de @12500002
+
 // Opcode 255 : Création d'objet (en jours) : phrases 0100 (22 550 000-22 550 999)
 @22550100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @22550101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
@@ -2956,6 +2987,26 @@
 @23010011 = ~en mêlée~ // reprise de @13010011
 @23010012 = ~à distance~ // reprise de @13010012
 @23010013 = ~magique~ // reprise de @13010013
+
+// Opcode 302 : Utilisation de tout objet : phrases 0100 permise, 0110 bloquée (23 020 000-23 020 999)
+@23020100 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~ // reprise de @13020002
+@23020101 = ~Permet %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~ // reprise de @13020004
+@23020102 = ~de permettre %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~ // reprise de @13020006
+@23020103 = ~de permettre %toTheTarget% d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~ // reprise de @13020006
+@23020110 = ~Bloque la capacité d'utiliser n'importe quel objet~ // reprise de @13020001
+@23020111 = ~Bloque la capacité %ofTheTarget% d'utiliser n'importe quel objet~ // reprise de @13020003
+@23020112 = ~de bloquer la capacité %ofTheTarget% d'utiliser n'importe quel objet~ // reprise de @13020005
+@23020113 = ~de bloquer la capacité %ofTheTarget% d'utiliser n'importe quel objet~ // reprise de @13020005
+
+// Opcode 303 : Attaque sournoise à chaque coup : phrases 0100 permise, 0110 bloquée (23 030 000-23 030 999)
+@23030100 = ~Transforme toute attaque portée en attaque sournoise (si l'arme équipée l'autorise)~ // reprise de @13030011
+@23030101 = ~Transforme toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~ // reprise de @13030012
+@23030102 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~ // reprise de @13030013
+@23030103 = ~de transformer toute attaque portée par %theTarget% en attaque sournoise (si l'arme équipée l'autorise)~ // reprise de @13030013
+@23030110 = ~Bloque la capacité à infliger des dégâts sournois à chaque attaque~ // reprise de @13030001
+@23030111 = ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030002
+@23030112 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030003
+@23030113 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030003
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~TAC0 de la main secondaire~ // reprise de @13050001
@@ -3156,6 +3207,34 @@
 
 // Opcode 344 : Enchantement contre un type de créature : 0000 nom (23 440 000-23 440 999)
 @23440000 = ~Niveau d'enchantement~ // reprise de @13440001
+
+// Opcode 345 : Bonus d'enchantement : 0000 nom, 0002 statistique, 0013 emplacement « des armes » (23 450 000-23 450 999)
+@23450000 = ~Niveau d'enchantement~ // reprise de @13440001
+@23450002 = ~le niveau d'enchantement~ // reprise de @13440002
+@23450013 = ~des armes~ // reprise de @13440013
+
+// Opcode 346 : Jets de sauvegarde contre une école : 0000 nom, 0002 statistique, 0011-0019 écoles (23 460 000-23 460 999)
+@23460000 = ~Jets de sauvegarde~ // reprise de @102034
+@23460002 = ~les jets de sauvegarde %versus%~ // reprise de @10330002
+@23460011 = ~contre les sorts de l'école de l'Abjuration~ // reprise de @13460011
+@23460012 = ~contre les sorts de l'école de la Conjuration~ // reprise de @13460012
+@23460013 = ~contre les sorts de l'école de la Divination~ // reprise de @13460013
+@23460014 = ~contre les sorts de l'école de l'Enchantement~ // reprise de @13460014
+@23460015 = ~contre les sorts de l'école de l'Illusion~ // reprise de @13460015
+@23460016 = ~contre les sorts de l'école de l'Évocation~ // reprise de @13460016
+@23460017 = ~contre les sorts de l'école de la Nécromancie~ // reprise de @13460017
+@23460018 = ~contre les sorts de l'école de l'Altération~ // reprise de @13460018
+@23460019 = ~contre les sorts de l'école Généraliste~ // reprise de @13460019
+
+// Opcode 367 : Caractéristiques minimales : phrases 0100 immunité, 0110 sensibilité (23 670 000-23 670 999)
+@23670100 = ~Immunité à la mort par absorption de caractéristique~ // reprise de @13670002
+@23670101 = ~Immunise %theTarget% à la mort par absorption de caractéristique~ // reprise de @13670012
+@23670102 = ~d'être immunisé à la mort par absorption de caractéristique~ // reprise de @13670022
+@23670103 = ~d'immuniser %theTarget% à la mort par absorption de caractéristique~ // reprise de @13670032
+@23670110 = ~Sensible à la mort par absorption de caractéristique~ // reprise de @13670001
+@23670111 = ~Rend %theTarget% sensible à la mort par absorption de caractéristique~ // reprise de @13670011
+@23670112 = ~d'être sensible à la mort par absorption de caractéristique~ // reprise de @13670021
+@23670113 = ~de rendre %theTarget% sensible à la mort par absorption de caractéristique~ // reprise de @13670031
 
 // Effet dérivé 001, AC_NO_PROTECTION : phrases (30 010 100-30 010 999)
 @30010100 = ~Ne protège pas %versus%~ // reprise de @15210001

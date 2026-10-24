@@ -10,7 +10,8 @@
 // dans l'effet avant toute validation pour que les passes suivantes lisent le vrai mode. Un opcode
 // pour qui un pourcentage de 100 a un sens fixe stat_percent_100 à valid. Un opcode aux cas
 // particuliers fixe stat_line_macro : appelée pour chaque effet line_fx (forme dans line_form), elle
-// peut changer le nom (stat_name_tra) ou écrire elle-même la ligne (stat_line_done à 1).
+// peut changer le nom (stat_name_tra), lui ajouter une précision (stat_name_suffix, « des armes »,
+// après le nom et la statistique de la forme « cible ») ou écrire elle-même la ligne (stat_line_done à 1).
 // Un opcode dont la statistique dépend d'un autre champ que la valeur et le mode (type de sort,
 // compétence) l'écrit dans fx_stat_subject, pour que deux effets de statistiques différentes ne
 // passent pas pour le même effet.
@@ -105,11 +106,15 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 			SET line_fx = stat_id
 			LPM ad_application_form
 			SET stat_line_done = 0
+			SPRINT stat_name_suffix ~~
 			PATCH_IF NOT (~%stat_line_macro%~ STRING_EQUAL ~~) BEGIN
 				LPM ~%stat_line_macro%~
 			END
 			PATCH_IF NOT stat_line_done BEGIN
 				LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
+				PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
+					SPRINT name ~%name% %stat_name_suffix%~
+				END
 				SPRINT stat_level_value $fx_level_value(~%stat_id%~)
 				PATCH_IF line_form == 0 BEGIN
 					LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
@@ -142,6 +147,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 	SET line_phrase = 0
 	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
 		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
+		PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
+			SPRINT theStatistic ~%theStatistic% %stat_name_suffix%~
+		END
 		SET value = ABS stat_value
 		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 			SPRINT value ~%stat_level_value%~
@@ -162,6 +170,30 @@ DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 			SET line_phrase = 1210120 // ~Réduit de %value% %theStatistic% %ofTheTarget%~ (+1)
 		END
 	END
+END
+
+// Prise en charge des modificateurs de chance que le jeu ne cumule pas (opcodes 131, 133 et 137) :
+// parameter2 ignoré, seul le premier octet de parameter1 lu (IESDP) ; l'ancien moteur garde la valeur
+// d'un parameter1 négatif et le premier octet d'un positif : refus d'une valeur hors de -128 à 127, que
+// ce premier octet changerait.
+DEFINE_PATCH_MACRO ad_stat_modifier_byte_support BEGIN
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		SET stat_value = $fx_parameter1(~%stat_id%~)
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND (stat_value < 0 - 128 OR stat_value > 127) BEGIN
+			LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:value~ message = ~value %stat_value% outside -128 to 127 (only the first byte is read)~ RET render_missing = refusal END
+		END
+	END
+	SET stat_forced_mode = MOD_TYPE_cumulative
+	SPRINT stat_mode_3 ~invalid~
+	LPM ad_stat_modifier_support
+END
+
+// Ligne d'un modificateur que le jeu ne cumule pas (opcodes 131 à 133 et 137) : « (non cumulatif) »
+// avant la durée (ancien opcode_not_cumulative), une seule fois après un 321 sur la ressource elle-même.
+DEFINE_PATCH_MACRO ad_stat_modifier_not_cumulative_line BEGIN
+	SPRINT stat_not_cumulative @4000010 // ~non cumulatif~
+	SPRINT line_suffix ~(%stat_not_cumulative%)~
+	SET $fx_not_cumulative(~%line_fx%~) = 0
 END
 
 // « +2 », « Passe à 18 » ou « -30 % » (mode 2 : valeur exprimée en pourcentage de la statistique).

@@ -186,8 +186,8 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
 	57 => 1 99 => 1 105 => 1 108 => 1 115 => 1 159 => 1 181 => 1 183 => 1 199 => 1
 	214 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 243 => 1
-	250 => 1 251 => 1 252 => 1 259 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
-	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 346 => 1 361 => 1 362 => 1
+	251 => 1 252 => 1 259 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
+	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 361 => 1 362 => 1
 END
 
 // Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien
@@ -384,7 +384,7 @@ END
 // valeur (fx_level_value) ; une progression d'un autre opcode est refusée tant que ses lignes ne
 // la lisent pas (new-lib/spell_levels.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_VALUE_OPCODES BEGIN
-	12 => 1 17 => 1 54 => 1 73 => 1 111 => 1 166 => 1 189 => 1 218 => 1
+	12 => 1 17 => 1 54 => 1 73 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1
 	502 => 1 503 => 1 504 => 1
 END
@@ -414,11 +414,17 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	97  => 8000037 // ~Force exceptionnelle~
 	104 => 8000044 // ~Expérience~
 	126 => 21260000 // ~Vitesse de déplacement~
+	131 => 8000032 // ~Chance~
+	132 => 21320000 // ~Force, dextérité et constitution~
+	133 => 8000032 // ~Chance~
+	137 => 8000032 // ~Chance~
 	176 => 21260000 // ~Vitesse de déplacement~
 	167 => 21670000 // ~TAC0~
 	189 => 21890000 // ~Temps d'incantation~
+	190 => 21900000 // ~Facteur de vitesse~
 	191 => 21910000 // ~Niveau de lanceur de sorts %spellType%~
 	233 => 22330000 // ~Compétence martiale %proficiency%~
+	250 => 22500000 // ~Dégâts minimums~
 	275 => 8000135 // ~Se cacher dans l'ombre~
 	276 => 8000136 // ~Détection des illusions~
 	277 => 8000137 // ~Pose de pièges~
@@ -431,6 +437,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	289 => 22890000 // ~Dégâts à mains nues~
 	305 => 23050000 // ~TAC0 de la main secondaire~
 	306 => 23060000 // ~TAC0 de la main principale~
+	345 => 23450000 // ~Niveau d'enchantement~
+	346 => 23460000 // ~Jets de sauvegarde~
 END
 
 // Modificateurs simples d'une statistique en pourcentage (« +20 % », « Passe à 50 % »), ancien

@@ -4,7 +4,7 @@ BALTH06	identical
 BALTH07	not_covered	not_implemented:phrase22060100:form1
 BHAAL1A	not_covered	not_implemented:opcode93:form1
 BHAAL1B	identical
-BHAAL2A	not_covered	not_implemented:missing_opcodes:132
+BHAAL2A	identical
 BHAAL2B	not_covered	not_implemented:spell_header:opcode177_eff_fields
 BHAAL3B	not_covered	file_error:recursion:missing_file
 BHAAL4A	identical
@@ -16,11 +16,11 @@ DEMOCHM	identical
 DEVAHEAL	identical
 DGARCHON	not_covered	not_implemented:opcode233:same_effect_twice
 DGFAITH	identical
-DGRIGHT	not_covered	not_implemented:missing_opcodes:250
+DGRIGHT	identical
 DW#FPPLO	identical
 JWGLOBE	identical
 MARW201	identical
-MARW301	not_covered	not_implemented:missing_opcodes:190
+MARW301	not_covered	not_implemented:spell:progression_two_values
 MARW401	identical
 MDK2SUMM	identical
 MELIS02	identical
@@ -64,7 +64,7 @@ SPCL103	not_covered	not_implemented:opcode73:form1
 SPCL104	identical
 SPCL106	identical
 SPCL121	not_covered	file_error:recursion:application:target
-SPCL144	not_covered	not_implemented:missing_opcodes:250
+SPCL144	identical
 SPCL152	not_covered	not_implemented:recursion:delayed
 SPCL211	identical
 SPCL212	not_covered	not_implemented:spell_header:opcode115
@@ -83,7 +83,7 @@ SPCL342	not_covered	not_implemented:missing_opcodes:192
 SPCL412	not_covered	not_implemented:missing_opcodes:252
 SPCL414	not_covered	not_implemented:missing_opcodes:252
 SPCL423	not_covered	not_implemented:recursion:opcode318:exceptions_group
-SPCL521	not_covered	not_implemented:missing_opcodes:250
+SPCL521	identical
 SPCL522	identical
 SPCL611	identical
 SPCL612	identical
@@ -122,8 +122,8 @@ SPCL911	not_covered	not_implemented:missing_opcodes:252
 SPCL912	not_covered	not_implemented:missing_opcodes:252
 SPCL913	identical
 SPCL914	identical
-SPCL915	not_covered	not_implemented:missing_opcodes:302
-SPCL916	not_covered	not_implemented:missing_opcodes:303
+SPCL915	identical
+SPCL916	identical
 SPCL917	identical
 SPCL918	identical
 SPCL919	identical
@@ -139,7 +139,7 @@ SPCL936	not_covered	not_implemented:missing_opcodes:236
 SPCL937	identical
 SPCL938	identical
 SPCL940	identical
-SPCL941	not_covered	not_implemented:missing_opcodes:208
+SPCL941	not_covered	not_implemented:recursion:nested_cast
 SPCRYO01	identical
 SPCRYOD	identical
 SPCTMD01	identical
@@ -161,7 +161,7 @@ SPIMIX01	identical
 SPIN001	identical
 SPIN101	identical
 SPIN102	identical
-SPIN103	not_covered	not_implemented:missing_opcodes:132
+SPIN103	identical
 SPIN104	not_covered	not_implemented:opcode318:stat
 SPIN105	identical
 SPIN106	not_covered	not_implemented:recursion:repeated
@@ -328,7 +328,7 @@ SPIN958	identical
 SPIN974	identical
 SPIN998	identical
 SPINHUM	not_covered	not_implemented:opcode135:natural_form
-SPJA01	not_covered	not_implemented:recursion:missing_opcodes:367
+SPJA01	not_covered	file_error:recursion:application:no_duration
 SPMDSLAY	not_covered	not_implemented:opcode112:no_name
 SPOGRE01	identical
 SPPR101	identical
@@ -343,10 +343,10 @@ SPPR109	not_covered	not_implemented:missing_opcodes:153
 SPPR110	identical
 SPPR111	identical
 SPPR113	identical
-SPPR150	not_covered	not_implemented:missing_opcodes:346
-SPPR201	not_covered	not_implemented:missing_opcodes:129
+SPPR150	not_covered	not_implemented:opcode219:several
+SPPR201	identical
 SPPR202	not_covered	not_implemented:opcode36:form1
-SPPR203	not_covered	not_implemented:recursion:missing_opcodes:131
+SPPR203	identical
 SPPR204	identical
 SPPR205	not_covered	not_implemented:missing_opcodes:150
 SPPR205D	not_covered	not_implemented:missing_opcodes:150
@@ -358,7 +358,7 @@ SPPR210	not_covered	not_implemented:opcode85:form1
 SPPR211	identical
 SPPR212	identical
 SPPR213	identical
-SPPR214	not_covered	not_implemented:missing_opcodes:132
+SPPR214	identical
 SPPR250	not_covered	not_implemented:phrase22060100:form1
 SPPR301	identical
 SPPR302	identical
@@ -409,7 +409,7 @@ SPPR509	not_covered	not_implemented:phrase5000130:form1
 SPPR510	identical
 SPPR511	identical
 SPPR512	not_covered	not_implemented:opcode324:exceptions_group
-SPPR513	not_covered	not_implemented:missing_opcodes:250
+SPPR513	not_covered	not_implemented:spell:progression_opcode44
 SPPR514	identical
 SPPR515	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR515D	not_covered	not_implemented:opcode318:stat
@@ -518,7 +518,7 @@ SPWI205	identical
 SPWI206	identical
 SPWI207	not_covered	not_implemented:missing_opcodes:125
 SPWI208	not_covered	not_implemented:missing_opcodes:115
-SPWI209	not_covered	not_implemented:missing_opcodes:133
+SPWI209	not_covered	not_implemented:opcode59:form1
 SPWI210	identical
 SPWI211	identical
 SPWI212	identical
@@ -577,7 +577,7 @@ SPWI413	not_covered	not_implemented:recursion:repeated
 SPWI414	not_covered	not_implemented:recursion:delayed
 SPWI415	identical
 SPWI416	not_covered	not_implemented:spell_header:save_subspell
-SPWI417	not_covered	not_implemented:missing_opcodes:345
+SPWI417	identical
 SPWI418	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPWI419	identical
 SPWI420	identical
@@ -741,7 +741,7 @@ SPWISH29	identical
 SPWISH30	identical
 SPWISH31	not_covered	not_implemented:phrase5000130:form1
 SPWISH32	identical
-SPWISH34	not_covered	not_implemented:opcode22:form1
+SPWISH34	identical
 SPWISH35	identical
 SPWISH36	not_covered	not_implemented:phrase22060100:form1
 SPWISH37	not_covered	not_implemented:phrase22060100:form1
@@ -763,7 +763,7 @@ SPWM140	not_covered	not_implemented:missing_opcodes:243
 SPWM141	not_covered	not_implemented:opcode122:random_treasure
 SPWM142	not_covered	not_implemented:opcode73:form1
 SPWM143	not_covered	not_implemented:missing_opcodes:222
-SPWM145	not_covered	not_implemented:missing_opcodes:190
+SPWM145	identical
 SPWM152	identical
 SPWM154	identical
 SPWM155	identical
@@ -779,7 +779,7 @@ SPWM183	not_covered	not_implemented:opcode111:external
 SPWM186	identical
 SPWM187	identical
 SPWM188	identical
-SPWM191	not_covered	not_implemented:missing_opcodes:190
+SPWM191	identical
 SPWM198	identical
 SPYANC01	identical
 SPYANCD	identical

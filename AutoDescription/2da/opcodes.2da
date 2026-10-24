@@ -130,15 +130,15 @@
 126      1        1        DESCRIBED LEVEL            80     SHOWN           Stat:_Movement_Modifier
 127      1        1        DESCRIBED LEVEL            131    NOT_PERMANENT   Summon:_Monster_Summoning
 128      1        1        DESCRIBED LEVEL            379    SHOWN           State:_Confusion
-129      1        1        TODO      LEVEL            390    SHOWN           State:_Aid
+129      1        1        DESCRIBED LEVEL            390    SHOWN           State:_Aid
 130      1        1        DESCRIBED LEVEL            389    SHOWN           State:_Bless
-131      1        1        TODO      LEVEL            112    SHOWN           State:_Positive_Chant
-132      1        1        TODO      LEVEL            101    SHOWN           State:_Raise_Strength,_Constitution,_&_Dexterity_Non-Cumulative
-133      1        1        TODO      LEVEL            111    SHOWN           Spell_Effect:_Luck_Non-Cumulative
+131      1        1        DESCRIBED LEVEL            112    SHOWN           State:_Positive_Chant
+132      1        1        DESCRIBED LEVEL            101    SHOWN           State:_Raise_Strength,_Constitution,_&_Dexterity_Non-Cumulative
+133      1        1        DESCRIBED LEVEL            111    SHOWN           Spell_Effect:_Luck_Non-Cumulative
 134      1        1        DESCRIBED LEVEL            368    IGNORED         State:_Petrification
 135      1        1        DESCRIBED LEVEL            1      SHOWN           Graphics:_Polymorph_into_Specific
 136      1        1        TODO      LEVEL            397    IGNORED         State:_Force_Visible
-137      1        1        TODO      LEVEL            113    SHOWN           State:_Negative_Chant
+137      1        1        DESCRIBED LEVEL            113    SHOWN           State:_Negative_Chant
 138      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Character_Animation_Change
 139      1        1        IGNORED   LEVEL            400    SHOWN           Text:_Display_String
 140      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Casting_Glow
@@ -191,7 +191,7 @@
 187      1        1        IGNORED   LEVEL            400    SHOWN           Script:_Store_Local_Variable
 188      1        1        DESCRIBED LEVEL            401    SHOWN           Spell_Effect:_Aura_Cleansing
 189      1        1        DESCRIBED LEVEL            93     SHOWN           Stat:_Casting_Time_Modifier
-190      1        1        TODO      LEVEL            94     SHOWN           Stat:_Attack_Speed_Factor
+190      1        1        DESCRIBED LEVEL            94     SHOWN           Stat:_Attack_Speed_Factor
 191      1        1        DESCRIBED LEVEL            15     SHOWN           Spell:_Casting_Level_Modifier
 192      1        1        TODO      LEVEL            479    SHOWN           Spell_Effect:_Find_Familiar
 193      1        1        TODO      LEVEL            405    SHOWN           Spell_Effect:_Invisible_Detection_by_Script
@@ -209,7 +209,7 @@
 205      1        1        DESCRIBED LEVEL            253    SHOWN           Spell:_Protection_(by_Secondary_Type)
 206      1        1        DESCRIBED LEVEL            256    SHOWN           Spell:_Protection_from_Spell
 207      1        1        DESCRIBED LEVEL            247    SHOWN           Spell:_Bounce_(by_Resource)
-208      1        1        TODO      LEVEL            86     SHOWN           HP:_Minimum_Limit
+208      1        1        DESCRIBED LEVEL            86     SHOWN           HP:_Minimum_Limit
 209      1        1        DESCRIBED LEVEL            355    IGNORED         Death:_Kill_60HP
 210      1        1        DESCRIBED LEVEL            371    IGNORED         Spell_Effect:_Stun_90HP
 211      1        1        DESCRIBED LEVEL            366    IGNORED         Spell_Effect:_Imprisonment
@@ -251,7 +251,7 @@
 247      1        1        DESCRIBED LEVEL            381    SHOWN           Spell_Effect:_Attack_Nearest_Creature
 248      1        1        DESCRIBED LEVEL            474    SHOWN           Item:_Set_Melee_Effect
 249      1        1        DESCRIBED LEVEL            475    SHOWN           Item:_Set_Ranged_Effect
-250      1        1        TODO      LEVEL            49     SHOWN           Spell_Effect:_Damage_Modifier
+250      1        1        DESCRIBED LEVEL            49     SHOWN           Spell_Effect:_Damage_Modifier
 251      1        1        TODO      LEVEL            494    IGNORED         Spell_Effect:_Change_Bard_Song_Effect
 252      1        1        TODO      LEVEL            471    IGNORED         Spell_Effect:_Set_Trap
 253      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Add_Map_Marker
@@ -303,8 +303,8 @@
 299      1        1        TODO      LEVEL            90     SHOWN           Spell_Effect:_Chaos_Shield
 300      1        1        TODO      LEVEL            498    SHOWN           Spell_Effect:_NPCBump
 301      1        1        DESCRIBED LEVEL            40     SHOWN           Stat:_Critical_Hit_Modifier
-302      1        1        TODO      LEVEL            484    SHOWN           Item:_Can_Use_Any_Item
-303      1        1        TODO      LEVEL            400    SHOWN           Spell_Effect:_Backstab_Every_Hit
+302      1        1        DESCRIBED LEVEL            484    SHOWN           Item:_Can_Use_Any_Item
+303      1        1        DESCRIBED LEVEL            400    SHOWN           Spell_Effect:_Backstab_Every_Hit
 304      1        1        TODO      LEVEL            199    SHOWN           Mass_Raise_Dead
 305      1        1        DESCRIBED LEVEL            64     SHOWN           Stat:_THAC0_Modifier_(Off-Hand)
 306      1        1        DESCRIBED LEVEL            63     SHOWN           Stat:_THAC0_Modifier_(On-Hand)
@@ -346,8 +346,8 @@
 342      0        1        IGNORED   LEVEL            400    SHOWN           Animation:_Override_Data
 343      0        1        TODO      LEVEL            85     IGNORED         HP_Swap
 344      0        1        DESCRIBED LEVEL            31     SHOWN           Enchantment_vs._creature_type
-345      0        1        TODO      LEVEL            30     SHOWN           Enchantment_bonus
-346      0        1        TODO      LEVEL            77     SHOWN           Save_vs._school_bonus
+345      0        1        DESCRIBED LEVEL            30     SHOWN           Enchantment_bonus
+346      0        1        DESCRIBED LEVEL            77     SHOWN           Save_vs._school_bonus
 347      0        1        TODO      LEVEL            400    SHOWN           Unused
 348      0        1        TODO      LEVEL            400    SHOWN           Unused
 349      0        1        TODO      LEVEL            400    SHOWN           Unused
@@ -368,4 +368,4 @@
 364      0        1        TODO      LEVEL            400    SHOWN           Empty
 365      0        1        IGNORED   LEVEL            400    SHOWN           Make_unselectable
 366      0        1        IGNORED   LEVEL            400    SHOWN           Spell:_Apply_Spell_On_Move
-367      0        1        TODO      LEVEL            279    SHOWN           Minimum_base_stats
+367      0        1        DESCRIBED LEVEL            279    SHOWN           Minimum_base_stats

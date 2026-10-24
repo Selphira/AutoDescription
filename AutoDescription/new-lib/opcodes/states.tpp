@@ -1,8 +1,9 @@
 // États, soins et autres effets à phrase fixe : états (opcodes 3, 13, 16, 20, 24, 38, 39, 40, 45,
-// 63, 74, 76, 80, 109, 128, 134, 165, 175, 185, 210, 211, 213, 217, 231, 247, 317), morts (209, 238),
+// 63, 74, 76, 80, 109, 128, 134, 165, 175, 185, 210, 211, 213, 217, 231, 247, 303, 317, 367), morts (209, 238),
 // soins et dissipations (2, 4, 11, 32, 43, 46, 47, 48, 58, 75, 77,
 // 79, 81, 116, 161-164), capacité ajoutée (171), drain de niveaux (216), point de rupture de moral (106), charme (5, 241),
 // inversion de l'alignement (56) et du sexe (71), protection contre un type de créature (100),
+// points de vie minimums (208), utilisation de tout objet (302),
 // métamorphose (135), remplacement d'une créature (151), peau de pierre (218), téléportation auprès
 // d'un ennemi (274) ; une phrase par variante de l'opcode, « Réduit la cible au silence ».
 // Chaque fichier d'opcode fixe state_opcode et state_variant_macro (vide si l'opcode n'a qu'une
