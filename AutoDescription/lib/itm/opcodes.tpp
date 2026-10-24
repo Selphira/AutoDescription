@@ -12550,6 +12550,10 @@ DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 		SPRINT spellType @12610011 // ~divin~
 		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
 	END
+	// Restaurations profane et divine réunies (opcode_261_group), au niveau 7 au plus.
+	ELSE PATCH_IF parameter2 == 2 BEGIN
+		SPRINT spellType @12610012 // ~profane ou divin~
+	END
 	PATCH_IF spellLevel == 1 BEGIN
 		SET strref += 4
 	END
@@ -12572,63 +12576,140 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 	LOCAL_SET initOpcode = opcode
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
-	CLEAR_ARRAY positions
-	CLEAR_ARRAY positions_already_check
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~groupData~ BEGIN END
+	// CLEAR_ARRAY ne supprime pas les variables positions_already_check_<position> : chaque passe marque
+	// les effets vus de son propre numéro (checkPass), sans quoi les marques d'une passe ou d'un sort
+	// précédent écartent des effets.
+	PATCH_IF NOT VARIABLE_IS_SET checkPass BEGIN
+		SET checkPass = 0
+	END
+	SET checkPass += 1
 
+	// Chaque effet est comparé à l'effet de départ, type de sort (parameter2) compris : des sorts profanes et
+	// divins ne sont pas réunis, et l'effet réuni garde les champs de l'effet de départ (BUG-058).
 	PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		SET newP1 = 0b0
-		CLEAR_ARRAY positions
-		SET $positions_already_check(~%position%~) = 1
-		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
-			LPM ~data_to_vars~
-			PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
-				// On retire l'opcode de ceux à checker dans les futures itérations
-				SET $positions_already_check(~%position%~) = 1
-				// On ajoute l'opcode courant à ceux qui seront désactivés
-				SET $positions(~%position%~) = initOpcode
-				// P2 retiré
-				LPF ~get_opcode_position~
-					INT_VAR opcode
-			            match_position     = position
-			            match_target       = target
-				        match_parameter2   = parameter2
-				        match_power        = power
-				        match_timingMode   = timingMode
-				        match_resistance   = resistance
-						match_duration     = duration
-				        match_probability1 = probability1
-				        match_probability2 = probability2
-				        match_diceCount    = diceCount
-				        match_diceSides    = diceSides
-				        match_saveType     = saveType
-				        match_saveBonus    = saveBonus
-					STR_VAR match_macro = ~opcode_match_not_position_and_diceCount_and_diceSides_and_duration_and_parameter2_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target_and_timingMode~
-					RET opcodePosition = position
-				END
-				PATCH_IF opcodePosition >= 0 BEGIN
-					SET $positions(~%opcodePosition%~) = initOpcode
+		PATCH_IF NOT (VARIABLE_IS_SET $positions_already_check(~%position%~) AND $positions_already_check(~%position%~) == checkPass) AND parameter1 >= 1 AND parameter1 <= 9 BEGIN
+			SET $positions_already_check(~%position%~) = checkPass
+			CLEAR_ARRAY positions
+			SET $positions(~%position%~) = initOpcode
+			SET groupCount = 1
+			SET parameter = parameter1 - 1
+			SET newP1 = ~%BIT%parameter%%~
+			FOR (idx = 0; idx < 30; ++idx) BEGIN
+				SPRINT $groupData(~%idx%~) $data(~%idx%~)
+			END
+			SET groupTarget = target
+			SET groupParameter2 = parameter2
+			SET groupPower = power
+			SET groupTimingMode = timingMode
+			SET groupResistance = resistance
+			SET groupDuration = duration
+			SET groupProbability1 = probability1
+			SET groupProbability2 = probability2
+			SET groupDiceCount = diceCount
+			SET groupDiceSides = diceSides
+			SET groupSaveType = saveType
+			SET groupSaveBonus = saveBonus
+			PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF NOT (VARIABLE_IS_SET $positions_already_check(~%position%~) AND $positions_already_check(~%position%~) == checkPass) AND parameter1 >= 1 AND parameter1 <= 9
+						AND target == groupTarget AND parameter2 == groupParameter2 AND power == groupPower
+						AND timingMode == groupTimingMode AND resistance == groupResistance AND duration == groupDuration
+						AND probability1 == groupProbability1 AND probability2 == groupProbability2
+						AND diceCount == groupDiceCount AND diceSides == groupDiceSides
+						AND saveType == groupSaveType AND saveBonus == groupSaveBonus BEGIN
+					SET $positions_already_check(~%position%~) = checkPass
+					SET $positions(~%position%~) = initOpcode
+					SET groupCount += 1
 					SET parameter = parameter1 - 1
 					SET newP1 |= ~%BIT%parameter%%~
 				END
 			END
-		END
-		PATCH_IF newP1 > 0 BEGIN
-			// Suppression des effets similaires
-			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
-				LPF ~delete_opcode~
-					INT_VAR opcode match_position = position1
-					RET $opcodes(~%opcode%~) = count
-					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+			PATCH_IF groupCount > 1 BEGIN
+				PATCH_PHP_EACH positions AS position1 => opcode BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position1
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
 				END
+				FOR (idx = 0; idx < 30; ++idx) BEGIN
+					SPRINT $data(~%idx%~) $groupData(~%idx%~)
+				END
+				LPM ~data_to_vars~
+				SET opcode = 510
+				SET parameter1 = newP1
+				LPM ~add_opcode~
 			END
-			// FIXME: à ce stade les données ne sont pas spécifiquement sauvegardées, reliquat du PATCH_PHP_EACH précédent
-			// Fonctionnel dans les cas généraux
-			SET opcode = 510
-			SET parameter1 = newP1
-			LPM ~add_opcode~
 		END
 	END
+
+	// Une restauration profane et une divine qui ne diffèrent que par le type s'écrivent ensemble
+	// (parameter2 2 : « profane ou divin ») ; un effet seul jusqu'au niveau 7, où les deux types ne sont
+	// pas ramenés différemment.
+	PATCH_FOR_EACH mergeOpcode IN 261 510 BEGIN
+		PATCH_IF VARIABLE_IS_SET $opcodes(~%mergeOpcode%~) AND $opcodes(~%mergeOpcode%~) > 1 BEGIN
+			SET checkPass += 1
+			PATCH_PHP_EACH EVAL ~opcodes_%mergeOpcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				PATCH_IF parameter2 == 0 AND NOT (VARIABLE_IS_SET $positions_already_check(~%position%~) AND $positions_already_check(~%position%~) == checkPass) AND (mergeOpcode == 510 OR (parameter1 >= 0 AND parameter1 <= 7)) BEGIN
+					SET $positions_already_check(~%position%~) = checkPass
+					FOR (idx = 0; idx < 30; ++idx) BEGIN
+						SPRINT $groupData(~%idx%~) $data(~%idx%~)
+					END
+					SET groupPosition = position
+					SET groupParameter1 = parameter1
+					SET groupTarget = target
+					SET groupPower = power
+					SET groupTimingMode = timingMode
+					SET groupResistance = resistance
+					SET groupDuration = duration
+					SET groupProbability1 = probability1
+					SET groupProbability2 = probability2
+					SET groupDiceCount = diceCount
+					SET groupDiceSides = diceSides
+					SET groupSaveType = saveType
+					SET groupSaveBonus = saveBonus
+					SET mergePosition = 0 - 1
+					PATCH_PHP_EACH EVAL ~opcodes_%mergeOpcode%~ AS data => _ BEGIN
+						LPM ~data_to_vars~
+						PATCH_IF mergePosition < 0 AND parameter2 == 1 AND NOT (VARIABLE_IS_SET $positions_already_check(~%position%~) AND $positions_already_check(~%position%~) == checkPass)
+								AND parameter1 == groupParameter1 AND target == groupTarget AND power == groupPower
+								AND timingMode == groupTimingMode AND resistance == groupResistance AND duration == groupDuration
+								AND probability1 == groupProbability1 AND probability2 == groupProbability2
+								AND diceCount == groupDiceCount AND diceSides == groupDiceSides
+								AND saveType == groupSaveType AND saveBonus == groupSaveBonus BEGIN
+							SET $positions_already_check(~%position%~) = checkPass
+							SET mergePosition = position
+						END
+					END
+					// L'effet réuni est ajouté avant le dernier retrait : un tableau vidé par delete_opcode n'est
+					// pas remplacé (RET_ARRAY d'un tableau vide), l'effet retiré y reviendrait.
+					PATCH_IF mergePosition >= 0 BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = mergeOpcode match_position = groupPosition
+							RET $opcodes(~%mergeOpcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%mergeOpcode%~ = opcodes_xx
+						END
+						FOR (idx = 0; idx < 30; ++idx) BEGIN
+							SPRINT $data(~%idx%~) $groupData(~%idx%~)
+						END
+						LPM ~data_to_vars~
+						SET opcode = mergeOpcode
+						SET parameter2 = 2
+						LPM ~add_opcode~
+						LPF ~delete_opcode~
+							INT_VAR opcode = mergeOpcode match_position = mergePosition
+							RET $opcodes(~%mergeOpcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%mergeOpcode%~ = opcodes_xx
+						END
+					END
+				END
+			END
+		END
+	END
+	SET opcode = initOpcode
 END
 
 /* ------------------------ *
@@ -16088,6 +16169,9 @@ DEFINE_PATCH_MACRO ~opcode_510_common~ BEGIN
 	END
 	ELSE PATCH_IF parameter2 == 1 BEGIN
 		SPRINT spellType @12610011 // ~divin~
+	END
+	ELSE PATCH_IF parameter2 == 2 BEGIN
+		SPRINT spellType @12610012 // ~profane ou divin~
 	END
 
 	PATCH_IF parameter1 != 0x1FF BEGIN // 511
