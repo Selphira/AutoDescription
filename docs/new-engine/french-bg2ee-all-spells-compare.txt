@@ -59,7 +59,7 @@ OHTYR2	not_covered	not_implemented:spell:abilities
 SENSPIHE	identical
 SENSPISU	identical
 SPBLUN29	identical
-SPCL102	not_covered	not_implemented:recursion:headers
+SPCL102	not_covered	not_implemented:opcode318:stat
 SPCL103	not_covered	not_implemented:spell:abilities
 SPCL104	identical
 SPCL106	not_covered	not_implemented:spell:abilities
@@ -67,7 +67,7 @@ SPCL121	not_covered	not_implemented:spell:abilities
 SPCL144	not_covered	not_implemented:missing_opcodes:250
 SPCL152	not_covered	not_implemented:recursion:delayed
 SPCL211	not_covered	not_implemented:spell:abilities
-SPCL212	not_covered	not_implemented:recursion:missing_opcodes:115
+SPCL212	not_covered	not_implemented:spell_header:opcode115
 SPCL213	identical
 SPCL222	identical
 SPCL231	not_covered	not_implemented:spell:abilities
@@ -76,7 +76,7 @@ SPCL233	not_covered	not_implemented:spell:abilities
 SPCL236	not_covered	not_implemented:spell:abilities
 SPCL237	not_covered	not_implemented:spell:abilities
 SPCL238	not_covered	not_implemented:spell:abilities
-SPCL239	not_covered	not_implemented:recursion:repeated
+SPCL239	identical
 SPCL311	identical
 SPCL321	not_covered	not_implemented:opcode101:ability_group_fields
 SPCL342	not_covered	not_implemented:missing_opcodes:192
@@ -178,7 +178,7 @@ SPIN116	identical
 SPIN117	not_covered	not_implemented:opcode101:ability_group_fields
 SPIN118	identical
 SPIN119	identical
-SPIN120	not_covered	not_implemented:recursion:missing_opcodes:115
+SPIN120	not_covered	not_implemented:spell_header:opcode115
 SPIN121	not_covered	not_implemented:opcode233:same_effect_twice
 SPIN122	not_covered	not_implemented:opcode135:natural_form
 SPIN123	not_covered	not_implemented:opcode135:natural_form
@@ -334,7 +334,7 @@ SPOGRE01	identical
 SPPR101	identical
 SPPR102	identical
 SPPR103	identical
-SPPR104	not_covered	not_implemented:recursion:missing_opcodes:115
+SPPR104	not_covered	not_implemented:spell_header:opcode115
 SPPR105	identical
 SPPR106	identical
 SPPR107	not_covered	not_implemented:spell:abilities
@@ -512,7 +512,7 @@ SPWI123	not_covered	not_implemented:missing_opcodes:192
 SPWI124	not_covered	not_implemented:missing_opcodes:214
 SPWI125	not_covered	not_implemented:spell:abilities
 SPWI201	not_covered	not_implemented:spell:abilities
-SPWI202	not_covered	not_implemented:recursion:missing_opcodes:115
+SPWI202	not_covered	not_implemented:spell_header:opcode115
 SPWI203	identical
 SPWI205	identical
 SPWI206	identical
@@ -573,7 +573,7 @@ SPWI409	not_covered	not_implemented:opcode78:group
 SPWI410	not_covered	not_implemented:missing_opcodes:26
 SPWI411	not_covered	not_implemented:spell:abilities
 SPWI412	not_covered	not_implemented:spell:abilities
-SPWI413	not_covered	not_implemented:recursion:missing_opcodes:185 204
+SPWI413	not_covered	not_implemented:recursion:repeated
 SPWI414	not_covered	not_implemented:recursion:delayed
 SPWI415	identical
 SPWI416	not_covered	not_implemented:spell:abilities
@@ -619,7 +619,7 @@ SPWI519	not_covered	not_implemented:missing_opcodes:226
 SPWI520	not_covered	not_implemented:missing_opcodes:165
 SPWI521	not_covered	not_implemented:missing_opcodes:165
 SPWI522	not_covered	not_implemented:spell:abilities
-SPWI523	not_covered	not_implemented:recursion:headers
+SPWI523	not_covered	not_implemented:opcode318:resource
 SPWI601	identical
 SPWI602	not_covered	not_implemented:spell:abilities
 SPWI603	not_covered	not_implemented:spell:abilities

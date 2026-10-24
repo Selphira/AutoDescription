@@ -341,7 +341,7 @@ SPCL236	ignored:not_covered
 SPCL237	ignored:not_covered	
 SPCL237D	ignored:without_description	
 SPCL238	ignored:not_covered	
-SPCL239	ignored:not_covered	
+SPCL239	ok	Faisceau de la Conscience Solaire\n(Inné)\n\nPortée : Contact\nDurée : Spéciale\nTemps d'incantation : 1\nZone d'effet : Le lanceur et toute créature dans un rayon de 4,5 mètres\nJet de sauvegarde : Spécial\nDissipation : Non-affecté\nRésistance à la magie : Affecté\n\nLe personnage provoque une explosion de lumière intense qui touche toutes les créatures dans un rayon de 4,5 m. Le Faisceau de la Conscience Solaire ne frappe pas automatiquement toutes les cibles, mais consiste en une attaque de mêlée basée sur le TAC0 actuel du personnage (+3 contre les morts-vivants). Les victimes subissent 9d6 points de dégâts de feu (+3 si morts-vivants), mais peuvent faire un jet de sauvegarde contre les sorts pour diviser par deux. En outre, toutes les créatures (excepté le personnage) doivent réussir un jet de sauvegarde contre les sorts, ou être aveuglées pendant 2 heures.\n\nPARAMÈTRES : \n\n- TAC0 : +3 contre les morts-vivants pendant 2 heures\n- Inflige 3 points de dégâts de feu contre les morts-vivants\n- Inflige 9d6 points de dégâts de feu à la cible (jet de sauvegarde contre les sorts pour réduire de moitié)\n- Aveugle la cible pendant 2 heures (jet de sauvegarde contre les sorts pour annuler)
 SPCL239A	ignored:without_name	
 SPCL241	ignored:without_description	
 SPCL242	ignored:without_description	

@@ -39,14 +39,14 @@
 | OHTMPS2.SPL | 5 abilities and no casting level (level rendering not supported yet) | ability 0, effect 0 (opcode 146) > OHTMPS2D.SPL | opcode **146**, target **1**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, resource **OHTMPS2D** | `recursion:headers` | not described |
 | OHTYR1.SPL | opcodes not supported yet: 242 |  |  | `missing_opcodes:242` | not described |
 | OHTYR2.SPL | 6 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
-| SPCL102.SPL | 34 abilities and no casting level (level rendering not supported yet) | ability 0, effect 2 (opcode 146) > SPDN01A.SPL | opcode **146**, target **2**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, power **1**, resistance **3**, resource **SPDN01A** | `recursion:headers` | not described |
+| SPCL102.SPL | condition 43 not supported | ability 0, effect 0 | opcode **318**, target **2**, parameter1 **0**, parameter2 **43**, timing **0**, duration **0**, power **1**, resistance **2**, resource **SPCL102** | `opcode318:stat` | not described |
 | SPCL103.SPL | 4 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL106.SPL | 4 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL121.SPL | 4 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL144.SPL | opcodes not supported yet: 250 |  |  | `missing_opcodes:250` | not described |
 | SPCL152.SPL | delayed effect casting a spell (the old engine writes it as a condition) | ability 0, effect 77 | opcode **146**, target **1**, parameter1 **1**, parameter2 **1**, timing **4**, duration **30**, resistance **2**, resource **BDDRAGB2** | `recursion:delayed` | not described |
 | SPCL211.SPL | 34 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
-| SPCL212.SPL | opcodes not supported yet: 115 | ability 0, effect 1 (opcode 146) > CDDETEVL.SPL | opcode **146**, target **2**, parameter1 **1**, parameter2 **1**, timing **1**, duration **0**, power **1**, resistance **1**, resource **CDDETEVL** | `recursion:missing_opcodes:115` | not described |
+| SPCL212.SPL | opcode 115 not supported yet, whose effects the old engine may drop or merge before reading the header | ability 0, effect 0 | opcode **115**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **60**, power **1**, resistance **1** | `spell_header:opcode115` | not described |
 | SPCL213.SPL | proficiency 117 has no name | ability 0, effect 2 | opcode **233**, target **2**, parameter1 **1**, parameter2 **117**, timing **0**, duration **60**, power **1**, resistance **3** | `opcode233:no_name` | effect ignored |
 | SPCL231.SPL | 20 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL232.SPL | opcodes not supported yet: 220 |  |  | `missing_opcodes:220` | not described |
@@ -55,7 +55,6 @@
 | SPCL237.SPL | 14 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL238.SPL | 8 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPCL239.SPL | spell SPCL239A.SPL has no name | ability 0, effect 1 | opcode **206**, target **1**, parameter1 **-1**, parameter2 **0**, timing **0**, duration **5**, resource **SPCL239A** | `opcode206:no_name` | effect ignored |
-| SPCL239.SPL | spell already described by this resource | ability 0, effect 2 | opcode **146**, target **2**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, resistance **1**, resource **SPCL239A** | `recursion:repeated` | not described |
 | SPCL321.SPL | immunities of the ability with different fields | ability 0, effect 3 | opcode **101**, target **1**, parameter1 **0**, parameter2 **210**, timing **0**, duration **60**, resistance **2**, resource **SPCL321** | `opcode101:ability_group_fields` | not described |
 | SPCL342.SPL | opcodes not supported yet: 192 |  |  | `missing_opcodes:192` | not described |
 | SPCL412.SPL | opcodes not supported yet: 252 |  |  | `missing_opcodes:252` | not described |
@@ -107,7 +106,7 @@
 | SPIN109.SPL | 20 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPIN113.SPL | 18 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPIN117.SPL | immunities of the ability with different fields | ability 0, effect 0 | opcode **101**, target **1**, parameter1 **0**, parameter2 **210**, timing **0**, duration **120** | `opcode101:ability_group_fields` | not described |
-| SPIN120.SPL | opcodes not supported yet: 115 | ability 0, effect 1 (opcode 146) > CDDETEVL.SPL | opcode **146**, target **2**, parameter1 **1**, parameter2 **1**, timing **1**, duration **0**, power **1**, resistance **1**, resource **CDDETEVL** | `recursion:missing_opcodes:115` | not described |
+| SPIN120.SPL | opcode 115 not supported yet, whose effects the old engine may drop or merge before reading the header | ability 0, effect 0 | opcode **115**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **60**, power **1**, resistance **1** | `spell_header:opcode115` | not described |
 | SPIN121.SPL | same effect twice (the old engine merges them) | ability 0, effect 20 | opcode **233**, target **2**, parameter1 **1**, parameter2 **117**, timing **0**, duration **60**, power **1**, resistance **1** | `opcode233:same_effect_twice` | not described |
 | SPIN122.SPL | polymorph back to natural form | ability 0, effect 17 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3600000**, resistance **2** | `opcode135:natural_form` | not described |
 | SPIN123.SPL | polymorph back to natural form | ability 0, effect 17 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3600000**, resistance **2** | `opcode135:natural_form` | not described |
@@ -162,7 +161,7 @@
 | SPINHUM.SPL | polymorph back to natural form | ability 0, effect 17 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3600000**, resistance **2** | `opcode135:natural_form` | not described |
 | SPJA01.SPL | opcodes not supported yet: 367 | ability 0, effect 1 (opcode 326) > SPJA01A.SPL | opcode **326**, target **2**, parameter1 **3**, parameter2 **103**, timing **1**, duration **0**, power **5**, resistance **2**, resource **SPJA01A** | `recursion:missing_opcodes:367` | not described |
 | SPMDSLAY.SPL | item SLAYERWP.ITM has no name | ability 0, effect 4 | opcode **112**, target **1**, parameter1 **0**, parameter2 **0**, timing **1**, duration **0**, resistance **2**, resource **SLAYERWP** | `opcode112:no_name` | not described |
-| SPPR104.SPL | opcodes not supported yet: 115 | ability 0, effect 1 (opcode 146) > CDDETEVL.SPL | opcode **146**, target **2**, parameter1 **1**, parameter2 **1**, timing **1**, duration **0**, power **1**, resistance **1**, resource **CDDETEVL** | `recursion:missing_opcodes:115` | not described |
+| SPPR104.SPL | opcode 115 not supported yet, whose effects the old engine may drop or merge before reading the header | ability 0, effect 0 | opcode **115**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **60**, power **1**, resistance **1** | `spell_header:opcode115` | not described |
 | SPPR107.SPL | 20 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPPR109.SPL | opcodes not supported yet: 153 |  |  | `missing_opcodes:153` | not described |
 | SPPR110.SPL | 20 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
@@ -276,7 +275,7 @@
 | SPWI124.SPL | opcodes not supported yet: 214 |  |  | `missing_opcodes:214` | not described |
 | SPWI125.SPL | 7 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPWI201.SPL | 18 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
-| SPWI202.SPL | opcodes not supported yet: 115 | ability 0, effect 1 (opcode 146) > CDDETEVL.SPL | opcode **146**, target **2**, parameter1 **1**, parameter2 **1**, timing **1**, duration **0**, power **2**, resistance **1**, resource **CDDETEVL** | `recursion:missing_opcodes:115` | not described |
+| SPWI202.SPL | opcode 115 not supported yet, whose effects the old engine may drop or merge before reading the header | ability 0, effect 0 | opcode **115**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **60**, power **1**, resistance **1** | `spell_header:opcode115` | not described |
 | SPWI207.SPL | opcodes not supported yet: 125 |  |  | `missing_opcodes:125` | not described |
 | SPWI208.SPL | opcodes not supported yet: 115 |  |  | `missing_opcodes:115` | not described |
 | SPWI209.SPL | opcodes not supported yet: 133 |  |  | `missing_opcodes:133` | not described |
@@ -316,7 +315,7 @@
 | SPWI410.SPL | opcodes not supported yet: 26 |  |  | `missing_opcodes:26` | not described |
 | SPWI411.SPL | 14 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPWI412.SPL | 14 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
-| SPWI413.SPL | opcodes not supported yet: 185 204 | ability 0, effect 2 (opcode 146) > SPWI413A.SPL | opcode **146**, target **2**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, power **4**, resistance **1**, saving throw type **1**, saving throw bonus **0**, resource **SPWI413A** | `recursion:missing_opcodes:185 204` | not described |
+| SPWI413.SPL | spell already described by this resource | ability 0, effect 0 | opcode **326**, target **2**, parameter1 **0**, parameter2 **49**, timing **1**, duration **0**, power **4**, resource **SPWI413A** | `recursion:repeated` | not described |
 | SPWI414.SPL | delayed effect casting a spell (the old engine writes it as a condition) | ability 0, effect 8 | opcode **148**, target **2**, parameter1 **1**, parameter2 **1**, timing **4**, duration **600**, power **4**, resistance **3**, resource **SPWI414A** | `recursion:delayed` | not described |
 | SPWI416.SPL | 14 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPWI417.SPL | opcodes not supported yet: 345 |  |  | `missing_opcodes:345` | not described |
@@ -346,7 +345,7 @@
 | SPWI520.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPWI521.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPWI522.SPL | 16 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
-| SPWI523.SPL | 7 abilities and no casting level (level rendering not supported yet) | ability 0, effect 0 (opcode 148) > SPWI523D.SPL | opcode **148**, target **1**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, resource **SPWI523D** | `recursion:headers` | not described |
+| SPWI523.SPL | exception for another resource than SPWI523 | ability 0, effect 0 | opcode **318**, target **2**, parameter1 **0**, parameter2 **43**, timing **0**, duration **0**, power **5**, resource **SPWI523D** | `opcode318:resource` | not described |
 | SPWI602.SPL | 9 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPWI603.SPL | 9 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
 | SPWI606.SPL | 9 abilities: level sections not supported yet |  |  | `spell:abilities` | not described |
