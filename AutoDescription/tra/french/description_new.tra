@@ -297,6 +297,9 @@
 @7001103 = ~Point dans le champ visuel du lanceur~ // reprise de @102462
 @7001110 = ~du lanceur~ // reprise de @102476
 @7001111 = ~de la cible~ // reprise de @101085
+@7002000 = ~À partir du niveau %minRequiredLevel%~ // reprise de @12320400
+@7002001 = ~Entre le niveau %minRequiredLevel% et %maxRequiredLevel%~ // reprise de @12320401
+@7002002 = ~Au niveau %minRequiredLevel%~ // reprise de @12320402
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150

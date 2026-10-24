@@ -49,6 +49,11 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~23~) AND VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
 			LPM ad_group_morale
 		END
+		// Avant les immunités, qui absorbent la vitesse rétablie : l'action libre en est retirée quand
+		// le 126 précède le 101 dans le bloc (ancien ordre des opcodes), cas du jeu de base (SPPR403).
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~126~) AND VARIABLE_IS_SET $fx_opcode_count(~163~) BEGIN
+			LPM ad_group_movement_restored
+		END
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
 			LPM ad_group_immunities
 		END
@@ -62,9 +67,6 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		END
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~58~) AND (VARIABLE_IS_SET $fx_opcode_count(~77~) OR VARIABLE_IS_SET $fx_opcode_count(~81~)) BEGIN
 			LPM ad_group_dispel_cures
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~126~) AND VARIABLE_IS_SET $fx_opcode_count(~163~) BEGIN
-			LPM ad_group_movement_restored
 		END
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~154~) BEGIN
 			LPM ad_group_entangle

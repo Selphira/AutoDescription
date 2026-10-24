@@ -297,6 +297,9 @@
 @7001103 = ~Point in the visual range of the caster~ // reprise de @102462
 @7001110 = ~of the caster~ // reprise de @102476
 @7001111 = ~of the target~ // reprise de @101085
+@7002000 = ~From level %minRequiredLevel%~ // reprise de @12320400
+@7002001 = ~Between level %minRequiredLevel% and %maxRequiredLevel%~ // reprise de @12320401
+@7002002 = ~At level %minRequiredLevel%~ // reprise de @12320402
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150

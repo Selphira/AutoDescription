@@ -32,6 +32,8 @@ DEFINE_PATCH_MACRO ad_op_126_line BEGIN
 		SET line_phrase = 21260120 // ~Rétablissement de la vitesse de déplacement~
 	END
 	PATCH_IF line_phrase > 0 BEGIN
+		// L'ancien moteur ne les dit jamais non cumulatives (cumulable remis à 1).
+		SET $fx_not_cumulative(~%line_fx%~) = 0
 		LPM ad_effect_line
 		SET stat_line_done = 1
 	END

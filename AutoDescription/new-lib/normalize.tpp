@@ -16,6 +16,8 @@
 // - fx_scope : portée de l'effet, equipped, casting ou ability<h> (en-tête h) ; les lignes, les
 //   regroupements et les contrôles de doublons ne réunissent que des effets de même portée, comme
 //   l'ancien moteur qui traite chaque bloc séparément ;
+// - fx_line_section : section de ses lignes, sa portée (un sort à plusieurs en-têtes la remplace
+//   par sa plage de niveaux, new-lib/spell_levels.tpp) ;
 // - fx_group_target : cible comparée par les regroupements, celle que l'ancien moteur compare : « soi »
 //   pour un effet d'équipement (remplacée à la lecture), la cible du fichier sinon (une potion n'est
 //   corrigée qu'après ses regroupements).
@@ -109,6 +111,7 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~ability~ BEGIN
 		SPRINT $fx_scope(~%fx_id%~) ~ability%fx_block_header%~
 	END
+	SPRINT $fx_line_section(~%fx_id%~) $fx_scope(~%fx_id%~)
 
 	SPRINT fx_resource_lower $fx_resource(~%fx_id%~)
 	TO_LOWER fx_resource_lower

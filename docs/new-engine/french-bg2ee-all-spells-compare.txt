@@ -2,15 +2,15 @@
 BALSHLD	identical
 BALTH06	identical
 BALTH07	not_covered	not_implemented:phrase22060100:form1
-BHAAL1A	not_covered	not_implemented:spell:abilities
-BHAAL1B	not_covered	not_implemented:spell:abilities
+BHAAL1A	not_covered	not_implemented:opcode93:form1
+BHAAL1B	not_covered	not_implemented:spell:progression
 BHAAL2A	not_covered	not_implemented:missing_opcodes:132
-BHAAL2B	not_covered	not_implemented:spell:abilities
-BHAAL3B	not_covered	not_implemented:spell:abilities
+BHAAL2B	not_covered	not_implemented:spell_header:opcode177_eff_fields
+BHAAL3B	not_covered	file_error:recursion:missing_file
 BHAAL4A	identical
 CDHLYSY2	identical
 CDPR417	not_covered	not_implemented:missing_opcodes:224
-CDSTAF12	not_covered	not_implemented:spell:abilities
+CDSTAF12	not_covered	not_implemented:spell:progression
 CDWI917A	not_covered	not_implemented:opcode71:gender_set
 DEMOCHM	identical
 DEVAHEAL	identical
@@ -18,8 +18,8 @@ DGARCHON	not_covered	not_implemented:opcode233:same_effect_twice
 DGFAITH	identical
 DGRIGHT	not_covered	not_implemented:missing_opcodes:250
 DW#FPPLO	identical
-JWGLOBE	not_covered	not_implemented:spell:abilities
-MARW201	not_covered	not_implemented:spell:abilities
+JWGLOBE	identical
+MARW201	not_covered	not_implemented:spell:progression
 MARW301	not_covered	not_implemented:missing_opcodes:190
 MARW401	not_covered	not_implemented:missing_opcodes:188
 MDK2SUMM	identical
@@ -33,16 +33,16 @@ OHBDEMI3	not_covered	not_implemented:missing_opcodes:213
 OHBPR608	not_covered	file_error:opcode111:invalid
 OHBQUAKE	identical
 OHBRESTO	not_covered	not_implemented:missing_opcodes:224 242
-OHBWI212	not_covered	not_implemented:spell:abilities
+OHBWI212	identical
 OHBWI302	not_covered	not_implemented:missing_opcodes:136
 OHBWI304	not_covered	not_implemented:missing_opcodes:136
-OHBWI308	not_covered	not_implemented:spell:abilities
-OHBWI405	not_covered	not_implemented:spell:abilities
+OHBWI308	identical
+OHBWI405	identical
 OHDCUT02	not_covered	not_implemented:missing_opcodes:231
 OHDPOTN1	identical
 OHDXDIS	identical
 OHHDRAIN	not_covered	not_implemented:missing_opcodes:165
-OHHSUMM	not_covered	not_implemented:spell:abilities
+OHHSUMM	not_covered	not_implemented:opcode67:random_amount
 OHNDDOOR	not_covered	not_implemented:missing_opcodes:124
 OHNRDKIL	identical
 OHNRDTEL	not_covered	not_implemented:missing_opcodes:68
@@ -50,32 +50,32 @@ OHNVRD1	identical
 OHNVRD2	identical
 OHNVRD3	identical
 OHNWISH	identical
-OHPRGD10	not_covered	not_implemented:spell:abilities
+OHPRGD10	identical
 OHRRAGE	identical
-OHTMPS1	not_covered	not_implemented:spell:abilities
+OHTMPS1	not_covered	not_implemented:opcode97:several_strength
 OHTMPS2	not_covered	not_implemented:recursion:headers
 OHTYR1	not_covered	not_implemented:missing_opcodes:242
-OHTYR2	not_covered	not_implemented:spell:abilities
+OHTYR2	not_covered	not_implemented:spell:progression
 SENSPIHE	identical
 SENSPISU	identical
 SPBLUN29	identical
 SPCL102	not_covered	not_implemented:opcode318:stat
-SPCL103	not_covered	not_implemented:spell:abilities
+SPCL103	not_covered	not_implemented:opcode73:form1
 SPCL104	identical
-SPCL106	not_covered	not_implemented:spell:abilities
-SPCL121	not_covered	not_implemented:spell:abilities
+SPCL106	identical
+SPCL121	not_covered	file_error:recursion:application:target
 SPCL144	not_covered	not_implemented:missing_opcodes:250
 SPCL152	not_covered	not_implemented:recursion:delayed
-SPCL211	not_covered	not_implemented:spell:abilities
+SPCL211	not_covered	not_implemented:spell:progression
 SPCL212	not_covered	not_implemented:spell_header:opcode115
 SPCL213	identical
 SPCL222	identical
-SPCL231	not_covered	not_implemented:spell:abilities
+SPCL231	identical
 SPCL232	not_covered	not_implemented:missing_opcodes:220
-SPCL233	not_covered	not_implemented:spell:abilities
-SPCL236	not_covered	not_implemented:spell:abilities
-SPCL237	not_covered	not_implemented:spell:abilities
-SPCL238	not_covered	not_implemented:spell:abilities
+SPCL233	identical
+SPCL236	not_covered	not_implemented:spell:progression
+SPCL237	not_covered	not_implemented:spell_header:opcode177_eff_fields
+SPCL238	not_covered	not_implemented:spell:progression
 SPCL239	identical
 SPCL311	identical
 SPCL321	not_covered	not_implemented:opcode101:ability_group_fields
@@ -84,28 +84,28 @@ SPCL412	not_covered	not_implemented:missing_opcodes:252
 SPCL414	not_covered	not_implemented:missing_opcodes:252
 SPCL423	not_covered	not_implemented:recursion:headers
 SPCL521	not_covered	not_implemented:missing_opcodes:250
-SPCL522	not_covered	not_implemented:spell:abilities
+SPCL522	identical
 SPCL611	identical
 SPCL612	identical
 SPCL613	identical
 SPCL621	not_covered	not_implemented:missing_opcodes:214
-SPCL622	not_covered	not_implemented:spell:abilities
-SPCL623	not_covered	not_implemented:spell:abilities
-SPCL624	not_covered	not_implemented:spell:abilities
-SPCL625	not_covered	not_implemented:spell:abilities
+SPCL622	identical
+SPCL623	identical
+SPCL624	identical
+SPCL625	identical
 SPCL632	identical
 SPCL633	identical
 SPCL634	identical
 SPCL643	identical
 SPCL644	identical
-SPCL721	not_covered	not_implemented:spell:abilities
-SPCL722	not_covered	not_implemented:spell:abilities
-SPCL731	not_covered	not_implemented:spell:abilities
+SPCL721	identical
+SPCL722	not_covered	not_implemented:spell:progression
+SPCL731	identical
 SPCL732	not_covered	not_implemented:missing_opcodes:220
-SPCL741	not_covered	not_implemented:spell:abilities
+SPCL741	identical
 SPCL742	not_covered	not_implemented:missing_opcodes:185
 SPCL811	identical
-SPCL815	not_covered	not_implemented:spell:abilities
+SPCL815	not_covered	not_implemented:spell:progression
 SPCL820	identical
 SPCL900	identical
 SPCL901	identical
@@ -114,7 +114,7 @@ SPCL903	not_covered	not_implemented:recursion:eff_level
 SPCL904	identical
 SPCL905	identical
 SPCL906	identical
-SPCL907	not_covered	not_implemented:spell:abilities
+SPCL907	identical
 SPCL908	identical
 SPCL909	identical
 SPCL910	not_covered	not_implemented:missing_opcodes:252
@@ -130,11 +130,11 @@ SPCL919	identical
 SPCL920	not_covered	not_implemented:missing_opcodes:251
 SPCL921	identical
 SPCL922	identical
-SPCL923	not_covered	not_implemented:spell:abilities
+SPCL923	identical
 SPCL928	not_covered	not_implemented:opcode42:ability
 SPCL929	not_covered	not_implemented:opcode42:ability
 SPCL930	not_covered	not_implemented:opcode42:ability
-SPCL935	not_covered	not_implemented:spell:abilities
+SPCL935	identical
 SPCL936	not_covered	not_implemented:missing_opcodes:236
 SPCL937	not_covered	not_implemented:missing_opcodes:213
 SPCL938	identical
@@ -145,17 +145,17 @@ SPCRYOD	identical
 SPCTMD01	identical
 SPDD03	not_covered	not_implemented:missing_opcodes:165
 SPDM101	identical
-SPDM102	not_covered	not_implemented:spell:abilities
+SPDM102	identical
 SPDM103	identical
 SPDM105	identical
-SPDM106	not_covered	not_implemented:spell:abilities
-SPDM108	not_covered	not_implemented:spell:abilities
-SPDR101	not_covered	not_implemented:spell:abilities
+SPDM106	identical
+SPDM108	not_covered	not_implemented:recursion:repeated
+SPDR101	not_covered	not_implemented:spell_header:save_bonus_progression
 SPDR201	identical
-SPDR301	not_covered	not_implemented:spell:abilities
-SPDR401	not_covered	not_implemented:spell:abilities
-SPDR501	not_covered	not_implemented:spell:abilities
-SPDR601	not_covered	not_implemented:spell:abilities
+SPDR301	not_covered	not_implemented:spell:progression
+SPDR401	identical
+SPDR501	not_covered	not_implemented:spell_header:save_bonus_progression
+SPDR601	not_covered	not_implemented:spell:progression
 SPDWD02	identical
 SPIMIX01	identical
 SPIN001	identical
@@ -164,14 +164,14 @@ SPIN102	identical
 SPIN103	not_covered	not_implemented:missing_opcodes:132
 SPIN104	not_covered	not_implemented:opcode318:stat
 SPIN105	identical
-SPIN106	not_covered	not_implemented:spell:abilities
+SPIN106	not_covered	not_implemented:recursion:repeated
 SPIN107	identical
 SPIN108	identical
-SPIN109	not_covered	not_implemented:spell:abilities
+SPIN109	not_covered	not_implemented:spell:progression
 SPIN110	identical
 SPIN111	identical
 SPIN112	identical
-SPIN113	not_covered	not_implemented:spell:abilities
+SPIN113	identical
 SPIN114	identical
 SPIN115	identical
 SPIN116	identical
@@ -206,7 +206,7 @@ SPIN532	identical
 SPIN538	not_covered	not_implemented:opcode111:external
 SPIN542	not_covered	not_implemented:missing_opcodes:238
 SPIN543	identical
-SPIN544	not_covered	not_implemented:spell:abilities
+SPIN544	identical
 SPIN545	not_covered	not_implemented:opcode318:stat
 SPIN546	identical
 SPIN547	identical
@@ -247,24 +247,24 @@ SPIN679	identical
 SPIN681	identical
 SPIN682	identical
 SPIN684	not_covered	not_implemented:missing_opcodes:220
-SPIN685	not_covered	not_implemented:spell:abilities
+SPIN685	identical
 SPIN686	identical
-SPIN687	not_covered	not_implemented:spell:abilities
+SPIN687	identical
 SPIN689	identical
 SPIN692	identical
-SPIN694	not_covered	not_implemented:spell:abilities
+SPIN694	not_covered	not_implemented:spell:progression
 SPIN695	not_covered	not_implemented:missing_opcodes:273
 SPIN696	not_covered	not_implemented:missing_opcodes:115 150 220
-SPIN697	not_covered	not_implemented:spell:abilities
-SPIN698	not_covered	not_implemented:spell:abilities
+SPIN697	identical
+SPIN698	not_covered	not_implemented:spell:progression
 SPIN699	identical
 SPIN701	identical
 SPIN702	identical
 SPIN703	identical
-SPIN704	not_covered	not_implemented:spell:abilities
+SPIN704	identical
 SPIN710	identical
 SPIN711	identical
-SPIN714	not_covered	not_implemented:spell:abilities
+SPIN714	not_covered	not_implemented:spell:progression
 SPIN717	identical
 SPIN718	not_covered	not_implemented:opcode135:natural_form
 SPIN718A	not_covered	not_implemented:opcode135:natural_form
@@ -276,7 +276,7 @@ SPIN732	identical
 SPIN733	identical
 SPIN734	identical
 SPIN735	identical
-SPIN736	not_covered	not_implemented:spell:abilities
+SPIN736	identical
 SPIN737	not_covered	not_implemented:missing_opcodes:261
 SPIN738	identical
 SPIN773	identical
@@ -294,9 +294,9 @@ SPIN822	identical
 SPIN823	identical
 SPIN824	identical
 SPIN825	identical
-SPIN826	not_covered	not_implemented:spell:abilities
-SPIN827	not_covered	not_implemented:spell:abilities
-SPIN828	not_covered	not_implemented:spell:abilities
+SPIN826	not_covered	not_implemented:opcode97:several_strength
+SPIN827	not_covered	not_implemented:spell:progression
+SPIN828	identical
 SPIN829	identical
 SPIN836	identical
 SPIN837	not_covered	not_implemented:missing_opcodes:231
@@ -323,7 +323,7 @@ SPIN938	identical
 SPIN939	identical
 SPIN941	identical
 SPIN944	not_covered	not_implemented:missing_opcodes:210
-SPIN956	not_covered	not_implemented:spell:abilities
+SPIN956	identical
 SPIN958	identical
 SPIN974	identical
 SPIN998	identical
@@ -337,43 +337,43 @@ SPPR103	identical
 SPPR104	not_covered	not_implemented:spell_header:opcode115
 SPPR105	identical
 SPPR106	identical
-SPPR107	not_covered	not_implemented:spell:abilities
+SPPR107	identical
 SPPR108	identical
 SPPR109	not_covered	not_implemented:missing_opcodes:153
-SPPR110	not_covered	not_implemented:spell:abilities
-SPPR111	not_covered	not_implemented:spell:abilities
+SPPR110	not_covered	not_implemented:spell:progression
+SPPR111	not_covered	not_implemented:spell:progression
 SPPR113	identical
 SPPR150	not_covered	not_implemented:missing_opcodes:346
 SPPR201	not_covered	not_implemented:missing_opcodes:129
-SPPR202	not_covered	not_implemented:spell:abilities
+SPPR202	not_covered	not_implemented:opcode36:form1
 SPPR203	not_covered	not_implemented:recursion:missing_opcodes:131
 SPPR204	identical
 SPPR205	not_covered	not_implemented:missing_opcodes:150
 SPPR205D	not_covered	not_implemented:missing_opcodes:150
-SPPR206	not_covered	not_implemented:spell:abilities
+SPPR206	identical
 SPPR207	identical
 SPPR208	not_covered	not_implemented:opcode175:creature_type
 SPPR209	not_covered	not_implemented:missing_opcodes:115
-SPPR210	not_covered	not_implemented:spell:abilities
-SPPR211	not_covered	not_implemented:spell:abilities
+SPPR210	not_covered	not_implemented:opcode85:form1
+SPPR211	identical
 SPPR212	identical
-SPPR213	not_covered	not_implemented:spell:abilities
+SPPR213	identical
 SPPR214	not_covered	not_implemented:missing_opcodes:132
 SPPR250	not_covered	not_implemented:phrase22060100:form1
-SPPR301	not_covered	not_implemented:spell:abilities
-SPPR302	not_covered	not_implemented:spell:abilities
+SPPR301	identical
+SPPR302	not_covered	not_implemented:spell:progression
 SPPR303	identical
-SPPR304	not_covered	not_implemented:spell:abilities
-SPPR305	not_covered	not_implemented:spell:abilities
-SPPR306	not_covered	not_implemented:spell:abilities
+SPPR304	not_covered	not_implemented:spell:progression
+SPPR305	not_covered	not_implemented:opcode175:creature_type
+SPPR306	not_covered	not_implemented:opcode84:form1
 SPPR307	not_covered	not_implemented:missing_opcodes:26
 SPPR308	identical
 SPPR309	identical
 SPPR310	identical
 SPPR311	identical
 SPPR312	not_covered	not_implemented:opcode97:form1
-SPPR313	not_covered	not_implemented:spell:abilities
-SPPR314	not_covered	not_implemented:spell:abilities
+SPPR313	not_covered	not_implemented:spell:progression
+SPPR314	not_covered	not_implemented:opcode177:versus_group
 SPPR315	identical
 SPPR317	identical
 SPPR318	not_covered	not_implemented:missing_opcodes:273
@@ -381,47 +381,47 @@ SPPR319	not_covered	not_implemented:opcode233:same_effect_twice
 SPPR350	not_covered	not_implemented:missing_opcodes:242 337
 SPPR401	identical
 SPPR402	not_covered	not_implemented:spell_header:opcode177_eff_fields
-SPPR403	not_covered	not_implemented:spell:abilities
+SPPR403	identical
 SPPR404	identical
 SPPR405	identical
 SPPR406	identical
-SPPR407	not_covered	not_implemented:spell:abilities
-SPPR408	not_covered	not_implemented:spell:abilities
-SPPR409	not_covered	not_implemented:spell:abilities
+SPPR407	identical
+SPPR408	identical
+SPPR409	identical
 SPPR410	identical
-SPPR411	not_covered	not_implemented:spell:abilities
-SPPR412	not_covered	not_implemented:spell:abilities
+SPPR411	not_covered	not_implemented:spell_header:opcode177_eff_fields
+SPPR412	not_covered	not_implemented:opcode97:several_strength
 SPPR413	identical
 SPPR414	identical
 SPPR415	not_covered	not_implemented:missing_opcodes:239
 SPPR416	identical
 SPPR417	not_covered	not_implemented:missing_opcodes:224
-SPPR450	not_covered	not_implemented:spell:abilities
+SPPR450	not_covered	not_implemented:recursion:probability
 SPPR501	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR502	identical
-SPPR503	not_covered	not_implemented:spell:abilities
+SPPR503	not_covered	not_implemented:spell:progression
 SPPR504	identical
 SPPR505	not_covered	not_implemented:missing_opcodes:220
-SPPR506	not_covered	not_implemented:spell:abilities
-SPPR507	not_covered	not_implemented:spell:abilities
-SPPR508	not_covered	not_implemented:spell:abilities
-SPPR509	not_covered	not_implemented:spell:abilities
+SPPR506	not_covered	not_implemented:spell:progression
+SPPR507	not_covered	not_implemented:opcode145:ability
+SPPR508	not_covered	not_implemented:phrase30100100:form1
+SPPR509	not_covered	not_implemented:phrase5000130:form1
 SPPR510	identical
 SPPR511	identical
-SPPR512	not_covered	not_implemented:spell:abilities
+SPPR512	not_covered	not_implemented:opcode324:exceptions_group
 SPPR513	not_covered	not_implemented:missing_opcodes:250
-SPPR514	not_covered	not_implemented:spell:abilities
+SPPR514	not_covered	not_implemented:spell:progression
 SPPR515	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR515D	not_covered	not_implemented:opcode318:stat
 SPPR516	identical
 SPPR517	not_covered	not_implemented:opcode233:same_effect_twice
 SPPR550	identical
-SPPR601	not_covered	not_implemented:spell:abilities
+SPPR601	identical
 SPPR602	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR603	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR603D	identical
 SPPR604	not_covered	not_implemented:spell_header:opcode177_eff_fields
-SPPR605	not_covered	not_implemented:spell:abilities
+SPPR605	identical
 SPPR606	identical
 SPPR607	identical
 SPPR608	identical
@@ -431,39 +431,39 @@ SPPR611	not_covered	not_implemented:missing_opcodes:261
 SPPR612	not_covered	not_implemented:opcode324:exceptions_identical
 SPPR613	not_covered	not_implemented:opcode233:same_effect_twice
 SPPR614	identical
-SPPR650	not_covered	not_implemented:spell:abilities
+SPPR650	not_covered	not_implemented:spell_header:save_bonus_progression
 SPPR698	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR698D	identical
 SPPR699	identical
-SPPR701	not_covered	not_implemented:spell:abilities
-SPPR702	not_covered	not_implemented:spell:abilities
+SPPR701	not_covered	not_implemented:opcode233:same_effect_twice
+SPPR702	identical
 SPPR703	identical
 SPPR704	identical
-SPPR705	not_covered	not_implemented:spell:abilities
-SPPR706	not_covered	not_implemented:spell:abilities
-SPPR707	not_covered	not_implemented:spell:abilities
-SPPR708	not_covered	not_implemented:spell:abilities
-SPPR709	not_covered	not_implemented:spell:abilities
+SPPR705	not_covered	not_implemented:spell:progression
+SPPR706	identical
+SPPR707	not_covered	not_implemented:recursion:repeated
+SPPR708	not_covered	not_implemented:spell_header:save_bonus_progression
+SPPR709	identical
 SPPR710	not_covered	not_implemented:application:level
-SPPR711	not_covered	not_implemented:spell:abilities
+SPPR711	identical
 SPPR712	identical
 SPPR713	not_covered	not_implemented:missing_opcodes:224 242
 SPPR715	not_covered	not_implemented:application:level
 SPPR717	not_covered	not_implemented:recursion:series
-SPPR718	not_covered	not_implemented:spell:abilities
+SPPR718	identical
 SPPR719	not_covered	not_implemented:missing_opcodes:209
 SPPR720	identical
-SPPR721	not_covered	not_implemented:spell:abilities
+SPPR721	not_covered	not_implemented:spell:progression
 SPPR722	not_covered	not_implemented:opcode318:exceptions_group
 SPPR723	not_covered	not_implemented:phrase30100100:form3
 SPPR724	not_covered	not_implemented:phrase30100100:form1
 SPPR725	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR725D	identical
-SPPR726	not_covered	not_implemented:spell:abilities
-SPPR727	not_covered	not_implemented:spell:abilities
+SPPR726	identical
+SPPR727	identical
 SPPR728	identical
-SPPR729	not_covered	not_implemented:spell:abilities
-SPPR730	not_covered	not_implemented:spell:abilities
+SPPR729	not_covered	not_implemented:recursion:repeated
+SPPR730	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR731	identical
 SPPR732	identical
 SPPR750	not_covered	not_implemented:missing_opcodes:213
@@ -472,8 +472,8 @@ SPPR984	identical
 SPPR986	identical
 SPPR987	identical
 SPPR999	identical
-SPRA301	not_covered	not_implemented:spell:abilities
-SPRA302	not_covered	not_implemented:spell:abilities
+SPRA301	not_covered	not_implemented:opcode93:form1
+SPRA302	not_covered	not_implemented:opcode233:same_effect_twice
 SPRA303	identical
 SPRA304	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPRA305	not_covered	not_implemented:spell_header:opcode177_eff_fields
@@ -489,29 +489,29 @@ SPWI053	identical
 SPWI054	identical
 SPWI055	not_covered	not_implemented:missing_opcodes:238
 SPWI056	not_covered	not_implemented:missing_opcodes:238
-SPWI101	not_covered	not_implemented:spell:abilities
+SPWI101	not_covered	not_implemented:phrase1210140:form1
 SPWI102	identical
 SPWI103	not_covered	not_implemented:missing_opcodes:165
 SPWI104	identical
 SPWI105	not_covered	not_implemented:missing_opcodes:165
 SPWI106	identical
-SPWI107	not_covered	not_implemented:spell:abilities
+SPWI107	identical
 SPWI108	identical
 SPWI110	not_covered	not_implemented:opcode21:form1
 SPWI111	identical
-SPWI112	not_covered	not_implemented:spell:abilities
-SPWI113	not_covered	not_implemented:spell:abilities
+SPWI112	identical
+SPWI113	identical
 SPWI114	identical
-SPWI115	not_covered	not_implemented:spell:abilities
-SPWI116	not_covered	not_implemented:spell:abilities
+SPWI115	identical
+SPWI116	not_covered	not_implemented:opcode324:exceptions_group
 SPWI117	identical
-SPWI118	not_covered	not_implemented:spell:abilities
+SPWI118	not_covered	not_implemented:spell_header:save_bonus_progression
 SPWI119	not_covered	not_implemented:opcode318:stat
 SPWI120	not_covered	not_implemented:missing_opcodes:159
 SPWI123	not_covered	not_implemented:missing_opcodes:192
 SPWI124	not_covered	not_implemented:missing_opcodes:214
-SPWI125	not_covered	not_implemented:spell:abilities
-SPWI201	not_covered	not_implemented:spell:abilities
+SPWI125	not_covered	not_implemented:spell_header:save_bonus_progression
+SPWI201	identical
 SPWI202	not_covered	not_implemented:spell_header:opcode115
 SPWI203	identical
 SPWI205	identical
@@ -520,73 +520,73 @@ SPWI207	not_covered	not_implemented:missing_opcodes:125
 SPWI208	not_covered	not_implemented:missing_opcodes:115
 SPWI209	not_covered	not_implemented:missing_opcodes:133
 SPWI210	identical
-SPWI211	not_covered	not_implemented:spell:abilities
-SPWI212	not_covered	not_implemented:spell:abilities
+SPWI211	identical
+SPWI212	identical
 SPWI213	identical
-SPWI214	not_covered	not_implemented:spell:abilities
+SPWI214	not_covered	not_implemented:opcode97:form1
 SPWI215	identical
 SPWI217	not_covered	not_implemented:missing_opcodes:165
 SPWI218	identical
 SPWI219	identical
 SPWI220	not_covered	not_implemented:missing_opcodes:217
-SPWI221	not_covered	not_implemented:spell:abilities
-SPWI222	not_covered	not_implemented:spell:abilities
+SPWI221	identical
+SPWI222	identical
 SPWI223	identical
 SPWI224	identical
-SPWI298	not_covered	not_implemented:spell:abilities
+SPWI298	identical
 SPWI299	identical
 SPWI301	not_covered	not_implemented:missing_opcodes:117
 SPWI302	identical
-SPWI303	not_covered	not_implemented:spell:abilities
-SPWI304	not_covered	not_implemented:spell:abilities
-SPWI305	not_covered	not_implemented:spell:abilities
+SPWI303	identical
+SPWI304	not_covered	not_implemented:spell:progression
+SPWI305	not_covered	not_implemented:opcode93:form1
 SPWI306	not_covered	not_implemented:opcode175:creature_type
 SPWI307	identical
-SPWI308	not_covered	not_implemented:spell:abilities
-SPWI309	not_covered	not_implemented:spell:abilities
+SPWI308	not_covered	not_implemented:spell:progression
+SPWI309	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPWI310	identical
 SPWI311	identical
 SPWI312	identical
-SPWI313	not_covered	not_implemented:spell:abilities
-SPWI314	not_covered	not_implemented:spell:abilities
-SPWI315	not_covered	not_implemented:spell:abilities
+SPWI313	not_covered	not_implemented:spell:progression
+SPWI314	not_covered	not_implemented:recursion:repeated
+SPWI315	not_covered	not_implemented:opcode145:ability
 SPWI316	identical
 SPWI317	identical
-SPWI318	not_covered	not_implemented:spell:abilities
-SPWI319	not_covered	not_implemented:spell:abilities
-SPWI320	not_covered	not_implemented:spell:abilities
+SPWI318	not_covered	not_implemented:opcode201:group_fields
+SPWI319	not_covered	not_implemented:opcode84:form1
+SPWI320	not_covered	not_implemented:opcode85:form1
 SPWI321	identical
 SPWI322	not_covered	not_implemented:missing_opcodes:220
 SPWI324	not_covered	not_implemented:missing_opcodes:185
-SPWI325	not_covered	not_implemented:spell:abilities
+SPWI325	not_covered	not_implemented:spell:progression
 SPWI326	identical
-SPWI399	not_covered	not_implemented:spell:abilities
-SPWI401	not_covered	not_implemented:spell:abilities
+SPWI399	identical
+SPWI401	identical
 SPWI402	not_covered	not_implemented:missing_opcodes:124
-SPWI403	not_covered	not_implemented:spell:abilities
+SPWI403	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPWI404	identical
-SPWI405	not_covered	not_implemented:spell:abilities
-SPWI406	not_covered	not_implemented:spell:abilities
-SPWI407	not_covered	not_implemented:spell:abilities
-SPWI408	not_covered	not_implemented:spell:abilities
+SPWI405	identical
+SPWI406	identical
+SPWI407	not_covered	not_implemented:spell_header:opcode177_eff_fields
+SPWI408	not_covered	not_implemented:spell:progression
 SPWI409	not_covered	not_implemented:opcode78:group
 SPWI410	not_covered	not_implemented:missing_opcodes:26
-SPWI411	not_covered	not_implemented:spell:abilities
-SPWI412	not_covered	not_implemented:spell:abilities
+SPWI411	identical
+SPWI412	identical
 SPWI413	not_covered	not_implemented:recursion:repeated
 SPWI414	not_covered	not_implemented:recursion:delayed
 SPWI415	identical
-SPWI416	not_covered	not_implemented:spell:abilities
+SPWI416	not_covered	not_implemented:spell_header:save_subspell
 SPWI417	not_covered	not_implemented:missing_opcodes:345
-SPWI418	not_covered	not_implemented:spell:abilities
+SPWI418	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPWI419	identical
 SPWI420	identical
 SPWI420D	identical
 SPWI420P	identical
 SPWI421	not_covered	not_implemented:missing_opcodes:222
-SPWI423	not_covered	not_implemented:spell:abilities
+SPWI423	identical
 SPWI424	not_covered	not_implemented:missing_opcodes:239
-SPWI425	not_covered	not_implemented:spell:abilities
+SPWI425	identical
 SPWI489	not_covered	not_implemented:opcode135:natural_form
 SPWI490	not_covered	not_implemented:opcode135:natural_form
 SPWI491	not_covered	not_implemented:opcode135:natural_form
@@ -597,55 +597,55 @@ SPWI496	identical
 SPWI497	identical
 SPWI498	identical
 SPWI499	identical
-SPWI501	not_covered	not_implemented:spell:abilities
+SPWI501	identical
 SPWI502	identical
-SPWI503	not_covered	not_implemented:spell:abilities
-SPWI504	not_covered	not_implemented:spell:abilities
-SPWI505	not_covered	not_implemented:spell:abilities
+SPWI503	not_covered	not_implemented:spell:progression
+SPWI504	not_covered	not_implemented:spell_header:opcode177_eff_fields
+SPWI505	identical
 SPWI506	identical
-SPWI507	not_covered	not_implemented:spell:abilities
-SPWI508	not_covered	not_implemented:spell:abilities
+SPWI507	identical
+SPWI508	not_covered	not_implemented:spell_header:save_bonus_progression
 SPWI509	identical
 SPWI510	not_covered	not_implemented:missing_opcodes:214
-SPWI511	not_covered	not_implemented:spell:abilities
-SPWI512	not_covered	not_implemented:spell:abilities
+SPWI511	identical
+SPWI512	identical
 SPWI513	identical
-SPWI514	not_covered	not_implemented:spell:abilities
+SPWI514	not_covered	not_implemented:spell:progression
 SPWI515	not_covered	not_implemented:missing_opcodes:220
 SPWI516	not_covered	not_implemented:missing_opcodes:165
-SPWI517	not_covered	not_implemented:spell:abilities
-SPWI518	not_covered	not_implemented:spell:abilities
+SPWI517	identical
+SPWI518	identical
 SPWI519	not_covered	not_implemented:missing_opcodes:226
 SPWI520	not_covered	not_implemented:missing_opcodes:165
 SPWI521	not_covered	not_implemented:missing_opcodes:165
-SPWI522	not_covered	not_implemented:spell:abilities
+SPWI522	identical
 SPWI523	not_covered	not_implemented:opcode318:resource
 SPWI601	identical
-SPWI602	not_covered	not_implemented:spell:abilities
-SPWI603	not_covered	not_implemented:spell:abilities
+SPWI602	identical
+SPWI603	not_covered	not_implemented:opcode145:ability
 SPWI604	identical
 SPWI605	identical
-SPWI606	not_covered	not_implemented:spell:abilities
+SPWI606	not_covered	not_implemented:opcode31:form1
 SPWI607	not_covered	not_implemented:missing_opcodes:236
-SPWI608	not_covered	not_implemented:spell:abilities
+SPWI608	not_covered	not_implemented:spell:progression
 SPWI609	not_covered	not_implemented:missing_opcodes:220
 SPWI611	identical
 SPWI612	identical
-SPWI613	not_covered	not_implemented:spell:abilities
+SPWI613	not_covered	not_implemented:phrase30100100:form1
 SPWI614	identical
-SPWI615	not_covered	not_implemented:spell:abilities
+SPWI615	not_covered	not_implemented:spell:progression
 SPWI616	not_covered	not_implemented:missing_opcodes:238
-SPWI617	not_covered	not_implemented:spell:abilities
-SPWI618	not_covered	not_implemented:spell:abilities
-SPWI619	not_covered	not_implemented:spell:abilities
+SPWI617	identical
+SPWI618	not_covered	not_implemented:opcode233:same_effect_twice
+SPWI619	identical
 SPWI620	not_covered	not_implemented:missing_opcodes:165
 SPWI621	not_covered	not_implemented:missing_opcodes:165
 SPWI622	not_covered	not_implemented:missing_opcodes:165
-SPWI623	not_covered	not_implemented:spell:abilities
-SPWI624	not_covered	not_implemented:spell:abilities
+SPWI623	not_covered	not_implemented:spell:progression
+SPWI624	not_covered	not_implemented:spell:progression
 SPWI625	identical
-SPWI701	not_covered	not_implemented:spell:abilities
-SPWI702	not_covered	not_implemented:spell:abilities
+SPWI701	not_covered	not_implemented:opcode233:same_effect_twice
+SPWI702	not_covered	not_implemented:opcode85:form1
 SPWI703	not_covered	not_implemented:missing_opcodes:236
 SPWI704	identical
 SPWI705	identical
@@ -659,36 +659,36 @@ SPWI712	identical
 SPWI713	identical
 SPWI714	not_covered	not_implemented:missing_opcodes:238
 SPWI715	not_covered	not_implemented:missing_opcodes:210
-SPWI716	not_covered	not_implemented:spell:abilities
-SPWI717	not_covered	not_implemented:spell:abilities
-SPWI718	not_covered	not_implemented:spell:abilities
-SPWI719	not_covered	not_implemented:spell:abilities
+SPWI716	identical
+SPWI717	not_covered	not_implemented:spell:progression
+SPWI718	identical
+SPWI719	identical
 SPWI720	not_covered	not_implemented:missing_opcodes:241
-SPWI721	not_covered	not_implemented:spell:abilities
+SPWI721	identical
 SPWI722	identical
 SPWI723	identical
 SPWI802	identical
-SPWI803	not_covered	not_implemented:spell:abilities
+SPWI803	not_covered	not_implemented:opcode31:form1
 SPWI804	not_covered	not_implemented:missing_opcodes:236
-SPWI805	not_covered	not_implemented:spell:abilities
+SPWI805	not_covered	not_implemented:spell:progression
 SPWI807	identical
 SPWI808	identical
 SPWI809	identical
 SPWI809D	identical
 SPWI809P	identical
-SPWI810	not_covered	not_implemented:spell:abilities
-SPWI811	not_covered	not_implemented:spell:abilities
-SPWI812	not_covered	not_implemented:spell:abilities
+SPWI810	not_covered	not_implemented:spell:progression
+SPWI811	identical
+SPWI812	not_covered	not_implemented:spell:progression
 SPWI813	not_covered	not_implemented:missing_opcodes:213
 SPWI815	identical
-SPWI816	not_covered	not_implemented:spell:abilities
+SPWI816	identical
 SPWI817	not_covered	not_implemented:missing_opcodes:209
 SPWI818	not_covered	not_implemented:application:timing
 SPWI853	not_covered	not_implemented:missing_opcodes:185
 SPWI888	identical
 SPWI897	not_covered	not_implemented:missing_opcodes:209
-SPWI898	not_covered	not_implemented:spell:abilities
-SPWI899	not_covered	not_implemented:spell:abilities
+SPWI898	identical
+SPWI899	identical
 SPWI902	not_covered	not_implemented:missing_opcodes:259
 SPWI903	identical
 SPWI905	identical
@@ -705,11 +705,11 @@ SPWI916	identical
 SPWI917	not_covered	not_implemented:missing_opcodes:212
 SPWI918	not_covered	not_implemented:application:timing
 SPWI919	identical
-SPWI920	not_covered	not_implemented:spell:abilities
+SPWI920	not_covered	not_implemented:spell:progression
 SPWI921	not_covered	not_implemented:missing_opcodes:188
 SPWI922	identical
-SPWI923	not_covered	not_implemented:spell:abilities
-SPWI924	not_covered	not_implemented:spell:abilities
+SPWI923	identical
+SPWI924	identical
 SPWI925	identical
 SPWI926	not_covered	not_implemented:missing_opcodes:124
 SPWI943	identical
@@ -728,7 +728,7 @@ SPWISH07	not_covered	not_implemented:missing_opcodes:224 242
 SPWISH09	identical
 SPWISH10	identical
 SPWISH11	not_covered	not_implemented:recursion:eff_level
-SPWISH12	not_covered	not_implemented:spell:abilities
+SPWISH12	not_covered	not_implemented:opcode86:form1
 SPWISH17	not_covered	not_implemented:missing_opcodes:188 231
 SPWISH18	identical
 SPWISH19	identical

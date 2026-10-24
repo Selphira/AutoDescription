@@ -45,10 +45,10 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 		SET $charged_global_duration(~%header_h%~) = 0
 	END
 	FOR (header_id = 0; header_id < fx_count; ++header_id) BEGIN
-		SET $fx_header_hidden(~%header_id%~) = 0
 		LPM ad_spell_header_keeps
 		// Une exception de cible est écartée après la lecture de ses noms, que les lignes écrivent
-		// (ad_target_exception_support).
+		// (ad_target_exception_support) : seul l'en-tête l'ignore.
+		SET $fx_header_hidden(~%header_id%~) = NOT keep_effect
 		PATCH_IF NOT keep_effect AND (support_header_only OR NOT $fx_exception(~%header_id%~)) BEGIN
 			SET $fx_consumed(~%header_id%~) = 1
 			SET $fx_dropped(~%header_id%~) = 1
@@ -155,11 +155,13 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 			FOR (header_n = 0; header_n < $header_opcode_size(~%header_k%~); ++header_n) BEGIN
 				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = $EVAL ~header_opcode_%header_k%~(~%header_n%~)
 				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = header_opcode
+				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = 0 - 1
 				SET header_kept += 1
 			END
 			FOR (header_n = 0; header_n < $header_opcode_late(~%header_k%~); ++header_n) BEGIN
 				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = $EVAL ~header_late_%header_k%~(~%header_n%~)
 				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = header_opcode
+				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = 0 - 1
 				SET header_kept += 1
 			END
 		END
@@ -169,6 +171,7 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 				SPRINT header_derived_kind $derived_kind(~%header_k%~)
 				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = header_id
 				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = $AD_DERIVED_OLD_OPCODE(~%header_derived_kind%~)
+				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = header_k
 				SET header_kept += 1
 			END
 		END
@@ -216,7 +219,7 @@ END
 
 // Refus des cas que ce rendu ne sait pas reproduire (header_missing, vide sinon), avant le rendu :
 // sort sans en-tête, plusieurs en-têtes dont les niveaux ne croissent pas à partir de 1 (absents du
-// jeu de base), plusieurs en-têtes avec la section « PARAMÈTRES », types, écoles et types
+// jeu de base), types, écoles et types
 // secondaires sans nom, refus de la chaîne des effets.
 DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	SPRINT header_missing ~~
@@ -231,9 +234,6 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 		PATCH_IF $spell_level(~%header_h%~) <= $spell_level(~%header_previous%~) OR $spell_level(~0~) > 1 BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:ability_levels~ message = ~abilities whose required levels do not grow from level 1: not supported~ RET header_missing = refusal END
 		END
-	END
-	PATCH_IF fx_header_count > 1 AND NOT support_header_only AND ~%header_missing%~ STRING_EQUAL ~~ BEGIN
-		LPF ad_refusal STR_VAR reason = ~not_implemented:spell:abilities~ message = ~%fx_header_count% abilities: level sections not supported yet~ RET header_missing = refusal END
 	END
 	READ_SHORT SPL_type    spell_type
 	READ_LONG  SPL_sectype spell_sectype

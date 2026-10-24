@@ -653,7 +653,8 @@ END
 // sous-sort, qui nomment déjà leurs cibles) ; line_section et line_sort comme pour ad_line_add ;
 // line_no_duration : durée de l'effet non écrite (déjà dans la condition).
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
-// entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_scope), suivi de sa
+// entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_line_section : sa portée,
+// ou sa plage de niveaux dans un sort à plusieurs en-têtes, new-lib/spell_levels.tpp), suivi de sa
 // durée. line_sentence (phrase ajoutée par l'opcode) suit le texte après un point ; line_suffix
 // (précisions de l'opcode, « (ne réveille pas la cible) ») les suit, avant la durée ; line_save_for_half et line_fail_for_half règlent le jet de sauvegarde
 // (ad_application_save), suivi de « (non cumulatif) » pour un effet lu après un 321 sur la ressource
@@ -696,7 +697,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SPRINT app_saved_section ~%line_section%~
 	SPRINT app_block $fx_block(~%line_fx%~)
 	PATCH_IF ~%app_block%~ STRING_EQUAL ~ability~ BEGIN
-		SPRINT line_section $fx_scope(~%line_fx%~)
+		SPRINT line_section $fx_line_section(~%line_fx%~)
 		LPM ad_application_duration
 		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) AND NOT line_no_duration BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~

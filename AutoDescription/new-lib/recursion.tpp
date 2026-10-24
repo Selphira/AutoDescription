@@ -180,68 +180,72 @@ END
 // à sa vérification.
 DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 	FOR (pending_k = 0; pending_k < recursion_pending_count AND ~%render_late_missing%~ STRING_EQUAL ~~; ++pending_k) BEGIN
-		SET pending_seen_value = 0
-		LPM ad_recursion_pending_seen
 		SET recursion_fx = $recursion_pending(~%pending_k%~)
-		SPRINT recursion_kind $fx_sub_kind(~%recursion_fx%~)
-		SET recursion_h = $fx_header(~%recursion_fx%~)
-		SET recursion_hide = ctx_ignore_duration OR $fx_sub_ignore_duration(~%recursion_fx%~)
-		// L'ancien get_res_description ne transmet pas à l'effet d'un EFF la durée tue par l'en-tête
-		// d'un sort, ni son jet (ad_describe_subresource).
-		PATCH_IF support_spell AND ~%recursion_kind%~ STRING_EQUAL ~eff~ BEGIN
-			SET recursion_hide = $fx_sub_ignore_duration(~%recursion_fx%~)
-		END
-		PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
-			SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
-		END
-		SPRINT recursion_resref $fx_sub_resref(~%recursion_fx%~)
-		SPRINT recursion_origin $fx_sub_origin(~%recursion_fx%~)
-		SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
-		TO_UPPER recursion_origin_resource
-		LPF ad_describe_subresource
-			INT_VAR
-				ctx_depth = $fx_sub_depth(~%recursion_fx%~)
-				ctx_casting_level = $fx_sub_casting_level(~%recursion_fx%~)
-				ctx_parent_dice = $fx_sub_parent_dice(~%recursion_fx%~)
-				ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
-				ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
-				ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
-				ctx_ignore_duration = recursion_hide
-				ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
-				ctx_base_probability = $fx_probability(~%recursion_fx%~)
-				ctx_base_low = $fx_probability_low(~%recursion_fx%~)
-				ctx_base_high = $fx_probability_high(~%recursion_fx%~)
-			STR_VAR
-				resref = ~%recursion_resref%~
-				kind = ~%recursion_kind%~
-				ctx_chain = ~%ctx_chain%~
-				ctx_origin = ~%recursion_origin% > %recursion_origin_resource%~
-				ctx_the_target = $fx_sub_the_target(~%recursion_fx%~)
-				ctx_of_the_target = $fx_sub_of_the_target(~%recursion_fx%~)
-				ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
-				ctx_versus = $fx_sub_versus(~%recursion_fx%~)
-			RET
-				recursion_sub_missing = sub_missing
-				recursion_sub_count = sub_count
-				recursion_sub_text = sub_text
-				recursion_sub_opcode = sub_opcode
-		END
-		SET pending_seen_value = 1
-		LPM ad_recursion_pending_seen
-		PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
-			LPF ad_refusal_nest INT_VAR fx_id = recursion_fx STR_VAR refusal = ~%recursion_sub_missing%~ RET render_late_missing = refusal END
-		END
-		ELSE BEGIN
-			SPRINT recursion_single_reason $fx_sub_single_reason(~%recursion_fx%~)
-			PATCH_IF recursion_sub_count > 1 AND NOT (~%recursion_single_reason%~ STRING_EQUAL ~~) BEGIN
-				SPRINT recursion_single_message $fx_sub_single_message(~%recursion_fx%~)
-				LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_single_reason%~ message = ~%recursion_single_message%~ RET render_late_missing = refusal END
+		// Un effet écarté après sa vérification (effet répété d'un niveau de sort au suivant,
+		// new-lib/spell_levels.tpp) n'a pas de ligne.
+		PATCH_IF NOT $fx_consumed(~%recursion_fx%~) BEGIN
+			SET pending_seen_value = 0
+			LPM ad_recursion_pending_seen
+			SPRINT recursion_kind $fx_sub_kind(~%recursion_fx%~)
+			SET recursion_h = $fx_header(~%recursion_fx%~)
+			SET recursion_hide = ctx_ignore_duration OR $fx_sub_ignore_duration(~%recursion_fx%~)
+			// L'ancien get_res_description ne transmet pas à l'effet d'un EFF la durée tue par l'en-tête
+			// d'un sort, ni son jet (ad_describe_subresource).
+			PATCH_IF support_spell AND ~%recursion_kind%~ STRING_EQUAL ~eff~ BEGIN
+				SET recursion_hide = $fx_sub_ignore_duration(~%recursion_fx%~)
 			END
+			PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
+				SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
+			END
+			SPRINT recursion_resref $fx_sub_resref(~%recursion_fx%~)
+			SPRINT recursion_origin $fx_sub_origin(~%recursion_fx%~)
+			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
+			TO_UPPER recursion_origin_resource
+			LPF ad_describe_subresource
+				INT_VAR
+					ctx_depth = $fx_sub_depth(~%recursion_fx%~)
+					ctx_casting_level = $fx_sub_casting_level(~%recursion_fx%~)
+					ctx_parent_dice = $fx_sub_parent_dice(~%recursion_fx%~)
+					ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
+					ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
+					ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
+					ctx_ignore_duration = recursion_hide
+					ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
+					ctx_base_probability = $fx_probability(~%recursion_fx%~)
+					ctx_base_low = $fx_probability_low(~%recursion_fx%~)
+					ctx_base_high = $fx_probability_high(~%recursion_fx%~)
+				STR_VAR
+					resref = ~%recursion_resref%~
+					kind = ~%recursion_kind%~
+					ctx_chain = ~%ctx_chain%~
+					ctx_origin = ~%recursion_origin% > %recursion_origin_resource%~
+					ctx_the_target = $fx_sub_the_target(~%recursion_fx%~)
+					ctx_of_the_target = $fx_sub_of_the_target(~%recursion_fx%~)
+					ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
+					ctx_versus = $fx_sub_versus(~%recursion_fx%~)
+				RET
+					recursion_sub_missing = sub_missing
+					recursion_sub_count = sub_count
+					recursion_sub_text = sub_text
+					recursion_sub_opcode = sub_opcode
+			END
+			SET pending_seen_value = 1
+			LPM ad_recursion_pending_seen
+			PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
+				LPF ad_refusal_nest INT_VAR fx_id = recursion_fx STR_VAR refusal = ~%recursion_sub_missing%~ RET render_late_missing = refusal END
+			END
+			ELSE BEGIN
+				SPRINT recursion_single_reason $fx_sub_single_reason(~%recursion_fx%~)
+				PATCH_IF recursion_sub_count > 1 AND NOT (~%recursion_single_reason%~ STRING_EQUAL ~~) BEGIN
+					SPRINT recursion_single_message $fx_sub_single_message(~%recursion_fx%~)
+					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_single_reason%~ message = ~%recursion_single_message%~ RET render_late_missing = refusal END
+				END
+			END
+			SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
+			SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
+			SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
+			SET $fx_probability_in_sub(~%recursion_fx%~) = $fx_probability(~%recursion_fx%~) < 100
 		END
-		SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
-		SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
-		SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
-		SET $fx_probability_in_sub(~%recursion_fx%~) = $fx_probability(~%recursion_fx%~) < 100
 	END
 END
 
