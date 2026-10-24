@@ -185,8 +185,8 @@ END
 // (new-lib/spell_header.tpp). Un opcode qui passe à DESCRIBED sort de cette liste.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
 	57 => 1 99 => 1 105 => 1 108 => 1 115 => 1 159 => 1 181 => 1 183 => 1 199 => 1
-	214 => 1 220 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 243 => 1
-	250 => 1 251 => 1 252 => 1 259 => 1 261 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
+	214 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 243 => 1
+	250 => 1 251 => 1 252 => 1 259 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
 	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 346 => 1 361 => 1 362 => 1
 END
 
@@ -317,6 +317,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
 	~REPLACE_ITEM~          => 400
+	~ALL_ILLUSIONS~         => 224
+	~RESTORED_SPELLS~       => 21
 END
 
 // Opcode virtuel de l'effet que l'ancien moteur crée pour un effet dérivé, ajouté après les autres
@@ -332,6 +334,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
 	~EXCEPTIONAL_STRENGTH~  => 522
 	~FREE_ACTION~           => 520
 	~REPLACE_ITEM~          => 525
+	~ALL_ILLUSIONS~         => 511
+	~RESTORED_SPELLS~       => 510
 END
 
 // Champs qu'ignore la comparaison d'un effet aux effets des autres en-têtes d'un sort (anciennes

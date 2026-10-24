@@ -3443,6 +3443,7 @@
 
 @12610010 = ~wizard~ // ~%spellType%~
 @12610011 = ~priest~
+@12610012 = ~wizard or priest~
 
 // Opcode 262: Stat: Visual Range [262]
 

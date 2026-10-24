@@ -27,7 +27,7 @@
 23       1        1        DESCRIBED LEVEL            422    IGNORED         Stat:_Morale_Modifier
 24       1        1        DESCRIBED LEVEL            393    NOT_AFTER_DEATH State:_Horror
 25       1        1        DESCRIBED LEVEL            24     NOT_AFTER_DEATH State:_Poison
-26       1        1        TODO      LEVEL            489    IGNORED         Item:_Remove_Curse
+26       1        1        DESCRIBED LEVEL            489    IGNORED         Item:_Remove_Curse
 27       1        1        DESCRIBED LEVEL            308    SHOWN           Stat:_Acid_Resistance_Modifier
 28       1        1        DESCRIBED LEVEL            305    SHOWN           Stat:_Cold_Resistance_Modifier
 29       1        1        DESCRIBED LEVEL            306    SHOWN           Stat:_Electricity_Resistance_Modifier
@@ -69,7 +69,7 @@
 65       1        1        IGNORED   LEVEL            391    SHOWN           Overlay:_Blur
 66       1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Transparency_Fade
 67       1        1        DESCRIBED LEVEL            130    SHOWN           Summon:_Creature_Summoning
-68       1        1        TODO      LEVEL            354    IGNORED         Summon:_Unsummon_Creature
+68       1        1        DESCRIBED LEVEL            354    IGNORED         Summon:_Unsummon_Creature
 69       1        1        DESCRIBED LEVEL            290    SHOWN           Protection:_From_Detection_(Non-Detection)
 70       1        1        TODO      LEVEL            220    IGNORED         Cure:_Non-Detection
 71       1        1        DESCRIBED LEVEL            464    SHOWN           IDS:_Sex_Change
@@ -189,7 +189,7 @@
 185      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Hold_(II)
 186      1        1        IGNORED   LEVEL            400    SHOWN           Script:_MoveToArea
 187      1        1        IGNORED   LEVEL            400    SHOWN           Script:_Store_Local_Variable
-188      1        1        TODO      LEVEL            401    SHOWN           Spell_Effect:_Aura_Cleansing
+188      1        1        DESCRIBED LEVEL            401    SHOWN           Spell_Effect:_Aura_Cleansing
 189      1        1        DESCRIBED LEVEL            93     SHOWN           Stat:_Casting_Time_Modifier
 190      1        1        TODO      LEVEL            94     SHOWN           Stat:_Attack_Speed_Factor
 191      1        1        DESCRIBED LEVEL            15     SHOWN           Spell:_Casting_Level_Modifier
@@ -221,11 +221,11 @@
 217      1        1        DESCRIBED LEVEL            378    SHOWN           Spell_Effect:_Unconsciousness_20HP
 218      1        1        DESCRIBED DICE_IF_P2_1_EE  406    NOT_PERMANENT   Protection:_Stoneskin
 219      1        1        DESCRIBED LEVEL            400    SHOWN           Stat:_AC_vs._Creature_Type_Modifier
-220      1        1        TODO      LEVEL            223    IGNORED         Removal:_Remove_School
+220      1        1        DESCRIBED LEVEL            223    IGNORED         Removal:_Remove_School
 221      1        1        DESCRIBED LEVEL            224    IGNORED         Removal:_Remove_Secondary_Type
 222      1        1        TODO      LEVEL            455    IGNORED         Spell_Effect:_Teleport_Field
 223      1        1        TODO      LEVEL            254    SHOWN           Spell:_Immunity_(by_School,_decrementing)
-224      1        1        TODO      LEVEL            203    IGNORED         Cure:_Level_Drain_(Restoration)
+224      1        1        DESCRIBED LEVEL            203    IGNORED         Cure:_Level_Drain_(Restoration)
 225      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Reveal_Magic
 226      1        1        TODO      LEVEL            255    SHOWN           Spell:_Immunity_(by_Secondary_Type,_decrementing)
 227      1        1        TODO      LEVEL            244    SHOWN           Spell:_Bounce_(by_School,_decrementing)
@@ -243,7 +243,7 @@
 239      1        1        TODO      LEVEL            451    SHOWN           Spell_Effect:_Farsight
 240      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Remove_Special_Effect_Icon
 241      1        1        DESCRIBED LEVEL            369    SHOWN           Charm:_Control_Creature
-242      1        1        TODO      LEVEL            209    IGNORED         Cure:_Confusion
+242      1        1        DESCRIBED LEVEL            209    IGNORED         Cure:_Confusion
 243      1        1        TODO      LEVEL            488    IGNORED         Item:_Drain_Item_Charges
 244      1        1        DESCRIBED LEVEL            376    IGNORED         Spell:_Drain_Wizard_Spell
 245      1        1        TODO      LEVEL            432    SHOWN           Check_For_Berserk
@@ -262,7 +262,7 @@
 258      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
 259      1        1        TODO      LEVEL            238    SHOWN           Protection:_Spell_Trap_(by_Power_Level,_decrementing)
 260      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
-261      1        1        TODO      LEVEL            20     IGNORED         Spell:_Restore_Lost_Spells
+261      1        1        DESCRIBED LEVEL            20     IGNORED         Spell:_Restore_Lost_Spells
 262      1        1        TODO      LEVEL            426    SHOWN           Stat:_Visual_Range
 263      1        1        TODO      LEVEL            47     SHOWN           Stat:_Backstab
 264      1        1        TODO      LEVEL            7      IGNORED         Spell_Effect:_Drop_Weapons_in_Panic
@@ -274,7 +274,7 @@
 270      1        1        TODO      LEVEL            205    IGNORED         Cure:_Unpause_Target
 271      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Avatar_Removal
 272      1        1        DESCRIBED LEVEL            467    SHOWN           Spell:_Apply_Repeating_EFF
-273      1        1        TODO      LEVEL            227    IGNORED         Remove:_Specific_Area_Effect(Zone_of_Sweet_Air)
+273      1        1        DESCRIBED LEVEL            227    IGNORED         Remove:_Specific_Area_Effect(Zone_of_Sweet_Air)
 274      1        1        DESCRIBED LEVEL            454    NOT_PERMANENT   Spell_Effect:_Teleport_to_Target
 275      1        1        DESCRIBED LEVEL            126    SHOWN           Stat:_Hide_in_Shadows_Modifier
 276      1        1        DESCRIBED LEVEL            123    SHOWN           Stat:_Detect_Illusion_Modifier
@@ -338,7 +338,7 @@
 334      0        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Turn_Undead
 335      0        1        TODO      LEVEL            493    SHOWN           Spell_Effect:_Seven_Eyes
 336      0        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Display_Eyes_Overlay
-337      0        1        TODO      LEVEL            203    IGNORED         Remove:_Opcode
+337      0        1        DESCRIBED LEVEL            203    IGNORED         Remove:_Opcode
 338      0        1        IGNORED   LEVEL            400    SHOWN           Disable_Rest
 339      0        1        IGNORED   LEVEL            400    SHOWN           Alter_Animation
 340      0        1        TODO      LEVEL            478    SHOWN           Spell_Effect:_Change_Backstab_Effect

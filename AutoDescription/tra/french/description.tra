@@ -3644,6 +3644,7 @@
 
 @12610010 = ~profane~ // ~%spellType%~
 @12610011 = ~divin~
+@12610012 = ~profane ou divin~
 
 // Opcode 262: Stat: Visual Range [262]
 

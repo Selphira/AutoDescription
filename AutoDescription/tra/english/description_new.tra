@@ -1231,6 +1231,363 @@
 @8140009 = ~Generalist~ // reprise de @100129
 @8140010 = ~Entropy~ // reprise de @100130
 
+// Écoles de magie, complément « de l'Illusion » (8 150 000 + école, 0-10)
+@8150000 = ~~ // reprise de @100100
+@8150001 = ~of Abjuration~ // reprise de @100101
+@8150002 = ~of Conjuration~ // reprise de @100102
+@8150003 = ~of Divination~ // reprise de @100103
+@8150004 = ~of Enchantment~ // reprise de @100104
+@8150005 = ~of Illusion~ // reprise de @100105
+@8150006 = ~of Invocation~ // reprise de @100106
+@8150007 = ~of Necromancy~ // reprise de @100107
+@8150008 = ~of Alteration~ // reprise de @100108
+@8150009 = ~generalist~ // reprise de @100109
+@8150010 = ~of Entropy~ // reprise de @100110
+
+// Effets d'un opcode (« les effets de charme ») : opcodes 337 et suivants (8 160 000 + opcode)
+@8160000 = ~effects modifying armor class~ // reprise de @401000
+@8160001 = ~effects modifying attack speed~ // reprise de @401001
+@8160002 = ~cure sleep effects~ // reprise de @401002
+@8160003 = ~berserker madness~ // reprise de @401003
+@8160004 = ~cure berserker madness effects~ // reprise de @401004
+@8160005 = ~charms effects~ // reprise de @401005
+@8160006 = ~effects modifying charisma~ // reprise de @401006
+@8160007 = ~~ // reprise de @401007
+@8160008 = ~~ // reprise de @401008
+@8160009 = ~~ // reprise de @401009
+@8160010 = ~effects modifying constitution~ // reprise de @401010
+@8160011 = ~effects that dispel poisons~ // reprise de @401011
+@8160012 = ~effects inflicting exceptional damage~ // reprise de @401012
+@8160013 = ~magical death effects~ // reprise de @401013
+@8160014 = ~freezing effects~ // reprise de @401014
+@8160015 = ~effects modifying dexterity~ // reprise de @401015
+@8160016 = ~haste effects~ // reprise de @401016
+@8160017 = ~cure effects~ // reprise de @401017
+@8160018 = ~effects modifying maximum hit points~ // reprise de @401018
+@8160019 = ~effects modifying intelligence~ // reprise de @401019
+@8160020 = ~invisibility effects~ // reprise de @401020
+@8160021 = ~effects modifying lore~ // reprise de @401021
+@8160022 = ~effects modifying luck~ // reprise de @401022
+@8160023 = ~effects modifying morale~ // reprise de @401023
+@8160024 = ~horror effects~ // reprise de @401024
+@8160025 = ~poisoning effects~ // reprise de @401025
+@8160026 = ~the effects that dispel curses~ // reprise de @401026
+@8160027 = ~effects modifying acid resistance~ // reprise de @401027
+@8160028 = ~effects modifying cold resistance~ // reprise de @401028
+@8160029 = ~effects modifying electricity resistance~ // reprise de @401029
+@8160030 = ~effects modifying fire resistance~ // reprise de @401030
+@8160031 = ~effects modifying magic damage resistance~ // reprise de @401031
+@8160032 = ~effects causing resurrection~ // reprise de @401032
+@8160033 = ~effects modifying saving throws against paralysis, poison and death~ // reprise de @401033
+@8160034 = ~effects modifying saving throws against rods, staves and wands~ // reprise de @401034
+@8160035 = ~effects modifying saving throws against petrification and polymorph~ // reprise de @401035
+@8160036 = ~effects modifying saving throws against breath~ // reprise de @401036
+@8160037 = ~effects modifying saving throws against spells~ // reprise de @401037
+@8160038 = ~silence effects~ // reprise de @401038
+@8160039 = ~sleep effects~ // reprise de @401039
+@8160040 = ~slow effects~ // reprise de @401040
+@8160041 = ~~ // reprise de @401041
+@8160042 = ~effects allowing the memorization of additional wizard spells~ // reprise de @401042
+@8160043 = ~effects transmuting stone into flesh~ // reprise de @401043
+@8160044 = ~effects modifying strength~ // reprise de @401044
+@8160045 = ~stun effects~ // reprise de @401045
+@8160046 = ~effects dispelling stun~ // reprise de @401046
+@8160047 = ~effects dispelling invisibility~ // reprise de @401047
+@8160048 = ~effects dispelling silence~ // reprise de @401048
+@8160049 = ~effects modifying wisdom~ // reprise de @401049
+@8160050 = ~~ // reprise de @401050
+@8160051 = ~~ // reprise de @401051
+@8160052 = ~~ // reprise de @401052
+@8160053 = ~~ // reprise de @401053
+@8160054 = ~effects modifying THAC0~ // reprise de @401054
+@8160055 = ~magical death effects~ // reprise de @401055
+@8160056 = ~alignment reversal effects~ // reprise de @401056
+@8160057 = ~alignment change effects~ // reprise de @401057
+@8160058 = ~effects that dispel magic~ // reprise de @401058
+@8160059 = ~effects modifying Stealth score~ // reprise de @401059
+@8160060 = ~effects altering miscast magic~ // reprise de @401060
+@8160061 = ~~ // reprise de @401061
+@8160062 = ~effects allowing the memorization of additional divine spells~ // reprise de @401062
+@8160063 = ~infravision~ // reprise de @401063
+@8160064 = ~effects that dispel infravision~ // reprise de @401064
+@8160065 = ~~ // reprise de @401065
+@8160066 = ~~ // reprise de @401066
+@8160067 = ~~ // reprise de @401067
+@8160068 = ~banishment effects~ // reprise de @401068
+@8160069 = ~non-detection effects~ // reprise de @401069
+@8160070 = ~effects dispelling non-detection~ // reprise de @401070
+@8160071 = ~effects causing sex change~ // reprise de @401071
+@8160072 = ~effects modifying ability scores~ // reprise de @401072
+@8160073 = ~effects modifying attack damage~ // reprise de @401073
+@8160074 = ~blindness effects~ // reprise de @401074
+@8160075 = ~effects dispelling blindness~ // reprise de @401075
+@8160076 = ~feeblemindedness effects~ // reprise de @401076
+@8160077 = ~effects dispelling feeblemindedness~ // reprise de @401077
+@8160078 = ~disease effects~ // reprise de @401078
+@8160079 = ~effects dispelling disease and feeblemindedness~ // reprise de @401079
+@8160080 = ~deafness effects~ // reprise de @401080
+@8160081 = ~effects dispelling deafness~ // reprise de @401081
+@8160082 = ~effects causing script change~ // reprise de @401082
+@8160083 = ~effects protecting from specific type of projectile~ // reprise de @401083
+@8160084 = ~effects modifying magical fire resistance~ // reprise de @401084
+@8160085 = ~effects modifying magical cold resistance~ // reprise de @401085
+@8160086 = ~effects modifying Slashing Resistance~ // reprise de @401086
+@8160087 = ~effects modifying Crushing Resistance~ // reprise de @401087
+@8160088 = ~effects modifying Piercing Resistance~ // reprise de @401088
+@8160089 = ~effects modifying Missile Resistance~ // reprise de @401089
+@8160090 = ~effects modifying Open locks score~ // reprise de @401090
+@8160091 = ~effects modifying Find Trap score~ // reprise de @401091
+@8160092 = ~effects modifying Pick Pockets score~ // reprise de @401092
+@8160093 = ~fatigue effects~ // reprise de @401093
+@8160094 = ~effects modifying drunkness~ // reprise de @401094
+@8160095 = ~effects modifying Tracking score~ // reprise de @401095
+@8160096 = ~effects modifying level~ // reprise de @401096
+@8160097 = ~effects modifying exceptional strength~ // reprise de @401097
+@8160098 = ~regeneration effects~ // reprise de @401098
+@8160099 = ~effects modifying spell duration~ // reprise de @401099
+@8160100 = ~effects protecting from a specific type of creature~ // reprise de @401100
+@8160101 = ~effects protecting from a specific effect~ // reprise de @401101
+@8160102 = ~effects protecting from a specific spell level~ // reprise de @401102
+@8160103 = ~~ // reprise de @401103
+@8160104 = ~effects modifying experience~ // reprise de @401104
+@8160105 = ~effects modifying gold~ // reprise de @401105
+@8160106 = ~~ // reprise de @401106
+@8160107 = ~~ // reprise de @401107
+@8160108 = ~effects modifying reputation~ // reprise de @401108
+@8160109 = ~paralysis effects~ // reprise de @401109
+@8160110 = ~~ // reprise de @401110
+@8160111 = ~effects that create magic weapons~ // reprise de @401111
+@8160112 = ~effects that remove equipped objects~ // reprise de @401112
+@8160113 = ~~ // reprise de @401113
+@8160114 = ~~ // reprise de @401114
+@8160115 = ~effects detecting alignment~ // reprise de @401115
+@8160116 = ~invisibility dispelling effects~ // reprise de @401116
+@8160117 = ~clairvoyance~ // reprise de @401117
+@8160118 = ~~ // reprise de @401118
+@8160119 = ~mirror images~ // reprise de @401119
+@8160120 = ~effects protecting from a specific type of weapon~ // reprise de @401120
+@8160121 = ~~ // reprise de @401121
+@8160122 = ~effects creating magic objects~ // reprise de @401122
+@8160123 = ~effects removing magic objects~ // reprise de @401123
+@8160124 = ~effects causing teleportation to a target~ // reprise de @401124
+@8160125 = ~effects modifying the Lock Picking score~ // reprise de @401125
+@8160126 = ~effects modifying movement speed~ // reprise de @401126
+@8160127 = ~~ // reprise de @401127
+@8160128 = ~confusion~ // reprise de @401128
+@8160129 = ~Aid~ // reprise de @401129
+@8160130 = ~Bless~ // reprise de @401130
+@8160131 = ~allied hymns~ // reprise de @401131
+@8160132 = ~Holy Power~ // reprise de @401132
+@8160133 = ~Luck~ // reprise de @401133
+@8160134 = ~petrifaction~ // reprise de @401134
+@8160135 = ~shapeshifting~ // reprise de @401135
+@8160136 = ~effects rendering partially visible~ // reprise de @401136
+@8160137 = ~effects of enemy hymns~ // reprise de @401137
+@8160138 = ~~ // reprise de @401138
+@8160139 = ~~ // reprise de @401139
+@8160140 = ~~ // reprise de @401140
+@8160141 = ~~ // reprise de @401141
+@8160142 = ~~ // reprise de @401142
+@8160143 = ~effects creating objects~ // reprise de @401143
+@8160144 = ~effects blocking active skills~ // reprise de @401144
+@8160145 = ~effects blocking spell casting~ // reprise de @401145
+@8160146 = ~effects casting spells on a target~ // reprise de @401146
+@8160147 = ~effects causing spells to be transcribed~ // reprise de @401147
+@8160148 = ~effects casting spells on an area~ // reprise de @401148
+@8160149 = ~~ // reprise de @401149
+@8160150 = ~effects modifying Find Trap score~ // reprise de @401150
+@8160151 = ~effects causing creature swapping~ // reprise de @401151
+@8160152 = ~~ // reprise de @401152
+@8160153 = ~Sanctuary~ // reprise de @401153
+@8160154 = ~entanglement~ // reprise de @401154
+@8160155 = ~~ // reprise de @401155
+@8160156 = ~~ // reprise de @401156
+@8160157 = ~webs~ // reprise de @401157
+@8160158 = ~~ // reprise de @401158
+@8160159 = ~effects modifying the amount of mirror-image~ // reprise de @401159
+@8160160 = ~Sanctuary dispelling effects~ // reprise de @401160
+@8160161 = ~effects dispelling horror~ // reprise de @401161
+@8160162 = ~effects dispelling paralysis~ // reprise de @401162
+@8160163 = ~effects modifying movement speed~ // reprise de @401163
+@8160164 = ~effects dispelling drunkenness~ // reprise de @401164
+@8160165 = ~effects causing pause~ // reprise de @401165
+@8160166 = ~effects modifying Magic Resistance~ // reprise de @401166
+@8160167 = ~effects modifying THAC0 of throwing weapons~ // reprise de @401167
+@8160168 = ~effects banishing summoned creatures~ // reprise de @401168
+@8160169 = ~~ // reprise de @401169
+@8160170 = ~~ // reprise de @401170
+@8160171 = ~spell learning effects~ // reprise de @401171
+@8160172 = ~effects that cause spells to be forgotten~ // reprise de @401172
+@8160173 = ~effects modifying Poison Resistance~ // reprise de @401173
+@8160174 = ~~ // reprise de @401174
+@8160175 = ~paralyzing effects~ // reprise de @401175
+@8160176 = ~effects modifying movement speed~ // reprise de @401176
+@8160178 = ~effects modifying THAC0 against a specific creature type~ // reprise de @401178
+@8160179 = ~effects modifying damage against a specific type of creature~ // reprise de @401179
+@8160180 = ~effects blocking the use of specific items~ // reprise de @401180
+@8160181 = ~effects blocking the use of a specific type of object~ // reprise de @401181
+@8160182 = ~~ // reprise de @401182
+@8160183 = ~~ // reprise de @401183
+@8160184 = ~effects enabling passage through impassable zones~ // reprise de @401184
+@8160185 = ~effects causing paralysis~ // reprise de @401185
+@8160186 = ~effects causing teleportation~ // reprise de @401186
+@8160187 = ~~ // reprise de @401187
+@8160188 = ~effects modifying the limit of spells cast per round~ // reprise de @401188
+@8160189 = ~effects modifying spell casting time~ // reprise de @401189
+@8160190 = ~effects modifying speed factor~ // reprise de @401190
+@8160191 = ~effects modifying spellcaster level~ // reprise de @401191
+@8160192 = ~effects causing a pet to be summoned~ // reprise de @401192
+@8160193 = ~effects detecting invisibility~ // reprise de @401193
+@8160194 = ~~ // reprise de @401194
+@8160195 = ~~ // reprise de @401195
+@8160196 = ~~ // reprise de @401196
+@8160197 = ~effects reflecting projectiles back to their source~ // reprise de @401197
+@8160198 = ~effects reflecting effects to their source~ // reprise de @401198
+@8160199 = ~effects reflecting spells of a specific level~ // reprise de @401199
+@8160200 = ~effects reflecting a quantity of spell level~ // reprise de @401200
+@8160201 = ~effects protecting from a specific amount of spell level~ // reprise de @401201
+@8160202 = ~effects reflecting spells from a specific school of magic~ // reprise de @401202
+@8160203 = ~effects reflecting spells from a specific magic sphere~ // reprise de @401203
+@8160204 = ~effects protecting spells from a specific school of magic~ // reprise de @401204
+@8160205 = ~effects protecting spells from a specific magic sphere~ // reprise de @401205
+@8160206 = ~effects protecting from a specific spell~ // reprise de @401206
+@8160207 = ~effects reflecting a specific spell~ // reprise de @401207
+@8160209 = ~Death Finger~ // reprise de @401209
+@8160210 = ~Power Word : Stun~ // reprise de @401210
+@8160211 = ~imprisonment~ // reprise de @401211
+@8160212 = ~~ // reprise de @401212
+@8160213 = ~labyrinth~ // reprise de @401213
+@8160214 = ~effects generating multiple spells~ // reprise de @401214
+@8160215 = ~~ // reprise de @401215
+@8160216 = ~level draining effects~ // reprise de @401216
+@8160217 = ~Power Word: Sleep~ // reprise de @401217
+@8160218 = ~stone skins~ // reprise de @401218
+@8160219 = ~effects protecting from a specific type of creature~ // reprise de @401219
+@8160220 = ~effects dispelling spells of a specific school of magic~ // reprise de @401220
+@8160221 = ~effects dispelling spells of a specific magic sphere~ // reprise de @401221
+@8160222 = ~effects causing random teleportation~ // reprise de @401222
+@8160223 = ~effects protecting from a specific amount of spell level belonging to a school of magic~ // reprise de @401223
+@8160224 = ~effects restoring levels~ // reprise de @401224
+@8160225 = ~effects that detect magic~ // reprise de @401225
+@8160226 = ~effects protecting from a specific amount of spell level belonging to a sphere of magic~ // reprise de @401226
+@8160227 = ~effects reflecting a specific amount of spell level belonging to a school of magic~ // reprise de @401227
+@8160228 = ~effects reflecting a specific amount of spell level belonging to a magic sphere~ // reprise de @401228
+@8160229 = ~effects dispelling a specific school of magic~ // reprise de @401229
+@8160230 = ~effects dispelling a specific magic sphere~ // reprise de @401230
+@8160231 = ~Timestop~ // reprise de @401231
+@8160232 = ~effects activating conditional spells~ // reprise de @401232
+@8160233 = ~effects modifying Proficiency~ // reprise de @401233
+@8160234 = ~effects causing contingency~ // reprise de @401234
+@8160235 = ~Wing Buffet~ // reprise de @401235
+@8160236 = ~effects causing image projection~ // reprise de @401236
+@8160237 = ~~ // reprise de @401237
+@8160238 = ~effects causing disintegration~ // reprise de @401238
+@8160239 = ~Farsight~ // reprise de @401239
+@8160240 = ~~ // reprise de @401240
+@8160241 = ~control creature~ // reprise de @401241
+@8160242 = ~cure confusion~ // reprise de @401242
+@8160243 = ~effects that drain item charges~ // reprise de @401243
+@8160244 = ~effects that drain wizard spell~ // reprise de @401244
+@8160246 = ~berserking~ // reprise de @401246
+@8160247 = ~effects causing berserker madness state~ // reprise de @401247
+@8160248 = ~effects causing effect after a melee attack~ // reprise de @401248
+@8160249 = ~effects causing effect after ranged attack~ // reprise de @401249
+@8160250 = ~effects modifying damage due to luck~ // reprise de @401250
+@8160251 = ~effects changing bard song~ // reprise de @401251
+@8160252 = ~effects causing Set Trap~ // reprise de @401252
+@8160253 = ~~ // reprise de @401253
+@8160254 = ~~ // reprise de @401254
+@8160255 = ~effects causing inventory item creation~ // reprise de @401255
+@8160256 = ~~ // reprise de @401256
+@8160257 = ~~ // reprise de @401257
+@8160259 = ~Spell Trap~ // reprise de @401259
+@8160261 = ~effects causing spell restoration~ // reprise de @401261
+@8160262 = ~effects modifying visual range~ // reprise de @401262
+@8160263 = ~effects modifying Backstab multiplier~ // reprise de @401263
+@8160264 = ~effects causing drop weapons in panic~ // reprise de @401264
+@8160265 = ~~ // reprise de @401265
+@8160266 = ~effects dispelling protection against a specific spell~ // reprise de @401266
+@8160267 = ~~ // reprise de @401267
+@8160268 = ~Clear fog of war~ // reprise de @401268
+@8160269 = ~~ // reprise de @401269
+@8160270 = ~cure unpause target~ // reprise de @401270
+@8160271 = ~~ // reprise de @401271
+@8160272 = ~effects that activate spells at regular intervals~ // reprise de @401272
+@8160273 = ~~ // reprise de @401273
+@8160274 = ~effects causing teleportation to a random opponent~ // reprise de @401274
+@8160275 = ~effects modifying Hide in the Shadows score~ // reprise de @401275
+@8160276 = ~effects modifying Detect Illusion score~ // reprise de @401276
+@8160277 = ~effects modifying Set Traps score~ // reprise de @401277
+@8160278 = ~effects modifying THAC0~ // reprise de @401278
+@8160279 = ~effects unlocking active skills~ // reprise de @401279
+@8160280 = ~effects activating Wild Magic~ // reprise de @401280
+@8160281 = ~effects modifying the probability of entropic hiatus triggering~ // reprise de @401281
+@8160282 = ~effects modifying Scripting State modifier~ // reprise de @401282
+@8160283 = ~cursed effects~ // reprise de @401283
+@8160284 = ~effects modifying THAC0 with a melee weapon~ // reprise de @401284
+@8160285 = ~effects modifying damage with a melee weapon~ // reprise de @401285
+@8160286 = ~effects modifying damage with a ranged weapon~ // reprise de @401286
+@8160287 = ~~ // reprise de @401287
+@8160288 = ~effects modifying THAC0 with fists~ // reprise de @401288
+@8160289 = ~effects modifying fists damages~ // reprise de @401289
+@8160290 = ~~ // reprise de @401290
+@8160291 = ~~ // reprise de @401291
+@8160292 = ~effects protecting from Backstab~ // reprise de @401292
+@8160293 = ~~ // reprise de @401293
+@8160294 = ~~ // reprise de @401294
+@8160295 = ~effects protecting from permanent death~ // reprise de @401295
+@8160296 = ~~ // reprise de @401296
+@8160297 = ~effects protecting from Turn Undead~ // reprise de @401297
+@8160298 = ~~ // reprise de @401298
+@8160299 = ~Chaos Shield~ // reprise de @401299
+@8160300 = ~effects modifying character collision~ // reprise de @401300
+@8160301 = ~effects modifying Critical Hit Modifier~ // reprise de @401301
+@8160302 = ~effects of item use ability~ // reprise de @401302
+@8160303 = ~effects activating Backstab every hit~ // reprise de @401303
+@8160304 = ~~ // reprise de @401304
+@8160305 = ~effects modifying THAC0 of the off-hand weapon~ // reprise de @401305
+@8160306 = ~effects modifying THAC0 of the main-hand weapon~ // reprise de @401306
+@8160307 = ~Tracking~ // reprise de @401307
+@8160308 = ~effects protecting from Tracking~ // reprise de @401308
+@8160309 = ~~ // reprise de @401309
+@8160310 = ~effects protecting from Timestop~ // reprise de @401310
+@8160311 = ~effects generating a random wish spell~ // reprise de @401311
+@8160312 = ~~ // reprise de @401312
+@8160313 = ~~ // reprise de @401313
+@8160314 = ~golem stoneskin~ // reprise de @401314
+@8160315 = ~~ // reprise de @401315
+@8160316 = ~magical rest~ // reprise de @401316
+@8160317 = ~haste 2~ // reprise de @401317
+@8160318 = ~protection from resource~ // reprise de @401318
+@8160319 = ~effects of limiting item usability~ // reprise de @401319
+@8160320 = ~~ // reprise de @401320
+@8160321 = ~effects protecting from a specific spell or item~ // reprise de @401321
+@8160322 = ~~ // reprise de @401322
+@8160323 = ~effects modifying Turn Undead level~ // reprise de @401323
+@8160324 = ~effects protecting from a specific spell or object~ // reprise de @401324
+@8160325 = ~effects modifying all saving throws~ // reprise de @401325
+@8160326 = ~effects causing spells to be cast on a specific type of target~ // reprise de @401326
+@8160327 = ~~ // reprise de @401327
+@8160329 = ~slow poison~ // reprise de @401329
+@8160330 = ~~ // reprise de @401330
+@8160331 = ~~ // reprise de @401331
+@8160332 = ~effects modifying specific damage modifier~ // reprise de @401332
+@8160333 = ~Static Charge~ // reprise de @401333
+@8160334 = ~Turn Undead~ // reprise de @401334
+@8160336 = ~~ // reprise de @401336
+@8160337 = ~remove Opcode~ // reprise de @401337
+@8160338 = ~~ // reprise de @401338
+@8160339 = ~~ // reprise de @401339
+@8160340 = ~change Backstab effects~ // reprise de @401340
+@8160341 = ~change Critical Hit effects~ // reprise de @401341
+@8160342 = ~~ // reprise de @401342
+@8160343 = ~hit points swap effects~ // reprise de @401343
+@8160344 = ~effects modifying enchantment vs. creature type~ // reprise de @401344
+@8160345 = ~effects modifying enchantment bonus~ // reprise de @401345
+@8160346 = ~effects modifying saving throws vs. a specific school of magic~ // reprise de @401346
+@8160505 = ~effects protecting against psionic abilities~ // reprise de @401505
+@8160507 = ~effects protecting against poisons~ // reprise de @401507
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
 @20000001 = ~Base Armor Class~ // reprise de @10000100
@@ -1466,6 +1823,12 @@
 @20250112 = ~to poison %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250006
 @20250113 = ~to poison %theTarget%, inflicting %amount% damages %strDuration%~ // reprise de @10250006
 
+// Opcode 26 : Délivrance des malédictions : phrases 0100 (20 260 000-20 260 999)
+@20260100 = ~Removes curses from %theTarget%~ // reprise de @10260001
+@20260101 = ~Removes curses from %theTarget%~ // reprise de @10260001
+@20260102 = ~to remove the curses from %theTarget%~ // reprise de @10260002
+@20260103 = ~to remove the curses from %theTarget%~ // reprise de @10260002
+
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Acid Resistance~ // reprise de @10270001
 @20270001 = ~from acid~ // reprise de @10270002
@@ -1649,6 +2012,11 @@
 @20670171 = ~Summon %amount% neutral %creatureName%~ // reprise de @10670016
 @20670172 = ~to summon %amount% neutral %creatureName%~ // reprise de @10670018
 @20670173 = ~to summon %amount% neutral %creatureName%~ // reprise de @10670018
+
+// Opcode 68 : Renvoi d'une créature invoquée : phrases 0100, pas de forme « soi » probable, comme dans l'ancien moteur (20 680 000-20 680 999)
+@20680100 = ~Unsummon %theTarget% if it is a summoned creature~ // reprise de @10680001
+@20680101 = ~Unsummon %theTarget% if it is a summoned creature~ // reprise de @10680001
+@20680103 = ~to unsummon %theTarget% if it is a summoned creature~ // reprise de @10680002
 
 // Opcode 69 : Non-détection : phrases 0100, 0110 version courte (20 690 000-20 690 999)
 @20690100 = ~Makes %theTarget% non-detectable by magical means such as Detect Invisibility and other divinations~ // reprise de @10690004
@@ -2209,6 +2577,16 @@
 @21850112 = ~to hold the %creatureType%~ // reprise de @11090003
 @21850113 = ~to hold the %creatureType%~ // reprise de @11090003
 
+// Opcode 188 : Purification d'aura : phrases 0100 plusieurs sorts par round, 0110 un seul (21 880 000-21 880 999)
+@21880100 = ~Aura cleansing~ // reprise de @11880001
+@21880101 = ~Aura cleansing on %theTarget%~ // reprise de @11880002
+@21880102 = ~to allow %theTarget% to cast several spells per round~ // reprise de @11880003
+@21880103 = ~to allow %theTarget% to cast several spells per round~ // reprise de @11880003
+@21880110 = ~Casts only one spell per round~ // reprise de @11880011
+@21880111 = ~Allows %theTarget% to cast only one spell per round~ // reprise de @11880012
+@21880112 = ~to allow %theTarget% to cast only one spell per round~ // reprise de @11880013
+@21880113 = ~to allow %theTarget% to cast only one spell per round~ // reprise de @11880013
+
 // Opcode 189 : Temps d'incantation : 0000 nom, 0002 statistique ; 0003 temps maximal, 0005 sa statistique (21 890 000-21 890 999)
 @21890000 = ~Casting time~ // reprise de @11890001
 @21890002 = ~the casting time~ // reprise de @11890002
@@ -2333,6 +2711,16 @@
 @22180102 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 @22180103 = ~to create %amount% on %theTarget%~ // reprise de @12180002
 
+// Opcode 220 : Dissipation d'une école : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 200 000-22 200 999)
+@22200100 = ~Dispels all %spellSchoolName% spells of level %spellLevel% or lower on %theTarget%~ // reprise de @12200001
+@22200101 = ~Dispels all %spellSchoolName% spells of level %spellLevel% or lower on %theTarget%~ // reprise de @12200001
+@22200102 = ~to dispel all %spellSchoolName% spells of level %spellLevel% or lower on %theTarget%~ // reprise de @12200002
+@22200103 = ~to dispel all %spellSchoolName% spells of level %spellLevel% or lower on %theTarget%~ // reprise de @12200002
+@22200110 = ~Dispels all %spellSchoolName% spells on %theTarget%~ // reprise de @12200003
+@22200111 = ~Dispels all %spellSchoolName% spells on %theTarget%~ // reprise de @12200003
+@22200112 = ~to dispel all %spellSchoolName% spells on %theTarget%~ // reprise de @12200004
+@22200113 = ~to dispel all %spellSchoolName% spells on %theTarget%~ // reprise de @12200004
+
 // Opcode 221 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 210 000-22 210 999)
 @22210100 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210001
 @22210101 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210001
@@ -2342,6 +2730,12 @@
 @22210111 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
 @22210112 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
 @22210113 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
+
+// Opcode 224 : Restauration : phrases 0100 (22 240 000-22 240 999)
+@22240100 = ~Cure level drain %ofTheTarget%~ // reprise de @12240001
+@22240101 = ~Cure level drain %ofTheTarget%~ // reprise de @12240001
+@22240102 = ~to cure level drain %ofTheTarget%~ // reprise de @12240002
+@22240103 = ~to cure level drain %ofTheTarget%~ // reprise de @12240002
 
 // Opcode 230 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 300 000-22 300 999)
 @22300100 = ~Dispels one %spellSecondaryTypeName% spell of level %spellLevel% or lower on %theTarget%~ // reprise de @12300001
@@ -2432,6 +2826,12 @@
 @22410111 = ~Universal charm on %theTarget%~ // reprise de @10050003
 @22410113 = ~to charm %theTarget%~ // reprise de @10050002
 
+// Opcode 242 : Soin de la confusion : phrases 0100 (22 420 000-22 420 999)
+@22420100 = ~Cure confusion~ // reprise de @12420001
+@22420101 = ~Cure confusion on %theTarget%~ // reprise de @12420002
+@22420102 = ~to cure confusion on %theTarget%~ // reprise de @12420003
+@22420103 = ~to cure confusion on %theTarget%~ // reprise de @12420003
+
 // Opcode 244 : Drain de sorts profanes : phrases 0100 un sort, 0110 plusieurs (22 440 000-22 440 999)
 @22440100 = ~Drains 1 wizard spell %ofTheTarget%~ // reprise de @12440001
 @22440101 = ~Drains 1 wizard spell %ofTheTarget%~ // reprise de @12440001
@@ -2472,6 +2872,19 @@
 @22550102 = ~to create %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220004
 @22550103 = ~to create %amount% "%itemName%" in %theTarget%'s inventory~ // reprise de @11220004
 
+// Opcode 261 : Sorts perdus rendus : 0010 profane, 0011 divin, phrases 0100 jusqu'à un niveau, 0110 premier niveau (22 610 000-22 610 999)
+@22610010 = ~wizard~ // reprise de @12610010
+@22610011 = ~priest~ // reprise de @12610011
+@22610012 = ~wizard or priest~ // reprise de @12610012
+@22610100 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower~ // reprise de @12610001
+@22610101 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower %toTheTarget%~ // reprise de @12610002
+@22610102 = ~to recover 1 %spellType% spell of level %spellLevel% or lower~ // reprise de @12610003
+@22610103 = ~to recover 1 %spellType% spell of level %spellLevel% or lower %toTheTarget%~ // reprise de @12610004
+@22610110 = ~Recovers 1 %spellType% spell of level %spellLevel%~ // reprise de @12610005
+@22610111 = ~Recovers 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @12610006
+@22610112 = ~to recover 1 %spellType% spell of level %spellLevel%~ // reprise de @12610007
+@22610113 = ~to recover 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @12610008
+
 // Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
 @22720010 = ~At each %strDuration%~ // reprise de @12720010
 @22720011 = ~Every %strDuration%~ // reprise de @12720011
@@ -2479,6 +2892,12 @@
 @22720013 = ~%amount% times per %strDuration%~ // reprise de @12720013
 @22720014 = ~%amount% times every %strDuration%~ // reprise de @12720014
 @22720015 = ~%amount% times every %strDuration%~ // reprise de @12720015
+
+// Opcode 273 : Dispersion des nuages : phrases 0100 (22 730 000-22 730 999)
+@22730100 = ~Zone of Sweet Air~ // reprise de @12730001
+@22730101 = ~Casts Zone of Sweet Air~ // reprise de @12730002
+@22730102 = ~to cast Zone of Sweet Air~ // reprise de @12730003
+@22730103 = ~to cast Zone of Sweet Air on %theTarget%~ // reprise de @12730004
 
 // Opcode 274 : téléportation auprès d'un ennemi (22 740 000-22 740 999)
 @22740100 = ~Randomly teleports %theTarget% to an enemy in visual range~ // reprise de @12740001
@@ -2724,6 +3143,12 @@
 @23320009 = ~Crushing Damage~ // reprise de @13320009
 @23320010 = ~Missile Damage~ // reprise de @13320010
 
+// Opcode 337 : Retrait des effets d'un opcode : phrases 0100 (23 370 000-23 370 999)
+@23370100 = ~Dispels %opcodeStr%~ // reprise de @13370001
+@23370101 = ~Dispels %opcodeStr% on %theTarget%~ // reprise de @13370002
+@23370102 = ~to dispel %opcodeStr%~ // reprise de @13370003
+@23370103 = ~to dispel %opcodeStr% on %theTarget%~ // reprise de @13370004
+
 // Opcode 341 : coup critique : 0001-0003 conditions (23 410 000-23 410 099)
 @23410001 = ~On a critical hit~ // reprise de @13410001
 @23410002 = ~On a critical hit %ofTheTarget%~ // reprise de @13410002
@@ -2764,3 +3189,19 @@
 @30120101 = ~Replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~ // reprise de @15250001
 @30120102 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~ // reprise de @15250002
 @30120103 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~ // reprise de @15250002
+
+// Effet dérivé 013 ALL_ILLUSIONS (220 et 221 de l'illusion) : phrases 0100 (30 130 000-30 130 999)
+@30130100 = ~Dispels all illusionary protection spells on %theTarget%~ // reprise de @15110001
+@30130101 = ~Dispels all illusionary protection spells on %theTarget%~ // reprise de @15110001
+@30130102 = ~to dispel all illusionary protection spells on %theTarget%~ // reprise de @15110002
+@30130103 = ~to dispel all illusionary protection spells on %theTarget%~ // reprise de @15110002
+
+// Effet dérivé 014 RESTORED_SPELLS (plusieurs 261) : phrases 0100 de chaque niveau, 0110 liste des niveaux (30 140 000-30 140 999)
+@30140100 = ~Recovers 1 %spellType% spell of each level~ // reprise de @15100001
+@30140101 = ~Recovers 1 %spellType% spell of each level %toTheTarget%~ // reprise de @15100003
+@30140102 = ~to recover 1 %spellType% spell of each level~ // reprise de @15100005
+@30140103 = ~to recover 1 %spellType% spell of each level~ // reprise de @15100007
+@30140110 = ~Recovers 1 %spellType% spell of level %spellLevel%~ // reprise de @15100002
+@30140111 = ~Recovers 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @15100004
+@30140112 = ~to recover 1 %spellType% spell of level %spellLevel%~ // reprise de @15100006
+@30140113 = ~to recover 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @15100008

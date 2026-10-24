@@ -86,6 +86,12 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~211~) AND VARIABLE_IS_SET $fx_opcode_count(~71~) BEGIN
 			LPM ad_group_imprisonment
 		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~220~) AND VARIABLE_IS_SET $fx_opcode_count(~221~) BEGIN
+			LPM ad_group_all_illusions
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~261~) BEGIN
+			LPM ad_group_restored_spells
+		END
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
@@ -622,6 +628,142 @@ DEFINE_PATCH_MACRO ad_group_imprisonment BEGIN
 				SET $fx_consumed(~%group_candidate%~) = 1
 			END
 		END
+	END
+END
+
+// Toutes les illusions (ancien opcode_220_group, opcode virtuel 511) : la dissipation de l'école de
+// l'Illusion (220, parameter2 5) à tous les niveaux (parameter1 9) et celle des protections illusoires
+// (221, parameter2 3) à tous les niveaux, aux mêmes champs (puissance et dés mis à part), s'écrivent
+// « Dissipe toutes les illusions qui affectent la cible » (effet dérivé ALL_ILLUSIONS).
+DEFINE_PATCH_MACRO ad_group_all_illusions BEGIN
+	PHP_EACH fx_ids_220 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 9 AND $fx_parameter2(~%group_id%~) == 5 BEGIN
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_POWER BOR AD_SAME_DICE
+			SET group_found = 0
+			PHP_EACH fx_ids_221 AS _ => group_candidate BEGIN
+				PATCH_IF NOT group_found AND NOT $fx_consumed(~%group_candidate%~) AND $fx_parameter1(~%group_candidate%~) == 9 AND $fx_parameter2(~%group_candidate%~) == 3 BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET group_found = 1
+						SET $fx_consumed(~%group_candidate%~) = 1
+					END
+				END
+			END
+			PATCH_IF group_found BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
+				SPRINT derived_kind ~ALL_ILLUSIONS~
+				SET derived_id = group_id
+				SET derived_other = 0 - 1
+				SPRINT derived_line ~ad_group_all_illusions_line~
+				LPM ad_derived_add
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_group_all_illusions_line BEGIN
+	SET line_phrase = 30130100 // ~Dissipe toutes les illusions qui affectent %theTarget%~
+END
+
+// Sorts perdus rendus (ancien opcode_261_group, opcode virtuel 510) : les effets 261 de niveaux 1 à 9
+// semblables à un premier au niveau près (même type de sort parameter2 ; special mis à part)
+// s'écrivent ensemble, « Remet en mémoire 1 sort divin de 1er, 2ème et 3ème niveau » (effet dérivé
+// RESTORED_SPELLS ; fx_restore_levels : bits des niveaux, 0x1FF « de chaque niveau »). Une restauration
+// profane et une divine qui ne diffèrent que par le type s'écrivent ensemble, « profane ou divin »
+// (fx_restore_both) : deux effets réunis de mêmes niveaux, dont seul le second reste écrit, comme
+// l'effet que l'ancien moteur ajoute en fin de liste ; ou deux effets seuls jusqu'au niveau 7, où
+// les deux types ne sont pas ramenés différemment.
+DEFINE_PATCH_MACRO ad_group_restored_spells BEGIN
+	SET group_first_derived = derived_count
+	PHP_EACH fx_ids_261 AS _ => group_id BEGIN
+		SET group_level = $fx_parameter1(~%group_id%~)
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_level >= 1 AND group_level <= 9 BEGIN
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_SPECIAL
+			SET group_levels = 1 BLSL (group_level - 1)
+			SET group_members = 1
+			PHP_EACH fx_ids_261 AS _ => group_candidate BEGIN
+				SET group_level = $fx_parameter1(~%group_candidate%~)
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_level >= 1 AND group_level <= 9 BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET group_levels = group_levels BOR (1 BLSL (group_level - 1))
+						SET group_members += 1
+					END
+				END
+			END
+			PATCH_IF group_members > 1 BEGIN
+				SET $fx_consumed(~%group_id%~) = 1
+				SET $fx_restore_levels(~%group_id%~) = group_levels
+				SPRINT derived_kind ~RESTORED_SPELLS~
+				SET derived_id = group_id
+				SET derived_other = 0 - 1
+				SPRINT derived_line ~ad_group_restored_spells_line~
+				LPM ad_derived_add
+			END
+		END
+	END
+	SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
+	FOR (group_k = group_first_derived; group_k < derived_count; ++group_k) BEGIN
+		SET same_id = $derived_id(~%group_k%~)
+		SPRINT group_line $derived_line(~%group_k%~)
+		PATCH_IF $fx_parameter2(~%same_id%~) == 0 AND NOT (~%group_line%~ STRING_EQUAL ~~) BEGIN
+			SET group_merged = 0
+			FOR (group_other_k = group_first_derived; group_other_k < derived_count AND NOT group_merged; ++group_other_k) BEGIN
+				SET same_other = $derived_id(~%group_other_k%~)
+				SPRINT group_other_line $derived_line(~%group_other_k%~)
+				PATCH_IF $fx_parameter2(~%same_other%~) == 1 AND NOT (~%group_other_line%~ STRING_EQUAL ~~)
+						AND $fx_restore_levels(~%same_other%~) == $fx_restore_levels(~%same_id%~) AND NOT $fx_restore_both(~%same_other%~) BEGIN
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET group_merged = 1
+						SPRINT $derived_line(~%group_k%~) ~~
+						SET $fx_restore_both(~%same_other%~) = 1
+					END
+				END
+			END
+		END
+	END
+	PHP_EACH fx_ids_261 AS _ => same_id BEGIN
+		SET group_level = $fx_parameter1(~%same_id%~)
+		PATCH_IF NOT $fx_consumed(~%same_id%~) AND $fx_parameter2(~%same_id%~) == 0 AND group_level >= 0 AND group_level <= 7 BEGIN
+			SET group_merged = 0
+			PHP_EACH fx_ids_261 AS _ => same_other BEGIN
+				PATCH_IF NOT group_merged AND NOT $fx_consumed(~%same_other%~) AND $fx_parameter2(~%same_other%~) == 1 AND $fx_parameter1(~%same_other%~) == group_level BEGIN
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET group_merged = 1
+						SET $fx_consumed(~%same_other%~) = 1
+						SET $fx_restore_both(~%same_id%~) = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+// « de 1er, 2ème et 3ème niveau » (ancien opcode_509_common), ou « de chaque niveau ».
+DEFINE_PATCH_MACRO ad_group_restored_spells_line BEGIN
+	SET line_fx = group_id
+	LPM ad_op_261_type
+	SET group_levels = $fx_restore_levels(~%group_id%~)
+	PATCH_IF group_levels == 0x1FF BEGIN
+		SET line_phrase = 30140100 // ~Se remémore 1 sort %spellType% de chaque niveau~
+	END
+	ELSE BEGIN
+		CLEAR_ARRAY group_level_names
+		FOR (group_level = 1; group_level <= 9; ++group_level) BEGIN
+			PATCH_IF (group_levels BAND (1 BLSL (group_level - 1))) != 0 BEGIN
+				LPF ad_tra INT_VAR tra_id = 8010000 + group_level tra_block_start = 8010000 tra_block_size = 10 RET group_level_name = text END // ~2ème~ (@8010002)
+				SPRINT $group_level_names(~%group_level%~) ~%group_level_name%~
+			END
+		END
+		LPF ad_join STR_VAR array_name = ~group_level_names~ RET spellLevel = text END
+		SET line_phrase = 30140110 // ~Se remémore 1 sort %spellType% de %spellLevel% niveau~
 	END
 END
 
