@@ -1,0 +1,436 @@
+
+BALSHLD.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 2	opcode 233, target 1, parameter1 1, parameter2 125, timing 9, duration 0, resistance 3, resource BALSHLD2	proficiency 125 has no name
+BALTH07.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 10	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 240, power 4, resistance 1, resource SPWI412	no sentence 22060101 for this form (target or probable effect)
+BHAAL1A.SPL	not_implemented	spell:abilities	refused			22 abilities: level sections not supported yet
+BHAAL1B.SPL	not_implemented	spell:abilities	refused			11 abilities: level sections not supported yet
+BHAAL2A.SPL	not_implemented	missing_opcodes:132	refused			opcodes not supported yet: 132
+BHAAL2B.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+BHAAL3B.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+CDHLYSY2.SPL	not_implemented	opcode206:no_name	ignored	ability 0, effect 1	opcode 206, target 2, parameter1 0, parameter2 0, timing 9, duration 0, power 100, resource CDHLYSYM	spell CDHLYSYM.SPL has no name
+CDPR417.SPL	not_implemented	missing_opcodes:224	refused			opcodes not supported yet: 224
+CDSTAF12.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+CDWI917A.SPL	not_implemented	opcode71:gender_set	refused	ability 0, effect 0, CDWI917A.EFF (opcode 177)	opcode 71, target 4, parameter1 6, parameter2 1, timing 9, duration 0, resource BOTSMITH	gender set to a given value
+DGARCHON.SPL	not_implemented	opcode233:same_effect_twice	refused	ability 0, effect 7	opcode 233, target 1, parameter1 1, parameter2 123, timing 0, duration 360, power 7, resistance 2	same effect twice (the old engine merges them)
+DGFAITH.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 13	opcode 233, target 1, parameter1 1, parameter2 110, timing 0, duration 138, power 1, resistance 3	proficiency 110 has no name
+DGRIGHT.SPL	not_implemented	missing_opcodes:250	refused			opcodes not supported yet: 250
+JWGLOBE.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+MARW201.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+MARW301.SPL	not_implemented	missing_opcodes:190	refused			opcodes not supported yet: 190
+MARW401.SPL	not_implemented	missing_opcodes:188	refused			opcodes not supported yet: 188
+MELIS02.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 1	opcode 233, target 1, parameter1 2, parameter2 121, timing 0, duration 62, power 7, resistance 3	proficiency 121 has no name
+OHBDEMI3.SPL	not_implemented	missing_opcodes:213	refused			opcodes not supported yet: 213
+OHBPR608.SPL	file_error	opcode111:invalid	refused	ability 0, effect 0	opcode 111, target 1, parameter1 0, parameter2 2, timing 1, duration 0, power 6, resistance 2	empty resource field
+OHBRESTO.SPL	not_implemented	missing_opcodes:224 242	refused			opcodes not supported yet: 224 242
+OHBWI212.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+OHBWI302.SPL	not_implemented	missing_opcodes:136	refused			opcodes not supported yet: 136
+OHBWI304.SPL	not_implemented	missing_opcodes:136	refused			opcodes not supported yet: 136
+OHBWI308.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+OHBWI405.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+OHDCUT02.SPL	not_implemented	missing_opcodes:231	refused			opcodes not supported yet: 231
+OHHDRAIN.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+OHHSUMM.SPL	not_implemented	spell:abilities	refused			30 abilities: level sections not supported yet
+OHNDDOOR.SPL	not_implemented	missing_opcodes:124	refused			opcodes not supported yet: 124
+OHNRDTEL.SPL	not_implemented	missing_opcodes:68	refused			opcodes not supported yet: 68
+OHPRGD10.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+OHTMPS1.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+OHTMPS2.SPL	not_implemented	recursion:headers	refused	ability 0, effect 0 (opcode 146) > OHTMPS2D.SPL	opcode 146, target 1, parameter1 0, parameter2 1, timing 1, duration 0, resource OHTMPS2D	5 abilities and no casting level (level rendering not supported yet)
+OHTYR1.SPL	not_implemented	missing_opcodes:242	refused			opcodes not supported yet: 242
+OHTYR2.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPCL102.SPL	not_implemented	recursion:headers	refused	ability 0, effect 2 (opcode 146) > SPDN01A.SPL	opcode 146, target 2, parameter1 0, parameter2 1, timing 1, duration 0, power 1, resistance 3, resource SPDN01A	34 abilities and no casting level (level rendering not supported yet)
+SPCL103.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPCL106.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPCL121.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPCL144.SPL	not_implemented	missing_opcodes:250	refused			opcodes not supported yet: 250
+SPCL152.SPL	not_implemented	recursion:delayed	refused	ability 0, effect 77	opcode 146, target 1, parameter1 1, parameter2 1, timing 4, duration 30, resistance 2, resource BDDRAGB2	delayed effect casting a spell (the old engine writes it as a condition)
+SPCL211.SPL	not_implemented	spell:abilities	refused			34 abilities: level sections not supported yet
+SPCL212.SPL	not_implemented	recursion:missing_opcodes:115	refused	ability 0, effect 1 (opcode 146) > CDDETEVL.SPL	opcode 146, target 2, parameter1 1, parameter2 1, timing 1, duration 0, power 1, resistance 1, resource CDDETEVL	opcodes not supported yet: 115
+SPCL213.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 2	opcode 233, target 2, parameter1 1, parameter2 117, timing 0, duration 60, power 1, resistance 3	proficiency 117 has no name
+SPCL231.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPCL232.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPCL233.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPCL236.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPCL237.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPCL238.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPCL239.SPL	not_implemented	opcode206:no_name	ignored	ability 0, effect 1	opcode 206, target 1, parameter1 -1, parameter2 0, timing 0, duration 5, resource SPCL239A	spell SPCL239A.SPL has no name
+SPCL239.SPL	not_implemented	recursion:repeated	refused	ability 0, effect 2	opcode 146, target 2, parameter1 0, parameter2 1, timing 1, duration 0, resistance 1, resource SPCL239A	spell already described by this resource
+SPCL321.SPL	not_implemented	opcode101:ability_group_fields	refused	ability 0, effect 3	opcode 101, target 1, parameter1 0, parameter2 210, timing 0, duration 60, resistance 2, resource SPCL321	immunities of the ability with different fields
+SPCL342.SPL	not_implemented	missing_opcodes:192	refused			opcodes not supported yet: 192
+SPCL412.SPL	not_implemented	missing_opcodes:252	refused			opcodes not supported yet: 252
+SPCL414.SPL	not_implemented	missing_opcodes:252	refused			opcodes not supported yet: 252
+SPCL423.SPL	not_implemented	recursion:headers	refused	ability 0, effect 1 (opcode 248) > BDPWEAPN.EFF (opcode 146) > BDPWEAPN.SPL	opcode 146, target 2, parameter1 0, parameter2 1, timing 1, duration 0, resource BDPWEAPN	4 abilities and no casting level (level rendering not supported yet)
+SPCL521.SPL	not_implemented	missing_opcodes:250	refused			opcodes not supported yet: 250
+SPCL522.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPCL621.SPL	not_implemented	missing_opcodes:214	refused			opcodes not supported yet: 214
+SPCL622.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPCL623.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPCL624.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPCL625.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPCL721.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPCL722.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPCL731.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPCL732.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPCL741.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPCL742.SPL	not_implemented	missing_opcodes:185	refused			opcodes not supported yet: 185
+SPCL815.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPCL902.SPL	not_implemented	recursion:eff_level	refused	ability 0, effect 0 (opcode 248) > SPCL902.EFF	opcode 248, target 1, parameter1 0, parameter2 0, timing 0, duration 12, resistance 2, resource SPCL902	EFF file with a level restriction
+SPCL903.SPL	not_implemented	recursion:eff_level	refused	ability 0, effect 0 (opcode 248) > SPCL903.EFF	opcode 248, target 1, parameter1 0, parameter2 0, timing 0, duration 12, resistance 2, resource SPCL903	EFF file with a level restriction
+SPCL907.SPL	not_implemented	spell:abilities	refused			15 abilities: level sections not supported yet
+SPCL910.SPL	not_implemented	missing_opcodes:252	refused			opcodes not supported yet: 252
+SPCL911.SPL	not_implemented	missing_opcodes:252	refused			opcodes not supported yet: 252
+SPCL912.SPL	not_implemented	missing_opcodes:252	refused			opcodes not supported yet: 252
+SPCL915.SPL	not_implemented	missing_opcodes:302	refused			opcodes not supported yet: 302
+SPCL916.SPL	not_implemented	missing_opcodes:303	refused			opcodes not supported yet: 303
+SPCL920.SPL	not_implemented	missing_opcodes:251	refused			opcodes not supported yet: 251
+SPCL923.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPCL928.SPL	not_implemented	opcode42:ability	refused	ability 0, effect 1	opcode 42, target 1, parameter1 1, parameter2 32, timing 9, duration 0, resistance 2	opcode 42 is only described as an equipped effect
+SPCL929.SPL	not_implemented	opcode42:ability	refused	ability 0, effect 1	opcode 42, target 1, parameter1 1, parameter2 64, timing 9, duration 0, resistance 2	opcode 42 is only described as an equipped effect
+SPCL930.SPL	not_implemented	opcode42:ability	refused	ability 0, effect 1	opcode 42, target 1, parameter1 1, parameter2 128, timing 9, duration 0, resistance 2	opcode 42 is only described as an equipped effect
+SPCL935.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPCL936.SPL	not_implemented	missing_opcodes:236	refused			opcodes not supported yet: 236
+SPCL937.SPL	not_implemented	missing_opcodes:213	refused			opcodes not supported yet: 213
+SPCL941.SPL	not_implemented	missing_opcodes:208	refused			opcodes not supported yet: 208
+SPDD03.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPDM102.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPDM106.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPDM108.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPDR101.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPDR301.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPDR401.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPDR501.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPDR601.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPIN103.SPL	not_implemented	missing_opcodes:132	refused			opcodes not supported yet: 132
+SPIN104.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 1, resource SPIN104	condition 43 not supported
+SPIN106.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPIN109.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPIN113.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPIN117.SPL	not_implemented	opcode101:ability_group_fields	refused	ability 0, effect 0	opcode 101, target 1, parameter1 0, parameter2 210, timing 0, duration 120	immunities of the ability with different fields
+SPIN120.SPL	not_implemented	recursion:missing_opcodes:115	refused	ability 0, effect 1 (opcode 146) > CDDETEVL.SPL	opcode 146, target 2, parameter1 1, parameter2 1, timing 1, duration 0, power 1, resistance 1, resource CDDETEVL	opcodes not supported yet: 115
+SPIN121.SPL	not_implemented	opcode233:same_effect_twice	refused	ability 0, effect 20	opcode 233, target 2, parameter1 1, parameter2 117, timing 0, duration 60, power 1, resistance 1	same effect twice (the old engine merges them)
+SPIN122.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPIN123.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPIN124.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPIN150.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000	polymorph back to natural form
+SPIN151.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000	polymorph back to natural form
+SPIN529.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 19	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3666000, resistance 3	polymorph back to natural form
+SPIN530.SPL	file_error	opcode173:invalid	refused	ability 0, effect 0	opcode 173, target 2, parameter1 0, parameter2 0, timing 0, duration 36, resistance 2, saving throw type 1, saving throw bonus -6	invalid mode or no change (mode 0, value 0)
+SPIN538.SPL	not_implemented	opcode111:external	refused	ability 0, effect 4, PLYSQUWE.EFF (opcode 177)	opcode 111, target 2, parameter1 1, parameter2 1, timing 0, duration 3600000, power 4, resistance 1, saving throw type 16, saving throw bonus -4, resource SQUIRP	effect from an EFF file
+SPIN542.SPL	not_implemented	missing_opcodes:238	refused			opcodes not supported yet: 238
+SPIN544.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPIN545.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 4, resistance 2, resource SPIN545	condition 43 not supported
+SPIN572.SPL	not_implemented	opcode93:form1	refused	ability 0, effect 1	opcode 93, target 2, parameter1 4, parameter2 0, timing 4, duration 48, power 3, resistance 2	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPIN580.SPL	not_implemented	missing_opcodes:211	refused			opcodes not supported yet: 211
+SPIN608.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 7	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 7200, power 10, resistance 3, resource SPWI611	no sentence 22060101 for this form (target or probable effect)
+SPIN613.SPL	not_implemented	missing_opcodes:283	refused			opcodes not supported yet: 283
+SPIN623.SPL	not_implemented	opcode111:external	refused	ability 0, effect 4, PLYRABWE.EFF (opcode 177)	opcode 111, target 2, parameter1 1, parameter2 1, timing 0, duration 120, power 4, resource SQUIRP	effect from an EFF file
+SPIN633.SPL	not_implemented	missing_opcodes:193	refused			opcodes not supported yet: 193
+SPIN634.SPL	not_implemented	missing_opcodes:283	refused			opcodes not supported yet: 283
+SPIN635.SPL	not_implemented	missing_opcodes:283	refused			opcodes not supported yet: 283
+SPIN648.SPL	not_implemented	opcode175:creature_type	refused	ability 0, effect 3	opcode 175, target 2, parameter1 1, parameter2 3, timing 1, duration 0, power 1, resistance 2	hold of a creature type
+SPIN651.SPL	not_implemented	missing_opcodes:193	refused			opcodes not supported yet: 193
+SPIN655.SPL	not_implemented	phrase30100100:form1	refused	ability 0, effect 6	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 90, power 6, resistance 1, resource SPWI305	no sentence 30100101 for this form (target or probable effect)
+SPIN667.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 19	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3666000, resistance 3	polymorph back to natural form
+SPIN676.SPL	not_implemented	opcode284:form1	refused	ability 0, effect 23	opcode 284, target 2, parameter1 1, parameter2 0, timing 0, duration 300, power 1, resistance 3	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPIN684.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPIN685.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPIN686.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 9	opcode 233, target 1, parameter1 4, parameter2 128, timing 0, duration 24, power 6, resistance 3	proficiency 128 has no name
+SPIN687.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPIN694.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPIN695.SPL	not_implemented	missing_opcodes:273	refused			opcodes not supported yet: 273
+SPIN696.SPL	not_implemented	missing_opcodes:115 150 220	refused			opcodes not supported yet: 115 150 220
+SPIN697.SPL	not_implemented	spell:abilities	refused			2 abilities: level sections not supported yet
+SPIN698.SPL	not_implemented	spell:abilities	refused			2 abilities: level sections not supported yet
+SPIN704.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPIN710.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 14	opcode 233, target 1, parameter1 2, parameter2 116, timing 0, duration 324, power 6, resistance 2	proficiency 116 has no name
+SPIN714.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPIN718.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 19	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3666000, resistance 3	polymorph back to natural form
+SPIN718A.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 19	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3666000, resistance 3	polymorph back to natural form
+SPIN736.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPIN737.SPL	not_implemented	missing_opcodes:261	refused			opcodes not supported yet: 261
+SPIN774.SPL	not_implemented	missing_opcodes:213	refused			opcodes not supported yet: 213
+SPIN788.SPL	not_implemented	missing_opcodes:211	refused			opcodes not supported yet: 211
+SPIN826.SPL	not_implemented	spell:abilities	refused			3 abilities: level sections not supported yet
+SPIN827.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPIN828.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPIN837.SPL	not_implemented	missing_opcodes:231	refused			opcodes not supported yet: 231
+SPIN852.SPL	not_implemented	missing_opcodes:247	refused			opcodes not supported yet: 247
+SPIN853.SPL	not_implemented	missing_opcodes:185	refused			opcodes not supported yet: 185
+SPIN891.SPL	not_implemented	opcode177:versus_group	refused	ability 0, effect 24, MOOND8.EFF (opcode 177)	opcode 12, target 2, parameter1 5, parameter2 4194304, timing 4, duration 12, saving throw type 16777216, saving throw bonus 0, parameter3 4	effect with a creature type grouped with other effects
+SPIN944.SPL	not_implemented	missing_opcodes:210	refused			opcodes not supported yet: 210
+SPIN956.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPINHUM.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPJA01.SPL	not_implemented	recursion:missing_opcodes:367	refused	ability 0, effect 1 (opcode 326) > SPJA01A.SPL	opcode 326, target 2, parameter1 3, parameter2 103, timing 1, duration 0, power 5, resistance 2, resource SPJA01A	opcodes not supported yet: 367
+SPMDSLAY.SPL	not_implemented	opcode112:no_name	refused	ability 0, effect 4	opcode 112, target 1, parameter1 0, parameter2 0, timing 1, duration 0, resistance 2, resource SLAYERWP	item SLAYERWP.ITM has no name
+SPPR104.SPL	not_implemented	recursion:missing_opcodes:115	refused	ability 0, effect 1 (opcode 146) > CDDETEVL.SPL	opcode 146, target 2, parameter1 1, parameter2 1, timing 1, duration 0, power 1, resistance 1, resource CDDETEVL	opcodes not supported yet: 115
+SPPR107.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR109.SPL	not_implemented	missing_opcodes:153	refused			opcodes not supported yet: 153
+SPPR110.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR111.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR150.SPL	not_implemented	missing_opcodes:346	refused			opcodes not supported yet: 346
+SPPR201.SPL	not_implemented	missing_opcodes:129	refused			opcodes not supported yet: 129
+SPPR202.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPPR203.SPL	not_implemented	recursion:missing_opcodes:131	refused	ability 0, effect 0 (opcode 146) > SPPR203D.SPL	opcode 146, target 1, parameter1 0, parameter2 1, timing 1, duration 0, resource SPPR203D	opcodes not supported yet: 131
+SPPR205.SPL	not_implemented	missing_opcodes:150	refused			opcodes not supported yet: 150
+SPPR205D.SPL	not_implemented	missing_opcodes:150	refused			opcodes not supported yet: 150
+SPPR206.SPL	not_implemented	spell:abilities	refused			11 abilities: level sections not supported yet
+SPPR208.SPL	not_implemented	opcode175:creature_type	refused	ability 0, effect 3	opcode 175, target 2, parameter1 1, parameter2 3, timing 0, duration 60, power 2, resistance 1, saving throw type 1, saving throw bonus 0	hold of a creature type
+SPPR209.SPL	not_implemented	missing_opcodes:115	refused			opcodes not supported yet: 115
+SPPR210.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR211.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR213.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPPR214.SPL	not_implemented	missing_opcodes:132	refused			opcodes not supported yet: 132
+SPPR250.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 9	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 5, power 2, resource SPPR250	no sentence 22060101 for this form (target or probable effect)
+SPPR301.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPPR302.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR304.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR305.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPPR306.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR307.SPL	not_implemented	missing_opcodes:26	refused			opcodes not supported yet: 26
+SPPR312.SPL	not_implemented	opcode97:form1	refused	ability 0, effect 1	opcode 97, target 2, parameter1 75, parameter2 1, timing 0, duration 60, power 3, resistance 3	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPPR313.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPPR314.SPL	not_implemented	spell:abilities	refused			15 abilities: level sections not supported yet
+SPPR318.SPL	not_implemented	missing_opcodes:273	refused			opcodes not supported yet: 273
+SPPR319.SPL	not_implemented	opcode233:same_effect_twice	refused	ability 0, effect 6	opcode 233, target 2, parameter1 1, parameter2 120, timing 0, duration 42, power 3, resistance 1, saving throw type 2, saving throw bonus -4	same effect twice (the old engine merges them)
+SPPR350.SPL	not_implemented	missing_opcodes:242 337	refused			opcodes not supported yet: 242 337
+SPPR402.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 180, resistance 2, resource SPANIM1	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR403.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR406.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 7	opcode 233, target 2, parameter1 1, parameter2 133, timing 0, duration 36, power 4, resistance 3	proficiency 133 has no name
+SPPR407.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR408.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR409.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR411.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPPR412.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPPR415.SPL	not_implemented	missing_opcodes:239	refused			opcodes not supported yet: 239
+SPPR417.SPL	not_implemented	missing_opcodes:224	refused			opcodes not supported yet: 224
+SPPR450.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPPR501.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 180, resistance 3, resource SPANIM2	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR503.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR505.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPPR506.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPPR507.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR508.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPPR509.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR512.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR513.SPL	not_implemented	missing_opcodes:250	refused			opcodes not supported yet: 250
+SPPR514.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPPR515.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 7	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 66, power 5, resistance 1, resource SPPR515D	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR515D.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 5, resource SPPR515D	condition 43 not supported
+SPPR517.SPL	not_implemented	opcode233:same_effect_twice	refused	ability 0, effect 5	opcode 233, target 2, parameter1 2, parameter2 120, timing 0, duration 36, power 5, resistance 1	same effect twice (the old engine merges them)
+SPPR601.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPPR602.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 240, resistance 3, resource SPANIM3	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR603.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 4	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 62, power 6, resistance 3, resource SPPR603D	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR604.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 240, resistance 3, resource SPANIM4	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR605.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPPR609.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 6, resistance 2, resource SPPR609	condition 43 not supported
+SPPR611.SPL	not_implemented	missing_opcodes:261	refused			opcodes not supported yet: 261
+SPPR612.SPL	not_implemented	opcode324:exceptions_identical	refused	ability 0, effect 23, BOLTDEM.EFF (opcode 177)	opcode 12, target 2, parameter1 0, parameter2 4194304, timing 1, duration 0, dice 10d6	identical effects with different exceptions
+SPPR613.SPL	not_implemented	opcode233:same_effect_twice	refused	ability 0, effect 31	opcode 233, target 1, parameter1 1, parameter2 122, timing 0, duration 54, power 6, resistance 3	same effect twice (the old engine merges them)
+SPPR650.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPPR698.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 4	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 62, power 6, resistance 1, resource SPPR698D	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR701.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR702.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR705.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR706.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPPR707.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR708.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR709.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPPR710.SPL	not_implemented	application:level	refused	ability 0, effect 1, DEATH.EFF (opcode 177)	opcode 13, target 2, parameter1 0, parameter2 4, timing 1, duration 0, dice 3d0, parameter3 2	level restriction of an effect from an EFF file not supported
+SPPR711.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPPR713.SPL	not_implemented	missing_opcodes:224 242	refused			opcodes not supported yet: 224 242
+SPPR715.SPL	not_implemented	application:level	refused	ability 0, effect 0, DEATH.EFF (opcode 177)	opcode 13, target 2, parameter1 0, parameter2 4, timing 1, duration 0, dice 3d0, parameter3 2	level restriction of an effect from an EFF file not supported
+SPPR717.SPL	not_implemented	recursion:series	refused	ability 0, effect 6	opcode 146, target 2, parameter1 0, parameter2 1, timing 4, duration 0, power 7, resistance 1, resource FLPR717A	repeated effect casting a spell
+SPPR718.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPPR719.SPL	not_implemented	missing_opcodes:209	refused			opcodes not supported yet: 209
+SPPR721.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR722.SPL	not_implemented	opcode318:exceptions_group	refused	ability 0, effect 8	opcode 12, target 2, parameter1 0, parameter2 65536, timing 4, duration 12, power 7, resistance 1, dice 1d6, saving throw type 16777217, saving throw bonus 0, special 256	grouped effect with exceptions
+SPPR723.SPL	not_implemented	phrase30100100:form3	refused	ability 0, effect 9	opcode 206, target 3, parameter1 74011, parameter2 0, timing 0, duration 60, resistance 2, probability1 100, probability2 70, resource SPPR724	no sentence 30100103 for this form (target or probable effect)
+SPPR724.SPL	not_implemented	phrase30100100:form1	refused	ability 0, effect 3	opcode 206, target 3, parameter1 74011, parameter2 0, timing 0, duration 60, resistance 2, resource SPPR723	no sentence 30100101 for this form (target or probable effect)
+SPPR725.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 3	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 60, power 7, resistance 3, resource SPPR725D	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPPR726.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPPR727.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPPR729.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPPR730.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPPR750.SPL	not_implemented	missing_opcodes:213	refused			opcodes not supported yet: 213
+SPRA301.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPRA302.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPRA304.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 180, resource SPANIM1	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPRA305.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 180, resistance 3, resource SPANIM2	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPRA306.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 0	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 240, resistance 3, resource SPANIM3	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPSD02.SPL	not_implemented	missing_opcodes:231	refused			opcodes not supported yet: 231
+SPWI055.SPL	not_implemented	missing_opcodes:238	refused			opcodes not supported yet: 238
+SPWI056.SPL	not_implemented	missing_opcodes:238	refused			opcodes not supported yet: 238
+SPWI101.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI103.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI105.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI107.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI110.SPL	not_implemented	opcode21:form1	refused	ability 0, effect 0	opcode 21, target 3, parameter1 0, parameter2 2, timing 2, duration 0, power 1, resistance 3	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPWI112.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI113.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI115.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI116.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI118.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI119.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 1, resource SPWI119	condition 43 not supported
+SPWI120.SPL	not_implemented	missing_opcodes:159	refused			opcodes not supported yet: 159
+SPWI123.SPL	not_implemented	missing_opcodes:192	refused			opcodes not supported yet: 192
+SPWI124.SPL	not_implemented	missing_opcodes:214	refused			opcodes not supported yet: 214
+SPWI125.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI201.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPWI202.SPL	not_implemented	recursion:missing_opcodes:115	refused	ability 0, effect 1 (opcode 146) > CDDETEVL.SPL	opcode 146, target 2, parameter1 1, parameter2 1, timing 1, duration 0, power 2, resistance 1, resource CDDETEVL	opcodes not supported yet: 115
+SPWI207.SPL	not_implemented	missing_opcodes:125	refused			opcodes not supported yet: 125
+SPWI208.SPL	not_implemented	missing_opcodes:115	refused			opcodes not supported yet: 115
+SPWI209.SPL	not_implemented	missing_opcodes:133	refused			opcodes not supported yet: 133
+SPWI211.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI212.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPWI214.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPWI217.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI220.SPL	not_implemented	missing_opcodes:217	refused			opcodes not supported yet: 217
+SPWI221.SPL	not_implemented	spell:abilities	refused			18 abilities: level sections not supported yet
+SPWI222.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI298.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI301.SPL	not_implemented	missing_opcodes:117	refused			opcodes not supported yet: 117
+SPWI303.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI304.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPWI305.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI306.SPL	not_implemented	opcode175:creature_type	refused	ability 0, effect 3	opcode 175, target 2, parameter1 1, parameter2 3, timing 0, duration 60, power 3, resistance 1, saving throw type 1, saving throw bonus -1	hold of a creature type
+SPWI308.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPWI309.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI313.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI314.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI315.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI318.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI319.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI320.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI322.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPWI324.SPL	not_implemented	missing_opcodes:185	refused			opcodes not supported yet: 185
+SPWI325.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI399.SPL	not_implemented	spell:abilities	refused			6 abilities: level sections not supported yet
+SPWI401.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI402.SPL	not_implemented	missing_opcodes:124	refused			opcodes not supported yet: 124
+SPWI403.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI405.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI406.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI407.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI408.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPWI409.SPL	not_implemented	opcode78:group	refused	ability 0, effect 3	opcode 78, target 2, parameter1 2, parameter2 5, timing 1, duration 0, power 4, saving throw type 1, saving throw bonus 0	identical diseases
+SPWI410.SPL	not_implemented	missing_opcodes:26	refused			opcodes not supported yet: 26
+SPWI411.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI412.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI413.SPL	not_implemented	recursion:missing_opcodes:185 204	refused	ability 0, effect 2 (opcode 146) > SPWI413A.SPL	opcode 146, target 2, parameter1 0, parameter2 1, timing 1, duration 0, power 4, resistance 1, saving throw type 1, saving throw bonus 0, resource SPWI413A	opcodes not supported yet: 185 204
+SPWI414.SPL	not_implemented	recursion:delayed	refused	ability 0, effect 8	opcode 148, target 2, parameter1 1, parameter2 1, timing 4, duration 600, power 4, resistance 3, resource SPWI414A	delayed effect casting a spell (the old engine writes it as a condition)
+SPWI416.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI417.SPL	not_implemented	missing_opcodes:345	refused			opcodes not supported yet: 345
+SPWI418.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI421.SPL	not_implemented	missing_opcodes:222	refused			opcodes not supported yet: 222
+SPWI423.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI424.SPL	not_implemented	missing_opcodes:239	refused			opcodes not supported yet: 239
+SPWI425.SPL	not_implemented	spell:abilities	refused			14 abilities: level sections not supported yet
+SPWI489.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPWI490.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPWI491.SPL	not_implemented	opcode135:natural_form	refused	ability 0, effect 17	opcode 135, target 1, parameter1 0, parameter2 0, timing 0, duration 3600000, resistance 2	polymorph back to natural form
+SPWI501.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI503.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI504.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI505.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI507.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI508.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI510.SPL	not_implemented	missing_opcodes:214	refused			opcodes not supported yet: 214
+SPWI511.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI512.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI514.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI515.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPWI516.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI517.SPL	not_implemented	spell:abilities	refused			12 abilities: level sections not supported yet
+SPWI518.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPWI519.SPL	not_implemented	missing_opcodes:226	refused			opcodes not supported yet: 226
+SPWI520.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI521.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI522.SPL	not_implemented	spell:abilities	refused			16 abilities: level sections not supported yet
+SPWI523.SPL	not_implemented	recursion:headers	refused	ability 0, effect 0 (opcode 148) > SPWI523D.SPL	opcode 148, target 1, parameter1 0, parameter2 1, timing 1, duration 0, resource SPWI523D	7 abilities and no casting level (level rendering not supported yet)
+SPWI602.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI603.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI606.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI607.SPL	not_implemented	missing_opcodes:236	refused			opcodes not supported yet: 236
+SPWI608.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI609.SPL	not_implemented	missing_opcodes:220	refused			opcodes not supported yet: 220
+SPWI611.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 11	opcode 233, target 1, parameter1 4, parameter2 128, timing 0, duration 24, power 6, resistance 3	proficiency 128 has no name
+SPWI613.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI615.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI616.SPL	not_implemented	missing_opcodes:238	refused			opcodes not supported yet: 238
+SPWI617.SPL	not_implemented	spell:abilities	refused			3 abilities: level sections not supported yet
+SPWI618.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI619.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI620.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI621.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI622.SPL	not_implemented	missing_opcodes:165	refused			opcodes not supported yet: 165
+SPWI623.SPL	not_implemented	spell:abilities	refused			10 abilities: level sections not supported yet
+SPWI624.SPL	not_implemented	spell:abilities	refused			9 abilities: level sections not supported yet
+SPWI701.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI702.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI703.SPL	not_implemented	missing_opcodes:236	refused			opcodes not supported yet: 236
+SPWI705.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 9	opcode 233, target 2, parameter1 1, parameter2 132, timing 0, duration 13, power 7	proficiency 132 has no name
+SPWI708.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 11	opcode 233, target 1, parameter1 1, parameter2 128, timing 0, duration 24, power 7, resistance 3	proficiency 128 has no name
+SPWI711.SPL	not_implemented	missing_opcodes:222 238	refused			opcodes not supported yet: 222 238
+SPWI714.SPL	not_implemented	missing_opcodes:238	refused			opcodes not supported yet: 238
+SPWI715.SPL	not_implemented	missing_opcodes:210	refused			opcodes not supported yet: 210
+SPWI716.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI717.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI718.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI719.SPL	not_implemented	spell:abilities	refused			8 abilities: level sections not supported yet
+SPWI720.SPL	not_implemented	missing_opcodes:241	refused			opcodes not supported yet: 241
+SPWI721.SPL	not_implemented	spell:abilities	refused			7 abilities: level sections not supported yet
+SPWI802.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 11	opcode 233, target 1, parameter1 2, parameter2 116, timing 0, duration 288, power 8, resistance 1	proficiency 116 has no name
+SPWI803.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI804.SPL	not_implemented	missing_opcodes:236	refused			opcodes not supported yet: 236
+SPWI805.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI808.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 12	opcode 233, target 1, parameter1 2, parameter2 128, timing 0, duration 24, power 8, resistance 3	proficiency 128 has no name
+SPWI810.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI811.SPL	not_implemented	spell:abilities	refused			3 abilities: level sections not supported yet
+SPWI812.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI813.SPL	not_implemented	missing_opcodes:213	refused			opcodes not supported yet: 213
+SPWI816.SPL	not_implemented	spell:abilities	refused			3 abilities: level sections not supported yet
+SPWI817.SPL	not_implemented	missing_opcodes:209	refused			opcodes not supported yet: 209
+SPWI818.SPL	not_implemented	application:timing	refused	ability 0, effect 6	opcode 39, target 2, parameter1 0, parameter2 1, timing 3, duration 1, power 8, resistance 1, special 13	timing 3 not supported in an ability
+SPWI853.SPL	not_implemented	missing_opcodes:185	refused			opcodes not supported yet: 185
+SPWI897.SPL	not_implemented	missing_opcodes:209	refused			opcodes not supported yet: 209
+SPWI898.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI899.SPL	not_implemented	spell:abilities	refused			5 abilities: level sections not supported yet
+SPWI902.SPL	not_implemented	missing_opcodes:259	refused			opcodes not supported yet: 259
+SPWI907.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 14	opcode 233, target 1, parameter1 3, parameter2 128, timing 0, duration 24, power 9, resistance 3	proficiency 128 has no name
+SPWI909.SPL	not_implemented	missing_opcodes:231	refused			opcodes not supported yet: 231
+SPWI910.SPL	not_implemented	missing_opcodes:211	refused			opcodes not supported yet: 211
+SPWI912.SPL	not_implemented	missing_opcodes:209	refused			opcodes not supported yet: 209
+SPWI917.SPL	not_implemented	missing_opcodes:212	refused			opcodes not supported yet: 212
+SPWI918.SPL	not_implemented	application:timing	refused	ability 0, effect 6	opcode 39, target 2, parameter1 0, parameter2 1, timing 3, duration 1, power 9, resistance 1, special 13	timing 3 not supported in an ability
+SPWI920.SPL	not_implemented	spell:abilities	refused			20 abilities: level sections not supported yet
+SPWI921.SPL	not_implemented	missing_opcodes:188	refused			opcodes not supported yet: 188
+SPWI923.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI924.SPL	not_implemented	spell:abilities	refused			4 abilities: level sections not supported yet
+SPWI926.SPL	not_implemented	missing_opcodes:124	refused			opcodes not supported yet: 124
+SPWI959.SPL	not_implemented	missing_opcodes:210	refused			opcodes not supported yet: 210
+SPWI960.SPL	not_implemented	missing_opcodes:209	refused			opcodes not supported yet: 209
+SPWI982.SPL	not_implemented	missing_opcodes:68	refused			opcodes not supported yet: 68
+SPWI994.SPL	not_implemented	missing_opcodes:124	refused			opcodes not supported yet: 124
+SPWI995.SPL	not_implemented	missing_opcodes:68	refused			opcodes not supported yet: 68
+SPWISH07.SPL	not_implemented	missing_opcodes:224 242	refused			opcodes not supported yet: 224 242
+SPWISH09.SPL	not_implemented	opcode233:no_name	ignored	ability 0, effect 2	opcode 233, target 1, parameter1 1, parameter2 121, timing 0, duration 60, power 7, resistance 3	proficiency 121 has no name
+SPWISH11.SPL	not_implemented	recursion:eff_level	refused	ability 0, effect 0 (opcode 248) > SPCL903.EFF	opcode 248, target 3, parameter1 0, parameter2 0, timing 0, duration 12, power 9, resistance 2, resource SPCL903	EFF file with a level restriction
+SPWISH12.SPL	not_implemented	spell:abilities	refused			15 abilities: level sections not supported yet
+SPWISH17.SPL	not_implemented	missing_opcodes:188 231	refused			opcodes not supported yet: 188 231
+SPWISH31.SPL	not_implemented	phrase5000130:form1	refused	ability 0, effect 2	opcode 166, target 4, parameter1 40, parameter2 1, timing 0, duration 126, power 9, resistance 3	no sentence 5000131 for this form (target or probable effect)
+SPWISH34.SPL	not_implemented	opcode22:form1	refused	ability 0, effect 0	opcode 22, target 4, parameter1 -5, parameter2 0, timing 0, duration 60, power 9, resistance 3	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPWISH36.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 7	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 90, power 9, resistance 1, resource SPCL521	no sentence 22060101 for this form (target or probable effect)
+SPWISH37.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 7	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 90, power 9, resistance 1, resource SPCL521	no sentence 22060101 for this form (target or probable effect)
+SPWISH40.SPL	not_implemented	phrase22060100:form1	refused	ability 0, effect 7	opcode 206, target 2, parameter1 0, parameter2 0, timing 0, duration 90, power 9, resistance 1, resource SPCL521	no sentence 22060101 for this form (target or probable effect)
+SPWISH46.SPL	not_implemented	missing_opcodes:224 242	refused			opcodes not supported yet: 224 242
+SPWM101.SPL	not_implemented	spell_header:opcode177_eff_fields	refused	ability 0, effect 2	opcode 177, target 1, parameter1 0, parameter2 2, timing 0, duration 90, power 5, resistance 1, resource SPWM101D	effect of an EFF file that the old engine keeps in another form: header block not supported
+SPWM101D.SPL	not_implemented	opcode318:stat	refused	ability 0, effect 0	opcode 318, target 2, parameter1 0, parameter2 43, timing 0, duration 0, power 5, resource SPWM101D	condition 43 not supported
+SPWM113.SPL	not_implemented	opcode111:remove_group	refused	ability 0, effect 12	opcode 112, target 2, parameter1 0, parameter2 0, timing 4, duration 70, power 4, resource WSWOLF	weapon removed later by opcode 112
+SPWM122.SPL	not_implemented	opcode175:creature_type	refused	ability 0, effect 3	opcode 175, target 2, parameter1 1, parameter2 3, timing 0, duration 60, power 2, resistance 1, saving throw type 1, saving throw bonus 0	hold of a creature type
+SPWM125.SPL	not_implemented	missing_opcodes:117	refused			opcodes not supported yet: 117
+SPWM140.SPL	not_implemented	missing_opcodes:243	refused			opcodes not supported yet: 243
+SPWM141.SPL	not_implemented	opcode122:random_treasure	refused	ability 0, effect 1	opcode 122, target 2, parameter1 0, parameter2 0, timing 1, duration 0, resource RNDTRE05	random treasure rndtre05
+SPWM142.SPL	not_implemented	opcode73:form1	refused	ability 0, effect 1	opcode 73, target 2, parameter1 2, parameter2 0, timing 0, duration 60, power 2, resistance 1	no text for form 1 (1 target, 2 probable, 3 probable on the target)
+SPWM143.SPL	not_implemented	missing_opcodes:222	refused			opcodes not supported yet: 222
+SPWM145.SPL	not_implemented	missing_opcodes:190	refused			opcodes not supported yet: 190
+SPWM183.SPL	not_implemented	opcode111:external	refused	ability 0, effect 8, PLYSQUWE.EFF (opcode 177)	opcode 111, target 2, parameter1 1, parameter2 1, timing 0, duration 40, power 4, resistance 1, saving throw type 16, saving throw bonus 0, resource SQUIRP	effect from an EFF file
+SPWM191.SPL	not_implemented	missing_opcodes:190	refused			opcodes not supported yet: 190
+STAF11.SPL	not_implemented	missing_opcodes:259	refused			opcodes not supported yet: 259

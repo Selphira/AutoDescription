@@ -1,0 +1,27 @@
+
+SPCL121.SPL : Opcode 54: Invalid target : 255
+SPCL121.SPL : Opcode 44: Invalid target : 255
+SPCL121.SPL : Opcode 12: Invalid target : 255
+SPCL920.SPL : Opcode 318 : Immunité à contre le sort « Horreur » différente de l'objet : SPWI205
+SPCL920.SPL : Opcode 318 : Immunité à contre le sort « Horreur » différente de l'objet : SPIN105
+SPIN001.SPL : Opcode 135: Timing mode == Instant/Limited and duration == 0
+SPIN122.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPIN123.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPIN124.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPIN150.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPIN151.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPIN891.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPINHUM.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPJA01.SPL : Opcode 31: Timing mode == Instant/Limited and duration == 0
+SPWI414.SPL : Opcode 31: Timing mode == Instant/Limited and duration == 0
+SPWI414.SPL : Opcode 31: Timing mode == Instant/Limited and duration == 0
+SPWI414.SPL : Opcode 31: Timing mode == Instant/Limited and duration == 0
+SPWI416.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI489.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI490.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI491.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI818.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+SPWI916.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI916.SPL : Opcode 111: Timing mode == Instant/Limited and duration == 0
+SPWI918.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+SPWI960.SPL : Opcode 318 : Immunité à contre le sort « Souffle psionique » différente de l'objet : SPIN959
