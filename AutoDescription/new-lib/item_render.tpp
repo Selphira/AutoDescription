@@ -6,10 +6,12 @@
 
 // Raison de non-couverture si l'objet demande un rendu qui n'existe pas encore, vide sinon :
 // cas que ad_item_combat_support ou ad_item_charged_support refuse, utilisabilité (affichée seulement sur les jeux classiques), cas
-// d'un opcode décrit que sa macro ad_op_<N>_support refuse.
+// d'un opcode décrit que sa macro ad_op_<N>_support refuse. Puis les regroupements
+// (new-lib/groups.tpp), qui n'écrivent rien.
 DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	READ_SHORT ITM_type item_type
 	SPRINT render_missing ~~
+	SPRINT render_late_missing ~~
 	SET combat_is_ammo = 0
 	SET charged_uses_id = 0 - 1
 	SET item_has_combat = (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
@@ -35,6 +37,9 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 			END
 		END
 	END
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_cross_groups
+	END
 END
 
 // Un opcode inconnu (absent du catalogue ou du jeu courant) n'est jamais décrit.
@@ -50,7 +55,8 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 	LPF ad_strip_technical_part STR_VAR text = ~%original_description%~ RET description = text END
 	LPM ad_lines_reset
 	LPM ad_item_equipped_lines
-	LPM ad_cross_groups
+	LPM ad_recursion_describe_pending
+	LPM ad_derived_lines
 	// fx_opcode_count est trié (ad_set_coverage) : l'ordre des ajouts ne dépend pas du fichier.
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 		LPM ad_opcode_is_described

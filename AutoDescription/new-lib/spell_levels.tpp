@@ -4,14 +4,22 @@
 // (ad_spell_header_pipeline). Un en-tête unique n'a pas de titre de niveau, même requis au-dessus
 // du niveau 1 : l'ancien moteur n'en écrit qu'avec plusieurs niveaux.
 
-// Lignes des opcodes décrits, puis lignes probables regroupées par plage (ancien
+// Lignes des sous-ressources et des effets dérivés (ad_recursion_describe_pending, ad_derived_lines),
+// puis des opcodes décrits, puis lignes probables regroupées par plage (ancien
 // group_probability_effects) ; refus d'une forme ou d'une cible sans texte (render_late_missing)
 // et d'une ligne hors de la section de l'en-tête. Les opcodes écrivent leurs lignes dans l'ordre de
 // leur premier effet restant (ad_spell_header_effects), comme l'ancien moteur depuis
 // leveled_opcodes : à rang égal, l'ordre des lignes et celle qu'un doublon garde en dépendent ; les
 // autres opcodes suivent, dans l'ordre numérique.
 DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
-	// Clés propres à cet appel : une seconde description du sort les retrouverait (V36).
+	// Les lignes, et celles des sous-sorts, taisent la durée et le jet de sauvegarde que l'en-tête
+	// écrit (ancien ignoreDuration et ignoreSavingThrow).
+	SET ctx_ignore_duration = header_hide_duration
+	SET ctx_ignore_save = header_hide_save
+	LPM ad_lines_reset
+	LPM ad_recursion_describe_pending
+	LPM ad_derived_lines
+	// Clés propres à cet appel : la description d'un autre sort les retrouverait (V36).
 	SET statistics_call = VARIABLE_IS_SET statistics_call ? statistics_call + 1 : 1
 	SET statistics_opcodes = 0
 	FOR (statistics_n = 0; statistics_n < $spell_fx_count(~0~); ++statistics_n) BEGIN

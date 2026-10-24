@@ -36,6 +36,7 @@
 DEFINE_PATCH_MACRO ad_fx_reset BEGIN
 	SET fx_count = 0
 	SET fx_header_count = 0
+	SET recursion_pending_count = 0
 	SPRINT fx_load_error ~~
 	SPRINT fx_load_message ~~
 	SPRINT ignored_reason ~~

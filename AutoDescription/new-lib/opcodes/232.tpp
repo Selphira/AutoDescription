@@ -67,11 +67,12 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				SET recursion_depth_reset = 0
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
-				LPM ad_recursion_support
-				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%condition_id%~) > 1
-						AND ~%condition_name%~ STRING_EQUAL ~~ AND ~%condition_text%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:no_condition~ message = ~several lines without a condition text~ RET render_missing = refusal END
+				SPRINT recursion_single_reason ~~
+				PATCH_IF ~%condition_name%~ STRING_EQUAL ~~ AND ~%condition_text%~ STRING_EQUAL ~~ BEGIN
+					SPRINT recursion_single_reason ~not_implemented:opcode232:no_condition~
+					SPRINT recursion_single_message ~several lines without a condition text~
 				END
+				LPM ad_recursion_support
 			END
 		END
 	END

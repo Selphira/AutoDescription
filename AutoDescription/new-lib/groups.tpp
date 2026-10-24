@@ -1,17 +1,23 @@
 // Passe 3 : regroupements entre opcodes, après la prise en charge de tous les opcodes et avant
 // leurs lignes. Un effet réuni à d'autres est marqué consommé (fx_consumed) : la macro
-// ad_op_<N>_lines de son opcode le saute, et la ligne est celle d'un effet dérivé. Les règles
-// s'appliquent dans l'ordre ci-dessous, indépendamment de l'ordre des opcodes. Une règle fixe
-// l'opcode d'ancrage, les opcodes membres, l'effet dérivé, le nom de la ligne et la macro qui
-// écrit la ligne (group_line), puis appelle ad_group_same_fields.
+// ad_op_<N>_lines de son opcode le saute, et la ligne est celle d'un effet dérivé (ad_derived_add),
+// écrite avec les autres lignes (ad_derived_lines) : les regroupements n'écrivent rien, l'en-tête d'un
+// sort se lit entre eux et les lignes. Les règles s'appliquent dans l'ordre ci-dessous,
+// indépendamment de l'ordre des opcodes. Une règle fixe l'opcode d'ancrage, les opcodes membres,
+// l'effet dérivé, le nom de la ligne et la macro qui écrit la ligne (group_line), puis appelle
+// ad_group_same_fields.
 //
-// Tableau écrit : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp).
+// Tableaux écrits : fx_consumed (initialisé à 0 à la lecture, new-lib/effects.tpp), derived_*.
 //
 // Une règle n'est appliquée que si l'objet a les opcodes sans lesquels elle ne réunit rien
 // (fx_opcode_count) : chacune parcourt tous les effets, souvent plusieurs fois.
 
 DEFINE_PATCH_MACRO ad_cross_groups BEGIN
+	SET derived_count = 0
 	SET group_statistic_tra = 0
+	SET group_name_tra = 0
+	SET group_anchor = 0
+	SPRINT group_name ~~
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_identical_effects
 	END
@@ -231,29 +237,29 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 			PATCH_IF group_other >= 0 BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
 				SET $fx_consumed(~%group_other%~) = 1
-				SET strength = $fx_parameter1(~%group_other%~)
-				SET strength_bonus = $fx_parameter1(~%group_id%~)
-				SPRINT bonus ~%strength_bonus%~
-				// Seul 100 est écrit sur deux chiffres (« 18/00 ») : l'ancien moteur écrit « 18/5 ».
-				PATCH_IF strength_bonus == 100 BEGIN
-					SPRINT bonus ~00~
-				END
-				SPRINT value ~%strength%/%bonus%~
-				SPRINT value @1200002 // ~Passe à %value%~
-				SPRINT name @8000036 // ~Force~
-				SPRINT line_section ~equipped~
-				PATCH_IF support_spell BEGIN
-					SET derived_id = group_id
-					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~EXCEPTIONAL_STRENGTH~)
-					LPM ad_spell_header_derive
-				END
-				SET line_sort = $AD_DERIVED_SORT(~EXCEPTIONAL_STRENGTH~)
-				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-				SET line_fx = group_id
-				LPM ad_effect_line
+				SPRINT derived_kind ~EXCEPTIONAL_STRENGTH~
+				SET derived_id = group_id
+				SET derived_other = group_other
+				SPRINT derived_line ~ad_group_exceptional_strength_line~
+				LPM ad_derived_add
 			END
 		END
 	END
+END
+
+// Force de l'effet 44 group_other, Force exceptionnelle de l'effet 97 group_id.
+DEFINE_PATCH_MACRO ad_group_exceptional_strength_line BEGIN
+	SET strength = $fx_parameter1(~%group_other%~)
+	SET strength_bonus = $fx_parameter1(~%group_id%~)
+	SPRINT bonus ~%strength_bonus%~
+	// Seul 100 est écrit sur deux chiffres (« 18/00 ») : l'ancien moteur écrit « 18/5 ».
+	PATCH_IF strength_bonus == 100 BEGIN
+		SPRINT bonus ~00~
+	END
+	SPRINT value ~%strength%/%bonus%~
+	SPRINT value @1200002 // ~Passe à %value%~
+	SPRINT name @8000036 // ~Force~
+	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 END
 
 // Immunités aux projectiles (ancien opcode_83_group) : une immunité au projectile P (83) absorbe
@@ -448,7 +454,7 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 		// Dans un sort, l'ancien moteur applique aussi les règles des effets d'équipement (abilityType
 		// négatif, ancien delete_cure_linked_to_specific_immunity).
-		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR group_spell_as_equipped
+		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR resource_is_spell
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
@@ -696,20 +702,19 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 							SET $fx_consumed(~%group_candidate%~) = 1
 						END
 					END
-					SPRINT line_section ~equipped~
-					PATCH_IF support_spell BEGIN
-						SET derived_id = group_id
-						SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~FREE_ACTION~)
-						LPM ad_spell_header_derive
-					END
-					SET line_sort = $AD_DERIVED_SORT(~FREE_ACTION~)
-					SET line_phrase = 30110100 // ~Action libre~
-					SET line_fx = group_id
-					LPM ad_effect_line
+					SPRINT derived_kind ~FREE_ACTION~
+					SET derived_id = group_id
+					SET derived_other = 0 - 1
+					SPRINT derived_line ~ad_group_free_action_line~
+					LPM ad_derived_add
 				END
 			END
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ad_group_free_action_line BEGIN
+	SET line_phrase = 30110100 // ~Action libre~
 END
 
 // Objet rendu (ancien opcode_112_group, second cas) : un retrait d'objet (112) sans délai ni durée
@@ -763,21 +768,21 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 			PATCH_IF group_removal >= 0 BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
 				SET $fx_consumed(~%group_removal%~) = 1
-				SPRINT itemName $fx_item_name(~%group_removal%~)
-				SPRINT itemName2 $fx_item_name(~%group_id%~)
-				SPRINT line_section ~equipped~
-				PATCH_IF support_spell BEGIN
-					SET derived_id = group_id
-					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~REPLACE_ITEM~)
-					LPM ad_spell_header_derive
-				END
-				SET line_sort = $AD_DERIVED_SORT(~REPLACE_ITEM~)
-				SET line_phrase = 30120100 // ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
-				SET line_fx = group_id
-				LPM ad_effect_line
+				SPRINT derived_kind ~REPLACE_ITEM~
+				SET derived_id = group_id
+				SET derived_other = group_removal
+				SPRINT derived_line ~ad_group_replace_item_line~
+				LPM ad_derived_add
 			END
 		END
 	END
+END
+
+// Objet retiré par l'effet 112 group_other, créé par l'effet 122 group_id.
+DEFINE_PATCH_MACRO ad_group_replace_item_line BEGIN
+	SPRINT itemName $fx_item_name(~%group_other%~)
+	SPRINT itemName2 $fx_item_name(~%group_id%~)
+	SET line_phrase = 30120100 // ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 END
 
 // Types de sort (anciens opcode_60_group et opcode_145_group, échec des sorts et lancement de sorts
@@ -918,8 +923,8 @@ END
 // Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
 // group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
 // opcodes group_members qui a les mêmes champs (ad_fx_same_fields) ; s'ils sont tous trouvés, ils
-// sont consommés et la macro group_line écrit la ligne de l'effet dérivé group_derived, d'après
-// l'effet d'ancrage group_id.
+// sont consommés au profit de l'effet dérivé group_derived, d'après l'effet d'ancrage group_id, dont
+// la macro group_line écrira la ligne.
 DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 	SET group_possible = VARIABLE_IS_SET $fx_opcode_count(~%group_anchor%~)
 	PHP_EACH group_members AS _ => group_opcode BEGIN
@@ -949,19 +954,52 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 					SET group_other = $group_member(~%group_opcode%~)
 					SET $fx_consumed(~%group_other%~) = 1
 				END
-				SPRINT line_section ~equipped~
-				SET line_sort = $AD_DERIVED_SORT(~%group_derived%~)
-				SET group_value = $fx_parameter1(~%group_id%~)
-				SET group_mode = $fx_parameter2(~%group_id%~)
-				PATCH_IF support_spell BEGIN
-					SET derived_id = group_id
-					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~%group_derived%~)
-					LPM ad_spell_header_derive
-				END
-				LPM ~%group_line%~
-				SET line_fx = group_id
-				LPM ad_effect_line
+				SPRINT derived_kind ~%group_derived%~
+				SET derived_id = group_id
+				SET derived_other = 0 - 1
+				SPRINT derived_line ~%group_line%~
+				LPM ad_derived_add
 			END
+		END
+	END
+END
+
+// Effet dérivé derived_kind (ancien opcode virtuel AD_DERIVED_OLD_OPCODE, ajouté après les autres
+// effets : il compte pour l'en-tête d'un sort, ad_spell_header_effects), aux champs de l'effet
+// derived_id ; derived_other : second effet que lit sa ligne ; derived_line : macro qui rédige sa
+// ligne (line_text ou line_phrase), vide s'il n'en a pas. Les paramètres de la règle
+// (ad_group_same_fields) y sont gardés pour la ligne.
+DEFINE_PATCH_MACRO ad_derived_add BEGIN
+	SPRINT $derived_kind(~%derived_count%~) ~%derived_kind%~
+	SET $derived_id(~%derived_count%~) = derived_id
+	SET $derived_other(~%derived_count%~) = derived_other
+	SPRINT $derived_line(~%derived_count%~) ~%derived_line%~
+	SPRINT $derived_name(~%derived_count%~) ~%group_name%~
+	SET $derived_name_tra(~%derived_count%~) = group_name_tra
+	SET $derived_statistic_tra(~%derived_count%~) = group_statistic_tra
+	SET $derived_anchor(~%derived_count%~) = group_anchor
+	SET derived_count += 1
+END
+
+// Lignes des effets dérivés, dans l'ordre de leurs regroupements, avant celles des opcodes.
+DEFINE_PATCH_MACRO ad_derived_lines BEGIN
+	FOR (derived_k = 0; derived_k < derived_count; ++derived_k) BEGIN
+		SPRINT derived_line $derived_line(~%derived_k%~)
+		PATCH_IF NOT (~%derived_line%~ STRING_EQUAL ~~) BEGIN
+			SPRINT derived_kind $derived_kind(~%derived_k%~)
+			SET group_id = $derived_id(~%derived_k%~)
+			SET group_other = $derived_other(~%derived_k%~)
+			SPRINT group_name $derived_name(~%derived_k%~)
+			SET group_name_tra = $derived_name_tra(~%derived_k%~)
+			SET group_statistic_tra = $derived_statistic_tra(~%derived_k%~)
+			SET group_anchor = $derived_anchor(~%derived_k%~)
+			SET group_value = $fx_parameter1(~%group_id%~)
+			SET group_mode = $fx_parameter2(~%group_id%~)
+			SPRINT line_section ~equipped~
+			SET line_sort = $AD_DERIVED_SORT(~%derived_kind%~)
+			LPM ~%derived_line%~
+			SET line_fx = group_id
+			LPM ad_effect_line
 		END
 	END
 END

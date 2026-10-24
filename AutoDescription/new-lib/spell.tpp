@@ -14,42 +14,17 @@ BEGIN
 	// Fixé dès la lecture des effets : le remplacement d'un 177 en dépend (ad_fx_substitute_177).
 	SET support_header_only = NOT AD_ADD_STATISTICS_SECTION_TO_SPELL_DESCRIPTION
 	SET support_spell = 1
-	SET source_is_spell = 1
-	SET group_spell_as_equipped = 1
+	SET resource_is_spell = 1
 	// Un sort n'a pas de type d'objet (prises en charge partagées avec les objets).
 	SET item_type = 0 - 1
 	// Ni l'en-tête ni la section « PARAMÈTRES » de l'ancien moteur ne lisent le bloc de lancement
 	// (load_level_effects ; add_casting_features est vide).
 	SET fx_with_casting = 0
-	// Les lignes taisent la durée et le jet de sauvegarde que l'en-tête écrit (ancien ignoreDuration et
-	// ignoreSavingThrow, hérités par les sous-sorts). L'en-tête se lit après la chaîne des effets, dont
-	// les regroupements et les sous-sorts écrivent déjà des lignes : il est supposé les écrire, et le
-	// sort est décrit une seconde fois, sans journaux, s'il ne le fait pas.
-	SET spell_hide_duration = 1
-	SET spell_hide_save = 1
-	SET log_muted = 0
-	LPM ad_spell_describe
-	PATCH_IF covered AND NOT support_header_only AND (header_hide_duration != spell_hide_duration OR header_hide_save != spell_hide_save) BEGIN
-		SET spell_hide_duration = header_hide_duration
-		SET spell_hide_save = header_hide_save
-		SET log_muted = 1
-		LPM ad_spell_describe
-		SET log_muted = 0
-	END
-	PATCH_IF NOT covered BEGIN
-		LPF ad_log_event STR_VAR event = ~%uncovered_reason%~ RET uncovered_reason = reason END
-	END
-END
-
-// Une description du sort : description, covered, uncovered_reason.
-DEFINE_PATCH_MACRO ad_spell_describe BEGIN
 	SPRINT description ~~
 	SET covered = 0
 	LPM ad_recursion_reset
-	SET ctx_ignore_duration = spell_hide_duration
-	SET ctx_ignore_save = spell_hide_save
 	LPM ad_fx_load_spell
-	PATCH_IF AD_EFFECTS_DUMP AND NOT log_muted BEGIN
+	PATCH_IF AD_EFFECTS_DUMP BEGIN
 		LPM ad_fx_dump
 	END
 	LPM ad_set_coverage
@@ -77,5 +52,8 @@ DEFINE_PATCH_MACRO ad_spell_describe BEGIN
 		END
 		SET covered = ~%header_missing%~ STRING_EQUAL ~~
 		SPRINT uncovered_reason ~%header_missing%~
+	END
+	PATCH_IF NOT covered BEGIN
+		LPF ad_log_event STR_VAR event = ~%uncovered_reason%~ RET uncovered_reason = reason END
 	END
 END

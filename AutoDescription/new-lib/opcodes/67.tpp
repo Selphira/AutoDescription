@@ -63,7 +63,7 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 			// L'ancien moteur n'ajoute les dés de vie de la créature (niveau de sa première classe) qu'à la
 			// description d'un sort.
 			SPRINT lifeDice ~~
-			PATCH_IF source_is_spell BEGIN
+			PATCH_IF resource_is_spell BEGIN
 				SET creatureLevel = $fx_creature_level(~%summon_id%~)
 				LPF ad_tra INT_VAR tra_id = creatureLevel == 1 ? 20670020 : 20670021 RET lifeDice = text END // ~ de 1 dé de vie~
 			END

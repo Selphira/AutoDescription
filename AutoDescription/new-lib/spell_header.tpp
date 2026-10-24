@@ -29,7 +29,8 @@ END
 // commune et de chaque opcode décrit, regroupements. Un effet écarté ou réuni à d'autres est
 // consommé (fx_consumed) ; celui que seul l'en-tête ne compte plus est caché (fx_header_hidden).
 // Avec les phrases, les effets d'un sort qui vise le lanceur sans zone visent le lanceur
-// (spell_self_target, ancien globalSpellTarget), avant les regroupements qui écrivent leurs lignes.
+// (spell_self_target, ancien globalSpellTarget). Rien n'est écrit : les lignes viennent après
+// l'en-tête (ad_spell_statistics).
 // header_missing : refus d'un cas dont on ne sait pas quels effets l'ancien moteur garde.
 DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 	// Opcodes dans l'ordre numérique, comme pour la ressource décrite (ad_set_coverage) : un sous-sort
@@ -80,9 +81,8 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 			END
 		END
 	END
-	SET header_derived_count = 0
+	SET derived_count = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_lines_reset
 		LPM ad_cross_groups
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~321~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
 			LPM ad_op_321_after_groups
@@ -96,21 +96,15 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 	END
 END
 
-// Effet que l'ancien moteur crée en réunissant d'autres effets (opcode virtuel derived_opcode), avec
-// les champs de l'effet derived_id : il vient après tous les autres effets de l'en-tête de celui-ci.
-DEFINE_PATCH_MACRO ad_spell_header_derive BEGIN
-	SET $header_derived_id(~%header_derived_count%~) = derived_id
-	SET $header_derived_opcode(~%header_derived_count%~) = derived_opcode
-	SET header_derived_count += 1
-END
-
 // Effets restants de chaque en-tête, dans l'ordre de l'ancien moteur : opcodes dans l'ordre de leur
 // premier effet, puis effets de chaque opcode dans l'ordre de lecture ; les effets remplacés par
 // ceux d'un EFF (177) ou d'une arme (111) viennent après les autres, l'ancien moteur les ajoutant une
 // fois l'en-tête lu (opcode_177_replace, opcode_111_replace), de même que l'effet qui en représente
 // plusieurs identiques (fx_late, ancien opcode_group_by_target) ou une série (fx_series_anchor,
-// ancien opcode_group_by_duration). Les effets d'un en-tête se suivent dans le magasin : chacun n'est
-// parcouru que dans ses bornes (header_first, header_end).
+// ancien opcode_group_by_duration) ; les effets dérivés des regroupements (ad_derived_add,
+// new-lib/groups.tpp), avec l'opcode virtuel de l'ancien moteur, viennent en dernier. Les effets d'un
+// en-tête se suivent dans le magasin : chacun n'est parcouru que dans ses bornes (header_first,
+// header_end).
 DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 	FOR (header_h = 0; header_h < fx_header_count; ++header_h) BEGIN
 		SET $header_first(~%header_h%~) = 0
@@ -169,11 +163,12 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 				SET header_kept += 1
 			END
 		END
-		FOR (header_k = 0; header_k < header_derived_count; ++header_k) BEGIN
-			SET header_id = $header_derived_id(~%header_k%~)
+		FOR (header_k = 0; header_k < derived_count; ++header_k) BEGIN
+			SET header_id = $derived_id(~%header_k%~)
 			PATCH_IF $fx_header(~%header_id%~) == header_h BEGIN
+				SPRINT header_derived_kind $derived_kind(~%header_k%~)
 				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = header_id
-				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = $header_derived_opcode(~%header_k%~)
+				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = $AD_DERIVED_OLD_OPCODE(~%header_derived_kind%~)
 				SET header_kept += 1
 			END
 		END
@@ -301,7 +296,7 @@ DEFINE_PATCH_MACRO ad_spell_header_render BEGIN
 	// L'ancien moteur n'a jamais %theTarget% dans la portée de l'en-tête, que la chaîne anglaise de la
 	// zone d'effet garde telle quelle (@102455) ; les lignes le définissent, et une réécriture de la
 	// description le remplacerait (V41) : un repère en tient la place jusqu'à la fin
-	// (ad_spell_describe).
+	// (ad_describe_spell).
 	SPRINT header_saved_target ~%theTarget%~
 	SPRINT theTarget ~AD_THE_TARGET_MARK~
 	READ_STRREF SPL_unidentified_name spell_name
@@ -567,7 +562,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 						SPRINT duration_kind $AD_OPCODE_DURATION(~%duration_opcode%~)
 					END
 					// Anciennes listes opcodes_ignore_duration et opcodes_cant_be_permanent (177, et 525 :
-					// objet remplacé, ad_spell_header_derive).
+					// objet remplacé, ad_derived_add).
 					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 525 BEGIN
 						PATCH_IF duration_instant < 0 BEGIN
 							SET duration_instant = 1

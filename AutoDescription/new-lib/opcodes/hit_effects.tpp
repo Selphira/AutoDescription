@@ -43,10 +43,9 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 					SET recursion_depth_reset = 0
 					SET recursion_versus_set = 0
 					SPRINT recursion_versus ~~
+					SPRINT recursion_single_reason ~not_implemented:opcode%hit_opcode%:lines~
+					SPRINT recursion_single_message ~several lines in the applied EFF file~
 					LPM ad_recursion_support
-					PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_sub_count(~%hit_id%~) > 1 BEGIN
-						LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:lines~ message = ~several lines in the applied EFF file~ RET render_missing = refusal END
-					END
 				END
 			END
 		END

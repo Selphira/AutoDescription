@@ -40,6 +40,7 @@ DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 				SET recursion_parent_dice = 0
 				SET recursion_versus_set = 0
 				SPRINT recursion_versus ~~
+				SPRINT recursion_single_reason ~~
 				LPM ad_recursion_support
 			END
 		END

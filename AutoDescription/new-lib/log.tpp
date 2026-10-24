@@ -327,8 +327,7 @@ END
 // en colonnes dans …-events.txt : ressource<TAB>nature<TAB>raison<TAB>conséquence<TAB>emplacement
 // <TAB>données<TAB>message. Conséquence : refused (ressource non décrite), ignored (effet écarté, la
 // ressource reste décrite) ou kept (effet douteux décrit quand même). Renvoie la raison avec sa
-// nature, pour …-compare.txt. Rien n'est écrit pendant une seconde description de la ressource
-// (log_muted, new-lib/spell.tpp).
+// nature, pour …-compare.txt.
 DEFINE_PATCH_FUNCTION ad_log_event
 	STR_VAR
 		event = ~~
@@ -366,13 +365,11 @@ BEGIN
 	PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
 		SPRINT event_file ~file-errors~
 	END
-	PATCH_IF NOT log_muted BEGIN
-		INNER_ACTION BEGIN
-			SILENT
-			APPEND_OUTER ~AutoDescription/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
-			APPEND_OUTER ~AutoDescription/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
-			VERBOSE
-		END
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~AutoDescription/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
+		APPEND_OUTER ~AutoDescription/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
+		VERBOSE
 	END
 END
 
@@ -380,12 +377,10 @@ END
 // chaîne des ressources<TAB>sous-ressource<TAB>raison (depth : au-delà de AD_RECURSION_MAX_DEPTH ;
 // loop : déjà dans la chaîne).
 DEFINE_PATCH_MACRO ad_log_recursion BEGIN
-	PATCH_IF NOT log_muted BEGIN
-		INNER_ACTION BEGIN
-			SILENT
-			APPEND_OUTER ~AutoDescription/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
-			VERBOSE
-		END
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~AutoDescription/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+		VERBOSE
 	END
 END
 

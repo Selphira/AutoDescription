@@ -159,7 +159,7 @@ END
 // si la première dure tant que l'objet est porté, de même timing et même durée, à au moins deux sorts
 // de noms différents disparaissent (avec la première, même sans nom) au profit d'un effet 518. Comme
 // dans l'ancien moteur, celui-ci prend les champs de la dernière immunité qui reste dans l'en-tête,
-// réunie ou non (ad_spell_header_derive). Les immunités réunies sont cachées à l'en-tête
+// réunie ou non (ad_derived_add, sans ligne). Les immunités réunies sont cachées à l'en-tête
 // (fx_header_hidden) : leurs lignes sont écrites par ad_op_206_lines.
 DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 	SET immunity_serial = 0
@@ -218,9 +218,11 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 						SET immunity_member_id = $immunity_order(~%immunity_member%~)
 						SET $fx_header_hidden(~%immunity_member_id%~) = 1
 					END
+					SPRINT derived_kind ~SPELL_IMMUNITIES~
 					SET derived_id = immunity_last
-					SET derived_opcode = 518
-					LPM ad_spell_header_derive
+					SET derived_other = 0 - 1
+					SPRINT derived_line ~~
+					LPM ad_derived_add
 				END
 			END
 		END

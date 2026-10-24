@@ -501,7 +501,7 @@ END
 // Premier identifiant (source_tra, puis « de… » et « à… ») des chaînes de la source des effets :
 // le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le porteur d'un autre objet.
 DEFINE_PATCH_MACRO ad_application_source BEGIN
-	SET source_tra = source_is_spell ? 2000120 : item_type == ITM_TYPE_potion ? 2000110 : 2000100
+	SET source_tra = resource_is_spell ? 2000120 : item_type == ITM_TYPE_potion ? 2000110 : 2000100
 END
 
 // Restriction de niveau de l'effet line_fx (ancien add_target_level), après la zone du projectile

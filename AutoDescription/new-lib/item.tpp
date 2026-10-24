@@ -14,9 +14,7 @@ BEGIN
 	SET covered = 0
 	SET support_header_only = 0
 	SET support_spell = 0
-	SET source_is_spell = 0
-	SET log_muted = 0
-	SET group_spell_as_equipped = 0
+	SET resource_is_spell = 0
 	LPM ad_recursion_reset
 	LPM ad_fx_load_item
 	PATCH_IF AD_EFFECTS_DUMP BEGIN
@@ -26,7 +24,6 @@ BEGIN
 	PATCH_IF ~%uncovered_reason%~ STRING_EQUAL ~not_implemented~ BEGIN
 		LPM ad_item_render_support
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			SPRINT render_late_missing ~~
 			LPM ad_item_render
 			// Une forme de phrase absente n'apparaît qu'au rendu des lignes (new-lib/application.tpp).
 			SET covered = ~%render_late_missing%~ STRING_EQUAL ~~
