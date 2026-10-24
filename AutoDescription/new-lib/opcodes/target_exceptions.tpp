@@ -197,10 +197,13 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	SET exc_base_high = $fx_probability1(~%line_fx%~)
 	SET exc_base_low = $fx_probability2(~%line_fx%~)
 	SPRINT exc_scope $fx_scope(~%line_fx%~)
+	// Exceptions qui précèdent l'effet dans son bloc du fichier : un 177, lu en fin de bloc, n'a que
+	// celles d'avant sa place.
+	SET exc_position = $fx_position(~%line_fx%~)
 	CLEAR_ARRAY exc_keys
-	FOR (exc_id = 0; exc_id < line_fx; ++exc_id) BEGIN
+	FOR (exc_id = 0; exc_id < fx_count; ++exc_id) BEGIN
 		SPRINT exc_id_scope $fx_scope(~%exc_id%~)
-		PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) BEGIN
+		PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) AND $fx_position(~%exc_id%~) < exc_position BEGIN
 			SET exc_high = $fx_probability1(~%exc_id%~)
 			SET exc_low = $fx_probability2(~%exc_id%~)
 			SET exc_probability = $fx_probability(~%exc_id%~)
@@ -237,9 +240,9 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 		CLEAR_ARRAY exc_IF
 		CLEAR_ARRAY exc_EFFECTIVE_IF
 		SET exc_found = 0
-		FOR (exc_id = 0; exc_id < line_fx; ++exc_id) BEGIN
+		FOR (exc_id = 0; exc_id < fx_count; ++exc_id) BEGIN
 			SPRINT exc_id_scope $fx_scope(~%exc_id%~)
-			PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) BEGIN
+			PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) AND $fx_position(~%exc_id%~) < exc_position BEGIN
 				PATCH_IF $exc_key(~%exc_id%~) == exc_rank BEGIN
 					SET exc_found = 1
 					SPRINT exc_kind $fx_exception_kind(~%exc_id%~)

@@ -242,7 +242,7 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				SPRINT value @1200002 // ~Passe à %value%~
 				SPRINT name @8000036 // ~Force~
 				SPRINT line_section ~equipped~
-				PATCH_IF support_header_only BEGIN
+				PATCH_IF support_spell BEGIN
 					SET derived_id = group_id
 					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~EXCEPTIONAL_STRENGTH~)
 					LPM ad_spell_header_derive
@@ -697,7 +697,7 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 						END
 					END
 					SPRINT line_section ~equipped~
-					PATCH_IF support_header_only BEGIN
+					PATCH_IF support_spell BEGIN
 						SET derived_id = group_id
 						SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~FREE_ACTION~)
 						LPM ad_spell_header_derive
@@ -766,7 +766,7 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 				SPRINT itemName $fx_item_name(~%group_removal%~)
 				SPRINT itemName2 $fx_item_name(~%group_id%~)
 				SPRINT line_section ~equipped~
-				PATCH_IF support_header_only BEGIN
+				PATCH_IF support_spell BEGIN
 					SET derived_id = group_id
 					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~REPLACE_ITEM~)
 					LPM ad_spell_header_derive
@@ -953,7 +953,7 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 				SET line_sort = $AD_DERIVED_SORT(~%group_derived%~)
 				SET group_value = $fx_parameter1(~%group_id%~)
 				SET group_mode = $fx_parameter2(~%group_id%~)
-				PATCH_IF support_header_only BEGIN
+				PATCH_IF support_spell BEGIN
 					SET derived_id = group_id
 					SET derived_opcode = $AD_DERIVED_OLD_OPCODE(~%group_derived%~)
 					LPM ad_spell_header_derive

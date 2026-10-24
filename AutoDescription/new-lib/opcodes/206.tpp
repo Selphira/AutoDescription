@@ -159,14 +159,16 @@ END
 // si la première dure tant que l'objet est porté, de même timing et même durée, à au moins deux sorts
 // de noms différents disparaissent (avec la première, même sans nom) au profit d'un effet 518. Comme
 // dans l'ancien moteur, celui-ci prend les champs de la dernière immunité qui reste dans l'en-tête,
-// réunie ou non (ad_spell_header_derive).
+// réunie ou non (ad_spell_header_derive). Les immunités réunies sont cachées à l'en-tête
+// (fx_header_hidden) : leurs lignes sont écrites par ad_op_206_lines.
 DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 	SET immunity_serial = 0
 	FOR (immunity_h = 0; immunity_h < fx_header_count; ++immunity_h) BEGIN
 		SET immunity_size = 0
 		FOR (immunity_late = 0; immunity_late < 2; ++immunity_late) BEGIN
 			PHP_EACH fx_ids_206 AS _ => immunity_id BEGIN
-				PATCH_IF $fx_header(~%immunity_id%~) == immunity_h AND NOT $fx_consumed(~%immunity_id%~) AND $fx_late(~%immunity_id%~) == immunity_late BEGIN
+				PATCH_IF $fx_header(~%immunity_id%~) == immunity_h AND NOT $fx_consumed(~%immunity_id%~) AND NOT $fx_header_hidden(~%immunity_id%~)
+						AND $fx_late(~%immunity_id%~) == immunity_late BEGIN
 					SET $immunity_order(~%immunity_size%~) = immunity_id
 					SET $immunity_checked(~%immunity_size%~) = 0
 					SPRINT immunity_resref $fx_resource(~%immunity_id%~)
@@ -178,7 +180,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 		END
 		FOR (immunity_k = 0; immunity_k < immunity_size; ++immunity_k) BEGIN
 			SET immunity_id = $immunity_order(~%immunity_k%~)
-			PATCH_IF NOT $immunity_checked(~%immunity_k%~) AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+			PATCH_IF NOT $immunity_checked(~%immunity_k%~) AND NOT $fx_header_hidden(~%immunity_id%~) BEGIN
 				SET immunity_target = $fx_target(~%immunity_id%~)
 				SET immunity_timing = $fx_timing(~%immunity_id%~)
 				SET immunity_duration = $fx_duration(~%immunity_id%~)
@@ -191,7 +193,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 				SET immunity_last = 0 - 1
 				FOR (immunity_j = 0; immunity_j < immunity_size; ++immunity_j) BEGIN
 					SET immunity_other = $immunity_order(~%immunity_j%~)
-					PATCH_IF NOT $fx_consumed(~%immunity_other%~) BEGIN
+					PATCH_IF NOT $fx_header_hidden(~%immunity_other%~) BEGIN
 						SET immunity_last = immunity_other
 						PATCH_IF NOT $immunity_checked(~%immunity_j%~) AND $fx_target(~%immunity_other%~) == immunity_target
 								AND (immunity_timing == TIMING_while_equipped OR ($fx_timing(~%immunity_other%~) == immunity_timing AND $fx_duration(~%immunity_other%~) == immunity_duration)) BEGIN
@@ -214,7 +216,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 					FOR (immunity_m = 0; immunity_m < immunity_member_count; ++immunity_m) BEGIN
 						SET immunity_member = $immunity_members(~%immunity_m%~)
 						SET immunity_member_id = $immunity_order(~%immunity_member%~)
-						SET $fx_consumed(~%immunity_member_id%~) = 1
+						SET $fx_header_hidden(~%immunity_member_id%~) = 1
 					END
 					SET derived_id = immunity_last
 					SET derived_opcode = 518

@@ -27,19 +27,35 @@ DEFINE_PATCH_MACRO ad_op_79_support BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_79_lines BEGIN
-	SET state_opcode = 79
-	SPRINT state_variant_macro ~~
-	LPM ad_state_lines
+	SET disease_cures = 0
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		SPRINT line_section ~equipped~
-		SET line_sort = $AD_OPCODE_SORT(~77~)
 		FOR (disease_id = 0; disease_id < fx_count; ++disease_id) BEGIN
 			LPM ad_op_79_adds_feeblemind_cure
 			PATCH_IF disease_adds_cure BEGIN
-				SET line_fx = disease_id
-				SET line_phrase = 20770100 // ~Guérison de la débilité mentale~ (+1 : ~Guérit la débilité mentale %ofTheTarget%~)
-				LPM ad_effect_line
+				SET $disease_cure(~%disease_cures%~) = disease_id
+				SET disease_cures += 1
 			END
+		END
+	END
+	// Dans un sort, la guérison ajoutée, de mêmes champs, prend la place du 79 dans l'ancien tableau
+	// leveled_opcodes (BUG-052) : il n'est plus écrit.
+	PATCH_IF store_leveled BEGIN
+		FOR (disease_k = 0; disease_k < disease_cures; ++disease_k) BEGIN
+			SET disease_id = $disease_cure(~%disease_k%~)
+			SET $fx_consumed(~%disease_id%~) = 1
+			SET $fx_dropped(~%disease_id%~) = 1
+		END
+	END
+	SET state_opcode = 79
+	SPRINT state_variant_macro ~~
+	LPM ad_state_lines
+	PATCH_IF disease_cures > 0 BEGIN
+		SPRINT line_section ~equipped~
+		SET line_sort = $AD_OPCODE_SORT(~77~)
+		FOR (disease_k = 0; disease_k < disease_cures; ++disease_k) BEGIN
+			SET line_fx = $disease_cure(~%disease_k%~)
+			SET line_phrase = 20770100 // ~Guérison de la débilité mentale~ (+1 : ~Guérit la débilité mentale %ofTheTarget%~)
+			LPM ad_effect_line
 		END
 	END
 END

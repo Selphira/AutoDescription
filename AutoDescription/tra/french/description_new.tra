@@ -76,12 +76,21 @@
 @2000050 = ~les créatures externes au groupe~ // reprise de @101191
 @2000051 = ~des créatures externes au groupe~ // reprise de @101192
 @2000052 = ~aux créatures externes au groupe~ // reprise de @101193
+@2000060 = ~les membres du groupe~ // reprise de @102473
+@2000061 = ~des membres du groupe~ // reprise de @101088
+@2000062 = ~aux membres du groupe~ // reprise de @101182
+@2000080 = ~les autres créatures dans la zone d'effet~ // reprise de @101194
+@2000081 = ~des autres créatures dans la zone d'effet~ // reprise de @101195
+@2000082 = ~aux autres créatures dans la zone d'effet~ // reprise de @101196
 @2000100 = ~le porteur~ // reprise de @102472
 @2000101 = ~du porteur~ // reprise de @101086
 @2000102 = ~au porteur~ // reprise de @101180
 @2000110 = ~le buveur~ // reprise de @102451
 @2000111 = ~du buveur~ // reprise de @102452
 @2000112 = ~au buveur~ // reprise de @102453
+@2000120 = ~le lanceur~ // reprise de @102475
+@2000121 = ~du lanceur~ // reprise de @102476
+@2000122 = ~au lanceur~ // reprise de @102477
 
 // Cibles d'une zone nommées d'après le projectile : 2 001 000 + 10 × créatures visées (0 toutes, 1 hostiles, 2 alliées) + forme (0 sujet, 1 « de… », 2 « à… ») ; 2 001 100 zone, 2 001 102 cône (2 001 000-2 001 199)
 @2001000 = ~les créatures~ // reprise de @102700
@@ -1599,6 +1608,8 @@
 @20630103 = ~d'octroyer la capacité d'infravision %toTheTarget% ~ // reprise de @10630031
 
 // Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures) (20 670 000-20 670 999)
+@20670020 = ~ de 1 dé de vie~ // reprise de @10670020
+@20670021 = ~ de %creatureLevel% dés de vie~ // reprise de @10670021
 @20670100 = ~Invoque 1 « %creatureName% »%lifeDice%~ // reprise de @10670001
 @20670101 = ~Invoque 1 « %creatureName% »%lifeDice%~ // reprise de @10670001
 @20670102 = ~d'invoquer 1 « %creatureName% »%lifeDice%~ // reprise de @10670003

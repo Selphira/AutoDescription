@@ -24,26 +24,33 @@ DEFINE_PATCH_MACRO ad_spell_header_fields BEGIN
 END
 
 // Chaîne des effets des en-têtes du sort chargé (son bloc de lancement n'est pas lu,
-// fx_with_casting = 0), comme pour un objet mais sans phrases (support_header_only) : effets que
-// l'ancien moteur écarte dès leur lecture (ad_spell_header_keeps), prise en charge commune et de
-// chaque opcode décrit, regroupements. Un effet écarté ou réuni à d'autres est consommé
-// (fx_consumed). header_missing : refus d'un cas dont on ne sait pas quels effets l'ancien moteur
-// garde.
+// fx_with_casting = 0), comme pour un objet, sans phrases pour l'en-tête seul (support_header_only) :
+// effets que l'ancien moteur écarte dès leur lecture (ad_spell_header_keeps), prise en charge
+// commune et de chaque opcode décrit, regroupements. Un effet écarté ou réuni à d'autres est
+// consommé (fx_consumed) ; celui que seul l'en-tête ne compte plus est caché (fx_header_hidden).
+// Avec les phrases, les effets d'un sort qui vise le lanceur sans zone visent le lanceur
+// (spell_self_target, ancien globalSpellTarget), avant les regroupements qui écrivent leurs lignes.
+// header_missing : refus d'un cas dont on ne sait pas quels effets l'ancien moteur garde.
 DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
-	SET support_header_only = 1
 	// Opcodes dans l'ordre numérique, comme pour la ressource décrite (ad_set_coverage) : un sous-sort
 	// est chargé sans elle.
 	SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
 	SPRINT render_missing ~~
 	SPRINT render_late_missing ~~
+	// Un en-tête de sort n'est pas une capacité de charge (ancien abilityType négatif) : un sort nommé
+	// qu'il lance est « Lance « X » sur la cible » (new-lib/opcodes/cast_spell.tpp).
 	FOR (header_h = 0; header_h < fx_header_count; ++header_h) BEGIN
-		SET $charged_other(~%header_h%~) = 0
+		SET $charged_other(~%header_h%~) = 1
 		SET $charged_global_duration(~%header_h%~) = 0
 	END
 	FOR (header_id = 0; header_id < fx_count; ++header_id) BEGIN
+		SET $fx_header_hidden(~%header_id%~) = 0
 		LPM ad_spell_header_keeps
-		PATCH_IF NOT keep_effect BEGIN
+		// Une exception de cible est écartée après la lecture de ses noms, que les lignes écrivent
+		// (ad_target_exception_support).
+		PATCH_IF NOT keep_effect AND (support_header_only OR NOT $fx_exception(~%header_id%~)) BEGIN
 			SET $fx_consumed(~%header_id%~) = 1
+			SET $fx_dropped(~%header_id%~) = 1
 		END
 	END
 	PHP_EACH fx_opcode_count AS header_opcode => _ BEGIN
@@ -63,6 +70,13 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 			LPM ad_opcode_is_described
 			PATCH_IF opcode_described BEGIN
 				LPM ~ad_op_%render_opcode%_support~
+			END
+		END
+	END
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND spell_self_target BEGIN
+		FOR (header_id = 0; header_id < fx_count; ++header_id) BEGIN
+			PATCH_IF $fx_effective_target(~%header_id%~) == TARGET_FX_preset BEGIN
+				SET $fx_effective_target(~%header_id%~) = TARGET_FX_self
 			END
 		END
 	END
@@ -115,7 +129,7 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 		SET header_opcodes = 0
 		FOR (header_pass = 0; header_pass < 2; ++header_pass) BEGIN
 			FOR (header_id = $header_first(~%header_h%~); header_id < $header_end(~%header_h%~); ++header_id) BEGIN
-				PATCH_IF NOT $fx_consumed(~%header_id%~)
+				PATCH_IF NOT $fx_consumed(~%header_id%~) AND NOT $fx_header_hidden(~%header_id%~)
 						AND ($fx_external(~%header_id%~) OR $fx_from_111(~%header_id%~)) == header_pass BEGIN
 					SET header_opcode = $fx_opcode(~%header_id%~)
 					SET header_k = 0
@@ -207,7 +221,8 @@ END
 
 // Refus des cas que ce rendu ne sait pas reproduire (header_missing, vide sinon), avant le rendu :
 // sort sans en-tête, plusieurs en-têtes dont les niveaux ne croissent pas à partir de 1 (absents du
-// jeu de base), types, écoles et types secondaires sans nom, refus de la chaîne des effets.
+// jeu de base), plusieurs en-têtes avec la section « PARAMÈTRES », types, écoles et types
+// secondaires sans nom, refus de la chaîne des effets.
 DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	SPRINT header_missing ~~
 	SPRINT spell_self ~%SOURCE_RES%~
@@ -221,6 +236,9 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 		PATCH_IF $spell_level(~%header_h%~) <= $spell_level(~%header_previous%~) OR $spell_level(~0~) > 1 BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:ability_levels~ message = ~abilities whose required levels do not grow from level 1: not supported~ RET header_missing = refusal END
 		END
+	END
+	PATCH_IF fx_header_count > 1 AND NOT support_header_only AND ~%header_missing%~ STRING_EQUAL ~~ BEGIN
+		LPF ad_refusal STR_VAR reason = ~not_implemented:spell:abilities~ message = ~%fx_header_count% abilities: level sections not supported yet~ RET header_missing = refusal END
 	END
 	READ_SHORT SPL_type    spell_type
 	READ_LONG  SPL_sectype spell_sectype
@@ -252,14 +270,40 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 		END
 	END
 	PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_spell_self_target
 		LPM ad_spell_header_pipeline
 		LPM ad_spell_header_effects
+	END
+END
+
+// Le sort vise-t-il le lanceur sans zone (ancien spell_target : globalSpellTarget « self ») ?
+// spell_self_target : 1 si le dernier en-tête sans zone de projectile qui vise le lanceur ou une
+// créature vise le lanceur.
+DEFINE_PATCH_MACRO ad_spell_self_target BEGIN
+	SET spell_self_target = 0
+	FOR (self_h = 0; self_h < fx_header_count; ++self_h) BEGIN
+		LPF ad_projectile_area INT_VAR projectile = $spell_projectile(~%self_h%~) RET self_shape = area_shape END
+		SET self_target = $spell_target(~%self_h%~)
+		PATCH_IF self_shape <= 0 BEGIN
+			PATCH_IF self_target == TARGET_HEAD_self OR self_target == TARGET_HEAD_self_ignore_pause BEGIN
+				SET spell_self_target = 1
+			END
+			ELSE PATCH_IF self_target == TARGET_HEAD_creature OR self_target == TARGET_HEAD_character_portrait BEGIN
+				SET spell_self_target = 0
+			END
+		END
 	END
 END
 
 // Texte de l'en-tête, après ad_spell_header_support sans refus ; une valeur que ce rendu ne sait pas
 // reproduire laisse sa raison dans header_missing.
 DEFINE_PATCH_MACRO ad_spell_header_render BEGIN
+	// L'ancien moteur n'a jamais %theTarget% dans la portée de l'en-tête, que la chaîne anglaise de la
+	// zone d'effet garde telle quelle (@102455) ; les lignes le définissent, et une réécriture de la
+	// description le remplacerait (V41) : un repère en tient la place jusqu'à la fin
+	// (ad_spell_describe).
+	SPRINT header_saved_target ~%theTarget%~
+	SPRINT theTarget ~AD_THE_TARGET_MARK~
 	READ_STRREF SPL_unidentified_name spell_name
 	SPRINT description ~%spell_name%~
 	LPM ad_spell_header_type_line
@@ -281,6 +325,9 @@ DEFINE_PATCH_MACRO ad_spell_header_render BEGIN
 	SPRINT name @7000005 // ~Jet de sauvegarde~
 	SPRINT value ~%save_text%~
 	LPM ad_spell_header_value
+	// Un jet « Spécial » est écrit par les lignes (ancien ignoreSavingThrow).
+	SPRINT save_special_text @7000010 // ~Spécial~
+	SET header_hide_save = NOT (~%save_text%~ STRING_EQUAL ~%save_special_text%~)
 	LPM ad_spell_header_resistance
 	LPF ad_spell_roleplay_text STR_VAR text = ~%original_description%~ name = ~%spell_name%~ RET roleplay = text END
 	SPRINT description ~%description%%CRLF%%CRLF%%roleplay%~
@@ -297,9 +344,7 @@ DEFINE_PATCH_MACRO ad_spell_header_render BEGIN
 	PATCH_IF ~%SOURCE_RES%~ STRING_EQUAL_CASE ~sppr318~ BEGIN
 		LPM ad_spell_header_clearair_list
 	END
-	INNER_PATCH_SAVE description ~%description%~ BEGIN
-		REPLACE_TEXTUALLY CASE_INSENSITIVE EVALUATE_REGEXP ~\(%CRLF%%CRLF%%CRLF%\)+~ ~%CRLF%%CRLF%~
-	END
+	SPRINT theTarget ~%header_saved_target%~
 END
 
 // Ligne « nom : valeur » ajoutée à la description (ancien appendValue).
@@ -489,8 +534,10 @@ END
 // si le premier effet différé ou permanent lu est d'un opcode dont la durée ne compte pas et
 // qu'aucun autre ne l'a contredit ensuite. L'opcode 213 rend la durée « Spéciale ». Les opcodes 318,
 // 321 et 324 qui visent le sort lui-même ne comptent pas. header_has_duration : 0 si la durée est
-// permanente ou instantanée (ligne « Dissipation »).
+// permanente ou instantanée (ligne « Dissipation ») ; header_hide_duration : 0 si elle est
+// « Spéciale », les lignes écrivant alors leurs durées (ancien ignoreDuration).
 DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
+	SET header_hide_duration = 1
 	SET duration_valid = 1
 	SET duration_special = 0
 	SET duration_instant = 0 - 1
@@ -556,6 +603,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 	SET header_has_duration = 1
 	PATCH_IF duration_special BEGIN
 		SPRINT value @7000011 // ~Spéciale~
+		SET header_hide_duration = 0
 	END
 	ELSE BEGIN
 		SET projectile_used = 0
@@ -570,6 +618,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 			END
 			PATCH_IF complex_special BEGIN
 				SPRINT value @7000011 // ~Spéciale~
+				SET header_hide_duration = 0
 			END
 			ELSE PATCH_IF complex_permanent BEGIN
 				SET header_has_duration = 0
@@ -590,6 +639,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 		END
 		ELSE BEGIN
 			SPRINT value @7000011 // ~Spéciale~
+			SET header_hide_duration = 0
 		END
 	END
 	SPRINT name @7000002 // ~Durée~
@@ -964,6 +1014,8 @@ BEGIN
 	SPRINT save_missing ~~
 	SPRINT save_bonus_text ~~
 	SET save_bonus_valid = 1
+	// Seuls ses effets comptent, pas leurs phrases.
+	SET support_header_only = 1
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 		LPM ad_fx_load_spell
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN

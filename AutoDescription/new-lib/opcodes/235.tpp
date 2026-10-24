@@ -18,9 +18,10 @@ END
 DEFINE_PATCH_MACRO ad_op_235_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~235~)
-	LPF ad_tra INT_VAR tra_id = item_type == ITM_TYPE_potion ? 2000110 : 2000100 RET theSource = text END // ~le porteur~
-	LPF ad_tra INT_VAR tra_id = item_type == ITM_TYPE_potion ? 2000111 : 2000101 RET ofTheSource = text END // ~du porteur~
-	LPF ad_tra INT_VAR tra_id = item_type == ITM_TYPE_potion ? 2000112 : 2000102 RET toTheSource = text END // ~au porteur~
+	LPM ad_application_source
+	LPF ad_tra INT_VAR tra_id = source_tra     RET theSource = text END // ~le porteur~ (@2000100)
+	LPF ad_tra INT_VAR tra_id = source_tra + 1 RET ofTheSource = text END // ~du porteur~ (@2000101)
+	LPF ad_tra INT_VAR tra_id = source_tra + 2 RET toTheSource = text END // ~au porteur~ (@2000102)
 	PHP_EACH fx_ids_235 AS _ => buffet_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%buffet_id%~) BEGIN
 			SET buffet_direction = $fx_parameter2(~%buffet_id%~)

@@ -13,6 +13,10 @@ BEGIN
 	SPRINT description ~~
 	SET covered = 0
 	SET support_header_only = 0
+	SET support_spell = 0
+	SET source_is_spell = 0
+	SET store_leveled = 0
+	SET log_muted = 0
 	SET group_spell_as_equipped = 0
 	LPM ad_recursion_reset
 	LPM ad_fx_load_item

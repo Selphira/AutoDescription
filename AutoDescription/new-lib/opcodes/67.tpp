@@ -11,7 +11,8 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
-			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance END
+			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance
+				summon_level = level END
 			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~not_implemented:opcode67:no_name~ message = ~creature %summon_resref%.CRE has no name~ RET render_missing = refusal END
@@ -22,6 +23,7 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			END
 			ELSE BEGIN
 				SPRINT $fx_creature_name(~%summon_id%~) ~%summon_name%~
+				SET $fx_creature_level(~%summon_id%~) = summon_level
 				SET summon_mode = $fx_parameter2(~%summon_id%~)
 				// Seuils GOODCUTOFF (30) et EVILCUTOFF (200) de ea.ids.
 				SET $fx_creature_side(~%summon_id%~) = (summon_mode == 0 OR summon_mode == 1 OR summon_mode == 3 OR summon_mode == 5) ? 0
@@ -58,8 +60,13 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 		PATCH_IF NOT $fx_consumed(~%summon_id%~) BEGIN
 			SPRINT creatureName $fx_creature_name(~%summon_id%~)
 			SET amount = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%summon_id%~) : 1
-			// L'ancien moteur n'ajoute les dés de vie de la créature qu'à la description d'un sort.
+			// L'ancien moteur n'ajoute les dés de vie de la créature (niveau de sa première classe) qu'à la
+			// description d'un sort.
 			SPRINT lifeDice ~~
+			PATCH_IF source_is_spell BEGIN
+				SET creatureLevel = $fx_creature_level(~%summon_id%~)
+				LPF ad_tra INT_VAR tra_id = creatureLevel == 1 ? 20670020 : 20670021 RET lifeDice = text END // ~ de 1 dé de vie~
+			END
 			SET line_phrase = 20670100 + 10 * ($fx_creature_side(~%summon_id%~) + (amount > 1 ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
 			SET line_fx = summon_id
 			LPM ad_effect_line

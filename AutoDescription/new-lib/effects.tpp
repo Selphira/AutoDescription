@@ -163,7 +163,9 @@ END
 // hors du fichier ferait échouer toute la ressource (V31) : les bornes sont vérifiées avant. Les 177
 // sont lus après les autres effets du bloc : l'ancien moteur (opcode_177_replace) ajoute l'effet de
 // leur EFF en fin de liste, il est donc écrit après les effets du fichier de même opcode. La
-// première passe note leurs positions (fx_deferred) : la seconde ne relit qu'eux.
+// première passe note leurs positions (fx_deferred) : la seconde ne relit qu'eux, avec les exceptions
+// de cible et la marque « non cumulatif » de leur place dans le bloc, que l'ancien moteur leur
+// attache à la lecture.
 DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	SET fx_block_exceptions = 0
 	SET fx_block_not_cumulative = 0
@@ -175,6 +177,8 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	SET fx_pass = 1
 	FOR (fx_k = 0; fx_k < fx_deferred_count AND ~%fx_load_error%~ STRING_EQUAL ~~; ++fx_k) BEGIN
 		SET fx_p = $fx_deferred(~%fx_k%~)
+		SET fx_block_exceptions = $fx_deferred_exceptions(~%fx_k%~)
+		SET fx_block_not_cumulative = $fx_deferred_not_cumulative(~%fx_k%~)
 		LPM ad_fx_load_block_effect
 	END
 END
@@ -193,6 +197,8 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
 		PATCH_IF fx_pass_opcode == 177 AND fx_pass == 0 BEGIN
 			SET $fx_deferred(~%fx_deferred_count%~) = fx_p
+			SET $fx_deferred_exceptions(~%fx_deferred_count%~) = fx_block_exceptions
+			SET $fx_deferred_not_cumulative(~%fx_deferred_count%~) = fx_block_not_cumulative
 			SET fx_deferred_count += 1
 		END
 		ELSE BEGIN

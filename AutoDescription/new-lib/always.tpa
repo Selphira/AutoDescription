@@ -200,5 +200,6 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/item_render.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/item.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/spell_header.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/spell_levels.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/spell.tpp~
 END

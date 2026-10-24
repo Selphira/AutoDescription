@@ -204,7 +204,9 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
 		END
 	END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
+	// Les lignes d'un sort ne nomment pas la zone de son projectile (ancien projectile 0 hors d'un
+	// sous-sort).
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_spell BEGIN
 		LPM ad_application_area_target
 	END
 END
@@ -255,7 +257,7 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SET drop_opcode = $fx_opcode(~%drop_id%~)
 	SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_opcode%~)
 	// L'en-tête d'un sort se lit après l'écart (new-lib/spell_header.tpp).
-	PATCH_IF NOT support_header_only AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
+	PATCH_IF NOT support_spell AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
 			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
@@ -381,10 +383,13 @@ END
 // (AD_SAVE_MIRROR_OPCODES, AD_SAVE_DIFFICULTY_OPCODES). Moitié des dégâts, fixée par l'opcode
 // (line_save_for_half : jet réussi ; line_fail_for_half : jet raté) : « pour réduire de moitié »,
 // « pour annuler et pour moitié en cas d'échec », ou « (réduits de moitié) » sans jet possible.
+// Rien quand l'en-tête du sort l'écrit (ctx_ignore_save, new-lib/spell.tpp).
 DEFINE_PATCH_MACRO ad_application_save BEGIN
 	SPRINT app_save_text ~~
 	SET app_save_types = $fx_save_types(~%line_fx%~)
-	PATCH_IF line_fail_for_half AND (app_save_types == 0 OR line_save_for_half) BEGIN
+	PATCH_IF ctx_ignore_save BEGIN
+	END
+	ELSE PATCH_IF line_fail_for_half AND (app_save_types == 0 OR line_save_for_half) BEGIN
 		SPRINT app_save_text @5000050 // ~réduits de moitié~
 		SPRINT app_save_text ~(%app_save_text%)~
 	END
@@ -448,7 +453,8 @@ END
 
 // Chaînes de la cible effective de line_fx (theTarget, ofTheTarget, toTheTarget) ; app_target_missing
 // si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
-// get_effect_description) : le buveur d'une potion, le porteur d'un autre objet. Un sous-effet qui
+// get_effect_description) : le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le
+// porteur d'un autre objet. Un sous-effet qui
 // hérite de la cible du parent prend ses chaînes (ctx_force_target, new-lib/recursion.tpp). La zone
 // d'un projectile (ad_application_area_target, ou celle d'un sous-sort, ad_recursion_area_strings)
 // remplace l'une et l'autre ; line_the_target, la cible que nomme l'opcode (« les rakshasas »),
@@ -458,7 +464,8 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
 	PATCH_IF app_target == TARGET_FX_self OR app_target == TARGET_FX_original_caster BEGIN
-		SET app_target_tra = item_type == ITM_TYPE_potion ? 2000110 : 2000100
+		LPM ad_application_source
+		SET app_target_tra = source_tra
 	END
 	SET app_target_missing = NOT TRA_ENTRY_EXISTS (~%app_target_tra%~)
 	PATCH_IF NOT app_target_missing BEGIN
@@ -489,6 +496,12 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	PATCH_IF NOT app_target_missing BEGIN
 		LPM ad_application_target_level
 	END
+END
+
+// Premier identifiant (source_tra, puis « de… » et « à… ») des chaînes de la source des effets :
+// le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le porteur d'un autre objet.
+DEFINE_PATCH_MACRO ad_application_source BEGIN
+	SET source_tra = source_is_spell ? 2000120 : item_type == ITM_TYPE_potion ? 2000110 : 2000100
 END
 
 // Restriction de niveau de l'effet line_fx (ancien add_target_level), après la zone du projectile

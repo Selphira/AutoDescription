@@ -20,10 +20,10 @@ DEFINE_PATCH_MACRO ad_fx_mark_not_cumulative BEGIN
 	END
 END
 
-// Prise en charge : ad_op_321_header_support pour l'en-tête d'un sort seul, ad_op_321_item_support
+// Prise en charge : ad_op_321_header_support pour un sort (support_spell), ad_op_321_item_support
 // sinon.
 DEFINE_PATCH_MACRO ad_op_321_support BEGIN
-	PATCH_IF support_header_only BEGIN
+	PATCH_IF support_spell BEGIN
 		LPM ad_op_321_header_support
 	END
 	ELSE BEGIN
@@ -31,12 +31,12 @@ DEFINE_PATCH_MACRO ad_op_321_support BEGIN
 	END
 END
 
-// En-tête d'un sort seul (new-lib/spell_header.tpp) : l'ancien moteur garde le 321 parmi les effets de
-// l'en-tête, sans rien en écrire, sauf s'il est vide (écarté, opcode_321_is_valid) ou si un 146 de
-// même portée, lu après lui, lance le même sort avec les mêmes cible, timing, durée, résistance,
-// probabilités, jet de sauvegarde et special (ancien opcode_146_group : le 321 disparaît, le 146 passe
-// après les autres effets de son opcode). Une immunité au même sort le retire après les regroupements
-// (ad_op_321_after_groups).
+// Sort (new-lib/spell_header.tpp) : l'ancien moteur garde le 321 parmi les effets de l'en-tête, sans
+// rien en écrire, sauf s'il est vide (écarté, opcode_321_is_valid) ou si un 146 de même portée, lu
+// après lui, lance le même sort avec les mêmes cible, timing, durée, résistance, probabilités, jet de
+// sauvegarde et special (ancien opcode_146_group : le 321 disparaît, le 146 passe après les autres
+// effets de son opcode et devient « (non cumulatif) »). Une immunité au même sort le retire après les
+// regroupements (ad_op_321_after_groups).
 DEFINE_PATCH_MACRO ad_op_321_header_support BEGIN
 	PHP_EACH fx_ids_321 AS _ => removal_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%removal_id%~) BEGIN
@@ -67,6 +67,7 @@ DEFINE_PATCH_MACRO ad_op_321_header_support BEGIN
 							AND $fx_special(~%removal_other%~) == $fx_special(~%removal_id%~) BEGIN
 						SET $fx_consumed(~%removal_id%~) = 1
 						SET $fx_late(~%removal_other%~) = 1
+						SET $fx_not_cumulative(~%removal_other%~) = 1
 					END
 				END
 			END

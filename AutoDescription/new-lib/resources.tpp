@@ -153,20 +153,23 @@ BEGIN
 END
 
 // Créature resref (ancien get_creature_name, get_creature_allegiance) : nom (vide si la créature
-// n'existe pas ou n'a pas de nom) et allégeance (ea.ids).
+// n'existe pas ou n'a pas de nom), allégeance (ea.ids) et niveau de sa première classe.
 DEFINE_PATCH_FUNCTION ad_creature_info
 	STR_VAR
 		resref = ~~
 	RET
 		name
 		allegiance
+		level
 BEGIN
 	SPRINT name ~~
 	SET allegiance = 0
+	SET level = 0
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
 		INNER_PATCH_FILE ~%resref%.cre~ BEGIN
 			READ_LONG CRE_name creature_name_ref
 			READ_BYTE CRE_allegiance allegiance
+			READ_BYTE CRE_level_first_class level
 			PATCH_IF creature_name_ref > 0 BEGIN
 				READ_STRREF CRE_name name
 			END

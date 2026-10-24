@@ -7,14 +7,17 @@
 //   l'effet d'un EFF ne la compte pas, comme dans l'ancien moteur (get_res_description) ;
 // - ctx_chain : ressources de la chaîne au-dessus de la sous-ressource, « |RES1|RES2| » (vide pour
 //   la ressource décrite : l'ancien moteur n'y ajoute la ressource parente qu'à sa première
-//   sous-description, recursive_resref) ;
+//   sous-description, recursive_resref) ; ctx_spell_chain, de même pour les seuls sorts : un sort
+//   qui porte le nom d'un EFF de la chaîne n'y est pas une boucle ;
 // - ctx_force_target : les sous-effets reprennent les chaînes de cible du parent (ctx_the_target,
 //   ctx_of_the_target, ctx_to_the_target), chacun gardant sa forme, soi ou cible (ancien forceTarget,
 //   opcode 146) ;
 // - ctx_area_phrase (0 sans zone), ctx_area_creatures, ctx_area_range, ctx_area_angle : cibles
 //   nommées d'après la zone du projectile de l'en-tête du sous-sort (ad_recursion_area_strings) ;
 // - ctx_ignore_duration : durées des sous-effets non écrites, hors délais et répétitions (ancien
-//   ignoreDuration hérité de la durée commune d'une potion) ;
+//   ignoreDuration hérité de la durée commune d'une potion, ou de la durée de l'en-tête d'un sort) ;
+// - ctx_ignore_save : jets de sauvegarde non écrits (ancien ignoreSavingThrow hérité de l'en-tête
+//   d'un sort) ;
 // - ctx_casting_level : niveau de lancement, qui choisit l'en-tête du sous-sort ;
 // - ctx_versus_set, ctx_versus : l'ancien moteur fixe versus (opcode 232), que les dégâts écrivent à la
 //   place de leur cible (« à l'attaquant »), même vide (BUG-038) ;
@@ -24,8 +27,8 @@
 //   « equipped effect 0 (opcode 232) > BDDRAGBL.SPL » (vide pour la ressource décrite ;
 //   ad_fx_location, new-lib/log.tpp) ; ctx_single_effect : sous-ressource à effet unique (EFF), dont
 //   l'effet n'a pas d'emplacement propre.
-// Les règles propres aux objets (équipement, capacités de combat, en-têtes à charges) ne
-// s'appliquent pas aux sous-effets.
+// Les règles propres aux objets (équipement, capacités de combat, en-têtes à charges) et à
+// l'en-tête d'un sort (support_spell) ne s'appliquent pas aux sous-effets.
 
 // Contexte d'une ressource décrite seule ; recursion_done et recursion_seen suivent les
 // sous-descriptions de la ressource (ad_recursion_allowed).
@@ -34,12 +37,14 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_force_target = 0
 	SET ctx_area_phrase = 0
 	SET ctx_ignore_duration = 0
+	SET ctx_ignore_save = 0
 	SET ctx_casting_level = 0
 	SET ctx_versus_set = 0
 	SPRINT ctx_versus ~~
 	SPRINT ctx_resource ~%SOURCE_RES%~
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
+	SPRINT ctx_spell_chain ~|~
 	SPRINT ctx_origin ~~
 	SET ctx_single_effect = 0
 	SET recursion_done = 0
@@ -61,7 +66,8 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
 	END
-	ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_chain%~) >= 0 BEGIN
+	ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_spell_chain%~) >= 0
+			OR (~%recursion_kind%~ STRING_EQUAL ~eff~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_chain%~) >= 0) BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~loop~
 	END
@@ -138,6 +144,11 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 				SET recursion_h = $fx_header(~%recursion_fx%~)
 				SET recursion_hide = ctx_ignore_duration OR recursion_ignore_duration
+				// L'ancien get_res_description ne transmet pas à l'effet d'un EFF la durée tue par l'en-tête
+				// d'un sort, ni son jet (ad_describe_subresource).
+				PATCH_IF support_spell AND ~%recursion_kind%~ STRING_EQUAL ~eff~ BEGIN
+					SET recursion_hide = recursion_ignore_duration
+				END
 				PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
 					SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
 				END
@@ -239,6 +250,11 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		sub_opcode
 BEGIN
 	SET sub_opcode = 0 - 1
+	SET support_spell = 0
+	SET store_leveled = ~%kind%~ STRING_EQUAL ~spl~
+	PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
+		SET ctx_ignore_save = 0
+	END
 	SPRINT sub_missing ~~
 	SET sub_count = 0
 	SPRINT sub_text ~~
@@ -247,6 +263,9 @@ BEGIN
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
 	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
+	PATCH_IF ~%kind%~ STRING_EQUAL ~spl~ BEGIN
+		SPRINT ctx_spell_chain ~%ctx_spell_chain%%ctx_resource%|%sub_resref%|~
+	END
 	SET ctx_single_effect = ~%kind%~ STRING_EQUAL ~eff~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.%kind%~ BEGIN
 		SPRINT sub_file ~%sub_resref%.%kind%~

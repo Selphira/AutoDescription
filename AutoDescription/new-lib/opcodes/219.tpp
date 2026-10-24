@@ -88,7 +88,9 @@ DEFINE_PATCH_MACRO ad_op_219_lines BEGIN
 			LPF ad_signed_value INT_VAR value = 2 RET value = text END
 			SPRINT value ~%value% %versus%~
 			SET line_fx = creature_ac_id
-			PATCH_IF NOT $fx_ac_merged(~%creature_ac_id%~) BEGIN
+			// Dans un sort, l'opcode virtuel des jets de sauvegarde, de mêmes champs, prend la place de
+			// celui de la classe d'armure dans l'ancien tableau leveled_opcodes (BUG-052).
+			PATCH_IF NOT $fx_ac_merged(~%creature_ac_id%~) AND NOT store_leveled BEGIN
 				SPRINT name @20000000 // ~Classe d'armure~
 				SET line_sort = $AD_DERIVED_SORT(~AC_VS_CREATURE~)
 				SET line_phrase = 1200010 // ~%name%%AD_COLON%%value%~ (+1 : ~%name% %ofTheTarget%%AD_COLON%%value%~)
