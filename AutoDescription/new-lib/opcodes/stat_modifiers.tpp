@@ -89,6 +89,8 @@ END
 
 // ---------------------------------------------------------------------------------------------
 // Lignes (ancien opcode_self_<N> et opcode_mod) : une par effet non consommé par un regroupement.
+// Une progression selon le niveau du sort (fx_level_value, new-lib/spell_levels.tpp) remplace la
+// valeur, précédée de « + » si elle augmente la statistique (« Dégâts : +1 par tranche de 3 niveaux »).
 
 DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -108,8 +110,15 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 			END
 			PATCH_IF NOT stat_line_done BEGIN
 				LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
+				SPRINT stat_level_value $fx_level_value(~%stat_id%~)
 				PATCH_IF line_form == 0 BEGIN
 					LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
+					PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
+						SPRINT value ~%stat_level_value%~
+						PATCH_IF stat_value >= 0 BEGIN
+							SPRINT value @1200001 // ~+%value%~
+						END
+					END
 					SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				END
 				ELSE BEGIN
@@ -126,13 +135,20 @@ END
 // base d'une série de 1 210 1x0 selon le mode (10 augmentation, 20 réduction, 30 valeur fixée, 40
 // multiplication), et ses variables value et theStatistic. La statistique (« la dextérité ») suit le
 // nom : liste 8 060 000 + valeur de stats.ids pour un nom de la liste des statistiques, libellé
-// 2OOO0002 pour un nom 2OOO0000 ; sans statistique dans le .tra, pas de phrase.
+// 2OOO0002 pour un nom 2OOO0000 ; sans statistique dans le .tra, pas de phrase. La progression
+// stat_level_value remplace la valeur, sans son signe pour une réduction.
 DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 	SET stat_statistic_tra = stat_name_tra < 9000000 ? stat_name_tra + 60000 : stat_name_tra + 2
 	SET line_phrase = 0
 	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
 		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
 		SET value = ABS stat_value
+		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
+			SPRINT value ~%stat_level_value%~
+			PATCH_IF stat_value < 0 BEGIN
+				LPF ad_level_unsigned STR_VAR text = ~%stat_level_value%~ RET value = text END
+			END
+		END
 		PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
 			SET line_phrase = 1210130
 		END

@@ -98,6 +98,11 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 	END
 END
 
+// Unité d'un pas de unit_value armes (ancien opcode_111_typed_value) : unit_tra.
+DEFINE_PATCH_MACRO ad_op_111_level_unit BEGIN
+	SET unit_tra = unit_value > 1 ? 21110002 : 21110001 // ~arme magique~
+END
+
 // Une ligne par effet : « d'1 arme magique », « de 2 armes magiques ».
 DEFINE_PATCH_MACRO ad_op_111_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -110,6 +115,12 @@ DEFINE_PATCH_MACRO ad_op_111_lines BEGIN
 			SPRINT amount @21110003 // ~%value% %valueType%~
 			SET line_fx = weapon_id
 			SET line_phrase = value > 1 ? 21110110 : 21110100 // ~Équipe %theTarget% d'%amount% (%itemName%)~
+			// Progression selon le niveau du sort (new-lib/spell_levels.tpp) : « de 1 arme magique par niveau ».
+			SPRINT weapon_level_value $fx_level_value(~%weapon_id%~)
+			PATCH_IF NOT (~%weapon_level_value%~ STRING_EQUAL ~~) BEGIN
+				SPRINT amount ~%weapon_level_value%~
+				SET line_phrase = 21110110 // ~Équipe %theTarget% de %amount% (%itemName%)~
+			END
 			LPM ad_effect_line
 		END
 	END

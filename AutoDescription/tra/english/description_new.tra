@@ -300,6 +300,9 @@
 @7002000 = ~From level %minRequiredLevel%~ // reprise de @12320400
 @7002001 = ~Between level %minRequiredLevel% and %maxRequiredLevel%~ // reprise de @12320401
 @7002002 = ~At level %minRequiredLevel%~ // reprise de @12320402
+@7002010 = ~%value% per level/%levelMax%~ // reprise de @102163
+@7002011 = ~%value% per %level% levels/%levelMax%~ // reprise de @102164
+@7002012 = ~%value% %valueType%~ // reprise de @102165
 
 // Sorts : noms imposés par ressource (7 100 000-7 100 099)
 @7100000 = ~~ // reprise de @102150

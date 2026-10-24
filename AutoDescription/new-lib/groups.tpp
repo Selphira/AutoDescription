@@ -1024,9 +1024,12 @@ DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 	END
 END
 
-// Ligne de résistance (new-lib/opcodes/resistances.tpp), nom au libellé group_name_tra.
+// Ligne de résistance (new-lib/opcodes/resistances.tpp), nom au libellé group_name_tra, valeur
+// remplacée par sa progression selon le niveau du sort (new-lib/spell_levels.tpp).
 DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
-	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra RET line_text = text END
+	SPRINT group_level_value $fx_level_value(~%group_id%~)
+	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra
+		STR_VAR level_value = ~%group_level_value%~ RET line_text = text END
 END
 
 // fx_same : les effets same_id et same_other ont les champs qui doivent être égaux pour être réunis,

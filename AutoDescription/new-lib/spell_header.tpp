@@ -1036,9 +1036,13 @@ END
 
 // Bonus du jet de sauvegarde (ancien get_spell_effects_by_saving_throw), d'après les effets du
 // premier en-tête du sort chargé : le même pour chacun (« -2 », « +1 », « 0 »), sinon
-// save_bonus_valid vaut 0 (« Spécial »). Avec plusieurs en-têtes, l'ancien moteur suit chaque effet
-// dans les suivants ; seul le cas d'un bonus partout identique est pris en charge (une progression
-// est refusée), avec au moins un effet retrouvé à l'identique dans chaque en-tête s'il n'est pas nul.
+// save_bonus_valid vaut 0 (« Spécial »). Avec plusieurs en-têtes, chaque effet du premier qui se
+// retrouve dans tous les autres à la durée et au bonus près (ad_spell_level_search) donne son bonus
+// (un seul effet trouvé) ou sa progression (ad_spell_level_formula : « -1 par tranche de 2 niveaux
+// du lanceur/12 ») ; tous doivent donner le même, sinon, ou sans formule, save_bonus_valid vaut 0.
+// Refus : formule à deux valeurs, que l'ancien moteur écrit en français dans les deux langues ;
+// bonus suivi de l'unité de l'opcode de l'effet (ancien opcode_<N>_typed_value). Rien n'est cherché
+// pour un sort déjà refusé (header_missing), dont les regroupements n'ont pas été faits.
 DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 	SPRINT save_bonus_text ~~
 	SET save_bonus_valid = 1
@@ -1055,61 +1059,49 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 			SPRINT save_bonus_text ~~
 		END
 	END
-	ELSE PATCH_IF $spell_fx_count(~0~) > 0 BEGIN
-		SET bonus_same = 1
-		SET bonus_value = $fx_save_bonus(~%spell_fx_0_0%~)
-		FOR (bonus_h = 0; bonus_h < fx_header_count; ++bonus_h) BEGIN
-			FOR (bonus_n = 0; bonus_n < $spell_fx_count(~%bonus_h%~); ++bonus_n) BEGIN
-				SET bonus_id = $EVAL ~spell_fx_%bonus_h%~(~%bonus_n%~)
-				SET bonus_same = bonus_same AND $fx_save_bonus(~%bonus_id%~) == bonus_value
+	ELSE PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_spell_levels_entries
+		SET level_special_duration = NOT header_hide_duration
+		SET level_skip = AD_SAME_TIMING BOR AD_SAME_SAVE
+		SPRINT bonus_first_text ~~
+		FOR (bonus_n = 0; bonus_n < $spell_fx_count(~0~) AND save_bonus_valid; ++bonus_n) BEGIN
+			SPRINT level_a ~0 %bonus_n%~
+			LPM ad_spell_level_search
+			PATCH_IF search_in_all BEGIN
+				PATCH_IF search_total > 1 BEGIN
+					SPRINT formula_array ~search_save~
+					SET formula_percent = 0
+					SET formula_flat = 0
+					SET formula_dice_sides = 0
+					SET formula_opcode = $level_opcode(~%level_a%~)
+					SET level_id = $level_id(~%level_a%~)
+					LPM ad_spell_level_formula
+					PATCH_IF formula_rank == 2 BEGIN
+						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell_header:save_bonus_two_values~ message = ~saving throw bonus taking only two values between the abilities~ RET save_missing = refusal END
+					END
+					ELSE PATCH_IF formula_unit_used BEGIN
+						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell_header:save_bonus_effects~ message = ~saving throw bonus followed by the unit of opcode %formula_opcode%~ RET save_missing = refusal END
+					END
+					SET save_bonus_valid = formula_valid
+					SPRINT save_bonus_text ~%formula_text%~
+					PATCH_IF formula_base > 0 BEGIN
+						SPRINT value ~%formula_text%~
+						SPRINT save_bonus_text @1200001 // ~+%value%~
+					END
+				END
+				ELSE PATCH_IF search_total == 1 BEGIN
+					LPF ad_signed_value INT_VAR value = $search_save(~0~) RET save_bonus_text = text END
+				END
+				PATCH_IF ~%bonus_first_text%~ STRING_EQUAL ~~ BEGIN
+					SPRINT bonus_first_text ~%save_bonus_text%~
+				END
+				PATCH_IF NOT (~%bonus_first_text%~ STRING_EQUAL ~%save_bonus_text%~) BEGIN
+					SET save_bonus_valid = 0
+				END
+				PATCH_IF NOT save_bonus_valid BEGIN
+					SPRINT save_bonus_text ~~
+				END
 			END
-		END
-		PATCH_IF NOT bonus_same BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:save_bonus_progression~ message = ~saving throw bonus that changes between abilities: not supported yet~ RET save_missing = refusal END
-		END
-		ELSE PATCH_IF bonus_value != 0 BEGIN
-			LPM ad_spell_header_save_bonus_followed
-			PATCH_IF NOT bonus_followed BEGIN
-				LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:save_bonus_effects~ message = ~saving throw bonus of effects that change between abilities: not supported yet~ RET save_missing = refusal END
-			END
-			LPF ad_signed_value INT_VAR value = bonus_value RET save_bonus_text = text END
-		END
-	END
-END
-
-// Un effet du premier en-tête se retrouve-t-il dans chacun des autres en-têtes qui ont des effets,
-// identique hors durée et bonus du jet (ancien opcode_match_except_duration_saveBonus) ? Les opcodes
-// dont l'ancien moteur écrit le bonus avec une unité (opcode_<N>_typed_value) sont refusés.
-// bonus_followed : 1 si oui.
-DEFINE_PATCH_MACRO ad_spell_header_save_bonus_followed BEGIN
-	SET bonus_followed = 0
-	FOR (bonus_n = 0; bonus_n < $spell_fx_count(~0~) AND NOT bonus_followed; ++bonus_n) BEGIN
-		SET bonus_id = $spell_fx_0(~%bonus_n%~)
-		SET bonus_opcode = $spell_fx_opcode_0(~%bonus_n%~)
-		SPRINT bonus_resource $fx_resource_lower(~%bonus_id%~)
-		SET bonus_followed = bonus_opcode != 12 AND bonus_opcode != 17 AND bonus_opcode != 111 AND bonus_opcode != 218
-		FOR (bonus_h = 1; bonus_h < fx_header_count AND bonus_followed; ++bonus_h) BEGIN
-			SET bonus_found = $spell_fx_count(~%bonus_h%~) == 0
-			FOR (bonus_k = 0; bonus_k < $spell_fx_count(~%bonus_h%~) AND NOT bonus_found; ++bonus_k) BEGIN
-				SET bonus_other = $EVAL ~spell_fx_%bonus_h%~(~%bonus_k%~)
-				SPRINT bonus_other_resource $fx_resource_lower(~%bonus_other%~)
-				SET bonus_found = $EVAL ~spell_fx_opcode_%bonus_h%~(~%bonus_k%~) == bonus_opcode
-					AND $fx_external(~%bonus_other%~) == $fx_external(~%bonus_id%~)
-					AND $fx_target(~%bonus_other%~) == $fx_target(~%bonus_id%~)
-					AND $fx_power(~%bonus_other%~) == $fx_power(~%bonus_id%~)
-					AND $fx_parameter1(~%bonus_other%~) == $fx_parameter1(~%bonus_id%~)
-					AND $fx_parameter2_raw(~%bonus_other%~) == $fx_parameter2_raw(~%bonus_id%~)
-					AND $fx_timing(~%bonus_other%~) == $fx_timing(~%bonus_id%~)
-					AND $fx_resistance(~%bonus_other%~) == $fx_resistance(~%bonus_id%~)
-					AND $fx_probability1(~%bonus_other%~) == $fx_probability1(~%bonus_id%~)
-					AND $fx_probability2(~%bonus_other%~) == $fx_probability2(~%bonus_id%~)
-					AND $fx_dice_count(~%bonus_other%~) == $fx_dice_count(~%bonus_id%~)
-					AND $fx_dice_sides(~%bonus_other%~) == $fx_dice_sides(~%bonus_id%~)
-					AND $fx_save_type(~%bonus_other%~) == $fx_save_type(~%bonus_id%~)
-					AND $fx_special(~%bonus_other%~) == $fx_special(~%bonus_id%~)
-					AND ~%bonus_other_resource%~ STRING_EQUAL ~%bonus_resource%~
-			END
-			SET bonus_followed = bonus_found
 		END
 	END
 END

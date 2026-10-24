@@ -5,7 +5,8 @@
 // (« la résistance à l'acide ») ; un effet dérivé suit la même convention (3NNN0000).
 
 // Lignes (ancien opcode_self_<N> et opcode_self_resist) : une par effet non consommé par un
-// regroupement.
+// regroupement. Une progression selon le niveau du sort (fx_level_value, new-lib/spell_levels.tpp)
+// remplace la valeur : « Résistance à la magie : 10 % + 1 % par niveau du lanceur/20 ».
 DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
@@ -14,9 +15,11 @@ DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SET line_fx = stat_id
+			SPRINT stat_level_value $fx_level_value(~%stat_id%~)
 			LPM ad_application_form
 			PATCH_IF line_form == 0 BEGIN
-				LPF ad_resistance_text INT_VAR value = stat_value mode = stat_mode name_tra = 20000000 + stat_opcode * 10000 RET line_text = text END
+				LPF ad_resistance_text INT_VAR value = stat_value mode = stat_mode name_tra = 20000000 + stat_opcode * 10000
+					STR_VAR level_value = ~%stat_level_value%~ RET line_text = text END
 			END
 			ELSE BEGIN
 				LPM ad_resistance_target_phrase
@@ -38,6 +41,12 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
 		SET value = ABS stat_value
 		SPRINT value @1200003 // ~%value%%PERCENT%~
+		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
+			SPRINT value ~%stat_level_value%~
+			PATCH_IF stat_value < 0 BEGIN
+				LPF ad_level_unsigned STR_VAR text = ~%stat_level_value%~ RET value = text END
+			END
+		END
 		PATCH_IF stat_mode == MOD_TYPE_flat AND stat_value == 100 BEGIN
 			LPF ad_tra INT_VAR tra_id = stat_statistic_tra - 1 RET resistName = text END
 			SET line_phrase = 5000150 // ~Immunise %theTarget% %resistName%~ (+1)
@@ -58,12 +67,14 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 END
 
 // Une résistance fixée à 100 % est une immunité ; sinon « nom : +20 % », « Passe à 50 % »,
-// « Multiplié par 50 % ».
+// « Multiplié par 50 % », ou « nom : » suivi de la progression level_value, sans « + ».
 DEFINE_PATCH_FUNCTION ad_resistance_text
 	INT_VAR
 		value = 0
 		mode = 0
 		name_tra = 0
+	STR_VAR
+		level_value = ~~
 	RET
 		text
 BEGIN
@@ -73,6 +84,9 @@ BEGIN
 	END
 	ELSE BEGIN
 		LPF ad_stat_modifier_value INT_VAR value mode percent = 1 RET value = text END
+		PATCH_IF NOT (~%level_value%~ STRING_EQUAL ~~) BEGIN
+			SPRINT value ~%level_value%~
+		END
 		LPF ad_tra INT_VAR tra_id = name_tra RET name = text END
 		SPRINT text @1200000 // ~%name%%AD_COLON%%value%~
 	END

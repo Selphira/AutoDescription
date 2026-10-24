@@ -118,16 +118,54 @@ END
 // 3. chaque effet restant couvre les niveaux de son en-tête jusqu'au dernier en-tête suivi sans
 //    interruption d'un effet semblable (« À partir du niveau » s'il va jusqu'au dernier) ; une plage
 //    qui commence au niveau 1 et va jusqu'au dernier est celle des effets communs.
+// Entre les passes 2 et 3, un effet du premier en-tête présent à tous les niveaux à la durée, au
+// bonus du jet de sauvegarde, à la valeur ou aux dés près est écrit une fois, sans titre de niveau,
+// avec la progression de sa valeur (ad_spell_levels_by_duration, _by_save, _by_values).
 // Un effet est écarté par son opcode (fx_consumed) ou, pour un effet dérivé, par sa ligne
 // (derived_line) ; il est rangé dans sa section par fx_line_section. Sections : statistics_section,
 // statistics_level_min, statistics_level_max, triées par niveaux (clé (min + 100) × 100 + max).
 // Comme l'ancien moteur, une position marquée écarte tout effet de cette position dans l'en-tête.
 // Refus (render_late_missing) : opcodes 173 et 178, dont l'ancien moteur réécrit les champs avant de
 // les comparer ; immunités aux sorts réunies pour l'en-tête (518, ad_op_206_header_groups), qui
-// ne sont pas dans les listes ; effet que l'ancien moteur réunit en progression, présent à tous les
-// niveaux à la durée, au bonus du jet de sauvegarde, à la valeur ou aux dés près
-// (group_spell_effects_by_duration, _by_saving_throw et _by_parameters ; étape suivante).
+// ne sont pas dans les listes.
 DEFINE_PATCH_MACRO ad_spell_levels BEGIN
+	LPM ad_spell_levels_entries
+	FOR (level_h = 0; level_h < fx_header_count; ++level_h) BEGIN
+		FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~); ++level_k) BEGIN
+			SPRINT level_a ~%level_h% %level_k%~
+			SET level_id = $level_id(~%level_a%~)
+			SET level_opcode = $level_opcode(~%level_a%~)
+			PATCH_IF (level_opcode == 173 OR level_opcode == 178) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_opcode%level_opcode%~ message = ~opcode %level_opcode% in a spell with several abilities~ RET render_late_missing = refusal END
+			END
+			PATCH_IF level_opcode == 518 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_immunities~ message = ~spell immunities merged in a spell with several abilities~ RET render_late_missing = refusal END
+			END
+		END
+	END
+	// L'ancien moteur ne compare pas les durées quand l'en-tête écrit celle du sort (ignoreDuration),
+	// qui n'est alors pas « Spéciale » (isSpecialDuration).
+	SET level_skip_default = ctx_ignore_duration ? AD_SAME_TIMING : 0
+	SET level_skip = level_skip_default
+	SET level_special_duration = NOT ctx_ignore_duration
+	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_spell_levels_common
+		LPM ad_spell_levels_chains
+		LPM ad_spell_levels_by_duration
+		LPM ad_spell_levels_by_save
+		LPM ad_spell_levels_by_values
+	END
+	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_spell_levels_ranges
+	END
+END
+
+// Effets restants de chaque en-tête, « en-tête rang » (listes de ad_spell_header_effects, effets
+// dérivés compris) : level_id, level_header, level_identical, level_position, level_opcode,
+// level_derived, level_on (1 : pas encore écarté), level_emitted (1 : écrit), level_mark (position
+// marquée). level_first : premier niveau de lanceur, calculé à la première progression.
+DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
+	SET level_first = 0 - 1
 	FOR (level_h = 0; level_h < fx_header_count; ++level_h) BEGIN
 		FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~); ++level_k) BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
@@ -151,24 +189,7 @@ DEFINE_PATCH_MACRO ad_spell_levels BEGIN
 			SET $level_emitted(~%level_a%~) = 0
 			SET level_position = $level_position(~%level_a%~)
 			SET $level_mark(~%level_h% %level_position%~) = 0
-			PATCH_IF (level_opcode == 173 OR level_opcode == 178) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_opcode%level_opcode%~ message = ~opcode %level_opcode% in a spell with several abilities~ RET render_late_missing = refusal END
-			END
-			PATCH_IF level_opcode == 518 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_immunities~ message = ~spell immunities merged in a spell with several abilities~ RET render_late_missing = refusal END
-			END
 		END
-	END
-	SET level_skip_duration = ctx_ignore_duration
-	SET level_skip_save_bonus = 0
-	SET level_skip_values = 0
-	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_spell_levels_common
-		LPM ad_spell_levels_chains
-		LPM ad_spell_levels_progressions
-	END
-	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_spell_levels_ranges
 	END
 END
 
@@ -240,49 +261,458 @@ DEFINE_PATCH_MACRO ad_spell_levels_chains BEGIN
 	LPM ad_spell_levels_disable_marked
 END
 
-// Refus des effets du premier en-tête que l'ancien moteur réunirait en progression : semblables, à
-// la durée, au bonus du jet de sauvegarde et (opcodes de AD_LEVEL_PROGRESSION_OPCODES) à la valeur et
-// aux dés près, à un effet de chaque en-tête qui a encore des effets, et d'au moins deux en-têtes
-// (ancien spell_has_same_effects_on_all_levels_except_duration). Le refus couvre aussi les cas où
-// l'ancien moteur, faute de formule, ne réunit rien.
-DEFINE_PATCH_MACRO ad_spell_levels_progressions BEGIN
+// Progressions par la durée (ancien group_spell_effects_by_duration) : effet semblable à la durée
+// près. Une durée qu'écrivent les lignes (« Spéciale » dans l'en-tête) doit varier à chaque niveau
+// et suivre une formule (ad_spell_level_duration), sinon l'effet garde ses sections.
+DEFINE_PATCH_MACRO ad_spell_levels_by_duration BEGIN
+	SET level_skip = AD_SAME_TIMING
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
 		PATCH_IF $level_on(~%level_a%~) BEGIN
-			SET level_opcode = $level_opcode(~%level_a%~)
-			SET level_skip_duration = 1
-			SET level_skip_save_bonus = 1
-			SET level_skip_values = VARIABLE_IS_SET $AD_LEVEL_PROGRESSION_OPCODES(~%level_opcode%~)
-			SET level_in_all = 1
-			SET level_total = 0
-			FOR (level_h = 0; level_h < fx_header_count AND level_in_all; ++level_h) BEGIN
-				SET level_found = 0
-				SET level_has_on = 0
-				FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~); ++level_k) BEGIN
-					SPRINT level_b ~%level_h% %level_k%~
-					PATCH_IF $level_on(~%level_b%~) BEGIN
-						SET level_has_on = 1
+			LPM ad_spell_level_search
+			PATCH_IF search_in_all AND search_total > 1 BEGIN
+				SPRINT level_value_text ~~
+				SET level_mode = MOD_TYPE_cumulative
+				LPM ad_spell_level_duration
+				PATCH_IF level_grouped BEGIN
+					LPM ad_spell_level_group
+				END
+			END
+		END
+	END
+	SET level_skip = level_skip_default
+END
+
+// Progressions du bonus du jet de sauvegarde (ancien group_spell_effects_by_saving_throw) : effet
+// semblable à ce bonus près, durée comprise, dont les bonus suivent une formule
+// (ad_spell_level_formula). Les lignes ne l'écrivent pas quand l'en-tête écrit le jet ; sinon,
+// refus tant qu'aucun sort ne le demande.
+DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
+	SET level_skip = AD_SAME_SAVE
+	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
+		SPRINT level_a ~0 %level_k0%~
+		PATCH_IF $level_on(~%level_a%~) BEGIN
+			LPM ad_spell_level_search
+			PATCH_IF search_in_all AND search_total > 1 BEGIN
+				SPRINT formula_array ~search_save~
+				SET formula_percent = 0
+				SET formula_flat = 0
+				SET formula_dice_sides = 0
+				SET formula_opcode = 0
+				LPM ad_spell_level_formula
+				PATCH_IF formula_valid OR formula_rank == 2 BEGIN
+					PATCH_IF NOT ctx_ignore_save BEGIN
+						SET level_id = $level_id(~%level_a%~)
+						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:save_progression~ message = ~saving throw bonus varying with the level, written in the line~ RET render_late_missing = refusal END
 					END
-					PATCH_IF NOT level_found AND $level_opcode(~%level_b%~) == level_opcode BEGIN
-						LPM ad_spell_level_same
-						PATCH_IF level_same BEGIN
-							SET level_found = 1
-							SET level_total += $level_on(~%level_b%~)
+					SPRINT level_value_text ~~
+					SET level_mode = MOD_TYPE_cumulative
+					LPM ad_spell_level_group
+				END
+			END
+		END
+	END
+	SET level_skip = level_skip_default
+END
+
+// Progressions de la valeur (ancien group_spell_effects_by_parameters) : effet d'un opcode de
+// AD_LEVEL_PROGRESSION_OPCODES, de mode 0, 1 ou 2 (mot de poids faible pour l'opcode 12), semblable
+// à parameter1 et à la durée près, dont les valeurs suivent une formule ; les dés d'un effet des
+// opcodes 12 et 17 la précèdent (« 2d8 + 1 point de dégâts par niveau »). Des dégâts de l'opcode 12
+// (mode 0) peuvent aussi progresser par le nombre de dés, et à défaut par les dés et parameter1
+// (« 1d4 … par niveau + 1 … par niveau »). Une durée écrite par les lignes doit suivre sa formule.
+DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
+	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
+		SPRINT level_a ~0 %level_k0%~
+		SET level_opcode = $level_opcode(~%level_a%~)
+		SET level_id = $level_id(~%level_a%~)
+		SET level_mode = $fx_parameter2(~%level_id%~)
+		PATCH_IF level_opcode == 12 BEGIN
+			SET level_mode = level_mode BAND 65535
+		END
+		PATCH_IF $level_on(~%level_a%~) AND VARIABLE_IS_SET $AD_LEVEL_PROGRESSION_OPCODES(~%level_opcode%~)
+				AND level_mode >= MOD_TYPE_cumulative AND level_mode <= MOD_TYPE_percentage BEGIN
+			SET level_skip = AD_SAME_PARAMETER1 BOR AD_SAME_TIMING
+			LPM ad_spell_level_search
+			PATCH_IF search_in_all AND search_total > 1 BEGIN
+				SPRINT formula_array ~search_parameter1~
+				SET formula_percent = VARIABLE_IS_SET $AD_LEVEL_PERCENT_OPCODES(~%level_opcode%~)
+				SET formula_flat = level_mode == MOD_TYPE_flat
+				SET formula_dice_sides = 0
+				SET formula_opcode = level_opcode
+				LPM ad_spell_level_formula
+				LPM ad_spell_level_formula_check
+				PATCH_IF formula_valid BEGIN
+					SPRINT level_value_text ~%formula_text%~
+					PATCH_IF level_opcode == 12 OR level_opcode == 17 BEGIN
+						LPF ad_dice_text INT_VAR dice_count = $fx_dice_count(~%level_id%~) dice_sides = $fx_dice_sides(~%level_id%~) RET level_dice_text = text END
+						PATCH_IF NOT (~%level_dice_text%~ STRING_EQUAL ~~) BEGIN
+							SPRINT level_value_text ~%level_dice_text% %formula_text%~
+							PATCH_IF formula_base > 0 BEGIN
+								SPRINT level_value_text ~%level_dice_text% + %formula_text%~
+							END
+						END
+					END
+					LPM ad_spell_level_duration
+					PATCH_IF level_grouped BEGIN
+						LPM ad_spell_level_group
+					END
+				END
+			END
+		END
+		PATCH_IF level_opcode == 12 AND level_mode == 0 AND $level_on(~%level_a%~) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+			SET formula_valid = 0
+			SET level_skip = AD_SAME_DICE BOR AD_SAME_TIMING
+			LPM ad_spell_level_search
+			SET formula_percent = 0
+			SET formula_flat = 0
+			SET formula_opcode = 12
+			PATCH_IF search_in_all AND search_total > 1 BEGIN
+				SPRINT formula_array ~search_dice~
+				SET formula_dice_sides = $fx_dice_sides(~%level_id%~)
+				LPM ad_spell_level_formula
+				LPM ad_spell_level_formula_check
+				PATCH_IF formula_valid BEGIN
+					SPRINT level_value_text ~%formula_text%~
+					LPM ad_spell_level_duration
+					PATCH_IF level_grouped BEGIN
+						LPM ad_spell_level_group
+					END
+				END
+			END
+			PATCH_IF NOT formula_valid AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+				SET level_skip = AD_SAME_DICE BOR AD_SAME_PARAMETER1 BOR AD_SAME_TIMING
+				LPM ad_spell_level_search
+				PATCH_IF search_in_all AND search_total > 1 BEGIN
+					SPRINT formula_array ~search_dice~
+					SET formula_dice_sides = $fx_dice_sides(~%level_id%~)
+					LPM ad_spell_level_formula
+					LPM ad_spell_level_formula_check
+					SET level_dice_valid = formula_valid
+					SPRINT level_dice_text ~%formula_text%~
+					SPRINT formula_array ~search_parameter1~
+					SET formula_dice_sides = 0
+					LPM ad_spell_level_formula
+					LPM ad_spell_level_formula_check
+					PATCH_IF level_dice_valid AND formula_valid BEGIN
+						SPRINT level_value_text ~%level_dice_text% + %formula_text%~
+						LPM ad_spell_level_duration
+						PATCH_IF level_grouped BEGIN
+							LPM ad_spell_level_group
 						END
 					END
 				END
-				PATCH_IF NOT level_found AND level_has_on BEGIN
-					SET level_in_all = 0
-				END
-			END
-			SET level_skip_duration = ctx_ignore_duration
-			SET level_skip_save_bonus = 0
-			SET level_skip_values = 0
-			PATCH_IF level_in_all AND level_total > 1 BEGIN
-				SET level_id = $level_id(~%level_a%~)
-				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression~ message = ~effect varying with the level (duration, saving throw bonus, value or dice): progression not supported yet~ RET render_late_missing = refusal END
 			END
 		END
+	END
+	SET level_skip = level_skip_default
+END
+
+// Recherche de l'effet level_a du premier en-tête dans chaque en-tête (ancien
+// spell_has_same_effects_on_all_levels_except_duration) : le premier effet de son opcode semblable
+// (ad_spell_level_same, champs level_skip laissés de côté), écarté ou non. search_in_all : 1 si
+// chaque en-tête qui a encore des effets en a un ; les effets non écartés trouvés, dans l'ordre des
+// en-têtes, en comptent search_total : search_match (« en-tête rang »), search_level (niveau
+// requis), search_parameter1 (au moins 1 pour l'opcode 111, ancien opcode_111_spell_level_match),
+// search_dice, search_save ; search_self : 1 si level_a en est. Durées (search_duration_level,
+// search_duration_value, search_durations) : celles qui changent depuis celle de level_a. Une durée
+// écrite par les lignes (level_special_duration) doit changer à chaque effet trouvé après le premier.
+DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
+	SET search_opcode = $level_opcode(~%level_a%~)
+	SET search_id = $level_id(~%level_a%~)
+	SET search_previous_duration = $fx_duration(~%search_id%~)
+	SET search_in_all = 1
+	SET search_total = 0
+	SET search_durations = 0
+	SET search_self = 0
+	FOR (search_h = 0; search_h < fx_header_count AND search_in_all; ++search_h) BEGIN
+		SET search_found = 0
+		SET search_has_on = 0
+		FOR (search_k = 0; search_k < $spell_fx_count(~%search_h%~); ++search_k) BEGIN
+			SPRINT level_b ~%search_h% %search_k%~
+			PATCH_IF $level_on(~%level_b%~) BEGIN
+				SET search_has_on = 1
+			END
+			PATCH_IF NOT search_found AND $level_opcode(~%level_b%~) == search_opcode BEGIN
+				LPM ad_spell_level_same
+				PATCH_IF level_same BEGIN
+					SET search_found = 1
+					PATCH_IF $level_on(~%level_b%~) BEGIN
+						SET search_id = $level_id(~%level_b%~)
+						SPRINT $search_match(~%search_total%~) ~%level_b%~
+						SET $search_level(~%search_total%~) = $spell_level(~%search_h%~)
+						SET search_parameter1 = $fx_parameter1(~%search_id%~)
+						PATCH_IF search_opcode == 111 AND search_parameter1 < 1 BEGIN
+							SET search_parameter1 = 1
+						END
+						SET $search_parameter1(~%search_total%~) = search_parameter1
+						SET $search_dice(~%search_total%~) = $fx_dice_count(~%search_id%~)
+						SET $search_save(~%search_total%~) = $fx_save_bonus(~%search_id%~)
+						SET search_total += 1
+						PATCH_IF ~%level_b%~ STRING_EQUAL ~%level_a%~ BEGIN
+							SET search_self = 1
+						END
+						PATCH_IF $fx_duration(~%search_id%~) != search_previous_duration BEGIN
+							SET search_previous_duration = $fx_duration(~%search_id%~)
+							SET $search_duration_level(~%search_durations%~) = $spell_level(~%search_h%~)
+							SET $search_duration_value(~%search_durations%~) = search_previous_duration
+							SET search_durations += 1
+						END
+					END
+				END
+			END
+		END
+		PATCH_IF NOT search_found AND search_has_on BEGIN
+			SET search_in_all = 0
+		END
+	END
+	PATCH_IF level_special_duration AND search_durations > 0 AND search_total - 1 != search_durations BEGIN
+		SET search_in_all = 0
+	END
+END
+
+// L'effet trouvé par ad_spell_level_search peut-il être réuni d'après ses durées ? level_grouped : 1
+// si les lignes n'écrivent pas sa durée, sinon si ses durées changent au moins deux fois (une seule
+// durée ne donne pas de formule : celle de level_a n'est pas comptée) et suivent une formule
+// (ad_spell_header_complex_duration) ; l'écriture de la formule est refusée tant qu'aucun sort ne
+// la demande.
+DEFINE_PATCH_MACRO ad_spell_level_duration BEGIN
+	SET level_grouped = 1
+	PATCH_IF level_special_duration AND search_durations > 0 BEGIN
+		SPRINT complex_array ~search_duration~
+		SET complex_count = search_durations
+		LPM ad_spell_header_complex_duration
+		SET level_grouped = search_durations > 1 AND NOT (~%complex_text%~ STRING_EQUAL ~~)
+		PATCH_IF level_grouped BEGIN
+			SET level_id = $level_id(~%level_a%~)
+			LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:duration_progression~ message = ~duration varying with the level, written in the line~ RET render_late_missing = refusal END
+		END
+	END
+END
+
+// Réunit l'effet level_a à ceux que ad_spell_level_search a trouvés (ancien
+// group_spell_effects_disable) : il est écrit sans titre de niveau, avec la progression
+// level_value_text de sa valeur (mode level_mode), et les autres sont écartés. Refus : level_a n'est
+// pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
+// opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout.
+DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
+	SET level_id = $level_id(~%level_a%~)
+	SET level_opcode = $level_opcode(~%level_a%~)
+	PATCH_IF NOT search_self BEGIN
+		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_other_effect~ message = ~effect of the first ability merged with another effect of its opcode~ RET render_late_missing = refusal END
+	END
+	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $AD_LEVEL_VALUE_OPCODES(~%level_opcode%~) BEGIN
+		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_opcode%level_opcode%~ message = ~value varying with the level, not written by the lines of opcode %level_opcode%~ RET render_late_missing = refusal END
+	END
+	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND level_mode != MOD_TYPE_cumulative BEGIN
+		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_mode~ message = ~value varying with the level in mode %level_mode%~ RET render_late_missing = refusal END
+	END
+	ELSE BEGIN
+		SET $level_emitted(~%level_a%~) = 1
+		FOR (group_n = 0; group_n < search_total; ++group_n) BEGIN
+			SPRINT level_b $search_match(~%group_n%~)
+			SET $level_on(~%level_b%~) = 0
+		END
+		SPRINT $fx_level_value(~%level_id%~) ~%level_value_text%~
+	END
+END
+
+// Refus d'une formule de valeur que l'ancien moteur écrit en français dans les deux langues (deux
+// valeurs seulement : « … + … au niveau N », « … jusqu'au niveau N »).
+DEFINE_PATCH_MACRO ad_spell_level_formula_check BEGIN
+	PATCH_IF formula_rank == 2 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+		SET level_id = $level_id(~%level_a%~)
+		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_two_values~ message = ~value taking only two values between the abilities~ RET render_late_missing = refusal END
+	END
+END
+
+// Valeur d'une progression (ancien get_complex_value) : valeurs <formula_array>(n) aux niveaux
+// search_level(n), n < search_total, un niveau requis de 1 ou moins comptant pour le premier niveau
+// de lanceur. Le pas (valeur et niveaux entre deux changements) est cherché en quatre essais : sur
+// tous les changements, puis sans le premier, sans le premier en comptant un niveau de plus au pas,
+// sans le premier en admettant un niveau de plus ou de moins. formula_valid : 1 si un pas tient ;
+// formula_text : « 1 par niveau du lanceur/20 », « 2 par tranche de 3 niveaux du lanceur/18 »,
+// précédé du reste de la valeur au dernier niveau (« 10 % + 1 % par niveau du lanceur/20 », sans le
+// signe du pas), une valeur constante seule ; formula_base : valeur de départ. formula_percent :
+// valeurs en pourcentage ; formula_dice_sides : valeurs en nombre de dés de ces faces ;
+// formula_flat : valeur fixée (l'ancien moteur ajoute « niveau + valeur » devant une valeur constante
+// ou un pas négatif) ; formula_opcode : opcode dont l'unité suit la valeur (AD_LEVEL_UNIT_OPCODES),
+// sur l'effet level_id ; formula_unit_used : 1 si elle a été écrite. formula_rank : nombre de valeurs
+// distinctes successives ; avec deux, formula_valid vaut 0 (ad_spell_level_formula_check).
+DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
+	SPRINT formula_text ~~
+	SET formula_base = 0
+	SET formula_unit_used = 0
+	SET formula_valid = 1
+	SET formula_start = 0
+	SET formula_delta = 0
+	SET formula_delta_level = 0
+	SET formula_previous = 0
+	SET formula_previous_level = 0
+	SET formula_rank = 0
+	FOR (formula_n = 0; formula_n < search_total; ++formula_n) BEGIN
+		LPM ad_spell_level_formula_entry
+		PATCH_IF formula_rank > 0 BEGIN
+			PATCH_IF formula_value != formula_previous BEGIN
+				PATCH_IF formula_delta == 0 BEGIN
+					SET formula_delta = formula_value - formula_previous
+					SET formula_delta_level = formula_level - formula_previous_level
+				END
+				ELSE PATCH_IF formula_delta != formula_value - formula_previous OR formula_delta_level != formula_level - formula_previous_level BEGIN
+					SET formula_valid = 0
+				END
+			END
+		END
+		ELSE BEGIN
+			SET formula_start = formula_value
+		END
+		PATCH_IF formula_previous_level == 0 OR formula_value != formula_previous BEGIN
+			SET formula_previous_level = formula_level
+			SET formula_rank += 1
+		END
+		SET formula_previous = formula_value
+	END
+	// Les essais suivants gardent le niveau du précédent jusqu'au premier changement.
+	FOR (formula_pass = 2; formula_pass <= 4; ++formula_pass) BEGIN
+		PATCH_IF NOT formula_valid BEGIN
+			SET formula_valid = 1
+			SET formula_rank = 0
+			SET formula_previous = 0
+			SET formula_start = 0
+			SET formula_delta = 0
+			SET formula_delta_level = 0
+			FOR (formula_n = 0; formula_n < search_total; ++formula_n) BEGIN
+				LPM ad_spell_level_formula_entry
+				PATCH_IF formula_rank > 1 AND formula_previous != formula_value BEGIN
+					PATCH_IF formula_delta == 0 BEGIN
+						SET formula_delta = formula_value - formula_previous
+						SET formula_delta_level = formula_level - formula_previous_level + (formula_pass == 3 ? 1 : 0)
+					END
+					ELSE PATCH_IF formula_delta != formula_value - formula_previous OR (formula_delta_level != formula_level - formula_previous_level
+							AND (formula_pass != 4 OR formula_delta_level + 1 != formula_level - formula_previous_level)) BEGIN
+						SET formula_valid = 0
+					END
+				END
+				ELSE BEGIN
+					SET formula_start = formula_value
+				END
+				PATCH_IF formula_previous != formula_value OR (formula_pass == 4 AND formula_rank < 2) BEGIN
+					SET formula_previous = formula_value
+					SET formula_previous_level = formula_level
+				END
+				SET formula_rank += 1
+			END
+		END
+	END
+	PATCH_IF formula_rank == 2 BEGIN
+		SET formula_valid = 0
+	END
+	ELSE PATCH_IF formula_valid BEGIN
+		SET formula_last = formula_value
+		SET formula_base = formula_start
+		SET formula_unit_tra = 0
+		PATCH_IF VARIABLE_IS_SET $AD_LEVEL_UNIT_OPCODES(~%formula_opcode%~) BEGIN
+			SET unit_value = formula_delta
+			SET unit_fx = level_id
+			LPM ~ad_op_%formula_opcode%_level_unit~
+			SET formula_unit_tra = unit_tra
+		END
+		PATCH_IF formula_dice_sides > 0 BEGIN
+			SET diceCount = ABS formula_delta
+			SET diceSides = formula_dice_sides
+			SPRINT formula_step @1200005 // ~%diceCount%d%diceSides%~
+		END
+		ELSE BEGIN
+			SPRINT formula_step ~%formula_delta%~
+		END
+		PATCH_IF formula_start > 0 AND formula_delta == 0 BEGIN
+			SPRINT formula_typed ~%formula_start%~
+			LPM ad_spell_level_formula_typed
+			SPRINT formula_text ~%formula_typed%~
+			PATCH_IF formula_flat BEGIN
+				SET formula_flat_value = formula_previous_level + formula_last
+				SPRINT formula_text ~%formula_flat_value% %formula_text%~
+			END
+		END
+		ELSE PATCH_IF formula_delta_level != 0 BEGIN
+			SET levelMax = formula_previous_level
+			SET formula_remains = (ABS formula_previous) - (ABS formula_delta * formula_level / formula_delta_level)
+			SPRINT formula_typed ~%formula_step%~
+			LPM ad_spell_level_formula_typed
+			SPRINT value ~%formula_typed%~
+			PATCH_IF formula_flat AND formula_delta < 0 BEGIN
+				SET formula_flat_value = formula_previous_level + formula_last
+				SPRINT value ~%formula_flat_value% %value%~
+			END
+			PATCH_IF ABS formula_delta_level == 1 BEGIN
+				SPRINT formula_text @7002010 // ~%value% par niveau du lanceur/%levelMax%~
+			END
+			ELSE BEGIN
+				SET level = formula_delta_level
+				SPRINT formula_text @7002011 // ~%value% par tranche de %level% niveaux du lanceur/%levelMax%~
+			END
+			PATCH_IF formula_remains > 0 BEGIN
+				SPRINT formula_remains_text ~%formula_remains%~
+				PATCH_IF formula_dice_sides > 0 BEGIN
+					SET diceCount = formula_remains
+					SET diceSides = formula_dice_sides
+					SPRINT formula_remains_text @1200005 // ~%diceCount%d%diceSides%~
+				END
+				PATCH_IF formula_percent BEGIN
+					SPRINT value ~%formula_remains_text%~
+					SPRINT formula_remains_text @1200003 // ~%value%%PERCENT%~
+				END
+				PATCH_IF formula_delta_level < 0 BEGIN
+					SPRINT formula_text ~%formula_remains_text% %formula_text%~
+				END
+				ELSE BEGIN
+					LPF ad_level_unsigned STR_VAR text = ~%formula_text%~ RET formula_text = text END
+					SPRINT formula_text ~%formula_remains_text% + %formula_text%~
+				END
+			END
+		END
+		ELSE BEGIN
+			SPRINT formula_text ~%formula_start%~
+		END
+	END
+END
+
+// Niveau formula_level et valeur formula_value du rang formula_n de ad_spell_level_formula.
+DEFINE_PATCH_MACRO ad_spell_level_formula_entry BEGIN
+	SET formula_level = $search_level(~%formula_n%~)
+	SET formula_value = $EVAL ~%formula_array%~(~%formula_n%~)
+	PATCH_IF formula_level <= 1 BEGIN
+		PATCH_IF level_first < 0 BEGIN
+			LPF ad_spell_first_level RET level_first = first_level END
+		END
+		SET formula_level = level_first
+	END
+END
+
+// formula_typed suivi de l'unité formula_unit_tra (ancien get_complex_typed_value), en
+// pourcentage avec formula_percent.
+DEFINE_PATCH_MACRO ad_spell_level_formula_typed BEGIN
+	PATCH_IF formula_percent BEGIN
+		SPRINT value ~%formula_typed%~
+		SPRINT formula_typed @1200003 // ~%value%%PERCENT%~
+	END
+	PATCH_IF formula_unit_tra > 0 BEGIN
+		LPF ad_tra INT_VAR tra_id = formula_unit_tra RET valueType = text END
+		SPRINT value ~%formula_typed%~
+		SPRINT formula_typed @7002012 // ~%value% %valueType%~
+		SET formula_unit_used = 1
+	END
+END
+
+// text sans le signe « - » de tête, ni l'espace qui le suit.
+DEFINE_PATCH_FUNCTION ad_level_unsigned
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	INNER_PATCH_SAVE text ~%text%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ?~ ~~
 	END
 END
 
@@ -364,16 +794,17 @@ END
 
 // level_same : les effets level_a et level_b (« en-tête rang ») de deux en-têtes ont les champs que
 // compare l'ancien moteur entre niveaux (opcode_match, ou opcode_match_except_duration sous la durée
-// de l'en-tête), sauf ceux de AD_LEVEL_SAME_IGNORED pour leur opcode ; level_skip_duration,
-// level_skip_save_bonus et level_skip_values (valeur et nombre de dés) en laissent d'autres de côté.
+// de l'en-tête), sauf ceux de AD_LEVEL_SAME_IGNORED pour leur opcode et ceux de level_skip : bits
+// AD_SAME_PARAMETER1 (parameter1), AD_SAME_DICE (nombre de dés), AD_SAME_SAVE (bonus du jet de
+// sauvegarde), AD_SAME_TIMING (durée).
 // L'ancien moteur compare parameter2 tel que lu, et le nombre d'effets identiques réunis.
 DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	SET same_a = $level_id(~%level_a%~)
 	SET same_b = $level_id(~%level_b%~)
 	SET same_opcode = $level_opcode(~%level_a%~)
-	SET same_ignored = 0
+	SET same_ignored = level_skip
 	PATCH_IF VARIABLE_IS_SET $AD_LEVEL_SAME_IGNORED(~%same_opcode%~) BEGIN
-		SET same_ignored = $AD_LEVEL_SAME_IGNORED(~%same_opcode%~)
+		SET same_ignored = level_skip BOR $AD_LEVEL_SAME_IGNORED(~%same_opcode%~)
 	END
 	SET same_parameter1_a = $fx_parameter1(~%same_a%~)
 	SET same_parameter1_b = $fx_parameter1(~%same_b%~)
@@ -385,17 +816,17 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	SET level_same = $fx_external(~%same_a%~) == $fx_external(~%same_b%~)
 		AND $fx_target(~%same_a%~) == $fx_target(~%same_b%~)
 		AND $fx_power(~%same_a%~) == $fx_power(~%same_b%~)
-		AND ((same_ignored BAND AD_SAME_PARAMETER1) != 0 OR level_skip_values OR same_parameter1_a == same_parameter1_b)
+		AND ((same_ignored BAND AD_SAME_PARAMETER1) != 0 OR same_parameter1_a == same_parameter1_b)
 		AND ((same_ignored BAND AD_SAME_PARAMETER2) != 0 OR $fx_parameter2_raw(~%same_a%~) == $fx_parameter2_raw(~%same_b%~))
-		AND (level_skip_duration OR $fx_duration(~%same_a%~) == $fx_duration(~%same_b%~))
+		AND ((same_ignored BAND AD_SAME_TIMING) != 0 OR $fx_duration(~%same_a%~) == $fx_duration(~%same_b%~))
 		AND $fx_timing(~%same_a%~) == $fx_timing(~%same_b%~)
 		AND $fx_resistance(~%same_a%~) == $fx_resistance(~%same_b%~)
 		AND $fx_probability1(~%same_a%~) == $fx_probability1(~%same_b%~)
 		AND $fx_probability2(~%same_a%~) == $fx_probability2(~%same_b%~)
-		AND (level_skip_values OR $fx_dice_count(~%same_a%~) == $fx_dice_count(~%same_b%~))
+		AND ((same_ignored BAND AD_SAME_DICE) != 0 OR $fx_dice_count(~%same_a%~) == $fx_dice_count(~%same_b%~))
 		AND $fx_dice_sides(~%same_a%~) == $fx_dice_sides(~%same_b%~)
 		AND $fx_save_type(~%same_a%~) == $fx_save_type(~%same_b%~)
-		AND (level_skip_save_bonus OR $fx_save_bonus(~%same_a%~) == $fx_save_bonus(~%same_b%~))
+		AND ((same_ignored BAND AD_SAME_SAVE) != 0 OR $fx_save_bonus(~%same_a%~) == $fx_save_bonus(~%same_b%~))
 		AND $fx_special(~%same_a%~) == $fx_special(~%same_b%~)
 		AND $fx_parameter3(~%same_a%~) == $fx_parameter3(~%same_b%~)
 		AND $fx_parameter4(~%same_a%~) == $fx_parameter4(~%same_b%~)

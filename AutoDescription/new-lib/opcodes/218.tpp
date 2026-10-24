@@ -31,4 +31,14 @@ DEFINE_PATCH_MACRO ad_op_218_amount BEGIN
 		SPRINT valueType @22180002 // ~peaux de pierre~
 	END
 	SPRINT amount @22180000 // ~%value% %valueType%~
+	// Progression selon le niveau du sort (new-lib/spell_levels.tpp) : « 1 peau de pierre par niveau ».
+	SPRINT skin_level_value $fx_level_value(~%line_fx%~)
+	PATCH_IF NOT (~%skin_level_value%~ STRING_EQUAL ~~) BEGIN
+		SPRINT amount ~%skin_level_value%~
+	END
+END
+
+// Unité d'un pas de unit_value peaux (ancien opcode_218_typed_value) : unit_tra.
+DEFINE_PATCH_MACRO ad_op_218_level_unit BEGIN
+	SET unit_tra = unit_value > 1 ? 22180002 : 22180001 // ~peau de pierre~
 END

@@ -14,6 +14,8 @@
 // nommées d'après la zone du projectile, new-lib/application.tpp) ; fx_late (0 à la lecture, 1 pour
 // un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
+// fx_level_value (vide à la lecture, progression de la valeur d'un effet présent à tous les niveaux
+// d'un sort, new-lib/spell_levels.tpp) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
 // pour un effet écarté, ad_application_drop) ; fx_exception et fx_exception_count (exceptions de
@@ -285,6 +287,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_late(~%fx_id%~) = 0
 	SET $fx_series_of(~%fx_id%~) = 0 - 1
 	SET $fx_series_anchor(~%fx_id%~) = 0
+	SPRINT $fx_level_value(~%fx_id%~) ~~
 	LPM ad_fx_mark_target_exception
 	LPM ad_fx_mark_not_cumulative
 	SET fx_opcode = $fx_opcode(~%fx_id%~)

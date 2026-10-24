@@ -54,14 +54,15 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 				LPM ad_op_12_value
 				SPRINT damage ~%damage_text%~
 				PATCH_IF damage_mode == 0 BEGIN
-					PATCH_IF VARIABLE_IS_SET $AD_DAMAGE_TYPES(~%damage_type%~) BEGIN
-						SET damage_type_tra = $AD_DAMAGE_TYPES(~%damage_type%~)
+					SPRINT damage $fx_level_value(~%damage_id%~)
+					// Une progression selon le niveau du sort (new-lib/spell_levels.tpp) nomme déjà le type.
+					PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
+						SET unit_fx = damage_id
+						LPM ad_op_12_level_unit
+						LPF ad_tra INT_VAR tra_id = unit_tra RET damageType = text END
+						SPRINT damage ~%damage_text%~
+						SPRINT damage @20120001 // ~%damage% %damageType%~
 					END
-					ELSE BEGIN
-						SET damage_type_tra = 20120010 // ~points de dégâts~
-					END
-					LPF ad_tra INT_VAR tra_id = damage_type_tra RET damageType = text END
-					SPRINT damage @20120001 // ~%damage% %damageType%~
 					SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
 					SET damage_target = $fx_effective_target(~%damage_id%~)
 					PATCH_IF line_phrase == 20120100 AND ($fx_versus_file(~%damage_id%~) > 0 OR ctx_versus_set)
@@ -114,6 +115,16 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 				LPM ad_effect_line
 			END
 		END
+	END
+END
+
+// Unité des dégâts de l'effet unit_fx (ancien opcode_12_typed_value) : unit_tra, nom de son type de
+// dégâts.
+DEFINE_PATCH_MACRO ad_op_12_level_unit BEGIN
+	SET unit_type = $fx_parameter2(~%unit_fx%~) - ($fx_parameter2(~%unit_fx%~) BAND 65535)
+	SET unit_tra = 20120010 // ~points de dégâts~
+	PATCH_IF VARIABLE_IS_SET $AD_DAMAGE_TYPES(~%unit_type%~) BEGIN
+		SET unit_tra = $AD_DAMAGE_TYPES(~%unit_type%~)
 	END
 END
 

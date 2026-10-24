@@ -54,29 +54,51 @@ DEFINE_PATCH_MACRO ad_op_17_lines BEGIN
 	END
 END
 
-// Phrase d'un ajout ou d'un pourcentage : sans « - » en tête, un soin ; sinon des dégâts.
+// Phrase d'un ajout ou d'un pourcentage : sans « - » en tête, un soin ; sinon des dégâts. Une
+// progression selon le niveau du sort (new-lib/spell_levels.tpp) remplace la valeur et son unité.
 DEFINE_PATCH_MACRO ad_op_17_phrase BEGIN
 	SET hp_damage = INDEX (EXACT_MATCH ~-~ ~%value%~) == 0
-	INNER_PATCH_SAVE value ~%value%~ BEGIN
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^[-+]~ ~~
-	END
-	PATCH_IF hp_type == 2 BEGIN
-		SPRINT value @1200003 // ~%value%%PERCENT%~
-	END
-	SET hp_single = (~%value%~ STRING_EQUAL ~1~) OR (~%value%~ STRING_EQUAL ~1%PERCENT%~)
-	PATCH_IF NOT hp_damage BEGIN
-		PATCH_IF hp_type == 2 BEGIN
-			SPRINT valueType @20170005 // ~des points de vie~
-			SET line_phrase = 20170120 // ~Restaure %value% %ofTheTarget%~
-		END
-		ELSE BEGIN
-			LPF ad_tra INT_VAR tra_id = hp_single ? 20170001 : 20170002 RET valueType = text END // ~point de vie~
-			SET line_phrase = 20170100 // ~Restaure %value% %toTheTarget%~
-		END
+	SPRINT hp_level_value $fx_level_value(~%hp_id%~)
+	PATCH_IF NOT (~%hp_level_value%~ STRING_EQUAL ~~) BEGIN
+		SPRINT value ~%hp_level_value%~
+		SET line_phrase = hp_damage ? 20170110 : 20170100 // ~Restaure %value% %toTheTarget%~
 	END
 	ELSE BEGIN
-		LPF ad_tra INT_VAR tra_id = hp_single ? 20170003 : 20170004 RET valueType = text END // ~point de dégât~
-		SET line_phrase = 20170110 // ~Inflige %value% %toTheTarget%~
+		INNER_PATCH_SAVE value ~%value%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^[-+]~ ~~
+		END
+		PATCH_IF hp_type == 2 BEGIN
+			SPRINT value @1200003 // ~%value%%PERCENT%~
+		END
+		SET hp_single = (~%value%~ STRING_EQUAL ~1~) OR (~%value%~ STRING_EQUAL ~1%PERCENT%~)
+		PATCH_IF NOT hp_damage BEGIN
+			PATCH_IF hp_type == 2 BEGIN
+				SPRINT valueType @20170005 // ~des points de vie~
+				SET line_phrase = 20170120 // ~Restaure %value% %ofTheTarget%~
+			END
+			ELSE BEGIN
+				LPF ad_tra INT_VAR tra_id = hp_single ? 20170001 : 20170002 RET valueType = text END // ~point de vie~
+				SET line_phrase = 20170100 // ~Restaure %value% %toTheTarget%~
+			END
+		END
+		ELSE BEGIN
+			LPF ad_tra INT_VAR tra_id = hp_single ? 20170003 : 20170004 RET valueType = text END // ~point de dégât~
+			SET line_phrase = 20170110 // ~Inflige %value% %toTheTarget%~
+		END
+		SPRINT value @20170006 // ~%value% %valueType%~
 	END
-	SPRINT value @20170006 // ~%value% %valueType%~
+END
+
+// Unité d'un pas de unit_value points de vie (ancien opcode_17_typed_value) : unit_tra.
+DEFINE_PATCH_MACRO ad_op_17_level_unit BEGIN
+	SET unit_tra = 20170001 // ~point de vie~
+	PATCH_IF unit_value > 1 BEGIN
+		SET unit_tra = 20170002 // ~points de vie~
+	END
+	ELSE PATCH_IF unit_value == 0 - 1 BEGIN
+		SET unit_tra = 20170003 // ~point de dégât~
+	END
+	ELSE PATCH_IF unit_value < 0 - 1 BEGIN
+		SET unit_tra = 20170004 // ~points de dégâts~
+	END
 END
