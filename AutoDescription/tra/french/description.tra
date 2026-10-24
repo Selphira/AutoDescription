@@ -3409,6 +3409,10 @@
 @12260002 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
 @12260003 = ~d'immuniser jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
 @12260004 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~
+@12260011 = ~Immunise contre le prochain sort de type %spellSecondaryTypeName%~
+@12260012 = ~Immunise %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~
+@12260013 = ~d'immuniser contre le prochain sort de type %spellSecondaryTypeName%~
+@12260014 = ~d'immuniser %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~
 
 // Opcode 227: Spell: Bounce (by School, decrementing) [227]
 
