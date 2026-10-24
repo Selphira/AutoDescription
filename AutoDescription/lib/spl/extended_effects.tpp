@@ -724,6 +724,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 		    END
 
 		    PATCH_IF inAllLevels AND total > 1 BEGIN
+		        SET durationIsValid = 1
 		        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
 					PATCH_IF level == 1 BEGIN
 						LPF get_first_level_for_spell RET level = minLevel END
@@ -735,6 +736,8 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 						RET
 							strDuration = complex_duration
 					END
+					// Sans formule, ou d'après une seule durée (all_durations n'a pas celle du premier niveau), l'effet garde ses sections de niveaux.
+					SET durationIsValid = total_durations > 1 AND NOT ~%strDuration%~ STRING_EQUAL ~~
 			        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
 			            PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_duration_ticks BEGIN
 			                SPRINT complex_duration @100311 // ~pendant %strDuration%~
@@ -750,7 +753,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
                         END
 			        END
 		        END
-		        LPM ~group_spell_effects_disable~
+		        PATCH_IF durationIsValid BEGIN
+		            LPM ~group_spell_effects_disable~
+		        END
 		    END
 		END
 	END
@@ -792,10 +797,12 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		BEGIN
 			PATCH_IF opcode == basicOpcode BEGIN
 			    LPM ~data_to_vars~
+			    // parameter2 reste entier : le type de dégâts de l'opcode 12 s'y lit (opcode_12_typed_value).
+			    SET mode = parameter2
 			    PATCH_IF opcode == 12 BEGIN
-					SET parameter2 = parameter2 BAND 65535
+					SET mode = parameter2 BAND 65535
 				END
-			    PATCH_IF parameter2 == MOD_TYPE_cumulative OR parameter2 == MOD_TYPE_flat OR parameter2 == MOD_TYPE_percentage BEGIN
+			    PATCH_IF mode == MOD_TYPE_cumulative OR mode == MOD_TYPE_flat OR mode == MOD_TYPE_percentage BEGIN
 			        LPM ~data_to_match_vars~
 				    LPF spell_has_same_effects_on_all_levels_except_duration
 						INT_VAR
@@ -817,7 +824,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						LPF ~get_complex_value~
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
-								is_flat_value = parameter2 == MOD_TYPE_flat ? 1 : 0
+								is_flat_value = mode == MOD_TYPE_flat ? 1 : 0
 							STR_VAR
 								array_name = ~all_effects~
 							RET
@@ -826,6 +833,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 								complex_value_int
 						END
 						PATCH_IF is_valid BEGIN
+					        SET durationIsValid = 1
 					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
 								PATCH_IF level == 1 BEGIN
 									LPF get_first_level_for_spell RET level = minLevel END
@@ -837,6 +845,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 									RET
 										strDuration = complex_duration
 								END
+						        SET durationIsValid = total_durations > 1 AND NOT ~%strDuration%~ STRING_EQUAL ~~
 						        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
 						            SPRINT complex_duration @100311 // ~pendant %strDuration%~
 						        END
@@ -852,7 +861,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 	                                END
 								END
 				            END
-					        LPM ~group_spell_effects_disable~
+					        PATCH_IF durationIsValid BEGIN
+					        	LPM ~group_spell_effects_disable~
+					        END
 						END
 					END
 			    END
@@ -895,6 +906,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							complex_value_int
 					END
 					PATCH_IF is_valid BEGIN
+				        SET durationIsValid = 1
 				        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
 							PATCH_IF level == 1 BEGIN
 								LPF get_first_level_for_spell RET level = minLevel END
@@ -906,11 +918,14 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 								RET
 									strDuration = complex_duration
 							END
+					        SET durationIsValid = total_durations > 1 AND NOT ~%strDuration%~ STRING_EQUAL ~~
 					        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
 					            SPRINT complex_duration @100311 // ~pendant %strDuration%~
 					        END
 				        END
-						LPM ~group_spell_effects_disable~
+						PATCH_IF durationIsValid BEGIN
+							LPM ~group_spell_effects_disable~
+						END
 					END
 		        END
 
@@ -969,6 +984,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						END
 						PATCH_IF c1_is_valid AND c2_is_valid BEGIN
 							SPRINT complex_value ~%c1% + %c2%~
+					        SET durationIsValid = 1
 					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
 								PATCH_IF level == 1 BEGIN
 									LPF get_first_level_for_spell RET level = minLevel END
@@ -979,11 +995,14 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 									RET
 										strDuration = complex_duration
 								END
+						        SET durationIsValid = total_durations > 1 AND NOT ~%strDuration%~ STRING_EQUAL ~~
 						        PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
 						            SPRINT complex_duration @100311 // ~pendant %strDuration%~
 						        END
 					        END
-							LPM ~group_spell_effects_disable~
+							PATCH_IF durationIsValid BEGIN
+								LPM ~group_spell_effects_disable~
+							END
 						END
 			        END
 				END
