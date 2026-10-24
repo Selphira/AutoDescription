@@ -339,7 +339,7 @@ SPPR105	identical
 SPPR106	identical
 SPPR107	identical
 SPPR108	identical
-SPPR109	not_covered	not_implemented:missing_opcodes:153
+SPPR109	identical
 SPPR110	identical
 SPPR111	identical
 SPPR113	identical
@@ -507,7 +507,7 @@ SPWI116	not_covered	not_implemented:opcode324:exceptions_group
 SPWI117	identical
 SPWI118	identical
 SPWI119	not_covered	not_implemented:opcode318:stat
-SPWI120	not_covered	not_implemented:missing_opcodes:159
+SPWI120	identical
 SPWI123	not_covered	not_implemented:missing_opcodes:192
 SPWI124	not_covered	not_implemented:missing_opcodes:214
 SPWI125	identical
@@ -615,7 +615,7 @@ SPWI515	identical
 SPWI516	identical
 SPWI517	identical
 SPWI518	identical
-SPWI519	not_covered	not_implemented:missing_opcodes:226
+SPWI519	identical
 SPWI520	identical
 SPWI521	identical
 SPWI522	identical
@@ -689,7 +689,7 @@ SPWI888	identical
 SPWI897	identical
 SPWI898	identical
 SPWI899	identical
-SPWI902	not_covered	not_implemented:missing_opcodes:259
+SPWI902	identical
 SPWI903	identical
 SPWI905	identical
 SPWI907	identical
@@ -702,7 +702,7 @@ SPWI913	identical
 SPWI914	identical
 SPWI915	identical
 SPWI916	identical
-SPWI917	not_covered	not_implemented:missing_opcodes:212
+SPWI917	identical
 SPWI918	not_covered	not_implemented:application:timing
 SPWI919	identical
 SPWI920	identical
@@ -783,5 +783,5 @@ SPWM191	identical
 SPWM198	identical
 SPYANC01	identical
 SPYANCD	identical
-STAF11	not_covered	not_implemented:missing_opcodes:259
+STAF11	identical
 SW2H10DM	identical

@@ -2491,6 +2491,12 @@
 @21510122 = ~d'invoquer %creatureName% sur %theTarget%~ // reprise de @11510006
 @21510123 = ~d'invoquer %creatureName% sur %theTarget%~ // reprise de @11510006
 
+// Opcode 153 : Sanctuaire : phrases 0100 (21 530 000-21 530 999)
+@21530100 = ~Sanctuaire~ // reprise de @11530001
+@21530101 = ~Lance Sanctuaire sur %theTarget%~ // reprise de @11530003
+@21530102 = ~de lancer Sanctuaire sur %theTarget%~ // reprise de @11530002
+@21530103 = ~de lancer Sanctuaire sur %theTarget%~ // reprise de @11530002
+
 // Opcode 154 : Enchevêtrement (21 540 000-21 540 999)
 @21540100 = ~Enchevêtrement~ // reprise de @11540001
 @21540101 = ~Enchevêtre %theTarget%~ // reprise de @11540002
@@ -2502,6 +2508,20 @@
 @21570101 = ~Empêtre %theTarget%~ // reprise de @11570001
 @21570102 = ~d'empêtrer %theTarget%~ // reprise de @11570002
 @21570103 = ~d'empêtrer %theTarget%~ // reprise de @11570002
+
+// Opcode 159 : Images miroir : phrases 0100 une image, 0110 plusieurs, 0120 images dissipées (21 590 000-21 590 999)
+@21590100 = ~Crée 1 image miroir sur %theTarget%~ // reprise de @11590001
+@21590101 = ~Crée 1 image miroir sur %theTarget%~ // reprise de @11590001
+@21590102 = ~de créer 1 image miroir sur %theTarget%~ // reprise de @11590011
+@21590103 = ~de créer 1 image miroir sur %theTarget%~ // reprise de @11590011
+@21590110 = ~Crée %amount% images miroir sur %theTarget%~ // reprise de @11590002
+@21590111 = ~Crée %amount% images miroir sur %theTarget%~ // reprise de @11590002
+@21590112 = ~de créer %amount% images miroir sur %theTarget%~ // reprise de @11590012
+@21590113 = ~de créer %amount% images miroir sur %theTarget%~ // reprise de @11590012
+@21590120 = ~Dissipe les images-miroir de %theTarget%~ // reprise de @11590003
+@21590121 = ~Dissipe les images-miroir de %theTarget%~ // reprise de @11590003
+@21590122 = ~de dissiper les images-miroir de %theTarget%~ // reprise de @11590013
+@21590123 = ~de dissiper les images-miroir de %theTarget%~ // reprise de @11590013
 
 // Opcode 161 : Soin : peur (21 610 000-21 610 999)
 @21610100 = ~Dissipation de la peur~ // reprise de @11610001
@@ -2690,6 +2710,11 @@
 @22110102 = ~d'emprisonner %theTarget%~ // reprise de @12110002
 @22110103 = ~d'emprisonner %theTarget%~ // reprise de @12110002
 
+// Opcode 212 : Liberté : phrases 0100, pas de forme « soi », comme dans l'ancien moteur (22 120 000-22 120 999)
+@22120101 = ~Libère les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~ // reprise de @12120001
+@22120102 = ~de libérer les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~ // reprise de @12120002
+@22120103 = ~de libérer les créatures dans la zone d'effet des effets de l'emprisonnement et du labyrinthe~ // reprise de @12120002
+
 // Opcode 213 : Labyrinthe : phrases 0100 durée selon l'Intelligence, 0110 durée de l'effet (EE) (22 130 000-22 130 999)
 @22130100 = ~Enferme %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~ // reprise de @12130001
 @22130101 = ~Enferme %theTarget% dans un labyrinthe, la durée varie selon l'Intelligence~ // reprise de @12130001
@@ -2763,6 +2788,16 @@
 @22240101 = ~Restaure les niveaux drainés %ofTheTarget%~ // reprise de @12240001
 @22240102 = ~de restaurer les niveaux drainés %ofTheTarget%~ // reprise de @12240002
 @22240103 = ~de restaurer les niveaux drainés %ofTheTarget%~ // reprise de @12240002
+
+// Opcode 226 : Immunité par type secondaire : phrases 0100 plusieurs niveaux, 0110 un seul (22 260 000-22 260 999)
+@22260100 = ~Immunise jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12260001
+@22260101 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12260002
+@22260102 = ~d'immuniser jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12260003
+@22260103 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12260004
+@22260110 = ~Immunise contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260011
+@22260111 = ~Immunise %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260012
+@22260112 = ~d'immuniser contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260013
+@22260113 = ~d'immuniser %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260014
 
 // Opcode 230 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 300 000-22 300 999)
 @22300100 = ~Dissipe un sort de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~ // reprise de @12300001
@@ -2902,6 +2937,10 @@
 @22550101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @22550102 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
 @22550103 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
+
+// Opcode 259 : Piège à sorts : phrases 0100, pas de forme « cible », comme dans l'ancien moteur (22 590 000-22 590 999)
+@22590100 = ~Absorbe jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~ // reprise de @12590001
+@22590102 = ~d'absorber jusqu'à %amount% niveaux de sorts de niveau %spellLevel% ou inférieur~ // reprise de @12590002
 
 // Opcode 261 : Sorts perdus rendus : 0010 profane, 0011 divin, phrases 0100 jusqu'à un niveau, 0110 premier niveau (22 610 000-22 610 999)
 @22610010 = ~profane~ // reprise de @12610010

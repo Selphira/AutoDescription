@@ -154,13 +154,13 @@
 150      1        1        TODO      LEVEL            456    IGNORED         Spell_Effect:_Find_Traps
 151      1        1        DESCRIBED LEVEL            133    IGNORED         Summon:_Replace_Creature
 152      1        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Play_Movie
-153      1        1        TODO      LEVEL            398    SHOWN           Overlay:_Sanctuary
+153      1        1        DESCRIBED LEVEL            398    SHOWN           Overlay:_Sanctuary
 154      1        1        DESCRIBED LEVEL            374    SHOWN           Overlay:_Entangle
 155      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Minor_Globe
 156      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Protection_from_Normal_Missiles_Cylinder
 157      1        1        DESCRIBED LEVEL            373    NOT_AFTER_DEATH State:_Web_Effect
 158      1        1        IGNORED   LEVEL            400    SHOWN           Overlay:_Grease
-159      1        1        TODO      LEVEL            403    SHOWN           Spell_Effect:_Mirror_Image_(Exact_Number)
+159      1        1        DESCRIBED LEVEL            403    SHOWN           Spell_Effect:_Mirror_Image_(Exact_Number)
 160      1        1        TODO      LEVEL            216    IGNORED         Remove_Sanctuary
 161      1        1        DESCRIBED LEVEL            210    IGNORED         Cure:_Horror
 162      1        1        DESCRIBED LEVEL            205    IGNORED         Cure:_Hold
@@ -213,7 +213,7 @@
 209      1        1        DESCRIBED LEVEL            355    IGNORED         Death:_Kill_60HP
 210      1        1        DESCRIBED LEVEL            371    IGNORED         Spell_Effect:_Stun_90HP
 211      1        1        DESCRIBED LEVEL            366    IGNORED         Spell_Effect:_Imprisonment
-212      1        1        TODO      LEVEL            289    IGNORED         Protection:_Freedom
+212      1        1        DESCRIBED LEVEL            289    IGNORED         Protection:_Freedom
 213      1        1        DESCRIBED LEVEL            367    SHOWN           Spell_Effect:_Maze
 214      1        1        TODO      LEVEL            12     NOT_PERMANENT   Spell_Effect:_Select_Spell
 215      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Play_3D_Effect
@@ -227,7 +227,7 @@
 223      1        1        TODO      LEVEL            254    SHOWN           Spell:_Immunity_(by_School,_decrementing)
 224      1        1        DESCRIBED LEVEL            203    IGNORED         Cure:_Level_Drain_(Restoration)
 225      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Reveal_Magic
-226      1        1        TODO      LEVEL            255    SHOWN           Spell:_Immunity_(by_Secondary_Type,_decrementing)
+226      1        1        DESCRIBED LEVEL            255    SHOWN           Spell:_Immunity_(by_Secondary_Type,_decrementing)
 227      1        1        TODO      LEVEL            244    SHOWN           Spell:_Bounce_(by_School,_decrementing)
 228      1        1        TODO      LEVEL            245    SHOWN           Spell:_Bounce_(by_Secondary_Type,_decrementing)
 229      1        1        TODO      LEVEL            225    IGNORED         Removal:_Remove_One_School
@@ -260,7 +260,7 @@
 256      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Active
 257      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Creation
 258      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
-259      1        1        TODO      LEVEL            238    SHOWN           Protection:_Spell_Trap_(by_Power_Level,_decrementing)
+259      1        1        DESCRIBED LEVEL            238    SHOWN           Protection:_Spell_Trap_(by_Power_Level,_decrementing)
 260      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
 261      1        1        DESCRIBED LEVEL            20     IGNORED         Spell:_Restore_Lost_Spells
 262      1        1        TODO      LEVEL            426    SHOWN           Stat:_Visual_Range
