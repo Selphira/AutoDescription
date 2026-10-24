@@ -210,7 +210,8 @@ BEGIN
 
 	SORT_ARRAY_INDICES ~all_durations~ NUMERICALLY
 
-	PATCH_IF isSpecialDuration == 1 AND total_durations > 0 AND total - 1 != total_durations BEGIN
+	// Les lignes écrivent les durées si l'en-tête ne le fait pas (ignoreDuration) : isSpecialDuration vaut 0 pour un sous-sort, même quand ses lignes les écrivent.
+	PATCH_IF NOT ignoreDuration AND total_durations > 0 AND total - 1 != total_durations BEGIN
 		SET inAllLevels = 0
 	END
 END
@@ -725,7 +726,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
 
 		    PATCH_IF inAllLevels AND total > 1 BEGIN
 		        SET durationIsValid = 1
-		        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+		        PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
 					PATCH_IF level == 1 BEGIN
 						LPF get_first_level_for_spell RET level = minLevel END
 					END
@@ -834,7 +835,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						END
 						PATCH_IF is_valid BEGIN
 					        SET durationIsValid = 1
-					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+					        PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
 								PATCH_IF level == 1 BEGIN
 									LPF get_first_level_for_spell RET level = minLevel END
 								END
@@ -907,7 +908,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 					END
 					PATCH_IF is_valid BEGIN
 				        SET durationIsValid = 1
-				        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+				        PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
 							PATCH_IF level == 1 BEGIN
 								LPF get_first_level_for_spell RET level = minLevel END
 							END
@@ -985,7 +986,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						PATCH_IF c1_is_valid AND c2_is_valid BEGIN
 							SPRINT complex_value ~%c1% + %c2%~
 					        SET durationIsValid = 1
-					        PATCH_IF isSpecialDuration AND total_durations > 0 BEGIN
+					        PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
 								PATCH_IF level == 1 BEGIN
 									LPF get_first_level_for_spell RET level = minLevel END
 								END
