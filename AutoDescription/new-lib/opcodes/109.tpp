@@ -1,22 +1,13 @@
-// Opcode 109 (State: Paralyze) : « Paralyse la cible » ; code commun dans new-lib/opcodes/states.tpp.
+// Opcode 109 (State: Paralyze) : « Paralyse la cible », ou un type de créature (« Paralyse les
+// morts-vivants ») ; code commun dans new-lib/opcodes/states.tpp.
 
-// parameter1 non nul : paralysie d'un type de créature (parameter2, fichier IDS), que l'ancien moteur
-// nomme, pas encore repris. Il décrit comme une paralysie simple un type de fichier inhabituel ou,
-// sur EE, un special non nul.
 DEFINE_PATCH_MACRO ad_op_109_support BEGIN
-	PHP_EACH fx_ids_109 AS _ => state_id BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			SET state_ids = $fx_parameter2(~%state_id%~)
-			SET state_plain = state_ids < 2 OR state_ids > 9 OR (state_ids > 8 AND NOT IS_EE) OR (IS_EE AND $fx_special(~%state_id%~) != 0)
-			PATCH_IF $fx_parameter1(~%state_id%~) != 0 AND NOT state_plain AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = state_id STR_VAR reason = ~not_implemented:opcode109:creature_type~ message = ~paralysis of a creature type~ RET render_missing = refusal END
-			END
-		END
-	END
+	SET hold_opcode = 109
+	LPM ad_hold_support
 END
 
 DEFINE_PATCH_MACRO ad_op_109_lines BEGIN
 	SET state_opcode = 109
-	SPRINT state_variant_macro ~~
+	SPRINT state_variant_macro ~ad_hold_variant~
 	LPM ad_state_lines
 END

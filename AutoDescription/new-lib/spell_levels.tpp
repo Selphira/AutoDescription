@@ -420,14 +420,18 @@ END
 // requis), search_parameter1 (au moins 1 pour l'opcode 111, ancien opcode_111_spell_level_match),
 // search_dice, search_save ; search_self : 1 si level_a en est. Durées (search_duration_level,
 // search_duration_value, search_durations) : celles qui changent depuis celle de level_a. Une durée
-// écrite par les lignes (level_special_duration) doit changer à chaque effet trouvé après le premier.
+// écrite par les lignes (level_special_duration) doit changer à chaque effet trouvé après le premier,
+// écartés compris : l'ancienne fonction rend positif l'opcode d'un effet écarté avant de le compter.
 DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 	SET search_opcode = $level_opcode(~%level_a%~)
 	SET search_id = $level_id(~%level_a%~)
 	SET search_previous_duration = $fx_duration(~%search_id%~)
+	SET search_previous_any = search_previous_duration
 	SET search_in_all = 1
 	SET search_total = 0
 	SET search_durations = 0
+	SET search_found_any = 0
+	SET search_changes_any = 0
 	SET search_self = 0
 	FOR (search_h = 0; search_h < fx_header_count AND search_in_all; ++search_h) BEGIN
 		SET search_found = 0
@@ -441,6 +445,12 @@ DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 				LPM ad_spell_level_same
 				PATCH_IF level_same BEGIN
 					SET search_found = 1
+					SET search_found_any += 1
+					SET search_any_id = $level_id(~%level_b%~)
+					PATCH_IF $fx_duration(~%search_any_id%~) != search_previous_any BEGIN
+						SET search_previous_any = $fx_duration(~%search_any_id%~)
+						SET search_changes_any += 1
+					END
 					PATCH_IF $level_on(~%level_b%~) BEGIN
 						SET search_id = $level_id(~%level_b%~)
 						SPRINT $search_match(~%search_total%~) ~%level_b%~
@@ -470,7 +480,7 @@ DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 			SET search_in_all = 0
 		END
 	END
-	PATCH_IF level_special_duration AND search_durations > 0 AND search_total - 1 != search_durations BEGIN
+	PATCH_IF level_special_duration AND search_changes_any > 0 AND search_found_any - 1 != search_changes_any BEGIN
 		SET search_in_all = 0
 	END
 END

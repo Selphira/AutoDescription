@@ -138,6 +138,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/162.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/163.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/164.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/165.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/166.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/167.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/171.tpp~
@@ -148,6 +149,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/178.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/179.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/180.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/185.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/189.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/191.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/197.tpp~
@@ -156,15 +158,24 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/205.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/206.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/207.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/209.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/210.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/211.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/213.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/216.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/217.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/218.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/219.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/221.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/230.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/231.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/232.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/233.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/235.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/238.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/241.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/244.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/247.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/248.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/249.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/opcodes/255.tpp~

@@ -299,7 +299,8 @@ END
 // n'est pas affichée : colonne DURATION du catalogue, ou durée commune de la potion
 // (charged_global_duration, new-lib/item_charged.tpp), qui remplace toutes celles de l'en-tête, et
 // dans un sous-sort qu'elle couvre (ctx_ignore_duration, new-lib/recursion.tpp) ; unité de l'opcode
-// dans AD_OPCODE_DURATION_SCALE.
+// dans AD_OPCODE_DURATION_SCALE, fraction dans AD_OPCODE_DURATION_DIVISOR, durée fixe dans
+// AD_OPCODE_FIXED_DURATION.
 DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	SPRINT app_duration_text ~~
 	SET app_opcode = $fx_opcode(~%line_fx%~)
@@ -307,8 +308,15 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	SET app_header = $fx_header(~%line_fx%~)
 	SET app_timing = $fx_timing(~%line_fx%~)
 	SET app_duration = $fx_duration(~%line_fx%~)
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FIXED_DURATION(~%app_opcode%~) BEGIN
+		SET app_timing = TIMING_duration
+		SET app_duration = $AD_OPCODE_FIXED_DURATION(~%app_opcode%~)
+	END
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION_SCALE(~%app_opcode%~) BEGIN
 		SET app_duration *= $AD_OPCODE_DURATION_SCALE(~%app_opcode%~)
+	END
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION_DIVISOR(~%app_opcode%~) BEGIN
+		SET app_duration /= $AD_OPCODE_DURATION_DIVISOR(~%app_opcode%~)
 	END
 	SPRINT app_level_duration $fx_level_duration(~%line_fx%~)
 	// Progression selon le niveau du sort (new-lib/spell_levels.tpp), calculée seulement quand les

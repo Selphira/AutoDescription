@@ -83,6 +83,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 			LPM ad_group_item_return
 			LPM ad_group_replace_item
 		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~211~) AND VARIABLE_IS_SET $fx_opcode_count(~71~) BEGIN
+			LPM ad_group_imprisonment
+		END
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_delayed_series
@@ -602,6 +605,21 @@ DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
 					END
 				END
+			END
+		END
+	END
+END
+
+// Emprisonnement (ancien opcode_211_group) : le changement de sexe en créature emprisonnée qui
+// l'accompagne (opcode 71 de parameter1 66 et parameter2 1) n'est pas écrit ; l'ancien moteur le
+// retire de la liste des effets de l'en-tête, quels que soient ses autres champs.
+DEFINE_PATCH_MACRO ad_group_imprisonment BEGIN
+	PHP_EACH fx_ids_211 AS _ => group_id BEGIN
+		SPRINT group_scope $fx_scope(~%group_id%~)
+		PHP_EACH fx_ids_71 AS _ => group_candidate BEGIN
+			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+			PATCH_IF (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_parameter1(~%group_candidate%~) == 66 AND $fx_parameter2(~%group_candidate%~) == 1 BEGIN
+				SET $fx_consumed(~%group_candidate%~) = 1
 			END
 		END
 	END

@@ -159,6 +159,18 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN
 	255 => 7200 // jours
 END
 
+// Opcodes dont l'effet ne dure qu'une fraction de la durée lue (IESDP) : diviseur entier appliqué à
+// l'affichage (ancien opcode_self_231 : « SET duration /= 2 »).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_DIVISOR BEGIN
+	231 => 2 // arrêt du temps
+END
+
+// Opcodes dont l'effet dure toujours autant, quels que soient son timing et sa durée (IESDP) :
+// secondes écrites comme une durée limitée (ancien opcode_self_217 : 5 rounds).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_FIXED_DURATION BEGIN
+	217 => 30 // inconscience
+END
+
 // Opcodes dont les lignes réunissent des effets sans tenir compte de leur portée (new-lib/normalize.tpp,
 // fx_scope) : leurs effets d'en-tête ne sont pas encore pris en charge (ad_application_support).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
@@ -172,8 +184,8 @@ END
 // charge, on ne sait pas quels effets il garde, ni donc l'en-tête d'un sort qui en a
 // (new-lib/spell_header.tpp). Un opcode qui passe à DESCRIBED sort de cette liste.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
-	57 => 1 99 => 1 105 => 1 108 => 1 115 => 1 159 => 1 181 => 1 183 => 1 185 => 1 199 => 1 209 => 1
-	211 => 1 214 => 1 220 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 238 => 1 241 => 1 243 => 1
+	57 => 1 99 => 1 105 => 1 108 => 1 115 => 1 159 => 1 181 => 1 183 => 1 199 => 1
+	214 => 1 220 => 1 223 => 1 226 => 1 227 => 1 228 => 1 236 => 1 243 => 1
 	250 => 1 251 => 1 252 => 1 259 => 1 261 => 1 262 => 1 263 => 1 266 => 1 279 => 1 283 => 1 323 => 1
 	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 346 => 1 361 => 1 362 => 1
 END

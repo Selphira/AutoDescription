@@ -1878,11 +1878,15 @@
 @21060142 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
 @21060143 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
 
-// Opcode 109 : Paralysie (21 090 000-21 090 999)
+// Opcode 109 : Paralysie : phrases 0100 paralysie, 0110 type de créature nommé (21 090 000-21 090 999)
 @21090100 = ~Hold %theTarget%~ // reprise de @11090002
 @21090101 = ~Hold %theTarget%~ // reprise de @11090002
 @21090102 = ~to hold %theTarget%~ // reprise de @11090004
 @21090103 = ~to hold %theTarget%~ // reprise de @11090004
+@21090110 = ~Hold the %creatureType%~ // reprise de @11090001
+@21090111 = ~Hold the %creatureType%~ // reprise de @11090001
+@21090112 = ~to hold the %creatureType%~ // reprise de @11090003
+@21090113 = ~to hold the %creatureType%~ // reprise de @11090003
 
 // Opcode 111 : arme magique créée : 0001-0002 « arme magique », « armes magiques », 0003 nombre et
 // libellé ; phrases 0100 une arme, 0110 plusieurs (21 110 000-21 110 999)
@@ -2144,6 +2148,12 @@
 @21640102 = ~to sober up %theTarget%~ // reprise de @11640003
 @21640103 = ~to sober up %theTarget%~ // reprise de @11640003
 
+// Opcode 165 : Pause de la cible : phrases 0100 (21 650 000-21 650 999)
+@21650100 = ~Pause %theTarget%~ // reprise de @11650001
+@21650101 = ~Pause %theTarget%~ // reprise de @11650002
+@21650102 = ~to pause %theTarget%~ // reprise de @11650003
+@21650103 = ~to pause %theTarget%~ // reprise de @11650004
+
 // Opcode 166 : libellés (21 660 000-21 660 099)
 @21660000 = ~Magic Resistance~ // reprise de @11660001
 @21660001 = ~from magic~ // reprise de @11660002
@@ -2168,11 +2178,15 @@
 @21730000 = ~Poison Resistance~ // reprise de @11730001
 @21730001 = ~to poison~ // reprise de @11730002
 
-// Opcode 175 : paralysie, phrase du 109 (21 750 000-21 750 999)
+// Opcode 175 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 750 000-21 750 999)
 @21750100 = ~Hold %theTarget%~ // reprise de @11090002
 @21750101 = ~Hold %theTarget%~ // reprise de @11090002
 @21750102 = ~to hold %theTarget%~ // reprise de @11090004
 @21750103 = ~to hold %theTarget%~ // reprise de @11090004
+@21750110 = ~Hold the %creatureType%~ // reprise de @11090001
+@21750111 = ~Hold the %creatureType%~ // reprise de @11090001
+@21750112 = ~to hold the %creatureType%~ // reprise de @11090003
+@21750113 = ~to hold the %creatureType%~ // reprise de @11090003
 
 // Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique, 0002 libellé de la forme « cible » (21 780 000-21 780 999)
 @21780000 = ~THAC0~ // reprise de @10540001
@@ -2184,6 +2198,16 @@
 
 // Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
 @21800100 = ~Unique : Only one copy can be equipped~ // reprise de @11800001
+
+// Opcode 185 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 850 000-21 850 999)
+@21850100 = ~Hold %theTarget%~ // reprise de @11090002
+@21850101 = ~Hold %theTarget%~ // reprise de @11090002
+@21850102 = ~to hold %theTarget%~ // reprise de @11090004
+@21850103 = ~to hold %theTarget%~ // reprise de @11090004
+@21850110 = ~Hold the %creatureType%~ // reprise de @11090001
+@21850111 = ~Hold the %creatureType%~ // reprise de @11090001
+@21850112 = ~to hold the %creatureType%~ // reprise de @11090003
+@21850113 = ~to hold the %creatureType%~ // reprise de @11090003
 
 // Opcode 189 : Temps d'incantation : 0000 nom, 0002 statistique ; 0003 temps maximal, 0005 sa statistique (21 890 000-21 890 999)
 @21890000 = ~Casting time~ // reprise de @11890001
@@ -2242,6 +2266,35 @@
 @22070100 = ~Reflects the spell %spellName%~ // reprise de @12070001
 @22070102 = ~to reflect the spell %spellName%~ // reprise de @12070002
 
+// Opcode 209 : Mort à moins de 60 points de vie : 0001 condition, phrases 0100 (22 090 000-22 090 999)
+@22090001 = ~if its hit points are below 60~ // reprise de @12090001
+@22090100 = ~Instantly slays %theTarget%~ // reprise de @500004
+@22090101 = ~Instantly slays %theTarget%~ // reprise de @500004
+@22090102 = ~to kill instantly %theTarget%~ // reprise de @500104
+@22090103 = ~to kill instantly %theTarget%~ // reprise de @500104
+
+// Opcode 210 : Étourdissement à moins de 90 points de vie : phrases 0100 (22 100 000-22 100 999)
+@22100100 = ~Stuns %theTarget% when its hit points are below 90, duration depends on remaining hit points~ // reprise de @12100001
+@22100101 = ~Stuns %theTarget% when its hit points are below 90, duration depends on remaining hit points~ // reprise de @12100001
+@22100102 = ~to stun %theTarget% when its hit points are below 90, duration depends on remaining hit points~ // reprise de @12100002
+@22100103 = ~to stun %theTarget% when its hit points are below 90, duration depends on remaining hit points~ // reprise de @12100002
+
+// Opcode 211 : Emprisonnement : phrases 0100 (22 110 000-22 110 999)
+@22110100 = ~Imprisons %theTarget%~ // reprise de @12110001
+@22110101 = ~Imprisons %theTarget%~ // reprise de @12110001
+@22110102 = ~to imprison %theTarget%~ // reprise de @12110002
+@22110103 = ~to imprison %theTarget%~ // reprise de @12110002
+
+// Opcode 213 : Labyrinthe : phrases 0100 durée selon l'Intelligence, 0110 durée de l'effet (EE) (22 130 000-22 130 999)
+@22130100 = ~Vanishes %theTarget% into the shifting labyrinth, duration depends on Intelligence~ // reprise de @12130001
+@22130101 = ~Vanishes %theTarget% into the shifting labyrinth, duration depends on Intelligence~ // reprise de @12130001
+@22130102 = ~to vanishe %theTarget% into the shifting labyrinth, duration depends on Intelligence~ // reprise de @12130002
+@22130103 = ~to vanishe %theTarget% into the shifting labyrinth, duration depends on Intelligence~ // reprise de @12130002
+@22130110 = ~Vanishes %theTarget% into the shifting labyrinth~ // reprise de @12130003
+@22130111 = ~Vanishes %theTarget% into the shifting labyrinth~ // reprise de @12130003
+@22130112 = ~to vanishe %theTarget% into the shifting labyrinth~ // reprise de @12130004
+@22130113 = ~to vanishe %theTarget% into the shifting labyrinth~ // reprise de @12130004
+
 // Opcode 216 : Drain de niveaux : phrases 0100 un niveau, 0110 plusieurs, 0120 passage de niveau inhibé, 0130 un niveau injecté (22 160 000-22 160 999)
 @22160100 = ~Drains 1 level from %theTarget%~ // reprise de @12160001
 @22160101 = ~Drains 1 level from %theTarget%~ // reprise de @12160001
@@ -2259,6 +2312,17 @@
 @22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+
+// Opcode 217 : Inconscience à moins de 20 points de vie : 0001 condition, phrases du 39 : 0100 sommeil, 0110 sommeil profond (22 170 000-22 170 999)
+@22170001 = ~if its hit points are below 20~
+@22170100 = ~Sleeps %theTarget%~ // reprise de @10390001
+@22170101 = ~Sleeps %theTarget%~ // reprise de @10390001
+@22170102 = ~to sleep %theTarget%~ // reprise de @10390002
+@22170103 = ~to sleep %theTarget%~ // reprise de @10390002
+@22170110 = ~Renders %theTarget% unconscious~ // reprise de @10390003
+@22170111 = ~Renders %theTarget% unconscious~ // reprise de @10390003
+@22170112 = ~to render %theTarget% unconscious~ // reprise de @10390004
+@22170113 = ~to render %theTarget% unconscious~ // reprise de @10390004
 
 // Opcode 218 : Peau de pierre : 0000 nombre et type, 0001-0002 type au singulier et au pluriel, phrases 0100 (22 180 000-22 180 999)
 @22180000 = ~%value% %valueType%~ // reprise de @102165
@@ -2288,6 +2352,12 @@
 @22300111 = ~Dispels one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300003
 @22300112 = ~to dispel one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300004
 @22300113 = ~to dispel one %spellSecondaryTypeName% spell on %theTarget%~ // reprise de @12300004
+
+// Opcode 231 : Arrêt du temps : phrases 0100 (22 310 000-22 310 999)
+@22310100 = ~Time stop~ // reprise de @12310001
+@22310101 = ~Cast Time stop~ // reprise de @12310002
+@22310102 = ~to cast Time stop~ // reprise de @12310003
+@22310103 = ~to cast Time stop~ // reprise de @12310003
 
 // Opcode 232 : sort lancé sous condition : 0001 sort nommé à plusieurs lignes, 0010 + parameter2 conditions
 // (0020 chaque round, 0024 distance, 0029-0030 points de vie, 0031 état de sort), 1000 + 10 × forme + parameter1
@@ -2349,6 +2419,19 @@
 @22350132 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
 @22350133 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
 
+// Opcode 238 : Désintégration : phrases 0100 (22 380 000-22 380 999)
+@22380100 = ~Disintegrates %theTarget%~ // reprise de @500011
+@22380101 = ~Disintegrates %theTarget%~ // reprise de @500011
+@22380102 = ~to disintegrate %theTarget%~ // reprise de @500111
+@22380103 = ~to disintegrate %theTarget%~ // reprise de @500111
+
+// Opcode 241 : Contrôle d'une créature : phrases du 5 : 0100 charme, 0110 sans restriction ; pas de forme « soi » probable, comme dans l'ancien moteur (22 410 000-22 410 999)
+@22410100 = ~Charm %theTarget%~ // reprise de @10050001
+@22410101 = ~Charm %theTarget%~ // reprise de @10050001
+@22410103 = ~to charm %theTarget%~ // reprise de @10050002
+@22410111 = ~Universal charm on %theTarget%~ // reprise de @10050003
+@22410113 = ~to charm %theTarget%~ // reprise de @10050002
+
 // Opcode 244 : Drain de sorts profanes : phrases 0100 un sort, 0110 plusieurs (22 440 000-22 440 999)
 @22440100 = ~Drains 1 wizard spell %ofTheTarget%~ // reprise de @12440001
 @22440101 = ~Drains 1 wizard spell %ofTheTarget%~ // reprise de @12440001
@@ -2358,6 +2441,13 @@
 @22440111 = ~Drains %amount% wizard spells %ofTheTarget%~ // reprise de @12440002
 @22440112 = ~to drain %amount% wizard spells %ofTheTarget%~ // reprise de @12440004
 @22440113 = ~to drain %amount% wizard spells %ofTheTarget%~ // reprise de @12440004
+
+// Opcode 247 : Attaque de la créature la plus proche : 0001 « En combat », phrases 0100 (22 470 000-22 470 999)
+@22470001 = ~In combat~ // reprise de @12470003
+@22470100 = ~Causes %theTarget% to go berserk~ // reprise de @12470001
+@22470101 = ~Causes %theTarget% to go berserk~ // reprise de @12470001
+@22470102 = ~of causing %theTarget% to go berserk~ // reprise de @12470002
+@22470103 = ~of causing %theTarget% to go berserk~ // reprise de @12470002
 
 // Opcode 248 : effet à chaque attaque de mêlée réussie : 0001-0006 conditions (0002, 0004, 0006 à mains nues ;
 // 0003-0004 d'une cible, 0005-0006 probables), 0010-0012 attaque réussie avec l'opcode 249 (22 480 000-22 480 099)

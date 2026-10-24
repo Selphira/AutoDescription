@@ -28,12 +28,11 @@
 | MARW301.SPL | opcodes not supported yet: 190 |  |  | `missing_opcodes:190` | not described |
 | MARW401.SPL | opcodes not supported yet: 188 |  |  | `missing_opcodes:188` | not described |
 | MELIS02.SPL | proficiency 121 has no name | ability 0, effect 1 | opcode **233**, target **1**, parameter1 **2**, parameter2 **121**, timing **0**, duration **62**, power **7**, resistance **3** | `opcode233:no_name` | effect ignored |
-| OHBDEMI3.SPL | opcodes not supported yet: 213 |  |  | `missing_opcodes:213` | not described |
+| OHBDEMI3.SPL | gender set to a given value | ability 0, effect 0, CDWI910.EFF (opcode 177) | opcode **71**, target **2**, parameter1 **66**, parameter2 **1**, timing **1**, duration **0**, resource **BOTSMITH** | `opcode71:gender_set` | not described |
 | OHBRESTO.SPL | opcodes not supported yet: 224 242 |  |  | `missing_opcodes:224 242` | not described |
 | OHBWI302.SPL | opcodes not supported yet: 136 |  |  | `missing_opcodes:136` | not described |
 | OHBWI304.SPL | opcodes not supported yet: 136 |  |  | `missing_opcodes:136` | not described |
-| OHDCUT02.SPL | opcodes not supported yet: 231 |  |  | `missing_opcodes:231` | not described |
-| OHHDRAIN.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
+| OHHDRAIN.SPL | delayed effect casting a spell (the old engine writes it as a condition) | ability 0, effect 0, OHHDRAI2.EFF (opcode 177) | opcode **146**, target **2**, parameter1 **1**, parameter2 **1**, timing **4**, duration **12**, saving throw type **4**, saving throw bonus **6**, resource **OHHDRAI2** | `recursion:delayed` | not described |
 | OHHSUMM.SPL | random number of creatures | ability 0, effect 2 | opcode **67**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **6**, power **1**, probability1 **25**, probability2 **0**, resource **OHHRAT** | `opcode67:random_amount` | not described |
 | OHNDDOOR.SPL | opcodes not supported yet: 124 |  |  | `missing_opcodes:124` | not described |
 | OHNRDTEL.SPL | opcodes not supported yet: 68 |  |  | `missing_opcodes:68` | not described |
@@ -76,7 +75,6 @@
 | SPCL521.SPL | opcodes not supported yet: 250 |  |  | `missing_opcodes:250` | not described |
 | SPCL621.SPL | opcodes not supported yet: 214 |  |  | `missing_opcodes:214` | not described |
 | SPCL732.SPL | opcodes not supported yet: 220 |  |  | `missing_opcodes:220` | not described |
-| SPCL742.SPL | opcodes not supported yet: 185 |  |  | `missing_opcodes:185` | not described |
 | SPCL902.SPL | EFF file with a level restriction | ability 0, effect 0 (opcode 248) > SPCL902.EFF | opcode **248**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **12**, resistance **2**, resource **SPCL902** | `recursion:eff_level` | not described |
 | SPCL903.SPL | EFF file with a level restriction | ability 0, effect 0 (opcode 248) > SPCL903.EFF | opcode **248**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **12**, resistance **2**, resource **SPCL903** | `recursion:eff_level` | not described |
 | SPCL910.SPL | opcodes not supported yet: 252 |  |  | `missing_opcodes:252` | not described |
@@ -89,9 +87,7 @@
 | SPCL929.SPL | opcode 42 is only described as an equipped effect | ability 0, effect 1 | opcode **42**, target **1**, parameter1 **1**, parameter2 **64**, timing **9**, duration **0**, resistance **2** | `opcode42:ability` | not described |
 | SPCL930.SPL | opcode 42 is only described as an equipped effect | ability 0, effect 1 | opcode **42**, target **1**, parameter1 **1**, parameter2 **128**, timing **9**, duration **0**, resistance **2** | `opcode42:ability` | not described |
 | SPCL936.SPL | opcodes not supported yet: 236 |  |  | `missing_opcodes:236` | not described |
-| SPCL937.SPL | opcodes not supported yet: 213 |  |  | `missing_opcodes:213` | not described |
 | SPCL941.SPL | opcodes not supported yet: 208 |  |  | `missing_opcodes:208` | not described |
-| SPDD03.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPDM108.SPL | spell already described by this resource | ability 1, effect 2 | opcode **146**, target **2**, parameter1 **6**, parameter2 **1**, timing **1**, duration **0**, power **3**, resistance **1**, resource **SPIN106A** | `recursion:repeated` | not described |
 | SPIN103.SPL | opcodes not supported yet: 132 |  |  | `missing_opcodes:132` | not described |
 | SPIN104.SPL | condition 43 not supported | ability 0, effect 0 | opcode **318**, target **2**, parameter1 **0**, parameter2 **43**, timing **0**, duration **0**, power **1**, resource **SPIN104** | `opcode318:stat` | not described |
@@ -106,17 +102,15 @@
 | SPIN151.SPL | polymorph back to natural form | ability 0, effect 17 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3600000** | `opcode135:natural_form` | not described |
 | SPIN529.SPL | polymorph back to natural form | ability 0, effect 19 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3666000**, resistance **3** | `opcode135:natural_form` | not described |
 | SPIN538.SPL | effect from an EFF file | ability 0, effect 4, PLYSQUWE.EFF (opcode 177) | opcode **111**, target **2**, parameter1 **1**, parameter2 **1**, timing **0**, duration **3600000**, power **4**, resistance **1**, saving throw type **16**, saving throw bonus **-4**, resource **SQUIRP** | `opcode111:external` | not described |
-| SPIN542.SPL | opcodes not supported yet: 238 |  |  | `missing_opcodes:238` | not described |
 | SPIN545.SPL | condition 43 not supported | ability 0, effect 0 | opcode **318**, target **2**, parameter1 **0**, parameter2 **43**, timing **0**, duration **0**, power **4**, resistance **2**, resource **SPIN545** | `opcode318:stat` | not described |
 | SPIN572.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **93**, target **2**, parameter1 **4**, parameter2 **0**, timing **4**, duration **48**, power **3**, resistance **2** | `opcode93:form1` | not described |
-| SPIN580.SPL | opcodes not supported yet: 211 |  |  | `missing_opcodes:211` | not described |
+| SPIN580.SPL | effect with a creature type grouped with other effects | ability 0, effect 0, CDWI910.EFF (opcode 177) | opcode **71**, target **2**, parameter1 **66**, parameter2 **1**, timing **4**, duration **1**, resource **BOTSMITH** | `opcode177:versus_group` | not described |
 | SPIN608.SPL | no sentence 22060101 for this form (target or probable effect) | ability 0, effect 7 | opcode **206**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **7200**, power **10**, resistance **3**, resource **SPWI611** | `phrase22060100:form1` | not described |
 | SPIN613.SPL | opcodes not supported yet: 283 |  |  | `missing_opcodes:283` | not described |
 | SPIN623.SPL | effect from an EFF file | ability 0, effect 4, PLYRABWE.EFF (opcode 177) | opcode **111**, target **2**, parameter1 **1**, parameter2 **1**, timing **0**, duration **120**, power **4**, resource **SQUIRP** | `opcode111:external` | not described |
 | SPIN633.SPL | opcodes not supported yet: 193 |  |  | `missing_opcodes:193` | not described |
 | SPIN634.SPL | opcodes not supported yet: 283 |  |  | `missing_opcodes:283` | not described |
 | SPIN635.SPL | opcodes not supported yet: 283 |  |  | `missing_opcodes:283` | not described |
-| SPIN648.SPL | hold of a creature type | ability 0, effect 3 | opcode **175**, target **2**, parameter1 **1**, parameter2 **3**, timing **1**, duration **0**, power **1**, resistance **2** | `opcode175:creature_type` | not described |
 | SPIN651.SPL | opcodes not supported yet: 193 |  |  | `missing_opcodes:193` | not described |
 | SPIN655.SPL | no sentence 30100101 for this form (target or probable effect) | ability 0, effect 6 | opcode **206**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **90**, power **6**, resistance **1**, resource **SPWI305** | `phrase30100100:form1` | not described |
 | SPIN667.SPL | polymorph back to natural form | ability 0, effect 19 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3666000**, resistance **3** | `opcode135:natural_form` | not described |
@@ -129,14 +123,11 @@
 | SPIN718.SPL | polymorph back to natural form | ability 0, effect 19 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3666000**, resistance **3** | `opcode135:natural_form` | not described |
 | SPIN718A.SPL | polymorph back to natural form | ability 0, effect 19 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3666000**, resistance **3** | `opcode135:natural_form` | not described |
 | SPIN737.SPL | opcodes not supported yet: 261 |  |  | `missing_opcodes:261` | not described |
-| SPIN774.SPL | opcodes not supported yet: 213 |  |  | `missing_opcodes:213` | not described |
-| SPIN788.SPL | opcodes not supported yet: 211 |  |  | `missing_opcodes:211` | not described |
+| SPIN788.SPL | effect with a creature type grouped with other effects | ability 0, effect 0, CDWI910.EFF (opcode 177) | opcode **71**, target **2**, parameter1 **66**, parameter2 **1**, timing **1**, duration **0**, resource **BOTSMITH** | `opcode177:versus_group` | not described |
 | SPIN826.SPL | several strength modifiers | ability 2, effect 1 | opcode **97**, target **2**, parameter1 **100**, parameter2 **1**, timing **0**, duration **180**, power **5**, resistance **3** | `opcode97:several_strength` | not described |
-| SPIN837.SPL | opcodes not supported yet: 231 |  |  | `missing_opcodes:231` | not described |
-| SPIN852.SPL | opcodes not supported yet: 247 |  |  | `missing_opcodes:247` | not described |
-| SPIN853.SPL | opcodes not supported yet: 185 |  |  | `missing_opcodes:185` | not described |
+| SPIN853.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 28 | opcode **85**, target **2**, parameter1 **100**, parameter2 **1**, timing **1**, duration **42**, power **4**, resistance **1** | `opcode85:form1` | not described |
 | SPIN891.SPL | effect with a creature type grouped with other effects | ability 0, effect 24, MOOND8.EFF (opcode 177) | opcode **12**, target **2**, parameter1 **5**, parameter2 **4194304**, timing **4**, duration **12**, saving throw type **16777216**, saving throw bonus **0**, parameter3 **4** | `opcode177:versus_group` | not described |
-| SPIN944.SPL | opcodes not supported yet: 210 |  |  | `missing_opcodes:210` | not described |
+| SPIN944.SPL | exception for another resource than SPIN944 | ability 0, effect 0 | opcode **324**, target **2**, parameter1 **90**, parameter2 **144**, timing **0**, duration **0**, resource **SPWI715** | `opcode324:resource` | not described |
 | SPINHUM.SPL | polymorph back to natural form | ability 0, effect 17 | opcode **135**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **3600000**, resistance **2** | `opcode135:natural_form` | not described |
 | SPJA01.SPL | opcodes not supported yet: 367 | ability 0, effect 1 (opcode 326) > SPJA01A.SPL | opcode **326**, target **2**, parameter1 **3**, parameter2 **103**, timing **1**, duration **0**, power **5**, resistance **2**, resource **SPJA01A** | `recursion:missing_opcodes:367` | not described |
 | SPMDSLAY.SPL | item SLAYERWP.ITM has no name | ability 0, effect 4 | opcode **112**, target **1**, parameter1 **0**, parameter2 **0**, timing **1**, duration **0**, resistance **2**, resource **SLAYERWP** | `opcode112:no_name` | not described |
@@ -188,12 +179,10 @@
 | SPPR203.SPL | opcodes not supported yet: 131 | ability 0, effect 0 (opcode 146) > SPPR203D.SPL | opcode **146**, target **1**, parameter1 **0**, parameter2 **1**, timing **1**, duration **0**, resource **SPPR203D** | `recursion:missing_opcodes:131` | not described |
 | SPPR205.SPL | opcodes not supported yet: 150 |  |  | `missing_opcodes:150` | not described |
 | SPPR205D.SPL | opcodes not supported yet: 150 |  |  | `missing_opcodes:150` | not described |
-| SPPR208.SPL | hold of a creature type | ability 0, effect 3 | opcode **175**, target **2**, parameter1 **1**, parameter2 **3**, timing **0**, duration **60**, power **2**, resistance **1**, saving throw type **1**, saving throw bonus **0** | `opcode175:creature_type` | not described |
 | SPPR209.SPL | opcodes not supported yet: 115 |  |  | `missing_opcodes:115` | not described |
 | SPPR210.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 8 | opcode **85**, target **2**, parameter1 **50**, parameter2 **0**, timing **0**, duration **6**, power **2**, resistance **3** | `opcode85:form1` | not described |
 | SPPR214.SPL | opcodes not supported yet: 132 |  |  | `missing_opcodes:132` | not described |
 | SPPR250.SPL | no sentence 22060101 for this form (target or probable effect) | ability 0, effect 9 | opcode **206**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **5**, power **2**, resource **SPPR250** | `phrase22060100:form1` | not described |
-| SPPR305.SPL | hold of a creature type | ability 0, effect 2 | opcode **175**, target **2**, parameter1 **2**, parameter2 **3**, timing **0**, duration **60**, power **3**, resistance **1**, saving throw type **1**, saving throw bonus **0** | `opcode175:creature_type` | not described |
 | SPPR306.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **84**, target **2**, parameter1 **80**, parameter2 **0**, timing **0**, duration **24**, power **3**, resistance **3** | `opcode84:form1` | not described |
 | SPPR307.SPL | opcodes not supported yet: 26 |  |  | `missing_opcodes:26` | not described |
 | SPPR312.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **97**, target **2**, parameter1 **75**, parameter2 **1**, timing **0**, duration **60**, power **3**, resistance **3** | `opcode97:form1` | not described |
@@ -279,25 +268,20 @@
 | SPPR713.SPL | opcodes not supported yet: 224 242 |  |  | `missing_opcodes:224 242` | not described |
 | SPPR715.SPL | level restriction of an effect from an EFF file not supported | ability 0, effect 0, DEATH.EFF (opcode 177) | opcode **13**, target **2**, parameter1 **0**, parameter2 **4**, timing **1**, duration **0**, dice **3d0**, parameter3 **2** | `application:level` | not described |
 | SPPR717.SPL | repeated effect casting a spell | ability 0, effect 6 | opcode **146**, target **2**, parameter1 **0**, parameter2 **1**, timing **4**, duration **0**, power **7**, resistance **1**, resource **FLPR717A** | `recursion:series` | not described |
-| SPPR719.SPL | opcodes not supported yet: 209 |  |  | `missing_opcodes:209` | not described |
 | SPPR722.SPL | grouped effect with exceptions | ability 0, effect 8 | opcode **12**, target **2**, parameter1 **0**, parameter2 **65536**, timing **4**, duration **12**, power **7**, resistance **1**, dice **1d6**, saving throw type **16777217**, saving throw bonus **0**, special **256** | `opcode318:exceptions_group` | not described |
 | SPPR723.SPL | no sentence 30100103 for this form (target or probable effect) | ability 0, effect 9 | opcode **206**, target **3**, parameter1 **74011**, parameter2 **0**, timing **0**, duration **60**, resistance **2**, probability1 **100**, probability2 **70**, resource **SPPR724** | `phrase30100100:form3` | not described |
 | SPPR724.SPL | no sentence 30100101 for this form (target or probable effect) | ability 0, effect 3 | opcode **206**, target **3**, parameter1 **74011**, parameter2 **0**, timing **0**, duration **60**, resistance **2**, resource **SPPR723** | `phrase30100100:form1` | not described |
 | SPPR725.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 3 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **60**, power **7**, resistance **3**, resource **SPPR725D** | `spell_header:opcode177_eff_fields` | not described |
 | SPPR729.SPL | spell already described by this resource | ability 1, effect 0 | opcode **326**, target **6**, parameter1 **3**, parameter2 **103**, timing **1**, duration **0**, power **7**, resistance **2**, resource **SPPR729A** | `recursion:repeated` | not described |
 | SPPR730.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 12 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **42**, power **7**, resistance **3**, resource **SPPR730D** | `spell_header:opcode177_eff_fields` | not described |
-| SPPR750.SPL | opcodes not supported yet: 213 |  |  | `missing_opcodes:213` | not described |
 | SPRA301.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 7 | opcode **93**, target **2**, parameter1 **4**, parameter2 **0**, timing **4**, duration **48**, power **3**, resistance **2** | `opcode93:form1` | not described |
 | SPRA302.SPL | same effect twice (the old engine merges them) | ability 0, effect 6 | opcode **233**, target **1**, parameter1 **1**, parameter2 **116**, timing **0**, duration **90**, power **3** | `opcode233:same_effect_twice` | not described |
 | SPRA304.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **180**, resource **SPANIM1** | `spell_header:opcode177_eff_fields` | not described |
 | SPRA305.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **180**, resistance **3**, resource **SPANIM2** | `spell_header:opcode177_eff_fields` | not described |
 | SPRA306.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **240**, resistance **3**, resource **SPANIM3** | `spell_header:opcode177_eff_fields` | not described |
-| SPSD02.SPL | opcodes not supported yet: 231 |  |  | `missing_opcodes:231` | not described |
-| SPWI055.SPL | opcodes not supported yet: 238 |  |  | `missing_opcodes:238` | not described |
-| SPWI056.SPL | opcodes not supported yet: 238 |  |  | `missing_opcodes:238` | not described |
+| SPSD02.SPL | opcode 145 is only described as an equipped effect | ability 0, effect 24 | opcode **145**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **7** | `opcode145:ability` | not described |
 | SPWI101.SPL | no sentence 1210141 for this form (target or probable effect) | ability 0, effect 2 | opcode **126**, target **2**, parameter1 **20**, parameter2 **5**, timing **0**, duration **24**, power **1**, resistance **1**, saving throw type **1**, saving throw bonus **2** | `phrase1210140:form1` | not described |
-| SPWI103.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
-| SPWI105.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
+| SPWI103.SPL | duration of 5 ticks, under one second | ability 0, effect 1 | opcode **165**, target **1**, parameter1 **0**, parameter2 **0**, timing **10**, duration **5**, power **1** | `application:ticks` | not described |
 | SPWI110.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 0 | opcode **21**, target **3**, parameter1 **0**, parameter2 **2**, timing **2**, duration **0**, power **1**, resistance **3** | `opcode21:form1` | not described |
 | SPWI113.SPL | proficiency 117 has no name | ability 0, effect 2 | opcode **233**, target **2**, parameter1 **1**, parameter2 **117**, timing **0**, duration **12**, power **1**, resistance **3** | `opcode233:no_name` | effect ignored |
 | SPWI113.SPL | proficiency 117 has no name | ability 1, effect 2 | opcode **233**, target **2**, parameter1 **1**, parameter2 **117**, timing **0**, duration **24**, power **1**, resistance **3** | `opcode233:no_name` | effect ignored |
@@ -329,11 +313,8 @@
 | SPWI208.SPL | opcodes not supported yet: 115 |  |  | `missing_opcodes:115` | not described |
 | SPWI209.SPL | opcodes not supported yet: 133 |  |  | `missing_opcodes:133` | not described |
 | SPWI214.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 2 | opcode **97**, target **2**, parameter1 **50**, parameter2 **0**, timing **0**, duration **180**, power **2**, resistance **3** | `opcode97:form1` | not described |
-| SPWI217.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
-| SPWI220.SPL | opcodes not supported yet: 217 |  |  | `missing_opcodes:217` | not described |
 | SPWI301.SPL | opcodes not supported yet: 117 |  |  | `missing_opcodes:117` | not described |
 | SPWI305.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 7 | opcode **93**, target **2**, parameter1 **4**, parameter2 **0**, timing **4**, duration **48**, power **3**, resistance **2** | `opcode93:form1` | not described |
-| SPWI306.SPL | hold of a creature type | ability 0, effect 3 | opcode **175**, target **2**, parameter1 **1**, parameter2 **3**, timing **0**, duration **60**, power **3**, resistance **1**, saving throw type **1**, saving throw bonus **-1** | `opcode175:creature_type` | not described |
 | SPWI309.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **42**, resistance **2**, probability1 **60**, probability2 **0**, resource **SPMON1** | `spell_header:opcode177_eff_fields` | not described |
 | SPWI314.SPL | spell already described by this resource | ability 1, effect 2 | opcode **146**, target **2**, parameter1 **6**, parameter2 **1**, timing **1**, duration **0**, power **3**, resistance **1**, resource **SPWI314A** | `recursion:repeated` | not described |
 | SPWI315.SPL | opcode 145 is only described as an equipped effect | ability 0, effect 3 | opcode **145**, target **1**, parameter1 **0**, parameter2 **0**, timing **0**, duration **12**, power **3**, resistance **1** | `opcode145:ability` | not described |
@@ -341,7 +322,6 @@
 | SPWI319.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **84**, target **2**, parameter1 **50**, parameter2 **0**, timing **0**, duration **300**, power **3**, resistance **3** | `opcode84:form1` | not described |
 | SPWI320.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **85**, target **2**, parameter1 **50**, parameter2 **0**, timing **0**, duration **300**, power **3**, resistance **3** | `opcode85:form1` | not described |
 | SPWI322.SPL | opcodes not supported yet: 220 |  |  | `missing_opcodes:220` | not described |
-| SPWI324.SPL | opcodes not supported yet: 185 |  |  | `missing_opcodes:185` | not described |
 | SPWI402.SPL | opcodes not supported yet: 124 |  |  | `missing_opcodes:124` | not described |
 | SPWI403.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 11 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **60**, power **4**, resistance **3**, resource **SPWI403D** | `spell_header:opcode177_eff_fields` | not described |
 | SPWI407.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **60**, resistance **3**, probability1 **60**, probability2 **0**, resource **SPMON2** | `spell_header:opcode177_eff_fields` | not described |
@@ -360,10 +340,7 @@
 | SPWI504.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 0 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **78**, resistance **3**, probability1 **60**, probability2 **0**, resource **SPMON3** | `spell_header:opcode177_eff_fields` | not described |
 | SPWI510.SPL | opcodes not supported yet: 214 |  |  | `missing_opcodes:214` | not described |
 | SPWI515.SPL | opcodes not supported yet: 220 |  |  | `missing_opcodes:220` | not described |
-| SPWI516.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPWI519.SPL | opcodes not supported yet: 226 |  |  | `missing_opcodes:226` | not described |
-| SPWI520.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
-| SPWI521.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPWI522.SPL | proficiency 129 has no name | ability 0, effect 2 | opcode **233**, target **1**, parameter1 **1**, parameter2 **129**, timing **0**, duration **90**, power **5**, resistance **2** | `opcode233:no_name` | effect ignored |
 | SPWI522.SPL | proficiency 129 has no name | ability 1, effect 2 | opcode **233**, target **1**, parameter1 **1**, parameter2 **129**, timing **0**, duration **108**, power **5**, resistance **2** | `opcode233:no_name` | effect ignored |
 | SPWI522.SPL | proficiency 129 has no name | ability 2, effect 2 | opcode **233**, target **1**, parameter1 **1**, parameter2 **129**, timing **0**, duration **126**, power **5**, resistance **2** | `opcode233:no_name` | effect ignored |
@@ -396,11 +373,7 @@
 | SPWI609.SPL | opcodes not supported yet: 220 |  |  | `missing_opcodes:220` | not described |
 | SPWI611.SPL | proficiency 128 has no name | ability 0, effect 11 | opcode **233**, target **1**, parameter1 **4**, parameter2 **128**, timing **0**, duration **24**, power **6**, resistance **3** | `opcode233:no_name` | effect ignored |
 | SPWI613.SPL | no sentence 30100101 for this form (target or probable effect) | ability 8, effect 6 | opcode **206**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **138**, power **6**, resistance **1**, resource **SPRA301** | `phrase30100100:form1` | not described |
-| SPWI616.SPL | opcodes not supported yet: 238 |  |  | `missing_opcodes:238` | not described |
 | SPWI618.SPL | same effect twice (the old engine merges them) | ability 0, effect 9 | opcode **233**, target **1**, parameter1 **2**, parameter2 **116**, timing **0**, duration **216**, power **6**, resistance **2** | `opcode233:same_effect_twice` | not described |
-| SPWI620.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
-| SPWI621.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
-| SPWI622.SPL | opcodes not supported yet: 165 |  |  | `missing_opcodes:165` | not described |
 | SPWI701.SPL | same effect twice (the old engine merges them) | ability 0, effect 9 | opcode **233**, target **1**, parameter1 **2**, parameter2 **129**, timing **0**, duration **252**, power **7**, resistance **2** | `opcode233:same_effect_twice` | not described |
 | SPWI702.SPL | proficiency 130 has no name | ability 0, effect 10 | opcode **233**, target **2**, parameter1 **1**, parameter2 **130**, timing **0**, duration **84**, power **7**, resistance **3** | `opcode233:no_name` | effect ignored |
 | SPWI702.SPL | proficiency 130 has no name | ability 1, effect 10 | opcode **233**, target **2**, parameter1 **1**, parameter2 **130**, timing **0**, duration **90**, power **7**, resistance **3** | `opcode233:no_name` | effect ignored |
@@ -413,30 +386,24 @@
 | SPWI703.SPL | opcodes not supported yet: 236 |  |  | `missing_opcodes:236` | not described |
 | SPWI705.SPL | proficiency 132 has no name | ability 0, effect 9 | opcode **233**, target **2**, parameter1 **1**, parameter2 **132**, timing **0**, duration **13**, power **7** | `opcode233:no_name` | effect ignored |
 | SPWI708.SPL | proficiency 128 has no name | ability 0, effect 11 | opcode **233**, target **1**, parameter1 **1**, parameter2 **128**, timing **0**, duration **24**, power **7**, resistance **3** | `opcode233:no_name` | effect ignored |
-| SPWI711.SPL | opcodes not supported yet: 222 238 |  |  | `missing_opcodes:222 238` | not described |
-| SPWI714.SPL | opcodes not supported yet: 238 |  |  | `missing_opcodes:238` | not described |
-| SPWI715.SPL | opcodes not supported yet: 210 |  |  | `missing_opcodes:210` | not described |
-| SPWI720.SPL | opcodes not supported yet: 241 |  |  | `missing_opcodes:241` | not described |
+| SPWI711.SPL | opcodes not supported yet: 222 |  |  | `missing_opcodes:222` | not described |
+| SPWI714.SPL | probable lines whose order the old engine sets differently |  |  | `application:probability_order` | not described |
 | SPWI802.SPL | proficiency 116 has no name | ability 0, effect 11 | opcode **233**, target **1**, parameter1 **2**, parameter2 **116**, timing **0**, duration **288**, power **8**, resistance **1** | `opcode233:no_name` | effect ignored |
 | SPWI803.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 7 | opcode **31**, target **2**, parameter1 **75**, parameter2 **0**, timing **0**, duration **96**, power **8**, resistance **3** | `opcode31:form1` | not described |
 | SPWI804.SPL | opcodes not supported yet: 236 |  |  | `missing_opcodes:236` | not described |
 | SPWI808.SPL | proficiency 128 has no name | ability 0, effect 12 | opcode **233**, target **1**, parameter1 **2**, parameter2 **128**, timing **0**, duration **24**, power **8**, resistance **3** | `opcode233:no_name` | effect ignored |
-| SPWI813.SPL | opcodes not supported yet: 213 |  |  | `missing_opcodes:213` | not described |
-| SPWI817.SPL | opcodes not supported yet: 209 |  |  | `missing_opcodes:209` | not described |
 | SPWI818.SPL | timing 3 not supported in an ability | ability 0, effect 6 | opcode **39**, target **2**, parameter1 **0**, parameter2 **1**, timing **3**, duration **1**, power **8**, resistance **1**, special **13** | `application:timing` | not described |
-| SPWI853.SPL | opcodes not supported yet: 185 |  |  | `missing_opcodes:185` | not described |
-| SPWI897.SPL | opcodes not supported yet: 209 |  |  | `missing_opcodes:209` | not described |
+| SPWI853.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 32 | opcode **85**, target **2**, parameter1 **100**, parameter2 **1**, timing **0**, duration **42**, power **4**, resistance **1** | `opcode85:form1` | not described |
 | SPWI902.SPL | opcodes not supported yet: 259 |  |  | `missing_opcodes:259` | not described |
 | SPWI907.SPL | proficiency 128 has no name | ability 0, effect 14 | opcode **233**, target **1**, parameter1 **3**, parameter2 **128**, timing **0**, duration **24**, power **9**, resistance **3** | `opcode233:no_name` | effect ignored |
-| SPWI909.SPL | opcodes not supported yet: 231 |  |  | `missing_opcodes:231` | not described |
-| SPWI910.SPL | opcodes not supported yet: 211 |  |  | `missing_opcodes:211` | not described |
-| SPWI912.SPL | opcodes not supported yet: 209 |  |  | `missing_opcodes:209` | not described |
+| SPWI909.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 1 | opcode **144**, target **3**, parameter1 **0**, parameter2 **7**, timing **0**, duration **18**, power **9**, resistance **3** | `opcode144:form1` | not described |
+| SPWI910.SPL | stat 274 of SPLPROT.2DA row 110 written differently by the old engine | ability 0, effect 0 | opcode **326**, target **2**, parameter1 **124**, parameter2 **110**, timing **4**, duration **2**, power **9**, special **1**, resource **DESTSELF** | `opcode326:condition_stat` | not described |
 | SPWI917.SPL | opcodes not supported yet: 212 |  |  | `missing_opcodes:212` | not described |
 | SPWI918.SPL | timing 3 not supported in an ability | ability 0, effect 6 | opcode **39**, target **2**, parameter1 **0**, parameter2 **1**, timing **3**, duration **1**, power **9**, resistance **1**, special **13** | `application:timing` | not described |
 | SPWI921.SPL | opcodes not supported yet: 188 |  |  | `missing_opcodes:188` | not described |
 | SPWI926.SPL | opcodes not supported yet: 124 |  |  | `missing_opcodes:124` | not described |
-| SPWI959.SPL | opcodes not supported yet: 210 |  |  | `missing_opcodes:210` | not described |
-| SPWI960.SPL | opcodes not supported yet: 209 |  |  | `missing_opcodes:209` | not described |
+| SPWI959.SPL | exception for another resource than SPWI959 | ability 0, effect 0 | opcode **324**, target **2**, parameter1 **90**, parameter2 **144**, timing **0**, duration **0**, power **7**, resource **SPIN959** | `opcode324:resource` | not described |
+| SPWI960.SPL | exception for another resource than SPWI960 | ability 0, effect 2 | opcode **318**, target **2**, parameter1 **3**, parameter2 **113**, timing **0**, duration **0**, power **9**, resource **SPIN959** | `opcode318:resource` | not described |
 | SPWI982.SPL | opcodes not supported yet: 68 |  |  | `missing_opcodes:68` | not described |
 | SPWI994.SPL | opcodes not supported yet: 124 |  |  | `missing_opcodes:124` | not described |
 | SPWI995.SPL | opcodes not supported yet: 68 |  |  | `missing_opcodes:68` | not described |
@@ -444,7 +411,7 @@
 | SPWISH09.SPL | proficiency 121 has no name | ability 0, effect 2 | opcode **233**, target **1**, parameter1 **1**, parameter2 **121**, timing **0**, duration **60**, power **7**, resistance **3** | `opcode233:no_name` | effect ignored |
 | SPWISH11.SPL | EFF file with a level restriction | ability 0, effect 0 (opcode 248) > SPCL903.EFF | opcode **248**, target **3**, parameter1 **0**, parameter2 **0**, timing **0**, duration **12**, power **9**, resistance **2**, resource **SPCL903** | `recursion:eff_level` | not described |
 | SPWISH12.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 5 | opcode **86**, target **3**, parameter1 **40**, parameter2 **0**, timing **0**, duration **6**, power **9**, resistance **2** | `opcode86:form1` | not described |
-| SPWISH17.SPL | opcodes not supported yet: 188 231 |  |  | `missing_opcodes:188 231` | not described |
+| SPWISH17.SPL | opcodes not supported yet: 188 |  |  | `missing_opcodes:188` | not described |
 | SPWISH31.SPL | no sentence 5000131 for this form (target or probable effect) | ability 0, effect 2 | opcode **166**, target **4**, parameter1 **40**, parameter2 **1**, timing **0**, duration **126**, power **9**, resistance **3** | `phrase5000130:form1` | not described |
 | SPWISH34.SPL | no text for form 1 (1 target, 2 probable, 3 probable on the target) | ability 0, effect 0 | opcode **22**, target **4**, parameter1 **-5**, parameter2 **0**, timing **0**, duration **60**, power **9**, resistance **3** | `opcode22:form1` | not described |
 | SPWISH36.SPL | no sentence 22060101 for this form (target or probable effect) | ability 0, effect 7 | opcode **206**, target **2**, parameter1 **0**, parameter2 **0**, timing **0**, duration **90**, power **9**, resistance **1**, resource **SPCL521** | `phrase22060100:form1` | not described |
@@ -454,7 +421,6 @@
 | SPWM101.SPL | effect of an EFF file that the old engine keeps in another form: header block not supported | ability 0, effect 2 | opcode **177**, target **1**, parameter1 **0**, parameter2 **2**, timing **0**, duration **90**, power **5**, resistance **1**, resource **SPWM101D** | `spell_header:opcode177_eff_fields` | not described |
 | SPWM101D.SPL | condition 43 not supported | ability 0, effect 0 | opcode **318**, target **2**, parameter1 **0**, parameter2 **43**, timing **0**, duration **0**, power **5**, resource **SPWM101D** | `opcode318:stat` | not described |
 | SPWM113.SPL | weapon removed later by opcode 112 | ability 0, effect 12 | opcode **112**, target **2**, parameter1 **0**, parameter2 **0**, timing **4**, duration **70**, power **4**, resource **WSWOLF** | `opcode111:remove_group` | not described |
-| SPWM122.SPL | hold of a creature type | ability 0, effect 3 | opcode **175**, target **2**, parameter1 **1**, parameter2 **3**, timing **0**, duration **60**, power **2**, resistance **1**, saving throw type **1**, saving throw bonus **0** | `opcode175:creature_type` | not described |
 | SPWM125.SPL | opcodes not supported yet: 117 |  |  | `missing_opcodes:117` | not described |
 | SPWM140.SPL | opcodes not supported yet: 243 |  |  | `missing_opcodes:243` | not described |
 | SPWM141.SPL | random treasure rndtre05 | ability 0, effect 1 | opcode **122**, target **2**, parameter1 **0**, parameter2 **0**, timing **1**, duration **0**, resource **RNDTRE05** | `opcode122:random_treasure` | not described |
