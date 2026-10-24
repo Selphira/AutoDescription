@@ -12205,6 +12205,7 @@ DEFINE_PATCH_MACRO ~opcode_248_group~ BEGIN
 
 	        SET opcode = 524
 	        LPM ~add_opcode~
+	        SET opcode = 248
 		END
 	END
 END
