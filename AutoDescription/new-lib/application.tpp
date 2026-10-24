@@ -310,9 +310,16 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION_SCALE(~%app_opcode%~) BEGIN
 		SET app_duration *= $AD_OPCODE_DURATION_SCALE(~%app_opcode%~)
 	END
+	SPRINT app_level_duration $fx_level_duration(~%line_fx%~)
+	// Progression selon le niveau du sort (new-lib/spell_levels.tpp), calculée seulement quand les
+	// lignes écrivent les durées.
+	PATCH_IF NOT (~%app_level_duration%~ STRING_EQUAL ~~) AND NOT (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)
+			AND (app_timing == TIMING_delayed OR NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~)) BEGIN
+		SPRINT app_duration_text ~%app_level_duration%~
+	END
 	// Une répétition est toujours écrite, même quand la durée de l'opcode ne l'est pas (ancien
 	// add_duration, timings 5000 et 5001 de opcode_group_by_duration).
-	PATCH_IF $fx_series_anchor(~%line_fx%~) AND NOT (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~) BEGIN
+	ELSE PATCH_IF $fx_series_anchor(~%line_fx%~) AND NOT (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~) BEGIN
 		SET app_series_delta = $fx_series_delta(~%line_fx%~)
 		LPF ad_duration_text INT_VAR seconds = app_series_delta tra_base = 3020000 RET frequency = text END
 		PATCH_IF $fx_series_instant(~%line_fx%~) BEGIN

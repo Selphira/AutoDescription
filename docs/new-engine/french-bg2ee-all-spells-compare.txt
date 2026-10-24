@@ -53,7 +53,7 @@ OHNWISH	identical
 OHPRGD10	identical
 OHRRAGE	identical
 OHTMPS1	not_covered	not_implemented:opcode97:several_strength
-OHTMPS2	not_covered	not_implemented:recursion:headers
+OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode18
 OHTYR1	not_covered	not_implemented:missing_opcodes:242
 OHTYR2	identical
 SENSPIHE	identical
@@ -82,7 +82,7 @@ SPCL321	not_covered	not_implemented:opcode101:ability_group_fields
 SPCL342	not_covered	not_implemented:missing_opcodes:192
 SPCL412	not_covered	not_implemented:missing_opcodes:252
 SPCL414	not_covered	not_implemented:missing_opcodes:252
-SPCL423	not_covered	not_implemented:recursion:headers
+SPCL423	not_covered	not_implemented:recursion:opcode318:exceptions_group
 SPCL521	not_covered	not_implemented:missing_opcodes:250
 SPCL522	identical
 SPCL611	identical
@@ -431,7 +431,7 @@ SPPR611	not_covered	not_implemented:missing_opcodes:261
 SPPR612	not_covered	not_implemented:opcode324:exceptions_identical
 SPPR613	not_covered	not_implemented:opcode233:same_effect_twice
 SPPR614	identical
-SPPR650	not_covered	not_implemented:opcode37:form1
+SPPR650	not_covered	not_implemented:opcode324:exceptions_group
 SPPR698	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR698D	identical
 SPPR699	identical

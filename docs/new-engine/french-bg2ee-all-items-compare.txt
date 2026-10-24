@@ -620,7 +620,7 @@ OHRAMUL1	identical
 OHRAX1H1	identical
 OHRAXE01	identical
 OHRBELT1	identical
-OHRBELT2	not_covered	not_implemented:recursion:headers
+OHRBELT2	identical
 OHRBOOT1	identical
 OHRBRAC1	identical
 OHRCLCK1	identical

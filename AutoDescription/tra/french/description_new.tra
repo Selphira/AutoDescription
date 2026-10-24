@@ -139,6 +139,7 @@
 @3000005 = ~après %strDuration%~ // reprise de @100310
 
 // Durées : progressions selon le niveau (en-tête des sorts)
+@3000006 = ~après %strDuration% et pendant %strDuration%~ // reprise de @100314
 @3000010 = ~%baseValue% + %value% au niveau %level%~ // reprise de @102160
 @3000011 = ~%value% par niveau~ // reprise de @102161
 @3000012 = ~%value% par tranche de %level% niveaux~ // reprise de @102162

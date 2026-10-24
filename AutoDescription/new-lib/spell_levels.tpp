@@ -266,6 +266,7 @@ END
 // et suivre une formule (ad_spell_level_duration), sinon l'effet garde ses sections.
 DEFINE_PATCH_MACRO ad_spell_levels_by_duration BEGIN
 	SET level_skip = AD_SAME_TIMING
+	SET level_duration_by_timing = 1
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
 		PATCH_IF $level_on(~%level_a%~) BEGIN
@@ -306,6 +307,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:save_progression~ message = ~saving throw bonus varying with the level, written in the line~ RET render_late_missing = refusal END
 					END
 					SPRINT level_value_text ~~
+					SPRINT level_duration_text ~~
 					SET level_mode = MOD_TYPE_cumulative
 					LPM ad_spell_level_group
 				END
@@ -342,6 +344,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				SET formula_opcode = level_opcode
 				LPM ad_spell_level_formula
 				LPM ad_spell_level_formula_check
+				SET level_duration_by_timing = 0
 				PATCH_IF formula_valid BEGIN
 					SPRINT level_value_text ~%formula_text%~
 					PATCH_IF level_opcode == 12 OR level_opcode == 17 BEGIN
@@ -367,6 +370,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 			SET formula_percent = 0
 			SET formula_flat = 0
 			SET formula_opcode = 12
+			SET level_duration_by_timing = 0
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_dice~
 				SET formula_dice_sides = $fx_dice_sides(~%level_id%~)
@@ -474,25 +478,42 @@ END
 // L'effet trouvé par ad_spell_level_search peut-il être réuni d'après ses durées ? level_grouped : 1
 // si les lignes n'écrivent pas sa durée, sinon si ses durées changent au moins deux fois (une seule
 // durée ne donne pas de formule : celle de level_a n'est pas comptée) et suivent une formule
-// (ad_spell_header_complex_duration) ; l'écriture de la formule est refusée tant qu'aucun sort ne
-// la demande.
+// (ad_spell_header_complex_duration). level_duration_text : la formule écrite par les lignes,
+// « pendant … » ; avec level_duration_by_timing (passe des durées), « après … » pour un effet
+// différé, « après … et pendant … » pour un effet différé limité, refus pour un autre timing.
 DEFINE_PATCH_MACRO ad_spell_level_duration BEGIN
 	SET level_grouped = 1
+	SPRINT level_duration_text ~~
 	PATCH_IF level_special_duration AND search_durations > 0 BEGIN
 		SPRINT complex_array ~search_duration~
 		SET complex_count = search_durations
 		LPM ad_spell_header_complex_duration
 		SET level_grouped = search_durations > 1 AND NOT (~%complex_text%~ STRING_EQUAL ~~)
 		PATCH_IF level_grouped BEGIN
+			SPRINT strDuration ~%complex_text%~
 			SET level_id = $level_id(~%level_a%~)
-			LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:duration_progression~ message = ~duration varying with the level, written in the line~ RET render_late_missing = refusal END
+			SET level_timing = $fx_timing(~%level_id%~)
+			PATCH_IF NOT level_duration_by_timing OR level_timing == TIMING_duration OR level_timing == TIMING_duration_ticks BEGIN
+				SPRINT level_duration_text @3000000 // ~pendant %strDuration%~
+			END
+			ELSE PATCH_IF level_timing == TIMING_delayed BEGIN
+				SPRINT level_duration_text @3000005 // ~après %strDuration%~
+			END
+			ELSE PATCH_IF level_timing == TIMING_delayed_duration BEGIN
+				SPRINT level_duration_text @3000006 // ~après %strDuration% et pendant %strDuration%~
+			END
+			ELSE BEGIN
+				SET level_id = $level_id(~%level_a%~)
+				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:duration_progression_timing~ message = ~duration varying with the level, timing %level_timing%~ RET render_late_missing = refusal END
+			END
 		END
 	END
 END
 
 // Réunit l'effet level_a à ceux que ad_spell_level_search a trouvés (ancien
 // group_spell_effects_disable) : il est écrit sans titre de niveau, avec la progression
-// level_value_text de sa valeur (mode level_mode), et les autres sont écartés. Refus : level_a n'est
+// level_value_text de sa valeur (mode level_mode) et level_duration_text de sa durée, et les autres
+// sont écartés. Refus : level_a n'est
 // pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
 // opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout.
 DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
@@ -514,6 +535,7 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 			SET $level_on(~%level_b%~) = 0
 		END
 		SPRINT $fx_level_value(~%level_id%~) ~%level_value_text%~
+		SPRINT $fx_level_duration(~%level_id%~) ~%level_duration_text%~
 	END
 END
 

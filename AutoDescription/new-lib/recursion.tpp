@@ -18,7 +18,9 @@
 //   ignoreDuration hérité de la durée commune d'une potion, ou de la durée de l'en-tête d'un sort) ;
 // - ctx_ignore_save : jets de sauvegarde non écrits (ancien ignoreSavingThrow hérité de l'en-tête
 //   d'un sort) ;
-// - ctx_casting_level : niveau de lancement, qui choisit l'en-tête du sous-sort ;
+// - ctx_casting_level : niveau de lancement, qui choisit l'en-tête du sous-sort ; sans lui, un
+//   sous-sort à plusieurs en-têtes est décrit comme un sort, effets de tous les niveaux et progressions
+//   (sub_all_headers, ad_spell_levels) ;
 // - ctx_versus_set, ctx_versus : l'ancien moteur fixe versus (opcode 232), que les dégâts écrivent à la
 //   place de leur cible (« à l'attaquant »), même vide (BUG-038) ;
 // - ctx_resource : ressource décrite, dont les opcodes comparent les effets à elle-même (exceptions
@@ -323,6 +325,7 @@ BEGIN
 	SET sub_count = 0
 	SPRINT sub_text ~~
 	SET sub_header = 0 - 1
+	SET sub_all_headers = 0
 	SET ctx_area_phrase = 0
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
@@ -345,8 +348,18 @@ BEGIN
 		SPRINT ctx_resource ~%sub_resref%~
 		INNER_PATCH_FILE ~%sub_resref%.spl~ BEGIN
 			LPM ad_recursion_load_spell
+			// La formule d'une progression lit le premier niveau de lanceur dans le fichier du sort.
+			PATCH_IF sub_all_headers BEGIN
+				LPM ad_recursion_finish
+			END
 		END
 	END
+	PATCH_IF NOT sub_all_headers BEGIN
+		LPM ad_recursion_finish
+	END
+END
+
+DEFINE_PATCH_MACRO ad_recursion_finish BEGIN
 	PATCH_IF ~%sub_missing%~ STRING_EQUAL ~~ AND sub_header >= 0 AND ctx_base_probability < 100 BEGIN
 		LPM ad_recursion_base_probability
 	END
@@ -374,7 +387,9 @@ DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 	END
 END
 
-// Effets de l'en-tête retenu du sort ouvert (sub_header, 0 - 1 si le sort n'a aucun en-tête).
+// Effets de l'en-tête retenu du sort ouvert (sub_header, 0 - 1 si le sort n'a aucun en-tête), ou,
+// sans niveau de lancement, de tous ses en-têtes (sub_all_headers), qui doivent avoir la même cible
+// et le même projectile (refus sinon : la zone des sous-effets en dépend).
 DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 	SPRINT sub_signature ~~
 	PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
@@ -407,7 +422,23 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 			END
 		END
 		ELSE PATCH_IF sub_header_count > 1 BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:headers~ message = ~%sub_header_count% abilities and no casting level (level rendering not supported yet)~ RET sub_missing = refusal END
+			SET sub_header = 0
+			SET sub_all_headers = 1
+			READ_BYTE  (sub_headers_offset + SPL_HEAD_target)        sub_first_target
+			READ_BYTE  (sub_headers_offset + SPL_HEAD_target_number) sub_first_target_count
+			READ_SHORT (sub_headers_offset + SPL_HEAD_projectile)    sub_first_projectile
+			FOR (sub_h = 1; sub_h < sub_header_count; ++sub_h) BEGIN
+				READ_BYTE  (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_target)        sub_h_target
+				READ_BYTE  (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_target_number) sub_h_target_count
+				READ_SHORT (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_projectile)    sub_h_projectile
+				PATCH_IF sub_h_target != sub_first_target OR sub_h_target_count != sub_first_target_count OR sub_h_projectile != sub_first_projectile BEGIN
+					SET sub_all_headers = 0
+				END
+			END
+			PATCH_IF NOT sub_all_headers BEGIN
+				SET sub_header = 0 - 1
+				LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:headers_area~ message = ~%sub_header_count% abilities with different targets or projectiles, and no casting level~ RET sub_missing = refusal END
+			END
 		END
 		ELSE PATCH_IF sub_header_count == 1 BEGIN
 			SET sub_header = 0
@@ -416,18 +447,26 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 	PATCH_IF ~%sub_missing%~ STRING_EQUAL ~~ AND sub_header >= 0 BEGIN
 		LPM ad_fx_reset
 		SET fx_header_count = sub_header_count
-		SET fx_header_offset = sub_headers_offset + sub_header * 0x28
 		READ_LONG  SPL_feature_blocks_offset fx_table_offset
-		READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_count)  fx_block_count
-		READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_offset) fx_block_index
+		SET fx_header_offset = sub_headers_offset + sub_header * 0x28
 		READ_BYTE  (fx_header_offset + SPL_HEAD_target)        sub_head_target
 		READ_BYTE  (fx_header_offset + SPL_HEAD_target_number) sub_head_target_count
 		READ_SHORT (fx_header_offset + SPL_HEAD_projectile)    sub_projectile
 		SPRINT fx_block_kind ~ability~
-		SET fx_block_header = sub_header
-		LPM ad_fx_load_block
+		SET sub_last_header = sub_all_headers ? sub_header_count - 1 : sub_header
+		FOR (sub_h = sub_header; sub_h <= sub_last_header AND ~%fx_load_error%~ STRING_EQUAL ~~; ++sub_h) BEGIN
+			SET fx_header_offset = sub_headers_offset + sub_h * 0x28
+			READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_count)  fx_block_count
+			READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_offset) fx_block_index
+			SET fx_block_header = sub_h
+			LPM ad_fx_load_block
+		END
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:recursion:%fx_load_error%~ message = ~%fx_load_message%~ RET sub_missing = refusal END
+		END
+		ELSE PATCH_IF sub_all_headers BEGIN
+			SET fx_headers_offset = sub_headers_offset
+			LPM ad_spell_header_fields
 		END
 	END
 END
@@ -568,8 +607,11 @@ END
 // Passes du moteur sur les effets du sous-sort, puis texte de ses lignes. L'en-tête du sous-sort
 // n'est ni une capacité de charge d'objet ni l'en-tête d'une potion.
 DEFINE_PATCH_MACRO ad_recursion_render BEGIN
-	SET $charged_other(~%sub_header%~) = 0
-	SET $charged_global_duration(~%sub_header%~) = 0
+	SET sub_last_header = sub_all_headers ? fx_header_count - 1 : sub_header
+	FOR (sub_h = sub_header; sub_h <= sub_last_header; ++sub_h) BEGIN
+		SET $charged_other(~%sub_h%~) = 0
+		SET $charged_global_duration(~%sub_h%~) = 0
+	END
 	SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
 	SPRINT sub_todo ~~
 	SPRINT sub_versus_opcode ~~
@@ -608,6 +650,18 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_cross_groups
+	END
+	// Sans niveau de lancement, les effets de tous les niveaux et les progressions (ancien
+	// get_spell_effects_description) ; les sections de niveaux sont refusées plus bas.
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND sub_all_headers BEGIN
+		FOR (sub_id = 0; sub_id < fx_count; ++sub_id) BEGIN
+			SET $fx_header_hidden(~%sub_id%~) = 0
+		END
+		LPM ad_spell_header_effects
+		SET statistics_sections = 1
+		SPRINT $statistics_section(~0~) ~ability0~
+		LPM ad_spell_levels
+		SPRINT render_missing ~%render_late_missing%~
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_lines_reset
@@ -648,7 +702,12 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
 			SPRINT sub_line_section $line_section(~%sub_line%~)
 			PATCH_IF NOT (~%sub_line_section%~ STRING_EQUAL ~~) AND NOT (~%sub_line_section%~ STRING_EQUAL ~ability%sub_header%~) BEGIN
-				LPF ad_refusal STR_VAR reason = ~not_implemented:section~ message = ~line outside the section of the ability~ RET render_missing = refusal END
+				PATCH_IF sub_all_headers BEGIN
+					LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:level_sections~ message = ~abilities of different levels: level sections inside a line not supported yet~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					LPF ad_refusal STR_VAR reason = ~not_implemented:section~ message = ~line outside the section of the ability~ RET render_missing = refusal END
+				END
 			END
 		END
 		// L'ancien moteur retire la puce de la première ligne, qui prend la place de la ligne parente.
