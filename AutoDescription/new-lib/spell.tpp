@@ -15,9 +15,6 @@ BEGIN
 	SET support_header_only = NOT AD_ADD_STATISTICS_SECTION_TO_SPELL_DESCRIPTION
 	SET support_spell = 1
 	SET source_is_spell = 1
-	// Effets d'un en-tête de sort, rangés par l'ancien moteur dans leveled_opcodes, où un effet ajouté
-	// par un regroupement écrase celui dont il a tous les champs (BUG-052).
-	SET store_leveled = 1
 	SET group_spell_as_equipped = 1
 	// Un sort n'a pas de type d'objet (prises en charge partagées avec les objets).
 	SET item_type = 0 - 1

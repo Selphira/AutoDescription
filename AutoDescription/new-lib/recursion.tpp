@@ -251,7 +251,6 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 BEGIN
 	SET sub_opcode = 0 - 1
 	SET support_spell = 0
-	SET store_leveled = ~%kind%~ STRING_EQUAL ~spl~
 	PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
 		SET ctx_ignore_save = 0
 	END
