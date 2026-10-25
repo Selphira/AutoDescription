@@ -17,10 +17,9 @@
 // de puissance nul, hors des invocations ordinaires (allégeance au plus 15 sauf familier, genre
 // invoqué : l'ancien moteur en compte 0, ou applique aux célestes la limite ordinaire), dont l'ancien
 // arrondi diffère de l'arrondi au-dessus (BUG-033) ou dont le nom contient une virgule (l'ancien
-// moteur y coupe la liste) ; avec AD_ENABLE_SHRINKAGE, invocations du même bloc qui ne diffèrent que
-// par parameter1 ou leur probabilité (l'ancien opcode_127_group en écrit le nombre « entre 0 et N »).
-// Pour l'en-tête d'un sort seul, seuls comptent cet écart et les regroupements
-// (ad_op_127_header_group).
+// moteur y coupe la liste). Avec AD_ENABLE_SHRINKAGE, les invocations semblables sont ensuite réunies
+// (ad_op_127_similar_group). Pour l'en-tête d'un sort seul, seuls comptent cet écart et les
+// regroupements (ad_op_127_header_group).
 DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -28,6 +27,7 @@ DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
 			SET monster_custom = $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~)
 			SET $fx_monster_resource_table(~%monster_id%~) = 0
+			SET $fx_monster_grouped(~%monster_id%~) = 0
 			PATCH_IF monster_custom AND NOT FILE_EXISTS_IN_GAME ~%monster_resref%.2da~ BEGIN
 				SET drop_id = monster_id
 				SPRINT ignored_reason ~file_error:opcode127:no_table~
@@ -53,11 +53,11 @@ DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 			END
 			ELSE BEGIN
 				LPM ad_op_127_table
-				PATCH_IF AD_ENABLE_SHRINKAGE AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-					LPM ad_op_127_similar_support
-				END
 			END
 		END
+	END
+	PATCH_IF AD_ENABLE_SHRINKAGE AND NOT support_header_only AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		LPM ad_op_127_similar_group
 	END
 END
 
@@ -195,19 +195,65 @@ DEFINE_PATCH_MACRO ad_op_127_header_group BEGIN
 	SET same_ignored = 0
 END
 
-DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN
-	SET same_id = monster_id
-	PHP_EACH fx_ids_127 AS _ => monster_other BEGIN
-		PATCH_IF monster_other != monster_id BEGIN
-			SET same_other = monster_other
-			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
-			LPM ad_fx_same_fields
-			SET monster_other_similar = fx_same
-			SET same_ignored = 0
-			LPM ad_fx_same_fields
-			SPRINT monster_other_resref $fx_resource(~%monster_other%~)
-			PATCH_IF monster_other_similar AND NOT fx_same AND ~%monster_other_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = monster_other STR_VAR reason = ~not_implemented:opcode127:similar~ message = ~similar summonings with different fields~ RET render_missing = refusal END
+// Avec AD_ENABLE_SHRINKAGE, des invocations d'une table de base du même bloc qui ne diffèrent que par
+// parameter1 ou leur probabilité (ancien opcode_127_group) n'en font qu'une, certaine, écrite après
+// les autres (fx_late) : « Invoque entre 1 et 8 monstres ». Le jeu tire un seul nombre de 0 à 99 pour
+// les effets d'une capacité : pour chaque tirage, les invocations dont la plage le contient
+// s'additionnent ; le plus petit total (0 si un tirage n'en déclenche aucune) et le plus grand
+// deviennent fx_monster_min et fx_monster_max de la première (fx_monster_grouped). Des invocations
+// toutes identiques restent au regroupement des effets identiques.
+DEFINE_PATCH_MACRO ad_op_127_similar_group BEGIN
+	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
+		SPRINT monster_resref $fx_resource(~%monster_id%~)
+		PATCH_IF NOT $fx_consumed(~%monster_id%~) AND ~%monster_resref%~ STRING_EQUAL ~~ BEGIN
+			CLEAR_ARRAY monster_members
+			SET $monster_members(~%monster_id%~) = 1
+			SET monster_similar = 0
+			SET same_id = monster_id
+			PHP_EACH fx_ids_127 AS _ => monster_other BEGIN
+				SPRINT monster_other_resref $fx_resource(~%monster_other%~)
+				PATCH_IF monster_other != monster_id AND NOT $fx_consumed(~%monster_other%~) AND ~%monster_other_resref%~ STRING_EQUAL ~~ BEGIN
+					SET same_other = monster_other
+					SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET $monster_members(~%monster_other%~) = 1
+						SET same_ignored = 0
+						LPM ad_fx_same_fields
+						SET monster_similar = monster_similar OR NOT fx_same
+					END
+					SET same_ignored = 0
+				END
+			END
+			PATCH_IF monster_similar BEGIN
+				SET monster_group_min = 0 - 1
+				SET monster_group_max = 0
+				FOR (monster_roll = 0; monster_roll < 100; ++monster_roll) BEGIN
+					SET monster_roll_min = 0
+					SET monster_roll_max = 0
+					PHP_EACH monster_members AS monster_member => _ BEGIN
+						PATCH_IF monster_roll >= $fx_probability_low(~%monster_member%~) AND monster_roll <= $fx_probability_high(~%monster_member%~) BEGIN
+							SET monster_roll_min += $fx_monster_min(~%monster_member%~)
+							SET monster_roll_max += $fx_monster_max(~%monster_member%~)
+						END
+					END
+					SET monster_group_min = (monster_group_min < 0 OR monster_roll_min < monster_group_min) ? monster_roll_min : monster_group_min
+					SET monster_group_max = monster_roll_max > monster_group_max ? monster_roll_max : monster_group_max
+				END
+				PHP_EACH monster_members AS monster_member => _ BEGIN
+					PATCH_IF monster_member != monster_id BEGIN
+						SET $fx_consumed(~%monster_member%~) = 1
+					END
+				END
+				SET $fx_monster_min(~%monster_id%~) = monster_group_min
+				SET $fx_monster_max(~%monster_id%~) = monster_group_max
+				SET $fx_monster_grouped(~%monster_id%~) = 1
+				SET $fx_late(~%monster_id%~) = 1
+				SET $fx_probability1(~%monster_id%~) = 100
+				SET $fx_probability2(~%monster_id%~) = 0
+				SET $fx_probability_low(~%monster_id%~) = 0
+				SET $fx_probability_high(~%monster_id%~) = 99
+				SET $fx_probability(~%monster_id%~) = 100
 			END
 		END
 	END
@@ -216,8 +262,9 @@ END
 // Phrase : 21 270 100 + 10 × variante + forme ; variante = 0 un monstre, 1 un animal, 2 plusieurs
 // monstres, 3 plusieurs animaux, + 4 hostiles ; 21 270 180 + forme pour une table resource. Un effet
 // identique à d'autres est écrit après les autres effets 127 (fx_late), comme celui que l'ancien
-// moteur ajoute en fin de liste. Refus (render_late_missing) : invocations identiques d'une table
-// resource, que l'ancien opcode_127_group ne réunit pas.
+// moteur ajoute en fin de liste. Des invocations réunies (fx_monster_grouped) s'écrivent toujours au
+// pluriel, « entre min et max », comme l'ancien moteur. Refus (render_late_missing) : invocations
+// identiques d'une table resource, que l'ancien opcode_127_group ne réunit pas.
 DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~127~)
@@ -233,16 +280,17 @@ DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 					SET line_phrase = 21270180 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 				END
 				ELSE BEGIN
+					SET monster_grouped = $fx_monster_grouped(~%monster_id%~)
 					SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
 					SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies
-					PATCH_IF amountMin == amountMax BEGIN
+					PATCH_IF amountMin == amountMax AND NOT monster_grouped BEGIN
 						SET amount = amountMax
 					END
 					ELSE BEGIN
 						SPRINT amount @21270000 // ~entre %amountMin% et %amountMax%~
 					END
 					SET monster_table = $fx_parameter2(~%monster_id%~)
-					SET monster_variant = (amountMax == 1 ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
+					SET monster_variant = (amountMax == 1 AND NOT monster_grouped ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
 					SET line_phrase = 21270100 + 10 * monster_variant // ~Invoque 1 monstre (%creatures%)~
 				END
 				SPRINT creatures $fx_monster_creatures(~%monster_id%~)

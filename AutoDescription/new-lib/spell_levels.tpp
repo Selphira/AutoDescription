@@ -527,8 +527,7 @@ END
 // pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
 // opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout ;
 // progression d'un opcode dont le premier en-tête a des effets du fichier et d'un EFF (177 : l'ancien
-// moteur ordonne autrement les lignes, SPCL236), ou progression de la valeur d'un opcode dont il a
-// plusieurs effets d'un EFF (l'ancien moteur en tire une autre formule, SPPR313).
+// moteur ordonne autrement les lignes, SPCL236).
 DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	SET level_id = $level_id(~%level_a%~)
 	SET level_opcode = $level_opcode(~%level_a%~)
@@ -546,7 +545,7 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 			END
 		END
 	END
-	SET level_external = level_ext_count > 0 AND (level_plain_count > 0 OR (level_ext_count > 1 AND NOT (~%level_value_text%~ STRING_EQUAL ~~)))
+	SET level_external = level_ext_count > 0 AND level_plain_count > 0
 	PATCH_IF NOT search_self BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_other_effect~ message = ~effect of the first ability merged with another effect of its opcode~ RET render_late_missing = refusal END
 	END
@@ -689,7 +688,9 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 		END
 		ELSE PATCH_IF formula_delta_level != 0 BEGIN
 			SET levelMax = formula_previous_level
-			SET formula_remains = (ABS formula_previous) - (ABS formula_delta * formula_level / formula_delta_level)
+			// Reste au niveau du dernier changement (levelMax) : un dernier en-tête à la même valeur ne le
+			// change pas.
+			SET formula_remains = (ABS formula_previous) - (ABS formula_delta * formula_previous_level / formula_delta_level)
 			SPRINT formula_typed ~%formula_step%~
 			LPM ad_spell_level_formula_typed
 			SPRINT value ~%formula_typed%~
