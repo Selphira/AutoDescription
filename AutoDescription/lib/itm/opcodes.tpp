@@ -1961,9 +1961,9 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_17~ BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 	ELSE BEGIN
-		SET damageAmount = parameter1
-		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
+		// Valeur fixée : « de passer à 5 les points de vie actuels de la cible ».
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_probability~ INT_VAR strref = 10170022 RET description END // ~les points de vie actuels~
 	END
 END
 
@@ -1974,9 +1974,9 @@ DEFINE_PATCH_MACRO ~opcode_target_17~ BEGIN
 	LOCAL_SET subType = parameter2 / 65535
 
 	PATCH_IF type == 1 BEGIN
-		SET damageAmount = parameter1
-		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-		LPF ~opcode_mod~ INT_VAR strref = 10170021 STR_VAR value = EVAL ~%value%~ RET description END // ~Points de vie actuels~
+		// Valeur fixée : « Porte à 5 les points de vie actuels de la cible ».
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_target~ INT_VAR strref = 10170022 RET description END // ~les points de vie actuels~
 	END
 	ELSE BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
@@ -1993,9 +1993,9 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_17~ BEGIN
 		LPF ~opcode_17_common~ INT_VAR strref_1 strref_2 RET description END
 	END
 	ELSE BEGIN
-		SET damageAmount = parameter1
-		LPF ~get_damage_value~ INT_VAR diceCount diceSides damageAmount RET value = damage END
-		LPF ~opcode_mod~ INT_VAR strref = 10170022 STR_VAR value = EVAL ~%value%~ RET description END // ~les points de vie actuels~
+		// Valeur fixée : « de passer à 5 les points de vie actuels de la cible ».
+		SET parameter2 = MOD_TYPE_flat
+		LPF ~opcode_probability~ INT_VAR strref = 10170022 RET description END // ~les points de vie actuels~
 	END
 END
 
@@ -5037,7 +5037,7 @@ END
  * Protection: from Creature Type [100] *
  * ------------------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_100~ BEGIN
-	SET strref = 11000001 // ~Immunité aux attaques et aux sorts de %creatureType%~
+	SET strref = 11000001 // ~Immunité contre les attaques et les sorts des %creatureType%~
 	LPM ~opcode_100_common~
 END
 
@@ -5082,7 +5082,7 @@ DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11010001 // ~Immunité %opcodeStr%~
+		SPRINT description @11010001 // ~Immunité contre %opcodeStr%~
 	END
 END
 
@@ -5090,7 +5090,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
 	LOCAL_SET strref = 400000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11010003 // ~d'être immunisé %opcodeStr%~
+		SPRINT description @11010003 // ~d'être immunisé contre %opcodeStr%~
 	END
 END
 
@@ -5104,7 +5104,7 @@ DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
 		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11010002 // ~Immunise %theTarget% %opcodeStr%~
+		SPRINT description @11010002 // ~Immunise %theTarget% contre %opcodeStr%~
 	END
 END
 
@@ -5112,7 +5112,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
 	LOCAL_SET strref = 400000 + parameter2
 	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @11010004 // ~d'immuniser %theTarget% %opcodeStr%~
+		SPRINT description @11010004 // ~d'immuniser %theTarget% contre %opcodeStr%~
 	END
 END
 
@@ -5701,21 +5701,21 @@ END
  * -------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_102~ BEGIN
 	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020001 // ~Immunité aux sorts de niveau %spellLevel%~
+	SPRINT description @11020001 // ~Immunité contre les sorts de %spellLevel% niveau~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_102~ BEGIN
 	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020003 // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+	SPRINT description @11020003 // ~Immunise %theTarget% contre les sorts de %spellLevel% niveau~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_102~ BEGIN
 	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020002 // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
+	SPRINT description @11020002 // ~Immunité contre les sorts de %spellLevel% niveau et inférieurs~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_102~ BEGIN
-	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% contre les sorts de niveau %spellLevel%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_102_is_valid~ BEGIN
@@ -5890,7 +5890,7 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 		END
 		PATCH_IF value == 0 BEGIN
 			// FIXME: différencier le nom de l'effet de l'opcode 24, Immunité contre la rupture de moral
-			SPRINT description @11060004 // ~Immunité à la panique~
+			SPRINT description @11060004 // ~Immunité contre la panique~
 		END
 		ELSE PATCH_IF value == 1 BEGIN
 			SPRINT description @11060001 // ~Le moral %ofTheTarget% reste au plus haut~
@@ -10203,7 +10203,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_204~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
-	SPRINT description @12040001 // ~Immunité aux sorts de l'école %spellSchoolName%~
+	SPRINT description @12040001 // ~Immunité contre les sorts de l'école %spellSchoolName%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_204~ BEGIN
@@ -10216,14 +10216,14 @@ DEFINE_PATCH_MACRO ~opcode_target_204~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12040003 // ~Immunise %theTarget% aux sorts de l'école %spellSchoolName%~
+		SPRINT description @12040003 // ~Immunise %theTarget% contre les sorts de l'école %spellSchoolName%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_204~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
-	SPRINT description @12040004 // ~d'immuniser %theTarget% aux sorts de l'école %spellSchoolName%~
+	SPRINT description @12040004 // ~d'immuniser %theTarget% contre les sorts de l'école %spellSchoolName%~
 END
 
 /* --------------------------------------------------- *
@@ -10233,7 +10233,7 @@ DEFINE_PATCH_MACRO ~opcode_self_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12050001 // ~Immunité aux sorts %spellSecondaryTypeName%~
+		SPRINT description @12050001 // ~Immunité contre les sorts de type %spellSecondaryTypeName%~
 	END
 END
 
@@ -10249,7 +10249,7 @@ DEFINE_PATCH_MACRO ~opcode_target_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12050003 // ~Immunise %theTarget% aux sorts %spellSecondaryTypeName%~
+		SPRINT description @12050003 // ~Immunise %theTarget% contre les sorts de type %spellSecondaryTypeName%~
 	END
 END
 
@@ -10257,7 +10257,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_205~ BEGIN
 	LPF ~get_spell_secondary_type~ INT_VAR secondaryType = parameter2 opcode RET spellSecondaryTypeName END
 
 	PATCH_IF NOT ~%spellSecondaryTypeName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12050004 // ~d'immuniser %theTarget% aux sorts %spellSecondaryTypeName%~
+		SPRINT description @12050004 // ~d'immuniser %theTarget% contre les sorts de type %spellSecondaryTypeName%~
 	END
 END
 
@@ -10297,7 +10297,7 @@ DEFINE_PATCH_MACRO ~opcode_self_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12060001 // ~Immunité au sort %spellName%~
+		SPRINT description @12060001 // ~Immunité contre le sort « %spellName% »~
 	END
 END
 
@@ -10305,7 +10305,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12060003 // ~d'immuniser %theTarget% au sort %spellName%~
+		SPRINT description @12060003 // ~d'immuniser %theTarget% contre le sort « %spellName% »~
 	END
 END
 
@@ -10313,7 +10313,7 @@ DEFINE_PATCH_MACRO ~opcode_target_206~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12060002 // ~Immunise %theTarget% au sort %spellName%~
+		SPRINT description @12060002 // ~Immunise %theTarget% contre le sort « %spellName% »~
 	END
 END
 
@@ -12892,7 +12892,7 @@ DEFINE_PATCH_MACRO ~opcode_self_266~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12660001 // ~Lève l'immunité au sort %spellName%~
+		SPRINT description @12660001 // ~Lève l'immunité contre le sort « %spellName% »~
 	END
 END
 
@@ -12900,7 +12900,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_266~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12660003 // ~de lever l'immunité au sort %spellName%~
+		SPRINT description @12660003 // ~de lever l'immunité contre le sort « %spellName% »~
 	END
 END
 
@@ -12908,7 +12908,7 @@ DEFINE_PATCH_MACRO ~opcode_target_266~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12660002 // ~Lève l'immunité %ofTheTarget% au sort %spellName%~
+		SPRINT description @12660002 // ~Lève l'immunité %ofTheTarget% contre le sort « %spellName% »~
 	END
 END
 
@@ -12916,7 +12916,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_266~ BEGIN
 	LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
 	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
-		SPRINT description @12660004 // ~de lever l'immunité au sort %spellName%~
+		SPRINT description @12660004 // ~de lever l'immunité %ofTheTarget% contre le sort « %spellName% »~
 	END
 END
 
@@ -13557,7 +13557,7 @@ END
  * -------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT description @12920001 // ~Immunité aux attaques sournoises~
+		SPRINT description @12920001 // ~Immunité contre les attaques sournoises~
 	END
 	ELSE BEGIN
 		SPRINT description @12920011 // ~Sensible aux attaques sournoises~
@@ -13575,7 +13575,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT description @12920002 // ~Immunise %theTarget% aux attaques sournoises~
+		SPRINT description @12920002 // ~Immunise %theTarget% contre les attaques sournoises~
 	END
 	ELSE BEGIN
 		SPRINT description @12920012 // ~rend %theTarget% sensible aux attaques sournoises~
@@ -13584,7 +13584,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_292~ BEGIN
 	PATCH_IF parameter2 != 0 BEGIN
-		SPRINT description @12920004 // ~d'immuniser %theTarget% aux attaques sournoises~
+		SPRINT description @12920004 // ~d'immuniser %theTarget% contre les attaques sournoises~
 	END
 	ELSE BEGIN
 		SPRINT description @12920014 // ~de rendre %theTarget% sensible aux attaques sournoises~
@@ -13935,10 +13935,10 @@ END
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_310~ BEGIN
 	PATCH_IF parameter2 == 0 BEGIN
-		SPRINT description @13100001 // ~Bloque l'immunité à l'arrêt du temps~
+		SPRINT description @13100001 // ~Bloque l'immunité contre l'arrêt du temps~
 	END
 	ELSE BEGIN
-		SPRINT description @13100011 // ~Immunité à l'arrêt du temps~
+		SPRINT description @13100011 // ~Immunité contre l'arrêt du temps~
 	END
 END
 
@@ -13947,7 +13947,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_310~ BEGIN
 		SPRINT description @13100003 // ~de rendre sensible %theTarget% à l'arrêt du temps~
 	END
 	ELSE BEGIN
-		SPRINT description @13100013 // ~d'immuniser %theTarget% à l'arrêt du temps~
+		SPRINT description @13100013 // ~d'immuniser %theTarget% contre l'arrêt du temps~
 	END
 END
 
@@ -13956,12 +13956,12 @@ DEFINE_PATCH_MACRO ~opcode_target_310~ BEGIN
 		SPRINT description @13100002 // ~Rendre sensible %theTarget% à l'arrêt du temps~
 	END
 	ELSE BEGIN
-		SPRINT description @13100012 // ~Immunise %theTarget% à l'arrêt du temps~
+		SPRINT description @13100012 // ~Immunise %theTarget% contre l'arrêt du temps~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_310~ BEGIN
-	LPM ~opcode_self_probability_310~ // ~d'immuniser %theTarget% à l'arrêt du temps~
+	LPM ~opcode_self_probability_310~ // ~d'immuniser %theTarget% contre l'arrêt du temps~
 END
 
 /* ------------------------------ *
@@ -14264,7 +14264,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 			END
 			ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
 				SET idsId = statType - 110
-				SET strref = strref + 302 // ~Effectif contre les %creatureType%~
+				SET strref = strref + 302 // ~Efficace contre les %creatureType%~
 				LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
 			END
 			ELSE PATCH_IF statType == 138 OR statType == 139 BEGIN // STATE
@@ -14370,7 +14370,7 @@ END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective~ BEGIN
 	1   => ~203004~ // ~morts-vivants~
-	3   => ~13241003~ // ~créatures immunisées au feu~
+	3   => ~13241003~ // ~créatures insensibles au feu~
 	4   => ~13241004~ // ~créatures sensibles au feu~
 	5   => ~203001~ // ~humanoïdes~
 	7   => ~203002~ // ~animaux~
@@ -14382,7 +14382,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective~ BEGIN
 	19  => ~204003~ // ~demi-elfes~
 	21  => ~203001 204145~ // ~humanoïdes~ ~animaux~
 	23  => ~13241023~ // ~créatures aveuglées~
-	25  => ~13241025~ // ~créatures immunisées au froid~
+	25  => ~13241025~ // ~créatures insensibles au froid~
 	26  => ~13241026~ // ~créatures sensibles au froid~
 	27  => ~204144~ // ~golems~
 	29  => ~204171~ // ~minotaures~
@@ -14402,7 +14402,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective~ BEGIN
 	47  => ~204144 203004 204164~ // ~golems~ ~morts-vivants~ ~myconides~
 	49  => ~202028~ // ~créatures alliées~
 	51  => ~202200~ // ~créatures hostiles~
-	53  => ~13241053~ // ~créatures immunisées au feu ou au froid~
+	53  => ~13241053~ // ~créatures insensibles au feu ou au froid~
 	54  => ~13241054~ // ~créatures sensibles au feu ou au froid~
 	55  => ~203004 204144~ // ~morts-vivants~ ~golems~
 	57  => ~13241057~ // ~créatures masculines~
@@ -14411,13 +14411,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_324_not_effective~ BEGIN
 	66  => ~13241066~ // ~créatures sourdes~
 	68  => ~13241068~ // ~créatures sous l'effet d'un toucher de la goule~
 	74  => ~13241074~ // ~créatures mortes~
-	77  => ~13241077~ // ~créatures immunisées aux poisons~
+	77  => ~13241077~ // ~créatures insensibles aux poisons~
 	78  => ~13241078~ // ~créatures sensibles aux poisons~
-	79  => ~13241079~ // ~créatures immunisées à l'acide~
+	79  => ~13241079~ // ~créatures insensibles à l'acide~
 	80  => ~13241080~ // ~créatures sensibles à l'acide~
-	81  => ~13241081~ // ~créatures immunisées à l'électricité~
+	81  => ~13241081~ // ~créatures insensibles à l'électricité~
 	82  => ~13241082~ // ~créatures sensibles à l'électricité~
-	83  => ~13241083~ // ~créatures immunisées aux dégâts magiques~
+	83  => ~13241083~ // ~créatures insensibles aux dégâts magiques~
 	84  => ~13241084~ // ~créatures sensibles aux dégâts magiques~
 	85  => ~204101~ // ~ankhegs~
 	87  => ~204150~ // ~liches~
@@ -14694,7 +14694,7 @@ BEGIN
 	END
 	LPF ~implode~ STR_VAR array_name = ~target_conditions~ glue = ~, ~ final_glue = ~, ~ RET creaturesList = text END
 	PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
-		SPRINT target_effective @13241500 // ~Effectif %creaturesList%~
+		SPRINT target_effective @13241500 // ~Efficace %creaturesList%~
 	END
 
 	SPRINT target_conditions ~~
@@ -14989,7 +14989,7 @@ END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	1   => ~3:004~ // ~morts-vivants~
-	3   => ~13241003~ // ~créatures immunisées au feu~ //1:001 => utiliser 2001001 complètement inventé, comme un ids!
+	3   => ~13241003~ // ~créatures insensibles au feu~ //1:001 => utiliser 2001001 complètement inventé, comme un ids!
 	4   => ~13241004~ // ~créatures sensibles au feu~
 	5   => ~3:001~ // ~humanoïdes~
 	7   => ~3:002~ // ~animaux~
@@ -15001,7 +15001,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	19  => ~4:003~ // ~demi-elfes~
 	21  => ~3:001 4:145~ // ~humanoïdes~ ~animaux~
 	23  => ~13241023~ // ~créatures aveuglées~
-	25  => ~13241025~ // ~créatures immunisées au froid~
+	25  => ~13241025~ // ~créatures insensibles au froid~
 	26  => ~13241026~ // ~créatures sensibles au froid~
 	27  => ~4:144~ // ~golems~
 	29  => ~4:171~ // ~minotaures~
@@ -15021,7 +15021,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	47  => ~4:144 3:004 4:164~ // ~golems~ ~morts-vivants~ ~myconides~
 	49  => ~2:028~ // ~créatures alliées~
 	51  => ~2:200~ // ~créatures hostiles~
-	53  => ~13241053~ // ~créatures immunisées au feu ou au froid~
+	53  => ~13241053~ // ~créatures insensibles au feu ou au froid~
 	54  => ~13241054~ // ~créatures sensibles au feu ou au froid~
 	55  => ~3:004 4:144~ // ~morts-vivants~ ~golems~
 	57  => ~13241057~ // ~créatures masculines~
@@ -15030,13 +15030,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcode_326_targets~ BEGIN
 	66  => ~13241066~ // ~créatures sourdes~
 	68  => ~13241068~ // ~créatures sous l'effet d'un toucher de la goule~
 	74  => ~13241074~ // ~créatures mortes~
-	77  => ~13241077~ // ~créatures immunisées aux poisons~
+	77  => ~13241077~ // ~créatures insensibles aux poisons~
 	78  => ~13241078~ // ~créatures sensibles aux poisons~
-	79  => ~13241079~ // ~créatures immunisées à l'acide~
+	79  => ~13241079~ // ~créatures insensibles à l'acide~
 	80  => ~13241080~ // ~créatures sensibles à l'acide~
-	81  => ~13241081~ // ~créatures immunisées à l'électricité~
+	81  => ~13241081~ // ~créatures insensibles à l'électricité~
 	82  => ~13241082~ // ~créatures sensibles à l'électricité~
-	83  => ~13241083~ // ~créatures immunisées aux dégâts magiques~
+	83  => ~13241083~ // ~créatures insensibles aux dégâts magiques~
 	84  => ~13241084~ // ~créatures sensibles aux dégâts magiques~
 	85  => ~4:101~ // ~ankhegs~
 	87  => ~4:150~ // ~liches~
@@ -16066,38 +16066,38 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_509~ BEGIN
 	LOCAL_SET strref = 11020001
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
-		SPRINT description @15090001 // ~Immunité aux sorts~
+		SPRINT description @15090001 // ~Immunité contre les sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description (AT strref) // ~Immunité aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~Immunité contre les sorts de niveau %spellLevel%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
 	LOCAL_SET strref = 11020005
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
-		SPRINT description @15090002 // ~d'immuniser %theTarget% aux sorts~
+		SPRINT description @15090002 // ~d'immuniser %theTarget% contre les sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description (AT strref) // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~d'immuniser %theTarget% contre les sorts de niveau %spellLevel%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
 	LOCAL_SET strref = 11020003
 	PATCH_IF parameter1 == 0x1FF BEGIN // 511
-		SPRINT description @15090003 // ~Immunise %theTarget% aux sorts~
+		SPRINT description @15090003 // ~Immunise %theTarget% contre les sorts~
 	END
 	ELSE BEGIN
 		LPM ~opcode_509_common~
-		SPRINT description (AT strref) // ~Immunise %theTarget% aux sorts de niveau %spellLevel%~
+		SPRINT description (AT strref) // ~Immunise %theTarget% contre les sorts de niveau %spellLevel%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_509~ BEGIN
-	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% aux sorts de niveau %spellLevel%~
+	LPM ~opcode_self_probability_509~ // ~d'immuniser %theTarget% contre les sorts de niveau %spellLevel%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_509_post_group~ BEGIN
@@ -16230,17 +16230,17 @@ END
  * ------------------------ */
 DEFINE_PATCH_MACRO ~opcode_self_518~ BEGIN
 	LOCAL_SPRINT spellNames ~%custom_str%~
-	SPRINT description @15180001 // ~Immunité aux sorts %spellNames%~
+	SPRINT description @15180001 // ~Immunité contre les sorts « %spellNames% »~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_518~ BEGIN
 	LOCAL_SPRINT spellNames ~%custom_str%~
-	SPRINT description @15180003 // ~d'immuniser %theTarget% au sorts %spellNames%~
+	SPRINT description @15180003 // ~d'immuniser %theTarget% contre les sorts « %spellNames% »~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_518~ BEGIN
 	LOCAL_SPRINT spellNames ~%custom_str%~
-	SPRINT description @15180002 // ~Immunise %theTarget% aux sorts %spellNames%~
+	SPRINT description @15180002 // ~Immunise %theTarget% contre les sorts « %spellNames% »~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_518~ BEGIN

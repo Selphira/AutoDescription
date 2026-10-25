@@ -200,7 +200,7 @@
 @102288 = ~Multiplies %theStatistic% %ofTheTarget% by %value%~
 @102543 = ~to reduce %theStatistic% %ofTheTarget% by %value%~
 @102544 = ~to increase %theStatistic% %ofTheTarget% by %value%~
-@102545 = ~of setting %theStatistic% %ofTheTarget% to %value%~
+@102545 = ~to set %theStatistic% %ofTheTarget% to %value%~
 @102546 = ~to multiply %theStatistic% %ofTheTarget% by %value%~
 
 @102547 = ~Protects %resistName%~
@@ -1791,22 +1791,22 @@
 @10010004 = ~Attacks per round%colon%Fixed at %value%~
 @10010005 = ~Unable to attack~ // TODO: trouver une tournure pour self // Ne peut (plus) attaquer // Ne peut (plus) effectuer d'attaque pas sur de ce que self veut dire dans quel contexte ?...
 
-@10010011 = ~Changes the number of attacks per round %ofTheTarget% from %value%~
+@10010011 = ~Changes the number of attacks per round %ofTheTarget% by %value%~
 @10010012 = ~Changes the number of attacks per round %ofTheTarget% to %value%~
-@10010013 = ~Multiply the number of attacks per round %ofTheTarget% by %value%~
-@10010014 = ~Fix the number of attacks per round %ofTheTarget% to %value%~
-@10010015 = ~Prevent %theTarget% from attacking~
+@10010013 = ~Multiplies the number of attacks per round %ofTheTarget% by %value%~
+@10010014 = ~Sets the number of attacks per round %ofTheTarget% to %value%~
+@10010015 = ~Prevents %theTarget% from attacking~
 
-@10010021 = ~to change the number of attacks per round from %value%~
+@10010021 = ~to change the number of attacks per round by %value%~
 @10010022 = ~to change the number of attacks per round to %value%~
 @10010023 = ~to multiply the number of attacks per round by %value%~
-@10010024 = ~to fix the number of attacks per round to %value%~
+@10010024 = ~to set the number of attacks per round to %value%~
 @10010025 = ~to prevent %theTarget% from attacking~ // TODO: trouver une tournure pour self
 
-@10010031 = ~to change the number of attacks per round %ofTheTarget% from %value%~
+@10010031 = ~to change the number of attacks per round %ofTheTarget% by %value%~
 @10010032 = ~to change the number of attacks per round %ofTheTarget% to %value%~
 @10010033 = ~to multiply the number of attacks per round %ofTheTarget% by %value%~
-@10010034 = ~to fix the number of attacks per round %ofTheTarget% to %value%~
+@10010034 = ~to set the number of attacks per round %ofTheTarget% to %value%~
 @10010035 = ~to prevent %theTarget% from attacking~
 
 @10010101 = ~a half~
