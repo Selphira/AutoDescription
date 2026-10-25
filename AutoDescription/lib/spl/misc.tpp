@@ -699,7 +699,8 @@ BEGIN
 				SPRINT base_value @10002 // ~%value% %~
 			END
 			SET level = prev_level - 1
-			SPRINT complex_value ~%base_value% jusqu'au niveau %level%~
+			SPRINT baseValue ~%base_value%~
+			SPRINT complex_value @102167 // ~%baseValue% jusqu'au niveau %level%~
 		END
 		ELSE BEGIN
 			PATCH_IF is_percent BEGIN
@@ -708,7 +709,9 @@ BEGIN
 				SPRINT value ~%delta_value%~
 				SPRINT delta_value @10002 // ~%value% %~
 			END
-			SPRINT complex_value ~%base_value% + %delta_value% au niveau %level%~
+			SPRINT baseValue ~%base_value%~
+			SPRINT value ~%delta_value%~
+			SPRINT complex_value @102160 // ~%baseValue% + %value% au niveau %level%~
 		END
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN

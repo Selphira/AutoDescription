@@ -742,6 +742,8 @@ DEFINE_PATCH_FUNCTION ~get_opcode_position~
 		match_resref3    = ~~
 		match_custom_str = ~~
 		match_macro      = ~~
+		// Type de créature (177) de l'effet cherché, comparé par les macros qui le lisent.
+		match_target_type = ~~
 	RET
 		position
 BEGIN
