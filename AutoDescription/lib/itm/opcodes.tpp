@@ -3653,7 +3653,7 @@ DEFINE_PATCH_MACRO ~opcode_60_group~ BEGIN
 					match_saveType     = saveType
 					match_saveBonus    = saveBonus
 					match_special      = special
-				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~ match_target_type = ~%target_type%~
 				RET opcodePosition = position
 			END
 
@@ -4992,7 +4992,7 @@ DEFINE_PATCH_MACRO ~opcode_99_group~ BEGIN
 					match_saveType     = saveType
 					match_saveBonus    = saveBonus
 					match_special      = special
-				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~ match_target_type = ~%target_type%~
 				RET opcodePosition = position
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
@@ -7664,7 +7664,7 @@ DEFINE_PATCH_MACRO ~opcode_145_group~ BEGIN
 					match_saveType     = saveType
 					match_saveBonus    = saveBonus
 					match_special      = special
-				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~
+				STR_VAR match_macro = ~opcode_match_opcode_60_145_group~ match_target_type = ~%target_type%~
 				RET opcodePosition = position
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
@@ -9024,7 +9024,11 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 
 				SET $to_delete(~%currentPosition%~) = 1
 				SET position += 1000
-				SET custom_int = count
+				// Nombre d'effets réunis, sauf pour les opcodes dont custom_int est un masque ou un indicateur
+				// (types de sort des 60, 99 et 145, niveau du 200, durée des 112 et 171).
+				PATCH_IF opcode != 60 AND opcode != 99 AND opcode != 145 AND opcode != 200 AND opcode != 112 AND opcode != 171 BEGIN
+					SET custom_int = count
+				END
 				PATCH_IF ~%target_type%~ STRING_EQUAL ~0:000~ BEGIN
 					SPRINT target_type ~~
 				END
@@ -10223,7 +10227,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_204~ BEGIN
 	LPF ~get_spell_school~ INT_VAR school = parameter2 opcode RET spellSchoolName END
 
-	PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT ~%spellSchoolName%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @12040003 // ~Immunise %theTarget% contre les sorts de l'école %spellSchoolName%~
 	END
 END
@@ -18108,6 +18112,7 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_60_145_group~ BEGIN
 		AND match_saveType     == saveType
 		AND match_saveBonus    == saveBonus
 		AND match_special      == special
+		AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
     )
 END
 

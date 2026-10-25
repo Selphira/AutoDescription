@@ -168,6 +168,7 @@
 @102164 = ~%value% per %level% levels/%levelMax%~
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
+@102167 = ~%baseValue% up to level %level%~
 
 /* Type de dégâts */
 @600170 = ~hit point~
@@ -3076,10 +3077,10 @@
 
 // Opcode 204: Spell: Protection from Spell (School) [204]
 
-@12040001 = ~Protects from %spellSchoolName% spells~
-@12040002 = ~to protect from %spellSchoolName% spells~
-@12040003 = ~Protects %theTarget% from %spellSchoolName% spells~
-@12040004 = ~to protect %theTarget% from %spellSchoolName% spells~
+@12040001 = ~Protects from spells %spellSchoolName%~
+@12040002 = ~to protect from spells %spellSchoolName%~
+@12040003 = ~Protects %theTarget% from spells %spellSchoolName%~
+@12040004 = ~to protect %theTarget% from spells %spellSchoolName%~
 
 // Opcode 205: Spell: Protection from Spell (Secondary Type) [205]
 

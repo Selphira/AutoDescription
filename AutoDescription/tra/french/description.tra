@@ -171,6 +171,7 @@
 @102164 = ~%value% par tranche de %level% niveaux du lanceur/%levelMax%~
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
+@102167 = ~%baseValue% jusqu'au niveau %level%~
 
 /* Type de dégâts */
 @600170 = ~point de vie~
