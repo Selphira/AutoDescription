@@ -2509,7 +2509,7 @@
 @21340102 = ~d'être pétrifié~ // reprise de @11340003
 @21340103 = ~de pétrifier %theTarget%~ // reprise de @11340004
 
-// Opcode 135 : Métamorphose : 0000 créature sans nom, phrases 0100 métamorphose, 0110 déguisement (21 350 000-21 350 999)
+// Opcode 135 : Métamorphose : 0000 créature sans nom, phrases 0100 métamorphose, 0110 déguisement, 0120 retour à la forme naturelle (21 350 000-21 350 999)
 @21350000 = ~créature sans nom~ // reprise de @11350100
 @21350100 = ~Métamorphose en %creatureName%~ // reprise de @11350001
 @21350101 = ~Métamorphose %theTarget% en %creatureName%~ // reprise de @11350011
@@ -2519,6 +2519,10 @@
 @21350111 = ~Déguise %theTarget% en %creatureName%~ // reprise de @11350012
 @21350112 = ~de se déguiser en %creatureName%~ // reprise de @11350022
 @21350113 = ~de déguiser %theTarget% en %creatureName%~ // reprise de @11350032
+@21350120 = ~Retrouve sa forme naturelle~ // reprise de @11350003
+@21350121 = ~Rend sa forme naturelle à %theTarget%~ // reprise de @11350013
+@21350122 = ~de retrouver sa forme naturelle~ // reprise de @11350023
+@21350123 = ~de faire retrouver la forme naturelle de %theTarget%~ // reprise de @11350033
 
 // Opcode 136 : Visibilité forcée : phrases 0100 (21 360 000-21 360 999)
 @21360100 = ~Devient partiellement visible~ // reprise de @11360001

@@ -180,14 +180,14 @@ SPIN118	identical
 SPIN119	identical
 SPIN120	identical
 SPIN121	identical
-SPIN122	not_covered	not_implemented:opcode135:natural_form
-SPIN123	not_covered	not_implemented:opcode135:natural_form
-SPIN124	not_covered	not_implemented:opcode135:natural_form
+SPIN122	identical
+SPIN123	identical
+SPIN124	identical
 SPIN125	identical
 SPIN126	identical
 SPIN127	identical
-SPIN150	not_covered	not_implemented:opcode135:natural_form
-SPIN151	not_covered	not_implemented:opcode135:natural_form
+SPIN150	identical
+SPIN151	identical
 SPIN152	identical
 SPIN153	identical
 SPIN154	identical
@@ -199,7 +199,7 @@ SPIN200	identical
 SPIN201	identical
 SPIN202	identical
 SPIN203	identical
-SPIN529	not_covered	not_implemented:opcode135:natural_form
+SPIN529	identical
 SPIN530	not_covered	file_error:opcode173:invalid
 SPIN531	identical
 SPIN532	identical
@@ -241,7 +241,7 @@ SPIN653	identical
 SPIN654	identical
 SPIN655	identical
 SPIN663	identical
-SPIN667	not_covered	not_implemented:opcode135:natural_form
+SPIN667	identical
 SPIN676	identical
 SPIN679	identical
 SPIN681	identical
@@ -266,8 +266,8 @@ SPIN710	identical
 SPIN711	identical
 SPIN714	identical
 SPIN717	identical
-SPIN718	not_covered	not_implemented:opcode135:natural_form
-SPIN718A	not_covered	not_implemented:opcode135:natural_form
+SPIN718	identical
+SPIN718A	identical
 SPIN719	identical
 SPIN723	identical
 SPIN730	identical
@@ -327,7 +327,7 @@ SPIN956	identical
 SPIN958	identical
 SPIN974	identical
 SPIN998	identical
-SPINHUM	not_covered	not_implemented:opcode135:natural_form
+SPINHUM	identical
 SPJA01	not_covered	file_error:recursion:application:no_duration
 SPMDSLAY	not_covered	not_implemented:opcode112:no_name
 SPOGRE01	identical
@@ -587,9 +587,9 @@ SPWI421	identical
 SPWI423	identical
 SPWI424	identical
 SPWI425	identical
-SPWI489	not_covered	not_implemented:opcode135:natural_form
-SPWI490	not_covered	not_implemented:opcode135:natural_form
-SPWI491	not_covered	not_implemented:opcode135:natural_form
+SPWI489	identical
+SPWI490	identical
+SPWI491	identical
 SPWI493	identical
 SPWI494	identical
 SPWI495	identical

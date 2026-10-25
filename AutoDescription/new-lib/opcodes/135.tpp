@@ -1,13 +1,13 @@
 // Opcode 135 (Graphics: Polymorph into Specific) : métamorphose en la créature resource
 // (parameter2 0) ou déguisement (sinon) : « Métamorphose en Ogre » ; une créature sans nom est
-// « créature sans nom ». Code commun dans new-lib/opcodes/states.tpp. Une arme créée (111) qui
+// « créature sans nom » ; sans ressource, retour à la forme naturelle, dont l'ancien moteur n'écrit
+// pas la durée (opcode_135_common) : « Retrouve sa forme naturelle ». Code commun dans new-lib/opcodes/states.tpp. Une arme créée (111) qui
 // métamorphose est remplacée par sa métamorphose (new-lib/opcodes/111.tpp, fx_from_111) ; avec
 // AD_ENABLE_SHRINKAGE, la métamorphose retire le retour à la forme naturelle (ad_group_polymorph,
 // new-lib/groups.tpp).
 
 // Comme l'ancien opcode_111_replace, une métamorphose venue d'un 111 est écartée si sa portée en a
-// déjà une, du fichier ou d'un 111 précédent, de même timing et de même durée. Refus : ressource vide
-// (retour à la forme naturelle : l'ancien moteur n'en écrit pas la durée).
+// déjà une, du fichier ou d'un 111 précédent, de même timing et de même durée.
 DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 	PHP_EACH fx_ids_135 AS _ => polymorph_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_from_111(~%polymorph_id%~) AND NOT $fx_consumed(~%polymorph_id%~) BEGIN
@@ -32,9 +32,6 @@ DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 				SPRINT polymorph_name @21350000 // ~créature sans nom~
 			END
 			SPRINT $fx_creature_name(~%polymorph_id%~) ~%polymorph_name%~
-			PATCH_IF ~%polymorph_resref%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = polymorph_id STR_VAR reason = ~not_implemented:opcode135:natural_form~ message = ~polymorph back to natural form~ RET render_missing = refusal END
-			END
 		END
 	END
 END
@@ -45,8 +42,13 @@ DEFINE_PATCH_MACRO ad_op_135_lines BEGIN
 	LPM ad_state_lines
 END
 
-// Variante 0 : métamorphose, 1 : déguisement.
+// Variante 0 : métamorphose, 1 : déguisement, 2 : retour à la forme naturelle.
 DEFINE_PATCH_MACRO ad_op_135_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~) == 0 ? 0 : 1
 	SPRINT creatureName $fx_creature_name(~%line_fx%~)
+	SPRINT polymorph_resref $fx_resource(~%line_fx%~)
+	PATCH_IF ~%polymorph_resref%~ STRING_EQUAL ~~ BEGIN
+		SET state_variant = 2
+		SET line_no_duration = 1
+	END
 END
