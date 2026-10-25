@@ -8746,6 +8746,9 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 		SET duration177 = duration
 		SET target177 = target
 		SET probability177 = probability
+		// Lues par opcode_177_replace_effect_vars pour un effet probable (opcode 283).
+		SET probability1177 = probability1
+		SET probability2177 = probability2
 		SET saveType177 = saveType
 		SET saveBonus177 = saveBonus
 		SET diceSides177 = diceSides // levelMin
@@ -11144,16 +11147,16 @@ END
 /* ---------------------------------- *
  * Spell Effect: Teleport Field [222] *
  * ---------------------------------- */
+// Portée en unités de rayon de projectile, 16 par pied (IESDP).
 DEFINE_PATCH_MACRO ~opcode_self_222~ BEGIN
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = parameter1 / 16
 	LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
 
 	SPRINT description @12220001 // ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_222~ BEGIN
-	LOCAL_SET value = parameter1
-	LOCAL_SET value = parameter1
+	LOCAL_SET value = parameter1 / 16
 	LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
 
 	SPRINT description @12220002 // ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~
@@ -12351,6 +12354,8 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_251~ BEGIN
 	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+	SPRINT name @12510010 // ~Remplace le chant de barde~
+	LPM ~opcode_sub_description_heading~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
@@ -12359,7 +12364,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_251~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_251~ BEGIN
-	LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
+	LPM ~opcode_self_251~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_251~ BEGIN
@@ -12383,18 +12388,22 @@ END
  * ---------------------------- */
 
 DEFINE_PATCH_MACRO ~opcode_self_252~ BEGIN
+    LOCAL_SET strref = 12520001 // ~Tente de poser un piège « %spellName% »~
     LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_252~ BEGIN
+    LOCAL_SET strref = 12520002 // ~de tenter de poser un piège « %spellName% »~
     LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_252~ BEGIN
+    LOCAL_SET strref = 12520003 // ~Fait poser un piège « %spellName% » %toTheTarget%~
     LPM ~opcode_252_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_252~ BEGIN
+    LOCAL_SET strref = 12520004 // ~de faire poser un piège « %spellName% » %toTheTarget%~
     LPM ~opcode_252_common~
 END
 
@@ -12402,7 +12411,27 @@ DEFINE_PATCH_MACRO ~opcode_252_common~ BEGIN
     LOCAL_SET type = 0
     LOCAL_SET castingLevel = 0
     LOCAL_SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
-    LPM ~opcode_146_get_spell_effects_description~
+    // Un piège nommé est cité ; sinon ses effets sont décrits sous un en-tête.
+    LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%resref%~ RET spellName END
+    PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+        SPRINT description (AT strref)
+    END
+    ELSE BEGIN
+        LPM ~opcode_146_get_spell_effects_description~
+        SPRINT name @12520010 // ~Tente de poser un piège~
+        LPM ~opcode_sub_description_heading~
+    END
+END
+
+// En-tête name devant la description d'un sous-sort (opcodes 251 et 252) : une seule ligne la suit,
+// plusieurs (description commencée par un saut de ligne) passent en retrait.
+DEFINE_PATCH_MACRO ~opcode_sub_description_heading~ BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY ~%crlf%~ ~%crlf%  ~
+		END
+		SPRINT description ~%name%%colon%%description%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_252_is_valid~ BEGIN
@@ -13386,35 +13415,22 @@ DEFINE_PATCH_MACRO ~opcode_self_283~ BEGIN
 	END
 END
 
+// « Malédiction : » est ajouté devant « 20 % de chances » (get_effect_description).
 DEFINE_PATCH_MACRO ~opcode_self_probability_283~ BEGIN
-	SET forceSort = 1
-	SET sort = 0
 	LPM ~opcode_self_probability_177~
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @12830002 // ~de maudir %theTarget% et~
-		SPRINT description ~%name% %description%~
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_283~ BEGIN
 	LPM ~opcode_target_177~
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @12830003 // ~Maudit %theTarget% et~
-		SPRINT description ~%name% %description%~
+		SPRINT name @12830001 // ~Malédiction~
+		SPRINT description ~%name%%colon%%description%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_283~ BEGIN
-	SET forceSort = 1
-	SET sort = 0
 	LPM ~opcode_target_probability_177~
-
-	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
-		SPRINT name @12830002 // ~de maudir %theTarget% et~
-		SPRINT description ~%name%%colon%%description%~
-	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_283_is_valid~ BEGIN
