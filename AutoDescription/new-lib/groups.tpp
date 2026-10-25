@@ -161,8 +161,10 @@ DEFINE_PATCH_MACRO ad_group_abilities BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 10 15 19 44 49 END
 	SPRINT group_derived ~ABILITIES~
 	SPRINT group_name @30030000 // ~Caractéristiques~
+	SET group_statistic_tra = 30030002 // ~les caractéristiques~
 	SPRINT group_line ~ad_group_modifier_line~
 	LPM ad_group_same_fields
+	SET group_statistic_tra = 0
 END
 
 // Cinq jets de sauvegarde modifiés de la même façon (ancien opcode_33_group, qui produit un effet
@@ -187,8 +189,10 @@ DEFINE_PATCH_MACRO ad_group_thief_skills BEGIN
 	PATCH_DEFINE_ARRAY group_members BEGIN 90 91 92 275 276 277 END
 	SPRINT group_derived ~THIEF_SKILLS~
 	SPRINT group_name @30090000 // ~Compétences de roublard~
+	SET group_statistic_tra = 30090002 // ~les compétences de roublard~
 	SPRINT group_line ~ad_group_modifier_line~
 	LPM ad_group_same_fields
+	SET group_statistic_tra = 0
 END
 
 // Onze résistances modifiées de la même façon (ancien opcode_group_all_resistances, opcode
@@ -268,9 +272,17 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength_line BEGIN
 		SPRINT bonus ~00~
 	END
 	SPRINT value ~%strength%/%bonus%~
-	SPRINT value @1200002 // ~Passe à %value%~
-	SPRINT name @8000036 // ~Force~
-	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+	SET line_fx = group_id
+	LPM ad_application_form
+	PATCH_IF line_form == 0 BEGIN
+		SPRINT value @1200002 // ~Passe à %value%~
+		SPRINT name @8000036 // ~Force~
+		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+	END
+	ELSE BEGIN
+		SPRINT theStatistic @8060036 // ~la force~
+		SET line_phrase = 1210130 // ~Porte à %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
 END
 
 // Immunités aux projectiles (ancien opcode_83_group) : une immunité au projectile P (83) absorbe
@@ -1167,29 +1179,43 @@ DEFINE_PATCH_MACRO ad_derived_lines BEGIN
 END
 
 // « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp), en pourcentage
-// si l'opcode d'ancrage l'est. Sur une autre cible que soi, avec un libellé de la statistique
-// (group_statistic_tra), la phrase à la forme « cible » des modificateurs (ancien opcode_target) :
+// si l'opcode d'ancrage l'est. À une autre forme que « soi », avec un libellé de la statistique
+// (group_statistic_tra), la phrase des modificateurs (ancien opcode_target et opcode_probability) :
 // « Augmente de 2 les jets de sauvegarde du porteur » ; le mode 3 des jeux EE y est un ajout.
 DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 	SET group_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%group_anchor%~)
 	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode percent = group_percent RET value = text END
 	SPRINT name ~%group_name%~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-	SET group_target = $fx_effective_target(~%group_id%~)
-	PATCH_IF group_statistic_tra > 0 AND group_target != TARGET_FX_self AND group_target != TARGET_FX_original_caster BEGIN
+	SET line_fx = group_id
+	LPM ad_application_form
+	PATCH_IF group_statistic_tra > 0 AND line_form != 0 BEGIN
 		LPF ad_tra INT_VAR tra_id = group_statistic_tra RET theStatistic = text END
-		SET value = ABS group_value
-		SET line_phrase = group_mode == MOD_TYPE_flat ? 1210130 : (group_mode == MOD_TYPE_percentage ? 1210140
-			: (group_value >= 0 ? 1210110 : 1210120)) // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+		SET stat_value = group_value
+		SET stat_mode = group_mode
+		SET stat_percent = group_percent
+		LPM ad_stat_modifier_phrase
 	END
 END
 
 // Ligne de résistance (new-lib/opcodes/resistances.tpp), nom au libellé group_name_tra, valeur
-// remplacée par sa progression selon le niveau du sort (new-lib/spell_levels.tpp).
+// remplacée par sa progression selon le niveau du sort (new-lib/spell_levels.tpp) ; à une autre forme
+// que « soi », la phrase des résistances (« Immunise la cible aux dégâts physiques »).
 DEFINE_PATCH_MACRO ad_group_resistance_line BEGIN
 	SPRINT group_level_value $fx_level_value(~%group_id%~)
-	LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra
-		STR_VAR level_value = ~%group_level_value%~ RET line_text = text END
+	SET line_fx = group_id
+	LPM ad_application_form
+	PATCH_IF line_form == 0 BEGIN
+		LPF ad_resistance_text INT_VAR value = group_value mode = group_mode name_tra = group_name_tra
+			STR_VAR level_value = ~%group_level_value%~ RET line_text = text END
+	END
+	ELSE BEGIN
+		SET stat_value = group_value
+		SET stat_mode = group_mode
+		SPRINT stat_level_value ~%group_level_value%~
+		SET resist_name_tra = group_name_tra
+		LPM ad_resistance_target_phrase
+	END
 END
 
 // fx_same : les effets same_id et same_other ont les champs qui doivent être égaux pour être réunis,

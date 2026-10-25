@@ -49,6 +49,9 @@
 @1210131 = ~Porte à %value% %theStatistic% %ofTheTarget%~ // reprise de @102287
 @1210132 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
 @1210133 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
+@1210141 = ~Multiplie par %value% %theStatistic% %ofTheTarget%~ // reprise de @102288
+@1210142 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~ // reprise de @102546
+@1210143 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~ // reprise de @102546
 
 // Mise en forme : titres de sections (1 300 000-1 300 099)
 @1300000 = ~PARAMÈTRES~ // reprise de @100003
@@ -189,6 +192,7 @@
 @5000000 = ~Jets de sauvegarde~ // reprise de @102034
 @5000001 = ~Immunité %resistName%~ // reprise de @102547
 @5000002 = ~les jets de sauvegarde~ // reprise de @13250002
+@5000003 = ~les jets de sauvegarde %versus%~ // reprise de @10330002
 @5000010 = ~jet de sauvegarde %saveTypeStr% pour annuler~ // reprise de @102121
 @5000012 = ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~ // reprise de @102122
 @5000020 = ~ignore la cible principale~ // reprise de @102170
@@ -206,8 +210,20 @@
 @5000068 = ~Baguettes, sceptres et bâtons~ // reprise de @103008
 @5000076 = ~Pétrification et métamorphose~ // reprise de @103016
 @5000111 = ~Augmente de %value% %theStatistic% %ofTheTarget%~ // reprise de @102286
+@5000112 = ~d'augmenter de %value% %theStatistic% %ofTheTarget%~ // reprise de @102544
+@5000113 = ~d'augmenter de %value% %theStatistic% %ofTheTarget%~ // reprise de @102544
 @5000121 = ~Réduit de %value% %theStatistic% %ofTheTarget%~ // reprise de @102285
+@5000122 = ~de réduire de %value% %theStatistic% %ofTheTarget%~ // reprise de @102543
+@5000123 = ~de réduire de %value% %theStatistic% %ofTheTarget%~ // reprise de @102543
+@5000131 = ~Porte à %value% %theStatistic% %ofTheTarget%~ // reprise de @102287
+@5000132 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
+@5000133 = ~de passer à %value% %theStatistic% %ofTheTarget%~ // reprise de @102545
+@5000141 = ~Multiplie par %value% %theStatistic% %ofTheTarget%~ // reprise de @102288
+@5000142 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~ // reprise de @102546
+@5000143 = ~de multiplier par %value% %theStatistic% %ofTheTarget%~ // reprise de @102546
 @5000151 = ~Immunise %theTarget% %resistName%~ // reprise de @102552
+@5000152 = ~d'immuniser %theTarget% %resistName%~ // reprise de @102549
+@5000153 = ~d'immuniser %theTarget% %resistName%~ // reprise de @102549
 
 // Objets : lignes fixes des capacités d'équipement (6 000 000-6 000 099)
 @6000000 = ~Maudit%AD_COLON%Ne peut être ôté qu'à l'aide d'un sort de Délivrance de la malédiction~ // reprise de @102126
@@ -723,11 +739,26 @@
 
 // Listes indexées : statistique d'une phrase à la forme « cible », 8 060 000 + valeur de stats.ids (8 060 000-8 069 999)
 @8060007 = ~le TAC0~ // reprise de @10540002
+@8060025 = ~les connaissances~ // reprise de @10210002
+@8060026 = ~le score de Crochetage de serrures~ // reprise de @10900002
+@8060027 = ~le score de Déplacement silencieux~ // reprise de @10590002
+@8060028 = ~le score de Détection et désamorçage des pièges~ // reprise de @10910002
+@8060029 = ~le score de Vol à la tire~ // reprise de @10920002
+@8060030 = ~la fatigue~ // reprise de @10930002
+@8060031 = ~l'ébriété~ // reprise de @10940002
 @8060032 = ~la chance~ // reprise de @10220002
+@8060034 = ~le niveau~ // reprise de @10960002
 @8060036 = ~la force~ // reprise de @10440002
+@8060037 = ~la force exceptionnelle~ // reprise de @10970002
+@8060038 = ~l'intelligence~ // reprise de @10190002
 @8060039 = ~la sagesse~ // reprise de @10490002
 @8060040 = ~la dextérité~ // reprise de @10150002
+@8060041 = ~la constitution~ // reprise de @10100002
 @8060042 = ~le charisme~ // reprise de @10060002
+@8060044 = ~l'expérience~ // reprise de @11040002
+@8060135 = ~le score de Se cacher dans l'ombre~ // reprise de @12750002
+@8060136 = ~le score de Détection des illusions~ // reprise de @12760002
+@8060137 = ~le score de Pose de pièges~ // reprise de @12770002
 
 // Noms des projectiles, 8 070 000 + index (AD_PROJECTILE_NAMES) (8 070 000-8 070 999)
 @8070001 = ~flèches~ // reprise de @300001
@@ -1600,6 +1631,8 @@
 @20000113 = ~d'accorder un bonus de %value% à la classe d'armure %ofTheTarget%~ // reprise de @10000103
 @20000122 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~ // reprise de @10000104
 @20000123 = ~d'infliger un malus de %value% à la classe d'armure %ofTheTarget%~ // reprise de @10000104
+@20000132 = ~de passer la classe d'armure de base %ofTheTarget% à %value%~ // reprise de @10000105
+@20000133 = ~de passer la classe d'armure de base %ofTheTarget% à %value%~ // reprise de @10000105
 
 // Opcode 0 : types d'attaque, 20 001 000 + masque de parameter2 (20 001 000-20 001 015)
 @20001001 = ~contre les armes contondantes~ // reprise de @10000001
@@ -1747,6 +1780,7 @@
 @20160102 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %toTheTarget%~ // reprise de @10160014
 @20160103 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %toTheTarget%~ // reprise de @10160014
 @20160110 = ~Double la vitesse de déplacement et le nombre d'attaques par round~ // reprise de @10160012
+@20160111 = ~Double la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160018
 @20160112 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160015
 @20160113 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160015
 @20160120 = ~Double la vitesse de déplacement~ // reprise de @10160013
@@ -1758,6 +1792,7 @@
 @20160132 = ~de lancer Hâte sur %theTarget%~ // reprise de @10160004
 @20160133 = ~de lancer Hâte sur %theTarget%~ // reprise de @10160004
 @20160140 = ~Hâte améliorée~ // reprise de @10160002
+@20160141 = ~Lance Hâte améliorée sur %theTarget%~ // reprise de @10160008
 @20160142 = ~de lancer Hâte améliorée sur %theTarget%~ // reprise de @10160005
 @20160143 = ~de lancer Hâte améliorée sur %theTarget%~ // reprise de @10160005
 @20160150 = ~Hâte (sans bonus d'attaque par round)~ // reprise de @10160003
@@ -1789,6 +1824,8 @@
 // Opcode 18 : libellés (20 180 000-20 180 099)
 @20180000 = ~Points de vie maximums~ // reprise de @10180001
 @20180001 = ~Points de vie~ // reprise de @10180003
+@20180002 = ~les points de vie maximums~ // reprise de @10180002
+@20180003 = ~les points de vie~ // reprise de @10180004
 
 // Opcode 20 : Invisibilité : 0100 invisibilité, 0110 améliorée (20 200 000-20 200 999)
 @20200100 = ~Invisibilité~ // reprise de @10200001
@@ -1853,6 +1890,7 @@
 // Opcode 31 : libellés (20 310 000-20 310 099)
 @20310000 = ~Résistance aux dégâts magiques~ // reprise de @10310001
 @20310001 = ~aux dégâts magiques~ // reprise de @10310002
+@20310002 = ~la résistance aux dégâts magiques~ // reprise de @10310003
 
 // Opcode 32 : Soin : résurrection (20 320 000-20 320 999)
 @20320100 = ~Ressuscite %theTarget%~ // reprise de @10320001
@@ -2037,6 +2075,7 @@
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001
+@20730002 = ~les dégâts~ // reprise de @10730002
 
 // Opcode 74 : Cécité (20 740 000-20 740 999)
 @20740100 = ~Cécité~ // reprise de @10740001
@@ -2169,26 +2208,32 @@
 // Opcode 84 : libellés (20 840 000-20 840 099)
 @20840000 = ~Résistance aux dégâts de feu magiques~ // reprise de @10840001
 @20840001 = ~aux dégâts de feu magiques~ // reprise de @10840002
+@20840002 = ~la résistance aux dégâts de feu magiques~ // reprise de @10840003
 
 // Opcode 85 : libellés (20 850 000-20 850 099)
 @20850000 = ~Résistance aux dégâts de froid magiques~ // reprise de @10850001
 @20850001 = ~aux dégâts de froid magiques~ // reprise de @10850002
+@20850002 = ~la résistance aux dégâts de froid magiques~ // reprise de @10850003
 
 // Opcode 86 : libellés (20 860 000-20 860 099)
 @20860000 = ~Résistance aux dégâts tranchants~ // reprise de @10860001
 @20860001 = ~aux dégâts tranchants~ // reprise de @10860002
+@20860002 = ~la résistance aux dégâts tranchants~ // reprise de @10860003
 
 // Opcode 87 : libellés (20 870 000-20 870 099)
 @20870000 = ~Résistance aux dégâts contondants~ // reprise de @10870001
 @20870001 = ~aux dégâts contondants~ // reprise de @10870002
+@20870002 = ~la résistance aux dégâts contondants~ // reprise de @10870003
 
 // Opcode 88 : libellés (20 880 000-20 880 099)
 @20880000 = ~Résistance aux dégâts perforants~ // reprise de @10880001
 @20880001 = ~aux dégâts perforants~ // reprise de @10880002
+@20880002 = ~la résistance aux dégâts perforants~ // reprise de @10880003
 
 // Opcode 89 : libellés (20 890 000-20 890 099)
 @20890000 = ~Résistance aux dégâts de projectiles~ // reprise de @10890001
 @20890001 = ~aux dégâts de projectiles~ // reprise de @10890002
+@20890002 = ~la résistance aux dégâts de projectiles~ // reprise de @10890003
 
 // Opcode 98 : Régénération : phrases 0100 un point, 0110 plusieurs (20 980 000-20 980 999)
 @20980100 = ~Régénère 1 point de vie %strDuration%~ // reprise de @10980001
@@ -2213,6 +2258,8 @@
 // Opcode 101 : phrases (21 010 100-21 010 999)
 @21010100 = ~Immunité %opcodeStr%~ // reprise de @11010001
 @21010101 = ~Immunise %theTarget% %opcodeStr%~ // reprise de @11010002
+@21010102 = ~d'être immunisé %opcodeStr%~ // reprise de @11010003
+@21010103 = ~d'immuniser %theTarget% %opcodeStr%~ // reprise de @11010004
 
 // Opcode 102 : immunité par niveau de sort, réunie (ancien opcode 509) : phrases 0110 niveaux 1 à N,
 // 0120 tous les niveaux (21 020 000-21 020 999)
@@ -2454,6 +2501,9 @@
 
 // Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
 @21440100 = ~Empêche~ // reprise de @11440050
+@21440101 = ~Empêche %theTarget%~ // reprise de @11440040
+@21440102 = ~d'empêcher~ // reprise de @11440051
+@21440103 = ~d'empêcher %theTarget%~ // reprise de @11440041
 @21441000 = ~%action% l'utilisation du camouflage dans l'ombre~ // reprise de @11440001
 @21441001 = ~%action% l'utilisation des compétences de roublard~ // reprise de @11440002
 @21441002 = ~%action% l'utilisation des sorts~ // reprise de @11440003
@@ -2470,6 +2520,22 @@
 @21441013 = ~%action% l'utilisation des sorts innés~ // reprise de @11440014
 @21441014 = ~%action% l'utilisation de la détection des pièges et des illusions~ // reprise de @11440015
 @21441015 = ~%action% l'utilisation de l'inventaire~ // reprise de @11440016
+@21441100 = ~%action% d'utiliser le camouflage dans l'ombre~ // reprise de @11440021
+@21441101 = ~%action% d'utiliser les compétences de roublard~ // reprise de @11440022
+@21441102 = ~%action% d'utiliser les sorts~ // reprise de @11440023
+@21441103 = ~%action% d'utiliser le premier sort rapide~ // reprise de @11440024
+@21441104 = ~%action% d'utiliser le second sort rapide~ // reprise de @11440025
+@21441105 = ~%action% d'utiliser le troisième sort rapide~ // reprise de @11440026
+@21441106 = ~%action% d'utiliser Repousser les morts-vivants~ // reprise de @11440027
+@21441107 = ~%action% d'utiliser les discussions~ // reprise de @11440028
+@21441108 = ~%action% d'utiliser les objets~ // reprise de @11440029
+@21441109 = ~%action% d'utiliser le premier objet rapide~ // reprise de @11440030
+@21441110 = ~%action% d'utiliser les chants de barde et les danses de shaman~ // reprise de @11440031
+@21441111 = ~%action% d'utiliser le second objet rapide~ // reprise de @11440032
+@21441112 = ~%action% d'utiliser le troisième objet rapide~ // reprise de @11440033
+@21441113 = ~%action% d'utiliser les sorts innés~ // reprise de @11440034
+@21441114 = ~%action% d'utiliser la détection des pièges et des illusions~ // reprise de @11440035
+@21441115 = ~%action% d'utiliser l'inventaire~ // reprise de @11440036
 
 // Opcode 145 : phrases 0100 types de sort nommés, 0110 tous les sorts (21 450 000-21 450 999)
 @21450100 = ~Empêche %theTarget% de lancer des sorts %spellType%~ // reprise de @11450000
@@ -2625,6 +2691,7 @@
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Résistance aux poisons~ // reprise de @11730001
 @21730001 = ~aux poisons~ // reprise de @11730002
+@21730002 = ~la résistance aux poisons~ // reprise de @11730003
 
 // Opcode 175 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 750 000-21 750 999)
 @21750100 = ~Paralyse %theTarget%~ // reprise de @11090002
@@ -2738,6 +2805,9 @@
 
 // Opcode 206 : phrases (22 060 100-22 060 999)
 @22060100 = ~Immunité au sort « %spellName% »~ // reprise de @12060001
+@22060101 = ~Immunise %theTarget% au sort « %spellName% »~ // reprise de @12060002
+@22060102 = ~d'immuniser %theTarget% au sort « %spellName% »~ // reprise de @12060003
+@22060103 = ~d'immuniser %theTarget% au sort « %spellName% »~ // reprise de @12060003
 
 // Opcode 207 : Renvoi d'un sort : phrases 0100, formes « soi » seulement, comme dans l'ancien moteur (22 070 000-22 070 999)
 @22070100 = ~Renvoie le sort « %spellName% »~ // reprise de @12070001
@@ -3109,24 +3179,30 @@
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001
+@22810002 = ~le modificateur des hiatus entropiques~ // reprise de @12810002
 
 // Opcode 283 : EFF maudit : 0000 « Malédiction », devant la ligne de l'effet de l'EFF (22 830 000-22 830 999)
 @22830000 = ~Malédiction~ // reprise de @12830001
 
 // Opcode 284 : libellés (22 840 000-22 840 099)
 @22840000 = ~TAC0 des armes de mêlée~ // reprise de @12840001
+@22840002 = ~le TAC0 des armes de mêlée~ // reprise de @12840002
 
 // Opcode 285 : libellés (22 850 000-22 850 099)
 @22850000 = ~Dégâts des armes de mêlée~ // reprise de @12850001
+@22850002 = ~les dégâts des armes de mêlée~ // reprise de @12850002
 
 // Opcode 286 : libellés (22 860 000-22 860 099)
 @22860000 = ~Dégâts des armes à projectiles~ // reprise de @12860001
+@22860002 = ~les dégâts des armes à projectiles~ // reprise de @12860002
 
 // Opcode 288 : libellés (22 880 000-22 880 099)
 @22880000 = ~TAC0 à mains nues~ // reprise de @12880001
+@22880002 = ~le TAC0 à mains nues~ // reprise de @12880002
 
 // Opcode 289 : libellés (22 890 000-22 890 099)
 @22890000 = ~Dégâts à mains nues~ // reprise de @12890001
+@22890002 = ~les dégâts à mains nues~ // reprise de @12890002
 
 // Opcode 292 : Attaques sournoises : phrases 0100 immunité, 0110 sensibilité (22 920 000-22 920 999)
 @22920100 = ~Immunité aux attaques sournoises~ // reprise de @12920001
@@ -3170,9 +3246,11 @@
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~TAC0 de la main secondaire~ // reprise de @13050001
+@23050002 = ~le TAC0 de la main secondaire~ // reprise de @13050002
 
 // Opcode 306 : libellés (23 060 000-23 060 099)
 @23060000 = ~TAC0 de la main principale~ // reprise de @13060001
+@23060002 = ~le TAC0 de la main principale~ // reprise de @13060002
 
 // Opcode 317 : Hâte (2) : comme l'opcode 16 (23 170 000-23 170 999)
 @23170100 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round~ // reprise de @10160011
@@ -3180,6 +3258,7 @@
 @23170102 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %toTheTarget%~ // reprise de @10160014
 @23170103 = ~de doubler la vitesse de déplacement et d'accorder une attaque supplémentaire par round %toTheTarget%~ // reprise de @10160014
 @23170110 = ~Double la vitesse de déplacement et le nombre d'attaques par round~ // reprise de @10160012
+@23170111 = ~Double la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160018
 @23170112 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160015
 @23170113 = ~de doubler la vitesse de déplacement et le nombre d'attaques par round %ofTheTarget%~ // reprise de @10160015
 @23170120 = ~Double la vitesse de déplacement~ // reprise de @10160013
@@ -3191,6 +3270,7 @@
 @23170132 = ~de lancer Hâte sur %theTarget%~ // reprise de @10160004
 @23170133 = ~de lancer Hâte sur %theTarget%~ // reprise de @10160004
 @23170140 = ~Hâte améliorée~ // reprise de @10160002
+@23170141 = ~Lance Hâte améliorée sur %theTarget%~ // reprise de @10160008
 @23170142 = ~de lancer Hâte améliorée sur %theTarget%~ // reprise de @10160005
 @23170143 = ~de lancer Hâte améliorée sur %theTarget%~ // reprise de @10160005
 @23170150 = ~Hâte (sans bonus d'attaque par round)~ // reprise de @10160003
@@ -3347,12 +3427,23 @@
 @23320002 = ~Dégâts de froid~ // reprise de @13320002
 @23320003 = ~Dégâts d'électricité~ // reprise de @13320003
 @23320004 = ~Dégâts d'acide~ // reprise de @13320004
-@23320005 = ~Dégâts magique~ // reprise de @13320005
+@23320005 = ~Dégâts magiques~ // reprise de @13320005
 @23320006 = ~Dégâts de poison~ // reprise de @13320006
 @23320007 = ~Dégâts tranchants~ // reprise de @13320007
 @23320008 = ~Dégâts perforants~ // reprise de @13320008
 @23320009 = ~Dégâts contondants~ // reprise de @13320009
 @23320010 = ~Dégâts de projectiles~ // reprise de @13320010
+@23320100 = ~les dégâts~ // reprise de @13320100
+@23320101 = ~les dégâts de feu~ // reprise de @13320101
+@23320102 = ~les dégâts de froid~ // reprise de @13320102
+@23320103 = ~les dégâts d'électricité~ // reprise de @13320103
+@23320104 = ~les dégâts d'acide~ // reprise de @13320104
+@23320105 = ~les dégâts magiques~ // reprise de @13320105
+@23320106 = ~les dégâts de poison~ // reprise de @13320106
+@23320107 = ~les dégâts tranchants~ // reprise de @13320107
+@23320108 = ~les dégâts perforants~ // reprise de @13320108
+@23320109 = ~les dégâts contondants~ // reprise de @13320109
+@23320110 = ~les dégâts de projectiles~ // reprise de @13320110
 
 // Opcode 337 : Retrait des effets d'un opcode : phrases 0100 (23 370 000-23 370 999)
 @23370100 = ~Dissipe %opcodeStr%~ // reprise de @13370001
@@ -3401,24 +3492,32 @@
 
 // Effet dérivé 003, ABILITIES : libellés (30 030 000-30 030 099)
 @30030000 = ~Caractéristiques~ // reprise de @15010001
+@30030002 = ~les caractéristiques~ // reprise de @15010002
 
 // Effet dérivé 005, ALL_RESISTANCES : libellés (30 050 000-30 050 099)
 @30050000 = ~Résistance aux dégâts~ // reprise de @15020001
 @30050001 = ~aux dégâts~ // reprise de @15020002
+@30050002 = ~la résistance aux dégâts~ // reprise de @15020003
 
 // Effet dérivé 006, ELEMENTAL_RESISTANCES : libellés (30 060 000-30 060 099)
 @30060000 = ~Résistance aux dégâts élémentaires~ // reprise de @15030001
 @30060001 = ~aux dégâts élémentaires~ // reprise de @15030002
+@30060002 = ~la résistance aux dégâts élémentaires~ // reprise de @15030003
 
 // Effet dérivé 007, PHYSICAL_RESISTANCES : libellés (30 070 000-30 070 099)
 @30070000 = ~Résistance aux dégâts physiques~ // reprise de @15040001
 @30070001 = ~aux dégâts physiques~ // reprise de @15040002
+@30070002 = ~la résistance aux dégâts physiques~ // reprise de @15040003
 
 // Effet dérivé 009, THIEF_SKILLS : libellés (30 090 000-30 090 099)
 @30090000 = ~Compétences de roublard~ // reprise de @15000001
+@30090002 = ~les compétences de roublard~ // reprise de @15000002
 
 // Effet dérivé 010, SPELL_IMMUNITIES : phrases (30 100 100-30 100 999)
 @30100100 = ~Immunité aux sorts « %spellNames% »~ // reprise de @15180001
+@30100101 = ~Immunise %theTarget% aux sorts « %spellNames% »~ // reprise de @15180002
+@30100102 = ~d'immuniser %theTarget% aux sorts « %spellNames% »~ // reprise de @15180003
+@30100103 = ~d'immuniser %theTarget% aux sorts « %spellNames% »~ // reprise de @15180003
 
 // Effet dérivé 011, FREE_ACTION : phrases (30 110 100-30 110 999)
 @30110100 = ~Action libre~ // reprise de @15200001

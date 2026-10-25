@@ -300,7 +300,7 @@ DEFINE_PATCH_MACRO ad_op_0_armor_line BEGIN
 END
 
 // CA de base fixée ; à la forme « cible », l'ancien moteur écrit « Classe d'armure de la cible :
-// Passe à N ».
+// Passe à N », aux formes probables « de passer la classe d'armure de base de la cible à N ».
 DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 	SET line_fx = ac_id
 	LPM ad_application_form
@@ -313,6 +313,10 @@ DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 		SPRINT value @1200002 // ~Passe à %value%~
 	END
 	SET line_phrase = 1200010 // ~%name%%AD_COLON%%value%~ (+1 : ~%name% %ofTheTarget%%AD_COLON%%value%~)
+	PATCH_IF line_form >= 2 BEGIN
+		SPRINT value ~%ac_value%~
+		SET line_phrase = 20000130 // ~de passer la classe d'armure de base %ofTheTarget% à %value%~ (+2)
+	END
 	LPM ad_effect_line
 END
 

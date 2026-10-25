@@ -19,12 +19,19 @@ END
 DEFINE_PATCH_MACRO ad_op_144_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~144~)
-	SPRINT action @21440100 // ~Empêche~
 	PHP_EACH fx_ids_144 AS _ => button_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%button_id%~) BEGIN
 			SET button = $fx_parameter2(~%button_id%~)
-			LPF ad_tra INT_VAR tra_id = 21441000 + button tra_block_start = 21441000 tra_block_size = 16 RET line_text = text END
 			SET line_fx = button_id
+			LPM ad_application_form
+			// Action selon la forme (« Empêche », « Empêche la cible », « d'empêcher »…), suivie de
+			// « l'utilisation de … » sans cible, de « d'utiliser … » avec la cible (ancien opcode_144_common) ;
+			// les chaînes de la cible de l'effet sont lues avant, l'action les contient.
+			LPM ad_application_target_strings
+			LPF ad_tra INT_VAR tra_id = 21440100 + line_form RET action = text END // ~Empêche~
+			SET button_list = (line_form == 1 OR line_form == 3) ? 21441100 : 21441000
+			LPF ad_tra INT_VAR tra_id = button_list + button tra_block_start = button_list tra_block_size = 16 RET line_text = text END // ~%action% l'utilisation du camouflage dans l'ombre~
+			SET line_any_form = 1
 			LPM ad_effect_line
 		END
 	END

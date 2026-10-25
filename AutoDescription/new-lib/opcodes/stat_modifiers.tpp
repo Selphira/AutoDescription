@@ -136,9 +136,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SPRINT stat_line_macro ~~
 END
 
-// Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target) : line_phrase, identifiant de
-// base d'une série de 1 210 1x0 selon le mode (10 augmentation, 20 réduction, 30 valeur fixée, 40
-// multiplication), et ses variables value et theStatistic. La statistique (« la dextérité ») suit le
+// Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target) : celle de
+// ad_stat_modifier_phrase, et sa variable theStatistic. La statistique (« la dextérité ») suit le
 // nom : liste 8 060 000 + valeur de stats.ids pour un nom de la liste des statistiques, libellé
 // 2OOO0002 pour un nom 2OOO0000 ; sans statistique dans le .tra, pas de phrase. La progression
 // stat_level_value remplace la valeur, sans son signe pour une réduction.
@@ -150,25 +149,38 @@ DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 		PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
 			SPRINT theStatistic ~%theStatistic% %stat_name_suffix%~
 		END
-		SET value = ABS stat_value
+		LPM ad_stat_modifier_phrase
 		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 			SPRINT value ~%stat_level_value%~
 			PATCH_IF stat_value < 0 BEGIN
 				LPF ad_level_unsigned STR_VAR text = ~%stat_level_value%~ RET value = text END
 			END
 		END
-		PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
-			SET line_phrase = 1210130
-		END
-		ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
-			SET line_phrase = 1210140
-		END
-		ELSE PATCH_IF stat_value >= 0 BEGIN
-			SET line_phrase = 1210110 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
-		END
-		ELSE BEGIN
-			SET line_phrase = 1210120 // ~Réduit de %value% %theStatistic% %ofTheTarget%~ (+1)
-		END
+	END
+END
+
+// Phrase des modificateurs à une autre forme que « soi » (ancien opcode_target, opcode_target_percent
+// et opcode_probability) pour la valeur stat_value de mode stat_mode : line_phrase, identifiant de base
+// d'une série de 1 210 1x0 selon le mode (10 augmentation, 20 réduction, 30 valeur fixée, 40
+// multiplication), et sa variable value. Seuls un ajout et une réduction perdent leur signe
+// (« Réduit de 2 ») ; la valeur d'une statistique en pourcentage (stat_percent) ou d'une
+// multiplication est suivie de « % ». Le mode 3 des jeux EE n'arrive ici que s'il vaut un ajout.
+DEFINE_PATCH_MACRO ad_stat_modifier_phrase BEGIN
+	SET value = (stat_mode == MOD_TYPE_flat OR stat_mode == MOD_TYPE_percentage) ? stat_value : ABS stat_value
+	PATCH_IF stat_percent OR stat_mode == MOD_TYPE_percentage BEGIN
+		SPRINT value @1200003 // ~%value%%PERCENT%~
+	END
+	PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
+		SET line_phrase = 1210130 // ~Porte à %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
+	ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
+		SET line_phrase = 1210140 // ~Multiplie par %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
+	ELSE PATCH_IF stat_value >= 0 BEGIN
+		SET line_phrase = 1210110 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
+	END
+	ELSE BEGIN
+		SET line_phrase = 1210120 // ~Réduit de %value% %theStatistic% %ofTheTarget%~ (+1)
 	END
 END
 

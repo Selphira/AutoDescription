@@ -22,6 +22,7 @@ DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 					STR_VAR level_value = ~%stat_level_value%~ RET line_text = text END
 			END
 			ELSE BEGIN
+				SET resist_name_tra = 20000000 + stat_opcode * 10000
 				LPM ad_resistance_target_phrase
 			END
 			LPM ad_effect_line
@@ -29,17 +30,19 @@ DEFINE_PATCH_MACRO ad_resistance_lines BEGIN
 	END
 END
 
-// Phrase à la forme « cible » de l'effet stat_id (ancien opcode_target_resist) : line_phrase,
+// Phrase à la forme « cible » de la résistance de libellés resist_name_tra (nom, + 1 complément d'une
+// immunité, + 2 statistique), de valeur stat_value, de mode stat_mode et de progression
+// stat_level_value (ancien opcode_target_resist et opcode_probability_resist) : line_phrase,
 // identifiant de base d'une série de 5 000 1x0 selon le mode (10 augmentation, 20 réduction, 30
 // valeur fixée, 40 multiplication, 50 immunité), et ses variables value et theStatistic (resistName
 // pour une immunité) ; sans
 // statistique dans le .tra, pas de phrase.
 DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
-	SET stat_statistic_tra = 20000000 + stat_opcode * 10000 + 2
+	SET stat_statistic_tra = resist_name_tra + 2
 	SET line_phrase = 0
 	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
 		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
-		SET value = ABS stat_value
+		SET value = (stat_mode == MOD_TYPE_flat OR stat_mode == MOD_TYPE_percentage) ? stat_value : ABS stat_value
 		SPRINT value @1200003 // ~%value%%PERCENT%~
 		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 			SPRINT value ~%stat_level_value%~
@@ -52,10 +55,10 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 			SET line_phrase = 5000150 // ~Immunise %theTarget% %resistName%~ (+1)
 		END
 		ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
-			SET line_phrase = 5000130
+			SET line_phrase = 5000130 // ~Porte à %value% %theStatistic% %ofTheTarget%~ (+1)
 		END
 		ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
-			SET line_phrase = 5000140
+			SET line_phrase = 5000140 // ~Multiplie par %value% %theStatistic% %ofTheTarget%~ (+1)
 		END
 		ELSE PATCH_IF stat_value >= 0 BEGIN
 			SET line_phrase = 5000110 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)

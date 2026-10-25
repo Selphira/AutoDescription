@@ -57,9 +57,9 @@ DEFINE_PATCH_MACRO ad_fx_substitute_111 BEGIN
 END
 
 // Refus : effet d'un EFF ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; ressource vide
-// (l'ancien opcode_111_is_valid l'écarte) ; arme sans nom (l'ancien moteur n'écrit rien) ; avec
-// AD_ENABLE_SHRINKAGE, retrait différé de la même arme (112), qui fixe la durée du 111 (ancien
-// opcode_112_group).
+// (l'ancien opcode_111_is_valid l'écarte) ; arme sans nom (l'ancien moteur n'écrit rien) ; retrait
+// différé de la même arme (112) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
+// opcode_112_group) ; sans, l'ancien moteur n'écrit pas la ligne du 111 (SPWM113, cause à établir).
 DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 	PHP_EACH fx_ids_111 AS _ => weapon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%weapon_id%~) BEGIN
@@ -89,8 +89,12 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 				PHP_EACH fx_ids_112 AS _ => weapon_other BEGIN
 					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
 					SPRINT weapon_other_resref $fx_resource(~%weapon_other%~)
-					PATCH_IF AD_ENABLE_SHRINKAGE AND $fx_timing(~%weapon_other%~) == TIMING_delayed AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
-						LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:remove_group~ message = ~weapon removed later by opcode 112~ RET render_missing = refusal END
+					PATCH_IF $fx_timing(~%weapon_other%~) == TIMING_delayed AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
+						SPRINT weapon_reason ~removed_later~
+						PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+							SPRINT weapon_reason ~remove_group~
+						END
+						LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:%weapon_reason%~ message = ~weapon removed later by opcode 112~ RET render_missing = refusal END
 					END
 				END
 			END

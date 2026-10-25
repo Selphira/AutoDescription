@@ -4,8 +4,7 @@
 
 // Refus : valeur nulle ou type inconnu (écartés par l'ancien opcode_332_is_valid) ; avec
 // AD_ENABLE_SHRINKAGE, les quatre types élémentaires (1 à 4) ou physiques (7 à 10) modifiés de la même
-// façon (l'ancien opcode_332_group en fait « Dégâts élémentaires », « Dégâts physiques ») ; forme
-// « cible » (l'ancien .tra anglais n'a pas ses noms « les dégâts de feu »).
+// façon (l'ancien opcode_332_group en fait « Dégâts élémentaires », « Dégâts physiques »).
 DEFINE_PATCH_MACRO ad_op_332_support BEGIN
 	PHP_EACH fx_ids_332 AS _ => damage_mod_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -58,7 +57,13 @@ DEFINE_PATCH_MACRO ad_op_332_lines BEGIN
 				LPM ad_effect_line
 			END
 			ELSE BEGIN
-				LPF ad_refusal INT_VAR fx_id = damage_mod_id STR_VAR reason = ~not_implemented:opcode332:form%line_form%~ message = ~no text for form %line_form%~ RET render_late_missing = refusal END
+				// Ancien opcode_target_332 : « Augmente de 10 % les dégâts de feu de la cible ».
+				LPF ad_tra INT_VAR tra_id = 23320100 + damage_mod_type tra_block_start = 23320100 tra_block_size = 11 RET theStatistic = text END // ~les dégâts de feu~ (@23320101)
+				SET stat_value = damage_mod_value
+				SET stat_mode = MOD_TYPE_cumulative
+				SET stat_percent = 1
+				LPM ad_stat_modifier_phrase
+				LPM ad_effect_line
 			END
 		END
 	END

@@ -1,8 +1,8 @@
 
 BALSHLD	identical
 BALTH06	identical
-BALTH07	not_covered	not_implemented:phrase22060100:form1
-BHAAL1A	not_covered	not_implemented:opcode93:form1
+BALTH07	identical
+BHAAL1A	identical
 BHAAL1B	identical
 BHAAL2A	identical
 BHAAL2B	not_covered	not_implemented:spell_header:opcode177_eff_fields
@@ -32,7 +32,7 @@ OHBCSFD	identical
 OHBDEMI3	not_covered	not_implemented:opcode71:gender_set
 OHBPR608	not_covered	file_error:opcode111:invalid
 OHBQUAKE	identical
-OHBRESTO	not_covered	not_implemented:opcode93:form1
+OHBRESTO	identical
 OHBWI212	identical
 OHBWI302	identical
 OHBWI304	identical
@@ -60,7 +60,7 @@ SENSPIHE	identical
 SENSPISU	identical
 SPBLUN29	identical
 SPCL102	not_covered	not_implemented:opcode318:stat
-SPCL103	not_covered	not_implemented:opcode73:form1
+SPCL103	not_covered	not_implemented:spell:progression_opcode278
 SPCL104	identical
 SPCL106	identical
 SPCL121	not_covered	file_error:recursion:application:target
@@ -119,7 +119,7 @@ SPCL908	identical
 SPCL909	identical
 SPCL910	identical
 SPCL911	identical
-SPCL912	not_covered	not_implemented:recursion:opcode144:form1
+SPCL912	identical
 SPCL913	identical
 SPCL914	identical
 SPCL915	identical
@@ -215,11 +215,11 @@ SPIN564	identical
 SPIN565	identical
 SPIN569	identical
 SPIN570	identical
-SPIN572	not_covered	not_implemented:opcode93:form1
+SPIN572	identical
 SPIN579	identical
 SPIN580	not_covered	not_implemented:opcode177:versus_group
 SPIN597	identical
-SPIN608	not_covered	not_implemented:phrase22060100:form1
+SPIN608	identical
 SPIN611	identical
 SPIN613	identical
 SPIN614	identical
@@ -239,10 +239,10 @@ SPIN651	identical
 SPIN652	identical
 SPIN653	identical
 SPIN654	identical
-SPIN655	not_covered	not_implemented:phrase30100100:form1
+SPIN655	identical
 SPIN663	identical
 SPIN667	not_covered	not_implemented:opcode135:natural_form
-SPIN676	not_covered	not_implemented:opcode284:form1
+SPIN676	identical
 SPIN679	identical
 SPIN681	identical
 SPIN682	identical
@@ -301,7 +301,7 @@ SPIN829	identical
 SPIN836	identical
 SPIN837	identical
 SPIN852	identical
-SPIN853	not_covered	not_implemented:opcode85:form1
+SPIN853	identical
 SPIN865	identical
 SPIN866	identical
 SPIN883	identical
@@ -345,7 +345,7 @@ SPPR111	identical
 SPPR113	identical
 SPPR150	not_covered	not_implemented:opcode219:several
 SPPR201	identical
-SPPR202	not_covered	not_implemented:opcode36:form1
+SPPR202	identical
 SPPR203	identical
 SPPR204	identical
 SPPR205	identical
@@ -354,24 +354,24 @@ SPPR206	identical
 SPPR207	identical
 SPPR208	identical
 SPPR209	identical
-SPPR210	not_covered	not_implemented:opcode85:form1
+SPPR210	identical
 SPPR211	identical
 SPPR212	identical
 SPPR213	identical
 SPPR214	identical
-SPPR250	not_covered	not_implemented:phrase22060100:form1
+SPPR250	identical
 SPPR301	identical
 SPPR302	identical
 SPPR303	identical
 SPPR304	identical
 SPPR305	identical
-SPPR306	not_covered	not_implemented:opcode84:form1
+SPPR306	identical
 SPPR307	identical
 SPPR308	identical
 SPPR309	identical
 SPPR310	identical
 SPPR311	identical
-SPPR312	not_covered	not_implemented:opcode97:form1
+SPPR312	identical
 SPPR313	not_covered	not_implemented:opcode177:versus_group
 SPPR314	not_covered	not_implemented:opcode177:versus_group
 SPPR315	identical
@@ -404,8 +404,8 @@ SPPR504	identical
 SPPR505	identical
 SPPR506	identical
 SPPR507	not_covered	not_implemented:opcode145:ability
-SPPR508	not_covered	not_implemented:phrase30100100:form1
-SPPR509	not_covered	not_implemented:phrase5000130:form1
+SPPR508	not_covered	not_implemented:spell:levels_immunities
+SPPR509	not_covered	not_implemented:spell:progression_mode
 SPPR510	identical
 SPPR511	identical
 SPPR512	not_covered	not_implemented:opcode324:exceptions_group
@@ -455,8 +455,8 @@ SPPR719	identical
 SPPR720	identical
 SPPR721	identical
 SPPR722	not_covered	not_implemented:opcode318:exceptions_group
-SPPR723	not_covered	not_implemented:phrase30100100:form3
-SPPR724	not_covered	not_implemented:phrase30100100:form1
+SPPR723	identical
+SPPR724	identical
 SPPR725	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPPR725D	identical
 SPPR726	identical
@@ -472,7 +472,7 @@ SPPR984	identical
 SPPR986	identical
 SPPR987	identical
 SPPR999	identical
-SPRA301	not_covered	not_implemented:opcode93:form1
+SPRA301	identical
 SPRA302	not_covered	not_implemented:opcode233:same_effect_twice
 SPRA303	identical
 SPRA304	not_covered	not_implemented:spell_header:opcode177_eff_fields
@@ -489,7 +489,7 @@ SPWI053	identical
 SPWI054	identical
 SPWI055	identical
 SPWI056	identical
-SPWI101	not_covered	not_implemented:phrase1210140:form1
+SPWI101	identical
 SPWI102	identical
 SPWI103	not_covered	not_implemented:application:ticks
 SPWI104	identical
@@ -497,7 +497,7 @@ SPWI105	identical
 SPWI106	identical
 SPWI107	identical
 SPWI108	identical
-SPWI110	not_covered	not_implemented:opcode21:form1
+SPWI110	identical
 SPWI111	identical
 SPWI112	identical
 SPWI113	identical
@@ -518,12 +518,12 @@ SPWI205	identical
 SPWI206	identical
 SPWI207	identical
 SPWI208	identical
-SPWI209	not_covered	not_implemented:opcode59:form1
+SPWI209	identical
 SPWI210	identical
 SPWI211	identical
 SPWI212	identical
 SPWI213	identical
-SPWI214	not_covered	not_implemented:opcode97:form1
+SPWI214	identical
 SPWI215	identical
 SPWI217	identical
 SPWI218	identical
@@ -539,7 +539,7 @@ SPWI301	identical
 SPWI302	identical
 SPWI303	identical
 SPWI304	identical
-SPWI305	not_covered	not_implemented:opcode93:form1
+SPWI305	identical
 SPWI306	identical
 SPWI307	identical
 SPWI308	identical
@@ -553,8 +553,8 @@ SPWI315	not_covered	not_implemented:opcode145:ability
 SPWI316	identical
 SPWI317	identical
 SPWI318	not_covered	not_implemented:opcode201:group_fields
-SPWI319	not_covered	not_implemented:opcode84:form1
-SPWI320	not_covered	not_implemented:opcode85:form1
+SPWI319	identical
+SPWI320	identical
 SPWI321	identical
 SPWI322	identical
 SPWI324	identical
@@ -625,13 +625,13 @@ SPWI602	identical
 SPWI603	not_covered	not_implemented:opcode145:ability
 SPWI604	identical
 SPWI605	identical
-SPWI606	not_covered	not_implemented:opcode31:form1
+SPWI606	identical
 SPWI607	identical
 SPWI608	identical
 SPWI609	identical
 SPWI611	identical
 SPWI612	identical
-SPWI613	not_covered	not_implemented:phrase30100100:form1
+SPWI613	not_covered	not_implemented:spell:levels_immunities
 SPWI614	identical
 SPWI615	identical
 SPWI616	identical
@@ -645,7 +645,7 @@ SPWI623	identical
 SPWI624	identical
 SPWI625	identical
 SPWI701	not_covered	not_implemented:opcode233:same_effect_twice
-SPWI702	not_covered	not_implemented:opcode85:form1
+SPWI702	identical
 SPWI703	identical
 SPWI704	identical
 SPWI705	identical
@@ -668,7 +668,7 @@ SPWI721	identical
 SPWI722	identical
 SPWI723	identical
 SPWI802	identical
-SPWI803	not_covered	not_implemented:opcode31:form1
+SPWI803	identical
 SPWI804	identical
 SPWI805	identical
 SPWI807	identical
@@ -684,7 +684,7 @@ SPWI815	identical
 SPWI816	identical
 SPWI817	identical
 SPWI818	not_covered	not_implemented:application:timing
-SPWI853	not_covered	not_implemented:opcode85:form1
+SPWI853	identical
 SPWI888	identical
 SPWI897	identical
 SPWI898	identical
@@ -694,7 +694,7 @@ SPWI903	identical
 SPWI905	identical
 SPWI907	identical
 SPWI908	identical
-SPWI909	not_covered	not_implemented:opcode144:form1
+SPWI909	identical
 SPWI910	not_covered	not_implemented:opcode326:condition_stat
 SPWI911	identical
 SPWI912	identical
@@ -724,12 +724,12 @@ SPWI994	identical
 SPWI995	identical
 SPWI997	identical
 SPWI998	identical
-SPWISH07	not_covered	not_implemented:opcode93:form1
+SPWISH07	identical
 SPWISH09	identical
 SPWISH10	identical
 SPWISH11	not_covered	not_implemented:recursion:eff_level
-SPWISH12	not_covered	not_implemented:opcode86:form1
-SPWISH17	not_covered	not_implemented:opcode144:form1
+SPWISH12	identical
+SPWISH17	identical
 SPWISH18	identical
 SPWISH19	identical
 SPWISH24	identical
@@ -739,16 +739,16 @@ SPWISH27	identical
 SPWISH28	identical
 SPWISH29	identical
 SPWISH30	identical
-SPWISH31	not_covered	not_implemented:phrase5000130:form1
+SPWISH31	identical
 SPWISH32	identical
 SPWISH34	identical
 SPWISH35	identical
-SPWISH36	not_covered	not_implemented:phrase22060100:form1
-SPWISH37	not_covered	not_implemented:phrase22060100:form1
+SPWISH36	identical
+SPWISH37	identical
 SPWISH38	identical
 SPWISH39	identical
-SPWISH40	not_covered	not_implemented:phrase22060100:form1
-SPWISH46	not_covered	not_implemented:opcode93:form1
+SPWISH40	identical
+SPWISH46	identical
 SPWM101	not_covered	not_implemented:spell_header:opcode177_eff_fields
 SPWM101D	not_covered	not_implemented:opcode318:stat
 SPWM111	identical
@@ -761,7 +761,7 @@ SPWM126	identical
 SPWM136	identical
 SPWM140	identical
 SPWM141	not_covered	not_implemented:opcode122:random_treasure
-SPWM142	not_covered	not_implemented:opcode73:form1
+SPWM142	identical
 SPWM143	identical
 SPWM145	identical
 SPWM152	identical

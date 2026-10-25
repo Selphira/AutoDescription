@@ -41,12 +41,6 @@ DEFINE_PATCH_MACRO ad_op_191_lines BEGIN
 	LPM ad_stat_modifier_lines
 END
 
-// Aux formes probables, l'ancien moteur écrit le nom de la statistique au lieu de « le niveau de
-// lanceur de sorts » : refusé.
 DEFINE_PATCH_MACRO ad_op_191_line BEGIN
 	LPF ad_tra INT_VAR tra_id = $fx_stat_subject(~%line_fx%~) tra_block_start = 8020000 tra_block_size = 10 RET spellType = text END // ~divins/druidiques~
-	PATCH_IF line_form >= 2 BEGIN
-		LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:opcode191:form%line_form%~ message = ~probable effect~ RET render_late_missing = refusal END
-		SET stat_line_done = 1
-	END
 END

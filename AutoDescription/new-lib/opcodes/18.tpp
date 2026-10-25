@@ -54,15 +54,22 @@ DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%hp_id%~) BEGIN
 			LPM ad_op_18_value
-			PATCH_IF (hp_type >= 3 AND hp_type <= 5) OR (IS_EE AND ($fx_special(~%hp_id%~) BAND BIT0) != 0) BEGIN
-				SPRINT name @20180000 // ~Points de vie maximums~
+			SET line_fx = hp_id
+			LPM ad_application_form
+			SET hp_name_tra = ((hp_type >= 3 AND hp_type <= 5) OR (IS_EE AND ($fx_special(~%hp_id%~) BAND BIT0) != 0)) ? 20180000 : 20180001 // ~Points de vie maximums~
+			PATCH_IF line_form == 0 BEGIN
+				LPF ad_tra INT_VAR tra_id = hp_name_tra RET name = text END
+				LPF ad_stat_modifier_value INT_VAR value = hp_value mode = hp_mode RET value = text END
+				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			END
 			ELSE BEGIN
-				SPRINT name @20180001 // ~Points de vie~
+				// Ancien opcode_target_18 : « Augmente de 2 les points de vie maximums de la cible ».
+				LPF ad_tra INT_VAR tra_id = hp_name_tra + 2 RET theStatistic = text END // ~les points de vie maximums~
+				SET stat_value = hp_value
+				SET stat_mode = hp_mode
+				SET stat_percent = 0
+				LPM ad_stat_modifier_phrase
 			END
-			LPF ad_stat_modifier_value INT_VAR value = hp_value mode = hp_mode RET value = text END
-			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-			SET line_fx = hp_id
 			LPM ad_effect_line
 		END
 	END

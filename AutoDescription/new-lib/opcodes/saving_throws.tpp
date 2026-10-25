@@ -3,7 +3,9 @@
 // est un ajout) dont la ligne nomme le jet concerné. Le nom du jet (« contre les sorts ») est le
 // libellé 2OOO0000 du bloc de l'opcode.
 
-// Lignes (ancien opcode_self_<N> et opcode_save_vs) : une par effet non consommé par un regroupement.
+// Lignes (ancien opcode_self_<N> et opcode_save_vs) : une par effet non consommé par un regroupement ;
+// sur une autre cible que soi, phrase des modificateurs (« Augmente de 1 les jets de sauvegarde contre
+// les sorts de la cible »), où le mode 3 des jeux EE est un ajout.
 DEFINE_PATCH_MACRO ad_saving_throw_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
@@ -13,17 +15,25 @@ DEFINE_PATCH_MACRO ad_saving_throw_lines BEGIN
 		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode RET value = text END
-			// Un ajout nomme le jet après la valeur, les autres modes avant elle.
-			PATCH_IF stat_mode == MOD_TYPE_flat OR stat_mode == MOD_TYPE_percentage BEGIN
-				SPRINT name ~%saves_name% %versus%~
+			SET line_fx = stat_id
+			LPM ad_application_form
+			PATCH_IF line_form == 0 BEGIN
+				LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode RET value = text END
+				// Un ajout nomme le jet après la valeur, les autres modes avant elle.
+				PATCH_IF stat_mode == MOD_TYPE_flat OR stat_mode == MOD_TYPE_percentage BEGIN
+					SPRINT name ~%saves_name% %versus%~
+				END
+				ELSE BEGIN
+					SPRINT name ~%saves_name%~
+					SPRINT value ~%value% %versus%~
+				END
+				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			END
 			ELSE BEGIN
-				SPRINT name ~%saves_name%~
-				SPRINT value ~%value% %versus%~
+				SPRINT theStatistic @5000003 // ~les jets de sauvegarde %versus%~
+				SET stat_percent = 0
+				LPM ad_stat_modifier_phrase
 			END
-			SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
-			SET line_fx = stat_id
 			LPM ad_effect_line
 		END
 	END

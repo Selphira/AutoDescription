@@ -10,7 +10,7 @@
 
 // Un 178 ou un 179 sans valeur : l'ancien moteur l'écarte (opcode_178_is_valid). Refus : fichier
 // hors de 2-8 et valeur 100 de ea.ids (opcode_idscheck8_is_valid du 344 ; kit.ids non repris) ;
-// valeur sans nom ; effet probable ; forme « cible » du 344 (l'ancien moteur n'en a pas) ;
+// valeur sans nom ; forme « cible » et effet probable du 344 (l'ancien moteur n'en a pas) ;
 // effet d'un 177 qui vise lui-même un type de créature (l'ancien moteur remplace alors celui de
 // l'opcode).
 DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
@@ -43,8 +43,8 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			ELSE PATCH_IF ~%versus_name%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:ids_name~ message = ~value %versus_value% of IDS file %versus_file% has no name~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF (versus_opcode == 344 AND versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
-					OR $fx_probability(~%versus_id%~) < 100 BEGIN
+			ELSE PATCH_IF versus_opcode == 344 AND ((versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
+					OR $fx_probability(~%versus_id%~) < 100) BEGIN
 				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:form~ message = ~effect on another target, or probable~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_versus_file(~%versus_id%~) > 0 BEGIN
@@ -116,8 +116,9 @@ DEFINE_PATCH_MACRO ad_versus_modifier_line BEGIN
 	SET line_fx = versus_id
 	LPM ad_application_form
 	SET versus_amount = $fx_versus_amount(~%versus_id%~)
-	// Forme « cible » (ancien opcode_target) : « Augmente de 5 le TAC0 de la cible contre les X ».
-	PATCH_IF line_form == 1 BEGIN
+	// Autres formes (ancien opcode_target et opcode_probability) : « Augmente de 5 le TAC0 de la cible
+	// contre les X ».
+	PATCH_IF line_form != 0 BEGIN
 		LPF ad_tra INT_VAR tra_id = versus_name_tra + 2 RET theStatistic = text END // ~le TAC0~
 		SET value = ABS versus_amount
 		SET line_phrase = versus_amount >= 0 ? 1210110 : 1210120 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
