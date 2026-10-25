@@ -2299,6 +2299,8 @@
 @10780031 = ~Causes a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~
 @10780032 = ~Causes a condition that inflicts 1 point of poison damage %strDuration% %toTheTarget%~
 @10780033 = ~Causes a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~
+@10780040 = ~Causes a condition that decreases by %amount% %theAttributes% %ofTheTarget%~
+@10780050 = ~Causes a condition that increases by %amount% %theAttributes% %ofTheTarget%~
 
 
 @10780100 = ~cause a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~
