@@ -4858,7 +4858,7 @@ DEFINE_PATCH_MACRO ~opcode_97_group~ BEGIN
 			END
 			PATCH_IF opcodePosition >= 0 BEGIN
 				LPF ~get_opcode_by_position~
-					INT_VAR opcode = 44 position = opcodePosition
+					INT_VAR opcode = 44 match_position = opcodePosition
 					RET op44_parameter1 = parameter1
 				END
 				LPF ~delete_opcode~
