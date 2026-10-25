@@ -142,8 +142,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 END
 
 // Effet app_id d'un en-tête d'objet. L'ancien moteur écarte sans le dire un effet sans cible ou
-// d'une durée limitée nulle (opcode_is_valid) : refusés ici. Durée limitée en ticks : moins de 15
-// ticks, l'ancien moteur écrit « N ticks » sans traduction.
+// d'une durée limitée nulle (opcode_is_valid) : refusés ici.
 DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_target = $fx_target(~%app_id%~)
 	SET app_effective_target = $fx_effective_target(~%app_id%~)
@@ -164,12 +163,13 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:probability_empty~ message = ~empty probability range (probability2 above probability1): the effect never occurs~ RET render_missing = refusal END
 	END
-	// Restriction de niveau d'un effet remplacé par celui d'un EFF (177 : l'ancien moteur prend celle
-	// du dernier EFF lu, pas forcément le sien) ou sans effet (minimum au-dessus du maximum, erreur
-	// journalisée par l'ancien moteur).
-	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND (($fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~))
+	// Restriction de niveau d'un effet remplacé par celui d'un EFF (177 : l'ancien add_target_level
+	// prend celle du dernier EFF lu dans sa portée, minLevel, sinon les dés du 177 ; dans un sort, il
+	// ne lit les EFF que dans des fonctions, qui la perdent au retour : les dés du 177) ou sans effet
+	// (minimum au-dessus du maximum, erreur journalisée par l'ancien moteur).
+	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND (($fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) AND NOT resource_is_spell)
 			OR ($fx_level_max(~%app_id%~) > 0 AND $fx_level_min(~%app_id%~) > $fx_level_max(~%app_id%~))) BEGIN
-		PATCH_IF $fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) BEGIN
+		PATCH_IF $fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) AND NOT resource_is_spell BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:level~ message = ~level restriction of an effect from an EFF file not supported~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
@@ -188,16 +188,14 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	ELSE PATCH_IF app_timing == TIMING_duration AND app_duration <= 0 AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:no_duration~ message = ~limited duration (timing 0) of 0 seconds: the effect ends at once~ RET render_missing = refusal END
 	END
-	ELSE PATCH_IF app_timing == TIMING_duration_ticks AND app_duration > 0 AND app_duration < 15 BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:ticks~ message = ~duration of %app_duration% ticks, under one second~ RET render_missing = refusal END
-	END
 	// Timing 2 d'un en-tête : l'ancien moteur n'écrit pas de durée, comme pour un effet d'équipement.
 	// Effet différé sans délai : l'ancien moteur le décrit comme permanent, sans le dire.
 	ELSE PATCH_IF app_timing == TIMING_delayed AND app_duration <= 0 AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:no_delay~ message = ~delayed effect (timing 4) with a delay of 0~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF app_timing != TIMING_duration AND app_timing != TIMING_duration_ticks AND app_timing != TIMING_permanent
-			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed BEGIN
+			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed
+			AND app_timing != TIMING_delayed_duration BEGIN
 		PATCH_IF app_timing >= 0 AND (app_timing <= 10 OR app_timing == 4096) BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:timing~ message = ~timing %app_timing% not supported in an ability~ RET render_missing = refusal END
 		END
@@ -362,13 +360,21 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		END
 	END
 	ELSE BEGIN
-		// Les ticks valent 1/15 de seconde ; la division entière est celle de l'ancien moteur.
+		// Les ticks valent 1/15 de seconde ; la division entière est celle de l'ancien moteur. Moins de
+		// 15 ticks : l'ancien moteur écrit « N ticks » sans traduction, refusé quand la durée est écrite.
+		PATCH_IF app_timing == TIMING_duration_ticks AND app_duration > 0 AND app_duration < 15 BEGIN
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:ticks~ message = ~duration of %app_duration% ticks, under one second~ RET render_late_missing = refusal END
+		END
 		PATCH_IF app_timing == TIMING_duration_ticks BEGIN
 			SET app_duration = app_duration / 15
 		END
 		PATCH_IF app_duration > 0 BEGIN
 			LPF ad_duration_text INT_VAR seconds = app_duration RET strDuration = text END
 			SPRINT app_duration_text @3000000 // ~pendant %strDuration%~
+			// Timing 3 (IESDP) : l'effet commence après la durée et dure autant.
+			PATCH_IF app_timing == TIMING_delayed_duration BEGIN
+				SPRINT app_duration_text @3000006 // ~après %strDuration% et pendant %strDuration%~
+			END
 		END
 	END
 END
@@ -619,8 +625,9 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 		ELSE PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:area~ message = ~creature type with targets named after the area of the projectile~ RET render_late_missing = refusal END
 		END
-		ELSE PATCH_IF $fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1 BEGIN
-			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:level~ message = ~creature type with a level restriction~ RET render_late_missing = refusal END
+		// À la forme « cible », la restriction de niveau suit les types de créature (ad_application_target_level).
+		ELSE PATCH_IF ($fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1) AND (line_form == 0 OR line_form == 2) BEGIN
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:level~ message = ~creature type with a level restriction on an effect on oneself~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF app_versus_kits > 0 BEGIN
 			PATCH_IF app_versus_kits < app_versus_count BEGIN

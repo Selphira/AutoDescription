@@ -3,7 +3,8 @@
 // ad_group_item_return et ad_group_replace_item (new-lib/groups.tpp).
 
 // Comme l'ancien opcode_112_is_valid, le retrait d'une arme nommée « Attaquer » ou « Morgenstern »
-// (armes des métamorphoses) est écarté sans rien écrire. Refus : ressource vide, objet sans nom.
+// (armes des métamorphoses) est écarté sans rien écrire ; un objet sans nom aussi (ancien
+// opcode_self_112, qui n'écrit rien sans nom), journalisé. Refus : ressource vide, objet absent.
 DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 	PHP_EACH fx_ids_112 AS _ => remove_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -20,7 +21,10 @@ DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 			// En-tête d'un sort seul : seul compte un objet absent, que l'ancien moteur écarte.
 			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ AND (NOT support_header_only OR NOT FILE_EXISTS_IN_GAME ~%remove_resref%.itm~) BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%remove_resref%.itm~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~not_implemented:opcode112:no_name~ message = ~item %remove_resref%.ITM has no name~ RET render_missing = refusal END
+					SET drop_id = remove_id
+					SPRINT ignored_reason ~not_implemented:opcode112:no_name~
+					SPRINT ignored_message ~item %remove_resref%.ITM has no name~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~file_error:opcode112:missing_item~ message = ~item %remove_resref%.ITM does not exist~ RET render_missing = refusal END

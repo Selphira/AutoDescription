@@ -146,6 +146,7 @@
 @3000010 = ~%baseValue% + %value% au niveau %level%~ // reprise de @102160
 @3000011 = ~%value% par niveau~ // reprise de @102161
 @3000012 = ~%value% par tranche de %level% niveaux~ // reprise de @102162
+@3000013 = ~%baseValue% jusqu'au niveau %level%~ // reprise de @102167
 
 // Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
 @3010000 = ~1 seconde~ // reprise de @100300
@@ -1116,6 +1117,15 @@
 @8098050 = ~créatures chaotiques neutres~ // reprise de @208050
 @8098051 = ~créatures chaotiques mauvaises~ // reprise de @208051
 
+// Noms au singulier des valeurs de gender.ids, 8 099 000 + valeur (opcode 71) (8 099 000-8 099 255)
+@8099001 = ~homme~ // reprise de @207501
+@8099002 = ~femme~ // reprise de @207502
+@8099005 = ~hermaphrodite~ // reprise de @207505
+@8099006 = ~créature invoquée~ // reprise de @207506
+@8099007 = ~illusion~ // reprise de @207507
+@8099009 = ~démon invoqué~ // reprise de @207509
+@8099066 = ~créature emprisonnée~ // reprise de @207566
+
 // Noms des types secondaires de sorts, 8 100 000 + valeur de msectype.ids (1-13) (8 100 000-8 100 013)
 @8100000 = ~~ // reprise de @100200
 @8100001 = ~Protection de sort~ // reprise de @100201
@@ -1620,6 +1630,13 @@
 @8160505 = ~les effets protégeant contre les capacités psioniques~ // reprise de @401505
 @8160507 = ~les effets protégeant contre les poisons~ // reprise de @401507
 
+// Noms des trésors aléatoires RNDTRE01-RNDTRE05, 8 170 000 + numéro, sans rndtres.2da (8 170 001-8 170 005)
+@8170001 = ~trésor aléatoire de qualité médiocre~ // reprise de @100401
+@8170002 = ~trésor aléatoire de qualité ordinaire~ // reprise de @100402
+@8170003 = ~trésor aléatoire de qualité~ // reprise de @100403
+@8170004 = ~trésor aléatoire de qualité supérieure~ // reprise de @100404
+@8170005 = ~trésor aléatoire de qualité exceptionnelle~ // reprise de @100405
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
 @20000001 = ~Classe d'armure de base~ // reprise de @10000100
@@ -2080,11 +2097,15 @@
 @20690112 = ~de lancer « Non-détection » sur %theTarget%~ // reprise de @10690003
 @20690113 = ~de lancer « Non-détection » sur %theTarget%~ // reprise de @10690003
 
-// Opcode 71 : Inversion du sexe : phrases 0100 (20 710 000-20 710 999)
+// Opcode 71 : Inversion du sexe : phrases 0100 inversion, 0110 sexe fixé (20 710 000-20 710 999)
 @20710100 = ~Inverse le sexe %ofTheTarget%~ // reprise de @10710001
 @20710101 = ~Inverse le sexe %ofTheTarget%~ // reprise de @10710001
 @20710102 = ~d'inverser le sexe %ofTheTarget%~ // reprise de @10710011
 @20710103 = ~d'inverser le sexe %ofTheTarget%~ // reprise de @10710011
+@20710110 = ~Change %theTarget% en %genderType%~ // reprise de @10710002
+@20710111 = ~Change %theTarget% en %genderType%~ // reprise de @10710002
+@20710112 = ~de changer %theTarget% en %genderType%~ // reprise de @10710012
+@20710113 = ~de changer %theTarget% en %genderType%~ // reprise de @10710012
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Dégâts~ // reprise de @10730001
@@ -2833,6 +2854,12 @@
 @22010121 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010022
 @22010122 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010023
 @22010123 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010024
+
+// Opcode 204 : Immunité à une école de magie : phrases 0100 (22 040 000-22 040 999)
+@22040100 = ~Immunité contre les sorts de l'école %spellSchoolName%~ // reprise de @12040001
+@22040101 = ~Immunise %theTarget% contre les sorts de l'école %spellSchoolName%~ // reprise de @12040003
+@22040102 = ~de résister aux sorts de l'école %spellSchoolName%~ // reprise de @12040002
+@22040103 = ~d'immuniser %theTarget% contre les sorts de l'école %spellSchoolName%~ // reprise de @12040004
 
 // Opcode 205 : Immunité à un type secondaire de sort : phrases 0100 (22 050 000-22 050 999)
 @22050100 = ~Immunité contre les sorts de type %spellSecondaryTypeName%~ // reprise de @12050001

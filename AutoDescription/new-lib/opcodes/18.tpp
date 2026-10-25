@@ -2,7 +2,9 @@
 // fixée, 2 pourcentage ; 3 à 5 : mêmes modes sans changer les points de vie actuels ; 6, EE : ajout
 // non cumulatif, décrit comme un ajout par l'ancien moteur). Le nom est « Points de vie maximums »
 // si les points de vie actuels ne changent pas (modes 3 à 5, ou bit 0 de special sur EE), « Points
-// de vie » sinon.
+// de vie » sinon. Une progression selon le niveau du sort (fx_level_value) remplace la valeur, comme
+// pour les autres modificateurs (new-lib/opcodes/stat_modifiers.tpp) ; refusée à la forme « cible »
+// ou en pourcentage.
 //
 // Pris en charge : effets d'équipement certains, actifs tant que l'objet est équipé.
 
@@ -57,9 +59,22 @@ DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 			SET line_fx = hp_id
 			LPM ad_application_form
 			SET hp_name_tra = ((hp_type >= 3 AND hp_type <= 5) OR (IS_EE AND ($fx_special(~%hp_id%~) BAND BIT0) != 0)) ? 20180000 : 20180001 // ~Points de vie maximums~
+			SPRINT hp_level_value $fx_level_value(~%hp_id%~)
+			PATCH_IF NOT (~%hp_level_value%~ STRING_EQUAL ~~) AND (line_form != 0 OR hp_mode == MOD_TYPE_percentage) BEGIN
+				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:spell:progression_opcode18~ message = ~maximum hit points varying with the level, on the target or as a percentage~ RET render_late_missing = refusal END
+			END
 			PATCH_IF line_form == 0 BEGIN
 				LPF ad_tra INT_VAR tra_id = hp_name_tra RET name = text END
 				LPF ad_stat_modifier_value INT_VAR value = hp_value mode = hp_mode RET value = text END
+				PATCH_IF NOT (~%hp_level_value%~ STRING_EQUAL ~~) BEGIN
+					SPRINT value ~%hp_level_value%~
+					PATCH_IF hp_mode == MOD_TYPE_flat BEGIN
+						SPRINT value @1200002 // ~Passe à %value%~
+					END
+					ELSE PATCH_IF hp_value >= 0 BEGIN
+						SPRINT value @1200001 // ~+%value%~
+					END
+				END
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			END
 			ELSE BEGIN

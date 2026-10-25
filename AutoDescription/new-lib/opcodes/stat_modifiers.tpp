@@ -99,7 +99,9 @@ END
 // ---------------------------------------------------------------------------------------------
 // Lignes (ancien opcode_self_<N> et opcode_mod) : une par effet non consommé par un regroupement.
 // Une progression selon le niveau du sort (fx_level_value, new-lib/spell_levels.tpp) remplace la
-// valeur, précédée de « + » si elle augmente la statistique (« Dégâts : +1 par tranche de 3 niveaux »).
+// valeur, précédée de « + » si elle augmente la statistique (« Dégâts : +1 par tranche de 3 niveaux »),
+// ou de « Passe à » pour une valeur fixée (« TAC0 : Passe à 21 -1 par niveau du lanceur/20 », ancien
+// opcode_mod_base) ; refusée pour une statistique en pourcentage fixée (render_late_missing).
 
 DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -128,7 +130,13 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 					LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
 					PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 						SPRINT value ~%stat_level_value%~
-						PATCH_IF stat_value >= 0 BEGIN
+						PATCH_IF stat_mode == MOD_TYPE_flat AND stat_percent BEGIN
+							LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:spell:progression_percent_set~ message = ~percentage set to a value varying with the level~ RET render_late_missing = refusal END
+						END
+						ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
+							SPRINT value @1200002 // ~Passe à %value%~
+						END
+						ELSE PATCH_IF stat_value >= 0 BEGIN
 							SPRINT value @1200001 // ~+%value%~
 						END
 					END

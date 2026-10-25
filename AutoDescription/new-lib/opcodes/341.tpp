@@ -1,12 +1,12 @@
 // Opcode 341 (Spell Effect: Change Critical Hit Effect, EE) : sort resource lancé à chaque coup
 // critique, de toute arme (parameter2 0) ou de cette arme (ancien opcode_341_common) : « À chaque coup
 // critique provoqué avec cette arme ; Inflige 2d4 points de dégâts de froid à la cible ». Le sort est
-// toujours décrit par ses effets (new-lib/recursion.tpp), chacun avec ses propres cibles.
+// toujours décrit par ses effets (new-lib/recursion.tpp), chacun avec ses propres cibles, sans limite
+// de profondeur comme pour l'opcode 232 (recursion_depth_reset).
 
 // Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme) ; ressource vide ;
 // parameter2 hors de 0-1 ; special non nul (type d'attaque, « en mêlée ») ; effet sur une cible (« À
-// chaque coup critique de la cible ») ; effet d'un sous-sort (l'ancien moteur n'y limite pas la
-// profondeur) ; refus de ad_recursion_support.
+// chaque coup critique de la cible ») ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 	PHP_EACH fx_ids_341 AS _ => critical_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
@@ -24,9 +24,6 @@ DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 			ELSE PATCH_IF critical_target != TARGET_FX_self AND critical_target != TARGET_FX_original_caster BEGIN
 				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode341:target~ message = ~target other than self~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF ctx_depth > 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:recursion:nested_condition~ message = ~condition in a spell already cast by another effect~ RET render_missing = refusal END
-			END
 			ELSE BEGIN
 				SET recursion_fx = critical_id
 				SPRINT recursion_resref ~%critical_resref%~
@@ -34,7 +31,7 @@ DEFINE_PATCH_MACRO ad_op_341_support BEGIN
 				SPRINT recursion_targets ~own~
 				SET recursion_ignore_duration = 0
 				SET recursion_series = 0
-				SET recursion_depth_reset = 0
+				SET recursion_depth_reset = 1
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
 				SET recursion_versus_set = 0

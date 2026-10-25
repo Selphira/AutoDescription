@@ -4,9 +4,10 @@
 // neutre). Avec AD_ENABLE_SHRINKAGE, des invocations identiques n'en font qu'une, avec leur nombre
 // (fx_identical_count, ad_group_identical_effects).
 
-// Refus : créature sans nom (aucune ligne) ; avec AD_ENABLE_SHRINKAGE, invocations identiques sauf
-// leurs probabilités, dont une certaine (l'ancien opcode_67_group en écrit le nombre « entre 1 et
-// 2 »).
+// Avec AD_ENABLE_SHRINKAGE, une invocation certaine réunit aussi les invocations probables identiques à
+// la probabilité près (ancien opcode_67_group) : chacune compte pour une créature de plus au plus,
+// « Invoque entre 2 et 5 « Rat » » (fx_summon_random).
+// Refus : créature sans nom (aucune ligne).
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -28,7 +29,8 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 				// Seuils GOODCUTOFF (30) et EVILCUTOFF (200) de ea.ids.
 				SET $fx_creature_side(~%summon_id%~) = (summon_mode == 0 OR summon_mode == 1 OR summon_mode == 3 OR summon_mode == 5) ? 0
 					: (summon_allegiance >= 200 ? 1 : (summon_allegiance <= 30 ? 2 : 3))
-				PATCH_IF AD_ENABLE_SHRINKAGE AND $fx_probability(~%summon_id%~) == 100 BEGIN
+				SET $fx_summon_random(~%summon_id%~) = 0
+				PATCH_IF AD_ENABLE_SHRINKAGE AND $fx_probability(~%summon_id%~) == 100 AND NOT support_header_only BEGIN
 					LPM ad_op_67_random_support
 				END
 			END
@@ -40,12 +42,13 @@ DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 	SET same_id = summon_id
 	SET same_ignored = AD_SAME_PROBABILITY
 	PHP_EACH fx_ids_67 AS _ => summon_other BEGIN
-		PATCH_IF summon_other != summon_id AND $fx_probability(~%summon_other%~) < 100 BEGIN
+		PATCH_IF summon_other != summon_id AND $fx_probability(~%summon_other%~) < 100 AND NOT $fx_consumed(~%summon_other%~) BEGIN
 			SET same_other = summon_other
 			LPM ad_fx_same_fields
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
-			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = summon_other STR_VAR reason = ~not_implemented:opcode67:random_amount~ message = ~random number of creatures~ RET render_missing = refusal END
+			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
+				SET $fx_consumed(~%summon_other%~) = 1
+				SET $fx_summon_random(~%summon_id%~) += 1
 			END
 		END
 	END
@@ -60,6 +63,19 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 		PATCH_IF NOT $fx_consumed(~%summon_id%~) BEGIN
 			SPRINT creatureName $fx_creature_name(~%summon_id%~)
 			SET amount = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%summon_id%~) : 1
+			// Invocations probables réunies aux effets certains que celui-ci représente.
+			SET summon_random = 0
+			FOR (summon_member = 0; summon_member < fx_count; ++summon_member) BEGIN
+				PATCH_IF $fx_opcode(~%summon_member%~) == 67 AND $fx_identical_anchor(~%summon_member%~) == summon_id
+						AND VARIABLE_IS_SET $fx_summon_random(~%summon_member%~) BEGIN
+					SET summon_random += $fx_summon_random(~%summon_member%~)
+				END
+			END
+			PATCH_IF summon_random > 0 BEGIN
+				SET amountMin = amount
+				SET amountMax = amount + summon_random
+				LPF ad_tra INT_VAR tra_id = 21270000 RET amount = text END // ~entre %amountMin% et %amountMax%~
+			END
 			// L'ancien moteur n'ajoute les dés de vie de la créature (niveau de sa première classe) qu'à la
 			// description d'un sort.
 			SPRINT lifeDice ~~
@@ -67,7 +83,7 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 				SET creatureLevel = $fx_creature_level(~%summon_id%~)
 				LPF ad_tra INT_VAR tra_id = creatureLevel == 1 ? 20670020 : 20670021 RET lifeDice = text END // ~ de 1 dé de vie~
 			END
-			SET line_phrase = 20670100 + 10 * ($fx_creature_side(~%summon_id%~) + (amount > 1 ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
+			SET line_phrase = 20670100 + 10 * ($fx_creature_side(~%summon_id%~) + ((summon_random > 0 OR amount > 1) ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
 			SET line_fx = summon_id
 			LPM ad_effect_line
 		END

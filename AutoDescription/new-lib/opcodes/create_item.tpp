@@ -3,19 +3,28 @@
 // dans l'inventaire du porteur ». Les macros ad_op_<N>_* fixent create_opcode (et create_phrase pour
 // les lignes) puis appellent les macros ci-dessous.
 
-// Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid), trésor aléatoire (l'ancien
-// moteur énumère les objets possibles), objet sans nom (aucune ligne).
+// Un trésor aléatoire RNDTRE01 à RNDTRE05 absent de rndtres.2da est nommé d'après sa qualité
+// (ancien get_random_treasure_names, liste @8170000) : « trésor aléatoire de qualité exceptionnelle ».
+// Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid), autre trésor aléatoire
+// (l'ancien moteur énumère les objets possibles), objet sans nom (aucune ligne).
 DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 	PHP_EACH ~fx_ids_%create_opcode%~ AS _ => create_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT create_resref $fx_resource(~%create_id%~)
-			LPF ad_item_is_random_treasure STR_VAR resref = ~%create_resref%~ RET create_random = random END
+			LPF ad_item_is_random_treasure STR_VAR resref = ~%create_resref%~ RET create_random = random create_listed = listed create_quality = quality END
 			LPF ad_item_info STR_VAR resref = ~%create_resref%~ RET create_name = name create_stackable = stackable END
 			PATCH_IF ~%create_resref%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~file_error:opcode%create_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF create_random AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref%~ RET render_missing = refusal END
+				PATCH_IF NOT create_listed BEGIN
+					LPF ad_tra INT_VAR tra_id = 8170000 + create_quality tra_block_start = 8170000 tra_block_size = 10 RET create_name = text END // ~trésor aléatoire de qualité exceptionnelle~ (@8170005)
+					SPRINT $fx_item_name(~%create_id%~) ~%create_name%~
+					SET $fx_item_amount(~%create_id%~) = 1
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref% listed in RNDTRES.2DA~ RET render_missing = refusal END
+				END
 			END
 			// En-tête d'un sort seul : seul compte un objet absent, que l'ancien moteur écarte.
 			ELSE PATCH_IF ~%create_name%~ STRING_EQUAL ~~ AND (NOT support_header_only OR NOT FILE_EXISTS_IN_GAME ~%create_resref%.itm~) BEGIN

@@ -171,9 +171,6 @@ END
 // Opcodes dont les lignes réunissent des effets sans tenir compte de leur portée (new-lib/normalize.tpp,
 // fx_scope) : leurs effets d'en-tête ne sont pas encore pris en charge (ad_application_support).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
-	42  => 1 // emplacements de sorts profanes
-	62  => 1 // emplacements de sorts divins
-	145 => 1 // lancement de sorts désactivé
 END
 
 // Opcodes pas encore pris en charge (TODO) dont l'ancien moteur écarte, remplace ou réunit des effets
@@ -381,7 +378,7 @@ END
 // valeur (fx_level_value) ; une progression d'un autre opcode est refusée tant que ses lignes ne
 // la lisent pas (new-lib/spell_levels.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_VALUE_OPCODES BEGIN
-	12 => 1 17 => 1 54 => 1 73 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1
+	12 => 1 15 => 1 17 => 1 18 => 1 44 => 1 54 => 1 73 => 1 278 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1
 	502 => 1 503 => 1 504 => 1
 END

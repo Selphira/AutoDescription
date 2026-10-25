@@ -130,26 +130,37 @@ BEGIN
 END
 
 // L'objet resref est un trésor aléatoire (RNDTRE01 à RNDTRE05, ou ligne de rndtres.2da), que le
-// jeu remplace à sa création par un objet tiré au sort.
+// jeu remplace à sa création par un objet tiré au sort : random ; listed, ligne de rndtres.2da (dont
+// l'ancien moteur énumère les objets) ; quality, numéro de RNDTRE01 à RNDTRE05 (0 sinon).
 DEFINE_PATCH_FUNCTION ad_item_is_random_treasure
 	STR_VAR
 		resref = ~~
 	RET
 		random
+		listed
+		quality
 BEGIN
 	SPRINT random_key ~%resref%~
 	TO_LOWER random_key
-	SET random = (~%random_key%~ STRING_MATCHES_REGEXP ~^rndtre0[1-5]$~) == 0
-	PATCH_IF NOT random AND FILE_EXISTS_IN_GAME ~rndtres.2da~ BEGIN
+	SET quality = 0
+	PATCH_IF (~%random_key%~ STRING_MATCHES_REGEXP ~^rndtre0[1-5]$~) == 0 BEGIN
+		INNER_PATCH_SAVE random_number ~%random_key%~ BEGIN
+			DELETE_BYTES 0 6
+		END
+		SET quality = random_number
+	END
+	SET listed = 0
+	PATCH_IF FILE_EXISTS_IN_GAME ~rndtres.2da~ BEGIN
 		INNER_PATCH_FILE ~rndtres.2da~ BEGIN
 			COUNT_2DA_ROWS 2 random_rows
-			FOR (random_row = 0; random_row < random_rows AND NOT random; ++random_row) BEGIN
+			FOR (random_row = 0; random_row < random_rows AND NOT listed; ++random_row) BEGIN
 				READ_2DA_ENTRY random_row 0 2 random_label
 				TO_LOWER random_label
-				SET random = ~%random_label%~ STRING_EQUAL ~%random_key%~
+				SET listed = ~%random_label%~ STRING_EQUAL ~%random_key%~
 			END
 		END
 	END
+	SET random = quality > 0 OR listed
 END
 
 // Créature resref (ancien get_creature_name, get_creature_allegiance) : nom (vide si la créature

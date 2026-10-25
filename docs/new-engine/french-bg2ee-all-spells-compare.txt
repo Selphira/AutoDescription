@@ -11,7 +11,7 @@ BHAAL4A	identical
 CDHLYSY2	identical
 CDPR417	identical
 CDSTAF12	identical
-CDWI917A	not_covered	not_implemented:opcode71:gender_set
+CDWI917A	identical
 DEMOCHM	identical
 DEVAHEAL	identical
 DGARCHON	identical
@@ -20,7 +20,7 @@ DGRIGHT	identical
 DW#FPPLO	identical
 JWGLOBE	identical
 MARW201	identical
-MARW301	not_covered	not_implemented:spell:progression_two_values
+MARW301	identical
 MARW401	identical
 MDK2SUMM	identical
 MELIS02	identical
@@ -29,7 +29,7 @@ MELSTONE	identical
 OHBBCLT4	identical
 OHBCALLL	identical
 OHBCSFD	identical
-OHBDEMI3	not_covered	not_implemented:opcode71:gender_set
+OHBDEMI3	identical
 OHBPR608	not_covered	file_error:opcode111:invalid
 OHBQUAKE	identical
 OHBRESTO	identical
@@ -42,7 +42,7 @@ OHDCUT02	identical
 OHDPOTN1	identical
 OHDXDIS	identical
 OHHDRAIN	not_covered	not_implemented:recursion:versus
-OHHSUMM	not_covered	not_implemented:opcode67:random_amount
+OHHSUMM	identical
 OHNDDOOR	identical
 OHNRDKIL	identical
 OHNRDTEL	identical
@@ -52,15 +52,15 @@ OHNVRD3	identical
 OHNWISH	identical
 OHPRGD10	identical
 OHRRAGE	identical
-OHTMPS1	not_covered	not_implemented:spell:progression_mode
-OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode18
+OHTMPS1	identical
+OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode22
 OHTYR1	identical
 OHTYR2	identical
 SENSPIHE	identical
 SENSPISU	identical
 SPBLUN29	identical
 SPCL102	identical
-SPCL103	not_covered	not_implemented:spell:progression_opcode278
+SPCL103	identical
 SPCL104	identical
 SPCL106	identical
 SPCL121	not_covered	file_error:recursion:application:target
@@ -131,9 +131,9 @@ SPCL920	not_covered	not_implemented:recursion:opcode318:exceptions_group
 SPCL921	identical
 SPCL922	identical
 SPCL923	identical
-SPCL928	not_covered	not_implemented:opcode42:ability
-SPCL929	not_covered	not_implemented:opcode42:ability
-SPCL930	not_covered	not_implemented:opcode42:ability
+SPCL928	identical
+SPCL929	identical
+SPCL930	identical
 SPCL935	identical
 SPCL936	identical
 SPCL937	identical
@@ -329,7 +329,7 @@ SPIN974	identical
 SPIN998	identical
 SPINHUM	identical
 SPJA01	not_covered	file_error:recursion:application:no_duration
-SPMDSLAY	not_covered	not_implemented:opcode112:no_name
+SPMDSLAY	identical
 SPOGRE01	identical
 SPPR101	identical
 SPPR102	identical
@@ -390,7 +390,7 @@ SPPR408	identical
 SPPR409	identical
 SPPR410	identical
 SPPR411	identical
-SPPR412	not_covered	not_implemented:spell:progression_mode
+SPPR412	identical
 SPPR413	identical
 SPPR414	identical
 SPPR415	identical
@@ -403,13 +403,13 @@ SPPR503	identical
 SPPR504	identical
 SPPR505	identical
 SPPR506	identical
-SPPR507	not_covered	not_implemented:opcode145:ability
+SPPR507	identical
 SPPR508	not_covered	not_implemented:spell:levels_immunities
-SPPR509	not_covered	not_implemented:spell:progression_mode
+SPPR509	identical
 SPPR510	identical
 SPPR511	identical
 SPPR512	identical
-SPPR513	not_covered	not_implemented:spell:progression_opcode44
+SPPR513	identical
 SPPR514	identical
 SPPR515	not_covered	not_implemented:recursion:versus_mixed
 SPPR515D	identical
@@ -444,11 +444,11 @@ SPPR706	identical
 SPPR707	not_covered	not_implemented:spell:progression_external
 SPPR708	identical
 SPPR709	identical
-SPPR710	not_covered	not_implemented:application:level
+SPPR710	identical
 SPPR711	identical
 SPPR712	identical
 SPPR713	identical
-SPPR715	not_covered	not_implemented:application:level
+SPPR715	identical
 SPPR717	identical
 SPPR718	identical
 SPPR719	identical
@@ -478,7 +478,7 @@ SPRA303	identical
 SPRA304	identical
 SPRA305	identical
 SPRA306	identical
-SPSD02	not_covered	not_implemented:opcode145:ability
+SPSD02	identical
 SPWI001	identical
 SPWI002	identical
 SPWI003	identical
@@ -491,7 +491,7 @@ SPWI055	identical
 SPWI056	identical
 SPWI101	identical
 SPWI102	identical
-SPWI103	not_covered	not_implemented:application:ticks
+SPWI103	identical
 SPWI104	identical
 SPWI105	identical
 SPWI106	identical
@@ -549,7 +549,7 @@ SPWI311	identical
 SPWI312	identical
 SPWI313	identical
 SPWI314	identical
-SPWI315	not_covered	not_implemented:opcode145:ability
+SPWI315	identical
 SPWI316	identical
 SPWI317	identical
 SPWI318	not_covered	not_implemented:opcode201:group_fields
@@ -573,7 +573,7 @@ SPWI409	identical
 SPWI410	identical
 SPWI411	identical
 SPWI412	identical
-SPWI413	not_covered	not_implemented:recursion:missing_opcodes:204
+SPWI413	identical
 SPWI414	not_covered	file_error:recursion:application:no_duration
 SPWI415	identical
 SPWI416	not_covered	not_implemented:spell:levels_immunities
@@ -622,7 +622,7 @@ SPWI522	identical
 SPWI523	not_covered	not_implemented:recursion:level_sections
 SPWI601	identical
 SPWI602	identical
-SPWI603	not_covered	not_implemented:opcode145:ability
+SPWI603	not_covered	not_implemented:opcode145:spell_types
 SPWI604	identical
 SPWI605	identical
 SPWI606	identical
@@ -683,7 +683,7 @@ SPWI813	identical
 SPWI815	identical
 SPWI816	identical
 SPWI817	identical
-SPWI818	not_covered	not_implemented:application:timing
+SPWI818	identical
 SPWI853	identical
 SPWI888	identical
 SPWI897	identical
@@ -703,7 +703,7 @@ SPWI914	identical
 SPWI915	identical
 SPWI916	identical
 SPWI917	identical
-SPWI918	not_covered	not_implemented:application:timing
+SPWI918	identical
 SPWI919	identical
 SPWI920	identical
 SPWI921	identical
@@ -760,7 +760,7 @@ SPWM125	identical
 SPWM126	identical
 SPWM136	identical
 SPWM140	identical
-SPWM141	not_covered	not_implemented:opcode122:random_treasure
+SPWM141	identical
 SPWM142	identical
 SPWM143	identical
 SPWM145	identical

@@ -205,7 +205,7 @@
 201      1        1        DESCRIBED LEVEL            251    SHOWN           Spell:_Immunity_(by_Power_Level,_decrementing)
 202      1        1        TODO      LEVEL            242    SHOWN           Spell:_Bounce_(by_School)
 203      1        1        TODO      LEVEL            243    SHOWN           Spell:_Bounce_(by_Secondary_Type)
-204      1        1        TODO      LEVEL            252    SHOWN           Spell:_Protection_(by_School)
+204      1        1        DESCRIBED LEVEL            252    SHOWN           Spell:_Protection_(by_School)
 205      1        1        DESCRIBED LEVEL            253    SHOWN           Spell:_Protection_(by_Secondary_Type)
 206      1        1        DESCRIBED LEVEL            256    SHOWN           Spell:_Protection_from_Spell
 207      1        1        DESCRIBED LEVEL            247    SHOWN           Spell:_Bounce_(by_Resource)

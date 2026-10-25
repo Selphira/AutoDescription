@@ -343,6 +343,12 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				SET formula_dice_sides = 0
 				SET formula_opcode = level_opcode
 				LPM ad_spell_level_formula
+				// Deux valeurs seulement : la formule de l'ancien moteur, sans dés ni unité.
+				PATCH_IF NOT (~%formula_two_text%~ STRING_EQUAL ~~) AND level_opcode != 12 AND level_opcode != 17 BEGIN
+					SPRINT formula_text ~%formula_two_text%~
+					SET formula_valid = 1
+					SET formula_rank = 0
+				END
 				LPM ad_spell_level_formula_check
 				SET level_duration_by_timing = 0
 				PATCH_IF formula_valid BEGIN
@@ -525,7 +531,8 @@ END
 // level_value_text de sa valeur (mode level_mode) et level_duration_text de sa durée, et les autres
 // sont écartés. Refus : level_a n'est
 // pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
-// opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout ;
+// opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout ou
+// la valeur fixée ;
 // progression d'un opcode dont le premier en-tête a des effets du fichier et d'un EFF (177 : l'ancien
 // moteur ordonne autrement les lignes, SPCL236).
 DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
@@ -552,7 +559,7 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $AD_LEVEL_VALUE_OPCODES(~%level_opcode%~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_opcode%level_opcode%~ message = ~value varying with the level, not written by the lines of opcode %level_opcode%~ RET render_late_missing = refusal END
 	END
-	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND level_mode != MOD_TYPE_cumulative BEGIN
+	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND level_mode != MOD_TYPE_cumulative AND level_mode != MOD_TYPE_flat BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_mode~ message = ~value varying with the level in mode %level_mode%~ RET render_late_missing = refusal END
 	END
 	ELSE PATCH_IF level_external BEGIN
@@ -590,7 +597,9 @@ END
 // formula_flat : valeur fixée (l'ancien moteur ajoute « niveau + valeur » devant une valeur constante
 // ou un pas négatif) ; formula_opcode : opcode dont l'unité suit la valeur (AD_LEVEL_UNIT_OPCODES),
 // sur l'effet level_id ; formula_unit_used : 1 si elle a été écrite. formula_rank : nombre de valeurs
-// distinctes successives ; avec deux, formula_valid vaut 0 (ad_spell_level_formula_check).
+// distinctes successives ; avec deux, formula_valid vaut 0 (ad_spell_level_formula_check) et, sans
+// dés, formula_two_text est la formule de l'ancien get_complex_value (« 1 + 1 au niveau 20 »,
+// « 2 jusqu'au niveau 9 » quand la seconde valeur est nulle), sans unité.
 DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 	SPRINT formula_text ~~
 	SET formula_base = 0
@@ -656,8 +665,12 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 			END
 		END
 	END
+	SPRINT formula_two_text ~~
 	PATCH_IF formula_rank == 2 BEGIN
 		SET formula_valid = 0
+		PATCH_IF formula_dice_sides == 0 BEGIN
+			LPM ad_spell_level_formula_two_values
+		END
 	END
 	ELSE PATCH_IF formula_valid BEGIN
 		SET formula_last = formula_value
@@ -740,6 +753,41 @@ DEFINE_PATCH_MACRO ad_spell_level_formula_entry BEGIN
 			LPF ad_spell_first_level RET level_first = first_level END
 		END
 		SET formula_level = level_first
+	END
+END
+
+// Formule à deux valeurs (formula_two_text) : première valeur, seconde valeur et niveau requis de son
+// premier en-tête.
+DEFINE_PATCH_MACRO ad_spell_level_formula_two_values BEGIN
+	SET formula_two_first = 0
+	SET formula_two_second = 0
+	SET formula_two_level = 0
+	FOR (formula_n = 0; formula_n < search_total; ++formula_n) BEGIN
+		LPM ad_spell_level_formula_entry
+		PATCH_IF formula_n == 0 BEGIN
+			SET formula_two_first = formula_value
+		END
+		ELSE PATCH_IF formula_two_level == 0 AND formula_value != formula_two_first BEGIN
+			SET formula_two_second = formula_value
+			SET formula_two_level = formula_level
+		END
+	END
+	SPRINT baseValue ~%formula_two_first%~
+	SET formula_two_delta = formula_two_second - formula_two_first
+	SPRINT value ~%formula_two_delta%~
+	PATCH_IF formula_percent BEGIN
+		SPRINT value ~%formula_two_first%~
+		SPRINT baseValue @1200003 // ~%value%%PERCENT%~
+		SPRINT value ~%formula_two_delta%~
+		SPRINT value @1200003 // ~%value%%PERCENT%~
+	END
+	PATCH_IF formula_two_first > 0 AND formula_two_second == 0 BEGIN
+		SET level = formula_two_level - 1
+		SPRINT formula_two_text @3000013 // ~%baseValue% jusqu'au niveau %level%~
+	END
+	ELSE BEGIN
+		SET level = formula_two_level
+		SPRINT formula_two_text @3000010 // ~%baseValue% + %value% au niveau %level%~
 	END
 END
 

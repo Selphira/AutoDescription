@@ -146,6 +146,7 @@
 @3000010 = ~%baseValue% + %value% on level %level%~ // reprise de @102160
 @3000011 = ~%value%/level~ // reprise de @102161
 @3000012 = ~%value%/%level% levels~ // reprise de @102162
+@3000013 = ~%baseValue% up to level %level%~ // reprise de @102167
 
 // Durées : unités, 3 010 000 + 2 × unité + pluriel ; unités 0 seconde, 1 round, 2 tour, 3 heure, 4 jour (3 010 000-3 010 009)
 @3010000 = ~1 second~ // reprise de @100300
@@ -1116,6 +1117,15 @@
 @8098050 = ~chaotic neutral creatures~ // reprise de @208050
 @8098051 = ~chaotic evil creatures~ // reprise de @208051
 
+// Noms au singulier des valeurs de gender.ids, 8 099 000 + valeur (opcode 71) (8 099 000-8 099 255)
+@8099001 = ~male~ // reprise de @207501
+@8099002 = ~female~ // reprise de @207502
+@8099005 = ~hermaphrodite~ // reprise de @207505
+@8099006 = ~summoned creature~ // reprise de @207506
+@8099007 = ~illusionary~ // reprise de @207507
+@8099009 = ~summoned demon~ // reprise de @207509
+@8099066 = ~imprisoned creature~ // reprise de @207566
+
 // Noms des types secondaires de sorts, 8 100 000 + valeur de msectype.ids (1-13) (8 100 000-8 100 013)
 @8100000 = ~without secondary type~ // reprise de @100200
 @8100001 = ~protection~ // reprise de @100201
@@ -1620,6 +1630,13 @@
 @8160505 = ~effects protecting against psionic abilities~ // reprise de @401505
 @8160507 = ~effects protecting against poisons~ // reprise de @401507
 
+// Noms des trésors aléatoires RNDTRE01-RNDTRE05, 8 170 000 + numéro, sans rndtres.2da (8 170 001-8 170 005)
+@8170001 = ~trésor aléatoire de qualité médiocre~ // reprise de @100401 (absente en anglais : texte français)
+@8170002 = ~trésor aléatoire de qualité ordinaire~ // reprise de @100402 (absente en anglais : texte français)
+@8170003 = ~trésor aléatoire de qualité~ // reprise de @100403 (absente en anglais : texte français)
+@8170004 = ~trésor aléatoire de qualité supérieure~ // reprise de @100404 (absente en anglais : texte français)
+@8170005 = ~trésor aléatoire de qualité exceptionnelle~ // reprise de @100405 (absente en anglais : texte français)
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Armor Class~ // reprise de @10000099
 @20000001 = ~Base Armor Class~ // reprise de @10000100
@@ -2080,11 +2097,15 @@
 @20690112 = ~to cast Non-detection on %theTarget%~ // reprise de @10690003
 @20690113 = ~to cast Non-detection on %theTarget%~ // reprise de @10690003
 
-// Opcode 71 : Inversion du sexe : phrases 0100 (20 710 000-20 710 999)
+// Opcode 71 : Inversion du sexe : phrases 0100 inversion, 0110 sexe fixé (20 710 000-20 710 999)
 @20710100 = ~Changes the gender %ofTheTarget%~ // reprise de @10710001
 @20710101 = ~Changes the gender %ofTheTarget%~ // reprise de @10710001
 @20710102 = ~to change the gender %ofTheTarget%~ // reprise de @10710011
 @20710103 = ~to change the gender %ofTheTarget%~ // reprise de @10710011
+@20710110 = ~Change %theTarget% to %genderType%~ // reprise de @10710002
+@20710111 = ~Change %theTarget% to %genderType%~ // reprise de @10710002
+@20710112 = ~to change %theTarget% to %genderType%~ // reprise de @10710012
+@20710113 = ~to change %theTarget% to %genderType%~ // reprise de @10710012
 
 // Opcode 73 : libellés (20 730 000-20 730 099)
 @20730000 = ~Damage~ // reprise de @10730001
@@ -2833,6 +2854,12 @@
 @22010121 = ~Immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010022
 @22010122 = ~to immunize up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010023
 @22010123 = ~to immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010024
+
+// Opcode 204 : Immunité à une école de magie : phrases 0100 (22 040 000-22 040 999)
+@22040100 = ~Protects from spells %spellSchoolName%~ // reprise de @12040001
+@22040101 = ~Protects %theTarget% from spells %spellSchoolName%~ // reprise de @12040003
+@22040102 = ~to protect from spells %spellSchoolName%~ // reprise de @12040002
+@22040103 = ~to protect %theTarget% from spells %spellSchoolName%~ // reprise de @12040004
 
 // Opcode 205 : Immunité à un type secondaire de sort : phrases 0100 (22 050 000-22 050 999)
 @22050100 = ~Protects from %spellSecondaryTypeName% spells~ // reprise de @12050001

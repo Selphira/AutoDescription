@@ -5,15 +5,16 @@
 // qui reprennent les chaînes de la cible parameter1, sauf pour une condition de distance (8, 9, 14) ;
 // l'ancien moteur y fixe aussi versus à cette cible (vide pour une distance, BUG-038), que les dégâts
 // écrivent même sous une zone de projectile (ctx_versus) ;
-// un sort nommé dont les effets donnent plusieurs lignes est cité par son nom.
+// un sort nommé dont les effets donnent plusieurs lignes est cité par son nom. L'ancien moteur décrit
+// ce sort sans limite de profondeur (get_item_spell_effects_description appelée sans recursivity) :
+// un 232 d'un sous-sort est décrit, un 146 du sort lancé ne l'est pas (recursion_depth_reset).
 
 // Refus : effet d'un EFF dont resource2 ou resource3 est rempli (l'ancien moteur y lance aussi ces
 // sorts), sauf pour l'en-tête d'un sort seul, qui ne dépend ni de la condition ni du sous-sort ;
 // valeurs que l'ancien
 // opcode_232_is_valid écarte (cible hors de 0-3, condition hors de 0-21, ou de 0-11 sur un jeu
 // classique, moment de la journée sur une autre cible que le porteur, condition 10 sans special,
-// ressource vide, ainsi que resource2 et resource3 pour un effet d'un EFF) ; effet d'un sous-sort
-// (l'ancien moteur n'y limite pas la profondeur) ; condition d'un état (5, 6, 15) ; condition de
+// ressource vide, ainsi que resource2 et resource3 pour un effet d'un EFF) ; condition d'un état (5, 6, 15) ; condition de
 // distance trop courte, moment de la journée ou état de sort sans nom ; plusieurs lignes d'un sort
 // sans nom sous une condition vide ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_232_support BEGIN
@@ -42,9 +43,6 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			END
 			ELSE PATCH_IF support_header_only BEGIN
 			END
-			ELSE PATCH_IF ctx_depth > 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:recursion:nested_condition~ message = ~condition in a spell already cast by another effect~ RET render_missing = refusal END
-			END
 			ELSE BEGIN
 				LPM ad_op_232_targets
 				LPM ad_op_232_condition
@@ -66,7 +64,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				SPRINT recursion_of_the_target ~%ofTheTarget%~
 				SPRINT recursion_to_the_target ~%toTheTarget%~
 				SET recursion_series = 0
-				SET recursion_depth_reset = 0
+				SET recursion_depth_reset = 1
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
 				SPRINT recursion_single_reason ~~

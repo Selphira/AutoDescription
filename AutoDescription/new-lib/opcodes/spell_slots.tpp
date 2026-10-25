@@ -16,7 +16,8 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 	PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
 		SET slots_amount = $fx_parameter1(~%slots_id%~)
 		SET slots_doubling = $fx_parameter2(~%slots_id%~) == 0
-		SET $slots_seen_levels(~%slots_amount% %slots_doubling%~) = 0
+		SPRINT slots_scope $fx_scope(~%slots_id%~)
+		SET $slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) = 0
 	END
 	FOR (slots_id = 0; slots_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++slots_id) BEGIN
 		PATCH_IF $fx_opcode(~%slots_id%~) == slots_opcode BEGIN
@@ -25,6 +26,7 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 			// Les doublements et les ajouts d'un même nombre sont réunis séparément.
 			SET slots_doubling = slots_levels == 0
 			SET slots_levels_used = slots_doubling ? slots_all_levels : slots_levels
+			SPRINT slots_scope $fx_scope(~%slots_id%~)
 			// Valeurs que l'ancien moteur décrit mal ou pas (aucun texte, niveaux non écrits, BIT9 =
 			// doublement d'un seul niveau, écrit « de 3 niveau »).
 			PATCH_IF slots_amount == 0 OR slots_amount > 32767 OR slots_amount < 0 - 32768
@@ -38,11 +40,11 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 			END
 			// En réunissant les effets d'un même nombre, l'ancien moteur fusionne les niveaux
 			// communs (ou deux doublements identiques) au lieu de cumuler leurs emplacements.
-			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND ($slots_seen_levels(~%slots_amount% %slots_doubling%~) BAND slots_levels_used) != 0 BEGIN
+			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND ($slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) BAND slots_levels_used) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:overlapping_levels~ message = ~overlapping spell levels~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SET $slots_seen_levels(~%slots_amount% %slots_doubling%~) = $slots_seen_levels(~%slots_amount% %slots_doubling%~) BOR slots_levels_used
+				SET $slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) = $slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) BOR slots_levels_used
 			END
 		END
 	END
@@ -66,8 +68,8 @@ END
 // ---------------------------------------------------------------------------------------------
 // Lignes (ancien opcode_self_42_62 et opcode_42_group)
 
-// Avec AD_ENABLE_SHRINKAGE, les effets d'un même nombre d'emplacements sont réunis en une ligne
-// (niveaux réunis) ; l'ancien moteur range les effets réunis après les doublements, d'où leurs
+// Avec AD_ENABLE_SHRINKAGE, les effets d'un même nombre d'emplacements, de même portée et de même
+// probabilité, sont réunis en une ligne (niveaux réunis) ; l'ancien moteur range les effets réunis après les doublements, d'où leurs
 // lignes ajoutées après celles-ci.
 DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -93,9 +95,14 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 			SET $slots_done(~%slots_id%~) = 1
 			SET slots_amount = $fx_parameter1(~%slots_id%~)
 			SET slots_levels = $fx_parameter2(~%slots_id%~)
+			SPRINT slots_scope $fx_scope(~%slots_id%~)
 			PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 				PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_other BEGIN
-					PATCH_IF slots_other >= slots_id + 1 AND NOT $slots_done(~%slots_other%~) AND $fx_parameter1(~%slots_other%~) == slots_amount BEGIN
+					SPRINT slots_other_scope $fx_scope(~%slots_other%~)
+					PATCH_IF slots_other >= slots_id + 1 AND NOT $slots_done(~%slots_other%~) AND $fx_parameter1(~%slots_other%~) == slots_amount
+							AND (~%slots_other_scope%~ STRING_EQUAL ~%slots_scope%~)
+							AND $fx_probability1(~%slots_other%~) == $fx_probability1(~%slots_id%~)
+							AND $fx_probability2(~%slots_other%~) == $fx_probability2(~%slots_id%~) BEGIN
 						SET $slots_done(~%slots_other%~) = 1
 						SET slots_levels = slots_levels BOR $fx_parameter2(~%slots_other%~)
 					END

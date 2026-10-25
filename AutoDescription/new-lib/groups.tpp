@@ -980,8 +980,13 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
-					PATCH_IF fx_same BEGIN
+					// Comme l'ancien opcode_match_opcode_60_145_group (corrigé), même type de créature (177).
+					PATCH_IF fx_same AND $fx_versus_file(~%group_id%~) == $fx_versus_file(~%group_candidate%~)
+							AND $fx_versus_value(~%group_id%~) == $fx_versus_value(~%group_candidate%~)
+							AND $fx_versus_inner_file(~%group_id%~) == $fx_versus_inner_file(~%group_candidate%~)
+							AND $fx_versus_inner_value(~%group_id%~) == $fx_versus_inner_value(~%group_candidate%~) BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
+						SET $fx_group_anchor(~%group_candidate%~) = group_id
 						SET group_types = group_types BOR (1 << group_other_type)
 						SET group_merged = 1
 					END
