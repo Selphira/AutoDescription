@@ -1126,9 +1126,11 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 			END
 			PATCH_IF group_found BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
+				SET $fx_derived_source(~%group_id%~) = 1
 				PHP_EACH group_members AS _ => group_opcode BEGIN
 					SET group_other = $group_member(~%group_opcode%~)
 					SET $fx_consumed(~%group_other%~) = 1
+					SET $fx_group_anchor(~%group_other%~) = group_id
 				END
 				SPRINT derived_kind ~%group_derived%~
 				SET derived_id = group_id

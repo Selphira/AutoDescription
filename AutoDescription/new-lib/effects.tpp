@@ -18,7 +18,11 @@
 // d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
-// pour un effet écarté, ad_application_drop) ; fx_exception et fx_exception_count (exceptions de
+// pour un effet écarté, ad_application_drop) ; fx_level_merged (1 pour l'effet d'un en-tête que l'effet
+// égal d'un autre niveau représente, new-lib/spell_levels.tpp) ; fx_group_anchor (l'effet lui-même à
+// la lecture, celui qui le représente une fois réuni par le regroupement d'un opcode : maladies,
+// invocations, ad_group_same_fields) ; fx_derived_source (1 pour l'effet d'ancrage d'un effet dérivé,
+// dont la ligne lit les champs, new-lib/groups.tpp) ; fx_exception et fx_exception_count (exceptions de
 // cible des opcodes 318 et 324, ad_fx_mark_target_exception, new-lib/opcodes/target_exceptions.tpp) ; fx_not_cumulative (effet lu après un
 // 321 sur la ressource elle-même dans son bloc, ad_fx_mark_not_cumulative, new-lib/opcodes/321.tpp) ; fx_external (1 pour un effet 177
 // remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_probability_in_sub
@@ -261,6 +265,8 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_versus_inner_file(~%fx_id%~) = 0
 	SET $fx_versus_inner_value(~%fx_id%~) = 0
 	SET $fx_identical_anchor(~%fx_id%~) = fx_id
+	SET $fx_group_anchor(~%fx_id%~) = fx_id
+	SET $fx_derived_source(~%fx_id%~) = 0
 	SET $fx_from_111(~%fx_id%~) = 0
 	SET $fx_probability_in_sub(~%fx_id%~) = 0
 	SET $fx_cursed(~%fx_id%~) = $fx_opcode(~%fx_id%~) == 283

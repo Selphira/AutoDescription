@@ -6,7 +6,8 @@
 
 // Validation de l'ancien opcode_233_is_valid. Une statistique de compétence sans nom dans
 // weapprof.2da (EXTRAPROFICIENCY…, que le jeu détourne en marqueur de sort) n'est pas une
-// compétence du personnage : l'ancien moteur l'écarte sans rien écrire.
+// compétence du personnage : l'ancien moteur l'écarte sans rien écrire, avant de réunir les effets
+// identiques (plusieurs marqueurs d'un même sort ne sont pas des doublons).
 DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 	PHP_EACH fx_ids_233 AS _ => stat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -26,11 +27,6 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 			END
 		END
 	END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		SET stat_opcode = 233
-		SPRINT stat_mode_3 ~invalid~
-		LPM ad_stat_modifier_support
-	END
 	PHP_EACH fx_ids_233 AS _ => stat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET proficiency_stat = $fx_stat_subject(~%stat_id%~)
@@ -41,6 +37,11 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 				LPM ad_application_drop
 			END
 		END
+	END
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		SET stat_opcode = 233
+		SPRINT stat_mode_3 ~invalid~
+		LPM ad_stat_modifier_support
 	END
 END
 

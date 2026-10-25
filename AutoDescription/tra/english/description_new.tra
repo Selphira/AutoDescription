@@ -2113,10 +2113,18 @@
 @20770101 = ~Cure Feeblemindedness on %theTarget%~ // reprise de @10770002
 @20770102 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
 @20770103 = ~to cure Feeblemindedness on %theTarget%~ // reprise de @10770003
+@20780001 = ~and~ // reprise de @100021
+@20780064 = ~the Strength~ // reprise de @10780164
+@20780065 = ~the Dexterity~ // reprise de @10780165
+@20780066 = ~the Constitution~ // reprise de @10780166
+@20780067 = ~the Intelligence~ // reprise de @10780167
+@20780068 = ~the Wisdom~ // reprise de @10780168
+@20780069 = ~the Charisma~ // reprise de @10780169
 
-// Opcode 78 : maladie : phrases 0100 + 10 × décalage de la chaîne de l'ancien moteur (0-1 dégâts, 4-9
-// caractéristique réduite, 10 lenteur, 13 contagion, 14-19 et 23 augmentées, 30-31 dégâts de poison
-// sur EE) (20 780 000-20 780 999)
+// Opcode 78 : maladie : 0001 « et », 0064-0069 noms des caractéristiques réunies, phrases 0100 + 10 ×
+// décalage de la chaîne de l'ancien moteur (0-1 dégâts, 4-9 caractéristique réduite, 10 lenteur, 13
+// contagion, 14-19 et 23 augmentées, 30-31 dégâts de poison sur EE, 40 et 50 caractéristiques réunies
+// réduites et augmentées) (20 780 000-20 780 999)
 @20780100 = ~Causes a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780000
 @20780101 = ~Causes a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780000
 @20780102 = ~cause a condition that inflicts 1 point of damage %strDuration% %toTheTarget%~ // reprise de @10780100
@@ -2193,6 +2201,14 @@
 @20780411 = ~Causes a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780031
 @20780412 = ~cause a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780131
 @20780413 = ~cause a condition that inflicts %amount% points of poison damage %strDuration% %toTheTarget%~ // reprise de @10780131
+@20780500 = ~Causes a condition that decreases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780040
+@20780501 = ~Causes a condition that decreases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780040
+@20780502 = ~cause a condition that decreases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780140
+@20780503 = ~cause a condition that decreases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780140
+@20780600 = ~Causes a condition that increases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780050
+@20780601 = ~Causes a condition that increases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780050
+@20780602 = ~cause a condition that increases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780150
+@20780603 = ~cause a condition that increases by %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780150
 
 // Opcode 79 : Soin : maladies (20 790 000-20 790 999)
 @20790100 = ~Cure Disease~ // reprise de @10790001

@@ -2113,10 +2113,18 @@
 @20770101 = ~Guérit la débilité mentale %ofTheTarget%~ // reprise de @10770002
 @20770102 = ~de guérir la débilité mentale %ofTheTarget%~ // reprise de @10770003
 @20770103 = ~de guérir la débilité mentale %ofTheTarget%~ // reprise de @10770003
+@20780001 = ~et~ // reprise de @100021
+@20780064 = ~la force~ // reprise de @10780164
+@20780065 = ~la dextérité~ // reprise de @10780165
+@20780066 = ~la constitution~ // reprise de @10780166
+@20780067 = ~l'intelligence~ // reprise de @10780167
+@20780068 = ~la sagesse~ // reprise de @10780168
+@20780069 = ~le charisme~ // reprise de @10780169
 
-// Opcode 78 : maladie : phrases 0100 + 10 × décalage de la chaîne de l'ancien moteur (0-1 dégâts, 4-9
-// caractéristique réduite, 10 lenteur, 13 contagion, 14-19 et 23 augmentées, 30-31 dégâts de poison
-// sur EE) (20 780 000-20 780 999)
+// Opcode 78 : maladie : 0001 « et », 0064-0069 noms des caractéristiques réunies, phrases 0100 + 10 ×
+// décalage de la chaîne de l'ancien moteur (0-1 dégâts, 4-9 caractéristique réduite, 10 lenteur, 13
+// contagion, 14-19 et 23 augmentées, 30-31 dégâts de poison sur EE, 40 et 50 caractéristiques réunies
+// réduites et augmentées) (20 780 000-20 780 999)
 @20780100 = ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~ // reprise de @10780000
 @20780101 = ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~ // reprise de @10780000
 @20780102 = ~d'inoculer une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~ // reprise de @10780100
@@ -2193,6 +2201,14 @@
 @20780411 = ~Inocule une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~ // reprise de @10780031
 @20780412 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~ // reprise de @10780131
 @20780413 = ~d'inoculer une maladie qui inflige %amount% points de dégâts de poison %strDuration% %toTheTarget%~ // reprise de @10780131
+@20780500 = ~Inocule une maladie qui diminue de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780040
+@20780501 = ~Inocule une maladie qui diminue de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780040
+@20780502 = ~d'inoculer une maladie qui diminue de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780140
+@20780503 = ~d'inoculer une maladie qui diminue de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780140
+@20780600 = ~Inocule une maladie qui augmente de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780050
+@20780601 = ~Inocule une maladie qui augmente de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780050
+@20780602 = ~d'inoculer une maladie qui augmente de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780150
+@20780603 = ~d'inoculer une maladie qui augmente de %amount% %theAttributes% %ofTheTarget%~ // reprise de @10780150
 
 // Opcode 79 : Soin : maladies (20 790 000-20 790 999)
 @20790100 = ~Guérison des maladies~ // reprise de @10790001

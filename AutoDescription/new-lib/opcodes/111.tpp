@@ -58,24 +58,50 @@ DEFINE_PATCH_MACRO ad_fx_substitute_111 BEGIN
 	END
 END
 
-// Refus : effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
+// Comme l'ancien opcode_111_replace, un 111 du fichier est écarté sans ligne quand une métamorphose
+// (135) de sa portée a la même durée et le même timing : l'arme fait partie de la métamorphose.
+// Refus : cette métamorphose vient d'un EFF (l'ancien moteur ne la voit que selon l'ordre de ses
+// opcodes) ; effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
 // selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; ressource vide
 // (l'ancien opcode_111_is_valid l'écarte) ; arme sans nom (l'ancien moteur n'écrit rien) ; retrait
 // différé de la même arme (112) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
-// opcode_112_group) ; sans, l'ancien moteur n'écrit pas la ligne du 111 (SPWM113, cause à établir).
+// opcode_112_group) ; sans, son texte n'est pas établi (le seul cas connu, SPWM113, est une arme
+// écartée par sa métamorphose).
 DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 	PHP_EACH fx_ids_111 AS _ => weapon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%weapon_id%~) BEGIN
 			SPRINT weapon_resref $fx_resource(~%weapon_id%~)
 			SPRINT weapon_error $fx_substitution_error(~%weapon_id%~)
 			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name END
+			SET weapon_polymorph = 0 - 1
+			PATCH_IF NOT $fx_external(~%weapon_id%~) BEGIN
+				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
+				PHP_EACH fx_ids_135 AS _ => weapon_other BEGIN
+					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
+					PATCH_IF weapon_polymorph < 0 AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~)
+							AND $fx_timing(~%weapon_other%~) == $fx_timing(~%weapon_id%~) AND $fx_duration(~%weapon_other%~) == $fx_duration(~%weapon_id%~) BEGIN
+						SET weapon_polymorph = weapon_other
+					END
+				END
+			END
 			SET weapon_mixed = 0
 			PATCH_IF $fx_external(~%weapon_id%~) BEGIN
 				PHP_EACH fx_ids_111 AS _ => weapon_other BEGIN
 					SET weapon_mixed = weapon_mixed OR NOT $fx_external(~%weapon_other%~)
 				END
 			END
-			PATCH_IF weapon_mixed BEGIN
+			PATCH_IF weapon_polymorph >= 0 BEGIN
+				PATCH_IF $fx_external(~%weapon_polymorph%~) BEGIN
+					LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:polymorph_external~ message = ~weapon with a polymorph from an EFF file of the same duration~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					SET drop_id = weapon_id
+					SPRINT ignored_reason ~not_implemented:opcode111:polymorph~
+					SPRINT ignored_message ~weapon removed by the polymorph of the same duration~
+					LPM ad_application_drop
+				END
+			END
+			ELSE PATCH_IF weapon_mixed BEGIN
 				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:external~ message = ~effect from an EFF file with another opcode 111 in the resource~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%weapon_error%~ STRING_EQUAL ~~) BEGIN

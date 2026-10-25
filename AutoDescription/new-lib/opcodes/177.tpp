@@ -285,10 +285,19 @@ END
 // a consommé perdrait ce type : refusé. Un effet écarté sans rien écrire (fx_dropped) n'en perd aucun ;
 // celui d'un en-tête que l'effet égal d'un autre niveau représente (fx_level_merged,
 // new-lib/spell_levels.tpp) non plus : l'ancien moteur ne compare pas non plus leur type de créature.
+// L'effet d'ancrage d'un effet dérivé (fx_derived_source), dont la ligne lit les champs, garde le sien,
+// comme le membre d'une série (fx_series_of) ou d'un regroupement (fx_group_anchor) dont l'effet qui
+// le représente vise le même type.
 DEFINE_PATCH_MACRO ad_op_177_lines BEGIN
 	FOR (substitute_id = 0; substitute_id < fx_count; ++substitute_id) BEGIN
+		SET substitute_rep = $fx_series_of(~%substitute_id%~) >= 0 ? $fx_series_of(~%substitute_id%~) : $fx_group_anchor(~%substitute_id%~)
+		SET substitute_same_versus = substitute_rep != substitute_id
+			AND $fx_versus_file(~%substitute_rep%~) == $fx_versus_file(~%substitute_id%~)
+			AND $fx_versus_value(~%substitute_rep%~) == $fx_versus_value(~%substitute_id%~)
+			AND $fx_versus_inner_file(~%substitute_rep%~) == $fx_versus_inner_file(~%substitute_id%~)
+			AND $fx_versus_inner_value(~%substitute_rep%~) == $fx_versus_inner_value(~%substitute_id%~)
 		PATCH_IF $fx_versus_file(~%substitute_id%~) > 0 AND $fx_consumed(~%substitute_id%~) AND NOT $fx_dropped(~%substitute_id%~)
-				AND NOT $fx_level_merged(~%substitute_id%~)
+				AND NOT $fx_level_merged(~%substitute_id%~) AND NOT $fx_derived_source(~%substitute_id%~) AND NOT substitute_same_versus
 				AND $fx_identical_anchor(~%substitute_id%~) == substitute_id BEGIN
 			LPF ad_refusal INT_VAR fx_id = substitute_id STR_VAR reason = ~not_implemented:opcode177:versus_group~ message = ~effect with a creature type grouped with other effects~ RET render_late_missing = refusal END
 		END

@@ -243,6 +243,7 @@ DEFINE_PATCH_MACRO ad_op_127_similar_group BEGIN
 				PHP_EACH monster_members AS monster_member => _ BEGIN
 					PATCH_IF monster_member != monster_id BEGIN
 						SET $fx_consumed(~%monster_member%~) = 1
+						SET $fx_group_anchor(~%monster_member%~) = monster_id
 					END
 				END
 				SET $fx_monster_min(~%monster_id%~) = monster_group_min

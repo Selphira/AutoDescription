@@ -42,8 +42,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 		SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
 		SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
 	END
+	// Un effet déjà écarté sans rien écrire (fx_dropped) n'est ni validé ni compté.
 	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
 			SPRINT stat_scope $fx_scope(~%stat_id%~)
@@ -67,9 +68,16 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler ; un effet d'un 177
 			// contre un type de créature n'est pas identique à celui qui vaut pour tous. Il ne fusionne
-			// que leurs lignes : l'en-tête d'un sort compte les deux.
+			// que leurs lignes : l'en-tête d'un sort compte les deux. La fusion n'est juste que pour des
+			// effets non cumulatifs (fx_not_cumulative, 321 sur la ressource elle-même) : le second est
+			// alors réuni au premier ; sinon, refus.
 			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
+				PATCH_IF $fx_not_cumulative(~%stat_id%~) BEGIN
+					SET $fx_consumed(~%stat_id%~) = 1
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 1

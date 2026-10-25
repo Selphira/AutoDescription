@@ -5,7 +5,7 @@ BALTH07	identical
 BHAAL1A	identical
 BHAAL1B	identical
 BHAAL2A	identical
-BHAAL2B	not_covered	not_implemented:opcode324:exceptions_group
+BHAAL2B	identical
 BHAAL3B	not_covered	file_error:recursion:missing_file
 BHAAL4A	identical
 CDHLYSY2	identical
@@ -14,7 +14,7 @@ CDSTAF12	identical
 CDWI917A	not_covered	not_implemented:opcode71:gender_set
 DEMOCHM	identical
 DEVAHEAL	identical
-DGARCHON	not_covered	not_implemented:opcode233:same_effect_twice
+DGARCHON	identical
 DGFAITH	identical
 DGRIGHT	identical
 DW#FPPLO	identical
@@ -52,7 +52,7 @@ OHNVRD3	identical
 OHNWISH	identical
 OHPRGD10	identical
 OHRRAGE	identical
-OHTMPS1	not_covered	not_implemented:opcode97:several_strength
+OHTMPS1	not_covered	not_implemented:spell:progression_mode
 OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode18
 OHTYR1	not_covered	not_implemented:opcode324:stat
 OHTYR2	identical
@@ -78,11 +78,11 @@ SPCL237	not_covered	not_implemented:spell_header:save_subspell
 SPCL238	identical
 SPCL239	identical
 SPCL311	identical
-SPCL321	not_covered	not_implemented:opcode101:ability_group_fields
+SPCL321	not_covered	not_implemented:recursion:delayed
 SPCL342	identical
 SPCL412	not_covered	not_implemented:recursion:spell:progression_two_values
 SPCL414	not_covered	not_implemented:recursion:level_sections
-SPCL423	not_covered	not_implemented:recursion:opcode318:exceptions_group
+SPCL423	not_covered	not_implemented:recursion:level_sections
 SPCL521	identical
 SPCL522	identical
 SPCL611	identical
@@ -127,7 +127,7 @@ SPCL916	identical
 SPCL917	identical
 SPCL918	identical
 SPCL919	identical
-SPCL920	not_covered	not_implemented:recursion:opcode166:same_effect_twice
+SPCL920	not_covered	not_implemented:recursion:opcode318:resource
 SPCL921	identical
 SPCL922	identical
 SPCL923	identical
@@ -175,11 +175,11 @@ SPIN113	identical
 SPIN114	identical
 SPIN115	identical
 SPIN116	identical
-SPIN117	not_covered	not_implemented:opcode101:ability_group_fields
+SPIN117	not_covered	not_implemented:recursion:delayed
 SPIN118	identical
 SPIN119	identical
 SPIN120	identical
-SPIN121	not_covered	not_implemented:opcode233:same_effect_twice
+SPIN121	identical
 SPIN122	not_covered	not_implemented:opcode135:natural_form
 SPIN123	not_covered	not_implemented:opcode135:natural_form
 SPIN124	not_covered	not_implemented:opcode135:natural_form
@@ -294,7 +294,7 @@ SPIN822	identical
 SPIN823	identical
 SPIN824	identical
 SPIN825	identical
-SPIN826	not_covered	not_implemented:opcode97:several_strength
+SPIN826	identical
 SPIN827	identical
 SPIN828	identical
 SPIN829	identical
@@ -307,7 +307,7 @@ SPIN866	identical
 SPIN883	identical
 SPIN888	identical
 SPIN889	identical
-SPIN891	not_covered	not_implemented:opcode177:versus_group
+SPIN891	identical
 SPIN892	identical
 SPIN913	identical
 SPIN914	identical
@@ -373,11 +373,11 @@ SPPR310	identical
 SPPR311	identical
 SPPR312	identical
 SPPR313	identical
-SPPR314	not_covered	not_implemented:opcode177:versus_group
+SPPR314	identical
 SPPR315	identical
 SPPR317	identical
 SPPR318	identical
-SPPR319	not_covered	not_implemented:opcode233:same_effect_twice
+SPPR319	identical
 SPPR350	identical
 SPPR401	identical
 SPPR402	identical
@@ -390,7 +390,7 @@ SPPR408	identical
 SPPR409	identical
 SPPR410	identical
 SPPR411	identical
-SPPR412	not_covered	not_implemented:opcode97:several_strength
+SPPR412	not_covered	not_implemented:spell:progression_mode
 SPPR413	identical
 SPPR414	identical
 SPPR415	identical
@@ -408,13 +408,13 @@ SPPR508	not_covered	not_implemented:spell:levels_immunities
 SPPR509	not_covered	not_implemented:spell:progression_mode
 SPPR510	identical
 SPPR511	identical
-SPPR512	not_covered	not_implemented:opcode324:exceptions_group
+SPPR512	identical
 SPPR513	not_covered	not_implemented:spell:progression_opcode44
 SPPR514	identical
 SPPR515	not_covered	not_implemented:opcode318:resource
 SPPR515D	not_covered	not_implemented:opcode318:stat
 SPPR516	identical
-SPPR517	not_covered	not_implemented:opcode233:same_effect_twice
+SPPR517	identical
 SPPR550	identical
 SPPR601	identical
 SPPR602	identical
@@ -428,14 +428,14 @@ SPPR608	identical
 SPPR609	not_covered	not_implemented:opcode318:stat
 SPPR610	identical
 SPPR611	identical
-SPPR612	not_covered	not_implemented:opcode324:exceptions_identical
-SPPR613	not_covered	not_implemented:opcode233:same_effect_twice
+SPPR612	identical
+SPPR613	identical
 SPPR614	identical
-SPPR650	not_covered	not_implemented:opcode324:exceptions_group
+SPPR650	identical
 SPPR698	not_covered	not_implemented:recursion:area_range
 SPPR698D	identical
 SPPR699	identical
-SPPR701	not_covered	not_implemented:opcode233:same_effect_twice
+SPPR701	identical
 SPPR702	identical
 SPPR703	identical
 SPPR704	identical
@@ -454,7 +454,7 @@ SPPR718	identical
 SPPR719	identical
 SPPR720	identical
 SPPR721	identical
-SPPR722	not_covered	not_implemented:opcode318:exceptions_group
+SPPR722	identical
 SPPR723	identical
 SPPR724	identical
 SPPR725	identical
@@ -473,7 +473,7 @@ SPPR986	identical
 SPPR987	identical
 SPPR999	identical
 SPRA301	identical
-SPRA302	not_covered	not_implemented:opcode233:same_effect_twice
+SPRA302	identical
 SPRA303	identical
 SPRA304	identical
 SPRA305	identical
@@ -503,7 +503,7 @@ SPWI112	identical
 SPWI113	identical
 SPWI114	identical
 SPWI115	identical
-SPWI116	not_covered	not_implemented:opcode324:exceptions_group
+SPWI116	identical
 SPWI117	identical
 SPWI118	identical
 SPWI119	not_covered	not_implemented:opcode318:stat
@@ -569,7 +569,7 @@ SPWI405	identical
 SPWI406	identical
 SPWI407	identical
 SPWI408	identical
-SPWI409	not_covered	not_implemented:opcode78:group
+SPWI409	identical
 SPWI410	identical
 SPWI411	identical
 SPWI412	identical
@@ -636,7 +636,7 @@ SPWI614	identical
 SPWI615	identical
 SPWI616	identical
 SPWI617	identical
-SPWI618	not_covered	not_implemented:opcode233:same_effect_twice
+SPWI618	identical
 SPWI619	identical
 SPWI620	identical
 SPWI621	identical
@@ -644,7 +644,7 @@ SPWI622	identical
 SPWI623	identical
 SPWI624	identical
 SPWI625	identical
-SPWI701	not_covered	not_implemented:opcode233:same_effect_twice
+SPWI701	identical
 SPWI702	identical
 SPWI703	identical
 SPWI704	identical
@@ -752,7 +752,7 @@ SPWISH46	identical
 SPWM101	not_covered	not_implemented:opcode318:resource
 SPWM101D	not_covered	not_implemented:opcode318:stat
 SPWM111	identical
-SPWM113	not_covered	not_implemented:opcode111:remove_group
+SPWM113	identical
 SPWM114	identical
 SPWM122	identical
 SPWM123	identical

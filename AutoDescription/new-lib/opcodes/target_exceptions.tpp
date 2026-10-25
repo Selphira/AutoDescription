@@ -335,29 +335,30 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 END
 
 // Lignes : aucune pour l'opcode. Les regroupements de l'ancien moteur ne comparent pas les
-// exceptions. Refus : effets identiques réunis avec des exceptions différentes ; effet réuni par
-// un autre regroupement dans une portée qui a des exceptions (la ligne réunie n'aurait pas
-// forcément celles de l'ancien moteur).
+// exceptions : des effets identiques d'un même bloc s'écrivent avec celles du premier, lues avant
+// lui (SPPR612 : les exceptions qui suivent ne s'ajoutent pas), de même que les effets réunis par un
+// regroupement d'un opcode (fx_group_anchor : maladies, invocations). Refus : effets réunis d'une autre
+// portée, avec des exceptions ; effet qui a des
+// exceptions (lu après elles) réuni par un autre regroupement (la ligne réunie n'aurait pas
+// forcément celles de l'ancien moteur), sauf l'effet d'un en-tête que l'effet égal d'un autre niveau
+// représente (fx_level_merged, new-lib/spell_levels.tpp), dont la ligne garde ses exceptions.
 DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
-	CLEAR_ARRAY exception_scopes
-	FOR (exception_id = 0; exception_id < fx_count; ++exception_id) BEGIN
-		PATCH_IF $fx_exception_count(~%exception_id%~) > 0 AND NOT $fx_exception(~%exception_id%~) BEGIN
-			SPRINT exception_scope $fx_scope(~%exception_id%~)
-			SET $exception_scopes(~%exception_scope%~) = 1
-		END
-	END
 	FOR (exception_id = 0; exception_id < fx_count; ++exception_id) BEGIN
 		SET exception_anchor = $fx_identical_anchor(~%exception_id%~)
+		PATCH_IF exception_anchor == exception_id BEGIN
+			SET exception_anchor = $fx_group_anchor(~%exception_id%~)
+		END
 		SET exception_count = $fx_exception_count(~%exception_id%~)
 		SPRINT exception_scope $fx_scope(~%exception_id%~)
 		PATCH_IF exception_anchor != exception_id BEGIN
 			SPRINT exception_anchor_scope $fx_scope(~%exception_anchor%~)
-			PATCH_IF exception_count != $fx_exception_count(~%exception_anchor%~)
-					OR (exception_count > 0 AND NOT (~%exception_scope%~ STRING_EQUAL ~%exception_anchor_scope%~)) BEGIN
+			PATCH_IF (exception_count > 0 OR $fx_exception_count(~%exception_anchor%~) > 0)
+					AND NOT (~%exception_scope%~ STRING_EQUAL ~%exception_anchor_scope%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_identical~ message = ~identical effects with different exceptions~ RET render_late_missing = refusal END
 			END
 		END
-		ELSE PATCH_IF $fx_consumed(~%exception_id%~) AND NOT $fx_dropped(~%exception_id%~) AND VARIABLE_IS_SET $exception_scopes(~%exception_scope%~) BEGIN
+		ELSE PATCH_IF $fx_consumed(~%exception_id%~) AND NOT $fx_dropped(~%exception_id%~) AND NOT $fx_level_merged(~%exception_id%~)
+				AND exception_count > 0 AND NOT $fx_exception(~%exception_id%~) BEGIN
 			LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_group~ message = ~grouped effect with exceptions~ RET render_late_missing = refusal END
 		END
 	END
