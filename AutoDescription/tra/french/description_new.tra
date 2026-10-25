@@ -2277,11 +2277,26 @@
 @21120102 = ~de retirer « %itemName% » de l'inventaire %ofTheTarget%~ // reprise de @11120005
 @21120103 = ~de retirer « %itemName% » de l'inventaire %ofTheTarget%~ // reprise de @11120005
 
+// Opcode 115 : Détection d'un alignement : 0010-0012 alignements (parameter2), phrases 0100 (21 150 000-21 150 999)
+@21150010 = ~mal~ // reprise de @11150101
+@21150011 = ~neutre~ // reprise de @11150102
+@21150012 = ~bien~ // reprise de @11150103
+@21150100 = ~Détection du %alignment%~ // reprise de @11150001
+@21150101 = ~Détection du %alignment% par %theTarget%~ // reprise de @11150011
+@21150102 = ~de détecter le %alignment%~ // reprise de @11150021
+@21150103 = ~que %theTarget% détecte le %alignment%~ // reprise de @11150031
+
 // Opcode 116 : Soin : invisibilité (2) (21 160 000-21 160 999)
 @21160100 = ~Dissipation de l'invisibilité~ // reprise de @10470001
 @21160101 = ~Dissipe l'invisibilité %ofTheTarget%~ // reprise de @10470003
 @21160102 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
 @21160103 = ~de dissiper l'invisibilité %ofTheTarget%~ // reprise de @10470002
+
+// Opcode 117 : Carte révélée : phrases 0100 (21 170 000-21 170 999)
+@21170100 = ~Révèle l'entièreté de la carte~ // reprise de @11170001
+@21170101 = ~Révèle l'entièreté de la carte~ // reprise de @11170001
+@21170102 = ~de révéler l'entièreté de la carte~ // reprise de @11170002
+@21170103 = ~de révéler l'entièreté de la carte~ // reprise de @11170002
 
 // Opcode 119 : Image miroir (21 190 000-21 190 999)
 @21190100 = ~Image miroir~ // reprise de @11190001
@@ -2316,6 +2331,28 @@
 @21220101 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
 @21220102 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
 @21220103 = ~de créer %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220004
+
+// Opcode 124 : Porte dimensionnelle : phrases 0100 + 10 × destination (parameter2 0-3) (21 240 000-21 240 999)
+@21240100 = ~Téléporte %theTarget%~ // reprise de @11240001
+@21240101 = ~Téléporte %theTarget%~ // reprise de @11240001
+@21240102 = ~de téléporter %theTarget%~ // reprise de @11240011
+@21240103 = ~de téléporter %theTarget%~ // reprise de @11240011
+@21240110 = ~Téléporte %theTarget% auprès de sa cible~ // reprise de @11240002
+@21240111 = ~Téléporte %theTarget% auprès du porteur~ // reprise de @11240005
+@21240112 = ~de téléporter %theTarget% auprès de sa cible~ // reprise de @11240012
+@21240113 = ~de téléporter %theTarget% auprès du porteur~ // reprise de @11240015
+@21240120 = ~Téléporte %theTarget% dans un endroit sûr~ // reprise de @11240003
+@21240121 = ~Téléporte %theTarget% dans un endroit sûr~ // reprise de @11240003
+@21240122 = ~de téléporter %theTarget% dans un endroit sûr~ // reprise de @11240013
+@21240123 = ~de téléporter %theTarget% dans un endroit sûr~ // reprise de @11240013
+@21240130 = ~Permute %theTarget% avec sa cible~ // reprise de @11240004
+@21240131 = ~Permute %theTarget% avec le porteur~ // reprise de @11240006
+@21240132 = ~d'échanger la place %ofTheTarget% auprès de sa cible~ // reprise de @11240014
+@21240133 = ~de permuter %theTarget% avec le porteur~ // reprise de @11240016
+
+// Opcode 125 : Déverrouillage : phrases 0100, formes « cible » seulement, comme dans l'ancien moteur (21 250 000-21 250 999)
+@21250101 = ~Déverrouille la serrure ciblée~ // reprise de @11250001
+@21250103 = ~de déverrouiller la serrure ciblée~ // reprise de @11250002
 
 // Opcode 126 : Vitesse de déplacement : 0000 nom, 0002 statistique ; phrases 0110 immobilisation, 0120 vitesse rétablie (21 260 000-21 260 999)
 @21260000 = ~Vitesse de déplacement~ // reprise de @11260001
@@ -2403,6 +2440,12 @@
 @21350112 = ~de se déguiser en %creatureName%~ // reprise de @11350022
 @21350113 = ~de déguiser %theTarget% en %creatureName%~ // reprise de @11350032
 
+// Opcode 136 : Visibilité forcée : phrases 0100 (21 360 000-21 360 999)
+@21360100 = ~Devient partiellement visible~ // reprise de @11360001
+@21360101 = ~Rend %theTarget% partiellement visible~ // reprise de @11360002
+@21360102 = ~de rendre %theTarget% partiellement visible~ // reprise de @11360003
+@21360103 = ~de rendre %theTarget% partiellement visible~ // reprise de @11360003
+
 // Opcode 143 : Objet créé dans un emplacement : phrases 0100 (21 430 000-21 430 999)
 @21430100 = ~Crée 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~ // reprise de @11430001
 @21430101 = ~Crée 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~ // reprise de @11430001
@@ -2475,6 +2518,12 @@
 @21480131 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
 @21480132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
 @21480133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+
+// Opcode 150 : Détection des pièges : phrases 0100 (21 500 000-21 500 999)
+@21500100 = ~Détection des pièges~ // reprise de @11500001
+@21500101 = ~Détection des pièges par %theTarget%~ // reprise de @11500002
+@21500102 = ~de détecter les pièges~ // reprise de @11500003
+@21500103 = ~que %theTarget% détecte les pièges~ // reprise de @11500004
 
 // Opcode 151 : phrases 0100 remplacement, 0110 la cible est tuée, 0120 invocation sur la cible
 // (21 510 000-21 510 999)
@@ -2634,6 +2683,19 @@
 @21910000 = ~Niveau de lanceur de sorts %spellType%~ // reprise de @11910001
 @21910002 = ~le niveau de lanceur de sorts %spellType%~ // reprise de @11910003
 
+// Opcode 192 : Familier : phrase 0100, forme « soi » seulement, comme dans l'ancien moteur (21 920 000-21 920 999)
+@21920100 = ~Invocation du familier~ // reprise de @11920001
+
+// Opcode 193 : Détection de l'invisible : phrases 0100 permise, 0110 retirée (21 930 000-21 930 999)
+@21930100 = ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~ // reprise de @11930001
+@21930101 = ~Permet %toTheTarget% d'attaquer une créature cachée ou invisible~ // reprise de @11930001
+@21930102 = ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~ // reprise de @11930002
+@21930103 = ~de permettre %toTheTarget% d'attaquer une créature cachée ou invisible~ // reprise de @11930002
+@21930110 = ~Empêche %theTarget% de pouvoir attaquer une créature cachée ou invisible~ // reprise de @11930011
+@21930111 = ~Empêche %theTarget% de pouvoir attaquer une créature cachée ou invisible~ // reprise de @11930011
+@21930112 = ~d'empêcher %theTarget% de pouvoir attaquer une créature cachée ou invisible~ // reprise de @11930012
+@21930113 = ~d'empêcher %theTarget% de pouvoir attaquer une créature cachée ou invisible~ // reprise de @11930012
+
 // Opcode 197 : Renvoi des projectiles : phrases 0100 (21 970 000-21 970 999)
 @21970100 = ~Renvoie %the% %projectiles%~ // reprise de @11970001
 @21970101 = ~Renvoie %the% %projectiles% visant %theTarget%~ // reprise de @11970002
@@ -2725,6 +2787,14 @@
 @22130112 = ~d'enfermer %theTarget% dans un labyrinthe~ // reprise de @12130004
 @22130113 = ~d'enfermer %theTarget% dans un labyrinthe~ // reprise de @12130004
 
+// Opcode 214 : Choix d'un sort : phrases 0100 livre de sorts, 0110 liste (%spells%), sans forme +3, comme dans l'ancien moteur (22 140 000-22 140 999)
+@22140100 = ~Permet de lancer un sort du livre de sorts~ // reprise de @12140001
+@22140101 = ~Permet %toTheTarget% de lancer un sort du livre de sorts~ // reprise de @12140003
+@22140102 = ~de permettre de lancer un sort du livre de sorts~ // reprise de @12140005
+@22140110 = ~Permet de lancer un sort de cette liste%AD_COLON%%spells%~ // reprise de @12140002
+@22140111 = ~Permet %toTheTarget% de lancer un sort de cette liste%AD_COLON%%spells%~ // reprise de @12140004
+@22140112 = ~de permettre de lancer un sort de cette liste%AD_COLON%%spells%~ // reprise de @12140006
+
 // Opcode 216 : Drain de niveaux : phrases 0100 un niveau, 0110 plusieurs, 0120 passage de niveau inhibé, 0130 un niveau injecté (22 160 000-22 160 999)
 @22160100 = ~Draine 1 niveau %toTheTarget%~ // reprise de @12160001
 @22160101 = ~Draine 1 niveau %toTheTarget%~ // reprise de @12160001
@@ -2782,6 +2852,12 @@
 @22210111 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
 @22210112 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
 @22210113 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
+
+// Opcode 222 : Champ de téléportation : phrases 0100 (22 220 000-22 220 999)
+@22220100 = ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220001
+@22220101 = ~Téléporte aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220001
+@22220102 = ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220002
+@22220103 = ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220002
 
 // Opcode 224 : Restauration : phrases 0100 (22 240 000-22 240 999)
 @22240100 = ~Restaure les niveaux drainés %ofTheTarget%~ // reprise de @12240001
@@ -2875,11 +2951,33 @@
 @22350132 = ~d'attirer %theTarget% de %range% vers %theSource%~ // reprise de @12350008
 @22350133 = ~d'attirer %theTarget% de %range% vers %theSource%~ // reprise de @12350008
 
+// Opcode 236 : Projection d'image : phrases 0100 + 10 × type (clone, image, projection, simulacre) (22 360 000-22 360 999)
+@22360100 = ~Crée un clone %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360001
+@22360101 = ~Crée un clone %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360001
+@22360102 = ~de créer un clone %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360005
+@22360103 = ~de créer un clone %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360005
+@22360110 = ~Crée une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~ // reprise de @12360002
+@22360111 = ~Crée une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~ // reprise de @12360002
+@22360112 = ~de créer une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~ // reprise de @12360006
+@22360113 = ~de créer une image %ofTheTarget% qui ne peut ni attaquer ni lancer de sorts~ // reprise de @12360006
+@22360120 = ~Crée une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~ // reprise de @12360003
+@22360121 = ~Crée une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~ // reprise de @12360003
+@22360122 = ~de créer une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~ // reprise de @12360007
+@22360123 = ~de créer une projection %ofTheTarget% possédant le même nombre de points de vie, elle peut attaquer mais pas lancer de sorts~ // reprise de @12360007
+@22360130 = ~Crée un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360004
+@22360131 = ~Crée un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360004
+@22360132 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360008
+@22360133 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360008
+
 // Opcode 238 : Désintégration : phrases 0100 (22 380 000-22 380 999)
 @22380100 = ~Désintègre %theTarget%~ // reprise de @500011
 @22380101 = ~Désintègre %theTarget%~ // reprise de @500011
 @22380102 = ~de désintégrer %theTarget%~ // reprise de @500111
 @22380103 = ~de désintégrer %theTarget%~ // reprise de @500111
+
+// Opcode 239 : Vision lointaine : phrases 0100 zone reconnue, 0110 même inconnue, forme « soi » seulement, comme dans l'ancien moteur (22 390 000-22 390 999)
+@22390100 = ~Permet d'observer une zone déjà reconnue~ // reprise de @12390001
+@22390110 = ~Permet d'observer une zone, même inconnue~ // reprise de @12390002
 
 // Opcode 241 : Contrôle d'une créature : phrases du 5 : 0100 charme, 0110 sans restriction ; pas de forme « soi » probable, comme dans l'ancien moteur (22 410 000-22 410 999)
 @22410100 = ~Charme %theTarget%~ // reprise de @10050001
@@ -2893,6 +2991,16 @@
 @22420101 = ~Dissipe la confusion %ofTheTarget%~ // reprise de @12420002
 @22420102 = ~de dissiper la confusion %ofTheTarget%~ // reprise de @12420003
 @22420103 = ~de dissiper la confusion %ofTheTarget%~ // reprise de @12420003
+
+// Opcode 243 : Charges drainées : phrases 0100 une charge, 0110 plusieurs (22 430 000-22 430 999)
+@22430100 = ~Draine une charge aux objets magiques %ofTheTarget%~ // reprise de @12430001
+@22430101 = ~Draine une charge aux objets magiques %ofTheTarget%~ // reprise de @12430001
+@22430102 = ~de drainer une charge aux objets magiques %ofTheTarget%~ // reprise de @12430004
+@22430103 = ~de drainer une charge aux objets magiques %ofTheTarget%~ // reprise de @12430004
+@22430110 = ~Draine %amount% charges aux objets magiques %ofTheTarget%~ // reprise de @12430002
+@22430111 = ~Draine %amount% charges aux objets magiques %ofTheTarget%~ // reprise de @12430002
+@22430112 = ~de drainer %amount% charges aux objets magiques %ofTheTarget%~ // reprise de @12430005
+@22430113 = ~de drainer %amount% charges aux objets magiques %ofTheTarget%~ // reprise de @12430005
 
 // Opcode 244 : Drain de sorts profanes : phrases 0100 un sort, 0110 plusieurs (22 440 000-22 440 999)
 @22440100 = ~Draine 1 sort profane de la mémoire %ofTheTarget%~ // reprise de @12440001
@@ -2931,6 +3039,16 @@
 // Opcode 250 : Dégâts minimums : 0000 nom, 0002 statistique (22 500 000-22 500 999)
 @22500000 = ~Dégâts minimums~ // reprise de @12500001
 @22500002 = ~les dégâts minimums~ // reprise de @12500002
+
+// Opcode 251 : Chant de barde remplacé : 0000 en-tête des effets du sort (22 510 000-22 510 999)
+@22510000 = ~Remplace le chant de barde~ // reprise de @12510010
+
+// Opcode 252 : Pose d'un piège : 0000 en-tête des effets du sort, phrases 0100 piège nommé (22 520 000-22 520 999)
+@22520000 = ~Tente de poser un piège~ // reprise de @12520010
+@22520100 = ~Tente de poser un piège « %spellName% »~ // reprise de @12520001
+@22520101 = ~Fait poser un piège « %spellName% » %toTheTarget%~ // reprise de @12520003
+@22520102 = ~de tenter de poser un piège « %spellName% »~ // reprise de @12520002
+@22520103 = ~de faire poser un piège « %spellName% » %toTheTarget%~ // reprise de @12520004
 
 // Opcode 255 : Création d'objet (en jours) : phrases 0100 (22 550 000-22 550 999)
 @22550100 = ~Crée %amount% « %itemName% » dans l'inventaire %ofTheTarget%~ // reprise de @11220001
@@ -2991,6 +3109,9 @@
 
 // Opcode 281 : libellés (22 810 000-22 810 099)
 @22810000 = ~Modificateur des hiatus entropiques~ // reprise de @12810001
+
+// Opcode 283 : EFF maudit : 0000 « Malédiction », devant la ligne de l'effet de l'EFF (22 830 000-22 830 999)
+@22830000 = ~Malédiction~ // reprise de @12830001
 
 // Opcode 284 : libellés (22 840 000-22 840 099)
 @22840000 = ~TAC0 des armes de mêlée~ // reprise de @12840001

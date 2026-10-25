@@ -4,7 +4,9 @@
 // 79, 81, 116, 161-164), capacité ajoutée (171), drain de niveaux (216), point de rupture de moral (106), charme (5, 241),
 // inversion de l'alignement (56) et du sexe (71), protection contre un type de créature (100),
 // points de vie minimums (208), utilisation de tout objet (302), sanctuaire (153), images miroir
-// (159), liberté (212), immunité par type secondaire (226),
+// (159), liberté (212), immunité par type secondaire (226), détections (115, 150, 193), carte révélée
+// (117), téléportations (124, 222), déverrouillage (125), visibilité forcée (136), familier (192),
+// choix d'un sort (214), projection d'image (236), vision lointaine (239), charges drainées (243),
 // métamorphose (135), remplacement d'une créature (151), peau de pierre (218), téléportation auprès
 // d'un ennemi (274) ; une phrase par variante de l'opcode, « Réduit la cible au silence ».
 // Chaque fichier d'opcode fixe state_opcode et state_variant_macro (vide si l'opcode n'a qu'une

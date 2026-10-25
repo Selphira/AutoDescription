@@ -277,6 +277,26 @@ DEFINE_PATCH_MACRO ad_recursion_condition_text BEGIN
 	END
 END
 
+// Lignes des effets heading_opcode dont le sous-sort est décrit sous un en-tête (opcodes 251 et 252,
+// ancien opcode_sub_description_heading) : « Pose un piège : » (chaîne heading_tra), suivi de la
+// sous-ligne, ou de plusieurs en retrait, comme sous une condition (ad_recursion_condition_text).
+DEFINE_PATCH_MACRO ad_recursion_heading_lines BEGIN
+	SPRINT line_section ~equipped~
+	SET line_sort = $AD_OPCODE_SORT(~%heading_opcode%~)
+	LPF ad_tra INT_VAR tra_id = heading_tra RET heading_name = text END
+	PHP_EACH ~fx_ids_%heading_opcode%~ AS _ => heading_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%heading_id%~) AND $fx_sub_count(~%heading_id%~) > 0 BEGIN
+			SET recursion_fx = heading_id
+			LPM ad_recursion_condition_text
+			SPRINT line_text ~%heading_name%%AD_COLON%%line_text%~
+			SET line_any_form = 1
+			SET line_no_duration = 1
+			SET line_fx = heading_id
+			LPM ad_effect_line
+		END
+	END
+END
+
 // Lignes du sort resref lancé par un effet du parent (ctx_* : contexte de la sous-ressource, voir
 // en tête du fichier) : sub_count lignes, rendues comme l'ancien moteur les insère dans la ligne
 // parente (sub_text : la première sans puce, les suivantes après un saut de ligne et une puce) ;
@@ -285,7 +305,7 @@ END
 // ce niveau (le premier à égalité, ancien get_spell_headeroffset_for_level) ; sans, l'unique
 // en-tête. Refus : sort absent ou illisible ; aucun en-tête de ce niveau (l'ancien moteur lit alors
 // le début du fichier comme un en-tête, BUG-037) ; plusieurs en-têtes sans niveau de lancement
-// (rendu par niveaux du sort) ; effets de lancement ; opcode à prendre en charge ; tout refus des
+// (rendu par niveaux du sort) ; opcode à prendre en charge ; tout refus des
 // passes ; ligne probable d'un sort (l'ancien moteur regroupe les lignes probables du sous-sort) ; ligne hors
 // de la section de l'en-tête.
 DEFINE_PATCH_FUNCTION ad_describe_subresource
@@ -401,12 +421,8 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 	ELSE BEGIN
 		READ_LONG  SPL_extended_headers_offset     sub_headers_offset
 		READ_SHORT SPL_extended_headers_count      sub_header_count
-		READ_SHORT SPL_casting_feature_blocks_count sub_casting_count
 		PATCH_IF sub_headers_offset < 0 OR sub_headers_offset + sub_header_count * 0x28 > BUFFER_LENGTH BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:recursion:invalid_header~ message = ~abilities at offset %sub_headers_offset% lie outside the file (%BUFFER_LENGTH% bytes)~ RET sub_missing = refusal END
-		END
-		ELSE PATCH_IF sub_casting_count > 0 BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:casting_effects~ message = ~spell with casting effects~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF ctx_casting_level > 0 BEGIN
 			SET sub_header_level = 0

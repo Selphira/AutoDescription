@@ -103,7 +103,10 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 			SET $fx_save_type(~%fx_id%~)      = substitute_save_type
 			SET $fx_save_bonus(~%fx_id%~)     = substitute_save_bonus
 			SET $fx_special(~%fx_id%~)        = substitute_special
-			SET $fx_resistance(~%fx_id%~)     = substitute_resistance
+			// L'ancien moteur ne remplace pas un 283 : l'en-tête d'un sort lit la résistance de l'effet.
+			PATCH_IF NOT $fx_cursed(~%fx_id%~) BEGIN
+				SET $fx_resistance(~%fx_id%~) = substitute_resistance
+			END
 			SET $fx_external(~%fx_id%~)       = 1
 			SET $fx_parameter3(~%fx_id%~)     = substitute_parameter3
 			SET $fx_parameter4(~%fx_id%~)     = substitute_parameter4
@@ -250,13 +253,19 @@ END
 // (raison de ad_fx_substitute_177). Les 177 sont lus en fin de bloc (ad_fx_load_block,
 // new-lib/effects.tpp) : l'effet remplacé est écrit après les effets du fichier de même opcode.
 DEFINE_PATCH_MACRO ad_op_177_support BEGIN
-	PHP_EACH fx_ids_177 AS _ => substitute_id BEGIN
+	SET substitute_parent = 177
+	LPM ad_fx_substitution_support
+END
+
+// Effets substitute_parent (177 ou 283) restés sans remplacement.
+DEFINE_PATCH_MACRO ad_fx_substitution_support BEGIN
+	PHP_EACH ~fx_ids_%substitute_parent%~ AS _ => substitute_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT substitute_error $fx_substitution_error(~%substitute_id%~)
 			PATCH_IF ~%substitute_error%~ STRING_EQUAL ~drop~ BEGIN
 				SET drop_id = substitute_id
 				SPRINT substitute_drop_kind $fx_substitution_drop_kind(~%substitute_id%~)
-				SPRINT ignored_reason ~%substitute_drop_kind%:opcode177:drop~
+				SPRINT ignored_reason ~%substitute_drop_kind%:opcode%substitute_parent%:drop~
 				SPRINT ignored_message $fx_substitution_message(~%substitute_id%~)
 				LPM ad_application_drop
 			END
@@ -266,7 +275,7 @@ DEFINE_PATCH_MACRO ad_op_177_support BEGIN
 				PATCH_IF ~%substitute_error%~ STRING_EQUAL ~format~ BEGIN
 					SPRINT substitute_kind ~file_error~
 				END
-				LPF ad_refusal INT_VAR fx_id = substitute_id STR_VAR reason = ~%substitute_kind%:opcode177:%substitute_error%~ message = ~%substitute_message%~ RET render_missing = refusal END
+				LPF ad_refusal INT_VAR fx_id = substitute_id STR_VAR reason = ~%substitute_kind%:opcode%substitute_parent%:%substitute_error%~ message = ~%substitute_message%~ RET render_missing = refusal END
 			END
 		END
 	END

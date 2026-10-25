@@ -759,6 +759,14 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SET line_probability_low = $fx_probability_low(~%line_fx%~)
 		SET line_probability_high = $fx_probability_high(~%line_fx%~)
 	END
+	// Effet d'un EFF maudit (opcode 283) : « Malédiction : » devant toute la ligne, probabilité comprise
+	// (« Malédiction : 20 % de chances d'aveugler la cible ») ; elle n'entre pas dans les regroupements
+	// par probabilité, qui réécrivent « 20 % de chances » (ancien forceSort).
+	PATCH_IF $fx_cursed(~%line_fx%~) BEGIN
+		SPRINT app_curse @22830000 // ~Malédiction~
+		SPRINT line_text ~%app_curse%%AD_COLON%%line_text%~
+		SET line_probability = 0
+	END
 	PATCH_IF NOT (~%line_condition%~ STRING_EQUAL ~~) BEGIN
 		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
 		// placé après la condition.

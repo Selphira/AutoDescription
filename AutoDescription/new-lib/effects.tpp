@@ -24,7 +24,8 @@
 // remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_probability_in_sub
 // (1 pour un effet dont la probabilité est écrite dans les lignes de son sort, new-lib/recursion.tpp), fx_versus_file et
 // fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre),
-// fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_opcode_count(opcode).
+// fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_cursed (1 pour
+// un effet 283 remplacé de même par celui de son EFF, new-lib/opcodes/283.tpp) ; fx_opcode_count(opcode).
 // Index par opcode : fx_ids_<opcode>, les effets de l'opcode dans l'ordre de lecture (clé et valeur :
 // fx_id), parcouru par PHP_EACH ~fx_ids_%opcode%~ AS _ => id ; un opcode absent n'a pas de tableau
 // et la boucle ne fait rien. Une passe qui change l'opcode d'un effet reconstruit les deux tableaux
@@ -262,7 +263,8 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_identical_anchor(~%fx_id%~) = fx_id
 	SET $fx_from_111(~%fx_id%~) = 0
 	SET $fx_probability_in_sub(~%fx_id%~) = 0
-	PATCH_IF $fx_opcode(~%fx_id%~) == 177 BEGIN
+	SET $fx_cursed(~%fx_id%~) = $fx_opcode(~%fx_id%~) == 283
+	PATCH_IF $fx_opcode(~%fx_id%~) == 177 OR $fx_opcode(~%fx_id%~) == 283 BEGIN
 		LPM ad_fx_substitute_177
 	END
 	ELSE PATCH_IF $fx_opcode(~%fx_id%~) == 111 BEGIN
@@ -296,6 +298,9 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $EVAL ~fx_ids_%fx_opcode%~(~%fx_id%~) = fx_id
 	PATCH_IF $fx_external(~%fx_id%~) BEGIN
 		SET $fx_opcode_count(~177~) = VARIABLE_IS_SET $fx_opcode_count(~177~) ? $fx_opcode_count(~177~) + 1 : 1
+	END
+	PATCH_IF $fx_cursed(~%fx_id%~) AND fx_opcode != 283 BEGIN
+		SET $fx_opcode_count(~283~) = VARIABLE_IS_SET $fx_opcode_count(~283~) ? $fx_opcode_count(~283~) + 1 : 1
 	END
 	SET fx_count += 1
 END
