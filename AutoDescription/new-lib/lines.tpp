@@ -412,6 +412,22 @@ BEGIN
 	END
 END
 
+// Texte à première lettre capitale (ancien ucfirst) : seul un premier caractère ASCII change.
+DEFINE_PATCH_FUNCTION ad_ucfirst
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	PATCH_IF STRING_LENGTH ~%text%~ > 0 BEGIN
+		SNPRINT 1 ucfirst_first ~%text%~
+		TO_UPPER ucfirst_first
+		INNER_PATCH_SAVE text ~%text%~ BEGIN
+			WRITE_ASCIIE 0 ~%ucfirst_first%~
+		END
+	END
+END
+
 // Éléments du tableau array_name, dans l'ordre d'ajout : « a », « a et b », « a, b et c » ;
 // séparateurs glue et final_glue (vide : « et » entouré d'espaces).
 DEFINE_PATCH_FUNCTION ad_join

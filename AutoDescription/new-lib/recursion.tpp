@@ -32,8 +32,7 @@
 // Les règles propres aux objets (équipement, capacités de combat, en-têtes à charges) et à
 // l'en-tête d'un sort (support_spell) ne s'appliquent pas aux sous-effets.
 
-// Contexte d'une ressource décrite seule ; recursion_done et recursion_seen suivent les
-// sous-descriptions de la ressource (ad_recursion_allowed).
+// Contexte d'une ressource décrite seule.
 DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_depth = 0
 	SET ctx_force_target = 0
@@ -49,21 +48,20 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SPRINT ctx_spell_chain ~|~
 	SPRINT ctx_origin ~~
 	SET ctx_single_effect = 0
-	SET recursion_done = 0
+	SET recursion_delayed = 0
+	SET recursion_probability = 0
 END
 
 // La sous-ressource recursion_resref peut-elle être décrite ? recursion_allowed : 1 si oui ; 0 au-delà
 // de AD_RECURSION_MAX_DEPTH ou pour une ressource déjà dans la chaîne, où l'ancien moteur n'écrit
-// rien (recursivity, recursive_resref) : aucune ligne, journalisé (…-recursion.txt). L'ancien moteur
-// ne retire pas non plus les ressources déjà décrites de sa liste (V36) : un second sort décrit
-// par la même ressource, ou le sort qui porte le nom de la ressource après un autre, n'écrit rien
-// selon un ordre de traitement qui n'est pas reproduit (recursion_repeated, refusé par l'appelant) ;
-// seuls les opcodes 146, 148 et 326 tiennent cette liste (recursion_tracked).
+// rien (recursivity, recursive_resref) : aucune ligne, journalisé (…-recursion.txt). Un même sort
+// lancé par deux effets de la ressource est décrit deux fois : l'ancien moteur décrit chaque effet
+// dans un appel de fonction (get_effect_description), qui perd au retour les sorts qu'il y ajoute à
+// sa liste.
 DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	SPRINT recursion_upper ~%recursion_resref%~
 	TO_UPPER recursion_upper
 	SET recursion_allowed = 1
-	SET recursion_repeated = 0
 	PATCH_IF ~%recursion_kind%~ STRING_EQUAL ~spl~ AND NOT recursion_depth_reset AND ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
@@ -76,14 +74,6 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	PATCH_IF NOT recursion_allowed BEGIN
 		LPM ad_log_recursion
 	END
-	ELSE PATCH_IF recursion_tracked BEGIN
-		SPRINT recursion_source ~%ctx_resource%~
-		TO_UPPER recursion_source
-		SET recursion_repeated = (VARIABLE_IS_SET $recursion_seen(~%recursion_upper%~) AND $recursion_seen(~%recursion_upper%~))
-			OR (recursion_done AND ~%recursion_upper%~ STRING_EQUAL ~%recursion_source%~)
-		SET $recursion_seen(~%recursion_upper%~) = 1
-		SET recursion_done = 1
-	END
 END
 
 // Sous-ressource recursion_resref lancée par l'effet recursion_fx, pour la prise en charge de son
@@ -95,7 +85,10 @@ END
 // recursion_of_the_target, recursion_to_the_target), own (chacun les siennes) ;
 // recursion_ignore_duration (durées masquées par l'opcode lui-même ; elles le sont aussi sous la
 // durée commune d'une potion) ; recursion_series (répétitions de l'effet acceptées) ;
-// recursion_tracked (ad_recursion_allowed) ; recursion_versus_set et recursion_versus (ctx_versus_set,
+// recursion_delayed (effet différé accepté, opcodes 146 et 148 : fx_sub_delayed) et recursion_probability
+// (effet probable accepté, sa probabilité passant aux sous-effets, dont plusieurs lignes sont
+// regroupées par probabilité : fx_sub_probability_lines), remis à 0 après la vérification, les
+// autres appelants ne les fixant pas ; recursion_versus_set et recursion_versus (ctx_versus_set,
 // ctx_versus) ; recursion_kind (spl ou eff) ; recursion_parent_dice (effet d'un EFF : dés de l'effet
 // recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides) ; recursion_depth_reset
 // (sort décrit hors de la limite de profondeur, et ses propres sous-sorts comme ceux d'un premier
@@ -103,13 +96,15 @@ END
 // recursion_single_message : refus de plusieurs lignes dans la sous-ressource (vide : acceptées).
 // Au-delà de la
 // profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
-// effet probable, sauf pour un opcode de AD_OPCODES_SUB_PROBABILITY, dont la probabilité passe aux
-// sous-effets (ctx_base_probability) ; effet différé (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
-// effet d'un 177 contre un type de créature ; sort déjà décrit par la ressource (recursion_repeated) ;
+// effet probable, sauf pour un opcode de AD_OPCODES_SUB_PROBABILITY ou avec recursion_probability, dont
+// la probabilité passe aux sous-effets (ctx_base_probability) ; effet différé non accepté (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
+// effet d'un 177 contre un type de créature ;
 // cible sans chaînes ; refus de la sous-description.
 DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SET $fx_sub_count(~%recursion_fx%~) = 0
 	SPRINT $fx_sub_text(~%recursion_fx%~) ~~
+	SET $fx_sub_delayed(~%recursion_fx%~) = 0
+	SET $fx_sub_probability_lines(~%recursion_fx%~) = 0
 	// Le sous-sort ne compte que pour les lignes, pas pour l'en-tête d'un sort seul.
 	SET recursion_allowed = 0
 	PATCH_IF NOT support_header_only BEGIN
@@ -117,10 +112,10 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	END
 	PATCH_IF recursion_allowed BEGIN
 		SET recursion_opcode = $fx_opcode(~%recursion_fx%~)
-		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) BEGIN
+		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) AND NOT recursion_probability BEGIN
 			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:probability~ message = ~probable effect casting a spell~ RET render_missing = refusal END
 		END
-		ELSE PATCH_IF $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~) BEGIN
+		ELSE PATCH_IF $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~) AND NOT recursion_delayed BEGIN
 			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:delayed~ message = ~delayed effect casting a spell (the old engine writes it as a condition)~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_series_anchor(~%recursion_fx%~) AND NOT recursion_series BEGIN
@@ -128,9 +123,6 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 		END
 		ELSE PATCH_IF $fx_versus_file(~%recursion_fx%~) > 0 BEGIN
 			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:versus~ message = ~spell cast against a creature type (opcode 177)~ RET render_missing = refusal END
-		END
-		ELSE PATCH_IF recursion_repeated BEGIN
-			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:repeated~ message = ~spell already described by this resource~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
 			PATCH_IF ~%recursion_targets%~ STRING_EQUAL ~effect~ BEGIN
@@ -163,31 +155,32 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%recursion_to_the_target%~
 				SPRINT $fx_sub_single_reason(~%recursion_fx%~) ~%recursion_single_reason%~
 				SPRINT $fx_sub_single_message(~%recursion_fx%~) ~%recursion_single_message%~
-				SPRINT $fx_sub_seen(~%recursion_fx%~) ~~
-				PATCH_IF recursion_tracked BEGIN
-					SPRINT $fx_sub_seen(~%recursion_fx%~) ~%recursion_upper%~
-				END
+				SET $fx_sub_delayed(~%recursion_fx%~) = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
+				SET $fx_sub_probability_lines(~%recursion_fx%~) = recursion_probability
 				SET $recursion_pending(~%recursion_pending_count%~) = recursion_fx
 				SET recursion_pending_count += 1
 			END
 		END
 	END
+	SET recursion_delayed = 0
+	SET recursion_probability = 0
 END
 
 // Description des sous-ressources vérifiées par ad_recursion_support, dans l'ordre de leur
 // vérification, avant les lignes de la ressource : durées tues sous ctx_ignore_duration (l'en-tête
 // d'un sort les écrit) ou par l'opcode, et sous la durée commune d'une potion ; refus dans
-// render_late_missing, qui arrête les suivantes, comme la prise en charge. Chacune ne voit, parmi les sorts déjà décrits par la ressource
-// (recursion_seen, ad_recursion_allowed), que ceux vérifiés avant elle, comme quand elle était décrite
-// à sa vérification.
+// render_late_missing, qui arrête les suivantes, comme la prise en charge. Un sort lancé après un
+// délai (fx_sub_delayed, ancien opcode_146_condition) tait la durée commune de ses effets, lue comme
+// celle de l'en-tête d'un sort (ancien spell_duration, ad_recursion_delayed_duration), que la ligne
+// écrit dans sa condition (fx_sub_duration_text) ; une durée « Spéciale » reste dans ses lignes, et
+// une potion n'en lit pas (ancien opcode_target_146). Refus : une seule ligne sous une durée commune,
+// que l'ancien moteur perd.
 DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 	FOR (pending_k = 0; pending_k < recursion_pending_count AND ~%render_late_missing%~ STRING_EQUAL ~~; ++pending_k) BEGIN
 		SET recursion_fx = $recursion_pending(~%pending_k%~)
 		// Un effet écarté après sa vérification (effet répété d'un niveau de sort au suivant,
 		// new-lib/spell_levels.tpp) n'a pas de ligne.
 		PATCH_IF NOT $fx_consumed(~%recursion_fx%~) BEGIN
-			SET pending_seen_value = 0
-			LPM ad_recursion_pending_seen
 			SPRINT recursion_kind $fx_sub_kind(~%recursion_fx%~)
 			SET recursion_h = $fx_header(~%recursion_fx%~)
 			SET recursion_hide = ctx_ignore_duration OR $fx_sub_ignore_duration(~%recursion_fx%~)
@@ -203,44 +196,63 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			SPRINT recursion_origin $fx_sub_origin(~%recursion_fx%~)
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
 			TO_UPPER recursion_origin_resource
-			LPF ad_describe_subresource
-				INT_VAR
-					ctx_depth = $fx_sub_depth(~%recursion_fx%~)
-					ctx_casting_level = $fx_sub_casting_level(~%recursion_fx%~)
-					ctx_parent_dice = $fx_sub_parent_dice(~%recursion_fx%~)
-					ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
-					ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
-					ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
-					ctx_ignore_duration = recursion_hide
-					ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
-					ctx_base_probability = $fx_probability(~%recursion_fx%~)
-					ctx_base_low = $fx_probability_low(~%recursion_fx%~)
-					ctx_base_high = $fx_probability_high(~%recursion_fx%~)
-				STR_VAR
-					resref = ~%recursion_resref%~
-					kind = ~%recursion_kind%~
-					ctx_chain = ~%ctx_chain%~
-					ctx_origin = ~%recursion_origin% > %recursion_origin_resource%~
-					ctx_the_target = $fx_sub_the_target(~%recursion_fx%~)
-					ctx_of_the_target = $fx_sub_of_the_target(~%recursion_fx%~)
-					ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
-					ctx_versus = $fx_sub_versus(~%recursion_fx%~)
-				RET
-					recursion_sub_missing = sub_missing
-					recursion_sub_count = sub_count
-					recursion_sub_text = sub_text
-					recursion_sub_opcode = sub_opcode
+			SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
+			SPRINT recursion_delayed_missing ~~
+			PATCH_IF $fx_sub_delayed(~%recursion_fx%~) AND item_type != ITM_TYPE_potion AND FILE_EXISTS_IN_GAME ~%recursion_resref%.spl~ BEGIN
+				LPF ad_recursion_delayed_duration STR_VAR resref = ~%recursion_resref%~
+					RET recursion_delayed_hide = duration_hide recursion_delayed_text = duration_text recursion_delayed_missing = duration_missing END
+				SET recursion_hide = recursion_hide OR recursion_delayed_hide
+				SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~%recursion_delayed_text%~
 			END
-			SET pending_seen_value = 1
-			LPM ad_recursion_pending_seen
+			PATCH_IF NOT (~%recursion_delayed_missing%~ STRING_EQUAL ~~) BEGIN
+				SET recursion_sub_count = 0
+				SPRINT recursion_sub_text ~~
+				SET recursion_sub_opcode = 0 - 1
+				SPRINT recursion_sub_missing ~%recursion_delayed_missing%~
+			END
+			ELSE BEGIN
+				LPF ad_describe_subresource
+					INT_VAR
+						ctx_depth = $fx_sub_depth(~%recursion_fx%~)
+						ctx_casting_level = $fx_sub_casting_level(~%recursion_fx%~)
+						ctx_parent_dice = $fx_sub_parent_dice(~%recursion_fx%~)
+						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
+						ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
+						ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
+						ctx_ignore_duration = recursion_hide
+						ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
+						ctx_base_probability = $fx_probability(~%recursion_fx%~)
+						ctx_base_low = $fx_probability_low(~%recursion_fx%~)
+						ctx_base_high = $fx_probability_high(~%recursion_fx%~)
+						ctx_base_lines = $fx_sub_probability_lines(~%recursion_fx%~)
+					STR_VAR
+						resref = ~%recursion_resref%~
+						kind = ~%recursion_kind%~
+						ctx_chain = ~%ctx_chain%~
+						ctx_origin = ~%recursion_origin% > %recursion_origin_resource%~
+						ctx_the_target = $fx_sub_the_target(~%recursion_fx%~)
+						ctx_of_the_target = $fx_sub_of_the_target(~%recursion_fx%~)
+						ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
+						ctx_versus = $fx_sub_versus(~%recursion_fx%~)
+					RET
+						recursion_sub_missing = sub_missing
+						recursion_sub_count = sub_count
+						recursion_sub_text = sub_text
+						recursion_sub_opcode = sub_opcode
+				END
+			END
 			PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal_nest INT_VAR fx_id = recursion_fx STR_VAR refusal = ~%recursion_sub_missing%~ RET render_late_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT recursion_single_reason $fx_sub_single_reason(~%recursion_fx%~)
+				SPRINT recursion_delayed_text $fx_sub_duration_text(~%recursion_fx%~)
 				PATCH_IF recursion_sub_count > 1 AND NOT (~%recursion_single_reason%~ STRING_EQUAL ~~) BEGIN
 					SPRINT recursion_single_message $fx_sub_single_message(~%recursion_fx%~)
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_single_reason%~ message = ~%recursion_single_message%~ RET render_late_missing = refusal END
+				END
+				ELSE PATCH_IF recursion_sub_count == 1 AND NOT (~%recursion_delayed_text%~ STRING_EQUAL ~~) BEGIN
+					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:delayed_single_duration~ message = ~single line of a spell cast after a delay, whose common duration (%recursion_delayed_text%) the old engine drops~ RET render_late_missing = refusal END
 				END
 			END
 			SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
@@ -251,14 +263,50 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 	END
 END
 
-// Sorts suivis (recursion_seen) des sous-ressources vérifiées après la pending_k-ième : cachés
-// (pending_seen_value 0) pendant sa description, puis rétablis (1).
-DEFINE_PATCH_MACRO ad_recursion_pending_seen BEGIN
-	FOR (pending_j = pending_k + 1; pending_j < recursion_pending_count; ++pending_j) BEGIN
-		SET pending_other = $recursion_pending(~%pending_j%~)
-		SPRINT pending_seen $fx_sub_seen(~%pending_other%~)
-		PATCH_IF NOT (~%pending_seen%~ STRING_EQUAL ~~) BEGIN
-			SET $recursion_seen(~%pending_seen%~) = pending_seen_value
+// Durée commune des effets du sort resref lancé après un délai, lue comme celle de l'en-tête d'un sort
+// (ad_spell_header_duration), sur les effets de tous ses en-têtes, dans sa propre portée : duration_hide
+// (sous-lignes sans durée : durée commune, ou aucune), duration_text (« 5 rounds », vide sans durée) ;
+// duration_missing, refus d'un sort que l'en-tête ne sait pas lire.
+DEFINE_PATCH_FUNCTION ad_recursion_delayed_duration
+	STR_VAR
+		resref = ~~
+	RET
+		duration_hide
+		duration_text
+		duration_missing
+BEGIN
+	SET duration_hide = 0
+	SPRINT duration_text ~~
+	SPRINT duration_missing ~~
+	SET support_header_only = 1
+	SET fx_with_casting = 0
+	// Comme l'ancien CURRENT_SOURCE_RES, le sous-sort est le sort décrit.
+	SPRINT spell_self ~%resref%~
+	TO_LOWER spell_self
+	SPRINT ctx_resource ~%resref%~
+	TO_UPPER ctx_resource
+	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+		LPM ad_fx_load_spell
+		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
+			LPF ad_refusal STR_VAR reason = ~file_error:recursion:delayed_%fx_load_error%~ message = ~%resref%.SPL: %fx_load_message%~ RET duration_missing = refusal END
+		END
+		ELSE BEGIN
+			SPRINT header_missing ~~
+			LPM ad_spell_header_fields
+			LPM ad_spell_header_pipeline
+			LPM ad_spell_header_effects
+			PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
+				LPM ad_spell_header_duration
+			END
+			PATCH_IF NOT (~%header_missing%~ STRING_EQUAL ~~) BEGIN
+				SPRINT duration_missing ~%header_missing%~
+			END
+			ELSE BEGIN
+				SET duration_hide = header_hide_duration
+				PATCH_IF header_hide_duration AND header_has_duration BEGIN
+					SPRINT duration_text ~%value%~
+				END
+			END
 		END
 	END
 END
@@ -321,6 +369,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_base_probability = 100
 		ctx_base_low = 0
 		ctx_base_high = 99
+		ctx_base_lines = 0
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -697,7 +746,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	// Lignes probables d'un sort : regroupées par plage comme celles des capacités de combat (ancien
 	// group_probability_effects, appelé aussi pour un sous-sort). Sous la probabilité du parent, une
-	// seule ligne est reprise.
+	// seule ligne est reprise, sauf avec ctx_base_lines (opcodes 146 et 148).
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%kind%~ STRING_EQUAL ~spl~ BEGIN
 		SET sub_probable = 0
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
@@ -705,7 +754,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 				SET sub_probable = 1
 			END
 		END
-		PATCH_IF sub_probable AND ctx_base_probability < 100 BEGIN
+		PATCH_IF sub_probable AND ctx_base_probability < 100 AND NOT ctx_base_lines BEGIN
 			PATCH_IF line_count > 1 BEGIN
 				LPF ad_refusal STR_VAR reason = ~not_implemented:probability_lines~ message = ~several lines in a spell cast by a probable effect~ RET render_missing = refusal END
 			END

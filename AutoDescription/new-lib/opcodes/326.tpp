@@ -35,7 +35,6 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				SPRINT recursion_targets ~effect~
 				SET recursion_ignore_duration = 0
 				SET recursion_series = 0
-				SET recursion_tracked = 1
 				SET recursion_depth_reset = 1
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0

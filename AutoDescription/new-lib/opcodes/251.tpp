@@ -19,7 +19,6 @@ DEFINE_PATCH_MACRO ad_op_251_support BEGIN
 				SPRINT recursion_targets ~own~
 				SET recursion_ignore_duration = 0
 				SET recursion_series = 0
-				SET recursion_tracked = 0
 				SET recursion_depth_reset = 1
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0

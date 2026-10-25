@@ -39,7 +39,6 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 					SPRINT recursion_targets ~own~
 					SET recursion_ignore_duration = 0
 					SET recursion_series = 0
-					SET recursion_tracked = 0
 					SET recursion_depth_reset = 0
 					SET recursion_versus_set = 0
 					SPRINT recursion_versus ~~

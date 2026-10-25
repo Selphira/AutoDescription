@@ -41,7 +41,7 @@ OHBWI405	identical
 OHDCUT02	identical
 OHDPOTN1	identical
 OHDXDIS	identical
-OHHDRAIN	not_covered	not_implemented:recursion:delayed
+OHHDRAIN	not_covered	not_implemented:recursion:versus
 OHHSUMM	not_covered	not_implemented:opcode67:random_amount
 OHNDDOOR	identical
 OHNRDKIL	identical
@@ -65,7 +65,7 @@ SPCL104	identical
 SPCL106	identical
 SPCL121	not_covered	file_error:recursion:application:target
 SPCL144	identical
-SPCL152	not_covered	not_implemented:recursion:delayed
+SPCL152	identical
 SPCL211	identical
 SPCL212	identical
 SPCL213	identical
@@ -74,11 +74,11 @@ SPCL231	identical
 SPCL232	identical
 SPCL233	identical
 SPCL236	not_covered	not_implemented:spell:progression_external
-SPCL237	not_covered	not_implemented:spell_header:save_subspell
+SPCL237	identical
 SPCL238	identical
 SPCL239	identical
 SPCL311	identical
-SPCL321	not_covered	not_implemented:recursion:delayed
+SPCL321	identical
 SPCL342	identical
 SPCL412	not_covered	not_implemented:recursion:spell:progression_two_values
 SPCL414	not_covered	not_implemented:recursion:level_sections
@@ -139,7 +139,7 @@ SPCL936	identical
 SPCL937	identical
 SPCL938	identical
 SPCL940	identical
-SPCL941	not_covered	not_implemented:recursion:nested_cast
+SPCL941	identical
 SPCRYO01	identical
 SPCRYOD	identical
 SPCTMD01	identical
@@ -149,7 +149,7 @@ SPDM102	identical
 SPDM103	identical
 SPDM105	identical
 SPDM106	identical
-SPDM108	not_covered	not_implemented:recursion:repeated
+SPDM108	not_covered	not_implemented:opcode318:stat
 SPDR101	identical
 SPDR201	identical
 SPDR301	identical
@@ -164,7 +164,7 @@ SPIN102	identical
 SPIN103	identical
 SPIN104	not_covered	not_implemented:opcode318:stat
 SPIN105	identical
-SPIN106	not_covered	not_implemented:recursion:repeated
+SPIN106	not_covered	not_implemented:opcode318:stat
 SPIN107	identical
 SPIN108	identical
 SPIN109	identical
@@ -175,7 +175,7 @@ SPIN113	identical
 SPIN114	identical
 SPIN115	identical
 SPIN116	identical
-SPIN117	not_covered	not_implemented:recursion:delayed
+SPIN117	identical
 SPIN118	identical
 SPIN119	identical
 SPIN120	identical
@@ -396,7 +396,7 @@ SPPR414	identical
 SPPR415	identical
 SPPR416	identical
 SPPR417	identical
-SPPR450	not_covered	not_implemented:recursion:probability
+SPPR450	not_covered	not_implemented:opcode326:group
 SPPR501	identical
 SPPR502	identical
 SPPR503	identical
@@ -441,7 +441,7 @@ SPPR703	identical
 SPPR704	identical
 SPPR705	identical
 SPPR706	identical
-SPPR707	not_covered	not_implemented:recursion:repeated
+SPPR707	not_covered	not_implemented:spell:progression_external
 SPPR708	identical
 SPPR709	identical
 SPPR710	not_covered	not_implemented:application:level
@@ -449,7 +449,7 @@ SPPR711	identical
 SPPR712	identical
 SPPR713	identical
 SPPR715	not_covered	not_implemented:application:level
-SPPR717	not_covered	not_implemented:recursion:series
+SPPR717	identical
 SPPR718	identical
 SPPR719	identical
 SPPR720	identical
@@ -462,8 +462,8 @@ SPPR725D	identical
 SPPR726	identical
 SPPR727	identical
 SPPR728	identical
-SPPR729	not_covered	not_implemented:recursion:repeated
-SPPR730	not_covered	not_implemented:spell_header:save_subspell
+SPPR729	identical
+SPPR730	identical
 SPPR731	identical
 SPPR732	identical
 SPPR750	identical
@@ -548,7 +548,7 @@ SPWI310	identical
 SPWI311	identical
 SPWI312	identical
 SPWI313	identical
-SPWI314	not_covered	not_implemented:recursion:repeated
+SPWI314	not_covered	not_implemented:opcode318:stat
 SPWI315	not_covered	not_implemented:opcode145:ability
 SPWI316	identical
 SPWI317	identical
@@ -563,7 +563,7 @@ SPWI326	identical
 SPWI399	identical
 SPWI401	identical
 SPWI402	identical
-SPWI403	not_covered	not_implemented:spell_header:save_subspell
+SPWI403	identical
 SPWI404	identical
 SPWI405	identical
 SPWI406	identical
@@ -573,12 +573,12 @@ SPWI409	identical
 SPWI410	identical
 SPWI411	identical
 SPWI412	identical
-SPWI413	not_covered	not_implemented:recursion:repeated
-SPWI414	not_covered	not_implemented:recursion:delayed
+SPWI413	not_covered	not_implemented:recursion:missing_opcodes:204
+SPWI414	not_covered	file_error:recursion:application:no_duration
 SPWI415	identical
-SPWI416	not_covered	not_implemented:spell_header:save_subspell
+SPWI416	not_covered	not_implemented:spell:levels_immunities
 SPWI417	identical
-SPWI418	not_covered	not_implemented:spell_header:save_subspell
+SPWI418	identical
 SPWI419	identical
 SPWI420	identical
 SPWI420D	identical
