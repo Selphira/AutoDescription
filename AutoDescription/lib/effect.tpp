@@ -877,6 +877,11 @@ BEGIN
                     END
 					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
 					SPRINT description @101125 // ~%probability% de chances %description%~
+					// Effet d'un EFF maudit : « Malédiction : 20 % de chances d'aveugler la cible ».
+					PATCH_IF thisOpcode == 283 BEGIN
+						SPRINT curseName @12830001 // ~Malédiction~
+						SPRINT description ~%curseName%%colon%%description%~
+					END
 				END
 			END
 			SET opcode = thisOpcode

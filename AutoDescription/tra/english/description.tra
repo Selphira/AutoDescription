@@ -3415,13 +3415,15 @@
 @12510002 = ~to change bard song (%spellName%)~
 @12510003 = ~Change bard song (%spellName%) %toTheTarget%~
 @12510004 = ~to change bard song (%spellName%) %toTheTarget%~
+@12510010 = ~Replaces the bard song~
 
 // Opcode 252: Spell Effect: Set Trap [252]
 
-@12520001 = ~Set a trap %spellName%~
-@12520002 = ~to set a trap %spellName%~
-@12520003 = ~to set a trap %spellName% %toTheTarget%~
-@12520004 = ~to lay a trap %spellName% %toTheTarget%~
+@12520001 = ~Attempts to set the trap %spellName%~
+@12520002 = ~to attempt to set the trap %spellName%~
+@12520003 = ~Makes %theTarget% attempt to set the trap %spellName%~
+@12520004 = ~to make %theTarget% attempt to set the trap %spellName%~
+@12520010 = ~Attempts to set a trap~
 
 // Opcode 259: Protection: Spell Trap [259]
 
