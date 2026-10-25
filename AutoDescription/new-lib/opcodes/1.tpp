@@ -47,7 +47,10 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 END
 
 // ---------------------------------------------------------------------------------------------
-// Lignes (ancien opcode_self_1 et opcode_1_common) : une par effet.
+// Lignes (ancien opcode_self_1 et opcode_1_common) : une par effet. Aux autres formes, phrases de
+// l'ancien moteur : « Modifie le nombre d'attaques par round de la cible de +1 », « Passe… à 2 »,
+// « Fixe… à 2 » ; une multiplication y est refusée (valeur de la forme « soi » écrite par l'ancien
+// moteur, « par +100 % » pour 200).
 
 DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -81,8 +84,21 @@ DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 					REPLACE_TEXTUALLY ~\([0-9]\)+5$~ ~%apr_and_half%~
 				END
 			END
+			SET line_fx = apr_id
+			LPM ad_application_form
 			PATCH_IF apr_parameter1 <= 0 AND (apr_mode == MOD_TYPE_flat OR apr_mode == MOD_TYPE_percentage OR apr_mode == 3) BEGIN
-				SET line_phrase = 20010140 // ~Attaque impossible~
+				SET line_phrase = 20010140 // ~Attaque impossible~ (+1 : ~Empêche %theTarget% d'attaquer~)
+			END
+			ELSE PATCH_IF line_form != 0 BEGIN
+				PATCH_IF apr_mode == MOD_TYPE_cumulative AND (~%value%~ STRING_EQUAL ~+%apr_half%~) BEGIN
+					SPRINT value @20010003 // ~une demi supplémentaire~
+				END
+				PATCH_IF apr_mode == MOD_TYPE_percentage BEGIN
+					LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:multiply_form~ message = ~multiplied number of attacks at form %line_form%~ RET render_late_missing = refusal END
+				END
+				ELSE BEGIN
+					SET line_phrase = apr_mode == MOD_TYPE_cumulative ? 20010100 : (apr_mode == MOD_TYPE_flat ? 20010110 : 20010120) // ~Modifie le nombre d'attaques par round %ofTheTarget% de %value%~ (+1)
+				END
 			END
 			ELSE BEGIN
 				PATCH_IF apr_mode == MOD_TYPE_flat BEGIN
@@ -97,8 +113,9 @@ DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 				SPRINT name @20010000 // ~Attaque par round~
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 			END
-			SET line_fx = apr_id
-			LPM ad_effect_line
+			PATCH_IF line_phrase > 0 OR line_form == 0 BEGIN
+				LPM ad_effect_line
+			END
 		END
 	END
 END

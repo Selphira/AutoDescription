@@ -47,8 +47,8 @@
 @1210122 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 @1210123 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 @1210131 = ~Change %theStatistic% %ofTheTarget% to %value%~ // reprise de @102287
-@1210132 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
-@1210133 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
+@1210132 = ~to set %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
+@1210133 = ~to set %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
 @1210141 = ~Multiplies %theStatistic% %ofTheTarget% by %value%~ // reprise de @102288
 @1210142 = ~to multiply %theStatistic% %ofTheTarget% by %value%~ // reprise de @102546
 @1210143 = ~to multiply %theStatistic% %ofTheTarget% by %value%~ // reprise de @102546
@@ -216,8 +216,8 @@
 @5000122 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 @5000123 = ~to reduce %theStatistic% %ofTheTarget% by %value%~ // reprise de @102543
 @5000131 = ~Change %theStatistic% %ofTheTarget% to %value%~ // reprise de @102287
-@5000132 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
-@5000133 = ~of setting %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
+@5000132 = ~to set %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
+@5000133 = ~to set %theStatistic% %ofTheTarget% to %value%~ // reprise de @102545
 @5000141 = ~Multiplies %theStatistic% %ofTheTarget% by %value%~ // reprise de @102288
 @5000142 = ~to multiply %theStatistic% %ofTheTarget% by %value%~ // reprise de @102546
 @5000143 = ~to multiply %theStatistic% %ofTheTarget% by %value%~ // reprise de @102546
@@ -1656,8 +1656,20 @@
 @20010002 = ~\1 and a half~ // reprise de @10010102
 @20010003 = ~an extra 1/2~ // reprise de @10010103
 
-// Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
+// Opcode 1 : phrases (20 010 100-20 010 999) : 0100 ajout, 0110 valeur fixée, 0120 valeur finale fixée (formes +1 à +3), 0140 attaque impossible
+@20010101 = ~Changes the number of attacks per round %ofTheTarget% by %value%~ // reprise de @10010011
+@20010102 = ~to change the number of attacks per round by %value%~ // reprise de @10010021
+@20010103 = ~to change the number of attacks per round %ofTheTarget% by %value%~ // reprise de @10010031
+@20010111 = ~Changes the number of attacks per round %ofTheTarget% to %value%~ // reprise de @10010012
+@20010112 = ~to change the number of attacks per round to %value%~ // reprise de @10010022
+@20010113 = ~to change the number of attacks per round %ofTheTarget% to %value%~ // reprise de @10010032
+@20010121 = ~Sets the number of attacks per round %ofTheTarget% to %value%~ // reprise de @10010014
+@20010122 = ~to set the number of attacks per round to %value%~ // reprise de @10010024
+@20010123 = ~to set the number of attacks per round %ofTheTarget% to %value%~ // reprise de @10010034
 @20010140 = ~Unable to attack~ // reprise de @10010005
+@20010141 = ~Prevents %theTarget% from attacking~ // reprise de @10010015
+@20010142 = ~to prevent %theTarget% from attacking~ // reprise de @10010025
+@20010143 = ~to prevent %theTarget% from attacking~ // reprise de @10010035
 
 // Opcode 2 : Soin : réveil (20 020 000-20 020 999)
 @20020100 = ~Wake up %theTarget%~ // reprise de @10020001
@@ -1800,7 +1812,7 @@
 @20160152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 @20160153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 
-// Opcode 17 : Points de vie actuels : 0000 nom, 0001-0004 point(s) de vie, de dégâts, 0005 des points de vie, 0006 valeur et unité ; phrases 0100 soin, 0110 dégâts, 0120 soin en pourcentage (20 170 000-20 170 999)
+// Opcode 17 : Points de vie actuels : 0000 nom, 0001-0004 point(s) de vie, de dégâts, 0005 des points de vie, 0006 valeur et unité, 0007 statistique de la forme « cible » ; phrases 0100 soin, 0110 dégâts, 0120 soin en pourcentage (20 170 000-20 170 999)
 @20170000 = ~Current hit points~ // reprise de @10170021
 @20170001 = ~hit point~ // reprise de @600170
 @20170002 = ~hit points~ // reprise de @600171
@@ -1808,6 +1820,7 @@
 @20170004 = ~points of damage~ // reprise de @600173
 @20170005 = ~hit points~ // reprise de @600180
 @20170006 = ~%value% %valueType%~ // reprise de @102165
+@20170007 = ~the current hit points~ // reprise de @10170022
 @20170100 = ~Heals %value% %toTheTarget%~ // reprise de @10170001
 @20170101 = ~Heals %value% %toTheTarget%~ // reprise de @10170001
 @20170102 = ~to heal %value% %toTheTarget%~ // reprise de @10170003
@@ -3278,7 +3291,7 @@
 @23170152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 @23170153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 
-// Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Effectif », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
+// Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Efficace », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
 @23240001 = ~Effective %creaturesList%~ // reprise de @13241500
 @23240002 = ~Ineffective %targetCondition%~ // reprise de @13241501
 @23240003 = ~against %creaturesList%~ // reprise de @13241502

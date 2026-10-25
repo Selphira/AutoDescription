@@ -376,349 +376,349 @@
 
 // Listes indexées : libellés des immunités, 8 030 000 + opcode (505, 507 : effets dérivés de
 // l'ancien moteur) ; vide : immunité non décrite (8 030 000-8 039 999)
-@8030000 = ~à la modification de la classe d'armure~ // reprise de @400000
-@8030001 = ~à la modification de la vitesse d'attaque~ // reprise de @400001
-@8030002 = ~à la dissipation du sommeil~ // reprise de @400002
-@8030003 = ~à la folie du berserker~ // reprise de @400003
-@8030004 = ~à la dissipation de la folie du berserker~ // reprise de @400004
-@8030005 = ~aux charmes~ // reprise de @400005
-@8030006 = ~à la modification du charisme~ // reprise de @400006
+@8030000 = ~la modification de la classe d'armure~ // reprise de @400000
+@8030001 = ~la modification de la vitesse d'attaque~ // reprise de @400001
+@8030002 = ~la dissipation du sommeil~ // reprise de @400002
+@8030003 = ~la folie du berserker~ // reprise de @400003
+@8030004 = ~la dissipation de la folie du berserker~ // reprise de @400004
+@8030005 = ~les charmes~ // reprise de @400005
+@8030006 = ~la modification du charisme~ // reprise de @400006
 @8030007 = ~~ // reprise de @400007
 @8030008 = ~~ // reprise de @400008
 @8030009 = ~~ // reprise de @400009
-@8030010 = ~à la modification de la constitution~ // reprise de @400010
-@8030011 = ~à la dissipation des poisons~ // reprise de @400011
-@8030012 = ~aux dégâts exceptionnels~ // reprise de @400012
-@8030013 = ~à la mort magique~ // reprise de @400013
-@8030014 = ~à la dissipation de la congélation~ // reprise de @400014
-@8030015 = ~à la modification de la dextérité~ // reprise de @400015
-@8030016 = ~à la hâte~ // reprise de @400016
-@8030017 = ~aux soins~ // reprise de @400017
-@8030018 = ~à la modification du maximum de point de vie~ // reprise de @400018
-@8030019 = ~à la modification de l'intelligence~ // reprise de @400019
-@8030020 = ~à l'invisibilité~ // reprise de @400020
-@8030021 = ~à la modification du score de connaissances~ // reprise de @400021
-@8030022 = ~à la modification de la chance~ // reprise de @400022
-@8030023 = ~à la modification du moral~ // reprise de @400023
-@8030024 = ~à la peur~ // reprise de @400024
-@8030025 = ~à l'empoisonnement~ // reprise de @400025
-@8030026 = ~à la dissipation des malédictions~ // reprise de @400026
-@8030027 = ~à la modification de la résistance à l'acide~ // reprise de @400027
-@8030028 = ~à la modification de la résistance au froid~ // reprise de @400028
-@8030029 = ~à la modification de la résistance à l'électricité~ // reprise de @400029
-@8030030 = ~à la modification de la résistance au feu~ // reprise de @400030
-@8030031 = ~à la modification de la résistance aux dégâts magiques~ // reprise de @400031
-@8030032 = ~à la résurrection~ // reprise de @400032
-@8030033 = ~à la modification des jets de sauvegarde contre la paralysie, la mort et les poisons~ // reprise de @400033
-@8030034 = ~à la modification des jets de sauvegarde contre les baguettes, les sceptres et les bâtons~ // reprise de @400034
-@8030035 = ~à la modification des jets de sauvegarde contre la pétrification et la métamorphose~ // reprise de @400035
-@8030036 = ~à la modification des jets de sauvegarde contre les souffles~ // reprise de @400036
-@8030037 = ~à la modification des jets de sauvegarde contre les sorts~ // reprise de @400037
-@8030038 = ~au silence~ // reprise de @400038
-@8030039 = ~au sommeil~ // reprise de @400039
-@8030040 = ~à la lenteur~ // reprise de @400040
+@8030010 = ~la modification de la constitution~ // reprise de @400010
+@8030011 = ~la dissipation des poisons~ // reprise de @400011
+@8030012 = ~les dégâts exceptionnels~ // reprise de @400012
+@8030013 = ~la mort magique~ // reprise de @400013
+@8030014 = ~la dissipation de la congélation~ // reprise de @400014
+@8030015 = ~la modification de la dextérité~ // reprise de @400015
+@8030016 = ~la hâte~ // reprise de @400016
+@8030017 = ~les soins~ // reprise de @400017
+@8030018 = ~la modification du maximum de point de vie~ // reprise de @400018
+@8030019 = ~la modification de l'intelligence~ // reprise de @400019
+@8030020 = ~l'invisibilité~ // reprise de @400020
+@8030021 = ~la modification du score de connaissances~ // reprise de @400021
+@8030022 = ~la modification de la chance~ // reprise de @400022
+@8030023 = ~la modification du moral~ // reprise de @400023
+@8030024 = ~la peur~ // reprise de @400024
+@8030025 = ~l'empoisonnement~ // reprise de @400025
+@8030026 = ~la dissipation des malédictions~ // reprise de @400026
+@8030027 = ~la modification de la résistance à l'acide~ // reprise de @400027
+@8030028 = ~la modification de la résistance au froid~ // reprise de @400028
+@8030029 = ~la modification de la résistance à l'électricité~ // reprise de @400029
+@8030030 = ~la modification de la résistance au feu~ // reprise de @400030
+@8030031 = ~la modification de la résistance aux dégâts magiques~ // reprise de @400031
+@8030032 = ~la résurrection~ // reprise de @400032
+@8030033 = ~la modification des jets de sauvegarde contre la paralysie, la mort et les poisons~ // reprise de @400033
+@8030034 = ~la modification des jets de sauvegarde contre les baguettes, les sceptres et les bâtons~ // reprise de @400034
+@8030035 = ~la modification des jets de sauvegarde contre la pétrification et la métamorphose~ // reprise de @400035
+@8030036 = ~la modification des jets de sauvegarde contre les souffles~ // reprise de @400036
+@8030037 = ~la modification des jets de sauvegarde contre les sorts~ // reprise de @400037
+@8030038 = ~le silence~ // reprise de @400038
+@8030039 = ~le sommeil~ // reprise de @400039
+@8030040 = ~la lenteur~ // reprise de @400040
 @8030041 = ~~ // reprise de @400041
-@8030042 = ~à la mémorisation de sorts profanes supplémentaires~ // reprise de @400042
-@8030043 = ~à la transmutation de pierre en chair~ // reprise de @400043
-@8030044 = ~à la modification de la force~ // reprise de @400044
-@8030045 = ~à l'étourdissement~ // reprise de @400045
-@8030046 = ~à la dissipation de l'étourdissement~ // reprise de @400046
-@8030047 = ~à la dissipation de l'invisibilité~ // reprise de @400047
-@8030048 = ~à la dissipation du silence~ // reprise de @400048
-@8030049 = ~à la modification de la sagesse~ // reprise de @400049
+@8030042 = ~la mémorisation de sorts profanes supplémentaires~ // reprise de @400042
+@8030043 = ~la transmutation de pierre en chair~ // reprise de @400043
+@8030044 = ~la modification de la force~ // reprise de @400044
+@8030045 = ~l'étourdissement~ // reprise de @400045
+@8030046 = ~la dissipation de l'étourdissement~ // reprise de @400046
+@8030047 = ~la dissipation de l'invisibilité~ // reprise de @400047
+@8030048 = ~la dissipation du silence~ // reprise de @400048
+@8030049 = ~la modification de la sagesse~ // reprise de @400049
 @8030050 = ~~ // reprise de @400050
 @8030051 = ~~ // reprise de @400051
 @8030052 = ~~ // reprise de @400052
 @8030053 = ~~ // reprise de @400053
-@8030054 = ~à la modification du TAC0~ // reprise de @400054
-@8030055 = ~à la mort magique~ // reprise de @400055
-@8030056 = ~à l'inversion d'alignement~ // reprise de @400056
-@8030057 = ~au changement d'alignement~ // reprise de @400057
-@8030058 = ~à la dissipation de la magie~ // reprise de @400058
-@8030059 = ~à la modification du score de Déplacement silencieux~ // reprise de @400059
-@8030060 = ~à l'échec d'incantation des sorts~ // reprise de @400060
+@8030054 = ~la modification du TAC0~ // reprise de @400054
+@8030055 = ~la mort magique~ // reprise de @400055
+@8030056 = ~l'inversion d'alignement~ // reprise de @400056
+@8030057 = ~le changement d'alignement~ // reprise de @400057
+@8030058 = ~la dissipation de la magie~ // reprise de @400058
+@8030059 = ~la modification du score de Déplacement silencieux~ // reprise de @400059
+@8030060 = ~l'échec d'incantation des sorts~ // reprise de @400060
 @8030061 = ~~ // reprise de @400061
-@8030062 = ~à la mémorisation de sorts divins et druidiques supplémentaires~ // reprise de @400062
-@8030063 = ~à l'infravision~ // reprise de @400063
-@8030064 = ~à la dissipation de l'infravision~ // reprise de @400064
+@8030062 = ~la mémorisation de sorts divins et druidiques supplémentaires~ // reprise de @400062
+@8030063 = ~l'infravision~ // reprise de @400063
+@8030064 = ~la dissipation de l'infravision~ // reprise de @400064
 @8030065 = ~~ // reprise de @400065
 @8030066 = ~~ // reprise de @400066
 @8030067 = ~~ // reprise de @400067
-@8030068 = ~au bannissement~ // reprise de @400068
-@8030069 = ~à la non-détection~ // reprise de @400069
-@8030070 = ~à la dissipation de la non-détection~ // reprise de @400070
-@8030071 = ~au changement de sexe~ // reprise de @400071
-@8030072 = ~à la modification des attributs~ // reprise de @400072
-@8030073 = ~à la modification des dégâts d'attaque~ // reprise de @400073
-@8030074 = ~à la cécité~ // reprise de @400074
-@8030075 = ~à la guérison de la cécité~ // reprise de @400075
-@8030076 = ~à la débilité mentale~ // reprise de @400076
-@8030077 = ~à la guérison de la débilité mentale~ // reprise de @400077
-@8030078 = ~à la maladie~ // reprise de @400078
-@8030079 = ~à la guérison des maladies et de la débilité mentale~ // reprise de @400079
-@8030080 = ~à la surdité~ // reprise de @400080
-@8030081 = ~à la guérison de la surdité~ // reprise de @400081
-@8030082 = ~au changement de script d'IA~ // reprise de @400082
-@8030083 = ~à la protection contre un type de projectile spécifique~ // reprise de @400083
-@8030084 = ~à la modification de la résistance au feu magique~ // reprise de @400084
-@8030085 = ~à la modification de la résistance au froid magique~ // reprise de @400085
-@8030086 = ~à la modification de la résistance aux dégâts tranchants~ // reprise de @400086
-@8030087 = ~à la modification de la résistance aux dégâts contondants~ // reprise de @400087
-@8030088 = ~à la modification de la résistance aux dégâts perforants~ // reprise de @400088
-@8030089 = ~à la modification de la résistance aux dégâts de projectiles~ // reprise de @400089
-@8030090 = ~à la modification du score de Crochetage de serrures~ // reprise de @400090
-@8030091 = ~à la modification du score de Détection des pièges~ // reprise de @400091
-@8030092 = ~à la modification du score de Vol à la tire~ // reprise de @400092
-@8030093 = ~à la fatigue~ // reprise de @400093
-@8030094 = ~à la modification du score d'ivresse~ // reprise de @400094
-@8030095 = ~à la modification du score de pistage~ // reprise de @400095
-@8030096 = ~à la modification de niveau~ // reprise de @400096
-@8030097 = ~à la modification de la force exceptionnelle~ // reprise de @400097
-@8030098 = ~à la régénération~ // reprise de @400098
-@8030099 = ~à la modification de la durée des sorts~ // reprise de @400099
-@8030100 = ~à la protection contre un type de créature spécifique~ // reprise de @400100
-@8030101 = ~à la protection contre un effet spécifique~ // reprise de @400101
-@8030102 = ~à la protection contre un niveau spécifique de sort~ // reprise de @400102
+@8030068 = ~le bannissement~ // reprise de @400068
+@8030069 = ~la non-détection~ // reprise de @400069
+@8030070 = ~la dissipation de la non-détection~ // reprise de @400070
+@8030071 = ~le changement de sexe~ // reprise de @400071
+@8030072 = ~la modification des attributs~ // reprise de @400072
+@8030073 = ~la modification des dégâts d'attaque~ // reprise de @400073
+@8030074 = ~la cécité~ // reprise de @400074
+@8030075 = ~la guérison de la cécité~ // reprise de @400075
+@8030076 = ~la débilité mentale~ // reprise de @400076
+@8030077 = ~la guérison de la débilité mentale~ // reprise de @400077
+@8030078 = ~la maladie~ // reprise de @400078
+@8030079 = ~la guérison des maladies et de la débilité mentale~ // reprise de @400079
+@8030080 = ~la surdité~ // reprise de @400080
+@8030081 = ~la guérison de la surdité~ // reprise de @400081
+@8030082 = ~le changement de script d'IA~ // reprise de @400082
+@8030083 = ~la protection contre un type de projectile spécifique~ // reprise de @400083
+@8030084 = ~la modification de la résistance au feu magique~ // reprise de @400084
+@8030085 = ~la modification de la résistance au froid magique~ // reprise de @400085
+@8030086 = ~la modification de la résistance aux dégâts tranchants~ // reprise de @400086
+@8030087 = ~la modification de la résistance aux dégâts contondants~ // reprise de @400087
+@8030088 = ~la modification de la résistance aux dégâts perforants~ // reprise de @400088
+@8030089 = ~la modification de la résistance aux dégâts de projectiles~ // reprise de @400089
+@8030090 = ~la modification du score de Crochetage de serrures~ // reprise de @400090
+@8030091 = ~la modification du score de Détection des pièges~ // reprise de @400091
+@8030092 = ~la modification du score de Vol à la tire~ // reprise de @400092
+@8030093 = ~la fatigue~ // reprise de @400093
+@8030094 = ~la modification du score d'ivresse~ // reprise de @400094
+@8030095 = ~la modification du score de pistage~ // reprise de @400095
+@8030096 = ~la modification de niveau~ // reprise de @400096
+@8030097 = ~la modification de la force exceptionnelle~ // reprise de @400097
+@8030098 = ~la régénération~ // reprise de @400098
+@8030099 = ~la modification de la durée des sorts~ // reprise de @400099
+@8030100 = ~la protection contre un type de créature spécifique~ // reprise de @400100
+@8030101 = ~la protection contre un effet spécifique~ // reprise de @400101
+@8030102 = ~la protection contre un niveau spécifique de sort~ // reprise de @400102
 @8030103 = ~~ // reprise de @400103
-@8030104 = ~à la modification de l'expérience acquise~ // reprise de @400104
-@8030105 = ~à la modification de la quantité d'or possédée~ // reprise de @400105
-@8030106 = ~à la panique~ // reprise de @400106
+@8030104 = ~la modification de l'expérience acquise~ // reprise de @400104
+@8030105 = ~la modification de la quantité d'or possédée~ // reprise de @400105
+@8030106 = ~la panique~ // reprise de @400106
 @8030107 = ~~ // reprise de @400107
-@8030108 = ~à la modification de la réputation~ // reprise de @400108
-@8030109 = ~à la paralysie~ // reprise de @400109
+@8030108 = ~la modification de la réputation~ // reprise de @400108
+@8030109 = ~la paralysie~ // reprise de @400109
 @8030110 = ~~ // reprise de @400110
-@8030111 = ~à l'invocation d'armes magiques~ // reprise de @400111
-@8030112 = ~aux effets qui retirent des objets de l'inventaire~ // reprise de @400112
+@8030111 = ~l'invocation d'armes magiques~ // reprise de @400111
+@8030112 = ~les effets qui retirent des objets de l'inventaire~ // reprise de @400112
 @8030113 = ~~ // reprise de @400113
-@8030114 = ~à l'identification d'objet~ // reprise de @400114
-@8030115 = ~à la détection des alignements~ // reprise de @400115
-@8030116 = ~à la dissipation de l'invisibilité~ // reprise de @400116
-@8030117 = ~à la clairvoyance~ // reprise de @400117
+@8030114 = ~l'identification d'objet~ // reprise de @400114
+@8030115 = ~la détection des alignements~ // reprise de @400115
+@8030116 = ~la dissipation de l'invisibilité~ // reprise de @400116
+@8030117 = ~la clairvoyance~ // reprise de @400117
 @8030118 = ~~ // reprise de @400118
-@8030119 = ~aux images-miroirs~ // reprise de @400119
-@8030120 = ~à la protection contre un type d'arme spécifique~ // reprise de @400120
+@8030119 = ~les images-miroirs~ // reprise de @400119
+@8030120 = ~la protection contre un type d'arme spécifique~ // reprise de @400120
 @8030121 = ~~ // reprise de @400121
-@8030122 = ~à la création d'objets magiques~ // reprise de @400122
-@8030123 = ~au retrait de l'inventaire des objets créés par magie~ // reprise de @400123
-@8030124 = ~à la téléportation auprès d'une cible~ // reprise de @400124
-@8030125 = ~à la modification du score de Crochetage de serrures~ // reprise de @400125
-@8030126 = ~à la modification de la vitesse de déplacement~ // reprise de @400126
+@8030122 = ~la création d'objets magiques~ // reprise de @400122
+@8030123 = ~le retrait de l'inventaire des objets créés par magie~ // reprise de @400123
+@8030124 = ~la téléportation auprès d'une cible~ // reprise de @400124
+@8030125 = ~la modification du score de Crochetage de serrures~ // reprise de @400125
+@8030126 = ~la modification de la vitesse de déplacement~ // reprise de @400126
 @8030127 = ~~ // reprise de @400127
-@8030128 = ~à la confusion~ // reprise de @400128
-@8030129 = ~à Aide~ // reprise de @400129
-@8030130 = ~à Bénédiction~ // reprise de @400130
-@8030131 = ~aux cantiques alliés~ // reprise de @400131
-@8030132 = ~à Puissance sacrée~ // reprise de @400132
-@8030133 = ~à la chance~ // reprise de @400133
-@8030134 = ~à la pétrification~ // reprise de @400134
-@8030135 = ~à la métamorphose~ // reprise de @400135
-@8030136 = ~aux effets rendant partiellement visible~ // reprise de @400136
-@8030137 = ~aux cantiques adverses~ // reprise de @400137
+@8030128 = ~la confusion~ // reprise de @400128
+@8030129 = ~Aide~ // reprise de @400129
+@8030130 = ~Bénédiction~ // reprise de @400130
+@8030131 = ~les cantiques alliés~ // reprise de @400131
+@8030132 = ~Puissance sacrée~ // reprise de @400132
+@8030133 = ~la chance~ // reprise de @400133
+@8030134 = ~la pétrification~ // reprise de @400134
+@8030135 = ~la métamorphose~ // reprise de @400135
+@8030136 = ~les effets rendant partiellement visible~ // reprise de @400136
+@8030137 = ~les cantiques adverses~ // reprise de @400137
 @8030138 = ~~ // reprise de @400138
 @8030139 = ~~ // reprise de @400139
 @8030140 = ~~ // reprise de @400140
 @8030141 = ~~ // reprise de @400141
 @8030142 = ~~ // reprise de @400142
-@8030143 = ~à la création d'objets~ // reprise de @400143
-@8030144 = ~au blocage des compétences actives~ // reprise de @400144
-@8030145 = ~au blocage de l'incantation des sorts~ // reprise de @400145
-@8030146 = ~aux effets qui lancent des sorts sur une cible~ // reprise de @400146
-@8030147 = ~à la retranscription des sorts~ // reprise de @400147
-@8030148 = ~aux effets qui lancent des sorts sur une zone~ // reprise de @400148
+@8030143 = ~la création d'objets~ // reprise de @400143
+@8030144 = ~le blocage des compétences actives~ // reprise de @400144
+@8030145 = ~le blocage de l'incantation des sorts~ // reprise de @400145
+@8030146 = ~les effets qui lancent des sorts sur une cible~ // reprise de @400146
+@8030147 = ~la retranscription des sorts~ // reprise de @400147
+@8030148 = ~les effets qui lancent des sorts sur une zone~ // reprise de @400148
 @8030149 = ~~ // reprise de @400149
-@8030150 = ~à la modification du score de Détection des pièges~ // reprise de @400150
-@8030151 = ~à la permutation de créature~ // reprise de @400151
+@8030150 = ~la modification du score de Détection des pièges~ // reprise de @400150
+@8030151 = ~la permutation de créature~ // reprise de @400151
 @8030152 = ~~ // reprise de @400152
-@8030153 = ~au sanctuaire~ // reprise de @400153
-@8030154 = ~à l'enchevêtrement~ // reprise de @400154
+@8030153 = ~le sanctuaire~ // reprise de @400153
+@8030154 = ~l'enchevêtrement~ // reprise de @400154
 @8030155 = ~~ // reprise de @400155
 @8030156 = ~~ // reprise de @400156
-@8030157 = ~à l'empêtrement~ // reprise de @400157
+@8030157 = ~l'empêtrement~ // reprise de @400157
 @8030158 = ~~ // reprise de @400158
-@8030159 = ~à la modification du nombre d'image-miroir~ // reprise de @400159
-@8030160 = ~à la dissipation de Sanctuaire~ // reprise de @400160
-@8030161 = ~à la dissipation de la peur~ // reprise de @400161
-@8030162 = ~à la dissipation de la paralysie~ // reprise de @400162
-@8030163 = ~à la modification de la vitesse de déplacement~ // reprise de @400163
-@8030164 = ~à la dissipation de l'ivresse~ // reprise de @400164
-@8030165 = ~aux figements~ // reprise de @400165
-@8030166 = ~à la modification de la résistance à la magie~ // reprise de @400166
-@8030167 = ~à la modification du TAC0 des armes de jet~ // reprise de @400167
-@8030168 = ~au bannissement des créatures invoquées~ // reprise de @400168
+@8030159 = ~la modification du nombre d'image-miroir~ // reprise de @400159
+@8030160 = ~la dissipation de Sanctuaire~ // reprise de @400160
+@8030161 = ~la dissipation de la peur~ // reprise de @400161
+@8030162 = ~la dissipation de la paralysie~ // reprise de @400162
+@8030163 = ~la modification de la vitesse de déplacement~ // reprise de @400163
+@8030164 = ~la dissipation de l'ivresse~ // reprise de @400164
+@8030165 = ~les figements~ // reprise de @400165
+@8030166 = ~la modification de la résistance à la magie~ // reprise de @400166
+@8030167 = ~la modification du TAC0 des armes de jet~ // reprise de @400167
+@8030168 = ~le bannissement des créatures invoquées~ // reprise de @400168
 @8030169 = ~~ // reprise de @400169
 @8030170 = ~~ // reprise de @400170
-@8030171 = ~à l'apprentissage de sorts~ // reprise de @400171
-@8030172 = ~à l'oubli de sorts~ // reprise de @400172
-@8030173 = ~à la modification de la résistance aux poisons~ // reprise de @400173
+@8030171 = ~l'apprentissage de sorts~ // reprise de @400171
+@8030172 = ~l'oubli de sorts~ // reprise de @400172
+@8030173 = ~la modification de la résistance aux poisons~ // reprise de @400173
 @8030174 = ~~ // reprise de @400174
-@8030175 = ~à l'immobilisation~ // reprise de @400175
-@8030176 = ~à la modification de la vitesse de déplacement~ // reprise de @400176
-@8030178 = ~à la modification du TAC0 contre un type de créature spécifique~ // reprise de @400178
-@8030179 = ~à la modification des dégâts contre un type de créature spécifique~ // reprise de @400179
-@8030180 = ~au blocage de l'utilisation d'objet spécifique~ // reprise de @400180
-@8030181 = ~au blocage de l'utilisation d'objet d'un type spécifique~ // reprise de @400181
+@8030175 = ~l'immobilisation~ // reprise de @400175
+@8030176 = ~la modification de la vitesse de déplacement~ // reprise de @400176
+@8030178 = ~la modification du TAC0 contre un type de créature spécifique~ // reprise de @400178
+@8030179 = ~la modification des dégâts contre un type de créature spécifique~ // reprise de @400179
+@8030180 = ~le blocage de l'utilisation d'objet spécifique~ // reprise de @400180
+@8030181 = ~le blocage de l'utilisation d'objet d'un type spécifique~ // reprise de @400181
 @8030182 = ~~ // reprise de @400182
 @8030183 = ~~ // reprise de @400183
-@8030184 = ~aux effets permettant de traverser les zones infranchissables~ // reprise de @400184
-@8030185 = ~à la paralysie~ // reprise de @400185
-@8030186 = ~à la téléportation~ // reprise de @400186
+@8030184 = ~les effets permettant de traverser les zones infranchissables~ // reprise de @400184
+@8030185 = ~la paralysie~ // reprise de @400185
+@8030186 = ~la téléportation~ // reprise de @400186
 @8030187 = ~~ // reprise de @400187
-@8030188 = ~à la modification de la limite de sorts pouvant être lancé par round~ // reprise de @400188
-@8030189 = ~à la modification du temps d'incantation des sorts~ // reprise de @400189
-@8030190 = ~à la modification du facteur de vitesse~ // reprise de @400190
-@8030191 = ~à la modification du niveau de lanceur de sort~ // reprise de @400191
-@8030192 = ~à l'invocation d'un familier~ // reprise de @400192
-@8030193 = ~à la détection de l'invisibilité~ // reprise de @400193
+@8030188 = ~la modification de la limite de sorts pouvant être lancé par round~ // reprise de @400188
+@8030189 = ~la modification du temps d'incantation des sorts~ // reprise de @400189
+@8030190 = ~la modification du facteur de vitesse~ // reprise de @400190
+@8030191 = ~la modification du niveau de lanceur de sort~ // reprise de @400191
+@8030192 = ~l'invocation d'un familier~ // reprise de @400192
+@8030193 = ~la détection de l'invisibilité~ // reprise de @400193
 @8030194 = ~~ // reprise de @400194
 @8030195 = ~~ // reprise de @400195
 @8030196 = ~~ // reprise de @400196
-@8030197 = ~au renvoi de projectile à leur source~ // reprise de @400197
-@8030198 = ~au renvoi d'effet à leur source~ // reprise de @400198
-@8030199 = ~au renvoi de sort d'un niveau spécifique~ // reprise de @400199
-@8030200 = ~au renvoi d'une quantité de niveau de sort~ // reprise de @400200
-@8030201 = ~à la protection contre une quantité de niveau de sort d'un niveau spécifique~ // reprise de @400201
-@8030202 = ~au renvoi de sort appartenant à une école de magie spécifique~ // reprise de @400202
-@8030203 = ~au renvoi de sort appartenant à une sphère de magie spécifique~ // reprise de @400203
-@8030204 = ~à la protection des sorts appartenant à une école de magie spécifique~ // reprise de @400204
-@8030205 = ~à la protection des sorts appartenant à une sphère de magie spécifique~ // reprise de @400205
-@8030206 = ~à la protection contre un sort spécifique~ // reprise de @400206
-@8030207 = ~au renvoi de sort spécifique~ // reprise de @400207
-@8030208 = ~à la modification du nombre de points de vie minimum~ // reprise de @400208
-@8030209 = ~aux conséquences de « Doigt de mort »~ // reprise de @400209
-@8030210 = ~aux conséquences de « Mot de pouvoir%AD_COLON%Étourdissement »~ // reprise de @400210
-@8030211 = ~à l'emprisonnement~ // reprise de @400211
+@8030197 = ~le renvoi de projectile à leur source~ // reprise de @400197
+@8030198 = ~le renvoi d'effet à leur source~ // reprise de @400198
+@8030199 = ~le renvoi de sort d'un niveau spécifique~ // reprise de @400199
+@8030200 = ~le renvoi d'une quantité de niveau de sort~ // reprise de @400200
+@8030201 = ~la protection contre une quantité de niveau de sort d'un niveau spécifique~ // reprise de @400201
+@8030202 = ~le renvoi de sort appartenant à une école de magie spécifique~ // reprise de @400202
+@8030203 = ~le renvoi de sort appartenant à une sphère de magie spécifique~ // reprise de @400203
+@8030204 = ~la protection des sorts appartenant à une école de magie spécifique~ // reprise de @400204
+@8030205 = ~la protection des sorts appartenant à une sphère de magie spécifique~ // reprise de @400205
+@8030206 = ~la protection contre un sort spécifique~ // reprise de @400206
+@8030207 = ~le renvoi de sort spécifique~ // reprise de @400207
+@8030208 = ~la modification du nombre de points de vie minimum~ // reprise de @400208
+@8030209 = ~les conséquences de « Doigt de mort »~ // reprise de @400209
+@8030210 = ~les conséquences de « Mot de pouvoir%AD_COLON%Étourdissement »~ // reprise de @400210
+@8030211 = ~l'emprisonnement~ // reprise de @400211
 @8030212 = ~~ // reprise de @400212
-@8030213 = ~au labyrinthe~ // reprise de @400213
-@8030214 = ~à la génération de sorts multiple~ // reprise de @400214
+@8030213 = ~le labyrinthe~ // reprise de @400213
+@8030214 = ~la génération de sorts multiple~ // reprise de @400214
 @8030215 = ~~ // reprise de @400215
-@8030216 = ~au drain de niveaux~ // reprise de @400216
-@8030217 = ~aux conséquences de « Mot de pouvoir%AD_COLON%Sommeil »~ // reprise de @400217
-@8030218 = ~aux peaux de pierre~ // reprise de @400218
-@8030219 = ~à la protection contre un type de créature spécifique~ // reprise de @400219
-@8030220 = ~à la dissipation des sorts d'une école de magie spécifique~ // reprise de @400220
-@8030221 = ~à la dissipation des sorts d'une sphère de magie spécifique~ // reprise de @400221
-@8030222 = ~à la téléportation aléatoire~ // reprise de @400222
-@8030223 = ~à la protection contre une quantité spécifique de niveau de sort appartenant à une école de magie~ // reprise de @400223
-@8030224 = ~à la restauration de niveau~ // reprise de @400224
-@8030225 = ~à la détection de la magie~ // reprise de @400225
-@8030226 = ~à la protection contre une quantité spécifique de niveau de sort appartenant à une sphère de magie~ // reprise de @400226
-@8030227 = ~au renvoi d'une quantité spécifique de niveau de sort appartenant à une école de magie~ // reprise de @400227
-@8030228 = ~au renvoi d'une quantité spécifique de niveau de sort appartenant à une sphère de magie~ // reprise de @400228
-@8030229 = ~à la dissipation spécifique à une école de magie~ // reprise de @400229
-@8030230 = ~à la dissipation spécifique à une sphère de magie~ // reprise de @400230
-@8030231 = ~à l'arrêt du temps~ // reprise de @400231
-@8030232 = ~aux activations conditionnelles des sorts~ // reprise de @400232
-@8030233 = ~à la modification des compétences martiales~ // reprise de @400233
-@8030234 = ~à la contingence~ // reprise de @400234
-@8030235 = ~au renversement~ // reprise de @400235
-@8030236 = ~à la projection d'image~ // reprise de @400236
+@8030216 = ~le drain de niveaux~ // reprise de @400216
+@8030217 = ~les conséquences de « Mot de pouvoir%AD_COLON%Sommeil »~ // reprise de @400217
+@8030218 = ~les peaux de pierre~ // reprise de @400218
+@8030219 = ~la protection contre un type de créature spécifique~ // reprise de @400219
+@8030220 = ~la dissipation des sorts d'une école de magie spécifique~ // reprise de @400220
+@8030221 = ~la dissipation des sorts d'une sphère de magie spécifique~ // reprise de @400221
+@8030222 = ~la téléportation aléatoire~ // reprise de @400222
+@8030223 = ~la protection contre une quantité spécifique de niveau de sort appartenant à une école de magie~ // reprise de @400223
+@8030224 = ~la restauration de niveau~ // reprise de @400224
+@8030225 = ~la détection de la magie~ // reprise de @400225
+@8030226 = ~la protection contre une quantité spécifique de niveau de sort appartenant à une sphère de magie~ // reprise de @400226
+@8030227 = ~le renvoi d'une quantité spécifique de niveau de sort appartenant à une école de magie~ // reprise de @400227
+@8030228 = ~le renvoi d'une quantité spécifique de niveau de sort appartenant à une sphère de magie~ // reprise de @400228
+@8030229 = ~la dissipation spécifique à une école de magie~ // reprise de @400229
+@8030230 = ~la dissipation spécifique à une sphère de magie~ // reprise de @400230
+@8030231 = ~l'arrêt du temps~ // reprise de @400231
+@8030232 = ~les activations conditionnelles des sorts~ // reprise de @400232
+@8030233 = ~la modification des compétences martiales~ // reprise de @400233
+@8030234 = ~la contingence~ // reprise de @400234
+@8030235 = ~le renversement~ // reprise de @400235
+@8030236 = ~la projection d'image~ // reprise de @400236
 @8030237 = ~~ // reprise de @400237
-@8030238 = ~à la désintégration~ // reprise de @400238
-@8030239 = ~à la vision lointaine~ // reprise de @400239
+@8030238 = ~la désintégration~ // reprise de @400238
+@8030239 = ~la vision lointaine~ // reprise de @400239
 @8030240 = ~~ // reprise de @400240
-@8030241 = ~aux charmes~ // reprise de @400241
-@8030242 = ~à la dissipation de la confusion~ // reprise de @400242
-@8030243 = ~à la perte de charge des objets magiques~ // reprise de @400243
-@8030244 = ~au drain de sorts profanes~ // reprise de @400244
-@8030246 = ~aux bonus de la folie du berserker~ // reprise de @400246
-@8030247 = ~à la modification de l'état de la folie du berserker~ // reprise de @400247
-@8030248 = ~à la création d'effet après une attaque de mêlée~ // reprise de @400248
-@8030249 = ~à la création d'effet après une attaque à distance~ // reprise de @400249
-@8030250 = ~à la modification de dégâts du à la Chance~ // reprise de @400250
-@8030251 = ~au changement du chant de barde~ // reprise de @400251
-@8030252 = ~à la pose de pièges~ // reprise de @400252
+@8030241 = ~les charmes~ // reprise de @400241
+@8030242 = ~la dissipation de la confusion~ // reprise de @400242
+@8030243 = ~la perte de charge des objets magiques~ // reprise de @400243
+@8030244 = ~le drain de sorts profanes~ // reprise de @400244
+@8030246 = ~les bonus de la folie du berserker~ // reprise de @400246
+@8030247 = ~la modification de l'état de la folie du berserker~ // reprise de @400247
+@8030248 = ~la création d'effet après une attaque de mêlée~ // reprise de @400248
+@8030249 = ~la création d'effet après une attaque à distance~ // reprise de @400249
+@8030250 = ~la modification de dégâts du à la Chance~ // reprise de @400250
+@8030251 = ~le changement du chant de barde~ // reprise de @400251
+@8030252 = ~la pose de pièges~ // reprise de @400252
 @8030253 = ~~ // reprise de @400253
 @8030254 = ~~ // reprise de @400254
-@8030255 = ~à la création d'objet~ // reprise de @400255
+@8030255 = ~la création d'objet~ // reprise de @400255
 @8030256 = ~~ // reprise de @400256
 @8030257 = ~~ // reprise de @400257
-@8030259 = ~au piège à sorts~ // reprise de @400259
-@8030261 = ~à la restauration des sorts~ // reprise de @400261
-@8030262 = ~à la modification du champ de vision~ // reprise de @400262
-@8030263 = ~à la modification du multiplicateur d'attaque sournoise~ // reprise de @400263
-@8030264 = ~à l'abandon de son équipement~ // reprise de @400264
+@8030259 = ~le piège à sorts~ // reprise de @400259
+@8030261 = ~la restauration des sorts~ // reprise de @400261
+@8030262 = ~la modification du champ de vision~ // reprise de @400262
+@8030263 = ~la modification du multiplicateur d'attaque sournoise~ // reprise de @400263
+@8030264 = ~l'abandon de son équipement~ // reprise de @400264
 @8030265 = ~~ // reprise de @400265
-@8030266 = ~à la dissipation des protections contre un sort spécifique~ // reprise de @400266
+@8030266 = ~la dissipation des protections contre un sort spécifique~ // reprise de @400266
 @8030267 = ~~ // reprise de @400267
-@8030268 = ~à la capacité d'exploration~ // reprise de @400268
+@8030268 = ~la capacité d'exploration~ // reprise de @400268
 @8030269 = ~~ // reprise de @400269
-@8030270 = ~à la dissipation des figements~ // reprise de @400270
+@8030270 = ~la dissipation des figements~ // reprise de @400270
 @8030271 = ~~ // reprise de @400271
-@8030272 = ~aux effets activant des sorts à intervalle régulier~ // reprise de @400272
+@8030272 = ~les effets activant des sorts à intervalle régulier~ // reprise de @400272
 @8030273 = ~~ // reprise de @400273
-@8030274 = ~à la téléportation auprès d'un adversaire aléatoire~ // reprise de @400274
-@8030275 = ~à la modification du score de Se cacher dans l'ombre~ // reprise de @400275
-@8030276 = ~à la modification du score de Détection des illusions~ // reprise de @400276
-@8030277 = ~à la modification du score de Pose de pièges~ // reprise de @400277
-@8030278 = ~à la modification du TAC0~ // reprise de @400278
-@8030279 = ~au déblocage des compétences actives~ // reprise de @400279
-@8030280 = ~au changement du déclenchement des hiatus entropiques~ // reprise de @400280
-@8030281 = ~à la modification de la probabilité de déclenchement des hiatus entropiques~ // reprise de @400281
-@8030282 = ~à la modification des caractéristiques~ // reprise de @400282
-@8030283 = ~aux effets maudits~ // reprise de @400283
-@8030284 = ~à la modification du TAC0 avec une arme de mêlée~ // reprise de @400284
-@8030285 = ~à la modification des dégâts avec une arme de mêlée~ // reprise de @400285
-@8030286 = ~à la modification des dégâts avec une arme à distance~ // reprise de @400286
+@8030274 = ~la téléportation auprès d'un adversaire aléatoire~ // reprise de @400274
+@8030275 = ~la modification du score de Se cacher dans l'ombre~ // reprise de @400275
+@8030276 = ~la modification du score de Détection des illusions~ // reprise de @400276
+@8030277 = ~la modification du score de Pose de pièges~ // reprise de @400277
+@8030278 = ~la modification du TAC0~ // reprise de @400278
+@8030279 = ~le déblocage des compétences actives~ // reprise de @400279
+@8030280 = ~le changement du déclenchement des hiatus entropiques~ // reprise de @400280
+@8030281 = ~la modification de la probabilité de déclenchement des hiatus entropiques~ // reprise de @400281
+@8030282 = ~la modification des caractéristiques~ // reprise de @400282
+@8030283 = ~les effets maudits~ // reprise de @400283
+@8030284 = ~la modification du TAC0 avec une arme de mêlée~ // reprise de @400284
+@8030285 = ~la modification des dégâts avec une arme de mêlée~ // reprise de @400285
+@8030286 = ~la modification des dégâts avec une arme à distance~ // reprise de @400286
 @8030287 = ~~ // reprise de @400287
-@8030288 = ~à la modification du TAC0 des poings~ // reprise de @400288
-@8030289 = ~à la modification des dégâts des poings~ // reprise de @400289
+@8030288 = ~la modification du TAC0 des poings~ // reprise de @400288
+@8030289 = ~la modification des dégâts des poings~ // reprise de @400289
 @8030290 = ~~ // reprise de @400290
 @8030291 = ~~ // reprise de @400291
-@8030292 = ~à la modification de la protection contre les attaques sournoises~ // reprise de @400292
+@8030292 = ~la modification de la protection contre les attaques sournoises~ // reprise de @400292
 @8030293 = ~~ // reprise de @400293
 @8030294 = ~~ // reprise de @400294
-@8030295 = ~à la modification de la protection contre les morts définitives~ // reprise de @400295
+@8030295 = ~la modification de la protection contre les morts définitives~ // reprise de @400295
 @8030296 = ~~ // reprise de @400296
-@8030297 = ~à la modification de la protection contre Repousser les morts-vivants~ // reprise de @400297
+@8030297 = ~la modification de la protection contre Repousser les morts-vivants~ // reprise de @400297
 @8030298 = ~~ // reprise de @400298
-@8030299 = ~à la modification du score des hiatus entropiques~ // reprise de @400299
-@8030300 = ~à la modification de la collision des personnages~ // reprise de @400300
-@8030301 = ~à la modification de la probabilité de porter un coup critique~ // reprise de @400301
-@8030302 = ~à la capacité Utilisation des objets~ // reprise de @400302
-@8030303 = ~au changement de la prise en compte d'attaque sournoise à chaque attaque~ // reprise de @400303
+@8030299 = ~la modification du score des hiatus entropiques~ // reprise de @400299
+@8030300 = ~la modification de la collision des personnages~ // reprise de @400300
+@8030301 = ~la modification de la probabilité de porter un coup critique~ // reprise de @400301
+@8030302 = ~la capacité Utilisation des objets~ // reprise de @400302
+@8030303 = ~le changement de la prise en compte d'attaque sournoise à chaque attaque~ // reprise de @400303
 @8030304 = ~~ // reprise de @400304
-@8030305 = ~à la modification du TAC0 de l'arme secondaire~ // reprise de @400305
-@8030306 = ~à la modification du TAC0 de l'arme principale~ // reprise de @400306
-@8030307 = ~au pistage~ // reprise de @400307
-@8030308 = ~à la protection contre le pistage~ // reprise de @400308
+@8030305 = ~la modification du TAC0 de l'arme secondaire~ // reprise de @400305
+@8030306 = ~la modification du TAC0 de l'arme principale~ // reprise de @400306
+@8030307 = ~le pistage~ // reprise de @400307
+@8030308 = ~la protection contre le pistage~ // reprise de @400308
 @8030309 = ~~ // reprise de @400309
-@8030310 = ~à la protection contre l'arrêt du temps~ // reprise de @400310
-@8030311 = ~à la génération de souhait aléatoire~ // reprise de @400311
+@8030310 = ~la protection contre l'arrêt du temps~ // reprise de @400310
+@8030311 = ~la génération de souhait aléatoire~ // reprise de @400311
 @8030312 = ~~ // reprise de @400312
 @8030313 = ~~ // reprise de @400313
-@8030314 = ~aux peaux de golem~ // reprise de @400314
+@8030314 = ~les peaux de golem~ // reprise de @400314
 @8030315 = ~~ // reprise de @400315
-@8030316 = ~au repos~ // reprise de @400316
-@8030317 = ~à la hâte~ // reprise de @400317
-@8030318 = ~à la protection contre un type de créature contre un sort spécifique~ // reprise de @400318
-@8030319 = ~aux restrictions d'utilisation des objets~ // reprise de @400319
+@8030316 = ~le repos~ // reprise de @400316
+@8030317 = ~la hâte~ // reprise de @400317
+@8030318 = ~la protection contre un type de créature contre un sort spécifique~ // reprise de @400318
+@8030319 = ~les restrictions d'utilisation des objets~ // reprise de @400319
 @8030320 = ~~ // reprise de @400320
-@8030321 = ~à la protection contre un sort ou un objet spécifique~ // reprise de @400321
+@8030321 = ~la protection contre un sort ou un objet spécifique~ // reprise de @400321
 @8030322 = ~~ // reprise de @400322
-@8030323 = ~à la modification du niveau de Repousser les morts-vivants~ // reprise de @400323
-@8030324 = ~à la protection contre un sort ou un objet spécifique~ // reprise de @400324
-@8030325 = ~à la modification de tous les jets de sauvegarde~ // reprise de @400325
-@8030326 = ~à l'incantation de sort sur une cible d'un type spécifique~ // reprise de @400326
+@8030323 = ~la modification du niveau de Repousser les morts-vivants~ // reprise de @400323
+@8030324 = ~la protection contre un sort ou un objet spécifique~ // reprise de @400324
+@8030325 = ~la modification de tous les jets de sauvegarde~ // reprise de @400325
+@8030326 = ~l'incantation de sort sur une cible d'un type spécifique~ // reprise de @400326
 @8030327 = ~~ // reprise de @400327
-@8030329 = ~au ralentissement du poison~ // reprise de @400329
+@8030329 = ~le ralentissement du poison~ // reprise de @400329
 @8030330 = ~~ // reprise de @400330
 @8030331 = ~~ // reprise de @400331
-@8030332 = ~à la modification des dégâts d'un type spécifique~ // reprise de @400332
-@8030333 = ~aux effets incantant des sorts à intervalle régulier~ // reprise de @400333
+@8030332 = ~la modification des dégâts d'un type spécifique~ // reprise de @400332
+@8030333 = ~les effets incantant des sorts à intervalle régulier~ // reprise de @400333
 @8030334 = ~ à la possibilité de repousser des créatures~ // reprise de @400334
 @8030336 = ~~ // reprise de @400336
-@8030337 = ~à la dissipation d'effet spécifique~ // reprise de @400337
+@8030337 = ~la dissipation d'effet spécifique~ // reprise de @400337
 @8030338 = ~~ // reprise de @400338
 @8030339 = ~~ // reprise de @400339
-@8030340 = ~à la génération d'effet en cas d'attaque sournoise~ // reprise de @400340
-@8030341 = ~à la génération d'effet en cas de coup critique~ // reprise de @400341
+@8030340 = ~la génération d'effet en cas d'attaque sournoise~ // reprise de @400340
+@8030341 = ~la génération d'effet en cas de coup critique~ // reprise de @400341
 @8030342 = ~~ // reprise de @400342
-@8030343 = ~à l'échange de points de vie avec une cible~ // reprise de @400343
-@8030344 = ~à la modification du niveau d'enchantement d'une arme contre une cible d'un type spécifique~ // reprise de @400344
-@8030345 = ~à la modification du niveau d'enchantement d'une arme d'un type spécifique~ // reprise de @400345
-@8030346 = ~à la modification des jets de sauvegarde contre une école de magie spécifique~ // reprise de @400346
-@8030505 = ~aux capacités psioniques~ // reprise de @400505
-@8030507 = ~à l'empoisonnement~ // reprise de @400507
+@8030343 = ~l'échange de points de vie avec une cible~ // reprise de @400343
+@8030344 = ~la modification du niveau d'enchantement d'une arme contre une cible d'un type spécifique~ // reprise de @400344
+@8030345 = ~la modification du niveau d'enchantement d'une arme d'un type spécifique~ // reprise de @400345
+@8030346 = ~la modification des jets de sauvegarde contre une école de magie spécifique~ // reprise de @400346
+@8030505 = ~les capacités psioniques~ // reprise de @400505
+@8030507 = ~l'empoisonnement~ // reprise de @400507
 
 // Listes indexées : types de dégâts, 8 040 000 + type de dégâts de l'en-tête (8 040 000-8 049 999)
 @8040000 = ~Contondant~ // reprise de @102010
@@ -1182,14 +1182,14 @@
 @8120044 = ~« Grande malédiction »~ // reprise de @420044
 @8120046 = ~le toucher de la goule~ // reprise de @420046
 @8120055 = ~« Fatalité »~ // reprise de @420055
-@8120056 = ~une immunité aux sorts d'Abjuration~ // reprise de @420056
-@8120057 = ~une immunité aux sorts de Conjuration~ // reprise de @420057
-@8120058 = ~une immunité aux sorts de Divination~ // reprise de @420058
-@8120059 = ~une immunité aux sorts d'Enchantement~ // reprise de @420059
-@8120060 = ~une immunité aux sorts d'Illusion~ // reprise de @420060
-@8120061 = ~une immunité aux sorts d'Évocation~ // reprise de @420061
-@8120062 = ~une immunité aux sorts de Nécromancie~ // reprise de @420062
-@8120063 = ~une immunité aux sorts de Transmutation~ // reprise de @420063
+@8120056 = ~une immunité contre les sorts d'Abjuration~ // reprise de @420056
+@8120057 = ~une immunité contre les sorts de Conjuration~ // reprise de @420057
+@8120058 = ~une immunité contre les sorts de Divination~ // reprise de @420058
+@8120059 = ~une immunité contre les sorts d'Enchantement~ // reprise de @420059
+@8120060 = ~une immunité contre les sorts d'Illusion~ // reprise de @420060
+@8120061 = ~une immunité contre les sorts d'Évocation~ // reprise de @420061
+@8120062 = ~une immunité contre les sorts de Nécromancie~ // reprise de @420062
+@8120063 = ~une immunité contre les sorts de Transmutation~ // reprise de @420063
 @8120064 = ~une protection contre les armes~ // reprise de @420064
 @8120065 = ~une protection contre les éléments~ // reprise de @420065
 @8120066 = ~une protection contre les sorts~ // reprise de @420066
@@ -1656,8 +1656,20 @@
 @20010002 = ~\1 et demi~ // reprise de @10010102
 @20010003 = ~une demi supplémentaire~ // reprise de @10010103
 
-// Opcode 1 : phrases (20 010 100-20 010 999) : 0140 attaque impossible
+// Opcode 1 : phrases (20 010 100-20 010 999) : 0100 ajout, 0110 valeur fixée, 0120 valeur finale fixée (formes +1 à +3), 0140 attaque impossible
+@20010101 = ~Modifie le nombre d'attaques par round %ofTheTarget% de %value%~ // reprise de @10010011
+@20010102 = ~de modifier le nombre d'attaques par round de %value%~ // reprise de @10010021
+@20010103 = ~de modifier le nombre d'attaques par round %ofTheTarget% de %value%~ // reprise de @10010031
+@20010111 = ~Passe le nombre d'attaques par round %ofTheTarget% à %value%~ // reprise de @10010012
+@20010112 = ~de passer le nombre d'attaques par round à %value%~ // reprise de @10010022
+@20010113 = ~de passer le nombre d'attaques par round %ofTheTarget% à %value%~ // reprise de @10010032
+@20010121 = ~Fixe le nombre d'attaques par round %ofTheTarget% à %value%~ // reprise de @10010014
+@20010122 = ~de fixer le nombre d'attaques par round à %value%~ // reprise de @10010024
+@20010123 = ~de fixer le nombre d'attaques par round %ofTheTarget% à %value%~ // reprise de @10010034
 @20010140 = ~Attaque impossible~ // reprise de @10010005
+@20010141 = ~Empêche %theTarget% d'attaquer~ // reprise de @10010015
+@20010142 = ~d'empêcher %theTarget% d'attaquer~ // reprise de @10010025
+@20010143 = ~d'empêcher %theTarget% d'attaquer~ // reprise de @10010035
 
 // Opcode 2 : Soin : réveil (20 020 000-20 020 999)
 @20020100 = ~Réveille %theTarget%~ // reprise de @10020001
@@ -1800,7 +1812,7 @@
 @20160152 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 @20160153 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 
-// Opcode 17 : Points de vie actuels : 0000 nom, 0001-0004 point(s) de vie, de dégâts, 0005 des points de vie, 0006 valeur et unité ; phrases 0100 soin, 0110 dégâts, 0120 soin en pourcentage (20 170 000-20 170 999)
+// Opcode 17 : Points de vie actuels : 0000 nom, 0001-0004 point(s) de vie, de dégâts, 0005 des points de vie, 0006 valeur et unité, 0007 statistique de la forme « cible » ; phrases 0100 soin, 0110 dégâts, 0120 soin en pourcentage (20 170 000-20 170 999)
 @20170000 = ~Points de vie actuels~ // reprise de @10170021
 @20170001 = ~point de vie~ // reprise de @600170
 @20170002 = ~points de vie~ // reprise de @600171
@@ -1808,6 +1820,7 @@
 @20170004 = ~points de dégâts~ // reprise de @600173
 @20170005 = ~des points de vie~ // reprise de @600180
 @20170006 = ~%value% %valueType%~ // reprise de @102165
+@20170007 = ~les points de vie actuels~ // reprise de @10170022
 @20170100 = ~Restaure %value% %toTheTarget%~ // reprise de @10170001
 @20170101 = ~Restaure %value% %toTheTarget%~ // reprise de @10170001
 @20170102 = ~de restaurer %value% %toTheTarget%~ // reprise de @10170003
@@ -1869,27 +1882,27 @@
 
 // Opcode 27 : libellés (20 270 000-20 270 099)
 @20270000 = ~Résistance à l'acide~ // reprise de @10270001
-@20270001 = ~à l'acide~ // reprise de @10270002
+@20270001 = ~contre l'acide~ // reprise de @10270002
 @20270002 = ~la résistance à l'acide~ // reprise de @10270003
 
 // Opcode 28 : libellés (20 280 000-20 280 099)
 @20280000 = ~Résistance au froid~ // reprise de @10280001
-@20280001 = ~au froid~ // reprise de @10280002
+@20280001 = ~contre le froid~ // reprise de @10280002
 @20280002 = ~la résistance au froid~ // reprise de @10280003
 
 // Opcode 29 : libellés (20 290 000-20 290 099)
 @20290000 = ~Résistance à l'électricité~ // reprise de @10290001
-@20290001 = ~à l'électricité~ // reprise de @10290002
+@20290001 = ~contre l'électricité~ // reprise de @10290002
 @20290002 = ~la résistance à l'électricité~ // reprise de @10290003
 
 // Opcode 30 : libellés (20 300 000-20 300 099)
 @20300000 = ~Résistance au feu~ // reprise de @10300001
-@20300001 = ~au feu~ // reprise de @10300002
+@20300001 = ~contre le feu~ // reprise de @10300002
 @20300002 = ~la résistance au feu~ // reprise de @10300003
 
 // Opcode 31 : libellés (20 310 000-20 310 099)
 @20310000 = ~Résistance aux dégâts magiques~ // reprise de @10310001
-@20310001 = ~aux dégâts magiques~ // reprise de @10310002
+@20310001 = ~contre les dégâts magiques~ // reprise de @10310002
 @20310002 = ~la résistance aux dégâts magiques~ // reprise de @10310003
 
 // Opcode 32 : Soin : résurrection (20 320 000-20 320 999)
@@ -2207,32 +2220,32 @@
 
 // Opcode 84 : libellés (20 840 000-20 840 099)
 @20840000 = ~Résistance aux dégâts de feu magiques~ // reprise de @10840001
-@20840001 = ~aux dégâts de feu magiques~ // reprise de @10840002
+@20840001 = ~contre les dégâts de feu magiques~ // reprise de @10840002
 @20840002 = ~la résistance aux dégâts de feu magiques~ // reprise de @10840003
 
 // Opcode 85 : libellés (20 850 000-20 850 099)
 @20850000 = ~Résistance aux dégâts de froid magiques~ // reprise de @10850001
-@20850001 = ~aux dégâts de froid magiques~ // reprise de @10850002
+@20850001 = ~contre les dégâts de froid magiques~ // reprise de @10850002
 @20850002 = ~la résistance aux dégâts de froid magiques~ // reprise de @10850003
 
 // Opcode 86 : libellés (20 860 000-20 860 099)
 @20860000 = ~Résistance aux dégâts tranchants~ // reprise de @10860001
-@20860001 = ~aux dégâts tranchants~ // reprise de @10860002
+@20860001 = ~contre les dégâts tranchants~ // reprise de @10860002
 @20860002 = ~la résistance aux dégâts tranchants~ // reprise de @10860003
 
 // Opcode 87 : libellés (20 870 000-20 870 099)
 @20870000 = ~Résistance aux dégâts contondants~ // reprise de @10870001
-@20870001 = ~aux dégâts contondants~ // reprise de @10870002
+@20870001 = ~contre les dégâts contondants~ // reprise de @10870002
 @20870002 = ~la résistance aux dégâts contondants~ // reprise de @10870003
 
 // Opcode 88 : libellés (20 880 000-20 880 099)
 @20880000 = ~Résistance aux dégâts perforants~ // reprise de @10880001
-@20880001 = ~aux dégâts perforants~ // reprise de @10880002
+@20880001 = ~contre les dégâts perforants~ // reprise de @10880002
 @20880002 = ~la résistance aux dégâts perforants~ // reprise de @10880003
 
 // Opcode 89 : libellés (20 890 000-20 890 099)
 @20890000 = ~Résistance aux dégâts de projectiles~ // reprise de @10890001
-@20890001 = ~aux dégâts de projectiles~ // reprise de @10890002
+@20890001 = ~contre les dégâts de projectiles~ // reprise de @10890002
 @20890002 = ~la résistance aux dégâts de projectiles~ // reprise de @10890003
 
 // Opcode 98 : Régénération : phrases 0100 un point, 0110 plusieurs (20 980 000-20 980 999)
@@ -2246,35 +2259,35 @@
 @20980113 = ~de régénérer %amount% points de vie %strDuration% %toTheTarget%~ // reprise de @10980012
 
 // Opcode 100 : Protection contre un type de créature : phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
-@21000100 = ~Immunité aux attaques et aux sorts des %creatureType%~ // reprise de @11000001
+@21000100 = ~Immunité contre les attaques et les sorts des %creatureType%~ // reprise de @11000001
 @21000101 = ~Immunise %theTarget% contre les attaques et les sorts des %creatureType%~ // reprise de @11000003
 @21000102 = ~de résister aux attaques et aux sorts des %creatureType%~ // reprise de @11000005
 @21000103 = ~de résister aux attaques et aux sorts des %creatureType%~ // reprise de @11000005
-@21000110 = ~Immunité aux attaques et aux sorts de toutes les créatures~ // reprise de @11000002
+@21000110 = ~Immunité contre les attaques et les sorts de toutes les créatures~ // reprise de @11000002
 @21000111 = ~Immunise %theTarget% contre les attaques et les sorts de toutes les créatures~ // reprise de @11000004
 @21000112 = ~de résister aux attaques et aux sorts de toutes les créatures~ // reprise de @11000006
 @21000113 = ~de résister aux attaques et aux sorts de toutes les créatures~ // reprise de @11000006
 
 // Opcode 101 : phrases (21 010 100-21 010 999)
-@21010100 = ~Immunité %opcodeStr%~ // reprise de @11010001
-@21010101 = ~Immunise %theTarget% %opcodeStr%~ // reprise de @11010002
-@21010102 = ~d'être immunisé %opcodeStr%~ // reprise de @11010003
-@21010103 = ~d'immuniser %theTarget% %opcodeStr%~ // reprise de @11010004
+@21010100 = ~Immunité contre %opcodeStr%~ // reprise de @11010001
+@21010101 = ~Immunise %theTarget% contre %opcodeStr%~ // reprise de @11010002
+@21010102 = ~d'être immunisé contre %opcodeStr%~ // reprise de @11010003
+@21010103 = ~d'immuniser %theTarget% contre %opcodeStr%~ // reprise de @11010004
 
 // Opcode 102 : immunité par niveau de sort, réunie (ancien opcode 509) : phrases 0110 niveaux 1 à N,
 // 0120 tous les niveaux (21 020 000-21 020 999)
-@21020110 = ~Immunité aux sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020002
-@21020111 = ~Immunise %theTarget% aux sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020004
-@21020112 = ~d'immuniser %theTarget% aux sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020006
-@21020113 = ~d'immuniser %theTarget% aux sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020006
-@21020120 = ~Immunité aux sorts~ // reprise de @15090001
-@21020121 = ~Immunise %theTarget% aux sorts~ // reprise de @15090003
-@21020122 = ~d'immuniser %theTarget% aux sorts~ // reprise de @15090002
-@21020123 = ~d'immuniser %theTarget% aux sorts~ // reprise de @15090002
+@21020110 = ~Immunité contre les sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020002
+@21020111 = ~Immunise %theTarget% contre les sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020004
+@21020112 = ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020006
+@21020113 = ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau et inférieurs~ // reprise de @11020006
+@21020120 = ~Immunité contre les sorts~ // reprise de @15090001
+@21020121 = ~Immunise %theTarget% contre les sorts~ // reprise de @15090003
+@21020122 = ~d'immuniser %theTarget% contre les sorts~ // reprise de @15090002
+@21020123 = ~d'immuniser %theTarget% contre les sorts~ // reprise de @15090002
 
 // Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
-@21060100 = ~Immunité à la panique~ // reprise de @11060004
-@21060101 = ~Immunité à la panique~ // reprise de @11060004
+@21060100 = ~Immunité contre la panique~ // reprise de @11060004
+@21060101 = ~Immunité contre la panique~ // reprise de @11060004
 @21060102 = ~d'immuniser %theTarget% contre la rupture de moral~ // reprise de @11060009
 @21060103 = ~d'immuniser %theTarget% contre la rupture de moral~ // reprise de @11060009
 @21060110 = ~Le moral %ofTheTarget% reste au plus haut~ // reprise de @11060001
@@ -2670,7 +2683,7 @@
 
 // Opcode 166 : libellés (21 660 000-21 660 099)
 @21660000 = ~Résistance à la magie~ // reprise de @11660001
-@21660001 = ~à la magie~ // reprise de @11660002
+@21660001 = ~contre la magie~ // reprise de @11660002
 @21660002 = ~la résistance à la magie~ // reprise de @11660003
 
 // Opcode 167 : TAC0 avec les armes de trait : 0000 nom, 0001 valeur, 0002 statistique (21 670 000-21 670 999)
@@ -2690,7 +2703,7 @@
 
 // Opcode 173 : libellés (21 730 000-21 730 099)
 @21730000 = ~Résistance aux poisons~ // reprise de @11730001
-@21730001 = ~aux poisons~ // reprise de @11730002
+@21730001 = ~contre les poisons~ // reprise de @11730002
 @21730002 = ~la résistance aux poisons~ // reprise de @11730003
 
 // Opcode 175 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 750 000-21 750 999)
@@ -2798,16 +2811,16 @@
 @22010123 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010024
 
 // Opcode 205 : Immunité à un type secondaire de sort : phrases 0100 (22 050 000-22 050 999)
-@22050100 = ~Immunité aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050001
-@22050101 = ~Immunise %theTarget% aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050003
+@22050100 = ~Immunité contre les sorts de type %spellSecondaryTypeName%~ // reprise de @12050001
+@22050101 = ~Immunise %theTarget% contre les sorts de type %spellSecondaryTypeName%~ // reprise de @12050003
 @22050102 = ~de résister aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050002
-@22050103 = ~d'immuniser %theTarget% aux sorts de type %spellSecondaryTypeName%~ // reprise de @12050004
+@22050103 = ~d'immuniser %theTarget% contre les sorts de type %spellSecondaryTypeName%~ // reprise de @12050004
 
 // Opcode 206 : phrases (22 060 100-22 060 999)
-@22060100 = ~Immunité au sort « %spellName% »~ // reprise de @12060001
-@22060101 = ~Immunise %theTarget% au sort « %spellName% »~ // reprise de @12060002
-@22060102 = ~d'immuniser %theTarget% au sort « %spellName% »~ // reprise de @12060003
-@22060103 = ~d'immuniser %theTarget% au sort « %spellName% »~ // reprise de @12060003
+@22060100 = ~Immunité contre le sort « %spellName% »~ // reprise de @12060001
+@22060101 = ~Immunise %theTarget% contre le sort « %spellName% »~ // reprise de @12060002
+@22060102 = ~d'immuniser %theTarget% contre le sort « %spellName% »~ // reprise de @12060003
+@22060103 = ~d'immuniser %theTarget% contre le sort « %spellName% »~ // reprise de @12060003
 
 // Opcode 207 : Renvoi d'un sort : phrases 0100, formes « soi » seulement, comme dans l'ancien moteur (22 070 000-22 070 999)
 @22070100 = ~Renvoie le sort « %spellName% »~ // reprise de @12070001
@@ -3205,10 +3218,10 @@
 @22890002 = ~les dégâts à mains nues~ // reprise de @12890002
 
 // Opcode 292 : Attaques sournoises : phrases 0100 immunité, 0110 sensibilité (22 920 000-22 920 999)
-@22920100 = ~Immunité aux attaques sournoises~ // reprise de @12920001
-@22920101 = ~Immunise %theTarget% aux attaques sournoises~ // reprise de @12920002
+@22920100 = ~Immunité contre les attaques sournoises~ // reprise de @12920001
+@22920101 = ~Immunise %theTarget% contre les attaques sournoises~ // reprise de @12920002
 @22920102 = ~de résister aux attaques sournoises~ // reprise de @12920003
-@22920103 = ~d'immuniser %theTarget% aux attaques sournoises~ // reprise de @12920004
+@22920103 = ~d'immuniser %theTarget% contre les attaques sournoises~ // reprise de @12920004
 @22920110 = ~Sensible aux attaques sournoises~ // reprise de @12920011
 @22920111 = ~Rend %theTarget% sensible aux attaques sournoises~ // reprise de @12920012
 @22920112 = ~d'être sensible aux attaques sournoises~ // reprise de @12920013
@@ -3278,19 +3291,19 @@
 @23170152 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 @23170153 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 
-// Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Effectif », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
-@23240001 = ~Effectif %creaturesList%~ // reprise de @13241500
+// Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Efficace », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
+@23240001 = ~Efficace %creaturesList%~ // reprise de @13241500
 @23240002 = ~Inefficace %targetCondition%~ // reprise de @13241501
 @23240003 = ~contre les %creaturesList%~ // reprise de @13241502
 @23240004 = ~à %probability% % ~ // reprise de @13241503
 @23240005 = ~créatures affectées par %splstateName%~ // reprise de @13241110
 @23240006 = ~créatures %descriptionState%~ // reprise de @13241138
 @23240007 = ~durant la pénurie de fer~ // reprise de @13240401
-@23241003 = ~créatures immunisées au feu~ // reprise de @13241003
+@23241003 = ~créatures insensibles au feu~ // reprise de @13241003
 @23241004 = ~créatures sensibles au feu~ // reprise de @13241004
 @23241013 = ~créatures gigantesques~ // reprise de @13241013
 @23241023 = ~créatures aveuglées~ // reprise de @13241023
-@23241025 = ~créatures immunisées au froid~ // reprise de @13241025
+@23241025 = ~créatures insensibles au froid~ // reprise de @13241025
 @23241026 = ~créatures sensibles au froid~ // reprise de @13241026
 @23241033 = ~créatures neutres~ // reprise de @13241033
 @23241034 = ~créatures bonnes ou mauvaises~ // reprise de @13241034
@@ -3301,7 +3314,7 @@
 @23241041 = ~créatures du même alignement que le porteur~ // reprise de @13241041
 @23241042 = ~créatures d'un alignement différent du porteur~ // reprise de @13241042
 @23241044 = ~créatures autre que le porteur~ // reprise de @13241044
-@23241053 = ~créatures immunisées au feu ou au froid~ // reprise de @13241053
+@23241053 = ~créatures insensibles au feu ou au froid~ // reprise de @13241053
 @23241054 = ~créatures sensibles au feu ou au froid~ // reprise de @13241054
 @23241057 = ~créatures masculines~ // reprise de @13241057
 @23241058 = ~créatures féminines~ // reprise de @13241058
@@ -3309,13 +3322,13 @@
 @23241068 = ~créatures sous l'effet d'un toucher de la goule~ // reprise de @13241068
 @23241074 = ~créatures mortes~ // reprise de @13241074
 @23241075 = ~créatures vivantes~ // reprise de @13241075
-@23241077 = ~créatures immunisées aux poisons~ // reprise de @13241077
+@23241077 = ~créatures insensibles aux poisons~ // reprise de @13241077
 @23241078 = ~créatures sensibles aux poisons~ // reprise de @13241078
-@23241079 = ~créatures immunisées à l'acide~ // reprise de @13241079
+@23241079 = ~créatures insensibles à l'acide~ // reprise de @13241079
 @23241080 = ~créatures sensibles à l'acide~ // reprise de @13241080
-@23241081 = ~créatures immunisées à l'électricité~ // reprise de @13241081
+@23241081 = ~créatures insensibles à l'électricité~ // reprise de @13241081
 @23241082 = ~créatures sensibles à l'électricité~ // reprise de @13241082
-@23241083 = ~créatures immunisées aux dégâts magiques~ // reprise de @13241083
+@23241083 = ~créatures insensibles aux dégâts magiques~ // reprise de @13241083
 @23241084 = ~créatures sensibles aux dégâts magiques~ // reprise de @13241084
 @23241089 = ~entre 6h et 20h~ // reprise de @13241089
 @23241090 = ~entre 21h et 5h~ // reprise de @13241090
@@ -3376,7 +3389,7 @@
 @23260050 = ~Si %theTarget% n'est pas une alliée~ // reprise de @13260050
 @23260051 = ~Si %theTarget% est une ennemie~ // reprise de @13260051
 @23260052 = ~Si %theTarget% n'est pas une ennemie~ // reprise de @13260052
-@23260053 = ~Si %theTarget% est immunisé au feu ou au froid~ // reprise de @13260053
+@23260053 = ~Si %theTarget% est immunisé contre le feu ou le froid~ // reprise de @13260053
 @23260054 = ~Si %theTarget% est sensible au feu ou au froid~ // reprise de @13260054
 @23260055 = ~Si %theTarget% est un mort-vivant ou un golem~ // reprise de @13260055
 @23260056 = ~Si %theTarget% n'est ni un mort-vivant, ni un golem~ // reprise de @13260056
@@ -3478,10 +3491,10 @@
 @23460019 = ~contre les sorts de l'école Généraliste~ // reprise de @13460019
 
 // Opcode 367 : Caractéristiques minimales : phrases 0100 immunité, 0110 sensibilité (23 670 000-23 670 999)
-@23670100 = ~Immunité à la mort par absorption de caractéristique~ // reprise de @13670002
-@23670101 = ~Immunise %theTarget% à la mort par absorption de caractéristique~ // reprise de @13670012
-@23670102 = ~d'être immunisé à la mort par absorption de caractéristique~ // reprise de @13670022
-@23670103 = ~d'immuniser %theTarget% à la mort par absorption de caractéristique~ // reprise de @13670032
+@23670100 = ~Immunité contre la mort par absorption de caractéristique~ // reprise de @13670002
+@23670101 = ~Immunise %theTarget% contre la mort par absorption de caractéristique~ // reprise de @13670012
+@23670102 = ~d'être immunisé contre la mort par absorption de caractéristique~ // reprise de @13670022
+@23670103 = ~d'immuniser %theTarget% contre la mort par absorption de caractéristique~ // reprise de @13670032
 @23670110 = ~Sensible à la mort par absorption de caractéristique~ // reprise de @13670001
 @23670111 = ~Rend %theTarget% sensible à la mort par absorption de caractéristique~ // reprise de @13670011
 @23670112 = ~d'être sensible à la mort par absorption de caractéristique~ // reprise de @13670021
@@ -3496,17 +3509,17 @@
 
 // Effet dérivé 005, ALL_RESISTANCES : libellés (30 050 000-30 050 099)
 @30050000 = ~Résistance aux dégâts~ // reprise de @15020001
-@30050001 = ~aux dégâts~ // reprise de @15020002
+@30050001 = ~contre les dégâts~ // reprise de @15020002
 @30050002 = ~la résistance aux dégâts~ // reprise de @15020003
 
 // Effet dérivé 006, ELEMENTAL_RESISTANCES : libellés (30 060 000-30 060 099)
 @30060000 = ~Résistance aux dégâts élémentaires~ // reprise de @15030001
-@30060001 = ~aux dégâts élémentaires~ // reprise de @15030002
+@30060001 = ~contre les dégâts élémentaires~ // reprise de @15030002
 @30060002 = ~la résistance aux dégâts élémentaires~ // reprise de @15030003
 
 // Effet dérivé 007, PHYSICAL_RESISTANCES : libellés (30 070 000-30 070 099)
 @30070000 = ~Résistance aux dégâts physiques~ // reprise de @15040001
-@30070001 = ~aux dégâts physiques~ // reprise de @15040002
+@30070001 = ~contre les dégâts physiques~ // reprise de @15040002
 @30070002 = ~la résistance aux dégâts physiques~ // reprise de @15040003
 
 // Effet dérivé 009, THIEF_SKILLS : libellés (30 090 000-30 090 099)
@@ -3514,10 +3527,10 @@
 @30090002 = ~les compétences de roublard~ // reprise de @15000002
 
 // Effet dérivé 010, SPELL_IMMUNITIES : phrases (30 100 100-30 100 999)
-@30100100 = ~Immunité aux sorts « %spellNames% »~ // reprise de @15180001
-@30100101 = ~Immunise %theTarget% aux sorts « %spellNames% »~ // reprise de @15180002
-@30100102 = ~d'immuniser %theTarget% aux sorts « %spellNames% »~ // reprise de @15180003
-@30100103 = ~d'immuniser %theTarget% aux sorts « %spellNames% »~ // reprise de @15180003
+@30100100 = ~Immunité contre les sorts « %spellNames% »~ // reprise de @15180001
+@30100101 = ~Immunise %theTarget% contre les sorts « %spellNames% »~ // reprise de @15180002
+@30100102 = ~d'immuniser %theTarget% contre les sorts « %spellNames% »~ // reprise de @15180003
+@30100103 = ~d'immuniser %theTarget% contre les sorts « %spellNames% »~ // reprise de @15180003
 
 // Effet dérivé 011, FREE_ACTION : phrases (30 110 100-30 110 999)
 @30110100 = ~Action libre~ // reprise de @15200001

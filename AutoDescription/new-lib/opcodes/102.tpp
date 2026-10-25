@@ -59,7 +59,7 @@ DEFINE_PATCH_MACRO ad_op_102_lines BEGIN
 			SET levels_mask = $fx_spell_levels(~%levels_id%~)
 			SET line_fx = levels_id
 			PATCH_IF levels_mask == 0x1FF BEGIN
-				SET line_phrase = 21020120 // ~Immunité aux sorts~
+				SET line_phrase = 21020120 // ~Immunité contre les sorts~
 			END
 			ELSE BEGIN
 				SET levels_top = 0
@@ -67,7 +67,7 @@ DEFINE_PATCH_MACRO ad_op_102_lines BEGIN
 					SET levels_top += 1
 				END
 				LPF ad_tra INT_VAR tra_id = 8010000 + levels_top tra_block_start = 8010001 tra_block_size = 9 RET spellLevel = text END // ~5ème~ (@8010005)
-				SET line_phrase = 21020110 // ~Immunité aux sorts de %spellLevel% niveau et inférieurs~
+				SET line_phrase = 21020110 // ~Immunité contre les sorts de %spellLevel% niveau et inférieurs~
 			END
 			LPM ad_effect_line
 		END

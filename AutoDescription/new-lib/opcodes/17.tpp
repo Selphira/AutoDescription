@@ -2,8 +2,8 @@
 // 2 pourcentage ; mot de poids fort : bit 0 rend la vie, bit 1 retire les effets (ancien
 // opcode_17_common, qui le signale sans le décrire). Valeur : dés et parameter1 (ad_dice_text) ;
 // positive, « Restaure 5 points de vie au porteur » ; négative, « Inflige 3 points de dégâts à la
-// cible » ; valeur fixée, « Points de vie actuels : Passe à +5 », à toutes les formes « soi » et
-// « cible ».
+// cible » ; valeur fixée, « Points de vie actuels : Passe à +5 » à la forme « soi », « Porte à 5 les
+// points de vie actuels de la cible » aux autres formes.
 
 DEFINE_PATCH_MACRO ad_op_17_support BEGIN
 	PHP_EACH fx_ids_17 AS _ => hp_id BEGIN
@@ -24,10 +24,6 @@ DEFINE_PATCH_MACRO ad_op_17_support BEGIN
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (hp_subtype BAND BIT0) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode17:raise_dead~ message = ~healing that also raises the dead~ RET render_missing = refusal END
 			END
-			// Valeur fixée probable : l'ancien moteur écrit « les points de vie actuels : … ».
-			ELSE PATCH_IF hp_type == 1 AND $fx_probability(~%hp_id%~) < 100 BEGIN
-				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode17:probable_set~ message = ~probable healing to a set value~ RET render_missing = refusal END
-			END
 		END
 	END
 END
@@ -41,10 +37,18 @@ DEFINE_PATCH_MACRO ad_op_17_lines BEGIN
 			LPF ad_dice_text INT_VAR dice_count = $fx_dice_count(~%hp_id%~) dice_sides = $fx_dice_sides(~%hp_id%~)
 				bonus = $fx_parameter1(~%hp_id%~) RET value = text END
 			SET line_fx = hp_id
-			PATCH_IF hp_type == 1 BEGIN
+			LPM ad_application_form
+			PATCH_IF hp_type == 1 AND line_form == 0 BEGIN
 				SPRINT name @20170000 // ~Points de vie actuels~
 				SPRINT value @1200002 // ~Passe à %value%~
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
+			END
+			ELSE PATCH_IF hp_type == 1 BEGIN
+				SPRINT theStatistic @20170007 // ~les points de vie actuels~
+				SET stat_value = $fx_parameter1(~%hp_id%~)
+				SET stat_mode = MOD_TYPE_flat
+				SET stat_percent = 0
+				LPM ad_stat_modifier_phrase
 			END
 			ELSE BEGIN
 				LPM ad_op_17_phrase

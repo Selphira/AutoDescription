@@ -97,7 +97,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 					LPM ad_immunity_label
 					PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
 						SPRINT opcodeStr ~%immunity_label%~
-						SET line_phrase = 21010100 // ~Immunité %opcodeStr%~ (+1 : ~Immunise %theTarget% %opcodeStr%~)
+						SET line_phrase = 21010100 // ~Immunité contre %opcodeStr%~ (+1 : ~Immunise %theTarget% %opcodeStr%~)
 						SET line_fx = immunity_id
 						LPM ad_effect_line
 					END
@@ -129,7 +129,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 			END
 			PATCH_IF immunity_label_count > 0 BEGIN
 				LPF ad_join STR_VAR array_name = ~immunity_labels~ RET opcodeStr = text END
-				SET line_phrase = 21010100 // ~Immunité %opcodeStr%~
+				SET line_phrase = 21010100 // ~Immunité contre %opcodeStr%~
 				SET line_fx = immunity_first
 				LPM ad_effect_line
 			END

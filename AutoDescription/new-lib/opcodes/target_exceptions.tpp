@@ -120,7 +120,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 			LPM ad_target_exception_add_name
 		END
 		ELSE PATCH_IF exception_tra > 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 23241000 tra_block_size = 1000 RET exception_name = text END // ~créatures immunisées aux poisons~ (@23241077)
+			LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 23241000 tra_block_size = 1000 RET exception_name = text END // ~créatures insensibles aux poisons~ (@23241077)
 			LPM ad_target_exception_add_name
 		END
 		ELSE BEGIN
@@ -185,7 +185,7 @@ END
 // exception nommée. Probabilité de chaque exception : la sienne, ou, pour un effet probable dont la
 // plage recouvre la sienne, 100 % si une borne est commune, sinon la part de la plage commune dans
 // celle de l'effet. Exceptions groupées par probabilité décroissante, « à 91 % » devant une
-// probabilité partielle ; « Effectif… » (conditions, puis types de créatures), puis
+// probabilité partielle ; « Efficace… » (conditions, puis types de créatures), puis
 // « Inefficace… » (types de créatures, plages horaires, conditions), séparés par un point.
 DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	SPRINT app_exceptions_text ~~
@@ -306,7 +306,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	LPF ad_join STR_VAR array_name = ~exc_conditions~ glue = ~, ~ final_glue = ~, ~ RET creaturesList = text END
 	SPRINT exc_effective ~~
 	PATCH_IF NOT (~%creaturesList%~ STRING_EQUAL ~~) BEGIN
-		SPRINT exc_effective @23240001 // ~Effectif %creaturesList%~
+		SPRINT exc_effective @23240001 // ~Efficace %creaturesList%~
 	END
 	CLEAR_ARRAY exc_conditions
 	LPF ad_join STR_VAR array_name = ~exc_not_effective_all~ glue = EVAL ~, %exc_the% ~ final_glue = EVAL ~ %exc_not_effective_and% ~ RET exc_text = text END

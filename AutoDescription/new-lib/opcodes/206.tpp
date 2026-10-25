@@ -122,7 +122,7 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SET spell_group_id = $spell_group(~%spell_id%~)
 			SPRINT spellName $spell_name(~%spell_id%~)
 			PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND (spell_group_id < 0 OR $spell_group_size(~%spell_group_id%~) < 2) BEGIN
-				SET line_phrase = 22060100 // ~Immunité au sort « %spellName% »~
+				SET line_phrase = 22060100 // ~Immunité contre le sort « %spellName% »~
 				SET line_fx = spell_id
 				LPM ad_effect_line
 			END
@@ -147,7 +147,7 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SPRINT spell_glue @1000005 // ~ », « ~
 			SPRINT spell_final_glue @1000006 // ~ » %and% « ~
 			LPF ad_join STR_VAR array_name = ~spell_group_names~ glue = ~%spell_glue%~ final_glue = ~%spell_final_glue%~ RET spellNames = text END
-			SET line_phrase = 30100100 // ~Immunité aux sorts « %spellNames% »~
+			SET line_phrase = 30100100 // ~Immunité contre les sorts « %spellNames% »~
 			SET line_fx = spell_first
 			LPM ad_effect_line
 		END
