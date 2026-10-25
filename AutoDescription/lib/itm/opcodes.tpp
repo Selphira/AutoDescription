@@ -7300,7 +7300,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_135_common~ BEGIN
 	PATCH_IF ~%resref%~ STRING_EQUAL ~~ BEGIN
 		SET ignoreDuration = 1
-		SET strref += 2 // ~%theTarget% retrouve sa forme naturelle~
+		SET strref += 2 // ~Rend sa forme naturelle à %theTarget%~
 	END
 	ELSE BEGIN
 		SET strref += parameter2 == 0 ? 0 : 1 // transformation / déguisement

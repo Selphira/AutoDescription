@@ -2923,8 +2923,7 @@
 
 @11350011 = ~Métamorphose %theTarget% en %creatureName%~//// Métamorphose %theTarget% en %creatureName%
 @11350012 = ~Déguise %theTarget% en %creatureName%~// Donne à %theTarget% l'apparence de %creatureName%
-// TODO: trouver une formulation qui ne place pas %theTarget% en début de ligne
-@11350013 = ~%theTarget% retrouve sa forme naturelle~// Métamorphose %theTarget% dans sa forme naturelle
+@11350013 = ~Rend sa forme naturelle à %theTarget%~// Métamorphose %theTarget% dans sa forme naturelle
 
 @11350021 = ~de se métamorphoser en %creatureName%~ // de se métamorphoser en %creatureName%
 @11350022 = ~de se déguiser en %creatureName%~// de prendre l'apparence de %creatureName%
