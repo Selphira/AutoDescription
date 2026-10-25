@@ -54,12 +54,12 @@ OHPRGD10	identical
 OHRRAGE	identical
 OHTMPS1	not_covered	not_implemented:spell:progression_mode
 OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode18
-OHTYR1	not_covered	not_implemented:opcode324:stat
+OHTYR1	identical
 OHTYR2	identical
 SENSPIHE	identical
 SENSPISU	identical
 SPBLUN29	identical
-SPCL102	not_covered	not_implemented:opcode318:stat
+SPCL102	identical
 SPCL103	not_covered	not_implemented:spell:progression_opcode278
 SPCL104	identical
 SPCL106	identical
@@ -127,7 +127,7 @@ SPCL916	identical
 SPCL917	identical
 SPCL918	identical
 SPCL919	identical
-SPCL920	not_covered	not_implemented:recursion:opcode318:resource
+SPCL920	not_covered	not_implemented:recursion:opcode318:exceptions_group
 SPCL921	identical
 SPCL922	identical
 SPCL923	identical
@@ -149,7 +149,7 @@ SPDM102	identical
 SPDM103	identical
 SPDM105	identical
 SPDM106	identical
-SPDM108	not_covered	not_implemented:opcode318:stat
+SPDM108	identical
 SPDR101	identical
 SPDR201	identical
 SPDR301	identical
@@ -162,9 +162,9 @@ SPIN001	identical
 SPIN101	identical
 SPIN102	identical
 SPIN103	identical
-SPIN104	not_covered	not_implemented:opcode318:stat
+SPIN104	identical
 SPIN105	identical
-SPIN106	not_covered	not_implemented:opcode318:stat
+SPIN106	identical
 SPIN107	identical
 SPIN108	identical
 SPIN109	identical
@@ -207,7 +207,7 @@ SPIN538	identical
 SPIN542	identical
 SPIN543	identical
 SPIN544	identical
-SPIN545	not_covered	not_implemented:opcode318:stat
+SPIN545	identical
 SPIN546	identical
 SPIN547	identical
 SPIN560	identical
@@ -322,7 +322,7 @@ SPIN936	identical
 SPIN938	identical
 SPIN939	identical
 SPIN941	identical
-SPIN944	not_covered	not_implemented:opcode324:resource
+SPIN944	identical
 SPIN956	identical
 SPIN958	identical
 SPIN974	identical
@@ -411,8 +411,8 @@ SPPR511	identical
 SPPR512	identical
 SPPR513	not_covered	not_implemented:spell:progression_opcode44
 SPPR514	identical
-SPPR515	not_covered	not_implemented:opcode318:resource
-SPPR515D	not_covered	not_implemented:opcode318:stat
+SPPR515	not_covered	not_implemented:recursion:versus_mixed
+SPPR515D	identical
 SPPR516	identical
 SPPR517	identical
 SPPR550	identical
@@ -425,7 +425,7 @@ SPPR605	identical
 SPPR606	identical
 SPPR607	identical
 SPPR608	identical
-SPPR609	not_covered	not_implemented:opcode318:stat
+SPPR609	identical
 SPPR610	identical
 SPPR611	identical
 SPPR612	identical
@@ -506,7 +506,7 @@ SPWI115	identical
 SPWI116	identical
 SPWI117	identical
 SPWI118	identical
-SPWI119	not_covered	not_implemented:opcode318:stat
+SPWI119	identical
 SPWI120	identical
 SPWI123	identical
 SPWI124	identical
@@ -548,7 +548,7 @@ SPWI310	identical
 SPWI311	identical
 SPWI312	identical
 SPWI313	identical
-SPWI314	not_covered	not_implemented:opcode318:stat
+SPWI314	identical
 SPWI315	not_covered	not_implemented:opcode145:ability
 SPWI316	identical
 SPWI317	identical
@@ -619,7 +619,7 @@ SPWI519	identical
 SPWI520	identical
 SPWI521	identical
 SPWI522	identical
-SPWI523	not_covered	not_implemented:opcode318:resource
+SPWI523	not_covered	not_implemented:recursion:level_sections
 SPWI601	identical
 SPWI602	identical
 SPWI603	not_covered	not_implemented:opcode145:ability
@@ -716,8 +716,8 @@ SPWI943	identical
 SPWI955	identical
 SPWI956	identical
 SPWI958	identical
-SPWI959	not_covered	not_implemented:opcode324:resource
-SPWI960	not_covered	not_implemented:opcode318:resource
+SPWI959	identical
+SPWI960	identical
 SPWI979	identical
 SPWI982	not_covered	file_error:opcode67:missing_creature
 SPWI994	identical
@@ -749,8 +749,8 @@ SPWISH38	identical
 SPWISH39	identical
 SPWISH40	identical
 SPWISH46	identical
-SPWM101	not_covered	not_implemented:opcode318:resource
-SPWM101D	not_covered	not_implemented:opcode318:stat
+SPWM101	identical
+SPWM101D	identical
 SPWM111	identical
 SPWM113	identical
 SPWM114	identical

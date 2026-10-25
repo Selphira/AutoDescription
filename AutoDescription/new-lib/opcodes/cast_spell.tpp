@@ -51,7 +51,7 @@ END
 
 // Sort cast_id décrit par ses effets (ancien opcode_146_get_spell_effects_description,
 // ad_recursion_support) : niveau de lancement parameter1, aucun pour un sort lancé instantanément
-// (parameter2 1) ; cible héritée pour l'opcode 146 ; lancé après un délai, sous une condition
+// (parameter2 1) par un objet (ancien isItem) ; cible héritée pour l'opcode 146 ; lancé après un délai, sous une condition
 // (ad_cast_spell_delayed_condition) ; répété (série), la durée des sous-lignes réécrite
 // (ad_cast_spell_series_text). Effet probable d'un sort : sa probabilité passe aux sous-effets, dont
 // les lignes sont regroupées par probabilité (ancien baseProbability) ; l'ancien moteur décrit
@@ -59,7 +59,7 @@ END
 DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SET recursion_fx = cast_id
 	SPRINT recursion_resref ~%cast_resref%~
-	SET recursion_casting_level = $fx_parameter2(~%cast_id%~) == 1 ? 0 : $fx_parameter1(~%cast_id%~)
+	SET recursion_casting_level = ($fx_parameter2(~%cast_id%~) == 1 AND NOT resource_is_spell) ? 0 : $fx_parameter1(~%cast_id%~)
 	PATCH_IF cast_opcode == 146 BEGIN
 		SPRINT recursion_targets ~effect~
 	END

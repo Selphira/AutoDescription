@@ -654,8 +654,11 @@ DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 END
 
 // Chaînes de cible theTarget, ofTheTarget et toTheTarget remplacées par la zone du sous-sort
-// (ad_recursion_area) ; chacune est construite à partir des trois chaînes d'origine.
+// (ad_recursion_area) ; chacune est construite à partir des trois chaînes d'origine. range et angle
+// sont rétablis : la phrase de l'effet peut avoir les siens (opcode 235 : « à %range% du lanceur »).
 DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
+	SPRINT area_saved_range ~%range%~
+	SPRINT area_saved_angle ~%angle%~
 	SPRINT range ~%ctx_area_range%~
 	SET angle = ctx_area_angle
 	SPRINT $area_main(~0~) ~%theTarget%~
@@ -671,6 +674,8 @@ DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 	SPRINT theTarget   $area_text(~0~)
 	SPRINT ofTheTarget $area_text(~1~)
 	SPRINT toTheTarget $area_text(~2~)
+	SPRINT range ~%area_saved_range%~
+	SPRINT angle ~%area_saved_angle%~
 END
 
 // Passes du moteur sur les effets du sous-sort, puis texte de ses lignes. L'en-tête du sous-sort

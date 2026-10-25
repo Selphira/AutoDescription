@@ -15,6 +15,7 @@
 DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
 	SET $fx_exception(~%fx_id%~) = 0
+	SET $fx_exception_name_count(~%fx_id%~) = 0
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
 	PATCH_IF (exception_opcode == 318 OR exception_opcode == 324) AND NOT $fx_external(~%fx_id%~) BEGIN
 		SPRINT exception_resource $fx_resource(~%fx_id%~)
@@ -32,9 +33,11 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 END
 
 // Effets exception_opcode qui ne sont pas déjà écartés : écartés, avec les noms de leur exception.
-// Refus : effet d'un EFF ; 318 d'un jeu classique (Set Stat de ToBEx, pas une protection) ; autre
-// ressource (l'ancien moteur en fait une immunité au sort ou à l'objet, ou des exceptions des
-// effets de cette ressource).
+// Sur une autre ressource, avec une condition (parameter2), l'ancien moteur n'écrit rien
+// (opcode_common_324) et garde l'effet pour l'en-tête d'un sort ; il écarte un 324 de durée limitée
+// nulle (opcode_324_is_valid). Refus : effet d'un EFF ; 318 d'un jeu classique (Set Stat de ToBEx,
+// pas une protection) ; autre ressource sans condition (l'ancien moteur en fait une immunité au sort
+// ou à l'objet).
 DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => exception_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%exception_id%~) BEGIN
@@ -46,7 +49,24 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode318:classic~ message = ~opcode 318 on classic games~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~) BEGIN
-				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
+				SET exception_stat = $fx_parameter2_raw(~%exception_id%~)
+				PATCH_IF exception_opcode == 324 AND $fx_timing(~%exception_id%~) == TIMING_duration AND $fx_duration(~%exception_id%~) <= 0 BEGIN
+					SET drop_id = exception_id
+					SPRINT ignored_reason ~file_error:opcode324:no_duration~
+					SPRINT ignored_message ~immunity to %exception_resource% for a limited duration of 0 seconds~
+					LPM ad_application_drop
+				END
+				ELSE PATCH_IF exception_stat != 0 BEGIN
+					PATCH_IF NOT support_header_only BEGIN
+						SET ignored_fx = exception_id
+						SPRINT ignored_reason ~not_implemented:opcode%exception_opcode%:resource_condition~
+						SPRINT ignored_message ~protection from %exception_resource% under condition %exception_stat%, which the old engine does not write~
+						LPM ad_log_ignored
+					END
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
+				END
 			END
 			ELSE BEGIN
 				LPM ad_target_exception_names
@@ -62,7 +82,8 @@ END
 // splprot.2da, dans l'ordre de l'ancien moteur : valeur parameter1 d'un fichier IDS (102-109
 // inefficace, 112-118 effectif) ; état de sort (76 et 110 inefficace, 111 effectif ; 121, Manteau,
 // ignoré comme dans l'ancien moteur) ; état (138 inefficace, 139 effectif) ; sinon la table, où
-// « chapitre 6 » (136) est la pénurie de fer. Refus : type de créature, état ou état de sort sans
+// « chapitre 6 » (136) est la pénurie de fer ; le lanceur (43) n'est pas nommé, l'ancien moteur
+// l'écartant de sa liste (opcode_324_target_exceptions). Refus : type de créature, état ou état de sort sans
 // nom ; ligne des EE au-delà de 145 (l'ancien moteur reprend la condition de l'opcode 326) ou
 // absente de la table (l'ancien moteur n'écrit rien).
 DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
@@ -106,6 +127,9 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 			SPRINT exception_name @23240006 // ~créatures %descriptionState%~
 		END
 		LPM ad_target_exception_add_name
+	END
+	ELSE PATCH_IF exception_stat == 43 BEGIN
+		SPRINT exception_kind ~NOT_EFFECTIVE~
 	END
 	ELSE PATCH_IF IS_EE AND exception_stat > 145 BEGIN
 		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:condition~ message = ~condition %exception_stat% (above 145) not supported~ RET render_missing = refusal END
@@ -359,7 +383,19 @@ DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 		END
 		ELSE PATCH_IF $fx_consumed(~%exception_id%~) AND NOT $fx_dropped(~%exception_id%~) AND NOT $fx_level_merged(~%exception_id%~)
 				AND exception_count > 0 AND NOT $fx_exception(~%exception_id%~) BEGIN
-			LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_group~ message = ~grouped effect with exceptions~ RET render_late_missing = refusal END
+			// Une exception sans nom (le lanceur, ligne 43) n'écrit rien : seules les autres comptent.
+			SET exception_named = 0
+			SET exception_position = $fx_position(~%exception_id%~)
+			FOR (exception_other = 0; exception_other < fx_count; ++exception_other) BEGIN
+				SPRINT exception_other_scope $fx_scope(~%exception_other%~)
+				PATCH_IF $fx_exception(~%exception_other%~) AND (~%exception_other_scope%~ STRING_EQUAL ~%exception_scope%~)
+						AND $fx_position(~%exception_other%~) < exception_position AND $fx_exception_name_count(~%exception_other%~) > 0 BEGIN
+					SET exception_named = 1
+				END
+			END
+			PATCH_IF exception_named BEGIN
+				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:exceptions_group~ message = ~grouped effect with exceptions~ RET render_late_missing = refusal END
+			END
 		END
 	END
 END
