@@ -6979,35 +6979,52 @@ DEFINE_PATCH_MACRO ~opcode_127_group~ BEGIN
 	LOCAL_SET grouped = 0
 	LOCAL_SET amountMin = 0
 	LOCAL_SET amountMax = 0
-	LOCAL_SET totalProbability = 0
 
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		CLEAR_ARRAY positions
 		SET grouped = 0
-		SET totalProbability = probability
 		LPF ~get_creatures_amount~ INT_VAR totalLevel = parameter1 multiplier = custom_int STR_VAR file = $opcode_127_files(~%parameter2%~) RET amount amountMin amountMax END
 		PATCH_IF special == 0 AND ~%resref%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
 			SET $positions(~%position%~) = 1
 			SET $positions_already_check(~%position%~) = 1
+			SET $groupAmountMin(~%position%~) = amountMin
+			SET $groupAmountMax(~%position%~) = amountMax
+			SET $groupHigh(~%position%~) = (probability1 > 99 OR probability1 < 0) ? 99 : probability1
+			SET $groupLow(~%position%~) = probability2
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 				LPM ~data_to_match_vars~
 				PATCH_IF NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
 					LPM ~opcode_match_opcode_127_group~
 					PATCH_IF match == 1 BEGIN
 						LPF ~get_creatures_amount~ INT_VAR totalLevel = match_parameter1 multiplier = match_custom_int STR_VAR file = $opcode_127_files(~%match_parameter2%~) RET matchAmountMin = amountMin matchAmountMax = amountMax END
-						PATCH_IF matchAmountMin < amountMin BEGIN
-							SET amountMin = matchAmountMin
-						END
-						PATCH_IF matchAmountMax > amountMax BEGIN
-	                        SET amountMax = matchAmountMax
-	                    END
+						SET $groupAmountMin(~%match_position%~) = matchAmountMin
+						SET $groupAmountMax(~%match_position%~) = matchAmountMax
+						SET $groupHigh(~%match_position%~) = (match_probability1 > 99 OR match_probability1 < 0) ? 99 : match_probability1
+						SET $groupLow(~%match_position%~) = match_probability2
 						SET $positions(~%match_position%~) = 1
 						SET $positions_already_check(~%match_position%~) = 1
 						SET grouped = 1
-						SET totalProbability += match_probability
 					END
 				END
+			END
+		END
+		// Le jeu tire un seul nombre de 0 à 99 pour les effets d'une capacité : les invocations dont la
+		// plage le contient s'additionnent (61 % de chances d'une invocation, 39 % de deux : entre 1 et 8).
+		PATCH_IF grouped == 1 BEGIN
+			SET amountMin = 0 - 1
+			SET amountMax = 0
+			FOR (roll = 0; roll < 100; ++roll) BEGIN
+				SET rollMin = 0
+				SET rollMax = 0
+				PATCH_PHP_EACH positions AS rollPosition => _ BEGIN
+					PATCH_IF roll <= $groupHigh(~%rollPosition%~) AND roll >= $groupLow(~%rollPosition%~) BEGIN
+						SET rollMin += $groupAmountMin(~%rollPosition%~)
+						SET rollMax += $groupAmountMax(~%rollPosition%~)
+					END
+				END
+				SET amountMin = (amountMin < 0 OR rollMin < amountMin) ? rollMin : amountMin
+				SET amountMax = rollMax > amountMax ? rollMax : amountMax
 			END
 		END
 		PATCH_IF grouped == 1 BEGIN
@@ -7022,9 +7039,6 @@ DEFINE_PATCH_MACRO ~opcode_127_group~ BEGIN
 			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
 			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
 	            CLEAR_ARRAY ~opcodes_%opcode%~
-	        END
-	        PATCH_IF totalProbability < 100 BEGIN
-	            SET amountMin = 0
 	        END
 			SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
 			SET probability = 100
