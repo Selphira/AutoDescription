@@ -2529,7 +2529,8 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 
 	// TODO parameter == 1 : Efficace que si les points de vie actuels >= 100 / Valeur ou si #P4 != 0
 	// Compliqué de faire une phrase simple
-	PATCH_IF (type == 0 AND (parameter1 != 0 OR p4IsActive)) OR
+	// Le multiplicateur (parameter4) est ignoré par le type 0 et n'allonge que l'intervalle des types 2 à 4.
+	PATCH_IF (type == 0 AND parameter1 != 0) OR
 			 (type == 1 AND (parameter1 > 1 OR p4IsActive)) BEGIN
 		SET amount = 1
 	END
@@ -2547,13 +2548,6 @@ DEFINE_PATCH_MACRO ~opcode_25_common~ BEGIN
 
 	PATCH_IF p4IsActive AND type >= 2 BEGIN
 		SET frequency = frequency * parameter4
-		// P4 divise également les dégâts si P2 == 2, avec un minimum à 1
-		PATCH_IF type == 2 BEGIN
-			SET amount = amount / parameter4
-			PATCH_IF amount < 1 BEGIN
-				SET amount = 1
-			END
-		END
 	END
 	PATCH_IF frequency < 1 BEGIN
 		SET frequency = 1
