@@ -1914,7 +1914,7 @@ DEFINE_PATCH_MACRO ~opcode_target_16~ BEGIN
 	PATCH_IF parameter2 == 1 BEGIN
 		SET strref = 10160008 // ~Lance Hâte améliorée sur %theTarget%~
 	END
-	PATCH_IF parameter2 == 2 BEGIN
+	ELSE PATCH_IF parameter2 == 2 BEGIN
 		SET strref = 10160009 // ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~
 	END
 	ELSE BEGIN
@@ -9731,7 +9731,7 @@ DEFINE_PATCH_MACRO ~opcode_self_191~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_191~ BEGIN
-	LOCAL_SET strref = 11910001 // ~Niveau de lanceur de sorts profanes~
+	LOCAL_SET strref = 11910003 // ~le niveau de lanceur de sorts profanes~
 
 	LPM ~opcode_191_common~
 	LPF ~opcode_probability~ INT_VAR strref RET description END

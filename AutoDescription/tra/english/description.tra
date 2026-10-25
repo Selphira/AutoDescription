@@ -1781,6 +1781,7 @@
 @10000102 = ~%value% penalty~
 @10000103 = ~to grant a bonus of %value% to the armour class %ofTheTarget%~
 @10000104 = ~to inflict a penalty of %value% to the armour class %ofTheTarget%~
+@10000105 = ~to set the base armour class %ofTheTarget% to %value%~
 
 // Opcode 1: Stat: Attacks Per Round Modifier [1]
 
@@ -4198,7 +4199,7 @@
 @13320000 = ~Damage~
 @13320001 = ~Fire Damage~
 @13320002 = ~Cold Damage~
-@13320003 = ~Elextricity Damage~
+@13320003 = ~Electricity Damage~
 @13320004 = ~Acid Damage~
 @13320005 = ~Magic Damage~
 @13320006 = ~Poison Damage~
@@ -4206,6 +4207,21 @@
 @13320008 = ~Piercing Damage~
 @13320009 = ~Crushing Damage~
 @13320010 = ~Missile Damage~
+@13320011 = ~Elemental Damage~
+@13320012 = ~Physical Damage~
+@13320100 = ~the damage~
+@13320101 = ~the fire damage~
+@13320102 = ~the cold damage~
+@13320103 = ~the electricity damage~
+@13320104 = ~the acid damage~
+@13320105 = ~the magic damage~
+@13320106 = ~the poison damage~
+@13320107 = ~the slashing damage~
+@13320108 = ~the piercing damage~
+@13320109 = ~the crushing damage~
+@13320110 = ~the missile damage~
+@13320111 = ~the elemental damage~
+@13320112 = ~the physical damage~
 
 // Opcode 333: Spell Effect: Static Charge [333]
 
@@ -4358,7 +4374,7 @@
 // Fake Opcode 518: Immunité aux sorts
 
 @15180001 = ~Protects from %spellNames% spells~
-@15180002 = ~Protecs %theTarget% from %spellNames% spells~
+@15180002 = ~Protects %theTarget% from %spellNames% spells~
 @15180003 = ~to protect %theTarget% from %spellNames% spells~
 
 // Fake Opcode 519: Arme brisée
