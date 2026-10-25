@@ -738,7 +738,8 @@ BEGIN
 		ELSE BEGIN
 			PATCH_IF delta_level != 0 BEGIN
 				SET levelMax = prev_level
-				SET remains_value = ABS prev_value - (ABS delta_value * level / delta_level)
+				// Reste au niveau du dernier changement : un dernier en-tête à la même valeur ne le change pas.
+				SET remains_value = ABS prev_value - (ABS delta_value * prev_level / delta_level)
 				LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
 				PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
 					SET base_value = prev_level + last_value
