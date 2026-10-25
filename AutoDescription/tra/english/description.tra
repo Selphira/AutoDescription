@@ -2735,7 +2735,7 @@
 
 @11350011 = ~Transform %theTarget% into %creatureName%~
 @11350012 = ~Disguise %theTarget% into %creatureName%~
-@11350013 = ~%theTarget% returns to her natural form~
+@11350013 = ~Restores %theTarget% to its natural form~
 
 @11350021 = ~to transform into %creatureName%~
 @11350022 = ~to disguise into %creatureName%~
