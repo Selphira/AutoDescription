@@ -282,10 +282,13 @@ DEFINE_PATCH_MACRO ad_fx_substitution_support BEGIN
 END
 
 // Un effet qui vise un type de créature et qu'un regroupement autre que celui des effets identiques
-// a consommé perdrait ce type : refusé. Un effet écarté sans rien écrire (fx_dropped) n'en perd aucun.
+// a consommé perdrait ce type : refusé. Un effet écarté sans rien écrire (fx_dropped) n'en perd aucun ;
+// celui d'un en-tête que l'effet égal d'un autre niveau représente (fx_level_merged,
+// new-lib/spell_levels.tpp) non plus : l'ancien moteur ne compare pas non plus leur type de créature.
 DEFINE_PATCH_MACRO ad_op_177_lines BEGIN
 	FOR (substitute_id = 0; substitute_id < fx_count; ++substitute_id) BEGIN
 		PATCH_IF $fx_versus_file(~%substitute_id%~) > 0 AND $fx_consumed(~%substitute_id%~) AND NOT $fx_dropped(~%substitute_id%~)
+				AND NOT $fx_level_merged(~%substitute_id%~)
 				AND $fx_identical_anchor(~%substitute_id%~) == substitute_id BEGIN
 			LPF ad_refusal INT_VAR fx_id = substitute_id STR_VAR reason = ~not_implemented:opcode177:versus_group~ message = ~effect with a creature type grouped with other effects~ RET render_late_missing = refusal END
 		END

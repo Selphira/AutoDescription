@@ -491,8 +491,10 @@ END
 // dont sa cible, son timing et sa durée ; avec ctx_parent_dice, les dés de l'effet parent quand ceux
 // de l'opcode donnent des niveaux (ancien get_res_description_248, règle du 177,
 // new-lib/opcodes/177.tpp). C'est un effet externe (fx_external) : ni exception de cible ni 321 sur la
-// ressource elle-même. Refus : autre format ; opcode que l'ancien moteur décrit autrement pour un effet
-// d'un EFF (AD_OPCODES_EFF_FIELDS) ; niveaux minimum et maximum de l'EFF.
+// ressource elle-même. Sa restriction de niveau est celle de l'EFF (niveaux minimum et maximum, que
+// l'ancien add_target_level lit sur le dernier EFF lu, celui-ci), à la place des dés, sauf pour un
+// opcode dont les dés n'en donnent pas (fx_eff_levels). Refus : autre format ; opcode que l'ancien
+// moteur décrit autrement pour un effet d'un EFF (AD_OPCODES_EFF_FIELDS).
 DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 	SPRINT sub_signature ~~
 	PATCH_IF BUFFER_LENGTH >= 0x110 BEGIN
@@ -551,15 +553,17 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 			END
 		END
 		LPM ad_fx_add_effect
+		PATCH_IF $fx_level_restricted(~0~) BEGIN
+			SET $fx_level_min(~0~) = sub_level_min
+			SET $fx_level_max(~0~) = sub_level_max
+			SET $fx_eff_levels(~0~) = 1
+		END
 		SET sub_opcode = $fx_opcode(~0~)
 		SET eff_fields_opcode = sub_opcode
 		SET eff_fields_parameter2 = $fx_parameter2_raw(~0~)
 		LPM ad_eff_fields_differ
 		PATCH_IF eff_fields_differ BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:eff_fields~ message = ~opcode %sub_opcode% of an EFF file, which the old engine describes differently~ RET sub_missing = refusal END
-		END
-		ELSE PATCH_IF sub_level_min != 0 OR sub_level_max != 0 BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:eff_level~ message = ~EFF file with a level restriction~ RET sub_missing = refusal END
 		END
 	END
 END

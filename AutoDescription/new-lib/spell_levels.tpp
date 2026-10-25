@@ -525,10 +525,28 @@ END
 // level_value_text de sa valeur (mode level_mode) et level_duration_text de sa durée, et les autres
 // sont écartés. Refus : level_a n'est
 // pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
-// opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout.
+// opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout ;
+// progression d'un opcode dont le premier en-tête a des effets du fichier et d'un EFF (177 : l'ancien
+// moteur ordonne autrement les lignes, SPCL236), ou progression de la valeur d'un opcode dont il a
+// plusieurs effets d'un EFF (l'ancien moteur en tire une autre formule, SPPR313).
 DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	SET level_id = $level_id(~%level_a%~)
 	SET level_opcode = $level_opcode(~%level_a%~)
+	SET level_ext_count = 0
+	SET level_plain_count = 0
+	FOR (level_ext_k = 0; level_ext_k < $spell_fx_count(~0~); ++level_ext_k) BEGIN
+		SPRINT level_ext_a ~0 %level_ext_k%~
+		PATCH_IF $level_opcode(~%level_ext_a%~) == level_opcode BEGIN
+			SET level_ext_id = $level_id(~%level_ext_a%~)
+			PATCH_IF $fx_external(~%level_ext_id%~) BEGIN
+				SET level_ext_count += 1
+			END
+			ELSE BEGIN
+				SET level_plain_count += 1
+			END
+		END
+	END
+	SET level_external = level_ext_count > 0 AND (level_plain_count > 0 OR (level_ext_count > 1 AND NOT (~%level_value_text%~ STRING_EQUAL ~~)))
 	PATCH_IF NOT search_self BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_other_effect~ message = ~effect of the first ability merged with another effect of its opcode~ RET render_late_missing = refusal END
 	END
@@ -537,6 +555,9 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	END
 	ELSE PATCH_IF NOT (~%level_value_text%~ STRING_EQUAL ~~) AND level_mode != MOD_TYPE_cumulative BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_mode~ message = ~value varying with the level in mode %level_mode%~ RET render_late_missing = refusal END
+	END
+	ELSE PATCH_IF level_external BEGIN
+		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_external~ message = ~progression of opcode %level_opcode% with effects from an EFF file mixed with others in the first ability~ RET render_late_missing = refusal END
 	END
 	ELSE BEGIN
 		SET $level_emitted(~%level_a%~) = 1
@@ -796,6 +817,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 				ELSE BEGIN
 					SET level_id = $level_id(~%level_a%~)
 					SET $fx_consumed(~%level_id%~) = 1
+					SET $fx_level_merged(~%level_id%~) = 1
 				END
 			END
 		END

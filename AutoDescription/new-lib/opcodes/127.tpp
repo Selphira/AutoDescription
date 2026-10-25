@@ -5,44 +5,51 @@
 // créature (ancien get_creatures_amount) : le total divisé par son niveau de puissance, arrondi
 // au-dessus, au moins 1, au plus la limite des invocations (ligne NORMAL de SUMMLIMT.2DA, 5 sans
 // elle) ; la ligne donne le plus petit et le plus grand de la table, multipliés par le nombre
-// d'effets identiques (fx_identical_count, avec AD_ENABLE_SHRINKAGE).
+// d'effets identiques (fx_identical_count, avec AD_ENABLE_SHRINKAGE). Avec une table resource,
+// l'ancien moteur écrit le total de niveaux et les créatures nommées de la table : « Invoque des
+// créatures pour un total de 50 niveaux (Lion, Loup des glaces, Ours des cavernes ou Ours de
+// montagne) ». Un effet d'un fichier EFF ne diffère que pour un special non nul (dés de l'EFF).
 
-// Refus : table de la ressource ou special non nul (niveau du lanceur) ; parameter2 hors de 0-9,
+// Comme l'ancien opcode_127_is_valid, un effet dont la table resource est absente (avec un special
+// non nul, la table vide l'est toujours) est écarté.
+// Refus : special non nul (niveau du lanceur, nombre de créatures) ; parameter2 hors de 0-9,
 // parameter1 négatif ; table absente ou sans créature, ou dont aucune n'a de nom ; créature de niveau
 // de puissance nul, hors des invocations ordinaires (allégeance au plus 15 sauf familier, genre
 // invoqué : l'ancien moteur en compte 0, ou applique aux célestes la limite ordinaire), dont l'ancien
 // arrondi diffère de l'arrondi au-dessus (BUG-033) ou dont le nom contient une virgule (l'ancien
 // moteur y coupe la liste) ; avec AD_ENABLE_SHRINKAGE, invocations du même bloc qui ne diffèrent que
 // par parameter1 ou leur probabilité (l'ancien opcode_127_group en écrit le nombre « entre 0 et N »).
-// Pour l'en-tête d'un sort seul, seuls comptent l'ancien opcode_127_is_valid, qui écarte l'effet
-// d'une table resource absente, et ces regroupements (ad_op_127_header_group).
+// Pour l'en-tête d'un sort seul, seuls comptent cet écart et les regroupements
+// (ad_op_127_header_group).
 DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
 			SET monster_custom = $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~)
-			PATCH_IF support_header_only BEGIN
-				PATCH_IF monster_custom AND NOT FILE_EXISTS_IN_GAME ~%monster_resref%.2da~ BEGIN
-					SET drop_id = monster_id
-					SPRINT ignored_reason ~file_error:opcode127:no_table~
-					SPRINT ignored_message ~table %monster_resref%.2DA does not exist~
-					LPM ad_application_drop
-				END
-				ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND NOT monster_custom AND NOT $fx_consumed(~%monster_id%~) BEGIN
+			SET $fx_monster_resource_table(~%monster_id%~) = 0
+			PATCH_IF monster_custom AND NOT FILE_EXISTS_IN_GAME ~%monster_resref%.2da~ BEGIN
+				SET drop_id = monster_id
+				SPRINT ignored_reason ~file_error:opcode127:no_table~
+				SPRINT ignored_message ~table %monster_resref%.2DA does not exist~
+				LPM ad_application_drop
+			END
+			ELSE PATCH_IF support_header_only BEGIN
+				PATCH_IF AD_ENABLE_SHRINKAGE AND NOT monster_custom AND NOT $fx_consumed(~%monster_id%~) BEGIN
 					LPM ad_op_127_header_group
 				END
 			END
-			ELSE PATCH_IF $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~) OR monster_table < 0 OR monster_table > 9 BEGIN
-				PATCH_IF (monster_table < 0 OR monster_table > 9) AND $fx_special(~%monster_id%~) == 0 AND ~%monster_resref%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:table~ message = ~monster table %monster_table% (expected 0-9)~ RET render_missing = refusal END
-				END
-				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:table~ message = ~custom table or special value not supported~ RET render_missing = refusal END
-				END
+			ELSE PATCH_IF $fx_special(~%monster_id%~) != 0 BEGIN
+				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:special~ message = ~special value (caster level or number of creatures) not supported~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF NOT monster_custom AND (monster_table < 0 OR monster_table > 9) BEGIN
+				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:table~ message = ~monster table %monster_table% (expected 0-9)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_parameter1(~%monster_id%~) < 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:level~ message = ~negative total level~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF monster_custom BEGIN
+				LPM ad_op_127_resource_table
 			END
 			ELSE BEGIN
 				LPM ad_op_127_table
@@ -104,6 +111,34 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
 	SET $fx_monster_min(~%monster_id%~) = monster_min
 	SET $fx_monster_max(~%monster_id%~) = monster_max
+END
+
+// Créatures nommées de la table resource de l'effet monster_id (ancien get_creatures_names), sans
+// leur nombre (fx_monster_creatures).
+DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
+	CLEAR_ARRAY monster_names
+	INNER_PATCH_FILE ~%monster_resref%.2da~ BEGIN
+		COUNT_2DA_ROWS 2 monster_rows
+		FOR (monster_row = 1; monster_row < monster_rows; ++monster_row) BEGIN
+			READ_2DA_ENTRY monster_row 1 2 monster_creature
+			PATCH_IF FILE_EXISTS_IN_GAME ~%monster_creature%.cre~ BEGIN
+				LPF ad_creature_info STR_VAR resref = ~%monster_creature%~ RET monster_name = name END
+				PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
+					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:name~ message = ~creature name with a comma~ RET render_missing = refusal END
+				END
+				ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
+					SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
+				END
+			END
+		END
+	END
+	SPRINT monster_or @1000007 // ~ou~
+	LPF ad_join STR_VAR array_name = ~monster_names~ final_glue = EVAL ~ %monster_or% ~ RET monster_creatures = text END
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:no_creature~ message = ~no named creature in table %monster_resref%.2DA~ RET render_missing = refusal END
+	END
+	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
+	SET $fx_monster_resource_table(~%monster_id%~) = 1
 END
 
 // Créature monster_resref (ligne monster_row) de la table.
@@ -179,8 +214,10 @@ DEFINE_PATCH_MACRO ad_op_127_similar_support BEGIN
 END
 
 // Phrase : 21 270 100 + 10 × variante + forme ; variante = 0 un monstre, 1 un animal, 2 plusieurs
-// monstres, 3 plusieurs animaux, + 4 hostiles. Un effet identique à d'autres est écrit après les
-// autres effets 127 (fx_late), comme celui que l'ancien moteur ajoute en fin de liste.
+// monstres, 3 plusieurs animaux, + 4 hostiles ; 21 270 180 + forme pour une table resource. Un effet
+// identique à d'autres est écrit après les autres effets 127 (fx_late), comme celui que l'ancien
+// moteur ajoute en fin de liste. Refus (render_late_missing) : invocations identiques d'une table
+// resource, que l'ancien opcode_127_group ne réunit pas.
 DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~127~)
@@ -188,18 +225,27 @@ DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 		PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%monster_id%~) AND $fx_late(~%monster_id%~) == monster_late BEGIN
 				SET monster_copies = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%monster_id%~) : 1
-				SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
-				SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies
-				PATCH_IF amountMin == amountMax BEGIN
-					SET amount = amountMax
+				PATCH_IF $fx_monster_resource_table(~%monster_id%~) BEGIN
+					PATCH_IF monster_copies > 1 BEGIN
+						LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:resource_identical~ message = ~identical summonings from a custom table~ RET render_late_missing = refusal END
+					END
+					SET amount = $fx_parameter1(~%monster_id%~)
+					SET line_phrase = 21270180 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
 				END
 				ELSE BEGIN
-					SPRINT amount @21270000 // ~entre %amountMin% et %amountMax%~
+					SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
+					SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies
+					PATCH_IF amountMin == amountMax BEGIN
+						SET amount = amountMax
+					END
+					ELSE BEGIN
+						SPRINT amount @21270000 // ~entre %amountMin% et %amountMax%~
+					END
+					SET monster_table = $fx_parameter2(~%monster_id%~)
+					SET monster_variant = (amountMax == 1 ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
+					SET line_phrase = 21270100 + 10 * monster_variant // ~Invoque 1 monstre (%creatures%)~
 				END
 				SPRINT creatures $fx_monster_creatures(~%monster_id%~)
-				SET monster_table = $fx_parameter2(~%monster_id%~)
-				SET monster_variant = (amountMax == 1 ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
-				SET line_phrase = 21270100 + 10 * monster_variant // ~Invoque 1 monstre (%creatures%)~
 				SET line_fx = monster_id
 				LPM ad_effect_line
 			END

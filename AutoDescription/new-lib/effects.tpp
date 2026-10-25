@@ -281,6 +281,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	LPM ad_fx_normalize
 	SET $fx_consumed(~%fx_id%~) = 0
 	SET $fx_dropped(~%fx_id%~) = 0
+	SET $fx_level_merged(~%fx_id%~) = 0
 	SET $fx_header_target(~%fx_id%~) = 0
 	SET $fx_header_target_count(~%fx_id%~) = 0
 	SET $fx_header_projectile(~%fx_id%~) = 0

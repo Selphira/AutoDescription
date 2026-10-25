@@ -97,8 +97,10 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	ELSE PATCH_IF ~%fx_dice_usage%~ STRING_EQUAL ~DICE_IF_P2_1_EE~ BEGIN
 		SET fx_level_restriction = NOT (IS_EE AND $fx_parameter2(~%fx_id%~) == 1)
 	END
+	SET $fx_level_restricted(~%fx_id%~) = fx_level_restriction
 	SET $fx_level_max(~%fx_id%~) = fx_level_restriction ? $fx_dice_count(~%fx_id%~) : 0
 	SET $fx_level_min(~%fx_id%~) = fx_level_restriction ? $fx_dice_sides(~%fx_id%~) : 0
+	SET $fx_eff_levels(~%fx_id%~) = 0
 
 	// L'effet d'équipement d'un objet touche toujours le porteur : sa cible est sans objet.
 	SET $fx_effective_target(~%fx_id%~) = $fx_target(~%fx_id%~)

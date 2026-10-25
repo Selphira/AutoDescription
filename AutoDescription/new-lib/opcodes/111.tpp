@@ -5,6 +5,8 @@
 // décrite par l'opcode 135 : opcode, puissance, paramètres, ressource, dés et special de l'effet de
 // l'arme ; cible, timing, durée, probabilités, jet de sauvegarde et résistance du 111. L'effet
 // remplacé n'est pas externe (l'ancien moteur garde isExternal du 111) ; fx_from_111 le distingue.
+// Un 111 d'un fichier EFF (177) n'est jamais remplacé : l'ancien opcode_111_replace parcourt les 111
+// avant que opcode_177_replace ne l'ajoute, sauf s'il en trouve déjà un dans la ressource.
 
 // Remplace l'effet fx_id (opcode 111) par la métamorphose de son arme, ou laisse la raison du refus
 // dans fx_substitution_error : plusieurs métamorphoses (l'ancien moteur ajoute un effet par
@@ -56,7 +58,8 @@ DEFINE_PATCH_MACRO ad_fx_substitute_111 BEGIN
 	END
 END
 
-// Refus : effet d'un EFF ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; ressource vide
+// Refus : effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
+// selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; ressource vide
 // (l'ancien opcode_111_is_valid l'écarte) ; arme sans nom (l'ancien moteur n'écrit rien) ; retrait
 // différé de la même arme (112) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
 // opcode_112_group) ; sans, l'ancien moteur n'écrit pas la ligne du 111 (SPWM113, cause à établir).
@@ -66,8 +69,14 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 			SPRINT weapon_resref $fx_resource(~%weapon_id%~)
 			SPRINT weapon_error $fx_substitution_error(~%weapon_id%~)
 			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name END
+			SET weapon_mixed = 0
 			PATCH_IF $fx_external(~%weapon_id%~) BEGIN
-				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
+				PHP_EACH fx_ids_111 AS _ => weapon_other BEGIN
+					SET weapon_mixed = weapon_mixed OR NOT $fx_external(~%weapon_other%~)
+				END
+			END
+			PATCH_IF weapon_mixed BEGIN
+				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:external~ message = ~effect from an EFF file with another opcode 111 in the resource~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT (~%weapon_error%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:%weapon_error%~ message = ~weapon %weapon_resref%.ITM with several polymorph effects~ RET render_missing = refusal END

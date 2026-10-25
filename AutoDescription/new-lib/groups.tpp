@@ -630,7 +630,8 @@ END
 
 // Emprisonnement (ancien opcode_211_group) : le changement de sexe en créature emprisonnée qui
 // l'accompagne (opcode 71 de parameter1 66 et parameter2 1) n'est pas écrit ; l'ancien moteur le
-// retire de la liste des effets de l'en-tête, quels que soient ses autres champs.
+// retire de la liste des effets de l'en-tête, quels que soient ses autres champs (fx_dropped : il ne
+// perd pas le type de créature d'un 177).
 DEFINE_PATCH_MACRO ad_group_imprisonment BEGIN
 	PHP_EACH fx_ids_211 AS _ => group_id BEGIN
 		SPRINT group_scope $fx_scope(~%group_id%~)
@@ -638,6 +639,7 @@ DEFINE_PATCH_MACRO ad_group_imprisonment BEGIN
 			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 			PATCH_IF (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_parameter1(~%group_candidate%~) == 66 AND $fx_parameter2(~%group_candidate%~) == 1 BEGIN
 				SET $fx_consumed(~%group_candidate%~) = 1
+				SET $fx_dropped(~%group_candidate%~) = 1
 			END
 		END
 	END

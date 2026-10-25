@@ -2426,7 +2426,7 @@
 @21260122 = ~to restore %theTarget%'s movement rate~ // reprise de @11260023
 @21260123 = ~to restore %theTarget%'s movement rate~ // reprise de @11260023
 
-// Opcode 127 : Invocation de monstres : 0000 nombre « entre », phrases 0100 + 10 × variante (0 un monstre, 1 un animal, 2 plusieurs monstres, 3 plusieurs animaux, + 4 hostiles) (21 270 000-21 270 999)
+// Opcode 127 : Invocation de monstres : 0000 nombre « entre », phrases 0100 + 10 × variante (0 un monstre, 1 un animal, 2 plusieurs monstres, 3 plusieurs animaux, + 4 hostiles), 0180 table de la ressource (21 270 000-21 270 999)
 @21270000 = ~between %amountMin% and %amountMax%~ // reprise de @101130
 @21270100 = ~Summon 1 monster (%creatures%)~ // reprise de @11270005
 @21270101 = ~Summon 1 monster (%creatures%)~ // reprise de @11270005
@@ -2460,6 +2460,10 @@
 @21270171 = ~Summon %amount% hostiles animals (%creatures%)~ // reprise de @11270016
 @21270172 = ~to summon %amount% hostiles animals (%creatures%)~ // reprise de @11270036
 @21270173 = ~to summon %amount% hostiles animals (%creatures%)~ // reprise de @11270036
+@21270180 = ~Summon creatures for a total of %amount% levels (%creatures%)~ // reprise de @11270017
+@21270181 = ~Summon creatures for a total of %amount% levels (%creatures%)~ // reprise de @11270017
+@21270182 = ~to summon creatures for a total of %amount% levels (%creatures%)~ // reprise de @11270037
+@21270183 = ~to summon creatures for a total of %amount% levels (%creatures%)~ // reprise de @11270037
 
 // Opcode 128 : Confusion (21 280 000-21 280 999)
 @21280100 = ~Confusion~ // reprise de @11280001

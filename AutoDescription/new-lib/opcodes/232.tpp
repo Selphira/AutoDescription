@@ -7,8 +7,9 @@
 // écrivent même sous une zone de projectile (ctx_versus) ;
 // un sort nommé dont les effets donnent plusieurs lignes est cité par son nom.
 
-// Refus : effet d'un EFF (l'ancien moteur y lit aussi resource2 et resource3), sauf pour l'en-tête
-// d'un sort seul, qui ne dépend ni de la condition ni du sous-sort ; valeurs que l'ancien
+// Refus : effet d'un EFF dont resource2 ou resource3 est rempli (l'ancien moteur y lance aussi ces
+// sorts), sauf pour l'en-tête d'un sort seul, qui ne dépend ni de la condition ni du sous-sort ;
+// valeurs que l'ancien
 // opcode_232_is_valid écarte (cible hors de 0-3, condition hors de 0-21, ou de 0-11 sur un jeu
 // classique, moment de la journée sur une autre cible que le porteur, condition 10 sans special,
 // ressource vide, ainsi que resource2 et resource3 pour un effet d'un EFF) ; effet d'un sous-sort
@@ -24,13 +25,15 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			SPRINT condition_resref $fx_resource_lower(~%condition_id%~)
 			SET condition_external = $fx_external(~%condition_id%~)
 			SET condition_no_resource = ~%condition_resref%~ STRING_EQUAL ~~
-			PATCH_IF condition_external AND condition_no_resource BEGIN
+			SET condition_other_spells = 0
+			PATCH_IF condition_external BEGIN
 				SPRINT condition_resref2 $fx_resource2(~%condition_id%~)
 				SPRINT condition_resref3 $fx_resource3(~%condition_id%~)
-				SET condition_no_resource = ~%condition_resref2%~ STRING_EQUAL ~~ AND ~%condition_resref3%~ STRING_EQUAL ~~
+				SET condition_other_spells = NOT (~%condition_resref2%~ STRING_EQUAL ~~ AND ~%condition_resref3%~ STRING_EQUAL ~~)
+				SET condition_no_resource = condition_no_resource AND NOT condition_other_spells
 			END
-			PATCH_IF condition_external AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
+			PATCH_IF condition_other_spells AND NOT support_header_only BEGIN
+				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:eff_spells~ message = ~spells in resource2 or resource3 of an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF condition_target < 0 OR condition_target > 3 OR condition_type < 0 OR condition_type > (IS_EE ? 21 : 11)
 					OR (condition_type == 13 AND condition_target != 0) OR (condition_type == 10 AND condition_special == 0)

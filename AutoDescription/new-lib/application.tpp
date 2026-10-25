@@ -164,11 +164,12 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:probability_empty~ message = ~empty probability range (probability2 above probability1): the effect never occurs~ RET render_missing = refusal END
 	END
-	// Restriction de niveau d'un effet d'un EFF (l'ancien moteur y prend celle du parent) ou sans
-	// effet (minimum au-dessus du maximum, erreur journalisée par l'ancien moteur).
-	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND ($fx_external(~%app_id%~)
+	// Restriction de niveau d'un effet remplacé par celui d'un EFF (177 : l'ancien moteur prend celle
+	// du dernier EFF lu, pas forcément le sien) ou sans effet (minimum au-dessus du maximum, erreur
+	// journalisée par l'ancien moteur).
+	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND (($fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~))
 			OR ($fx_level_max(~%app_id%~) > 0 AND $fx_level_min(~%app_id%~) > $fx_level_max(~%app_id%~))) BEGIN
-		PATCH_IF $fx_external(~%app_id%~) BEGIN
+		PATCH_IF $fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:level~ message = ~level restriction of an effect from an EFF file not supported~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
