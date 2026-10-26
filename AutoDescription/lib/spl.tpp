@@ -151,8 +151,24 @@ BEGIN
 		LPF ~appendSection~ INT_VAR strref = 100003 RET description END // ~PARAMÈTRES~
         LPF ~appendLine~ RET description END
 
-		LPF ~add_casting_features~ STR_VAR description RET description END
-		LPF ~get_spell_effects_description~ INT_VAR ignoreDuration STR_VAR description RET description END
+		LPF ~add_casting_features~ STR_VAR description RET description castingLines = countLines END
+		PATCH_IF castingLines > 0 BEGIN
+			// Sous les effets de lancement, ceux des en-têtes ont leur titre.
+			LPF ~get_spell_effects_description~ INT_VAR ignoreDuration RET effectsDescription = description END
+			PATCH_IF NOT ~%effectsDescription%~ STRING_EQUAL ~~ BEGIN
+				LPF ~count_description_lines~ STR_VAR text = ~%effectsDescription%~ RET effectsLines = countLines END
+				PATCH_IF effectsLines > 1 BEGIN
+					LPF ~appendSection~ INT_VAR strref = 100023 RET description END // ~Capacités du sort~
+				END
+				ELSE BEGIN
+					LPF ~appendSection~ INT_VAR strref = 100017 RET description END // ~Capacité du sort~
+				END
+				SPRINT description ~%description%%effectsDescription%~
+			END
+		END
+		ELSE BEGIN
+			LPF ~get_spell_effects_description~ INT_VAR ignoreDuration STR_VAR description RET description END
+		END
 	END
 
 	INNER_PATCH_SAVE description ~%description%~ BEGIN

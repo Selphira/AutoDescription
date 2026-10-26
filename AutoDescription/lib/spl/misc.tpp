@@ -104,7 +104,7 @@ DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
 
 	PATCH_IF IS_AN_INT ~%currentRange%~ BEGIN
 		LPF ~feets_to_meters~ INT_VAR range = currentRange RET range currentRange = rangeToMeter END
-		PATCH_IF range < 2 BEGIN
+		PATCH_IF range < 11 BEGIN
 			SPRINT currentRange @100034 // ~Contact~
 		END
 	END
@@ -530,6 +530,7 @@ DEFINE_PATCH_FUNCTION ~get_complex_value~
 		is_percent = 0
 		is_flat_value = 0
 		dice_sides = 0
+		no_two_values = 0
 	STR_VAR
 		array_name = ~~
 	RET
@@ -670,7 +671,10 @@ BEGIN
 		END
 	END
 
-	PATCH_IF cpt == 2 BEGIN
+	PATCH_IF cpt == 2 AND no_two_values BEGIN
+		SET is_valid = 0
+	END
+	ELSE PATCH_IF cpt == 2 BEGIN
 		SET cpt = 0
 		SET delta_value = 0
 		SET delta_level = 0
@@ -892,6 +896,7 @@ DEFINE_PATCH_FUNCTION ~get_target_by_projectile~
 		projectile = 0
 		target = 0
 		targetNumber = 0
+		sourceExcluded = 0
 	STR_VAR
 		theTarget = ~~
 		ofTheTarget = ~~
@@ -980,7 +985,30 @@ BEGIN
 							LPF ~add_log_warning~ STR_VAR message = EVAL ~Cible à gerer : %target% ~ END
 						END
 					END
-					PATCH_IF strref > 0 BEGIN
+					// Cible principale qui est la source, dont l'effet l'excepte (sourceExcluded, ligne 43 de
+					// splprot.2da) : seules les créatures de la zone (SPWM101 : « Repousse les créatures dans un
+					// rayon de 2,5 mètres… », et non « le lanceur et les créatures »).
+					PATCH_IF strref == 102803 AND sourceExcluded AND VARIABLE_IS_SET theSource BEGIN
+						PATCH_IF ~%theTarget%~ STRING_EQUAL ~%theSource%~ BEGIN
+							SET strref = 102800 // ~%target% dans un rayon de %range%~
+						END
+					END
+					// Cible nommée par un type de créature (opcode_set_target_strings) : la zone la restreint
+					// (SPPR515 : « les morts-vivants dans un rayon de 2,5 mètres »).
+					SET versusNamed = VARIABLE_IS_SET onlyForTheTarget
+					PATCH_IF versusNamed BEGIN
+						SET versusNamed = NOT ~%onlyForTheTarget%~ STRING_EQUAL ~~ AND ~%onlyForTheTarget%~ STRING_EQUAL ~%theTarget%~
+					END
+					PATCH_IF strref > 0 AND versusNamed AND NOT isConeShape BEGIN
+						SET strref = 102800 // ~%target% dans un rayon de %range%~
+						SPRINT target ~%theTarget%~
+						SPRINT theTarget (AT strref)
+						SPRINT target ~%toTheTarget%~
+						SPRINT toTheTarget (AT strref)
+						SPRINT target ~%ofTheTarget%~
+						SPRINT ofTheTarget (AT strref)
+					END
+					ELSE PATCH_IF strref > 0 BEGIN
 						SET strrefTarget = 102700 + targetOffset
 						SPRINT target (AT strrefTarget)
 						SPRINT main_target ~%theTarget%~
@@ -995,10 +1023,60 @@ BEGIN
 						SPRINT target (AT strrefTarget)
 						SPRINT main_target ~%ofTheTarget%~
                         SPRINT ofTheTarget (AT strref)
+
 					END
                 END
             END
         END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~spell_area_within_distance~
+	INT_VAR
+		distance = 0
+	STR_VAR
+		file = ~~
+	RET
+		withinDistance
+BEGIN
+	SET withinDistance = 0
+	PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+		INNER_PATCH_FILE ~%file%.spl~ BEGIN
+			READ_LONG  SPL_extended_headers_offset areaHeaderOffset
+			READ_SHORT SPL_extended_headers_count  areaHeaderCount
+			READ_LONG  SPL_feature_blocks_offset   areaEffectsOffset
+			SET withinDistance = areaHeaderCount > 0
+			FOR (areaHeader = 0; areaHeader < areaHeaderCount AND withinDistance; ++areaHeader) BEGIN
+				SET offset = areaHeaderOffset + 0x28 * areaHeader
+				READ_SHORT (offset + SPL_HEAD_projectile)            areaProjectile
+				READ_SHORT (offset + SPL_HEAD_feature_blocks_count)  areaEffectCount
+				READ_SHORT (offset + SPL_HEAD_feature_blocks_offset) areaEffectIndex
+				// Un effet sur la cible de l'en-tête (le porteur du 232) ne dépend pas de la zone.
+				SET withinDistance = areaEffectCount > 0
+				FOR (areaEffect = 0; areaEffect < areaEffectCount; ++areaEffect) BEGIN
+					READ_BYTE (areaEffectsOffset + 0x30 * (areaEffectIndex + areaEffect) + FX_target) areaEffectTarget
+					PATCH_IF areaEffectTarget != 2 BEGIN
+						SET withinDistance = 0
+					END
+				END
+				SET areaRadius = 0
+				PATCH_IF withinDistance AND areaProjectile > 1 BEGIN
+					LOOKUP_IDS_SYMBOL_OF_INT areaProjectileFile ~projectl~ (areaProjectile - 1)
+					PATCH_IF NOT IS_AN_INT areaProjectileFile AND FILE_EXISTS_IN_GAME ~%areaProjectileFile%.pro~ BEGIN
+						INNER_PATCH_FILE ~%areaProjectileFile%.pro~ BEGIN
+							READ_SHORT 0x8 areaType
+							PATCH_IF areaType == 3 AND BUFFER_LENGTH >= 0x226 BEGIN
+								READ_LONG  0x200 areaFlags
+								READ_SHORT 0x206 areaRadius
+								// Même conversion que get_target_by_projectile.
+								SET areaRadius = (areaFlags BAND BIT11) == BIT11 ? 0 : areaRadius / 17
+							END
+						END
+					END
+				END
+				SET withinDistance = withinDistance AND areaRadius > 0 AND areaRadius <= distance
+			END
+		END
 	END
 END
 

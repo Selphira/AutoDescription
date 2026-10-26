@@ -7,7 +7,11 @@
 @100013 = ~Melee~
 @100014 = ~Thrown~
 @100015 = ~Charge ability~
+@100016 = ~Casting ability~
+@100017 = ~Spell ability~
 @100018 = ~in use~
+@100022 = ~Casting abilities~
+@100023 = ~Spell abilities~
 @101032 = ~Requires~
 @101070 = ~Usable By~
 @101071 = ~Not Usable By~
@@ -2804,9 +2808,11 @@
 
 @11450000 = ~Disables %theTarget% to cast %spellType% spells~
 @11450001 = ~Disables %theTarget% to cast spells~
+@11450002 = ~Disables %theTarget% to cast spells affected by dead magic zones and wild surges~
 
 @11450050 = ~to disable %theTarget% to cast %spellType% spells~
 @11450051 = ~to disable %theTarget% to cast spells~
+@11450052 = ~to disable %theTarget% to cast spells affected by dead magic zones and wild surges~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
@@ -3275,7 +3281,7 @@
 @12320021 = ~When the wearer takes damage~
 @12320022 = ~When the wearer kills the target~
 @12320023 = ~~ // Cas particulier, moment de la journée
-@12320024 = ~When the target is less than %range%~
+@12320024 = ~When a creature is within %range%~
 @12320025 = ~When %theTarget% is %state%~
 @12320026 = ~When the wearer dies~
 @12320027 = ~When a creature dies~
@@ -4050,6 +4056,7 @@
 @13241501 = ~Ineffective %targetCondition%~
 @13241502 = ~against %creaturesList%~
 @13241503 = ~at %probability%% ~
+@13241999 = ~creatures other than the caster~
 
 @13242000 = ~if proficiency in %proficiency% is greater than or equal to %value%~
 @13242001 = ~if proficiency in %proficiency% is equal to %value%~

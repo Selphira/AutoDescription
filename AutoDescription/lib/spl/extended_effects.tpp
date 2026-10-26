@@ -13,10 +13,10 @@ BEGIN
 	SET projectileTarget = 0
 	SET projectileTargetNumber = 0
 
-	PATCH_IF isSubSpell AND VARIABLE_IS_SET $level_projectiles(~%levelIndex%~) BEGIN
-		SET projectile = $level_projectiles(~%levelIndex%~)
-		SET projectileTarget = $level_targets(~%levelIndex%~)
-		SET projectileTargetNumber = $level_target_numbers(~%levelIndex%~)
+	PATCH_IF isSubSpell AND VARIABLE_IS_SET $level_projectiles(~%projectileLevelIndex%~) BEGIN
+		SET projectile = $level_projectiles(~%projectileLevelIndex%~)
+		SET projectileTarget = $level_targets(~%projectileLevelIndex%~)
+		SET projectileTargetNumber = $level_target_numbers(~%projectileLevelIndex%~)
 	END
 
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
@@ -49,6 +49,32 @@ BEGIN
 END
 
 
+/*
+ * Effets de l'en-tête headerOffset (comme load_extended_effects). Un effet dont l'index tombe dans le
+ * bloc de lancement n'est pas relu avec l'en-tête (OHBWI302, OHBWI304 : index de l'en-tête 0 qui
+ * chevauche ce bloc) : add_casting_features le décrit.
+ */
+DEFINE_PATCH_MACRO ~load_spell_header_effects~ BEGIN
+	SET cumulable = 1
+	SET position = 0
+	SPRINT target_exceptions ~~
+
+	LPM ~clear_opcodes~
+
+	READ_LONG  SPL_feature_blocks_offset         spellEffectsOffset
+	READ_SHORT SPL_casting_feature_blocks_offset castingIndex
+	READ_SHORT SPL_casting_feature_blocks_count  castingCount
+	READ_SHORT (headerOffset + SPL_HEAD_feature_blocks_count)  headerEffectCount
+	READ_SHORT (headerOffset + SPL_HEAD_feature_blocks_offset) headerEffectIndex
+	FOR (headerEffect = 0; headerEffect < headerEffectCount; ++headerEffect) BEGIN
+		SET effectIndex = headerEffectIndex + headerEffect
+		PATCH_IF effectIndex < castingIndex OR effectIndex >= castingIndex + castingCount BEGIN
+			SET offset = spellEffectsOffset + 0x30 * effectIndex
+			LPM ~load_effect~
+		END
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~load_leveled_extended_effects~
 	INT_VAR
 		headerOffset = 0
@@ -67,7 +93,7 @@ BEGIN
     PATCH_DEFINE_ASSOCIATIVE_ARRAY leveled_opcodes BEGIN END
     PATCH_DEFINE_ASSOCIATIVE_ARRAY opcodes BEGIN END
 
-	PATCH_TIME ~step:load_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~load_extended_effects~ END
+	PATCH_TIME ~step:load_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~load_spell_header_effects~ END
 	PATCH_TIME ~step:replace_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~replace_effects~ END
 	PATCH_TIME ~step:filter_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~filter_effects~ END
 	PATCH_TIME ~step:group_effects:item=%isItem%:subspell=%isSubSpell%~ BEGIN LPM ~group_effects~ END
@@ -234,7 +260,7 @@ BEGIN
 	// 272 : [272] Active un effet (boucle)
 	// 326 :
 	// 341 : Semble que ce soit toujours la cible de l'attaque
-	SET forceTarget = (opcode == 146 OR (opcode == 232 AND parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR opcode == 326) ? 1 : 0
+	SET forceTarget = (opcode == 146 OR (opcode == 232 AND ((parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR parameter1 == 0)) OR opcode == 326) ? 1 : 0
 	SET totalLines = 0
 	SET depthOfEffect = recursivity
 	SPRINT strDuration ~~
@@ -501,6 +527,7 @@ BEGIN
 		END
 	END
 
+	SET projectileLevelIndex = 0
 	LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 	SET totalLines += countLines
 
@@ -521,6 +548,14 @@ BEGIN
 			END
 		END
 
+		// En-tête du premier niveau de la section.
+		SET sectionMinLevel = ((levelIndex - (levelIndex MODULO 100)) / 100) - 100
+		SET projectileLevelIndex = 0
+		PATCH_PHP_EACH level_effects AS headerIndex => headerLevel BEGIN
+			PATCH_IF headerLevel == sectionMinLevel BEGIN
+				SET projectileLevelIndex = headerIndex
+			END
+		END
 		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
 
@@ -557,14 +592,26 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 	LOCAL_SET inAllLevel = 1
 
 	// On commence par traiter tous les effets identiques qui se trouvent dans tous les niveaux du sort
-	CLEAR_ARRAY positions
+	SPRINT resetPositionsArray ~positions~
+	LPM ~reset_level_positions~
 	SET requiredLevel = $level_effects(~0~)
 	PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 		LPM ~data_to_vars~
 		SET inAllLevel = 1
-		CLEAR_ARRAY tmpPositions
+		SPRINT resetPositionsArray ~tmpPositions~
+		LPM ~reset_level_positions~
 		PATCH_PHP_EACH level_effects AS _ => matchRequiredLevel BEGIN
 			PATCH_IF inAllLevel == 1 AND requiredLevel < matchRequiredLevel BEGIN
+				// Un niveau sans cet opcode n'a pas l'effet : il n'est pas commun à tous les niveaux.
+				SET levelHasOpcode = 0
+				PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
+					PATCH_IF matchOpcode == opcode BEGIN
+						SET levelHasOpcode = 1
+					END
+				END
+				PATCH_IF NOT levelHasOpcode BEGIN
+					SET inAllLevel = 0
+				END
 				PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
 					PATCH_IF matchOpcode == opcode AND inAllLevel == 1 BEGIN
 						LPM ~data_to_match_vars~
@@ -612,7 +659,8 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 		END
 	END
 
-	CLEAR_ARRAY positions
+	SPRINT resetPositionsArray ~positions~
+	LPM ~reset_level_positions~
 
 	// On traite ensuite les effets qui diffèrent selon le niveau
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
@@ -628,7 +676,7 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 							PATCH_PHP_EACH ~leveled_opcodes_%matchRequiredLevel%~ AS data => matchOpcode BEGIN
 								PATCH_IF loop2 == 1 AND matchOpcode >= 0 BEGIN
 							        LPM ~data_to_match_vars~
-									PATCH_IF matchOpcode == opcode AND NOT VARIABLE_IS_SET $positions(~%matchRequiredLevel%-%match_position%~) BEGIN
+									PATCH_IF matchOpcode == opcode AND NOT $positions(~%matchRequiredLevel%-%match_position%~) BEGIN
 										SPRINT dispatch_spell_level_match ~opcode_%opcode%_spell_level_match~
 										PATCH_TRY LPM ~%dispatch_spell_level_match%~ WITH DEFAULT
 											PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
@@ -668,7 +716,16 @@ DEFINE_PATCH_MACRO ~group_identical_spell_effects_between_level~ BEGIN
 		END
 	END
 
-	CLEAR_ARRAY positions
+	SPRINT resetPositionsArray ~positions~
+	LPM ~reset_level_positions~
+END
+
+DEFINE_PATCH_MACRO ~reset_level_positions~ BEGIN
+	PATCH_PHP_EACH level_effects AS _ => resetLevel BEGIN
+		PATCH_PHP_EACH ~leveled_opcodes_%resetLevel%~ AS resetData => _ BEGIN
+			SET $EVAL ~%resetPositionsArray%~(~%resetLevel%-%resetData_0%~) = 0
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~group_spell_effects_by_duration~ BEGIN
@@ -826,6 +883,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
 								is_flat_value = mode == MOD_TYPE_flat ? 1 : 0
+								no_two_values = opcode == 12 OR opcode == 17
 							STR_VAR
 								array_name = ~all_effects~
 							RET
@@ -899,6 +957,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						INT_VAR
 							is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
 							dice_sides = diceSides
+							no_two_values = 1
 						STR_VAR
 							array_name = ~all_effects~
 						RET
@@ -966,6 +1025,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
 								dice_sides = diceSides
+								no_two_values = 1
 							STR_VAR
 								array_name = ~all_effects~
 							RET
@@ -976,6 +1036,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 						LPF ~get_complex_value~
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
+								no_two_values = 1
 							STR_VAR
 								array_name = ~p1All_effects~
 							RET

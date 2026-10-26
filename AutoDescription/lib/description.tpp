@@ -13,6 +13,21 @@ BEGIN
 	END
 END
 
+/*
+ * Nombre de lignes de premier niveau (« - » en début de ligne) du texte text.
+ */
+DEFINE_PATCH_FUNCTION ~count_description_lines~
+	STR_VAR
+		text = ~~
+	RET
+		countLines
+BEGIN
+	SET countLines = 0
+	INNER_PATCH ~%text%~ BEGIN
+		COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ countLines
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~add_items_section_to_description~
 	STR_VAR
 		arrayName = ~~

@@ -7,7 +7,11 @@
 @100013 = ~au corps à corps~
 @100014 = ~à distance~
 @100015 = ~Capacité de charge~
+@100016 = ~Capacité d'incantation~
+@100017 = ~Capacité du sort~
 @100018 = ~à l'utilisation~
+@100022 = ~Capacités d'incantation~
+@100023 = ~Capacités du sort~
 @101032 = ~Nécessite~
 @101070 = ~Utilisable par~
 @101071 = ~Non utilisable par~
@@ -2992,9 +2996,11 @@
 
 @11450000 = ~Empêche %theTarget% de lancer des sorts %spellType%~
 @11450001 = ~Empêche %theTarget% de lancer des sorts~
+@11450002 = ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
 
 @11450050 = ~d'empêcher %theTarget% de lancer des sorts %spellType%~
 @11450051 = ~d'empêcher %theTarget% de lancer des sorts~
+@11450052 = ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
 
 // Opcode 146: Spell: Cast Spell (at Creature) [146]
 
@@ -3475,7 +3481,7 @@
 @12320021 = ~Lorsque le porteur subit des dégâts~
 @12320022 = ~Lorsque le porteur tue la cible~
 @12320023 = ~~ // Cas particulier, moment de la journée
-@12320024 = ~Lorsque la cible se trouve à moins de %range%~
+@12320024 = ~Lorsqu'une créature se trouve à moins de %range%~
 @12320025 = ~Lorsque %theTarget% est %state%~
 @12320026 = ~Lorsque le porteur meurt~
 @12320027 = ~Lorsqu'une créature meurt~
@@ -3981,7 +3987,7 @@
 @13240041 = ~Inefficace contre les créatures du même alignement que le porteur~
 @13240042 = ~Inefficace contre les créatures d'un alignement différent du porteur~
 @13240043 = ~Inefficace contre le porteur~
-@13240044 = ~Inefficace contre les créatures autre que le porteur~
+@13240044 = ~Inefficace contre les créatures autres que le porteur~
 @13240045 = ~Inefficace contre les githyankis~
 @13240046 = ~Efficace contre les githyankis~
 @13240047 = ~Inefficace contre les golems, les morts-vivants et les myconides~
@@ -4112,7 +4118,7 @@
 @13240541 = ~d'être inefficace contre les créatures du même alignement que le porteur~
 @13240542 = ~d'être inefficace contre les créatures d'un alignement différent du porteur~
 @13240543 = ~d'être inefficace contre le porteur~
-@13240544 = ~d'être inefficace contre les créatures autre que le porteur~
+@13240544 = ~d'être inefficace contre les créatures autres que le porteur~
 @13240545 = ~d'être inefficace contre les githyankis~
 @13240546 = ~d'être efficace contre les githyankis~
 @13240547 = ~d'être inefficace contre les golems, les morts-vivants et les myconides~
@@ -4211,7 +4217,7 @@
 @13241038 = ~créatures neutres ou bonnes~
 @13241041 = ~créatures du même alignement que le porteur~
 @13241042 = ~créatures d'un alignement différent du porteur~
-@13241044 = ~créatures autre que le porteur~
+@13241044 = ~créatures autres que le porteur~
 @13241053 = ~créatures insensibles au feu ou au froid~
 @13241054 = ~créatures sensibles au feu ou au froid~
 @13241057 = ~créatures masculines~
@@ -4259,6 +4265,7 @@
 @13241501 = ~Inefficace %targetCondition%~
 @13241502 = ~contre les %creaturesList%~
 @13241503 = ~à %probability% % ~
+@13241999 = ~créatures autres que le lanceur~
 
 @13242000 = ~si la compétence %proficiency% est supérieure ou égale à %value%~
 @13242001 = ~si la compétence %proficiency% est égale à %value%~
