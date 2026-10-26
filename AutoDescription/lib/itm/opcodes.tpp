@@ -12387,6 +12387,9 @@ DEFINE_PATCH_FUNCTION ~get_res_description_248~ INT_VAR resetTarget = 0 STR_VAR 
 		SET diceCount248 = diceCount // levelMax
 
 		LPM ~read_external_effect_vars~
+		// L'EFF s'applique à la créature touchée (IESDP, opcodes 248 et 249) : sa propre cible ne sert pas,
+		// et une cible invalide (-1 dans ARCHHIT.EFF) écartait l'effet.
+		SET target = TARGET_FX_preset
 
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET isValid = 1
