@@ -10927,7 +10927,7 @@ END
  * ----------------------------------------- */
 // AC
 DEFINE_PATCH_MACRO ~opcode_self_219000~ BEGIN
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	LPM ~opcode_219_versus~
 
 	SPRINT value ~+2 %versus%~
 	SPRINT name @10000099      // ~Classe d'armure~
@@ -10935,7 +10935,7 @@ DEFINE_PATCH_MACRO ~opcode_self_219000~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_219000~ BEGIN
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	LPM ~opcode_219_versus~
 
 	SPRINT value ~+2 %versus%~
 	SPRINT name @10000099      // ~Classe d'armure~
@@ -10944,28 +10944,99 @@ END
 
 // Save throws
 DEFINE_PATCH_MACRO ~opcode_self_219001~ BEGIN
-	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
-		SPRINT versus ~%custom_str%~
-	END
-	ELSE BEGIN
-		LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
-	END
+	LPM ~opcode_219_versus~
 	SPRINT value ~+2 %versus%~
 	SPRINT name @102034        // ~Jets de sauvegarde~
 	SPRINT description @100001 // ~%name%%colon%%value%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_219001~ BEGIN
-	LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	LPM ~opcode_219_versus~
 
 	SPRINT value ~+2 %versus%~
 	SPRINT name @102034        // ~Jets de sauvegarde~
 	SPRINT description @100007 // ~%name% %ofTheTarget%%colon%%value%~
 END
 
+// Types de créature réunis par opcode_219_group_versus ou opcode_219001_group (custom_str), sinon celui
+// de l'effet.
+DEFINE_PATCH_MACRO ~opcode_219_versus~ BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT versus ~%custom_str%~
+	END
+	ELSE BEGIN
+		LPF ~get_ids_versus_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET versus = idVersusName END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_219000_group~ BEGIN
+	LPM ~opcode_219_group_versus~
+END
+
+// Hors équipement (sorts, effets à l'impact…), les effets aux mêmes champs hormis le type de créature
+// n'en font qu'un : « Classe d'armure de la cible : +2 contre les élémentaires, les esprits et les
+// fées ». Ceux d'équipement sont réunis par opcode_219001_group et opcode_0_group.
+DEFINE_PATCH_MACRO ~opcode_219_group_versus~ BEGIN
+	LOCAL_SPRINT the @11770200 // ~les~
+	LOCAL_SPRINT andThe @11770201 // ~et les~
+	// CLEAR_ARRAY ne retire pas les éléments : chacun est remis à 0.
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		SET $opcode_219_grouped(~%data_0%~) = 0
+	END
+
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF NOT $opcode_219_grouped(~%position%~) AND ~%custom_str%~ STRING_EQUAL ~~
+				AND NOT (timingMode == TIMING_while_equipped AND target == TARGET_FX_self) BEGIN
+			LPM ~data_to_match_vars~
+			SPRINT match_complex_duration ~%data_28%~
+			SET anchorPosition = position
+			SET members = 0
+			CLEAR_ARRAY opcode_219_types
+			PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_219_types~ BEGIN END
+			CLEAR_ARRAY opcode_219_members
+			PATCH_DEFINE_ASSOCIATIVE_ARRAY ~opcode_219_members~ BEGIN END
+			PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				LPM ~opcode_match_opcode_219_group~
+				PATCH_IF match AND NOT $opcode_219_grouped(~%position%~) AND VARIABLE_IS_SET $ids_files(~%parameter2%~) BEGIN
+					LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET idName END
+					SET $opcode_219_types(~%idName%~) = 1
+					SET $opcode_219_members(~%position%~) = 1
+					SET members += 1
+				END
+			END
+			PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+				PATCH_IF ~%data_0%~ == anchorPosition BEGIN
+					LPM ~data_to_vars~
+				END
+			END
+			PATCH_IF members > 1 BEGIN
+				PATCH_PHP_EACH opcode_219_members AS memberPosition => _ BEGIN
+					SET $opcode_219_grouped(~%memberPosition%~) = 1
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = memberPosition
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
+				LPF ~implode~ STR_VAR array_name = ~opcode_219_types~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
+				SPRINT custom_str @102387 // ~contre les %targetType%~
+				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ~opcode_219001_group~ BEGIN
 	LOCAL_SPRINT the @11770200 // ~les~
 	LOCAL_SPRINT andThe @11770201 // ~et les~
+	// Avant le regroupement d'équipement, dont implode échoue sans effet d'équipement.
+	LPM ~opcode_219_group_versus~
 	CLEAR_ARRAY targetTypes
     PATCH_DEFINE_ARRAY targetTypes BEGIN END
 
@@ -18114,6 +18185,35 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_60_145_group~ BEGIN
 		AND match_special      == special
 		AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
     )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_219_group~ BEGIN
+	SET match = (
+		    match_isExternal   == isExternal
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+		AND match_diceCount    == diceCount
+		AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+		AND match_custom_int   == custom_int
+		AND match_cumulable    == cumulable
+		AND ~%match_custom_str%~ STRING_EQUAL ~%custom_str%~
+		AND ~%match_resref%~ STRING_EQUAL_CASE ~%resref%~
+		AND ~%match_target_exceptions%~ STRING_EQUAL ~%target_exceptions%~
+		AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
+		AND ~%match_complex_value%~ STRING_EQUAL ~%complex_value%~
+		AND ~%match_complex_duration%~ STRING_EQUAL ~%complex_duration%~
+		AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~
+	)
 END
 
 DEFINE_PATCH_MACRO ~opcode_match_opcode_67_group~ BEGIN

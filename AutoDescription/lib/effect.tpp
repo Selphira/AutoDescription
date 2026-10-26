@@ -878,7 +878,14 @@ BEGIN
                         REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
                     END
 					LPF ~percent_value~ INT_VAR value = EVAL ~%probability%~ RET probability = value END
-					SPRINT description @101125 // ~%probability% de chances %description%~
+					// Description de plusieurs lignes (sort lancé par un 146 probable) : titre sans espace final.
+					PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%~ ~%description%~) == 0 BEGIN
+						SPRINT probabilityTitle @101126 // ~%probability% de chances~
+						SPRINT description ~%probabilityTitle%%description%~
+					END
+					ELSE BEGIN
+						SPRINT description @101125 // ~%probability% de chances %description%~
+					END
 					// Effet d'un EFF maudit : « Malédiction : 20 % de chances d'aveugler la cible ».
 					PATCH_IF thisOpcode == 283 BEGIN
 						SPRINT curseName @12830001 // ~Malédiction~
