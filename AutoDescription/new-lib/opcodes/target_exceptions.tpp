@@ -32,6 +32,21 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	END
 END
 
+// L'effet line_fx est-il excepté pour la source (exception de la ligne 43 de splprot.2da, « SOURCE »,
+// lue avant lui dans son bloc) ? source_excluded : 1 si oui.
+DEFINE_PATCH_MACRO ad_fx_source_excluded BEGIN
+	SET source_excluded = 0
+	SPRINT source_scope $fx_scope(~%line_fx%~)
+	SET source_position = $fx_position(~%line_fx%~)
+	FOR (source_id = 0; source_id < fx_count; ++source_id) BEGIN
+		SPRINT source_id_scope $fx_scope(~%source_id%~)
+		PATCH_IF $fx_exception(~%source_id%~) AND $fx_parameter2_raw(~%source_id%~) == 43
+				AND (~%source_id_scope%~ STRING_EQUAL ~%source_scope%~) AND $fx_position(~%source_id%~) < source_position BEGIN
+			SET source_excluded = 1
+		END
+	END
+END
+
 // Effets exception_opcode qui ne sont pas déjà écartés : écartés, avec les noms de leur exception.
 // Sur une autre ressource, avec une condition (parameter2), l'ancien moteur n'écrit rien
 // (opcode_common_324) et garde l'effet pour l'en-tête d'un sort ; il écarte un 324 de durée limitée
@@ -141,6 +156,11 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		PATCH_IF exception_stat == 136 AND exception_value == 6 BEGIN
 			SPRINT exception_kind ~EFFECTIVE_IF~
 			SPRINT exception_name @23240007 // ~durant la pénurie de fer~
+			LPM ad_target_exception_add_name
+		END
+		// Ligne 44 dans un sort : la ressource est lancée, son lanceur n'est pas un porteur.
+		ELSE PATCH_IF exception_tra == 23241044 AND resource_is_spell BEGIN
+			SPRINT exception_name @23240008 // ~créatures autres que le lanceur~
 			LPM ad_target_exception_add_name
 		END
 		ELSE PATCH_IF exception_tra > 0 BEGIN
@@ -358,14 +378,16 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	END
 END
 
-// Lignes : aucune pour l'opcode. Les regroupements de l'ancien moteur ne comparent pas les
-// exceptions : des effets identiques d'un même bloc s'écrivent avec celles du premier, lues avant
-// lui (SPPR612 : les exceptions qui suivent ne s'ajoutent pas), de même que les effets réunis par un
+// Lignes : aucune pour l'opcode. Des effets identiques d'un même bloc séparés par des exceptions ne
+// sont pas réunis (ad_group_identical_effects) ; les autres regroupements de l'ancien moteur ne
+// comparent pas les exceptions : les effets réunis s'écrivent avec celles du premier, de même que les effets réunis par un
 // regroupement d'un opcode (fx_group_anchor : maladies, invocations). Refus : effets réunis d'une autre
 // portée, avec des exceptions ; effet qui a des
 // exceptions (lu après elles) réuni par un autre regroupement (la ligne réunie n'aurait pas
 // forcément celles de l'ancien moteur), sauf l'effet d'un en-tête que l'effet égal d'un autre niveau
-// représente (fx_level_merged, new-lib/spell_levels.tpp), dont la ligne garde ses exceptions.
+// représente (fx_level_merged, new-lib/spell_levels.tpp), dont la ligne garde ses exceptions, ou
+// la répétition d'un effet de tête qui a les mêmes exceptions (fx_series_of, SPCL412), ou un effet
+// dont tous ceux de son opcode et de sa portée ont les mêmes exceptions (SPCL920).
 DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 	FOR (exception_id = 0; exception_id < fx_count; ++exception_id) BEGIN
 		SET exception_anchor = $fx_identical_anchor(~%exception_id%~)
@@ -374,6 +396,22 @@ DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 		END
 		SET exception_count = $fx_exception_count(~%exception_id%~)
 		SPRINT exception_scope $fx_scope(~%exception_id%~)
+		SET exception_series = $fx_series_of(~%exception_id%~)
+		SET exception_same = 0
+		PATCH_IF exception_series >= 0 BEGIN
+			SET exception_same = $fx_exception_count(~%exception_series%~) == exception_count
+		END
+		ELSE PATCH_IF $fx_consumed(~%exception_id%~) BEGIN
+			SET exception_same = 1
+			SET exception_own_opcode = $fx_opcode(~%exception_id%~)
+			FOR (exception_other = 0; exception_other < fx_count; ++exception_other) BEGIN
+				SPRINT exception_other_scope $fx_scope(~%exception_other%~)
+				PATCH_IF $fx_opcode(~%exception_other%~) == exception_own_opcode AND (~%exception_other_scope%~ STRING_EQUAL ~%exception_scope%~)
+						AND $fx_exception_count(~%exception_other%~) != exception_count BEGIN
+					SET exception_same = 0
+				END
+			END
+		END
 		PATCH_IF exception_anchor != exception_id BEGIN
 			SPRINT exception_anchor_scope $fx_scope(~%exception_anchor%~)
 			PATCH_IF (exception_count > 0 OR $fx_exception_count(~%exception_anchor%~) > 0)
@@ -382,7 +420,8 @@ DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 			END
 		END
 		ELSE PATCH_IF $fx_consumed(~%exception_id%~) AND NOT $fx_dropped(~%exception_id%~) AND NOT $fx_level_merged(~%exception_id%~)
-				AND exception_count > 0 AND NOT $fx_exception(~%exception_id%~) BEGIN
+				AND exception_count > 0 AND NOT $fx_exception(~%exception_id%~)
+				AND NOT exception_same BEGIN
 			// Une exception sans nom (le lanceur, ligne 43) n'écrit rien : seules les autres comptent.
 			SET exception_named = 0
 			SET exception_position = $fx_position(~%exception_id%~)

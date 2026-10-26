@@ -763,7 +763,7 @@ Le prêtre crée un mur de lames tournantes, acérées comme des rasoirs. Elles 
 
 PARAMÈTRES : 
 
-- Lorsque la cible se trouve à moins de 1 mètre ; Inflige 12d12 points de dégâts tranchants </pre></td></tr>
+- Inflige 12d12 points de dégâts tranchants aux créatures dans un rayon d'un mètre autour du lanceur</pre></td></tr>
 <tr><th class="title">MELIS02B<br/>Barrière de lames</th><td class="description before"><pre>Barrière de lames
 (Évocation)
 
@@ -1062,9 +1062,12 @@ Remarque : si ce sort dissipe les effets individuels de sorts comme Glisse, Toi
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Devient partiellement visible
+
+Capacités du sort : 
 - Dissipation de la magie sur la cible
-- Guérit la débilité mentale de la cible
-- Devient partiellement visible</pre></td></tr>
+- Guérit la débilité mentale de la cible</pre></td></tr>
 <tr><th class="title">OHBWI304<br/>Boule de feu</th><td class="description before"><pre>Boule de feu
 (Évocation)
 
@@ -1082,15 +1085,18 @@ Portée : 12 mètres
 Durée : Instantanée
 Temps d'incantation : 1
 Zone d'effet : Rayon de 4,5 mètres
-Jet de sauvegarde : Spécial
+Jet de sauvegarde : Sorts (1/2)
 Résistance à la magie : Affecté
 
 Une boule de feu est une explosion de flammes qui éclate avec un grondement sourd et engendre des dégâts proportionnels au niveau d'expérience du magicien : 1d6 points de dégâts par niveau d'expérience du lanceur de sorts (10d6 maximum). Le magicien pointe son doigt et annonce la distance et la hauteur à laquelle il veut faire exploser la boule de feu. Un éclair jaillit du bout de son doigt et, à moins qu'il ne soit bloqué par un corps physique ou une barrière solide avant d'atteindre sa cible, se transforme en boule de feu (un impact prématuré provoque une explosion prématurée). Les créatures qui ratent leur jet de sauvegarde contre les sorts subissent la totalité des dégâts. Celles qui le réussissent parviennent à bondir à l'écart, à se jeter à terre ou à rouler sur le côté, et n'encaissent que la moitié des dégâts.
 
 PARAMÈTRES : 
 
-- Inflige 1d6 points de dégâts de feu par niveau du lanceur/10 à la cible (jet de sauvegarde contre les sorts pour réduire de moitié, ignore les images miroir)
-- Devient partiellement visible</pre></td></tr>
+Capacité d'incantation : 
+- Devient partiellement visible
+
+Capacité du sort : 
+- Inflige 1d6 points de dégâts de feu par niveau du lanceur/10 à la cible</pre></td></tr>
 <tr><th class="title">OHBWI308<br/>Éclair</th><td class="description before"><pre>Éclair
 (Évocation)
 
@@ -1114,6 +1120,11 @@ Résistance à la magie : Affecté
 En lançant ce sort, le magicien libère une décharge électrique puissante qui inflige 1d6 points de dégâts par niveau du lanceur de sorts (dégâts maximum de 10d6) à chaque créature située dans la zone d'effet. Un jet de sauvegarde contre les sorts réussi permet de n'encaisser que la moitié des dégâts (arrondis à la fraction inférieure). Si l'éclair rencontre un mur, il rebondit jusqu'à ce qu'il atteigne sa longueur complète.
 
 PARAMÈTRES : 
+
+Capacité d'incantation : 
+- Devient partiellement visible
+
+Capacités du sort : 
 
 Entre le niveau 1 et 5
 - Inflige 5d6 points de dégâts d'électricité à la cible (jet de sauvegarde contre les sorts pour réduire de moitié, ignore les images miroir)
@@ -1240,6 +1251,41 @@ Toutes les créatures invisibles situées dans la zone d'effet perdent leur invi
 PARAMÈTRES : 
 
 - Dissipation de l'invisibilité (Efficace contre les créatures invisibles. Inefficace contre les créatures sous l'effet de « Non-détection »)</pre></td></tr>
+<tr><th class="title">OHHDRAIN<br/>Drain de sang</th><td class="description before"><pre>Drain de sang
+
+Afin de survivre, un vampire a besoin de se nourrir. Cette capacité permet de drainer la cible de 1-4 de sa Constitution et de lui faire perdre connaissance pendant 5 rounds.
+
+Jet de sauvegarde : jet de sauvegarde contre la mort</pre></td><td class="description after"><pre>Drain de sang
+(Inné)
+
+Portée : 6 mètres
+Durée : 2 secondes
+Temps d'incantation : 0
+Zone d'effet : 1 créature
+Jet de sauvegarde : Spécial
+Dissipation : Non-affecté
+Résistance à la magie : Affecté
+
+Jet de sauvegarde : jet de sauvegarde contre la mort
+
+PARAMÈTRES : 
+
+- Fige le lanceur
+- Fige les animaux et les humanoïdes
+- 25 % de chances de réduire de 4 la constitution des animaux et des humanoïdes
+- 25 % de chances de réduire de 3 la constitution des animaux et des humanoïdes
+- 25 % de chances de réduire de 2 la constitution des animaux et des humanoïdes
+- 25 % de chances de réduire de 1 la constitution des animaux et des humanoïdes (jet de sauvegarde contre la paralysie, la mort et les poisons pour annuler)
+- Après 1 round ; Fige les animaux et les humanoïdes
+  - 25 % de chances de réduire de 4 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 3 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 2 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 1 la constitution des animaux et des humanoïdes (jet de sauvegarde à +3 contre la paralysie, la mort et les poisons pour annuler)
+- Après 2 rounds ; Fige les animaux et les humanoïdes
+  - 25 % de chances de réduire de 4 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 3 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 2 la constitution des animaux et des humanoïdes
+  - 25 % de chances de réduire de 1 la constitution des animaux et des humanoïdes (jet de sauvegarde à +6 contre la paralysie, la mort et les poisons pour annuler)</pre></td></tr>
 <tr><th class="title">OHHSUMM<br/>Enfants de la nuit</th><td class="description before"><pre>Enfants de la nuit
 
 Lorsque le vampire utilise cette capacité, des créatures des ténèbres 1d4 émergent des ombres. Au fur et à mesure que le vampire monte de niveau, les créatures convoquées deviennent plus puissantes.
@@ -2295,6 +2341,124 @@ CHAOTIQUE BON : Dragon fée
 PARAMÈTRES : 
 
 - Invocation du familier</pre></td></tr>
+<tr><th class="title">SPCL412<br/>Pose de piège</th><td class="description before"><pre>Pose de piège
+Permet de poser un collet à l'endroit choisi lorsqu'aucune créature hostile n'est en vue. La puissance des pièges s'améliore à mesure que le personnage augmente ses niveaux. Les pièges ne peuvent être déclenchés que par les ennemis.
+  Niveau 1 : le piège inflige 2d8+5 points de dégâts de projectiles.
+  Niveau 11 : le piège inflige 2d8+5 points de dégâts de projectiles, plus 2d6 points de dégâts de poison par round pendant 3 rounds.
+  Niveau 16 : le piège inflige 3d8+5 points de dégâts de projectiles, plus 4d8+2 points de dégâts de feu.
+  Niveau 21 : le piège inflige 3d8+5 points de dégâts de projectiles, plus 20 points de dégâts de poison sans jet de sauvegarde. La cible meurt instantanément si elle échoue à un jet de sauvegarde contre la mort avec un bonus de +4.</pre></td><td class="description after"><pre>Pose de piège
+(Inné)
+
+Portée : 3 mètres
+Durée : Instantanée
+Temps d'incantation : 0
+Zone d'effet : Point dans le champ visuel du lanceur
+Jet de sauvegarde : Aucun
+Résistance à la magie : Affecté
+
+Permet de poser un collet à l'endroit choisi lorsqu'aucune créature hostile n'est en vue. La puissance des pièges s'améliore à mesure que le personnage augmente ses niveaux. Les pièges ne peuvent être déclenchés que par les ennemis.
+  Niveau 1 : le piège inflige 2d8+5 points de dégâts de projectiles.
+  Niveau 11 : le piège inflige 2d8+5 points de dégâts de projectiles, plus 2d6 points de dégâts de poison par round pendant 3 rounds.
+  Niveau 16 : le piège inflige 3d8+5 points de dégâts de projectiles, plus 4d8+2 points de dégâts de feu.
+  Niveau 21 : le piège inflige 3d8+5 points de dégâts de projectiles, plus 20 points de dégâts de poison sans jet de sauvegarde. La cible meurt instantanément si elle échoue à un jet de sauvegarde contre la mort avec un bonus de +4.
+
+PARAMÈTRES : 
+
+- Tente de poser un piège : 
+  
+  Entre le niveau 1 et 15
+  - Inflige 2d8 +5 points de dégâts de projectiles à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  
+  Entre le niveau 11 et 15
+  - Inflige 2d6 points de dégâts de poison à la cible et aux créatures hostiles dans un rayon de 6 mètres chaque round pendant 3 rounds après 1 round (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  
+  Entre le niveau 16 et 20
+  - Inflige 4d8 +2 points de dégâts de feu à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  
+  À partir du niveau 16
+  - Inflige 3d8 +5 points de dégâts de projectiles à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  
+  À partir du niveau 21
+  - Inflige 20 points de dégâts de poison à la cible et aux créatures hostiles dans un rayon de 6 mètres (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  - Tue instantanément la cible et les créatures hostiles dans un rayon de 6 mètres (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)</pre></td></tr>
+<tr><th class="title">SPCL414<br/>Pose de pièges spéciaux</th><td class="description before"><pre>Pose de piège spécial
+Permet de poser un collet à l'endroit choisi lorsqu'aucune créature hostile n'est en vue. La puissance des pièges s'améliore à mesure que le personnage augmente ses niveaux. Les pièges ne peuvent être déclenchés que par les ennemis.
+  Niveau 1 : le piège inflige 3d8+5 points de dégâts de projectiles et ralentit la victime pendant 5 rounds si elle échoue à un jet de sauvegarde contre les sorts avec un malus de -4.
+  Niveau 11 : le piège inflige 4d8+5 points de dégâts de projectiles et immobilise la victime pendant 5 rounds si elle échoue à un jet de sauvegarde contre les sorts avec un malus de -1.
+  Niveau 16 : le piège déclenche une Sphère résistante d'Otiluke autour de la cible pendant 7 rounds si elle échoue à un jet de sauvegarde contre les sorts.
+  Niveau 21 : le piège inflige un sort de labyrinthe sur la cible.</pre></td><td class="description after"><pre>Pose de pièges spéciaux
+(Inné)
+
+Portée : 30,5 mètres
+Durée : Instantanée
+Temps d'incantation : 0
+Zone d'effet : Point dans le champ visuel du lanceur
+Jet de sauvegarde : Aucun
+Résistance à la magie : Affecté
+
+Pose de piège spécial
+Permet de poser un collet à l'endroit choisi lorsqu'aucune créature hostile n'est en vue. La puissance des pièges s'améliore à mesure que le personnage augmente ses niveaux. Les pièges ne peuvent être déclenchés que par les ennemis.
+  Niveau 1 : le piège inflige 3d8+5 points de dégâts de projectiles et ralentit la victime pendant 5 rounds si elle échoue à un jet de sauvegarde contre les sorts avec un malus de -4.
+  Niveau 11 : le piège inflige 4d8+5 points de dégâts de projectiles et immobilise la victime pendant 5 rounds si elle échoue à un jet de sauvegarde contre les sorts avec un malus de -1.
+  Niveau 16 : le piège déclenche une Sphère résistante d'Otiluke autour de la cible pendant 7 rounds si elle échoue à un jet de sauvegarde contre les sorts.
+  Niveau 21 : le piège inflige un sort de labyrinthe sur la cible.
+
+PARAMÈTRES : 
+
+- Tente de poser un piège : 
+  
+  Entre le niveau 1 et 10
+  - Inflige 3d8 +5 points de dégâts de projectiles à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  - Inflige lenteur à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  
+  Entre le niveau 11 et 15
+  - Inflige 4d8 +5 points de dégâts de projectiles à la cible et aux créatures hostiles dans un rayon de 6 mètres
+  - Paralyse les humanoïdes
+  
+  À partir du niveau 21
+  - Enferme la cible et les créatures hostiles dans un rayon de 6 mètres dans un labyrinthe, la durée varie selon l'Intelligence après 4 secondes</pre></td></tr>
+<tr><th class="title">SPCL423<br/>Arme empoisonnée</th><td class="description before"><pre>Arme empoisonnée
+Chaque coup réussi au cours des 5 prochains rounds empoisonnera la cible. Chaque cible ne peut être affectée qu'une fois par round. Le montant des dégâts de poison dépend du niveau du personnage :
+
+Niveau 1 : la cible subit 1 point de dégât de poison par seconde pendant 6 secondes (jet de sauvegarde contre la mort de +1 pour annuler)
+Niveau 5 : la cible subit 1 point de dégât de poison par seconde pendant 12 secondes (jet de sauvegarde contre la mort pour annuler) et subit immédiatement 2 points de dégâts de poison (pas de sauvegarde)
+Niveau 9 : la cible subit 1 point de dégât de poison par seconde pendant 18 secondes (jet de sauvegarde contre la mort de -1 pour annuler) et subit immédiatement 4 points de dégâts de poison (pas de sauvegarde)
+Niveau 13 : la cible subit 1 point de dégât de poison par seconde pendant 24 secondes (jet de sauvegarde contre la mort de -2 pour annuler) et subit immédiatement 6 points de dégâts de poison (pas de sauvegarde)</pre></td><td class="description after"><pre>Arme empoisonnée
+(Inné)
+
+Portée : Contact
+Durée : 5 rounds
+Temps d'incantation : 0
+Zone d'effet : Le lanceur
+Jet de sauvegarde : Aucun
+Dissipation : Non-affecté
+Résistance à la magie : Affecté
+
+Chaque coup réussi au cours des 5 prochains rounds empoisonnera la cible. Chaque cible ne peut être affectée qu'une fois par round. Le montant des dégâts de poison dépend du niveau du personnage :
+
+Niveau 1 : la cible subit 1 point de dégât de poison par seconde pendant 6 secondes (jet de sauvegarde contre la mort de +1 pour annuler)
+Niveau 5 : la cible subit 1 point de dégât de poison par seconde pendant 12 secondes (jet de sauvegarde contre la mort pour annuler) et subit immédiatement 2 points de dégâts de poison (pas de sauvegarde)
+Niveau 9 : la cible subit 1 point de dégât de poison par seconde pendant 18 secondes (jet de sauvegarde contre la mort de -1 pour annuler) et subit immédiatement 4 points de dégâts de poison (pas de sauvegarde)
+Niveau 13 : la cible subit 1 point de dégât de poison par seconde pendant 24 secondes (jet de sauvegarde contre la mort de -2 pour annuler) et subit immédiatement 6 points de dégâts de poison (pas de sauvegarde)
+
+PARAMÈTRES : 
+
+- À chaque attaque réussie ; 
+  
+  Entre le niveau 1 et 4
+  - Empoisonne la cible, lui infligeant 1 point de dégâts par seconde pendant 1 round (jet de sauvegarde à +1 contre la paralysie, la mort et les poisons pour annuler) (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  
+  Entre le niveau 5 et 8
+  - Inflige 2 points de dégâts de poison à la cible (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  - Empoisonne la cible, lui infligeant 1 point de dégâts par seconde pendant 2 rounds (jet de sauvegarde contre la paralysie, la mort et les poisons pour annuler) (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  
+  Entre le niveau 9 et 12
+  - Inflige 4 points de dégâts de poison à la cible (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  - Empoisonne la cible, lui infligeant 1 point de dégâts par seconde pendant 3 rounds (jet de sauvegarde à -1 contre la paralysie, la mort et les poisons pour annuler) (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  
+  À partir du niveau 13
+  - Inflige 6 points de dégâts de poison à la cible (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons)
+  - Empoisonne la cible, lui infligeant 1 point de dégâts par seconde pendant 4 rounds (jet de sauvegarde à -2 contre la paralysie, la mort et les poisons pour annuler) (Inefficace contre les morts-vivants, les golems et les créatures insensibles aux poisons) (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPCL521<br/>Spirale offensive</th><td class="description before"><pre>Spirale offensive
 Durant les 4 prochains rounds, la vitesse de déplacement du personnage est doublée et il obtient un bonus de +2 aux jets de toucher et de dégâts, ainsi qu'une attaque supplémentaire par round, et toutes ses attaques infligent le maximum de dégâts. Ne peut être utilisée en conjonction avec Hâte ou Hâte améliorée.</pre></td><td class="description after"><pre>Spirale offensive
 (Inné)
@@ -3428,6 +3592,33 @@ PARAMÈTRES :
 - 11 % de chances de créer 1 « Dissipation de la magie » dans l'inventaire du lanceur
 - 11 % de chances de créer 1 « Boule de feu » dans l'inventaire du lanceur
 - 11 % de chances de créer 1 « Hâte » dans l'inventaire du lanceur</pre></td></tr>
+<tr><th class="title">SPCL920<br/>Chant du Barde amélioré</th><td class="description before"><pre>Chant du Barde amélioré
+Cette chanson aide à la fois le barde et ses alliés. Sa vibrante mélodie octroie au barde un bonus de 10 à sa classe d'armure ainsi que 10 % de résistance à la magie. Ses alliés reçoivent quant à eux +4 aux coups et aux dégâts, -4 à la classe d'armure, une immunité contre la peur, l'étourdissement, la confusion et les armes normales, ainsi que 5 % de résistance à la magie.
+
+Cette capacité remplace le Chant du Barde actuel.</pre></td><td class="description after"><pre>Chant du Barde amélioré
+(Inné)
+
+Portée : 3 mètres
+Durée : Permanente
+Temps d'incantation : 0
+Zone d'effet : 1 créature
+Jet de sauvegarde : Aucun
+
+Cette chanson aide à la fois le barde et ses alliés. Sa vibrante mélodie octroie au barde un bonus de 10 à sa classe d'armure ainsi que 10 % de résistance à la magie. Ses alliés reçoivent quant à eux +4 aux coups et aux dégâts, -4 à la classe d'armure, une immunité contre la peur, l'étourdissement, la confusion et les armes normales, ainsi que 5 % de résistance à la magie.
+
+Cette capacité remplace le Chant du Barde actuel.
+
+PARAMÈTRES : 
+
+- Remplace le chant de barde : 
+  - Classe d'armure de la cible et des créatures alliées dans un rayon de 4,5 mètres : +6 (non cumulatif) (Inefficace contre les créatures sourdes et les créatures autres que le lanceur)
+  - Classe d'armure de la cible et des créatures alliées dans un rayon de 4,5 mètres : +4 (non cumulatif) (Inefficace contre les créatures sourdes)
+  - Augmente de 4 les dégâts de la cible et des créatures alliées dans un rayon de 4,5 mètres (non cumulatif) (Inefficace contre les créatures sourdes)
+  - Augmente de 4 le TAC0 de la cible et des créatures alliées dans un rayon de 4,5 mètres (non cumulatif) (Inefficace contre les créatures sourdes)
+  - Immunise la cible et les créatures alliées dans un rayon de 4,5 mètres contre les armes non-magiques (non cumulatif) (Inefficace contre les créatures sourdes)
+  - Immunise la cible et les créatures alliées dans un rayon de 4,5 mètres contre la peur, l'étourdissement, la confusion et la panique (Inefficace contre les créatures sourdes)
+  - Augmente de 5 % la résistance à la magie de la cible et des créatures alliées dans un rayon de 4,5 mètres (non cumulatif) (Inefficace contre les créatures sourdes et les créatures autres que le lanceur)
+  - Augmente de 5 % la résistance à la magie de la cible et des créatures alliées dans un rayon de 4,5 mètres (non cumulatif) (Inefficace contre les créatures sourdes)</pre></td></tr>
 <tr><th class="title">SPCL921<br/>Flûte magique</th><td class="description before"><pre>Flûte magique
 Cette capacité permet de créer une flûte de pure énergie magique. Lorsque le personnage en joue, elle peut lancer les sorts suivants :
 Résistance à la peur (pour le groupe) : 1 charge
@@ -6362,7 +6553,9 @@ Jet de sauvegarde : Aucun
 Cette capacité renvoie &lt;CHARNAME&gt; et son groupe à l'Antichambre.
 
 PARAMÈTRES : 
-</pre></td></tr>
+
+Capacité d'incantation : 
+- Ajoute la capacité « Antichambre »</pre></td></tr>
 <tr><th class="title">SPIN651<br/>Résistance à la magie</th><td class="description before"><pre>Résistance à la magie
 (Transmutation)
 
@@ -6629,6 +6822,10 @@ Au paroxysme de l'invocation, le magicien hurle à la manière d'une banshee. To
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Immunité contre la mort magique pendant 5 secondes
+
+Capacité du sort : 
 - Tue instantanément la cible</pre></td></tr>
 <tr><th class="title">SPIN682<br/>Abaissement de la résistance au feu</th><td class="description before"><pre>Grande malédiction
 (Enchantement/Charme)
@@ -7752,6 +7949,10 @@ Au paroxysme de l'invocation, le magicien hurle à la manière d'une banshee. To
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Immunité contre la mort magique pendant 5 secondes
+
+Capacité du sort : 
 - Tue instantanément la cible</pre></td></tr>
 <tr><th class="title">SPIN799<br/>Colonne de feu</th><td class="description before"><pre>Colonne de feu
 (Évocation)
@@ -7898,6 +8099,10 @@ Au paroxysme de l'invocation, le magicien hurle à la manière d'une banshee. To
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Immunité contre la mort magique pendant 5 secondes
+
+Capacité du sort : 
 - Tue instantanément la cible</pre></td></tr>
 <tr><th class="title">SPIN822<br/>Changement en Écorcheur</th><td class="description before"><pre>Transformation en Écorcheur
 
@@ -8055,6 +8260,7 @@ Quand nécessaire, Mazzy peut puiser dans une grande réserve de force pendant d
 
 PARAMÈTRES : 
 
+Entre le niveau 1 et 6
 - Force : Passe à 18
 - Force exceptionnelle : +50
 
@@ -8143,6 +8349,10 @@ Le Souhait est une version améliorée du Souhait mineur, capable de répondre �
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Immunité contre la mort magique pendant 5 secondes
+
+Capacité du sort : 
 - Tue instantanément les membres du groupe</pre></td></tr>
 <tr><th class="title">SPIN837<br/>Souhait</th><td class="description before"><pre>Souhait
 (Toutes écoles)
@@ -11427,6 +11637,33 @@ Au niveau 19
 
 À partir du niveau 20
 - Dissipe l'état d'ébriété des membres du groupe</pre></td></tr>
+<tr><th class="title">SPPR515<br/>Repousser les morts-vivants</th><td class="description before"><pre>Repousser les morts-vivants
+(Abjuration)
+
+Niveau : 5
+Portée : 0
+Durée : 1 tour
+Temps d'incantation : 5
+Zone d'effet : lanceur
+Jet de sauvegarde : aucun
+
+Ce puissant sort crée des vagues d'énergie anti-négative, à raison d'une par round jusqu'à la fin du sort, qui semblent déferler depuis le lanceur. Cette vague repousse pendant plusieurs secondes tous les morts-vivants qui essayent d'attaquer le lanceur de sort. Tous les morts-vivants sont affectés et aucun jet de sauvegarde n'est autorisé contre ce sort.</pre></td><td class="description after"><pre>Repousser les morts-vivants
+(Divin - Abjuration, Protection de combat)
+
+Niveau : 5
+Portée : Contact
+Durée : 11 rounds
+Temps d'incantation : 5
+Zone d'effet : Le lanceur et toute créature dans un rayon de 2,5 mètres
+Jet de sauvegarde : Aucun
+Dissipation : Non-affecté
+Résistance à la magie : Affecté
+
+Ce puissant sort crée des vagues d'énergie anti-négative, à raison d'une par round jusqu'à la fin du sort, qui semblent déferler depuis le lanceur. Cette vague repousse pendant plusieurs secondes tous les morts-vivants qui essayent d'attaquer le lanceur de sort. Tous les morts-vivants sont affectés et aucun jet de sauvegarde n'est autorisé contre ce sort.
+
+PARAMÈTRES : 
+
+- Repousse les morts-vivants dans un rayon de 2,5 mètres à 7,5 mètres du lanceur (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPPR515D<br/>Repousser les morts-vivants</th><td class="description before"><pre>Repousser les morts-vivants
 (Abjuration)
 
@@ -11626,7 +11863,7 @@ Le prêtre crée un mur de lames tournantes, acérées comme des rasoirs. Elles 
 
 PARAMÈTRES : 
 
-- Lorsque la cible se trouve à moins de 1 mètre ; Inflige 8d8 points de dégâts tranchants  (non cumulatif)</pre></td></tr>
+- Inflige 8d8 points de dégâts tranchants aux créatures dans un rayon d'un mètre autour du lanceur (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPPR603D<br/>Barrière de lames</th><td class="description before"><pre>Barrière de lames
 (Évocation)
 
@@ -12013,6 +12250,34 @@ PARAMÈTRES :
 
 - Réduit de 2 les jets de sauvegarde contre les sorts des fées, des ombres, des spectres, des trolls spectraux, des âmes-en-peine, des élémentaires, des morts-vivants spectraux et des esprits pendant 1 seconde (Inefficace contre les créatures affectées par « Ordres chaotiques », les créatures affectées par « Rage du barbare », les créatures affectées par « Rage du berserker », les créatures affectées par « Furie », les créatures affectées par une potion de clarté et les épées)
 - Inflige débilité mentale à la cible pendant 1 tour + 1 round par niveau (jet de sauvegarde à -2 contre les sorts pour annuler) (Inefficace contre les créatures affectées par « Ordres chaotiques », les créatures affectées par « Rage du barbare », les créatures affectées par « Rage du berserker », les créatures affectées par « Furie », les créatures affectées par une potion de clarté et les épées)</pre></td></tr>
+<tr><th class="title">SPPR698<br/>Barrière de lames</th><td class="description before"><pre>Barrière de lames
+(Évocation)
+
+Niveau : 6
+Sphère : Garde, Création
+Portée : 0
+Durée : 1 tour
+Temps d'incantation : 9
+Zone d'effet : Spécial
+Jet de Sauvegarde : spéciale
+
+Le prêtre crée un mur de lames tournantes, acérées comme des rasoirs. Elles pivotent à grande vitesse autour du lanceur, créant ainsi une barrière impénétrable. Toute créature tentant de traverser la barrière reçoit 8d8 points de dégâts. Les créatures se trouvant dans la zone de la barrière au moment où elle apparaît doivent faire un Jet de sauvegarde contre les sorts. S'il est réussi, aucun dégât n'est infligé. La barrière reste en place pendant 1 tour.</pre></td><td class="description after"><pre>Barrière de lames
+(Divin/Druidique - Évocation, Protection de combat)
+
+Niveau : 6
+Portée : Contact
+Durée : 62 secondes
+Temps d'incantation : 9
+Zone d'effet : Le lanceur
+Jet de sauvegarde : Sorts (Annule)
+Dissipation : Non-affecté
+Résistance à la magie : Affecté
+
+Le prêtre crée un mur de lames tournantes, acérées comme des rasoirs. Elles pivotent à grande vitesse autour du lanceur, créant ainsi une barrière impénétrable. Toute créature tentant de traverser la barrière reçoit 8d8 points de dégâts. Les créatures se trouvant dans la zone de la barrière au moment où elle apparaît doivent faire un Jet de sauvegarde contre les sorts. S'il est réussi, aucun dégât n'est infligé. La barrière reste en place pendant 1 tour.
+
+PARAMÈTRES : 
+
+- Inflige 6d8 points de dégâts tranchants aux créatures hostiles dans un rayon d'un mètre autour du lanceur (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPPR698D<br/>Barrière de lames</th><td class="description before"><pre>Barrière de lames
 (Évocation)
 
@@ -12772,7 +13037,7 @@ Les prêtres utilisent ce sort pour faire apparaître une sphère de lames aigui
 
 PARAMÈTRES : 
 
-- Lorsque la cible se trouve à moins de 1 mètre ; Inflige 10d10 points de dégâts tranchants  (non cumulatif)</pre></td></tr>
+- Inflige 10d10 points de dégâts tranchants aux créatures dans un rayon d'un mètre autour du lanceur (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPPR725D<br/>Sphère de lames</th><td class="description before"><pre>Sphère de lames
 (Évocation)
 
@@ -15622,6 +15887,80 @@ Grâce à ce sort, le magicien crée un champ de force magique qui protège la c
 PARAMÈTRES : 
 
 - Classe d'armure de base : 2</pre></td></tr>
+<tr><th class="title">SPWI318<br/>Déviation des sorts mineure</th><td class="description before"><pre>Déviation des sorts mineure
+(Abjuration)
+
+Niveau : 3
+Portée : 0
+Durée : 3 rounds par niveau
+Temps d'incantation : 3
+Zone d'effet : lanceur
+Jet de sauvegarde : aucun
+
+Ce sort est similaire au sort de 6e niveau, Déviation des sorts, qui absorbe les sorts lancés contre le lanceur. Cette version amoindrie affecte jusqu'à un total de 4 niveaux de sorts, y compris ceux provenant de parchemins ou de compétences semblables aux sorts. Les sorts de zone stationnaires ou non-centrés sur le magicien protégé, comme le Nuage puant ou le Nuage mortel par exemple, ne sont pas absorbés. Le sort doit être lancé spécifiquement sur le magicien pour qu'il soit absorbé. Cette déviation mineure n'affecte que les sorts inférieurs au 7e niveau. Si on essaye d'absorber un sort au-delà de sa limite, le sort échouera et la déviation sera annulée. Par exemple si un sort de troisième niveau frappe le magicien alors qu'il ne lui reste qu'un niveau de déviation, le sort sera absorbé et les effets de la déviation annulés.</pre></td><td class="description after"><pre>Déviation des sorts mineure
+(Profane - Abjuration, Protection de sort)
+
+Niveau : 3
+Portée : Contact
+Durée : Spéciale
+Temps d'incantation : 3
+Zone d'effet : Le lanceur
+Jet de sauvegarde : Aucun
+Dissipation : Non-affecté
+Résistance à la magie : Non-affecté
+
+Ce sort est similaire au sort de 6e niveau, Déviation des sorts, qui absorbe les sorts lancés contre le lanceur. Cette version amoindrie affecte jusqu'à un total de 4 niveaux de sorts, y compris ceux provenant de parchemins ou de compétences semblables aux sorts. Les sorts de zone stationnaires ou non-centrés sur le magicien protégé, comme le Nuage puant ou le Nuage mortel par exemple, ne sont pas absorbés. Le sort doit être lancé spécifiquement sur le magicien pour qu'il soit absorbé. Cette déviation mineure n'affecte que les sorts inférieurs au 7e niveau. Si on essaye d'absorber un sort au-delà de sa limite, le sort échouera et la déviation sera annulée. Par exemple si un sort de troisième niveau frappe le magicien alors qu'il ne lui reste qu'un niveau de déviation, le sort sera absorbé et les effets de la déviation annulés.
+
+PARAMÈTRES : 
+
+Entre le niveau 1 et 5
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 15 rounds
+
+Au niveau 6
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 18 rounds
+
+Au niveau 7
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 21 rounds
+
+Au niveau 8
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 24 rounds
+
+Au niveau 9
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 27 rounds
+
+Au niveau 10
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 3 tours
+
+Au niveau 11
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 6ème et 7ème niveau pendant 3 tours
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 5ème niveau et inférieur pendant 33 rounds
+
+Au niveau 12
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 36 rounds
+
+Au niveau 13
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 39 rounds
+
+Au niveau 14
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 42 rounds
+
+Au niveau 15
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 45 rounds
+
+Au niveau 16
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 48 rounds
+
+Au niveau 17
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 51 rounds
+
+Au niveau 18
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 54 rounds
+
+Au niveau 19
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 57 rounds
+
+À partir du niveau 20
+- Immunise jusqu'à 4 niveaux de sorts parmi ceux de 7ème niveau et inférieur pendant 6 tours</pre></td></tr>
 <tr><th class="title">SPWI319<br/>Protection contre le feu</th><td class="description before"><pre>Protection contre le feu
 (Abjuration)
 
@@ -17636,6 +17975,51 @@ Notez cependant que même s'il ne reste qu'un seul niveau et qu'un sort de nivea
 PARAMÈTRES : 
 
 - Renvoie jusqu'à 4 niveaux de sorts parmi ceux de 4ème niveau et inférieur</pre></td></tr>
+<tr><th class="title">SPWI523<br/>Feu solaire</th><td class="description before"><pre>Feu solaire
+(Évocation)
+
+Niveau : 5
+Portée : 0
+Durée : instantanée
+Temps d'incantation : 3
+Zone d'effet : rayon de 4,5 m
+Jet de sauvegarde : divise par deux
+
+Ce sort est similaire à la boule de feu, une flamme explosive qui éclate avec un bruit sourd et inflige des dégâts proportionnels au niveau du lanceur, 1d6 points de dégâts par niveau du lanceur (jusqu'à un maximum de 15d6). Le magicien fait un geste de la main et la zone qui l'entoure est envahie de flammes, frappant toutes les créatures à l'exception du lanceur du sort. Les créatures qui ne réussissent pas de jet de sauvegarde subissent la totalité des dégâts de l'explosion. Celles qui réussissent peuvent éviter les flammes, tomber à terre ou rouler de côté, mais reçoivent la moitié des points de dégâts.</pre></td><td class="description after"><pre>Feu solaire
+(Profane - Évocation, Dégâts offensifs)
+
+Niveau : 5
+Portée : Contact
+Durée : Instantanée
+Temps d'incantation : 3
+Zone d'effet : Le lanceur
+Jet de sauvegarde : Sorts (1/2)
+Résistance à la magie : Affecté
+
+Ce sort est similaire à la boule de feu, une flamme explosive qui éclate avec un bruit sourd et inflige des dégâts proportionnels au niveau du lanceur, 1d6 points de dégâts par niveau du lanceur (jusqu'à un maximum de 15d6). Le magicien fait un geste de la main et la zone qui l'entoure est envahie de flammes, frappant toutes les créatures à l'exception du lanceur du sort. Les créatures qui ne réussissent pas de jet de sauvegarde subissent la totalité des dégâts de l'explosion. Celles qui réussissent peuvent éviter les flammes, tomber à terre ou rouler de côté, mais reçoivent la moitié des points de dégâts.
+
+PARAMÈTRES : 
+
+Entre le niveau 1 et 9
+- Inflige 9d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+Au niveau 10
+- Inflige 10d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+Au niveau 11
+- Inflige 11d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+Au niveau 12
+- Inflige 12d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+Au niveau 13
+- Inflige 13d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+Au niveau 14
+- Inflige 14d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres
+
+À partir du niveau 15
+- Inflige 15d6 points de dégâts de feu aux créatures dans un rayon de 4,5 mètres</pre></td></tr>
 <tr><th class="title">SPWI601<br/>Chasseur invisible</th><td class="description before"><pre>Chasseur invisible
 (Conjuration/Convocation)
 
@@ -17690,6 +18074,43 @@ Ce sort crée une sphère magique immobile autour du lanceur qui le rend invuln�
 PARAMÈTRES : 
 
 - Immunité contre les sorts de 4ème niveau et inférieurs</pre></td></tr>
+<tr><th class="title">SPWI603<br/>Transformation de Tenser</th><td class="description before"><pre>Transformation de Tenser
+(Transmutation)
+
+Niveau : 6
+Portée : 0
+Durée : 1 round par niveau
+Temps d'incantation : 6
+Zone d'effet : lanceur
+Jet de sauvegarde : aucun
+
+La transformation de Tenser est un spectacle stupéfiant pour quiconque ne connaît pas la puissance de ce sort. Lorsqu'un magicien lance ce sort, sa taille et sa force augmentent de façon considérable, le transformant en véritable guerrier berserk.
+
+Les points de vie du magicien sont doublés et c'est sur les points ainsi gagnés que seront déduits en priorité les dégâts à venir. La classe d'armure du personnage est diminuée de 4 par rapport à celle qu'il possédait avant l'incantation jusqu'à un maximum de -10. Toutes les attaques du magicien sont considérées comme celles d'un guerrier de même niveau (i.e. : le magicien utilise les tables de combat du guerrier). Chaque attaque bénéficie de plus d'un bonus de +2 aux frappes et aux dégâts. </pre></td><td class="description after"><pre>Transformation de Tenser
+(Profane - Altération, Combinaison)
+
+Niveau : 6
+Portée : Contact
+Durée : 1 round par niveau
+Temps d'incantation : 6
+Zone d'effet : Le lanceur
+Jet de sauvegarde : Aucun
+Dissipation : Affecté
+Résistance à la magie : Non-affecté
+
+La transformation de Tenser est un spectacle stupéfiant pour quiconque ne connaît pas la puissance de ce sort. Lorsqu'un magicien lance ce sort, sa taille et sa force augmentent de façon considérable, le transformant en véritable guerrier berserk.
+
+Les points de vie du magicien sont doublés et c'est sur les points ainsi gagnés que seront déduits en priorité les dégâts à venir. La classe d'armure du personnage est diminuée de 4 par rapport à celle qu'il possédait avant l'incantation jusqu'à un maximum de -10. Toutes les attaques du magicien sont considérées comme celles d'un guerrier de même niveau (i.e. : le magicien utilise les tables de combat du guerrier). Chaque attaque bénéficie de plus d'un bonus de +2 aux frappes et aux dégâts. 
+
+PARAMÈTRES : 
+
+- Classe d'armure : +4 (non cumulatif)
+- Dégâts : +2 (non cumulatif)
+- TAC0 : Passe à 21 -1 par niveau du lanceur/20 (non cumulatif)
+- TAC0 : +2 (non cumulatif)
+- Points de vie : +100 % (non cumulatif)
+- Empêche le lanceur de lancer des sorts profanes, divins et druidiques (non cumulatif)
+- Empêche le lanceur de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPWI604<br/>Pétrification</th><td class="description before"><pre>Pétrification
 (Transmutation)
 
@@ -17948,8 +18369,10 @@ La créature affectée se déplace au double de sa vitesse normale et attaque de
 
 PARAMÈTRES : 
 
-- Immunise la cible contre les sorts « Hâte » et « Spirale offensive » pendant 15 rounds
 - Double la vitesse de déplacement et le nombre d'attaques par round de la cible pendant 3 rounds + 1 round par niveau
+
+Entre le niveau 1 et 12
+- Immunise la cible contre les sorts « Hâte » et « Spirale offensive » pendant 15 rounds
 
 Au niveau 13
 - Immunise la cible contre le sort « Hâte » pendant 16 rounds
@@ -19981,6 +20404,10 @@ Au paroxysme de l'invocation, le magicien hurle à la manière d'une banshee. To
 
 PARAMÈTRES : 
 
+Capacité d'incantation : 
+- Immunité contre la mort magique pendant 5 secondes
+
+Capacité du sort : 
 - Tue instantanément la cible</pre></td></tr>
 <tr><th class="title">SPWI914<br/>Absorption d'énergie</th><td class="description before"><pre>Absorption d'énergie
 (Nécromancie)
@@ -21378,7 +21805,7 @@ Ce puissant sort crée des vagues d'énergie anti-négative, à raison d'une par
 
 PARAMÈTRES : 
 
-- Lorsque la cible se trouve à moins de 3 mètres ; Repousse la cible et les créatures dans un rayon de 2,5 mètres à 7,5 mètres du lanceur (non cumulatif)</pre></td></tr>
+- Repousse le lanceur et les créatures dans un rayon de 2,5 mètres à 7,5 mètres du lanceur (non cumulatif)</pre></td></tr>
 <tr><th class="title">SPWM101D<br/>Répulsion</th><td class="description before"><pre>Repousser les morts-vivants
 (Abjuration)
 

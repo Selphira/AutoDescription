@@ -17,9 +17,8 @@ BEGIN
 	SET resource_is_spell = 1
 	// Un sort n'a pas de type d'objet (prises en charge partagées avec les objets).
 	SET item_type = 0 - 1
-	// Ni l'en-tête ni la section « PARAMÈTRES » de l'ancien moteur ne lisent le bloc de lancement
-	// (load_level_effects ; add_casting_features est vide).
-	SET fx_with_casting = 0
+	// Effets de lancement décrits à part (ancien add_casting_features), pas pour les sous-sorts.
+	SET fx_with_casting = 1
 	SPRINT description ~~
 	SET covered = 0
 	LPM ad_recursion_reset

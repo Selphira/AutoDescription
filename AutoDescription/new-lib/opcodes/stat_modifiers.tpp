@@ -39,7 +39,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 		SET stat_versus_value = $fx_versus_value(~%stat_id%~)
 		SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
 		SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
+		SET stat_exceptions = $fx_external(~%stat_id%~) ? 0 - 1 : $fx_exception_count(~%stat_id%~)
 		SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
+		SPRINT stat_versus ~%stat_versus% %stat_exceptions%~
 		SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
 	END
 	// Un effet déjà écarté sans rien écrire (fx_dropped) n'est ni validé ni compté.
@@ -53,7 +55,10 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
 			SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
 			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
+			SET stat_exceptions = $fx_external(~%stat_id%~) ? 0 - 1 : $fx_exception_count(~%stat_id%~)
 			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
+			// Effets du fichier séparés par une exception de cible : distincts (ancien opcode_group_by_target).
+			SPRINT stat_versus ~%stat_versus% %stat_exceptions%~
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:mode3~ message = ~mode 3 not supported for this opcode~ RET render_missing = refusal END
 			END

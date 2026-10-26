@@ -141,7 +141,11 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 						SET same_other = group_candidate
 						LPM ad_fx_same_fields
 						SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-						PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+						// Exceptions de cible lues entre deux effets du fichier (318, 324 du bloc) : effets
+						// distincts, comme dans l'ancien opcode_group_by_target (SPCL920) ; pas pour ceux d'EFF
+						// (177, SPPR612).
+						PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~)
+								AND ($fx_external(~%group_id%~) OR $fx_exception_count(~%group_candidate%~) == $fx_exception_count(~%group_id%~)) BEGIN
 							SET $fx_consumed(~%group_candidate%~) = 1
 							SET $fx_identical_anchor(~%group_candidate%~) = group_id
 							SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
@@ -977,7 +981,9 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 			SPRINT group_resource $fx_resource_lower(~%group_id%~)
 			PHP_EACH ~fx_ids_%group_spell_opcode%~ AS _ => group_candidate BEGIN
 				SET group_other_type = $fx_parameter2(~%group_candidate%~)
-				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= 2 BEGIN
+				// Un effet qui en réunit déjà d'autres n'est pas repris (ancien custom_int non nul).
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= 2
+						AND $fx_spell_types(~%group_candidate%~) == 0 BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					// Comme l'ancien opcode_match_opcode_60_145_group (corrigé), même type de créature (177).

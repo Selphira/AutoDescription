@@ -56,8 +56,14 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				SPRINT recursion_targets ~given~
 				SET recursion_versus_set = 1
 				SPRINT recursion_versus ~%toTheTarget%~
+				// Condition de distance : les sous-effets gardent leurs cibles, ou celles de l'effet pour un
+				// sort lancé sur son porteur (SPPR698 : « autour du lanceur »), sans « contre » (BUG-038).
 				PATCH_IF condition_type == 8 OR condition_type == 9 OR condition_type == 14 BEGIN
 					SPRINT recursion_targets ~own~
+					PATCH_IF condition_target == 0 BEGIN
+						SPRINT recursion_targets ~effect~
+					END
+					SET recursion_versus_set = 0
 					SPRINT recursion_versus ~~
 				END
 				SPRINT recursion_the_target ~%theTarget%~
@@ -124,7 +130,17 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 			LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:range~ message = ~no text for this distance~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
-			SPRINT condition_text @22320024 // ~Lorsque la cible se trouve à moins de %range%~
+			SPRINT condition_text @22320024 // ~Lorsqu'une créature se trouve à moins de %range%~
+			// Sort lancé sur le porteur, dont la zone ne touche que des créatures à cette distance : la
+			// condition est remplie dès qu'il touche quelqu'un (SPPR698 : « Inflige 6d8 points de dégâts
+			// tranchants aux créatures hostiles dans un rayon d'un mètre autour du lanceur »).
+			PATCH_IF condition_target == 0 BEGIN
+				LPF ad_spell_area_within_distance INT_VAR feet = condition_type == 8 ? 4 : condition_type == 9 ? 10 : condition_special
+					STR_VAR resref = ~%condition_resref%~ RET within_distance END
+				PATCH_IF within_distance BEGIN
+					SPRINT condition_text ~~
+				END
+			END
 		END
 	END
 	ELSE PATCH_IF condition_type == 13 BEGIN

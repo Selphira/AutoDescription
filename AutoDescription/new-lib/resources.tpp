@@ -188,6 +188,51 @@ BEGIN
 	END
 END
 
+// Vrai si tous les effets de tous les en-têtes du sort resref passent par la zone ronde de leur
+// projectile, d'un rayon d'au plus feet pieds (ancien spell_area_within_distance) : lancé sur une
+// créature, il ne touche que des créatures à moins de cette distance d'elle.
+DEFINE_PATCH_FUNCTION ad_spell_area_within_distance
+	INT_VAR
+		feet = 0
+	STR_VAR
+		resref = ~~
+	RET
+		within_distance
+BEGIN
+	SET within_distance = 0
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			READ_LONG  SPL_extended_headers_offset area_headers_offset
+			READ_SHORT SPL_extended_headers_count  area_header_count
+			READ_LONG  SPL_feature_blocks_offset   area_table_offset
+			SET within_distance = area_header_count > 0
+			FOR (area_h = 0; area_h < area_header_count AND within_distance; ++area_h) BEGIN
+				SET area_header_offset = area_headers_offset + area_h * 0x28
+				SET within_distance = area_header_offset >= 0 AND area_header_offset + 0x28 <= BUFFER_LENGTH
+				PATCH_IF within_distance BEGIN
+					READ_SHORT (area_header_offset + SPL_HEAD_projectile)            area_projectile
+					READ_SHORT (area_header_offset + SPL_HEAD_feature_blocks_count)  area_fx_count
+					READ_SHORT (area_header_offset + SPL_HEAD_feature_blocks_offset) area_fx_index
+					// Un effet sur la cible de l'en-tête (le porteur du 232) ne dépend pas de la zone.
+					SET within_distance = area_fx_count > 0
+					FOR (area_p = 0; area_p < area_fx_count AND within_distance; ++area_p) BEGIN
+						SET area_fx_offset = area_table_offset + (area_fx_index + area_p) * 0x30
+						SET within_distance = area_fx_offset >= 0 AND area_fx_offset + 0x30 <= BUFFER_LENGTH
+						PATCH_IF within_distance BEGIN
+							READ_BYTE (area_fx_offset + FX_target) area_fx_target
+							SET within_distance = area_fx_target == 2
+						END
+					END
+				END
+				PATCH_IF within_distance BEGIN
+					LPF ad_projectile_area INT_VAR projectile = area_projectile RET area_shape area_feet area_cone END
+					SET within_distance = area_shape == 1 AND NOT area_cone AND area_feet > 0 AND area_feet <= feet
+				END
+			END
+		END
+	END
+END
+
 // Nom d'un projectile (valeur de projectl.ids) : liste @8070000 indexée par AD_PROJECTILE_NAMES
 // (new-lib/catalog.tpa) ; vide pour un projectile sans nom connu.
 DEFINE_PATCH_FUNCTION ad_projectile_name

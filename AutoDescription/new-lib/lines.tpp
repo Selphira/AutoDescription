@@ -293,6 +293,7 @@ END
 DEFINE_PATCH_FUNCTION ad_lines_section_text
 	INT_VAR
 		level = 1
+		strip_sections = 1
 	STR_VAR
 		section = ~~
 	RET
@@ -329,8 +330,9 @@ BEGIN
 	PHP_EACH section_lines AS _ => line_id BEGIN
 		SPRINT line_text $line_text(~%line_id%~)
 		// Texte qui commence par deux sauts de ligne (sections de niveaux d'un sous-sort) : écrit sans
-		// puce, ces sauts retirés, comme l'ancien add_items_section_to_description.
-		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
+		// puce, ces sauts retirés, comme l'ancien add_items_section_to_description ; gardé tel quel dans
+		// le texte d'un sous-sort (strip_sections à 0), qui le transmet à sa ligne parente.
+		PATCH_IF strip_sections AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
 			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
 				DELETE_BYTES 0 2 * STRING_LENGTH ~%CRLF%~
 			END
@@ -392,8 +394,8 @@ BEGIN
 END
 
 // Distance donnée en pieds : « 4,5 mètres » ou « 15 feet », le .tra choisissant l'unité. Mètres
-// arrondis au demi-mètre comme l'ancien feets_to_meters, pluriel à partir de 2 ; vide pour 1 mètre
-// ou moins, que l'ancien moteur écrit faux (« 9 mètres » pour 0,9 mètre).
+// arrondis au demi-mètre comme l'ancien feets_to_meters (« 0,5 mètre », « 1 mètre » pour un mètre ou
+// moins), pluriel à partir de 2 ; vide en deçà de 0,3 mètre, que l'ancien moteur écrit en décimètres.
 DEFINE_PATCH_FUNCTION ad_distance_text
 	INT_VAR
 		feet = 0
@@ -403,7 +405,7 @@ BEGIN
 	SPRINT text ~~
 	// Décimètres, troncature de l'ancien moteur (1 pied = 0,3048 mètre).
 	SET distance_decimeters = feet * 10000 / 3281
-	PATCH_IF distance_decimeters > 10 BEGIN
+	PATCH_IF distance_decimeters >= 3 BEGIN
 		SET distance_units = distance_decimeters / 10
 		SET distance_tenths = distance_decimeters MODULO 10
 		SET distance_half = distance_tenths >= 3 AND distance_tenths <= 7
@@ -413,6 +415,20 @@ BEGIN
 		SET distance_feet = feet
 		LPF ad_tra INT_VAR tra_id = 1100000 + (distance_units > 1 ? 1 : 0) + 2 * distance_half
 			tra_block_start = 1100000 tra_block_size = 4 RET text END // ~%distance_units% mètre~
+	END
+END
+
+// Nombre de lignes de premier niveau (« - » en début de ligne) du texte text (ancien
+// count_description_lines) : un titre de section s'accorde à ce nombre.
+DEFINE_PATCH_FUNCTION ad_count_text_lines
+	STR_VAR
+		text = ~~
+	RET
+		count
+BEGIN
+	SET count = 0
+	INNER_PATCH ~%text%~ BEGIN
+		COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ count
 	END
 END
 

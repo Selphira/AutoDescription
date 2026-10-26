@@ -122,9 +122,6 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 		ELSE PATCH_IF $fx_series_anchor(~%recursion_fx%~) AND NOT recursion_series BEGIN
 			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:series~ message = ~repeated effect casting a spell~ RET render_missing = refusal END
 		END
-		ELSE PATCH_IF $fx_versus_file(~%recursion_fx%~) > 0 BEGIN
-			LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:versus~ message = ~spell cast against a creature type (opcode 177)~ RET render_missing = refusal END
-		END
 		ELSE BEGIN
 			PATCH_IF ~%recursion_targets%~ STRING_EQUAL ~effect~ BEGIN
 				SET line_fx = recursion_fx
@@ -147,6 +144,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SET $fx_sub_casting_level(~%recursion_fx%~) = recursion_casting_level
 				SET $fx_sub_parent_dice(~%recursion_fx%~) = recursion_parent_dice
 				SET $fx_sub_force_target(~%recursion_fx%~) = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
+				SET $fx_sub_effect_targets(~%recursion_fx%~) = ~%recursion_targets%~ STRING_EQUAL ~effect~
 				SET $fx_sub_ignore_duration(~%recursion_fx%~) = recursion_ignore_duration
 				SET $fx_sub_versus_set(~%recursion_fx%~) = recursion_versus_set
 				SPRINT $fx_sub_versus(~%recursion_fx%~) ~%recursion_versus%~
@@ -195,12 +193,24 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			END
 			SPRINT recursion_resref $fx_sub_resref(~%recursion_fx%~)
 			SPRINT recursion_origin $fx_sub_origin(~%recursion_fx%~)
-			// Sections de niveaux remontées à la ligne parente seulement pour un sort lancé sans
-			// condition, probabilité ni délai (146, 148) par la ressource décrite : sinon l'ancien moteur
-			// les imbrique (SPCL423, 146 d'un EFF lancé à chaque coup).
+			// Chaînes de cible de l'effet recalculées après les regroupements, qui réunissent les types
+			// d'un 177 (OHHDRAIN : « les animaux et les humanoïdes »), et après le passage à « soi » de la
+			// cible préréglée d'un sort personnel (MELIS02 : « autour du lanceur »).
+			PATCH_IF $fx_sub_effect_targets(~%recursion_fx%~) BEGIN
+				SET line_fx = recursion_fx
+				SPRINT line_the_target ~~
+				LPM ad_application_form
+				LPM ad_application_target_strings
+				SPRINT line_only_for ~~
+				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%theTarget%~
+				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%ofTheTarget%~
+				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%toTheTarget%~
+			END
+			// Sections de niveaux d'un sous-sort écrites dans la ligne parente, sauf pour un sort lancé
+			// sous une probabilité ou après un délai (146, 148), dont les lignes ont leur propre préfixe.
 			SET recursion_lift_opcode = $fx_opcode(~%recursion_fx%~)
-			SET recursion_lift_sections = (recursion_lift_opcode == 146 OR recursion_lift_opcode == 148)
-				AND $fx_probability(~%recursion_fx%~) >= 100 AND NOT $fx_sub_delayed(~%recursion_fx%~) AND ~%ctx_origin%~ STRING_EQUAL ~~
+			SET recursion_lift_sections = NOT ((recursion_lift_opcode == 146 OR recursion_lift_opcode == 148)
+				AND ($fx_probability(~%recursion_fx%~) < 100 OR $fx_sub_delayed(~%recursion_fx%~)))
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
 			TO_UPPER recursion_origin_resource
 			SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
@@ -325,7 +335,14 @@ END
 // ligne).
 DEFINE_PATCH_MACRO ad_recursion_condition_text BEGIN
 	SPRINT line_text $fx_sub_text(~%recursion_fx%~)
-	PATCH_IF $fx_sub_count(~%recursion_fx%~) > 1 BEGIN
+	// Sections de niveaux sans ligne commune : déjà précédées de leurs sauts de ligne.
+	SET recursion_sections_first = INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0
+	PATCH_IF recursion_sections_first BEGIN
+		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+		END
+	END
+	ELSE PATCH_IF $fx_sub_count(~%recursion_fx%~) > 1 BEGIN
 		SPRINT line_text ~%CRLF%- %line_text%~
 		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
 			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
@@ -522,6 +539,7 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		LPM ad_fx_reset
 		SET fx_header_count = sub_header_count
 		READ_LONG  SPL_feature_blocks_offset fx_table_offset
+		LPM ad_fx_casting_range
 		SET fx_header_offset = sub_headers_offset + sub_header * 0x28
 		READ_BYTE  (fx_header_offset + SPL_HEAD_target)        sub_head_target
 		READ_BYTE  (fx_header_offset + SPL_HEAD_target_number) sub_head_target_count
@@ -663,7 +681,8 @@ DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 END
 
 // Chaînes de cible theTarget, ofTheTarget et toTheTarget remplacées par la zone du sous-sort
-// (ad_recursion_area) ; chacune est construite à partir des trois chaînes d'origine. range et angle
+// (ad_recursion_area), avec la phrase area_phrase (ctx_area_phrase, ou celle de l'appelant) ; chacune
+// est construite à partir des trois chaînes d'origine. range et angle
 // sont rétablis : la phrase de l'effet peut avoir les siens (opcode 235 : « à %range% du lanceur »).
 DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 	SPRINT area_saved_range ~%range%~
@@ -677,7 +696,7 @@ DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 		LPF ad_tra INT_VAR tra_id = 2001000 + ctx_area_creatures * 10 + area_form
 			tra_block_start = 2001000 tra_block_size = 100 RET target = text END // ~les créatures~
 		SPRINT main_target $area_main(~%area_form%~)
-		LPF ad_tra INT_VAR tra_id = ctx_area_phrase RET area_text = text END
+		LPF ad_tra INT_VAR tra_id = area_phrase RET area_text = text END
 		SPRINT $area_text(~%area_form%~) ~%area_text%~
 	END
 	SPRINT theTarget   $area_text(~0~)
@@ -781,16 +800,13 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	SET sub_sections_lifted = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPF ad_lines_section_text STR_VAR section = EVAL ~ability%sub_header%~ RET sub_text = text sub_count = count END
-		// Sous-sort décrit par tous ses en-têtes dont toutes les lignes sont dans des sections de niveaux
-		// (SPWI523) : comme l'ancien moteur, le texte est celui des sections, titres compris, précédé de
-		// deux sauts de ligne ; la ligne parente l'écrit sans puce (ad_lines_section_text).
-		// Refus sous la zone du projectile du sous-sort : l'ancien moteur y garde la cible de l'effet.
-		PATCH_IF sub_all_headers AND sub_count == 0 AND statistics_sections > 1 AND ctx_lift_sections BEGIN
+		LPF ad_lines_section_text INT_VAR strip_sections = 0 STR_VAR section = EVAL ~ability%sub_header%~ RET sub_text = text sub_count = count END
+		// Sous-sort décrit par tous ses en-têtes, à sections de niveaux : comme l'ancien moteur, ses
+		// lignes communes puis ses sections, titres compris, chacune précédée de deux sauts de ligne
+		// (SPWI523, SPCL414) ; une ligne qui commence par ces sauts est écrite sans puce
+		// (ad_lines_section_text), en retrait sous une condition (ad_effect_line).
+		PATCH_IF sub_all_headers AND statistics_sections > 1 AND ctx_lift_sections BEGIN
 			LPM ad_recursion_level_sections_text
-			PATCH_IF sub_sections_lifted AND ctx_area_phrase > 0 BEGIN
-				LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:level_sections_area~ message = ~level sections of a spell whose projectile has an area, where the old engine keeps the target of the effect~ RET render_missing = refusal END
-			END
 		END
 		// Toute ligne est dans la section de l'en-tête (les lignes probables regroupées en sont retirées).
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
@@ -819,13 +835,15 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 END
 
-// Texte des sections de niveaux d'un sous-sort (sub_text, sub_count), titres comme ceux d'un sort
-// (new-lib/spell_levels.tpp) ; sub_sections_lifted à 1 s'il en a.
+// Texte des lignes communes (sub_text, sub_count) suivies des sections de niveaux d'un sous-sort,
+// titres comme ceux d'un sort (new-lib/spell_levels.tpp) ; sub_sections_lifted à 1 s'il en a.
 DEFINE_PATCH_MACRO ad_recursion_level_sections_text BEGIN
+	SPRINT sub_base_text ~%sub_text%~
+	SET sub_base_count = sub_count
 	SPRINT sub_text ~~
 	FOR (sub_s = 1; sub_s < statistics_sections; ++sub_s) BEGIN
 		SPRINT sub_section_name $statistics_section(~%sub_s%~)
-		LPF ad_lines_section_text STR_VAR section = ~%sub_section_name%~ RET sub_section_lines = text sub_section_count = count END
+		LPF ad_lines_section_text INT_VAR strip_sections = 0 STR_VAR section = ~%sub_section_name%~ RET sub_section_lines = text sub_section_count = count END
 		PATCH_IF sub_section_count > 0 BEGIN
 			SET minRequiredLevel = $statistics_level_min(~%sub_s%~)
 			SET maxRequiredLevel = $statistics_level_max(~%sub_s%~)
@@ -843,4 +861,11 @@ DEFINE_PATCH_MACRO ad_recursion_level_sections_text BEGIN
 			SET sub_sections_lifted = 1
 		END
 	END
+	PATCH_IF sub_sections_lifted AND sub_base_count > 0 BEGIN
+		SPRINT sub_base_bullet ~%CRLF%- ~
+		INNER_PATCH_SAVE sub_base_text ~%sub_base_text%~ BEGIN
+			DELETE_BYTES 0 STRING_LENGTH ~%sub_base_bullet%~
+		END
+	END
+	SPRINT sub_text ~%sub_base_text%%sub_text%~
 END

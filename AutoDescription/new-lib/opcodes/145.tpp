@@ -1,6 +1,7 @@
 // Opcode 145 (Spell: Disable Spellcasting) : empêche de lancer des sorts du type parameter2 (0
-// profanes, 1 divins, 2 innés) : « Empêche le porteur de lancer des sorts profanes, divins et
-// druidiques » (ancien opcode_self_145). Avec AD_ENABLE_SHRINKAGE, les effets qui ne diffèrent que par
+// profanes, 1 divins, 2 innés ; 3, sur EE, sorts sans l'indicateur « Ignore dead/wild magic »,
+// IESDP) : « Empêche le porteur de lancer des sorts profanes, divins et druidiques », « … des sorts
+// sensibles aux zones de magie morte et aux hiatus entropiques » (ancien opcode_self_145). Avec AD_ENABLE_SHRINKAGE, les effets qui ne diffèrent que par
 // le type de sort sont réunis (ad_group_spell_types, new-lib/groups.tpp, fx_spell_types). Avec
 // AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS, une armure qui n'est pas une robe n'a pas de ligne pour les
 // sorts profanes : elle ne dit simplement pas « Permet de lancer des sorts profanes »
@@ -10,8 +11,8 @@
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp).
 
-// Refus : type de sort hors de 0-2 (l'ancien opcode_145_is_valid écarte un type hors de 0-3 ; le
-// type 3 n'a pas de nom).
+// Refus : type de sort hors de 0-3 (écarté par l'ancien opcode_145_is_valid) ; type 3 réuni à
+// d'autres types (l'ancien moteur en perd le nom).
 DEFINE_PATCH_MACRO ad_op_145_support BEGIN
 	PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -23,7 +24,7 @@ DEFINE_PATCH_MACRO ad_op_145_support BEGIN
 					LPM ad_application_drop
 				END
 			END
-			ELSE PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 2 BEGIN
+			ELSE PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 3 BEGIN
 				LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:spell_types~ message = ~spell type (parameter2) not supported~ RET render_missing = refusal END
 			END
 		END
@@ -44,7 +45,15 @@ DEFINE_PATCH_MACRO ad_op_145_lines BEGIN
 				// Ancien opcode_self_145 : effet de type profane, ou réuni aux seuls types profanes.
 				SET spellcasting_armor_rule = ($fx_parameter2(~%spellcasting_id%~) == 0 OR spellcasting_types == 1)
 					AND AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS AND item_type == ITM_TYPE_armor AND NOT spellcasting_robe
-				PATCH_IF NOT spellcasting_armor_rule BEGIN
+				PATCH_IF NOT spellcasting_armor_rule AND $fx_parameter2(~%spellcasting_id%~) == 3 BEGIN
+					PATCH_IF $fx_spell_types(~%spellcasting_id%~) != 0 BEGIN
+						LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:magical_group~ message = ~spell type 3 merged with other spell types~ RET render_late_missing = refusal END
+					END
+					SET line_phrase = 21450120 // ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
+					SET line_fx = spellcasting_id
+					LPM ad_effect_line
+				END
+				ELSE PATCH_IF NOT spellcasting_armor_rule BEGIN
 					SET line_phrase = 21450110 // ~Empêche %theTarget% de lancer des sorts~
 					PATCH_IF spellcasting_types != 7 BEGIN
 						CLEAR_ARRAY spellcasting_names

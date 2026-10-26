@@ -566,7 +566,7 @@ OHBPTN11	identical
 OHBREW01	identical
 OHBREW02	identical
 OHBREW03	identical
-OHBREW04	not_covered	not_implemented:recursion:versus
+OHBREW04	not_covered	not_implemented:versus:ids_name
 OHBREW05	identical
 OHBRING1	identical
 OHBRING2	identical

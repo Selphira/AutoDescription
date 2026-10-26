@@ -15,7 +15,8 @@
 // un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
 // fx_level_value et fx_level_duration (vides à la lecture, progressions de la valeur et de la durée
-// d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ;
+// d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ; fx_level_progression
+// (0 à la lecture, 1 pour un effet qui porte une telle progression) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
 // pour un effet écarté, ad_application_drop) ; fx_level_merged (1 pour l'effet d'un en-tête que l'effet
@@ -34,7 +35,8 @@
 // fx_id), parcouru par PHP_EACH ~fx_ids_%opcode%~ AS _ => id ; un opcode absent n'a pas de tableau
 // et la boucle ne fait rien. Une passe qui change l'opcode d'un effet reconstruit les deux tableaux
 // (ad_fx_index_opcode).
-// Variable lue par ad_fx_load_spell : fx_with_casting (0 : le bloc de lancement n'est pas lu).
+// Variable lue par ad_fx_load_spell : fx_with_casting (0 : le bloc de lancement n'est pas lu ; 1 :
+// il l'est, avant les en-têtes, en bloc « casting » sans en-tête, décrit à part).
 // Variables écrites : fx_count, fx_header_count, fx_load_error (vide si la lecture a réussi) et
 // fx_load_message (son explication, en anglais, pour les journaux).
 
@@ -43,6 +45,8 @@
 DEFINE_PATCH_MACRO ad_fx_reset BEGIN
 	SET fx_count = 0
 	SET fx_header_count = 0
+	SET fx_casting_start = 0
+	SET fx_casting_count = 0
 	SET recursion_pending_count = 0
 	SPRINT fx_load_error ~~
 	SPRINT fx_load_message ~~
@@ -143,8 +147,9 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 		READ_LONG  SPL_extended_headers_offset       fx_headers_offset
 		READ_SHORT SPL_extended_headers_count        fx_header_count
 		// Malgré leur nom BGforge, 0x6e et 0x20 sont des index dans la table d'effets (IESDP).
-		READ_SHORT SPL_casting_feature_blocks_offset fx_block_index
-		READ_SHORT SPL_casting_feature_blocks_count  fx_block_count
+		LPM ad_fx_casting_range
+		SET fx_block_index = fx_casting_start
+		SET fx_block_count = fx_casting_count
 		SPRINT fx_block_kind ~casting~
 		SET fx_block_header = 0 - 1
 		PATCH_IF fx_with_casting BEGIN
@@ -191,9 +196,27 @@ DEFINE_PATCH_MACRO ad_fx_load_block BEGIN
 	END
 END
 
+// Bloc de lancement du sort chargé (fx_casting_start, fx_casting_count) : un effet d'en-tête qui y
+// tombe n'est pas relu avec l'en-tête (ad_fx_load_block_effect).
+DEFINE_PATCH_MACRO ad_fx_casting_range BEGIN
+	READ_SHORT SPL_casting_feature_blocks_offset fx_casting_start
+	READ_SHORT SPL_casting_feature_blocks_count  fx_casting_count
+END
+
+// Un effet d'en-tête pris dans le bloc de lancement (index de l'en-tête qui le chevauche : OHBWI302,
+// OHBWI304) n'est pas lu : le jeu l'applique déjà à chaque lancement.
 DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	SET fx_offset = fx_table_offset + (fx_block_index + fx_p) * 0x30
-	PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
+	SET fx_table_index = fx_block_index + fx_p
+	PATCH_IF fx_block_header >= 0
+			AND fx_table_index >= fx_casting_start AND fx_table_index < fx_casting_start + fx_casting_count BEGIN
+		PATCH_IF fx_pass == 0 BEGIN
+			SET fx_casting_end = fx_casting_start + fx_casting_count - 1
+			LPF ad_refusal STR_VAR reason = ~file_error:spell:casting_overlap~ message = ~ability %fx_block_header% effect %fx_p% (index %fx_table_index%) is also casting effect %fx_table_index% (casting effects %fx_casting_start%-%fx_casting_end%): ability effect index %fx_block_index% overlaps the casting effects; read once, as a casting effect~ RET fx_overlap_event = refusal END
+			LPF ad_log_event STR_VAR event = ~%fx_overlap_event%~ consequence = ~ignored~ RET fx_overlap_logged = reason END
+		END
+	END
+	ELSE PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
 		SPRINT fx_load_error ~invalid_effect~
 		SPRINT fx_load_message ~%fx_block_kind% effect %fx_p%~
 		PATCH_IF fx_block_header >= 0 BEGIN
@@ -298,6 +321,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_series_anchor(~%fx_id%~) = 0
 	SPRINT $fx_level_value(~%fx_id%~) ~~
 	SPRINT $fx_level_duration(~%fx_id%~) ~~
+	SET $fx_level_progression(~%fx_id%~) = 0
 	LPM ad_fx_mark_target_exception
 	LPM ad_fx_mark_not_cumulative
 	SET fx_opcode = $fx_opcode(~%fx_id%~)

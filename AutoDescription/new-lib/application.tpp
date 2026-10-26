@@ -43,7 +43,8 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 					LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:effect_kind~ message = ~equipped effect of this opcode with this timing or probability not supported~ RET render_missing = refusal END
 				END
 			END
-			ELSE PATCH_IF ~%app_block%~ STRING_EQUAL ~ability~ BEGIN
+			// Les effets de lancement d'un sort s'écrivent comme ceux d'un en-tête.
+			ELSE PATCH_IF (~%app_block%~ STRING_EQUAL ~ability~) OR (~%app_block%~ STRING_EQUAL ~casting~) BEGIN
 				LPM ad_application_ability_support
 			END
 			ELSE BEGIN
@@ -307,6 +308,12 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	SET app_header = $fx_header(~%line_fx%~)
 	SET app_timing = $fx_timing(~%line_fx%~)
 	SET app_duration = $fx_duration(~%line_fx%~)
+	// L'en-tête du sort ne compte pas les effets de lancement : leur durée est toujours écrite.
+	SPRINT app_duration_block $fx_block(~%line_fx%~)
+	SET app_hide_duration = ctx_ignore_duration AND NOT (~%app_duration_block%~ STRING_EQUAL ~casting~)
+	PATCH_IF app_header >= 0 BEGIN
+		SET app_hide_duration = app_hide_duration OR $charged_global_duration(~%app_header%~) > 0
+	END
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FIXED_DURATION(~%app_opcode%~) BEGIN
 		SET app_timing = TIMING_duration
 		SET app_duration = $AD_OPCODE_FIXED_DURATION(~%app_opcode%~)
@@ -346,7 +353,7 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		SPRINT app_duration_text @3000005 // ~après %strDuration%~
 	END
 	ELSE PATCH_IF (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)
-			OR $charged_global_duration(~%app_header%~) > 0 OR ctx_ignore_duration OR app_timing == TIMING_while_equipped OR app_timing == TIMING_delayed BEGIN
+			OR app_hide_duration OR app_timing == TIMING_while_equipped OR app_timing == TIMING_delayed BEGIN
 		SPRINT app_duration_text ~~
 	END
 	ELSE PATCH_IF app_timing == TIMING_permanent OR app_timing == TIMING_permanent_after_death BEGIN
@@ -409,7 +416,8 @@ END
 DEFINE_PATCH_MACRO ad_application_save BEGIN
 	SPRINT app_save_text ~~
 	SET app_save_types = $fx_save_types(~%line_fx%~)
-	PATCH_IF ctx_ignore_save BEGIN
+	SPRINT app_save_block $fx_block(~%line_fx%~)
+	PATCH_IF ctx_ignore_save AND NOT (~%app_save_block%~ STRING_EQUAL ~casting~) BEGIN
 	END
 	ELSE PATCH_IF line_fail_for_half AND (app_save_types == 0 OR line_save_for_half) BEGIN
 		SPRINT app_save_text @5000050 // ~réduits de moitié~
@@ -502,6 +510,17 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		SPRINT toTheTarget ~%ctx_to_the_target%~
 	END
 	PATCH_IF ctx_area_phrase > 0 AND NOT app_target_missing BEGIN
+		// Cible principale qui est la source, que l'effet excepte (ligne 43 de splprot.2da) : seules
+		// les créatures de la zone (ancien get_target_by_projectile, sourceExcluded).
+		SET area_phrase = ctx_area_phrase
+		PATCH_IF area_phrase == 2001103 BEGIN
+			LPM ad_fx_source_excluded
+			LPM ad_application_source
+			LPF ad_tra INT_VAR tra_id = source_tra tra_block_start = 2000000 tra_block_size = 1000 RET app_source_name = text END // ~le lanceur~ (@2000120)
+			PATCH_IF source_excluded AND (~%theTarget%~ STRING_EQUAL ~%app_source_name%~) BEGIN
+				SET area_phrase = 2001100 // ~%target% dans un rayon de %range%~
+			END
+		END
 		LPM ad_recursion_area_strings
 	END
 	PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
@@ -662,6 +681,23 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			SPRINT ofTheTarget @2002011 // ~des %targetType%~
 			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_to% ~ final_glue = EVAL ~ %app_versus_and_to% ~ RET targetType = text END
 			SPRINT toTheTarget @2002012 // ~aux %targetType%~
+			// Sous-effet d'un sort à zone : la zone restreint les types (SPPR515 : « les morts-vivants
+			// dans un rayon de 2,5 mètres »), comme l'ancien get_target_by_projectile corrigé.
+			PATCH_IF ctx_area_phrase > 0 BEGIN
+				SPRINT app_versus_saved_range ~%range%~
+				SET app_versus_saved_angle = angle
+				SPRINT range ~%ctx_area_range%~
+				SET angle = ctx_area_angle
+				SET app_versus_area_phrase = ctx_area_phrase == 2001102 ? 2001102 : 2001100
+				SPRINT target ~%theTarget%~
+				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET theTarget = text END // ~%target% dans un rayon de %range%~
+				SPRINT target ~%ofTheTarget%~
+				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET ofTheTarget = text END
+				SPRINT target ~%toTheTarget%~
+				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET toTheTarget = text END
+				SPRINT range ~%app_versus_saved_range%~
+				SET angle = app_versus_saved_angle
+			END
 			SET app_target_missing = 0
 			PATCH_IF line_form == 0 OR line_form == 2 BEGIN
 				SPRINT line_only_for ~%app_versus_only_for%~
@@ -719,7 +755,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	SPRINT app_saved_section ~%line_section%~
 	SPRINT app_block $fx_block(~%line_fx%~)
-	PATCH_IF ~%app_block%~ STRING_EQUAL ~ability~ BEGIN
+	PATCH_IF (~%app_block%~ STRING_EQUAL ~ability~) OR (~%app_block%~ STRING_EQUAL ~casting~) BEGIN
 		SPRINT line_section $fx_line_section(~%line_fx%~)
 		LPM ad_application_duration
 		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) AND NOT line_no_duration BEGIN
@@ -733,7 +769,12 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET app_opcode = $fx_opcode(~%line_fx%~)
 	PATCH_IF $fx_not_cumulative(~%line_fx%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_ALWAYS_CUMULATIVE(~%app_opcode%~) BEGIN
 		SPRINT app_not_cumulative @4000010 // ~non cumulatif~
-		SPRINT line_text ~%line_text% (%app_not_cumulative%)~
+		SPRINT app_not_cumulative ~ (%app_not_cumulative%)~
+		// Pas de seconde mention après la dernière sous-ligne d'un sort lancé qui l'a déjà.
+		SET app_not_cumulative_start = STRING_LENGTH ~%line_text%~ - STRING_LENGTH ~%app_not_cumulative%~
+		PATCH_IF app_not_cumulative_start < 0 OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_not_cumulative%~ ~%line_text%~ app_not_cumulative_start) != app_not_cumulative_start BEGIN
+			SPRINT line_text ~%line_text%%app_not_cumulative%~
+		END
 	END
 	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~
@@ -782,10 +823,23 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition~ RET render_late_missing = refusal END
 			SET app_line_ok = 0
 		END
+		// Sections de niveaux d'un sous-sort sans ligne commune : en retrait sous la condition (ancien
+		// add_condition, qui décale les sauts de ligne d'une description commencée par un saut de ligne).
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
+			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+				REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+			END
+		END
 		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~
 	END
 	PATCH_IF app_line_ok BEGIN
+		SET app_line_count = line_count
 		LPM ad_line_add
+		// Progression selon le niveau du sort : l'ancien moteur ajoute l'effet qui la porte en fin de
+		// liste ; à rang égal, il vient donc avant les autres lignes (égalités inversées, SPWI603).
+		PATCH_IF line_count > app_line_count AND $fx_level_progression(~%line_fx%~) BEGIN
+			SET $line_order(~%app_line_count%~) = app_line_count + 500
+		END
 	END
 	SET line_sort = app_saved_sort
 	SET line_probability = 0

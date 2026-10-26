@@ -41,7 +41,7 @@ OHBWI405	identical
 OHDCUT02	identical
 OHDPOTN1	identical
 OHDXDIS	identical
-OHHDRAIN	not_covered	not_implemented:recursion:versus
+OHHDRAIN	identical
 OHHSUMM	identical
 OHNDDOOR	identical
 OHNRDKIL	identical
@@ -80,9 +80,9 @@ SPCL239	identical
 SPCL311	identical
 SPCL321	identical
 SPCL342	identical
-SPCL412	not_covered	not_implemented:recursion:spell:progression_two_values
-SPCL414	not_covered	not_implemented:recursion:level_sections
-SPCL423	not_covered	not_implemented:recursion:level_sections
+SPCL412	identical
+SPCL414	identical
+SPCL423	identical
 SPCL521	identical
 SPCL522	identical
 SPCL611	identical
@@ -127,7 +127,7 @@ SPCL916	identical
 SPCL917	identical
 SPCL918	identical
 SPCL919	identical
-SPCL920	not_covered	not_implemented:recursion:opcode318:exceptions_group
+SPCL920	identical
 SPCL921	identical
 SPCL922	identical
 SPCL923	identical
@@ -411,7 +411,7 @@ SPPR511	identical
 SPPR512	identical
 SPPR513	identical
 SPPR514	identical
-SPPR515	not_covered	not_implemented:recursion:versus_mixed
+SPPR515	identical
 SPPR515D	identical
 SPPR516	identical
 SPPR517	identical
@@ -432,7 +432,7 @@ SPPR612	identical
 SPPR613	identical
 SPPR614	identical
 SPPR650	identical
-SPPR698	not_covered	not_implemented:recursion:area_range
+SPPR698	identical
 SPPR698D	identical
 SPPR699	identical
 SPPR701	identical
@@ -552,7 +552,7 @@ SPWI314	identical
 SPWI315	identical
 SPWI316	identical
 SPWI317	identical
-SPWI318	not_covered	not_implemented:opcode201:group_fields
+SPWI318	identical
 SPWI319	identical
 SPWI320	identical
 SPWI321	identical
@@ -619,10 +619,10 @@ SPWI519	identical
 SPWI520	identical
 SPWI521	identical
 SPWI522	identical
-SPWI523	not_covered	not_implemented:recursion:level_sections_area
+SPWI523	identical
 SPWI601	identical
 SPWI602	identical
-SPWI603	not_covered	not_implemented:opcode145:spell_types
+SPWI603	identical
 SPWI604	identical
 SPWI605	identical
 SPWI606	identical

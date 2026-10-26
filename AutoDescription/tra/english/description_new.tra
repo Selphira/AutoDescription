@@ -61,6 +61,10 @@
 @1300004 = ~Charge abilities~ // reprise de @100012
 @1300005 = ~Charge ability~ // reprise de @100015
 @1300006 = ~Ability %abilityNumber%~ // reprise de @101124
+@1300007 = ~Casting ability~ // reprise de @100016
+@1300008 = ~Spell ability~ // reprise de @100017
+@1300009 = ~Casting abilities~ // reprise de @100022
+@1300010 = ~Spell abilities~ // reprise de @100023
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
@@ -2604,6 +2608,10 @@
 @21450111 = ~Disables %theTarget% to cast spells~ // reprise de @11450001
 @21450112 = ~to disable %theTarget% to cast spells~ // reprise de @11450051
 @21450113 = ~to disable %theTarget% to cast spells~ // reprise de @11450051
+@21450120 = ~Disables %theTarget% to cast spells affected by dead magic zones and wild surges~ // reprise de @11450002
+@21450121 = ~Disables %theTarget% to cast spells affected by dead magic zones and wild surges~ // reprise de @11450002
+@21450122 = ~to disable %theTarget% to cast spells affected by dead magic zones and wild surges~ // reprise de @11450052
+@21450123 = ~to disable %theTarget% to cast spells affected by dead magic zones and wild surges~ // reprise de @11450052
 
 // Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
 @21460000 = ~as a level %castingLevel% spellcaster~ // reprise de @102095
@@ -3035,7 +3043,7 @@
 @22320020 = ~Every round~ // reprise de @12320020
 @22320021 = ~When the wearer takes damage~ // reprise de @12320021
 @22320022 = ~When the wearer kills the target~ // reprise de @12320022
-@22320024 = ~When the target is less than %range%~ // reprise de @12320024
+@22320024 = ~When a creature is within %range%~ // reprise de @12320024
 @22320026 = ~When the wearer dies~ // reprise de @12320026
 @22320027 = ~When a creature dies~ // reprise de @12320027
 @22320028 = ~When %theTarget% is repelled by a cleric or paladin~ // reprise de @12320028
@@ -3350,6 +3358,7 @@
 @23240005 = ~creatures under the effect of %splstateName%~ // reprise de @13241110
 @23240006 = ~creatures %descriptionState%~ // reprise de @13241138
 @23240007 = ~during the iron crisis~ // reprise de @13240401
+@23240008 = ~creatures other than the caster~ // reprise de @13241999
 @23241003 = ~creatures immune to fire~ // reprise de @13241003
 @23241004 = ~creatures sensitive to fire~ // reprise de @13241004
 @23241013 = ~gigantic creatures~ // reprise de @13241013

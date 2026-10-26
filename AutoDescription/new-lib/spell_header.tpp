@@ -90,6 +90,13 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 		PATCH_IF AD_ENABLE_SHRINKAGE AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
 			LPM ad_op_206_header_groups
 		END
+		PATCH_IF AD_ENABLE_SHRINKAGE AND fx_header_count > 1 BEGIN
+			PATCH_FOR_EACH power_opcode IN 200 201 BEGIN
+				PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%power_opcode%~) BEGIN
+					LPM ad_spell_power_header_groups
+				END
+			END
+		END
 	END
 	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) AND ~%header_missing%~ STRING_EQUAL ~~ BEGIN
 		SPRINT header_missing ~%render_missing%~
@@ -365,9 +372,9 @@ DEFINE_PATCH_MACRO ad_spell_header_type_line BEGIN
 	SPRINT description ~%description%%CRLF%(%header_line%)~
 END
 
-// Distance d'un en-tête de sort, donnée en pieds, comme l'ancien feets_to_meters : au-delà d'un
+// Distance d'un en-tête de sort, donnée en pieds, comme l'ancien feets_to_meters : à partir de 0,3
 // mètre, comme ad_distance_text ; en deçà, l'ancien moteur écrit en français le nombre de décimètres
-// comme des mètres (« 3 mètres » pour 1 pied), en anglais le nombre de pieds. distance_number : ce
+// comme des mètres (« 2 mètres » pour 0,2 mètre), en anglais le nombre de pieds. distance_number : ce
 // nombre, que la portée compare à 2 (« Contact » en deçà) ; 2 au-delà d'un mètre.
 DEFINE_PATCH_FUNCTION ad_spell_distance_text
 	INT_VAR
@@ -405,7 +412,7 @@ DEFINE_PATCH_MACRO ad_spell_header_range BEGIN
 	END
 	PATCH_IF range_same BEGIN
 		LPF ad_spell_distance_text INT_VAR feet = $range_feet(~0~) RET value = text range_number = distance_number END
-		PATCH_IF range_number < 2 BEGIN
+		PATCH_IF range_number < 11 BEGIN
 			SPRINT value @7000012 // ~Contact~
 		END
 	END
@@ -1045,8 +1052,9 @@ BEGIN
 	SET tail_bonus = 0 - 1
 	SET tail_special = 0
 	SET tail_half = 0
-	// Seuls ses effets comptent, pas leurs phrases.
+	// Seuls ses effets comptent, pas leurs phrases ; sous-sort, sans ses effets de lancement.
 	SET support_header_only = 1
+	SET fx_with_casting = 0
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 		LPM ad_fx_load_spell
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN

@@ -10,14 +10,16 @@
 // nom) ; total inférieur à 1 (écarté par l'ancien opcode_200_is_valid sur un jeu classique, « Lance »
 // sur EE) ; sur EE, sort à lancer qui a un nom (la ressource, sinon le sort <objet>B : l'ancien
 // side_spell ajoute « puis lance « … » ») ; sans AD_ENABLE_SHRINKAGE, niveau au-delà de 2 (l'ancien
-// moteur le lit comme une liste de niveaux, BUG-034) ; avec AD_ENABLE_SHRINKAGE, effets de même total
-// aux autres champs différents (l'ancien moteur les réunit et garde ceux du dernier effet lu).
+// moteur le lit comme une liste de niveaux, BUG-034). Avec AD_ENABLE_SHRINKAGE, des effets de même
+// total aux autres champs différents (durée…) forment des lignes distinctes ; l'anomalie de la série
+// est journalisée (erreur de fichier, décrit quand même : SPWI318 au niveau 11).
 DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 	SPRINT power_own_spell ~~
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
 		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET power_own_spell = name END
 	END
 	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
+		SET $fx_power_mask(~%power_id%~) = 0
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET power_level = $fx_parameter2(~%power_id%~)
 			SPRINT power_resref $fx_resource(~%power_id%~)
@@ -44,18 +46,57 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 	END
 END
 
+// Effets de même total de la portée de power_id, s'il en est le premier, aux autres champs
+// différents : journalisés.
 DEFINE_PATCH_MACRO ad_spell_power_group_support BEGIN
 	SET same_id = power_id
 	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
 	SPRINT power_scope $fx_scope(~%power_id%~)
+	SET power_first = 1
 	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
 		SPRINT power_other_scope $fx_scope(~%power_other%~)
-		PATCH_IF (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
+		PATCH_IF power_other < power_id AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
+			SET power_first = 0
+		END
+	END
+	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
+		SPRINT power_other_scope $fx_scope(~%power_other%~)
+		PATCH_IF power_first AND power_other > power_id AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
 			SET same_other = power_other
 			LPM ad_fx_same_fields
 			PATCH_IF NOT fx_same BEGIN
-				LPF ad_refusal INT_VAR fx_id = power_other STR_VAR reason = ~not_implemented:opcode%power_opcode%:group_fields~ message = ~effects with different fields~ RET render_missing = refusal END
+				SET power_other_duration = $fx_duration(~%power_other%~)
+				SET power_duration = $fx_duration(~%power_id%~)
+				SET power_other_level = $fx_parameter2(~%power_other%~)
+				LPF ad_refusal INT_VAR fx_id = power_other STR_VAR reason = ~file_error:opcode%power_opcode%:inconsistent_series~ message = ~spell level %power_other_level% with other fields than the first effect of the same total (duration %power_other_duration% instead of %power_duration%), written on its own line~ RET power_event = refusal END
+				LPF ad_log_event STR_VAR event = ~%power_event%~ consequence = ~kept~ RET power_logged = reason END
 			END
+		END
+	END
+END
+
+// Sort à plusieurs en-têtes (new-lib/spell_header.tpp), comme l'ancien opcode_200_group avant la
+// comparaison des niveaux : dans chaque en-tête, les effets de même total et de mêmes champs sont
+// réunis au premier (fx_power_mask : masque des niveaux), les autres écartés ; les en-têtes se
+// comparent avec ce masque (ad_spell_level_same).
+DEFINE_PATCH_MACRO ad_spell_power_header_groups BEGIN
+	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%power_id%~) AND $fx_power_mask(~%power_id%~) == 0 BEGIN
+			SET power_mask = 1 << ($fx_parameter2(~%power_id%~) - 1)
+			SET same_id = power_id
+			SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
+			PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
+				PATCH_IF power_other > power_id AND NOT $fx_consumed(~%power_other%~) AND $fx_header(~%power_other%~) == $fx_header(~%power_id%~)
+						AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
+					SET same_other = power_other
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET power_mask = power_mask BOR (1 << ($fx_parameter2(~%power_other%~) - 1))
+						SET $fx_consumed(~%power_other%~) = 1
+					END
+				END
+			END
+			SET $fx_power_mask(~%power_id%~) = power_mask
 		END
 	END
 END
@@ -74,8 +115,15 @@ DEFINE_PATCH_MACRO ad_spell_power_lines BEGIN
 			PATCH_IF NOT $fx_consumed(~%power_id%~) AND $power_anchor(~%power_id%~) == power_id BEGIN
 				PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_other BEGIN
 					SPRINT power_other_scope $fx_scope(~%power_other%~)
-					PATCH_IF power_other >= power_id + 1 AND NOT $fx_consumed(~%power_other%~) AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~) BEGIN
-						SET $power_anchor(~%power_other%~) = power_id
+					PATCH_IF power_other >= power_id + 1 AND NOT $fx_consumed(~%power_other%~) AND (~%power_other_scope%~ STRING_EQUAL ~%power_scope%~) AND $fx_parameter1(~%power_other%~) == $fx_parameter1(~%power_id%~)
+							AND $power_anchor(~%power_other%~) == power_other BEGIN
+						SET same_id = power_id
+						SET same_other = power_other
+						SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_SPECIAL
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
+							SET $power_anchor(~%power_other%~) = power_id
+						END
 					END
 				END
 			END
@@ -89,6 +137,10 @@ DEFINE_PATCH_MACRO ad_spell_power_lines BEGIN
 					SET power_bit = 1
 					FOR (power_shift = 1; power_shift < $fx_parameter2(~%power_member%~); ++power_shift) BEGIN
 						SET power_bit *= 2
+					END
+					// Effet qui en réunit déjà d'autres dans son en-tête (ad_spell_power_header_groups).
+					PATCH_IF $fx_power_mask(~%power_member%~) > 0 BEGIN
+						SET power_bit = $fx_power_mask(~%power_member%~)
 					END
 					SET power_mask = power_mask BOR power_bit
 				END

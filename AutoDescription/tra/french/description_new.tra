@@ -61,6 +61,10 @@
 @1300004 = ~Capacités de charge~ // reprise de @100012
 @1300005 = ~Capacité de charge~ // reprise de @100015
 @1300006 = ~Capacité %abilityNumber%~ // reprise de @101124
+@1300007 = ~Capacité d'incantation~ // reprise de @100016
+@1300008 = ~Capacité du sort~ // reprise de @100017
+@1300009 = ~Capacités d'incantation~ // reprise de @100022
+@1300010 = ~Capacités du sort~ // reprise de @100023
 
 // Mise en forme : expressions régulières d'analyse des descriptions d'origine (1 900 000-1 900 099)
 @1900000 = ~^[ %TAB%]*\(CARACTÉRISTIQUES\|Caractéristiques\|CARACTERISTIQUES\|PARAMETRES\|PARAMÈTRES\|STATISTIQUES\|CAPACITES SPECIALES\|CAPACITES DE COMBAT\|Capacité de combat\|Capacités spéciales\|Capacité d'équipement\|Capacités d'équipement\|Capacités de charge\|Capacités de combat\|Poids\|Weight\|Statistics\|EIGENSCHAFTEN\|STATISTICHE\|Caratteristiche\|SPEZIELLE EIGENSCHAFTEN\)+\(.*[%MNL%%LNL%%WNL%]*\)*~ // reprise de @10008
@@ -2604,6 +2608,10 @@
 @21450111 = ~Empêche %theTarget% de lancer des sorts~ // reprise de @11450001
 @21450112 = ~d'empêcher %theTarget% de lancer des sorts~ // reprise de @11450051
 @21450113 = ~d'empêcher %theTarget% de lancer des sorts~ // reprise de @11450051
+@21450120 = ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450002
+@21450121 = ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450002
+@21450122 = ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450052
+@21450123 = ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450052
 
 // Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
 @21460000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
@@ -3035,7 +3043,7 @@
 @22320020 = ~À chaque round~ // reprise de @12320020
 @22320021 = ~Lorsque le porteur subit des dégâts~ // reprise de @12320021
 @22320022 = ~Lorsque le porteur tue la cible~ // reprise de @12320022
-@22320024 = ~Lorsque la cible se trouve à moins de %range%~ // reprise de @12320024
+@22320024 = ~Lorsqu'une créature se trouve à moins de %range%~ // reprise de @12320024
 @22320026 = ~Lorsque le porteur meurt~ // reprise de @12320026
 @22320027 = ~Lorsqu'une créature meurt~ // reprise de @12320027
 @22320028 = ~Lorsque %theTarget% est repoussé par un clerc ou un paladin~ // reprise de @12320028
@@ -3350,6 +3358,7 @@
 @23240005 = ~créatures affectées par %splstateName%~ // reprise de @13241110
 @23240006 = ~créatures %descriptionState%~ // reprise de @13241138
 @23240007 = ~durant la pénurie de fer~ // reprise de @13240401
+@23240008 = ~créatures autres que le lanceur~ // reprise de @13241999
 @23241003 = ~créatures insensibles au feu~ // reprise de @13241003
 @23241004 = ~créatures sensibles au feu~ // reprise de @13241004
 @23241013 = ~créatures gigantesques~ // reprise de @13241013
@@ -3364,7 +3373,7 @@
 @23241038 = ~créatures neutres ou bonnes~ // reprise de @13241038
 @23241041 = ~créatures du même alignement que le porteur~ // reprise de @13241041
 @23241042 = ~créatures d'un alignement différent du porteur~ // reprise de @13241042
-@23241044 = ~créatures autre que le porteur~ // reprise de @13241044
+@23241044 = ~créatures autres que le porteur~ // reprise de @13241044
 @23241053 = ~créatures insensibles au feu ou au froid~ // reprise de @13241053
 @23241054 = ~créatures sensibles au feu ou au froid~ // reprise de @13241054
 @23241057 = ~créatures masculines~ // reprise de @13241057

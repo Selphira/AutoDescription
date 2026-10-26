@@ -67,7 +67,7 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		FOR (statistics_line = 0; statistics_line < line_count; ++statistics_line) BEGIN
 			SPRINT statistics_line_section $line_section(~%statistics_line%~)
-			SET statistics_known = ~%statistics_line_section%~ STRING_EQUAL ~~
+			SET statistics_known = (~%statistics_line_section%~ STRING_EQUAL ~~) OR (~%statistics_line_section%~ STRING_EQUAL ~casting~)
 			FOR (statistics_s = 0; statistics_s < statistics_sections; ++statistics_s) BEGIN
 				SPRINT statistics_name $statistics_section(~%statistics_s%~)
 				PATCH_IF ~%statistics_line_section%~ STRING_EQUAL ~%statistics_name%~ BEGIN
@@ -82,7 +82,8 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_lines_section_text STR_VAR section = ~ability0~ RET statistics_lines = text END
 		SPRINT title @1300000 // ~PARAMÈTRES~
-		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%CRLF%%statistics_lines%~
+		SPRINT description ~%description%%CRLF%%CRLF%%title%%AD_COLON%%CRLF%~
+		SPRINT statistics_text ~%statistics_lines%~
 		FOR (statistics_s = 1; statistics_s < statistics_sections; ++statistics_s) BEGIN
 			SPRINT statistics_name $statistics_section(~%statistics_s%~)
 			LPF ad_lines_section_text STR_VAR section = ~%statistics_name%~ RET statistics_lines = text statistics_count = count END
@@ -99,9 +100,29 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 				ELSE BEGIN
 					SPRINT statistics_title @7002001 // ~Entre le niveau %minRequiredLevel% et %maxRequiredLevel%~
 				END
-				SPRINT description ~%description%%CRLF%%CRLF%%statistics_title%%statistics_lines%~
+				SPRINT statistics_text ~%statistics_text%%CRLF%%CRLF%%statistics_title%%statistics_lines%~
 			END
 		END
+		// Effets de lancement d'abord, sous leur titre ; les autres sous le leur s'il y en a (ancien
+		// add_casting_features). Titres au pluriel pour plusieurs lignes.
+		LPF ad_lines_section_text STR_VAR section = ~casting~ RET casting_lines = text casting_count = count END
+		PATCH_IF casting_count > 0 BEGIN
+			LPF ad_count_text_lines STR_VAR text = ~%casting_lines%~ RET casting_text_lines = count END
+			SPRINT casting_title @1300007 // ~Capacité d'incantation~
+			PATCH_IF casting_text_lines > 1 BEGIN
+				SPRINT casting_title @1300009 // ~Capacités d'incantation~
+			END
+			SPRINT description ~%description%%CRLF%%casting_title%%AD_COLON%%casting_lines%~
+			PATCH_IF NOT (~%statistics_text%~ STRING_EQUAL ~~) BEGIN
+				LPF ad_count_text_lines STR_VAR text = ~%statistics_text%~ RET effects_text_lines = count END
+				SPRINT effects_title @1300008 // ~Capacité du sort~
+				PATCH_IF effects_text_lines > 1 BEGIN
+					SPRINT effects_title @1300010 // ~Capacités du sort~
+				END
+				SPRINT statistics_text ~%CRLF%%CRLF%%effects_title%%AD_COLON%%statistics_text%~
+			END
+		END
+		SPRINT description ~%description%%statistics_text%~
 	END
 	ELSE BEGIN
 		SPRINT header_missing ~%render_missing%~
@@ -112,7 +133,7 @@ END
 // en-tête (liste de ad_spell_header_effects, effets dérivés compris) est comparé à ceux des autres
 // en-têtes (ad_spell_level_same), en trois passes :
 // 1. un effet du premier en-tête est commun à tous les niveaux si, dans chaque autre en-tête, tous
-//    les effets de son opcode lui sont semblables (un en-tête sans cet opcode ne l'empêche pas) : il
+//    les effets de son opcode lui sont semblables (un en-tête sans cet opcode l'empêche) : il
 //    est écrit sans titre de niveau, et ses semblables sont écartés ;
 // 2. un effet est semblable à au plus un effet de l'en-tête suivant, qui est écarté ;
 // 3. chaque effet restant couvre les niveaux de son en-tête jusqu'au dernier en-tête suivi sans
@@ -202,9 +223,11 @@ DEFINE_PATCH_MACRO ad_spell_levels_common BEGIN
 		SET level_in_all = 1
 		SET level_similar = 0
 		FOR (level_h = 1; level_h < fx_header_count AND level_in_all; ++level_h) BEGIN
+			SET level_has_opcode = 0
 			FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~) AND level_in_all; ++level_k) BEGIN
 				SPRINT level_b ~%level_h% %level_k%~
 				PATCH_IF $level_opcode(~%level_b%~) == level_opcode BEGIN
+					SET level_has_opcode = 1
 					LPM ad_spell_level_same
 					PATCH_IF level_same BEGIN
 						SPRINT $level_similar_list(~%level_similar%~) ~%level_b%~
@@ -214,6 +237,9 @@ DEFINE_PATCH_MACRO ad_spell_levels_common BEGIN
 						SET level_in_all = 0
 					END
 				END
+			END
+			PATCH_IF NOT level_has_opcode BEGIN
+				SET level_in_all = 0
 			END
 		END
 		PATCH_IF level_in_all BEGIN
@@ -572,13 +598,18 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 		END
 		SPRINT $fx_level_value(~%level_id%~) ~%level_value_text%~
 		SPRINT $fx_level_duration(~%level_id%~) ~%level_duration_text%~
+		SET $fx_level_progression(~%level_id%~) = 1
 	END
 END
 
-// Refus d'une formule de valeur que l'ancien moteur écrit en français dans les deux langues (deux
-// valeurs seulement : « … + … au niveau N », « … jusqu'au niveau N »).
+// Formule d'une valeur qui n'en prend que deux : pas de progression pour les dégâts (12, 17), qui
+// gardent leurs sections de niveaux, comme l'ancien moteur (no_two_values de get_complex_value) ;
+// refus pour un autre opcode.
 DEFINE_PATCH_MACRO ad_spell_level_formula_check BEGIN
-	PATCH_IF formula_rank == 2 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF formula_rank == 2 AND (formula_opcode == 12 OR formula_opcode == 17) BEGIN
+		SET formula_valid = 0
+	END
+	ELSE PATCH_IF formula_rank == 2 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 		SET level_id = $level_id(~%level_a%~)
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_two_values~ message = ~value taking only two values between the abilities~ RET render_late_missing = refusal END
 	END
@@ -959,6 +990,11 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 		SET level_same = (~%same_resource_a%~ STRING_EQUAL ~%same_resource_b%~)
 			AND (~%same_resource2_a%~ STRING_EQUAL_CASE ~%same_resource2_b%~)
 			AND (~%same_resource3_a%~ STRING_EQUAL_CASE ~%same_resource3_b%~)
+	END
+	// Renvois et immunités par niveau de sort réunis dans leur en-tête : même masque des niveaux (ancien
+	// custom_int).
+	PATCH_IF level_same AND (same_opcode == 200 OR same_opcode == 201) BEGIN
+		SET level_same = $fx_power_mask(~%same_a%~) == $fx_power_mask(~%same_b%~)
 	END
 	PATCH_IF level_same AND same_opcode == 518 BEGIN
 		SET same_derived_a = $level_derived(~%level_a%~)
