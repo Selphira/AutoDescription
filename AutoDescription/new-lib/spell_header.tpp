@@ -374,35 +374,25 @@ END
 
 // Distance d'un en-tête de sort, donnée en pieds, comme l'ancien feets_to_meters : à partir de 0,3
 // mètre, comme ad_distance_text ; en deçà, l'ancien moteur écrit en français le nombre de décimètres
-// comme des mètres (« 2 mètres » pour 0,2 mètre), en anglais le nombre de pieds. distance_number : ce
-// nombre, que la portée compare à 2 (« Contact » en deçà) ; 2 au-delà d'un mètre.
+// comme des mètres (« 2 mètres » pour 0,2 mètre), en anglais le nombre de pieds.
 DEFINE_PATCH_FUNCTION ad_spell_distance_text
 	INT_VAR
 		feet = 0
 	RET
 		text
-		distance_number
 BEGIN
 	LPF ad_distance_text INT_VAR feet RET text END
-	SET distance_number = 2
 	PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
 		SET distance_feet = feet
 		SET distance_decimeters = feet * 10000 / 3281
 		LPF ad_tra INT_VAR tra_id = 1100010 + (distance_decimeters > 1 ? 1 : 0)
 			tra_block_start = 1100010 tra_block_size = 2 RET text END // ~%distance_decimeters% mètre~
-		SPRINT distance_number ~%text%~
-		INNER_PATCH_SAVE distance_number ~%distance_number%~ BEGIN
-			REPLACE_TEXTUALLY ~^\(-?[0-9]+\).*$~ ~\1~
-		END
-		PATCH_IF NOT IS_AN_INT distance_number BEGIN
-			SET distance_number = 2
-		END
 	END
 END
 
 // Portée (ancien spell_range) : celle des en-têtes si elle est la même partout (0 pour un en-tête
-// qui vise le lanceur), « Contact » en deçà de 2 unités écrites ; sinon une progression par niveau
-// (ad_spell_header_range_progression).
+// qui vise le lanceur), « Contact » jusqu'à un mètre (moins de 11 décimètres, dans toutes les
+// langues) ; sinon une progression par niveau (ad_spell_header_range_progression).
 DEFINE_PATCH_MACRO ad_spell_header_range BEGIN
 	SET range_same = 1
 	FOR (range_h = 0; range_h < fx_header_count; ++range_h) BEGIN
@@ -411,8 +401,8 @@ DEFINE_PATCH_MACRO ad_spell_header_range BEGIN
 		SET range_same = range_same AND $range_feet(~%range_h%~) == $range_feet(~0~)
 	END
 	PATCH_IF range_same BEGIN
-		LPF ad_spell_distance_text INT_VAR feet = $range_feet(~0~) RET value = text range_number = distance_number END
-		PATCH_IF range_number < 11 BEGIN
+		LPF ad_spell_distance_text INT_VAR feet = $range_feet(~0~) RET value = text END
+		PATCH_IF $range_feet(~0~) * 10000 / 3281 < 11 BEGIN
 			SPRINT value @7000012 // ~Contact~
 		END
 	END
