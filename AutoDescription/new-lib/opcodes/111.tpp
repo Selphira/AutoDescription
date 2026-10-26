@@ -60,10 +60,12 @@ END
 
 // Comme l'ancien opcode_111_replace, un 111 du fichier est écarté sans ligne quand une métamorphose
 // (135) de sa portée a la même durée et le même timing : l'arme fait partie de la métamorphose.
+// Ressource vide (l'ancien opcode_111_is_valid l'écarte) ou arme absente : effet écarté sans
+// rien écrire, erreur journalisée.
 // Refus : cette métamorphose vient d'un EFF (l'ancien moteur ne la voit que selon l'ordre de ses
 // opcodes) ; effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
-// selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; ressource vide
-// (l'ancien opcode_111_is_valid l'écarte) ; arme sans nom (l'ancien moteur n'écrit rien) ; retrait
+// selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; arme sans nom
+// (l'ancien moteur n'écrit rien) ; retrait
 // différé de la même arme (112) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
 // opcode_112_group) ; sans, son texte n'est pas établi (le seul cas connu, SPWM113, est une arme
 // écartée par sa métamorphose).
@@ -108,14 +110,20 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:%weapon_error%~ message = ~weapon %weapon_resref%.ITM with several polymorph effects~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%weapon_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode111:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = weapon_id
+				SPRINT ignored_reason ~file_error:opcode111:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF ~%weapon_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%weapon_resref%.itm~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~not_implemented:opcode111:no_name~ message = ~item %weapon_resref%.ITM has no name~ RET render_missing = refusal END
 				END
 				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode111:missing_item~ message = ~item %weapon_resref%.ITM does not exist~ RET render_missing = refusal END
+					SET drop_id = weapon_id
+					SPRINT ignored_reason ~file_error:opcode111:missing_item~
+					SPRINT ignored_message ~item %weapon_resref%.ITM does not exist~
+					LPM ad_application_drop
 				END
 			END
 			ELSE BEGIN

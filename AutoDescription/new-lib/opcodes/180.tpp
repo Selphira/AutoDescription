@@ -2,7 +2,9 @@
 // « Unique : Un seul exemplaire peut être équipé », en tête des capacités d'équipement (rang 0).
 // Un objet du même nom n'écrit rien, comme dans l'ancien moteur.
 
-// Refus : ressource vide ou parameter2 non nul (écartés par l'ancien opcode_180_is_valid) ; objet
+// Ressource vide ou parameter2 non nul : effet écarté sans rien écrire, erreur journalisée
+// (comme l'ancien opcode_180_is_valid).
+// Refus : objet
 // d'un autre nom : l'ancien moteur y écrit le nom de l'objet décrit (BUG-031).
 DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 	LPF ad_item_info STR_VAR resref = ~%ctx_resource%~ RET forbid_own_name = name END
@@ -13,7 +15,10 @@ DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
 			PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ OR $fx_parameter2(~%forbid_id%~) != 0 BEGIN
 				PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~file_error:opcode180:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+					SET drop_id = forbid_id
+					SPRINT ignored_reason ~file_error:opcode180:invalid~
+					SPRINT ignored_message ~empty resource field~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~not_implemented:opcode180:invalid~ message = ~parameter2 other than 0 not supported~ RET render_missing = refusal END

@@ -881,7 +881,7 @@ SCRL5P	identical
 SCRL5Q	identical
 SCRL5T	identical
 SCRL5U	identical
-SCRL5W	not_covered	file_error:recursion:opcode151:missing_creature
+SCRL5W	identical
 SCRL5X	identical
 SCRL5Y	identical
 SCRL5Z	identical

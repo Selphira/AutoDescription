@@ -3,14 +3,18 @@
 // propres cibles (ancien opcode_self_251, get_item_spell_effects_description appelée sans profondeur :
 // ni limite de profondeur, ni liste des sorts déjà décrits) ; code commun dans new-lib/recursion.tpp.
 
-// Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid) ; refus de la sous-description
-// (ad_recursion_support).
+// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_resref_is_valid).
+// Refus : refus de la sous-description (ad_recursion_support).
 DEFINE_PATCH_MACRO ad_op_251_support BEGIN
 	PHP_EACH fx_ids_251 AS _ => heading_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%heading_id%~) BEGIN
 			SPRINT heading_resref $fx_resource_lower(~%heading_id%~)
 			PATCH_IF ~%heading_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = heading_id STR_VAR reason = ~file_error:opcode251:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = heading_id
+				SPRINT ignored_reason ~file_error:opcode251:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				SET recursion_fx = heading_id

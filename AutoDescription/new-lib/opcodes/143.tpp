@@ -4,7 +4,9 @@
 // retirer l'objet n'a pas de ressource, IESDP) : le timing de l'effet devient permanent, comme dans
 // l'ancien opcode_143_common.
 
-// Refus : objet absent ou sans nom, emplacement inconnu (écartés par l'ancien opcode_143_is_valid) ;
+// Objet absent : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_143_is_valid).
+// Refus : objet sans nom, emplacement inconnu (écartés par l'ancien opcode_143_is_valid) ;
 // avec AD_ENABLE_SHRINKAGE, objet qui remplace une arme brisée (MISC57, MISC58, CDDELHLM : opcode
 // virtuel 519 de l'ancien opcode_143_group_mod).
 DEFINE_PATCH_MACRO ad_op_143_support BEGIN
@@ -18,7 +20,10 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~file_error:opcode143:invalid~ message = ~slot %slot_index% (expected 0-38)~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF ~%slot_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%slot_resref%.itm~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~file_error:opcode143:missing_item~ message = ~item %slot_resref%.ITM does not exist~ RET render_missing = refusal END
+					SET drop_id = slot_id
+					SPRINT ignored_reason ~file_error:opcode143:missing_item~
+					SPRINT ignored_message ~item %slot_resref%.ITM does not exist~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:no_name~ message = ~item %slot_resref%.ITM has no name~ RET render_missing = refusal END

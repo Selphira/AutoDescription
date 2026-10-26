@@ -12,6 +12,8 @@
 // - ctx_force_target : les sous-effets reprennent les chaînes de cible du parent (ctx_the_target,
 //   ctx_of_the_target, ctx_to_the_target), chacun gardant sa forme, soi ou cible (ancien forceTarget,
 //   opcode 146) ;
+// - ctx_hit_target : EFF appliqué à la créature touchée (opcodes 248 et 249, IESDP), dont la propre
+//   cible ne sert pas : l'effet vise la cible (2) ;
 // - ctx_area_phrase (0 sans zone), ctx_area_creatures, ctx_area_range, ctx_area_angle : cibles
 //   nommées d'après la zone du projectile de l'en-tête du sous-sort (ad_recursion_area_strings) ;
 // - ctx_ignore_duration : durées des sous-effets non écrites, hors délais et répétitions (ancien
@@ -51,6 +53,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_single_effect = 0
 	SET recursion_delayed = 0
 	SET recursion_probability = 0
+	SET recursion_hit_target = 0
 END
 
 // La sous-ressource recursion_resref peut-elle être décrite ? recursion_allowed : 1 si oui ; 0 au-delà
@@ -111,6 +114,17 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	PATCH_IF NOT support_header_only BEGIN
 		LPM ad_recursion_allowed
 	END
+	// Sous-ressource absente : le jeu n'applique rien, l'ancien moteur n'écrit aucune ligne ; l'effet
+	// reste lu pour l'en-tête d'un sort (sa durée).
+	PATCH_IF recursion_allowed AND NOT FILE_EXISTS_IN_GAME ~%recursion_resref%.%recursion_kind%~ BEGIN
+		SET recursion_allowed = 0
+		SPRINT recursion_missing_file ~%recursion_resref%.%recursion_kind%~
+		TO_UPPER recursion_missing_file
+		SET ignored_fx = recursion_fx
+		SPRINT ignored_reason ~file_error:recursion:missing_file~
+		SPRINT ignored_message ~%recursion_missing_file% does not exist~
+		LPM ad_log_ignored
+	END
 	PATCH_IF recursion_allowed BEGIN
 		SET recursion_opcode = $fx_opcode(~%recursion_fx%~)
 		PATCH_IF $fx_probability(~%recursion_fx%~) < 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%recursion_opcode%~) AND NOT recursion_probability BEGIN
@@ -143,6 +157,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SET $fx_sub_depth(~%recursion_fx%~) = recursion_depth_reset ? 1 : ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
 				SET $fx_sub_casting_level(~%recursion_fx%~) = recursion_casting_level
 				SET $fx_sub_parent_dice(~%recursion_fx%~) = recursion_parent_dice
+				SET $fx_sub_hit_target(~%recursion_fx%~) = recursion_hit_target
 				SET $fx_sub_force_target(~%recursion_fx%~) = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
 				SET $fx_sub_effect_targets(~%recursion_fx%~) = ~%recursion_targets%~ STRING_EQUAL ~effect~
 				SET $fx_sub_ignore_duration(~%recursion_fx%~) = recursion_ignore_duration
@@ -163,6 +178,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	END
 	SET recursion_delayed = 0
 	SET recursion_probability = 0
+	SET recursion_hit_target = 0
 END
 
 // Description des sous-ressources vérifiées par ad_recursion_support, dans l'ordre de leur
@@ -233,6 +249,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_depth = $fx_sub_depth(~%recursion_fx%~)
 						ctx_casting_level = $fx_sub_casting_level(~%recursion_fx%~)
 						ctx_parent_dice = $fx_sub_parent_dice(~%recursion_fx%~)
+						ctx_hit_target = $fx_sub_hit_target(~%recursion_fx%~)
 						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
 						ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
 						ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
@@ -389,6 +406,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_ignore_duration = 0
 		ctx_versus_set = 0
 		ctx_parent_dice = 0
+		ctx_hit_target = 0
 		ctx_dice_count = 0
 		ctx_dice_sides = 0
 		ctx_base_probability = 100
@@ -564,7 +582,8 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 END
 
 // Effet unique de l'EFF ouvert (ancien get_res_description), dans l'en-tête 0 du magasin : ses champs,
-// dont sa cible, son timing et sa durée ; avec ctx_parent_dice, les dés de l'effet parent quand ceux
+// dont sa cible (la cible, 2, avec ctx_hit_target), son timing et sa durée ; avec ctx_parent_dice, les
+// dés de l'effet parent quand ceux
 // de l'opcode donnent des niveaux (ancien get_res_description_248, règle du 177,
 // new-lib/opcodes/177.tpp). C'est un effet externe (fx_external) : ni exception de cible ni 321 sur la
 // ressource elle-même. Sa restriction de niveau est celle de l'EFF (niveaux minimum et maximum, que
@@ -594,6 +613,9 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		SET $fx_position(~0~) = 0
 		READ_SHORT EFF2_opcode            $fx_opcode(~0~)
 		READ_BYTE  EFF2_target            $fx_target(~0~)
+		PATCH_IF ctx_hit_target BEGIN
+			SET $fx_target(~0~) = TARGET_FX_preset
+		END
 		READ_BYTE  EFF2_power             $fx_power(~0~)
 		READ_LONG  EFF2_parameter1        $fx_parameter1(~0~)
 		READ_LONG  EFF2_parameter2        $fx_parameter2(~0~)

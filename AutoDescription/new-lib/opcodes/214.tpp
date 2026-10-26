@@ -4,7 +4,8 @@
 // new-lib/opcodes/states.tpp ; pas de forme « cible » probable, comme dans l'ancien moteur.
 // fx_select_spells : liste écrite des sorts.
 
-// Refus : 2DA absent ; sort de la liste absent (l'ancien moteur le saute et l'écrit dans son journal
+// 2DA absent : effet écarté sans rien écrire, erreur journalisée.
+// Refus : sort de la liste absent (l'ancien moteur le saute et l'écrit dans son journal
 // d'erreurs) ; liste sans aucun sort nommé (l'ancien moteur n'écrit rien).
 DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 	PHP_EACH fx_ids_214 AS _ => select_id BEGIN
@@ -13,7 +14,10 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 			SPRINT select_spells ~~
 			SPRINT select_missing ~~
 			PATCH_IF NOT FILE_EXISTS_IN_GAME ~%select_table%.2da~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = select_id STR_VAR reason = ~file_error:opcode214:table~ message = ~missing table %select_table%.2da~ RET render_missing = refusal END
+				SET drop_id = select_id
+				SPRINT ignored_reason ~file_error:opcode214:table~
+				SPRINT ignored_message ~missing table %select_table%.2da~
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				INNER_PATCH_FILE ~%select_table%.2da~ BEGIN

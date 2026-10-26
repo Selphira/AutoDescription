@@ -187,7 +187,10 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:potion_target~ message = ~potion effect with target %app_target% while the ability has a number of targets (BUG-020)~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF app_timing == TIMING_duration AND app_duration <= 0 AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:no_duration~ message = ~limited duration (timing 0) of 0 seconds: the effect ends at once~ RET render_missing = refusal END
+		SET drop_id = app_id
+		SPRINT ignored_reason ~file_error:application:no_duration~
+		SPRINT ignored_message ~limited duration (timing 0) of 0 seconds: the effect ends at once~
+		LPM ad_application_drop
 	END
 	// Timing 2 d'un en-tête : l'ancien moteur n'écrit pas de durée, comme pour un effet d'équipement.
 	// Effet différé sans délai : l'ancien moteur le décrit comme permanent, sans le dire.
@@ -248,9 +251,9 @@ END
 // Effet drop_id que l'ancien moteur écarte dès sa lecture, sans rien écrire (validation d'un opcode) :
 // consommé ; journalisé si l'appelant en a fixé la raison (ignored_reason, ignored_message :
 // ad_log_ignored, new-lib/log.tpp). La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
-// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée, si la
-// durée de son opcode n'y est jamais comptée (colonne DURATION à IGNORED) ou si un autre effet décrit
-// du même en-tête a la même durée.
+// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée (dont une
+// durée limitée de 0 seconde), si la durée de son opcode n'y est jamais comptée (colonne DURATION à
+// IGNORED) ou si un autre effet décrit du même en-tête a la même durée.
 DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SPRINT drop_scope $fx_scope(~%drop_id%~)
 	SET drop_timing = $fx_timing(~%drop_id%~)
@@ -258,7 +261,7 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_opcode%~)
 	// L'en-tête d'un sort se lit après l'écart (new-lib/spell_header.tpp).
 	PATCH_IF NOT support_spell AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
-			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) BEGIN
+			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) AND $fx_duration(~%drop_id%~) > 0 BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
 			SET render_opcode = $fx_opcode(~%drop_other%~)

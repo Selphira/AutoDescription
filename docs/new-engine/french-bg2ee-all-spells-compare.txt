@@ -6,7 +6,7 @@ BHAAL1A	identical
 BHAAL1B	identical
 BHAAL2A	identical
 BHAAL2B	identical
-BHAAL3B	not_covered	file_error:recursion:missing_file
+BHAAL3B	identical
 BHAAL4A	identical
 CDHLYSY2	identical
 CDPR417	identical
@@ -30,7 +30,7 @@ OHBBCLT4	identical
 OHBCALLL	identical
 OHBCSFD	identical
 OHBDEMI3	identical
-OHBPR608	not_covered	file_error:opcode111:invalid
+OHBPR608	identical
 OHBQUAKE	identical
 OHBRESTO	identical
 OHBWI212	identical
@@ -63,7 +63,7 @@ SPCL102	identical
 SPCL103	identical
 SPCL104	identical
 SPCL106	identical
-SPCL121	not_covered	file_error:recursion:application:target
+SPCL121	identical
 SPCL144	identical
 SPCL152	identical
 SPCL211	identical
@@ -200,7 +200,7 @@ SPIN201	identical
 SPIN202	identical
 SPIN203	identical
 SPIN529	identical
-SPIN530	not_covered	file_error:opcode173:invalid
+SPIN530	identical
 SPIN531	identical
 SPIN532	identical
 SPIN538	identical
@@ -328,7 +328,7 @@ SPIN958	identical
 SPIN974	identical
 SPIN998	identical
 SPINHUM	identical
-SPJA01	not_covered	file_error:recursion:application:no_duration
+SPJA01	identical
 SPMDSLAY	identical
 SPOGRE01	identical
 SPPR101	identical
@@ -574,7 +574,7 @@ SPWI410	identical
 SPWI411	identical
 SPWI412	identical
 SPWI413	identical
-SPWI414	not_covered	file_error:recursion:application:no_duration
+SPWI414	identical
 SPWI415	identical
 SPWI416	identical
 SPWI417	identical
@@ -719,7 +719,7 @@ SPWI958	identical
 SPWI959	identical
 SPWI960	identical
 SPWI979	identical
-SPWI982	not_covered	file_error:opcode67:missing_creature
+SPWI982	identical
 SPWI994	identical
 SPWI995	identical
 SPWI997	identical

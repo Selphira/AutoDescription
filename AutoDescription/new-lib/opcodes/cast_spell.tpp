@@ -8,7 +8,9 @@
 // macros ci-dessous. Le regroupement avec l'opcode 321 (ancien opcode_146_group, non cumulatif)
 // viendra avec cet opcode.
 
-// Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid) ; sort d'Item Revision
+// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_resref_is_valid).
+// Refus : sort d'Item Revision
 // (AD_ITEM_REVISION_SPELLS : l'ancien moteur en écrit un texte propre) ; en-tête à charges d'une
 // fléchette (ses lignes vont aux capacités de combat, où l'ancien moteur les écrit autrement) ; sort
 // nommé lancé par un sous-sort d'un objet (l'ancien moteur y lit le type de capacité de l'objet ; un
@@ -30,7 +32,10 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 				SET $fx_cast_charge(~%cast_id%~) = NOT $charged_other(~%cast_h%~)
 			END
 			PATCH_IF ~%cast_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~file_error:opcode%cast_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = cast_id
+				SPRINT ignored_reason ~file_error:opcode%cast_opcode%:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF VARIABLE_IS_SET $AD_ITEM_REVISION_SPELLS(~%cast_resref%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:item_revision~ message = ~spell %cast_resref% from Item Revisions~ RET render_missing = refusal END

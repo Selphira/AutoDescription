@@ -9,7 +9,10 @@
 // 524) : « À chaque attaque réussie ». Les macros ad_op_<N>_* fixent hit_opcode puis appellent les
 // macros ci-dessous.
 
-// Refus : effet d'un EFF ; ressource vide ; effet probable (l'ancien moteur écrit « par attaque… ») ;
+// Ressource vide : effet écarté sans rien écrire, erreur journalisée ; EFF absent : aucune ligne
+// (ad_recursion_support). L'EFF
+// s'applique à la créature touchée : sa propre cible ne sert pas (ctx_hit_target).
+// Refus : effet d'un EFF ; effet probable (l'ancien moteur écrit « par attaque… ») ;
 // réunion avec plusieurs effets possibles ou d'un 248 à mains nues (l'ancien moteur y lirait la forme
 // « cible ») ; plusieurs lignes ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
@@ -21,7 +24,10 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%hit_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~file_error:opcode%hit_opcode%:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = hit_id
+				SPRINT ignored_reason ~file_error:opcode%hit_opcode%:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF $fx_probability(~%hit_id%~) < 100 BEGIN
 				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:probability~ message = ~probable effect~ RET render_missing = refusal END
@@ -35,6 +41,7 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 					SPRINT recursion_resref ~%hit_resref%~
 					SPRINT recursion_kind ~eff~
 					SET recursion_parent_dice = 1
+					SET recursion_hit_target = 1
 					SET recursion_casting_level = 0
 					SPRINT recursion_targets ~own~
 					SET recursion_ignore_duration = 0

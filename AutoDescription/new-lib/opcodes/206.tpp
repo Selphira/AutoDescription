@@ -7,7 +7,8 @@
 // new-lib/application.tpp). Avec AD_ENABLE_SHRINKAGE, cinq protections psioniques d'un bloc
 // deviennent « Immunité aux capacités psioniques » (ad_group_psionic_immunity, new-lib/groups.tpp).
 
-// Refus : effet sans ressource ; dans un en-tête, avec la ligne unique des immunités, immunité aux
+// Effet sans ressource : écarté sans rien écrire, erreur journalisée.
+// Refus : dans un en-tête, avec la ligne unique des immunités, immunité aux
 // capacités psioniques dont les champs (ceux de la cinquième protection) diffèrent de ceux d'une
 // autre immunité de l'en-tête, parameter2 mis à part (ad_op_101_ability_support).
 DEFINE_PATCH_MACRO ad_op_206_support BEGIN
@@ -17,7 +18,10 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 			TO_UPPER spell_resref
 			// L'ancien moteur écarte un effet sans ressource (erreur journalisée).
 			PATCH_IF ~%spell_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = spell_id STR_VAR reason = ~file_error:opcode206:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = spell_id
+				SPRINT ignored_reason ~file_error:opcode206:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur ; sans
 			// objet pour l'en-tête d'un sort seul.

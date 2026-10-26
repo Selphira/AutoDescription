@@ -7,10 +7,13 @@
 // Avec AD_ENABLE_SHRINKAGE, une invocation certaine réunit aussi les invocations probables identiques à
 // la probabilité près (ancien opcode_67_group) : chacune compte pour une créature de plus au plus,
 // « Invoque entre 2 et 5 « Rat » » (fx_summon_random).
+// Créature absente : aucune ligne (fx_summon_missing), erreur journalisée ; l'en-tête d'un sort compte
+// l'effet (sa durée), comme l'ancien moteur.
 // Refus : créature sans nom (aucune ligne).
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			SET $fx_summon_missing(~%summon_id%~) = 0
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance
 				summon_level = level END
@@ -18,8 +21,12 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~not_implemented:opcode67:no_name~ message = ~creature %summon_resref%.CRE has no name~ RET render_missing = refusal END
 				END
-				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~file_error:opcode67:missing_creature~ message = ~creature %summon_resref%.CRE does not exist~ RET render_missing = refusal END
+				ELSE PATCH_IF NOT support_header_only BEGIN
+					SET $fx_summon_missing(~%summon_id%~) = 1
+					SET ignored_fx = summon_id
+					SPRINT ignored_reason ~file_error:opcode67:missing_creature~
+					SPRINT ignored_message ~creature %summon_resref%.CRE does not exist~
+					LPM ad_log_ignored
 				END
 			END
 			ELSE BEGIN
@@ -60,7 +67,7 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~67~)
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%summon_id%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%summon_id%~) AND NOT $fx_summon_missing(~%summon_id%~) BEGIN
 			SPRINT creatureName $fx_creature_name(~%summon_id%~)
 			SET amount = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%summon_id%~) : 1
 			// Invocations probables réunies aux effets certains que celui-ci représente.

@@ -69,7 +69,10 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 					OR (stat_mode == MOD_TYPE_cumulative AND stat_value == 0)
 					OR (stat_mode == MOD_TYPE_percentage AND ((stat_value == 100 AND NOT (~%stat_percent_100%~ STRING_EQUAL ~valid~))
 					OR (~%stat_percentage%~ STRING_EQUAL ~invalid~))) BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode%stat_opcode%:invalid~ message = ~invalid mode or no change (mode %stat_mode%, value %stat_value%)~ RET render_missing = refusal END
+				SET drop_id = stat_id
+				SPRINT ignored_reason ~file_error:opcode%stat_opcode%:invalid~
+				SPRINT ignored_message ~invalid mode or no change (mode %stat_mode%, value %stat_value%)~
+				LPM ad_application_drop
 			END
 			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler ; un effet d'un 177
 			// contre un type de créature n'est pas identique à celui qui vaut pour tous. Il ne fusionne

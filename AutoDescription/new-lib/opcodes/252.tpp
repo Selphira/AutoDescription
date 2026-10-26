@@ -4,8 +4,9 @@
 // leurs propres cibles, sans niveau de lancement (ancien opcode_252_common) ; code commun dans
 // new-lib/recursion.tpp.
 
-// Refus : ressource vide (écartée par l'ancien opcode_resref_is_valid) ; refus de la sous-description
-// (ad_recursion_support).
+// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_resref_is_valid).
+// Refus : refus de la sous-description (ad_recursion_support).
 DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 	PHP_EACH fx_ids_252 AS _ => heading_id BEGIN
 		SET $fx_sub_count(~%heading_id%~) = 0
@@ -15,7 +16,10 @@ DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 			LPF ad_spell_name STR_VAR resref = ~%heading_resref%~ RET heading_spell = name END
 			SPRINT $fx_trap_spell(~%heading_id%~) ~%heading_spell%~
 			PATCH_IF ~%heading_resref%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = heading_id STR_VAR reason = ~file_error:opcode252:invalid~ message = ~empty resource field~ RET render_missing = refusal END
+				SET drop_id = heading_id
+				SPRINT ignored_reason ~file_error:opcode252:invalid~
+				SPRINT ignored_message ~empty resource field~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF ~%heading_spell%~ STRING_EQUAL ~~ BEGIN
 				SET recursion_fx = heading_id
