@@ -125,9 +125,11 @@ END
 // (derived_line) ; il est rangé dans sa section par fx_line_section. Sections : statistics_section,
 // statistics_level_min, statistics_level_max, triées par niveaux (clé (min + 100) × 100 + max).
 // Comme l'ancien moteur, une position marquée écarte tout effet de cette position dans l'en-tête.
+// Les immunités aux sorts réunies pour l'en-tête (518, ad_op_206_header_groups) se comparent aussi
+// par leurs noms ; leurs immunités, cachées aux listes, suivent leur effet dérivé : écartées avec lui,
+// rangées dans sa section ; elles n'ont pas de progression.
 // Refus (render_late_missing) : opcodes 173 et 178, dont l'ancien moteur réécrit les champs avant de
-// les comparer ; immunités aux sorts réunies pour l'en-tête (518, ad_op_206_header_groups), qui
-// ne sont pas dans les listes.
+// les comparer.
 DEFINE_PATCH_MACRO ad_spell_levels BEGIN
 	LPM ad_spell_levels_entries
 	FOR (level_h = 0; level_h < fx_header_count; ++level_h) BEGIN
@@ -137,9 +139,6 @@ DEFINE_PATCH_MACRO ad_spell_levels BEGIN
 			SET level_opcode = $level_opcode(~%level_a%~)
 			PATCH_IF (level_opcode == 173 OR level_opcode == 178) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_opcode%level_opcode%~ message = ~opcode %level_opcode% in a spell with several abilities~ RET render_late_missing = refusal END
-			END
-			PATCH_IF level_opcode == 518 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:levels_immunities~ message = ~spell immunities merged in a spell with several abilities~ RET render_late_missing = refusal END
 			END
 		END
 	END
@@ -269,7 +268,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_duration BEGIN
 	SET level_duration_by_timing = 1
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
-		PATCH_IF $level_on(~%level_a%~) BEGIN
+		PATCH_IF $level_on(~%level_a%~) AND $level_opcode(~%level_a%~) != 518 BEGIN
 			LPM ad_spell_level_search
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT level_value_text ~~
@@ -292,7 +291,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 	SET level_skip = AD_SAME_SAVE
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
-		PATCH_IF $level_on(~%level_a%~) BEGIN
+		PATCH_IF $level_on(~%level_a%~) AND $level_opcode(~%level_a%~) != 518 BEGIN
 			LPM ad_spell_level_search
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_save~
@@ -851,6 +850,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					SET level_keys_count += 1
 					SET level_id = $level_id(~%level_a%~)
 					SPRINT $fx_line_section(~%level_id%~) ~level%level_key%~
+					SET level_derived = $level_derived(~%level_a%~)
+					PATCH_IF level_opcode == 518 BEGIN
+						PHP_EACH fx_ids_206 AS _ => level_member BEGIN
+							PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
+								SPRINT $fx_line_section(~%level_member%~) ~level%level_key%~
+							END
+						END
+					END
 				END
 			END
 		END
@@ -860,7 +867,15 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
 			PATCH_IF NOT $level_emitted(~%level_a%~) BEGIN
 				SET level_derived = $level_derived(~%level_a%~)
-				PATCH_IF level_derived >= 0 BEGIN
+				PATCH_IF $level_opcode(~%level_a%~) == 518 BEGIN
+					PHP_EACH fx_ids_206 AS _ => level_member BEGIN
+						PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
+							SET $fx_consumed(~%level_member%~) = 1
+							SET $fx_level_merged(~%level_member%~) = 1
+						END
+					END
+				END
+				ELSE PATCH_IF level_derived >= 0 BEGIN
 					SPRINT $derived_line(~%level_derived%~) ~~
 				END
 				ELSE BEGIN
@@ -944,5 +959,12 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 		SET level_same = (~%same_resource_a%~ STRING_EQUAL ~%same_resource_b%~)
 			AND (~%same_resource2_a%~ STRING_EQUAL_CASE ~%same_resource2_b%~)
 			AND (~%same_resource3_a%~ STRING_EQUAL_CASE ~%same_resource3_b%~)
+	END
+	PATCH_IF level_same AND same_opcode == 518 BEGIN
+		SET same_derived_a = $level_derived(~%level_a%~)
+		SET same_derived_b = $level_derived(~%level_b%~)
+		SPRINT same_signature_a $derived_signature(~%same_derived_a%~)
+		SPRINT same_signature_b $derived_signature(~%same_derived_b%~)
+		SET level_same = ~%same_signature_a%~ STRING_EQUAL ~%same_signature_b%~
 	END
 END

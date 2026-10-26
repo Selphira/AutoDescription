@@ -343,7 +343,7 @@ SPPR109	identical
 SPPR110	identical
 SPPR111	identical
 SPPR113	identical
-SPPR150	not_covered	not_implemented:opcode219:several
+SPPR150	identical
 SPPR201	identical
 SPPR202	identical
 SPPR203	identical
@@ -396,7 +396,7 @@ SPPR414	identical
 SPPR415	identical
 SPPR416	identical
 SPPR417	identical
-SPPR450	not_covered	not_implemented:opcode326:group
+SPPR450	identical
 SPPR501	identical
 SPPR502	identical
 SPPR503	identical
@@ -404,7 +404,7 @@ SPPR504	identical
 SPPR505	identical
 SPPR506	identical
 SPPR507	identical
-SPPR508	not_covered	not_implemented:spell:levels_immunities
+SPPR508	identical
 SPPR509	identical
 SPPR510	identical
 SPPR511	identical
@@ -576,7 +576,7 @@ SPWI412	identical
 SPWI413	identical
 SPWI414	not_covered	file_error:recursion:application:no_duration
 SPWI415	identical
-SPWI416	not_covered	not_implemented:spell:levels_immunities
+SPWI416	identical
 SPWI417	identical
 SPWI418	identical
 SPWI419	identical
@@ -619,7 +619,7 @@ SPWI519	identical
 SPWI520	identical
 SPWI521	identical
 SPWI522	identical
-SPWI523	not_covered	not_implemented:recursion:level_sections
+SPWI523	not_covered	not_implemented:recursion:level_sections_area
 SPWI601	identical
 SPWI602	identical
 SPWI603	not_covered	not_implemented:opcode145:spell_types
@@ -631,7 +631,7 @@ SPWI608	identical
 SPWI609	identical
 SPWI611	identical
 SPWI612	identical
-SPWI613	not_covered	not_implemented:spell:levels_immunities
+SPWI613	identical
 SPWI614	identical
 SPWI615	identical
 SPWI616	identical
@@ -657,7 +657,7 @@ SPWI710P	identical
 SPWI711	identical
 SPWI712	identical
 SPWI713	identical
-SPWI714	not_covered	not_implemented:application:probability_order
+SPWI714	identical
 SPWI715	identical
 SPWI716	identical
 SPWI717	identical
@@ -695,7 +695,7 @@ SPWI905	identical
 SPWI907	identical
 SPWI908	identical
 SPWI909	identical
-SPWI910	not_covered	not_implemented:opcode326:condition_stat
+SPWI910	identical
 SPWI911	identical
 SPWI912	identical
 SPWI913	identical

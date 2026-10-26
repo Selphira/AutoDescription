@@ -42,6 +42,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_casting_level = 0
 	SET ctx_versus_set = 0
 	SPRINT ctx_versus ~~
+	SET ctx_base_lines = 0
 	SPRINT ctx_resource ~%SOURCE_RES%~
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
@@ -194,6 +195,12 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			END
 			SPRINT recursion_resref $fx_sub_resref(~%recursion_fx%~)
 			SPRINT recursion_origin $fx_sub_origin(~%recursion_fx%~)
+			// Sections de niveaux remontées à la ligne parente seulement pour un sort lancé sans
+			// condition, probabilité ni délai (146, 148) par la ressource décrite : sinon l'ancien moteur
+			// les imbrique (SPCL423, 146 d'un EFF lancé à chaque coup).
+			SET recursion_lift_opcode = $fx_opcode(~%recursion_fx%~)
+			SET recursion_lift_sections = (recursion_lift_opcode == 146 OR recursion_lift_opcode == 148)
+				AND $fx_probability(~%recursion_fx%~) >= 100 AND NOT $fx_sub_delayed(~%recursion_fx%~) AND ~%ctx_origin%~ STRING_EQUAL ~~
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
 			TO_UPPER recursion_origin_resource
 			SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
@@ -225,6 +232,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_base_low = $fx_probability_low(~%recursion_fx%~)
 						ctx_base_high = $fx_probability_high(~%recursion_fx%~)
 						ctx_base_lines = $fx_sub_probability_lines(~%recursion_fx%~)
+						ctx_lift_sections = recursion_lift_sections
 					STR_VAR
 						resref = ~%recursion_resref%~
 						kind = ~%recursion_kind%~
@@ -370,6 +378,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_base_low = 0
 		ctx_base_high = 99
 		ctx_base_lines = 0
+		ctx_lift_sections = 0
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -770,12 +779,23 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 			SPRINT render_missing ~%render_late_missing%~
 		END
 	END
+	SET sub_sections_lifted = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_lines_section_text STR_VAR section = EVAL ~ability%sub_header%~ RET sub_text = text sub_count = count END
+		// Sous-sort décrit par tous ses en-têtes dont toutes les lignes sont dans des sections de niveaux
+		// (SPWI523) : comme l'ancien moteur, le texte est celui des sections, titres compris, précédé de
+		// deux sauts de ligne ; la ligne parente l'écrit sans puce (ad_lines_section_text).
+		// Refus sous la zone du projectile du sous-sort : l'ancien moteur y garde la cible de l'effet.
+		PATCH_IF sub_all_headers AND sub_count == 0 AND statistics_sections > 1 AND ctx_lift_sections BEGIN
+			LPM ad_recursion_level_sections_text
+			PATCH_IF sub_sections_lifted AND ctx_area_phrase > 0 BEGIN
+				LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:level_sections_area~ message = ~level sections of a spell whose projectile has an area, where the old engine keeps the target of the effect~ RET render_missing = refusal END
+			END
+		END
 		// Toute ligne est dans la section de l'en-tête (les lignes probables regroupées en sont retirées).
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
 			SPRINT sub_line_section $line_section(~%sub_line%~)
-			PATCH_IF NOT (~%sub_line_section%~ STRING_EQUAL ~~) AND NOT (~%sub_line_section%~ STRING_EQUAL ~ability%sub_header%~) BEGIN
+			PATCH_IF NOT (~%sub_line_section%~ STRING_EQUAL ~~) AND NOT (~%sub_line_section%~ STRING_EQUAL ~ability%sub_header%~) AND NOT sub_sections_lifted BEGIN
 				PATCH_IF sub_all_headers BEGIN
 					LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:level_sections~ message = ~abilities of different levels: level sections inside a line not supported yet~ RET render_missing = refusal END
 				END
@@ -786,7 +806,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 		// L'ancien moteur retire la puce de la première ligne, qui prend la place de la ligne parente.
 		SPRINT sub_bullet ~%CRLF%- ~
-		PATCH_IF sub_count > 0 BEGIN
+		PATCH_IF sub_count > 0 AND NOT sub_sections_lifted BEGIN
 			INNER_PATCH_SAVE sub_text ~%sub_text%~ BEGIN
 				DELETE_BYTES 0 STRING_LENGTH ~%sub_bullet%~
 			END
@@ -796,5 +816,31 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		SPRINT sub_missing ~%render_missing%~
 		SET sub_count = 0
 		SPRINT sub_text ~~
+	END
+END
+
+// Texte des sections de niveaux d'un sous-sort (sub_text, sub_count), titres comme ceux d'un sort
+// (new-lib/spell_levels.tpp) ; sub_sections_lifted à 1 s'il en a.
+DEFINE_PATCH_MACRO ad_recursion_level_sections_text BEGIN
+	SPRINT sub_text ~~
+	FOR (sub_s = 1; sub_s < statistics_sections; ++sub_s) BEGIN
+		SPRINT sub_section_name $statistics_section(~%sub_s%~)
+		LPF ad_lines_section_text STR_VAR section = ~%sub_section_name%~ RET sub_section_lines = text sub_section_count = count END
+		PATCH_IF sub_section_count > 0 BEGIN
+			SET minRequiredLevel = $statistics_level_min(~%sub_s%~)
+			SET maxRequiredLevel = $statistics_level_max(~%sub_s%~)
+			PATCH_IF maxRequiredLevel == 99 BEGIN
+				SPRINT sub_section_title @7002000 // ~À partir du niveau %minRequiredLevel%~
+			END
+			ELSE PATCH_IF minRequiredLevel == maxRequiredLevel BEGIN
+				SPRINT sub_section_title @7002002 // ~Au niveau %minRequiredLevel%~
+			END
+			ELSE BEGIN
+				SPRINT sub_section_title @7002001 // ~Entre le niveau %minRequiredLevel% et %maxRequiredLevel%~
+			END
+			SPRINT sub_text ~%sub_text%%CRLF%%CRLF%%sub_section_title%%sub_section_lines%~
+			SET sub_count += sub_section_count
+			SET sub_sections_lifted = 1
+		END
 	END
 END

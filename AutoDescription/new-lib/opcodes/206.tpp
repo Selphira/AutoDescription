@@ -72,8 +72,9 @@ DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
 END
 
 // Lignes (ancien opcode_self_206 et opcode_206_post_group) : avec AD_ENABLE_SHRINKAGE, les
-// immunités d'une même cible et d'une même portée (l'ancien moteur décrit chaque bloc à part) à au
-// moins deux sorts de noms différents sont réunies en une ligne
+// immunités d'une même cible et d'une même section (portée, ou plage de niveaux d'un sort à plusieurs
+// en-têtes ; l'ancien moteur décrit chaque bloc à part) à au moins deux sorts de noms différents sont
+// réunies en une ligne
 // (effet dérivé SPELL_IMMUNITIES), noms triés ; les lignes réunies viennent après les autres.
 DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -90,10 +91,10 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 		PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) < 0 BEGIN
 				SET spell_target = $fx_effective_target(~%spell_id%~)
-				SPRINT spell_scope $fx_scope(~%spell_id%~)
+				SPRINT spell_scope $fx_line_section(~%spell_id%~)
 				SET spell_name_count = 0
 				PHP_EACH fx_ids_206 AS _ => spell_other BEGIN
-					SPRINT spell_other_scope $fx_scope(~%spell_other%~)
+					SPRINT spell_other_scope $fx_line_section(~%spell_other%~)
 					PATCH_IF spell_other >= spell_id AND NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
@@ -160,9 +161,15 @@ END
 // de noms différents disparaissent (avec la première, même sans nom) au profit d'un effet 518. Comme
 // dans l'ancien moteur, celui-ci prend les champs de la dernière immunité qui reste dans l'en-tête,
 // réunie ou non (ad_derived_add, sans ligne). Les immunités réunies sont cachées à l'en-tête
-// (fx_header_hidden) : leurs lignes sont écrites par ad_op_206_lines.
+// (fx_header_hidden) : leurs lignes sont écrites par ad_op_206_lines. Pour la comparaison entre
+// niveaux (new-lib/spell_levels.tpp), chacune garde son effet dérivé (fx_immunity_derived, -1 sans
+// regroupement) et celui-ci la liste triée des noms (derived_signature), que l'ancien moteur compare
+// dans custom_str.
 DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 	SET immunity_serial = 0
+	PHP_EACH fx_ids_206 AS _ => immunity_id BEGIN
+		SET $fx_immunity_derived(~%immunity_id%~) = 0 - 1
+	END
 	FOR (immunity_h = 0; immunity_h < fx_header_count; ++immunity_h) BEGIN
 		SET immunity_size = 0
 		FOR (immunity_late = 0; immunity_late < 2; ++immunity_late) BEGIN
@@ -213,11 +220,18 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 					END
 				END
 				PATCH_IF immunity_name_count > 1 BEGIN
+					CLEAR_ARRAY immunity_signature_names
 					FOR (immunity_m = 0; immunity_m < immunity_member_count; ++immunity_m) BEGIN
 						SET immunity_member = $immunity_members(~%immunity_m%~)
 						SET immunity_member_id = $immunity_order(~%immunity_member%~)
 						SET $fx_header_hidden(~%immunity_member_id%~) = 1
+						SET $fx_immunity_derived(~%immunity_member_id%~) = derived_count
+						SPRINT immunity_name $immunity_names(~%immunity_member%~)
+						SPRINT $immunity_signature_names(~%immunity_name%~) ~%immunity_name%~
 					END
+					SORT_ARRAY_INDICES immunity_signature_names
+					LPF ad_join STR_VAR array_name = ~immunity_signature_names~ glue = ~|~ final_glue = ~|~ RET immunity_signature = text END
+					SPRINT $derived_signature(~%derived_count%~) ~%immunity_signature%~
 					SPRINT derived_kind ~SPELL_IMMUNITIES~
 					SET derived_id = immunity_last
 					SET derived_other = 0 - 1

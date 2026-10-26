@@ -208,29 +208,17 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 		END
 	END
 
-	// Rang d'un titre : l'ancien moteur le calcule avec l'opcode du dernier effet lu, connu seulement
-	// de lui ; il ne compte que face aux lignes de même probabilité, refusées.
-	CLEAR_ARRAY prob_band_lines
+	// Lignes rangées par probabilité décroissante ; à probabilité égale, un titre suit les lignes
+	// seules (SPWI714). Deux titres de même probabilité : l'ancien moteur les range selon l'opcode du
+	// dernier effet lu, connu seulement de lui, refus.
 	CLEAR_ARRAY prob_band_titles
 	FOR (seg_s = 0; seg_s < seg_count; ++seg_s) BEGIN
-		PATCH_IF NOT $seg_duplicate(~%seg_s%~) BEGIN
-			PATCH_IF $seg_size(~%seg_s%~) == 1 BEGIN
-				SET prob_id = $seg_member(~%seg_s% 0~)
-				SET prob_band = $line_sort(~%prob_id%~) / 10000
-				SET $prob_band_lines(~%prob_band%~) = 1
+		PATCH_IF NOT $seg_duplicate(~%seg_s%~) AND $seg_size(~%seg_s%~) > 1 BEGIN
+			SET prob_band = 100 - $seg_probability(~%seg_s%~)
+			PATCH_IF VARIABLE_IS_SET $prob_band_titles(~%prob_band%~) BEGIN
+				LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable titles of the same probability, whose order the old engine sets differently~ RET render_late_missing = refusal END
 			END
-			ELSE BEGIN
-				SET prob_band = 100 - $seg_probability(~%seg_s%~)
-				PATCH_IF VARIABLE_IS_SET $prob_band_titles(~%prob_band%~) BEGIN
-					LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable lines whose order the old engine sets differently~ RET render_late_missing = refusal END
-				END
-				SET $prob_band_titles(~%prob_band%~) = 1
-			END
-		END
-	END
-	PHP_EACH prob_band_titles AS prob_band => _ BEGIN
-		PATCH_IF VARIABLE_IS_SET $prob_band_lines(~%prob_band%~) BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable lines whose order the old engine sets differently~ RET render_late_missing = refusal END
+			SET $prob_band_titles(~%prob_band%~) = 1
 		END
 	END
 
@@ -252,13 +240,21 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 				LPM ad_line_append
 			END
 			ELSE BEGIN
-				SET line_sort = (100 - value) * 10000
+				SET line_sort = (100 - value) * 10000 + 9999 - $seg_size(~%seg_s%~)
 				SPRINT line_text @4000001 // ~%probability% de chances~
 				SET line_nested = 0
 				LPM ad_line_append
 				SET line_nested = 1
+				// Lignes d'un sort lancé par un effet probable (146, 148) : l'ancien moteur les écrit dans
+				// l'ordre de leurs rangs, sous la ligne de l'effet (SPPR450).
+				CLEAR_ARRAY prob_nested
 				FOR (seg_k = 0; seg_k < $seg_size(~%seg_s%~); ++seg_k) BEGIN
 					SET prob_id = $seg_member(~%seg_s% %seg_k%~)
+					SET prob_nested_key = ctx_base_lines ? $line_sort(~%prob_id%~) * 100 + seg_k : seg_k
+					SET $prob_nested(~%prob_nested_key%~) = prob_id
+				END
+				SORT_ARRAY_INDICES prob_nested NUMERICALLY
+				PHP_EACH prob_nested AS _ => prob_id BEGIN
 					SPRINT line_text $line_core(~%prob_id%~)
 					SET line_sort += 1
 					LPM ad_line_append
@@ -332,7 +328,15 @@ BEGIN
 	SORT_ARRAY_INDICES section_lines NUMERICALLY
 	PHP_EACH section_lines AS _ => line_id BEGIN
 		SPRINT line_text $line_text(~%line_id%~)
-		PATCH_IF $line_nested(~%line_id%~) BEGIN
+		// Texte qui commence par deux sauts de ligne (sections de niveaux d'un sous-sort) : écrit sans
+		// puce, ces sauts retirés, comme l'ancien add_items_section_to_description.
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
+			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+				DELETE_BYTES 0 2 * STRING_LENGTH ~%CRLF%~
+			END
+			SPRINT text ~%text%%CRLF%%line_text%~
+		END
+		ELSE PATCH_IF $line_nested(~%line_id%~) BEGIN
 			SPRINT text ~%text%%CRLF%  %line_prefix%%line_text%~
 		END
 		ELSE BEGIN
