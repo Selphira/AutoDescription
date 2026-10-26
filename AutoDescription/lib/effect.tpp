@@ -858,7 +858,9 @@ BEGIN
 
 		PATCH_IF NOT ~%opcode_target%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF projectile > 1 BEGIN
-				LPF ~get_target_by_projectile~ INT_VAR projectile target = projectileTarget targetNumber = projectileTargetNumber STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
+				// Exception du lanceur : l'effet ne le touche pas.
+				SET sourceExcluded = INDEX (CASE_SENSITIVE EVALUATE_REGEXP ~;-?[0-9]+=>43 ~ ~%target_exceptions% ~) >= 0
+				LPF ~get_target_by_projectile~ INT_VAR projectile target = projectileTarget targetNumber = projectileTargetNumber sourceExcluded STR_VAR theTarget ofTheTarget toTheTarget RET theTarget ofTheTarget toTheTarget END
 			END
 			// Après la zone du projectile, qui remplace les chaînes de la cible : sinon la restriction de
 			// niveau disparaît (WAND13 : « Tue instantanément les créatures dans un rayon de 4,5 mètres »).

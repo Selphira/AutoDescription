@@ -1560,7 +1560,7 @@ DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 
 	LPM ~opcode_12_flags~
 
-	PATCH_IF VARIABLE_IS_SET versus AND NOT %versus% STRING_EQUAL ~~ BEGIN
+	PATCH_IF VARIABLE_IS_SET versus AND NOT ~%versus%~ STRING_EQUAL ~~ BEGIN
 		SET strref_0 = 10120003 // ~Inflige %damage% %damageType% supplémentaires %versus%~
 	END
 	PATCH_IF flagDrain == 1 BEGIN
@@ -1591,7 +1591,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 
 	LPM ~opcode_12_flags~
 
-	PATCH_IF VARIABLE_IS_SET versus AND NOT %versus% STRING_EQUAL ~~ BEGIN
+	PATCH_IF VARIABLE_IS_SET versus AND NOT ~%versus%~ STRING_EQUAL ~~ BEGIN
 		SET strref_0 = 10120013 // ~d'infliger %damage% %damageType% supplémentaires %versus%~
 	END
 	PATCH_IF flagDrain == 1 BEGIN
@@ -7585,7 +7585,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_145~ BEGIN
 	LOCAL_SET value = custom_int > 0 ? custom_int : (1 << parameter2)
 
-	PATCH_IF value == 7 BEGIN
+	PATCH_IF parameter2 == 3 AND custom_int == 0 BEGIN
+		SPRINT description @11450002 // ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
+	END
+	ELSE PATCH_IF value == 7 BEGIN
 		SPRINT description @11450001 // ~Empêche %theTarget% de lancer des sorts~
 	END
 	ELSE BEGIN
@@ -7603,7 +7606,10 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_145~ BEGIN
 	LOCAL_SET value = custom_int > 0 ? custom_int : (1 << parameter2)
 
-	PATCH_IF value == 7 BEGIN
+	PATCH_IF parameter2 == 3 AND custom_int == 0 BEGIN
+		SPRINT description @11450052 // ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
+	END
+	ELSE PATCH_IF value == 7 BEGIN
 		SPRINT description @11450051 // ~d'empêcher %theTarget% de lancer des sorts~
 	END
 	ELSE BEGIN
@@ -8717,7 +8723,10 @@ DEFINE_PATCH_MACRO ~opcode_self_177~ BEGIN
 	ELSE BEGIN
 		LPM ~opcode_set_target_strings~
 		LPF ~get_res_description_177~ STR_VAR resref macro = ~opcode_self_~ RET description saveAdded ignoreDuration opcode END
-		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		// Pas de « (uniquement pour les X) » quand la description nomme déjà les X comme cible (OHHDRAIN :
+		// « Fige les animaux et les humanoïdes »).
+		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~
+				AND NOT (NOT ~%onlyForTheTarget%~ STRING_EQUAL ~~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%onlyForTheTarget%~ ~%description%~) >= 0) BEGIN
 			// On ajoute le (uniquement pour les xxx) derrière chaque sous-effets
             INNER_PATCH_SAVE description ~%description%~ BEGIN
                 REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%onlyForTarget%)%crlf%~
@@ -9013,6 +9022,7 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 						match_resref2    = ~%resref2%~
 						match_resref3    = ~%resref3%~
 						match_custom_str = ~%custom_str%~
+						match_target_exceptions = ~%target_exceptions%~
 			        RET
 			            count
 			        RET_ARRAY
@@ -9260,6 +9270,8 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		PATCH_IF NOT (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
 			SPRINT onlyForTarget @11770001 // ~uniquement pour les %targetType%~
 		END
+		// Cible nommée par les types de créature, que la mention ne répète pas (add_only_for).
+		SPRINT onlyForTheTarget ~~
 		// Le type de créature propre à un 178, 179 ou 344 est celui de l'adversaire : la cible de l'effet
 		// reste la sienne (OHBSCRL3 : « le TAC0 de la cible contre les planétaires déchus »). Un kit est
 		// celui du porteur : la cible reste la sienne aussi.
@@ -9278,6 +9290,7 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 		END
 		ELSE PATCH_IF NOT (opcode == 178 OR opcode == 179 OR opcode == 344) OR NOT ~%target_type%~ STRING_EQUAL ~~ BEGIN
 			SPRINT theTarget     @102384 // ~les %targetType%~
+			SPRINT onlyForTheTarget ~%theTarget%~
 			LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %of% ~ final_glue = ~ %andOf% ~ RET targetType = text END
 			SPRINT ofTheTarget @102385 // ~des %targetType%~
 			LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %to% ~ final_glue = ~ %andTo% ~ RET targetType = text END
@@ -9381,6 +9394,7 @@ DEFINE_PATCH_FUNCTION ~opcode_not_177_get_all_opcode_positions~
 		match_resref2    = ~~
 		match_resref3    = ~~
 		match_custom_str = ~~
+		match_target_exceptions = ~~
 	RET
 		count
 	RET_ARRAY
@@ -9392,7 +9406,7 @@ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%match_opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		LPM ~opcode_match~
-		PATCH_IF match BEGIN
+		PATCH_IF match AND (isExternal OR ~%match_target_exceptions%~ STRING_EQUAL ~%target_exceptions%~) BEGIN
 			SET $positions(~%position%~) = 1
 			SET count += 1
 		END
@@ -10079,11 +10093,23 @@ DEFINE_PATCH_MACRO ~opcode_200_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		SET searchP1 = parameter1
+		// Seuls les effets aux mêmes champs sont réunis (SPWI318 : au niveau 11, les niveaux de sort 1 à 5
+		// durent 33 rounds, 6 et 7 30 rounds) ; l'effet réuni garde ceux du premier.
+		SET searchPosition = position
+		SET searchTarget = target
+		SET searchTimingMode = timingMode
+		SET searchDuration = duration
+		SET searchProbability1 = probability1
+		SET searchProbability2 = probability2
+		SET searchResistance = resistance
+		SET searchPower = power
 		SET newP2 = 0b0
 		CLEAR_ARRAY positions
 		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
-			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~) BEGIN
+			PATCH_IF parameter1 == searchP1 AND parameter2 >= 1 AND parameter2 <= 256 AND NOT VARIABLE_IS_SET $positions_already_check(~%position%~)
+					AND target == searchTarget AND timingMode == searchTimingMode AND duration == searchDuration AND power == searchPower
+					AND probability1 == searchProbability1 AND probability2 == searchProbability2 AND resistance == searchResistance BEGIN
 				// On retire l'opcode de ceux à checker dans les futures itérations
 				SET $positions_already_check(~%position%~) = 1
 				// On ajoute l'opcode courant à ceux qui seront désactivés
@@ -10115,6 +10141,11 @@ DEFINE_PATCH_MACRO ~opcode_200_group~ BEGIN
 			END
 		END
 		PATCH_IF newP2 > 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				PATCH_IF ~%data_0%~ == searchPosition BEGIN
+					LPM ~data_to_vars~
+				END
+			END
 			// Suppression des effets similaires
 			PATCH_PHP_EACH positions AS position1 => opcode BEGIN
 				LPF ~delete_opcode~
@@ -11567,6 +11598,11 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 	SET featureCount   = 0
+	// Cibles de l'effet lui-même (son porteur), que reprend le sort lancé sur lui sous une condition
+	// de distance (get_item_spell_effects_description, forceTarget).
+	SPRINT holderTheTarget   ~%theTarget%~
+	SPRINT holderOfTheTarget ~%ofTheTarget%~
+	SPRINT holderToTheTarget ~%toTheTarget%~
 	SET theTargetRef   = 12320200 + parameter1
 	SET ofTheTargetRef = 12320210 + parameter1
 	SET toTheTargetRef = 12320220 + parameter1
@@ -11612,6 +11648,12 @@ DEFINE_PATCH_MACRO ~opcode_232_common~ BEGIN
 		PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
             //TODO: recalculer versus selon la cible du sort pointé ?
             SPRINT versus ~~
+            // Sort lancé sur le porteur : ses cibles (SPPR698 : « autour du lanceur »).
+            PATCH_IF parameter1 == 0 BEGIN
+                SPRINT theTarget   ~%holderTheTarget%~
+                SPRINT ofTheTarget ~%holderOfTheTarget%~
+                SPRINT toTheTarget ~%holderToTheTarget%~
+            END
         END
 		PATCH_IF NOT ~%spellName3%~ STRING_EQUAL ~~ BEGIN
 			LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref3%~ RET description END
@@ -11682,7 +11724,16 @@ DEFINE_PATCH_MACRO ~opcode_232_condition~ BEGIN
 	ELSE PATCH_IF parameter2 == 8 OR parameter2 == 9 OR parameter2 == 14 BEGIN
 		SET value = parameter2 == 8 ? 4 : parameter2 == 9 ? 10 : special
 		LPF ~feets_to_meters~ INT_VAR range = value RET range = rangeToMeter END
-		SPRINT condition @12320024 // ~Lorsque la cible se trouve à moins de %range%~
+		SPRINT condition @12320024 // ~Lorsqu'une créature se trouve à moins de %range%~
+		// Sort lancé sur le porteur, dont la zone ne touche que des créatures à cette distance : la
+		// condition est remplie dès qu'il touche quelqu'un (SPPR698 : « Inflige 6d8 points de dégâts
+		// tranchants aux créatures hostiles dans un rayon d'un mètre autour du lanceur »).
+		PATCH_IF parameter1 == 0 BEGIN
+			LPF ~spell_area_within_distance~ INT_VAR distance = value STR_VAR file = ~%resref%~ RET withinDistance END
+			PATCH_IF withinDistance BEGIN
+				SPRINT condition ~~
+			END
+		END
 	END
 	ELSE PATCH_IF parameter2 == 13 BEGIN
 		PATCH_IF abilityType == AbilityType_Equipped BEGIN
@@ -14664,6 +14715,10 @@ BEGIN
                     SPRINT opcode_324_list $opcode_324_not_effective(~%statType%~)
                     WHILE NOT ~%opcode_324_list%~ STRING_EQUAL ~~ BEGIN
                         LPF return_first_entry STR_VAR list = ~%opcode_324_list%~ RET strref=entry opcode_324_list = list END
+                        // Dans un sort, la ressource est lancée : son lanceur, pas un porteur.
+                        PATCH_IF strref == 13241044 AND NOT isItem BEGIN
+                            SET strref = 13241999 // ~créatures autres que le lanceur~
+                        END
                         LPF ~getTranslation~ INT_VAR strref opcode RET creatureType = string END
                         SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
                     END

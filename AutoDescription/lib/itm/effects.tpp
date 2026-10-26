@@ -84,7 +84,16 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_only_for~ BEGIN
-	PATCH_IF ~%opcode_target%~ STRING_EQUAL ~_self~ AND VARIABLE_IS_SET onlyForTarget AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	// Pas de « (uniquement pour les X) » quand la description nomme déjà les X comme cible (OHHDRAIN :
+	// « Fige les animaux et les humanoïdes »).
+	SPRINT onlyForNamed ~~
+	PATCH_IF VARIABLE_IS_SET onlyForTheTarget BEGIN
+		PATCH_IF NOT ~%onlyForTheTarget%~ STRING_EQUAL ~~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%onlyForTheTarget%~ ~%description%~) >= 0 BEGIN
+			SPRINT onlyForNamed ~1~
+		END
+	END
+	PATCH_IF ~%opcode_target%~ STRING_EQUAL ~_self~ AND VARIABLE_IS_SET onlyForTarget AND NOT ~%description%~ STRING_EQUAL ~~
+			AND ~%onlyForNamed%~ STRING_EQUAL ~~ BEGIN
 		// On ajoute le (uniquement pour les xxx) derrière chaque sous-effets
         INNER_PATCH_SAVE description ~%description%~ BEGIN
             REPLACE_TEXTUALLY EVALUATE_REGEXP ~\(.+\)%crlf%~ ~\1 (%onlyForTarget%)%crlf%~
@@ -250,7 +259,12 @@ END
 DEFINE_PATCH_MACRO ~add_cumulable~ BEGIN
 	PATCH_IF cumulable == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
 		SPRINT stringNotCumulable @102682 // ~non cumulatif~
-		SPRINT description ~%description% (%stringNotCumulable%)~
+		SPRINT notCumulableSuffix ~ (%stringNotCumulable%)~
+		// Pas de seconde mention après la dernière ligne d'un sort lancé qui l'a déjà.
+		SET notCumulableStart = STRING_LENGTH ~%description%~ - STRING_LENGTH ~%notCumulableSuffix%~
+		PATCH_IF notCumulableStart < 0 OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%notCumulableSuffix%~ ~%description%~ notCumulableStart) != notCumulableStart BEGIN
+			SPRINT description ~%description%%notCumulableSuffix%~
+		END
 	END
 END
 
