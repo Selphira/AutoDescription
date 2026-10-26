@@ -103,8 +103,11 @@ DEFINE_PATCH_FUNCTION ~spell_range~ RET description BEGIN
 	END
 
 	PATCH_IF IS_AN_INT ~%currentRange%~ BEGIN
-		LPF ~feets_to_meters~ INT_VAR range = currentRange RET range currentRange = rangeToMeter END
-		PATCH_IF range < 11 BEGIN
+		// Contact jusqu'à un mètre, en décimètres dans toutes les langues : en anglais, feets_to_meters
+		// rend la portée en pieds.
+		SET rangeDecimeters = currentRange * 10000 / 3281
+		LPF ~feets_to_meters~ INT_VAR range = currentRange RET currentRange = rangeToMeter END
+		PATCH_IF rangeDecimeters < 11 BEGIN
 			SPRINT currentRange @100034 // ~Contact~
 		END
 	END
