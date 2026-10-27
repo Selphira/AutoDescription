@@ -12,7 +12,9 @@
 // fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
 // d'un en-tête d'objet) ; fx_area_target (0 à la lecture, 1 pour un effet dont les cibles sont
 // nommées d'après la zone du projectile, new-lib/application.tpp) ; fx_late (0 à la lecture, 1 pour
-// un effet réuni que l'ancien moteur ajoute en fin de liste, new-lib/groups.tpp) ; fx_series_of,
+// un effet réuni que l'ancien moteur ajoute en fin de liste par son premier regroupement, les effets
+// identiques, 2 par un regroupement suivant, qui l'y ajoute après : chaque opcode écrit ses lignes
+// niveau par niveau, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
 // fx_level_value et fx_level_duration (vides à la lecture, progressions de la valeur et de la durée
 // d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ; fx_level_progression

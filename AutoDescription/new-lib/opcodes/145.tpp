@@ -35,7 +35,7 @@ DEFINE_PATCH_MACRO ad_op_145_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~145~)
 	LPF ad_item_is_robe RET spellcasting_robe = is_robe END
-	FOR (spellcasting_late = 0; spellcasting_late <= 1; ++spellcasting_late) BEGIN
+	FOR (spellcasting_late = 0; spellcasting_late <= 2; ++spellcasting_late) BEGIN
 		PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%spellcasting_id%~) AND $fx_late(~%spellcasting_id%~) == spellcasting_late BEGIN
 				SET spellcasting_types = $fx_spell_types(~%spellcasting_id%~)

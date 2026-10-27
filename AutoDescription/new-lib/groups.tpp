@@ -1010,7 +1010,7 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 			END
 			PATCH_IF group_merged BEGIN
 				SET $fx_spell_types(~%group_id%~) = group_types
-				SET $fx_late(~%group_id%~) = 1
+				SET $fx_late(~%group_id%~) = 2
 			END
 		END
 	END
@@ -1026,7 +1026,7 @@ DEFINE_PATCH_MACRO ad_group_delayed_series BEGIN
 			SET $fx_consumed(~%group_id%~) = 1
 		END
 		PATCH_IF $fx_series_anchor(~%group_id%~) BEGIN
-			SET $fx_late(~%group_id%~) = 1
+			SET $fx_late(~%group_id%~) = 2
 		END
 	END
 END
@@ -1060,7 +1060,7 @@ DEFINE_PATCH_MACRO ad_group_polymorph BEGIN
 							SET $fx_consumed(~%group_candidate%~) = 1
 							SET $fx_timing(~%group_id%~) = TIMING_duration
 							SET $fx_duration(~%group_id%~) = $fx_duration(~%group_candidate%~)
-							SET $fx_late(~%group_id%~) = 1
+							SET $fx_late(~%group_id%~) = 2
 						END
 					END
 				END
@@ -1098,7 +1098,7 @@ DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 				SET $fx_save_type(~%group_id%~) = $fx_save_type(~%group_other%~)
 				SET $fx_save_types(~%group_id%~) = $fx_save_types(~%group_other%~)
 				SET $fx_save_flags(~%group_id%~) = $fx_save_flags(~%group_other%~)
-				SET $fx_late(~%group_id%~) = 1
+				SET $fx_late(~%group_id%~) = 2
 			END
 		END
 	END
@@ -1178,6 +1178,32 @@ DEFINE_PATCH_MACRO ad_derived_add BEGIN
 	SET $derived_statistic_tra(~%derived_count%~) = group_statistic_tra
 	SET $derived_anchor(~%derived_count%~) = group_anchor
 	SET derived_count += 1
+END
+
+// Avant les lignes des opcodes : chaque liste fx_ids_<opcode> range ses effets réunis (fx_late) après
+// les autres, niveau par niveau, comme l'ancien moteur qui les ajoute en fin de liste ; les lignes
+// d'un opcode suivent cette liste.
+DEFINE_PATCH_MACRO ad_fx_ids_late_order BEGIN
+	PHP_EACH fx_opcode_count AS late_opcode => _ BEGIN
+		SET late_any = 0
+		PHP_EACH ~fx_ids_%late_opcode%~ AS _ => late_id BEGIN
+			SET late_any = late_any OR $fx_late(~%late_id%~) > 0
+		END
+		PATCH_IF late_any BEGIN
+			CLEAR_ARRAY late_ids
+			PHP_EACH ~fx_ids_%late_opcode%~ AS late_key => late_id BEGIN
+				SET $late_ids(~%late_key%~) = late_id
+			END
+			CLEAR_ARRAY ~fx_ids_%late_opcode%~
+			FOR (late_level = 0; late_level <= 2; ++late_level) BEGIN
+				PHP_EACH late_ids AS late_key => late_id BEGIN
+					PATCH_IF $fx_late(~%late_id%~) == late_level BEGIN
+						SET $EVAL ~fx_ids_%late_opcode%~(~%late_key%~) = late_id
+					END
+				END
+			END
+		END
+	END
 END
 
 // Lignes des effets dérivés, dans l'ordre de leurs regroupements, avant celles des opcodes.

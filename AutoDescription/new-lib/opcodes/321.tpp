@@ -66,7 +66,7 @@ DEFINE_PATCH_MACRO ad_op_321_header_support BEGIN
 							AND $fx_save_bonus(~%removal_other%~) == $fx_save_bonus(~%removal_id%~)
 							AND $fx_special(~%removal_other%~) == $fx_special(~%removal_id%~) BEGIN
 						SET $fx_consumed(~%removal_id%~) = 1
-						SET $fx_late(~%removal_other%~) = 1
+						SET $fx_late(~%removal_other%~) = 2
 						SET $fx_not_cumulative(~%removal_other%~) = 1
 					END
 				END

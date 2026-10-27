@@ -52,14 +52,14 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
 							SET $kill_anchor(~%kill_other%~) = kill_id
-							SET $fx_late(~%kill_id%~) = 1
+							SET $fx_late(~%kill_id%~) = 2
 						END
 					END
 				END
 			END
 		END
 	END
-	FOR (kill_late = 0; kill_late <= 1; ++kill_late) BEGIN
+	FOR (kill_late = 0; kill_late <= 2; ++kill_late) BEGIN
 		PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id AND $fx_late(~%kill_id%~) == kill_late BEGIN
 				LPM ad_op_55_target

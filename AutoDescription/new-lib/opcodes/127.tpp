@@ -188,7 +188,7 @@ DEFINE_PATCH_MACRO ad_op_127_header_group BEGIN
 			LPM ad_fx_same_fields
 			PATCH_IF fx_same BEGIN
 				SET $fx_consumed(~%monster_other%~) = 1
-				SET $fx_late(~%monster_id%~) = 1
+				SET $fx_late(~%monster_id%~) = 2
 			END
 		END
 	END
@@ -249,7 +249,7 @@ DEFINE_PATCH_MACRO ad_op_127_similar_group BEGIN
 				SET $fx_monster_min(~%monster_id%~) = monster_group_min
 				SET $fx_monster_max(~%monster_id%~) = monster_group_max
 				SET $fx_monster_grouped(~%monster_id%~) = 1
-				SET $fx_late(~%monster_id%~) = 1
+				SET $fx_late(~%monster_id%~) = 2
 				SET $fx_probability1(~%monster_id%~) = 100
 				SET $fx_probability2(~%monster_id%~) = 0
 				SET $fx_probability_low(~%monster_id%~) = 0
@@ -269,7 +269,7 @@ END
 DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~127~)
-	FOR (monster_late = 0; monster_late <= 1; ++monster_late) BEGIN
+	FOR (monster_late = 0; monster_late <= 2; ++monster_late) BEGIN
 		PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%monster_id%~) AND $fx_late(~%monster_id%~) == monster_late BEGIN
 				SET monster_copies = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%monster_id%~) : 1

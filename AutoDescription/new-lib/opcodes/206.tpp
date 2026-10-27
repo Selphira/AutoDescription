@@ -176,7 +176,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 	END
 	FOR (immunity_h = 0; immunity_h < fx_header_count; ++immunity_h) BEGIN
 		SET immunity_size = 0
-		FOR (immunity_late = 0; immunity_late < 2; ++immunity_late) BEGIN
+		FOR (immunity_late = 0; immunity_late < 3; ++immunity_late) BEGIN
 			PHP_EACH fx_ids_206 AS _ => immunity_id BEGIN
 				PATCH_IF $fx_header(~%immunity_id%~) == immunity_h AND NOT $fx_consumed(~%immunity_id%~) AND NOT $fx_header_hidden(~%immunity_id%~)
 						AND $fx_late(~%immunity_id%~) == immunity_late BEGIN

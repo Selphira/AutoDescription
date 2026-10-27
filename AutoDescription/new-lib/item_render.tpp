@@ -57,6 +57,7 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 	LPM ad_item_equipped_lines
 	LPM ad_recursion_describe_pending
 	LPM ad_derived_lines
+	LPM ad_fx_ids_late_order
 	// fx_opcode_count est trié (ad_set_coverage) : l'ordre des ajouts ne dépend pas du fichier.
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 		LPM ad_opcode_is_described

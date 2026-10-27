@@ -791,6 +791,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		LPM ad_lines_reset
 		LPM ad_recursion_describe_pending
 		LPM ad_derived_lines
+		LPM ad_fx_ids_late_order
 		PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 			LPM ad_opcode_is_described
 			PATCH_IF opcode_described BEGIN

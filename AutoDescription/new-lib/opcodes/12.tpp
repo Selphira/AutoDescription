@@ -48,7 +48,7 @@ END
 DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~12~)
-	FOR (damage_late = 0; damage_late <= 1; ++damage_late) BEGIN
+	FOR (damage_late = 0; damage_late <= 2; ++damage_late) BEGIN
 		PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
 				LPM ad_op_12_value

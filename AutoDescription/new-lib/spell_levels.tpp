@@ -42,6 +42,7 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 			SET statistics_opcodes += 1
 		END
 	END
+	LPM ad_fx_ids_late_order
 	FOR (statistics_k = 0; statistics_k < statistics_opcodes; ++statistics_k) BEGIN
 		SET render_opcode = $statistics_order(~%statistics_k%~)
 		LPM ad_opcode_is_described

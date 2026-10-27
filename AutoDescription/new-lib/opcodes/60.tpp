@@ -18,7 +18,7 @@ END
 DEFINE_PATCH_MACRO ad_op_60_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~60~)
-	FOR (failure_late = 0; failure_late <= 1; ++failure_late) BEGIN
+	FOR (failure_late = 0; failure_late <= 2; ++failure_late) BEGIN
 		PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%failure_id%~) AND $fx_late(~%failure_id%~) == failure_late BEGIN
 				SET failure_types = $fx_spell_types(~%failure_id%~)

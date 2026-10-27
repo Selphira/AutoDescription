@@ -15,19 +15,22 @@
 // Phrase : 20 000 000 + opcode × 10 000 + 100 + 10 × variante, plus la forme (ad_effect_line,
 // new-lib/application.tpp).
 
-// Une ligne par effet non consommé, dans l'ordre du fichier (ancien opcode_<self|target>[_probability]_N).
+// Une ligne par effet non consommé, dans l'ordre du fichier (ancien opcode_<self|target>[_probability]_N),
+// les effets réunis (fx_late) après les autres, comme ceux que l'ancien moteur ajoute en fin de liste.
 DEFINE_PATCH_MACRO ad_state_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%state_opcode%~)
-	PHP_EACH ~fx_ids_%state_opcode%~ AS _ => state_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%state_id%~) BEGIN
-			SET line_fx = state_id
-			SET state_variant = 0
-			PATCH_IF NOT (~%state_variant_macro%~ STRING_EQUAL ~~) BEGIN
-				LPM ~%state_variant_macro%~
+	FOR (state_late = 0; state_late <= 2; ++state_late) BEGIN
+		PHP_EACH ~fx_ids_%state_opcode%~ AS _ => state_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%state_id%~) AND $fx_late(~%state_id%~) == state_late BEGIN
+				SET line_fx = state_id
+				SET state_variant = 0
+				PATCH_IF NOT (~%state_variant_macro%~ STRING_EQUAL ~~) BEGIN
+					LPM ~%state_variant_macro%~
+				END
+				SET line_phrase = 20000000 + state_opcode * 10000 + 100 + 10 * state_variant
+				LPM ad_effect_line
 			END
-			SET line_phrase = 20000000 + state_opcode * 10000 + 100 + 10 * state_variant
-			LPM ad_effect_line
 		END
 	END
 END

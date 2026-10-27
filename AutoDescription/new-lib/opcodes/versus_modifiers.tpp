@@ -80,7 +80,7 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 			END
 		END
 	END
-	FOR (versus_late = 0; versus_late <= 1; ++versus_late) BEGIN
+	FOR (versus_late = 0; versus_late <= 2; ++versus_late) BEGIN
 		PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%versus_id%~) AND $versus_anchor(~%versus_id%~) == versus_id AND $fx_late(~%versus_id%~) == versus_late BEGIN
 				LPM ad_versus_modifier_line

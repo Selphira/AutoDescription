@@ -86,7 +86,7 @@ DEFINE_PATCH_MACRO ad_op_78_group BEGIN
 				LPF ad_join STR_VAR array_name = ~disease_names~ glue = ~, ~ final_glue = EVAL ~ %disease_and% ~ RET disease_attributes = text END
 				SPRINT $fx_disease_attributes(~%disease_id%~) ~%disease_attributes%~
 				SET $fx_disease_group(~%disease_id%~) = 1
-				SET $fx_late(~%disease_id%~) = 1
+				SET $fx_late(~%disease_id%~) = 2
 			END
 		END
 	END
@@ -95,7 +95,7 @@ END
 DEFINE_PATCH_MACRO ad_op_78_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~78~)
-	FOR (disease_late = 0; disease_late <= 1; ++disease_late) BEGIN
+	FOR (disease_late = 0; disease_late <= 2; ++disease_late) BEGIN
 		PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%disease_id%~) AND $fx_late(~%disease_id%~) == disease_late BEGIN
 				SET disease_type = $fx_parameter2(~%disease_id%~)
