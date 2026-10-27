@@ -53,7 +53,7 @@ OHNWISH	identical
 OHPRGD10	identical
 OHRRAGE	identical
 OHTMPS1	identical
-OHTMPS2	not_covered	not_implemented:recursion:spell:progression_opcode22
+OHTMPS2	identical
 OHTYR1	identical
 OHTYR2	identical
 SENSPIHE	identical
@@ -73,7 +73,7 @@ SPCL222	identical
 SPCL231	identical
 SPCL232	identical
 SPCL233	identical
-SPCL236	not_covered	not_implemented:spell:progression_external
+SPCL236	identical
 SPCL237	identical
 SPCL238	identical
 SPCL239	identical
@@ -441,7 +441,7 @@ SPPR703	identical
 SPPR704	identical
 SPPR705	identical
 SPPR706	identical
-SPPR707	not_covered	not_implemented:spell:progression_external
+SPPR707	identical
 SPPR708	identical
 SPPR709	identical
 SPPR710	identical
