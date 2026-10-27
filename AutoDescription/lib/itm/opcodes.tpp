@@ -756,6 +756,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	242 => 1
 	335 => 1
 	337 => 1
+	518 => 1 // Immunités aux sorts réunies (206)
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
