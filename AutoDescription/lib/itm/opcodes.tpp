@@ -8231,6 +8231,8 @@ END
 DEFINE_PATCH_MACRO ~opcode_159_group~ BEGIN
 	LOCAL_SET amountMin = 0
 	LOCAL_SET amountMax = 0
+	LOCAL_SET groupLow = 0
+	LOCAL_SET groupHigh = 0
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
 	CLEAR_ARRAY positions
@@ -8244,6 +8246,8 @@ DEFINE_PATCH_MACRO ~opcode_159_group~ BEGIN
 			SET $positions(~%position%~) = 1
 			SET $positions_already_check(~%position%~) = 1
 			SET parameter1 = parameter1 MODULO 65536
+			SET groupLow = probability2
+			SET groupHigh = probability1
 			PATCH_IF parameter1 > 0 BEGIN
 				PATCH_IF amountMin = 0 OR amountMin > parameter1 BEGIN
 					SET amountMin = parameter1
@@ -8263,6 +8267,8 @@ DEFINE_PATCH_MACRO ~opcode_159_group~ BEGIN
 							PATCH_IF amountMax = 0 OR amountMax < match_parameter1 BEGIN
 								SET amountMax = match_parameter1
 							END
+							SET groupLow = match_probability2 < groupLow ? match_probability2 : groupLow
+							SET groupHigh = match_probability1 > groupHigh ? match_probability1 : groupHigh
 							SET $positions(~%match_position%~) = 1
 							SET $positions_already_check(~%match_position%~) = 1
 							SET grouped = 1
@@ -8285,6 +8291,11 @@ DEFINE_PATCH_MACRO ~opcode_159_group~ BEGIN
 	            CLEAR_ARRAY ~opcodes_%opcode%~
 	        END
 			SPRINT custom_str @101130 // ~entre %amountMin% et %amountMax%~
+			// Plages de tirage contiguës (un nombre d'images au hasard) : le groupe a la probabilité de leur
+			// union, et non celle du premier effet.
+			SET probability1 = groupHigh
+			SET probability2 = groupLow
+			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 	        LPM ~add_opcode~
 		END
 	END
@@ -12402,6 +12413,10 @@ DEFINE_PATCH_MACRO ~opcode_248_common~ BEGIN
 		END
 
 		LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+		// Durée qui progresse selon le niveau du sort (group_spell_effects_by_duration).
+		PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT tmpDuration ~%complex_duration%~
+		END
 
 		PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT frequency (AT strref)
@@ -12470,6 +12485,10 @@ DEFINE_PATCH_MACRO ~opcode_249_common~ BEGIN
 
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+		// Durée qui progresse selon le niveau du sort (group_spell_effects_by_duration).
+		PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
+			SPRINT tmpDuration ~%complex_duration%~
+		END
 
 		PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT frequency (AT strref)
@@ -13263,6 +13282,10 @@ DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
 	END
 
 	LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
+	// Durée qui progresse selon le niveau du sort (group_spell_effects_by_duration).
+	PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
+		SPRINT tmpDuration ~%complex_duration%~
+	END
 
 	PATCH_IF ignoreDuration == 0 AND NOT ~%tmpDuration%~ STRING_EQUAL ~~ BEGIN
 		SPRINT strFrequency (AT strref)
