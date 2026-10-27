@@ -300,10 +300,15 @@ DEFINE_PATCH_MACRO ad_op_0_armor_line BEGIN
 END
 
 // CA de base fixée ; à la forme « cible », l'ancien moteur écrit « Classe d'armure de la cible :
-// Passe à N », aux formes probables « de passer la classe d'armure de base de la cible à N ».
+// Passe à N », aux formes probables « de passer la classe d'armure de base de la cible à N ». Une
+// progression selon le niveau du sort (fx_level_value, new-lib/spell_levels.tpp) remplace N.
 DEFINE_PATCH_MACRO ad_op_0_base_line BEGIN
 	SET line_fx = ac_id
 	LPM ad_application_form
+	SPRINT ac_level_value $fx_level_value(~%ac_id%~)
+	PATCH_IF NOT (~%ac_level_value%~ STRING_EQUAL ~~) BEGIN
+		SPRINT ac_value ~%ac_level_value%~
+	END
 	SPRINT value ~%ac_value%~
 	PATCH_IF line_form == 0 BEGIN
 		SPRINT name @20000001 // ~Classe d'armure de base~
@@ -322,11 +327,32 @@ END
 
 // Modificateur ac_value contre les attaques du masque ac_mask (0 : toutes) : « +2 », ou « Bonus
 // de 2 » avec AD_ARMOR_CLASS_SHOW_BONUS_MALUS ; un effet probable a sa phrase (« d'infliger un malus
-// de 1 à la classe d'armure de la cible »).
+// de 1 à la classe d'armure de la cible »). Une progression selon le niveau du sort (fx_level_value)
+// remplace la valeur, sans son signe après « Bonus de », « Malus de » et dans une phrase probable.
 DEFINE_PATCH_MACRO ad_op_0_modifier_line BEGIN
 	SET line_fx = ac_line_fx
 	LPM ad_application_form
-	PATCH_IF line_form >= 2 BEGIN
+	SPRINT ac_level_value $fx_level_value(~%ac_line_fx%~)
+	SPRINT ac_level_unsigned ~%ac_level_value%~
+	PATCH_IF ac_value < 0 AND NOT (~%ac_level_value%~ STRING_EQUAL ~~) BEGIN
+		LPF ad_level_unsigned STR_VAR text = ~%ac_level_value%~ RET ac_level_unsigned = text END
+	END
+	PATCH_IF NOT (~%ac_level_value%~ STRING_EQUAL ~~) BEGIN
+		SPRINT value ~%ac_level_unsigned%~
+		PATCH_IF line_form < 2 AND NOT AD_ARMOR_CLASS_SHOW_BONUS_MALUS BEGIN
+			SPRINT value ~%ac_level_value%~
+			PATCH_IF ac_value >= 0 BEGIN
+				SPRINT value @1200001 // ~+%value%~
+			END
+		END
+		ELSE PATCH_IF line_form < 2 AND ac_value >= 0 BEGIN
+			SPRINT value @20000002 // ~Bonus de %value%~
+		END
+		ELSE PATCH_IF line_form < 2 BEGIN
+			SPRINT value @20000003 // ~Malus de %value%~
+		END
+	END
+	ELSE PATCH_IF line_form >= 2 BEGIN
 		SET value = ABS ac_value
 	END
 	ELSE PATCH_IF NOT AD_ARMOR_CLASS_SHOW_BONUS_MALUS BEGIN

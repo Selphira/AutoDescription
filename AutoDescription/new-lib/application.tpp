@@ -580,7 +580,8 @@ END
 // (render_late_missing) : effet réuni à un effet sans type de créature (l'ancien moteur l'écrirait
 // pour les deux) ; valeur sans nom ; classes que l'ancien moteur réunit sous un seul nom (mages,
 // voleurs, monoclassés et multiclassés) ; cible d'une zone (l'ancien moteur y écrit la zone, comme
-// BUG-032) ; restriction de niveau. Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
+// BUG-032) ; restriction de niveau. Une valeur sans nom (OHBREW04 : 100 de SPECIFIC.IDS) est décrite
+// sans type de créature, comme dans l'ancien moteur, erreur journalisée. Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
 // garde ses chaînes et la ligne finit par « uniquement pour le kit Archer » (« … les kits Bretteur et
 // Maître-lames ») ; refusé à une autre forme que « soi » ou avec un autre type de créature.
 DEFINE_PATCH_MACRO ad_application_versus BEGIN
@@ -613,8 +614,17 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 						SPRINT app_versus_name @2002040 // ~%outerType% qui sont aussi des %innerType%~
 					END
 				END
+				// Journalisée une fois par effet : la phrase se construit pour chaque ligne qu'il porte.
+				PATCH_IF ~%app_versus_name%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $app_versus_unnamed(~%SOURCE_RES% %ctx_origin% %app_member%~) BEGIN
+					SET $app_versus_unnamed(~%SOURCE_RES% %ctx_origin% %app_member%~) = 1
+					SET ignored_fx = app_member
+					SPRINT ignored_reason ~file_error:versus:ids_name~
+					SPRINT ignored_message ~value %app_versus_value% of IDS file %app_versus_file% has no name: described without this creature type~
+					SPRINT ignored_consequence ~kept~
+					LPM ad_log_ignored
+				END
 				PATCH_IF ~%app_versus_name%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = app_member STR_VAR reason = ~not_implemented:versus:ids_name~ message = ~value %app_versus_value% of IDS file %app_versus_file% has no name~ RET render_late_missing = refusal END
+					SET app_versus_plain = 1
 				END
 				ELSE BEGIN
 					SPRINT $app_versus_names(~%app_versus_name%~) ~%app_versus_name%~

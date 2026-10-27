@@ -357,6 +357,10 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 		PATCH_IF level_opcode == 12 BEGIN
 			SET level_mode = level_mode BAND 65535
 		END
+		// Opcode 0 : parameter2 donne les attaques concernées, un ajout ; seule la CA de base (16) est fixée.
+		ELSE PATCH_IF level_opcode == 0 BEGIN
+			SET level_mode = level_mode == AC_MOD_TYPE_set_base ? MOD_TYPE_flat : MOD_TYPE_cumulative
+		END
 		PATCH_IF $level_on(~%level_a%~) AND VARIABLE_IS_SET $AD_LEVEL_PROGRESSION_OPCODES(~%level_opcode%~)
 				AND level_mode >= MOD_TYPE_cumulative AND level_mode <= MOD_TYPE_percentage BEGIN
 			SET level_skip = AD_SAME_PARAMETER1 BOR AD_SAME_TIMING
@@ -368,8 +372,9 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				SET formula_dice_sides = 0
 				SET formula_opcode = level_opcode
 				LPM ad_spell_level_formula
-				// Deux valeurs seulement : la formule de l'ancien moteur, sans dés ni unité.
-				PATCH_IF NOT (~%formula_two_text%~ STRING_EQUAL ~~) AND level_opcode != 12 AND level_opcode != 17 BEGIN
+				// Deux valeurs seulement : la formule de l'ancien moteur, sans dés ni unité ; la classe d'armure
+				// garde ses sections (« -2 + -2 au niveau 15 »).
+				PATCH_IF NOT (~%formula_two_text%~ STRING_EQUAL ~~) AND level_opcode != 12 AND level_opcode != 17 AND level_opcode != 0 BEGIN
 					SPRINT formula_text ~%formula_two_text%~
 					SET formula_valid = 1
 					SET formula_rank = 0
@@ -583,11 +588,11 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	END
 END
 
-// Formule d'une valeur qui n'en prend que deux : pas de progression pour les dégâts (12, 17), qui
-// gardent leurs sections de niveaux, comme l'ancien moteur (no_two_values de get_complex_value) ;
-// refus pour un autre opcode.
+// Formule d'une valeur qui n'en prend que deux : pas de progression pour les dégâts (12, 17) et la
+// classe d'armure (0), qui gardent leurs sections de niveaux, comme l'ancien moteur (no_two_values de
+// get_complex_value) ; refus pour un autre opcode.
 DEFINE_PATCH_MACRO ad_spell_level_formula_check BEGIN
-	PATCH_IF formula_rank == 2 AND (formula_opcode == 12 OR formula_opcode == 17) BEGIN
+	PATCH_IF formula_rank == 2 AND (formula_opcode == 12 OR formula_opcode == 17 OR formula_opcode == 0) BEGIN
 		SET formula_valid = 0
 	END
 	ELSE PATCH_IF formula_rank == 2 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
@@ -718,8 +723,10 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 			SPRINT formula_typed ~%formula_step%~
 			LPM ad_spell_level_formula_typed
 			SPRINT value ~%formula_typed%~
+			// Valeur fixée qui décroît : la valeur au niveau 0, d'après la dernière et le pas (« Passe à 21 -1
+			// par niveau », « Passe à 6 -1 par tranche de 4 niveaux »).
 			PATCH_IF formula_flat AND formula_delta < 0 BEGIN
-				SET formula_flat_value = formula_previous_level + formula_last
+				SET formula_flat_value = formula_last + (ABS formula_delta) * formula_previous_level / formula_delta_level
 				SPRINT value ~%formula_flat_value% %value%~
 			END
 			PATCH_IF ABS formula_delta_level == 1 BEGIN
