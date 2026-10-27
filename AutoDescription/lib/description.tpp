@@ -148,6 +148,13 @@ DEFINE_PATCH_FUNCTION ~signed_value~ INT_VAR value = 0 RET value BEGIN
 	END
 END
 
+// Progression (complex_value) sans le signe de tête : la phrase dit déjà s'il s'agit d'une réduction.
+DEFINE_PATCH_FUNCTION ~unsigned_complex_value~ STR_VAR value = ~~ RET value BEGIN
+	INNER_PATCH_SAVE value ~%value%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ?~ ~~
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~percent_value~ INT_VAR value = 0 RET value BEGIN
 	PATCH_IF value >= 0 BEGIN
 		SPRINT value @10002 // ~%value% %~

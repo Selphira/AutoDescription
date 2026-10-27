@@ -875,6 +875,9 @@ DEFINE_PATCH_MACRO ~opcode_self_0~ BEGIN
 	LOCAL_SPRINT versus ~~
 	LOCAL_SET value = ~%parameter1%~
 	LOCAL_SPRINT name @10000099 // ~Classe d'armure~
+	PATCH_IF parameter2 == AC_MOD_TYPE_set_base AND NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT value ~%complex_value%~
+	END
 
 	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
 		SPRINT value ~%custom_str%~
@@ -899,10 +902,18 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_0~ BEGIN
 	LOCAL_SET value = parameter1
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT value ~%complex_value%~
+		END
 		SPRINT description  @10000105 // ~de passer la classe d'armure de base %ofTheTarget% à %value%~
 	END
 	ELSE BEGIN
 		SET value = ABS value
+		// Progression selon le niveau du sort (complex_value) : sans signe, celui de parameter1 choisit
+		// bonus ou malus.
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			LPF ~unsigned_complex_value~ STR_VAR value = ~%complex_value%~ RET value END
+		END
 
 		PATCH_IF parameter2 > AC_MOD_TYPE_all AND parameter2 < 0xF BEGIN
 			SET strref = 10000000 + parameter2
@@ -924,6 +935,9 @@ DEFINE_PATCH_MACRO ~opcode_target_0~ BEGIN
 	LOCAL_SET value = ~%parameter1%~
 
 	PATCH_IF parameter2 == AC_MOD_TYPE_set_base BEGIN
+		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+			SPRINT value ~%complex_value%~
+		END
 		SPRINT value @10010 // ~Passe à %value%~
 	END
 	ELSE BEGIN
@@ -946,7 +960,24 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_0~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_0_get_value~ BEGIN
-	PATCH_IF armor_class_show_bonus_malus BEGIN
+	// Progression selon le niveau du sort (complex_value) : elle remplace la valeur, le signe de
+	// parameter1 choisit bonus ou malus.
+	PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+		LPF ~unsigned_complex_value~ STR_VAR value = ~%complex_value%~ RET value END
+		PATCH_IF armor_class_show_bonus_malus AND parameter1 >= 0 BEGIN
+			SPRINT value @10000101 // ~Bonus de %value%~
+		END
+		ELSE PATCH_IF armor_class_show_bonus_malus BEGIN
+			SPRINT value @10000102 // ~Malus de %value%~
+		END
+		ELSE PATCH_IF parameter1 >= 0 BEGIN
+			SPRINT value ~+%value%~
+		END
+		ELSE BEGIN
+			SPRINT value ~-%value%~
+		END
+	END
+	ELSE PATCH_IF armor_class_show_bonus_malus BEGIN
 		PATCH_IF value >= 0 BEGIN
 			SPRINT value @10000101 // ~Bonus de %value%~
 		END
