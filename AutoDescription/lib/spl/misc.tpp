@@ -554,6 +554,20 @@ BEGIN
 	SET prev_level = 0
 	SET cpt = 0
 
+	// Nombre de valeurs distinctes : no_two_values refuse une série de deux valeurs, que les passes
+	// suivantes peuvent ajuster à une formule fausse (« -1 + 2 par tranche de 9 niveaux » pour -2 et -4).
+	SET distinct_values = 0
+	CLEAR_ARRAY distinct_seen
+	PATCH_PHP_EACH ~%array_name%~ AS _ => value BEGIN
+		PATCH_IF NOT VARIABLE_IS_SET $distinct_seen(~%value%~) OR $distinct_seen(~%value%~) == 0 BEGIN
+			SET $distinct_seen(~%value%~) = 1
+			SET distinct_values += 1
+		END
+	END
+	PATCH_PHP_EACH distinct_seen AS distinct_key => _ BEGIN
+		SET $distinct_seen(~%distinct_key%~) = 0
+	END
+
 	PATCH_PHP_EACH ~%array_name%~ AS level => value BEGIN
 		PATCH_IF level <= 1 BEGIN
 			LPF get_first_level_for_spell RET level = minLevel END
@@ -674,7 +688,7 @@ BEGIN
 		END
 	END
 
-	PATCH_IF cpt == 2 AND no_two_values BEGIN
+	PATCH_IF (cpt == 2 OR distinct_values == 2) AND no_two_values BEGIN
 		SET is_valid = 0
 	END
 	ELSE PATCH_IF cpt == 2 BEGIN
@@ -751,8 +765,10 @@ BEGIN
 				// Reste au niveau du dernier changement : un dernier en-tête à la même valeur ne le change pas.
 				SET remains_value = ABS prev_value - (ABS delta_value * prev_level / delta_level)
 				LPF ~get_complex_typed_value~ INT_VAR is_percent strref STR_VAR value RET value END
+				// Valeur fixée qui décroît : la valeur au niveau 0, d'après la dernière et le pas (« Passe à 21 -1
+				// par niveau », « Passe à 6 -1 par tranche de 4 niveaux »).
 				PATCH_IF is_flat_value == 1 AND delta_value < 0 BEGIN
-					SET base_value = prev_level + last_value
+					SET base_value = last_value + (ABS delta_value) * prev_level / delta_level
 					SPRINT value ~%base_value% %value%~
 				END
 				PATCH_IF ABS delta_level == 1 BEGIN

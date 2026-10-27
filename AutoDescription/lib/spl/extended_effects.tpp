@@ -847,7 +847,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		 * Uniquement si parameter2 == MOD_TYPE_cumulative ET que parameter1 et duration sont différents
 		 */
 		PATCH_FOR_EACH basicOpcode IN
-			6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 190 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
+			0 6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 190 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
 			27 28 29 30 31 84 85 86 87 88 89 166 173 502 503 504 // Les résistances
 			12 17 18 111 218
 			// 25 98
@@ -859,6 +859,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			    SET mode = parameter2
 			    PATCH_IF opcode == 12 BEGIN
 					SET mode = parameter2 BAND 65535
+				END
+				ELSE PATCH_IF opcode == 0 BEGIN
+					SET mode = parameter2 == AC_MOD_TYPE_set_base ? MOD_TYPE_flat : MOD_TYPE_cumulative
 				END
 			    PATCH_IF mode == MOD_TYPE_cumulative OR mode == MOD_TYPE_flat OR mode == MOD_TYPE_percentage BEGIN
 			        LPM ~data_to_match_vars~
@@ -883,7 +886,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							INT_VAR
 								is_percent = VARIABLE_IS_SET $opcodes_resistance(~%opcode%~) ? 1 : 0
 								is_flat_value = mode == MOD_TYPE_flat ? 1 : 0
-								no_two_values = opcode == 12 OR opcode == 17
+								no_two_values = opcode == 12 OR opcode == 17 OR opcode == 0
 							STR_VAR
 								array_name = ~all_effects~
 							RET
@@ -1121,10 +1124,12 @@ DEFINE_PATCH_MACRO ~group_spell_effects_disable~ BEGIN
 	SET $leveled_opcodes_zero(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~ ~%opcode%~) = opcode
 	SET leveled_opcodes_count_zero += 1
 
-	// On désactive les effets qui se trouvent dans les niveaux plus importants
+	// On désactive les effets qui se trouvent dans les niveaux plus importants. Marque -100000, qui ne
+	// code aucun opcode : -1 est l'opcode 0 désactivé (0 - opcode - 1), qu'une recherche de l'opcode 0
+	// aurait confondu avec n'importe quel effet réuni.
 	PATCH_PHP_EACH effects_to_disabled AS data => level2 BEGIN
         LPM ~data_to_vars~
-	    SET $EVAL ~leveled_opcodes_%level2%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~ ~%data_30%~) = ~-1~
+	    SET $EVAL ~leveled_opcodes_%level2%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~ ~%data_30%~) = 0 - 100000
 	    SET ~leveled_opcodes_count_%level2%~ -= 1
 	    PATCH_IF ~leveled_opcodes_count_%level2%~ == 0 BEGIN
 	        CLEAR_ARRAY ~leveled_opcodes_%level2%~
