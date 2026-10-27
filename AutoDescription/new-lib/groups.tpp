@@ -117,40 +117,50 @@ END
 // fx_identical_count en garde le nombre, fx_identical_anchor(id) l'effet qui les représente (initialisé
 // à id à la lecture, new-lib/effects.tpp) ; l'ancien moteur ne compare pas le type de créature
 // d'un effet d'un 177, qui réunit leurs noms (ad_application_versus, new-lib/application.tpp).
-// identical_left(opcode) : effets de l'opcode qui suivent group_id (au plus : fx_opcode_count compte
-// aussi les 177 remplacés) ; la recherche s'arrête quand il n'en reste plus, ou à la fin du bloc de
-// group_id (les effets d'un bloc se suivent dans le magasin, et deux portées ne sont jamais réunies).
+// La recherche s'arrête à la fin du bloc de group_id (les effets d'un bloc se suivent dans le magasin,
+// et deux portées ne sont jamais réunies). Seuls deux effets de même ressource pouvant être réunis,
+// elle ne parcourt que ceux de même suite d'en-tête, de même opcode et de même ressource
+// (identical_next, dans l'ordre du magasin) : un sort qui en lance des centaines d'autres (D5ZZ206,
+// 699 opcodes 146 vers des sorts tous différents) demandait sinon des centaines de milliers de
+// comparaisons.
+// identical_generation distingue les clés d'un appel de celles des appels précédents dans la même
+// portée (CLEAR_ARRAY les laisse lisibles par VARIABLE_IS_SET).
 DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
-	PHP_EACH fx_opcode_count AS identical_opcode => identical_total BEGIN
-		SET $identical_left(~%identical_opcode%~) = identical_total
+	SET identical_generation = VARIABLE_IS_SET identical_generation ? identical_generation + 1 : 0
+	SET identical_run = 0
+	SET identical_header = 0
+	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
+		PATCH_IF group_id > 0 AND $fx_header(~%group_id%~) != identical_header BEGIN
+			SET identical_run += 1
+		END
+		SET identical_header = $fx_header(~%group_id%~)
+		SET identical_opcode = $fx_opcode(~%group_id%~)
+		SPRINT identical_resource $fx_resource_lower(~%group_id%~)
+		SPRINT identical_key ~%identical_generation% %identical_run% %identical_opcode% %identical_resource%~
+		SET $identical_next(~%group_id%~) = 0 - 1
+		PATCH_IF VARIABLE_IS_SET $identical_last(~%identical_key%~) BEGIN
+			SET identical_previous = $identical_last(~%identical_key%~)
+			SET $identical_next(~%identical_previous%~) = group_id
+		END
+		SET $identical_last(~%identical_key%~) = group_id
 	END
 	SET same_ignored = 0
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		SET $fx_identical_count(~%group_id%~) = 1
-		SET group_opcode = $fx_opcode(~%group_id%~)
-		SET group_left = $identical_left(~%group_opcode%~) - 1
-		SET $identical_left(~%group_opcode%~) = group_left
-		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_left > 0 BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
-			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			SET group_header = $fx_header(~%group_id%~)
-			FOR (group_candidate = group_id + 1; group_left > 0 AND group_candidate < fx_count AND $fx_header(~%group_candidate%~) == group_header; ++group_candidate) BEGIN
-				PATCH_IF $fx_opcode(~%group_candidate%~) == group_opcode BEGIN
-					SET group_left -= 1
-					PATCH_IF NOT $fx_consumed(~%group_candidate%~) BEGIN
-						SET same_other = group_candidate
-						LPM ad_fx_same_fields
-						SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-						// Exceptions de cible lues entre deux effets du fichier (318, 324 du bloc) : effets
-						// distincts, comme dans l'ancien opcode_group_by_target (SPCL920) ; pas pour ceux d'EFF
-						// (177, SPPR612).
-						PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~)
-								AND ($fx_external(~%group_id%~) OR $fx_exception_count(~%group_candidate%~) == $fx_exception_count(~%group_id%~)) BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
-							SET $fx_identical_anchor(~%group_candidate%~) = group_id
-							SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
-							SET $fx_late(~%group_id%~) = 1
-						END
+			FOR (group_candidate = $identical_next(~%group_id%~); group_candidate >= 0; group_candidate = $identical_next(~%group_candidate%~)) BEGIN
+				PATCH_IF NOT $fx_consumed(~%group_candidate%~) BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					// Exceptions de cible lues entre deux effets du fichier (318, 324 du bloc) : effets
+					// distincts, comme dans l'ancien opcode_group_by_target (SPCL920) ; pas pour ceux d'EFF
+					// (177, SPPR612).
+					PATCH_IF fx_same AND ($fx_external(~%group_id%~) OR $fx_exception_count(~%group_candidate%~) == $fx_exception_count(~%group_id%~)) BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET $fx_identical_anchor(~%group_candidate%~) = group_id
+						SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
+						SET $fx_late(~%group_id%~) = 1
 					END
 				END
 			END
