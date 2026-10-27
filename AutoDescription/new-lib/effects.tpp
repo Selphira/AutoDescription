@@ -322,8 +322,21 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SPRINT $fx_level_value(~%fx_id%~) ~~
 	SPRINT $fx_level_duration(~%fx_id%~) ~~
 	SET $fx_level_progression(~%fx_id%~) = 0
-	LPM ad_fx_mark_target_exception
-	LPM ad_fx_mark_not_cumulative
+	LPM ad_fx_mod_ignored
+	// Écarté comme un effet que l'ancien moteur ne charge pas : sans effet sur son bloc (exceptions de
+	// cible, 321 qui rend la suite non cumulative).
+	PATCH_IF fx_mod_ignored BEGIN
+		SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
+		SET $fx_exception(~%fx_id%~) = 0
+		SET $fx_exception_name_count(~%fx_id%~) = 0
+		SET $fx_not_cumulative(~%fx_id%~) = fx_block_not_cumulative
+		SET $fx_consumed(~%fx_id%~) = 1
+		SET $fx_dropped(~%fx_id%~) = 1
+	END
+	ELSE BEGIN
+		LPM ad_fx_mark_target_exception
+		LPM ad_fx_mark_not_cumulative
+	END
 	SET fx_opcode = $fx_opcode(~%fx_id%~)
 	SET $fx_opcode_count(~%fx_opcode%~) = VARIABLE_IS_SET $fx_opcode_count(~%fx_opcode%~) ? $fx_opcode_count(~%fx_opcode%~) + 1 : 1
 	SET $EVAL ~fx_ids_%fx_opcode%~(~%fx_id%~) = fx_id
@@ -334,4 +347,38 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 		SET $fx_opcode_count(~283~) = VARIABLE_IS_SET $fx_opcode_count(~283~) ? $fx_opcode_count(~283~) + 1 : 1
 	END
 	SET fx_count += 1
+END
+
+// fx_mod_ignored : 1 si l'effet fx_id est l'un de ceux que l'ancien moteur écarte pour un mod
+// (2da/mod_ignored.2da, ad_read_mod_ignored, new-lib/catalog.tpa).
+DEFINE_PATCH_MACRO ad_fx_mod_ignored BEGIN
+	SET mod_opcode = $fx_opcode(~%fx_id%~)
+	SPRINT mod_resource $fx_resource_lower(~%fx_id%~)
+	SET fx_mod_ignored = VARIABLE_IS_SET $AD_MOD_IGNORED_EXACT(~%mod_opcode%~ ~%mod_resource%~)
+	PATCH_IF NOT fx_mod_ignored AND VARIABLE_IS_SET $AD_MOD_IGNORED_PARTIAL_COUNT(~%mod_opcode%~) BEGIN
+		FOR (mod_rank = 0; mod_rank < $AD_MOD_IGNORED_PARTIAL_COUNT(~%mod_opcode%~); ++mod_rank) BEGIN
+			SPRINT mod_rule $AD_MOD_IGNORED_PARTIAL(~%mod_opcode%~ ~%mod_rank%~)
+			PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~PREFIX ~ ~%mod_rule%~) == 0 BEGIN
+				SPRINT mod_value ~%mod_rule%~
+				INNER_PATCH_SAVE mod_value ~%mod_value%~ BEGIN DELETE_BYTES 0 7 END
+				SET fx_mod_ignored = fx_mod_ignored OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%mod_value%~ ~%mod_resource%~) == 0
+			END
+			ELSE BEGIN
+				SPRINT mod_value ~%mod_rule%~
+				INNER_PATCH_SAVE mod_value ~%mod_value%~ BEGIN DELETE_BYTES 0 9 END
+				SET fx_mod_ignored = fx_mod_ignored OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%mod_value%~ ~%mod_resource%~) >= 0
+			END
+		END
+	END
+	PATCH_IF NOT fx_mod_ignored AND mod_opcode == 326 BEGIN
+		SET mod_splprot = $fx_parameter2_raw(~%fx_id%~)
+		SET fx_mod_ignored = VARIABLE_IS_SET $AD_MOD_IGNORED_SPLPROT(~%mod_splprot%~)
+		PATCH_IF NOT fx_mod_ignored AND VARIABLE_IS_SET $AD_SPLPROT_STAT(~%mod_splprot%~) BEGIN
+			SPRINT mod_stat $AD_SPLPROT_STAT(~%mod_splprot%~)
+			PATCH_IF ~%mod_stat%~ STRING_EQUAL ~274~ BEGIN
+				SET mod_state = $fx_parameter1_raw(~%fx_id%~)
+				SET fx_mod_ignored = VARIABLE_IS_SET $AD_MOD_IGNORED_SPLSTATE(~%mod_state%~)
+			END
+		END
+	END
 END

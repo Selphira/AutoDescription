@@ -551,6 +551,77 @@ BEGIN
 END
 LAF ad_read_splprot RET_ARRAY AD_SPLPROT_STAT AD_SPLPROT_VALUE AD_SPLPROT_RELATION END
 
+// Effets propres à certains mods que l'ancien moteur écarte dès leur lecture (ancien
+// lib/itm/opcodes_mod.tpp) : mécanismes internes que le joueur ne voit pas comme des effets (faux
+// emplacements de sorts de 5E_spellcasting, échange d'un objet contre sa variante de Tweaks
+// Anthology…). 2da/mod_ignored.2da, une règle par ligne : opcode, MATCH sur la ressource en
+// minuscules (EXACT, PREFIX, CONTAINS), ou sur la condition d'un 326 (SPLPROT : nom de la ligne de
+// splprot.2da en parameter2 ; SPLSTATE : nom de splstate.ids en parameter1, pour une ligne de
+// splprot.2da sur la statistique 274), puis le mod d'origine. Rendus :
+// $AD_MOD_IGNORED_EXACT(opcode ressource) ; $AD_MOD_IGNORED_PARTIAL(opcode rang) = MATCH ressource et
+// $AD_MOD_IGNORED_PARTIAL_COUNT(opcode) ; $AD_MOD_IGNORED_SPLPROT(ligne de splprot.2da) ;
+// $AD_MOD_IGNORED_SPLSTATE(valeur de splstate.ids).
+DEFINE_ACTION_FUNCTION ad_read_mod_ignored
+	RET_ARRAY AD_MOD_IGNORED_EXACT AD_MOD_IGNORED_PARTIAL AD_MOD_IGNORED_PARTIAL_COUNT AD_MOD_IGNORED_SPLPROT AD_MOD_IGNORED_SPLSTATE
+BEGIN
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_MOD_IGNORED_EXACT BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_MOD_IGNORED_PARTIAL BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_MOD_IGNORED_PARTIAL_COUNT BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_MOD_IGNORED_SPLPROT BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_MOD_IGNORED_SPLSTATE BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY ad_splprot_names BEGIN END
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY ad_splstate_names BEGIN END
+	COPY - ~%MOD_FOLDER%/2da/mod_ignored.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_mod_rules 5
+		FOR (ad_row = 0; ad_row < ad_mod_rules; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_mod_rules ad_row 1 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_mod_rules ad_row 2 ad_match
+			READ_2DA_ENTRY_FORMER ad_mod_rules ad_row 3 ad_value
+			PATCH_IF ~%ad_match%~ STRING_EQUAL ~EXACT~ BEGIN
+				TO_LOWER ad_value
+				SET $AD_MOD_IGNORED_EXACT(~%ad_opcode%~ ~%ad_value%~) = 1
+			END
+			ELSE PATCH_IF ~%ad_match%~ STRING_EQUAL ~PREFIX~ OR ~%ad_match%~ STRING_EQUAL ~CONTAINS~ BEGIN
+				TO_LOWER ad_value
+				SET ad_rank = VARIABLE_IS_SET $AD_MOD_IGNORED_PARTIAL_COUNT(~%ad_opcode%~) ? $AD_MOD_IGNORED_PARTIAL_COUNT(~%ad_opcode%~) : 0
+				SPRINT $AD_MOD_IGNORED_PARTIAL(~%ad_opcode%~ ~%ad_rank%~) ~%ad_match% %ad_value%~
+				SET $AD_MOD_IGNORED_PARTIAL_COUNT(~%ad_opcode%~) = ad_rank + 1
+			END
+			ELSE PATCH_IF ~%ad_match%~ STRING_EQUAL ~SPLPROT~ BEGIN
+				TO_UPPER ad_value
+				SET $ad_splprot_names(~%ad_value%~) = 1
+			END
+			ELSE PATCH_IF ~%ad_match%~ STRING_EQUAL ~SPLSTATE~ BEGIN
+				SET $ad_splstate_names(~%ad_value%~) = 1
+			END
+			ELSE BEGIN
+				PATCH_FAIL ~2da/mod_ignored.2da, row %ad_row%: unknown MATCH %ad_match%~
+			END
+		END
+	ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
+		COPY_EXISTING - ~splprot.2da~ ~override~
+			READ_2DA_ENTRIES_NOW ad_splprot 4
+			FOR (ad_row = 0; ad_row < ad_splprot; ++ad_row) BEGIN
+				READ_2DA_ENTRY_FORMER ad_splprot ad_row 0 ad_name
+				TO_UPPER ad_name
+				PATCH_IF VARIABLE_IS_SET $ad_splprot_names(~%ad_name%~) BEGIN
+					SET $AD_MOD_IGNORED_SPLPROT(~%ad_row%~) = 1
+				END
+			END
+	END
+	ACTION_IF FILE_EXISTS_IN_GAME ~splstate.ids~ BEGIN
+		ACTION_PHP_EACH ad_splstate_names AS ad_name => _ BEGIN
+			OUTER_SET ad_state = IDS_OF_SYMBOL (~splstate~ ~%ad_name%~)
+			ACTION_IF ad_state >= 0 BEGIN
+				OUTER_SET $AD_MOD_IGNORED_SPLSTATE(~%ad_state%~) = 1
+			END
+		END
+	END
+END
+LAF ad_read_mod_ignored
+	RET_ARRAY AD_MOD_IGNORED_EXACT AD_MOD_IGNORED_PARTIAL AD_MOD_IGNORED_PARTIAL_COUNT AD_MOD_IGNORED_SPLPROT AD_MOD_IGNORED_SPLSTATE
+END
+
 // Noms des kits du jeu (EE, kitlist.2da, ancien tableau kits) : $AD_KIT_NAMES(valeur de kit.ids) =
 // nom de la colonne MIXED, au singulier (« Archer »).
 DEFINE_ACTION_FUNCTION ad_read_kit_names

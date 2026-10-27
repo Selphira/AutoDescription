@@ -1,0 +1,27 @@
+2DA V1.0
+*
+     OPCODE  MATCH     VALUE             MOD
+0    67      EXACT     dw#sweet          Stratagems
+1    122     PREFIX    cd                Tweaks_Anthology
+2    122     CONTAINS  c!                Tweaks_Anthology
+3    146     PREFIX    d5z               5E_spellcasting
+4    146     EXACT     d5_nukt           npc_ee
+5    146     EXACT     meknockb          metweaks
+6    321     PREFIX    d5z               5E_spellcasting
+7    326     PREFIX    d5z               5E_spellcasting
+8    326     EXACT     d5_nukt           npc_ee
+9    326     EXACT     meknockb          metweaks
+10   326     SPLPROT   D5_DIV_1_7        5E_spellcasting
+11   326     SPLPROT   D5_DIV_8_9        5E_spellcasting
+12   326     SPLPROT   D5_WIZ_1_7        5E_spellcasting
+13   326     SPLPROT   D5_WIZ_8_9        5E_spellcasting
+14   326     SPLPROT   D5_KIT_IS         5E_spellcasting
+15   326     SPLPROT   D5_FATIGUE_0      5E_spellcasting
+16   326     SPLPROT   D5_FATIGUE_1      5E_spellcasting
+17   326     SPLPROT   D5_FATIGUE_3      5E_spellcasting
+18   326     SPLPROT   D5_DIV=1_7        5E_spellcasting
+19   326     SPLPROT   D5_WIZ=1_7        5E_spellcasting
+20   326     SPLPROT   D5_WIZ=8_9        5E_spellcasting
+21   326     SPLPROT   D5_115_FEATS      might_and_guile
+22   326     SPLSTATE  D5_SEMI_SORC      5E_spellcasting
+23   326     SPLSTATE  D5_SEMI_REST      5E_spellcasting
