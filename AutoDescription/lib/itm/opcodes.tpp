@@ -2125,11 +2125,14 @@ DEFINE_PATCH_MACRO ~opcode_target_18~ BEGIN
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
+        // Signe lu sur parameter1 : une progression (complex_value, sans signe) réduit aussi la valeur.
+        PATCH_IF parameter1 >= 0 BEGIN
 	        SPRINT description @102286 // ~Augmente %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
+            PATCH_IF IS_AN_INT ~%value%~ BEGIN
+                value = ABS value
+            END
 	        SPRINT description @102285 // ~Réduit %theStatistic% %ofTheTarget% de %value%~
         END
 	END
@@ -2155,11 +2158,14 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_18~ BEGIN
 	END
 
 	PATCH_IF parameter2 == MOD_TYPE_cumulative BEGIN
-        PATCH_IF parameter1 >= 0 OR NOT IS_AN_INT value BEGIN
+        // Signe lu sur parameter1 : une progression (complex_value, sans signe) réduit aussi la valeur.
+        PATCH_IF parameter1 >= 0 BEGIN
 	        SPRINT description @102544 // ~d'augmenter %theStatistic% %ofTheTarget% de %value%~
         END
         ELSE BEGIN
-            value = ABS value
+            PATCH_IF IS_AN_INT ~%value%~ BEGIN
+                value = ABS value
+            END
 	        SPRINT description @102543 // ~de réduire %theStatistic% %ofTheTarget% de %value%~
         END
 	END
