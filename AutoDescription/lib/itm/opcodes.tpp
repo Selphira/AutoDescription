@@ -313,6 +313,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	148 => 466 // Spell: Cast Spell (at Point) [148]
 	272 => 467 // Spell: Apply Repeating EFF [272]
 	232 => 468 // Spell Effect: Cast Spell on Condition [232]
+	526 => 468 // Protection: chance d'être sans effet sous une condition [526]
 	326 => 469 // Apply Effects List [326]
 	311 => 470 // Spell: Random Wish Spell [311]
 	252 => 471 // Spell Effect: Set Trap [252]
@@ -718,6 +719,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	337 => 0 // Remove: Opcode
 	343 => 0 // HP Swap
 	511 => 0 // Dissipe toutes les illusions
+	526 => 1 // Protection: chance d'être sans effet sous une condition [526]
 END
 
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
@@ -16563,6 +16565,20 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_525~ BEGIN
 	LPM ~opcode_self_probability_525~
+END
+
+/* ------------------------------------------------------------------------------------------------ *
+ * Protection contre la ressource elle-même, probable et sous une condition [526] (318 remplacé)    *
+ * pnp_potion : « Si le buveur est sous l'effet d'une potion ; 24 % de chances d'être sans effet ». *
+ * ------------------------------------------------------------------------------------------------ */
+DEFINE_PATCH_MACRO ~opcode_self_526~ BEGIN
+	LPM ~opcode_326_condition~
+	LPF ~percent_value~ INT_VAR value = custom_int RET chanceValue = value END
+	SPRINT description @15260001 // ~%chanceValue% de chances d'être sans effet~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_526~ BEGIN
+	LPM ~opcode_self_526~
 END
 
 DEFINE_PATCH_MACRO ~opcode_group_all_resistances~ BEGIN

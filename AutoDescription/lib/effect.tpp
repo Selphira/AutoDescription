@@ -177,12 +177,27 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
 		LPM ~opcode_is_valid~
 
+		SPRINT exceptionSplstateName ~~
+		PATCH_IF opcode == 318 AND (parameter2 == 76 OR parameter2 == 110 OR parameter2 == 111) BEGIN
+			LPF ~get_splstate_name~ INT_VAR strref = 420000 + parameter1 opcode splstate = parameter1 RET exceptionSplstateName = splstateName END
+		END
 		PATCH_IF isValid == 1 AND opcode == 321 BEGIN
 			PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND
                     (timingMode != TIMING_duration OR duration != 0) BEGIN // N'empêche rien sans durée
                 SET cumulable = 0
                 SET isValid = 0
             END
+        END
+        // Protection probable contre la ressource elle-même sous un état de sort sans nom (pnp_potion : « sous l'effet
+        // d'une potion ») : l'exception ne peut pas être nommée ; écrite comme une ligne sous la condition du 326
+        // (opcode virtuel 526).
+        ELSE PATCH_IF isValid == 1 AND opcode == 318 AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND probability < 100
+                AND (parameter2 == 76 OR parameter2 == 110 OR parameter2 == 111) AND parameter1 != 121 AND ~%exceptionSplstateName%~ STRING_EQUAL ~~ BEGIN
+            SET opcode = 526
+            SET custom_int = probability
+            SET probability1 = 99
+            SET probability2 = 0
+            SET probability = 100
         END
         ELSE PATCH_IF isValid == 1 AND (opcode == 318 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 			SPRINT target_exceptions ~%target_exceptions% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
