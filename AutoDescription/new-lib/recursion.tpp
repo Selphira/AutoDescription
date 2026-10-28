@@ -55,6 +55,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SPRINT ctx_spell_chain ~|~
 	SPRINT ctx_origin ~~
 	SET ctx_single_effect = 0
+	SPRINT sub_checked ~~
 	SET recursion_delayed = 0
 	SET recursion_probability = 0
 	SET recursion_hit_target = 0
@@ -70,6 +71,7 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 	SPRINT recursion_upper ~%recursion_resref%~
 	TO_UPPER recursion_upper
 	SET recursion_allowed = 1
+	SPRINT sub_checked ~%sub_checked%|%recursion_upper%|~
 	PATCH_IF ~%recursion_kind%~ STRING_EQUAL ~spl~ AND NOT recursion_depth_reset AND ctx_depth + 1 > AD_RECURSION_MAX_DEPTH BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
@@ -291,7 +293,9 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						recursion_sub_count = sub_count
 						recursion_sub_text = sub_text
 						recursion_sub_opcode = sub_opcode
+						recursion_sub_checked = sub_checked
 				END
+				SPRINT sub_checked ~%sub_checked%%recursion_sub_checked%~
 				SET ctx_ignore_save = recursion_saved_ignore_save
 			END
 			PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
@@ -403,7 +407,9 @@ END
 // en tête du fichier) : sub_count lignes, rendues comme l'ancien moteur les insère dans la ligne
 // parente (sub_text : la première sans puce, les suivantes après un saut de ligne et une puce) ;
 // sub_missing, refus (ad_refusal, new-lib/log.tpp ; l'appelant le rattache à son effet par
-// ad_refusal_nest, qui préfixe sa raison de recursion:), vide si le sort est décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
+// ad_refusal_nest, qui préfixe sa raison de recursion:), vide si le sort est décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon) ;
+// sub_checked, sous-ressources vérifiées par ad_recursion_allowed pendant la description, « |RES1||RES2| »
+// (cache des sous-sorts, new-lib/subspell_cache.tpp). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
 // ce niveau (le premier à égalité, ancien get_spell_headeroffset_for_level) ; sans, l'unique
 // en-tête. Refus : sort absent ou illisible ; aucun en-tête de ce niveau (l'ancien moteur lit alors
 // le début du fichier comme un en-tête, BUG-037) ; plusieurs en-têtes sans niveau de lancement
@@ -442,6 +448,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		sub_count
 		sub_text
 		sub_opcode
+		sub_checked
 BEGIN
 	SET sub_opcode = 0 - 1
 	SET support_spell = 0
@@ -456,6 +463,26 @@ BEGIN
 	SET ctx_area_phrase = 0
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
+	SPRINT sub_checked ~~
+	SET cache_used = AD_SUBSPELL_CACHE AND ~%kind%~ STRING_EQUAL ~spl~ AND FILE_EXISTS_IN_GAME ~%sub_resref%.spl~
+	SET cache_hit = 0
+	PATCH_IF cache_used BEGIN
+		LPM ad_subspell_cache_read
+	END
+	PATCH_IF cache_hit AND AD_SUBSPELL_CACHE == 1 BEGIN
+		SET sub_count = cache_count
+		SPRINT sub_text ~%cache_text%~
+		SPRINT sub_checked ~%cache_checked%~
+	END
+	ELSE BEGIN
+		LPM ad_describe_subresource_effects
+		PATCH_IF cache_used BEGIN
+			LPM ad_subspell_cache_store
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_describe_subresource_effects BEGIN
 	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
 	PATCH_IF ~%kind%~ STRING_EQUAL ~spl~ BEGIN
 		SPRINT ctx_spell_chain ~%ctx_spell_chain%%ctx_resource%|%sub_resref%|~

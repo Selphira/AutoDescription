@@ -18,6 +18,10 @@ OUTER_SPRINT AD_AND       @1000004 // ~et~
 // effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
 OUTER_SET AD_RECURSION_MAX_DEPTH = 1
 
+// Cache des sous-sorts (new-lib/subspell_cache.tpp), à part de celui de l'ancien moteur, qui vide le
+// sien à son initialisation.
+OUTER_SPRINT AD_SUBSPELL_CACHE_FOLDER ~%CACHE_FOLDER%/subspell-new~
+
 // Caractéristiques minimales d'un objet, dans l'ordre d'affichage : valeur de stats.ids => champ
 // de l'en-tête.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN

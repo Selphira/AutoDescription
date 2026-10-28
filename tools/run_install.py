@@ -32,7 +32,7 @@ REPOSITORY = Path(__file__).resolve().parent.parent
 MOD = REPOSITORY / "AutoDescription"
 MOD_DIRECTORIES = ("lib", "new-lib", "tra", "sfo", "2da")
 LOG_PATTERNS = ("*.log", "*-diff.html", "*-dump.txt", "*-compare.txt", "*-effects.txt", "*-opcodes.txt",
-                "*-recursion.txt", "*-events.txt", "*.md")
+                "*-recursion.txt", "*-events.txt", "*-cache.txt", "*.md")
 LOOPS = {"lib/itm.tpp": "itm", "lib/spl.tpp": "spl"}
 # Ligne du tp2 qui suit la lecture de settings.ini : les options imposées sont insérées avant.
 SETTINGS_END = "\tACTION_IF description_engine < 0 OR description_engine > 3 BEGIN"

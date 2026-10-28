@@ -21,6 +21,7 @@ BEGIN
 	ACTION_IF AD_EFFECTS_DUMP BEGIN
 		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-effects.txt~
 	END
+	LAF ad_subspell_cache_init STR_VAR log_name END
 END
 
 // Remplace les lignes RESREF<TAB>opcode<TAB>occurrences<TAB>genre écrites par ad_set_coverage

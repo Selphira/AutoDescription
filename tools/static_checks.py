@@ -292,9 +292,12 @@ def check_new_tra_rules(report):
             if quoted and identifier in french and quoted.group(1) != expected:
                 report.add("ERREUR", f"{relative(path)}:{line} : commentaire de @{identifier} différent du texte "
                            "français")
-        # Majuscules = globale fixée au démarrage, jamais modifiée pendant le traitement.
+        # Majuscules = globale fixée au démarrage, jamais modifiée pendant le traitement ; les
+        # variables de WeiDU qu'un COPY change sont rétablies (cache des sous-sorts).
         if path.name not in NEW_STARTUP_FILES:
             for match in re.finditer(r"\b(?:OUTER_)?(?:SET|SPRINT|TEXT_SPRINT)[ \t]+([A-Z][A-Z0-9_]*)\b", code):
+                if match.group(1) in WEIDU_VARIABLES:
+                    continue
                 report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : affectation de la globale "
                            f"{match.group(1)} hors des fichiers de démarrage")
 
@@ -523,6 +526,8 @@ STRING_VARIABLE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
 NON_VARIABLES = {"EVAL", "BEGIN", "END"}
 WEIDU_VARIABLES = {"SOURCE_FILE", "SOURCE_RES", "SOURCE_SIZE", "SOURCE_EXT", "SOURCE_DIRECTORY", "SOURCE_FILESPEC",
                    "DEST_FILE", "DEST_RES", "DEST_EXT", "DEST_DIRECTORY", "DEST_FILESPEC"}
+# Variables du tp2 communes aux deux moteurs, lues seulement (dossier du cache, défini une fois).
+SHARED_VARIABLES = {"CACHE_FOLDER"}
 # Seuls les points d'entrée de la boucle commune appellent le nouveau moteur (initialisation des
 # journaux, boucles des objets et des sorts).
 ENGINE_CALLERS = ("AutoDescription/lib/log.tpp", "AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
@@ -588,6 +593,7 @@ def check_engine_separation(report, definitions):
     old_variables -= bgforge_variables
     # Variables de WeiDU que l'ancien code rétablit après un COPY (cache des sous-sorts).
     old_variables -= WEIDU_VARIABLES
+    old_variables -= SHARED_VARIABLES
 
     new_variables, new_globals = set(new_options), set(new_options)
     parsed = {}
