@@ -667,9 +667,9 @@ BEGIN
 END
 LAF ad_read_stat_conditions RET_ARRAY AD_STAT_CONDITION AD_STAT_CONDITION_ADD_RELATION END
 
-// Sorts qui infligent l'effet d'un opcode (2da/immunity_spells.2da, anciennes listes
-// <état>SpellList ; 505 : capacités psioniques) : $AD_IMMUNITY_SPELLS(~opcode RESREF~), ressource
-// en majuscules.
+// Capacités psioniques (2da/immunity_spells.2da, colonne 505) : $AD_IMMUNITY_SPELLS(~505 RESREF~),
+// ressource en majuscules. Les sorts qui infligent un état se lisent dans le sort lui-même
+// (ad_spell_inflicted_state).
 DEFINE_ACTION_FUNCTION ad_read_immunity_spells
 	RET_ARRAY AD_IMMUNITY_SPELLS
 BEGIN
@@ -683,6 +683,43 @@ BEGIN
 		END
 END
 LAF ad_read_immunity_spells RET_ARRAY AD_IMMUNITY_SPELLS END
+
+// Opcode d'un état => état contre lequel le 101 de même parameter2 protège ; 210, 217, 185 et 241 sont
+// des variantes du même état (anciennes listes de sorts par état).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_INFLICTED_STATES BEGIN
+	5 => 5 // Charme
+	241 => 5
+	16 => 16 // Hâte
+	24 => 24 // Panique
+	25 => 25 // Empoisonnement
+	38 => 38 // Silence
+	39 => 39 // Inconscience
+	217 => 39
+	40 => 40 // Lenteur
+	45 => 45 // Étourdissement
+	210 => 45
+	74 => 74 // Cécité
+	76 => 76 // Débilité mentale
+	80 => 80 // Surdité
+	109 => 109 // Paralysie
+	128 => 128 // Confusion
+	134 => 134 // Pétrification
+	135 => 135 // Polymorphie
+	154 => 154 // Enchevêtrement
+	157 => 157 // Toile d'araignée
+	175 => 175 // Immobilisation
+	185 => 175
+	213 => 213 // Labyrinthe
+END
+
+// Dégâts et morts : une protection contre un sort qui les inflige protège de plus que de son état.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_INFLICTED_HARMS BEGIN
+	12 => 1
+	13 => 1
+	55 => 1
+	209 => 1
+	238 => 1
+END
 
 // Noms de sorts imposés (ancien tableau spellnames), ressource en minuscules => chaîne ; @7100000
 // (vide) : sort à ne pas citer, redondant avec les effets qui l'accompagnent ou sans effet concret.

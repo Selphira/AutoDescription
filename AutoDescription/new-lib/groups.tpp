@@ -484,9 +484,10 @@ END
 //   l'immunité ce libellé et la place après les autres, comme l'effet que l'ancien moteur ajoute ;
 //   la colonne P2 est comparée à la valeur lue (fx_parameter2_raw), que l'ancien moteur teste avant
 //   toute correction du mode ;
-// - les protections contre un sort (206, 321) qui inflige P selon 2da/immunity_spells.2da, si elles
+// - les protections contre un sort (206, 321) qui inflige P seul (ad_spell_inflicted_state), si elles
 //   ont aussi les mêmes dés et la même puissance (321 : la même résistance).
 DEFINE_PATCH_MACRO ad_group_immunities BEGIN
+	CLEAR_ARRAY ad_inflicted_states
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 		// Dans un sort, l'ancien moteur applique aussi les règles des effets d'équipement (abilityType
@@ -524,7 +525,11 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 					SPRINT absorb_resref $fx_resource(~%absorb_id%~)
 					TO_UPPER absorb_resref
 					LPM ad_immunity_same_fields
-					PATCH_IF absorb_same AND VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~%immunity_opcode% %absorb_resref%~)
+					PATCH_IF NOT VARIABLE_IS_SET $ad_inflicted_states(~%absorb_resref%~) BEGIN
+						LPF ad_spell_inflicted_state STR_VAR file = EVAL ~%absorb_resref%~ RET inflicted_state = state END
+						SET $ad_inflicted_states(~%absorb_resref%~) = inflicted_state
+					END
+					PATCH_IF absorb_same AND immunity_opcode > 0 AND $ad_inflicted_states(~%absorb_resref%~) == immunity_opcode
 							AND $fx_dice_count(~%absorb_id%~) == $fx_dice_count(~%immunity_id%~)
 							AND $fx_dice_sides(~%absorb_id%~) == $fx_dice_sides(~%immunity_id%~)
 							AND $fx_power(~%absorb_id%~) == $fx_power(~%immunity_id%~)
@@ -533,6 +538,96 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 					END
 				END
 			END END
+		END
+	END
+END
+
+// État qu'inflige le sort file, ses sous-sorts (146, 148, 326) et ses EFF (177, 183, 283), seul : sans
+// dégâts, sans mort, sans autre état (AD_INFLICTED_STATES, AD_INFLICTED_HARMS) ; 0 sinon. Une protection
+// contre ce sort ne protège alors que de cet état. Lu dans le sort, non dans une liste : les mods
+// modifient les sorts du jeu.
+DEFINE_PATCH_FUNCTION ad_spell_inflicted_state
+	STR_VAR file = ~~
+	RET state
+BEGIN
+	CLEAR_ARRAY inflicted_opcodes
+	CLEAR_ARRAY inflicted_seen
+	LPF ad_collect_spell_opcodes STR_VAR file ext = ~spl~ RET_ARRAY inflicted_opcodes inflicted_seen END
+	SET state = 0
+	SET harmful = 0
+	PHP_EACH inflicted_opcodes AS inflicted_opcode => _ BEGIN
+		PATCH_IF VARIABLE_IS_SET $AD_INFLICTED_HARMS(~%inflicted_opcode%~) BEGIN
+			SET harmful = 1
+		END
+		ELSE PATCH_IF VARIABLE_IS_SET $AD_INFLICTED_STATES(~%inflicted_opcode%~) BEGIN
+			SET inflicted_state = $AD_INFLICTED_STATES(~%inflicted_opcode%~)
+			SET state = (state == 0 OR state == inflicted_state) ? inflicted_state : 0 - 1
+		END
+	END
+	PATCH_IF harmful OR state < 0 BEGIN
+		SET state = 0
+	END
+END
+
+DEFINE_PATCH_FUNCTION ad_collect_spell_opcodes
+	INT_VAR depth = 0
+	STR_VAR file = ~~ ext = ~spl~
+	RET_ARRAY inflicted_opcodes inflicted_seen
+BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY inflicted_opcodes BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY inflicted_seen BEGIN END
+	TO_LOWER file
+	PATCH_IF depth <= 4 AND NOT (~%file%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $inflicted_seen(~%file%.%ext%~) AND FILE_EXISTS_IN_GAME ~%file%.%ext%~ BEGIN
+		SET $inflicted_seen(~%file%.%ext%~) = 1
+		CLEAR_ARRAY inflicted_children
+		INNER_PATCH_FILE ~%file%.%ext%~ BEGIN
+			CLEAR_ARRAY inflicted_ranges
+			PATCH_IF ~%ext%~ STRING_EQUAL ~eff~ AND BUFFER_LENGTH >= 0x38 BEGIN
+				READ_LONG 0x10 child_opcode
+				READ_ASCII 0x30 child_resref (8) NULL
+				LPM ad_inflicted_add
+			END
+			ELSE PATCH_IF ~%ext%~ STRING_EQUAL ~spl~ AND BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG 0x64 header_offset
+				READ_SHORT 0x68 header_count
+				READ_LONG 0x6a effect_offset
+				READ_SHORT 0x6e range_index
+				READ_SHORT 0x70 range_count
+				SET $inflicted_ranges(~%range_index%~) = range_count
+				FOR (header = 0; header < header_count AND header_offset + header * 0x28 + 0x22 <= BUFFER_LENGTH; ++header) BEGIN
+					READ_SHORT (header_offset + header * 0x28 + 0x1e) range_count
+					READ_SHORT (header_offset + header * 0x28 + 0x20) range_index
+					SET $inflicted_ranges(~%range_index%~) = range_count
+				END
+				PHP_EACH inflicted_ranges AS range_index => range_count BEGIN
+					FOR (inflicted_effect = range_index; inflicted_effect < range_index + range_count AND effect_offset + (inflicted_effect + 1) * 0x30 <= BUFFER_LENGTH; ++inflicted_effect) BEGIN
+						READ_SHORT (effect_offset + inflicted_effect * 0x30) child_opcode
+						READ_ASCII (effect_offset + inflicted_effect * 0x30 + 0x14) child_resref (8) NULL
+						LPM ad_inflicted_add
+					END
+				END
+			END
+		END
+		PHP_EACH inflicted_children AS child_resref => child_ext BEGIN
+			LPF ad_collect_spell_opcodes INT_VAR depth = depth + 1 STR_VAR file = EVAL ~%child_resref%~ ext = EVAL ~%child_ext%~ RET_ARRAY child_opcodes = inflicted_opcodes child_seen = inflicted_seen END
+			PHP_EACH child_opcodes AS child_key => _ BEGIN
+				SET $inflicted_opcodes(~%child_key%~) = 1
+			END
+			PHP_EACH child_seen AS child_key => _ BEGIN
+				SET $inflicted_seen(~%child_key%~) = 1
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_inflicted_add BEGIN
+	SET $inflicted_opcodes(~%child_opcode%~) = 1
+	PATCH_IF NOT (~%child_resref%~ STRING_EQUAL ~~) BEGIN
+		PATCH_IF child_opcode == 146 OR child_opcode == 148 OR child_opcode == 326 BEGIN
+			SPRINT $inflicted_children(~%child_resref%~) ~spl~
+		END
+		ELSE PATCH_IF child_opcode == 177 OR child_opcode == 183 OR child_opcode == 283 BEGIN
+			SPRINT $inflicted_children(~%child_resref%~) ~eff~
 		END
 	END
 END
