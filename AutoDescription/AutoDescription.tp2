@@ -36,6 +36,7 @@ ALWAYS
     END
 
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
+	OUTER_SPRINT CACHE_FOLDER ~weidu_external/AutoDescription/cache~
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
     INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
 END

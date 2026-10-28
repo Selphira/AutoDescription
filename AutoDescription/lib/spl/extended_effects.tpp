@@ -176,6 +176,8 @@ BEGIN
 					PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_spell_level_match%~ error = ~%ERROR_MESSAGE%~ END END
 				END
 				LPM ~%match_macro%~
+				// Effet d'un 177 : un autre type de créature est un autre effet.
+				SET match = match AND (~%match_target_type%~ STRING_EQUAL ~%target_type%~)
 
 				PATCH_IF match == 1 BEGIN
 					SET found = 1
@@ -260,14 +262,30 @@ BEGIN
 	// 272 : [272] Active un effet (boucle)
 	// 326 :
 	// 341 : Semble que ce soit toujours la cible de l'attaque
-	SET forceTarget = (opcode == 146 OR (opcode == 232 AND ((parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR parameter1 == 0)) OR opcode == 326) ? 1 : 0
+	// 2 : sort lancé (146, 232) par la source de l'effet, dont les effets sur soi touchent ce lanceur
+	// et non la cible imposée (effect.tpp, get_effect_description).
+	SET forceTarget = (opcode == 146 OR (opcode == 232 AND ((parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR parameter1 == 0))) ? 2 : opcode == 326 ? 1 : 0
+	// L'en-tête du sort ne lit que les sous-sorts des opcodes 146, 148 et 232 (spell_saving_throw) : ceux
+	// des autres écrivent leurs jets de sauvegarde.
+	PATCH_IF opcode != 146 AND opcode != 148 AND opcode != 232 BEGIN
+		SET ignoreSavingThrow = 0
+	END
 	SET totalLines = 0
 	SET depthOfEffect = recursivity
 	SPRINT strDuration ~~
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.
 	LPM ~clear_opcodes~
 
-    PATCH_IF recursivity < 1 BEGIN
+	SET subspell_cache_hit = 0
+	PATCH_IF subspell_cache AND recursivity < 1 BEGIN
+		LPM ~subspell_cache_read~
+	END
+	PATCH_IF subspell_cache_hit AND subspell_cache == 1 BEGIN
+		SPRINT description ~%subspell_cache_description%~
+		SET totalLines = subspell_cache_total_lines
+		SPRINT strDuration ~%subspell_cache_duration%~
+	END
+    ELSE PATCH_IF recursivity < 1 BEGIN
         PATCH_IF FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
             INNER_PATCH_FILE ~%file%.spl~ BEGIN
                 SPRINT CURRENT_SOURCE_RES ~%file%~
@@ -297,6 +315,127 @@ BEGIN
         ELSE BEGIN
             LPF ~add_log_error~ STR_VAR message = EVAL ~Resource %file%.spl doesn't exist.~ END
         END
+		PATCH_IF subspell_cache AND subspell_cache_hit BEGIN
+			LPM ~subspell_cache_check~
+		END
+		ELSE PATCH_IF subspell_cache AND FILE_EXISTS_IN_GAME ~%file%.spl~ BEGIN
+			LPM ~subspell_cache_write~
+		END
+	END
+END
+
+/*
+ * Cache des descriptions de sous-sorts (option subspell_cache). Un fichier
+ * d'index par sous-sort (<dossier du cache>/<sort>.txt), une ligne par contexte : clé,
+ * fichier du texte, totalLines, strDuration ; le texte dans son propre fichier, lu tel quel. La clé
+ * réunit ce qui change le texte ; le mode 2 recalcule chaque texte trouvé et écrit les écarts dans
+ * AutoDescription/log/<journal>-cache.txt, signe d'une dépendance que la clé ignore. Un texte repris
+ * du cache ne répète pas les messages que sa description a écrits dans les journaux.
+ */
+OUTER_SPRINT subspell_cache_folder ~%CACHE_FOLDER%/subspell~
+
+DEFINE_PATCH_MACRO ~subspell_cache_key~ BEGIN
+	SPRINT subspell_cache_item_type ~~
+	PATCH_IF VARIABLE_IS_SET itemType BEGIN
+		SPRINT subspell_cache_item_type ~%itemType%~
+	END
+	SPRINT subspell_cache_item_duration ~~
+	PATCH_IF VARIABLE_IS_SET itemDuration BEGIN
+		SPRINT subspell_cache_item_duration ~%itemDuration% %itemTimingMode%~
+	END
+	SPRINT subspell_cache_targets ~~
+	PATCH_IF forceTarget AND VARIABLE_IS_SET theTarget BEGIN
+		SPRINT subspell_cache_targets ~%theTarget%|%ofTheTarget%|%toTheTarget%~
+	END
+	SPRINT subspell_cache_key ~%castingLevel%|%baseProbability%|%ignoreDurationIfSameForAllEffect%|%forceTarget%|%ignoreSavingThrow%|%ignoreDuration%|%isItem%|%isSpell%|%abilityType%|%subspell_cache_item_type%|%subspell_cache_item_duration%|%subspell_cache_targets%~
+END
+
+DEFINE_PATCH_MACRO ~subspell_cache_read~ BEGIN
+	LPM ~subspell_cache_key~
+	SPRINT subspell_cache_index ~%subspell_cache_folder%/%file%.txt~
+	PATCH_IF FILE_EXISTS ~%subspell_cache_index%~ BEGIN
+		INNER_PATCH_FILE ~%subspell_cache_index%~ BEGIN
+			SET subspell_cache_at = INDEX_BUFFER (CASE_SENSITIVE EXACT_MATCH ~%LNL%%subspell_cache_key%%TAB%~)
+			PATCH_IF subspell_cache_at >= 0 BEGIN
+				SET subspell_cache_at += STRING_LENGTH ~%LNL%%subspell_cache_key%%TAB%~
+				READ_ASCII subspell_cache_at subspell_cache_values (BUFFER_LENGTH - subspell_cache_at)
+			END
+		END
+		PATCH_IF subspell_cache_at >= 0 BEGIN
+			INNER_PATCH ~%subspell_cache_values%~ BEGIN
+				REPLACE_EVALUATE CASE_SENSITIVE ~^\([^%TAB%]+\)%TAB%\([0-9]+\)%TAB%\([^%TAB%%MNL%%LNL%]*\)~ BEGIN
+					PATCH_IF NOT subspell_cache_hit BEGIN
+						SET subspell_cache_hit = 1
+						SPRINT subspell_cache_entry ~%MATCH1%~
+						SET subspell_cache_total_lines = MATCH2
+						SPRINT subspell_cache_duration ~%MATCH3%~
+					END
+				END ~%MATCH0%~
+			END
+		END
+		PATCH_IF subspell_cache_hit BEGIN
+			SPRINT subspell_cache_description ~~
+			INNER_PATCH_FILE ~%subspell_cache_folder%/%subspell_cache_entry%~ BEGIN
+				PATCH_IF BUFFER_LENGTH > 0 BEGIN
+					READ_ASCII 0 subspell_cache_description (BUFFER_LENGTH)
+				END
+			END
+		END
+	END
+END
+
+// COPY change SOURCE_FILE, SOURCE_RES et SOURCE_SIZE, que les journaux de la ressource décrite lisent ensuite.
+DEFINE_PATCH_MACRO ~subspell_cache_write~ BEGIN
+	SPRINT subspell_cache_source_file ~%SOURCE_FILE%~
+	SPRINT subspell_cache_source_res ~%SOURCE_RES%~
+	SET subspell_cache_source_size = SOURCE_SIZE
+	SPRINT subspell_cache_index ~%subspell_cache_folder%/%file%.txt~
+	SET subspell_cache_size = 0
+	PATCH_IF FILE_EXISTS ~%subspell_cache_index%~ BEGIN
+		INNER_PATCH_FILE ~%subspell_cache_index%~ BEGIN
+			SET subspell_cache_size = BUFFER_LENGTH
+		END
+	END
+	// La taille de l'index, qui croît à chaque ligne, nomme le fichier du texte.
+	SPRINT subspell_cache_entry ~%file%.%subspell_cache_size%.txt~
+	SET subspell_cache_length = STRING_LENGTH ~%description%~
+	INNER_ACTION BEGIN
+		COPY ~.../AutoDescription/inlined/subspell_cache_empty.txt~ ~%subspell_cache_folder%/%subspell_cache_entry%~
+			PATCH_IF subspell_cache_length > 0 BEGIN
+				INSERT_BYTES 0 subspell_cache_length
+				WRITE_ASCIIE 0 ~%description%~
+			END
+		ACTION_IF NOT FILE_EXISTS ~%subspell_cache_index%~ BEGIN
+			COPY ~.../AutoDescription/inlined/subspell_cache_empty.txt~ ~%subspell_cache_index%~
+		END
+		SILENT
+		APPEND_OUTER ~%subspell_cache_index%~ ~%LNL%%subspell_cache_key%%TAB%%subspell_cache_entry%%TAB%%totalLines%%TAB%%strDuration%~ KEEP_CRLF
+		VERBOSE
+	END
+	SPRINT SOURCE_FILE ~%subspell_cache_source_file%~
+	SPRINT SOURCE_RES ~%subspell_cache_source_res%~
+	SET SOURCE_SIZE = subspell_cache_source_size
+END
+
+DEFINE_PATCH_MACRO ~subspell_cache_check~ BEGIN
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~%subspell_cache_description%~ OR totalLines != subspell_cache_total_lines OR NOT ~%strDuration%~ STRING_EQUAL ~%subspell_cache_duration%~ BEGIN
+		INNER_ACTION BEGIN
+			SILENT
+			APPEND_OUTER ~AutoDescription/log/%log_filename%-cache.txt~ ~%SOURCE_FILE%%TAB%%file%%TAB%%subspell_cache_key%%WNL%  cached (%subspell_cache_total_lines%, %subspell_cache_duration%): %subspell_cache_description%%WNL%  computed (%totalLines%, %strDuration%): %description%~ KEEP_CRLF
+			VERBOSE
+		END
+	END
+END
+
+DEFINE_ACTION_FUNCTION ~subspell_cache_init~ BEGIN
+	<<<<<<<< .../AutoDescription/inlined/subspell_cache_empty.txt
+>>>>>>>>
+	DELETE + ~%subspell_cache_folder%~
+	ACTION_IF subspell_cache BEGIN
+		MKDIR ~%subspell_cache_folder%~
+	END
+	ACTION_IF subspell_cache == 2 BEGIN
+		COPY ~.../AutoDescription/inlined/subspell_cache_empty.txt~ ~AutoDescription/log/%log_filename%-cache.txt~
 	END
 END
 

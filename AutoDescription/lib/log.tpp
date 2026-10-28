@@ -127,6 +127,7 @@ BEGIN
 	ACTION_IF regression_dump BEGIN
 		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-dump.txt~
 	END
+	LAF ~subspell_cache_init~ END
 	ACTION_IF is_ee BEGIN
 		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END

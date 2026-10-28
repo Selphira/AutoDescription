@@ -58,6 +58,14 @@ END
 
 DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%~ ~%description%~) == 0 BEGIN
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\(%crlf%\)+~ ~%crlf%~
+			END
+		END
+		ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ ~%description%~) > 0 BEGIN
+			SPRINT description ~%crlf%- %description%~
+		END
         INNER_PATCH_SAVE description ~%description%~ BEGIN
             REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
         END
@@ -163,7 +171,8 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 			PATCH_IF saveBonus != 0 OR NOT ~%complex_save%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF NOT ~%complex_save%~ STRING_EQUAL ~~ BEGIN
 					SPRINT saveBonus ~%complex_save%~
-					PATCH_IF complex_value_int < 0 BEGIN
+					// Formule d'un pas négatif déjà signée (« -1 par tranche de 6 niveaux »).
+					PATCH_IF complex_value_int < 0 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~-~ ~%complex_save%~) != 0 BEGIN
 						SPRINT saveBonus ~-%saveBonus%~
 					END
 				END
@@ -257,7 +266,9 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_cumulable~ BEGIN
-	PATCH_IF cumulable == 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~) BEGIN
+	// notCumulableParent : effet de l'EFF d'un 272 non cumulable (opcode_272_common).
+	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND ((cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~))
+			OR (VARIABLE_IS_SET notCumulableParent AND notCumulableParent)) BEGIN
 		SPRINT stringNotCumulable @102682 // ~non cumulatif~
 		SPRINT notCumulableSuffix ~ (%stringNotCumulable%)~
 		// Pas de seconde mention après la dernière ligne d'un sort lancé qui l'a déjà.
