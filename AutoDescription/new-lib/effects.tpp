@@ -55,9 +55,11 @@ DEFINE_PATCH_MACRO ad_fx_reset BEGIN
 	SPRINT ignored_reason ~~
 	SPRINT ignored_message ~~
 	SPRINT ignored_consequence ~ignored~
-	// Une sous-ressource hérite des tableaux de l'appelant (V7).
+	// Une sous-ressource hérite des tableaux de l'appelant (V7) ; CLEAR_ARRAY laisse les entrées
+	// lisibles (V36) : les comptes sont remis à 0, sinon ceux du parent s'ajoutent.
 	PHP_EACH fx_opcode_count AS fx_reset_opcode => _ BEGIN
 		CLEAR_ARRAY ~fx_ids_%fx_reset_opcode%~
+		SET $fx_opcode_count(~%fx_reset_opcode%~) = 0
 	END
 	CLEAR_ARRAY fx_opcode_count
 END

@@ -140,11 +140,13 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 END
 
 // Classe de cible de l'effet immunity_id pour la ligne unique : 1 soi ou lanceur d'origine, 2 cible
-// prédéfinie, 0 jamais réunie (immunité probable, autre cible) ; immunity_key : classe dans sa portée
+// prédéfinie, 0 jamais réunie (immunité probable hors d'un sous-sort probable, autre cible) ; immunity_key : classe dans sa portée
 // (une ligne unique par bloc).
 DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	SET immunity_target = $fx_effective_target(~%immunity_id%~)
-	SET immunity_class = $fx_probability(~%immunity_id%~) < 100 ? 0
+	// Dans un sous-sort lancé sous une probabilité, toutes les immunités ont celle du parent : réunies
+	// comme des immunités certaines (ancien opcode_101_post_group, qui les lit avant de l'appliquer, POTN21).
+	SET immunity_class = ($fx_probability(~%immunity_id%~) < 100 AND ctx_base_probability >= 100) ? 0
 		: ((immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
 		: (immunity_target == TARGET_FX_preset ? 2 : 0))
 	SPRINT immunity_key_scope $fx_scope(~%immunity_id%~)

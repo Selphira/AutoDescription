@@ -439,10 +439,14 @@ END
 // fixés à 1 (106) du bloc ; l'immunité à la panique reste. Les rétablissements suivants du bloc
 // restent : l'ancien moteur n'en réunit qu'un.
 DEFINE_PATCH_MACRO ad_group_morale BEGIN
+	// CLEAR_ARRAY laisse les entrées du parent lisibles (V36) : leur valeur est remise à 0.
+	PHP_EACH morale_done AS morale_scope => _ BEGIN
+		SET $morale_done(~%morale_scope%~) = 0
+	END
 	CLEAR_ARRAY morale_done
 	PHP_EACH fx_ids_23 AS _ => group_id BEGIN
 		SPRINT group_scope $fx_scope(~%group_id%~)
-		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 10 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT VARIABLE_IS_SET $morale_done(~%group_scope%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) == 10 AND $fx_parameter2(~%group_id%~) == MOD_TYPE_flat AND NOT (VARIABLE_IS_SET $morale_done(~%group_scope%~) AND $morale_done(~%group_scope%~)) BEGIN
 			SET $morale_done(~%group_scope%~) = 1
 			SET morale_found = 0
 			SET morale_duration = 0

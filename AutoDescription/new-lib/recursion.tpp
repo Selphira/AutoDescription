@@ -46,6 +46,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_ignore_duration = 0
 	SET ctx_ignore_save = 0
 	SET ctx_casting_level = 0
+	SET ctx_base_probability = 100
 	SET ctx_versus_set = 0
 	SPRINT ctx_versus ~~
 	SET ctx_base_lines = 0

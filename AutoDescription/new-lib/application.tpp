@@ -705,6 +705,7 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			SPRINT versus @2002020 // ~contre les %targetType%~
 			SPRINT app_versus_only_for @2002030 // ~uniquement pour les %targetType%~
 			SPRINT theTarget @2002010 // ~les %targetType%~
+			SPRINT app_versus_the_target ~%theTarget%~
 			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_of% ~ final_glue = EVAL ~ %app_versus_and_of% ~ RET targetType = text END
 			SPRINT ofTheTarget @2002011 // ~des %targetType%~
 			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_to% ~ final_glue = EVAL ~ %app_versus_and_to% ~ RET targetType = text END
@@ -804,7 +805,12 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SPRINT line_text ~%line_text%%app_not_cumulative%~
 		END
 	END
-	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
+	// Pas de mention quand la ligne nomme déjà ces créatures.
+	SET app_only_for_named = app_versus_count > 0 AND (~%line_only_for%~ STRING_EQUAL ~%app_versus_only_for%~)
+	PATCH_IF app_only_for_named BEGIN
+		SET app_only_for_named = INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_versus_the_target%~ ~%line_text%~) >= 0
+	END
+	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) AND NOT app_only_for_named BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~
 	END
 	PATCH_IF $fx_exception_count(~%line_fx%~) > 0 BEGIN
