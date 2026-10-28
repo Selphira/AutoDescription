@@ -58,6 +58,7 @@ END
 
 DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+		SET indentSublines = 1
 		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%~ ~%description%~) == 0 BEGIN
 			INNER_PATCH_SAVE description ~%description%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\(%crlf%\)+~ ~%crlf%~
@@ -66,17 +67,24 @@ DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 		ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ ~%description%~) > 0 BEGIN
 			SPRINT description ~%crlf%- %description%~
 		END
-        INNER_PATCH_SAVE description ~%description%~ BEGIN
-            REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
-        END
+		ELSE BEGIN
+			SET indentSublines = 0
+		END
+		PATCH_IF indentSublines BEGIN
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~%crlf%  ~
+			END
+		END
 		SPRINT description ~%condition%%semicolon%%description%~
 	END
 END
 
 DEFINE_PATCH_MACRO ~add_duration~ BEGIN
-	// durée ou pas, un effet peut avoir un délai avant fonctionnement
-	PATCH_IF (timingMode == TIMING_delayed OR timingMode == 5000 OR timingMode == 5001 OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
-			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR timingMode == TIMING_delayed OR timingMode == 5000 OR timingMode == 5001) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+	// durée ou pas, un effet peut avoir un délai avant fonctionnement ; sans délai, le timing 4 est
+	// permanent (get_duration_value) et suit la règle des autres durées.
+	SET hasDelay = timingMode == TIMING_delayed AND duration > 0
+	PATCH_IF (hasDelay OR timingMode == 5000 OR timingMode == 5001 OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
+			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR hasDelay OR timingMode == 5000 OR timingMode == 5001) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% %complex_duration%~
 		END

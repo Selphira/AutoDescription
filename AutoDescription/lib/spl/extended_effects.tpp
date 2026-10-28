@@ -555,7 +555,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_headeroffset_for_level~
 		headerOffset
 BEGIN
 	SET headerOffset = 0
-	SET headerLevel  = 0
+	SET headerLevel  = 0 - 1
 
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => offset BEGIN
