@@ -346,6 +346,120 @@ BEGIN
 		END
 		SET count += 1
 	END
+	PATCH_IF level == 1 BEGIN
+		LPF ad_group_condition_lines STR_VAR text RET text END
+	END
+END
+
+// Lignes de même condition réunies (« - Si … ; 7 % de chances … » et « - Si … ; 2 % de chances … », ancien
+// group_condition_lines) : la condition seule à la place de la première, puis la suite de chacune en retrait, avec
+// ses sous-lignes. Une condition dont une ligne n'a pas de suite (ses effets sont déjà en retrait dessous) n'est pas
+// réunie.
+DEFINE_PATCH_FUNCTION ad_group_condition_lines
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	CLEAR_ARRAY cond_lines
+	CLEAR_ARRAY cond_names
+	CLEAR_ARRAY cond_counts
+	CLEAR_ARRAY cond_bare
+	CLEAR_ARRAY cond_done
+	SET cond_line_count = 0
+	INNER_PATCH ~%text%~ BEGIN
+		REPLACE_EVALUATE CASE_SENSITIVE ~%CRLF%\([^%CRLF%]*\)~ BEGIN
+			SPRINT $cond_lines(~%cond_line_count%~) ~%MATCH1%~
+			SET cond_line_count += 1
+		END ~~
+	END
+	SET cond_found = 0
+	SET cond_semicolon_length = STRING_LENGTH ~%AD_SEMICOLON%~
+	FOR (cond_i = 0; cond_i < cond_line_count; ++cond_i) BEGIN
+		SPRINT cond_line $cond_lines(~%cond_i%~)
+		SPRINT cond_name ~~
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~- ~ ~%cond_line%~) == 0 BEGIN
+			SET cond_at = INDEX (CASE_SENSITIVE EXACT_MATCH ~%AD_SEMICOLON%~ ~%cond_line%~)
+			PATCH_IF cond_at > 2 BEGIN
+				INNER_PATCH_SAVE cond_name ~%cond_line%~ BEGIN
+					DELETE_BYTES cond_at (BUFFER_LENGTH - cond_at)
+					DELETE_BYTES 0 2
+				END
+				SET cond_seen = VARIABLE_IS_SET $cond_counts(~%cond_name%~) ? $cond_counts(~%cond_name%~) : 0
+				SET $cond_counts(~%cond_name%~) = cond_seen + 1
+				PATCH_IF cond_seen == 1 BEGIN
+					SET cond_found = 1
+				END
+				PATCH_IF cond_at + cond_semicolon_length >= STRING_LENGTH ~%cond_line%~ BEGIN
+					SET $cond_bare(~%cond_name%~) = 1
+				END
+			END
+		END
+		SPRINT $cond_names(~%cond_i%~) ~%cond_name%~
+	END
+	PATCH_IF cond_found BEGIN
+		SPRINT text ~~
+		SET cond_i = 0
+		WHILE cond_i < cond_line_count BEGIN
+			SPRINT cond_line $cond_lines(~%cond_i%~)
+			SPRINT cond_name $cond_names(~%cond_i%~)
+			SET cond_grouped = 0
+			PATCH_IF NOT (~%cond_name%~ STRING_EQUAL ~~) BEGIN
+				SET cond_grouped = $cond_counts(~%cond_name%~) > 1 AND NOT VARIABLE_IS_SET $cond_bare(~%cond_name%~)
+			END
+			PATCH_IF NOT cond_grouped BEGIN
+				SPRINT text ~%text%%CRLF%%cond_line%~
+				SET cond_i += 1
+			END
+			ELSE BEGIN
+				PATCH_IF NOT VARIABLE_IS_SET $cond_done(~%cond_name%~) BEGIN
+					SET $cond_done(~%cond_name%~) = 1
+					SPRINT text ~%text%%CRLF%- %cond_name%%AD_SEMICOLON%~
+					SET cond_head_length = STRING_LENGTH ~- %cond_name%%AD_SEMICOLON%~
+					FOR (cond_j = cond_i; cond_j < cond_line_count; ++cond_j) BEGIN
+						SPRINT cond_other $cond_names(~%cond_j%~)
+						PATCH_IF ~%cond_other%~ STRING_EQUAL ~%cond_name%~ BEGIN
+							SPRINT cond_member $cond_lines(~%cond_j%~)
+							INNER_PATCH_SAVE cond_member ~%cond_member%~ BEGIN
+								DELETE_BYTES 0 cond_head_length
+							END
+							SPRINT text ~%text%%CRLF%  - %cond_member%~
+							// Sous-lignes de la ligne réunie : un retrait de plus.
+							SET cond_k = cond_j + 1
+							SET cond_sub = 1
+							WHILE cond_sub AND cond_k < cond_line_count BEGIN
+								SPRINT cond_member $cond_lines(~%cond_k%~)
+								SET cond_sub = INDEX (CASE_SENSITIVE EXACT_MATCH ~ ~ ~%cond_member%~) == 0
+								PATCH_IF cond_sub BEGIN
+									// Retrait d'origine des sous-lignes remplacé par celui du niveau suivant.
+									PATCH_IF cond_k == cond_j + 1 BEGIN
+										INNER_PATCH ~%cond_member%~ BEGIN
+											REPLACE_EVALUATE ~^\( *\)~ BEGIN SET cond_indent = STRING_LENGTH ~%MATCH1%~ END ~%MATCH1%~
+										END
+									END
+									INNER_PATCH_SAVE cond_member ~%cond_member%~ BEGIN
+										DELETE_BYTES 0 (cond_indent < BUFFER_LENGTH ? cond_indent : 0)
+									END
+									SPRINT text ~%text%%CRLF%    %cond_member%~
+									SET cond_k += 1
+								END
+							END
+						END
+					END
+				END
+				// La ligne et ses sous-lignes sont déjà écrites avec la condition.
+				SET cond_i += 1
+				SET cond_sub = 1
+				WHILE cond_sub AND cond_i < cond_line_count BEGIN
+					SPRINT cond_member $cond_lines(~%cond_i%~)
+					SET cond_sub = INDEX (CASE_SENSITIVE EXACT_MATCH ~ ~ ~%cond_member%~) == 0
+					PATCH_IF cond_sub BEGIN
+						SET cond_i += 1
+					END
+				END
+			END
+		END
+	END
 END
 
 // Valeur signée : « +2 » pour un nombre positif, inchangée sinon.

@@ -189,6 +189,7 @@ END
 // (new-lib/recursion.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_SUB_PROBABILITY BEGIN
 	232 => 1 // sort lancé sous une condition
+	326 => 1 // sort appliqué sous une condition (ancien opcode_self_probability_326)
 END
 
 // Types de jet de sauvegarde d'un effet (bits 0-4, IESDP) => opcode dont le libellé 2OOO0000 les
@@ -667,6 +668,55 @@ BEGIN
 		END
 END
 LAF ad_read_stat_conditions RET_ARRAY AD_STAT_CONDITION AD_STAT_CONDITION_ADD_RELATION END
+
+// Conditions propres à des mods (2da/stats_mods.2da, ancien stats_<stat>_mods_*) : statistique et symbole de sa
+// valeur (ex. 274 et l'état de sort GT_UNDER_THE_EFFECTS_OF_A_POTION) => chaîne de la phrase, relation ajoutée
+// (« * ») et chaîne du nom de la valeur (0 : aucune).
+DEFINE_ACTION_FUNCTION ad_read_stat_mods
+	RET_ARRAY AD_STAT_MOD_CONDITION AD_STAT_MOD_ADD_RELATION AD_STAT_MOD_VALUE_NAME
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/stats_mods.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_mods 5
+		FOR (ad_row = 0; ad_row < ad_mods; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_mods ad_row 0 ad_stat
+			READ_2DA_ENTRY_FORMER ad_mods ad_row 1 ad_symbol
+			READ_2DA_ENTRY_FORMER ad_mods ad_row 2 ad_relation
+			READ_2DA_ENTRY_FORMER ad_mods ad_row 3 ad_condition
+			READ_2DA_ENTRY_FORMER ad_mods ad_row 4 ad_value_name
+			PATCH_IF IS_AN_INT ad_stat AND IS_AN_INT ad_condition BEGIN
+				TO_UPPER ad_symbol
+				SET $AD_STAT_MOD_CONDITION(~%ad_stat%-%ad_symbol%~) = ad_condition
+				SET $AD_STAT_MOD_ADD_RELATION(~%ad_stat%-%ad_symbol%~) = ~%ad_relation%~ STRING_EQUAL ~*~
+				SET $AD_STAT_MOD_VALUE_NAME(~%ad_stat%-%ad_symbol%~) = IS_AN_INT ad_value_name ? ad_value_name : 0
+			END
+		END
+END
+LAF ad_read_stat_mods RET_ARRAY AD_STAT_MOD_CONDITION AD_STAT_MOD_ADD_RELATION AD_STAT_MOD_VALUE_NAME END
+
+// Types secondaires de sort ajoutés par des mods (ancien msectypeMod) : identifiant de msectype.2da => chaîne de
+// leur nom ; la valeur du type est le rang de sa ligne moins un, à partir de la ligne 15.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SECONDARY_TYPE_MODS BEGIN
+	~GT_PotionEffects~ => 8100100 // ~Potion~ (pnp_potion)
+END
+
+DEFINE_ACTION_FUNCTION ad_read_secondary_type_mods
+	RET_ARRAY AD_SECONDARY_TYPE_MOD_NAME
+BEGIN
+	ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SECONDARY_TYPE_MOD_NAME BEGIN END
+	ACTION_IF FILE_EXISTS_IN_GAME ~msectype.2da~ BEGIN
+		COPY_EXISTING - ~msectype.2da~ ~override~
+			COUNT_2DA_COLS ad_columns
+			READ_2DA_ENTRIES_NOW ad_types ad_columns
+			FOR (ad_row = 15; ad_row < ad_types; ++ad_row) BEGIN
+				READ_2DA_ENTRY_FORMER ad_types ad_row 0 ad_id
+				PATCH_IF VARIABLE_IS_SET $AD_SECONDARY_TYPE_MODS(~%ad_id%~) BEGIN
+					SET ad_value = ad_row - 1
+					SET $AD_SECONDARY_TYPE_MOD_NAME(~%ad_value%~) = $AD_SECONDARY_TYPE_MODS(~%ad_id%~)
+				END
+			END
+	END
+END
+LAF ad_read_secondary_type_mods RET_ARRAY AD_SECONDARY_TYPE_MOD_NAME END
 
 // Capacités psioniques (2da/immunity_spells.2da, colonne 505) : $AD_IMMUNITY_SPELLS(~505 RESREF~),
 // ressource en majuscules. Les sorts qui infligent un état se lisent dans le sort lui-même

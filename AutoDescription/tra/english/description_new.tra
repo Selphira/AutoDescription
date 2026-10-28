@@ -354,7 +354,7 @@
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisma~ // reprise de @10060001
 @8000044 = ~Experience~ // reprise de @11040001
-@8000056 = ~Backtab Multiplier~ // reprise de @12630001
+@8000056 = ~Backtab Multiplier~ // reprise de @12630001
 @8000135 = ~Hide in Shadows~ // reprise de @12750001
 @8000136 = ~Detect Illusion~ // reprise de @12760001
 @8000137 = ~Set Traps~ // reprise de @12770001
@@ -1167,6 +1167,7 @@
 @8100011 = ~disabling~ // reprise de @100211
 @8100012 = ~combination~ // reprise de @100212
 @8100013 = ~non-combat~ // reprise de @100213
+@8100100 = ~Potion~ // reprise de @100220
 
 // Noms des états, 8 110 000 + rang du bit d'état (1-32), 8 110 000 sans état (8 110 000-8 110 032)
 @8110000 = ~subject to no effect~ // reprise de @410000
@@ -3371,6 +3372,7 @@
 @23170151 = ~Cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160009
 @23170152 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
 @23170153 = ~to cast Haste (without APR bonus) on %theTarget%~ // reprise de @10160006
+@23180100 = ~%chanceValue% chance to have no effect~ // reprise de @15260001
 
 // Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Efficace », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
 @23240001 = ~Effective %creaturesList%~ // reprise de @13241500

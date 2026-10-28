@@ -266,7 +266,7 @@ BEGIN
 END
 
 // Nom d'un type secondaire de sort (msectype.ids, 1-13 : « Dégâts offensifs ») : liste @8100000 ;
-// vide pour une autre valeur (type sans nom ou ajouté par un mod).
+// type ajouté par un mod nommé dans AD_SECONDARY_TYPE_MODS ; vide pour une autre valeur.
 DEFINE_PATCH_FUNCTION ad_spell_secondary_type_name
 	INT_VAR
 		secondary_type = 0
@@ -277,6 +277,10 @@ BEGIN
 	SET sectype_name_tra = 8100000 + secondary_type
 	PATCH_IF secondary_type >= 1 AND secondary_type <= 13 AND TRA_ENTRY_EXISTS (~%sectype_name_tra%~) BEGIN
 		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100000 tra_block_size = 14 RET name = text END // ~Dégâts offensifs~ (@8100010)
+	END
+	ELSE PATCH_IF VARIABLE_IS_SET $AD_SECONDARY_TYPE_MOD_NAME(~%secondary_type%~) BEGIN
+		SET sectype_name_tra = $AD_SECONDARY_TYPE_MOD_NAME(~%secondary_type%~)
+		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100100 tra_block_size = 100 RET name = text END // ~Potion~ (@8100100)
 	END
 END
 

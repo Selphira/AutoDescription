@@ -838,6 +838,13 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SET sub_sections_lifted = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_lines_section_text INT_VAR strip_sections = 0 STR_VAR section = EVAL ~ability%sub_header%~ RET sub_text = text sub_count = count END
+		// Lignes de premier niveau seulement, comme l'ancien count_description_lines : une ligne et ses
+		// sous-lignes (« 5 % de chances » puis « - de… ») n'en font qu'une.
+		PATCH_IF sub_count > 1 BEGIN
+			INNER_PATCH ~%sub_text%~ BEGIN
+				COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ sub_count
+			END
+		END
 		// Sous-sort décrit par tous ses en-têtes, à sections de niveaux : comme l'ancien moteur, ses
 		// lignes communes puis ses sections, titres compris, chacune précédée de deux sauts de ligne
 		// (SPWI523, SPCL414) ; une ligne qui commence par ces sauts est écrite sans puce

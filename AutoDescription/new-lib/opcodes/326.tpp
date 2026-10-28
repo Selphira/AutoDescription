@@ -54,6 +54,9 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				SET recursion_series = 0
 				SET recursion_depth_reset = 1
 				SET recursion_delayed = apply_delayed
+				// Effet probable : sa probabilité passe aux sous-effets, regroupés par probabilité, dans un objet comme dans
+				// un sort (ancien opcode_self_probability_326, baseProbability).
+				SET recursion_probability = 1
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
 				SET recursion_versus_set = apply_versus_set
@@ -168,7 +171,28 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			SPRINT apply_key ~%apply_stat%-*-*~
 		END
 		SPRINT idName ~~
-		PATCH_IF NOT VARIABLE_IS_SET $AD_STAT_CONDITION(~%apply_key%~) BEGIN
+		// État de sort sans nom, propre à un mod (2da/stats_mods.2da, comme l'ancien moteur qui ne lit cette table
+		// que pour un état sans nom) : sa phrase, sans nom de valeur.
+		SET apply_mod_tra = 0
+		SET apply_splstate_tra = 8120000 + apply_value
+		PATCH_IF apply_stat == 274 AND NOT TRA_ENTRY_EXISTS (~%apply_splstate_tra%~) BEGIN
+			LOOKUP_IDS_SYMBOL_OF_INT apply_symbol ~SPLSTATE~ apply_value
+			TO_UPPER apply_symbol
+			PATCH_IF VARIABLE_IS_SET $AD_STAT_MOD_CONDITION(~274-%apply_symbol%~) AND $AD_STAT_MOD_VALUE_NAME(~274-%apply_symbol%~) == 0 BEGIN
+				SET apply_mod_tra = $AD_STAT_MOD_CONDITION(~274-%apply_symbol%~) + 10000000
+				PATCH_IF $AD_STAT_MOD_ADD_RELATION(~274-%apply_symbol%~) BEGIN
+					SET apply_mod_tra += apply_relation
+				END
+			END
+		END
+		PATCH_IF apply_mod_tra > 0 BEGIN
+			SET apply_tra = apply_mod_tra
+			PATCH_IF NOT TRA_ENTRY_EXISTS (~%apply_tra%~) BEGIN
+				SPRINT apply_pending ~not_implemented:opcode326:condition_text~
+				SPRINT apply_pending_message ~no condition sentence %apply_tra%~
+			END
+		END
+		ELSE PATCH_IF NOT VARIABLE_IS_SET $AD_STAT_CONDITION(~%apply_key%~) BEGIN
 			SPRINT apply_pending ~not_implemented:opcode326:condition~
 			SPRINT apply_pending_message ~no condition text for SPLPROT.2DA row %apply_row% (stat %apply_stat%, value %apply_value%, relation %apply_relation%)~
 		END
@@ -184,7 +208,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 				SPRINT apply_pending_message ~value %apply_value% of stat %apply_stat% has no name~
 			END
 		END
-		PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ AND apply_mod_tra == 0 BEGIN
 			SET apply_tra = $AD_STAT_CONDITION(~%apply_key%~) + 10000000
 			SET apply_stat_tra = apply_stat + 8060000
 			PATCH_IF $AD_STAT_CONDITION_ADD_RELATION(~%apply_key%~) BEGIN

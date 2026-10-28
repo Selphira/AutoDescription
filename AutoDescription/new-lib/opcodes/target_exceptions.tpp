@@ -16,11 +16,21 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
 	SET $fx_exception(~%fx_id%~) = 0
 	SET $fx_exception_name_count(~%fx_id%~) = 0
+	SET $fx_no_effect_chance(~%fx_id%~) = 0
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
 	PATCH_IF (exception_opcode == 318 OR exception_opcode == 324) AND NOT $fx_external(~%fx_id%~) BEGIN
 		SPRINT exception_resource $fx_resource(~%fx_id%~)
 		PATCH_IF ~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~ BEGIN
-			PATCH_IF $fx_parameter1(~%fx_id%~) != 0 OR $fx_parameter2_raw(~%fx_id%~) != 0 BEGIN
+			SET exception_chance = ($fx_probability1(~%fx_id%~) > 99 ? 99 : $fx_probability1(~%fx_id%~)) - $fx_probability2(~%fx_id%~) + 1
+			// 318 probable sous un état de sort sans nom (pnp_potion : « sous l'effet d'une potion ») : l'exception ne
+			// peut pas être nommée ; une ligne sous la condition du 326 (ad_op_318_lines, ancien opcode virtuel 526).
+			SET exception_stat = $fx_parameter2_raw(~%fx_id%~)
+			SET exception_splstate_tra = 8120000 + $fx_parameter1(~%fx_id%~)
+			PATCH_IF exception_opcode == 318 AND exception_chance < 100 AND (exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111)
+					AND $fx_parameter1(~%fx_id%~) != 121 AND NOT TRA_ENTRY_EXISTS (~%exception_splstate_tra%~) BEGIN
+				SET $fx_no_effect_chance(~%fx_id%~) = 1
+			END
+			ELSE PATCH_IF $fx_parameter1(~%fx_id%~) != 0 OR $fx_parameter2_raw(~%fx_id%~) != 0 BEGIN
 				SET $fx_exception(~%fx_id%~) = 1
 				SET fx_block_exceptions += 1
 			END
@@ -55,7 +65,7 @@ END
 // ou à l'objet).
 DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => exception_id BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%exception_id%~) BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%exception_id%~) AND NOT $fx_no_effect_chance(~%exception_id%~) BEGIN
 			SPRINT exception_resource $fx_resource(~%exception_id%~)
 			PATCH_IF $fx_external(~%exception_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END

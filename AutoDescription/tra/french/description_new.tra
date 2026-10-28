@@ -354,7 +354,7 @@
 @8000041 = ~Constitution~ // reprise de @10100001
 @8000042 = ~Charisme~ // reprise de @10060001
 @8000044 = ~Expérience~ // reprise de @11040001
-@8000056 = ~Multiplicateur d'attaque sournoise~ // reprise de @12630001
+@8000056 = ~Multiplicateur d'attaque sournoise~ // reprise de @12630001
 @8000135 = ~Se cacher dans l'ombre~ // reprise de @12750001
 @8000136 = ~Détection des illusions~ // reprise de @12760001
 @8000137 = ~Pose de pièges~ // reprise de @12770001
@@ -1167,6 +1167,7 @@
 @8100011 = ~Invalidant~ // reprise de @100211
 @8100012 = ~Combinaison~ // reprise de @100212
 @8100013 = ~Non-offensif~ // reprise de @100213
+@8100100 = ~Potion~ // reprise de @100220
 
 // Noms des états, 8 110 000 + rang du bit d'état (1-32), 8 110 000 sans état (8 110 000-8 110 032)
 @8110000 = ~sous aucun effet~ // reprise de @410000
@@ -3371,6 +3372,7 @@
 @23170151 = ~Lance Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160009
 @23170152 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 @23170153 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
+@23180100 = ~%chanceValue% de chances d'être sans effet~ // reprise de @15260001
 
 // Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Efficace », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
 @23240001 = ~Efficace %creaturesList%~ // reprise de @13241500
