@@ -264,7 +264,7 @@
 260      1        1        IGNORED   LEVEL            400    SHOWN           Spell:_Spell_Sequencer_Activation
 261      1        1        DESCRIBED LEVEL            20     IGNORED         Spell:_Restore_Lost_Spells
 262      1        1        TODO      LEVEL            426    SHOWN           Stat:_Visual_Range
-263      1        1        TODO      LEVEL            47     SHOWN           Stat:_Backstab
+263      1        1        DESCRIBED LEVEL            47     SHOWN           Stat:_Backstab
 264      1        1        TODO      LEVEL            7      IGNORED         Spell_Effect:_Drop_Weapons_in_Panic
 265      1        1        IGNORED   LEVEL            400    SHOWN           Script:_Modify_Global_Variable
 266      1        1        TODO      LEVEL            228    SHOWN           Spell:_Remove_Protection_from_Spell

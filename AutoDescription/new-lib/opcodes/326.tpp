@@ -129,11 +129,12 @@ END
 // table, ou parameter1 pour - 1) et relation de la ligne donnent la chaîne de stats.2da, de la clé la
 // plus précise à la plus générale ; une chaîne reprise de l'ancien fichier (@13260000-@13269999 ->
 // @23260000-@23269999) n'utilise que les chaînes de cible et, pour les statistiques d'un fichier IDS
-// (266 à 268, 271, 273), le nom de la valeur (idName). Refus : ligne absente ou inutilisée ; aucune
+// (266 à 268, 271, 273), le nom de la valeur (idName) et, pour les phrases génériques, le nom de la
+// statistique (theStatistic) et la valeur (value). Refus : ligne absente ou inutilisée ; aucune
 // clé dans stats.2da (l'ancien moteur garde la condition précédente) ; statistique que l'ancien moteur
 // écrit autrement (258 taille, 263 heure, 269 classe, 270 type précis, 272 alignement, 274 état de
-// sort) ou d'un fichier IDS mal calculé (262) ; valeur sans nom ; chaîne non reprise, qui utilise une
-// autre variable (statistique, compétence, élément…). Hors erreur de fichier, le refus attend les
+// sort) ou d'un fichier IDS mal calculé (262) ; valeur sans nom ; statistique sans nom ; chaîne non
+// reprise, qui utilise une autre variable (compétence, élément…). Hors erreur de fichier, le refus attend les
 // lignes (fx_condition_refusal) : l'ancien moteur n'écrit pas de condition sans ligne du sort
 // appliqué (SPWI910).
 DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
@@ -185,12 +186,19 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		END
 		PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
 			SET apply_tra = $AD_STAT_CONDITION(~%apply_key%~) + 10000000
+			SET apply_stat_tra = apply_stat + 8060000
 			PATCH_IF $AD_STAT_CONDITION_ADD_RELATION(~%apply_key%~) BEGIN
 				SET apply_tra += apply_relation
 			END
 			PATCH_IF NOT TRA_ENTRY_EXISTS (~%apply_tra%~) BEGIN
 				SPRINT apply_pending ~not_implemented:opcode326:condition_text~
 				SPRINT apply_pending_message ~no condition sentence %apply_tra%~
+			END
+			// Phrases génériques d'une statistique (@23269000-@23269005) : son nom à la forme « cible »,
+			// dans la liste des statistiques (8 060 000 + valeur de stats.ids).
+			ELSE PATCH_IF apply_tra >= 23269000 AND apply_tra <= 23269005 AND NOT TRA_ENTRY_EXISTS (~%apply_stat_tra%~) BEGIN
+				SPRINT apply_pending ~not_implemented:opcode326:statistic_name~
+				SPRINT apply_pending_message ~stat %apply_stat% has no name~
 			END
 		END
 		PATCH_IF NOT ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
@@ -203,6 +211,10 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			LPM ad_application_form
 			LPM ad_application_target_strings
 			SPRINT line_only_for ~~
+			PATCH_IF apply_tra >= 23269000 AND apply_tra <= 23269005 BEGIN
+				LPF ad_tra INT_VAR tra_id = apply_stat_tra tra_block_start = 8060000 tra_block_size = 10000 RET theStatistic = text END // ~la force~ (@8060036)
+				SPRINT value ~%apply_value%~
+			END
 			LPF ad_tra INT_VAR tra_id = apply_tra tra_block_start = 23260000 tra_block_size = 10000 RET apply_condition = text END // ~Si l'état %ofTheTarget% est « mort »~ (@23260181)
 		END
 	END
