@@ -97,7 +97,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_lines BEGIN
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND NOT $fx_consumed(~%cast_id%~) AND $fx_recursion(~%cast_id%~) BEGIN
 			PATCH_IF $fx_sub_count(~%cast_id%~) > 0 BEGIN
 				SPRINT line_text $fx_sub_text(~%cast_id%~)
-				PATCH_IF $fx_sub_delayed(~%cast_id%~) AND $fx_sub_count(~%cast_id%~) > 1 BEGIN
+				PATCH_IF $fx_sub_delayed(~%cast_id%~) AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) >= 0 BEGIN
 					LPM ad_cast_spell_delayed_condition
 				END
 				PATCH_IF $fx_series_anchor(~%cast_id%~) AND item_type != ITM_TYPE_potion BEGIN
@@ -148,7 +148,7 @@ END
 // Sort cast_id lancé après un délai, à plusieurs sous-lignes (ancien opcode_146_condition) : la
 // condition « Après 1 tour, pendant 5 rounds » (durée commune de ses effets, fx_sub_duration_text,
 // new-lib/recursion.tpp) précède la première, les suivantes en retrait (ad_effect_line) ; ni délai ni durée après la
-// ligne. Une seule sous-ligne garde le délai à sa suite (« … après 2 heures »).
+// ligne. Une seule sous-ligne, sans sous-lignes, garde le délai à sa suite (« … après 2 heures »).
 DEFINE_PATCH_MACRO ad_cast_spell_delayed_condition BEGIN
 	LPF ad_duration_text INT_VAR seconds = $fx_duration(~%cast_id%~) RET strDuration = text END
 	SPRINT line_condition @3000005 // ~après %strDuration%~

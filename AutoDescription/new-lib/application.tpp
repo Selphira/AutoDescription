@@ -193,9 +193,13 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		LPM ad_application_drop
 	END
 	// Timing 2 d'un en-tête : l'ancien moteur n'écrit pas de durée, comme pour un effet d'équipement.
-	// Effet différé sans délai : l'ancien moteur le décrit comme permanent, sans le dire.
+	// Effet différé sans délai : appliqué aussitôt, puis permanent (timing 4, IESDP) ; l'ancien
+	// get_duration_value lui donne le timing 1.
 	ELSE PATCH_IF app_timing == TIMING_delayed AND app_duration <= 0 AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:no_delay~ message = ~delayed effect (timing 4) with a delay of 0~ RET render_missing = refusal END
+		SET app_timing = TIMING_permanent
+		SET $fx_timing(~%app_id%~) = TIMING_permanent
+		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
+		SET $fx_delay_ticks(~%app_id%~) = 0
 	END
 	ELSE PATCH_IF app_timing != TIMING_duration AND app_timing != TIMING_duration_ticks AND app_timing != TIMING_permanent
 			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed
@@ -851,6 +855,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		// add_condition, qui décale tous les sauts de ligne), la première ligne comprise quand elles sont
 		// sœurs ; les sous-lignes d'un groupe de probabilité restent sous lui. Un sous-sort décrit par
 		// niveaux commence par ses sections : une seule fin de ligne avant elles, sans tiret (SPCL423).
+		SET line_indent_sublines = 1
 		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) == 0 BEGIN
 			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\(%CRLF%\)+~ ~%CRLF%~
@@ -859,8 +864,15 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%line_text%~) > 0 BEGIN
 			SPRINT line_text ~%CRLF%- %line_text%~
 		END
-		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+		// Une seule ligne suivie de ses sous-lignes : la ligne suit la condition, ses sous-lignes gardent
+		// leur retrait de 2 (PXW5CHAR : « Après 2 rounds ; 6 % de chances »).
+		ELSE BEGIN
+			SET line_indent_sublines = 0
+		END
+		PATCH_IF line_indent_sublines BEGIN
+			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+				REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+			END
 		END
 		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~
 	END

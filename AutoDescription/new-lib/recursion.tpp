@@ -227,6 +227,12 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
 				PATCH_IF app_versus_count > 0 BEGIN
 					SPRINT $fx_sub_only_for(~%recursion_fx%~) ~%app_versus_only_for%~
+					// Comme pour l'opcode 232, l'ancien moteur garde le versus du 177 (« contre les trolls »),
+					// que les dégâts du sous-sort écrivent à la place de leur cible (AROW04).
+					PATCH_IF NOT $fx_sub_versus_set(~%recursion_fx%~) BEGIN
+						SET $fx_sub_versus_set(~%recursion_fx%~) = 1
+						SPRINT $fx_sub_versus(~%recursion_fx%~) ~%versus%~
+					END
 				END
 				SPRINT line_only_for ~~
 				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%theTarget%~
@@ -308,7 +314,8 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 					SPRINT recursion_single_message $fx_sub_single_message(~%recursion_fx%~)
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_single_reason%~ message = ~%recursion_single_message%~ RET render_late_missing = refusal END
 				END
-				ELSE PATCH_IF recursion_sub_count == 1 AND NOT (~%recursion_delayed_text%~ STRING_EQUAL ~~) BEGIN
+				ELSE PATCH_IF recursion_sub_count == 1 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%recursion_sub_text%~) < 0
+						AND NOT (~%recursion_delayed_text%~ STRING_EQUAL ~~) BEGIN
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:delayed_single_duration~ message = ~single line of a spell cast after a delay, whose common duration (%recursion_delayed_text%) the old engine drops~ RET render_late_missing = refusal END
 				END
 			END
@@ -409,7 +416,7 @@ END
 // sub_missing, refus (ad_refusal, new-lib/log.tpp ; l'appelant le rattache à son effet par
 // ad_refusal_nest, qui préfixe sa raison de recursion:), vide si le sort est décrit ; sub_opcode, opcode de l'effet d'un EFF (0 - 1 sinon) ;
 // sub_checked, sous-ressources vérifiées par ad_recursion_allowed pendant la description, « |RES1||RES2| »
-// (cache des sous-sorts, new-lib/subspell_cache.tpp). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 1 et
+// (cache des sous-sorts, new-lib/subspell_cache.tpp). En-tête : avec un niveau de lancement, celui du plus haut niveau requis compris entre 0 et
 // ce niveau (le premier à égalité, ancien get_spell_headeroffset_for_level) ; sans, l'unique
 // en-tête. Refus : sort absent ou illisible ; aucun en-tête de ce niveau (l'ancien moteur lit alors
 // le début du fichier comme un en-tête, BUG-037) ; plusieurs en-têtes sans niveau de lancement
@@ -559,7 +566,7 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:recursion:invalid_header~ message = ~abilities at offset %sub_headers_offset% lie outside the file (%BUFFER_LENGTH% bytes)~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF ctx_casting_level > 0 BEGIN
-			SET sub_header_level = 0
+			SET sub_header_level = 0 - 1
 			FOR (sub_h = 0; sub_h < sub_header_count; ++sub_h) BEGIN
 				READ_SHORT (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_level_required) sub_level
 				PATCH_IF sub_level <= ctx_casting_level AND sub_level > sub_header_level BEGIN

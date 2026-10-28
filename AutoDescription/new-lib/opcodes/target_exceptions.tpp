@@ -61,7 +61,7 @@ END
 // Sur une autre ressource, avec une condition (parameter2), l'ancien moteur n'écrit rien
 // (opcode_common_324) et garde l'effet pour l'en-tête d'un sort ; il écarte un 324 de durée limitée
 // nulle (opcode_324_is_valid). Refus : effet d'un EFF ; 318 d'un jeu classique (Set Stat de ToBEx,
-// pas une protection) ; autre ressource sans condition (l'ancien moteur en fait une immunité au sort
+// pas une protection) ; autre ressource nommée sans condition (l'ancien moteur en fait une immunité au sort
 // ou à l'objet).
 DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => exception_id BEGIN
@@ -90,7 +90,21 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 					END
 				END
 				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
+					LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
+					LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
+					PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) OR NOT (~%exception_item_name%~ STRING_EQUAL ~~) BEGIN
+						LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
+					END
+					ELSE PATCH_IF NOT support_header_only BEGIN
+						SET ignored_fx = exception_id
+						SPRINT ignored_reason ~not_implemented:opcode%exception_opcode%:resource_no_name~
+						SPRINT ignored_message ~protection from %exception_resource%, which has no name~
+						PATCH_IF NOT FILE_EXISTS_IN_GAME ~%exception_resource%.spl~ AND NOT FILE_EXISTS_IN_GAME ~%exception_resource%.itm~ BEGIN
+							SPRINT ignored_reason ~file_error:opcode%exception_opcode%:missing_resource~
+							SPRINT ignored_message ~protection from %exception_resource%, which is neither a spell nor an item~
+						END
+						LPM ad_log_ignored
+					END
 				END
 			END
 			ELSE BEGIN
