@@ -226,6 +226,7 @@ BEGIN
 	ACTION_IF description_engine != 0 BEGIN
 		LAF ~ad_init_log~ STR_VAR log_name = ~%log_filename%~ END
 	END
+	LAF ~subspell_cache_init~ END
 	ACTION_IF is_ee BEGIN
 		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~
 	END

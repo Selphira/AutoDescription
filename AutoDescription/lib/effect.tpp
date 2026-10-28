@@ -793,7 +793,7 @@ BEGIN
 	PATCH_TRY
 		PATCH_IF target == TARGET_FX_self OR target == TARGET_FX_original_caster BEGIN
 			SPRINT opcode_target ~_self~
-			PATCH_IF forceTarget == 0 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
+			PATCH_IF forceTarget != 1 OR NOT VARIABLE_IS_SET theTarget OR resetTarget == 1 BEGIN
 				PATCH_IF isSpell BEGIN
 					SPRINT theTarget   @102475 // ~le lanceur~
 					SPRINT ofTheTarget @102476 // ~du lanceur~

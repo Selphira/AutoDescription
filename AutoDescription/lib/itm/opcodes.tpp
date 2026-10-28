@@ -7873,7 +7873,8 @@ DEFINE_PATCH_MACRO ~opcode_146_get_spell_effects_description~ BEGIN
     PATCH_IF isItem == 1 AND type == 1 BEGIN
         SET castingLevel = 0
     END
-    PATCH_IF VARIABLE_IS_SET levelIndex BEGIN
+    // Un niveau de lancement imposé (parameter1, hors type 1) prime sur celui de la section de niveaux
+    PATCH_IF VARIABLE_IS_SET levelIndex AND (castingLevel == 0 OR type == 1) BEGIN
         SET maxRequiredLevel = levelIndex MODULO 100
         SET minRequiredLevel = ((levelIndex - maxRequiredLevel) / 100) - 100
         PATCH_IF minRequiredLevel == maxRequiredLevel OR maxRequiredLevel == 99 BEGIN
@@ -8925,6 +8926,7 @@ DEFINE_PATCH_MACRO ~opcode_177_replace~ BEGIN
 			END
 
             PATCH_IF nestedValid AND NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
+                SET isValid = 1
                 LPM ~opcode_177_replace_effect_vars~
                 LPM ~opcode_is_valid~
 
@@ -13191,9 +13193,21 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
 	LPM ~opcode_272_condition~
+	// Un 272 lu après un 321 sur la ressource n'est pas cumulable, quel que soit l'effet de son EFF, dont
+	// l'opcode, rendu par get_res_description, peut être toujours cumulable : la mention
+	// est écrite avec l'effet de l'EFF, avant ses exceptions de cible.
+	SET notCumulableParent = cumulable == 0
 	LPF ~get_res_description~ INT_VAR ignoreDuration = (frequency == 6 AND abilityType == AbilityType_Equipped) STR_VAR resref RET description saveAdded opcode END
+	PATCH_IF notCumulableParent BEGIN
+		SET cumulable = 1
+	END
+	SET notCumulableParent = 0
 	PATCH_IF ~%description%~ STRING_EQUAL ~~ BEGIN
 		SPRINT condition ~~
+	END
+	// L'effet de l'EFF a déjà écrit les exceptions de cible du 272, qu'il hérite.
+	ELSE BEGIN
+		SPRINT target_exceptions ~~
 	END
 	SET ignoreDuration = 1
 END

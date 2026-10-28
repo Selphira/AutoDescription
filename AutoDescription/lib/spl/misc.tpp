@@ -599,6 +599,7 @@ BEGIN
 		SET is_valid = 1
 		SET cpt = 0
 		SET prev_value = 0
+		SET prev_level = 0
 		SET base_value = 0
 		SET delta_value = 0
 		SET delta_level = 0
@@ -630,6 +631,7 @@ BEGIN
 		SET is_valid = 1
 		SET cpt = 0
 		SET prev_value = 0
+		SET prev_level = 0
 		SET base_value = 0
 		SET delta_value = 0
 		SET delta_level = 0
@@ -661,6 +663,7 @@ BEGIN
 		SET is_valid = 1
 		SET cpt = 0
 		SET prev_value = 0
+		SET prev_level = 0
 		SET base_value = 0
 		SET delta_value = 0
 		SET delta_level = 0
@@ -732,6 +735,8 @@ BEGIN
 			END
 			SPRINT baseValue ~%base_value%~
 			SPRINT value ~%delta_value%~
+			// Niveau du changement, et non le dernier parcouru.
+			SET level = prev_level
 			SPRINT complex_value @102160 // ~%baseValue% + %value% au niveau %level%~
 		END
 	END
@@ -1392,6 +1397,12 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_v
 		        END
 		    END
 		END
+	END
+	// data_to_vars de l'effet suivant remet complex_value à la valeur gardée dans l'effet (vide) :
+	// seul base_complex_value garde le bonus commun.
+	SPRINT complex_value ~~
+	PATCH_IF is_valid BEGIN
+		SPRINT complex_value ~%base_complex_value%~
 	END
 END
 
