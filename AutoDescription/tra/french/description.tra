@@ -4680,6 +4680,7 @@
 
 @15250001 = ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 @15250002 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
+@15260001 = ~%chanceValue% de chances d'être sans effet~
 
 // STATS.ids
 // > A7-GolemConstruction

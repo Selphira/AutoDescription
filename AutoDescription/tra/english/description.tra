@@ -4413,6 +4413,7 @@
 
 @15250001 = ~Replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
 @15250002 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
+@15260001 = ~%chanceValue% chance to have no effect~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
