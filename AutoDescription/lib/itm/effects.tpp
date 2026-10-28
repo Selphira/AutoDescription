@@ -59,6 +59,12 @@ END
 DEFINE_PATCH_MACRO ~add_condition~ BEGIN
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
 		SET indentSublines = 1
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ ~%description%~) == 0 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ ~%description%~ 1) < 0 BEGIN
+			SPRINT bullet ~%crlf%- ~
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				DELETE_BYTES 0 STRING_LENGTH ~%bullet%~
+			END
+		END
 		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%~ ~%description%~) == 0 BEGIN
 			INNER_PATCH_SAVE description ~%description%~ BEGIN
 				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\(%crlf%\)+~ ~%crlf%~
