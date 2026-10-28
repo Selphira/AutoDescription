@@ -1,11 +1,3 @@
-OUTER_SET $entangleSpellList(~d2wk5s1a~) = 1 // The Workshop Kitpack v4.6
-OUTER_SET $entangleSpellList(~d2wk5s1b~) = 1 // The Workshop Kitpack v4.6
-OUTER_SET $entangleSpellList(~d2wk5s1e~) = 1 // The Workshop Kitpack v4.6
-OUTER_SET $entangleSpellList(~x#kispr~) = 1 // BG1 NPC Project v32
-
-OUTER_SET $slowSpellList(~finslow~) = 1 // Ascension v2.0.24
-OUTER_SET $slowSpellList(~mels545~) = 1 // Ascension v2.0.24
-
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignoredResref~ BEGIN
     ~d5_nukt~ => 1  // npc_ee
     ~meknockb~ => 1 // metweaks : Implementer un autre type d'animation de mort par eclatement
