@@ -521,6 +521,8 @@ PHP_EACH = re.compile(r"\bPHP_EACH\s+\S+\s+AS\s+([A-Za-z_][A-Za-z0-9_]*)\s*=>\s*
 IDENTIFIER = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)(?![A-Za-z0-9_#-])")
 STRING_VARIABLE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
 NON_VARIABLES = {"EVAL", "BEGIN", "END"}
+WEIDU_VARIABLES = {"SOURCE_FILE", "SOURCE_RES", "SOURCE_SIZE", "SOURCE_EXT", "SOURCE_DIRECTORY", "SOURCE_FILESPEC",
+                   "DEST_FILE", "DEST_RES", "DEST_EXT", "DEST_DIRECTORY", "DEST_FILESPEC"}
 # Seuls les points d'entrée de la boucle commune appellent le nouveau moteur (initialisation des
 # journaux, boucles des objets et des sorts).
 ENGINE_CALLERS = ("AutoDescription/lib/log.tpp", "AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
@@ -584,6 +586,8 @@ def check_engine_separation(report, definitions):
     for path in old_files:
         old_variables |= assigned_variables(strip_weidu(read_text(path))[1])
     old_variables -= bgforge_variables
+    # Variables de WeiDU que l'ancien code rétablit après un COPY (cache des sous-sorts).
+    old_variables -= WEIDU_VARIABLES
 
     new_variables, new_globals = set(new_options), set(new_options)
     parsed = {}

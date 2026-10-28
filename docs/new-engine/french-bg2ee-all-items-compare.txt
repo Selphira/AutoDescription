@@ -16,7 +16,7 @@ AMUL13	identical
 AMUL14	identical
 AMUL15	identical
 AMUL16	identical
-AMUL17	identical
+AMUL17	different	Cette amulette contient une néphrite sertie dans de l'or. Quand on l'active, elle protège son porteur de toute forme d'attaque mentale, y compris psionique (Remarque : elle n'immunise pas complètement contre les attaques psioniques).\n\nPARAMÈTRES : \n\nCapacité de charge (50 charges, l'objet est détruit quand toutes les charges sont utilisées) : \n- Dissipation de la peur\n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, l'immobilisation et les capacités psioniques pendant 1 tour\n\nPoids : 1	Cette amulette contient une néphrite sertie dans de l'or. Quand on l'active, elle protège son porteur de toute forme d'attaque mentale, y compris psionique (Remarque : elle n'immunise pas complètement contre les attaques psioniques).\n\nPARAMÈTRES : \n\nCapacité de charge (50 charges, l'objet est détruit quand toutes les charges sont utilisées) : \n- Dissipation de la peur\n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, les capacités psioniques et l'immobilisation pendant 1 tour\n\nPoids : 1
 AMUL18	identical
 AMUL19	identical
 AMUL20	identical
@@ -225,7 +225,7 @@ CDNEBDAG	identical
 CDSW2H07	identical
 CHALCY1	identical
 CHALCY2	identical
-CHALCY3	identical
+CHALCY3	different	Cette amulette contient une néphrite sertie dans de l'or. Quand on l'active, elle protège son porteur de toute forme d'attaque mentale, y compris psionique (Remarque : elle n'immunise pas complètement contre les attaques psioniques).\n\nPARAMÈTRES : \n\nCapacités d'équipement : \n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, l'immobilisation et les capacités psioniques\n- Résistance à la magie : Passe à 50 %\n\nCapacité de charge (50 charges, l'objet est détruit quand toutes les charges sont utilisées) : \n- Dissipation de la peur\n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, l'immobilisation et les capacités psioniques pendant 1 tour\n\nPoids : 1	Cette amulette contient une néphrite sertie dans de l'or. Quand on l'active, elle protège son porteur de toute forme d'attaque mentale, y compris psionique (Remarque : elle n'immunise pas complètement contre les attaques psioniques).\n\nPARAMÈTRES : \n\nCapacités d'équipement : \n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, les capacités psioniques et l'immobilisation\n- Résistance à la magie : Passe à 50 %\n\nCapacité de charge (50 charges, l'objet est détruit quand toutes les charges sont utilisées) : \n- Dissipation de la peur\n- Immunité contre les charmes, le sommeil, la confusion, la paralysie, la débilité mentale, la peur, la détection des alignements, l'étourdissement, la panique, les capacités psioniques et l'immobilisation pendant 1 tour\n\nPoids : 1
 CHALHELM	identical
 CHALSHLD	identical
 CHAN01	identical

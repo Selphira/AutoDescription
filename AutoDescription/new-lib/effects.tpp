@@ -16,8 +16,8 @@
 // identiques, 2 par un regroupement suivant, qui l'y ajoute après : chaque opcode écrit ses lignes
 // niveau par niveau, new-lib/groups.tpp) ; fx_series_of,
 // fx_series_anchor (0 - 1 et 0 à la lecture, répétitions d'un effet, new-lib/application.tpp) ;
-// fx_level_value et fx_level_duration (vides à la lecture, progressions de la valeur et de la durée
-// d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ; fx_level_progression
+// fx_level_value, fx_level_duration et fx_level_save (vides à la lecture, progressions de la valeur,
+// de la durée et du bonus du jet de sauvegarde d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ; fx_level_progression
 // (0 à la lecture, 1 pour un effet qui porte une telle progression) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
@@ -323,6 +323,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_series_anchor(~%fx_id%~) = 0
 	SPRINT $fx_level_value(~%fx_id%~) ~~
 	SPRINT $fx_level_duration(~%fx_id%~) ~~
+	SPRINT $fx_level_save(~%fx_id%~) ~~
 	SET $fx_level_progression(~%fx_id%~) = 0
 	LPM ad_fx_mod_ignored
 	// Écarté comme un effet que l'ancien moteur ne charge pas : sans effet sur son bloc (exceptions de

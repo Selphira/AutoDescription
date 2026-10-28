@@ -558,9 +558,10 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 					PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION(~%duration_opcode%~) BEGIN
 						SPRINT duration_kind $AD_OPCODE_DURATION(~%duration_opcode%~)
 					END
-					// Anciennes listes opcodes_ignore_duration et opcodes_cant_be_permanent (177, et 525 :
-					// objet remplacé, ad_derived_add).
-					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 525 BEGIN
+					// Anciennes listes opcodes_ignore_duration et opcodes_cant_be_permanent (177, et les
+					// opcodes virtuels des effets dérivés, ad_derived_add : 511, illusions dissipées ; 525,
+					// objet remplacé).
+					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 511 OR duration_opcode == 525 BEGIN
 						PATCH_IF duration_instant < 0 BEGIN
 							SET duration_instant = 1
 						END

@@ -147,7 +147,7 @@ END
 
 // Sort cast_id lancé après un délai, à plusieurs sous-lignes (ancien opcode_146_condition) : la
 // condition « Après 1 tour, pendant 5 rounds » (durée commune de ses effets, fx_sub_duration_text,
-// new-lib/recursion.tpp) précède la première, les suivantes en retrait ; ni délai ni durée après la
+// new-lib/recursion.tpp) précède la première, les suivantes en retrait (ad_effect_line) ; ni délai ni durée après la
 // ligne. Une seule sous-ligne garde le délai à sa suite (« … après 2 heures »).
 DEFINE_PATCH_MACRO ad_cast_spell_delayed_condition BEGIN
 	LPF ad_duration_text INT_VAR seconds = $fx_duration(~%cast_id%~) RET strDuration = text END
@@ -159,8 +159,5 @@ DEFINE_PATCH_MACRO ad_cast_spell_delayed_condition BEGIN
 		SPRINT line_condition ~%line_condition%, %cast_during%~
 	END
 	LPF ad_ucfirst STR_VAR text = ~%line_condition%~ RET line_condition = text END
-	INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-		REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
-	END
 	SET line_no_duration = 1
 END

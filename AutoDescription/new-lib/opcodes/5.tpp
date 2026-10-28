@@ -40,11 +40,18 @@ DEFINE_PATCH_MACRO ad_op_5_lines BEGIN
 END
 
 // Variante 0 : charme (du type nommé), 1 : sans restriction, sur une autre cible que soi.
+// Comme l'ancien opcode_target_5, le type n'est nommé que si la cible est « la cible » : la cible
+// imposée par le parent d'un sous-sort (« les créatures hostiles » d'un 177) ou sa zone restent.
 DEFINE_PATCH_MACRO ad_op_5_variant BEGIN
 	SET charm_target = $fx_effective_target(~%line_fx%~)
 	SET charm_self = charm_target == TARGET_FX_self OR charm_target == TARGET_FX_original_caster
 	SET state_variant = (NOT charm_self AND $fx_parameter1(~%line_fx%~) == 0) ? 1 : 0
-	PATCH_IF NOT charm_self AND $fx_parameter1(~%line_fx%~) != 0 AND $fx_versus_file(~%line_fx%~) == 0 BEGIN
+	SET charm_named = NOT charm_self AND $fx_parameter1(~%line_fx%~) != 0 AND $fx_versus_file(~%line_fx%~) == 0 AND ctx_area_phrase <= 0
+	PATCH_IF charm_named AND ctx_force_target BEGIN
+		SPRINT charm_basic_target @2000020 // ~la cible~
+		SET charm_named = ~%ctx_the_target%~ STRING_EQUAL ~%charm_basic_target%~
+	END
+	PATCH_IF charm_named BEGIN
 		SPRINT charm_name $fx_charm_name(~%line_fx%~)
 		SPRINT line_the_target ~%the% %charm_name%~
 	END

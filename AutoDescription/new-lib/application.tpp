@@ -442,6 +442,12 @@ DEFINE_PATCH_MACRO ad_application_save BEGIN
 		END
 		SET app_save_bonus = $fx_save_bonus(~%line_fx%~)
 		LPF ad_signed_value INT_VAR value = app_save_bonus RET saveBonus = text END
+		// Bonus qui progresse selon le niveau du sort (new-lib/spell_levels.tpp).
+		SPRINT app_level_save $fx_level_save(~%line_fx%~)
+		PATCH_IF NOT (~%app_level_save%~ STRING_EQUAL ~~) BEGIN
+			SET app_save_bonus = 1
+			SPRINT saveBonus ~%app_level_save%~
+		END
 		PATCH_IF app_save_bonus != 0 AND line_save_for_half BEGIN
 			SPRINT app_save_text @5000032 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
 		END
@@ -488,7 +494,8 @@ END
 // si le .tra ne les a pas. Sur soi ou le lanceur d'origine, c'est la source de l'effet (ancien
 // get_effect_description) : le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le
 // porteur d'un autre objet. Un sous-effet qui
-// hérite de la cible du parent prend ses chaînes (ctx_force_target, new-lib/recursion.tpp). La zone
+// hérite de la cible du parent prend ses chaînes (ctx_force_target, new-lib/recursion.tpp), sauf un
+// effet sur soi d'un sort lancé par la source du parent (ctx_force_keep_self). La zone
 // d'un projectile (ad_application_area_target, ou celle d'un sous-sort, ad_recursion_area_strings)
 // remplace l'une et l'autre ; line_the_target, la cible que nomme l'opcode (« les rakshasas »),
 // remplace le tout à la forme sujet ; puis le type de créature d'un effet d'un 177
@@ -506,7 +513,11 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		LPF ad_tra INT_VAR tra_id = app_target_tra + 1 tra_block_start = 2000000 tra_block_size = 1000 RET ofTheTarget = text END
 		LPF ad_tra INT_VAR tra_id = app_target_tra + 2 tra_block_start = 2000000 tra_block_size = 1000 RET toTheTarget = text END
 	END
-	PATCH_IF ctx_force_target BEGIN
+	SET app_force_self = ctx_force_target AND ctx_force_keep_self AND (app_target == TARGET_FX_self OR app_target == TARGET_FX_original_caster)
+	PATCH_IF app_force_self AND NOT (~%ctx_force_only_for%~ STRING_EQUAL ~~) BEGIN
+		SPRINT line_only_for ~%ctx_force_only_for%~
+	END
+	PATCH_IF ctx_force_target AND NOT app_force_self BEGIN
 		SET app_target_missing = 0
 		SPRINT theTarget   ~%ctx_the_target%~
 		SPRINT ofTheTarget ~%ctx_of_the_target%~
@@ -836,12 +847,20 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition~ RET render_late_missing = refusal END
 			SET app_line_ok = 0
 		END
-		// Sections de niveaux d'un sous-sort sans ligne commune : en retrait sous la condition (ancien
-		// add_condition, qui décale les sauts de ligne d'une description commencée par un saut de ligne).
-		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
+		// Sous-lignes et sections de niveaux d'un sous-sort : en retrait sous la condition (ancien
+		// add_condition, qui décale tous les sauts de ligne), la première ligne comprise quand elles sont
+		// sœurs ; les sous-lignes d'un groupe de probabilité restent sous lui. Un sous-sort décrit par
+		// niveaux commence par ses sections : une seule fin de ligne avant elles, sans tiret (SPCL423).
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) == 0 BEGIN
 			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-				REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+				REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\(%CRLF%\)+~ ~%CRLF%~
 			END
+		END
+		ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%line_text%~) > 0 BEGIN
+			SPRINT line_text ~%CRLF%- %line_text%~
+		END
+		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
 		END
 		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~
 	END

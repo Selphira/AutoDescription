@@ -11,7 +11,9 @@
 //   qui porte le nom d'un EFF de la chaîne n'y est pas une boucle ;
 // - ctx_force_target : les sous-effets reprennent les chaînes de cible du parent (ctx_the_target,
 //   ctx_of_the_target, ctx_to_the_target), chacun gardant sa forme, soi ou cible (ancien forceTarget,
-//   opcode 146) ;
+//   opcode 146) ; ctx_force_keep_self : sort lancé (146, 232) par la source de l'effet parent, dont les
+//   effets sur soi touchent ce lanceur et gardent les chaînes de la source, suivies de la restriction
+//   du type de créature du parent (ctx_force_only_for, « uniquement pour les animaux », OHHDRAIN) ;
 // - ctx_hit_target : EFF appliqué à la créature touchée (opcodes 248 et 249, IESDP), dont la propre
 //   cible ne sert pas : l'effet vise la cible (2) ;
 // - ctx_area_phrase (0 sans zone), ctx_area_creatures, ctx_area_range, ctx_area_angle : cibles
@@ -19,7 +21,7 @@
 // - ctx_ignore_duration : durées des sous-effets non écrites, hors délais et répétitions (ancien
 //   ignoreDuration hérité de la durée commune d'une potion, ou de la durée de l'en-tête d'un sort) ;
 // - ctx_ignore_save : jets de sauvegarde non écrits (ancien ignoreSavingThrow hérité de l'en-tête
-//   d'un sort) ;
+//   d'un sort, qui ne lit que les sous-sorts des opcodes 146, 148 et 232) ;
 // - ctx_casting_level : niveau de lancement, qui choisit l'en-tête du sous-sort ; sans lui, un
 //   sous-sort à plusieurs en-têtes est décrit comme un sort, effets de tous les niveaux et progressions
 //   (sub_all_headers, ad_spell_levels) ;
@@ -38,6 +40,8 @@
 DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_depth = 0
 	SET ctx_force_target = 0
+	SET ctx_force_keep_self = 0
+	SPRINT ctx_force_only_for ~~
 	SET ctx_area_phrase = 0
 	SET ctx_ignore_duration = 0
 	SET ctx_ignore_save = 0
@@ -167,6 +171,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%recursion_the_target%~
 				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%recursion_of_the_target%~
 				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%recursion_to_the_target%~
+				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
 				SPRINT $fx_sub_single_reason(~%recursion_fx%~) ~%recursion_single_reason%~
 				SPRINT $fx_sub_single_message(~%recursion_fx%~) ~%recursion_single_message%~
 				SET $fx_sub_delayed(~%recursion_fx%~) = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
@@ -217,6 +222,10 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT line_the_target ~~
 				LPM ad_application_form
 				LPM ad_application_target_strings
+				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
+				PATCH_IF app_versus_count > 0 BEGIN
+					SPRINT $fx_sub_only_for(~%recursion_fx%~) ~%app_versus_only_for%~
+				END
 				SPRINT line_only_for ~~
 				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%theTarget%~
 				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%ofTheTarget%~
@@ -244,6 +253,12 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT recursion_sub_missing ~%recursion_delayed_missing%~
 			END
 			ELSE BEGIN
+				// L'en-tête d'un sort ne lit que les sous-sorts des opcodes 146, 148 et 232
+				// (ad_spell_header_save) : ceux des autres écrivent leurs jets de sauvegarde.
+				SET recursion_saved_ignore_save = ctx_ignore_save
+				PATCH_IF recursion_lift_opcode != 146 AND recursion_lift_opcode != 148 AND recursion_lift_opcode != 232 BEGIN
+					SET ctx_ignore_save = 0
+				END
 				LPF ad_describe_subresource
 					INT_VAR
 						ctx_depth = $fx_sub_depth(~%recursion_fx%~)
@@ -253,6 +268,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
 						ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
 						ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
+						ctx_force_keep_self = recursion_lift_opcode == 146 OR recursion_lift_opcode == 232
 						ctx_ignore_duration = recursion_hide
 						ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
 						ctx_base_probability = $fx_probability(~%recursion_fx%~)
@@ -268,6 +284,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_the_target = $fx_sub_the_target(~%recursion_fx%~)
 						ctx_of_the_target = $fx_sub_of_the_target(~%recursion_fx%~)
 						ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
+						ctx_force_only_for = $fx_sub_only_for(~%recursion_fx%~)
 						ctx_versus = $fx_sub_versus(~%recursion_fx%~)
 					RET
 						recursion_sub_missing = sub_missing
@@ -275,6 +292,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						recursion_sub_text = sub_text
 						recursion_sub_opcode = sub_opcode
 				END
+				SET ctx_ignore_save = recursion_saved_ignore_save
 			END
 			PATCH_IF NOT (~%recursion_sub_missing%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal_nest INT_VAR fx_id = recursion_fx STR_VAR refusal = ~%recursion_sub_missing%~ RET render_late_missing = refusal END
@@ -347,29 +365,20 @@ BEGIN
 END
 
 // Texte de la ligne de l'effet recursion_fx, dont le sous-sort est décrit sous une condition (opcodes
-// 232, 341) : la sous-ligne seule ; plusieurs, chacune sur sa ligne, en retrait, après la condition
-// (ancien add_condition, qui décale les sauts de ligne d'une description commencée par un saut de
-// ligne).
+// 232, 326, 341) : la sous-ligne seule ; plusieurs, chacune sur sa ligne après la condition, que
+// ad_effect_line met en retrait (ancien add_condition).
 DEFINE_PATCH_MACRO ad_recursion_condition_text BEGIN
 	SPRINT line_text $fx_sub_text(~%recursion_fx%~)
 	// Sections de niveaux sans ligne commune : déjà précédées de leurs sauts de ligne.
-	SET recursion_sections_first = INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0
-	PATCH_IF recursion_sections_first BEGIN
-		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
-		END
-	END
-	ELSE PATCH_IF $fx_sub_count(~%recursion_fx%~) > 1 BEGIN
+	PATCH_IF $fx_sub_count(~%recursion_fx%~) > 1 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) != 0 BEGIN
 		SPRINT line_text ~%CRLF%- %line_text%~
-		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-			REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
-		END
 	END
 END
 
 // Lignes des effets heading_opcode dont le sous-sort est décrit sous un en-tête (opcodes 251 et 252,
 // ancien opcode_sub_description_heading) : « Pose un piège : » (chaîne heading_tra), suivi de la
-// sous-ligne, ou de plusieurs en retrait, comme sous une condition (ad_recursion_condition_text).
+// sous-ligne, ou de plusieurs en retrait, comme sous une condition (ancien
+// opcode_sub_description_heading, qui décale tous les sauts de ligne).
 DEFINE_PATCH_MACRO ad_recursion_heading_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%heading_opcode%~)
@@ -378,6 +387,9 @@ DEFINE_PATCH_MACRO ad_recursion_heading_lines BEGIN
 		PATCH_IF NOT $fx_consumed(~%heading_id%~) AND $fx_sub_count(~%heading_id%~) > 0 BEGIN
 			SET recursion_fx = heading_id
 			LPM ad_recursion_condition_text
+			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+				REPLACE_TEXTUALLY ~%CRLF%~ ~%CRLF%  ~
+			END
 			SPRINT line_text ~%heading_name%%AD_COLON%%line_text%~
 			SET line_any_form = 1
 			SET line_no_duration = 1
@@ -403,6 +415,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_depth = 1
 		ctx_casting_level = 0
 		ctx_force_target = 0
+		ctx_force_keep_self = 0
 		ctx_ignore_duration = 0
 		ctx_versus_set = 0
 		ctx_parent_dice = 0
@@ -422,6 +435,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_the_target = ~~
 		ctx_of_the_target = ~~
 		ctx_to_the_target = ~~
+		ctx_force_only_for = ~~
 		ctx_versus = ~~
 	RET
 		sub_missing

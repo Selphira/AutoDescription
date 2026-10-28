@@ -183,7 +183,16 @@ DEFINE_PATCH_MACRO ad_op_232_lines BEGIN
 			SET recursion_fx = condition_id
 			SPRINT spellName $fx_spell_name(~%condition_id%~)
 			PATCH_IF $fx_sub_count(~%condition_id%~) > 1 AND NOT (~%spellName%~ STRING_EQUAL ~~) BEGIN
-				LPM ad_op_232_targets
+				SET condition_type = $fx_parameter2(~%condition_id%~)
+				// Sort lancé sur le porteur sous une condition de distance : les cibles de l'effet (« le
+				// lanceur » d'un sort), comme ses sous-effets.
+				PATCH_IF (condition_type == 8 OR condition_type == 9 OR condition_type == 14) AND $fx_parameter1(~%condition_id%~) == 0 BEGIN
+					SET line_fx = condition_id
+					LPM ad_application_target_strings
+				END
+				ELSE BEGIN
+					LPM ad_op_232_targets
+				END
 				SPRINT line_text @22320001 // ~Lance le sort « %spellName% » sur %theTarget%~
 			END
 			ELSE BEGIN

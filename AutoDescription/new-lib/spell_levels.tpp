@@ -312,8 +312,9 @@ END
 
 // Progressions du bonus du jet de sauvegarde (ancien group_spell_effects_by_saving_throw) : effet
 // semblable à ce bonus près, durée comprise, dont les bonus suivent une formule
-// (ad_spell_level_formula). Les lignes ne l'écrivent pas quand l'en-tête écrit le jet ; sinon,
-// refus tant qu'aucun sort ne le demande.
+// (ad_spell_level_formula). Les lignes ne l'écrivent pas quand l'en-tête écrit le jet ; sinon, la
+// formule devient le bonus de la ligne (fx_level_save, ancien complex_save), refusée si le bonus ne
+// prend que deux valeurs.
 DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 	SET level_skip = AD_SAME_SAVE
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
@@ -328,9 +329,16 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 				SET formula_opcode = 0
 				LPM ad_spell_level_formula
 				PATCH_IF formula_valid OR formula_rank == 2 BEGIN
-					PATCH_IF NOT ctx_ignore_save BEGIN
-						SET level_id = $level_id(~%level_a%~)
-						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:save_progression~ message = ~saving throw bonus varying with the level, written in the line~ RET render_late_missing = refusal END
+					SET level_id = $level_id(~%level_a%~)
+					PATCH_IF NOT ctx_ignore_save AND formula_rank == 2 BEGIN
+						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:save_progression_two_values~ message = ~saving throw bonus taking only two values between the abilities, written in the line~ RET render_late_missing = refusal END
+					END
+					ELSE PATCH_IF NOT ctx_ignore_save BEGIN
+						SPRINT $fx_level_save(~%level_id%~) ~%formula_text%~
+						PATCH_IF formula_base > 0 BEGIN
+							SPRINT value ~%formula_text%~
+							SPRINT $fx_level_save(~%level_id%~) @1200001 // ~+%value%~
+						END
 					END
 					SPRINT level_value_text ~~
 					SPRINT level_duration_text ~~
