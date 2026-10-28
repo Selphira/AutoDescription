@@ -570,6 +570,7 @@ END
 DEFINE_PATCH_MACRO ~clear_opcodes~ BEGIN
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 		CLEAR_ARRAY ~opcodes_%opcode%~
+		SET $opcodes(~%opcode%~) = 0
 	END
 	CLEAR_ARRAY opcodes
 END

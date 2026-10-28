@@ -5105,8 +5105,14 @@ DEFINE_PATCH_MACRO ~opcode_self_101~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_101~ BEGIN
-	LOCAL_SET strref = 400000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	LOCAL_SET strref = 0
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT opcodeStr ~%custom_str%~
+	END
+	ELSE BEGIN
+		SET strref = 400000 + parameter2
+		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11010003 // ~d'être immunisé contre %opcodeStr%~
 	END
@@ -5127,8 +5133,15 @@ DEFINE_PATCH_MACRO ~opcode_target_101~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_101~ BEGIN
-	LOCAL_SET strref = 400000 + parameter2
-	LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	LOCAL_SET strref = 0
+	// Immunités réunies dans un sous-sort lancé sous une probabilité (opcode_101_post_group, POTN21).
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT opcodeStr ~%custom_str%~
+	END
+	ELSE BEGIN
+		SET strref = 400000 + parameter2
+		LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+	END
 	PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
 		SPRINT description @11010004 // ~d'immuniser %theTarget% contre %opcodeStr%~
 	END
