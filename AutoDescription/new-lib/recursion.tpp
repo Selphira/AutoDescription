@@ -7,8 +7,9 @@
 //   l'effet d'un EFF ne la compte pas, comme dans l'ancien moteur (get_res_description) ;
 // - ctx_chain : ressources de la chaîne au-dessus de la sous-ressource, « |RES1|RES2| » (vide pour
 //   la ressource décrite : l'ancien moteur n'y ajoute la ressource parente qu'à sa première
-//   sous-description, recursive_resref) ; ctx_spell_chain, de même pour les seuls sorts : un sort
-//   qui porte le nom d'un EFF de la chaîne n'y est pas une boucle ;
+//   sous-description, recursive_resref) ; ctx_spell_chain, de même pour les seuls sorts, et
+//   ctx_eff_chain pour les seuls EFF : un sort et un EFF de même nom (A7!FATK, qui applique
+//   A7!FATK.EFF) ne forment pas une boucle ;
 // - ctx_force_target : les sous-effets reprennent les chaînes de cible du parent (ctx_the_target,
 //   ctx_of_the_target, ctx_to_the_target), chacun gardant sa forme, soi ou cible (ancien forceTarget,
 //   opcode 146) ; ctx_force_keep_self : sort lancé (146, 232) par la source de l'effet parent, dont les
@@ -54,6 +55,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
 	SPRINT ctx_spell_chain ~|~
+	SPRINT ctx_eff_chain ~|~
 	SPRINT ctx_origin ~~
 	SET ctx_single_effect = 0
 	SPRINT sub_checked ~~
@@ -77,8 +79,8 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~depth~
 	END
-	ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_spell_chain%~) >= 0
-			OR (~%recursion_kind%~ STRING_EQUAL ~eff~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_chain%~) >= 0) BEGIN
+	ELSE PATCH_IF (~%recursion_kind%~ STRING_EQUAL ~spl~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_spell_chain%~) >= 0)
+			OR (~%recursion_kind%~ STRING_EQUAL ~eff~ AND INDEX (CASE_SENSITIVE EXACT_MATCH ~|%recursion_upper%|~ ~%ctx_eff_chain%~) >= 0) BEGIN
 		SET recursion_allowed = 0
 		SPRINT recursion_reason ~loop~
 	END
@@ -494,6 +496,9 @@ DEFINE_PATCH_MACRO ad_describe_subresource_effects BEGIN
 	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
 	PATCH_IF ~%kind%~ STRING_EQUAL ~spl~ BEGIN
 		SPRINT ctx_spell_chain ~%ctx_spell_chain%%ctx_resource%|%sub_resref%|~
+	END
+	ELSE BEGIN
+		SPRINT ctx_eff_chain ~%ctx_eff_chain%%sub_resref%|~
 	END
 	SET ctx_single_effect = ~%kind%~ STRING_EQUAL ~eff~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.%kind%~ BEGIN

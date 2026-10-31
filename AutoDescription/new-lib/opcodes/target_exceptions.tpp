@@ -122,9 +122,9 @@ END
 // inefficace, 112-118 effectif) ; état de sort (76 et 110 inefficace, 111 effectif ; 121, Manteau,
 // ignoré comme dans l'ancien moteur) ; état (138 inefficace, 139 effectif) ; sinon la table, où
 // « chapitre 6 » (136) est la pénurie de fer ; le lanceur (43) n'est pas nommé, l'ancien moteur
-// l'écartant de sa liste (opcode_324_target_exceptions). Refus : type de créature, état ou état de sort sans
-// nom ; ligne des EE au-delà de 145 (l'ancien moteur reprend la condition de l'opcode 326) ou
-// absente de la table (l'ancien moteur n'écrit rien).
+// l'écartant de sa liste (opcode_324_target_exceptions). Type de créature, état ou état de sort sans
+// nom, ligne des EE au-delà de 145 ou absente de la table : l'ancien moteur n'écrit rien, exception
+// journalisée (ad_target_exception_ignored).
 DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 	SET exception_stat = $fx_parameter2_raw(~%exception_id%~)
 	SET exception_value = $fx_parameter1(~%exception_id%~)
@@ -171,7 +171,9 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		SPRINT exception_kind ~NOT_EFFECTIVE~
 	END
 	ELSE PATCH_IF IS_EE AND exception_stat > 145 BEGIN
-		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:condition~ message = ~condition %exception_stat% (above 145) not supported~ RET render_missing = refusal END
+		SPRINT exception_ignored_reason ~condition~
+		SPRINT exception_ignored_message ~condition %exception_stat% (above 145) not supported~
+		LPM ad_target_exception_ignored
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $AD_TARGET_EXCEPTION_KIND(~%exception_stat%~) BEGIN
 		SPRINT exception_kind $AD_TARGET_EXCEPTION_KIND(~%exception_stat%~)
@@ -200,15 +202,30 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		END
 	END
 	ELSE BEGIN
-		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:stat~ message = ~condition %exception_stat% not supported~ RET render_missing = refusal END
+		SPRINT exception_ignored_reason ~stat~
+		SPRINT exception_ignored_message ~condition %exception_stat% not supported~
+		LPM ad_target_exception_ignored
 	END
 	SPRINT $fx_exception_kind(~%exception_id%~) ~%exception_kind%~
 	SET $fx_exception_name_count(~%exception_id%~) = exception_name_count
 END
 
+// Exception sans nom (état de sort ou ligne de splprot.2da propres à un mod) : l'ancien moteur ne
+// l'écrit pas, les lignes qui la suivent restent ; journalisée (raison exception_ignored_reason).
+DEFINE_PATCH_MACRO ad_target_exception_ignored BEGIN
+	PATCH_IF NOT support_header_only BEGIN
+		SET ignored_fx = exception_id
+		SPRINT ignored_reason ~not_implemented:opcode%exception_opcode%:%exception_ignored_reason%~
+		SPRINT ignored_message ~%exception_ignored_message%~
+		LPM ad_log_ignored
+	END
+END
+
 DEFINE_PATCH_MACRO ad_target_exception_add_name BEGIN
 	PATCH_IF ~%exception_name%~ STRING_EQUAL ~~ BEGIN
-		LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:name~ message = ~no name for the excepted creatures~ RET render_missing = refusal END
+		SPRINT exception_ignored_reason ~name~
+		SPRINT exception_ignored_message ~no name for the excepted creatures (condition %exception_stat%, value %exception_value%)~
+		LPM ad_target_exception_ignored
 	END
 	ELSE BEGIN
 		SPRINT $fx_exception_name(~%exception_id%~ ~%exception_name_count%~) ~%exception_name%~
