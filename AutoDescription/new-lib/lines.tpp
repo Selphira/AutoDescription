@@ -6,11 +6,12 @@
 // ligne d'effet probable garde sa probabilité (line_probability, 0 pour une autre ligne), sa plage
 // (line_probability_low, line_probability_high) et son texte sans « N % de chances » (line_core),
 // pour le regroupement par plage (ad_lines_probability_groups) ; line_nested : ligne en retrait sous
-// le titre de son groupe ; line_effect : effet (line_fx) d'une ligne probable.
+// le titre de son groupe ; line_effect : effet (line_fx) d'une ligne probable ; line_composite : ligne
+// d'un groupe de probabilité propre réunie sous la probabilité du parent (0, ou rang dans ce groupe).
 //
 // Tableaux écrits : line_section, line_sort, line_text, line_order, line_probability,
-// line_probability_low, line_probability_high, line_core, line_nested, line_effect ; variable écrite :
-// line_count.
+// line_probability_low, line_probability_high, line_core, line_nested, line_effect, line_composite ;
+// variable écrite : line_count.
 
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
@@ -20,6 +21,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_probability = 0
 	SPRINT line_core ~~
 	SET line_nested = 0
+	SET line_composite = 0
 	SPRINT line_suffix ~~
 	SPRINT line_sentence ~~
 	SPRINT line_condition ~~
@@ -66,6 +68,7 @@ DEFINE_PATCH_MACRO ad_line_append BEGIN
 	END
 	SPRINT $line_core(~%line_count%~) ~%line_core%~
 	SET $line_nested(~%line_count%~) = line_nested
+	SET $line_composite(~%line_count%~) = line_composite
 	SET line_count += 1
 END
 
@@ -106,7 +109,42 @@ DEFINE_PATCH_MACRO ad_lines_opcode_rank BEGIN
 	SET prob_rank = prob_final_rank > 99 ? 99 : prob_final_rank
 END
 
+// Sous-sort d'un effet probable (146, 148 : ctx_base_lines) : ses effets certains ont la plage du
+// parent (fx_parent_probability), ses effets probables gardent la leur, même égale. Comme l'ancien moteur, ces derniers sont d'abord
+// regroupés entre eux (passe intérieure, prob_inner) ; chaque groupe devient une ligne composée
+// (line_composite), à la plage du parent, écrite sous son titre avec les effets certains : « 2 % de
+// chances » puis « 66 % de chances de… », ou « 13 % de chances » et ses lignes en second retrait.
 DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
+	SET prob_inner = 0
+	PATCH_IF ctx_base_probability < 100 AND ctx_base_lines BEGIN
+		SPRINT prob_outer_section ~%prob_section%|outer~
+		FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
+			SPRINT prob_line_section $line_section(~%prob_id%~)
+			PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_probability(~%prob_id%~) > 0 BEGIN
+				SET prob_fx = $line_effect(~%prob_id%~)
+				PATCH_IF $fx_parent_probability(~%prob_fx%~) BEGIN
+					SPRINT $line_section(~%prob_id%~) ~%prob_outer_section%~
+				END
+				ELSE BEGIN
+					SET prob_inner = 1
+				END
+			END
+		END
+		PATCH_IF prob_inner BEGIN
+			LPM ad_lines_probability_pass
+			SET prob_inner = 0
+		END
+		FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
+			SPRINT prob_line_section $line_section(~%prob_id%~)
+			PATCH_IF ~%prob_line_section%~ STRING_EQUAL ~%prob_outer_section%~ BEGIN
+				SPRINT $line_section(~%prob_id%~) ~%prob_section%~
+			END
+		END
+	END
+	LPM ad_lines_probability_pass
+END
+
+DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 	CLEAR_ARRAY prob_keys
 	FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 		SPRINT prob_line_section $line_section(~%prob_id%~)
@@ -210,10 +248,11 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 
 	// Lignes rangées par probabilité décroissante ; à probabilité égale, un titre suit les lignes
 	// seules (SPWI714). Deux titres de même probabilité : l'ancien moteur les range selon l'opcode du
-	// dernier effet lu, connu seulement de lui, refus.
+	// dernier effet lu, connu seulement de lui, refus ; sous la probabilité d'un parent, il les garde
+	// dans l'ordre de leurs plages (PXW7ENER).
 	CLEAR_ARRAY prob_band_titles
 	FOR (seg_s = 0; seg_s < seg_count; ++seg_s) BEGIN
-		PATCH_IF NOT $seg_duplicate(~%seg_s%~) AND $seg_size(~%seg_s%~) > 1 BEGIN
+		PATCH_IF NOT prob_inner AND NOT $seg_duplicate(~%seg_s%~) AND $seg_size(~%seg_s%~) > 1 BEGIN
 			SET prob_band = 100 - $seg_probability(~%seg_s%~)
 			PATCH_IF VARIABLE_IS_SET $prob_band_titles(~%prob_band%~) BEGIN
 				LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable titles of the same probability, whose order the old engine sets differently~ RET render_late_missing = refusal END
@@ -229,40 +268,90 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 		PATCH_IF NOT $seg_duplicate(~%seg_s%~) BEGIN
 			SET value = $seg_probability(~%seg_s%~)
 			SPRINT probability @1200003 // ~%value%%PERCENT%~
-			PATCH_IF $seg_size(~%seg_s%~) == 1 BEGIN
-				SET prob_id = $seg_member(~%seg_s% 0~)
+			SET prob_first = $seg_member(~%seg_s% 0~)
+			PATCH_IF $seg_size(~%seg_s%~) == 1 AND NOT $line_composite(~%prob_first%~) BEGIN
+				SET prob_id = prob_first
 				SPRINT description_saved ~%description%~
 				SPRINT description $line_core(~%prob_id%~)
 				SPRINT line_text @4000000 // ~%probability% de chances %description%~
 				SPRINT description ~%description_saved%~
 				SET line_sort = $line_sort(~%prob_id%~)
 				SET line_nested = 0
-				LPM ad_line_append
+				// Ligne seule d'un groupe intérieur : par probabilité décroissante, égalités inversées.
+				SET prob_composite = (100 - value) * 10000 + 5000 - seg_s
+				LPM ad_lines_probability_emit
 			END
 			ELSE BEGIN
 				SET line_sort = (100 - value) * 10000 + 9999 - $seg_size(~%seg_s%~)
 				SPRINT line_text @4000001 // ~%probability% de chances~
 				SET line_nested = 0
-				LPM ad_line_append
+				SPRINT prob_composite_text ~%line_text%~
+				PATCH_IF NOT prob_inner BEGIN
+					LPM ad_line_append
+				END
 				SET line_nested = 1
 				// Lignes d'un sort lancé par un effet probable (146, 148) : l'ancien moteur les écrit dans
-				// l'ordre de leurs rangs, sous la ligne de l'effet (SPPR450).
+				// l'ordre de leurs rangs, sous la ligne de l'effet (SPPR450) ; sous ce titre, les lignes
+				// seules d'un groupe intérieur d'abord, puis les effets certains, puis les titres intérieurs.
 				CLEAR_ARRAY prob_nested
 				FOR (seg_k = 0; seg_k < $seg_size(~%seg_s%~); ++seg_k) BEGIN
 					SET prob_id = $seg_member(~%seg_s% %seg_k%~)
-					SET prob_nested_key = ctx_base_lines ? $line_sort(~%prob_id%~) * 100 + seg_k : seg_k
+					SET prob_member_composite = $line_composite(~%prob_id%~)
+					PATCH_IF prob_member_composite > 0 AND prob_member_composite < 1000000 BEGIN
+						SET prob_nested_key = prob_member_composite
+					END
+					ELSE PATCH_IF prob_member_composite >= 1000000 BEGIN
+						SET prob_nested_key = 2000000000 + prob_member_composite - 1000000
+					END
+					ELSE BEGIN
+						SET prob_nested_key = ctx_base_lines AND NOT prob_inner ? 1000000000 + $line_sort(~%prob_id%~) * 100 + seg_k : seg_k
+					END
 					SET $prob_nested(~%prob_nested_key%~) = prob_id
 				END
 				SORT_ARRAY_INDICES prob_nested NUMERICALLY
+				SET prob_title_sort = line_sort
 				PHP_EACH prob_nested AS _ => prob_id BEGIN
 					SPRINT line_text $line_core(~%prob_id%~)
-					SET line_sort += 1
-					LPM ad_line_append
+					PATCH_IF prob_inner BEGIN
+						SPRINT prob_composite_text ~%prob_composite_text%%CRLF%    - %line_text%~
+					END
+					ELSE BEGIN
+						SET line_sort += 1
+						LPM ad_line_append
+					END
+				END
+				PATCH_IF prob_inner BEGIN
+					SET line_sort = prob_title_sort
+					SET line_nested = 0
+					SPRINT line_text ~%prob_composite_text%~
+					// Titres intérieurs : par probabilité décroissante, égalités dans l'ordre des plages.
+					SET prob_composite = 1000000 + (100 - value) * 1000 + seg_s
+					LPM ad_lines_probability_emit
 				END
 			END
 		END
 	END
 	SET line_nested = 0
+END
+
+// Ligne d'un segment (line_text, line_sort) : écrite telle quelle, ou, dans la passe intérieure, ligne
+// composée à la plage du parent, de rang prob_composite sous son titre.
+DEFINE_PATCH_MACRO ad_lines_probability_emit BEGIN
+	PATCH_IF prob_inner BEGIN
+		SET line_fx = $line_effect(~%prob_first%~)
+		SET line_probability = ctx_base_probability
+		SET line_probability_low = ctx_base_low
+		SET line_probability_high = ctx_base_high
+		SPRINT line_core ~%line_text%~
+		SET line_composite = prob_composite
+		LPM ad_line_append
+		SET line_probability = 0
+		SPRINT line_core ~~
+		SET line_composite = 0
+	END
+	ELSE BEGIN
+		LPM ad_line_append
+	END
 END
 
 // Passage de tri de la section line_pass_section : ses lignes prennent l'ordre que leur donne un tri

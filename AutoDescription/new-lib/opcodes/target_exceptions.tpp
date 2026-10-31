@@ -269,7 +269,8 @@ END
 // Texte des exceptions de l'effet line_fx (ancien opcode_324_target_exceptions), vide sans
 // exception nommée. Probabilité de chaque exception : la sienne, ou, pour un effet probable dont la
 // plage recouvre la sienne, 100 % si une borne est commune, sinon la part de la plage commune dans
-// celle de l'effet. Exceptions groupées par probabilité décroissante, « à 91 % » devant une
+// celle de l'effet ; un effet ou une exception certains d'un sous-sort, qui ont reçu la probabilité du
+// parent, comptent pour certains (l'ancien moteur lit leurs plages propres). Exceptions groupées par probabilité décroissante, « à 91 % » devant une
 // probabilité partielle ; « Efficace… » (conditions, puis types de créatures), puis
 // « Inefficace… » (types de créatures, plages horaires, conditions), séparés par un point.
 DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
@@ -278,7 +279,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	SPRINT exc_and_the @2002001 // ~et les~
 	SPRINT exc_effective_and ~%exc_and_the%~
 	SPRINT exc_not_effective_and ~%exc_and_the%~
-	SET exc_base = $fx_probability(~%line_fx%~)
+	SET exc_base = $fx_parent_probability(~%line_fx%~) ? 100 : $fx_probability(~%line_fx%~)
 	SET exc_base_high = $fx_probability1(~%line_fx%~)
 	SET exc_base_low = $fx_probability2(~%line_fx%~)
 	SPRINT exc_scope $fx_scope(~%line_fx%~)
@@ -291,7 +292,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 		PATCH_IF $fx_exception(~%exc_id%~) AND (~%exc_id_scope%~ STRING_EQUAL ~%exc_scope%~) AND $fx_position(~%exc_id%~) < exc_position BEGIN
 			SET exc_high = $fx_probability1(~%exc_id%~)
 			SET exc_low = $fx_probability2(~%exc_id%~)
-			SET exc_probability = $fx_probability(~%exc_id%~)
+			SET exc_probability = $fx_parent_probability(~%exc_id%~) ? 100 : $fx_probability(~%exc_id%~)
 			PATCH_IF exc_base < 100 AND exc_base_high >= exc_low AND exc_base_low <= exc_high BEGIN
 				PATCH_IF exc_base_high == exc_high OR exc_base_low == exc_low BEGIN
 					SET exc_probability = 100

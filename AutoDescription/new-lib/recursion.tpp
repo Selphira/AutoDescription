@@ -539,17 +539,21 @@ DEFINE_PATCH_MACRO ad_recursion_finish BEGIN
 END
 
 // Probabilité du parent (ctx_base_probability, sa plage ctx_base_low-ctx_base_high) donnée aux
-// sous-effets certains : l'ancien moteur la multiplie par la leur (baseProbability). Refus : sous-effet
-// probable (l'ancien moteur garde alors sa plage pour le regroupement, mais écrit le produit).
+// sous-effets certains (ancien baseProbability). Un sous-effet probable garde la sienne, écrite sous
+// celle du parent (ad_lines_probability_groups) : seulement avec ctx_base_lines (opcodes 146 et 148),
+// refus sinon.
 DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 	FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
 		PATCH_IF $fx_probability(~%sub_fx%~) < 100 BEGIN
-			LPF ad_refusal INT_VAR fx_id = sub_fx STR_VAR reason = ~not_implemented:recursion:probability_product~ message = ~probable effect under a probable parent effect~ RET sub_missing = refusal END
+			PATCH_IF NOT ctx_base_lines BEGIN
+				LPF ad_refusal INT_VAR fx_id = sub_fx STR_VAR reason = ~not_implemented:recursion:probability_product~ message = ~probable effect under a probable parent effect~ RET sub_missing = refusal END
+			END
 		END
 		ELSE BEGIN
 			SET $fx_probability(~%sub_fx%~) = ctx_base_probability
 			SET $fx_probability_low(~%sub_fx%~) = ctx_base_low
 			SET $fx_probability_high(~%sub_fx%~) = ctx_base_high
+			SET $fx_parent_probability(~%sub_fx%~) = 1
 		END
 	END
 END
