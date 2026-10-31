@@ -28,12 +28,26 @@ BEGIN
 		            SET target = TARGET_FX_self
 		        END
 
+				// Sous un parent probable, un effet certain prend la forme probable (« de… ») sans la probabilité
+				// du parent, que la ligne parente écrit ; un effet probable garde la sienne, emboîtée sous celle
+				// du parent (« 2 % de chances » puis « 66 % de chances de… »).
 				SET oldProbability = probability
-				PATCH_IF baseProbability != 100 BEGIN
-		            SET probability = probability * baseProbability / 100
+				PATCH_IF baseProbability != 100 AND probability == 100 BEGIN
+		            SET probability = baseProbability
 		        END
 				PATCH_TIME ~step:get_effect_description:item=%isItem%:subspell=%isSubSpell%~ BEGIN
 					LPF ~get_effect_description~ INT_VAR ignoreDuration ignoreSavingThrow forceTarget projectile projectileTarget projectileTargetNumber RET effectDescription = description sort END
+				END
+				// Probabilité du parent retirée où qu'elle soit (après la condition d'un 232 : « Lorsque le
+				// porteur est touché; de… »).
+				PATCH_IF baseProbability != 100 AND oldProbability == 100 BEGIN
+					SPRINT regex @10019 // ~[0-9]+ % de chances ~
+					INNER_PATCH_SAVE regex ~%regex%~ BEGIN
+						REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~[0-9]+~ ~%baseProbability%~
+					END
+					INNER_PATCH_SAVE effectDescription ~%effectDescription%~ BEGIN
+						REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+					END
 				END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET probability = oldProbability
