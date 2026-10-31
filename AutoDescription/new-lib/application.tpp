@@ -25,11 +25,13 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 			SPRINT app_timing_kind $fx_timing_kind(~%app_id%~)
 			PATCH_IF ~%app_block%~ STRING_EQUAL ~equipped~ BEGIN
 				SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
-				// Effet d'équipement permanent : l'ancien moteur l'écrit comme un effet tant que l'objet est
-				// équipé quand la durée de l'opcode n'est jamais affichée.
+				// Effet d'équipement permanent, même après la mort : l'ancien moteur l'écrit comme un effet tant
+				// que l'objet est équipé quand la durée de l'opcode n'est jamais affichée, ou jamais dite
+				// permanente (get_duration_value, opcodes_cant_be_permanent : sort lancé à l'équipement).
 				SET app_equipped_timing = (~%app_timing_kind%~ STRING_EQUAL ~while_equipped~)
-					OR ((~%app_timing_kind%~ STRING_EQUAL ~permanent~)
-						AND ((~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)))
+					OR (((~%app_timing_kind%~ STRING_EQUAL ~permanent~) OR (~%app_timing_kind%~ STRING_EQUAL ~permanent_after_death~))
+						AND ((~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) OR (~%app_duration_kind%~ STRING_EQUAL ~HIDDEN~)
+							OR (~%app_duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~)))
 				// Durée limitée nulle : l'ancien opcode_is_valid écarte l'effet (avertissement journalisé).
 				PATCH_IF $fx_timing(~%app_id%~) == TIMING_duration AND $fx_duration(~%app_id%~) <= 0
 						AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
