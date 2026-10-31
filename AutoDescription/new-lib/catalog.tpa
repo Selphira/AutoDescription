@@ -624,6 +624,14 @@ LAF ad_read_mod_ignored
 	RET_ARRAY AD_MOD_IGNORED_EXACT AD_MOD_IGNORED_PARTIAL AD_MOD_IGNORED_PARTIAL_COUNT AD_MOD_IGNORED_SPLPROT AD_MOD_IGNORED_SPLSTATE
 END
 
+// Groupes de classes (valeurs de class.ids) nommés quand toutes leurs classes sont visées par les
+// types de créature d'un effet (ancien opcode_set_target_strings), dans l'ordre où l'ancien moteur
+// les essaie : une classe réunie ne compte plus pour le groupe suivant.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_VERSUS_CLASS_GROUPS BEGIN
+	~|1|7|10|13|14|17|~ => 2002050 // ~mages monoclassés et multiclassés~
+	~|4|9|10|13|15|~    => 2002051 // ~voleurs monoclassés et multiclassés~
+END
+
 // Noms des kits du jeu (EE, kitlist.2da, ancien tableau kits) : $AD_KIT_NAMES(valeur de kit.ids) =
 // nom de la colonne MIXED, au singulier (« Archer »).
 DEFINE_ACTION_FUNCTION ad_read_kit_names

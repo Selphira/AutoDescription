@@ -130,6 +130,8 @@
 @2002031 = ~uniquement pour le kit %targetType%~ // reprise de @11770002
 @2002032 = ~uniquement pour les kits %targetType%~ // reprise de @11770003
 @2002040 = ~%outerType% qui sont aussi des %innerType%~ // reprise de @11770210
+@2002050 = ~mages monoclassés et multiclassés~ // reprise de @11770100
+@2002051 = ~voleurs monoclassés et multiclassés~ // reprise de @11770101
 
 // Restriction de niveau de la cible (ancien add_target_level) : 0 un niveau, 1 au plus, 2 au moins, 3 de… à… (2 003 000-2 003 009)
 @2003000 = ~%target% (de niveau %levelMin%)~ // reprise de @101186

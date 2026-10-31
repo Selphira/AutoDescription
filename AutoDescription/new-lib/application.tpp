@@ -593,18 +593,16 @@ END
 // « soi », line_only_for « uniquement pour les X… » finit la ligne (ancien add_only_for) ; versus
 // n'est écrit que pour un tel effet (la ligne de classe d'armure de l'opcode 0 a le sien). Refus
 // (render_late_missing) : effet réuni à un effet sans type de créature (l'ancien moteur l'écrirait
-// pour les deux) ; valeur sans nom ; classes que l'ancien moteur réunit sous un seul nom (mages,
-// voleurs, monoclassés et multiclassés) ; cible d'une zone (l'ancien moteur y écrit la zone, comme
+// pour les deux) ; valeur sans nom ; cible d'une zone (l'ancien moteur y écrit la zone, comme
 // BUG-032) ; restriction de niveau. Une valeur sans nom (OHBREW04 : 100 de SPECIFIC.IDS) est décrite
-// sans type de créature, comme dans l'ancien moteur, erreur journalisée. Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
+// sans type de créature, comme dans l'ancien moteur, erreur journalisée. Les classes d'un groupe de AD_VERSUS_CLASS_GROUPS sont réunies sous son nom (ad_application_versus_class_groups). Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
 // garde ses chaînes et la ligne finit par « uniquement pour le kit Archer » (« … les kits Bretteur et
 // Maître-lames ») ; refusé à une autre forme que « soi » ou avec un autre type de créature.
 DEFINE_PATCH_MACRO ad_application_versus BEGIN
 	SET app_versus_count = 0
 	SET app_versus_kits = 0
 	SET app_versus_plain = 0
-	SET app_versus_mages = 0
-	SET app_versus_thieves = 0
+	SPRINT app_versus_classes ~|~
 	CLEAR_ARRAY app_versus_names
 	FOR (app_member = line_fx; app_member < fx_count; ++app_member) BEGIN
 		PATCH_IF $fx_identical_anchor(~%app_member%~) == line_fx BEGIN
@@ -645,14 +643,15 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 					SPRINT $app_versus_names(~%app_versus_name%~) ~%app_versus_name%~
 					SET app_versus_count += 1
 				END
-				PATCH_IF app_versus_file == 5 BEGIN
-					SET app_versus_mages = app_versus_mages BOR ((app_versus_value == 1) + 2 * (app_versus_value == 7) + 4 * (app_versus_value == 10)
-						+ 8 * (app_versus_value == 13) + 16 * (app_versus_value == 14) + 32 * (app_versus_value == 17))
-					SET app_versus_thieves = app_versus_thieves BOR ((app_versus_value == 4) + 2 * (app_versus_value == 9) + 4 * (app_versus_value == 10)
-						+ 8 * (app_versus_value == 13) + 16 * (app_versus_value == 15))
+				PATCH_IF app_versus_file == 5 AND NOT (~%app_versus_name%~ STRING_EQUAL ~~) BEGIN
+					SPRINT app_versus_classes ~%app_versus_classes%%app_versus_value%|~
+					SPRINT $app_versus_class_name(~%app_versus_value%~) ~%app_versus_name%~
 				END
 			END
 		END
+	END
+	PATCH_IF app_versus_count > 0 BEGIN
+		LPM ad_application_versus_class_groups
 	END
 	// Sous-effet d'un sort lancé par l'opcode 232 : l'ancien moteur y fixe versus à la cible de l'opcode,
 	// ou à vide pour une condition de distance (BUG-038).
@@ -665,9 +664,6 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 	PATCH_IF app_versus_count > 0 BEGIN
 		PATCH_IF app_versus_plain BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:mixed~ message = ~identical effects with and without a creature type~ RET render_late_missing = refusal END
-		END
-		ELSE PATCH_IF app_versus_mages == 63 OR app_versus_thieves == 31 BEGIN
-			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:class_group~ message = ~creature types covering all mage or thief classes~ RET render_late_missing = refusal END
 		END
 		ELSE PATCH_IF $fx_area_target(~%line_fx%~) BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:area~ message = ~creature type with targets named after the area of the projectile~ RET render_late_missing = refusal END
@@ -731,6 +727,54 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			PATCH_IF line_form == 0 OR line_form == 2 BEGIN
 				SPRINT line_only_for ~%app_versus_only_for%~
 			END
+		END
+	END
+END
+
+// Groupes de classes (AD_VERSUS_CLASS_GROUPS) : quand toutes leurs classes sont visées, leur nom les
+// remplace en tête de la liste app_versus_names, les autres types à la suite (« les mages monoclassés et
+// multiclassés et les bardes »), comme l'ancien opcode_set_target_strings. Les marqueurs sont remis à 0
+// avant d'être vidés, CLEAR_ARRAY laissant les entrées lisibles (V36).
+DEFINE_PATCH_MACRO ad_application_versus_class_groups BEGIN
+	PHP_EACH app_versus_class_member AS app_versus_key => _ BEGIN
+		SET $app_versus_class_member(~%app_versus_key%~) = 0
+	END
+	CLEAR_ARRAY app_versus_class_member
+	CLEAR_ARRAY app_versus_grouped
+	SET app_versus_group_count = 0
+	PHP_EACH AD_VERSUS_CLASS_GROUPS AS app_group_classes => app_group_tra BEGIN
+		SET app_group_complete = 1
+		INNER_PATCH ~%app_group_classes%~ BEGIN
+			REPLACE_EVALUATE CASE_SENSITIVE ~|\([0-9]+\)~ BEGIN
+				PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~|%MATCH1%|~ ~%app_versus_classes%~) < 0 BEGIN
+					SET app_group_complete = 0
+				END
+			END ~%MATCH0%~
+		END
+		PATCH_IF app_group_complete BEGIN
+			INNER_PATCH ~%app_group_classes%~ BEGIN
+				REPLACE_EVALUATE CASE_SENSITIVE ~|\([0-9]+\)~ BEGIN
+					INNER_PATCH_SAVE app_versus_classes ~%app_versus_classes%~ BEGIN
+						REPLACE_TEXTUALLY EXACT_MATCH ~|%MATCH1%|~ ~|~
+					END
+					SPRINT app_group_member $app_versus_class_name(~%MATCH1%~)
+					SET $app_versus_class_member(~%app_group_member%~) = 1
+				END ~%MATCH0%~
+			END
+			LPF ad_tra INT_VAR tra_id = app_group_tra RET app_group_name = text END
+			SPRINT $app_versus_grouped(~%app_group_name%~) ~%app_group_name%~
+			SET app_versus_group_count += 1
+		END
+	END
+	PATCH_IF app_versus_group_count > 0 BEGIN
+		PHP_EACH app_versus_names AS app_versus_key => app_versus_text BEGIN
+			PATCH_IF NOT (VARIABLE_IS_SET $app_versus_class_member(~%app_versus_key%~) AND $app_versus_class_member(~%app_versus_key%~)) BEGIN
+				SPRINT $app_versus_grouped(~%app_versus_key%~) ~%app_versus_text%~
+			END
+		END
+		CLEAR_ARRAY app_versus_names
+		PHP_EACH app_versus_grouped AS app_versus_key => app_versus_text BEGIN
+			SPRINT $app_versus_names(~%app_versus_key%~) ~%app_versus_text%~
 		END
 	END
 END
