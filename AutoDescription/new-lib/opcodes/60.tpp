@@ -30,21 +30,7 @@ DEFINE_PATCH_MACRO ad_op_60_lines BEGIN
 				SPRINT percent @1200003 // ~%value%%PERCENT%~
 				SET line_phrase = 20600100 // ~Provoque l'échec de %percent% des sorts~
 				PATCH_IF failure_types != 7 BEGIN
-					CLEAR_ARRAY failure_names
-					SET failure_count = 0
-					FOR (failure_bit = 0; failure_bit < 3; ++failure_bit) BEGIN
-						PATCH_IF (failure_types BAND (1 << failure_bit)) != 0 BEGIN
-							LPF ad_tra INT_VAR tra_id = 8020000 + failure_bit tra_block_start = 8020000 tra_block_size = 10 RET failure_name = text END // ~profanes~
-							SPRINT $failure_names(~%failure_count%~) ~%failure_name%~
-							SET failure_count += 1
-							// Les sorts divins sont ceux des clercs et des druides (ancien get_spell_type_str).
-							PATCH_IF failure_bit == 1 BEGIN
-								SPRINT $failure_names(~%failure_count%~) @8020004 // ~druidiques~
-								SET failure_count += 1
-							END
-						END
-					END
-					LPF ad_join STR_VAR array_name = ~failure_names~ RET spellType = text END
+					LPF ad_spell_types_text INT_VAR types = failure_types RET spellType = text END
 					SET line_phrase = 20600110 // ~Provoque l'échec de %percent% des sorts %spellType%~
 				END
 				SET line_fx = failure_id

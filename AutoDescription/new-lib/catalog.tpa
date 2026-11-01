@@ -178,10 +178,7 @@ END
 // charge, on ne sait pas quels effets il garde, ni donc l'en-tête d'un sort qui en a
 // (new-lib/spell_header.tpp). Un opcode qui passe à DESCRIBED sort de cette liste.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
-	57 => 1 99 => 1 105 => 1 108 => 1 181 => 1 183 => 1 199 => 1
-	223 => 1 227 => 1 228 => 1
-	266 => 1 323 => 1
-	329 => 1 333 => 1 340 => 1 361 => 1 362 => 1
+	183 => 1 333 => 1
 END
 
 // Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien
@@ -379,7 +376,7 @@ END
 // valeur (fx_level_value) ; une progression d'un autre opcode est refusée tant que ses lignes ne
 // la lisent pas (new-lib/spell_levels.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_VALUE_OPCODES BEGIN
-	0 => 1 12 => 1 15 => 1 17 => 1 18 => 1 22 => 1 33 => 1 34 => 1 35 => 1 36 => 1 37 => 1 44 => 1 54 => 1 73 => 1 278 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1 325 => 1
+	0 => 1 12 => 1 15 => 1 17 => 1 18 => 1 22 => 1 33 => 1 34 => 1 35 => 1 36 => 1 37 => 1 44 => 1 54 => 1 73 => 1 278 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1 325 => 1 108 => 1 323 => 1
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1
 	502 => 1 503 => 1 504 => 1
 END
@@ -408,6 +405,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	96  => 8000034 // ~Niveau~
 	97  => 8000037 // ~Force exceptionnelle~
 	104 => 8000044 // ~Expérience~
+	105 => 21050002 // ~la quantité de pièces d'or~ (ligne propre à l'opcode)
+	108 => 21080000 // ~Réputation du personnage~
 	126 => 21260000 // ~Vitesse de déplacement~
 	131 => 8000032 // ~Chance~
 	132 => 21320000 // ~Force, dextérité et constitution~
@@ -433,6 +432,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	288 => 22880000 // ~TAC0 à mains nues~
 	289 => 22890000 // ~Dégâts à mains nues~
 	305 => 23050000 // ~TAC0 de la main secondaire~
+	323 => 23230000 // ~Niveau de Repousser les morts-vivants~
 	325 => 23250000 // ~Jets de sauvegarde~
 	306 => 23060000 // ~TAC0 de la main principale~
 	345 => 23450000 // ~Niveau d'enchantement~

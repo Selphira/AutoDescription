@@ -1668,6 +1668,74 @@
 @8170004 = ~trésor aléatoire de qualité supérieure~ // reprise de @100404
 @8170005 = ~trésor aléatoire de qualité exceptionnelle~ // reprise de @100405
 
+// Noms au pluriel des types d'objets (itemcat.ids, en-tête des objets), 8 180 000 + type (0-73) ; un type sans chaîne n'a pas de nom (opcodes 181, 183) (8 180 000-8 180 999)
+@8180000 = ~livres~ // reprise de @230000
+@8180001 = ~amulettes et les colliers~ // reprise de @230001
+@8180002 = ~armures~ // reprise de @230002
+@8180003 = ~ceintures~ // reprise de @230003
+@8180004 = ~bottes~ // reprise de @230004
+@8180005 = ~flèches~ // reprise de @230005
+@8180006 = ~bracelets et les gantelets~ // reprise de @230006
+@8180007 = ~casques~ // reprise de @230007
+@8180008 = ~clés~ // reprise de @230008
+@8180009 = ~potions~ // reprise de @230009
+@8180010 = ~anneaux~ // reprise de @230010
+@8180011 = ~parchemins~ // reprise de @230011
+@8180012 = ~boucliers~ // reprise de @230012
+@8180013 = ~nourritures~ // reprise de @230013
+@8180014 = ~billes~ // reprise de @230014
+@8180015 = ~arcs~ // reprise de @230015
+@8180016 = ~dagues~ // reprise de @230016
+@8180017 = ~masses~ // reprise de @230017
+@8180018 = ~frondes~ // reprise de @230018
+@8180019 = ~épées courtes~ // reprise de @230019
+@8180020 = ~épées longues~ // reprise de @230020
+@8180021 = ~marteaux~ // reprise de @230021
+@8180022 = ~étoiles du matin~ // reprise de @230022
+@8180023 = ~fléaux~ // reprise de @230023
+@8180024 = ~fléchettes~ // reprise de @230024
+@8180025 = ~haches~ // reprise de @230025
+@8180026 = ~bâtons~ // reprise de @230026
+@8180027 = ~arbalètes~ // reprise de @230027
+@8180028 = ~poings~ // reprise de @230028
+@8180029 = ~lances~ // reprise de @230029
+@8180030 = ~hallebardes~ // reprise de @230030
+@8180031 = ~carreaux~ // reprise de @230031
+@8180032 = ~capes~ // reprise de @230032
+@8180033 = ~pièces d'or~ // reprise de @230033
+@8180034 = ~gemmes~ // reprise de @230034
+@8180035 = ~baguettes~ // reprise de @230035
+@8180036 = ~conteneurs, yeux et armures cassées~ // reprise de @230036
+@8180037 = ~boucliers cassés et les bracelets~ // reprise de @230037
+@8180038 = ~familiers, épées cassées et boucles d'oreilles~ // reprise de @230038
+@8180039 = ~tatouages~ // reprise de @230039
+@8180040 = ~lentilles~ // reprise de @230040
+@8180041 = ~boucliers et les dents~ // reprise de @230041
+@8180042 = ~bougies~ // reprise de @230042
+@8180043 = ~clubs~ // reprise de @230043
+@8180047 = ~grands boucliers~ // reprise de @230047
+@8180049 = ~boucliers moyens~ // reprise de @230049
+@8180050 = ~notes~ // reprise de @230050
+@8180053 = ~petits boucliers~ // reprise de @230053
+@8180055 = ~télescopes~ // reprise de @230055
+@8180056 = ~boissons~ // reprise de @230056
+@8180057 = ~épées longues~ // reprise de @230057
+@8180058 = ~conteneurs~ // reprise de @230058
+@8180059 = ~peaux et les fourrures~ // reprise de @230059
+@8180060 = ~armures de cuir~ // reprise de @230060
+@8180061 = ~armures de cuir clouté~ // reprise de @230061
+@8180062 = ~armures en cotte de mailles~ // reprise de @230062
+@8180063 = ~armures feuilletées~ // reprise de @230063
+@8180064 = ~armures de plate~ // reprise de @230064
+@8180065 = ~armures de plate complète~ // reprise de @230065
+@8180066 = ~armures de peau~ // reprise de @230066
+@8180067 = ~robes~ // reprise de @230067
+@8180069 = ~épées bâtardes~ // reprise de @230069
+@8180070 = ~écharpes~ // reprise de @230070
+@8180071 = ~nourritures~ // reprise de @230071
+@8180072 = ~chapeaux~ // reprise de @230072
+@8180073 = ~gantelets~ // reprise de @230073
+
 // Opcode 0, classe d'armure : libellés (20 000 000-20 000 099)
 @20000000 = ~Classe d'armure~ // reprise de @10000099
 @20000001 = ~Classe d'armure de base~ // reprise de @10000100
@@ -2044,6 +2112,21 @@
 @20560102 = ~d'inverser l'alignement %ofTheTarget%~ // reprise de @10560002
 @20560103 = ~d'inverser l'alignement %ofTheTarget%~ // reprise de @10560002
 
+// Opcode 57 : Changement d'alignement : 0017-0051 alignements (parameter2), phrases 0100 (20 570 000-20 570 999)
+@20570017 = ~loyal bon~ // @101004 et @101002, comme l'ancien opcode_57_common
+@20570018 = ~loyal neutre~ // @101004 et @101003, comme l'ancien opcode_57_common
+@20570019 = ~loyal mauvais~ // @101004 et @101001, comme l'ancien opcode_57_common
+@20570033 = ~neutre bon~ // @101003 et @101002, comme l'ancien opcode_57_common
+@20570034 = ~neutre strict~ // reprise de @10570004
+@20570035 = ~neutre mauvais~ // @101003 et @101001, comme l'ancien opcode_57_common
+@20570049 = ~chaotique bon~ // @101000 et @101002, comme l'ancien opcode_57_common
+@20570050 = ~chaotique neutre~ // @101000 et @101003, comme l'ancien opcode_57_common
+@20570051 = ~chaotique mauvais~ // @101000 et @101001, comme l'ancien opcode_57_common
+@20570100 = ~Alignement modifié en %alignment%~ // reprise de @10570001
+@20570101 = ~Modifie l'alignement %ofTheTarget% en %alignment%~ // reprise de @10570003
+@20570102 = ~de modifier l'alignement %ofTheTarget% en %alignment%~ // reprise de @10570002
+@20570103 = ~de modifier l'alignement %ofTheTarget% en %alignment%~ // reprise de @10570002
+
 // Opcode 58 : Dissipation de la magie : 0001 niveau du lanceur, 0002-0003 armes invoquées ; phrases 0100, 0110 inéluctable (20 580 000-20 580 999)
 @20580001 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
 @20580002 = ~les armes invoquées ne sont pas affectées~ // reprise de @10580005
@@ -2326,6 +2409,32 @@
 @20980112 = ~de régénérer %amount% points de vie %strDuration% %toTheTarget%~ // reprise de @10980012
 @20980113 = ~de régénérer %amount% points de vie %strDuration% %toTheTarget%~ // reprise de @10980012
 
+// Opcode 99 : Durée des sorts : phrases 0100 + 10 × variante (0 durée nulle, 1 réduite, 2 allongée ; + 3 chants du barde) (20 990 000-20 990 999)
+@20990100 = ~Réduit à néant la durée des sorts %spellType%~ // reprise de @10990001
+@20990101 = ~Réduit à néant la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990011
+@20990102 = ~de réduire à néant la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990021
+@20990103 = ~de réduire à néant la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990021
+@20990110 = ~Réduit de %duration% la durée des sorts %spellType%~ // reprise de @10990003
+@20990111 = ~Réduit de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990013
+@20990112 = ~de réduire de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990023
+@20990113 = ~de réduire de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990023
+@20990120 = ~Allonge de %duration% la durée des sorts %spellType%~ // reprise de @10990005
+@20990121 = ~Allonge de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990015
+@20990122 = ~d'allonger de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990025
+@20990123 = ~d'allonger de %duration% la durée des sorts %spellType% %ofTheTarget%~ // reprise de @10990025
+@20990130 = ~Réduit à néant la durée des chants de barde~ // reprise de @10990002
+@20990131 = ~Réduit à néant la durée des chants de barde %ofTheTarget%~ // reprise de @10990012
+@20990132 = ~de réduire à néant la durée des chants de barde %ofTheTarget%~ // reprise de @10990022
+@20990133 = ~de réduire à néant la durée des chants de barde %ofTheTarget%~ // reprise de @10990022
+@20990140 = ~Réduit de %duration% la durée des chants de barde~ // reprise de @10990004
+@20990141 = ~Réduit de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990014
+@20990142 = ~de réduire de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990024
+@20990143 = ~de réduire de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990024
+@20990150 = ~Allonge de %duration% la durée des chants de barde~ // reprise de @10990006
+@20990151 = ~Allonge de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990016
+@20990152 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990026
+@20990153 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990026
+
 // Opcode 100 : Protection contre un type de créature : phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
 @21000100 = ~Immunité contre les attaques et les sorts des %creatureType%~ // reprise de @11000001
 @21000101 = ~Immunise %theTarget% contre les attaques et les sorts des %creatureType%~ // reprise de @11000003
@@ -2353,6 +2462,13 @@
 @21020122 = ~d'immuniser %theTarget% contre les sorts~ // reprise de @15090002
 @21020123 = ~d'immuniser %theTarget% contre les sorts~ // reprise de @15090002
 
+// Opcode 105 : Or : 0002 statistique, phrases 0100 or retiré (21 050 000-21 050 999)
+@21050002 = ~la quantité de pièces d'or~ // reprise de @11050001
+@21050100 = ~Déleste %theTarget% de tout son or~ // reprise de @11050003
+@21050101 = ~Déleste %theTarget% de tout son or~ // reprise de @11050003
+@21050102 = ~de délester %theTarget% de tout son or~
+@21050103 = ~de délester %theTarget% de tout son or~
+
 // Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
 @21060100 = ~Immunité contre la panique~ // reprise de @11060004
 @21060101 = ~Immunité contre la panique~ // reprise de @11060004
@@ -2374,6 +2490,12 @@
 @21060141 = ~Le moral %ofTheTarget% est affaibli de %value%~ // reprise de @11060003
 @21060142 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
 @21060143 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
+
+// Opcode 108 : Réputation : 0000-0002 du personnage, 0003-0005 du groupe (21 080 000-21 080 999)
+@21080000 = ~Réputation du personnage~ // reprise de @11080003
+@21080002 = ~la réputation du personnage~ // reprise de @11080004
+@21080003 = ~Réputation du groupe~ // reprise de @11080005
+@21080005 = ~la réputation du groupe~ // reprise de @11080006
 
 // Opcode 109 : Paralysie : phrases 0100 paralysie, 0110 type de créature nommé (21 090 000-21 090 999)
 @21090100 = ~Paralyse %theTarget%~ // reprise de @11090002
@@ -2807,6 +2929,9 @@
 // Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
 @21800100 = ~Unique%AD_COLON%Un seul exemplaire peut être équipé~ // reprise de @11800001
 
+// Opcode 181 : Type d'objet interdit : phrase 0100, forme « soi » seulement (21 810 000-21 810 999)
+@21810100 = ~Empêche d'utiliser les %itemType%~ // reprise de @11810001
+
 // Opcode 185 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 850 000-21 850 999)
 @21850100 = ~Paralyse %theTarget%~ // reprise de @11090002
 @21850101 = ~Paralyse %theTarget%~ // reprise de @11090002
@@ -2861,6 +2986,12 @@
 @21970101 = ~Renvoie %the% %projectiles% visant %theTarget%~ // reprise de @11970002
 @21970102 = ~de renvoyer %the% %projectiles%~ // reprise de @11970003
 @21970103 = ~de renvoyer %the% %projectiles% visant %theTarget%~ // reprise de @11970004
+
+// Opcode 199 : Renvoi des sorts d'un niveau : phrases 0100 (21 990 000-21 990 999)
+@21990100 = ~Renvoie les sorts de niveau %spellLevel%~ // reprise de @11990001
+@21990101 = ~Renvoie les sorts de niveau %spellLevel% ciblant %theTarget%~ // reprise de @11990003
+@21990102 = ~de renvoyer les sorts de niveau %spellLevel%~ // reprise de @11990002
+@21990103 = ~de renvoyer les sorts de niveau %spellLevel% ciblant %theTarget%~ // reprise de @11990004
 
 // Opcode 200 : Renvoi décroissant par niveau de sort : phrases 0100 liste de niveaux, 0110 tous les niveaux, 0120 du 1er au N-ième (22 000 000-22 000 999)
 @22000100 = ~Renvoie jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau~ // reprise de @12000001
@@ -3028,6 +3159,12 @@
 @22220102 = ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220002
 @22220103 = ~de téléporter aléatoirement %theTarget% dans un rayon de %range%~ // reprise de @12220002
 
+// Opcode 223 : Immunité à une école, décroissante : phrases 0100 (22 230 000-22 230 999)
+@22230100 = ~Immunise jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12230001
+@22230101 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12230002
+@22230102 = ~d'immuniser jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12230003
+@22230103 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12230004
+
 // Opcode 224 : Restauration : phrases 0100 (22 240 000-22 240 999)
 @22240100 = ~Restaure les niveaux drainés %ofTheTarget%~ // reprise de @12240001
 @22240101 = ~Restaure les niveaux drainés %ofTheTarget%~ // reprise de @12240001
@@ -3043,6 +3180,18 @@
 @22260111 = ~Immunise %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260012
 @22260112 = ~d'immuniser contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260013
 @22260113 = ~d'immuniser %theTarget% contre le prochain sort de type %spellSecondaryTypeName%~ // reprise de @12260014
+
+// Opcode 227 : Renvoi d'une école, décroissant : phrases 0100 (22 270 000-22 270 999)
+@22270100 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12270001
+@22270101 = ~Renvoie jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% ciblant %theTarget%~ // reprise de @12270002
+@22270102 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName%~ // reprise de @12270003
+@22270103 = ~de renvoyer jusqu'à %amount% niveaux de sorts de l'école %spellSchoolName% ciblant %theTarget%~ // reprise de @12270004
+
+// Opcode 228 : Renvoi d'un type secondaire, décroissant : phrases 0100 (22 280 000-22 280 999)
+@22280100 = ~Renvoie jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12280001
+@22280101 = ~Renvoie jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~ // reprise de @12280002
+@22280102 = ~de renvoyer jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName%~ // reprise de @12280003
+@22280103 = ~de renvoyer jusqu'à %amount% niveaux de sorts de type %spellSecondaryTypeName% ciblant %theTarget%~ // reprise de @12280004
 
 // Opcode 230 : phrases 0100 jusqu'à un niveau, 0110 tous les niveaux (22 300 000-22 300 999)
 @22300100 = ~Dissipe un sort de type %spellSecondaryTypeName% de niveau %spellLevel% ou inférieur sur %theTarget%~ // reprise de @12300001
@@ -3243,6 +3392,12 @@
 @22610112 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~ // reprise de @12610007
 @22610113 = ~de remémorer 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~ // reprise de @12610008
 
+// Opcode 266 : Levée d'une immunité à un sort : phrases 0100 (22 660 000-22 660 999)
+@22660100 = ~Lève l'immunité contre le sort « %spellName% »~ // reprise de @12660001
+@22660101 = ~Lève l'immunité %ofTheTarget% contre le sort « %spellName% »~ // reprise de @12660002
+@22660102 = ~de lever l'immunité contre le sort « %spellName% »~ // reprise de @12660003
+@22660103 = ~de lever l'immunité %ofTheTarget% contre le sort « %spellName% »~ // reprise de @12660004
+
 // Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
 @22720010 = ~À chaque %strDuration%~ // reprise de @12720010
 @22720011 = ~Toutes les %strDuration%~ // reprise de @12720011
@@ -3384,6 +3539,10 @@
 @23170152 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 @23170153 = ~de lancer Hâte (sans bonus d'attaque par round) sur %theTarget%~ // reprise de @10160006
 @23180100 = ~%chanceValue% de chances d'être sans effet~ // reprise de @15260001
+
+// Opcode 323 : Niveau de repousser les morts-vivants : 0000 nom, 0002 statistique (23 230 000-23 230 999)
+@23230000 = ~Niveau de Repousser les morts-vivants~ // reprise de @13230001
+@23230002 = ~le niveau de Repousser les morts-vivants~ // reprise de @13230002
 
 // Opcodes 318 et 324 : exceptions de cible : 0001-0004 mise en forme (« Efficace », « Inefficace », « contre les », probabilité), 0005-0007 noms (état de sort, état, pénurie de fer), 1000 + statistique de splprot.2da noms (23 240 000-23 249 999)
 @23240001 = ~Efficace %creaturesList%~ // reprise de @13241500
@@ -3539,6 +3698,12 @@
 @23269245 = ~Si %theTarget% est d'un alignement moral différent de la source~ // reprise de @13269245
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
+// Opcode 329 : Ralentissement des poisons : phrases 0100 (23 290 000-23 290 999)
+@23290100 = ~Abaissement de la virulence de la plupart des poisons de %amount%~ // reprise de @13290001
+@23290101 = ~Abaisse la virulence de la plupart des poisons sur %theTarget% de %amount%~ // reprise de @13290002
+@23290102 = ~d'abaisser la virulence de la plupart des poisons sur %theTarget% de %amount%~ // reprise de @13290003
+@23290103 = ~d'abaisser la virulence de la plupart des poisons sur %theTarget% de %amount%~ // reprise de @13290003
+
 // Opcode 331 : Invocation aléatoire de monstres : phrases 0100 total de niveaux, 0110 niveau du lanceur,
 // 0120 une créature, 0130 plusieurs (23 310 000-23 310 999)
 @23310100 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~ // reprise de @13310001
@@ -3588,6 +3753,9 @@
 @23370102 = ~de dissiper %opcodeStr%~ // reprise de @13370003
 @23370103 = ~de dissiper %opcodeStr% sur %theTarget%~ // reprise de @13370004
 
+// Opcode 340 : Sort lancé à chaque attaque sournoise : 0001 condition (23 400 000-23 400 999)
+@23400001 = ~À chaque attaque sournoise~ // reprise de @13400001
+
 // Opcode 341 : coup critique : 0001-0003 conditions (23 410 000-23 410 099)
 @23410001 = ~À chaque coup critique~ // reprise de @13410001
 @23410002 = ~À chaque coup critique %ofTheTarget%~ // reprise de @13410002
@@ -3613,6 +3781,16 @@
 @23460017 = ~contre les sorts de l'école de la Nécromancie~ // reprise de @13460017
 @23460018 = ~contre les sorts de l'école de l'Altération~ // reprise de @13460018
 @23460019 = ~contre les sorts de l'école Généraliste~ // reprise de @13460019
+
+// Opcode 361 : Sort lancé à chaque échec critique : 0001 condition, 0003 avec cette arme (23 610 000-23 610 999)
+@23610001 = ~À chaque échec critique~ // reprise de @13610001
+@23610003 = ~À chaque échec critique provoqué avec cette arme~ // reprise de @13610003
+
+// Opcode 362 : Chance d'échec critique : 0001-0004 libellés (« soi », puis forme « cible »), comme le 301 (23 620 000-23 620 999)
+@23620001 = ~Chance d'échec critique~ // reprise de @13620001
+@23620002 = ~Chance d'échec critique avec cette arme~ // reprise de @13620002
+@23620003 = ~la chance d'échec critique~ // reprise de @13620003
+@23620004 = ~la chance d'échec critique avec cette arme~ // reprise de @13620004
 
 // Opcode 367 : Caractéristiques minimales : phrases 0100 immunité, 0110 sensibilité (23 670 000-23 670 999)
 @23670100 = ~Immunité contre la mort par absorption de caractéristique~ // reprise de @13670002

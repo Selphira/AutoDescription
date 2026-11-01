@@ -284,6 +284,20 @@ BEGIN
 	END
 END
 
+// Nom au pluriel du type d'objet item_type (itemcat.ids, « robes »), vide hors de 0-73 ou sans chaîne.
+DEFINE_PATCH_FUNCTION ad_item_type_name
+	INT_VAR
+		item_type = 0
+	RET
+		name
+BEGIN
+	SPRINT name ~~
+	SET item_type_tra = 8180000 + item_type
+	PATCH_IF item_type >= 0 AND item_type <= 73 AND TRA_ENTRY_EXISTS (~%item_type_tra%~) BEGIN
+		LPF ad_tra INT_VAR tra_id = item_type_tra tra_block_start = 8180000 tra_block_size = 74 RET name = text END // ~robes~ (@8180067)
+	END
+END
+
 // Le sort resref a-t-il, dans l'un de ses en-têtes (effets de lancement exclus, comme l'ancien
 // SPL_V10_HEAD_EFFECTS), un effet de l'opcode opcode (0 - 1 : tout opcode) et de la ressource
 // resource (vide : toute ressource, casse ignorée) ? found : 1 si oui ; 0 si le sort n'existe pas.

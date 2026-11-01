@@ -56,21 +56,7 @@ DEFINE_PATCH_MACRO ad_op_145_lines BEGIN
 				ELSE PATCH_IF NOT spellcasting_armor_rule BEGIN
 					SET line_phrase = 21450110 // ~Empêche %theTarget% de lancer des sorts~
 					PATCH_IF spellcasting_types != 7 BEGIN
-						CLEAR_ARRAY spellcasting_names
-						SET spellcasting_count = 0
-						FOR (spellcasting_bit = 0; spellcasting_bit < 3; ++spellcasting_bit) BEGIN
-							PATCH_IF (spellcasting_types BAND (1 << spellcasting_bit)) != 0 BEGIN
-								LPF ad_tra INT_VAR tra_id = 8020000 + spellcasting_bit tra_block_start = 8020000 tra_block_size = 10 RET spellcasting_name = text END // ~profanes~
-								SPRINT $spellcasting_names(~%spellcasting_count%~) ~%spellcasting_name%~
-								SET spellcasting_count += 1
-								// Les sorts divins sont ceux des clercs et des druides (ancien get_spell_type_str).
-								PATCH_IF spellcasting_bit == 1 BEGIN
-									SPRINT $spellcasting_names(~%spellcasting_count%~) @8020004 // ~druidiques~
-									SET spellcasting_count += 1
-								END
-							END
-						END
-						LPF ad_join STR_VAR array_name = ~spellcasting_names~ RET spellType = text END
+						LPF ad_spell_types_text INT_VAR types = spellcasting_types RET spellType = text END
 						SET line_phrase = 21450100 // ~Empêche %theTarget% de lancer des sorts %spellType%~
 					END
 					SET line_fx = spellcasting_id

@@ -74,7 +74,8 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
 			LPM ad_group_free_action
 		END
-		PATCH_FOR_EACH group_spell_opcode IN 60 145 BEGIN
+		PATCH_FOR_EACH group_spell_opcode IN 60 145 99 BEGIN
+			SET group_spell_max_type = group_spell_opcode == 99 ? 1 : 2
 			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%group_spell_opcode%~) BEGIN
 				LPM ad_group_spell_types
 			END
@@ -1076,15 +1077,16 @@ DEFINE_PATCH_MACRO ad_group_replace_item_line BEGIN
 	SET line_phrase = 30120100 // ~Remplace « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 END
 
-// Types de sort (anciens opcode_60_group et opcode_145_group, échec des sorts et lancement de sorts
-// empêché) : chaque effet de l'opcode group_spell_opcode réunit les autres effets de cet opcode de
-// types de sort 0 à 2 qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni
+// Types de sort (anciens opcode_60_group, opcode_145_group et opcode_99_group, échec des sorts,
+// lancement de sorts empêché et durée des sorts) : chaque effet de l'opcode group_spell_opcode réunit
+// les autres effets de cet opcode de types de sort 0 à group_spell_max_type (2 ; 1 pour le 99, dont le
+// type 2 est le chant du barde) qui ont les mêmes champs, parameter2 mis à part ; l'effet réuni
 // (fx_spell_types : masque des types) est écrit après les autres, comme celui que l'ancien moteur
 // ajoute en fin de liste.
 DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 	PHP_EACH ~fx_ids_%group_spell_opcode%~ AS _ => group_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
-			SET group_type = $fx_parameter2(~%group_id%~)
+		SET group_type = $fx_parameter2(~%group_id%~)
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND (group_spell_max_type == 2 OR group_type <= group_spell_max_type) BEGIN
 			SET group_types = 1 << (group_type > 2 ? group_type - 3 : group_type)
 			SET group_merged = 0
 			SET same_id = group_id
@@ -1093,7 +1095,7 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 			PHP_EACH ~fx_ids_%group_spell_opcode%~ AS _ => group_candidate BEGIN
 				SET group_other_type = $fx_parameter2(~%group_candidate%~)
 				// Un effet qui en réunit déjà d'autres n'est pas repris (ancien custom_int non nul).
-				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= 2
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_other_type >= 0 AND group_other_type <= group_spell_max_type
 						AND $fx_spell_types(~%group_candidate%~) == 0 BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
@@ -1115,6 +1117,30 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 			END
 		END
 	END
+END
+
+// Noms des types de sort du masque types (bit 0 profanes, 1 divins, 2 innés), « profanes, divins et
+// druidiques » : les sorts divins sont ceux des clercs et des druides (ancien get_spell_type_str).
+DEFINE_PATCH_FUNCTION ad_spell_types_text
+	INT_VAR
+		types = 0
+	RET
+		text
+BEGIN
+	CLEAR_ARRAY spell_type_names
+	SET spell_type_count = 0
+	FOR (spell_type_bit = 0; spell_type_bit < 3; ++spell_type_bit) BEGIN
+		PATCH_IF (types BAND (1 << spell_type_bit)) != 0 BEGIN
+			LPF ad_tra INT_VAR tra_id = 8020000 + spell_type_bit tra_block_start = 8020000 tra_block_size = 10 RET spell_type_name = text END // ~profanes~
+			SPRINT $spell_type_names(~%spell_type_count%~) ~%spell_type_name%~
+			SET spell_type_count += 1
+			PATCH_IF spell_type_bit == 1 BEGIN
+				SPRINT $spell_type_names(~%spell_type_count%~) @8020004 // ~druidiques~
+				SET spell_type_count += 1
+			END
+		END
+	END
+	LPF ad_join STR_VAR array_name = ~spell_type_names~ RET text END
 END
 
 // Répétitions d'un effet (ancien opcode_group_by_duration), trouvées par la prise en charge
