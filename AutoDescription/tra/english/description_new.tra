@@ -2466,8 +2466,8 @@
 @21050002 = ~the amount of gold~ // reprise de @11050001
 @21050100 = ~Delights %theTarget% with all its gold~ // reprise de @11050003
 @21050101 = ~Delights %theTarget% with all its gold~ // reprise de @11050003
-@21050102 = ~to relieve %theTarget% of all their gold~
-@21050103 = ~to relieve %theTarget% of all their gold~
+@21050102 = ~to relieve %theTarget% of all their gold~ // reprise de @11050004
+@21050103 = ~to relieve %theTarget% of all their gold~ // reprise de @11050004
 
 // Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
 @21060100 = ~Immunity to panic~ // reprise de @11060004
@@ -2989,9 +2989,9 @@
 
 // Opcode 199 : Renvoi des sorts d'un niveau : phrases 0100 (21 990 000-21 990 999)
 @21990100 = ~Reflects level %spellLevel% spells~ // reprise de @11990001
-@21990101 = ~Renvoie les sorts de niveau %spellLevel% ciblant %theTarget%~ // reprise de @11990003 (absente en anglais : texte français)
+@21990101 = ~Reflects level %spellLevel% spells targeting %theTarget%~ // reprise de @11990003
 @21990102 = ~to reflect level %spellLevel% spells~ // reprise de @11990002
-@21990103 = ~de renvoyer les sorts de niveau %spellLevel% ciblant %theTarget%~ // reprise de @11990004 (absente en anglais : texte français)
+@21990103 = ~to reflect level %spellLevel% spells targeting %theTarget%~ // reprise de @11990004
 
 // Opcode 200 : Renvoi décroissant par niveau de sort : phrases 0100 liste de niveaux, 0110 tous les niveaux, 0120 du 1er au N-ième (22 000 000-22 000 999)
 @22000100 = ~Reflects up to %amount% levels of spells from %levelStr% level~ // reprise de @12000001
@@ -3789,8 +3789,8 @@
 // Opcode 362 : Chance d'échec critique : 0001-0004 libellés (« soi », puis forme « cible »), comme le 301 (23 620 000-23 620 999)
 @23620001 = ~Critical Miss bonus~ // reprise de @13620001
 @23620002 = ~Critical Miss bonus with this weapon~ // reprise de @13620002
-@23620003 = ~la chance d'échec critique~ // reprise de @13620003 (absente en anglais : texte français)
-@23620004 = ~la chance d'échec critique avec cette arme~ // reprise de @13620004 (absente en anglais : texte français)
+@23620003 = ~the Critical Miss bonus~ // reprise de @13620003
+@23620004 = ~the Critical Miss bonus with this weapon~ // reprise de @13620004
 
 // Opcode 367 : Caractéristiques minimales : phrases 0100 immunité, 0110 sensibilité (23 670 000-23 670 999)
 @23670100 = ~Protects from death by characteristic absorption~ // reprise de @13670002

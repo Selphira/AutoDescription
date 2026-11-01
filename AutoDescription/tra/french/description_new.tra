@@ -2466,8 +2466,8 @@
 @21050002 = ~la quantité de pièces d'or~ // reprise de @11050001
 @21050100 = ~Déleste %theTarget% de tout son or~ // reprise de @11050003
 @21050101 = ~Déleste %theTarget% de tout son or~ // reprise de @11050003
-@21050102 = ~de délester %theTarget% de tout son or~
-@21050103 = ~de délester %theTarget% de tout son or~
+@21050102 = ~de délester %theTarget% de tout son or~ // reprise de @11050004
+@21050103 = ~de délester %theTarget% de tout son or~ // reprise de @11050004
 
 // Opcode 106 : Point de rupture de moral : phrases 0100 immunité à la panique, 0110 moral au plus haut, 0120 point fixé, 0130 moral renforcé, 0140 moral affaibli (21 060 000-21 060 999)
 @21060100 = ~Immunité contre la panique~ // reprise de @11060004

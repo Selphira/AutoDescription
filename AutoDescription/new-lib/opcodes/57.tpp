@@ -3,7 +3,7 @@
 // bon, 50 chaotique neutre, 51 chaotique mauvais) : « Alignement modifié en neutre mauvais » ; code
 // commun dans new-lib/opcodes/states.tpp. Noms des alignements : 2057 0000 + parameter2.
 
-// Alignement inconnu : écarté et journalisé (l'ancien opcode_self_57 écrivait sa valeur brute).
+// Alignement inconnu : écarté et journalisé (ancien opcode_57_is_valid).
 DEFINE_PATCH_MACRO ad_op_57_support BEGIN
 	PHP_EACH fx_ids_57 AS _ => alignment_id BEGIN
 		SET alignment_value = $fx_parameter2(~%alignment_id%~)

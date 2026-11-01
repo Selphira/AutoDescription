@@ -5,8 +5,8 @@
 // profane ou divin sont réunis (ad_group_spell_types, new-lib/groups.tpp, fx_spell_types).
 // Phrase : 2099 0100 + 10 × variante (0 durée nulle, 1 réduite, 2 allongée ; + 3 chants du barde).
 
-// Écartés et journalisés : type inconnu (ancien opcode_99_is_valid) ; pourcentage négatif ou de 100,
-// sans effet (l'ancien moteur écrivait « Réduit à néant la durée » pour 100).
+// Écartés et journalisés, comme dans l'ancien opcode_99_is_valid : type inconnu ; pourcentage négatif
+// ou de 100, sans effet.
 DEFINE_PATCH_MACRO ad_op_99_support BEGIN
 	PHP_EACH fx_ids_99 AS _ => duration_id BEGIN
 		SET $fx_spell_types(~%duration_id%~) = 0

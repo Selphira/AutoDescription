@@ -1,7 +1,6 @@
 // Opcode 199 (Spell: Bounce (by Power Level)) : renvoie les effets dont la puissance (power) vaut
 // parameter1 (IESDP : 0 à 9) : « Renvoie les sorts de niveau 2 » ; code commun dans
-// new-lib/opcodes/states.tpp. À la forme « cible », l'ancien moteur n'écrit rien (sa macro porte un
-// autre nom) : la phrase qu'il prévoyait pour cette forme est reprise (« … ciblant la cible »).
+// new-lib/opcodes/states.tpp.
 
 // Puissance hors de 0-9 : écartée et journalisée (ancien opcode_199_is_valid).
 DEFINE_PATCH_MACRO ad_op_199_support BEGIN
