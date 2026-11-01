@@ -51,6 +51,10 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_versus_set = 0
 	SPRINT ctx_versus ~~
 	SET ctx_base_lines = 0
+	SPRINT ctx_frequency ~~
+	SET ctx_frequency_seconds = 0
+	SET ctx_inherit_dice = 0
+	SPRINT ctx_dice_text ~~
 	SPRINT ctx_resource ~%SOURCE_RES%~
 	TO_UPPER ctx_resource
 	SPRINT ctx_chain ~|~
@@ -62,6 +66,8 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET recursion_delayed = 0
 	SET recursion_probability = 0
 	SET recursion_hit_target = 0
+	SPRINT recursion_frequency ~~
+	SET recursion_inherit_dice = 0
 END
 
 // La sous-ressource recursion_resref peut-elle être décrite ? recursion_allowed : 1 si oui ; 0 au-delà
@@ -103,7 +109,11 @@ END
 // regroupées par probabilité : fx_sub_probability_lines), remis à 0 après la vérification, les
 // autres appelants ne les fixant pas ; recursion_versus_set et recursion_versus (ctx_versus_set,
 // ctx_versus) ; recursion_kind (spl ou eff) ; recursion_parent_dice (effet d'un EFF : dés de l'effet
-// recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides) ; recursion_depth_reset
+// recursion_fx quand ils donnent des niveaux, ctx_dice_count et ctx_dice_sides) ; recursion_frequency
+// (sort lancé à intervalle régulier, opcode 333 : fréquence de ses lignes, « chaque tour », pendant la
+// durée de l'effet recursion_fx) et recursion_inherit_dice (dégâts sans dés du sort : ceux de l'effet
+// recursion_fx, ou leur progression selon le niveau, ctx_inherit_dice), remis à vide et à 0 après la
+// vérification ; recursion_depth_reset
 // (sort décrit hors de la limite de profondeur, et ses propres sous-sorts comme ceux d'un premier
 // sous-sort : ancien appel sans recursivity, opcode 326) ; recursion_single_reason et
 // recursion_single_message : refus de plusieurs lignes dans la sous-ressource (vide : acceptées).
@@ -181,6 +191,8 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SPRINT $fx_sub_single_message(~%recursion_fx%~) ~%recursion_single_message%~
 				SET $fx_sub_delayed(~%recursion_fx%~) = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
 				SET $fx_sub_probability_lines(~%recursion_fx%~) = recursion_probability
+				SPRINT $fx_sub_frequency(~%recursion_fx%~) ~%recursion_frequency%~
+				SET $fx_sub_inherit_dice(~%recursion_fx%~) = recursion_inherit_dice
 				SET $recursion_pending(~%recursion_pending_count%~) = recursion_fx
 				SET recursion_pending_count += 1
 			END
@@ -189,6 +201,8 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SET recursion_delayed = 0
 	SET recursion_probability = 0
 	SET recursion_hit_target = 0
+	SPRINT recursion_frequency ~~
+	SET recursion_inherit_dice = 0
 END
 
 // Description des sous-ressources vérifiées par ad_recursion_support, dans l'ordre de leur
@@ -294,6 +308,8 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_base_high = $fx_probability_high(~%recursion_fx%~)
 						ctx_base_lines = $fx_sub_probability_lines(~%recursion_fx%~)
 						ctx_lift_sections = recursion_lift_sections
+						ctx_frequency_seconds = recursion_hide ? 0 : $fx_duration(~%recursion_fx%~)
+						ctx_inherit_dice = $fx_sub_inherit_dice(~%recursion_fx%~)
 					STR_VAR
 						resref = ~%recursion_resref%~
 						kind = ~%recursion_kind%~
@@ -304,6 +320,8 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_to_the_target = $fx_sub_to_the_target(~%recursion_fx%~)
 						ctx_force_only_for = $fx_sub_only_for(~%recursion_fx%~)
 						ctx_versus = $fx_sub_versus(~%recursion_fx%~)
+						ctx_frequency = $fx_sub_frequency(~%recursion_fx%~)
+						ctx_dice_text = $fx_level_value(~%recursion_fx%~)
 					RET
 						recursion_sub_missing = sub_missing
 						recursion_sub_count = sub_count
@@ -459,6 +477,8 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_base_high = 99
 		ctx_base_lines = 0
 		ctx_lift_sections = 0
+		ctx_frequency_seconds = 0
+		ctx_inherit_dice = 0
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -469,6 +489,8 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_to_the_target = ~~
 		ctx_force_only_for = ~~
 		ctx_versus = ~~
+		ctx_frequency = ~~
+		ctx_dice_text = ~~
 	RET
 		sub_missing
 		sub_count
@@ -490,7 +512,9 @@ BEGIN
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
 	SPRINT sub_checked ~~
+	// Un sort lancé à intervalle régulier (opcode 333) dépend de son parent : pas mis en cache.
 	SET cache_used = AD_SUBSPELL_CACHE AND ~%kind%~ STRING_EQUAL ~spl~ AND FILE_EXISTS_IN_GAME ~%sub_resref%.spl~
+		AND ~%ctx_frequency%~ STRING_EQUAL ~~ AND NOT ctx_inherit_dice
 	SET cache_hit = 0
 	PATCH_IF cache_used BEGIN
 		LPM ad_subspell_cache_read
@@ -651,6 +675,16 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		ELSE PATCH_IF sub_all_headers BEGIN
 			SET fx_headers_offset = sub_headers_offset
 			LPM ad_spell_header_fields
+		END
+		// Opcode 333 sans niveau de lancement (IESDP) : les dégâts du sort prennent les dés de l'effet.
+		PATCH_IF ctx_inherit_dice AND ~%fx_load_error%~ STRING_EQUAL ~~ BEGIN
+			FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
+				PATCH_IF $fx_opcode(~%sub_fx%~) == 12 AND $fx_dice_count(~%sub_fx%~) == 0 BEGIN
+					SET $fx_dice_count(~%sub_fx%~) = ctx_dice_count
+					SET $fx_dice_sides(~%sub_fx%~) = ctx_dice_sides
+					SPRINT $fx_dice_text(~%sub_fx%~) ~%ctx_dice_text%~
+				END
+			END
 		END
 	END
 END

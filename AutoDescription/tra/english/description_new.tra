@@ -3747,6 +3747,12 @@
 @23320109 = ~the crushing damage~ // reprise de @13320109
 @23320110 = ~the missile damage~ // reprise de @13320110
 
+// Opcode 333 : Charge statique : phrases 0100 sort nommé, la fréquence dans la phrase (23 330 000-23 330 999)
+@23330100 = ~Casts the spell "%spellName%" %frequency%~ // reprise de @13330011
+@23330101 = ~Casts the spell "%spellName%" on %theTarget% %frequency%~ // reprise de @13330012
+@23330102 = ~to cast the spell "%spellName%" %frequency%~ // reprise de @13330013
+@23330103 = ~to cast the spell "%spellName%" on %theTarget% %frequency%~ // reprise de @13330014
+
 // Opcode 337 : Retrait des effets d'un opcode : phrases 0100 (23 370 000-23 370 999)
 @23370100 = ~Dispels %opcodeStr%~ // reprise de @13370001
 @23370101 = ~Dispels %opcodeStr% on %theTarget%~ // reprise de @13370002

@@ -154,6 +154,11 @@ DEFINE_PATCH_MACRO ad_op_12_value BEGIN
 	INNER_PATCH_SAVE damage_text ~%damage_text%~ BEGIN
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 	END
+	// Dés hérités d'un opcode 333 qui progressent selon le niveau du sort (new-lib/recursion.tpp).
+	SPRINT damage_inherited_text $fx_dice_text(~%damage_id%~)
+	PATCH_IF NOT (~%damage_inherited_text%~ STRING_EQUAL ~~) BEGIN
+		SPRINT damage_text ~%damage_inherited_text%~
+	END
 	SET damage_special = IS_EE ? $fx_special(~%damage_id%~) : 0
 	SET damage_drain = (damage_special BAND 0b11011) == BIT0 OR (damage_special BAND 0b11011) == BIT3
 	SET damage_transfer = (damage_special BAND 0b11011) == BIT1 OR (damage_special BAND 0b11011) == BIT4

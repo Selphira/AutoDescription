@@ -356,7 +356,9 @@ END
 // à parameter1 et à la durée près, dont les valeurs suivent une formule ; les dés d'un effet des
 // opcodes 12 et 17 la précèdent (« 2d8 + 1 point de dégâts par niveau »). Des dégâts de l'opcode 12
 // (mode 0) peuvent aussi progresser par le nombre de dés, et à défaut par les dés et parameter1
-// (« 1d4 … par niveau + 1 … par niveau »). Une durée écrite par les lignes doit suivre sa formule.
+// (« 1d4 … par niveau + 1 … par niveau ») ; de même, par le nombre de dés seul, ceux d'un opcode 333
+// sans niveau de lancement, que les dégâts de son sort reprennent (« 2d8 + 1d8 par niveau du
+// lanceur/30 »). Une durée écrite par les lignes doit suivre sa formule.
 DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
@@ -408,13 +410,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				END
 			END
 		END
-		PATCH_IF level_opcode == 12 AND level_mode == 0 AND $level_on(~%level_a%~) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+		PATCH_IF ((level_opcode == 12 AND level_mode == 0) OR (level_opcode == 333 AND $fx_parameter2(~%level_id%~) == 0))
+				AND $level_on(~%level_a%~) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 			SET formula_valid = 0
 			SET level_skip = AD_SAME_DICE BOR AD_SAME_TIMING
 			LPM ad_spell_level_search
 			SET formula_percent = 0
 			SET formula_flat = 0
-			SET formula_opcode = 12
+			SET formula_opcode = level_opcode
 			SET level_duration_by_timing = 0
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_dice~
@@ -429,7 +432,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 					END
 				END
 			END
-			PATCH_IF NOT formula_valid AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF NOT formula_valid AND level_opcode == 12 AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 				SET level_skip = AD_SAME_DICE BOR AD_SAME_PARAMETER1 BOR AD_SAME_TIMING
 				LPM ad_spell_level_search
 				PATCH_IF search_in_all AND search_total > 1 BEGIN

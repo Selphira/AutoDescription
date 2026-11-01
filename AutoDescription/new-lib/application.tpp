@@ -309,7 +309,9 @@ END
 // (charged_global_duration, new-lib/item_charged.tpp), qui remplace toutes celles de l'en-tête, et
 // dans un sous-sort qu'elle couvre (ctx_ignore_duration, new-lib/recursion.tpp) ; unité de l'opcode
 // dans AD_OPCODE_DURATION_SCALE, fraction dans AD_OPCODE_DURATION_DIVISOR, durée fixe dans
-// AD_OPCODE_FIXED_DURATION.
+// AD_OPCODE_FIXED_DURATION. Dans un sort lancé à intervalle régulier (opcode 333, ctx_frequency), la
+// fréquence suit la durée de l'effet, comme une répétition : « chaque tour pendant 7 tours », sans
+// « pendant » quand la durée est écrite ailleurs (ctx_frequency_seconds nul).
 DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	SPRINT app_duration_text ~~
 	SET app_opcode = $fx_opcode(~%line_fx%~)
@@ -391,6 +393,20 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 			PATCH_IF app_timing == TIMING_delayed_duration BEGIN
 				SPRINT app_duration_text @3000006 // ~après %strDuration% et pendant %strDuration%~
 			END
+		END
+	END
+	PATCH_IF NOT (~%ctx_frequency%~ STRING_EQUAL ~~) BEGIN
+		SPRINT frequency ~%ctx_frequency%~
+		SPRINT app_frequency_text ~%frequency%~
+		PATCH_IF ctx_frequency_seconds > 0 BEGIN
+			LPF ad_duration_text INT_VAR seconds = ctx_frequency_seconds RET strDuration = text END
+			SPRINT app_frequency_text @3000003 // ~%frequency% pendant %strDuration%~
+		END
+		PATCH_IF ~%app_duration_text%~ STRING_EQUAL ~~ BEGIN
+			SPRINT app_duration_text ~%app_frequency_text%~
+		END
+		ELSE BEGIN
+			SPRINT app_duration_text ~%app_duration_text% %app_frequency_text%~
 		END
 	END
 END

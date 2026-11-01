@@ -330,6 +330,8 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_series_of(~%fx_id%~) = 0 - 1
 	SET $fx_series_anchor(~%fx_id%~) = 0
 	SPRINT $fx_level_value(~%fx_id%~) ~~
+	SPRINT $fx_dice_text(~%fx_id%~) ~~
+	SET $fx_charge_rewritten(~%fx_id%~) = 0
 	SPRINT $fx_level_duration(~%fx_id%~) ~~
 	SPRINT $fx_level_save(~%fx_id%~) ~~
 	SET $fx_level_progression(~%fx_id%~) = 0

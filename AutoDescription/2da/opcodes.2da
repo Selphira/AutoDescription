@@ -334,7 +334,7 @@
 330      0        1        IGNORED   LEVEL            400    SHOWN           Text:_Float_Text
 331      0        1        DESCRIBED DICE             132    NOT_PERMANENT   Summon:_Random_Monster_Summoning
 332      0        1        DESCRIBED LEVEL            48     SHOWN           Stat:_Specific_Damage_Modifier
-333      0        1        TODO      DICE             473    SHOWN           Spell_Effect:_Static_Charge
+333      0        1        DESCRIBED DICE             473    SHOWN           Spell_Effect:_Static_Charge
 334      0        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Turn_Undead
 335      0        1        TODO      LEVEL            493    SHOWN           Spell_Effect:_Seven_Eyes
 336      0        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Display_Eyes_Overlay
