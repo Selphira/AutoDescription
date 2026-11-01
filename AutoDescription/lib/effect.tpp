@@ -175,6 +175,12 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 		END
 
 		LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+		// Sort lancé par un opcode 333 sans niveau de lancement : ses dégâts sans dés prennent ceux de
+		// l'effet (opcode_333_common).
+		PATCH_IF opcode == 12 AND diceCount == 0 AND VARIABLE_IS_SET inheritDiceCount AND inheritDiceCount > 0 BEGIN
+			SET diceCount = inheritDiceCount
+			SET diceSides = inheritDiceSides
+		END
 		LPM ~opcode_is_valid~
 
 		SPRINT exceptionSplstateName ~~

@@ -4243,6 +4243,10 @@
 @13330002 = ~Allows %theTarget% to cast %amount% times %spellName% spell %strDuration%~
 @13330003 = ~to cast %amount% times %spellName% spell %strDuration%~
 @13330004 = ~to allow %theTarget% to cast %amount% times %spellName% spell %strDuration%~
+@13330011 = ~Casts the spell "%spellName%" %frequency%~
+@13330012 = ~Casts the spell "%spellName%" on %theTarget% %frequency%~
+@13330013 = ~to cast the spell "%spellName%" %frequency%~
+@13330014 = ~to cast the spell "%spellName%" on %theTarget% %frequency%~
 
 // Opcode 335: Spell Effect: Seven Eyes [335]
 
