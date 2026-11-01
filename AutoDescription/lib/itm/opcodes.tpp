@@ -17145,6 +17145,7 @@ DEFINE_PATCH_FUNCTION ~get_creatures_names~
 		creatures
 BEGIN
 	SPRINT creatures  ~~
+	CLEAR_ARRAY namedCreatures
 
 	INNER_PATCH_FILE ~%file%.2da~ BEGIN
 		COUNT_2DA_ROWS ~2~ ~rows~
@@ -17154,7 +17155,15 @@ BEGIN
 
 			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
 				LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName END
-				PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+				// Une créature citée plusieurs fois par la table, ou deux de même nom, n'est nommée qu'une fois.
+				SET alreadyNamed = 0
+				PATCH_PHP_EACH namedCreatures AS namedCreature => _ BEGIN
+					PATCH_IF ~%namedCreature%~ STRING_EQUAL ~%creatureName%~ BEGIN
+						SET alreadyNamed = 1
+					END
+				END
+				PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ AND NOT alreadyNamed BEGIN
+					SET $namedCreatures(~%creatureName%~) = 1
 					SPRINT creatures ~%creatures%, %creatureName%~
 				END
 			END
