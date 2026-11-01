@@ -528,12 +528,14 @@ BEGIN
 	END
 END
 
+// untyped : valeur sans l'unité de l'opcode (opcode_<N>_typed_value), pour un bonus de jet de sauvegarde.
 DEFINE_PATCH_FUNCTION ~get_complex_value~
 	INT_VAR
 		is_percent = 0
 		is_flat_value = 0
 		dice_sides = 0
 		no_two_values = 0
+		untyped = 0
 	STR_VAR
 		array_name = ~~
 	RET
@@ -741,10 +743,13 @@ BEGIN
 		END
 	END
 	ELSE PATCH_IF is_valid == 1 BEGIN
-		SPRINT dispatch_typed_value ~opcode_%opcode%_typed_value~
-		PATCH_TRY LPF ~%dispatch_typed_value%~ INT_VAR value = delta_value RET strref END WITH DEFAULT
-			strref = 0
-			PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_typed_value%~ type = ~function~ error = ~%ERROR_MESSAGE%~ END END
+		SET strref = 0
+		PATCH_IF NOT untyped BEGIN
+			SPRINT dispatch_typed_value ~opcode_%opcode%_typed_value~
+			PATCH_TRY LPF ~%dispatch_typed_value%~ INT_VAR value = delta_value RET strref END WITH DEFAULT
+				strref = 0
+				PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_typed_value%~ type = ~function~ error = ~%ERROR_MESSAGE%~ END END
+			END
 		END
 		SET last_value = value
 		SET value = ABS delta_value
@@ -1374,6 +1379,8 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_v
 		    PATCH_IF inAllLevels BEGIN
 		        PATCH_IF total > 1 BEGIN
 					LPF ~get_complex_value~
+						INT_VAR
+							untyped = 1
 						STR_VAR
 							array_name = ~all_effects~
 						RET
