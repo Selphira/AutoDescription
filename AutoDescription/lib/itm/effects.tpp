@@ -103,6 +103,17 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 			END
 		END
 	END
+	// Effet d'un sort lancé à intervalle régulier (opcode_333_common) : la fréquence suit sa durée,
+	// « chaque tour pendant 7 tours », sans « pendant » quand la durée est écrite ailleurs.
+	PATCH_IF VARIABLE_IS_SET subFrequency AND NOT ~%subFrequency%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+		SPRINT frequency ~%subFrequency%~
+		SPRINT frequencyText ~%frequency%~
+		PATCH_IF subFrequencySeconds > 0 BEGIN
+			LPF ~get_str_duration~ INT_VAR duration = subFrequencySeconds RET strDuration END
+			SPRINT frequencyText @100315 // ~%frequency% pendant %strDuration%~
+		END
+		SPRINT description ~%description% %frequencyText%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~add_only_for~ BEGIN

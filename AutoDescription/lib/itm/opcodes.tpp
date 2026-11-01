@@ -1657,6 +1657,10 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 	INNER_PATCH_SAVE damage ~%damage%~ BEGIN
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 	END
+	// Dés hérités d'un opcode 333 qui progressent selon le niveau du sort (opcode_333_common).
+	PATCH_IF VARIABLE_IS_SET inheritDiceText AND NOT ~%inheritDiceText%~ STRING_EQUAL ~~ AND diceCount == inheritDiceCount AND diceSides == inheritDiceSides BEGIN
+		SPRINT damage ~%inheritDiceText%~
+	END
 
 	// Montant tiré au sort (opcode_12_group), en dés : « 1d8 ».
 	PATCH_IF mode == 0 AND NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
@@ -15686,54 +15690,102 @@ END
  * Spell Effect: Static Charge [333] *
  * --------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_333~ BEGIN
+	SET strref = 13330011 // ~Lance le sort « %spellName% » %frequency%~
+	SET oldStrref = 13330001 // ~Lance %amount% fois le sort %spellName% %strDuration%~
 	LPM ~opcode_333_common~
-	SPRINT description @13330001 // ~Lance %amount% fois le sort %spellName% %strDuration%~
-	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-	SPRINT description ~%description% (%castingLevelStr%)~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_333~ BEGIN
+	SET strref = 13330012 // ~Lance le sort « %spellName% » sur %theTarget% %frequency%~
+	SET oldStrref = 13330002 // ~Permet à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
 	LPM ~opcode_333_common~
-	SPRINT description @13330002 // ~Permet à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
-	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-	SPRINT description ~%description% (%castingLevelStr%)~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_333~ BEGIN
+	SET strref = 13330013 // ~de lancer le sort « %spellName% » %frequency%~
+	SET oldStrref = 13330003 // ~de lancer %amount% fois le sort %spellName% %strDuration%~
 	LPM ~opcode_333_common~
-	SPRINT description @13330003 // ~de lancer %amount% fois le sort %spellName% %strDuration%~
-	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-	SPRINT description ~%description% (%castingLevelStr%)~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_333~ BEGIN
+	SET strref = 13330014 // ~de lancer le sort « %spellName% » sur %theTarget% %frequency%~
+	SET oldStrref = 13330004 // ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
 	LPM ~opcode_333_common~
-	SPRINT description @13330004 // ~de permettre à %theTarget% de lancer %amount% fois le sort %spellName% %strDuration%~
-	SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
-	SPRINT description ~%description% (%castingLevelStr%)~
 END
 
 DEFINE_PATCH_MACRO ~opcode_333_common~ BEGIN
-	LOCAL_SET frequency = special == 0 ? 6 : special
-	SET amount = parameter1
-	SET castingLevel = parameter2 <= 1 ? 1 : parameter2
-	SPRINT spellName ~~
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+	LOCAL_SET delay = special > 0 ? special : 6
+	LOCAL_SPRINT file ~%resref%~
+	PATCH_IF ~%file%~ STRING_EQUAL ~~ AND STRING_LENGTH ~%CURRENT_SOURCE_RES%~ <= 7 BEGIN
+		SPRINT file ~%CURRENT_SOURCE_RES%B~
 	END
-	ELSE BEGIN
-		SET strLen = STRING_LENGTH ~%CURRENT_SOURCE_RES%~
-		PATCH_IF strLen <= 7 BEGIN
-			LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file = EVAL ~%CURRENT_SOURCE_RES%B~ RET spellName END
+	LPF ~get_spell_name~ INT_VAR showWarning = 0 STR_VAR file RET spellName END
+	LPF ~get_frequency_duration~ INT_VAR duration = delay strref = 100323 RET frequency END // ~chaque %strDuration%~
+	PATCH_IF NOT (timingMode == TIMING_duration AND duration == parameter1 * delay) BEGIN
+		SET amount = parameter1
+		SET castingLevel = parameter2 <= 1 ? 1 : parameter2
+		LPF ~get_frequency_duration~ INT_VAR duration = delay RET strDuration = frequency END
+		LPF ~getTranslation~ INT_VAR strref = oldStrref opcode RET description = string END
+		SPRINT castingLevelStr @102095 // ~comme un lanceur de sorts de niveau %castingLevel%~
+		SPRINT description ~%description% (%castingLevelStr%)~
+	END
+	ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END
+	END
+	ELSE PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%file%~) BEGIN
+		SET $recursive_resref(~%file%~) = 1
+		SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
+		SPRINT subFrequency ~%frequency%~
+		SET subFrequencySeconds = ignoreDuration ? 0 : duration
+		SET inheritDiceCount = parameter2 == 0 ? diceCount : 0
+		SET inheritDiceSides = diceSides
+		SPRINT inheritDiceText ~%complex_value%~
+		LPF ~get_item_spell_effects_description~ INT_VAR castingLevel = parameter2 > 0 ? parameter2 : 1 STR_VAR file RET description END
+		SPRINT subFrequency ~~
+		SET inheritDiceCount = 0
+		SPRINT inheritDiceText ~~
+		CLEAR_ARRAY recursive_resref
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
 		END
+		// Les lignes du sort écrivent la fréquence et la durée.
+		SET ignoreDuration = 1
 	END
-	LPF ~get_frequency_duration~ INT_VAR duration = frequency RET strDuration = frequency END
 END
 
 DEFINE_PATCH_MACRO ~opcode_333_is_valid~ BEGIN
 	PATCH_IF parameter1 <= 0 BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid Number %parameter1%.~ END
+	END
+	ELSE PATCH_IF (timingMode == TIMING_permanent OR (timingMode == TIMING_delayed AND duration == 0)) AND saveType == 0 BEGIN
+		SPRINT chargeFile ~%resref%~
+		PATCH_IF ~%chargeFile%~ STRING_EQUAL ~~ AND STRING_LENGTH ~%CURRENT_SOURCE_RES%~ <= 7 BEGIN
+			SPRINT chargeFile ~%CURRENT_SOURCE_RES%B~
+		END
+		SET chargeNested = 0
+		PATCH_IF FILE_EXISTS_IN_GAME ~%chargeFile%.spl~ BEGIN
+			INNER_PATCH_FILE ~%chargeFile%.spl~ BEGIN
+				PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+					READ_LONG SPL_feature_blocks_offset chargeBlocks
+					FOR (chargeAt = chargeBlocks; chargeAt + 0x30 <= BUFFER_LENGTH; chargeAt += 0x30) BEGIN
+						READ_SHORT chargeAt chargeOpcode
+						SET chargeNested = chargeNested OR chargeOpcode == 333
+					END
+				END
+			END
+		END
+		PATCH_IF NOT chargeNested BEGIN
+			SET timingMode = TIMING_duration
+			SET duration = parameter1 * (special > 0 ? special : 6)
+		END
+	END
+END
+
+// Parameter #1 : nombre de décharges, compris dans la durée d'un effet écrit comme une répétition.
+DEFINE_PATCH_MACRO ~opcode_333_spell_level_match~ BEGIN
+	PATCH_IF timingMode == TIMING_duration AND duration == parameter1 * (special > 0 ? special : 6) BEGIN
+		SET match_parameter1 = parameter1
 	END
 END
 

@@ -4506,6 +4506,10 @@
 @13330002 = ~Permet à %theTarget% de lancer %amount% fois le sort « %spellName% » %strDuration%~
 @13330003 = ~de lancer %amount% fois le sort « %spellName% » %strDuration%~
 @13330004 = ~de permettre à %theTarget% de lancer %amount% fois le sort « %spellName% » %strDuration%~
+@13330011 = ~Lance le sort « %spellName% » %frequency%~
+@13330012 = ~Lance le sort « %spellName% » sur %theTarget% %frequency%~
+@13330013 = ~de lancer le sort « %spellName% » %frequency%~
+@13330014 = ~de lancer le sort « %spellName% » sur %theTarget% %frequency%~
 
 // Opcode 335: Spell Effect: Seven Eyes [335]
 

@@ -278,7 +278,8 @@ BEGIN
 	// 341 : Semble que ce soit toujours la cible de l'attaque
 	// 2 : sort lancé (146, 232) par la source de l'effet, dont les effets sur soi touchent ce lanceur
 	// et non la cible imposée (effect.tpp, get_effect_description).
-	SET forceTarget = (opcode == 146 OR (opcode == 232 AND ((parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR parameter1 == 0))) ? 2 : opcode == 326 ? 1 : 0
+	// 1 : sort appliqué à la cible de l'effet (326), ou lancé depuis elle (333).
+	SET forceTarget = (opcode == 146 OR (opcode == 232 AND ((parameter2 != 8 AND parameter2 != 9 AND parameter2 != 14) OR parameter1 == 0))) ? 2 : (opcode == 326 OR opcode == 333) ? 1 : 0
 	// L'en-tête du sort ne lit que les sous-sorts des opcodes 146, 148 et 232 (spell_saving_throw) : ceux
 	// des autres écrivent leurs jets de sauvegarde.
 	PATCH_IF opcode != 146 AND opcode != 148 AND opcode != 232 BEGIN
@@ -1242,6 +1243,63 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 
 				// Si parameter1 et duration sont différents
 				// Si diceCount et parameter1 et duration sont différents
+			END
+		END
+		// Opcode 333 sans niveau de lancement : progression de ses dés, que les dégâts de son sort reprennent
+		// (opcode_333_common) ; parameter1, le nombre de décharges, est compris dans la durée.
+		PATCH_IF opcode == 333 BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter2 == 0 BEGIN
+				LPM ~data_to_match_vars~
+				LPF spell_has_same_effects_on_all_levels_except_duration
+					INT_VAR
+						match_opcode match_isExternal match_target match_power match_parameter1 match_parameter2
+						match_timingMode match_resistance match_duration match_probability match_probability1
+						match_probability2 match_diceCount match_diceSides match_saveType match_saveBonus match_special
+						match_parameter3 match_parameter4 match_custom_int
+					STR_VAR
+						match_resref match_resref2 match_resref3 match_custom_str
+						match_macro = ~opcode_match_except_diceCount_and_duration_and_parameter1~
+						return_parameter = ~diceCount~
+					RET
+						inAllLevels total total_durations
+					RET_ARRAY
+						effects_to_disabled all_durations all_effects
+				END
+				PATCH_IF inAllLevels AND total > 1 BEGIN
+					LPF ~get_complex_value~
+						INT_VAR
+							dice_sides = diceSides
+							no_two_values = 1
+						STR_VAR
+							array_name = ~all_effects~
+						RET
+							is_valid
+							complex_value
+							complex_value_int
+					END
+					PATCH_IF is_valid BEGIN
+						SET durationIsValid = 1
+						PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
+							PATCH_IF level == 1 BEGIN
+								LPF get_first_level_for_spell RET level = minLevel END
+							END
+							LPF ~get_complex_duration~
+								STR_VAR
+									array_name = ~all_durations~
+								RET
+									strDuration = complex_duration
+							END
+							SET durationIsValid = total_durations > 1 AND NOT ~%strDuration%~ STRING_EQUAL ~~
+							PATCH_IF NOT ~%strDuration%~ STRING_EQUAL ~~ BEGIN
+								SPRINT complex_duration @100311 // ~pendant %strDuration%~
+							END
+						END
+						PATCH_IF durationIsValid BEGIN
+							LPM ~group_spell_effects_disable~
+						END
+					END
+				END
 			END
 		END
 	END
