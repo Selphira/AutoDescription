@@ -4,9 +4,9 @@
 // code commun dans new-lib/opcodes/states.tpp.
 
 // Refus : total inférieur à 1 (écarté par l'ancien opcode_226_is_valid sur un jeu classique,
-// « Lance » sur EE) ; type secondaire sans nom (l'ancien moteur n'écrit rien) ; sur EE, sort lancé à la
-// fin de l'effet qui a un nom (la ressource, sinon le sort <ressource>B : l'ancien side_spell ajoute
-// « puis lance « … » »).
+// « Lance » sur EE) ; sur EE, sort lancé à la fin de l'effet qui a un nom (la ressource, sinon le sort
+// <ressource>B : l'ancien side_spell ajoute « puis lance « … » »). Type secondaire sans nom (ajouté par
+// un mod) : comme l'ancien moteur, pas de ligne ; l'effet compte encore pour l'en-tête, journalisé.
 DEFINE_PATCH_MACRO ad_op_226_support BEGIN
 	SPRINT immunity_own_spell ~~
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
@@ -26,7 +26,12 @@ DEFINE_PATCH_MACRO ad_op_226_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~file_error:opcode226:amount~ message = ~amount of 0 or less~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%immunity_type_name%~ STRING_EQUAL ~~ BEGIN
-				LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode226:secondary_type~ message = ~secondary type %immunity_type% has no name~ RET render_missing = refusal END
+				PATCH_IF NOT support_header_only BEGIN
+					SET ignored_fx = immunity_id
+					SPRINT ignored_reason ~not_implemented:opcode226:no_name~
+					SPRINT ignored_message ~secondary type %immunity_type% has no name~
+					LPM ad_log_ignored
+				END
 			END
 			ELSE PATCH_IF IS_EE AND NOT (~%immunity_spell%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode226:spell~ message = ~spell cast when the effect ends~ RET render_missing = refusal END
@@ -36,6 +41,12 @@ DEFINE_PATCH_MACRO ad_op_226_support BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_226_lines BEGIN
+	PHP_EACH fx_ids_226 AS _ => immunity_id BEGIN
+		SPRINT immunity_type_name $fx_immunity_type_name(~%immunity_id%~)
+		PATCH_IF ~%immunity_type_name%~ STRING_EQUAL ~~ BEGIN
+			SET $fx_consumed(~%immunity_id%~) = 1
+		END
+	END
 	SET state_opcode = 226
 	SPRINT state_variant_macro ~ad_op_226_variant~
 	LPM ad_state_lines

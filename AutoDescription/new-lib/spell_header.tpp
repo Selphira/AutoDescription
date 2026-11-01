@@ -225,9 +225,9 @@ DEFINE_PATCH_MACRO ad_spell_header_keeps BEGIN
 END
 
 // Refus des cas que ce rendu ne sait pas reproduire (header_missing, vide sinon), avant le rendu :
-// sort sans en-tête, plusieurs en-têtes dont les niveaux ne croissent pas à partir de 1 (absents du
-// jeu de base), types, écoles et types
-// secondaires sans nom, refus de la chaîne des effets.
+// sort sans en-tête, plusieurs en-têtes dont les niveaux ne croissent pas (absents du jeu de base),
+// types et écoles sans nom, refus de la chaîne des effets. Un type secondaire sans nom n'est pas
+// écrit (journalisé).
 DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	SPRINT header_missing ~~
 	SPRINT spell_self ~%SOURCE_RES%~
@@ -267,8 +267,16 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 		ELSE PATCH_IF spell_school > 10 BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:school~ message = ~spell school %spell_school% (expected 0-10)~ RET header_missing = refusal END
 		END
-		ELSE PATCH_IF spell_sectype < 0 OR spell_sectype > 13 BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:secondary_type~ message = ~secondary type %spell_sectype% (msectype.ids values 0-13 supported)~ RET header_missing = refusal END
+		// Type secondaire sans nom (ajouté par un mod hors de AD_SECONDARY_TYPE_MODS, ou invalide) : pas
+		// écrit, comme dans l'ancien moteur.
+		ELSE PATCH_IF spell_sectype != 0 BEGIN
+			LPF ad_spell_secondary_type_name INT_VAR secondary_type = spell_sectype RET header_sectype = name END
+			PATCH_IF ~%header_sectype%~ STRING_EQUAL ~~ BEGIN
+				SET ignored_fx = 0 - 1
+				SPRINT ignored_reason ~not_implemented:spell_header:secondary_type~
+				SPRINT ignored_message ~secondary type %spell_sectype% has no name (msectype.ids values 1-13 and the mod types of AD_SECONDARY_TYPE_MODS are named): not written~
+				LPM ad_log_ignored
+			END
 		END
 	END
 	PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
@@ -360,7 +368,7 @@ END
 // un nom (en anglais, le type 0 en a un).
 DEFINE_PATCH_MACRO ad_spell_header_type_line BEGIN
 	LPF ad_tra INT_VAR tra_id = 8130000 + spell_type_name tra_block_start = 8130000 tra_block_size = 8 RET header_type = text END // ~Profane~ (@8130001)
-	LPF ad_tra INT_VAR tra_id = 8100000 + spell_sectype tra_block_start = 8100000 tra_block_size = 14 RET header_sectype = text END // ~Dégâts offensifs~ (@8100010)
+	LPF ad_spell_secondary_type_name INT_VAR secondary_type = spell_sectype RET header_sectype = name END
 	SPRINT header_line ~%header_type%~
 	PATCH_IF spell_school > 0 BEGIN
 		LPF ad_tra INT_VAR tra_id = 8140000 + spell_school tra_block_start = 8140000 tra_block_size = 11 RET header_school = text END // ~Évocation~ (@8140006)
