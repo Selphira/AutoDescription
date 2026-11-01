@@ -3656,6 +3656,8 @@
 
 @12610010 = ~profane~ // ~%spellType%~
 @12610011 = ~divin~
+@12610012 = ~profane ou divin~
+@12610013 = ~%amountMin% à %amountMax%~
 
 // Opcode 262: Stat: Visual Range [262]
 

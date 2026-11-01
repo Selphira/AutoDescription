@@ -1218,6 +1218,11 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 									INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 										LPM ~load_level_effects~
 										LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus isHalfDamage END
+										// Sous-sort « Spécial » (jets différents) : le sort l'est aussi, et ses lignes écrivent
+										// leur jet, que l'en-tête ne donne pas.
+										PATCH_IF ignoreSavingThrow232 == 0 BEGIN
+											SET isSpecial = 1
+										END
 									END
 								END
 							END

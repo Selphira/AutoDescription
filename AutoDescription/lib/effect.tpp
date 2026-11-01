@@ -533,6 +533,102 @@ DEFINE_PATCH_MACRO ~opcode_group_generic~ BEGIN
     // Si ce tableau a une valeur de plus de 1, un regroupement est possible !
 END
 
+/**
+ * Valeurs tirées au sort : le jeu tire un seul nombre de 0 à 99 pour les effets d'une capacité ; des effets de
+ * l'opcode courant semblables à leur valeur (parameter1) et à leur probabilité près, dont les plages sont
+ * contiguës et disjointes, donnent donc une seule de ces valeurs. Ils n'en font qu'un, sur l'union de leurs
+ * plages, sa valeur « entre X et Y » (texte rangeStrref) dans custom_str. Les valeurs sont écrites comme
+ * équiprobables : les écarts d'arrondi des plages (11 %, 10 %… 9 %) sont acceptés, enable_shrinkage à 0 les
+ * détaille. rangeEligibleMacro (facultative) écarte un effet en mettant rangeEligible à 0.
+ */
+DEFINE_PATCH_MACRO ~group_value_range~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~rangePositions~ BEGIN END
+	// CLEAR_ARRAY ne supprime pas les variables rangeChecked_<position> : chaque appel marque les effets vus de
+	// son propre numéro.
+	SET rangePass = VARIABLE_IS_SET rangePass ? rangePass + 1 : 1
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		SET rangeEligible = parameter1 > 0 AND ~%custom_str%~ STRING_EQUAL ~~
+			AND NOT (VARIABLE_IS_SET $rangeChecked(~%position%~) AND $rangeChecked(~%position%~) == rangePass)
+		PATCH_IF rangeEligible AND NOT ~%rangeEligibleMacro%~ STRING_EQUAL ~~ BEGIN
+			LPM ~%rangeEligibleMacro%~
+		END
+		PATCH_IF rangeEligible BEGIN
+			SET $rangeChecked(~%position%~) = rangePass
+			CLEAR_ARRAY rangePositions
+			SET $rangePositions(~%position%~) = 1
+			SET rangePosition = position
+			SET amountMin = parameter1
+			SET amountMax = parameter1
+			SET rangeLow = probability2
+			SET rangeHigh = probability1 > 99 ? 99 : probability1
+			LPF ~get_probability~ INT_VAR probability1 probability2 RET rangeTotal = probability END
+			SET rangeCount = 1
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF match_parameter1 > 0 AND NOT (VARIABLE_IS_SET $rangeChecked(~%match_position%~) AND $rangeChecked(~%match_position%~) == rangePass) BEGIN
+					LPM ~opcode_match_value_range~
+					PATCH_IF match == 1 BEGIN
+						SET $rangeChecked(~%match_position%~) = rangePass
+						SET $rangePositions(~%match_position%~) = 1
+						SET rangeCount += 1
+						SET amountMin = match_parameter1 < amountMin ? match_parameter1 : amountMin
+						SET amountMax = match_parameter1 > amountMax ? match_parameter1 : amountMax
+						SET rangeLow = match_probability2 < rangeLow ? match_probability2 : rangeLow
+						SET rangeHigh = match_probability1 > rangeHigh ? (match_probability1 > 99 ? 99 : match_probability1) : rangeHigh
+						LPF ~get_probability~ INT_VAR probability1 = match_probability1 probability2 = match_probability2 RET matchProbability = probability END
+						SET rangeTotal += matchProbability
+					END
+				END
+			END
+			// Plages disjointes et sans trou : leur somme est la largeur de leur union.
+			PATCH_IF rangeCount > 1 AND rangeTotal == rangeHigh - rangeLow + 1 BEGIN
+				PATCH_PHP_EACH rangePositions AS rangeDeleted => _ BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = rangeDeleted
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
+				LPF ~getTranslation~ INT_VAR strref = rangeStrref opcode RET custom_str = string END
+				SET position = rangePosition
+				SET probability1 = rangeHigh
+				SET probability2 = rangeLow
+				SET probability = rangeTotal
+				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_value_range~ BEGIN
+	SET match = (
+		    match_isExternal   == isExternal
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter2   == parameter2
+		AND match_duration     == duration
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_diceCount    == diceCount
+		AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_custom_int   == custom_int
+		AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+		AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+		AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+		AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+	)
+END
+
 DEFINE_PATCH_FUNCTION ~has_opcode~
 	INT_VAR
 		opcode = 0

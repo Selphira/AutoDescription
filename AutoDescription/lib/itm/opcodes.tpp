@@ -1658,6 +1658,11 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 	END
 
+	// Montant tiré au sort (opcode_12_group) : « entre 1 et 8 ».
+	PATCH_IF mode == 0 AND NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT damage ~%custom_str%~
+	END
+
 	// Dégâts basiques
 	PATCH_IF mode == 0 BEGIN
 		PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
@@ -1781,6 +1786,15 @@ DEFINE_PATCH_MACRO ~opcode_12_group~ BEGIN
 			END
 		END
 	END
+
+	SET rangeStrref = 101130 // ~entre %amountMin% et %amountMax%~
+	SPRINT rangeEligibleMacro ~opcode_12_range_eligible~
+	LPM ~group_value_range~
+END
+
+// Seuls des dégâts (mode 0) sans dé ont un montant qui s'écrit « entre X et Y ».
+DEFINE_PATCH_MACRO ~opcode_12_range_eligible~ BEGIN
+	SET rangeEligible = (parameter2 BAND 65535) == 0 AND diceCount == 0
 END
 
 /* ------------------------- *
@@ -12210,7 +12224,12 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_244~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF amount == 1 BEGIN
+	// Nombre tiré au sort (opcode_244_group) : « entre 1 et 10 ».
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT amount ~%custom_str%~
+		SPRINT description @12440002 // ~Draine %amount% sorts profanes de la mémoire %ofTheTarget%~
+	END
+	ELSE PATCH_IF amount == 1 BEGIN
 		SPRINT description @12440001 // ~Draine 1 sort profane de la mémoire %ofTheTarget%~
 	END
 	ELSE BEGIN
@@ -12221,7 +12240,11 @@ END
 DEFINE_PATCH_MACRO ~opcode_self_probability_244~ BEGIN
 	LOCAL_SET amount = parameter1
 
-	PATCH_IF amount == 1 BEGIN
+	PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT amount ~%custom_str%~
+		SPRINT description @12440004 // ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~
+	END
+	ELSE PATCH_IF amount == 1 BEGIN
 		SPRINT description @12440003 // ~de drainer 1 sort profane de la mémoire %ofTheTarget%~
 	END
 	ELSE BEGIN
@@ -12235,6 +12258,12 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_244~ BEGIN
 	LPM ~opcode_self_probability_244~
+END
+
+DEFINE_PATCH_MACRO ~opcode_244_group~ BEGIN
+	SET rangeStrref = 101130 // ~entre %amountMin% et %amountMax%~
+	SPRINT rangeEligibleMacro ~~
+	LPM ~group_value_range~
 END
 
 DEFINE_PATCH_MACRO ~opcode_244_is_valid~ BEGIN
@@ -12760,6 +12789,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 	LOCAL_SET spellLevel = parameter1
+	LOCAL_SET levelRange = NOT ~%custom_str%~ STRING_EQUAL ~~
 	PATCH_IF parameter2 == 0 BEGIN
 		SPRINT spellType @12610010 // ~profane~
 		SET spellLevel = spellLevel > 9 ? 9 : spellLevel
@@ -12772,7 +12802,11 @@ DEFINE_PATCH_MACRO ~opcode_261_common~ BEGIN
 	ELSE PATCH_IF parameter2 == 2 BEGIN
 		SPRINT spellType @12610012 // ~profane ou divin~
 	END
-	PATCH_IF spellLevel == 1 BEGIN
+	// Niveau tiré au sort (group_value_range) : « de niveau 1 à 8 ou inférieur ».
+	PATCH_IF levelRange BEGIN
+		SPRINT spellLevel ~%custom_str%~
+	END
+	ELSE PATCH_IF spellLevel == 1 BEGIN
 		SET strref += 4
 	END
 
@@ -12928,6 +12962,15 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 		END
 	END
 	SET opcode = initOpcode
+
+	SET rangeStrref = 12610013 // ~%amountMin% à %amountMax%~
+	SPRINT rangeEligibleMacro ~opcode_261_range_eligible~
+	LPM ~group_value_range~
+END
+
+// Un niveau au-delà du maximum du type de sort (ramené à 9 ou 7) n'est pas réuni.
+DEFINE_PATCH_MACRO ~opcode_261_range_eligible~ BEGIN
+	SET rangeEligible = (parameter2 == 0 AND parameter1 <= 9) OR (parameter2 == 1 AND parameter1 <= 7)
 END
 
 /* ------------------------ *
