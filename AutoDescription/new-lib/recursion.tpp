@@ -198,8 +198,9 @@ END
 // délai (fx_sub_delayed, ancien opcode_146_condition) tait la durée commune de ses effets, lue comme
 // celle de l'en-tête d'un sort (ancien spell_duration, ad_recursion_delayed_duration), que la ligne
 // écrit dans sa condition (fx_sub_duration_text) ; une durée « Spéciale » reste dans ses lignes, et
-// une potion n'en lit pas (ancien opcode_target_146). Refus : une seule ligne sous une durée commune,
-// que l'ancien moteur perd.
+// une potion n'en lit pas (ancien opcode_target_146) ; une seule ligne est redécrite avec sa propre
+// durée. Refus : une seule ligne sous une durée commune que l'appelant cache déjà, que l'ancien moteur
+// perd.
 DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 	FOR (pending_k = 0; pending_k < recursion_pending_count AND ~%render_late_missing%~ STRING_EQUAL ~~; ++pending_k) BEGIN
 		SET recursion_fx = $recursion_pending(~%pending_k%~)
@@ -251,6 +252,8 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			TO_UPPER recursion_origin_resource
 			SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
 			SPRINT recursion_delayed_missing ~~
+			SET recursion_delayed_hide = 0
+			SET recursion_hide_base = recursion_hide
 			PATCH_IF $fx_sub_delayed(~%recursion_fx%~) AND item_type != ITM_TYPE_potion AND FILE_EXISTS_IN_GAME ~%recursion_resref%.spl~ BEGIN
 				LPF ad_recursion_delayed_duration STR_VAR resref = ~%recursion_resref%~
 					RET recursion_delayed_hide = duration_hide recursion_delayed_text = duration_text recursion_delayed_missing = duration_missing END
@@ -270,6 +273,10 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				PATCH_IF recursion_lift_opcode != 146 AND recursion_lift_opcode != 148 AND recursion_lift_opcode != 232 BEGIN
 					SET ctx_ignore_save = 0
 				END
+				// La durée commune tue n'est écrite que devant plusieurs lignes : une ligne seule est
+				// redécrite avec sa propre durée, que son opcode montre ou non (ancien
+				// get_item_spell_effects_description).
+				FOR (recursion_pass = 0; recursion_pass < 2; ++recursion_pass) BEGIN
 				LPF ad_describe_subresource
 					INT_VAR
 						ctx_depth = $fx_sub_depth(~%recursion_fx%~)
@@ -303,6 +310,15 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						recursion_sub_text = sub_text
 						recursion_sub_opcode = sub_opcode
 						recursion_sub_checked = sub_checked
+				END
+				PATCH_IF recursion_pass == 0 AND recursion_sub_count == 1 AND recursion_delayed_hide AND NOT recursion_hide_base
+						AND ~%recursion_sub_missing%~ STRING_EQUAL ~~ BEGIN
+					SET recursion_hide = recursion_hide_base
+					SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
+				END
+				ELSE BEGIN
+					SET recursion_pass = 2
+				END
 				END
 				SPRINT sub_checked ~%sub_checked%%recursion_sub_checked%~
 				SET ctx_ignore_save = recursion_saved_ignore_save
