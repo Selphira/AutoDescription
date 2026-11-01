@@ -2,13 +2,17 @@
 // l'Enchantement » ; parameter2 0 ajoute la valeur, 1 la fixe (IESDP), special = école (mschool.2da).
 // Modificateur simple, code commun dans new-lib/opcodes/stat_modifiers.tpp.
 
-// Refus : école hors de 0-11 (ancien opcode_346_is_valid) ; école sans nom (0, 10, 11).
+// École hors de 0-11 : écartée et journalisée (ancien opcode_346_is_valid). Refus : école sans nom (0,
+// 10, 11).
 DEFINE_PATCH_MACRO ad_op_346_support BEGIN
 	PHP_EACH fx_ids_346 AS _ => stat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET save_school = $fx_special(~%stat_id%~)
 			PATCH_IF save_school < 0 OR save_school > 11 BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode346:invalid~ message = ~school %save_school% (expected 0-11)~ RET render_missing = refusal END
+				SET drop_id = stat_id
+				SPRINT ignored_reason ~file_error:opcode346:invalid~
+				SPRINT ignored_message ~school %save_school% (expected 0-11)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF save_school < 1 OR save_school > 9 BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode346:school~ message = ~school %save_school% has no name~ RET render_missing = refusal END

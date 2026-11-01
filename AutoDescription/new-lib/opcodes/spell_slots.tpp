@@ -32,7 +32,10 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 			PATCH_IF slots_amount == 0 OR slots_amount > 32767 OR slots_amount < 0 - 32768
 					OR (slots_levels == 0 AND slots_amount < 0)
 					OR (slots_levels BAND (BNOT slots_all_levels)) != 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~file_error:opcode%slots_opcode%:invalid~ message = ~invalid amount %slots_amount% or spell levels~ RET render_missing = refusal END
+				SET drop_id = slots_id
+				SPRINT ignored_reason ~file_error:opcode%slots_opcode%:invalid~
+				SPRINT ignored_message ~invalid amount %slots_amount% or spell levels~
+				LPM ad_application_drop
 			END
 			// L'ancien moteur écrit le nombre négatif : « Suppression de -2 sorts ».
 			ELSE PATCH_IF slots_amount < 0 - 1 BEGIN

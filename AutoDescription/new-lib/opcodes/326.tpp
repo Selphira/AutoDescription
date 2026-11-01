@@ -38,14 +38,14 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 			// Effet différé : l'ancien moteur n'écrit rien quand le sort appliqué n'a pas de ligne
 			// (SPWI910) ; sinon refus, avec les lignes.
 			SET apply_delayed = $fx_timing(~%apply_id%~) == TIMING_delayed
-			PATCH_IF apply_delayed AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF apply_delayed AND ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%apply_id%~) BEGIN
 				SPRINT apply_pending $fx_condition_refusal(~%apply_id%~)
 				PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
 					SPRINT $fx_condition_refusal(~%apply_id%~) ~not_implemented:opcode326:delayed~
 					SPRINT $fx_condition_refusal_message(~%apply_id%~) ~delayed effect~
 				END
 			END
-			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%apply_id%~) BEGIN
 				SET recursion_fx = apply_id
 				SPRINT recursion_resref ~%apply_resref%~
 				SET recursion_casting_level = 0
@@ -154,7 +154,10 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 	END
 	SPRINT apply_condition ~~
 	PATCH_IF NOT IS_AN_INT apply_stat OR NOT IS_AN_INT apply_value OR NOT IS_AN_INT apply_relation BEGIN
-		LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~file_error:opcode326:splprot~ message = ~row %apply_row% of SPLPROT.2DA is missing or unused~ RET render_missing = refusal END
+		SET drop_id = apply_id
+		SPRINT ignored_reason ~file_error:opcode326:splprot~
+		SPRINT ignored_message ~row %apply_row% of SPLPROT.2DA is missing or unused~
+		LPM ad_application_drop
 	END
 	ELSE BEGIN
 		PATCH_IF apply_value == 0 - 1 BEGIN

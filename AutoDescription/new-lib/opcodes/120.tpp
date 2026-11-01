@@ -4,11 +4,14 @@
 // Sur EE avec AD_ENABLE_SHRINKAGE, seules les immunités aux armes enchantées du bonus le plus élevé
 // de leur bloc restent (ancien opcode_120_group).
 
-// Type inconnu : écarté par l'ancien opcode_120_is_valid.
+// Type inconnu : écarté et journalisé (ancien opcode_120_is_valid).
 DEFINE_PATCH_MACRO ad_op_120_support BEGIN
 	PHP_EACH fx_ids_120 AS _ => weapon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ($fx_parameter2(~%weapon_id%~) < 0 OR $fx_parameter2(~%weapon_id%~) > 11) BEGIN
-			LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode120:invalid~ message = ~weapon type (parameter2) outside 0-11~ RET render_missing = refusal END
+			SET drop_id = weapon_id
+			SPRINT ignored_reason ~file_error:opcode120:invalid~
+			SPRINT ignored_message ~weapon type (parameter2) outside 0-11~
+			LPM ad_application_drop
 		END
 	END
 	// Réunies avant la comparaison des niveaux d'un sort, comme l'ancien moteur qui les réunit au chargement

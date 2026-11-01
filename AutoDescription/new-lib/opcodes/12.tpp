@@ -23,7 +23,10 @@ DEFINE_PATCH_MACRO ad_op_12_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_op_12_value
 			PATCH_IF damage_mode > 3 BEGIN
-				LPF ad_refusal INT_VAR fx_id = damage_id STR_VAR reason = ~file_error:opcode12:invalid~ message = ~damage mode %damage_mode% (expected 0-3)~ RET render_missing = refusal END
+				SET drop_id = damage_id
+				SPRINT ignored_reason ~file_error:opcode12:invalid~
+				SPRINT ignored_message ~damage mode %damage_mode% (expected 0-3)~
+				LPM ad_application_drop
 			END
 			// Dégâts sans dé ni valeur : l'ancien moteur n'écrit pas de ligne ; écarté.
 			ELSE PATCH_IF (damage_mode == 0 OR damage_mode == 2) AND ~%damage_text%~ STRING_EQUAL ~~ BEGIN

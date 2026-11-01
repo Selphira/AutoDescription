@@ -13,7 +13,10 @@ DEFINE_PATCH_MACRO ad_op_191_support BEGIN
 			SET caster_type = $fx_parameter2(~%stat_id%~)
 			SET caster_bonus = $fx_parameter1(~%stat_id%~)
 			PATCH_IF caster_type < 0 OR caster_type > 1 OR caster_bonus < 0 OR caster_bonus > 255 BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~file_error:opcode191:invalid~ message = ~invalid spell type or bonus (type %caster_type% expected 0-1, bonus %caster_bonus% expected 0-255)~ RET render_missing = refusal END
+				SET drop_id = stat_id
+				SPRINT ignored_reason ~file_error:opcode191:invalid~
+				SPRINT ignored_message ~invalid spell type or bonus (type %caster_type% expected 0-1, bonus %caster_bonus% expected 0-255)~
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				SET $fx_stat_subject(~%stat_id%~) = 8020000

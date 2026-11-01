@@ -251,8 +251,13 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 			READ_LONG SPL_exclusion_flags spell_exclusions
 			SET spell_no_cleric = (spell_exclusions BAND BIT30) != 0
 			SET spell_no_druid = (spell_exclusions BAND BIT31) != 0
+			// Exclu des deux : type divin sans précision, comme l'ancien get_spell_type_name.
 			PATCH_IF spell_no_cleric AND spell_no_druid BEGIN
-				LPF ad_refusal STR_VAR reason = ~file_error:spell_header:priest_exclusions~ message = ~priest spell excluded for both clerics and druids (exclusion flags %spell_exclusions%)~ RET header_missing = refusal END
+				SET ignored_fx = 0 - 1
+				SPRINT ignored_reason ~file_error:spell_header:priest_exclusions~
+				SPRINT ignored_message ~priest spell excluded for both clerics and druids (exclusion flags %spell_exclusions%): written as a priest spell~
+				SPRINT ignored_consequence ~kept~
+				LPM ad_log_ignored
 			END
 			ELSE PATCH_IF spell_no_druid BEGIN
 				SET spell_type_name = 6

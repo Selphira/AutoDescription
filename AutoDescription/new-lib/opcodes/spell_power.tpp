@@ -6,9 +6,9 @@
 // et 3ème niveau »). Les macros ad_op_<N>_* fixent power_opcode (et power_phrase pour les lignes)
 // puis appellent les macros ci-dessous.
 
-// Refus : niveau hors de 1-9 (l'ancien moteur écarte un niveau hors de 0-9 et écrit le niveau 0 sans
-// nom) ; total inférieur à 1 (écarté par l'ancien opcode_200_is_valid sur un jeu classique, « Lance »
-// sur EE) ; sur EE, sort à lancer qui a un nom (la ressource, sinon le sort <objet>B : l'ancien
+// Niveau hors de 0-9, et total inférieur à 1 sur un jeu classique : écartés et journalisés, comme
+// dans l'ancien opcode_200_is_valid. Refus : niveau 0 (l'ancien moteur l'écrit sans nom) ; total
+// inférieur à 1 sur EE (l'ancien moteur écrit « Lance ») ; sur EE, sort à lancer qui a un nom (la ressource, sinon le sort <objet>B : l'ancien
 // side_spell ajoute « puis lance « … » ») ; sans AD_ENABLE_SHRINKAGE, niveau au-delà de 2 (l'ancien
 // moteur le lit comme une liste de niveaux, BUG-034). Avec AD_ENABLE_SHRINKAGE, des effets de même
 // total aux autres champs différents (durée…) forment des lignes distinctes ; l'anomalie de la série
@@ -27,11 +27,26 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 			PATCH_IF NOT (~%power_resref%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%power_resref%~ RET power_spell = name END
 			END
-			PATCH_IF power_level < 1 OR power_level > 9 BEGIN
-				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~file_error:opcode%power_opcode%:level~ message = ~spell level %power_level% (expected 1-9)~ RET render_missing = refusal END
+			PATCH_IF power_level < 0 OR power_level > 9 BEGIN
+				SET drop_id = power_id
+				SPRINT ignored_reason ~file_error:opcode%power_opcode%:level~
+				SPRINT ignored_message ~spell level %power_level% (expected 0-9)~
+				LPM ad_application_drop
+			END
+			ELSE PATCH_IF power_level == 0 BEGIN
+				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~not_implemented:opcode%power_opcode%:level0~ message = ~spell level 0~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_parameter1(~%power_id%~) < 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~file_error:opcode%power_opcode%:amount~ message = ~amount of 0 or less~ RET render_missing = refusal END
+				// Sur EE, l'ancien moteur ne l'écarte pas : effet en jeu non établi.
+				PATCH_IF IS_EE BEGIN
+					LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~not_implemented:opcode%power_opcode%:amount~ message = ~amount of 0 or less on enhanced editions~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					SET drop_id = power_id
+					SPRINT ignored_reason ~file_error:opcode%power_opcode%:amount~
+					SPRINT ignored_message ~amount of 0 or less~
+					LPM ad_application_drop
+				END
 			END
 			ELSE PATCH_IF IS_EE AND NOT (~%power_spell%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = power_id STR_VAR reason = ~not_implemented:opcode%power_opcode%:spell~ message = ~spell given in the resource field~ RET render_missing = refusal END

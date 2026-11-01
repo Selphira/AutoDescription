@@ -4,7 +4,7 @@
 // « Immunité aux sorts de 5ème niveau et inférieurs », ou « Immunité aux sorts » pour les neuf
 // niveaux.
 
-// Refus : effet d'un EFF ; niveau hors de 1-9 ; 102 non réuni (l'ancien opcode_self_102 écrit le
+// Niveau hors de 1-9 : écarté et journalisé. Refus : effet d'un EFF ; 102 non réuni (l'ancien opcode_self_102 écrit le
 // nombre à la place du rang et ses formes « cible » et probables prennent les chaînes d'autres
 // formes, BUG-041) ; 102 de la même portée aux champs différents (l'ancien moteur les réunit tous,
 // avec les champs du dernier lu) ; niveaux réunis qui ne vont pas de 1 à N (l'ancien moteur en
@@ -18,7 +18,10 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF levels_level < 1 OR levels_level > 9 BEGIN
-				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~file_error:opcode102:invalid~ message = ~spell level %levels_level% (expected 1-9)~ RET render_missing = refusal END
+				SET drop_id = levels_id
+				SPRINT ignored_reason ~file_error:opcode102:invalid~
+				SPRINT ignored_message ~spell level %levels_level% (expected 1-9)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF NOT AD_ENABLE_SHRINKAGE BEGIN
 				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:single~ message = ~single spell level without AD_ENABLE_SHRINKAGE~ RET render_missing = refusal END

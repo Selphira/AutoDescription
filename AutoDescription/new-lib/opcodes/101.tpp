@@ -23,7 +23,10 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 			// Opcode sans libellé : l'ancien moteur échoue sur la chaîne absente.
 			PATCH_IF immunity_opcode < 0 OR immunity_opcode > 999 OR NOT TRA_ENTRY_EXISTS (~%immunity_label_tra%~) BEGIN
 				PATCH_IF immunity_opcode < 0 OR immunity_opcode > 999 BEGIN
-					LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~file_error:opcode101:unknown_opcode~ message = ~opcode %immunity_opcode% does not exist (expected 0-999)~ RET render_missing = refusal END
+					SET drop_id = immunity_id
+					SPRINT ignored_reason ~file_error:opcode101:unknown_opcode~
+					SPRINT ignored_message ~opcode %immunity_opcode% does not exist (expected 0-999)~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode101:unknown_opcode~ message = ~no name for opcode %immunity_opcode%~ RET render_missing = refusal END

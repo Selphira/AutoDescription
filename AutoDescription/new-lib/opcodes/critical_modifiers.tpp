@@ -7,8 +7,8 @@
 // chance… » des phrases « Augmente de… », 1 210 1x0, chacun sans puis avec « avec cette arme ») ;
 // libellés 2301 0011-0013 type d'attaque.
 
-// Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme) ; type d'attaque
-// hors de 0-3 ou valeur nulle (l'ancien opcode_301_is_valid les écarte).
+// Type d'attaque hors de 0-3 ou valeur nulle : écartés et journalisés (ancien opcode_301_is_valid).
+// Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme).
 DEFINE_PATCH_MACRO ad_critical_support BEGIN
 	PHP_EACH ~fx_ids_%critical_opcode%~ AS _ => critical_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
@@ -16,7 +16,10 @@ DEFINE_PATCH_MACRO ad_critical_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode%critical_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_special(~%critical_id%~) < 0 OR $fx_special(~%critical_id%~) > 3 OR $fx_parameter1(~%critical_id%~) == 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~file_error:opcode%critical_opcode%:invalid~ message = ~invalid weapon type (special, expected 0-3) or modifier of 0~ RET render_missing = refusal END
+				SET drop_id = critical_id
+				SPRINT ignored_reason ~file_error:opcode%critical_opcode%:invalid~
+				SPRINT ignored_message ~invalid weapon type (special, expected 0-3) or modifier of 0~
+				LPM ad_application_drop
 			END
 		END
 	END

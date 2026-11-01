@@ -11,7 +11,7 @@
 // (fx_creature_anchor ; ancien opcode_219_group_versus) : « +2 contre les élémentaires, les esprits et
 // les fées ».
 
-// Refus : fichier IDS hors de 2-8, ou modificateur sans effet que l'ancien opcode_idscheck8_is_valid
+// Fichier IDS qui n'est pas un type de créature : écarté et journalisé. Refus : kit.ids, ou modificateur sans effet que l'ancien opcode_idscheck8_is_valid
 // écarte (EA et valeur 100) ; type de créature sans nom ; effet probable (l'ancien moteur n'a pas de
 // forme probable) ; avec AD_ENABLE_SHRINKAGE, plusieurs 219 d'équipement sur le porteur dans un bloc
 // (l'ancien opcode_219001_group et opcode_0_group réunissent leurs types) ; réunion à la classe d'armure d'une armure, d'un
@@ -28,7 +28,10 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 			PATCH_IF creature_ac_file < 2 OR creature_ac_file > 8 OR (creature_ac_file == 2 AND $fx_parameter1(~%creature_ac_id%~) == 100) BEGIN
 				SET creature_ac_value = $fx_parameter1(~%creature_ac_id%~)
 				PATCH_IF creature_ac_file < 2 OR creature_ac_file > (IS_EE ? 9 : 8) BEGIN
-					LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~file_error:opcode219:invalid~ message = ~IDS file %creature_ac_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+					SET drop_id = creature_ac_id
+					SPRINT ignored_reason ~file_error:opcode219:invalid~
+					SPRINT ignored_message ~IDS file %creature_ac_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:invalid~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %creature_ac_file%, value %creature_ac_value%)~ RET render_missing = refusal END

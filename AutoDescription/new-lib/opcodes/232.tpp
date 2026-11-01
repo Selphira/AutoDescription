@@ -12,7 +12,7 @@
 // Refus : effet d'un EFF dont resource2 ou resource3 est rempli (l'ancien moteur y lance aussi ces
 // sorts), sauf pour l'en-tête d'un sort seul, qui ne dépend ni de la condition ni du sous-sort ;
 // valeurs que l'ancien
-// opcode_232_is_valid écarte (cible hors de 0-3, condition hors de 0-21, ou de 0-11 sur un jeu
+// opcode_232_is_valid écarte, écartées et journalisées (cible hors de 0-3, condition hors de 0-21, ou de 0-11 sur un jeu
 // classique, moment de la journée sur une autre cible que le porteur, condition 10 sans special,
 // ressource vide, ainsi que resource2 et resource3 pour un effet d'un EFF) ; condition d'un état (5, 6, 15) ; condition de
 // distance trop courte, moment de la journée ou état de sort sans nom ; plusieurs lignes d'un sort
@@ -39,7 +39,10 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			ELSE PATCH_IF condition_target < 0 OR condition_target > 3 OR condition_type < 0 OR condition_type > (IS_EE ? 21 : 11)
 					OR (condition_type == 13 AND condition_target != 0) OR (condition_type == 10 AND condition_special == 0)
 					OR condition_no_resource BEGIN
-				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:invalid~ message = ~invalid target (%condition_target%, expected 0-3), condition (%condition_type%, expected 0-21, 0-11 on classic games) or resource~ RET render_missing = refusal END
+				SET drop_id = condition_id
+				SPRINT ignored_reason ~file_error:opcode232:invalid~
+				SPRINT ignored_message ~invalid target (%condition_target%, expected 0-3), condition (%condition_type%, expected 0-21, 0-11 on classic games) or resource~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF support_header_only BEGIN
 			END
@@ -47,7 +50,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				LPM ad_op_232_targets
 				LPM ad_op_232_condition
 			END
-			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND NOT $fx_dropped(~%condition_id%~) BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%condition_resref%~ RET condition_name = name END
 				SPRINT $fx_spell_name(~%condition_id%~) ~%condition_name%~
 				SET recursion_fx = condition_id
@@ -145,7 +148,10 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	END
 	ELSE PATCH_IF condition_type == 13 BEGIN
 		PATCH_IF condition_special < 0 OR condition_special > 3 BEGIN
-			LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:time_of_day~ message = ~time of day %condition_special% (expected 0-3)~ RET render_missing = refusal END
+			SET drop_id = condition_id
+			SPRINT ignored_reason ~file_error:opcode232:time_of_day~
+			SPRINT ignored_message ~time of day %condition_special% (expected 0-3)~
+			LPM ad_application_drop
 		END
 		ELSE BEGIN
 			SET recursion_ignore_duration = condition_equipped
@@ -156,7 +162,10 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 		SET condition_splstate_tra = 8120000 + condition_special
 		PATCH_IF condition_special < 0 OR condition_special > 255 OR NOT TRA_ENTRY_EXISTS (~%condition_splstate_tra%~) BEGIN
 			PATCH_IF condition_special < 0 OR condition_special > 255 BEGIN
-				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~file_error:opcode232:splstate~ message = ~spell state %condition_special% (expected 0-255)~ RET render_missing = refusal END
+				SET drop_id = condition_id
+				SPRINT ignored_reason ~file_error:opcode232:splstate~
+				SPRINT ignored_message ~spell state %condition_special% (expected 0-255)~
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:splstate~ message = ~spell state %condition_special% has no name~ RET render_missing = refusal END

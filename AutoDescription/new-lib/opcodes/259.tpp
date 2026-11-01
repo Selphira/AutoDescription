@@ -5,8 +5,8 @@
 // dans l'ancien moteur. fx_trap_anchor : effet qui écrit la ligne de son groupe, fx_trap_level :
 // niveau le plus haut du groupe.
 
-// Refus : niveau hors de 0-9 et total inférieur à 1 (ancien opcode_259_is_valid) ; niveau 0, sans
-// nom ; sur EE, sort lancé à la fin de l'effet qui a un nom (la ressource, sinon le sort
+// Niveau hors de 0-9, et total inférieur à 1 sur un jeu classique : écartés et journalisés (ancien
+// opcode_259_is_valid). Refus : total inférieur à 1 sur EE ; niveau 0, sans nom ; sur EE, sort lancé à la fin de l'effet qui a un nom (la ressource, sinon le sort
 // <ressource>B : l'ancien side_spell ajoute « puis lance « … » ») ; effet probable, que l'ancien
 // regroupement traite à part ; niveau au-delà de 1 hors d'un groupe des niveaux 1 à N : l'ancien
 // moteur l'écrit « de niveau N ou inférieur », alors qu'un effet ne piège que son niveau.
@@ -28,10 +28,22 @@ DEFINE_PATCH_MACRO ad_op_259_support BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%trap_resref%~ RET trap_spell = name END
 			END
 			PATCH_IF trap_level < 0 OR trap_level > 9 BEGIN
-				LPF ad_refusal INT_VAR fx_id = trap_id STR_VAR reason = ~file_error:opcode259:level~ message = ~spell level %trap_level% (expected 0-9)~ RET render_missing = refusal END
+				SET drop_id = trap_id
+				SPRINT ignored_reason ~file_error:opcode259:level~
+				SPRINT ignored_message ~spell level %trap_level% (expected 0-9)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF $fx_parameter1(~%trap_id%~) < 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = trap_id STR_VAR reason = ~file_error:opcode259:amount~ message = ~amount of 0 or less~ RET render_missing = refusal END
+				// Sur EE, l'ancien moteur ne l'écarte pas : effet en jeu non établi.
+				PATCH_IF IS_EE BEGIN
+					LPF ad_refusal INT_VAR fx_id = trap_id STR_VAR reason = ~not_implemented:opcode259:amount~ message = ~amount of 0 or less on enhanced editions~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					SET drop_id = trap_id
+					SPRINT ignored_reason ~file_error:opcode259:amount~
+					SPRINT ignored_message ~amount of 0 or less~
+					LPM ad_application_drop
+				END
 			END
 			ELSE PATCH_IF trap_level == 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = trap_id STR_VAR reason = ~not_implemented:opcode259:level0~ message = ~spell level 0~ RET render_missing = refusal END

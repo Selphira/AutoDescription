@@ -144,8 +144,9 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 	END
 END
 
-// Effet app_id d'un en-tête d'objet. L'ancien moteur écarte sans le dire un effet sans cible ou
-// d'une durée limitée nulle (opcode_is_valid) : refusés ici.
+// Effet app_id d'un en-tête d'objet. Comme l'ancien opcode_is_valid, un effet sans cible valide, d'une
+// durée limitée nulle, de probabilité vide ou de restriction de niveau sans cible possible est écarté
+// et journalisé, de même qu'un timing invalide.
 DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_target = $fx_target(~%app_id%~)
 	SET app_effective_target = $fx_effective_target(~%app_id%~)
@@ -153,10 +154,13 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_duration = $fx_duration(~%app_id%~)
 	SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
 	// En-tête d'un sort seul (new-lib/spell_header.tpp) : seuls comptent les effets gardés et leurs
-	// champs, pas leur phrase ; l'ancien moteur garde un effet de timing invalide.
+	// champs, pas leur phrase.
 	PATCH_IF support_header_only BEGIN
 		PATCH_IF NOT (app_timing >= 0 AND (app_timing <= 10 OR app_timing == 4096)) BEGIN
-			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
+			SET drop_id = app_id
+			SPRINT ignored_reason ~file_error:application:timing~
+			SPRINT ignored_message ~timing %app_timing% (expected 0-10 or 4096)~
+			LPM ad_application_drop
 		END
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EQUIPPED_ONLY(~%render_opcode%~) BEGIN
@@ -164,12 +168,15 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	END
 	// Plage vide : l'effet n'a jamais lieu.
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:probability_empty~ message = ~empty probability range (probability2 above probability1): the effect never occurs~ RET render_missing = refusal END
+		SET drop_id = app_id
+		SPRINT ignored_reason ~file_error:application:probability_empty~
+		SPRINT ignored_message ~empty probability range (probability2 above probability1): the effect never occurs~
+		LPM ad_application_drop
 	END
 	// Restriction de niveau d'un effet remplacé par celui d'un EFF (177 : l'ancien add_target_level
 	// prend celle du dernier EFF lu dans sa portée, minLevel, sinon les dés du 177 ; dans un sort, il
 	// ne lit les EFF que dans des fonctions, qui la perdent au retour : les dés du 177) ou sans effet
-	// (minimum au-dessus du maximum, erreur journalisée par l'ancien moteur).
+	// (minimum au-dessus du maximum : aucune cible possible, écarté).
 	ELSE PATCH_IF ($fx_level_max(~%app_id%~) > 0 OR $fx_level_min(~%app_id%~) > 1) AND (($fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) AND NOT resource_is_spell)
 			OR ($fx_level_max(~%app_id%~) > 0 AND $fx_level_min(~%app_id%~) > $fx_level_max(~%app_id%~))) BEGIN
 		PATCH_IF $fx_external(~%app_id%~) AND NOT $fx_eff_levels(~%app_id%~) AND NOT resource_is_spell BEGIN
@@ -178,11 +185,17 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		ELSE BEGIN
 			SET app_level_min = $fx_level_min(~%app_id%~)
 			SET app_level_max = $fx_level_max(~%app_id%~)
-			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:level~ message = ~minimum level %app_level_min% above maximum level %app_level_max%: the effect never applies~ RET render_missing = refusal END
+			SET drop_id = app_id
+			SPRINT ignored_reason ~file_error:application:level~
+			SPRINT ignored_message ~minimum level %app_level_min% above maximum level %app_level_max%: the effect never applies~
+			LPM ad_application_drop
 		END
 	END
 	ELSE PATCH_IF app_target == TARGET_FX_none OR app_target > TARGET_FX_original_caster BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:target~ message = ~target %app_target% (expected 1-9)~ RET render_missing = refusal END
+		SET drop_id = app_id
+		SPRINT ignored_reason ~file_error:application:target~
+		SPRINT ignored_message ~target %app_target% (expected 1-9)~
+		LPM ad_application_drop
 	END
 	ELSE PATCH_IF $fx_potion_drinker(~%app_id%~) AND $fx_header_target_count(~%app_id%~) != 0
 			AND app_target != TARGET_FX_self AND app_target != TARGET_FX_original_caster BEGIN
@@ -210,7 +223,10 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:timing~ message = ~timing %app_timing% not supported in an ability~ RET render_missing = refusal END
 		END
 		ELSE BEGIN
-			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:timing~ message = ~timing %app_timing% (expected 0-10 or 4096)~ RET render_missing = refusal END
+			SET drop_id = app_id
+			SPRINT ignored_reason ~file_error:application:timing~
+			SPRINT ignored_message ~timing %app_timing% (expected 0-10 or 4096)~
+			LPM ad_application_drop
 		END
 	END
 	// Les lignes d'un sort ne nomment pas la zone de son projectile (ancien projectile 0 hors d'un

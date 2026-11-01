@@ -5,14 +5,17 @@
 // (new-lib/resources.tpp). Phrase : 2OOO 0100 avec un niveau, 0110 tous les niveaux (+ forme). Les
 // macros ad_op_<N>_* fixent dispel_type_opcode puis appellent celles-ci.
 
-// Refus : niveau négatif (l'ancien opcode_221_is_valid l'écarte). Type sans nom (type 0, nommé en
+// Niveau négatif : écarté et journalisé (ancien opcode_221_is_valid). Type sans nom (type 0, nommé en
 // anglais mais pas en français ; type ajouté par un mod) : pas de ligne, journalisé.
 DEFINE_PATCH_MACRO ad_dispel_type_support BEGIN
 	PHP_EACH ~fx_ids_%dispel_type_opcode%~ AS _ => dispel_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%dispel_id%~) BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = $fx_parameter2(~%dispel_id%~) RET dispel_name = name END
 			PATCH_IF $fx_parameter1(~%dispel_id%~) < 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = dispel_id STR_VAR reason = ~file_error:opcode%dispel_type_opcode%:invalid~ message = ~negative secondary type~ RET render_missing = refusal END
+				SET drop_id = dispel_id
+				SPRINT ignored_reason ~file_error:opcode%dispel_type_opcode%:invalid~
+				SPRINT ignored_message ~negative secondary type~
+				LPM ad_application_drop
 			END
 			ELSE BEGIN
 				SPRINT $fx_secondary_type_name(~%dispel_id%~) ~%dispel_name%~

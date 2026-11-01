@@ -6,7 +6,8 @@
 
 // Objet absent : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
 // opcode_143_is_valid).
-// Refus : objet sans nom, emplacement inconnu (écartés par l'ancien opcode_143_is_valid) ;
+// Emplacement inconnu : écarté et journalisé. Refus : objet sans nom (écarté par l'ancien
+// opcode_143_is_valid) ;
 // avec AD_ENABLE_SHRINKAGE, objet qui remplace une arme brisée (MISC57, MISC58, CDDELHLM : opcode
 // virtuel 519 de l'ancien opcode_143_group_mod).
 DEFINE_PATCH_MACRO ad_op_143_support BEGIN
@@ -17,7 +18,10 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 			LPF ad_item_info STR_VAR resref = ~%slot_resref%~ RET slot_item_name = name END
 			PATCH_IF ~%slot_item_name%~ STRING_EQUAL ~~ OR slot_index < 0 OR slot_index > 38 BEGIN
 				PATCH_IF slot_index < 0 OR slot_index > 38 BEGIN
-					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~file_error:opcode143:invalid~ message = ~slot %slot_index% (expected 0-38)~ RET render_missing = refusal END
+					SET drop_id = slot_id
+					SPRINT ignored_reason ~file_error:opcode143:invalid~
+					SPRINT ignored_message ~slot %slot_index% (expected 0-38)~
+					LPM ad_application_drop
 				END
 				ELSE PATCH_IF ~%slot_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%slot_resref%.itm~ BEGIN
 					SET drop_id = slot_id

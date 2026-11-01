@@ -39,8 +39,8 @@ END
 // valeur du fichier IDS parameter2, nommé (ancien opcode_self_109 : « Paralyse les morts-vivants »).
 // L'ancien moteur décrit le 109 comme une paralysie simple quand ce fichier est inhabituel ou, sur EE,
 // quand special n'est pas nul (opcode_109_common) ; il écarte un 175 ou un 185 de fichier hors de 2-9
-// (9 sur EE seulement) ou de valeur 100 d'ea.ids (opcode_idscheck9_is_valid). Refus : ces effets
-// écartés ; type de créature sans nom (dont kit.ids).
+// (9 sur EE seulement) ou de valeur 100 d'ea.ids (opcode_idscheck9_is_valid) : écartés et journalisés.
+// Refus : type de créature sans nom (dont kit.ids).
 DEFINE_PATCH_MACRO ad_hold_support BEGIN
 	PHP_EACH ~fx_ids_%hold_opcode%~ AS _ => hold_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%hold_id%~) BEGIN
@@ -51,7 +51,10 @@ DEFINE_PATCH_MACRO ad_hold_support BEGIN
 				OR (hold_opcode == 109 AND (hold_invalid OR (IS_EE AND $fx_special(~%hold_id%~) != 0)))
 			SPRINT $fx_hold_name(~%hold_id%~) ~~
 			PATCH_IF hold_opcode != 109 AND (hold_invalid OR (hold_ids == 2 AND hold_value == 100)) BEGIN
-				LPF ad_refusal INT_VAR fx_id = hold_id STR_VAR reason = ~file_error:opcode%hold_opcode%:invalid~ message = ~IDS file %hold_ids% is not a creature type (expected 2-9: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN, KIT (enhanced editions))~ RET render_missing = refusal END
+				SET drop_id = hold_id
+				SPRINT ignored_reason ~file_error:opcode%hold_opcode%:invalid~
+				SPRINT ignored_message ~IDS file %hold_ids% is not a creature type (expected 2-9: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN, KIT (enhanced editions))~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF NOT $fx_hold_plain(~%hold_id%~) AND NOT support_header_only BEGIN
 				LPF ad_ids_name INT_VAR ids_file = hold_ids entry = hold_value RET hold_name = name END

@@ -5,8 +5,8 @@
 // decrement_opcode, decrement_by_school (1 : école) et, pour ses lignes, decrement_variant_macro (vide
 // sans variante) ; phrases du code commun des états (new-lib/opcodes/states.tpp).
 
-// Refus : total inférieur à 1 (écarté par l'ancien opcode_<N>_is_valid sur un jeu classique, « Lance »
-// sur EE) ; sur EE, sort lancé à la fin de l'effet qui a un nom (la ressource, sinon le sort
+// Total inférieur à 1 sur un jeu classique : écarté et journalisé (ancien opcode_<N>_is_valid). Refus :
+// total inférieur à 1 sur EE (l'ancien moteur écrit « Lance ») ; sur EE, sort lancé à la fin de l'effet qui a un nom (la ressource, sinon le sort
 // <ressource>B : l'ancien side_spell ajoute « puis lance « … » »). École ou type secondaire sans nom
 // (ajouté par un mod) : comme l'ancien moteur, pas de ligne ; l'effet compte encore pour l'en-tête,
 // journalisé.
@@ -32,7 +32,16 @@ DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%decrement_resref%~ RET decrement_spell = name END
 			END
 			PATCH_IF $fx_parameter1(~%decrement_id%~) < 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = decrement_id STR_VAR reason = ~file_error:opcode%decrement_opcode%:amount~ message = ~amount of 0 or less~ RET render_missing = refusal END
+				// Sur EE, l'ancien moteur ne l'écarte pas : effet en jeu non établi.
+				PATCH_IF IS_EE BEGIN
+					LPF ad_refusal INT_VAR fx_id = decrement_id STR_VAR reason = ~not_implemented:opcode%decrement_opcode%:amount~ message = ~amount of 0 or less on enhanced editions~ RET render_missing = refusal END
+				END
+				ELSE BEGIN
+					SET drop_id = decrement_id
+					SPRINT ignored_reason ~file_error:opcode%decrement_opcode%:amount~
+					SPRINT ignored_message ~amount of 0 or less~
+					LPM ad_application_drop
+				END
 			END
 			ELSE PATCH_IF ~%decrement_kind_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF NOT support_header_only BEGIN

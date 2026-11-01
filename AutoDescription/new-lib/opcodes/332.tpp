@@ -2,7 +2,7 @@
 // parameter2 (0 tous, 1 feu, 2 froid, 3 électricité, 4 acide, 5 magie, 6 poison, 7 tranchants,
 // 8 perforants, 9 contondants, 10 projectiles) : « Dégâts de feu : +10 % ».
 
-// Refus : valeur nulle ou type inconnu (écartés par l'ancien opcode_332_is_valid) ; avec
+// Valeur nulle ou type inconnu : écartés et journalisés (ancien opcode_332_is_valid). Refus : avec
 // AD_ENABLE_SHRINKAGE, les quatre types élémentaires (1 à 4) ou physiques (7 à 10) modifiés de la même
 // façon (l'ancien opcode_332_group en fait « Dégâts élémentaires », « Dégâts physiques »).
 DEFINE_PATCH_MACRO ad_op_332_support BEGIN
@@ -10,7 +10,10 @@ DEFINE_PATCH_MACRO ad_op_332_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET damage_mod_type = $fx_parameter2(~%damage_mod_id%~)
 			PATCH_IF $fx_parameter1(~%damage_mod_id%~) == 0 OR damage_mod_type < 0 OR damage_mod_type > 10 BEGIN
-				LPF ad_refusal INT_VAR fx_id = damage_mod_id STR_VAR reason = ~file_error:opcode332:invalid~ message = ~modifier of 0 or damage type %damage_mod_type% (expected 0-10)~ RET render_missing = refusal END
+				SET drop_id = damage_mod_id
+				SPRINT ignored_reason ~file_error:opcode332:invalid~
+				SPRINT ignored_message ~modifier of 0 or damage type %damage_mod_type% (expected 0-10)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (damage_mod_type == 1 OR damage_mod_type == 7) BEGIN
 				LPM ad_op_332_group_support

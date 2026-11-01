@@ -3,11 +3,14 @@
 // new-lib/opcodes/states.tpp. Nombre tiré au sort réuni : « Draine entre 1 et 10 sorts profanes »
 // (new-lib/opcodes/value_ranges.tpp).
 
-// Refus : aucun sort drainé (écarté par l'ancien opcode_244_is_valid).
+// Aucun sort drainé : écarté et journalisé (ancien opcode_244_is_valid).
 DEFINE_PATCH_MACRO ad_op_244_support BEGIN
 	PHP_EACH fx_ids_244 AS _ => drain_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_parameter1(~%drain_id%~) <= 0 BEGIN
-			LPF ad_refusal INT_VAR fx_id = drain_id STR_VAR reason = ~file_error:opcode244:invalid~ message = ~number of spells to drain of 0 or less~ RET render_missing = refusal END
+			SET drop_id = drain_id
+			SPRINT ignored_reason ~file_error:opcode244:invalid~
+			SPRINT ignored_message ~number of spells to drain of 0 or less~
+			LPM ad_application_drop
 		END
 	END
 	SET range_opcode = 244

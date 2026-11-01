@@ -4,14 +4,17 @@
 // ad_group_restored_spells (new-lib/groups.tpp) ; niveau tiré au sort réuni : « de niveau 1 à 8 ou
 // inférieur » (new-lib/opcodes/value_ranges.tpp). Code commun dans new-lib/opcodes/states.tpp.
 
-// Refus : type autre que 0 ou 1 et niveau négatif (écartés par l'ancien opcode_261_is_valid).
+// Type autre que 0 ou 1 et niveau négatif : écartés et journalisés (ancien opcode_261_is_valid).
 DEFINE_PATCH_MACRO ad_op_261_support BEGIN
 	PHP_EACH fx_ids_261 AS _ => restore_id BEGIN
 		SET $fx_restore_both(~%restore_id%~) = 0
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET restore_type = $fx_parameter2(~%restore_id%~)
 			PATCH_IF (restore_type != 0 AND restore_type != 1) OR $fx_parameter1(~%restore_id%~) < 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = restore_id STR_VAR reason = ~file_error:opcode261:invalid~ message = ~spell type %restore_type% (expected 0 or 1) or negative spell level~ RET render_missing = refusal END
+				SET drop_id = restore_id
+				SPRINT ignored_reason ~file_error:opcode261:invalid~
+				SPRINT ignored_message ~spell type %restore_type% (expected 0 or 1) or negative spell level~
+				LPM ad_application_drop
 			END
 		END
 	END

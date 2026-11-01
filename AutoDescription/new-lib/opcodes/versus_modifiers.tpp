@@ -8,8 +8,9 @@
 // ligne écrite après les autres effets de l'opcode, comme celle que l'ancien moteur ajoute. Les
 // macros ad_op_<N>_* fixent versus_opcode et versus_name_tra puis appellent les macros ci-dessous.
 
-// Un 178 ou un 179 sans valeur : l'ancien moteur l'écarte (opcode_178_is_valid). Refus : fichier
-// hors de 2-8 et valeur 100 de ea.ids (opcode_idscheck8_is_valid du 344 ; kit.ids non repris) ;
+// Un 178 ou un 179 sans valeur : l'ancien moteur l'écarte (opcode_178_is_valid). Fichier qui
+// n'est pas un type de créature : écarté et journalisé. Refus : kit.ids et valeur 100 de ea.ids
+// (opcode_idscheck8_is_valid du 344) ;
 // valeur sans nom ; forme « cible » et effet probable du 344 (l'ancien moteur n'en a pas) ;
 // effet d'un 177 qui vise lui-même un type de créature (l'ancien moteur remplace alors celui de
 // l'opcode).
@@ -34,7 +35,10 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			END
 			ELSE PATCH_IF versus_file < 2 OR versus_file > 8 OR (versus_file == 2 AND versus_value == 100) BEGIN
 				PATCH_IF versus_file < 2 OR versus_file > (IS_EE ? 9 : 8) BEGIN
-					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~file_error:opcode%versus_opcode%:ids_file~ message = ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+					SET drop_id = versus_id
+					SPRINT ignored_reason ~file_error:opcode%versus_opcode%:ids_file~
+					SPRINT ignored_message ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %versus_file%, value %versus_value%)~ RET render_missing = refusal END

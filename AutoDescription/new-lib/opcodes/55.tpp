@@ -6,8 +6,8 @@
 // dans l'ordre des effets, ligne écrite après les autres effets 55, comme celle que l'ancien moteur
 // ajoute en fin de liste.
 
-// Refus : fichier hors de 2-8 (l'ancien moteur écarte les autres, sauf kit.ids sur EE, et la valeur
-// 100 de ea.ids, opcode_modstat_is_valid) ; valeur sans nom ; effet d'un 177 qui vise un type de
+// Fichier qui n'est pas un type de créature : écarté et journalisé. Refus : kit.ids sur EE et valeur
+// 100 de ea.ids (l'ancien opcode_modstat_is_valid écarte ces cas) ; valeur sans nom ; effet d'un 177 qui vise un type de
 // créature (l'ancien moteur remplace alors le nom de l'opcode par celui du 177).
 DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 	PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
@@ -18,7 +18,10 @@ DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 			SPRINT $fx_kill_name(~%kill_id%~) ~%kill_name%~
 			PATCH_IF kill_file < 2 OR kill_file > 8 OR (kill_file == 2 AND kill_value == 100) BEGIN
 				PATCH_IF kill_file < 2 OR kill_file > (IS_EE ? 9 : 8) BEGIN
-					LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~file_error:opcode55:ids_file~ message = ~IDS file %kill_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+					SET drop_id = kill_id
+					SPRINT ignored_reason ~file_error:opcode55:ids_file~
+					SPRINT ignored_message ~IDS file %kill_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %kill_file%, value %kill_value%)~ RET render_missing = refusal END

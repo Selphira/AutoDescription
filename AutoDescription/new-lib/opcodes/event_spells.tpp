@@ -7,8 +7,8 @@
 // event_weapon (1 : parameter2 et special lus, IESDP ; le 340 ne les lit pas) et, pour ses lignes,
 // event_condition_tra (condition de toute arme, suivie de celle de cette arme à + 2).
 
-// Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme) ; ressource vide ;
-// parameter2 hors de 0-1 ; special non nul (type d'attaque, « en mêlée ») ; effet sur une cible (« À
+// Ressource vide et parameter2 hors de 0-1 : écartés et journalisés. Refus : effet d'un EFF (l'ancien
+// moteur y lit parameter3, la catégorie d'arme) ; special non nul (type d'attaque, « en mêlée ») ; effet sur une cible (« À
 // chaque coup critique de la cible ») ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_event_spell_support BEGIN
 	PHP_EACH ~fx_ids_%event_opcode%~ AS _ => event_id BEGIN
@@ -19,7 +19,10 @@ DEFINE_PATCH_MACRO ad_event_spell_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = event_id STR_VAR reason = ~not_implemented:opcode%event_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%event_resref%~ STRING_EQUAL ~~ OR (event_weapon AND ($fx_parameter2(~%event_id%~) < 0 OR $fx_parameter2(~%event_id%~) > 1)) BEGIN
-				LPF ad_refusal INT_VAR fx_id = event_id STR_VAR reason = ~file_error:opcode%event_opcode%:invalid~ message = ~empty resource field or parameter2 outside 0-1~ RET render_missing = refusal END
+				SET drop_id = event_id
+				SPRINT ignored_reason ~file_error:opcode%event_opcode%:invalid~
+				SPRINT ignored_message ~empty resource field or parameter2 outside 0-1~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF event_weapon AND $fx_special(~%event_id%~) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = event_id STR_VAR reason = ~not_implemented:opcode%event_opcode%:attack_type~ message = ~attack type (special) other than 0~ RET render_missing = refusal END

@@ -5,7 +5,7 @@
 // type (ad_application_versus), le charme ne nomme pas le sien. Code commun dans
 // new-lib/opcodes/states.tpp.
 
-// Refus : type de charme inconnu (écarté par l'ancien opcode_5_is_valid) ; type de créature sans nom
+// Type de charme inconnu : écarté et journalisé (ancien opcode_5_is_valid). Refus : type de créature sans nom
 // (aucune ligne) ou cible autre que « la cible » (l'ancien moteur garde alors un nom lu pour un effet
 // précédent).
 DEFINE_PATCH_MACRO ad_op_5_support BEGIN
@@ -17,7 +17,10 @@ DEFINE_PATCH_MACRO ad_op_5_support BEGIN
 			LPF ad_ids_name INT_VAR ids_file = 3 entry = charm_value RET charm_name = name END
 			SPRINT $fx_charm_name(~%charm_id%~) ~%charm_name%~
 			PATCH_IF NOT ((charm_type >= 0 AND charm_type <= 5) OR (charm_type >= 1000 AND charm_type <= 1005)) BEGIN
-				LPF ad_refusal INT_VAR fx_id = charm_id STR_VAR reason = ~file_error:opcode5:invalid~ message = ~charm type %charm_type% (expected 0-5 or 1000-1005)~ RET render_missing = refusal END
+				SET drop_id = charm_id
+				SPRINT ignored_reason ~file_error:opcode5:invalid~
+				SPRINT ignored_message ~charm type %charm_type% (expected 0-5 or 1000-1005)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF charm_value != 0 AND charm_target != TARGET_FX_self AND charm_target != TARGET_FX_original_caster
 					AND $fx_versus_file(~%charm_id%~) == 0 BEGIN

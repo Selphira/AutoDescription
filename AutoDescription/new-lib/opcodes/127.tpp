@@ -11,9 +11,10 @@
 // montagne) ». Un effet d'un fichier EFF ne diffère que pour un special non nul (dés de l'EFF).
 
 // Comme l'ancien opcode_127_is_valid, un effet dont la table resource est absente (avec un special
-// non nul, la table vide l'est toujours) est écarté.
-// Refus : special non nul (niveau du lanceur, nombre de créatures) ; parameter2 hors de 0-9,
-// parameter1 négatif ; table absente ou sans créature, ou dont aucune n'a de nom ; créature de niveau
+// non nul, la table vide l'est toujours) est écarté ; de même, journalisés, parameter2 hors de 0-9 et
+// parameter1 négatif.
+// Refus : special non nul (niveau du lanceur, nombre de créatures) ; table sans créature, ou dont
+// aucune n'a de nom ; créature de niveau
 // de puissance nul, hors des invocations ordinaires (allégeance au plus 15 sauf familier, genre
 // invoqué : l'ancien moteur en compte 0, ou applique aux célestes la limite ordinaire), dont l'ancien
 // arrondi diffère de l'arrondi au-dessus (BUG-033) ou dont le nom contient une virgule (l'ancien
@@ -44,10 +45,16 @@ DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:special~ message = ~special value (caster level or number of creatures) not supported~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF NOT monster_custom AND (monster_table < 0 OR monster_table > 9) BEGIN
-				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:table~ message = ~monster table %monster_table% (expected 0-9)~ RET render_missing = refusal END
+				SET drop_id = monster_id
+				SPRINT ignored_reason ~file_error:opcode127:table~
+				SPRINT ignored_message ~monster table %monster_table% (expected 0-9)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF $fx_parameter1(~%monster_id%~) < 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:level~ message = ~negative total level~ RET render_missing = refusal END
+				SET drop_id = monster_id
+				SPRINT ignored_reason ~file_error:opcode127:level~
+				SPRINT ignored_message ~negative total level~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF monster_custom BEGIN
 				LPM ad_op_127_resource_table
@@ -91,7 +98,10 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	SET monster_max = 0
 	CLEAR_ARRAY monster_names
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%monster_file%.2da~ BEGIN
-		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~file_error:opcode127:no_table~ message = ~table %monster_file%.2DA does not exist~ RET render_missing = refusal END
+		SET drop_id = monster_id
+		SPRINT ignored_reason ~file_error:opcode127:no_table~
+		SPRINT ignored_message ~table %monster_file%.2DA does not exist~
+		LPM ad_application_drop
 	END
 	ELSE BEGIN
 		INNER_PATCH_FILE ~%monster_file%.2da~ BEGIN

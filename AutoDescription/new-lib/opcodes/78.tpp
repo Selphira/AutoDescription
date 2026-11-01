@@ -6,8 +6,8 @@
 // Phrase : 2078 0100 + 10 × décalage de la chaîne de l'ancien moteur (+ forme) ; 40 (réduites) et 50
 // (augmentées) pour des caractéristiques réunies (ad_op_78_group).
 
-// Refus : type hors de 0-13, ou au-delà de 10 sur un jeu classique ; dégâts sans durée sous un timing
-// permanent ou sans effet (opcode_78_is_valid, comme le poison) ; contact de la moisissure (11, 12),
+// Type hors de 0-13, ou au-delà de 10 sur un jeu classique, dégâts sans durée sous un timing permanent
+// ou sans effet : écartés et journalisés (opcode_78_is_valid, comme le poison). Refus : contact de la moisissure (11, 12),
 // que l'ancien moteur n'écrit pas ; caractéristique inchangée ; refus de ad_op_78_group.
 DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 	PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
@@ -19,20 +19,32 @@ DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 			SET hp_id = disease_id
 			LPM ad_hp_over_time_value
 			PATCH_IF disease_type < 0 OR disease_type > 13 OR (disease_type > 10 AND NOT IS_EE) BEGIN
-				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:invalid~ message = ~disease type %disease_type% (expected 0-13, 0-10 on classic games)~ RET render_missing = refusal END
+				SET drop_id = disease_id
+				SPRINT ignored_reason ~file_error:opcode78:invalid~
+				SPRINT ignored_message ~disease type %disease_type% (expected 0-13, 0-10 on classic games)~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF disease_type <= 3 AND (disease_timing == TIMING_permanent OR disease_timing == TIMING_delayed OR disease_timing == 7
 					OR disease_timing == TIMING_permanent_after_death) AND $fx_duration(~%disease_id%~) == 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:timing~ message = ~damage over time with a permanent or delayed timing and no duration~ RET render_missing = refusal END
+				SET drop_id = disease_id
+				SPRINT ignored_reason ~file_error:opcode78:timing~
+				SPRINT ignored_message ~damage over time with a permanent or delayed timing and no duration~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF disease_type <= 3 AND hp_amount <= 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:no_effect~ message = ~damage amount of 0 or less~ RET render_missing = refusal END
+				SET drop_id = disease_id
+				SPRINT ignored_reason ~file_error:opcode78:no_effect~
+				SPRINT ignored_message ~damage amount of 0 or less~
+				LPM ad_application_drop
 			END
 			ELSE PATCH_IF disease_type == 11 OR disease_type == 12 BEGIN
 				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~not_implemented:opcode78:mold_touch~ message = ~mold touch~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ((disease_type >= 4 AND disease_type <= 9) OR disease_type == 13) AND disease_amount == 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = disease_id STR_VAR reason = ~file_error:opcode78:no_effect~ message = ~amount of 0~ RET render_missing = refusal END
+				SET drop_id = disease_id
+				SPRINT ignored_reason ~file_error:opcode78:no_effect~
+				SPRINT ignored_message ~amount of 0~
+				LPM ad_application_drop
 			END
 		END
 	END

@@ -3,8 +3,8 @@
 // « Immunité aux attaques et aux sorts des morts-vivants » ; valeur 0 : de toutes les créatures.
 // Code commun dans new-lib/opcodes/states.tpp.
 
-// Refus : fichier hors de 2-8 et valeur 100 de ea.ids (écartés par l'ancien opcode_idscheck8_is_valid) ;
-// valeur sans nom.
+// Fichier qui n'est pas un type de créature : écarté et journalisé. Refus : kit.ids et valeur 100 de
+// ea.ids (écartés par l'ancien opcode_idscheck8_is_valid) ; valeur sans nom.
 DEFINE_PATCH_MACRO ad_op_100_support BEGIN
 	PHP_EACH fx_ids_100 AS _ => versus_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -14,7 +14,10 @@ DEFINE_PATCH_MACRO ad_op_100_support BEGIN
 			SPRINT $fx_versus_name(~%versus_id%~) ~%versus_name%~
 			PATCH_IF versus_file < 2 OR versus_file > 8 OR (versus_file == 2 AND versus_value == 100) BEGIN
 				PATCH_IF versus_file < 2 OR versus_file > (IS_EE ? 9 : 8) BEGIN
-					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~file_error:opcode100:ids_file~ message = ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~ RET render_missing = refusal END
+					SET drop_id = versus_id
+					SPRINT ignored_reason ~file_error:opcode100:ids_file~
+					SPRINT ignored_message ~IDS file %versus_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~
+					LPM ad_application_drop
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode100:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %versus_file%, value %versus_value%)~ RET render_missing = refusal END
