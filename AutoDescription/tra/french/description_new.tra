@@ -360,6 +360,7 @@
 @8000135 = ~Se cacher dans l'ombre~ // reprise de @12750001
 @8000136 = ~Détection des illusions~ // reprise de @12760001
 @8000137 = ~Pose de pièges~ // reprise de @12770001
+@8000147 = ~Champ de vision~ // reprise de @12620001
 
 // Listes indexées : niveaux de sort (ordinaux), 8 010 000 + niveau (8 010 000-8 019 999)
 @8010001 = ~1er~ // reprise de @101201
@@ -788,6 +789,7 @@
 @8060135 = ~le score de Se cacher dans l'ombre~ // reprise de @12750002
 @8060136 = ~le score de Détection des illusions~ // reprise de @12760002
 @8060137 = ~le score de Pose de pièges~ // reprise de @12770002
+@8060147 = ~le champ de vision~ // reprise de @12620002
 
 // Noms des projectiles, 8 070 000 + index (AD_PROJECTILE_NAMES) (8 070 000-8 070 999)
 @8070001 = ~flèches~ // reprise de @300001

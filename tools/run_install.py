@@ -60,7 +60,8 @@ def impose_options(tp2, options):
 
 
 def restrict_loops(target, resources):
-    pattern = "\\(" + "\\|".join(re.escape(resource) for resource in resources) + "\\)"
+    # re.escape protège aussi « # » (L#NSSEE), que l'expression régulière de WeiDU ne reconnaît plus.
+    pattern = "\\(" + "\\|".join(re.sub(r"([.*+?^$\[\]\\])", r"\\\1", resource) for resource in resources) + "\\)"
     for relative, extension in LOOPS.items():
         path = target / relative
         text = path.read_bytes().decode("utf-8")

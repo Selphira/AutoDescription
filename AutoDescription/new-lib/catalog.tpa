@@ -180,7 +180,7 @@ END
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
 	57 => 1 99 => 1 105 => 1 108 => 1 181 => 1 183 => 1 199 => 1
 	223 => 1 227 => 1 228 => 1
-	262 => 1 266 => 1 279 => 1 323 => 1
+	266 => 1 279 => 1 323 => 1
 	325 => 1 329 => 1 331 => 1 333 => 1 340 => 1 361 => 1 362 => 1
 END
 
@@ -419,6 +419,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_NAMES BEGIN
 	190 => 21900000 // ~Facteur de vitesse~
 	191 => 21910000 // ~Niveau de lanceur de sorts %spellType%~
 	233 => 22330000 // ~Compétence martiale %proficiency%~
+	262 => 8000147 // ~Champ de vision~
 	263 => 8000056 // ~Multiplicateur d'attaque sournoise~
 	250 => 22500000 // ~Dégâts minimums~
 	275 => 8000135 // ~Se cacher dans l'ombre~

@@ -360,6 +360,7 @@
 @8000135 = ~Hide in Shadows~ // reprise de @12750001
 @8000136 = ~Detect Illusion~ // reprise de @12760001
 @8000137 = ~Set Traps~ // reprise de @12770001
+@8000147 = ~Visual Range~ // reprise de @12620001
 
 // Listes indexées : niveaux de sort (ordinaux), 8 010 000 + niveau (8 010 000-8 019 999)
 @8010001 = ~1st~ // reprise de @101201
@@ -788,6 +789,7 @@
 @8060135 = ~the Hide in Shadows~ // reprise de @12750002
 @8060136 = ~the Detect Illusion~ // reprise de @12760002
 @8060137 = ~the Set Traps~ // reprise de @12770002
+@8060147 = ~the Visual Range~ // reprise de @12620002
 
 // Noms des projectiles, 8 070 000 + index (AD_PROJECTILE_NAMES) (8 070 000-8 070 999)
 @8070001 = ~arrows~ // reprise de @300001
