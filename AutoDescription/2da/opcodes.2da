@@ -280,7 +280,7 @@
 276      1        1        DESCRIBED LEVEL            123    SHOWN           Stat:_Detect_Illusion_Modifier
 277      1        1        DESCRIBED LEVEL            125    SHOWN           Stat:_Set_Traps_Modifier
 278      1        1        DESCRIBED LEVEL            61     SHOWN           Stat:_To_Hit_Modifier
-279      1        1        TODO      LEVEL            497    SHOWN           Button:_Enable_Button
+279      1        1        DESCRIBED LEVEL            497    SHOWN           Button:_Enable_Button
 280      1        1        DESCRIBED LEVEL            404    NOT_PERMANENT   Spell_Effect:_Wild_Magic
 281      1        1        DESCRIBED LEVEL            420    SHOWN           Stat:_Wild_Magic
 282      1        1        DESCRIBED LEVEL            999    SHOWN           Script:_Scripting_State_Modifier
@@ -326,13 +326,13 @@
 322      0        1        TODO      LEVEL            400    SHOWN           Evade_Area_of_Effect
 323      0        1        TODO      LEVEL            421    SHOWN           Stat:_Turn_Undead_Level
 324      0        1        DESCRIBED LEVEL            3      IGNORED         Protection:_Immunity_to_Resource_and_Message
-325      0        1        TODO      LEVEL            70     SHOWN           Stat:_Save_vs._all
+325      0        1        DESCRIBED LEVEL            70     SHOWN           Stat:_Save_vs._all
 326      0        1        DESCRIBED LEVEL            469    SHOWN           Apply_Effects_List
 327      0        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Icewind_Visual_Spell_Hit_(plays_sound)
 328      0        1        IGNORED   LEVEL            400    SHOWN           State:_Set_Extended_or_Spell_State
 329      0        1        TODO      LEVEL            399    SHOWN           Spell_Effect:_Slow_Poison
 330      0        1        IGNORED   LEVEL            400    SHOWN           Text:_Float_Text
-331      0        1        TODO      DICE             132    NOT_PERMANENT   Summon:_Random_Monster_Summoning
+331      0        1        DESCRIBED DICE             132    NOT_PERMANENT   Summon:_Random_Monster_Summoning
 332      0        1        DESCRIBED LEVEL            48     SHOWN           Stat:_Specific_Damage_Modifier
 333      0        1        TODO      DICE             473    SHOWN           Spell_Effect:_Static_Charge
 334      0        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Turn_Undead

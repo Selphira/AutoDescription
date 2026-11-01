@@ -3263,6 +3263,12 @@
 @22740102 = ~de téléporter aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740002
 @22740103 = ~de téléporter aléatoirement %theTarget% auprès d'un ennemi à portée de vue~ // reprise de @12740002
 
+// Opcode 279 : Activation d'un bouton : actions 0100-0103, suivies des listes du 144 (22 790 000-22 790 999)
+@22790100 = ~Permet~ // reprise de @12790020
+@22790101 = ~Permet %toTheTarget%~ // reprise de @12790040
+@22790102 = ~de permettre~ // reprise de @12790021
+@22790103 = ~de permettre %toTheTarget%~ // reprise de @12790041
+
 // Opcode 280 : Hiatus entropique : phrases 0100 prochain sort, 0110 tous les sorts, 0120 dissipation (22 800 000-22 800 999)
 @22800100 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~ // reprise de @12800001
 @22800101 = ~Le prochain sort lancé par %theTarget% déclenche un hiatus entropique~ // reprise de @12800001
@@ -3445,6 +3451,10 @@
 @23241144 = ~créatures dont les points de vie sont supérieurs ou égaux à %value%~ // reprise de @13241144
 @23241145 = ~créatures dont les points de vie sont inférieurs à %value%~ // reprise de @13241145
 
+// Opcode 325 : Tous les jets de sauvegarde : 0000 nom, 0002 statistique (23 250 000-23 250 999)
+@23250000 = ~Jets de sauvegarde~ // reprise de @102034
+@23250002 = ~les jets de sauvegarde~ // reprise de @13250002
+
 // Opcode 326 : conditions (stats.2da), reprises de @13260000-@13269999 qui n'utilisent que les chaînes
 // de cible et idName (23 260 000-23 269 999)
 @23260000 = ~~ // reprise de @13260000
@@ -3528,6 +3538,25 @@
 @23269241 = ~Si %theTarget% est du même alignement moral que la source~ // reprise de @13269241
 @23269245 = ~Si %theTarget% est d'un alignement moral différent de la source~ // reprise de @13269245
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
+
+// Opcode 331 : Invocation aléatoire de monstres : phrases 0100 total de niveaux, 0110 niveau du lanceur,
+// 0120 une créature, 0130 plusieurs (23 310 000-23 310 999)
+@23310100 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~ // reprise de @13310001
+@23310101 = ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~ // reprise de @13310001
+@23310102 = ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~ // reprise de @13310005
+@23310103 = ~d'invoquer des créatures pour un total de %amount% niveaux (%creatures%)~ // reprise de @13310005
+@23310110 = ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // reprise de @13310002
+@23310111 = ~Invoque des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // reprise de @13310002
+@23310112 = ~d'invoquer des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // reprise de @13310006
+@23310113 = ~d'invoquer des créatures pour un total de niveaux égal au niveau du lanceur (%creatures%)~ // reprise de @13310006
+@23310120 = ~Invoque 1 créature (%creatures%)~ // reprise de @13310003
+@23310121 = ~Invoque 1 créature (%creatures%)~ // reprise de @13310003
+@23310122 = ~d'invoquer 1 créature (%creatures%)~ // reprise de @13310007
+@23310123 = ~d'invoquer 1 créature (%creatures%)~ // reprise de @13310007
+@23310130 = ~Invoque %amount% créatures (%creatures%)~ // reprise de @13310004
+@23310131 = ~Invoque %amount% créatures (%creatures%)~ // reprise de @13310004
+@23310132 = ~d'invoquer %amount% créatures (%creatures%)~ // reprise de @13310008
+@23310133 = ~d'invoquer %amount% créatures (%creatures%)~ // reprise de @13310008
 
 // Opcode 332 : Modificateur de dégâts d'un type : 0000-0010 noms (« Dégâts de feu ») (23 320 000-23 320 999)
 @23320000 = ~Dégâts~ // reprise de @13320000

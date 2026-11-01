@@ -21,6 +21,7 @@
 // (ad_op_127_similar_group). Pour l'en-tête d'un sort seul, seuls comptent cet écart et les
 // regroupements (ad_op_127_header_group).
 DEFINE_PATCH_MACRO ad_op_127_support BEGIN
+	SET monster_opcode = 127
 	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
@@ -114,7 +115,7 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 END
 
 // Créatures nommées de la table resource de l'effet monster_id (ancien get_creatures_names), sans
-// leur nombre (fx_monster_creatures).
+// leur nombre (fx_monster_creatures) ; aussi pour l'opcode 331 (monster_opcode).
 DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 	CLEAR_ARRAY monster_names
 	INNER_PATCH_FILE ~%monster_resref%.2da~ BEGIN
@@ -124,7 +125,7 @@ DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 			PATCH_IF FILE_EXISTS_IN_GAME ~%monster_creature%.cre~ BEGIN
 				LPF ad_creature_info STR_VAR resref = ~%monster_creature%~ RET monster_name = name END
 				PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
-					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:name~ message = ~creature name with a comma~ RET render_missing = refusal END
+					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
 					SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
@@ -135,7 +136,7 @@ DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 	SPRINT monster_or @1000007 // ~ou~
 	LPF ad_join STR_VAR array_name = ~monster_names~ final_glue = EVAL ~ %monster_or% ~ RET monster_creatures = text END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
-		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:no_creature~ message = ~no named creature in table %monster_resref%.2DA~ RET render_missing = refusal END
+		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:no_creature~ message = ~no named creature in table %monster_resref%.2DA~ RET render_missing = refusal END
 	END
 	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
 	SET $fx_monster_resource_table(~%monster_id%~) = 1

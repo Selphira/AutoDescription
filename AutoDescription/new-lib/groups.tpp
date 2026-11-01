@@ -1333,10 +1333,25 @@ END
 // « group_name : +1 » (modificateurs simples, new-lib/opcodes/stat_modifiers.tpp), en pourcentage
 // si l'opcode d'ancrage l'est. À une autre forme que « soi », avec un libellé de la statistique
 // (group_statistic_tra), la phrase des modificateurs (ancien opcode_target et opcode_probability) :
-// « Augmente de 2 les jets de sauvegarde du porteur » ; le mode 3 des jeux EE y est un ajout.
+// « Augmente de 2 les jets de sauvegarde du porteur » ; le mode 3 des jeux EE y est un ajout. Une
+// progression selon le niveau du sort (fx_level_value, effet dérivé dont l'opcode virtuel est dans
+// AD_LEVEL_VALUE_OPCODES) remplace la valeur, comme dans ad_stat_modifier_lines.
 DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 	SET group_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%group_anchor%~)
+	SPRINT group_level_value $fx_level_value(~%group_id%~)
 	LPF ad_stat_modifier_value INT_VAR value = group_value mode = group_mode percent = group_percent RET value = text END
+	PATCH_IF NOT (~%group_level_value%~ STRING_EQUAL ~~) BEGIN
+		SPRINT value ~%group_level_value%~
+		PATCH_IF group_mode == MOD_TYPE_flat AND group_percent BEGIN
+			LPF ad_refusal INT_VAR fx_id = group_id STR_VAR reason = ~not_implemented:spell:progression_percent_set~ message = ~percentage set to a value varying with the level~ RET render_late_missing = refusal END
+		END
+		ELSE PATCH_IF group_mode == MOD_TYPE_flat BEGIN
+			SPRINT value @1200002 // ~Passe à %value%~
+		END
+		ELSE PATCH_IF group_value >= 0 BEGIN
+			SPRINT value @1200001 // ~+%value%~
+		END
+	END
 	SPRINT name ~%group_name%~
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 	SET line_fx = group_id
@@ -1347,6 +1362,12 @@ DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 		SET stat_mode = group_mode
 		SET stat_percent = group_percent
 		LPM ad_stat_modifier_phrase
+		PATCH_IF NOT (~%group_level_value%~ STRING_EQUAL ~~) BEGIN
+			SPRINT value ~%group_level_value%~
+			PATCH_IF group_value < 0 BEGIN
+				LPF ad_level_unsigned STR_VAR text = ~%group_level_value%~ RET value = text END
+			END
+		END
 	END
 END
 
