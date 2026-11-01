@@ -127,8 +127,8 @@ DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 				PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
 					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 				END
-				ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
-					SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
+				ELSE BEGIN
+					LPM ad_op_127_add_name
 				END
 			END
 		END
@@ -173,7 +173,22 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 	PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 	END
-	ELSE PATCH_IF NOT (~%monster_name%~ STRING_EQUAL ~~) BEGIN
+	ELSE BEGIN
+		LPM ad_op_127_add_name
+	END
+END
+
+// Nom monster_name de la créature de la ligne monster_row, ajouté à la liste monster_names s'il n'y est
+// pas déjà : une créature citée plusieurs fois par la table, ou deux de même nom, n'est nommée qu'une
+// fois, comme dans l'ancien get_creatures_names.
+DEFINE_PATCH_MACRO ad_op_127_add_name BEGIN
+	SET monster_named = ~%monster_name%~ STRING_EQUAL ~~
+	PHP_EACH monster_names AS _ => monster_named_name BEGIN
+		PATCH_IF ~%monster_named_name%~ STRING_EQUAL ~%monster_name%~ BEGIN
+			SET monster_named = 1
+		END
+	END
+	PATCH_IF NOT monster_named BEGIN
 		SPRINT $monster_names(~%monster_row%~) ~%monster_name%~
 	END
 END
