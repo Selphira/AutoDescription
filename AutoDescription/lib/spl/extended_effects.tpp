@@ -306,18 +306,32 @@ BEGIN
                 SET isSpecialDuration = 0
                 SET isSubSpell = 1
 
+                SET callerIgnoreDuration = ignoreDuration
                 PATCH_IF ignoreDurationIfSameForAllEffect BEGIN
                     LPM ~load_level_effects~
                     LPF ~spell_duration~ RET ignoreDuration strDuration isSpecialDuration = is_special END
                     LPM ~clear_levels~
                 END
 
-                PATCH_IF castingLevel > 0 BEGIN
-                    LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget ignoreDuration RET description totalLines END
-                END
-                ELSE BEGIN
-                    LPM ~load_level_effects~
-                    LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
+                SPRINT emptyDescription ~%description%~
+                // La durée commune tue n'est écrite que devant plusieurs lignes (opcode_146_condition) : une
+                // ligne seule est réécrite avec sa propre durée, que son opcode montre ou non.
+                FOR (durationPass = 0; durationPass < 2; ++durationPass) BEGIN
+                    SPRINT description ~%emptyDescription%~
+                    PATCH_IF castingLevel > 0 BEGIN
+                        LPF ~get_spell_effects_description_for_level~ INT_VAR baseProbability castingLevel forceTarget ignoreDuration RET description totalLines END
+                    END
+                    ELSE BEGIN
+                        LPM ~load_level_effects~
+                        LPF ~get_spell_effects_description~ INT_VAR baseProbability forceTarget ignoreDuration STR_VAR description RET description totalLines END
+                    END
+                    PATCH_IF durationPass == 0 AND totalLines == 1 AND ignoreDuration AND NOT callerIgnoreDuration AND ignoreDurationIfSameForAllEffect BEGIN
+                        SET ignoreDuration = 0
+                        SPRINT strDuration ~~
+                    END
+                    ELSE BEGIN
+                        SET durationPass = 2
+                    END
                 END
                 PATCH_IF totalLines == 1 BEGIN
                     INNER_PATCH_SAVE description ~%description%~ BEGIN
