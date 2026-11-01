@@ -539,7 +539,8 @@ END
  * contiguës et disjointes, donnent donc une seule de ces valeurs. Ils n'en font qu'un, sur l'union de leurs
  * plages, sa valeur « entre X et Y » (texte rangeStrref) dans custom_str. Les valeurs sont écrites comme
  * équiprobables : les écarts d'arrondi des plages (11 %, 10 %… 9 %) sont acceptés, enable_shrinkage à 0 les
- * détaille. rangeEligibleMacro (facultative) écarte un effet en mettant rangeEligible à 0.
+ * détaille. rangeEligibleMacro (facultative) écarte un effet en mettant rangeEligible à 0 ; rangeTextMacro
+ * (facultative) écrit custom_str d'après amountMin et amountMax à la place du texte rangeStrref.
  */
 DEFINE_PATCH_MACRO ~group_value_range~ BEGIN
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~rangePositions~ BEGIN END
@@ -594,7 +595,12 @@ DEFINE_PATCH_MACRO ~group_value_range~ BEGIN
 				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
 					CLEAR_ARRAY ~opcodes_%opcode%~
 				END
-				LPF ~getTranslation~ INT_VAR strref = rangeStrref opcode RET custom_str = string END
+				PATCH_IF ~%rangeTextMacro%~ STRING_EQUAL ~~ BEGIN
+					LPF ~getTranslation~ INT_VAR strref = rangeStrref opcode RET custom_str = string END
+				END
+				ELSE BEGIN
+					LPM ~%rangeTextMacro%~
+				END
 				SET position = rangePosition
 				SET probability1 = rangeHigh
 				SET probability2 = rangeLow
