@@ -2516,6 +2516,7 @@
 @11050001 = ~the amount of gold~
 @11050002 = ~Decreases the amount of gold %ofTheTarget% by %amount%~
 @11050003 = ~Delights %theTarget% with all its gold~
+@11050004 = ~to relieve %theTarget% of all their gold~
 
 // Opcode 106: Stat: Morale Break Modifier [106]
 
@@ -3040,6 +3041,8 @@
 
 @11990001 = ~Reflects level %spellLevel% spells~
 @11990002 = ~to reflect level %spellLevel% spells~
+@11990003 = ~Reflects level %spellLevel% spells targeting %theTarget%~
+@11990004 = ~to reflect level %spellLevel% spells targeting %theTarget%~
 
 // Opcode 200: Spell: Bounce (by Power level, decrementing) [200]
 
@@ -4317,6 +4320,8 @@
 
 @13620001 = ~Critical Miss bonus~
 @13620002 = ~Critical Miss bonus with this weapon~
+@13620003 = ~the Critical Miss bonus~
+@13620004 = ~the Critical Miss bonus with this weapon~
 
 // Opcode 367: Minimum base stats [367]
 

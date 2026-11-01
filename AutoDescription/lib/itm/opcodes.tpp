@@ -3464,7 +3464,7 @@ DEFINE_PATCH_MACRO ~opcode_57_is_valid~ BEGIN
 			 parameter2 > 35 AND parameter2 < 49
 			 BEGIN
 		// l'opcode est valide même si l'alignement est inconnu
-		// SET isValid = 0
+		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Unknown alignment %parameter2%.~ END
 	END
 END
@@ -5072,6 +5072,11 @@ DEFINE_PATCH_MACRO ~opcode_99_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid type %parameter2%.~ END
 	END
+	// Pourcentage de la durée (IESDP) : 100 la laisse inchangée.
+	ELSE PATCH_IF parameter1 < 0 OR parameter1 == 100 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected: Duration modifier %parameter1%.~ END
+	END
 END
 
 /* ------------------------------------ *
@@ -5893,7 +5898,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_105~ BEGIN
 	PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 < 0 BEGIN
-		SPRINT description @11050003 // ~Déleste %theTarget% de tout son or~
+		SPRINT description @11050004 // ~de délester %theTarget% de tout son or~
 	END
 	ELSE BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 > 0 BEGIN
@@ -10043,7 +10048,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_199~ BEGIN
 	SPRINT description @11990002 // ~de renvoyer les sorts de niveau %spellLevel%~
 END
 
-DEFINE_PATCH_MACRO ~opcode_target~ BEGIN
+DEFINE_PATCH_MACRO ~opcode_target_199~ BEGIN
 	LOCAL_SET spellLevel = parameter1
 	SPRINT description @11990003 // ~Renvoie les sorts de niveau %spellLevel% ciblant %theTarget%~
 END
