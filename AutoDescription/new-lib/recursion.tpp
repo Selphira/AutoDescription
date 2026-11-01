@@ -257,6 +257,20 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%ofTheTarget%~
 				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%toTheTarget%~
 			END
+			// Sous-effets à leurs propres cibles (272 d'un EFF) : le type de créature du 177 qui remplace
+			// l'effet passe aussi à leurs dégâts (A7#INTA2 : « contre les animaux, les humanoïdes et les
+			// géants »).
+			ELSE PATCH_IF $fx_versus_file(~%recursion_fx%~) > 0 AND NOT $fx_sub_versus_set(~%recursion_fx%~) BEGIN
+				SET line_fx = recursion_fx
+				SPRINT line_the_target ~~
+				LPM ad_application_form
+				LPM ad_application_target_strings
+				PATCH_IF app_versus_count > 0 BEGIN
+					SET $fx_sub_versus_set(~%recursion_fx%~) = 1
+					SPRINT $fx_sub_versus(~%recursion_fx%~) ~%versus%~
+				END
+				SPRINT line_only_for ~~
+			END
 			// Sections de niveaux d'un sous-sort écrites dans la ligne parente, sauf pour un sort lancé
 			// sous une probabilité ou après un délai (146, 148), dont les lignes ont leur propre préfixe.
 			SET recursion_lift_opcode = $fx_opcode(~%recursion_fx%~)
@@ -767,6 +781,10 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		SET sub_opcode = $fx_opcode(~0~)
 		SET eff_fields_opcode = sub_opcode
 		SET eff_fields_parameter2 = $fx_parameter2_raw(~0~)
+		SET eff_fields_parameter3 = $fx_parameter3(~0~)
+		SET eff_fields_parameter4 = $fx_parameter4(~0~)
+		SPRINT eff_fields_resource2 $fx_resource2(~0~)
+		SPRINT eff_fields_resource3 $fx_resource3(~0~)
 		LPM ad_eff_fields_differ
 		PATCH_IF eff_fields_differ BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:eff_fields~ message = ~opcode %sub_opcode% of an EFF file, which the old engine describes differently~ RET sub_missing = refusal END

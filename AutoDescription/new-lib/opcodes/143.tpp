@@ -7,9 +7,8 @@
 // Objet absent : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
 // opcode_143_is_valid).
 // Emplacement inconnu : écarté et journalisé. Refus : objet sans nom (écarté par l'ancien
-// opcode_143_is_valid) ;
-// avec AD_ENABLE_SHRINKAGE, objet qui remplace une arme brisée (MISC57, MISC58, CDDELHLM : opcode
-// virtuel 519 de l'ancien opcode_143_group_mod).
+// opcode_143_is_valid). Avec AD_ENABLE_SHRINKAGE, l'armure, le casque ou le bouclier brisé (MISC57,
+// MISC58, CDDELHLM) s'écrit « de se briser » (ad_group_broken_armor, new-lib/groups.tpp).
 DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 	PHP_EACH fx_ids_143 AS _ => slot_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -32,10 +31,6 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:no_name~ message = ~item %slot_resref%.ITM has no name~ RET render_missing = refusal END
 				END
-			END
-			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND (~%slot_resref%~ STRING_EQUAL_CASE ~MISC57~ OR ~%slot_resref%~ STRING_EQUAL_CASE ~MISC58~
-					OR ~%slot_resref%~ STRING_EQUAL_CASE ~CDDELHLM~) BEGIN
-				LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:broken_weapon~ message = ~item replacing a broken weapon~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SPRINT $fx_item_name(~%slot_id%~) ~%slot_item_name%~

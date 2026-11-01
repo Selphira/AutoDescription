@@ -3864,3 +3864,7 @@
 @30140111 = ~Recovers 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @15100004
 @30140112 = ~to recover 1 %spellType% spell of level %spellLevel%~ // reprise de @15100006
 @30140113 = ~to recover 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @15100008
+
+// Effet dérivé 015, BROKEN_ITEM : phrases probables seulement (30 150 102-30 150 103)
+@30150102 = ~of breaking~ // reprise de @15190001
+@30150103 = ~of breaking~ // reprise de @15190001

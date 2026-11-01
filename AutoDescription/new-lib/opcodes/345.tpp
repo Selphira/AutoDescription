@@ -4,8 +4,12 @@
 // new-lib/opcodes/stat_modifiers.tpp. Un 345 d'un EFF (type d'objet dans parameter4) n'est pas
 // remplacé (AD_OPCODES_EFF_FIELDS).
 
+// Emplacement 1 (main directrice, munitions comprises, IESDP) d'un arc, d'une arbalète ou d'une fronde :
+// toujours tenu en main directrice, ses attaques passent par les munitions ; écrit comme l'emplacement
+// 0, comme dans l'ancien moteur, qui ne nomme l'emplacement que pour un EFF.
 // Refus : parameter2 non nul (propriété de l'arme : argent, fer froid…), que l'ancien moteur ne
-// décrit pas ; emplacement 1 ou 2, qu'il ne nomme que pour un EFF, et inconnu.
+// décrit pas ; emplacement 1 d'un autre objet, qui peut viser une autre arme que lui, emplacement 2,
+// et inconnu.
 DEFINE_PATCH_MACRO ad_op_345_support BEGIN
 	PHP_EACH fx_ids_345 AS _ => stat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -14,8 +18,9 @@ DEFINE_PATCH_MACRO ad_op_345_support BEGIN
 			PATCH_IF enchantment_type != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode345:type~ message = ~weapon type %enchantment_type% (only 0, enchantment level, is described)~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF enchantment_slot != 0 AND enchantment_slot != 3 BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode345:slot~ message = ~weapon slot %enchantment_slot% (only 0, current weapon, and 3, both hands, are described)~ RET render_missing = refusal END
+			ELSE PATCH_IF enchantment_slot != 0 AND enchantment_slot != 3 AND NOT (enchantment_slot == 1
+					AND (item_type == ITM_TYPE_bow OR item_type == ITM_TYPE_crossbow OR item_type == ITM_TYPE_sling)) BEGIN
+				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode345:slot~ message = ~weapon slot %enchantment_slot% (only 0, current weapon, 3, both hands, and 1 for a launcher are described)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				SET $fx_stat_subject(~%stat_id%~) = enchantment_slot

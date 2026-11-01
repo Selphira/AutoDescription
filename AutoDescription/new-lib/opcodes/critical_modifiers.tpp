@@ -8,12 +8,13 @@
 // libellés 2301 0011-0013 type d'attaque.
 
 // Type d'attaque hors de 0-3 ou valeur nulle : écartés et journalisés (ancien opcode_301_is_valid).
-// Refus : effet d'un EFF (l'ancien moteur y lit parameter3, la catégorie d'arme).
+// Refus : effet d'un EFF de parameter3 non nul (catégorie d'arme, que l'ancien moteur y lit sur EE).
 DEFINE_PATCH_MACRO ad_critical_support BEGIN
 	PHP_EACH ~fx_ids_%critical_opcode%~ AS _ => critical_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
-			PATCH_IF $fx_external(~%critical_id%~) BEGIN
-				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode%critical_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
+			SET critical_category = $fx_parameter3(~%critical_id%~)
+			PATCH_IF $fx_external(~%critical_id%~) AND IS_EE AND critical_category != 0 BEGIN
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode%critical_opcode%:external~ message = ~effect from an EFF file with weapon category %critical_category% (parameter3)~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_special(~%critical_id%~) < 0 OR $fx_special(~%critical_id%~) > 3 OR $fx_parameter1(~%critical_id%~) == 0 BEGIN
 				SET drop_id = critical_id

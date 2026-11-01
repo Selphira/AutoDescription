@@ -3864,3 +3864,7 @@
 @30140111 = ~Remet en mémoire 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~ // reprise de @15100004
 @30140112 = ~de se remémorer 1 sort %spellType% de %spellLevel% niveau~ // reprise de @15100006
 @30140113 = ~de remémorer 1 sort %spellType% de %spellLevel% niveau %toTheTarget%~ // reprise de @15100008
+
+// Effet dérivé 015, BROKEN_ITEM : phrases probables seulement (30 150 102-30 150 103)
+@30150102 = ~de se briser~ // reprise de @15190001
+@30150103 = ~de se briser~ // reprise de @15190001

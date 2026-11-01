@@ -102,16 +102,19 @@ END
 
 // Opcodes que l'ancien moteur décrit autrement pour un effet d'un fichier EFF (isExternal : champs
 // propres au format EFF, comme parameter3 ou resource2) : un effet 177 vers l'un d'eux n'est pas
-// remplacé (new-lib/opcodes/177.tpp, ad_eff_fields_differ). Valeur : parameter2 concerné, ou ALL pour
-// tout effet de l'opcode. Les opcodes non décrits sont listés pour leur prise en charge.
+// remplacé (new-lib/opcodes/177.tpp, ad_eff_fields_differ). Valeur : parameter2 concerné, ALL pour
+// tout effet de l'opcode, ou le champ propre à l'EFF que l'ancien moteur lit, l'effet n'étant
+// refusé que s'il est renseigné : RESOURCES_EE (resource2 ou resource3, sur EE), PARAMETER3_EE
+// (parameter3 non nul, sur EE), TYPE4_PARAMETER4_EE (parameter2 4, ou parameter4 non nul sur EE).
+// Les opcodes non décrits sont listés pour leur prise en charge.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
 	1   => 3   // attaques par round, mode 3
 	15  => 3   // dextérité, mode 3
-	122 => ALL // objet créé, resource2 sur EE
+	122 => RESOURCES_EE        // objets créés de resource2 et resource3 (ancien opcode_122_common)
 	344 => ALL // enchantement, parameter3 et parameter4
 	248 => ALL
-	272 => ALL
-	301 => ALL
+	272 => TYPE4_PARAMETER4_EE // nombre et fréquence (ancien opcode_272_condition)
+	301 => PARAMETER3_EE       // type d'arme (ancien opcode_301_common)
 	331 => ALL
 	341 => ALL
 	345 => ALL
@@ -309,6 +312,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~SPELL_IMMUNITIES~      => 256
 	~FREE_ACTION~           => 285
 	~REPLACE_ITEM~          => 400
+	~BROKEN_ITEM~           => 4
 	~ALL_ILLUSIONS~         => 224
 	~RESTORED_SPELLS~       => 21
 END
@@ -326,6 +330,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
 	~EXCEPTIONAL_STRENGTH~  => 522
 	~FREE_ACTION~           => 520
 	~REPLACE_ITEM~          => 525
+	~BROKEN_ITEM~           => 519
 	~ALL_ILLUSIONS~         => 511
 	~RESTORED_SPELLS~       => 510
 END

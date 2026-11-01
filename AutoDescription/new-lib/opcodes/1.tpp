@@ -14,7 +14,7 @@
 DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 	PHP_EACH fx_ids_1 AS _ => apr_id BEGIN
 		LPM ad_op_1_value
-		SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) = 0
+		SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) = 0
 	END
 	PHP_EACH fx_ids_1 AS _ => apr_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -37,13 +37,13 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 			ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND apr_parameter1 < 0 AND apr_value == 6 BEGIN
 				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:half_removed~ message = ~half attack removed (BUG-021)~ RET render_missing = refusal END
 			END
-			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler (leurs lignes seulement :
+			// L'ancien moteur fusionne deux effets de même ligne (ad_fx_line_key) au lieu de les cumuler (leurs lignes seulement :
 			// l'en-tête d'un sort compte les deux).
-			ELSE PATCH_IF $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) AND NOT support_header_only BEGIN
+			ELSE PATCH_IF $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode%~) = 1
+				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) = 1
 			END
 		END
 	END
@@ -133,4 +133,6 @@ DEFINE_PATCH_MACRO ad_op_1_value BEGIN
 	END
 	SET apr_value = (ABS apr_parameter1) BAND 0xffff
 	SPRINT apr_scope $fx_scope(~%apr_id%~)
+	SET key_id = apr_id
+	LPM ad_fx_line_key
 END

@@ -60,6 +60,10 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 		SET parent_chance = $fx_probability2(~%fx_id%~) <= parent_high ? parent_high - $fx_probability2(~%fx_id%~) + 1 : 0
 		SET eff_fields_opcode = substitute_opcode
 		SET eff_fields_parameter2 = substitute_parameter2
+		SET eff_fields_parameter3 = substitute_parameter3
+		SET eff_fields_parameter4 = substitute_parameter4
+		SPRINT eff_fields_resource2 ~%substitute_resource2%~
+		SPRINT eff_fields_resource3 ~%substitute_resource3%~
 		LPM ad_eff_fields_differ
 		PATCH_IF eff_fields_differ AND NOT support_header_only BEGIN
 			SPRINT $fx_substitution_error(~%fx_id%~) ~eff_fields~

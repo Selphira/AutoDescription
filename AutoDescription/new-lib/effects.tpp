@@ -271,14 +271,24 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	END
 END
 
-// Un effet d'un fichier EFF de l'opcode eff_fields_opcode et du parameter2 eff_fields_parameter2
-// est-il décrit autrement par l'ancien moteur (AD_OPCODES_EFF_FIELDS) ? eff_fields_differ : 1 si oui.
+// Un effet d'un fichier EFF de l'opcode eff_fields_opcode, aux champs eff_fields_parameter2,
+// eff_fields_parameter3, eff_fields_parameter4, eff_fields_resource2 et eff_fields_resource3, est-il
+// décrit autrement par l'ancien moteur (AD_OPCODES_EFF_FIELDS) ? eff_fields_differ : 1 si oui.
 DEFINE_PATCH_MACRO ad_eff_fields_differ BEGIN
 	SET eff_fields_differ = 0
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EFF_FIELDS(~%eff_fields_opcode%~) BEGIN
 		SPRINT eff_fields_mode $AD_OPCODES_EFF_FIELDS(~%eff_fields_opcode%~)
 		PATCH_IF ~%eff_fields_mode%~ STRING_EQUAL ~ALL~ BEGIN
 			SET eff_fields_differ = 1
+		END
+		ELSE PATCH_IF ~%eff_fields_mode%~ STRING_EQUAL ~RESOURCES_EE~ BEGIN
+			SET eff_fields_differ = IS_EE AND (NOT (~%eff_fields_resource2%~ STRING_EQUAL ~~) OR NOT (~%eff_fields_resource3%~ STRING_EQUAL ~~))
+		END
+		ELSE PATCH_IF ~%eff_fields_mode%~ STRING_EQUAL ~PARAMETER3_EE~ BEGIN
+			SET eff_fields_differ = IS_EE AND eff_fields_parameter3 != 0
+		END
+		ELSE PATCH_IF ~%eff_fields_mode%~ STRING_EQUAL ~TYPE4_PARAMETER4_EE~ BEGIN
+			SET eff_fields_differ = eff_fields_parameter2 == 4 OR (IS_EE AND eff_fields_parameter4 != 0)
 		END
 		ELSE BEGIN
 			SET eff_fields_differ = eff_fields_mode == eff_fields_parameter2

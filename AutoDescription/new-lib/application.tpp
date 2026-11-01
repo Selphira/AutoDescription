@@ -905,6 +905,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	// rang de la ligne en dépend.
 	PATCH_IF $fx_probability_in_sub(~%line_fx%~) BEGIN
 		SET line_sort += (100 - app_probability) * 10000
+		SET line_sub_probability = app_probability
 		SET app_probability = 100
 	END
 	PATCH_IF app_probability < 100 BEGIN
@@ -971,6 +972,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	SET line_sort = app_saved_sort
 	SET line_probability = 0
+	SET line_sub_probability = 0
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0
 	SET line_any_form = 0

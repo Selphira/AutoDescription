@@ -15,12 +15,16 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
 		LPM ad_op_18_value
 		SPRINT hp_scope $fx_scope(~%hp_id%~)
-		SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 0
+		SET key_id = hp_id
+		LPM ad_fx_line_key
+		SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) = 0
 	END
 	PHP_EACH fx_ids_18 AS _ => hp_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			LPM ad_op_18_value
 			SPRINT hp_scope $fx_scope(~%hp_id%~)
+			SET key_id = hp_id
+			LPM ad_fx_line_key
 			// L'ancien moteur écarte un mode inconnu (erreur journalisée).
 			PATCH_IF hp_type < 0 OR hp_type > 6 OR (hp_type == 6 AND NOT IS_EE) BEGIN
 				SET drop_id = hp_id
@@ -41,13 +45,13 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 				SPRINT ignored_message ~no change (mode %hp_mode%, value %hp_value%)~
 				LPM ad_application_drop
 			END
-			// L'ancien moteur fusionne deux effets identiques au lieu de les cumuler (leurs lignes seulement :
+			// L'ancien moteur fusionne deux effets de même ligne (ad_fx_line_key) au lieu de les cumuler (leurs lignes seulement :
 			// l'en-tête d'un sort compte les deux).
-			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) AND NOT support_header_only BEGIN
+			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode18:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~) = 1
+				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) = 1
 			END
 		END
 	END

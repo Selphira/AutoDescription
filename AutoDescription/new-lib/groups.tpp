@@ -84,6 +84,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 			LPM ad_group_item_return
 			LPM ad_group_replace_item
 		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~143~) BEGIN
+			LPM ad_group_broken_armor
+		END
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~211~) AND VARIABLE_IS_SET $fx_opcode_count(~71~) BEGIN
 			LPM ad_group_imprisonment
 		END
@@ -1041,15 +1044,21 @@ END
 // Objet remplacé (ancien opcode_122_group, opcode virtuel 525) : chaque création d'objet (122) est
 // réunie au premier retrait d'objet (112) du même bloc qui a les mêmes cible, timing, durée,
 // probabilités, jet de sauvegarde, résistance à la dissipation et special : « Remplace « Lance +3 »
-// par « Sceptre de puissance altière » » (effet dérivé REPLACE_ITEM).
+// par « Sceptre de puissance altière » » (effet dérivé REPLACE_ITEM). L'arme brisée (MISC56) qui
+// remplace la ressource décrite : « de se briser » (effet dérivé BROKEN_ITEM, opcode virtuel 519) ;
+// sans retrait de la ressource, la création reste seule, comme dans l'ancien moteur.
 DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 	PHP_EACH fx_ids_122 AS _ => group_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
+			SPRINT group_resource $fx_resource(~%group_id%~)
+			SET group_broken = (~%group_resource%~ STRING_EQUAL_CASE ~MISC56~) OR (~%group_resource%~ STRING_EQUAL_CASE ~MISC56_~)
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_POWER BOR AD_SAME_DICE
 			SET group_removal = 0 - 1
 			PHP_EACH fx_ids_112 AS _ => group_candidate BEGIN
-				PATCH_IF group_removal < 0 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+				SPRINT group_other_resource $fx_resource(~%group_candidate%~)
+				PATCH_IF group_removal < 0 AND NOT $fx_consumed(~%group_candidate%~)
+						AND (NOT group_broken OR (~%group_other_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
@@ -1060,14 +1069,46 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 			PATCH_IF group_removal >= 0 BEGIN
 				SET $fx_consumed(~%group_id%~) = 1
 				SET $fx_consumed(~%group_removal%~) = 1
-				SPRINT derived_kind ~REPLACE_ITEM~
 				SET derived_id = group_id
 				SET derived_other = group_removal
-				SPRINT derived_line ~ad_group_replace_item_line~
+				PATCH_IF group_broken BEGIN
+					SPRINT derived_kind ~BROKEN_ITEM~
+					SPRINT derived_line ~ad_group_broken_item_line~
+				END
+				ELSE BEGIN
+					SPRINT derived_kind ~REPLACE_ITEM~
+					SPRINT derived_line ~ad_group_replace_item_line~
+				END
 				LPM ad_derived_add
 			END
 		END
 	END
+END
+
+// Armure, casque ou bouclier brisé (Tweaks Anthology : MISC57, MISC58, CDDELHLM) créé à son
+// emplacement (143) : « de se briser » (ancien opcode_143_group_mod, effet dérivé BROKEN_ITEM).
+DEFINE_PATCH_MACRO ad_group_broken_armor BEGIN
+	PHP_EACH fx_ids_143 AS _ => group_id BEGIN
+		SPRINT group_resource $fx_resource(~%group_id%~)
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND ((~%group_resource%~ STRING_EQUAL_CASE ~MISC57~)
+				OR (~%group_resource%~ STRING_EQUAL_CASE ~MISC58~) OR (~%group_resource%~ STRING_EQUAL_CASE ~CDDELHLM~)) BEGIN
+			SET $fx_consumed(~%group_id%~) = 1
+			SPRINT derived_kind ~BROKEN_ITEM~
+			SET derived_id = group_id
+			SET derived_other = 0 - 1
+			SPRINT derived_line ~ad_group_broken_item_line~
+			LPM ad_derived_add
+		END
+	END
+END
+
+// L'ancien moteur n'a que les formes probables (opcode_<self|target>_probability_519) : un objet brisé
+// à coup sûr n'a pas de phrase, refusé. Comme pour l'ancien opcodes_cant_be_permanent, une durée
+// permanente n'est pas écrite.
+DEFINE_PATCH_MACRO ad_group_broken_item_line BEGIN
+	SET line_phrase = 30150100 // ~de se briser~ (formes probables)
+	SET group_timing = $fx_timing(~%group_id%~)
+	SET line_no_duration = group_timing == TIMING_permanent OR group_timing == TIMING_permanent_after_death
 END
 
 // Objet retiré par l'effet 112 group_other, créé par l'effet 122 group_id.
@@ -1427,6 +1468,24 @@ END
 // lu, avant que la prise en charge d'un opcode n'y range un mode (191, 233 : la statistique visée
 // y disparaît). Macro, appelée pour des paires d'effets : un LPF y coûterait la copie de toutes les
 // variables, magasin d'effets compris ; AND n'évalue pas son second terme si le premier est faux.
+// fx_line_key : champs de l'effet key_id qui font sa ligne en plus de sa valeur (cible, timing,
+// durée, plage de probabilité, jet de sauvegarde, dés de la restriction de niveau, origine) : deux
+// effets de même valeur et de même clé écrivent la même ligne, que l'ancien moteur ne garde qu'une
+// fois (get_unique_effects : même texte, même plage), alors que le jeu applique les deux.
+DEFINE_PATCH_MACRO ad_fx_line_key BEGIN
+	SET key_target = $fx_group_target(~%key_id%~)
+	SET key_external = $fx_external(~%key_id%~)
+	SET key_timing = $fx_timing(~%key_id%~)
+	SET key_duration = $fx_duration(~%key_id%~)
+	SET key_probability1 = $fx_probability1(~%key_id%~)
+	SET key_probability2 = $fx_probability2(~%key_id%~)
+	SET key_save_type = $fx_save_type(~%key_id%~)
+	SET key_save_bonus = $fx_save_bonus(~%key_id%~)
+	SET key_dice_count = $fx_dice_count(~%key_id%~)
+	SET key_dice_sides = $fx_dice_sides(~%key_id%~)
+	SPRINT fx_line_key ~%key_target% %key_external% %key_timing% %key_duration% %key_probability1% %key_probability2% %key_save_type% %key_save_bonus% %key_dice_count% %key_dice_sides%~
+END
+
 DEFINE_PATCH_MACRO ad_fx_same_fields BEGIN
 	SET fx_same = $fx_group_target(~%same_id%~) == $fx_group_target(~%same_other%~)
 		AND $fx_external(~%same_id%~) == $fx_external(~%same_other%~)

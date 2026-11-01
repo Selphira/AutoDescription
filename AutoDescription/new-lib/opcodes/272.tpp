@@ -7,7 +7,8 @@
 // ligne ; la ligne prend le rang de l'opcode de l'EFF (ancien get_res_description).
 
 // parameter2 hors de 0, 2, 3, et aucune application (parameter2 0 ou 2, parameter1 nul) : écartés et
-// journalisés. Refus : effet d'un EFF (l'ancien moteur y lit parameter3 et parameter4) ; effet probable ; plusieurs lignes ;
+// journalisés. Refus : effet d'un EFF de type 4 (nombre parameter3) ou de parameter4 non nul sur EE
+// (multiplicateur de la fréquence), que l'ancien moteur y lit ; effet probable ; plusieurs lignes ;
 // refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 	PHP_EACH fx_ids_272 AS _ => repeat_id BEGIN
@@ -15,8 +16,8 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 			SET repeat_type = $fx_parameter2(~%repeat_id%~)
 			SET repeat_value = $fx_parameter1(~%repeat_id%~)
 			SPRINT repeat_resref $fx_resource_lower(~%repeat_id%~)
-			PATCH_IF $fx_external(~%repeat_id%~) BEGIN
-				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
+			PATCH_IF $fx_external(~%repeat_id%~) AND (repeat_type == 4 OR (IS_EE AND $fx_parameter4(~%repeat_id%~) != 0)) BEGIN
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:external~ message = ~effect from an EFF file of type %repeat_type% (4: amount in parameter3) or with parameter4 (frequency multiplier) set~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (repeat_type != 0 AND repeat_type != 2 AND repeat_type != 3) OR ~%repeat_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = repeat_id

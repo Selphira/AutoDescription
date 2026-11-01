@@ -19,6 +19,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_any_form = 0
 	SET line_no_duration = 0
 	SET line_probability = 0
+	SET line_sub_probability = 0
 	SPRINT line_core ~~
 	SET line_nested = 0
 	SET line_composite = 0
@@ -63,7 +64,8 @@ DEFINE_PATCH_MACRO ad_line_append BEGIN
 	SET $line_probability(~%line_count%~) = line_probability
 	SET $line_probability_low(~%line_count%~) = line_probability > 0 ? line_probability_low : 0
 	SET $line_probability_high(~%line_count%~) = line_probability > 0 ? line_probability_high : 0
-	PATCH_IF line_probability > 0 BEGIN
+	SET $line_sub_probability(~%line_count%~) = line_sub_probability
+	PATCH_IF line_probability > 0 OR line_sub_probability > 0 BEGIN
 		SET $line_effect(~%line_count%~) = line_fx
 	END
 	SPRINT $line_core(~%line_count%~) ~%line_core%~
@@ -115,6 +117,7 @@ END
 // (line_composite), à la plage du parent, écrite sous son titre avec les effets certains : « 2 % de
 // chances » puis « 66 % de chances de… », ou « 13 % de chances » et ses lignes en second retrait.
 DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
+	LPM ad_lines_split_sub_probability
 	SET prob_inner = 0
 	PATCH_IF ctx_base_probability < 100 AND ctx_base_lines BEGIN
 		SPRINT prob_outer_section ~%prob_section%|outer~
@@ -142,6 +145,94 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 		END
 	END
 	LPM ad_lines_probability_pass
+END
+
+// Ligne d'un sort lancé par un effet probable (146, 148), dont les lignes sont déjà réunies sous sa
+// probabilité (line_sub_probability) : comme dans l'ancien moteur, chacune rejoint le regroupement de
+// la section, avec les effets de même plage (C!KT30 : « 11 % de chances » puis la paralysie du sort et
+// la vitesse de l'arme). Une ligne d'une autre forme (sous une condition) reste entière. Les
+// sous-lignes sont ajoutées de la dernière à la première : à rang égal, la dernière ajoutée vient en
+// premier.
+DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
+	SET split_line_count = line_count
+	FOR (split_id = 0; split_id < split_line_count; ++split_id) BEGIN
+		SPRINT split_section $line_section(~%split_id%~)
+		SET split_opcode = 0
+		PATCH_IF $line_sub_probability(~%split_id%~) > 0 BEGIN
+			SET split_fx = $line_effect(~%split_id%~)
+			SET split_opcode = $fx_opcode(~%split_fx%~)
+		END
+		PATCH_IF (~%split_section%~ STRING_EQUAL ~%prob_section%~) AND (split_opcode == 146 OR split_opcode == 148) BEGIN
+			SET value = $line_sub_probability(~%split_id%~)
+			SPRINT probability @1200003 // ~%value%%PERCENT%~
+			SPRINT split_title @4000001 // ~%probability% de chances~
+			SPRINT split_text $line_text(~%split_id%~)
+			SET split_title_length = STRING_LENGTH ~%split_title%~
+			CLEAR_ARRAY split_members
+			SET split_member_count = 0
+			SET split_title_form = INDEX (CASE_SENSITIVE EXACT_MATCH ~%split_title%%CRLF%  - ~ ~%split_text%~) == 0
+			PATCH_IF split_title_form BEGIN
+				SPRINT split_rest ~~
+				INNER_PATCH_SAVE split_rest ~%split_text%~ BEGIN
+					DELETE_BYTES 0 split_title_length
+				END
+				SPRINT split_check ~%split_title%~
+				INNER_PATCH ~%split_rest%~ BEGIN
+					REPLACE_EVALUATE CASE_SENSITIVE ~%CRLF%  - \(\([^%CRLF%]\|%CRLF%    \)*\)~ BEGIN
+						SPRINT $split_members(~%split_member_count%~) ~%MATCH1%~
+						SPRINT split_check ~%split_check%%CRLF%  - %MATCH1%~
+						SET split_member_count += 1
+					END ~~
+				END
+				// Texte d'une autre forme que prévu : ligne gardée entière.
+				PATCH_IF NOT (~%split_check%~ STRING_EQUAL ~%split_text%~) BEGIN
+					SET split_member_count = 0
+				END
+			END
+			ELSE PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%split_title% ~ ~%split_text%~) == 0 BEGIN
+				INNER_PATCH_SAVE split_core ~%split_text%~ BEGIN
+					DELETE_BYTES 0 split_title_length + 1
+				END
+				SPRINT $split_members(~0~) ~%split_core%~
+				SET split_member_count = 1
+			END
+			PATCH_IF split_member_count > 0 BEGIN
+				SET line_probability = value
+				SET line_probability_low = $fx_probability_low(~%split_fx%~)
+				SET line_probability_high = $fx_probability_high(~%split_fx%~)
+				SET line_fx = split_fx
+				SET line_sort = $line_sort(~%split_id%~)
+				SET line_nested = 0
+				SPRINT line_section ~%split_section%~
+				SET line_sub_probability = 0
+				FOR (split_k = split_member_count - 1; split_k >= 0; split_k = split_k - 1) BEGIN
+					SPRINT line_core $split_members(~%split_k%~)
+					SPRINT line_text ~%split_title% %line_core%~
+					// Groupe intérieur seul sous le titre du sort : il garde ce titre. Plusieurs sous-lignes
+					// gardent l'ordre du sort.
+					SET line_composite = 0
+					PATCH_IF split_title_form AND split_member_count == 1 BEGIN
+						SET line_composite = 1000000
+					END
+					PATCH_IF split_k == split_member_count - 1 BEGIN
+						SPRINT $line_text(~%split_id%~) ~%line_text%~
+						SET $line_probability(~%split_id%~) = line_probability
+						SET $line_probability_low(~%split_id%~) = line_probability_low
+						SET $line_probability_high(~%split_id%~) = line_probability_high
+						SPRINT $line_core(~%split_id%~) ~%line_core%~
+						SET $line_composite(~%split_id%~) = line_composite
+						SET $line_sub_probability(~%split_id%~) = 0
+					END
+					ELSE BEGIN
+						LPM ad_line_append
+					END
+				END
+				SET line_probability = 0
+				SPRINT line_core ~~
+				SET line_composite = 0
+			END
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN

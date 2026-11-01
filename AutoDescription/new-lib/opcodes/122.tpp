@@ -1,19 +1,12 @@
 // Opcode 122 (Item: Create Inventory Item) : objet créé dans l'inventaire, code commun dans
 // new-lib/opcodes/create_item.tpp. Avec AD_ENABLE_SHRINKAGE, l'objet qu'un effet 112 retire dans les
 // mêmes conditions s'écrit « Remplace « A » par « B » » (ad_group_replace_item), et l'objet que le
-// porteur retrouve après un délai prolonge son retrait (ad_group_item_return, new-lib/groups.tpp).
+// porteur retrouve après un délai prolonge son retrait (ad_group_item_return, new-lib/groups.tpp) ;
+// l'arme brisée (MISC56) qui remplace la ressource décrite s'écrit « de se briser ».
 
-// Refus propre à l'opcode : objet MISC56 qui remplace une arme brisée (opcode virtuel 519 de l'ancien
-// opcode_122_group).
 DEFINE_PATCH_MACRO ad_op_122_support BEGIN
 	SET create_opcode = 122
 	LPM ad_create_item_support
-	PHP_EACH fx_ids_122 AS _ => create_id BEGIN
-		SPRINT create_resref $fx_resource(~%create_id%~)
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND AD_ENABLE_SHRINKAGE AND (~%create_resref%~ STRING_EQUAL_CASE ~MISC56~ OR ~%create_resref%~ STRING_EQUAL_CASE ~MISC56_~) BEGIN
-			LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode122:broken_weapon~ message = ~item replacing a broken weapon~ RET render_missing = refusal END
-		END
-	END
 END
 
 DEFINE_PATCH_MACRO ad_op_122_lines BEGIN

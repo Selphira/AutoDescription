@@ -2,8 +2,10 @@
 // sur une capacité de charge (en-tête à charges ou utilisé depuis l'objet), le nom seul
 // (« Boule de feu (instantané) ») ; ailleurs, « Lance « Boule de feu » sur la cible ».
 // parameter2 non nul : lancé instantanément ; parameter2 2, ou parameter1 non nul avec parameter2
-// 0 : « (comme un lanceur de sorts de niveau N) ». Un sort sans nom, ou lancé par une potion, est
-// décrit par ses effets (new-lib/recursion.tpp) : ses lignes prennent la place de celle du sort.
+// 0 : « (comme un lanceur de sorts de niveau N) ». Un sort sans nom, ou lancé à coup sûr par une
+// potion, est décrit par ses effets (new-lib/recursion.tpp) : ses lignes prennent la place de celle du
+// sort. Effet probable : comme l'ancien opcode_target_probability_146, une potion cite aussi le sort
+// par son nom.
 // Les macros ad_op_<N>_* fixent cast_opcode (et cast_phrase pour les lignes) puis appellent les
 // macros ci-dessous. Le regroupement avec l'opcode 321 (ancien opcode_146_group, non cumulatif)
 // viendra avec cet opcode.
@@ -43,7 +45,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			ELSE PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:dart~ message = ~dart casting a spell on each charge~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF item_type == ITM_TYPE_potion OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
+			ELSE PATCH_IF (item_type == ITM_TYPE_potion AND $fx_probability(~%cast_id%~) >= 100) OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
 				SET $fx_recursion(~%cast_id%~) = 1
 				LPM ad_cast_spell_recursion_support
 			END
@@ -58,9 +60,9 @@ END
 // ad_recursion_support) : niveau de lancement parameter1, aucun pour un sort lancé instantanément
 // (parameter2 1) par un objet (ancien isItem) ; cible héritée pour l'opcode 146 ; lancé après un délai, sous une condition
 // (ad_cast_spell_delayed_condition) ; répété (série), la durée des sous-lignes réécrite
-// (ad_cast_spell_series_text). Effet probable d'un sort : sa probabilité passe aux sous-effets, dont
-// les lignes sont regroupées par probabilité (ancien baseProbability) ; l'ancien moteur décrit
-// autrement celui d'un objet, refusé.
+// (ad_cast_spell_series_text). Effet probable : sa probabilité passe aux sous-effets, dont les lignes
+// sont regroupées par probabilité (ancien baseProbability), puis avec les effets de même plage de la
+// ressource (ad_lines_split_sub_probability, new-lib/lines.tpp).
 DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SET recursion_fx = cast_id
 	SPRINT recursion_resref ~%cast_resref%~
@@ -80,7 +82,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SPRINT recursion_versus ~~
 	SPRINT recursion_single_reason ~~
 	SET recursion_delayed = 1
-	SET recursion_probability = resource_is_spell
+	SET recursion_probability = 1
 	LPM ad_recursion_support
 END
 

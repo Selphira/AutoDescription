@@ -12,8 +12,8 @@
 // sauvegarde…) de la dernière immunité de l'en-tête.
 
 // Refus : opcode sans libellé ; dans un en-tête dont une classe de cible a plusieurs immunités (ligne
-// unique), immunités aux champs différents, parameter2 et résistance (que la ligne n'écrit pas) mis
-// à part.
+// unique), immunités aux champs différents, parameter2, résistance et puissance (que la ligne n'écrit
+// pas) mis à part : la ligne cacherait la durée ou la restriction de niveau des autres.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
@@ -45,13 +45,13 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 END
 
 // Immunité immunity_id d'un en-tête : si une autre immunité de l'en-tête est de la même classe de
-// cible (ad_immunity_class), toutes les immunités de l'en-tête ont les mêmes champs, parameter2 et
-// résistance mis à part.
+// cible (ad_immunity_class), toutes les immunités de l'en-tête ont les mêmes champs, parameter2,
+// résistance et puissance mis à part.
 DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
 	LPM ad_immunity_class
 	SET immunity_own_class = immunity_class
 	SET same_id = immunity_id
-	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_RESISTANCE
+	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_RESISTANCE BOR AD_SAME_POWER
 	SET immunity_same_class = 0
 	SET immunity_different = 0
 	SET immunity_self = immunity_id
