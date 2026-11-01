@@ -1259,6 +1259,8 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_saving_throw~ BEGIN
 
 		    PATCH_IF inAllLevels AND total > 1 BEGIN
 				LPF ~get_complex_value~
+					INT_VAR
+						untyped = 1
 					STR_VAR
 						array_name = ~all_effects~
 					RET
