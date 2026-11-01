@@ -1658,7 +1658,7 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
 	END
 
-	// Montant tiré au sort (opcode_12_group) : « entre 1 et 8 ».
+	// Montant tiré au sort (opcode_12_group), en dés : « 1d8 ».
 	PATCH_IF mode == 0 AND NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
 		SPRINT damage ~%custom_str%~
 	END
@@ -1787,14 +1787,23 @@ DEFINE_PATCH_MACRO ~opcode_12_group~ BEGIN
 		END
 	END
 
-	SET rangeStrref = 101130 // ~entre %amountMin% et %amountMax%~
 	SPRINT rangeEligibleMacro ~opcode_12_range_eligible~
+	SPRINT rangeTextMacro ~opcode_12_range_text~
 	LPM ~group_value_range~
 END
 
-// Seuls des dégâts (mode 0) sans dé ont un montant qui s'écrit « entre X et Y ».
+// Seuls des dégâts (mode 0) sans dé ont un montant tiré au sort réunissable.
 DEFINE_PATCH_MACRO ~opcode_12_range_eligible~ BEGIN
 	SET rangeEligible = (parameter2 BAND 65535) == 0 AND diceCount == 0
+END
+
+// Montant tiré au sort écrit en dés, la notation des dégâts du jeu : un seul dé, seul exact pour des
+// valeurs équiprobables (« entre 2 et 9 » : « 1d8 +1 »).
+DEFINE_PATCH_MACRO ~opcode_12_range_text~ BEGIN
+	LPF ~get_damage_value~ INT_VAR diceCount = 1 diceSides = amountMax - amountMin + 1 damageAmount = amountMin - 1 RET custom_str = damage END
+	INNER_PATCH_SAVE custom_str ~%custom_str%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~^\+~ ~~
+	END
 END
 
 /* ------------------------- *
@@ -12263,6 +12272,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_244_group~ BEGIN
 	SET rangeStrref = 101130 // ~entre %amountMin% et %amountMax%~
 	SPRINT rangeEligibleMacro ~~
+	SPRINT rangeTextMacro ~~
 	LPM ~group_value_range~
 END
 
@@ -12965,6 +12975,7 @@ DEFINE_PATCH_MACRO ~opcode_261_group~ BEGIN
 
 	SET rangeStrref = 12610013 // ~%amountMin% à %amountMax%~
 	SPRINT rangeEligibleMacro ~opcode_261_range_eligible~
+	SPRINT rangeTextMacro ~~
 	LPM ~group_value_range~
 END
 
