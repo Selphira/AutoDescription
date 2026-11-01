@@ -11,9 +11,8 @@ DEFINE_PATCH_MACRO ad_op_120_support BEGIN
 			LPF ad_refusal INT_VAR fx_id = weapon_id STR_VAR reason = ~file_error:opcode120:invalid~ message = ~weapon type (parameter2) outside 0-11~ RET render_missing = refusal END
 		END
 	END
-END
-
-DEFINE_PATCH_MACRO ad_op_120_lines BEGIN
+	// Réunies avant la comparaison des niveaux d'un sort, comme l'ancien moteur qui les réunit au chargement
+	// de chaque niveau : un niveau ne garde que son bonus le plus élevé (« +3 » de 16 à 19, « +4 » ensuite).
 	PATCH_IF IS_EE AND AD_ENABLE_SHRINKAGE BEGIN
 		PHP_EACH fx_ids_120 AS _ => weapon_id BEGIN
 			PATCH_IF $fx_parameter2(~%weapon_id%~) == 0 AND NOT $fx_consumed(~%weapon_id%~) BEGIN
@@ -27,6 +26,9 @@ DEFINE_PATCH_MACRO ad_op_120_lines BEGIN
 			END
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ad_op_120_lines BEGIN
 	SET state_opcode = 120
 	SPRINT state_variant_macro ~ad_op_120_variant~
 	LPM ad_state_lines

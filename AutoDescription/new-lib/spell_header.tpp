@@ -238,7 +238,7 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	END
 	FOR (header_h = 1; header_h < fx_header_count AND ~%header_missing%~ STRING_EQUAL ~~; ++header_h) BEGIN
 		SET header_previous = header_h - 1
-		PATCH_IF $spell_level(~%header_h%~) <= $spell_level(~%header_previous%~) OR $spell_level(~0~) > 1 BEGIN
+		PATCH_IF $spell_level(~%header_h%~) <= $spell_level(~%header_previous%~) BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:ability_levels~ message = ~abilities whose required levels do not grow from level 1: not supported~ RET header_missing = refusal END
 		END
 	END
@@ -1114,8 +1114,8 @@ END
 // retrouve dans tous les autres à la durée et au bonus près (ad_spell_level_search) donne son bonus
 // (un seul effet trouvé) ou sa progression (ad_spell_level_formula : « -1 par tranche de 2 niveaux
 // du lanceur/12 ») ; tous doivent donner le même, sinon, ou sans formule, save_bonus_valid vaut 0.
-// Refus : formule à deux valeurs, que l'ancien moteur écrit en français dans les deux langues ;
-// bonus suivi de l'unité de l'opcode de l'effet (ancien opcode_<N>_typed_value). Rien n'est cherché
+// Le bonus s'écrit sans l'unité de l'opcode de l'effet. Refus : formule à deux valeurs, que l'ancien
+// moteur écrit en français dans les deux langues. Rien n'est cherché
 // pour un sort déjà refusé (header_missing), dont les regroupements n'ont pas été faits.
 DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 	SPRINT save_bonus_text ~~
@@ -1147,14 +1147,12 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 					SET formula_percent = 0
 					SET formula_flat = 0
 					SET formula_dice_sides = 0
-					SET formula_opcode = $level_opcode(~%level_a%~)
+					// Un bonus de jet de sauvegarde, sans l'unité de l'opcode (ancien get_complex_value, untyped).
+					SET formula_opcode = 0
 					SET level_id = $level_id(~%level_a%~)
 					LPM ad_spell_level_formula
 					PATCH_IF formula_rank == 2 BEGIN
 						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell_header:save_bonus_two_values~ message = ~saving throw bonus taking only two values between the abilities~ RET save_missing = refusal END
-					END
-					ELSE PATCH_IF formula_unit_used BEGIN
-						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell_header:save_bonus_effects~ message = ~saving throw bonus followed by the unit of opcode %formula_opcode%~ RET save_missing = refusal END
 					END
 					SET save_bonus_valid = formula_valid
 					SPRINT save_bonus_text ~%formula_text%~

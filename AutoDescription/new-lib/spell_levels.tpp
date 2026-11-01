@@ -872,7 +872,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					END
 				END
 				SET $level_emitted(~%level_a%~) = 1
-				PATCH_IF level_from > 1 OR level_to < 99 BEGIN
+				PATCH_IF level_h > 0 OR level_to < 99 BEGIN
 					SET level_key = (level_from + 100) * 100 + level_to
 					SET $level_keys(~%level_key%~) = 1
 					SET level_keys_count += 1
