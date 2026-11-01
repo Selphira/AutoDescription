@@ -39,6 +39,15 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Timing mode == Instant/Limited and duration == 0~ END
 	END
 
+	// Restriction de niveau de la cible sans aucun niveau possible (minimum au-dessus du maximum) :
+	// l'effet ne s'applique jamais (mêmes exceptions que add_target_level). Un effet d'équipement vise le
+	// porteur, sans restriction écrite.
+	PATCH_IF isExternal != 1 AND NOT (isItem == 1 AND isSubSpell == 0 AND abilityType == AbilityType_Equipped) AND diceCount > 0 AND diceSides > diceCount AND NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~)
+			AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%diceSides%) > levelMax (%diceCount%)~ END
+	END
+
 	PATCH_IF is_ee == 0 AND VARIABLE_IS_SET $opcodes_parameters_should_be_zero(~%opcode%~) AND (parameter1 != 0 OR parameter2 != 0) BEGIN
 		SET isValid = 0
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Les 2 parametres doivent avoir la valeur 0~ END
