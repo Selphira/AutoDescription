@@ -1,7 +1,8 @@
 // Opcode 261 (Spell: Restore Lost Spells) : « Se remémore 1 sort divin de niveau 5 ou inférieur »,
 // type selon parameter2 (0 profane, 1 divin), niveau parameter1 ramené à 9 ou 7 ; « de niveau 1 »
 // pour le premier niveau (ancien opcode_261_common) ; plusieurs niveaux réunis par
-// ad_group_restored_spells (new-lib/groups.tpp). Code commun dans new-lib/opcodes/states.tpp.
+// ad_group_restored_spells (new-lib/groups.tpp) ; niveau tiré au sort réuni : « de niveau 1 à 8 ou
+// inférieur » (new-lib/opcodes/value_ranges.tpp). Code commun dans new-lib/opcodes/states.tpp.
 
 // Refus : type autre que 0 ou 1 et niveau négatif (écartés par l'ancien opcode_261_is_valid).
 DEFINE_PATCH_MACRO ad_op_261_support BEGIN
@@ -14,6 +15,16 @@ DEFINE_PATCH_MACRO ad_op_261_support BEGIN
 			END
 		END
 	END
+	SET range_opcode = 261
+	SPRINT range_eligible_macro ~ad_op_261_range_eligible~
+	LPM ad_value_range_support
+END
+
+// Un niveau au-delà du maximum du type de sort (ramené à 9 ou 7) n'est pas réuni (ancien
+// opcode_261_range_eligible).
+DEFINE_PATCH_MACRO ad_op_261_range_eligible BEGIN
+	SET range_type = $fx_parameter2(~%range_id%~)
+	SET range_eligible = (range_type == 0 AND $fx_parameter1(~%range_id%~) <= 9) OR (range_type == 1 AND $fx_parameter1(~%range_id%~) <= 7)
 END
 
 DEFINE_PATCH_MACRO ad_op_261_lines BEGIN
@@ -33,6 +44,12 @@ DEFINE_PATCH_MACRO ad_op_261_variant BEGIN
 		SET spellLevel = spellLevel > 7 ? 7 : spellLevel
 	END
 	SET state_variant = spellLevel == 1
+	PATCH_IF $fx_range_max(~%line_fx%~) > 0 BEGIN
+		SET amountMin = $fx_range_min(~%line_fx%~)
+		SET amountMax = $fx_range_max(~%line_fx%~)
+		SPRINT spellLevel @22610013 // ~%amountMin% à %amountMax%~
+		SET state_variant = 0
+	END
 END
 
 // Type « profane ou divin » : restaurations des deux types réunies (fx_restore_both,

@@ -1,6 +1,7 @@
 // Opcode 244 (Spell: Drain Wizard Spell) : draine parameter1 sorts profanes de la mémoire de la
 // cible : « Draine 1 sort profane de la mémoire de la cible » ; code commun dans
-// new-lib/opcodes/states.tpp.
+// new-lib/opcodes/states.tpp. Nombre tiré au sort réuni : « Draine entre 1 et 10 sorts profanes »
+// (new-lib/opcodes/value_ranges.tpp).
 
 // Refus : aucun sort drainé (écarté par l'ancien opcode_244_is_valid).
 DEFINE_PATCH_MACRO ad_op_244_support BEGIN
@@ -9,6 +10,9 @@ DEFINE_PATCH_MACRO ad_op_244_support BEGIN
 			LPF ad_refusal INT_VAR fx_id = drain_id STR_VAR reason = ~file_error:opcode244:invalid~ message = ~number of spells to drain of 0 or less~ RET render_missing = refusal END
 		END
 	END
+	SET range_opcode = 244
+	SPRINT range_eligible_macro ~~
+	LPM ad_value_range_support
 END
 
 DEFINE_PATCH_MACRO ad_op_244_lines BEGIN
@@ -21,4 +25,9 @@ END
 DEFINE_PATCH_MACRO ad_op_244_variant BEGIN
 	SET amount = $fx_parameter1(~%line_fx%~)
 	SET state_variant = amount == 1 ? 0 : 1
+	LPM ad_value_range_text
+	PATCH_IF NOT (~%range_text%~ STRING_EQUAL ~~) BEGIN
+		SPRINT amount ~%range_text%~
+		SET state_variant = 1
+	END
 END

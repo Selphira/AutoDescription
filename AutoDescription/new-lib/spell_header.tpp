@@ -887,7 +887,8 @@ END
 // ses en-têtes (hors opcodes 318, 321, 324 et effets qui visent le sort lui-même) : leur type de jet
 // (bits 0 à 5) doit être le même partout, sinon « Spécial » ; « Aucun » sans type. Un 146, 148 ou
 // 232 sans jet prend celui du premier sous-sort qu'il lance (une fois par sous-sort), dont la moitié
-// des dégâts remplace alors celle des effets déjà lus. L'ancien moteur charge alors les effets du
+// des dégâts remplace alors celle des effets déjà lus ; un sous-sort « Spécial » rend le sort
+// « Spécial ». L'ancien moteur charge alors les effets du
 // sous-sort à la place de ceux du sort : la fin de l'en-tête en cours se lit encore, mais les en-têtes
 // suivants lisent ceux du sous-sort de même niveau requis, ou rien (save_tail_*). « Sorts à -2
 // (Annule) », « (1/2) » pour des dégâts réduits de moitié sur EE (ad_spell_header_save_bonus).
@@ -936,7 +937,9 @@ BEGIN
 							LPF ad_spell_header_save_sub INT_VAR tail_count = save_tail_count STR_VAR resref = ~%save_resource%~
 								RET save_effect_type = save_type save_effect_bonus = save_bonus save_half sub_missing = save_missing
 								save_bonus_text save_bonus_valid save_tail_type = tail_type save_tail_bonus = tail_bonus
-								save_tail_special = tail_special save_tail_half = tail_half END
+								save_tail_special = tail_special save_tail_half = tail_half save_sub_special = sub_special END
+							// Sous-sort « Spécial » : le sort l'est aussi, et ses lignes écrivent leur jet.
+							SET save_special = save_special OR save_sub_special
 							SET save_from_sub = 1
 							SET save_tail_pending = save_tail_count > 0
 							PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) AND ~%save_missing%~ STRING_EQUAL ~~ BEGIN
@@ -1015,7 +1018,7 @@ END
 // du sort (save_tail_level) : ceux du sous-sort de même niveau (le dernier à égalité, comme les
 // tableaux de l'ancien load_level_effects) donnent tail_type (0 - 1 sans jet), tail_bonus,
 // tail_special et tail_half, lus comme ceux du sort ; un sous-sort lancé sans jet par l'un d'eux est
-// refusé.
+// refusé. sub_special : le sous-sort lui-même est « Spécial ».
 DEFINE_PATCH_FUNCTION ad_spell_header_save_sub
 	INT_VAR
 		tail_count = 0
@@ -1032,7 +1035,9 @@ DEFINE_PATCH_FUNCTION ad_spell_header_save_sub
 		tail_bonus
 		tail_special
 		tail_half
+		sub_special
 BEGIN
+	SET sub_special = 0
 	SET save_type = 0 - 1
 	SET save_bonus = 0 - 1
 	SET save_half = 0
@@ -1059,7 +1064,9 @@ BEGIN
 			PATCH_IF NOT (~%header_missing%~ STRING_EQUAL ~~) BEGIN
 				SPRINT save_missing ~%header_missing%~
 			END
-			LPF ad_spell_header_save RET save_type save_bonus save_half sub_missing = save_missing save_bonus_text save_bonus_valid END
+			LPF ad_spell_header_save RET save_type save_bonus save_half sub_missing = save_missing save_bonus_text save_bonus_valid sub_save_text = save_text END
+			SPRINT sub_special_text @7000010 // ~Spécial~
+			SET sub_special = ~%sub_save_text%~ STRING_EQUAL ~%sub_special_text%~
 			PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) AND ~%save_missing%~ STRING_EQUAL ~~ BEGIN
 				SPRINT save_missing ~%sub_missing%~
 			END

@@ -3231,6 +3231,7 @@
 @22610010 = ~profane~ // reprise de @12610010
 @22610011 = ~divin~ // reprise de @12610011
 @22610012 = ~profane ou divin~ // reprise de @12610012
+@22610013 = ~%amountMin% à %amountMax%~
 @22610100 = ~Se remémore 1 sort %spellType% de niveau %spellLevel% ou inférieur~ // reprise de @12610001
 @22610101 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% ou inférieur %toTheTarget%~ // reprise de @12610002
 @22610102 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel% ou inférieur~ // reprise de @12610003

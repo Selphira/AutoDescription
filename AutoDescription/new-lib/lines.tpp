@@ -277,8 +277,8 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 				SPRINT description ~%description_saved%~
 				SET line_sort = $line_sort(~%prob_id%~)
 				SET line_nested = 0
-				// Ligne seule d'un groupe intérieur : par probabilité décroissante, égalités inversées.
-				SET prob_composite = (100 - value) * 10000 + 5000 - seg_s
+				// Ligne seule d'un groupe intérieur : sa probabilité, égalités inversées.
+				SET prob_composite = (100 - value) * 1000 + 999 - seg_s
 				LPM ad_lines_probability_emit
 			END
 			ELSE BEGIN
@@ -291,20 +291,26 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 				END
 				SET line_nested = 1
 				// Lignes d'un sort lancé par un effet probable (146, 148) : l'ancien moteur les écrit dans
-				// l'ordre de leurs rangs, sous la ligne de l'effet (SPPR450) ; sous ce titre, les lignes
-				// seules d'un groupe intérieur d'abord, puis les effets certains, puis les titres intérieurs.
+				// l'ordre de leurs rangs, sous la ligne de l'effet (SPPR450) : line_sort, rang de l'opcode
+				// plus (100 - probabilité) × 10 000 (ancien set_opcode_sort), la probabilité du parent pour
+				// un effet certain, la sienne pour une ligne seule d'un groupe intérieur ; les titres
+				// intérieurs ensuite.
 				CLEAR_ARRAY prob_nested
 				FOR (seg_k = 0; seg_k < $seg_size(~%seg_s%~); ++seg_k) BEGIN
 					SET prob_id = $seg_member(~%seg_s% %seg_k%~)
 					SET prob_member_composite = $line_composite(~%prob_id%~)
+					SET prob_member_sort = $line_sort(~%prob_id%~) < 0 ? 0 : ($line_sort(~%prob_id%~) > 1999999 ? 1999999 : $line_sort(~%prob_id%~))
 					PATCH_IF prob_member_composite > 0 AND prob_member_composite < 1000000 BEGIN
-						SET prob_nested_key = prob_member_composite
+						SET prob_nested_key = 100000000 + prob_member_sort * 500 + prob_member_composite MODULO 500
 					END
 					ELSE PATCH_IF prob_member_composite >= 1000000 BEGIN
 						SET prob_nested_key = 2000000000 + prob_member_composite - 1000000
 					END
+					ELSE PATCH_IF ctx_base_lines AND NOT prob_inner BEGIN
+						SET prob_nested_key = 100000000 + prob_member_sort * 500 + (seg_k > 499 ? 499 : seg_k)
+					END
 					ELSE BEGIN
-						SET prob_nested_key = ctx_base_lines AND NOT prob_inner ? 1000000000 + $line_sort(~%prob_id%~) * 100 + seg_k : seg_k
+						SET prob_nested_key = seg_k
 					END
 					SET $prob_nested(~%prob_nested_key%~) = prob_id
 				END

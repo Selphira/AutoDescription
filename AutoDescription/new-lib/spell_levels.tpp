@@ -943,7 +943,8 @@ END
 // de l'en-tête), sauf ceux de AD_LEVEL_SAME_IGNORED pour leur opcode et ceux de level_skip : bits
 // AD_SAME_PARAMETER1 (parameter1), AD_SAME_DICE (nombre de dés), AD_SAME_SAVE (bonus du jet de
 // sauvegarde), AD_SAME_TIMING (durée).
-// L'ancien moteur compare parameter2 tel que lu, et le nombre d'effets identiques réunis.
+// L'ancien moteur compare parameter2 tel que lu, le nombre d'effets identiques réunis et les valeurs
+// tirées au sort réunies (custom_str ; fx_range_min et fx_range_max, new-lib/opcodes/value_ranges.tpp).
 DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	SET same_a = $level_id(~%level_a%~)
 	SET same_b = $level_id(~%level_b%~)
@@ -977,6 +978,8 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 		AND $fx_parameter3(~%same_a%~) == $fx_parameter3(~%same_b%~)
 		AND $fx_parameter4(~%same_a%~) == $fx_parameter4(~%same_b%~)
 		AND $level_identical(~%level_a%~) == $level_identical(~%level_b%~)
+		AND $fx_range_min(~%same_a%~) == $fx_range_min(~%same_b%~)
+		AND $fx_range_max(~%same_a%~) == $fx_range_max(~%same_b%~)
 	PATCH_IF level_same BEGIN
 		SPRINT same_resource_a $fx_resource_lower(~%same_a%~)
 		SPRINT same_resource_b $fx_resource_lower(~%same_b%~)

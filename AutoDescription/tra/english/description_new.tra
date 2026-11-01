@@ -3231,6 +3231,7 @@
 @22610010 = ~wizard~ // reprise de @12610010
 @22610011 = ~priest~ // reprise de @12610011
 @22610012 = ~wizard or priest~ // reprise de @12610012
+@22610013 = ~%amountMin% to %amountMax%~
 @22610100 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower~ // reprise de @12610001
 @22610101 = ~Recovers 1 %spellType% spell of level %spellLevel% or lower %toTheTarget%~ // reprise de @12610002
 @22610102 = ~to recover 1 %spellType% spell of level %spellLevel% or lower~ // reprise de @12610003

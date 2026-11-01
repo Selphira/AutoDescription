@@ -801,19 +801,21 @@ END
 // profane et une divine qui ne diffèrent que par le type s'écrivent ensemble, « profane ou divin »
 // (fx_restore_both) : deux effets réunis de mêmes niveaux, dont seul le second reste écrit, comme
 // l'effet que l'ancien moteur ajoute en fin de liste ; ou deux effets seuls jusqu'au niveau 7, où
-// les deux types ne sont pas ramenés différemment.
+// les deux types ne sont pas ramenés différemment. Un niveau tiré au sort, déjà réuni
+// (new-lib/opcodes/value_ranges.tpp), reste à part.
 DEFINE_PATCH_MACRO ad_group_restored_spells BEGIN
 	SET group_first_derived = derived_count
 	PHP_EACH fx_ids_261 AS _ => group_id BEGIN
 		SET group_level = $fx_parameter1(~%group_id%~)
-		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_level >= 1 AND group_level <= 9 BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND group_level >= 1 AND group_level <= 9 AND $fx_range_max(~%group_id%~) == 0 BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_SPECIAL
 			SET group_levels = 1 BLSL (group_level - 1)
 			SET group_members = 1
 			PHP_EACH fx_ids_261 AS _ => group_candidate BEGIN
 				SET group_level = $fx_parameter1(~%group_candidate%~)
-				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_level >= 1 AND group_level <= 9 BEGIN
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND group_level >= 1 AND group_level <= 9
+						AND $fx_range_max(~%group_candidate%~) == 0 BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN

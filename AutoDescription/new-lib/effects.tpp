@@ -31,7 +31,8 @@
 // remplacé par celui de son EFF, ad_fx_substitute_177, new-lib/opcodes/177.tpp), fx_probability_in_sub
 // (1 pour un effet dont la probabilité est écrite dans les lignes de son sort, new-lib/recursion.tpp),
 // fx_parent_probability (0 à la lecture, 1 pour un effet certain d'un sous-sort qui a reçu la
-// probabilité de l'effet qui le lance, ad_recursion_base_probability), fx_versus_file et
+// probabilité de l'effet qui le lance, ad_recursion_base_probability), fx_range_min et fx_range_max
+// (0 à la lecture, valeurs tirées au sort réunies, new-lib/opcodes/value_ranges.tpp), fx_versus_file et
 // fx_versus_value (fichier IDS et valeur du type de créature visé par ce 177, 0 sans filtre),
 // fx_versus_inner_file et fx_versus_inner_value (type d'un 177 imbriqué qui le restreint) ; fx_cursed (1 pour
 // un effet 283 remplacé de même par celui de son EFF, new-lib/opcodes/283.tpp) ; fx_opcode_count(opcode).
@@ -317,6 +318,8 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_consumed(~%fx_id%~) = 0
 	SET $fx_dropped(~%fx_id%~) = 0
 	SET $fx_parent_probability(~%fx_id%~) = 0
+	SET $fx_range_min(~%fx_id%~) = 0
+	SET $fx_range_max(~%fx_id%~) = 0
 	SET $fx_level_merged(~%fx_id%~) = 0
 	SET $fx_header_target(~%fx_id%~) = 0
 	SET $fx_header_target_count(~%fx_id%~) = 0

@@ -11,6 +11,8 @@
 // secondes quel que soit le timing (l'ancien moteur le force à « durée »), suivi de
 // « (non cumulatif) » pour les bits 3-4 de special. Des dégâts qui visent un type de créature (effet d'un 177) s'écrivent
 // « contre les X » à la forme « cible » (versus, ad_application_versus, new-lib/application.tpp).
+// Des dégâts sans dé dont le montant est tiré au sort sont réunis : « Inflige entre 1 et 8 points de
+// dégâts magiques » (new-lib/opcodes/value_ranges.tpp).
 
 // ---------------------------------------------------------------------------------------------
 // Prise en charge (ancien opcode_12_is_valid, plus les cas que ce moteur ne décrit pas encore)
@@ -38,6 +40,14 @@ DEFINE_PATCH_MACRO ad_op_12_support BEGIN
 			END
 		END
 	END
+	SET range_opcode = 12
+	SPRINT range_eligible_macro ~ad_op_12_range_eligible~
+	LPM ad_value_range_support
+END
+
+// Seuls des dégâts (mode 0) sans dé ont un montant qui s'écrit « entre X et Y ».
+DEFINE_PATCH_MACRO ad_op_12_range_eligible BEGIN
+	SET range_eligible = ($fx_parameter2(~%range_id%~) BAND 65535) == 0 AND $fx_dice_count(~%range_id%~) == 0
 END
 
 // ---------------------------------------------------------------------------------------------
@@ -52,6 +62,11 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 		PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
 			PATCH_IF NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
 				LPM ad_op_12_value
+				SET line_fx = damage_id
+				LPM ad_value_range_text
+				PATCH_IF NOT (~%range_text%~ STRING_EQUAL ~~) BEGIN
+					SPRINT damage_text ~%range_text%~
+				END
 				SPRINT damage ~%damage_text%~
 				PATCH_IF damage_mode == 0 BEGIN
 					SPRINT damage $fx_level_value(~%damage_id%~)
