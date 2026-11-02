@@ -4386,8 +4386,24 @@ DEFINE_PATCH_MACRO ~opcode_79_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		// Ajout de l'opcode 77, dissipation de la débilité mentale
+		// Une dissipation de la magie aux mêmes champs guérit déjà la débilité mentale et a absorbé le 77 du
+		// bloc (opcode_58_group) : la guérison n'est pas recréée.
+		LPF ~has_opcode~
+			INT_VAR opcode = 58
+				match_diceCount = diceCount
+				match_diceSides = diceSides
+				match_power = power
+				match_probability1 = probability1
+				match_probability2 = probability2
+				match_resistance = resistance
+				match_target = target
+				match_saveBonus = saveBonus
+				match_saveType = saveType
+			STR_VAR match_macro = ~opcode_match_diceCount_and_diceSides_and_power_and_probability1_and_probability2_and_resistance_and_saveBonus_and_saveType_and_target~
+			RET dispelCoversFeeblemind = hasOpcode
+		END
 		SET opcode = 77
-		PATCH_IF NOT VARIABLE_IS_SET $opcodes(~%opcode%~) OR $opcodes(~%opcode%~) == 0 BEGIN
+		PATCH_IF (NOT VARIABLE_IS_SET $opcodes(~%opcode%~) OR $opcodes(~%opcode%~) == 0) AND NOT dispelCoversFeeblemind BEGIN
 			LPM ~add_opcode~
 		END
 		SET opcode = 79
@@ -14783,6 +14799,7 @@ BEGIN
 	SPRINT the @11770200 // ~les~
 	SPRINT and @100021 // ~et~
 	SPRINT andThe @11770201 // ~et les~
+	SPRINT orWord @100004 // ~ou~
 	SPRINT target_effective ~~
 	SPRINT target_effective_if ~~
 	SPRINT target_not_effective ~~
@@ -14836,7 +14853,17 @@ BEGIN
 		SET value = parameter1
 		SET statType = parameter2
 
-		PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
+		PATCH_IF statType == 100183 BEGIN // Type d'objet équipé (183 vers une protection contre la ressource, load_opcode)
+			SET strref = 230000 + value
+			SPRINT itemTypeName ~~
+			PATCH_IF TRA_ENTRY_EXISTS (~%strref%~) BEGIN
+				LPF ~getTranslation~ INT_VAR strref opcode RET itemTypeName = string END
+			END
+			PATCH_IF NOT ~%itemTypeName%~ STRING_EQUAL ~~ BEGIN
+				SET $EVAL ~equipped_types%key%~(~%itemTypeName%~) = 1
+			END
+		END
+		ELSE PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
             SET idsId = statType - 100
             LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%idsId%~ RET creatureType = idName END
             SET $EVAL ~not_effective_against%key%~(~%creatureType%~) = 1
@@ -14991,6 +15018,17 @@ BEGIN
 		END
 		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %and% ~ RET creaturesList = text END
 		PATCH_IF NOT ~%creaturesList%~ STRING_EQUAL ~~ BEGIN
+			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
+			SET $not_effective_if(~%creaturesList%~) = 1
+		END
+
+		CLEAR_ARRAY targetsList
+		PATCH_PHP_EACH ~equipped_types%key%~ AS target => _ BEGIN
+			SET $targetsList(~%target%~) = 1
+		END
+		LPF ~implode~ STR_VAR array_name = ~targetsList~ glue = ~, ~ final_glue = ~ %orWord% ~ RET itemType = text END
+		PATCH_IF NOT ~%itemType%~ STRING_EQUAL ~~ BEGIN
+			SPRINT creaturesList @11830002 // ~si l'équipement %ofTheTarget% contient des %itemType%~
 			SPRINT creaturesList ~%probabilityStr%%creaturesList%~
 			SET $not_effective_if(~%creaturesList%~) = 1
 		END
