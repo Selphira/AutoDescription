@@ -45,13 +45,22 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 				SPRINT ignored_message ~no change (mode %hp_mode%, value %hp_value%)~
 				LPM ad_application_drop
 			END
-			// L'ancien moteur fusionne deux effets de même ligne (ad_fx_line_key) au lieu de les cumuler (leurs lignes seulement :
-			// l'en-tête d'un sort compte les deux).
+			// Deux effets de même ligne (ad_fx_line_key) : le jeu applique les deux, le second est réuni au
+			// premier, ajouts additionnés, pourcentages multipliés ; une valeur fixée ou un ajout non
+			// cumulatif (mode 6) ne compte qu'une fois (ancien merge_duplicate_effects ; l'en-tête d'un sort
+			// compte les deux).
 			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:opcode18:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
+				SET hp_first = $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) - 1
+				SET $fx_consumed(~%hp_id%~) = 1
+				PATCH_IF hp_type == 0 OR hp_type == 3 BEGIN
+					SET $fx_parameter1(~%hp_first%~) += hp_value
+				END
+				ELSE PATCH_IF hp_type == 2 OR hp_type == 5 BEGIN
+					SET $fx_parameter1(~%hp_first%~) = $fx_parameter1(~%hp_first%~) * hp_value / 100
+				END
 			END
 			ELSE BEGIN
-				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) = 1
+				SET $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) = hp_id + 1
 			END
 		END
 	END

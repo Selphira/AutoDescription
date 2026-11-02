@@ -7,10 +7,9 @@
 // new-lib/application.tpp). Avec AD_ENABLE_SHRINKAGE, cinq protections psioniques d'un bloc
 // deviennent « Immunité aux capacités psioniques » (ad_group_psionic_immunity, new-lib/groups.tpp).
 
-// Effet sans ressource : écarté sans rien écrire, erreur journalisée.
-// Refus : dans un en-tête, avec la ligne unique des immunités, immunité aux
-// capacités psioniques dont les champs (ceux de la cinquième protection) diffèrent de ceux d'une
-// autre immunité de l'en-tête, parameter2 mis à part (ad_op_101_ability_support).
+// Effet sans ressource : écarté sans rien écrire, erreur journalisée. L'immunité aux capacités
+// psioniques prend les champs de la cinquième protection, qui la placent dans un groupe de la ligne
+// unique des immunités (new-lib/opcodes/101.tpp).
 DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 	PHP_EACH fx_ids_206 AS _ => spell_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN

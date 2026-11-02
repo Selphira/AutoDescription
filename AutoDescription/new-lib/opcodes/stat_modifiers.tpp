@@ -78,21 +78,26 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 				SPRINT ignored_message ~invalid mode or no change (mode %stat_mode%, value %stat_value%)~
 				LPM ad_application_drop
 			END
-			// L'ancien moteur fusionne deux effets qui écrivent la même ligne (ad_fx_line_key) au lieu de
-			// les cumuler ; un effet d'un 177 contre un type de créature n'est pas identique à celui qui
-			// vaut pour tous. Il ne fusionne que leurs lignes : l'en-tête d'un sort compte les deux. La fusion n'est juste que pour des
-			// effets non cumulatifs (fx_not_cumulative, 321 sur la ressource elle-même) : le second est
-			// alors réuni au premier ; sinon, refus.
+			// Deux effets qui écrivent la même ligne (ad_fx_line_key) : le jeu applique les deux, le second
+			// est réuni au premier, valeurs additionnées pour un ajout, pourcentages multipliés ; une valeur
+			// fixée deux fois, ou un effet non cumulatif (fx_not_cumulative, 321 sur la ressource
+			// elle-même), ne compte qu'une fois (ancien merge_duplicate_effects). Un effet d'un 177 contre
+			// un type de créature n'est pas identique à celui qui vaut pour tous. L'en-tête d'un sort compte
+			// les deux.
 			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) AND NOT support_header_only BEGIN
-				PATCH_IF $fx_not_cumulative(~%stat_id%~) BEGIN
-					SET $fx_consumed(~%stat_id%~) = 1
-				END
-				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
+				SET stat_first = $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) - 1
+				SET $fx_consumed(~%stat_id%~) = 1
+				PATCH_IF NOT $fx_not_cumulative(~%stat_id%~) BEGIN
+					PATCH_IF stat_mode == MOD_TYPE_cumulative OR (stat_mode == 3 AND (~%stat_mode_3%~ STRING_EQUAL ~added~)) BEGIN
+						SET $fx_parameter1(~%stat_first%~) += stat_value
+					END
+					ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
+						SET $fx_parameter1(~%stat_first%~) = $fx_parameter1(~%stat_first%~) * stat_value / 100
+					END
 				END
 			END
 			ELSE BEGIN
-				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 1
+				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = stat_id + 1
 			END
 		END
 	END

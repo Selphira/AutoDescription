@@ -899,18 +899,16 @@ END
 // Jet de sauvegarde du sort chargé dans le magasin (ancien spell_saving_throw), d'après les effets de
 // ses en-têtes (hors opcodes 318, 321, 324 et effets qui visent le sort lui-même) : leur type de jet
 // (bits 0 à 5) doit être le même partout, sinon « Spécial » ; « Aucun » sans type. Un 146, 148 ou
-// 232 sans jet prend celui du premier sous-sort qu'il lance (une fois par sous-sort), dont la moitié
-// des dégâts remplace alors celle des effets déjà lus ; un sous-sort « Spécial » rend le sort
-// « Spécial ». L'ancien moteur charge alors les effets du
-// sous-sort à la place de ceux du sort : la fin de l'en-tête en cours se lit encore, mais les en-têtes
-// suivants lisent ceux du sous-sort de même niveau requis, ou rien (save_tail_*). « Sorts à -2
-// (Annule) », « (1/2) » pour des dégâts réduits de moitié sur EE (ad_spell_header_save_bonus).
+// 232 sans jet prend celui du premier sous-sort qu'il lance (une fois par sous-sort, lu dans sa propre
+// portée : les en-têtes suivants du sort restent les siens), dont la moitié des dégâts remplace alors
+// celle des effets déjà lus ; un sous-sort « Spécial » rend le sort « Spécial ». « Sorts à -2
+// (Annule) », « (1/2) » pour des dégâts réduits de moitié sur EE (ad_spell_header_save_bonus). Le
+// bonus ne se lit que dans les effets qui portent le jet : quand aucun effet du sort n'a de type, il
+// vient de ses sous-sorts (SPPR725 : « Sorts à -2 »), « Spécial » s'ils en donnent des différents.
 //
 // save_* (rendus) : save_type (0 - 1 sans effet), save_bonus, save_half ; save_text : texte de la
-// ligne ; save_missing : raison d'un cas que ce rendu ne sait pas reproduire ; save_bonus_text et
-// save_bonus_valid : bonus de ce sort (ad_spell_header_save_bonus), que l'appelant lit après la
-// lecture d'un sous-sort, l'ancien moteur rechargeant les effets de ce dernier à la place des siens.
-// save_visited (hérité) : sous-sorts déjà lus.
+// ligne ; save_missing : raison d'un cas que ce rendu ne sait pas reproduire ; save_bonus_text,
+// save_bonus_valid : bonus du jet. save_visited (hérité) : sous-sorts déjà lus.
 DEFINE_PATCH_FUNCTION ad_spell_header_save
 	RET
 		save_type
@@ -926,11 +924,14 @@ BEGIN
 	SET save_half = 0
 	SET save_type = 0 - 1
 	SET save_bonus = 0 - 1
-	SET save_from_sub = 0
-	SET save_tail_done = 0
+	SPRINT save_bonus_text ~~
+	SET save_bonus_valid = 1
+	SET save_own_type = 0
+	SET save_sub_count = 0
+	SPRINT save_sub_bonus_first ~~
+	SET save_sub_bonus_valid = 1
 	SET $save_visited(~%spell_self%~) = 1
-	FOR (save_h = 0; save_h < fx_header_count AND NOT save_special AND NOT save_tail_done; ++save_h) BEGIN
-		SET save_tail_pending = 0
+	FOR (save_h = 0; save_h < fx_header_count AND NOT save_special; ++save_h) BEGIN
 		FOR (save_n = 0; save_n < $spell_fx_count(~%save_h%~); ++save_n) BEGIN
 			SET save_id = $EVAL ~spell_fx_%save_h%~(~%save_n%~)
 			SET save_opcode = $EVAL ~spell_fx_opcode_%save_h%~(~%save_n%~)
@@ -938,23 +939,23 @@ BEGIN
 			PATCH_IF save_opcode != 318 AND save_opcode != 321 AND save_opcode != 324 AND NOT (~%save_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
 				SET save_effect_type = $fx_save_type(~%save_id%~) BAND 0b111111
 				SET save_effect_bonus = $fx_save_bonus(~%save_id%~)
+				SET save_own_type = save_own_type OR save_effect_type > 0
 				PATCH_IF save_effect_type == 0 AND (save_opcode == 146 OR save_opcode == 148 OR save_opcode == 232) BEGIN
 					PATCH_IF NOT VARIABLE_IS_SET $save_visited(~%save_resource%~) BEGIN
 						SET $save_visited(~%save_resource%~) = 1
 						PATCH_IF FILE_EXISTS_IN_GAME ~%save_resource%.spl~ BEGIN
-							SET save_tail_count = 0
-							FOR (save_k = save_h + 1; save_k < fx_header_count; ++save_k) BEGIN
-								SET $save_tail_level(~%save_tail_count%~) = $spell_level(~%save_k%~)
-								SET save_tail_count += 1
-							END
-							LPF ad_spell_header_save_sub INT_VAR tail_count = save_tail_count STR_VAR resref = ~%save_resource%~
+							LPF ad_spell_header_save_sub STR_VAR resref = ~%save_resource%~
 								RET save_effect_type = save_type save_effect_bonus = save_bonus save_half sub_missing = save_missing
-								save_bonus_text save_bonus_valid save_tail_type = tail_type save_tail_bonus = tail_bonus
-								save_tail_special = tail_special save_tail_half = tail_half save_sub_special = sub_special END
+								save_sub_special = sub_special save_sub_bonus_text save_sub_bonus_valid_one END
+							PATCH_IF save_effect_type > 0 BEGIN
+								PATCH_IF save_sub_count == 0 BEGIN
+									SPRINT save_sub_bonus_first ~%save_sub_bonus_text%~
+								END
+								SET save_sub_bonus_valid = save_sub_bonus_valid AND save_sub_bonus_valid_one AND ~%save_sub_bonus_text%~ STRING_EQUAL ~%save_sub_bonus_first%~
+								SET save_sub_count += 1
+							END
 							// Sous-sort « Spécial » : le sort l'est aussi, et ses lignes écrivent leur jet.
 							SET save_special = save_special OR save_sub_special
-							SET save_from_sub = 1
-							SET save_tail_pending = save_tail_count > 0
 							PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) AND ~%save_missing%~ STRING_EQUAL ~~ BEGIN
 								SPRINT save_missing ~%sub_missing%~
 							END
@@ -975,29 +976,19 @@ BEGIN
 				END
 			END
 		END
-		// En-têtes suivants lus dans le sous-sort (ad_spell_header_save_sub).
-		PATCH_IF save_tail_pending BEGIN
-			SET save_tail_done = 1
-			SET save_half = save_half OR save_tail_half
-			SET save_special = save_special OR save_tail_special
-			PATCH_IF save_tail_type >= 0 BEGIN
-				PATCH_IF save_type < 0 BEGIN
-					SET save_type = save_tail_type
-					SET save_bonus = save_tail_bonus
-				END
-				PATCH_IF save_type != save_tail_type BEGIN
-					SET save_special = 1
-				END
-			END
-		END
-	END
-	PATCH_IF NOT save_from_sub BEGIN
-		LPM ad_spell_header_save_bonus
 	END
 	PATCH_IF save_special BEGIN
 		SPRINT save_text @7000010 // ~Spécial~
 	END
 	ELSE PATCH_IF save_type > 0 BEGIN
+		// Comme l'ancien get_spell_effects_by_saving_throw, le bonus n'est lu que pour un type de jet.
+		PATCH_IF NOT save_own_type AND save_sub_count > 0 BEGIN
+			SPRINT save_bonus_text ~%save_sub_bonus_first%~
+			SET save_bonus_valid = save_sub_bonus_valid
+		END
+		ELSE BEGIN
+			LPM ad_spell_header_save_bonus
+		END
 		PATCH_IF save_half BEGIN
 			SPRINT savingThrow @7000019 // ~1/2~
 		END
@@ -1027,14 +1018,10 @@ BEGIN
 END
 
 // Jet de sauvegarde du sous-sort resref (ad_spell_header_save), lu dans sa propre portée pour que
-// ses effets ne remplacent pas ceux du sort en cours. tail_count niveaux requis des en-têtes suivants
-// du sort (save_tail_level) : ceux du sous-sort de même niveau (le dernier à égalité, comme les
-// tableaux de l'ancien load_level_effects) donnent tail_type (0 - 1 sans jet), tail_bonus,
-// tail_special et tail_half, lus comme ceux du sort ; un sous-sort lancé sans jet par l'un d'eux est
-// refusé. sub_special : le sous-sort lui-même est « Spécial ».
+// ses effets ne remplacent pas ceux du sort en cours : save_type (0 - 1 sans jet), save_bonus,
+// save_half, save_missing ; sub_special : le sous-sort lui-même est « Spécial » ; save_sub_bonus_text,
+// save_sub_bonus_valid_one : bonus de son jet, lu dans ses propres effets.
 DEFINE_PATCH_FUNCTION ad_spell_header_save_sub
-	INT_VAR
-		tail_count = 0
 	STR_VAR
 		resref = ~~
 	RET
@@ -1042,25 +1029,17 @@ DEFINE_PATCH_FUNCTION ad_spell_header_save_sub
 		save_bonus
 		save_half
 		save_missing
-		save_bonus_text
-		save_bonus_valid
-		tail_type
-		tail_bonus
-		tail_special
-		tail_half
 		sub_special
+		save_sub_bonus_text
+		save_sub_bonus_valid_one
 BEGIN
 	SET sub_special = 0
 	SET save_type = 0 - 1
 	SET save_bonus = 0 - 1
 	SET save_half = 0
 	SPRINT save_missing ~~
-	SPRINT save_bonus_text ~~
-	SET save_bonus_valid = 1
-	SET tail_type = 0 - 1
-	SET tail_bonus = 0 - 1
-	SET tail_special = 0
-	SET tail_half = 0
+	SPRINT save_sub_bonus_text ~~
+	SET save_sub_bonus_valid_one = 1
 	// Seuls ses effets comptent, pas leurs phrases ; sous-sort, sans ses effets de lancement.
 	SET support_header_only = 1
 	SET fx_with_casting = 0
@@ -1077,45 +1056,12 @@ BEGIN
 			PATCH_IF NOT (~%header_missing%~ STRING_EQUAL ~~) BEGIN
 				SPRINT save_missing ~%header_missing%~
 			END
-			LPF ad_spell_header_save RET save_type save_bonus save_half sub_missing = save_missing save_bonus_text save_bonus_valid sub_save_text = save_text END
+			LPF ad_spell_header_save RET save_type save_bonus save_half sub_missing = save_missing sub_save_text = save_text
+				save_sub_bonus_text = save_bonus_text save_sub_bonus_valid_one = save_bonus_valid END
 			SPRINT sub_special_text @7000010 // ~Spécial~
 			SET sub_special = ~%sub_save_text%~ STRING_EQUAL ~%sub_special_text%~
 			PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) AND ~%save_missing%~ STRING_EQUAL ~~ BEGIN
 				SPRINT save_missing ~%sub_missing%~
-			END
-			// Bonus du sous-sort lui-même, celui que l'ancien moteur lit au retour.
-			LPM ad_spell_header_save_bonus
-			FOR (tail_k = 0; tail_k < tail_count; ++tail_k) BEGIN
-				SET tail_level = $save_tail_level(~%tail_k%~)
-				SET tail_h = 0 - 1
-				FOR (tail_sub_h = 0; tail_sub_h < fx_header_count; ++tail_sub_h) BEGIN
-					PATCH_IF $spell_level(~%tail_sub_h%~) == tail_level BEGIN
-						SET tail_h = tail_sub_h
-					END
-				END
-				FOR (tail_n = 0; tail_h >= 0 AND tail_n < $spell_fx_count(~%tail_h%~); ++tail_n) BEGIN
-					SET tail_id = $EVAL ~spell_fx_%tail_h%~(~%tail_n%~)
-					SET tail_opcode = $EVAL ~spell_fx_opcode_%tail_h%~(~%tail_n%~)
-					SPRINT tail_resource $fx_resource_lower(~%tail_id%~)
-					PATCH_IF tail_opcode != 318 AND tail_opcode != 321 AND tail_opcode != 324 AND NOT (~%tail_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
-						SET tail_effect_type = $fx_save_type(~%tail_id%~) BAND 0b111111
-						PATCH_IF tail_effect_type == 0 AND (tail_opcode == 146 OR tail_opcode == 148 OR tail_opcode == 232)
-								AND NOT VARIABLE_IS_SET $save_visited(~%tail_resource%~) AND FILE_EXISTS_IN_GAME ~%tail_resource%.spl~
-								AND ~%save_missing%~ STRING_EQUAL ~~ BEGIN
-							LPF ad_refusal INT_VAR fx_id = tail_id STR_VAR reason = ~not_implemented:spell_header:save_subspell_nested~ message = ~saving throw read from %tail_resource%.SPL by an ability of the sub-spell read in place of the spell~ RET save_missing = refusal END
-						END
-						PATCH_IF IS_EE AND tail_opcode == 12 AND ($fx_parameter2(~%tail_id%~) BAND 65535) == 0 AND ($fx_special(~%tail_id%~) BAND BIT8) != 0 BEGIN
-							SET tail_half = 1
-						END
-						PATCH_IF tail_type < 0 BEGIN
-							SET tail_type = tail_effect_type
-							SET tail_bonus = $fx_save_bonus(~%tail_id%~)
-						END
-						PATCH_IF tail_type != tail_effect_type BEGIN
-							SET tail_special = 1
-						END
-					END
-				END
 			END
 		END
 	END

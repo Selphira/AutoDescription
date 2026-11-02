@@ -37,13 +37,30 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 			ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND apr_parameter1 < 0 AND apr_value == 6 BEGIN
 				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:half_removed~ message = ~half attack removed (BUG-021)~ RET render_missing = refusal END
 			END
-			// L'ancien moteur fusionne deux effets de même ligne (ad_fx_line_key) au lieu de les cumuler (leurs lignes seulement :
-			// l'en-tête d'un sort compte les deux).
+			// Deux effets de même ligne (ad_fx_line_key) : le jeu applique les deux, le second est réuni au
+			// premier, attaques additionnées (en demi-attaques : 6 à 10 valent 0,5 à 4,5), pourcentages
+			// multipliés ; une valeur fixée ne compte qu'une fois (ancien merge_duplicate_effects ; l'en-tête
+			// d'un sort compte les deux). Refus : retrait d'attaques, ou total que parameter1 ne sait pas
+			// écrire (plus de 5 attaques).
 			ELSE PATCH_IF $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) AND NOT support_header_only BEGIN
-				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:same_effect_twice~ message = ~same effect twice (the old engine merges them)~ RET render_missing = refusal END
+				SET apr_first = $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) - 1
+				SET apr_merged = $fx_parameter1(~%apr_first%~)
+				PATCH_IF apr_mode == MOD_TYPE_cumulative BEGIN
+					SET apr_halves = ((apr_merged <= 5) ? 2 * apr_merged : 2 * (apr_merged - 5) - 1)
+						+ ((apr_parameter1 <= 5) ? 2 * apr_parameter1 : 2 * (apr_parameter1 - 5) - 1)
+					SET apr_merged = ((apr_halves MODULO 2) == 0) ? apr_halves / 2 : (apr_halves + 1) / 2 + 5
+					PATCH_IF apr_parameter1 < 0 OR (apr_halves MODULO 2 == 0 AND apr_merged > 5) OR (apr_halves MODULO 2 == 1 AND apr_merged > 10) BEGIN
+						LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:same_effect_twice~ message = ~same effect twice whose total (%apr_halves% half attacks) parameter1 cannot hold~ RET render_missing = refusal END
+					END
+				END
+				ELSE PATCH_IF apr_mode == MOD_TYPE_percentage BEGIN
+					SET apr_merged = apr_merged * apr_parameter1 / 100
+				END
+				SET $fx_parameter1(~%apr_first%~) = apr_merged
+				SET $fx_consumed(~%apr_id%~) = 1
 			END
 			ELSE BEGIN
-				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) = 1
+				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) = apr_id + 1
 			END
 		END
 	END

@@ -9,11 +9,9 @@
 // new-lib/application.tpp). Dans un en-tête, l'ancien moteur n'applique pas les absorptions des
 // soins (delete_cure_linked_to_specific_immunity, lignes EQUIPPED de 2da/immunity_absorbs.2da) ni
 // celle de l'action libre ; la ligne unique qu'il y forme prend les champs (durée, jet de
-// sauvegarde…) de la dernière immunité de l'en-tête.
+// sauvegarde…) de la dernière immunité de son groupe.
 
-// Refus : opcode sans libellé ; dans un en-tête dont une classe de cible a plusieurs immunités (ligne
-// unique), immunités aux champs différents, parameter2, résistance et puissance (que la ligne n'écrit
-// pas) mis à part : la ligne cacherait la durée ou la restriction de niveau des autres.
+// Refus : opcode sans libellé.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
@@ -35,47 +33,16 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 			ELSE BEGIN
 				SET $fx_immunity_label(~%immunity_id%~) = immunity_opcode
 				SET $fx_immunity_late(~%immunity_id%~) = 0
-				SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-				PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND NOT (~%immunity_scope%~ STRING_EQUAL ~equipped~) BEGIN
-					LPM ad_op_101_ability_support
-				END
 			END
 		END
 	END
 END
 
-// Immunité immunity_id d'un en-tête : si une autre immunité de l'en-tête est de la même classe de
-// cible (ad_immunity_class), toutes les immunités de l'en-tête ont les mêmes champs, parameter2,
-// résistance et puissance mis à part.
-DEFINE_PATCH_MACRO ad_op_101_ability_support BEGIN
-	LPM ad_immunity_class
-	SET immunity_own_class = immunity_class
-	SET same_id = immunity_id
-	SET same_ignored = AD_SAME_PARAMETER2 BOR AD_SAME_RESISTANCE BOR AD_SAME_POWER
-	SET immunity_same_class = 0
-	SET immunity_different = 0
-	SET immunity_self = immunity_id
-	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
-		SPRINT immunity_other_scope $fx_scope(~%immunity_id%~)
-		PATCH_IF immunity_id != immunity_self AND (~%immunity_other_scope%~ STRING_EQUAL ~%immunity_scope%~) BEGIN
-			LPM ad_immunity_class
-			SET immunity_same_class = immunity_same_class OR (immunity_own_class > 0 AND immunity_class == immunity_own_class)
-			SET same_other = immunity_id
-			LPM ad_fx_same_fields
-			SET immunity_different = immunity_different OR NOT fx_same
-		END
-	END
-	SET same_ignored = 0
-	SET immunity_id = immunity_self
-	SPRINT immunity_scope $fx_scope(~%immunity_id%~)
-	PATCH_IF immunity_same_class AND immunity_different BEGIN
-		LPF ad_refusal INT_VAR fx_id = immunity_id STR_VAR reason = ~not_implemented:opcode101:ability_group_fields~ message = ~immunities of the ability with different fields~ RET render_missing = refusal END
-	END
-END
-
 // Lignes (ancien opcode_self_101 et opcode_101_post_group) : avec AD_SHRINK_IMMUNITIES_SINGLE_LINE,
-// les immunités certaines d'un même bloc et d'une même classe de cible (soi ou lanceur d'origine ;
-// cible prédéfinie) sont réunies en une ligne si elles sont plusieurs, libellés identiques fusionnés ;
+// les immunités certaines d'un même bloc, d'une même classe de cible (soi ou lanceur d'origine ;
+// cible prédéfinie) et aux mêmes champs écrits (parameter2, résistance et puissance mis à part : une ligne
+// commune cacherait la durée ou la restriction de niveau des autres, SPPR403) sont réunies en une
+// ligne si elles sont plusieurs, libellés identiques fusionnés ;
 // les lignes réunies viennent après les autres, comme les effets que l'ancien moteur ajoute en fin de
 // liste.
 DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
@@ -143,8 +110,8 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 END
 
 // Classe de cible de l'effet immunity_id pour la ligne unique : 1 soi ou lanceur d'origine, 2 cible
-// prédéfinie, 0 jamais réunie (immunité probable hors d'un sous-sort probable, autre cible) ; immunity_key : classe dans sa portée
-// (une ligne unique par bloc).
+// prédéfinie, 0 jamais réunie (immunité probable hors d'un sous-sort probable, autre cible) ; immunity_key : classe
+// dans sa portée et champs comparés (une ligne unique par bloc et par jeu de champs).
 DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	SET immunity_target = $fx_effective_target(~%immunity_id%~)
 	// Dans un sous-sort lancé sous une probabilité, toutes les immunités ont celle du parent : réunies
@@ -153,7 +120,19 @@ DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 		: ((immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
 		: (immunity_target == TARGET_FX_preset ? 2 : 0))
 	SPRINT immunity_key_scope $fx_scope(~%immunity_id%~)
-	SPRINT immunity_key ~%immunity_key_scope% %immunity_class%~
+	// Seuls les champs que la ligne écrit : parameter1 et special ne servent pas à l'opcode 101 ; la
+	// durée d'un effet permanent ou tant que l'objet est équipé, et le bonus d'un effet sans jet, sont
+	// ignorés par le jeu (SW2H21).
+	SET immunity_external = $fx_external(~%immunity_id%~)
+	SET immunity_timing = $fx_timing(~%immunity_id%~)
+	SET immunity_duration = (immunity_timing == TIMING_permanent OR immunity_timing == TIMING_while_equipped OR immunity_timing == TIMING_permanent_after_death) ? 0 : $fx_duration(~%immunity_id%~)
+	SET immunity_probability1 = $fx_probability1(~%immunity_id%~)
+	SET immunity_probability2 = $fx_probability2(~%immunity_id%~)
+	SET immunity_dice_count = $fx_dice_count(~%immunity_id%~)
+	SET immunity_dice_sides = $fx_dice_sides(~%immunity_id%~)
+	SET immunity_save_type = $fx_save_type(~%immunity_id%~)
+	SET immunity_save_bonus = (immunity_save_type == 0) ? 0 : $fx_save_bonus(~%immunity_id%~)
+	SPRINT immunity_key ~%immunity_key_scope% %immunity_class% %immunity_external% %immunity_timing% %immunity_duration% %immunity_probability1% %immunity_probability2% %immunity_dice_count% %immunity_dice_sides% %immunity_save_type% %immunity_save_bonus%~
 END
 
 // L'immunité immunity_id (classe et clé de ad_immunity_class) est-elle dans une ligne unique ?

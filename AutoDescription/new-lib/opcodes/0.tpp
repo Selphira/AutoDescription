@@ -55,18 +55,31 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					SET ac_all_count += ac_equipped
 				END
-				// L'ancien moteur fusionne deux effets de même ligne (ad_fx_line_key) au lieu de les cumuler (leurs lignes
-				// seulement : l'en-tête d'un sort compte les deux).
+				// Deux effets de même ligne (ad_fx_line_key) : le jeu applique les deux, le second est réuni au
+				// premier, modificateurs additionnés (ancien merge_duplicate_effects ; l'en-tête d'un sort compte
+				// les deux).
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) AND NOT support_header_only BEGIN
-						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
+						SET ac_first = $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) - 1
+						SET $fx_parameter1(~%ac_first%~) += ac_value
+						SET $fx_consumed(~%ac_id%~) = 1
+						SET ac_modifier_count -= ac_equipped
+						SET ac_all_count -= ac_equipped
 					END
-					SET $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) = 1
+					ELSE BEGIN
+						SET $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) = ac_id + 1
+					END
 				END
 				ELSE BEGIN
 					SET ac_mask = $ac_seen_types(~%ac_scope% %ac_value% %fx_line_key%~)
 					PATCH_IF (ac_mask BAND ac_type) != 0 AND NOT support_header_only BEGIN
-						LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:same_effect_twice~ message = ~same armor class modifier twice (the old engine merges them)~ RET render_missing = refusal END
+						SET ac_first = $ac_seen_type_id(~%ac_scope% %ac_value% %fx_line_key% %ac_type%~)
+						SET $fx_parameter1(~%ac_first%~) += ac_value
+						SET $fx_consumed(~%ac_id%~) = 1
+						SET ac_modifier_count -= ac_equipped
+					END
+					ELSE BEGIN
+						SET $ac_seen_type_id(~%ac_scope% %ac_value% %fx_line_key% %ac_type%~) = ac_id
 					END
 					SET $ac_seen_types(~%ac_scope% %ac_value% %fx_line_key%~) = ac_mask BOR ac_type
 					// Les quatre types à la fois : l'ancien moteur n'a pas de texte pour ce cas (seulement
@@ -116,6 +129,9 @@ END
 
 // Total contre toutes les attaques, puis total contre chaque type d'attaque qui en diffère ; les
 // types dont le total est nul forment la ligne « Ne protège pas » (effet dérivé AC_NO_PROTECTION).
+// Un modificateur d'un 177 contre un type de créature n'entre pas dans les totaux : comme l'ancien
+// opcode_group_by_target, il a sa ligne, après celle des totaux (PXL2BRIS : « Classe d'armure : +2
+// (uniquement pour les elfes et les demi-elfes) ») ; refusé contre un type d'attaque.
 // Sur une armure (ancien isArmor), les modificateurs contre toutes les attaques ne sont pas
 // totalisés, et une CA de base donne la ligne de la section de l'armure.
 DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
@@ -129,15 +145,26 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 	// comme dans l'ancien moteur.
 	CLEAR_ARRAY ac_masks
 	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all
+				AND $fx_versus_file(~%ac_id%~) == 0 BEGIN
 			SET ac_key = 0 - $fx_parameter1(~%ac_id%~)
 			SET $ac_masks(~%ac_key%~) = 0
 		END
 	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	SET ac_line_fx = 0 - 1
+	CLEAR_ARRAY ac_versus_ids
 	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
+		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_versus_file(~%ac_id%~) > 0 BEGIN
+			PATCH_IF $fx_parameter2(~%ac_id%~) == AC_MOD_TYPE_all BEGIN
+				SET $ac_versus_ids(~%ac_id%~) = ac_id
+			END
+			ELSE BEGIN
+				SET ac_type = $fx_parameter2(~%ac_id%~)
+				LPF ad_refusal INT_VAR fx_id = ac_id STR_VAR reason = ~not_implemented:opcode0:versus_type~ message = ~armor class modifier of type %ac_type% against a creature type~ RET render_late_missing = refusal END
+			END
+		END
+		ELSE PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) BEGIN
 			SET ac_type = $fx_parameter2(~%ac_id%~)
 			SET ac_value = $fx_parameter1(~%ac_id%~)
 			PATCH_IF ac_line_fx < 0 BEGIN
@@ -201,6 +228,15 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			SPRINT ac_values ~%ac_values%%ac_total_text% %versus%~
 		END
 	END
+	SET ac_totals_fx = ac_line_fx
+	PHP_EACH ac_versus_ids AS _ => ac_versus_id BEGIN
+		SET ac_line_fx = ac_versus_id
+		SET ac_value = $fx_parameter1(~%ac_versus_id%~)
+		SET ac_mask = AC_MOD_TYPE_all
+		LPM ad_op_0_modifier_line
+	END
+	SET ac_line_fx = ac_totals_fx
+	SET line_sort = $AD_OPCODE_SORT(~0~)
 	PATCH_IF NOT (~%ac_values%~ STRING_EQUAL ~~) AND NOT ac_has_base BEGIN
 		SPRINT name @20000000 // ~Classe d'armure~
 		SPRINT value ~%ac_values%~

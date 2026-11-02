@@ -1469,7 +1469,8 @@ END
 // y disparaît). Macro, appelée pour des paires d'effets : un LPF y coûterait la copie de toutes les
 // variables, magasin d'effets compris ; AND n'évalue pas son second terme si le premier est faux.
 // fx_line_key : champs de l'effet key_id qui font sa ligne en plus de sa valeur (cible, timing,
-// durée, plage de probabilité, jet de sauvegarde, dés de la restriction de niveau, origine) : deux
+// durée, plage de probabilité, jet de sauvegarde, dés de la restriction de niveau, special, origine,
+// type de créature d'un 177, exceptions de cible) : deux
 // effets de même valeur et de même clé écrivent la même ligne, que l'ancien moteur ne garde qu'une
 // fois (get_unique_effects : même texte, même plage), alors que le jeu applique les deux.
 DEFINE_PATCH_MACRO ad_fx_line_key BEGIN
@@ -1483,7 +1484,15 @@ DEFINE_PATCH_MACRO ad_fx_line_key BEGIN
 	SET key_save_bonus = $fx_save_bonus(~%key_id%~)
 	SET key_dice_count = $fx_dice_count(~%key_id%~)
 	SET key_dice_sides = $fx_dice_sides(~%key_id%~)
-	SPRINT fx_line_key ~%key_target% %key_external% %key_timing% %key_duration% %key_probability1% %key_probability2% %key_save_type% %key_save_bonus% %key_dice_count% %key_dice_sides%~
+	SET key_special = $fx_special(~%key_id%~)
+	SET key_versus_file = $fx_versus_file(~%key_id%~)
+	SET key_versus_value = $fx_versus_value(~%key_id%~)
+	SET key_versus_inner_file = $fx_versus_inner_file(~%key_id%~)
+	SET key_versus_inner_value = $fx_versus_inner_value(~%key_id%~)
+	// Effets du fichier séparés par une exception de cible : distincts (ancien opcode_group_by_target).
+	SET key_exceptions = key_external ? 0 - 1 : $fx_exception_count(~%key_id%~)
+	SPRINT fx_line_key ~%key_target% %key_external% %key_timing% %key_duration% %key_probability1% %key_probability2% %key_save_type% %key_save_bonus% %key_dice_count% %key_dice_sides% %key_special%~
+	SPRINT fx_line_key ~%fx_line_key% %key_versus_file% %key_versus_value% %key_versus_inner_file% %key_versus_inner_value% %key_exceptions%~
 END
 
 DEFINE_PATCH_MACRO ad_fx_same_fields BEGIN
