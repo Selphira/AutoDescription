@@ -1200,13 +1200,37 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow baseSavingType baseSavingBonus isHalfDamage BEGIN
+// Jet de sauvegarde du sous-sort resref, lu dans la portée de cette fonction : load_level_effects y réécrit
+// level_effects et leveled_opcodes_<niveau>, que le sort en cours garde ainsi pour ses en-têtes suivants et
+// pour le bonus de son jet.
+DEFINE_PATCH_FUNCTION ~spell_saving_throw_sub~ STR_VAR resref = ~~ RET ignoreSavingThrow232 saveType saveBonus isHalfDamage subBonusValue subBonusValid BEGIN
+	SET ignoreSavingThrow232 = 1
+	SET saveType = 0 - 1
+	SET saveBonus = 0 - 1
+	SET isHalfDamage = 0
+	SPRINT subBonusValue ~~
+	SET subBonusValid = 1
+	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+		LPM ~load_level_effects~
+		LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus isHalfDamage subBonusValue = savingBonusValue subBonusValid = savingBonusValid END
+	END
+END
+
+// Le bonus du jet ne se lit que dans les effets qui le portent : quand aucun effet du sort n'a de type
+// de jet, celui-ci vient de ses sous-sorts, et leur bonus avec lui (SPPR725 : « Sorts à -2 »).
+DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow baseSavingType baseSavingBonus isHalfDamage savingBonusValue savingBonusValid BEGIN
 	SET ignoreSavingThrow = 1
 	SET count = 0
 	SET isSpecial = 0
 	SET isHalfDamage = 0
 	SET baseSavingType = 0 - 1
 	SET baseSavingBonus = 0 - 1
+	SPRINT savingBonusValue ~~
+	SET savingBonusValid = 1
+	SET ownSavingType = 0
+	SET subBonusCount = 0
+	SPRINT subBonusFirst ~~
+	SET subBonusAllValid = 1
 
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_IF isSpecial == 0 BEGIN
@@ -1215,19 +1239,24 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 				    LPM ~data_to_vars~
 				    PATCH_IF( NOT (opcode == 318 OR opcode == 321 OR opcode == 324) AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
 						SET saveType = (saveType BAND 0b111111)
+						SET ownSavingType = ownSavingType OR saveType > 0
 		                PATCH_IF saveType == 0 AND (opcode == 232 OR opcode == 146 OR opcode == 148) BEGIN
 							SET $recursive_resref(~%CURRENT_SOURCE_RES%~) = 1
 							PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
 								SET $recursive_resref(~%resref%~) = 1
 								PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
-									INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-										LPM ~load_level_effects~
-										LPF ~spell_saving_throw~ RET ignoreSavingThrow232 = ignoreSavingThrow saveType = baseSavingType saveBonus = baseSavingBonus isHalfDamage END
-										// Sous-sort « Spécial » (jets différents) : le sort l'est aussi, et ses lignes écrivent
-										// leur jet, que l'en-tête ne donne pas.
-										PATCH_IF ignoreSavingThrow232 == 0 BEGIN
-											SET isSpecial = 1
+									LPF ~spell_saving_throw_sub~ STR_VAR resref RET ignoreSavingThrow232 saveType saveBonus isHalfDamage subBonusValue subBonusValid END
+									PATCH_IF saveType > 0 BEGIN
+										PATCH_IF subBonusCount == 0 BEGIN
+											SPRINT subBonusFirst ~%subBonusValue%~
 										END
+										SET subBonusAllValid = subBonusAllValid AND subBonusValid AND ~%subBonusValue%~ STRING_EQUAL ~%subBonusFirst%~
+										SET subBonusCount += 1
+									END
+									// Sous-sort « Spécial » (jets différents) : le sort l'est aussi, et ses lignes écrivent
+									// leur jet, que l'en-tête ne donne pas.
+									PATCH_IF ignoreSavingThrow232 == 0 BEGIN
+										SET isSpecial = 1
 									END
 								END
 							END
@@ -1261,7 +1290,15 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 		ELSE BEGIN
 			SPRINT savingThrow @10016 // ~Annule~
 		END
-		LPF ~get_spell_effects_by_saving_throw~ RET value = complex_value is_valid END
+		PATCH_IF NOT ownSavingType AND subBonusCount > 0 BEGIN
+			SPRINT value ~%subBonusFirst%~
+			SET is_valid = subBonusAllValid
+		END
+		ELSE BEGIN
+			LPF ~get_spell_effects_by_saving_throw~ RET value = complex_value is_valid END
+		END
+		SPRINT savingBonusValue ~%value%~
+		SET savingBonusValid = is_valid
 		PATCH_IF is_valid BEGIN
 			SPRINT saveTypeStrref $short_saveType_to_strref(~%baseSavingType%~)
 			SPRINT saveType (AT saveTypeStrref)
