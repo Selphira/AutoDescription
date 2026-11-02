@@ -15050,7 +15050,18 @@ DEFINE_PATCH_MACRO ~opcode_self_326~ BEGIN
 		LPF ~get_item_spell_effects_description~ STR_VAR file = ~%resref%~ RET description END
 	END
 	CLEAR_ARRAY recursive_resref
+	LPM ~opcode_326_without_condition~
 	SET ignoreDuration = 1
+END
+
+// Sans condition à écrire (« EA >= 0 »), les lignes du sort suivent celles de l'objet, comme celles
+// d'un sort lancé (opcode_target_146), au lieu de venir sous une ligne vide « - » (D2WKBS3S).
+DEFINE_PATCH_MACRO ~opcode_326_without_condition~ BEGIN
+	PATCH_IF ~%condition%~ STRING_EQUAL ~~ BEGIN
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~^%crlf%- ~ ~~
+		END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_326~ BEGIN
@@ -15064,6 +15075,7 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_326~ BEGIN
 		LPF ~get_item_spell_effects_description~ INT_VAR baseProbability = probability STR_VAR file = ~%resref%~ RET description END
 	END
 	CLEAR_ARRAY recursive_resref
+	LPM ~opcode_326_without_condition~
 	SET ignoreDuration = 1
 END
 
