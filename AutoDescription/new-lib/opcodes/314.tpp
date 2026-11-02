@@ -1,6 +1,6 @@
-// Opcode 314 (Spell: Golem Stoneskin) : crée parameter1 peaux de pierre, comme l'opcode 218 (IESDP),
-// décrites par ses phrases (ancien opcode_self_314 : « Crée 5 peaux de pierre ») ; code commun dans
-// new-lib/opcodes/states.tpp.
+// Opcode 314 (Spell: Golem Stoneskin) : crée parameter1 peaux de golem, protections contre les attaques
+// physiques (IESDP), décrites par les phrases de l'opcode 218 (ancien opcode_218_common : « Crée 5 peaux de
+// golem ») ; code commun dans new-lib/opcodes/states.tpp.
 
 // Aucune peau : écartée et journalisée (l'ancien moteur écrit « Crée 0 peaux de pierre »).
 DEFINE_PATCH_MACRO ad_op_314_support BEGIN
@@ -16,6 +16,17 @@ END
 
 DEFINE_PATCH_MACRO ad_op_314_lines BEGIN
 	SET state_opcode = 314
-	SPRINT state_variant_macro ~ad_op_218_amount~
+	SPRINT state_variant_macro ~ad_op_314_amount~
 	LPM ad_state_lines
+END
+
+DEFINE_PATCH_MACRO ad_op_314_amount BEGIN
+	SET value = $fx_parameter1(~%line_fx%~)
+	PATCH_IF value == 1 BEGIN
+		SPRINT valueType @23140001 // ~peau de golem~
+	END
+	ELSE BEGIN
+		SPRINT valueType @23140002 // ~peaux de golem~
+	END
+	SPRINT amount @22180000 // ~%value% %valueType%~
 END

@@ -69,6 +69,9 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 	PATCH_IF item_has_combat BEGIN
 		LPM ad_item_combat_lines
 	END
+	// Effets d'équipement probables : regroupés par plage, comme ceux d'un en-tête de combat.
+	SPRINT prob_section ~equipped~
+	LPM ad_lines_probability_groups
 	LPF ad_lines_section_text STR_VAR section = ~equipped~ RET equipped_lines = text END
 	PATCH_IF NOT (~%equipped_lines%~ STRING_EQUAL ~~) BEGIN
 		SPRINT title @1300001 // ~Capacités d'équipement~

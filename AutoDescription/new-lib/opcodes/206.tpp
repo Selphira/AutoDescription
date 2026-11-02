@@ -98,11 +98,13 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 				SET spell_name_count = 0
 				PHP_EACH fx_ids_206 AS _ => spell_other BEGIN
 					SPRINT spell_other_scope $fx_line_section(~%spell_other%~)
-					PATCH_IF spell_other >= spell_id AND NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
+					// Un effet déjà rangé a son groupe : seul l'ordre de fx_ids_206 compte, les effets placés après
+					// les autres (fx_late, 318 devenus des 206) y compris.
+					PATCH_IF NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
 							SET spell_name_new = 1
-							FOR (spell_member = spell_id; spell_member < spell_other; ++spell_member) BEGIN
+							PHP_EACH fx_ids_206 AS _ => spell_member BEGIN
 								PATCH_IF $spell_group(~%spell_member%~) == spell_group_count BEGIN
 									SPRINT spell_member_name $spell_name(~%spell_member%~)
 									PATCH_IF ~%spell_member_name%~ STRING_EQUAL ~%spell_name%~ BEGIN

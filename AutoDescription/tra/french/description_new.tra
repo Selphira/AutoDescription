@@ -3105,6 +3105,7 @@
 
 // Opcode 181 : Type d'objet interdit : phrase 0100, forme « soi » seulement (21 810 000-21 810 999)
 @21810100 = ~Empêche d'utiliser les %itemType%~ // reprise de @11810001
+@21830001 = ~si l'équipement %ofTheTarget% contient des %itemType%~ // reprise de @11830002
 
 // Opcode 185 : paralysie, phrases du 109 : 0100 paralysie, 0110 type de créature nommé (21 850 000-21 850 999)
 @21850100 = ~Paralyse %theTarget%~ // reprise de @11090002
@@ -3724,6 +3725,8 @@
 @23100111 = ~Rend %theTarget% sensible à l'arrêt du temps~ // reprise de @13100002
 @23100112 = ~de rendre sensible %theTarget% à l'arrêt du temps~ // reprise de @13100003
 @23100113 = ~de rendre sensible %theTarget% à l'arrêt du temps~ // reprise de @13100003
+@23140001 = ~peau de golem~ // reprise de @13140101
+@23140002 = ~peaux de golem~ // reprise de @13140102
 @23140100 = ~Crée %amount%~ // reprise de @12180001
 @23140101 = ~Crée %amount% sur %theTarget%~ // reprise de @12180003
 @23140102 = ~de créer %amount% sur %theTarget%~ // reprise de @12180002

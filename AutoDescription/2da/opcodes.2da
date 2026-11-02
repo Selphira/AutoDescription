@@ -184,7 +184,7 @@
 180      1        1        DESCRIBED LEVEL            486    SHOWN           Item:_Can't_Use_Item
 181      1        1        DESCRIBED LEVEL            487    SHOWN           Item:_Can't_Use_Itemtype
 182      1        1        IGNORED   LEVEL            400    SHOWN           Use_EFF_file_if/while_item_resource_equipped
-183      1        1        TODO      LEVEL            473    HIDDEN          Item:_Apply_Effect_Itemtype
+183      1        1        DESCRIBED LEVEL            473    HIDDEN          Item:_Apply_Effect_Itemtype
 184      1        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Passwall_(Don't_Jump)
 185      1        1        DESCRIBED LEVEL            372    NOT_AFTER_DEATH State:_Hold_(II)
 186      1        1        IGNORED   LEVEL            400    SHOWN           Script:_MoveToArea

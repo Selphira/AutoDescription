@@ -1,4 +1,5 @@
-// Exceptions de cible (opcodes 318 et 324 qui visent la ressource elle-même, ancien load_opcode et
+// Exceptions de cible (opcodes 318 et 324 qui visent la ressource elle-même, 183 vers un EFF qui la
+// vise, ancien load_opcode et
 // opcode_324_target_exceptions) : l'ancien moteur les écarte, sans ligne propre, et écrit
 // « (Inefficace contre les morts-vivants et les golems) » à la fin de la ligne de chaque effet lu
 // après elles dans le même bloc (équipement ou en-tête) ; ses regroupements ne les comparent pas.
@@ -18,6 +19,20 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	SET $fx_exception_name_count(~%fx_id%~) = 0
 	SET $fx_no_effect_chance(~%fx_id%~) = 0
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
+	// 318 sans condition contre un autre sort nommé, qui n'est pas un objet : l'ancien moteur en fait une
+	// immunité au sort (opcode_318_replace), ajoutée après les autres 206 (A7#LEAT1).
+	PATCH_IF exception_opcode == 318 AND IS_EE AND $fx_parameter2_raw(~%fx_id%~) == 0 BEGIN
+		SPRINT exception_resource $fx_resource(~%fx_id%~)
+		PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL ~~) AND NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~) BEGIN
+			LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
+			LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
+			PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) AND ~%exception_item_name%~ STRING_EQUAL ~~ BEGIN
+				SET $fx_opcode(~%fx_id%~) = 206
+				SET $fx_late(~%fx_id%~) = 1
+				SET exception_opcode = 206
+			END
+		END
+	END
 	PATCH_IF (exception_opcode == 318 OR exception_opcode == 324) AND NOT $fx_external(~%fx_id%~) BEGIN
 		SPRINT exception_resource $fx_resource(~%fx_id%~)
 		PATCH_IF ~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~ BEGIN
@@ -38,6 +53,31 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 				SET $fx_consumed(~%fx_id%~) = 1
 				SET $fx_dropped(~%fx_id%~) = 1
 			END
+		END
+	END
+	// 183 vers un EFF qui protège seulement contre la ressource elle-même (D2WKZM9) : exception des effets
+	// lus après lui, si la cible équipe ce type d'objet (new-lib/opcodes/183.tpp).
+	ELSE PATCH_IF exception_opcode == 183 AND IS_EE AND NOT $fx_external(~%fx_id%~) BEGIN
+		SPRINT exception_resource $fx_resource(~%fx_id%~)
+		SET exception_eff_self = 0
+		PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%exception_resource%.eff~ BEGIN
+			INNER_PATCH_FILE ~%exception_resource%.eff~ BEGIN
+				PATCH_IF BUFFER_LENGTH >= 0x38 BEGIN
+					READ_LONG 0x10 exception_eff_opcode
+					READ_LONG 0x1c exception_eff_parameter1
+					READ_LONG 0x20 exception_eff_parameter2
+					READ_ASCII 0x30 exception_eff_resource (8) NULL
+					SET exception_eff_self = exception_eff_opcode == 318 AND exception_eff_parameter1 == 0 AND exception_eff_parameter2 == 0
+						AND (~%exception_eff_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)
+				END
+			END
+		END
+		// Écarté dès ici, sans compter pour la durée de l'en-tête : l'ancien moteur ne charge pas l'effet.
+		PATCH_IF exception_eff_self BEGIN
+			SET $fx_exception(~%fx_id%~) = 1
+			SET fx_block_exceptions += 1
+			SET $fx_consumed(~%fx_id%~) = 1
+			SET $fx_dropped(~%fx_id%~) = 1
 		END
 	END
 END
@@ -277,6 +317,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 	SPRINT app_exceptions_text ~~
 	SPRINT exc_the @2002000 // ~les~
 	SPRINT exc_and_the @2002001 // ~et les~
+	SPRINT exc_or @1000007 // ~ou~
 	SPRINT exc_effective_and ~%exc_and_the%~
 	SPRINT exc_not_effective_and ~%exc_and_the%~
 	SET exc_base = $fx_parent_probability(~%line_fx%~) ? 100 : $fx_probability(~%line_fx%~)
@@ -325,6 +366,7 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 		CLEAR_ARRAY exc_BETWEEN
 		CLEAR_ARRAY exc_IF
 		CLEAR_ARRAY exc_EFFECTIVE_IF
+		CLEAR_ARRAY exc_EQUIPPED
 		SET exc_found = 0
 		FOR (exc_id = 0; exc_id < fx_count; ++exc_id) BEGIN
 			SPRINT exc_id_scope $fx_scope(~%exc_id%~)
@@ -370,6 +412,12 @@ DEFINE_PATCH_MACRO ad_application_target_exceptions BEGIN
 			END
 			LPF ad_join STR_VAR array_name = ~exc_IF~ RET exc_text = text END
 			PATCH_IF NOT (~%exc_text%~ STRING_EQUAL ~~) BEGIN
+				SPRINT exc_text ~%exc_prefix%%exc_text%~
+				SPRINT $exc_if_all(~%exc_text%~) ~%exc_text%~
+			END
+			LPF ad_join STR_VAR array_name = ~exc_EQUIPPED~ final_glue = EVAL ~ %exc_or% ~ RET itemType = text END
+			PATCH_IF NOT (~%itemType%~ STRING_EQUAL ~~) BEGIN
+				SPRINT exc_text @21830001 // ~si l'équipement %ofTheTarget% contient des %itemType%~
 				SPRINT exc_text ~%exc_prefix%%exc_text%~
 				SPRINT $exc_if_all(~%exc_text%~) ~%exc_text%~
 			END

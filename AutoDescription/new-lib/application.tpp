@@ -40,9 +40,11 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 					SPRINT ignored_message ~limited duration (timing 0) of 0 seconds: the effect ends at once~
 					LPM ad_application_drop
 				END
+				// Autre durée, ou effet probable : l'ancien moteur l'écrit comme un effet d'en-tête, avec sa
+				// probabilité et sa durée (« 1 % de chances de… », « pendant 1 tour », « de manière permanente »).
 				ELSE PATCH_IF NOT app_equipped_timing
 						OR ($fx_probability(~%app_id%~) != 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%render_opcode%~)) BEGIN
-					LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:effect_kind~ message = ~equipped effect of this opcode with this timing or probability not supported~ RET render_missing = refusal END
+					LPM ad_application_ability_support
 				END
 			END
 			// Les effets de lancement d'un sort s'écrivent comme ceux d'un en-tête.
@@ -191,7 +193,8 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 			LPM ad_application_drop
 		END
 	END
-	ELSE PATCH_IF app_target == TARGET_FX_none OR app_target > TARGET_FX_original_caster BEGIN
+	// Un effet d'équipement touche toujours le porteur : sa cible est sans objet.
+	ELSE PATCH_IF (app_target == TARGET_FX_none OR app_target > TARGET_FX_original_caster) AND NOT (~%app_block%~ STRING_EQUAL ~equipped~) BEGIN
 		SET drop_id = app_id
 		SPRINT ignored_reason ~file_error:application:target~
 		SPRINT ignored_message ~target %app_target% (expected 1-9)~
@@ -231,7 +234,7 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	END
 	// Les lignes d'un sort ne nomment pas la zone de son projectile (ancien projectile 0 hors d'un
 	// sous-sort).
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_spell BEGIN
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_spell AND NOT (~%app_block%~ STRING_EQUAL ~equipped~) BEGIN
 		LPM ad_application_area_target
 	END
 END
@@ -867,8 +870,11 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	SPRINT app_saved_section ~%line_section%~
 	SPRINT app_block $fx_block(~%line_fx%~)
-	PATCH_IF (~%app_block%~ STRING_EQUAL ~ability~) OR (~%app_block%~ STRING_EQUAL ~casting~) BEGIN
-		SPRINT line_section $fx_line_section(~%line_fx%~)
+	// Effet d'équipement : sa durée n'est écrite que hors du timing « tant que l'objet est équipé ».
+	PATCH_IF (~%app_block%~ STRING_EQUAL ~ability~) OR (~%app_block%~ STRING_EQUAL ~casting~) OR (~%app_block%~ STRING_EQUAL ~equipped~) BEGIN
+		PATCH_IF NOT (~%app_block%~ STRING_EQUAL ~equipped~) BEGIN
+			SPRINT line_section $fx_line_section(~%line_fx%~)
+		END
 		LPM ad_application_duration
 		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) AND NOT line_no_duration BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~
