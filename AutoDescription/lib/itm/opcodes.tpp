@@ -5585,6 +5585,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 	LOCAL_SET strref = 0
 	PATCH_IF shrink_immunities_single_line == 1 BEGIN
+		LPM ~opcode_101_join_panic~
 		// Immunités certaines d'une même classe de cible (soi, lanceur d'origine ou cible prédéfinie) réunies en
 		// une ligne, seulement entre immunités aux mêmes champs (parameter2, résistance et puissance mis à part) :
 		// une ligne commune cacherait la durée ou la restriction de niveau des autres.
@@ -5651,6 +5652,53 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 				END
 			END
 		END
+	END
+END
+
+// Un point de rupture du moral fixé à 0 (106) qui a la clé d'une immunité réunie en ligne unique devient l'immunité à
+// l'opcode 106 (« la panique ») de la liste, au lieu de sa propre ligne « Immunité contre la panique ».
+DEFINE_PATCH_MACRO ~opcode_101_join_panic~ BEGIN
+	PATCH_IF VARIABLE_IS_SET $opcodes(~106~) AND $opcodes(~106~) > 0 BEGIN
+		// Marque propre à cet appel : vider un tableau ne défait pas les éléments que VARIABLE_IS_SET teste.
+		SET panicPass = VARIABLE_IS_SET panicPass ? panicPass + 1 : 1
+		PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+			PATCH_PHP_EACH opcodes_101 AS data => _ BEGIN
+				LPM ~data_to_vars~
+				LPM ~opcode_101_post_group_key~
+				PATCH_IF immunityCandidate BEGIN
+					SET $panicKeys(~%panicPass% %immunityClass% %immunityKey%~) = 1
+				END
+			END
+		END
+		CLEAR_ARRAY ~panicPositions~
+		PATCH_PHP_EACH opcodes_106 AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 <= 0 BEGIN
+				SET panicJoined = 0
+				PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+					LPM ~opcode_101_post_group_key~
+					PATCH_IF NOT panicJoined AND immunityCandidate AND VARIABLE_IS_SET $panicKeys(~%panicPass% %immunityClass% %immunityKey%~) BEGIN
+						SET panicJoined = 1
+						SET $panicPositions(~%position%~) = 1
+						SET opcode = 101
+						SET parameter2 = 106
+						LPM ~add_opcode~
+					END
+				END
+			END
+		END
+		PATCH_PHP_EACH ~panicPositions~ AS deletedPosition => _ BEGIN
+			LPF ~delete_opcode~
+				INT_VAR opcode = 106 match_position = deletedPosition
+				RET $opcodes(~106~) = count
+				RET_ARRAY opcodes_106 = opcodes_xx
+			END
+		END
+		// Bug où il reste toujours un item dans le tableau si c'était le dernier.
+		PATCH_IF $opcodes(~106~) == 0 BEGIN
+			CLEAR_ARRAY ~opcodes_106~
+		END
+		SET opcode = 101
 	END
 END
 
@@ -5729,7 +5777,8 @@ DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
-	PATCH_IF shrink_cure_with_immunities AND (abilityType == AbilityType_Equipped OR abilityType < 0) BEGIN
+	PATCH_IF shrink_cure_with_immunities AND (abilityType == AbilityType_Equipped OR abilityType < 0
+			OR (VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion)) BEGIN
 		LPF ~delete_opcode~
 			INT_VAR opcode
 				match_probability1 = probability1
