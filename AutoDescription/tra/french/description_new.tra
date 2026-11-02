@@ -3194,6 +3194,8 @@
 @22010121 = ~Immunise %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010022
 @22010122 = ~d'immuniser jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010023
 @22010123 = ~d'immuniser %theTarget% jusqu'à %amount% niveaux de sorts parmi ceux de %levelStr% niveau et inférieur~ // reprise de @12010024
+@22020100 = ~Renvoie les sorts de l'école %spellSchoolName%~ // reprise de @12020001
+@22020102 = ~de renvoyer les sorts de l'école %spellSchoolName%~ // reprise de @12020002
 
 // Opcode 204 : Immunité à une école de magie : phrases 0100 (22 040 000-22 040 999)
 @22040100 = ~Immunité contre les sorts de l'école %spellSchoolName%~ // reprise de @12040001
@@ -3565,12 +3567,22 @@
 @22610111 = ~Remet en mémoire 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~ // reprise de @12610006
 @22610112 = ~de se remémorer 1 sort %spellType% de niveau %spellLevel%~ // reprise de @12610007
 @22610113 = ~de remémorer 1 sort %spellType% de niveau %spellLevel% %toTheTarget%~ // reprise de @12610008
+@22640010 = ~un objet de son inventaire~ // reprise de @12640010
+@22640011 = ~une arme équipée~ // reprise de @12640011
+@22640100 = ~Abandonne %objectType%~ // reprise de @12640001
+@22640101 = ~Fait abandonner %toTheTarget% %objectType%~ // reprise de @12640002
+@22640102 = ~d'abandonner %objectType%~ // reprise de @12640003
+@22640103 = ~de faire abandonner %toTheTarget% %objectType%~ // reprise de @12640004
 
 // Opcode 266 : Levée d'une immunité à un sort : phrases 0100 (22 660 000-22 660 999)
 @22660100 = ~Lève l'immunité contre le sort « %spellName% »~ // reprise de @12660001
 @22660101 = ~Lève l'immunité %ofTheTarget% contre le sort « %spellName% »~ // reprise de @12660002
 @22660102 = ~de lever l'immunité contre le sort « %spellName% »~ // reprise de @12660003
 @22660103 = ~de lever l'immunité %ofTheTarget% contre le sort « %spellName% »~ // reprise de @12660004
+@22700100 = ~Défige %theTarget%~ // reprise de @12700001
+@22700101 = ~Défige %theTarget%~ // reprise de @12700001
+@22700102 = ~de défiger %theTarget%~ // reprise de @12700002
+@22700103 = ~de défiger %theTarget%~ // reprise de @12700002
 
 // Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
 @22720010 = ~À chaque %strDuration%~ // reprise de @12720010
@@ -3648,6 +3660,20 @@
 @22920111 = ~Rend %theTarget% sensible aux attaques sournoises~ // reprise de @12920012
 @22920112 = ~d'être sensible aux attaques sournoises~ // reprise de @12920013
 @22920113 = ~de rendre %theTarget% sensible aux attaques sournoises~ // reprise de @12920014
+@22950100 = ~Protection contre la mort définitive~ // reprise de @12950001
+@22950101 = ~Protège %theTarget% contre la mort définitive~ // reprise de @12950002
+@22950102 = ~d'être protégé contre la mort définitive~ // reprise de @12950003
+@22950103 = ~de protéger %theTarget% contre la mort définitive~ // reprise de @12950004
+@22950110 = ~Dissipation de la protection contre la mort définitive~ // reprise de @12950011
+@22950111 = ~Rend %theTarget% sensible à la mort définitive~ // reprise de @12950012
+@22950112 = ~d'être sensible à la mort définitive~ // reprise de @12950013
+@22950113 = ~de rendre %theTarget% sensible à la mort définitive~ // reprise de @12950014
+@23000100 = ~Permet %toTheTarget% de bousculer les créatures sur son passage~ // reprise de @13000001
+@23000101 = ~Permet %toTheTarget% de bousculer les créatures sur son passage~ // reprise de @13000001
+@23000110 = ~Permet %toTheTarget% d'être inébranlable~ // reprise de @13000002
+@23000111 = ~Permet %toTheTarget% d'être inébranlable~ // reprise de @13000002
+@23000120 = ~Permet %toTheTarget% d'être inébranlable et de bousculer les créatures sur son passage~ // reprise de @13000003
+@23000121 = ~Permet %toTheTarget% d'être inébranlable et de bousculer les créatures sur son passage~ // reprise de @13000003
 
 // Opcode 301 : libellés 0001-0004 (« soi », « cible » ; + 1 avec cette arme), 0011-0013 type d'attaque
 // (23 010 000-23 010 099)
@@ -3678,6 +3704,10 @@
 @23030111 = ~Bloque la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030002
 @23030112 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030003
 @23030113 = ~de bloquer la capacité %ofTheTarget% à infliger des dégâts sournois à chaque attaque~ // reprise de @13030003
+@23040100 = ~Ressuscite %theTarget%~ // reprise de @10320001
+@23040101 = ~Ressuscite %theTarget%~ // reprise de @10320001
+@23040102 = ~de ressusciter %theTarget%~ // reprise de @10320002
+@23040103 = ~de ressusciter %theTarget%~ // reprise de @10320002
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~TAC0 de la main secondaire~ // reprise de @13050001
@@ -3686,6 +3716,22 @@
 // Opcode 306 : libellés (23 060 000-23 060 099)
 @23060000 = ~TAC0 de la main principale~ // reprise de @13060001
 @23060002 = ~le TAC0 de la main principale~ // reprise de @13060002
+@23100100 = ~Immunité contre l'arrêt du temps~ // reprise de @13100011
+@23100101 = ~Immunise %theTarget% contre l'arrêt du temps~ // reprise de @13100012
+@23100102 = ~d'immuniser %theTarget% contre l'arrêt du temps~ // reprise de @13100013
+@23100103 = ~d'immuniser %theTarget% contre l'arrêt du temps~ // reprise de @13100013
+@23100110 = ~Bloque l'immunité contre l'arrêt du temps~ // reprise de @13100001
+@23100111 = ~Rend %theTarget% sensible à l'arrêt du temps~ // reprise de @13100002
+@23100112 = ~de rendre sensible %theTarget% à l'arrêt du temps~ // reprise de @13100003
+@23100113 = ~de rendre sensible %theTarget% à l'arrêt du temps~ // reprise de @13100003
+@23140100 = ~Crée %amount%~ // reprise de @12180001
+@23140101 = ~Crée %amount% sur %theTarget%~ // reprise de @12180003
+@23140102 = ~de créer %amount% sur %theTarget%~ // reprise de @12180002
+@23140103 = ~de créer %amount% sur %theTarget%~ // reprise de @12180002
+@23160100 = ~Repose %theTarget%~ // reprise de @13160002
+@23160101 = ~Repose %theTarget%~ // reprise de @13160002
+@23160102 = ~de reposer %theTarget%~ // reprise de @13160001
+@23160103 = ~de reposer %theTarget%~ // reprise de @13160001
 
 // Opcode 317 : Hâte (2) : comme l'opcode 16 (23 170 000-23 170 999)
 @23170100 = ~Double la vitesse de déplacement et accorde une attaque supplémentaire par round~ // reprise de @10160011

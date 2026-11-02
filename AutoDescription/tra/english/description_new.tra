@@ -3194,6 +3194,8 @@
 @22010121 = ~Immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010022
 @22010122 = ~to immunize up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010023
 @22010123 = ~to immunize %theTarget% up to %amount% spell levels from those of %levelStr% level spells and below~ // reprise de @12010024
+@22020100 = ~Reflects %spellSchoolName% spells~ // reprise de @12020001
+@22020102 = ~to reflect %spellSchoolName% spells~ // reprise de @12020002
 
 // Opcode 204 : Immunité à une école de magie : phrases 0100 (22 040 000-22 040 999)
 @22040100 = ~Protects from spells %spellSchoolName%~ // reprise de @12040001
@@ -3565,12 +3567,22 @@
 @22610111 = ~Recovers 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @12610006
 @22610112 = ~to recover 1 %spellType% spell of level %spellLevel%~ // reprise de @12610007
 @22610113 = ~to recover 1 %spellType% spell of level %spellLevel% %toTheTarget%~ // reprise de @12610008
+@22640010 = ~an object from his inventory~ // reprise de @12640010
+@22640011 = ~an equipped weapon~ // reprise de @12640011
+@22640100 = ~Drops %objectType% in Panic~ // reprise de @12640001
+@22640101 = ~Makes %theTarget% drop %objectType%~ // reprise de @12640002
+@22640102 = ~to drop %objectType% in Panic~ // reprise de @12640003
+@22640103 = ~to make %theTarget% drop %objectType%~ // reprise de @12640004
 
 // Opcode 266 : Levée d'une immunité à un sort : phrases 0100 (22 660 000-22 660 999)
 @22660100 = ~Remove protection from %spellName% spell~ // reprise de @12660001
 @22660101 = ~Remove protection %ofTheTarget% from %spellName% spell~ // reprise de @12660002
 @22660102 = ~to remove protection from %spellName% spell~ // reprise de @12660003
 @22660103 = ~to remove protection %ofTheTarget% from %spellName% spell~ // reprise de @12660004
+@22700100 = ~Release %theTarget%~ // reprise de @12700001
+@22700101 = ~Release %theTarget%~ // reprise de @12700001
+@22700102 = ~to release %theTarget%~ // reprise de @12700002
+@22700103 = ~to release %theTarget%~ // reprise de @12700002
 
 // Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
 @22720010 = ~At each %strDuration%~ // reprise de @12720010
@@ -3648,6 +3660,20 @@
 @22920111 = ~Rend %theTarget% sensible aux attaques sournoises~ // reprise de @12920012
 @22920112 = ~d'être sensible aux attaques sournoises~ // reprise de @12920013
 @22920113 = ~de rendre %theTarget% sensible aux attaques sournoises~ // reprise de @12920014
+@22950100 = ~Protects against permanent death~ // reprise de @12950001
+@22950101 = ~Protects %theTarget% against permanent death~ // reprise de @12950002
+@22950102 = ~to be protected against permanent death~ // reprise de @12950003
+@22950103 = ~to protect %theTarget% from permanent death~ // reprise de @12950004
+@22950110 = ~Dispels protection against permanent death~ // reprise de @12950011
+@22950111 = ~Makes %theTarget% sensitive to permanent death~ // reprise de @12950012
+@22950112 = ~to be sensitive to permanent death~ // reprise de @12950013
+@22950113 = ~to make %theTarget% sensitive to permanent death~ // reprise de @12950014
+@23000100 = ~Permits %toTheTarget% to bump creatures in its path~ // reprise de @13000001
+@23000101 = ~Permits %toTheTarget% to bump creatures in its path~ // reprise de @13000001
+@23000110 = ~Permits %toTheTarget% to be unshakeable~ // reprise de @13000002
+@23000111 = ~Permits %toTheTarget% to be unshakeable~ // reprise de @13000002
+@23000120 = ~Permits %toTheTarget% to be unshakeable and to bump creatures in its path~ // reprise de @13000003
+@23000121 = ~Permits %toTheTarget% to be unshakeable and to bump creatures in its path~ // reprise de @13000003
 
 // Opcode 301 : libellés 0001-0004 (« soi », « cible » ; + 1 avec cette arme), 0011-0013 type d'attaque
 // (23 010 000-23 010 099)
@@ -3678,6 +3704,10 @@
 @23030111 = ~Blocks ability %ofTheTarget% to inflict sneaky damage on every hit~ // reprise de @13030002
 @23030112 = ~to block ability %ofTheTarget% to inflict sneaky damage on every hit~ // reprise de @13030003
 @23030113 = ~to block ability %ofTheTarget% to inflict sneaky damage on every hit~ // reprise de @13030003
+@23040100 = ~Resurrect %theTarget%~ // reprise de @10320001
+@23040101 = ~Resurrect %theTarget%~ // reprise de @10320001
+@23040102 = ~to resurrect %theTarget%~ // reprise de @10320002
+@23040103 = ~to resurrect %theTarget%~ // reprise de @10320002
 
 // Opcode 305 : libellés (23 050 000-23 050 099)
 @23050000 = ~THAC0 with the off hand~ // reprise de @13050001
@@ -3686,6 +3716,22 @@
 // Opcode 306 : libellés (23 060 000-23 060 099)
 @23060000 = ~THAC0 with the on hand~ // reprise de @13060001
 @23060002 = ~the THAC0 with the on hand~ // reprise de @13060002
+@23100100 = ~Protects from Timestop~ // reprise de @13100011
+@23100101 = ~Protects %theTarget% from Timestop~ // reprise de @13100012
+@23100102 = ~to protect %theTarget% from Timestop~ // reprise de @13100013
+@23100103 = ~to protect %theTarget% from Timestop~ // reprise de @13100013
+@23100110 = ~Blocks protection from Timestop~ // reprise de @13100001
+@23100111 = ~Makes %theTarget% sensitive to Timestop~ // reprise de @13100002
+@23100112 = ~to make %theTarget% sensitive to Timestop~ // reprise de @13100003
+@23100113 = ~to make %theTarget% sensitive to Timestop~ // reprise de @13100003
+@23140100 = ~Creates %amount%~ // reprise de @12180001
+@23140101 = ~Creates %amount% on %theTarget%~ // reprise de @12180003
+@23140102 = ~to create %amount% on %theTarget%~ // reprise de @12180002
+@23140103 = ~to create %amount% on %theTarget%~ // reprise de @12180002
+@23160100 = ~Refreshes %theTarget%~ // reprise de @13160002
+@23160101 = ~Refreshes %theTarget%~ // reprise de @13160002
+@23160102 = ~to rest %theTarget%~ // reprise de @13160001
+@23160103 = ~to rest %theTarget%~ // reprise de @13160001
 
 // Opcode 317 : Hâte (2) : comme l'opcode 16 (23 170 000-23 170 999)
 @23170100 = ~Double movement speed and grants one additional attack per round~ // reprise de @10160011
