@@ -294,6 +294,10 @@
 @101187 = ~%target% (de niveau %levelMax% ou inférieur)~
 @101188 = ~%target% (de niveau %levelMin% ou supérieur)~
 @101189 = ~%target% (de niveau %levelMin% à %levelMax%)~
+@101197 = ~uniquement au niveau %levelMin%~
+@101198 = ~uniquement jusqu'au niveau %levelMax%~
+@101199 = ~uniquement à partir du niveau %levelMin%~
+@101200 = ~uniquement du niveau %levelMin% au niveau %levelMax%~
 
 
 // (Non) Utilisable par
