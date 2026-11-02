@@ -261,41 +261,72 @@ DEFINE_PATCH_MACRO ~add_save~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
-	LOCAL_SET levelMin = diceSides
-	LOCAL_SET levelMax = diceCount
-	LOCAL_SET strref   = 0
+	LOCAL_SET levelMin  = 0
+	LOCAL_SET levelMax  = 0
+	LOCAL_SET levelKind = 0
+	LOCAL_SET strref    = 0
+	LPM ~get_target_level_kind~
+	PATCH_IF levelKind == 4 BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
+	END
+	ELSE PATCH_IF levelKind >= 0 BEGIN
+		SET strref = 101186 + levelKind // ~%target% (de niveau %levelMin%)~
+		SET oldTarget = target
+		PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
+			SPRINT target EVAL ~%%vTarget%%~
+			SPRINT EVAL ~%vTarget%~ (AT strref)
+		END
+		SET target = oldTarget
+	END
+END
+
+// Restriction de niveau de l'effet (levelKind, levelMin, levelMax) : -1 aucune, 0 un niveau, 1 au plus, 2 au
+// moins, 3 de… à…, 4 aucun niveau possible.
+DEFINE_PATCH_MACRO ~get_target_level_kind~ BEGIN
+	SET levelMin = diceSides
+	SET levelMax = diceCount
+	SET levelKind = 0 - 1
 
 	//TODO: Limiter aux effets qui ont été appelés par =>  AND (opcode == 177 OR opcode == 183 OR opcode == 248 OR opcode == 249 OR opcode == 282 OR opcode == 283)
 	PATCH_IF isExternal == 1 AND VARIABLE_IS_SET minLevel BEGIN
 		SET levelMin = minLevel
 		SET levelMax = maxLevel
 	END
-	
-	PATCH_IF (levelMax > 0 OR levelMin > 1) AND (NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
-		PATCH_IF levelMin == levelMax BEGIN
-			SET strref = 101186 // ~%target% (de niveau %levelMin%)~
-		END
-		ELSE PATCH_IF levelMin <= 1 AND levelMax > 0 BEGIN
-			SET strref = 101187 // ~%target% (de niveau %levelMax% ou inférieur)~
-		END
-		ELSE PATCH_IF levelMin > 1 AND levelMax == 0 BEGIN
-			SET strref = 101188 // ~%target% (de niveau %levelMin% ou supérieur)~
-		END
-		ELSE PATCH_IF levelMax > levelMin BEGIN
-			SET strref = 101189 // ~%target% (de niveau %levelMin% à %levelMax%)~
-		END
-		ELSE BEGIN
-			LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
-		END
 
-		PATCH_IF strref != 0 BEGIN
-			SET oldTarget = target
-		    PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
-		        SPRINT target EVAL ~%%vTarget%%~
-		        SPRINT EVAL ~%vTarget%~ (AT strref)
-		    END
-		    SET target = oldTarget
+	PATCH_IF (levelMax > 0 OR levelMin > 1) AND (NOT VARIABLE_IS_SET $opcode_without_level_restriction(~%opcode%~) AND (opcode != 218 OR is_ee == 0 OR parameter2 == 0) AND (opcode != 127 OR is_ee == 0)) BEGIN
+		SET levelKind = (levelMin == levelMax) ? 0
+			: ((levelMin <= 1 AND levelMax > 0) ? 1
+			: ((levelMin > 1 AND levelMax == 0) ? 2
+			: (levelMax > levelMin ? 3 : 4)))
+	END
+END
+
+// Une phrase à la forme « soi » ne nomme pas sa cible : sa restriction de niveau finit la ligne
+// (« Immunité contre la maladie (uniquement à partir du niveau 6) »), sans nommer la cible, qui peut être
+// celle, au pluriel, que le sort parent impose.
+DEFINE_PATCH_MACRO ~set_self_level_text~ BEGIN
+	LOCAL_SET levelMin  = 0
+	LOCAL_SET levelMax  = 0
+	LOCAL_SET levelKind = 0
+	LOCAL_SET strref    = 0
+	SPRINT selfLevelText ~~
+	PATCH_IF ~%opcode_target%~ STRING_EQUAL ~_self~ BEGIN
+		LPM ~get_target_level_kind~
+		PATCH_IF levelKind >= 0 AND levelKind <= 3 BEGIN
+			SET strref = 101197 + levelKind // ~uniquement au niveau %levelMin%~
+			SPRINT selfLevelText (AT strref)
 		END
+	END
+END
+
+// Pas de mention quand la phrase nomme déjà la cible, restriction comprise (ISHHAM : « au porteur (de niveau 6
+// ou supérieur) »).
+DEFINE_PATCH_MACRO ~add_self_level~ BEGIN
+	PATCH_IF NOT ~%selfLevelText%~ STRING_EQUAL ~~ AND NOT ~%description%~ STRING_EQUAL ~~
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%theTarget%~ ~%description%~) < 0
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%ofTheTarget%~ ~%description%~) < 0
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%toTheTarget%~ ~%description%~) < 0 BEGIN
+		SPRINT description ~%description% (%selfLevelText%)~
 	END
 END
 

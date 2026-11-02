@@ -1079,6 +1079,7 @@ BEGIN
 			END
 			// Après la zone du projectile, qui remplace les chaînes de la cible : sinon la restriction de
 			// niveau disparaît (WAND13 : « Tue instantanément les créatures dans un rayon de 4,5 mètres »).
+			LPM ~set_self_level_text~
 			LPM ~add_target_level~
 			SET thisOpcode = opcode
 			PATCH_IF probability >= 100 BEGIN
@@ -1117,6 +1118,7 @@ BEGIN
 			LPM ~add_save~
 			LPM ~add_cumulable~
 			LPM ~add_only_for~
+			LPM ~add_self_level~
 			LPM ~add_target_exceptions~
 		END
 		ELSE BEGIN

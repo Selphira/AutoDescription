@@ -291,6 +291,10 @@
 @101187 = ~%target% (of level %levelMax% or lower)~
 @101188 = ~%target% (of level %levelMin% or higher)~
 @101189 = ~%target% (from level %levelMin% to %levelMax%)~
+@101197 = ~only at level %levelMin%~
+@101198 = ~only up to level %levelMax%~
+@101199 = ~only from level %levelMin%~
+@101200 = ~only from level %levelMin% to level %levelMax%~
 
 
 // (Non) Utilisable par
