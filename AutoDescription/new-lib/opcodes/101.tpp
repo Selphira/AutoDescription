@@ -6,10 +6,10 @@
 // identique à un autre, fx_late).
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
-// new-lib/application.tpp). Dans un en-tête, l'ancien moteur n'applique pas les absorptions des
-// soins (delete_cure_linked_to_specific_immunity, lignes EQUIPPED de 2da/immunity_absorbs.2da) ni
-// celle de l'action libre ; la ligne unique qu'il y forme prend les champs (durée, jet de
-// sauvegarde…) de la dernière immunité de son groupe.
+// new-lib/application.tpp). Dans un en-tête autre que celui d'une potion, l'ancien moteur n'applique
+// pas les absorptions des soins (delete_cure_linked_to_specific_immunity, lignes EQUIPPED de
+// 2da/immunity_absorbs.2da) ni celle de l'action libre ; la ligne unique qu'il y forme prend les
+// champs (durée, jet de sauvegarde…) de la dernière immunité de son groupe.
 
 // Refus : opcode sans libellé.
 

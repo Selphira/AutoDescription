@@ -74,6 +74,9 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
 			LPM ad_group_free_action
 		END
+		PATCH_IF AD_SHRINK_IMMUNITIES_SINGLE_LINE AND VARIABLE_IS_SET $fx_opcode_count(~101~) AND VARIABLE_IS_SET $fx_opcode_count(~106~) BEGIN
+			LPM ad_group_panic_immunity
+		END
 		PATCH_FOR_EACH group_spell_opcode IN 60 145 99 BEGIN
 			SET group_spell_max_type = group_spell_opcode == 99 ? 1 : 2
 			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%group_spell_opcode%~) BEGIN
@@ -488,8 +491,9 @@ END
 // même jet de sauvegarde :
 // - ceux des lignes de 2da/immunity_absorbs.2da pour P (soins de l'état, autres immunités ; une
 //   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES, une ligne EQUIPPED seulement dans un
-//   bloc d'équipement, comme l'ancien delete_cure_linked_to_specific_immunity) ; une ligne RELABEL donne à
-//   l'immunité ce libellé et la place après les autres, comme l'effet que l'ancien moteur ajoute ;
+//   bloc d'équipement, un sort ou une potion, comme l'ancien delete_cure_linked_to_specific_immunity) ;
+//   une ligne RELABEL donne à l'immunité ce libellé et la place après les autres, comme l'effet que
+//   l'ancien moteur ajoute ;
 //   la colonne P2 est comparée à la valeur lue (fx_parameter2_raw), que l'ancien moteur teste avant
 //   toute correction du mode ;
 // - les protections contre un sort (206, 321) qui inflige P seul (ad_spell_inflicted_state), si elles
@@ -499,8 +503,8 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 		// Dans un sort, l'ancien moteur applique aussi les règles des effets d'équipement (abilityType
-		// négatif, ancien delete_cure_linked_to_specific_immunity).
-		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR resource_is_spell
+		// négatif) ; l'en-tête d'une potion, à charges, les suit aussi (POTX05).
+		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR resource_is_spell OR item_type == ITM_TYPE_potion
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
@@ -697,6 +701,47 @@ DEFINE_PATCH_MACRO ad_psionic_protection BEGIN
 		SPRINT psionic_resref $fx_resource(~%psionic_id%~)
 		TO_UPPER psionic_resref
 		SET psionic_protection = VARIABLE_IS_SET $AD_IMMUNITY_SPELLS(~505 %psionic_resref%~)
+	END
+END
+
+// Immunité à la panique (ancien opcode_101_join_panic) : un point de rupture du moral fixé à 0 (106)
+// qui a la clé d'une immunité réunie en ligne unique (ad_immunity_class) devient l'immunité à
+// l'opcode 106 (« la panique »), placée après les autres, au lieu d'écrire sa propre ligne
+// « Immunité contre la panique ». Une autre durée garde sa ligne : un 106 permanent ne dure pas
+// comme les immunités (S#CLCK03).
+DEFINE_PATCH_MACRO ad_group_panic_immunity BEGIN
+	// CLEAR_ARRAY laisse les entrées lisibles (V36) : leur valeur est remise à 0.
+	PHP_EACH panic_keys AS panic_key => _ BEGIN
+		SET $panic_keys(~%panic_key%~) = 0
+	END
+	CLEAR_ARRAY panic_keys
+	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
+			LPM ad_immunity_class
+			PATCH_IF immunity_class > 0 BEGIN
+				SET $panic_keys(~%immunity_key%~) = 1
+			END
+		END
+	END
+	SET panic_joined = 0
+	PHP_EACH fx_ids_106 AS _ => immunity_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND $fx_parameter2(~%immunity_id%~) == MOD_TYPE_flat AND $fx_parameter1(~%immunity_id%~) <= 0 BEGIN
+			LPM ad_immunity_class
+			PATCH_IF immunity_class > 0 AND VARIABLE_IS_SET $panic_keys(~%immunity_key%~) AND $panic_keys(~%immunity_key%~) BEGIN
+				SET $fx_opcode(~%immunity_id%~) = 101
+				SET $fx_parameter2(~%immunity_id%~) = 106
+				SET $fx_parameter2_raw(~%immunity_id%~) = 106
+				SET $fx_immunity_label(~%immunity_id%~) = 106
+				SET $fx_immunity_late(~%immunity_id%~) = 1
+				SET $fx_opcode_count(~101~) += 1
+				SET panic_joined = 1
+			END
+		END
+	END
+	PATCH_IF panic_joined BEGIN
+		PATCH_FOR_EACH index_opcode IN 101 106 BEGIN
+			LPM ad_fx_index_opcode
+		END
 	END
 END
 
