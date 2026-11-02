@@ -138,6 +138,10 @@
 @2003001 = ~%target% (de niveau %levelMax% ou inférieur)~ // reprise de @101187
 @2003002 = ~%target% (de niveau %levelMin% ou supérieur)~ // reprise de @101188
 @2003003 = ~%target% (de niveau %levelMin% à %levelMax%)~ // reprise de @101189
+@2003004 = ~uniquement au niveau %levelMin%~ // reprise de @101197
+@2003005 = ~uniquement jusqu'au niveau %levelMax%~ // reprise de @101198
+@2003006 = ~uniquement à partir du niveau %levelMin%~ // reprise de @101199
+@2003007 = ~uniquement du niveau %levelMin% au niveau %levelMax%~ // reprise de @101200
 
 // Durées : formules (3 000 000-3 000 099)
 @3000000 = ~pendant %strDuration%~ // reprise de @100311

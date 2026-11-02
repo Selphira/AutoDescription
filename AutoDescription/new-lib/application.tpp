@@ -539,6 +539,7 @@ END
 // remplace le tout à la forme sujet ; puis le type de créature d'un effet d'un 177
 // (ad_application_versus).
 DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
+	SPRINT app_self_level_text ~~
 	SET app_target = $fx_effective_target(~%line_fx%~)
 	SET app_target_tra = 2000000 + app_target * 10
 	PATCH_IF app_target == TARGET_FX_self OR app_target == TARGET_FX_original_caster BEGIN
@@ -600,8 +601,9 @@ END
 // Restriction de niveau de l'effet line_fx (ancien add_target_level), après la zone du projectile
 // qui remplace les chaînes de la cible (l'ancien moteur la perdait, BUG-045) : « les créatures dans
 // un rayon de 4,5 mètres (de niveau 4 ou inférieur) ». Sur EE, l'ancien moteur n'en écrit pas pour
-// le 127 ni pour le 218 de parameter2 non nul. Refus (render_late_missing) : cible propre à l'opcode
-// (line_the_target).
+// le 127 ni pour le 218 de parameter2 non nul. Une phrase à la forme « soi » ne nomme pas sa cible :
+// app_self_level_text « uniquement à partir du niveau 6 » finit alors la ligne (ad_effect_line), sans
+// nommer la cible, qui peut être celle, au pluriel, que le sort parent impose. Refus (render_late_missing) : cible propre à l'opcode (line_the_target).
 DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 	SET levelMin = $fx_level_min(~%line_fx%~)
 	SET levelMax = $fx_level_max(~%line_fx%~)
@@ -612,6 +614,9 @@ DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 		END
 		SET app_level_tra = levelMin == levelMax ? 2003000 : (levelMin <= 1 ? 2003001 : (levelMax == 0 ? 2003002 : 2003003)) // ~%target% (de niveau %levelMin%)~
 		SPRINT target ~%theTarget%~
+		PATCH_IF line_form == 0 OR line_form == 2 BEGIN
+			LPF ad_tra INT_VAR tra_id = app_level_tra + 4 tra_block_start = 2003000 tra_block_size = 10 RET app_self_level_text = text END // ~uniquement au niveau %levelMin%~
+		END
 		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET theTarget = text END
 		SPRINT target ~%ofTheTarget%~
 		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET ofTheTarget = text END
@@ -890,6 +895,14 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) AND NOT app_only_for_named BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~
+	END
+	// Pas de mention quand la phrase nomme déjà la cible, restriction comprise (ISHHAM : « au porteur
+	// (de niveau 6 ou supérieur) »).
+	PATCH_IF NOT (~%app_self_level_text%~ STRING_EQUAL ~~) AND NOT (~%line_text%~ STRING_EQUAL ~~)
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%theTarget%~ ~%line_text%~) < 0
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%ofTheTarget%~ ~%line_text%~) < 0
+			AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%toTheTarget%~ ~%line_text%~) < 0 BEGIN
+		SPRINT line_text ~%line_text% (%app_self_level_text%)~
 	END
 	PATCH_IF $fx_exception_count(~%line_fx%~) > 0 BEGIN
 		LPM ad_application_target_exceptions
