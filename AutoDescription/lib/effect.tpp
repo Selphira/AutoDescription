@@ -216,6 +216,28 @@ DEFINE_PATCH_MACRO ~load_opcode~ BEGIN
 			SPRINT EVAL ~target_exceptions_%resref%~ EVAL ~%target_exceptions_%resref%% %probability1%=>%probability2%;%parameter1%=>%parameter2%~
             //SET isValid = 0
         END
+		// EFF d'un 183 qui protège seulement contre la ressource elle-même (D2WKZM9) : les effets lus après lui sont
+		// inefficaces si la cible équipe ce type d'objet ; écrit comme une exception de cible (type 100183).
+		ELSE PATCH_IF isValid == 1 AND opcode == 183 BEGIN
+			SET effProtectsSource = 0
+			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.eff~ BEGIN
+				INNER_PATCH_FILE ~%resref%.eff~ BEGIN
+					PATCH_IF BUFFER_LENGTH >= 0x38 BEGIN
+						READ_LONG 0x10 effOpcode
+						READ_LONG 0x1c effParameter1
+						READ_LONG 0x20 effParameter2
+						READ_ASCII 0x30 effResref (8) NULL
+						PATCH_IF effOpcode == 318 AND effParameter1 == 0 AND effParameter2 == 0 AND ~%effResref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
+							SET effProtectsSource = 1
+						END
+					END
+				END
+			END
+			PATCH_IF effProtectsSource BEGIN
+				SPRINT target_exceptions ~%target_exceptions% %probability1%=>%probability2%;%parameter2%=>100183~
+				SET isValid = 0
+			END
+		END
 		// TODO: 206 depuis un 177 qui rend innefficace certains effets => RR#WEAR
 
         PATCH_IF isValid == 1 BEGIN

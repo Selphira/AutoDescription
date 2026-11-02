@@ -3624,7 +3624,7 @@
 @12950011 = ~Dispels protection against permanent death~
 @12950012 = ~Makes %theTarget% sensitive to permanent death~
 @12950013 = ~to be sensitive to permanent death~
-@12950014 = ~Make %theTarget% sensitive to permanent death~
+@12950014 = ~to make %theTarget% sensitive to permanent death~
 
 
 // Opcode 299: Spell Effect: Chaos Shield [299]
@@ -3681,7 +3681,7 @@
 // Opcode 310: Protection: from Timestop [310]
 
 @13100001 = ~Blocks protection from Timestop~
-@13100002 = ~Make %theTarget% sensitive to Timestop~
+@13100002 = ~Makes %theTarget% sensitive to Timestop~
 @13100003 = ~to make %theTarget% sensitive to Timestop~
 
 @13100011 = ~Protects from Timestop~
