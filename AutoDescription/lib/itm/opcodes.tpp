@@ -1,3 +1,28 @@
+// Opcodes dont deux effets identiques (puissance et résistance mises à part) sont réunis par
+// merge_duplicate_effects, avec la règle de leur parameter2 : 
+// - MODE (0 ajout, 1 valeur fixée, 2 pourcentage, 3 ajout sur EE pour les jets de sauvegarde)
+// - ADD (toujours un ajout)
+// - ADD_ANY (ajout, parameter2 ignoré par le jeu)
+// - ADD_EE (comme ADD_ANY sur EE, valeur fixée sur un jeu classique)
+// - PARTY (comme MODE, 3 à 5 sur EE pour la réputation du groupe)
+// - AC (classe d'armure : 16 CA de base)
+// - APR (attaques par round)
+// - HP (points de vie maximums)
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~merge_duplicate_kinds~ BEGIN
+	0 => AC 1 => APR 18 => HP
+	6 => MODE 10 => MODE 15 => MODE 19 => MODE 21 => MODE 22 => MODE 23 => MODE 27 => MODE 28 => MODE 29 => MODE
+	30 => MODE 31 => MODE 33 => MODE 34 => MODE 35 => MODE 36 => MODE 37 => MODE 44 => MODE 49 => MODE 54 => MODE
+	59 => MODE 73 => MODE 84 => MODE 85 => MODE 86 => MODE 87 => MODE 88 => MODE 89 => MODE 90 => MODE 91 => MODE
+	92 => MODE 93 => MODE 94 => MODE 95 => MODE 96 => MODE 97 => MODE 104 => MODE 105 => MODE 106 => MODE
+	126 => MODE 166 => MODE 167 => MODE 176 => MODE 189 => MODE 262 => MODE 263 => MODE 275 => MODE 276 => MODE
+	277 => MODE 278 => MODE 281 => MODE 284 => MODE 285 => MODE 286 => MODE 288 => MODE 289 => MODE 305 => MODE
+	306 => MODE 323 => MODE 325 => MODE 346 => MODE
+	191 => ADD 345 => ADD
+	132 => ADD_ANY 190 => ADD_ANY 250 => ADD_ANY
+	173 => ADD_EE
+	108 => PARTY
+END
+
 /*
  * Tableau servant à savoir comment trier le résultat final.
  * Vu qu'ils ne sont généralement pas
@@ -5559,100 +5584,83 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 	LOCAL_SET strref = 0
-	LOCAL_SET count = 0
 	PATCH_IF shrink_immunities_single_line == 1 BEGIN
-		//Toutes les immunités regroupées en un seul opcode
-		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
-			LPM ~data_to_vars~
-			PATCH_IF probability == 100 AND (target = TARGET_FX_self OR target == TARGET_FX_original_caster) BEGIN
-				SET count += 1
-			END
-		END
-		PATCH_IF count > 1 BEGIN
-			PATCH_DEFINE_ARRAY ~immunitiesList~ BEGIN END
+		// Immunités certaines d'une même classe de cible (soi, lanceur d'origine ou cible prédéfinie) réunies en
+		// une ligne, seulement entre immunités aux mêmes champs (parameter2, résistance et puissance mis à part) :
+		// une ligne commune cacherait la durée ou la restriction de niveau des autres.
+		PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+			// Marque propre à cet appel : vider un tableau ne défait pas les éléments que VARIABLE_IS_SET teste.
+			SET immunityPass = VARIABLE_IS_SET immunityPass ? immunityPass + 1 : 1
+			CLEAR_ARRAY ~immunityKeys~
 			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 				LPM ~data_to_vars~
-				PATCH_IF probability == 100 AND (target = TARGET_FX_self OR target == TARGET_FX_original_caster) BEGIN
-					SET strref = 400000 + parameter2
-					LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
-					PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-						SET $immunitiesList(~%opcodeStr%~) = 1
+				LPM ~opcode_101_post_group_key~
+				PATCH_IF immunityCandidate BEGIN
+					PATCH_IF VARIABLE_IS_SET $immunityCount(~%immunityPass% %immunityKey%~) BEGIN
+						SET $immunityCount(~%immunityPass% %immunityKey%~) += 1
 					END
-					LPF ~delete_opcode~
-						INT_VAR opcode = 101
-							match_parameter2  = parameter2
-					        match_probability = 100
-					        match_target      = TARGET_FX_self
-						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
-						RET $opcodes(~101~) = count
-						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
-					END
-					LPF ~delete_opcode~
-						INT_VAR opcode = 101
-							match_parameter2  = parameter2
-					        match_probability = 100
-					        match_target      = TARGET_FX_original_caster
-						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
-						RET $opcodes(~101~) = count
-						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+					ELSE BEGIN
+						SET $immunityCount(~%immunityPass% %immunityKey%~) = 1
+						SET $immunityKeys(~%immunityKey%~) = 1
 					END
 				END
 			END
-			// Bug où il reste toujours un item dans le tableau si c'était le dernier
-			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
-			PATCH_IF $opcodes(~101~) == 0 BEGIN
-				CLEAR_ARRAY ~opcodes_101~
-			END
-			SPRINT and @100021 // ~et~
-			LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
-			SET opcode = 101
-			SET target = TARGET_FX_self
-			SPRINT custom_str ~%immunities%~
-			LPM ~add_opcode~
-		END
-
-		SET count = 0
-		//Toutes les immunités ciblées regroupées en un seul opcode
-		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
-			LPM ~data_to_vars~
-			PATCH_IF probability == 100 AND target = TARGET_FX_preset BEGIN
-				SET count += 1
-			END
-		END
-		PATCH_IF count > 1 BEGIN
-			PATCH_DEFINE_ARRAY ~immunitiesList~ BEGIN END
-			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
-				LPM ~data_to_vars~
-				PATCH_IF probability == 100 AND target = TARGET_FX_preset BEGIN
-					SET strref = 400000 + parameter2
-					LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
-					PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
-						SET $immunitiesList(~%opcodeStr%~) = 1
+			PATCH_PHP_EACH ~immunityKeys~ AS groupKey => _ BEGIN
+				SET groupCount = $immunityCount(~%immunityPass% %groupKey%~)
+				PATCH_IF groupCount > 1 BEGIN
+					CLEAR_ARRAY ~immunitiesList~
+					CLEAR_ARRAY ~immunityPositions~
+					SET lastPosition = 0 - 1
+					PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+						LPM ~data_to_vars~
+						LPM ~opcode_101_post_group_key~
+						PATCH_IF immunityCandidate AND ~%immunityKey%~ STRING_EQUAL ~%groupKey%~ BEGIN
+							SET strref = 400000 + parameter2
+							LPF ~getTranslation~ INT_VAR strref opcode RET opcodeStr = string END
+							PATCH_IF NOT ~%opcodeStr%~ STRING_EQUAL ~~ BEGIN
+								SET $immunitiesList(~%opcodeStr%~) = 1
+							END
+							SET $immunityPositions(~%position%~) = 1
+							SET lastPosition = position
+						END
 					END
-					LPF ~delete_opcode~
-						INT_VAR opcode = 101
-							match_parameter2  = parameter2
-					        match_probability = 100
-					        match_target      = TARGET_FX_preset
-						STR_VAR match_macro = ~opcode_match_parameter2_and_probability_and_target~
-						RET $opcodes(~101~) = count
-						RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+					// La ligne réunie prend les champs du dernier effet du groupe.
+					PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+						PATCH_IF data_0 == lastPosition AND ~%data_23%~ STRING_EQUAL ~~ BEGIN
+							LPM ~data_to_vars~
+						END
 					END
+					PATCH_PHP_EACH ~immunityPositions~ AS deletedPosition => _ BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = 101 match_position = deletedPosition
+							RET $opcodes(~101~) = count
+							RET_ARRAY EVAL ~opcodes_101~ = opcodes_xx
+						END
+					END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
+					PATCH_IF $opcodes(~101~) == 0 BEGIN
+						CLEAR_ARRAY ~opcodes_101~
+					END
+					SPRINT and @100021 // ~et~
+					LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
+					SET opcode = 101
+					SET target = (immunityClass == 1) ? TARGET_FX_self : TARGET_FX_preset
+					SPRINT custom_str ~%immunities%~
+					LPM ~add_opcode~
 				END
 			END
-			// Bug où il reste toujours un item dans le tableau si c'était le dernier
-			// N'a aucune incidence en temps normal, mais l'ajout de l'opcode suivant fait que l'item restant revient dans la description générée.
-			PATCH_IF $opcodes(~101~) == 0 BEGIN
-				CLEAR_ARRAY ~opcodes_101~
-			END
-			SPRINT and @100021 // ~et~
-			LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
-			SET opcode = 101
-			SET target = TARGET_FX_preset
-			SPRINT custom_str ~%immunities%~
-			LPM ~add_opcode~
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_101_post_group_key~ BEGIN
+	SET immunityCandidate = probability == 100 AND ~%custom_str%~ STRING_EQUAL ~~
+		AND ((immunityClass == 1 AND (target == TARGET_FX_self OR target == TARGET_FX_original_caster))
+			OR (immunityClass == 2 AND target == TARGET_FX_preset))
+	SET keyDuration = (timingMode == TIMING_permanent OR timingMode == TIMING_while_equipped OR timingMode == TIMING_permanent_after_death) ? 0 : duration
+	SET keySaveBonus = (saveType == 0) ? 0 : saveBonus
+	SPRINT immunityKey ~%isExternal% %timingMode% %keyDuration% %probability1% %probability2% %diceCount% %diceSides% %saveType% %keySaveBonus%~
 END
 
 DEFINE_PATCH_MACRO ~delete_immunity_to_specific_spell~ BEGIN

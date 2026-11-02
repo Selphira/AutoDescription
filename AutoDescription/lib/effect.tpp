@@ -507,6 +507,11 @@ END
  * Attention, seules les variables resref, resref2 et resref3 peuvent accueillir une chaîne.
  */
 DEFINE_PATCH_MACRO ~group_effects~ BEGIN
+	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+		PATCH_IF count > 1 AND VARIABLE_IS_SET $merge_duplicate_kinds(~%opcode%~) BEGIN
+			LPM ~merge_duplicate_effects~
+		END
+	END
 	PATCH_IF enable_shrinkage == 1 BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 0 BEGIN
@@ -528,6 +533,93 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 				END
 			END
 		END
+	END
+END
+
+/**
+ * Deux effets identiques de l'opcode courant (puissance et résistance mises à part) écrivent la même ligne,
+ * que get_unique_effects ne garde qu'une fois, alors que le jeu applique les deux : le second est réuni au
+ * premier, selon la règle de merge_duplicate_kinds : ajouts additionnés, pourcentages multipliés, valeur fixée
+ * gardée une fois. Les attaques par round s'additionnent en demi-attaques (6 à 10 valent 0,5 à 4,5) ; un total
+ * que parameter1 ne sait pas écrire, ou un retrait d'attaques, laisse les deux effets. Le tableau de l'opcode
+ * est réécrit dans son ordre.
+ */
+DEFINE_PATCH_MACRO ~merge_duplicate_effects~ BEGIN
+	LOCAL_SPRINT mergeKind $merge_duplicate_kinds(~%opcode%~)
+	// Marque propre à cet appel : vider un tableau ne défait pas les éléments que VARIABLE_IS_SET teste.
+	SET mergePass = VARIABLE_IS_SET mergePass ? mergePass + 1 : 1
+	CLEAR_ARRAY ~mergeEffects~
+	SET mergeCount = 0
+	SET mergeAny = 0
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		SPRINT mergeMode ~%data_5%~
+		PATCH_IF ~%mergeKind%~ STRING_EQUAL ~ADD_ANY~ OR ~%mergeKind%~ STRING_EQUAL ~ADD_EE~ BEGIN
+			SPRINT mergeMode ~*~
+		END
+		SPRINT mergeKey ~%data_1%|%data_2%|%data_4%|%mergeMode%|%data_6%|%data_8%|%data_9%|%data_10%|%data_11%|%data_12%|%data_13%|%data_14%|%data_15%|%data_16%|%data_17%~
+		SPRINT mergeKey ~%mergeKey%|%data_18%|%data_19%|%data_20%|%data_21%|%data_22%|%data_23%|%data_24%|%data_25%|%data_26%|%data_27%|%data_28%|%data_29%~
+		PATCH_IF NOT VARIABLE_IS_SET $mergeFirst(~%mergePass% %mergeKey%~) BEGIN
+			SET $mergeFirst(~%mergePass% %mergeKey%~) = data_0
+			SET $mergeValue(~%mergePass% %data_0%~) = data_4
+		END
+		ELSE BEGIN
+			SET mergeFirstPosition = $mergeFirst(~%mergePass% %mergeKey%~)
+			SET mergeTotal = $mergeValue(~%mergePass% %mergeFirstPosition%~)
+			SET mergeMode = data_5
+			SET mergeAction = 0 // 0 : effet gardé une fois ; 1 : ajout ; 2 : pourcentage ; 3 : les deux gardés
+			PATCH_IF ~%mergeKind%~ STRING_EQUAL ~ADD~ OR ~%mergeKind%~ STRING_EQUAL ~ADD_ANY~ OR (~%mergeKind%~ STRING_EQUAL ~ADD_EE~ AND is_ee) BEGIN
+				SET mergeAction = 1
+			END
+			ELSE PATCH_IF ~%mergeKind%~ STRING_EQUAL ~AC~ BEGIN
+				SET mergeAction = (mergeMode == 16) ? 3 : 1
+			END
+			ELSE PATCH_IF ~%mergeKind%~ STRING_EQUAL ~HP~ BEGIN
+				SET mergeAction = (mergeMode == 0 OR mergeMode == 3) ? 1 : ((mergeMode == 2 OR mergeMode == 5) ? 2 : 0)
+			END
+			ELSE PATCH_IF ~%mergeKind%~ STRING_EQUAL ~MODE~ OR ~%mergeKind%~ STRING_EQUAL ~PARTY~ OR ~%mergeKind%~ STRING_EQUAL ~APR~ BEGIN
+				PATCH_IF ~%mergeKind%~ STRING_EQUAL ~PARTY~ AND is_ee AND mergeMode >= 3 AND mergeMode <= 5 BEGIN
+					SET mergeMode -= 3
+				END
+				SET mergeAction = (mergeMode == 0) ? 1 : ((mergeMode == 2) ? 2 : 0)
+				PATCH_IF mergeMode == 3 AND is_ee AND (opcode == 325 OR (opcode >= 33 AND opcode <= 37)) BEGIN
+					SET mergeAction = 1
+				END
+			END
+			PATCH_IF mergeAction == 1 AND ~%mergeKind%~ STRING_EQUAL ~APR~ BEGIN
+				SET mergeHalves = ((mergeTotal <= 5) ? 2 * mergeTotal : 2 * (mergeTotal - 5) - 1) + ((data_4 <= 5) ? 2 * data_4 : 2 * (data_4 - 5) - 1)
+				SET mergeTotal = ((mergeHalves MODULO 2) == 0) ? mergeHalves / 2 : (mergeHalves + 1) / 2 + 5
+				PATCH_IF data_4 < 0 OR ((mergeHalves MODULO 2) == 0 AND mergeTotal > 5) OR ((mergeHalves MODULO 2) == 1 AND mergeTotal > 10) BEGIN
+					SET mergeAction = 3
+				END
+			END
+			ELSE PATCH_IF mergeAction == 1 BEGIN
+				SET mergeTotal += data_4
+			END
+			ELSE PATCH_IF mergeAction == 2 BEGIN
+				SET mergeTotal = mergeTotal * data_4 / 100
+			END
+			PATCH_IF mergeAction != 3 BEGIN
+				SET $mergeValue(~%mergePass% %mergeFirstPosition%~) = mergeTotal
+				SET $mergeDropped(~%mergePass% %data_0%~) = 1
+				SET mergeAny = 1
+			END
+		END
+	END
+	PATCH_IF mergeAny BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			PATCH_IF NOT VARIABLE_IS_SET $mergeDropped(~%mergePass% %data_0%~) BEGIN
+				PATCH_IF VARIABLE_IS_SET $mergeValue(~%mergePass% %data_0%~) BEGIN
+					SPRINT data_4 $mergeValue(~%mergePass% %data_0%~)
+				END
+				SET $mergeEffects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~) = 1
+				SET mergeCount += 1
+			END
+		END
+		CLEAR_ARRAY ~opcodes_%opcode%~
+		PATCH_PHP_EACH ~mergeEffects~ AS data => _ BEGIN
+			SET $EVAL ~opcodes_%opcode%~(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~) = 1
+		END
+		SET $opcodes(~%opcode%~) = mergeCount
 	END
 END
 
