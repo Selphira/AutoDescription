@@ -2085,13 +2085,13 @@
 
 // FIXME: regrouper les strrefs avec 62
 @10420001 = ~Can memorise an extra %levelStr% level wizard spell~
-@10420002 = ~Can memorise %amount% extra %levelStr% level wizard spell~
-@10420003 = ~Remove a of %levelStr% level wizard spell~
+@10420002 = ~Can memorise %amount% extra %levelStr% level wizard spells~
+@10420003 = ~Remove a %levelStr% level wizard spell~
 @10420004 = ~Removes %amount% %levelStr% level wizard spell slots~
 @10420005 = ~Double the amount of %levelStr% level wizard spells that can be memorized~
 
 @10420011 = ~of memorizing an extra %levelStr% level wizard spell~
-@10420012 = ~of memorizing %amount% extra %levelStr% level wizard spell~
+@10420012 = ~of memorizing %amount% extra %levelStr% level wizard spells~
 @10420013 = ~of removing a %levelStr% level wizard spell~
 @10420014 = ~to remove %amount% %levelStr% level wizard spell slots~
 @10420015 = ~to double the amount of %levelStr% level wizard spells that can be memorized~
@@ -2181,13 +2181,13 @@
 // Opcode 62: Spell: Priest Spell Slots Modifier [62]
 
 @10620001 = ~Can memorise an extra %levelStr% level %spellType% spell~
-@10620002 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~
+@10620002 = ~Can memorise %amount% extra %levelStr% level %spellType% spells~
 @10620003 = ~Remove a %spellType% spell of %levelStr% level~
 @10620004 = ~Removes %amount% %levelStr% level %spellType% spell slots~
 @10620005 = ~Double the amount of %spellType% spells of %levelStr% level that can be memorized~
 
 @10620011 = ~of memorizing an extra %levelStr% level %spellType% spell~
-@10620012 = ~of memorizing %amount% extra %levelStr% level %spellType% spell~
+@10620012 = ~of memorizing %amount% extra %levelStr% level %spellType% spells~
 @10620013 = ~of removing a %levelStr% level %spellType% spell~
 @10620014 = ~to remove %amount% %levelStr% level %spellType% spell slots~
 @10620015 = ~to double the amount of %levelStr% level %spellType% spells that can be memorized~
@@ -2559,6 +2559,8 @@
 @11060008 = ~decrease morale %ofTheTarget% by %value%~
 @11060009 = ~to immunize %theTarget% against morale breakdown~
 @11060010 = ~to increase morale breakpoint %ofTheTarget% to %value%~
+@11060011 = ~Morale breakpoint %ofTheTarget% changes to %value% of its value~
+@11060012 = ~to change morale breakpoint %ofTheTarget% to %value% of its value~
 
 // Opcode 108: Stat: Reputation [108]
 
@@ -3354,14 +3356,14 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Knock down %theTarget% and push it %range% away~
-@12350002 = ~Knock down %theTarget% %range% away from %theSource%~
-@12350003 = ~Attracts %theTarget% %range% to the target area~
-@12350004 = ~Attracts %theTarget% %range% %toTheSource%~
-@12350005 = ~to knock down %theTarget% and push it %range% away~
-@12350006 = ~to knock down %theTarget% %range% away from %theSource%~
-@12350007 = ~to attract %theTarget% %range% to the target area~
-@12350008 = ~to attract %theTarget% %range% %toTheSource%~
+@12350001 = ~Pushes %theTarget% away from the target area~
+@12350002 = ~Pushes %theTarget% away from %theSource%~
+@12350003 = ~Pulls %theTarget% toward the target area~
+@12350004 = ~Pulls %theTarget% toward %theSource%~
+@12350005 = ~to push %theTarget% away from the target area~
+@12350006 = ~to push %theTarget% away from %theSource%~
+@12350007 = ~to pull %theTarget% toward the target area~
+@12350008 = ~to pull %theTarget% toward %theSource%~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 

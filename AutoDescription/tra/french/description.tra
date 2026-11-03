@@ -2747,6 +2747,8 @@
 @11060008 = ~d'affaiblir le moral %ofTheTarget% de %value%~
 @11060009 = ~d'immuniser %theTarget% contre la rupture de moral~
 @11060010 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
+@11060011 = ~Le point de rupture de moral %ofTheTarget% passe à %value% de sa valeur~
+@11060012 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value% de sa valeur~
 
 // Opcode 108: Stat: Reputation [108]
 
@@ -3552,14 +3554,14 @@
 
 // Opcode 235: Spell Effect: Wing Buffet [235]
 
-@12350001 = ~Repousse %theTarget% à %range% de l'endroit visé~
-@12350002 = ~Repousse %theTarget% à %range% %ofTheSource%~
-@12350003 = ~Attire %theTarget% de %range% vers l'endroit visé~
-@12350004 = ~Attire %theTarget% de %range% vers %theSource%~
-@12350005 = ~de repousser %theTarget% à %range% de l'endroit visé~
-@12350006 = ~de repousser %theTarget% à %range% %ofTheSource%~
-@12350007 = ~d'attirer %theTarget% de %range% vers l'endroit visé~
-@12350008 = ~d'attirer %theTarget% de %range% vers %theSource%~
+@12350001 = ~Repousse %theTarget% loin de l'endroit visé~
+@12350002 = ~Repousse %theTarget% loin %ofTheSource%~
+@12350003 = ~Attire %theTarget% vers l'endroit visé~
+@12350004 = ~Attire %theTarget% vers %theSource%~
+@12350005 = ~de repousser %theTarget% loin de l'endroit visé~
+@12350006 = ~de repousser %theTarget% loin %ofTheSource%~
+@12350007 = ~d'attirer %theTarget% vers l'endroit visé~
+@12350008 = ~d'attirer %theTarget% vers %theSource%~
 
 // Opcode 236: Spell Effect: Image Projection [236]
 

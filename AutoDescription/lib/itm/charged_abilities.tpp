@@ -14,7 +14,7 @@ BEGIN
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_BYTE  (headerOffset + ITM_HEAD_attack_type) attackType
 		READ_BYTE  (headerOffset + ITM_HEAD_location) location
-		READ_SHORT (headerOffset + ITM_HEAD_target) headTarget
+		READ_BYTE  (headerOffset + ITM_HEAD_target) headTarget
 		READ_BYTE  (headerOffset + ITM_HEAD_target_count) headTargetNumber
 		READ_SHORT (headerOffset + ITM_HEAD_charges) charges
 		READ_SHORT (headerOffset + ITM_HEAD_depletion) depletion
@@ -115,7 +115,7 @@ BEGIN
                     SET globalDuration = globalDuration / 15
                 END
                 LPF ~get_str_duration~ INT_VAR duration = globalDuration RET value = strDuration END
-                PATCH_IF NOT ~%duration%~ STRING_EQUAL ~~ BEGIN
+                PATCH_IF NOT ~%value%~ STRING_EQUAL ~~ BEGIN
 					LPF ~appendLine~ RET description END
 					LPF ~appendValue~ INT_VAR strref = 100031 STR_VAR value RET description END // Durée
                 END
