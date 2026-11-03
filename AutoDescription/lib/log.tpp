@@ -150,6 +150,22 @@ window.loadedData = window.loadedData || {};
     VERBOSE
 END
 
+DEFINE_PATCH_FUNCTION ~js_escape~
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	INNER_PATCH_SAVE text ~%text%~ BEGIN
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~\\~ ~\\\\~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%WNL%~ ~\n~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%LNL%~ ~\n~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%MNL%~ ~\n~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%TAB%~ ~\t~
+		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~add_js_row~
 	STR_VAR
 		id = ~~
@@ -159,14 +175,10 @@ DEFINE_PATCH_FUNCTION ~add_js_row~
 		original = ~~
 		modded = ~~
 BEGIN
-	INNER_PATCH_SAVE original ~%original%~ BEGIN
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
-	END
-	INNER_PATCH_SAVE modded ~%modded%~ BEGIN
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%crlf%~ ~\n~
-		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
-	END
+	LPF ~js_escape~ STR_VAR text = ~%id%~ RET id = text END
+	LPF ~js_escape~ STR_VAR text = ~%name%~ RET name = text END
+	LPF ~js_escape~ STR_VAR text = ~%original%~ RET original = text END
+	LPF ~js_escape~ STR_VAR text = ~%modded%~ RET modded = text END
 	INNER_ACTION BEGIN
 		SILENT
 		APPEND_OUTER ~docs/data/%log_filename%.js~ ~{"id":"%id%","name":"%name%","type":%type%,"level":%level%,"original":"%original%","modded":"%modded%"},~ KEEP_CRLF
