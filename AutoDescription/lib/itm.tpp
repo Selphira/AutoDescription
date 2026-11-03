@@ -287,13 +287,12 @@ DEFINE_ACTION_MACRO ~init_item_statistics~ BEGIN
 	OUTER_SET totalIgnoredNotMoveable = 0
 	OUTER_SET totalIgnoredType = 0
 	OUTER_SET opcodeTodo = 0
+	ACTION_CLEAR_ARRAY opcodes_to_code
 END
 
 DEFINE_ACTION_MACRO ~show_item_statistics~ BEGIN
-	ACTION_PHP_EACH ignored_opcodes AS opcode => value BEGIN
-		ACTION_IF value == 1 BEGIN
-			OUTER_SET opcodeTodo += 1
-		END
+	ACTION_PHP_EACH opcodes_to_code AS _ => _ BEGIN
+		OUTER_SET opcodeTodo += 1
 	END
 
 	OUTER_SET totalIgnored = totalIgnoredCursed + totalIgnoredWithoutDescription + totalIgnoredNotMoveable + totalIgnoredType

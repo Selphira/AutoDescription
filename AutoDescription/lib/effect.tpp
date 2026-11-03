@@ -1150,6 +1150,7 @@ BEGIN
 		~Failure("Unknown macro: \%method%")~
 		BEGIN
 			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: Unknown macro: %method%~ END
+			SET $opcodes_to_code(~%opcode%~) = 1
 		END
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
