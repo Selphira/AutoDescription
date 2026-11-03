@@ -2050,7 +2050,7 @@
 @10120002 = ~Inflige %damage% %toTheTarget%~
 @10120003 = ~Inflige %damage% %versus%~
 @10120004 = ~Draine %damage% %toTheTarget%~
-@10120005 = ~Transfert %damage% %toTheTarget%~
+@10120005 = ~Transfère %damage% %ofTheSource% %toTheTarget%~
 @10120006 = ~Passe les points de vie %ofTheTarget% à %damage%~
 @10120007 = ~Passe les points de vie %ofTheTarget% à %damage% %~
 @10120008 = ~Inflige %damage% % des points de vie maximums %toTheTarget%~// déjà vu aussi mais Inflige %damage% % du maximum de points de vie %toTheTarget%
@@ -2059,7 +2059,7 @@
 @10120012 = ~d'infliger %damage% %toTheTarget%~
 @10120013 = ~d'infliger %damage% %versus%~
 @10120014 = ~de drainer %damage% %toTheTarget%~
-@10120015 = ~de transférer %damage% %toTheTarget%~
+@10120015 = ~de transférer %damage% %ofTheSource% %toTheTarget%~
 @10120016 = ~de faire passer les points de vie %ofTheTarget% à %damage%~
 @10120017 = ~de faire passer les points de vie %ofTheTarget% à %damage% %~
 @10120018 = ~d'infliger %damage% % des points de vie maximums %toTheTarget%~ // ~d'infliger %damage% % du maximum de points de vie %toTheTarget%~
@@ -2275,13 +2275,13 @@
 @10420001 = ~Permet de mémoriser un sort profane supplémentaire de %levelStr% niveau~
 @10420002 = ~Permet de mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
 @10420003 = ~Suppression d'un sort profane de %levelStr% niveau~
-@10420004 = ~Suppression de %amount% sorts profanes de %levelStr% niveau~
+@10420004 = ~Retire %amount% emplacements de sorts profanes de %levelStr% niveau~
 @10420005 = ~Double la quantité de sorts profanes mémorisables de %levelStr% niveau~
 
 @10420011 = ~de pouvoir mémoriser un sort profane supplémentaire de %levelStr% niveau~
 @10420012 = ~de pouvoir mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~
 @10420013 = ~de supprimer un sort profane de %levelStr% niveau~
-@10420014 = ~de supprimer %amount% sorts profanes de %levelStr% niveau~
+@10420014 = ~de retirer %amount% emplacements de sorts profanes de %levelStr% niveau~
 @10420015 = ~de doubler la quantité de sorts profanes mémorisables de %levelStr% niveau~
 
 // Opcode 43: Cure: Stone to Flesh [43]
@@ -2371,13 +2371,13 @@
 @10620001 = ~Permet de mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~
 @10620002 = ~Permet de mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
 @10620003 = ~Suppression d'un sort %spellType% de %levelStr% niveau~
-@10620004 = ~Suppression de %amount% sorts %spellType% de %levelStr% niveau~
+@10620004 = ~Retire %amount% emplacements de sorts %spellType% de %levelStr% niveau~
 @10620005 = ~Double la quantité de sorts %spellType% mémorisables de %levelStr% niveau~
 
 @10620011 = ~de pouvoir mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~
 @10620012 = ~de pouvoir mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~
 @10620013 = ~de supprimer un sort %spellType% de %levelStr% niveau~
-@10620014 = ~de supprimer %amount% sorts %spellType% de %levelStr% niveau~
+@10620014 = ~de retirer %amount% emplacements de sorts %spellType% de %levelStr% niveau~
 @10620015 = ~de doubler la quantité de sorts %spellType% mémorisables de %levelStr% niveau~
 
 // Opcode 63: State: Infravision [63]
@@ -2415,6 +2415,23 @@
 
 @10670020 = ~ de 1 dé de vie~
 @10670021 = ~ de %creatureLevel% dés de vie~
+
+@10670031 = ~Invoque 1 créature%lifeDice%~
+@10670032 = ~Invoque 1 créature hostile%lifeDice%~
+@10670033 = ~d'invoquer 1 créature%lifeDice%~
+@10670034 = ~d'invoquer 1 créature hostile%lifeDice%~
+@10670035 = ~Invoque 1 créature alliée%lifeDice%~
+@10670036 = ~Invoque 1 créature neutre%lifeDice%~
+@10670037 = ~d'invoquer 1 créature alliée%lifeDice%~
+@10670038 = ~d'invoquer 1 créature neutre%lifeDice%~
+@10670041 = ~Invoque %amount% créatures%lifeDice%~
+@10670042 = ~Invoque %amount% créatures hostiles%lifeDice%~
+@10670043 = ~d'invoquer %amount% créatures%lifeDice%~
+@10670044 = ~d'invoquer %amount% créatures hostiles%lifeDice%~
+@10670045 = ~Invoque %amount% créatures alliées%lifeDice%~
+@10670046 = ~Invoque %amount% créatures neutres%lifeDice%~
+@10670047 = ~d'invoquer %amount% créatures alliées%lifeDice%~
+@10670048 = ~d'invoquer %amount% créatures neutres%lifeDice%~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
@@ -3717,6 +3734,9 @@
 @12720013 = ~%amount% fois par %strDuration%~
 @12720014 = ~%amount% fois toutes les %strDuration%~
 @12720015 = ~%amount% fois tous les %strDuration%~
+@12720020 = ~à chaque %strDuration%~
+@12720021 = ~toutes les %strDuration%~
+@12720022 = ~tous les %strDuration%~
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
