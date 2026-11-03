@@ -1614,7 +1614,7 @@ DEFINE_PATCH_MACRO ~opcode_target_12~ BEGIN
 		SET strref_0 = 10120004 // ~Draine %damage% %damageType% %toTheTarget%~
 	END
 	PATCH_IF flagTransfert == 1 BEGIN
-		SET strref_0 = 10120005 // ~Transfert %damage% %damageType% %toTheTarget%~
+		SET strref_0 = 10120005 // ~Transfère %damage% %ofTheSource% %toTheTarget%~
 	END
 
 	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
@@ -1645,7 +1645,7 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_12~ BEGIN
 		SET strref_0 = 10120014 // ~de drainer %damage% %damageType% %toTheTarget%~
 	END
 	PATCH_IF flagTransfert == 1 BEGIN
-		SET strref_0 = 10120015 // ~de transférer %damage% %damageType% %toTheTarget%~
+		SET strref_0 = 10120015 // ~de transférer %damage% %ofTheSource% %toTheTarget%~
 	END
 
 	LPF ~opcode_12_common~ INT_VAR strref_0 strref_1 strref_2 strref_3 RET description END
@@ -1708,6 +1708,10 @@ DEFINE_PATCH_FUNCTION ~opcode_12_common~ INT_VAR strref_0 = 0 strref_1 = 0 strre
 			END
 			ELSE BEGIN
 				SET type = 101092 // ~points de dégâts~
+			END
+			// Un transfert fait passer des points de vie de la source à la cible.
+			PATCH_IF strref_0 == 10120005 OR strref_0 == 10120015 BEGIN
+				SET type = ~%damage%~ STRING_EQUAL ~1~ ? 600170 : 600171 // ~point de vie~ / ~points de vie~
 			END
 			LPF ~getTranslation~ INT_VAR strref = type opcode RET damageType = string END
 			PATCH_IF NOT ~%damage%~ STRING_EQUAL ~~ BEGIN
@@ -3855,8 +3859,9 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
 	LOCAL_SPRINT lifeDice ~~
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName creatureLevel = level allegiance END
+	LPM ~opcode_67_unnamed~
 
-	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ OR unnamedCreature BEGIN
         PATCH_IF isSpell BEGIN
             PATCH_IF creatureLevel == 1 BEGIN
                 SPRINT lifeDice @10670020 // ~ de 1 dé de vie~
@@ -3888,6 +3893,9 @@ DEFINE_PATCH_MACRO ~opcode_target_67~ BEGIN
 			END
 			SET strref += 10
 		END
+		PATCH_IF unnamedCreature BEGIN
+			SET strref += 30 // ~Invoque 1 créature%lifeDice%~
+		END
 		SPRINT description (AT strref)
 	END
 END
@@ -3897,8 +3905,9 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 	LOCAL_SET amount = custom_int > 1 ? custom_int : 1
 	LOCAL_SPRINT lifeDice ~~
 	LPF ~get_creature_name~ STR_VAR file = EVAL ~%resref%~ RET creatureName creatureLevel = level allegiance END
+	LPM ~opcode_67_unnamed~
 
-	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ BEGIN
+	PATCH_IF NOT ~%creatureName%~ STRING_EQUAL ~~ OR unnamedCreature BEGIN
         PATCH_IF isSpell BEGIN
             PATCH_IF creatureLevel == 1 BEGIN
                 SPRINT lifeDice @10670020 // ~ de 1 dé de vie~
@@ -3927,7 +3936,18 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_67~ BEGIN
 			END
 			SET strref += 10
 		END
+		PATCH_IF unnamedCreature BEGIN
+			SET strref += 30 // ~Invoque 1 créature%lifeDice%~
+		END
 		SPRINT description (AT strref)
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_67_unnamed~ BEGIN
+	SET unnamedCreature = 0
+	PATCH_IF ~%creatureName%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
+		SET unnamedCreature = 1
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: creature %resref%.cre has no name: described as a creature.~ END
 	END
 END
 
@@ -5918,24 +5938,62 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 		CLEAR_ARRAY ~opcodes_%initOpcode%~
 	END
 
-	// On supprime les éventuelles immunités spécifiques à un sort dont le niveau est couvert par un opcode 102
+	// On supprime les éventuelles immunités spécifiques à un sort dont l'opcode 102 bloque tous les effets
 	PATCH_IF allSpellLevels > 0 BEGIN
 		PATCH_PHP_EACH EVAL ~opcodes_206~ AS data => _ BEGIN
 			LPM ~data_to_vars~
+			LPF ~opcode_102_spell_powers~ STR_VAR resref RET spellPowers END
+			PATCH_IF spellPowers != 0 AND (spellPowers BAND (BNOT allSpellLevels)) == 0 BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode = 206 match_position = position
+					RET $opcodes(~206~) = count
+					RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
+				END
+			END
+		END
+	END
+END
 
-			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
-				INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-					READ_LONG SPL_level spellLevel
-					PATCH_IF spellLevel >= 0 AND spellLevel <= 9 AND (allSpellLevels BAND (1 << (spellLevel == 0 ? 9 : spellLevel - 1))) != 0 BEGIN
-						LPF ~delete_opcode~
-							INT_VAR opcode = 206 match_position = position
-							RET $opcodes(~206~) = count
-							RET_ARRAY EVAL ~opcodes_206~ = opcodes_xx
+// L'opcode 102 bloque les effets dont la puissance est égale au niveau et non selon le niveau du sort lui-même.
+DEFINE_PATCH_FUNCTION ~opcode_102_spell_powers~ STR_VAR resref = ~~ RET spellPowers BEGIN
+	SET spellPowers = 0
+	SET spellLevel = ~-1~
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG  SPL_level spellLevel
+				READ_LONG  SPL_feature_blocks_offset tableOffset
+				READ_LONG  SPL_extended_headers_offset headerOffset
+				READ_SHORT SPL_extended_headers_count headerCount
+				// Bloc de lancement, puis bloc de chaque en-tête
+				FOR (block = 0 - 1; block < headerCount; ++block) BEGIN
+					PATCH_IF block < 0 BEGIN
+						READ_SHORT SPL_casting_feature_blocks_offset effectIndex
+						READ_SHORT SPL_casting_feature_blocks_count effectCount
+					END
+					ELSE PATCH_IF headerOffset + 0x28 * (block + 1) <= BUFFER_LENGTH BEGIN
+						READ_SHORT (headerOffset + 0x28 * block + SPL_HEAD_feature_blocks_offset) effectIndex
+						READ_SHORT (headerOffset + 0x28 * block + SPL_HEAD_feature_blocks_count) effectCount
+					END
+					ELSE BEGIN
+						SET effectCount = 0
+					END
+					FOR (effect = 0; effect < effectCount; ++effect) BEGIN
+						SET effectOffset = tableOffset + 0x30 * (effectIndex + effect)
+						PATCH_IF effectOffset >= 0 AND effectOffset + 0x30 <= BUFFER_LENGTH BEGIN
+							READ_BYTE (effectOffset + EFF_power) effectPower
+							SET spellPowers |= effectPower == 0 ? BIT9 : (effectPower <= 9 ? 1 << (effectPower - 1) : BIT10)
 						END
 					END
 				END
 			END
 		END
+	END
+	PATCH_IF spellLevel >= 1 AND spellLevel <= 9 BEGIN
+		SET spellPowers = 1 << (spellLevel - 1)
+	END
+	ELSE PATCH_IF spellPowers == 0 AND spellLevel >= 0 BEGIN
+		SET spellPowers = BIT9
 	END
 END
 
@@ -8651,7 +8709,12 @@ DEFINE_PATCH_MACRO ~opcode_171_common~ BEGIN
 		PATCH_IF spellType == 1 OR spellType == 2 BEGIN
 			SET strref += 1 // sorts
 		END
-		SPRINT description (AT strref)
+		PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: spell %resref%.spl has no name: no line.~ END
+		END
+		ELSE BEGIN
+			SPRINT description (AT strref)
+		END
 		// Hack pour forcer l'affichage de la durée / usage strictement interne
 		PATCH_IF custom_int AND timingMode == TIMING_duration AND duration > 0 BEGIN
 			LPF ~get_duration_value~ INT_VAR duration RET duration = value END
@@ -8947,7 +9010,7 @@ DEFINE_PATCH_FUNCTION ~get_res_description_177~ INT_VAR resetTarget = 0 STR_VAR 
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~get_res_description~ INT_VAR ignoreDuration = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
+DEFINE_PATCH_FUNCTION ~get_res_description~ INT_VAR ignoreDuration = 0 parentProbability = 0 STR_VAR resref = ~~ macro = ~~ RET description saveAdded ignoreDuration opcode BEGIN
 	INNER_PATCH_FILE ~%resref%.eff~ BEGIN
 		SET isExternal = 1
 		LPM ~read_external_effect_vars~
@@ -8955,6 +9018,9 @@ DEFINE_PATCH_FUNCTION ~get_res_description~ INT_VAR ignoreDuration = 0 STR_VAR r
 		PATCH_IF NOT VARIABLE_IS_SET $ignored_opcodes(~%opcode%~) BEGIN
 			SET isValid = 1
 			LPF ~get_probability~ INT_VAR probability1 probability2 RET probability END
+			PATCH_IF parentProbability > 0 BEGIN
+				SET probability = parentProbability
+			END
 			LPM ~opcode_is_valid~
 
 			PATCH_IF isValid == 1 BEGIN
@@ -10736,6 +10802,13 @@ DEFINE_PATCH_MACRO ~opcode_208_common~ BEGIN
 	    SET strref = strref + 1
 	END
 	SPRINT description (AT strref)
+END
+
+DEFINE_PATCH_MACRO ~opcode_208_is_valid~ BEGIN
+	PATCH_IF parameter1 < 0 BEGIN
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Negative minimum %parameter1%: no effect.~ END
+	END
 END
 
 /* ---------------------- *
@@ -13337,7 +13410,17 @@ DEFINE_PATCH_MACRO ~opcode_272_common~ BEGIN
 	// l'opcode, rendu par get_res_description, peut être toujours cumulable : la mention
 	// est écrite avec l'effet de l'EFF, avant ses exceptions de cible.
 	SET notCumulableParent = cumulable == 0
-	LPF ~get_res_description~ INT_VAR ignoreDuration = (frequency == 6 AND abilityType == AbilityType_Equipped) STR_VAR resref RET description saveAdded opcode END
+	// La probabilité d'un 272 probable est tirée une seule fois, quand il s'applique.
+	SET repeatProbability = probability < 100 ? probability : 0
+	LPF ~get_res_description~ INT_VAR ignoreDuration = (frequency == 6 AND abilityType == AbilityType_Equipped) parentProbability = repeatProbability STR_VAR resref RET description saveAdded opcode END
+	PATCH_IF repeatProbability > 0 AND NOT ~%description%~ STRING_EQUAL ~~ AND NOT ~%condition%~ STRING_EQUAL ~~ BEGIN
+		INNER_PATCH_SAVE description ~%description%~ BEGIN
+			SPRINT regex @10009 // ~^[0-9]+ % de chances ~
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~%regex%~ ~~
+		END
+		SPRINT description ~%description%, %condition%~
+		SPRINT condition ~~
+	END
 	PATCH_IF notCumulableParent BEGIN
 		SET cumulable = 1
 	END
@@ -13433,6 +13516,10 @@ DEFINE_PATCH_MACRO ~opcode_272_condition~ BEGIN
 				SET strref = 12720015 // ~%amount% fois tous les %strDuration%~
 			END
 		END
+	END
+
+	PATCH_IF probability < 100 AND strref >= 12720010 AND strref <= 12720012 BEGIN
+		SET strref += 10 // ~à chaque %strDuration%~
 	END
 
 	LPF ~get_duration_value~ INT_VAR duration RET tmpDuration = value END
@@ -17524,8 +17611,9 @@ DEFINE_PATCH_FUNCTION ~opcode_self_42_62~ INT_VAR level = 0 amount = 0 spellType
         END
         ELSE PATCH_IF amount < 0 BEGIN // Oubli
 			SET strref = amount == ~-1~ ? (startStrref + 2): (startStrref + 3)
+			SET amount = 0 - amount
     	END
-		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Suppression de %amount% sorts [profanes|divins] de niveau %levelStr%~
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Retire %amount% emplacements de sorts [profanes|divins] de %levelStr% niveau~
 	END
 END
 

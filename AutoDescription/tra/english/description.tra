@@ -1867,7 +1867,7 @@
 @10120002 = ~Inflicts %damage% %toTheTarget%~
 @10120003 = ~Inflicts %damage% %versus%~
 @10120004 = ~Drains %damage% %toTheTarget%~
-@10120005 = ~Transfer %damage% %toTheTarget%~
+@10120005 = ~Transfers %damage% from %theSource% %toTheTarget%~
 @10120006 = ~Change %theTarget%'s hit points to %damage%~
 @10120007 = ~Change %theTarget%'s hit points to %damage%%~
 @10120008 = ~Inflicts %damage%% of maximum hit points %toTheTarget%~// déjà vu aussi mais Inflige %damage%% du maximum de points de vie %toTheTarget%
@@ -1876,7 +1876,7 @@
 @10120012 = ~to inflict %damage% %toTheTarget%~
 @10120013 = ~to inflict %damage% %versus%~
 @10120014 = ~to drain %damage% %toTheTarget%~
-@10120015 = ~to transfer %damage% %toTheTarget%~
+@10120015 = ~to transfer %damage% from %theSource% %toTheTarget%~
 @10120016 = ~to change %theTarget%'s hit points to %damage%~
 @10120017 = ~to change %theTarget%'s hit points to %damage%%~
 @10120018 = ~to inflict %damage%% of maximum hit points %toTheTarget%~ // ~d'infliger %damage%% du maximum de points de vie %toTheTarget%~
@@ -2087,13 +2087,13 @@
 @10420001 = ~Can memorise an extra %levelStr% level wizard spell~
 @10420002 = ~Can memorise %amount% extra %levelStr% level wizard spell~
 @10420003 = ~Remove a of %levelStr% level wizard spell~
-@10420004 = ~Delete %amount% of %levelStr% level wizard spells~
+@10420004 = ~Removes %amount% %levelStr% level wizard spell slots~
 @10420005 = ~Double the amount of %levelStr% level wizard spells that can be memorized~
 
 @10420011 = ~of memorizing an extra %levelStr% level wizard spell~
 @10420012 = ~of memorizing %amount% extra %levelStr% level wizard spell~
 @10420013 = ~of removing a %levelStr% level wizard spell~
-@10420014 = ~of removing %amount% %levelStr% level wizard spells~
+@10420014 = ~to remove %amount% %levelStr% level wizard spell slots~
 @10420015 = ~to double the amount of %levelStr% level wizard spells that can be memorized~
 
 // Opcode 43: Cure: Stone to Flesh [43]
@@ -2183,13 +2183,13 @@
 @10620001 = ~Can memorise an extra %levelStr% level %spellType% spell~
 @10620002 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~
 @10620003 = ~Remove a %spellType% spell of %levelStr% level~
-@10620004 = ~Delete %amount% %spellType% spells of %levelStr% level~
+@10620004 = ~Removes %amount% %levelStr% level %spellType% spell slots~
 @10620005 = ~Double the amount of %spellType% spells of %levelStr% level that can be memorized~
 
 @10620011 = ~of memorizing an extra %levelStr% level %spellType% spell~
 @10620012 = ~of memorizing %amount% extra %levelStr% level %spellType% spell~
 @10620013 = ~of removing a %levelStr% level %spellType% spell~
-@10620014 = ~of removing %amount% %levelStr% level %spellType% spells~
+@10620014 = ~to remove %amount% %levelStr% level %spellType% spell slots~
 @10620015 = ~to double the amount of %levelStr% level %spellType% spells that can be memorized~
 
 // Opcode 63: State: Infravision [63]
@@ -2227,6 +2227,23 @@
 
 @10670020 = ~~ // ~ de 1 dé de vie~
 @10670021 = ~~ // ~ de %creatureLevel% dés de vie~
+
+@10670031 = ~Summon a creature~
+@10670032 = ~Summon a hostile creature~
+@10670033 = ~to summon a creature~
+@10670034 = ~to summon a hostile creature~
+@10670035 = ~Summon an allied creature~
+@10670036 = ~Summon a neutral creature~
+@10670037 = ~to summon an allied creature~
+@10670038 = ~to summon a neutral creature~
+@10670041 = ~Summon %amount% creatures~
+@10670042 = ~Summon %amount% hostile creatures~
+@10670043 = ~to summon %amount% creatures~
+@10670044 = ~to summon %amount% hostile creatures~
+@10670045 = ~Summon %amount% allied creatures~
+@10670046 = ~Summon %amount% neutral creatures~
+@10670047 = ~to summon %amount% allied creatures~
+@10670048 = ~to summon %amount% neutral creatures~
 
 // Opcode 68: Summon: Unsummon Creature [68]
 
@@ -3522,6 +3539,9 @@
 @12720013 = ~%amount% times per %strDuration%~
 @12720014 = ~%amount% times every %strDuration%~
 @12720015 = ~%amount% times every %strDuration%~
+@12720020 = ~at each %strDuration%~
+@12720021 = ~every %strDuration%~
+@12720022 = ~every %strDuration%~
 
 // Opcode 273: Remove: Specific Area Effect(Zone of Sweet Air) [273]
 
