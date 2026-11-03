@@ -9,7 +9,12 @@ DEFINE_PATCH_FUNCTION ~proficiency~ RET description BEGIN
 		SPRINT value @101084 // Arme à 2 mains
 	END
 
-	LPF ~appendValue~ INT_VAR strref = 102003 STR_VAR value = $tra_proficiencies(~%proficiency%~) RET description END
+	PATCH_IF VARIABLE_IS_SET $tra_proficiencies(~%proficiency%~) BEGIN
+		LPF ~appendValue~ INT_VAR strref = 102003 STR_VAR value = $tra_proficiencies(~%proficiency%~) RET description END
+	END
+	ELSE BEGIN
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Unknown proficiency %proficiency%.~ END
+	END
 	LPF ~appendValue~ INT_VAR strref = 102004 STR_VAR value RET description END
 END
 

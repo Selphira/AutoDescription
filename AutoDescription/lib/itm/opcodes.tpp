@@ -1330,6 +1330,10 @@ DEFINE_PATCH_MACRO ~opcode_1_common~ BEGIN
 		PATCH_IF parameter2 == MOD_TYPE_cumulative AND ~%value%~ STRING_EQUAL ~+%oneHalf%~ BEGIN
 			SPRINT value @10010103 // ~une demi supplémentaire~
 		END
+		// -6 retire une demi-attaque (IESDP : les valeurs négatives reprennent la table des positives)
+		ELSE PATCH_IF parameter2 == MOD_TYPE_cumulative AND ~%value%~ STRING_EQUAL ~-5~ BEGIN
+			SPRINT value @10010104 // ~une demi en moins~
+		END
 	END
 	SPRINT description (AT strref)
 END
@@ -5852,7 +5856,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 	LOCAL_SET initOpcode = opcode
-	LOCAL_SET maxSpellLevel = 0
+	LOCAL_SET allSpellLevels = 0
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions_already_check~ BEGIN END
 
@@ -5861,9 +5865,8 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 		SET newP1 = 0b0
 		CLEAR_ARRAY positions
 
-		PATCH_IF maxSpellLevel < parameter1 BEGIN
-			SET maxSpellLevel = parameter1
-		END
+		// Niveau 0 (effets de puissance 0) : bit 9, hors du masque 0x1FF des niveaux 1 à 9
+		SET allSpellLevels |= 1 << (parameter1 == 0 ? 9 : parameter1 - 1)
 
 		PATCH_PHP_EACH EVAL ~opcodes_%initOpcode%~ AS data => _ BEGIN
 			LPM ~data_to_vars~
@@ -5890,7 +5893,7 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 					RET opcodePosition = position
 				END
 				SET $positions(~%opcodePosition%~) = initOpcode
-				SET parameter = parameter1 - 1
+				SET parameter = parameter1 == 0 ? 9 : parameter1 - 1
 				SET newP1 |= ~%BIT%parameter%%~
 			END
 		END
@@ -5910,16 +5913,20 @@ DEFINE_PATCH_MACRO ~opcode_102_group~ BEGIN
 			LPM ~add_opcode~
 		END
 	END
+	// Bug où il reste toujours un item dans le tableau si c'était le dernier
+	PATCH_IF $opcodes(~%initOpcode%~) == 0 BEGIN
+		CLEAR_ARRAY ~opcodes_%initOpcode%~
+	END
 
-	// On supprime les éventuelles immunités spécifiques à un sort dont le niveau est inférieur ou égal au niveau le plus grand de l'opcode 102
-	PATCH_IF maxSpellLevel > 0 BEGIN
+	// On supprime les éventuelles immunités spécifiques à un sort dont le niveau est couvert par un opcode 102
+	PATCH_IF allSpellLevels > 0 BEGIN
 		PATCH_PHP_EACH EVAL ~opcodes_206~ AS data => _ BEGIN
 			LPM ~data_to_vars~
 
 			PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 				INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 					READ_LONG SPL_level spellLevel
-					PATCH_IF spellLevel <= maxSpellLevel BEGIN
+					PATCH_IF spellLevel >= 0 AND spellLevel <= 9 AND (allSpellLevels BAND (1 << (spellLevel == 0 ? 9 : spellLevel - 1))) != 0 BEGIN
 						LPF ~delete_opcode~
 							INT_VAR opcode = 206 match_position = position
 							RET $opcodes(~206~) = count
@@ -7343,9 +7350,13 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_132_common~ BEGIN
 	// A negative value of Statistic Modifier sets the Strength, Constitution and Dexterity of the targeted creature(s) to 25.
-	// N'est pas à prendre au pied de la lettre : -1 est considéré comme 255, -10 comme 246, -255 comme 1...
-	SET parameter1 = parameter1 MODULO 256
-	PATCH_IF parameter1 > 25 BEGIN
+	// Seul le premier octet est lu : -1 vaut 255, -10 vaut 246, -255 vaut 1 ; de 128 à 255, il est négatif
+	SET parameter1 = parameter1 BAND 255
+	PATCH_IF parameter1 >= 128 BEGIN
+		SET parameter1 = 25
+		SET parameter2 = MOD_TYPE_flat
+	END
+	ELSE PATCH_IF parameter1 > 25 BEGIN
 		SET parameter1 = 25
 	END
 END
@@ -9656,7 +9667,7 @@ DEFINE_PATCH_MACRO ~opcode_self_180~ BEGIN
 			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET resItemName = itemName END
 		END
 		PATCH_IF NOT ~%resItemName%~ STRING_EQUAL ~~ AND NOT ~%resItemName%~ STRING_EQUAL ~%itemName%~ BEGIN
-			SPRINT description @11800002 // ~Empêche d'utiliser %resItemName%~
+			SPRINT description @11800002 // ~Empêche d'utiliser « %resItemName% »~
 		END
 	END
 END
@@ -9671,12 +9682,14 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
 	PATCH_DEFINE_ARRAY ~itemNamesList~ BEGIN END
+	// Un objet du même nom que l'objet décrit en est un autre exemplaire : il n'est pas nommé
+	LPF ~get_item_name~ STR_VAR file = EVAL ~%CURRENT_SOURCE_RES%~ RET ownItemName = itemName END
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
 		PATCH_IF NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
-			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET itemName END
-			PATCH_IF NOT ~%itemName%~ STRING_EQUAL ~~ BEGIN
-				SET $itemNamesList(~%itemName%~) = 1
+			LPF ~get_item_name~ STR_VAR file = EVAL ~%resref%~ RET forbiddenItemName = itemName END
+			PATCH_IF NOT ~%forbiddenItemName%~ STRING_EQUAL ~~ AND NOT ~%forbiddenItemName%~ STRING_EQUAL ~%ownItemName%~ BEGIN
+				SET $itemNamesList(~%forbiddenItemName%~) = 1
 			END
 			LPF ~delete_opcode~
 				INT_VAR opcode = 180 match_position = position
@@ -9691,11 +9704,16 @@ DEFINE_PATCH_MACRO ~opcode_180_group~ BEGIN
 		CLEAR_ARRAY ~opcodes_180~
 	END
 	SPRINT and @100021 // ~et~
-	LPF ~implode~ STR_VAR array_name = ~itemNamesList~ glue = ~, ~ final_glue = ~ %and% ~ RET itemNames = text END
-	SET opcode = 180
-	SPRINT custom_str ~%itemNames%~
-	SPRINT resref ~~
-	LPM ~add_opcode~
+	SPRINT glue @10020 // ~ », « ~
+	SPRINT final_glue @10021 // ~ » %and% « ~
+	LPF ~implode~ STR_VAR array_name = ~itemNamesList~ glue final_glue RET itemNames = text END
+	// Sans autre objet nommé, rien à ajouter : un 180 de ressource vide serait cherché comme objet par opcode_self_180
+	PATCH_IF NOT ~%itemNames%~ STRING_EQUAL ~~ BEGIN
+		SET opcode = 180
+		SPRINT custom_str ~%itemNames%~
+		SPRINT resref ~~
+		LPM ~add_opcode~
+	END
 END
 
 /* ------------------------------ *
@@ -16481,7 +16499,7 @@ END
  * --------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_509~ BEGIN
 	LOCAL_SET strref = 11020001
-	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+	PATCH_IF (parameter1 BAND 0x1FF) == 0x1FF BEGIN // 511, niveau 0 compris ou non
 		SPRINT description @15090001 // ~Immunité contre les sorts~
 	END
 	ELSE BEGIN
@@ -16492,7 +16510,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_509~ BEGIN
 	LOCAL_SET strref = 11020005
-	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+	PATCH_IF (parameter1 BAND 0x1FF) == 0x1FF BEGIN // 511, niveau 0 compris ou non
 		SPRINT description @15090002 // ~d'immuniser %theTarget% contre les sorts~
 	END
 	ELSE BEGIN
@@ -16503,7 +16521,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_509~ BEGIN
 	LOCAL_SET strref = 11020003
-	PATCH_IF parameter1 == 0x1FF BEGIN // 511
+	PATCH_IF (parameter1 BAND 0x1FF) == 0x1FF BEGIN // 511, niveau 0 compris ou non
 		SPRINT description @15090003 // ~Immunise %theTarget% contre les sorts~
 	END
 	ELSE BEGIN
@@ -16519,7 +16537,7 @@ END
 DEFINE_PATCH_MACRO ~opcode_509_post_group~ BEGIN
 	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
 		LPM ~data_to_vars~
-		PATCH_IF parameter1 == 0x1FF BEGIN // 511
+		PATCH_IF (parameter1 BAND 0x1FF) == 0x1FF BEGIN // 511, niveau 0 compris ou non
 			PATCH_FOR_EACH searchOpcode IN 204 205 BEGIN
 				LPF ~delete_opcode~
 		            INT_VAR opcode = searchOpcode
@@ -16550,6 +16568,9 @@ DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
 	LOCAL_SET levelStrref = 0
 	LOCAL_SPRINT levelStr ~~
 	LOCAL_SPRINT and @100021 // ~et~
+	// Le bit 9 du 509 est le niveau 0 : couvert par « et inférieurs », sinon nommé à part
+	LOCAL_SET levels19 = parameter1 BAND 0x1FF
+	LOCAL_SET levelZero = opcode == 509 AND (parameter1 BAND BIT9) != 0
 	PATCH_DEFINE_ARRAY ~levels~ BEGIN END
 	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~levelAndBelow~ BEGIN
 		  3 => 2
@@ -16560,15 +16581,21 @@ DEFINE_PATCH_MACRO ~opcode_509_common~ BEGIN
 		127 => 7
 		255 => 8
 	END
-	PATCH_IF opcode == 509 AND VARIABLE_IS_SET $levelAndBelow(~%parameter1%~) BEGIN
-		SET levelStrref = 101200 + $levelAndBelow(~%parameter1%~)
+	PATCH_IF opcode == 509 AND VARIABLE_IS_SET $levelAndBelow(~%levels19%~) BEGIN
+		SET levelStrref = 101200 + $levelAndBelow(~%levels19%~)
 		SET strref += 1
 		SPRINT spellLevel (AT levelStrref)
 	END
+	ELSE PATCH_IF levelZero AND levels19 == 0 BEGIN
+		SET strref += 10 // ~Immunité contre les sorts de niveau 0~
+	END
 	ELSE BEGIN
+		PATCH_IF levelZero BEGIN
+			SET strref += 20 // ~Immunité contre les sorts de niveau 0 et de %spellLevel% niveau~
+		END
 		FOR (idx = 0 ; idx < 9 ; ++idx) BEGIN
 			SET bit = EVAL ~%BIT%idx%%~
-			PATCH_IF (parameter1 BAND bit) != 0 BEGIN
+			PATCH_IF (levels19 BAND bit) != 0 BEGIN
 				SET levelStrref = 101200 + idx + 1
 				SPRINT levelStr (AT levelStrref)
 				SPRINT $levels(~%levelStr%~) ~~
