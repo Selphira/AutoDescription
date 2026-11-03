@@ -200,10 +200,6 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		SPRINT ignored_message ~target %app_target% (expected 1-9)~
 		LPM ad_application_drop
 	END
-	ELSE PATCH_IF $fx_potion_drinker(~%app_id%~) AND $fx_header_target_count(~%app_id%~) != 0
-			AND app_target != TARGET_FX_self AND app_target != TARGET_FX_original_caster BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:potion_target~ message = ~potion effect with target %app_target% while the ability has a number of targets (BUG-020)~ RET render_missing = refusal END
-	END
 	ELSE PATCH_IF app_timing == TIMING_duration AND app_duration <= 0 AND NOT (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 		SET drop_id = app_id
 		SPRINT ignored_reason ~file_error:application:no_duration~
@@ -241,12 +237,11 @@ END
 
 // Cibles d'un effet d'une capacité de charge dont l'en-tête vise une zone avec un projectile :
 // l'ancien moteur les nomme d'après la zone du projectile (get_target_by_projectile), même pour un
-// effet sur soi : « aux créatures dans un rayon de 4,5 mètres ». Il lit la cible de l'en-tête avec
-// son nombre de cibles (BUG-020) : un nombre non nul l'en empêche. Les lignes d'une fléchette
-// viennent de ses capacités de combat, où il ne le fait pas.
+// effet sur soi : « aux créatures dans un rayon de 4,5 mètres ». Les lignes d'une fléchette viennent
+// de ses capacités de combat, où il ne le fait pas.
 DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 	SET app_header = $fx_header(~%app_id%~)
-	PATCH_IF $fx_header_target(~%app_id%~) == TARGET_HEAD_area AND $fx_header_target_count(~%app_id%~) == 0
+	PATCH_IF $fx_header_target(~%app_id%~) == TARGET_HEAD_area
 			AND $fx_header_projectile(~%app_id%~) > 1 AND item_type != ITM_TYPE_dart AND NOT $charged_other(~%app_header%~) BEGIN
 		LPF ad_projectile_area INT_VAR projectile = $fx_header_projectile(~%app_id%~) RET app_area_shape = area_shape
 			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle END
@@ -268,6 +263,8 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 					SPRINT $fx_area_text(~%app_id% %app_area_form%~) ~%app_area_text%~
 				END
 				SET $fx_area_target(~%app_id%~) = 1
+				SET $fx_area_cone(~%app_id%~) = app_area_shape == 2
+				SPRINT $fx_area_range(~%app_id%~) ~%range%~
 			END
 		END
 	END

@@ -246,9 +246,11 @@
 @6010001 = ~Ne nécessite pas de munitions~ // reprise de @102270
 @6010002 = ~Munition à usage illimité~ // reprise de @102271
 @6010010 = ~Les bonus au toucher et aux dégâts liés à la force s'appliquent à cette arme~ // reprise de @102263
+@6010011 = ~Le bonus aux dégâts lié à la force s'applique à cette arme~ // reprise de @102264
 @6010012 = ~Le bonus au toucher lié à la force s'applique à cette arme~ // reprise de @102265
 @6010013 = ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~ // reprise de @102266
 @6010014 = ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~ // reprise de @102267
+@6010015 = ~Le bonus aux dégâts lié à la force ne s'applique pas à cette arme~ // reprise de @102268
 
 // Objets : capacités de charge, nombre d'utilisations (6 020 000-6 020 099)
 @6020000 = ~usage illimité~ // reprise de @102678
@@ -2721,6 +2723,10 @@
 @21060141 = ~Le moral %ofTheTarget% est affaibli de %value%~ // reprise de @11060003
 @21060142 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
 @21060143 = ~d'affaiblir le moral %ofTheTarget% de %value%~ // reprise de @11060008
+@21060150 = ~Le point de rupture de moral %ofTheTarget% passe à %value% de sa valeur~ // reprise de @11060011
+@21060151 = ~Le point de rupture de moral %ofTheTarget% passe à %value% de sa valeur~ // reprise de @11060011
+@21060152 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value% de sa valeur~ // reprise de @11060012
+@21060153 = ~de faire passer le point de rupture de moral %ofTheTarget% à %value% de sa valeur~ // reprise de @11060012
 
 // Opcode 108 : Réputation : 0000-0002 du personnage, 0003-0005 du groupe (21 080 000-21 080 999)
 @21080000 = ~Réputation du personnage~ // reprise de @11080003
@@ -3347,6 +3353,10 @@
 @22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+@22160140 = ~Injecte %amount% niveaux %toTheTarget%~ // reprise de @12160005
+@22160141 = ~Injecte %amount% niveaux %toTheTarget%~ // reprise de @12160005
+@22160142 = ~d'injecter %amount% niveaux %toTheTarget%~ // reprise de @12160015
+@22160143 = ~d'injecter %amount% niveaux %toTheTarget%~ // reprise de @12160015
 
 // Opcode 217 : Inconscience à moins de 20 points de vie : 0001 condition, phrases du 39 : 0100 sommeil, 0110 sommeil profond (22 170 000-22 170 999)
 @22170001 = ~si ses points de vie sont inférieurs à 20~
@@ -3487,22 +3497,22 @@
 @22330002 = ~la compétence martiale %proficiency%~ // reprise de @12330002
 
 // Opcode 235 : phrases 0100 + 10 × (direction - 1) (22 350 000-22 350 999)
-@22350100 = ~Repousse %theTarget% à %range% de l'endroit visé~ // reprise de @12350001
-@22350101 = ~Repousse %theTarget% à %range% de l'endroit visé~ // reprise de @12350001
-@22350102 = ~de repousser %theTarget% à %range% de l'endroit visé~ // reprise de @12350005
-@22350103 = ~de repousser %theTarget% à %range% de l'endroit visé~ // reprise de @12350005
-@22350110 = ~Repousse %theTarget% à %range% %ofTheSource%~ // reprise de @12350002
-@22350111 = ~Repousse %theTarget% à %range% %ofTheSource%~ // reprise de @12350002
-@22350112 = ~de repousser %theTarget% à %range% %ofTheSource%~ // reprise de @12350006
-@22350113 = ~de repousser %theTarget% à %range% %ofTheSource%~ // reprise de @12350006
-@22350120 = ~Attire %theTarget% de %range% vers l'endroit visé~ // reprise de @12350003
-@22350121 = ~Attire %theTarget% de %range% vers l'endroit visé~ // reprise de @12350003
-@22350122 = ~d'attirer %theTarget% de %range% vers l'endroit visé~ // reprise de @12350007
-@22350123 = ~d'attirer %theTarget% de %range% vers l'endroit visé~ // reprise de @12350007
-@22350130 = ~Attire %theTarget% de %range% vers %theSource%~ // reprise de @12350004
-@22350131 = ~Attire %theTarget% de %range% vers %theSource%~ // reprise de @12350004
-@22350132 = ~d'attirer %theTarget% de %range% vers %theSource%~ // reprise de @12350008
-@22350133 = ~d'attirer %theTarget% de %range% vers %theSource%~ // reprise de @12350008
+@22350100 = ~Repousse %theTarget% loin de l'endroit visé~ // reprise de @12350001
+@22350101 = ~Repousse %theTarget% loin de l'endroit visé~ // reprise de @12350001
+@22350102 = ~de repousser %theTarget% loin de l'endroit visé~ // reprise de @12350005
+@22350103 = ~de repousser %theTarget% loin de l'endroit visé~ // reprise de @12350005
+@22350110 = ~Repousse %theTarget% loin %ofTheSource%~ // reprise de @12350002
+@22350111 = ~Repousse %theTarget% loin %ofTheSource%~ // reprise de @12350002
+@22350112 = ~de repousser %theTarget% loin %ofTheSource%~ // reprise de @12350006
+@22350113 = ~de repousser %theTarget% loin %ofTheSource%~ // reprise de @12350006
+@22350120 = ~Attire %theTarget% vers l'endroit visé~ // reprise de @12350003
+@22350121 = ~Attire %theTarget% vers l'endroit visé~ // reprise de @12350003
+@22350122 = ~d'attirer %theTarget% vers l'endroit visé~ // reprise de @12350007
+@22350123 = ~d'attirer %theTarget% vers l'endroit visé~ // reprise de @12350007
+@22350130 = ~Attire %theTarget% vers %theSource%~ // reprise de @12350004
+@22350131 = ~Attire %theTarget% vers %theSource%~ // reprise de @12350004
+@22350132 = ~d'attirer %theTarget% vers %theSource%~ // reprise de @12350008
+@22350133 = ~d'attirer %theTarget% vers %theSource%~ // reprise de @12350008
 
 // Opcode 236 : Projection d'image : phrases 0100 + 10 × type (clone, image, projection, simulacre) (22 360 000-22 360 999)
 @22360100 = ~Crée un clone %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360001

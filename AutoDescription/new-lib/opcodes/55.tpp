@@ -74,9 +74,11 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 	END
 END
 
-// Cible de la ligne de l'effet kill_id et de ceux qu'il réunit (line_the_target). Refus d'un
-// regroupement : valeur 0 ; cible d'une zone (l'ancien moteur y écrit la zone, sans les
-// types de créatures, BUG-032) ; classes que l'ancien moteur réunit sous un seul nom (ancien
+// Cible de la ligne de l'effet kill_id et de ceux qu'il réunit (line_the_target). Sous la zone
+// circulaire du projectile, les types réunis sont restreints à la zone (ancien
+// get_target_by_projectile) : « les rakshasas et les ettins dans un rayon de 4,5 mètres ». Refus d'un
+// regroupement : valeur 0 ; zone en cône (l'ancien moteur y écrit la zone sans les types, BUG-032) ;
+// classes que l'ancien moteur réunit sous un seul nom (ancien
 // opcode_set_target_strings : mages, puis voleurs, monoclassés et multiclassés).
 DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	CLEAR_ARRAY kill_names
@@ -104,8 +106,8 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	PATCH_IF kill_members > 1 AND kill_zero BEGIN
 		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:group_value~ message = ~group of slayings with value 0~ RET render_late_missing = refusal END
 	END
-	ELSE PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) BEGIN
-		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:area_group~ message = ~group of slayings with an area target~ RET render_late_missing = refusal END
+	ELSE PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) AND $fx_area_cone(~%kill_id%~) BEGIN
+		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:area_group~ message = ~group of slayings with a cone-shaped area target~ RET render_late_missing = refusal END
 	END
 	ELSE PATCH_IF kill_members > 1 AND (kill_mages == 63 OR kill_thieves == 31) BEGIN
 		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:class_group~ message = ~slayings covering all mage or thief classes~ RET render_late_missing = refusal END
@@ -114,5 +116,12 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	PATCH_IF $fx_parameter1(~%kill_id%~) != 0 BEGIN
 		LPF ad_join STR_VAR array_name = ~kill_names~ glue = EVAL ~, %the% ~ final_glue = EVAL ~ %AD_AND% %the% ~ RET kill_target = text END
 		SPRINT line_the_target ~%the% %kill_target%~
+		PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) BEGIN
+			SPRINT kill_saved_range ~%range%~
+			SPRINT range $fx_area_range(~%kill_id%~)
+			SPRINT target ~%line_the_target%~
+			LPF ad_tra INT_VAR tra_id = 2001100 RET line_the_target = text END // ~%target% dans un rayon de %range%~
+			SPRINT range ~%kill_saved_range%~
+		END
 	END
 END

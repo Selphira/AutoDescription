@@ -468,15 +468,16 @@ OUTER_SET AD_USABILITY_DRUIDS = BIT12 BOR BIT30
 // (P1_MIN, P1_MAX), parameter2 (P2) ; * : sans condition. CURE : 1 si la ligne dépend de
 // AD_SHRINK_CURE_WITH_IMMUNITIES ; RELABEL : libellé de l'immunité si elle absorbe l'effet ;
 // EQUIPPED : 1 si l'absorption n'a lieu que dans un bloc d'équipement (soins supprimés par l'ancien
-// delete_cure_linked_to_specific_immunity), 0 dans toute portée.
+// delete_cure_linked_to_specific_immunity), 0 dans toute portée ; WITH : parameter2 d'une autre
+// immunité (101) qui doit accompagner celle-ci, avec les mêmes champs, pour que l'effet soit absorbé.
 DEFINE_ACTION_FUNCTION ad_read_immunity_absorbs
 	RET AD_IMMUNITY_ABSORB_COUNT
 	RET_ARRAY AD_IMMUNITY_ABSORB_IMMUNITY AD_IMMUNITY_ABSORB_OPCODE AD_IMMUNITY_ABSORB_P1_MIN AD_IMMUNITY_ABSORB_P1_MAX
 		AD_IMMUNITY_ABSORB_ANY_P2 AD_IMMUNITY_ABSORB_P2 AD_IMMUNITY_ABSORB_CURE AD_IMMUNITY_ABSORB_RELABEL
-		AD_IMMUNITY_ABSORB_EQUIPPED
+		AD_IMMUNITY_ABSORB_EQUIPPED AD_IMMUNITY_ABSORB_WITH
 BEGIN
 	COPY - ~%MOD_FOLDER%/2da/immunity_absorbs.2da~ ~override~
-		READ_2DA_ENTRIES_NOW ad_absorbs 8
+		READ_2DA_ENTRIES_NOW ad_absorbs 9
 		SET AD_IMMUNITY_ABSORB_COUNT = ad_absorbs
 		FOR (ad_row = 0; ad_row < ad_absorbs; ++ad_row) BEGIN
 			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 0 ad_immunity
@@ -487,6 +488,7 @@ BEGIN
 			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 5 ad_cure
 			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 6 ad_relabel
 			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 7 ad_equipped
+			READ_2DA_ENTRY_FORMER ad_absorbs ad_row 8 ad_with
 			SET $AD_IMMUNITY_ABSORB_IMMUNITY(~%ad_row%~) = ad_immunity
 			SET $AD_IMMUNITY_ABSORB_OPCODE(~%ad_row%~) = ad_opcode
 			SET $AD_IMMUNITY_ABSORB_P1_MIN(~%ad_row%~) = IS_AN_INT ad_p1_min ? ad_p1_min : 0 - 2147483647
@@ -496,13 +498,14 @@ BEGIN
 			SET $AD_IMMUNITY_ABSORB_CURE(~%ad_row%~) = ad_cure
 			SET $AD_IMMUNITY_ABSORB_RELABEL(~%ad_row%~) = IS_AN_INT ad_relabel ? ad_relabel : 0 - 1
 			SET $AD_IMMUNITY_ABSORB_EQUIPPED(~%ad_row%~) = ad_equipped
+			SET $AD_IMMUNITY_ABSORB_WITH(~%ad_row%~) = IS_AN_INT ad_with ? ad_with : 0 - 1
 		END
 END
 LAF ad_read_immunity_absorbs
 	RET AD_IMMUNITY_ABSORB_COUNT
 	RET_ARRAY AD_IMMUNITY_ABSORB_IMMUNITY AD_IMMUNITY_ABSORB_OPCODE AD_IMMUNITY_ABSORB_P1_MIN AD_IMMUNITY_ABSORB_P1_MAX
 		AD_IMMUNITY_ABSORB_ANY_P2 AD_IMMUNITY_ABSORB_P2 AD_IMMUNITY_ABSORB_CURE AD_IMMUNITY_ABSORB_RELABEL
-		AD_IMMUNITY_ABSORB_EQUIPPED
+		AD_IMMUNITY_ABSORB_EQUIPPED AD_IMMUNITY_ABSORB_WITH
 END
 
 // Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux

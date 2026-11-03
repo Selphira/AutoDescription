@@ -9,9 +9,10 @@
 // new-lib/opcodes/177.tpp), fx_timing, fx_resistance, fx_duration, fx_probability1,
 // fx_probability2, fx_resource, fx_dice_count, fx_dice_sides, fx_save_type, fx_save_bonus,
 // fx_special, et les valeurs normalisées de new-lib/normalize.tpp ; fx_header_target,
-// fx_header_target_count, fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
+// fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
 // d'un en-tête d'objet) ; fx_area_target (0 à la lecture, 1 pour un effet dont les cibles sont
-// nommées d'après la zone du projectile, new-lib/application.tpp) ; fx_late (0 à la lecture, 1 pour
+// nommées d'après la zone du projectile, new-lib/application.tpp, qui fixe alors fx_area_cone et
+// fx_area_range, texte du rayon) ; fx_late (0 à la lecture, 1 pour
 // un effet réuni que l'ancien moteur ajoute en fin de liste par son premier regroupement, les effets
 // identiques, 2 par un regroupement suivant, qui l'y ajoute après : chaque opcode écrit ses lignes
 // niveau par niveau, new-lib/groups.tpp) ; fx_series_of,
@@ -119,17 +120,13 @@ END
 
 // Champs de l'en-tête d'objet des effets qui viennent d'être lus. Une potion dont l'en-tête vise
 // son utilisateur (cible 5) est bue par lui : ses effets le touchent, quelle que soit leur cible
-// (ancien load_charged_abilities). L'ancien moteur lit la cible et le nombre de cibles comme un
-// seul mot de 16 bits (BUG-020) : fx_header_target_count garde ce nombre pour que la prise en
-// charge refuse les cas où il en tient compte à tort.
+// (ancien load_charged_abilities).
 DEFINE_PATCH_MACRO ad_fx_header_fields BEGIN
 	READ_SHORT ITM_type fx_item_type
 	READ_BYTE  (fx_header_offset + ITM_HEAD_target)               fx_header_target
-	READ_BYTE  (fx_header_offset + ITM_HEAD_target_count)         fx_header_target_count
 	READ_SHORT (fx_header_offset + ITM_HEAD_projectile_animation) fx_header_projectile
 	FOR (fx_id = fx_first_id; fx_id < fx_count; ++fx_id) BEGIN
 		SET $fx_header_target(~%fx_id%~) = fx_header_target
-		SET $fx_header_target_count(~%fx_id%~) = fx_header_target_count
 		SET $fx_header_projectile(~%fx_id%~) = fx_header_projectile
 		SET $fx_potion_drinker(~%fx_id%~) = fx_item_type == ITM_TYPE_potion AND fx_header_target == TARGET_HEAD_self
 		PATCH_IF $fx_potion_drinker(~%fx_id%~) BEGIN
@@ -332,10 +329,11 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_range_max(~%fx_id%~) = 0
 	SET $fx_level_merged(~%fx_id%~) = 0
 	SET $fx_header_target(~%fx_id%~) = 0
-	SET $fx_header_target_count(~%fx_id%~) = 0
 	SET $fx_header_projectile(~%fx_id%~) = 0
 	SET $fx_potion_drinker(~%fx_id%~) = 0
 	SET $fx_area_target(~%fx_id%~) = 0
+	SET $fx_area_cone(~%fx_id%~) = 0
+	SPRINT $fx_area_range(~%fx_id%~) ~~
 	SET $fx_late(~%fx_id%~) = 0
 	SET $fx_series_of(~%fx_id%~) = 0 - 1
 	SET $fx_series_anchor(~%fx_id%~) = 0

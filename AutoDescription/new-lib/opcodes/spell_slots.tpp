@@ -38,9 +38,8 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 				SPRINT ignored_message ~invalid amount %slots_amount% or spell levels~
 				LPM ad_application_drop
 			END
-			// En réunissant les effets d'un même nombre, l'ancien moteur fusionne les niveaux
-			// communs (ou deux doublements identiques) au lieu de cumuler leurs emplacements.
-			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND ($slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) BAND slots_levels_used) != 0 BEGIN
+			// Deux doublements identiques : leur cumul n'est pas décrit.
+			ELSE PATCH_IF AD_ENABLE_SHRINKAGE AND slots_doubling AND ($slots_seen_levels(~%slots_amount% %slots_doubling% %slots_scope%~) BAND slots_levels_used) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:overlapping_levels~ message = ~overlapping spell levels~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
@@ -69,7 +68,8 @@ END
 // Lignes (ancien opcode_self_42_62 et opcode_42_group)
 
 // Avec AD_ENABLE_SHRINKAGE, les effets d'un même nombre d'emplacements, de même portée et de même
-// probabilité, sont réunis en une ligne (niveaux réunis) ; l'ancien moteur range les effets réunis après les doublements, d'où leurs
+// probabilité, sont réunis en une ligne (niveaux réunis) ; un effet dont un niveau est déjà réuni garde
+// sa ligne, ses emplacements se cumulent à ceux de la ligne ; l'ancien moteur range les effets réunis après les doublements, d'où leurs
 // lignes ajoutées après celles-ci.
 DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 	SPRINT line_section ~equipped~
@@ -102,7 +102,8 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 					PATCH_IF slots_other >= slots_id + 1 AND NOT $slots_done(~%slots_other%~) AND $fx_parameter1(~%slots_other%~) == slots_amount
 							AND (~%slots_other_scope%~ STRING_EQUAL ~%slots_scope%~)
 							AND $fx_probability1(~%slots_other%~) == $fx_probability1(~%slots_id%~)
-							AND $fx_probability2(~%slots_other%~) == $fx_probability2(~%slots_id%~) BEGIN
+							AND $fx_probability2(~%slots_other%~) == $fx_probability2(~%slots_id%~)
+							AND ($fx_parameter2(~%slots_other%~) BAND slots_levels) == 0 BEGIN
 						SET $slots_done(~%slots_other%~) = 1
 						SET slots_levels = slots_levels BOR $fx_parameter2(~%slots_other%~)
 					END

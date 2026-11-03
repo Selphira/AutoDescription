@@ -288,9 +288,12 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength_line BEGIN
 	SET strength = $fx_parameter1(~%group_other%~)
 	SET strength_bonus = $fx_parameter1(~%group_id%~)
 	SPRINT bonus ~%strength_bonus%~
-	// Seul 100 est écrit sur deux chiffres (« 18/00 ») : l'ancien moteur écrit « 18/5 ».
+	// Toujours sur deux chiffres, comme dans le jeu : « 18/05 », « 18/00 » pour 100.
 	PATCH_IF strength_bonus == 100 BEGIN
 		SPRINT bonus ~00~
+	END
+	ELSE PATCH_IF strength_bonus > 0 AND strength_bonus < 10 BEGIN
+		SPRINT bonus ~0%strength_bonus%~
 	END
 	SPRINT value ~%strength%/%bonus%~
 	SET line_fx = group_id
@@ -490,6 +493,7 @@ END
 // - ceux des lignes de 2da/immunity_absorbs.2da pour P (soins de l'état, autres immunités ; une
 //   ligne CURE seulement avec AD_SHRINK_CURE_WITH_IMMUNITIES, une ligne EQUIPPED seulement dans un
 //   bloc d'équipement, un sort ou une potion, comme l'ancien delete_cure_linked_to_specific_immunity) ;
+//   une ligne WITH n'a lieu qu'avec une autre immunité de ce parameter2, aux mêmes champs ;
 //   une ligne RELABEL donne à l'immunité ce libellé et la place après les autres, comme l'effet que
 //   l'ancien moteur ajoute ;
 //   la colonne P2 est comparée à la valeur lue (fx_parameter2_raw), que l'ancien moteur teste avant
@@ -506,7 +510,17 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN
-				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode
+				SET absorb_with = $AD_IMMUNITY_ABSORB_WITH(~%absorb_row%~)
+				SET absorb_with_found = absorb_with < 0
+				PATCH_IF NOT absorb_with_found AND $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode BEGIN
+					PHP_EACH fx_ids_101 AS _ => absorb_id BEGIN
+						PATCH_IF absorb_id != immunity_id AND $fx_parameter2(~%absorb_id%~) == absorb_with BEGIN
+							LPM ad_immunity_same_fields
+							SET absorb_with_found = absorb_with_found OR absorb_same
+						END
+					END
+				END
+				PATCH_IF $AD_IMMUNITY_ABSORB_IMMUNITY(~%absorb_row%~) == immunity_opcode AND absorb_with_found
 						AND (NOT $AD_IMMUNITY_ABSORB_CURE(~%absorb_row%~) OR AD_SHRINK_CURE_WITH_IMMUNITIES)
 						AND (NOT $AD_IMMUNITY_ABSORB_EQUIPPED(~%absorb_row%~) OR immunity_equipped) BEGIN
 					SET absorb_opcode = $AD_IMMUNITY_ABSORB_OPCODE(~%absorb_row%~)

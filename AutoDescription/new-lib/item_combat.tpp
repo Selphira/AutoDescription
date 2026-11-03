@@ -99,16 +99,12 @@ END
 
 // Raison de non-couverture d'une arme ou munition (render_missing), vide si ce rendu la décrit.
 // Les cas refusés sont ceux que l'ancien moteur décrit avec des règles pas encore reprises
-// (effets et titres des capacités) ou mal (bonus de Force, BUG-018 ; munition à plusieurs
-// en-têtes, dont il lit des valeurs d'un autre en-tête, BUG-019).
+// (effets et titres des capacités).
 DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	SET combat_is_ammo = item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	LPM ad_item_combat_load
 	PATCH_IF combat_count == 0 OR combat_other_count > 0 BEGIN
 		LPF ad_refusal STR_VAR reason = ~not_implemented:headers~ message = ~weapon without a combat ability, or with abilities of another type~ RET render_missing = refusal END
-	END
-	ELSE PATCH_IF combat_is_ammo AND combat_count > 1 BEGIN
-		LPF ad_refusal STR_VAR reason = ~not_implemented:combat:ammo_headers~ message = ~ammunition with several combat abilities (BUG-019)~ RET render_missing = refusal END
 	END
 	FOR (combat_id = 0; combat_id < combat_count AND ~%render_missing%~ STRING_EQUAL ~~; ++combat_id) BEGIN
 		SPRINT combat_section_type $combat_section_type(~%combat_id%~)
@@ -136,12 +132,6 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 			SPRINT ignored_message ~proficiency %combat_proficiency% has no name: no proficiency line~
 			LPM ad_log_ignored
 		END
-		PATCH_IF combat_count == 1 BEGIN
-			LPM ad_item_strength_bonus
-			PATCH_IF strength_bonus_invalid BEGIN
-				LPF ad_refusal STR_VAR reason = ~not_implemented:combat:strength_bonus~ message = ~strength bonus that the old engine describes wrongly (BUG-018)~ RET render_missing = refusal END
-			END
-		END
 	END
 END
 
@@ -164,34 +154,31 @@ END
 // Ligne de l'unique en-tête d'une arme sur les bonus de Force (strength_bonus_tra, 0 sans ligne).
 // Drapeaux de l'en-tête (IESDP) : bit 0, bonus de Force au toucher et aux dégâts ; sur EE, bit 2
 // aux dégâts seuls, bit 3 au toucher seul. Une arme de jet le signale quand le bonus s'applique,
-// les autres armes quand il ne s'applique pas. strength_bonus_invalid : combinaison que l'ancien
-// moteur décrit mal (BUG-018).
+// les autres armes quand il ne s'applique pas.
 DEFINE_PATCH_MACRO ad_item_strength_bonus BEGIN
 	SET strength_flags = $combat_flags(~0~)
-	SET strength_both = (strength_flags BAND BIT0) != 0
-	SET strength_damage = (strength_flags BAND BIT2) != 0
-	SET strength_tac0 = (strength_flags BAND BIT3) != 0
+	SET strength_damage = (strength_flags BAND BIT0) != 0 OR (IS_EE AND (strength_flags BAND BIT2) != 0)
+	SET strength_tac0 = (strength_flags BAND BIT0) != 0 OR (IS_EE AND (strength_flags BAND BIT3) != 0)
 	SET strength_bonus_tra = 0
-	SET strength_bonus_invalid = 0
 	PATCH_IF item_type == ITM_TYPE_bow OR item_type == ITM_TYPE_sling OR item_type == ITM_TYPE_crossbow BEGIN
-		PATCH_IF strength_both OR (IS_EE AND strength_damage AND strength_tac0) BEGIN
+		PATCH_IF strength_damage AND strength_tac0 BEGIN
 			SET strength_bonus_tra = 6010010 // ~Les bonus au toucher et aux dégâts liés à la force s'appliquent à cette arme~
+		END
+		ELSE PATCH_IF strength_damage BEGIN
+			SET strength_bonus_tra = 6010011 // ~Le bonus aux dégâts lié à la force s'applique à cette arme~
 		END
 		ELSE PATCH_IF strength_tac0 BEGIN
 			SET strength_bonus_tra = 6010012 // ~Le bonus au toucher lié à la force s'applique à cette arme~
 		END
-		// Seul bonus aux dégâts : l'ancien moteur n'écrit rien (BUG-018), sortie reprise telle quelle.
 	END
-	ELSE PATCH_IF NOT strength_both BEGIN
-		PATCH_IF strength_tac0 BEGIN
-			SET strength_bonus_invalid = 1
-		END
-		ELSE PATCH_IF strength_damage BEGIN
-			SET strength_bonus_tra = 6010014 // ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~
-		END
-		ELSE BEGIN
-			SET strength_bonus_tra = 6010013 // ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~
-		END
+	ELSE PATCH_IF NOT strength_damage AND NOT strength_tac0 BEGIN
+		SET strength_bonus_tra = 6010013 // ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~
+	END
+	ELSE PATCH_IF NOT strength_tac0 BEGIN
+		SET strength_bonus_tra = 6010014 // ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~
+	END
+	ELSE PATCH_IF NOT strength_damage BEGIN
+		SET strength_bonus_tra = 6010015 // ~Le bonus aux dégâts lié à la force ne s'applique pas à cette arme~
 	END
 END
 

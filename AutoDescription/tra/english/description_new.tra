@@ -246,9 +246,11 @@
 @6010001 = ~Requires no ammunition~ // reprise de @102270
 @6010002 = ~Unlimited ammunition~ // reprise de @102271
 @6010010 = ~Bonuses to hit and damage based on Strength apply to this weapon~ // reprise de @102263
+@6010011 = ~The Strength-based damage bonus applies to this weapon~ // reprise de @102264
 @6010012 = ~The Strength-based hit bonus applies to this weapon~ // reprise de @102265
 @6010013 = ~Bonuses to hit and damage based on Strength do not apply to this weapon~ // reprise de @102266
 @6010014 = ~The Strength-based hit bonus does not apply to this weapon~ // reprise de @102267
+@6010015 = ~The Strength-based damage bonus does not apply to this weapon~ // reprise de @102268
 
 // Objets : capacités de charge, nombre d'utilisations (6 020 000-6 020 099)
 @6020000 = ~illimited use~ // reprise de @102678
@@ -2245,8 +2247,8 @@
 
 // Opcode 42 : phrases (20 420 100-20 420 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20420100 = ~Can memorise an extra %levelStr% level wizard spell~ // reprise de @10420001
-@20420110 = ~Can memorise %amount% extra %levelStr% level wizard spell~ // reprise de @10420002
-@20420120 = ~Remove a of %levelStr% level wizard spell~ // reprise de @10420003
+@20420110 = ~Can memorise %amount% extra %levelStr% level wizard spells~ // reprise de @10420002
+@20420120 = ~Remove a %levelStr% level wizard spell~ // reprise de @10420003
 @20420130 = ~Removes %amount% %levelStr% level wizard spell slots~ // reprise de @10420004
 @20420131 = ~Removes %amount% %levelStr% level wizard spell slots~ // reprise de @10420004
 @20420132 = ~to remove %amount% %levelStr% level wizard spell slots~ // reprise de @10420014
@@ -2333,7 +2335,7 @@
 
 // Opcode 62 : phrases (20 620 100-20 620 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
-@20620110 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~ // reprise de @10620002
+@20620110 = ~Can memorise %amount% extra %levelStr% level %spellType% spells~ // reprise de @10620002
 @20620120 = ~Remove a %spellType% spell of %levelStr% level~ // reprise de @10620003
 @20620130 = ~Removes %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620004
 @20620131 = ~Removes %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620004
@@ -2721,6 +2723,10 @@
 @21060141 = ~Morale %ofTheTarget% is weakened by %value%~ // reprise de @11060003
 @21060142 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
 @21060143 = ~decrease morale %ofTheTarget% by %value%~ // reprise de @11060008
+@21060150 = ~Morale breakpoint %ofTheTarget% changes to %value% of its value~ // reprise de @11060011
+@21060151 = ~Morale breakpoint %ofTheTarget% changes to %value% of its value~ // reprise de @11060011
+@21060152 = ~to change morale breakpoint %ofTheTarget% to %value% of its value~ // reprise de @11060012
+@21060153 = ~to change morale breakpoint %ofTheTarget% to %value% of its value~ // reprise de @11060012
 
 // Opcode 108 : Réputation : 0000-0002 du personnage, 0003-0005 du groupe (21 080 000-21 080 999)
 @21080000 = ~Character reputation~ // reprise de @11080003
@@ -3347,6 +3353,10 @@
 @22160131 = ~Injecte 1 niveau %toTheTarget%~ // reprise de @12160004
 @22160132 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
 @22160133 = ~d'injecter 1 niveau %toTheTarget%~ // reprise de @12160014
+@22160140 = ~Injecte %amount% niveaux %toTheTarget%~ // reprise de @12160005
+@22160141 = ~Injecte %amount% niveaux %toTheTarget%~ // reprise de @12160005
+@22160142 = ~d'injecter %amount% niveaux %toTheTarget%~ // reprise de @12160015
+@22160143 = ~d'injecter %amount% niveaux %toTheTarget%~ // reprise de @12160015
 
 // Opcode 217 : Inconscience à moins de 20 points de vie : 0001 condition, phrases du 39 : 0100 sommeil, 0110 sommeil profond (22 170 000-22 170 999)
 @22170001 = ~if its hit points are below 20~
@@ -3487,22 +3497,22 @@
 @22330002 = ~the Proficiency %proficiency%~ // reprise de @12330002
 
 // Opcode 235 : phrases 0100 + 10 × (direction - 1) (22 350 000-22 350 999)
-@22350100 = ~Knock down %theTarget% and push it %range% away~ // reprise de @12350001
-@22350101 = ~Knock down %theTarget% and push it %range% away~ // reprise de @12350001
-@22350102 = ~to knock down %theTarget% and push it %range% away~ // reprise de @12350005
-@22350103 = ~to knock down %theTarget% and push it %range% away~ // reprise de @12350005
-@22350110 = ~Knock down %theTarget% %range% away from %theSource%~ // reprise de @12350002
-@22350111 = ~Knock down %theTarget% %range% away from %theSource%~ // reprise de @12350002
-@22350112 = ~to knock down %theTarget% %range% away from %theSource%~ // reprise de @12350006
-@22350113 = ~to knock down %theTarget% %range% away from %theSource%~ // reprise de @12350006
-@22350120 = ~Attracts %theTarget% %range% to the target area~ // reprise de @12350003
-@22350121 = ~Attracts %theTarget% %range% to the target area~ // reprise de @12350003
-@22350122 = ~to attract %theTarget% %range% to the target area~ // reprise de @12350007
-@22350123 = ~to attract %theTarget% %range% to the target area~ // reprise de @12350007
-@22350130 = ~Attracts %theTarget% %range% %toTheSource%~ // reprise de @12350004
-@22350131 = ~Attracts %theTarget% %range% %toTheSource%~ // reprise de @12350004
-@22350132 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
-@22350133 = ~to attract %theTarget% %range% %toTheSource%~ // reprise de @12350008
+@22350100 = ~Pushes %theTarget% away from the target area~ // reprise de @12350001
+@22350101 = ~Pushes %theTarget% away from the target area~ // reprise de @12350001
+@22350102 = ~to push %theTarget% away from the target area~ // reprise de @12350005
+@22350103 = ~to push %theTarget% away from the target area~ // reprise de @12350005
+@22350110 = ~Pushes %theTarget% away from %theSource%~ // reprise de @12350002
+@22350111 = ~Pushes %theTarget% away from %theSource%~ // reprise de @12350002
+@22350112 = ~to push %theTarget% away from %theSource%~ // reprise de @12350006
+@22350113 = ~to push %theTarget% away from %theSource%~ // reprise de @12350006
+@22350120 = ~Pulls %theTarget% toward the target area~ // reprise de @12350003
+@22350121 = ~Pulls %theTarget% toward the target area~ // reprise de @12350003
+@22350122 = ~to pull %theTarget% toward the target area~ // reprise de @12350007
+@22350123 = ~to pull %theTarget% toward the target area~ // reprise de @12350007
+@22350130 = ~Pulls %theTarget% toward %theSource%~ // reprise de @12350004
+@22350131 = ~Pulls %theTarget% toward %theSource%~ // reprise de @12350004
+@22350132 = ~to pull %theTarget% toward %theSource%~ // reprise de @12350008
+@22350133 = ~to pull %theTarget% toward %theSource%~ // reprise de @12350008
 
 // Opcode 236 : Projection d'image : phrases 0100 + 10 × type (clone, image, projection, simulacre) (22 360 000-22 360 999)
 @22360100 = ~Creates a clone %ofTheTarget% with the same number of hit points~ // reprise de @12360001

@@ -136,10 +136,6 @@ DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 		END
 		PATCH_IF charged_global_valid AND charged_global > 0 BEGIN
 			SET $charged_global_duration(~%charged_h%~) = charged_global
-			// Moins de 15 ticks : l'ancien moteur écrit une ligne « Durée » vide.
-			PATCH_IF charged_timing == TIMING_duration_ticks AND charged_global < 15 BEGIN
-				LPF ad_refusal INT_VAR fx_id = charged_fx STR_VAR reason = ~not_implemented:charged:ticks~ message = ~potion duration of %charged_global% ticks, under one second~ RET render_missing = refusal END
-			END
 		END
 		PATCH_IF charged_id == 0 BEGIN
 			SET charged_global_timing = charged_timing
@@ -201,10 +197,13 @@ DEFINE_PATCH_MACRO ad_item_charged_section BEGIN
 			PATCH_IF charged_global_timing == TIMING_duration_ticks BEGIN
 				SET charged_seconds = charged_seconds / 15
 			END
-			LPF ad_duration_text INT_VAR seconds = charged_seconds RET value = text END
-			SPRINT name @6200002 // ~Durée~
-			SPRINT charged_line @1200000 // ~%name%%AD_COLON%%value%~
-			SPRINT description ~%description%%CRLF%%CRLF%%charged_line%~
+			// Moins d'une seconde (moins de 15 ticks) : pas de ligne « Durée », les durées des effets restent tues.
+			PATCH_IF charged_seconds > 0 BEGIN
+				LPF ad_duration_text INT_VAR seconds = charged_seconds RET value = text END
+				SPRINT name @6200002 // ~Durée~
+				SPRINT charged_line @1200000 // ~%name%%AD_COLON%%value%~
+				SPRINT description ~%description%%CRLF%%CRLF%%charged_line%~
+			END
 		END
 	END
 	ELSE PATCH_IF NOT (~%charged_text%~ STRING_EQUAL ~~) BEGIN

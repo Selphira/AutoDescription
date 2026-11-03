@@ -1,6 +1,9 @@
 // Opcode 233 (Stat: Proficiency Modifier) : parameter1 = points de compétence, mot de poids faible de
 // parameter2 = compétence (stats.ids 89 à 134) ; sur EE, mot de poids fort 1 = ajout (Increment),
-// 0 = valeur fixée ; « Compétence martiale Épée longue : Passe à 5 ». Modificateur simple, code
+// 0 = valeur fixée ; « Compétence martiale Épée longue : Passe à 5 », « +1 » pour un ajout. Avec
+// special non nul, l'ajout vise la valeur parameter1 (IESDP), décrite par l'ancien moteur comme une
+// valeur fixée pour l'épée longue (90) seulement, la seule compétence où le jeu l'applique ; pour une
+// autre, special est sans effet. Modificateur simple, code
 // commun dans new-lib/opcodes/stat_modifiers.tpp ; nom de la compétence lu dans weapprof.2da
 // (AD_PROFICIENCY_NAMES).
 
@@ -26,14 +29,10 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 				SPRINT ignored_message ~proficiency %proficiency_stat% has no name~
 				LPM ad_application_drop
 			END
-			// Ajout (EE) : l'ancien moteur perd le mode dès la validation et écrit une valeur fixée
-			// (BUG-028).
-			ELSE PATCH_IF proficiency_mode == 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode233:increment~ message = ~proficiency increment (mode 1)~ RET render_missing = refusal END
-			END
 			ELSE BEGIN
 				SET $fx_stat_subject(~%stat_id%~) = proficiency_stat
-				SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_flat
+				SET proficiency_delta = proficiency_mode == 1 AND $fx_special(~%stat_id%~) != 0 AND proficiency_stat == 90
+				SET $fx_parameter2(~%stat_id%~) = (proficiency_mode == 1 AND NOT proficiency_delta) ? MOD_TYPE_cumulative : MOD_TYPE_flat
 			END
 		END
 	END
