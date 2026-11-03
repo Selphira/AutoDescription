@@ -4,7 +4,7 @@
 // Avec AD_ENABLE_SHRINKAGE, une métamorphose peut le retirer (ad_group_polymorph, new-lib/groups.tpp).
 
 // Sort absent : effet écarté sans rien écrire, erreur journalisée (l'ancien moteur n'écrit rien).
-// Refus : sort sans nom.
+// Sort sans nom : la capacité ne peut être désignée, effet écarté et journalisé.
 DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 	PHP_EACH fx_ids_171 AS _ => ability_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%ability_id%~) BEGIN
@@ -24,10 +24,15 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 					END
 				END
 				PATCH_IF ~%ability_name%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = ability_id STR_VAR reason = ~not_implemented:opcode171:no_name~ message = ~spell %ability_resref%.SPL has no name~ RET render_missing = refusal END
+					SET drop_id = ability_id
+					SPRINT ignored_reason ~not_implemented:opcode171:no_name~
+					SPRINT ignored_message ~spell %ability_resref%.SPL has no name: no line~
+					LPM ad_application_drop
 				END
-				SPRINT $fx_spell_name(~%ability_id%~) ~%ability_name%~
-				SET $fx_spell_book(~%ability_id%~) = ability_type == 1 OR ability_type == 2
+				ELSE BEGIN
+					SPRINT $fx_spell_name(~%ability_id%~) ~%ability_name%~
+					SET $fx_spell_book(~%ability_id%~) = ability_type == 1 OR ability_type == 2
+				END
 			END
 		END
 	END

@@ -3,7 +3,8 @@
 // (BIT0 = niveau 1) ; parameter2 = 0 double les emplacements des niveaux 1 à parameter1. Le fichier
 // de chaque opcode fixe slots_opcode, slots_max_level (dernier niveau de sort de la classe) et
 // slots_priest (1 : type de sort selon les clercs et druides qui peuvent utiliser l'objet).
-// Phrases du bloc de l'opcode : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0140 doublement.
+// Phrases du bloc de l'opcode : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs
+// retirés (nombre écrit sans signe), 0140 doublement.
 //
 // Pris en charge : effets que la prise en charge commune accepte (ad_application_support,
 // new-lib/application.tpp).
@@ -36,10 +37,6 @@ DEFINE_PATCH_MACRO ad_spell_slots_support BEGIN
 				SPRINT ignored_reason ~file_error:opcode%slots_opcode%:invalid~
 				SPRINT ignored_message ~invalid amount %slots_amount% or spell levels~
 				LPM ad_application_drop
-			END
-			// L'ancien moteur écrit le nombre négatif : « Suppression de -2 sorts ».
-			ELSE PATCH_IF slots_amount < 0 - 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = slots_id STR_VAR reason = ~not_implemented:opcode%slots_opcode%:removal~ message = ~several spell slots removed~ RET render_missing = refusal END
 			END
 			// En réunissant les effets d'un même nombre, l'ancien moteur fusionne les niveaux
 			// communs (ou deux doublements identiques) au lieu de cumuler leurs emplacements.
@@ -132,7 +129,10 @@ DEFINE_PATCH_MACRO ad_spell_slots_line BEGIN
 		SET slots_singular = slots_levels != 0 AND (amount == 1 OR amount == 0 - 1)
 		LPF ad_tra INT_VAR tra_id = 8020000 + slots_priest_type + (slots_singular ? 10 : 0) RET spellType = text END
 	END
-	SET slots_phrase = slots_levels == 0 ? 140 : (amount == 1 ? 100 : (amount > 1 ? 110 : 120))
+	SET slots_phrase = slots_levels == 0 ? 140 : (amount == 1 ? 100 : (amount > 1 ? 110 : (amount == 0 - 1 ? 120 : 130)))
+	PATCH_IF slots_phrase == 130 BEGIN
+		SET amount = 0 - amount
+	END
 	SET line_phrase = 20000000 + slots_opcode * 10000 + slots_phrase
 	SET line_fx = slots_id
 	LPM ad_effect_line

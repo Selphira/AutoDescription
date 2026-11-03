@@ -1994,8 +1994,10 @@
 @20110102 = ~of neutralizing poisons infecting %theTarget%~ // reprise de @10110003
 @20110103 = ~of neutralizing poisons infecting %theTarget%~ // reprise de @10110003
 
-// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
 @20120001 = ~%damage% %damageType%~ // reprise de @102166
+@20120002 = ~hit point~ // reprise de @600170
+@20120003 = ~hit points~ // reprise de @600171
 @20120010 = ~damage~ // reprise de @101092
 @20120020 = ~crushing damage~ // reprise de @10120020
 @20120021 = ~acid damage~ // reprise de @10120021
@@ -2020,6 +2022,8 @@
 @20120102 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120011
 @20120103 = ~to inflict %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Drains %damage% %toTheTarget%~ // reprise de @10120004
+@20120121 = ~Transfers %damage% from %theSource% %toTheTarget%~ // reprise de @10120005
+@20120123 = ~to transfer %damage% from %theSource% %toTheTarget%~ // reprise de @10120015
 @20120130 = ~Change %theTarget%'s hit points to %damage%~ // reprise de @10120006
 @20120131 = ~Change %theTarget%'s hit points to %damage%~ // reprise de @10120006
 @20120132 = ~to change %theTarget%'s hit points to %damage%~ // reprise de @10120016
@@ -2239,10 +2243,14 @@
 @20400102 = ~of slowing %theTarget%~ // reprise de @10400002
 @20400103 = ~of slowing %theTarget%~ // reprise de @10400002
 
-// Opcode 42 : phrases (20 420 100-20 420 999)
+// Opcode 42 : phrases (20 420 100-20 420 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20420100 = ~Can memorise an extra %levelStr% level wizard spell~ // reprise de @10420001
 @20420110 = ~Can memorise %amount% extra %levelStr% level wizard spell~ // reprise de @10420002
 @20420120 = ~Remove a of %levelStr% level wizard spell~ // reprise de @10420003
+@20420130 = ~Removes %amount% %levelStr% level wizard spell slots~ // reprise de @10420004
+@20420131 = ~Removes %amount% %levelStr% level wizard spell slots~ // reprise de @10420004
+@20420132 = ~to remove %amount% %levelStr% level wizard spell slots~ // reprise de @10420014
+@20420133 = ~to remove %amount% %levelStr% level wizard spell slots~ // reprise de @10420014
 @20420140 = ~Double the amount of %levelStr% level wizard spells that can be memorized~ // reprise de @10420005
 
 // Opcode 43 : Soin : pétrification (20 430 000-20 430 999)
@@ -2323,10 +2331,14 @@
 @20600111 = ~%percent% chance of spellcasting failure (%spellType%) for %theTarget%~ // reprise de @10600004
 @20600113 = ~of causing %percent% chance of spellcasting failure (%spellType%) for %theTarget%~ // reprise de @10600006
 
-// Opcode 62 : phrases (20 620 100-20 620 999)
+// Opcode 62 : phrases (20 620 100-20 620 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20620100 = ~Can memorise an extra %levelStr% level %spellType% spell~ // reprise de @10620001
 @20620110 = ~Can memorise %amount% extra %levelStr% level %spellType% spell~ // reprise de @10620002
 @20620120 = ~Remove a %spellType% spell of %levelStr% level~ // reprise de @10620003
+@20620130 = ~Removes %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620004
+@20620131 = ~Removes %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620004
+@20620132 = ~to remove %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620014
+@20620133 = ~to remove %amount% %levelStr% level %spellType% spell slots~ // reprise de @10620014
 @20620140 = ~Double the amount of %spellType% spells of %levelStr% level that can be memorized~ // reprise de @10620005
 
 // Opcode 63 : Infravision (20 630 000-20 630 999)
@@ -2335,7 +2347,7 @@
 @20630102 = ~to grant infravision~ // reprise de @10630021
 @20630103 = ~to grant infravision %toTheTarget% ~ // reprise de @10630031
 
-// Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures) (20 670 000-20 670 999)
+// Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures), 0200 + 10 x variante pour une créature sans nom (20 670 000-20 670 999)
 @20670020 = ~~ // reprise de @10670020
 @20670021 = ~~ // reprise de @10670021
 @20670100 = ~Summon a %creatureName%~ // reprise de @10670001
@@ -2370,6 +2382,38 @@
 @20670171 = ~Summon %amount% neutral %creatureName%~ // reprise de @10670016
 @20670172 = ~to summon %amount% neutral %creatureName%~ // reprise de @10670018
 @20670173 = ~to summon %amount% neutral %creatureName%~ // reprise de @10670018
+@20670200 = ~Summon a creature~ // reprise de @10670031
+@20670201 = ~Summon a creature~ // reprise de @10670031
+@20670202 = ~to summon a creature~ // reprise de @10670033
+@20670203 = ~to summon a creature~ // reprise de @10670033
+@20670210 = ~Summon a hostile creature~ // reprise de @10670032
+@20670211 = ~Summon a hostile creature~ // reprise de @10670032
+@20670212 = ~to summon a hostile creature~ // reprise de @10670034
+@20670213 = ~to summon a hostile creature~ // reprise de @10670034
+@20670220 = ~Summon an allied creature~ // reprise de @10670035
+@20670221 = ~Summon an allied creature~ // reprise de @10670035
+@20670222 = ~to summon an allied creature~ // reprise de @10670037
+@20670223 = ~to summon an allied creature~ // reprise de @10670037
+@20670230 = ~Summon a neutral creature~ // reprise de @10670036
+@20670231 = ~Summon a neutral creature~ // reprise de @10670036
+@20670232 = ~to summon a neutral creature~ // reprise de @10670038
+@20670233 = ~to summon a neutral creature~ // reprise de @10670038
+@20670240 = ~Summon %amount% creatures~ // reprise de @10670041
+@20670241 = ~Summon %amount% creatures~ // reprise de @10670041
+@20670242 = ~to summon %amount% creatures~ // reprise de @10670043
+@20670243 = ~to summon %amount% creatures~ // reprise de @10670043
+@20670250 = ~Summon %amount% hostile creatures~ // reprise de @10670042
+@20670251 = ~Summon %amount% hostile creatures~ // reprise de @10670042
+@20670252 = ~to summon %amount% hostile creatures~ // reprise de @10670044
+@20670253 = ~to summon %amount% hostile creatures~ // reprise de @10670044
+@20670260 = ~Summon %amount% allied creatures~ // reprise de @10670045
+@20670261 = ~Summon %amount% allied creatures~ // reprise de @10670045
+@20670262 = ~to summon %amount% allied creatures~ // reprise de @10670047
+@20670263 = ~to summon %amount% allied creatures~ // reprise de @10670047
+@20670270 = ~Summon %amount% neutral creatures~ // reprise de @10670046
+@20670271 = ~Summon %amount% neutral creatures~ // reprise de @10670046
+@20670272 = ~to summon %amount% neutral creatures~ // reprise de @10670048
+@20670273 = ~to summon %amount% neutral creatures~ // reprise de @10670048
 
 // Opcode 68 : Renvoi d'une créature invoquée : phrases 0100, pas de forme « soi » probable, comme dans l'ancien moteur (20 680 000-20 680 999)
 @20680100 = ~Unsummon %theTarget% if it is a summoned creature~ // reprise de @10680001
@@ -3599,13 +3643,16 @@
 @22700102 = ~to release %theTarget%~ // reprise de @12700002
 @22700103 = ~to release %theTarget%~ // reprise de @12700002
 
-// Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
+// Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures), 0020-0022 fréquences d'un effet probable, écrites après l'effet (22 720 000-22 720 099)
 @22720010 = ~At each %strDuration%~ // reprise de @12720010
 @22720011 = ~Every %strDuration%~ // reprise de @12720011
 @22720012 = ~Every %strDuration%~ // reprise de @12720012
 @22720013 = ~%amount% times per %strDuration%~ // reprise de @12720013
 @22720014 = ~%amount% times every %strDuration%~ // reprise de @12720014
 @22720015 = ~%amount% times every %strDuration%~ // reprise de @12720015
+@22720020 = ~at each %strDuration%~ // reprise de @12720020
+@22720021 = ~every %strDuration%~ // reprise de @12720021
+@22720022 = ~every %strDuration%~ // reprise de @12720022
 
 // Opcode 273 : Dispersion des nuages : phrases 0100 (22 730 000-22 730 999)
 @22730100 = ~Zone of Sweet Air~ // reprise de @12730001

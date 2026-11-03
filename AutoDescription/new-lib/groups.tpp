@@ -334,8 +334,8 @@ END
 
 // Immunités par niveau de sort (ancien opcode_102_group, opcode virtuel 509) : les 102 d'une même
 // portée, aux mêmes champs (ad_op_102_support), sont réunis dans le premier, qui reçoit le masque
-// des niveaux (fx_spell_levels) ; il absorbe les immunités à un sort (206) de sa portée dont le
-// niveau est réuni ; pour les neuf niveaux (ancien opcode_509_post_group),
+// des niveaux (fx_spell_levels) ; il absorbe les immunités à un sort (206) de sa portée dont il
+// bloque tous les effets (ad_spell_effects_powers) ; pour les neuf niveaux (ancien opcode_509_post_group),
 // aussi les immunités à une école ou un type secondaire de sort (204, 205) de même cible, puissance,
 // résistance, probabilités, dés et jet de sauvegarde.
 DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
@@ -360,9 +360,8 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
 					PATCH_IF group_other_opcode == 206 BEGIN
 						SPRINT group_spell $fx_resource(~%group_candidate%~)
-						LPF ad_spell_level STR_VAR resref = ~%group_spell%~ RET group_spell_level = level END
-						PATCH_IF group_spell_level >= 0 AND group_spell_level <= 9
-								AND (group_mask BAND (group_spell_level == 0 ? AD_SPELL_LEVEL_ZERO : 1 << (group_spell_level - 1))) != 0 BEGIN
+						LPF ad_spell_effects_powers STR_VAR resref = ~%group_spell%~ RET group_spell_powers = mask END
+						PATCH_IF group_spell_powers != 0 AND (group_spell_powers BAND (BNOT group_mask)) == 0 BEGIN
 							SET $fx_consumed(~%group_candidate%~) = 1
 						END
 					END

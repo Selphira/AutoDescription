@@ -7,9 +7,11 @@
 // ligne ; la ligne prend le rang de l'opcode de l'EFF (ancien get_res_description).
 
 // parameter2 hors de 0, 2, 3, et aucune application (parameter2 0 ou 2, parameter1 nul) : écartés et
-// journalisés. Refus : effet d'un EFF de type 4 (nombre parameter3) ou de parameter4 non nul sur EE
-// (multiplicateur de la fréquence), que l'ancien moteur y lit ; effet probable ; plusieurs lignes ;
-// refus de ad_recursion_support.
+// journalisés. La probabilité d'un effet probable est tirée une fois, quand il s'applique, pour toutes
+// ses répétitions : elle passe à l'effet de l'EFF, suivi de la fréquence. Refus : effet d'un EFF de
+// type 4 (nombre parameter3) ou de parameter4 non nul sur EE (multiplicateur de la fréquence), que
+// l'ancien moteur y lit ; effet probable d'équipement répété chaque round, dont la fréquence est tue ;
+// plusieurs lignes ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 	PHP_EACH fx_ids_272 AS _ => repeat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%repeat_id%~) BEGIN
@@ -31,11 +33,14 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 				SPRINT ignored_message ~frequency of 0 or less~
 				LPM ad_application_drop
 			END
-			ELSE PATCH_IF $fx_probability(~%repeat_id%~) < 100 BEGIN
-				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:probability~ message = ~probable effect~ RET render_missing = refusal END
-			END
 			ELSE BEGIN
 				LPM ad_op_272_condition
+			END
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%repeat_id%~) AND repeat_probable AND repeat_hide BEGIN
+				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:probability~ message = ~probable equipped effect repeated each round, whose frequency is not written~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%repeat_id%~) BEGIN
+				SET recursion_probability = repeat_probable
 				SET recursion_fx = repeat_id
 				SPRINT recursion_resref ~%repeat_resref%~
 				SPRINT recursion_kind ~eff~
@@ -58,8 +63,10 @@ END
 // Condition de l'effet repeat_id (ancien opcode_272_condition) : $fx_condition_text, et repeat_hide
 // pour un effet d'équipement répété chaque round. Une fois par intervalle : « À chaque round », sinon
 // « Toutes les 3 secondes » ; plusieurs fois : « 2 fois par seconde », « 2 fois tous les 2 rounds » ;
-// « toutes » pour les secondes et les heures (accord de l'ancien moteur).
+// « toutes » pour les secondes et les heures (accord de l'ancien moteur). Effet probable
+// (repeat_probable) : fréquence en minuscules, écrite après l'effet de l'EFF.
 DEFINE_PATCH_MACRO ad_op_272_condition BEGIN
+	SET repeat_probable = $fx_probability(~%repeat_id%~) < 100
 	SET amount = repeat_type == 2 ? repeat_value : 1
 	SET repeat_seconds = repeat_type == 3 ? repeat_value : 1
 	PATCH_IF repeat_seconds < 1 BEGIN
@@ -92,10 +99,11 @@ DEFINE_PATCH_MACRO ad_op_272_condition BEGIN
 		SET repeat_hide = 1
 	END
 	ELSE PATCH_IF amount == 1 AND repeat_unit_amount == 1 BEGIN
-		SPRINT condition_text @22720010 // ~À chaque %strDuration%~
+		SET repeat_tra = repeat_probable ? 22720020 : 22720010
+		LPF ad_tra INT_VAR tra_id = repeat_tra RET condition_text = text END // ~À chaque %strDuration%~
 	END
 	ELSE PATCH_IF amount == 1 BEGIN
-		SET repeat_tra = repeat_feminine ? 22720011 : 22720012
+		SET repeat_tra = (repeat_feminine ? 22720011 : 22720012) + (repeat_probable ? 10 : 0)
 		LPF ad_tra INT_VAR tra_id = repeat_tra RET condition_text = text END // ~Toutes les %strDuration%~
 	END
 	ELSE PATCH_IF repeat_unit_amount == 1 BEGIN
@@ -121,6 +129,12 @@ DEFINE_PATCH_MACRO ad_op_272_lines BEGIN
 				SPRINT line_condition ~%line_condition% %app_duration_text%~
 			END
 			SPRINT line_text $fx_sub_text(~%repeat_id%~)
+			// La virgule sépare la fréquence de la durée propre à l'effet de l'EFF (« pendant 7 secondes,
+			// à chaque round pendant 1 heure »).
+			PATCH_IF $fx_probability(~%repeat_id%~) < 100 BEGIN
+				SPRINT line_text ~%line_text%, %line_condition%~
+				SPRINT line_condition ~~
+			END
 			SET line_any_form = 1
 			SET line_no_duration = 1
 			LPM ad_effect_line

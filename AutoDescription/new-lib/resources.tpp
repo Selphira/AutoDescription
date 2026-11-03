@@ -338,20 +338,55 @@ BEGIN
 	END
 END
 
-// Niveau du sort resref (champ du fichier lu sur quatre octets, comme l'ancien moteur) ; 0 - 1 si le
-// sort n'existe pas.
-DEFINE_PATCH_FUNCTION ad_spell_level
+// Niveaux d'immunité (opcode 102) qui bloquent le sort resref, en masque (0 : sort absent). L'opcode
+// 102 bloque les effets dont la puissance est égale au niveau (IESDP) : le niveau 1 à 9 d'un sort en
+// tient lieu (ses effets techniques de puissance 0, 146 ou 321, ne comptent pas) ; un niveau 0 ou au-delà
+// de 9 n'en dit rien (SPWISH27 : niveau 0, effets de puissance 9), les puissances de ses effets (en-têtes
+// et lancement) sont lues : AD_SPELL_LEVEL_ZERO pour 0, BIT10 au-delà de 9 (aucun niveau ne la bloque) ;
+// sans effet, niveau 0.
+DEFINE_PATCH_FUNCTION ad_spell_effects_powers
 	STR_VAR
 		resref = ~~
 	RET
-		level
+		mask
 BEGIN
-	SET level = 0 - 1
+	SET mask = 0
+	SET powers_level = 0 - 1
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-			PATCH_IF BUFFER_LENGTH >= SPL_level + 4 BEGIN
-				READ_LONG SPL_level level
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG  SPL_level                         powers_level
+				READ_LONG  SPL_feature_blocks_offset         powers_table
+				READ_LONG  SPL_extended_headers_offset       powers_headers
+				READ_SHORT SPL_extended_headers_count        powers_header_count
+				READ_SHORT SPL_casting_feature_blocks_offset powers_index
+				READ_SHORT SPL_casting_feature_blocks_count  powers_count
+				LPM ad_spell_effects_powers_block
+				FOR (powers_h = 0; powers_h < powers_header_count; ++powers_h) BEGIN
+					SET powers_header = powers_headers + powers_h * 0x28
+					PATCH_IF powers_header >= 0 AND powers_header + 0x28 <= BUFFER_LENGTH BEGIN
+						READ_SHORT (powers_header + SPL_HEAD_feature_blocks_count)  powers_count
+						READ_SHORT (powers_header + SPL_HEAD_feature_blocks_offset) powers_index
+						LPM ad_spell_effects_powers_block
+					END
+				END
 			END
+		END
+	END
+	PATCH_IF powers_level >= 1 AND powers_level <= 9 BEGIN
+		SET mask = 1 << (powers_level - 1)
+	END
+	ELSE PATCH_IF mask == 0 AND powers_level >= 0 BEGIN
+		SET mask = AD_SPELL_LEVEL_ZERO
+	END
+END
+
+DEFINE_PATCH_MACRO ad_spell_effects_powers_block BEGIN
+	FOR (powers_k = 0; powers_k < powers_count; ++powers_k) BEGIN
+		SET powers_offset = powers_table + (powers_index + powers_k) * 0x30
+		PATCH_IF powers_offset >= 0 AND powers_offset + 0x30 <= BUFFER_LENGTH BEGIN
+			READ_BYTE (powers_offset + EFF_power) powers_value
+			SET mask = mask BOR (powers_value == 0 ? AD_SPELL_LEVEL_ZERO : (powers_value <= 9 ? 1 << (powers_value - 1) : BIT10))
 		END
 	END
 END

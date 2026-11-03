@@ -8,8 +8,8 @@
 // la probabilité près (ancien opcode_67_group) : chacune compte pour une créature de plus au plus,
 // « Invoque entre 2 et 5 « Rat » » (fx_summon_random).
 // Créature absente : aucune ligne (fx_summon_missing), erreur journalisée ; l'en-tête d'un sort compte
-// l'effet (sa durée), comme l'ancien moteur.
-// Refus : créature sans nom (aucune ligne).
+// l'effet (sa durée), comme l'ancien moteur. Créature sans nom : invocation décrite sans nom
+// (« Invoque 1 créature »), cas journalisé.
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -17,11 +17,20 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance
 				summon_level = level END
-			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ BEGIN
-				PATCH_IF FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = summon_id STR_VAR reason = ~not_implemented:opcode67:no_name~ message = ~creature %summon_resref%.CRE has no name~ RET render_missing = refusal END
-				END
-				ELSE PATCH_IF NOT support_header_only BEGIN
+			SET summon_unnamed = 0
+			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
+				SET summon_unnamed = 1
+			END
+			SET $fx_creature_unnamed(~%summon_id%~) = summon_unnamed
+			PATCH_IF summon_unnamed AND NOT support_header_only BEGIN
+				SET ignored_fx = summon_id
+				SPRINT ignored_reason ~file_error:opcode67:no_name~
+				SPRINT ignored_message ~creature %summon_resref%.CRE has no name, described as a creature~
+				SPRINT ignored_consequence ~kept~
+				LPM ad_log_ignored
+			END
+			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND NOT summon_unnamed BEGIN
+				PATCH_IF NOT support_header_only BEGIN
 					SET $fx_summon_missing(~%summon_id%~) = 1
 					SET ignored_fx = summon_id
 					SPRINT ignored_reason ~file_error:opcode67:missing_creature~
@@ -61,8 +70,8 @@ DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 	END
 END
 
-// Phrase : 20 670 100 + 10 × variante + forme ; variante = côté (0 selon le lanceur, 1 hostile,
-// 2 allié, 3 neutre), + 4 pour plusieurs créatures.
+// Phrase : 20 670 100 (20 670 200 pour une créature sans nom) + 10 × variante + forme ; variante =
+// côté (0 selon le lanceur, 1 hostile, 2 allié, 3 neutre), + 4 pour plusieurs créatures.
 DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~67~)
@@ -90,7 +99,7 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 				SET creatureLevel = $fx_creature_level(~%summon_id%~)
 				LPF ad_tra INT_VAR tra_id = creatureLevel == 1 ? 20670020 : 20670021 RET lifeDice = text END // ~ de 1 dé de vie~
 			END
-			SET line_phrase = 20670100 + 10 * ($fx_creature_side(~%summon_id%~) + ((summon_random > 0 OR amount > 1) ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
+			SET line_phrase = ($fx_creature_unnamed(~%summon_id%~) ? 20670200 : 20670100) + 10 * ($fx_creature_side(~%summon_id%~) + ((summon_random > 0 OR amount > 1) ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
 			SET line_fx = summon_id
 			LPM ad_effect_line
 		END

@@ -1994,8 +1994,10 @@
 @20110102 = ~de neutraliser les poisons infectant %theTarget%~ // reprise de @10110003
 @20110103 = ~de neutraliser les poisons infectant %theTarget%~ // reprise de @10110003
 
-// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
 @20120001 = ~%damage% %damageType%~ // reprise de @102166
+@20120002 = ~point de vie~ // reprise de @600170
+@20120003 = ~points de vie~ // reprise de @600171
 @20120010 = ~points de dégâts~ // reprise de @101092
 @20120020 = ~points de dégâts contondants~ // reprise de @10120020
 @20120021 = ~points de dégâts d'acide~ // reprise de @10120021
@@ -2020,6 +2022,8 @@
 @20120102 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120011
 @20120103 = ~d'infliger %damage% %toTheTarget%~ // reprise de @10120012
 @20120111 = ~Draine %damage% %toTheTarget%~ // reprise de @10120004
+@20120121 = ~Transfère %damage% %ofTheSource% %toTheTarget%~ // reprise de @10120005
+@20120123 = ~de transférer %damage% %ofTheSource% %toTheTarget%~ // reprise de @10120015
 @20120130 = ~Passe les points de vie %ofTheTarget% à %damage%~ // reprise de @10120006
 @20120131 = ~Passe les points de vie %ofTheTarget% à %damage%~ // reprise de @10120006
 @20120132 = ~de faire passer les points de vie %ofTheTarget% à %damage%~ // reprise de @10120016
@@ -2239,10 +2243,14 @@
 @20400102 = ~d'infliger lenteur %toTheTarget%~ // reprise de @10400002
 @20400103 = ~d'infliger lenteur %toTheTarget%~ // reprise de @10400002
 
-// Opcode 42 : phrases (20 420 100-20 420 999)
+// Opcode 42 : phrases (20 420 100-20 420 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20420100 = ~Permet de mémoriser un sort profane supplémentaire de %levelStr% niveau~ // reprise de @10420001
 @20420110 = ~Permet de mémoriser %amount% sorts profanes supplémentaires de %levelStr% niveau~ // reprise de @10420002
 @20420120 = ~Suppression d'un sort profane de %levelStr% niveau~ // reprise de @10420003
+@20420130 = ~Retire %amount% emplacements de sorts profanes de %levelStr% niveau~ // reprise de @10420004
+@20420131 = ~Retire %amount% emplacements de sorts profanes de %levelStr% niveau~ // reprise de @10420004
+@20420132 = ~de retirer %amount% emplacements de sorts profanes de %levelStr% niveau~ // reprise de @10420014
+@20420133 = ~de retirer %amount% emplacements de sorts profanes de %levelStr% niveau~ // reprise de @10420014
 @20420140 = ~Double la quantité de sorts profanes mémorisables de %levelStr% niveau~ // reprise de @10420005
 
 // Opcode 43 : Soin : pétrification (20 430 000-20 430 999)
@@ -2323,10 +2331,14 @@
 @20600111 = ~Provoque l'échec de %percent% des sorts %spellType% lancés par %theTarget%~ // reprise de @10600004
 @20600113 = ~de provoquer l'échec de %percent% des sorts %spellType% lancés par %theTarget%~ // reprise de @10600006
 
-// Opcode 62 : phrases (20 620 100-20 620 999)
+// Opcode 62 : phrases (20 620 100-20 620 999) : 0100 un emplacement, 0110 plusieurs, 0120 un retiré, 0130 plusieurs retirés, 0140 doublement
 @20620100 = ~Permet de mémoriser un sort %spellType% supplémentaire de %levelStr% niveau~ // reprise de @10620001
 @20620110 = ~Permet de mémoriser %amount% sorts %spellType% supplémentaires de %levelStr% niveau~ // reprise de @10620002
 @20620120 = ~Suppression d'un sort %spellType% de %levelStr% niveau~ // reprise de @10620003
+@20620130 = ~Retire %amount% emplacements de sorts %spellType% de %levelStr% niveau~ // reprise de @10620004
+@20620131 = ~Retire %amount% emplacements de sorts %spellType% de %levelStr% niveau~ // reprise de @10620004
+@20620132 = ~de retirer %amount% emplacements de sorts %spellType% de %levelStr% niveau~ // reprise de @10620014
+@20620133 = ~de retirer %amount% emplacements de sorts %spellType% de %levelStr% niveau~ // reprise de @10620014
 @20620140 = ~Double la quantité de sorts %spellType% mémorisables de %levelStr% niveau~ // reprise de @10620005
 
 // Opcode 63 : Infravision (20 630 000-20 630 999)
@@ -2335,7 +2347,7 @@
 @20630102 = ~d'octroyer la capacité d'infravision~ // reprise de @10630021
 @20630103 = ~d'octroyer la capacité d'infravision %toTheTarget% ~ // reprise de @10630031
 
-// Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures) (20 670 000-20 670 999)
+// Opcode 67 : Invocation : phrases 0100 + 10 x variante (0 allégeance du lanceur, 1 hostile, 2 alliée, 3 neutre ; + 4 plusieurs créatures), 0200 + 10 x variante pour une créature sans nom (20 670 000-20 670 999)
 @20670020 = ~ de 1 dé de vie~ // reprise de @10670020
 @20670021 = ~ de %creatureLevel% dés de vie~ // reprise de @10670021
 @20670100 = ~Invoque 1 « %creatureName% »%lifeDice%~ // reprise de @10670001
@@ -2370,6 +2382,38 @@
 @20670171 = ~Invoque %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670016
 @20670172 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
 @20670173 = ~d'invoquer %amount% « %creatureName% » neutres%lifeDice%~ // reprise de @10670018
+@20670200 = ~Invoque 1 créature%lifeDice%~ // reprise de @10670031
+@20670201 = ~Invoque 1 créature%lifeDice%~ // reprise de @10670031
+@20670202 = ~d'invoquer 1 créature%lifeDice%~ // reprise de @10670033
+@20670203 = ~d'invoquer 1 créature%lifeDice%~ // reprise de @10670033
+@20670210 = ~Invoque 1 créature hostile%lifeDice%~ // reprise de @10670032
+@20670211 = ~Invoque 1 créature hostile%lifeDice%~ // reprise de @10670032
+@20670212 = ~d'invoquer 1 créature hostile%lifeDice%~ // reprise de @10670034
+@20670213 = ~d'invoquer 1 créature hostile%lifeDice%~ // reprise de @10670034
+@20670220 = ~Invoque 1 créature alliée%lifeDice%~ // reprise de @10670035
+@20670221 = ~Invoque 1 créature alliée%lifeDice%~ // reprise de @10670035
+@20670222 = ~d'invoquer 1 créature alliée%lifeDice%~ // reprise de @10670037
+@20670223 = ~d'invoquer 1 créature alliée%lifeDice%~ // reprise de @10670037
+@20670230 = ~Invoque 1 créature neutre%lifeDice%~ // reprise de @10670036
+@20670231 = ~Invoque 1 créature neutre%lifeDice%~ // reprise de @10670036
+@20670232 = ~d'invoquer 1 créature neutre%lifeDice%~ // reprise de @10670038
+@20670233 = ~d'invoquer 1 créature neutre%lifeDice%~ // reprise de @10670038
+@20670240 = ~Invoque %amount% créatures%lifeDice%~ // reprise de @10670041
+@20670241 = ~Invoque %amount% créatures%lifeDice%~ // reprise de @10670041
+@20670242 = ~d'invoquer %amount% créatures%lifeDice%~ // reprise de @10670043
+@20670243 = ~d'invoquer %amount% créatures%lifeDice%~ // reprise de @10670043
+@20670250 = ~Invoque %amount% créatures hostiles%lifeDice%~ // reprise de @10670042
+@20670251 = ~Invoque %amount% créatures hostiles%lifeDice%~ // reprise de @10670042
+@20670252 = ~d'invoquer %amount% créatures hostiles%lifeDice%~ // reprise de @10670044
+@20670253 = ~d'invoquer %amount% créatures hostiles%lifeDice%~ // reprise de @10670044
+@20670260 = ~Invoque %amount% créatures alliées%lifeDice%~ // reprise de @10670045
+@20670261 = ~Invoque %amount% créatures alliées%lifeDice%~ // reprise de @10670045
+@20670262 = ~d'invoquer %amount% créatures alliées%lifeDice%~ // reprise de @10670047
+@20670263 = ~d'invoquer %amount% créatures alliées%lifeDice%~ // reprise de @10670047
+@20670270 = ~Invoque %amount% créatures neutres%lifeDice%~ // reprise de @10670046
+@20670271 = ~Invoque %amount% créatures neutres%lifeDice%~ // reprise de @10670046
+@20670272 = ~d'invoquer %amount% créatures neutres%lifeDice%~ // reprise de @10670048
+@20670273 = ~d'invoquer %amount% créatures neutres%lifeDice%~ // reprise de @10670048
 
 // Opcode 68 : Renvoi d'une créature invoquée : phrases 0100, pas de forme « soi » probable, comme dans l'ancien moteur (20 680 000-20 680 999)
 @20680100 = ~Renvoie %theTarget% s'il s'agit d'une créature invoquée~ // reprise de @10680001
@@ -3599,13 +3643,16 @@
 @22700102 = ~de défiger %theTarget%~ // reprise de @12700002
 @22700103 = ~de défiger %theTarget%~ // reprise de @12700002
 
-// Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures) (22 720 000-22 720 099)
+// Opcode 272 : effet répété : 0010-0015 fréquences (0011 et 0014 : secondes et heures), 0020-0022 fréquences d'un effet probable, écrites après l'effet (22 720 000-22 720 099)
 @22720010 = ~À chaque %strDuration%~ // reprise de @12720010
 @22720011 = ~Toutes les %strDuration%~ // reprise de @12720011
 @22720012 = ~Tous les %strDuration%~ // reprise de @12720012
 @22720013 = ~%amount% fois par %strDuration%~ // reprise de @12720013
 @22720014 = ~%amount% fois toutes les %strDuration%~ // reprise de @12720014
 @22720015 = ~%amount% fois tous les %strDuration%~ // reprise de @12720015
+@22720020 = ~à chaque %strDuration%~ // reprise de @12720020
+@22720021 = ~toutes les %strDuration%~ // reprise de @12720021
+@22720022 = ~tous les %strDuration%~ // reprise de @12720022
 
 // Opcode 273 : Dispersion des nuages : phrases 0100 (22 730 000-22 730 999)
 @22730100 = ~Disperse les nuages dans la zone d'effet~ // reprise de @12730001
