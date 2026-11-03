@@ -3140,7 +3140,8 @@ DEFINE_PATCH_MACRO ~opcode_42_group~ BEGIN
 				END
 			END
 			ELSE BEGIN
-				PATCH_IF match_parameter1 == searchP1 AND match_parameter2 >= 1 AND match_parameter2 <= 256 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
+				// Un niveau déjà réuni n'est pas fusionné, les emplacements des deux effets se cumulent, chacun garde sa ligne.
+				PATCH_IF match_parameter1 == searchP1 AND match_parameter2 >= 1 AND match_parameter2 <= 256 AND (match_parameter2 BAND newP2) == 0 AND match_probability1 == probability1 AND match_probability2 == probability2 AND NOT VARIABLE_IS_SET $positions_already_check(~%match_position%~) BEGIN
 					// On retire l'opcode de ceux à checker dans les futures itérations
 					SET $positions_already_check(~%match_position%~) = 1
 					// On ajoute l'opcode courant à ceux qui seront désactivés
@@ -5434,6 +5435,7 @@ DEFINE_PATCH_MACRO ~opcode_101_group~ BEGIN
 					INT_VAR opcode = 79
 				        match_probability1 = probability1
 				        match_probability2 = probability2
+				        match_target       = target
 					STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_target~
 					RET $opcodes(~79~) = count
 					RET_ARRAY EVAL ~opcodes_79~ = opcodes_xx
@@ -5819,14 +5821,20 @@ END
 DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
 	PATCH_IF shrink_cure_with_immunities AND (abilityType == AbilityType_Equipped OR abilityType < 0
 			OR (VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion)) BEGIN
+		// Une protection contre un projectile (83) n'est sans objet que pour le projectile voulu (parameter2).
+		SPRINT cureMatchMacro ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
+		PATCH_IF opcode == 83 BEGIN
+			SPRINT cureMatchMacro ~opcode_match_parameter2_and_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
+		END
 		LPF ~delete_opcode~
 			INT_VAR opcode
+				match_parameter2 = parameter2
 				match_probability1 = probability1
 				match_probability2 = probability2
 				match_target = target
 				match_saveType = saveType
 				match_saveBonus = saveBonus
-			STR_VAR match_macro = ~opcode_match_probability1_and_probability2_and_saveBonus_and_saveType_and_target~
+			STR_VAR match_macro = ~%cureMatchMacro%~
 			RET $opcodes(~%opcode%~) = count
 			RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 		END
@@ -6089,11 +6097,12 @@ DEFINE_PATCH_MACRO ~opcode_self_106~ BEGIN
 			SPRINT description @11060005 // ~Le point de rupture de moral %ofTheTarget% passe à %value%~
 		END
 	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+		LPF ~percent_value~ INT_VAR value = parameter1 RET value END
+		SPRINT description @11060011 // ~Le point de rupture de moral %ofTheTarget% passe à %value% de sa valeur~
+	END
 	ELSE BEGIN
 		SET value = ABS parameter1
-		PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-			LPF ~percent_value~ INT_VAR value RET value END
-		END
 		PATCH_IF parameter1 < 0 BEGIN
 			SPRINT description @11060002 // ~Le moral %ofTheTarget% est renforcé de %value%~
 		END
@@ -6122,11 +6131,12 @@ DEFINE_PATCH_MACRO ~opcode_self_probability_106~ BEGIN
 			SPRINT description @11060010 // ~de faire passer le point de rupture de moral %ofTheTarget% à %value%~
 		END
 	END
+	ELSE PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
+		LPF ~percent_value~ INT_VAR value = parameter1 RET value END
+		SPRINT description @11060012 // ~de faire passer le point de rupture de moral %ofTheTarget% à %value% de sa valeur~
+	END
 	ELSE BEGIN
 		SET value = ABS parameter1
-		PATCH_IF parameter2 == MOD_TYPE_percentage BEGIN
-			LPF ~percent_value~ INT_VAR value RET value END
-		END
 		PATCH_IF parameter1 < 0 BEGIN
 			SPRINT description @11060007 // ~de renforcer le moral %ofTheTarget% de %value%~
 		END
@@ -7723,8 +7733,8 @@ DEFINE_PATCH_MACRO ~opcode_143_common~ BEGIN
 	//  Note: When using a non-permanent timing mode, it applies a delayed opcode #123 effect based on the duration, but with an empty resource field, resulting in nothing being removed.
 	PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_while_equipped OR timingMode == TIMING_delayed_duration OR
 			 timingMode == 5 OR timingMode == 6 OR timingMode == 8 OR timingMode == TIMING_duration_ticks OR timingMode == TIMING_absolute_duration BEGIN 
-		timingMode = TIMING_permanent
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode% : non-permanent timing mode (%timingMode%) are permanent (bug).~ END
+		timingMode = TIMING_permanent
 	END
 END
 
@@ -12118,10 +12128,7 @@ DEFINE_PATCH_MACRO ~opcode_233_is_valid~ BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: No change detected. Proficiency %stat% += 0~ END
 	END
-	// FIXME: pas commun de voir cet appel dans is_valid, d'autant plus qu'il est à nouveau appelé dans les autres méthodes
-	LPM ~opcode_233_common~
-
-	PATCH_IF NOT VARIABLE_IS_SET $tra_proficiencies(~%parameter2%~) BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET $tra_proficiencies(~%stat%~) BEGIN
 		SET isValid = 0
 	END
 END
@@ -12130,12 +12137,12 @@ END
  * Spell Effect: Wing Buffet [235] *
  * ------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_235~ BEGIN
-	LOCAL_SET strref = 12350001 // ~Repousse %theTarget% à %range% de l'endroit visé~
+	LOCAL_SET strref = 12350001 // ~Repousse %theTarget% loin de l'endroit visé~
 	LPM ~opcode_235_common~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_235~ BEGIN
-	LOCAL_SET strref = 12350005 // ~de repousser %theTarget% à %range% %ofTheSource%~
+	LOCAL_SET strref = 12350005 // ~de repousser %theTarget% loin de l'endroit visé~
 	LPM ~opcode_235_common~
 END
 
@@ -12149,7 +12156,6 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_235_common~ BEGIN
 	SET strref += parameter2 > 4 OR parameter2 < 1 ? 0 : parameter2 - 1
-    LPF ~feets_to_meters~ INT_VAR range = parameter1 RET range = rangeToMeter END
 	SPRINT description (AT strref)
 END
 
@@ -16814,6 +16820,9 @@ DEFINE_PATCH_MACRO ~opcode_self_522~ BEGIN
 	PATCH_IF parameter2 == 100 BEGIN
 		SPRINT parameter2 ~00~
 	END
+	ELSE PATCH_IF parameter2 > 0 AND parameter2 < 10 BEGIN
+		SPRINT parameter2 ~0%parameter2%~
+	END
 	SPRINT value ~%parameter1%/%parameter2%~
 	SPRINT value @10010 // ~Passe à %value%~
 	SPRINT description @100001 // ~%name%%colon%%value%~
@@ -16838,6 +16847,10 @@ DEFINE_PATCH_MACRO ~opcode_522_common~ BEGIN
 	LOCAL_SPRINT value ~~
 	PATCH_IF parameter2 == 100 BEGIN
 		SPRINT parameter2 ~00~
+	END
+	// Toujours sur deux chiffres, comme dans le jeu : « 18/05 ».
+	ELSE PATCH_IF parameter2 > 0 AND parameter2 < 10 BEGIN
+		SPRINT parameter2 ~0%parameter2%~
 	END
 	SPRINT value ~%parameter1%/%parameter2%~
 	SPRINT description (AT strref)

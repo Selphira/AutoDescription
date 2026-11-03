@@ -46,7 +46,7 @@ BEGIN
 
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
 			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~ ~%depletion%~) = 1
 
 			SET countHeaders += 1
 		END
@@ -55,7 +55,7 @@ BEGIN
 			SET EVAL ~countLines%countHeaders%~ = 0
 			LPF ~load_weapon_attributes~ INT_VAR headerOffset RET_ARRAY EVAL ~weaponAttributes%countHeaders%~ = attributes END
 			LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~ ~%depletion%~) = 1
 			SET countHeaders += 1
 		END
 		// Les cas où on a une capacité de charge qui diminue à chaque attaque (Ex: BG2 => STAF05)
@@ -66,7 +66,7 @@ BEGIN
 			PATCH_IF charges == 0 BEGIN
 				LPF ~load_combat_abilities~ INT_VAR headerOffset RET EVAL ~countLines%countHeaders%~ = countLines RET_ARRAY EVAL ~lines%countHeaders%~ = lines END
 			END
-			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~) = 1
+			SET $EVAL ~headers%countHeaders%~(~%attackType%~ ~%location%~ ~%headerIndex%~ ~%charges%~ ~%flags%~ ~%depletion%~) = 1
 			SET countHeaders += 1
 		END
 
@@ -81,6 +81,7 @@ BEGIN
 		PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 			SET attackType = ~%data_0%~
 			SET charges = ~%data_3%~
+			SET depletion = ~%data_5%~
 
 			PATCH_IF attackType == ITM_ATTACK_TYPE_projectile AND (charges == 0 OR (depletion >= 3 AND charges == 1 AND isAmmo)) BEGIN
 				PATCH_IF isAmmo BEGIN
@@ -114,30 +115,29 @@ BEGIN
 		FOR (index = 0; index < countHeaders; index += 1) BEGIN
 			PATCH_PHP_EACH ~headers%index%~ AS data => _ BEGIN
 				SET flags = ~%data_4%~
-				SET useStrengthBonus = (flags BAND BIT0) > 0
-				SET useEEStrengthBonus = (flags BAND BIT2) > 0
-				SET useEETac0Bonus = (flags BAND BIT3) > 0
+				SET useDamageBonus = (flags BAND BIT0) > 0 OR (is_ee AND (flags BAND BIT2) > 0)
+				SET useTac0Bonus = (flags BAND BIT0) > 0 OR (is_ee AND (flags BAND BIT3) > 0)
 				SPRINT effectDescription ~~
 
 				PATCH_IF itemType == ITM_TYPE_bow OR itemType == ITM_TYPE_sling OR itemType == ITM_TYPE_crossbow BEGIN
-					PATCH_IF useStrengthBonus OR (is_ee AND useEEStrengthBonus AND useEETac0Bonus) BEGIN
-						SPRINT effectDescription @102263 // ~Les bonus aux jets de toucher et aux dégâts en fonction de la force s'appliquent à cette arme~
+					PATCH_IF useDamageBonus AND useTac0Bonus BEGIN
+						SPRINT effectDescription @102263 // ~Les bonus au toucher et aux dégâts liés à la force s'appliquent à cette arme~
 					END
-					ELSE PATCH_IF NOT useStrengthBonus AND useStrengthBonus BEGIN
-						SPRINT effectDescription @102264 // ~Les bonus aux dégâts en fonction de la force s'appliquent à cette arme~
+					ELSE PATCH_IF useDamageBonus BEGIN
+						SPRINT effectDescription @102264 // ~Le bonus aux dégâts lié à la force s'applique à cette arme~
 					END
-					ELSE PATCH_IF NOT useStrengthBonus AND useEETac0Bonus BEGIN
-						SPRINT effectDescription @102265 // ~Les bonus aux jets de toucher en fonction de la force s'appliquent à cette arme~
+					ELSE PATCH_IF useTac0Bonus BEGIN
+						SPRINT effectDescription @102265 // ~Le bonus au toucher lié à la force s'applique à cette arme~
 					END
 				END
-				ELSE PATCH_IF NOT useStrengthBonus AND NOT useEEStrengthBonus AND NOT useEETac0Bonus BEGIN
-					SPRINT effectDescription @102266 // ~Les bonus aux jets de toucher et aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
+				ELSE PATCH_IF NOT useDamageBonus AND NOT useTac0Bonus BEGIN
+					SPRINT effectDescription @102266 // ~Les bonus au toucher et aux dégâts liés à la force ne s'appliquent pas à cette arme~
 				END
-				ELSE PATCH_IF NOT useStrengthBonus AND NOT useStrengthBonus BEGIN
-					SPRINT effectDescription @102267 // ~Les bonus aux jets de toucher en fonction de la force ne s'appliquent pas à cette arme~
+				ELSE PATCH_IF NOT useTac0Bonus BEGIN
+					SPRINT effectDescription @102267 // ~Le bonus au toucher lié à la force ne s'applique pas à cette arme~
 				END
-				ELSE PATCH_IF NOT useStrengthBonus AND NOT useEETac0Bonus BEGIN
-					SPRINT effectDescription @102268 // ~Les bonus aux dégâts en fonction de la force ne s'appliquent pas à cette arme~
+				ELSE PATCH_IF NOT useDamageBonus BEGIN
+					SPRINT effectDescription @102268 // ~Le bonus aux dégâts lié à la force ne s'applique pas à cette arme~
 				END
 
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
@@ -518,6 +518,7 @@ BEGIN
 	END
 	// Arme de jet
 	ELSE BEGIN
+		LPF ~array_count~ STR_VAR array_name = ~projectileTypes~ RET count END
 		PATCH_PHP_EACH ~projectileTypes~ AS array_name => value BEGIN
 			SET strref = 101078 + value
 			SPRINT value (AT ~%strref%~)
