@@ -1821,6 +1821,7 @@
 @10010101 = ~a half~
 @10010102 = ~\1 and a half~
 @10010103 = ~an extra 1/2~
+@10010104 = ~1/2 fewer~
 
 // Opcode 2: Cure: Sleep [2]
 
@@ -2509,6 +2510,12 @@
 @11020004 = ~Protects %theTarget% from spells of %spellLevel% level and below~
 @11020005 = ~to protect %theTarget% from spells of %spellLevel% level~
 @11020006 = ~to protect %theTarget% from spells of %spellLevel% level and below~
+@11020011 = ~Protects from spells of level 0~
+@11020013 = ~Protects %theTarget% from spells of level 0~
+@11020015 = ~to protect %theTarget% from spells of level 0~
+@11020021 = ~Protects from spells of level 0 and of %spellLevel% level~
+@11020023 = ~Protects %theTarget% from spells of level 0 and of %spellLevel% level~
+@11020025 = ~to protect %theTarget% from spells of level 0 and of %spellLevel% level~
 
 // Opcode 104: Stat: Experience Points [104]
 
@@ -2971,7 +2978,7 @@
 // Opcode 180: Item: Can't Use Item [180]
 
 @11800001 = ~Unique : Only one copy can be equipped~
-@11800002 = ~Prevents equipping %itemName%~
+@11800002 = ~Prevents equipping %resItemName%~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
 

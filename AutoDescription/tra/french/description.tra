@@ -2002,6 +2002,7 @@
 @10010101 = ~une demi~
 @10010102 = ~\1 et demi~
 @10010103 = ~une demi supplémentaire~
+@10010104 = ~une demi en moins~
 
 @10010200 = ~le nombre d'attaque par round~
 
@@ -2697,6 +2698,12 @@
 @11020004 = ~Immunise %theTarget% contre les sorts de %spellLevel% niveau et inférieurs~
 @11020005 = ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau~
 @11020006 = ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau et inférieurs~
+@11020011 = ~Immunité contre les sorts de niveau 0~
+@11020013 = ~Immunise %theTarget% contre les sorts de niveau 0~
+@11020015 = ~d'immuniser %theTarget% contre les sorts de niveau 0~
+@11020021 = ~Immunité contre les sorts de niveau 0 et de %spellLevel% niveau~
+@11020023 = ~Immunise %theTarget% contre les sorts de niveau 0 et de %spellLevel% niveau~
+@11020025 = ~d'immuniser %theTarget% contre les sorts de niveau 0 et de %spellLevel% niveau~
 
 // Opcode 104: Stat: Experience Points [104]
 
@@ -3161,7 +3168,7 @@
 // Opcode 180: Item: Can't Use Item [180]
 
 @11800001 = ~Unique%colon%Un seul exemplaire peut être équipé~
-@11800002 = ~Empêche d'utiliser « %itemName% »~
+@11800002 = ~Empêche d'utiliser « %resItemName% »~
 
 // Opcode 181: Item: Can't Use Itemtype [181]
 
