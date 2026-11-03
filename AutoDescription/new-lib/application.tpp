@@ -950,10 +950,11 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	PATCH_IF NOT (~%line_condition%~ STRING_EQUAL ~~) BEGIN
 		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
-		// placé après la condition.
+		// placé après la condition : la ligne reste entière, hors des regroupements, tant qu'aucune autre
+		// ligne probable ne partage sa plage (ad_lines_probability_pass).
 		PATCH_IF app_probability < 100 BEGIN
-			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition~ RET render_late_missing = refusal END
-			SET app_line_ok = 0
+			SET line_conditioned = 1
+			SET line_probability = 0
 		END
 		// Sous-lignes et sections de niveaux d'un sous-sort : en retrait sous la condition (ancien
 		// add_condition, qui décale tous les sauts de ligne), la première ligne comprise quand elles sont
@@ -991,6 +992,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	END
 	SET line_sort = app_saved_sort
 	SET line_probability = 0
+	SET line_conditioned = 0
 	SET line_sub_probability = 0
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0

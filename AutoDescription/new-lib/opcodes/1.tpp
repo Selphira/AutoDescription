@@ -33,10 +33,6 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 				SPRINT ignored_message ~invalid or ineffective number of attacks (mode %apr_mode%, value %apr_value%)~
 				LPM ad_application_drop
 			END
-			// Une demi-attaque retirée : l'ancien moteur écrit « -5 » (BUG-021).
-			ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND apr_parameter1 < 0 AND apr_value == 6 BEGIN
-				LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:half_removed~ message = ~half attack removed (BUG-021)~ RET render_missing = refusal END
-			END
 			// Deux effets de même ligne (ad_fx_line_key) : le jeu applique les deux, le second est réuni au
 			// premier, attaques additionnées (en demi-attaques : 6 à 10 valent 0,5 à 4,5), pourcentages
 			// multipliés ; une valeur fixée ne compte qu'une fois (ancien merge_duplicate_effects ; l'en-tête
@@ -113,6 +109,10 @@ DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 				PATCH_IF apr_mode == MOD_TYPE_cumulative AND (~%value%~ STRING_EQUAL ~+%apr_half%~) BEGIN
 					SPRINT value @20010003 // ~une demi supplémentaire~
 				END
+				// -6 retire une demi-attaque (IESDP : les valeurs négatives reprennent la table des positives).
+				ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND (~%value%~ STRING_EQUAL ~-5~) BEGIN
+					SPRINT value @20010004 // ~une demi en moins~
+				END
 				PATCH_IF apr_mode == MOD_TYPE_percentage BEGIN
 					LPF ad_refusal INT_VAR fx_id = apr_id STR_VAR reason = ~not_implemented:opcode1:multiply_form~ message = ~multiplied number of attacks at form %line_form%~ RET render_late_missing = refusal END
 				END
@@ -129,6 +129,9 @@ DEFINE_PATCH_MACRO ad_op_1_lines BEGIN
 				END
 				ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND (~%value%~ STRING_EQUAL ~+%apr_half%~) BEGIN
 					SPRINT value @20010003 // ~une demi supplémentaire~
+				END
+				ELSE PATCH_IF apr_mode == MOD_TYPE_cumulative AND (~%value%~ STRING_EQUAL ~-5~) BEGIN
+					SPRINT value @20010004 // ~une demi en moins~
 				END
 				SPRINT name @20010000 // ~Attaque par round~
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~

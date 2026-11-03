@@ -55,3 +55,7 @@ OUTER_SET AD_SAME_POWER       = BIT5
 OUTER_SET AD_SAME_DICE        = BIT6
 OUTER_SET AD_SAME_RESISTANCE  = BIT7
 OUTER_SET AD_SAME_PROBABILITY = BIT8
+
+// Niveau de sort 0 dans un masque de niveaux de l'opcode 102 (fx_spell_levels), dont les bits 0 à 8
+// sont les niveaux 1 à 9 : effets de puissance 0 (IESDP).
+OUTER_SET AD_SPELL_LEVEL_ZERO = BIT9

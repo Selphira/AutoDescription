@@ -129,10 +129,14 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT combat_is_ammo BEGIN
 		READ_BYTE ITM_weapon_proficiency combat_proficiency
+		// Compétence sans nom dans WEAPPROF.2DA : la ligne « Type de compétence » n'est pas écrite.
 		PATCH_IF NOT VARIABLE_IS_SET $AD_PROFICIENCY_NAMES(~%combat_proficiency%~) BEGIN
-			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:proficiency~ message = ~proficiency %combat_proficiency% has no name~ RET render_missing = refusal END
+			SET ignored_fx = 0 - 1
+			SPRINT ignored_reason ~not_implemented:combat:proficiency~
+			SPRINT ignored_message ~proficiency %combat_proficiency% has no name: no proficiency line~
+			LPM ad_log_ignored
 		END
-		ELSE PATCH_IF combat_count == 1 BEGIN
+		PATCH_IF combat_count == 1 BEGIN
 			LPM ad_item_strength_bonus
 			PATCH_IF strength_bonus_invalid BEGIN
 				LPF ad_refusal STR_VAR reason = ~not_implemented:combat:strength_bonus~ message = ~strength bonus that the old engine describes wrongly (BUG-018)~ RET render_missing = refusal END
@@ -433,9 +437,11 @@ DEFINE_PATCH_MACRO ad_item_weapon_attributes BEGIN
 		END
 		READ_BYTE ITM_weapon_proficiency weapon_proficiency
 		SPRINT group_suffix ~~
-		SPRINT weapon_value $AD_PROFICIENCY_NAMES(~%weapon_proficiency%~)
-		SET weapon_name_tra = 6100006 // ~Type de compétence~
-		LPM ad_weapon_attribute_line
+		PATCH_IF VARIABLE_IS_SET $AD_PROFICIENCY_NAMES(~%weapon_proficiency%~) BEGIN
+			SPRINT weapon_value $AD_PROFICIENCY_NAMES(~%weapon_proficiency%~)
+			SET weapon_name_tra = 6100006 // ~Type de compétence~
+			LPM ad_weapon_attribute_line
+		END
 		READ_LONG ITM_flags weapon_flags
 		PATCH_IF (weapon_flags BAND BIT1) == 0 BEGIN
 			SPRINT weapon_value @6100010 // ~Arme à 1 main~

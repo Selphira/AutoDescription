@@ -1945,6 +1945,7 @@
 @20010001 = ~a half~ // reprise de @10010101
 @20010002 = ~\1 and a half~ // reprise de @10010102
 @20010003 = ~an extra 1/2~ // reprise de @10010103
+@20010004 = ~1/2 fewer~ // reprise de @10010104
 
 // Opcode 1 : phrases (20 010 100-20 010 999) : 0100 ajout, 0110 valeur fixée, 0120 valeur finale fixée (formes +1 à +3), 0140 attaque impossible
 @20010101 = ~Changes the number of attacks per round %ofTheTarget% by %value%~ // reprise de @10010011
@@ -2627,6 +2628,10 @@
 
 // Opcode 102 : immunité par niveau de sort, réunie (ancien opcode 509) : phrases 0110 niveaux 1 à N,
 // 0120 tous les niveaux (21 020 000-21 020 999)
+@21020100 = ~Protects from spells of %spellLevel% level~ // reprise de @11020001
+@21020101 = ~Protects %theTarget% from spells of %spellLevel% level~ // reprise de @11020003
+@21020102 = ~to protect %theTarget% from spells of %spellLevel% level~ // reprise de @11020005
+@21020103 = ~to protect %theTarget% from spells of %spellLevel% level~ // reprise de @11020005
 @21020110 = ~Protects from spells of %spellLevel% level and below~ // reprise de @11020002
 @21020111 = ~Protects %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020004
 @21020112 = ~to protect %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020006
@@ -2635,6 +2640,14 @@
 @21020121 = ~to protect %theTarget% from spells~ // reprise de @15090003
 @21020122 = ~to protect from spells~ // reprise de @15090002
 @21020123 = ~to protect from spells~ // reprise de @15090002
+@21020130 = ~Protects from spells of level 0~ // reprise de @11020011
+@21020131 = ~Protects %theTarget% from spells of level 0~ // reprise de @11020013
+@21020132 = ~to protect %theTarget% from spells of level 0~ // reprise de @11020015
+@21020133 = ~to protect %theTarget% from spells of level 0~ // reprise de @11020015
+@21020140 = ~Protects from spells of level 0 and of %spellLevel% level~ // reprise de @11020021
+@21020141 = ~Protects %theTarget% from spells of level 0 and of %spellLevel% level~ // reprise de @11020023
+@21020142 = ~to protect %theTarget% from spells of level 0 and of %spellLevel% level~ // reprise de @11020025
+@21020143 = ~to protect %theTarget% from spells of level 0 and of %spellLevel% level~ // reprise de @11020025
 
 // Opcode 105 : Or : 0002 statistique, phrases 0100 or retiré (21 050 000-21 050 999)
 @21050002 = ~the amount of gold~ // reprise de @11050001
@@ -3102,6 +3115,7 @@
 
 // Opcode 180 : Objet interdit : phrase 0100 objet unique, forme « soi » seulement (21 800 000-21 800 999)
 @21800100 = ~Unique : Only one copy can be equipped~ // reprise de @11800001
+@21800110 = ~Prevents equipping %resItemName%~ // reprise de @11800002
 
 // Opcode 181 : Type d'objet interdit : phrase 0100, forme « soi » seulement (21 810 000-21 810 999)
 @21810100 = ~Prevents using %itemType%~ // reprise de @11810001
