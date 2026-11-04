@@ -5857,22 +5857,35 @@ END
  * Spell: Immunity (by Power Level) [102] *
  * -------------------------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_102~ BEGIN
-	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020001 // ~Immunité contre les sorts de %spellLevel% niveau~
+	LOCAL_SET strref = 11020001
+	LPM ~opcode_102_common~
+	SPRINT description (AT strref) // ~Immunité contre les sorts de %spellLevel% niveau~ (niveau 0 : @11020011 ~Immunité contre les sorts de niveau 0~)
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_102~ BEGIN
-	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020003 // ~Immunise %theTarget% contre les sorts de %spellLevel% niveau~
+	LOCAL_SET strref = 11020005
+	LPM ~opcode_102_common~
+	SPRINT description (AT strref) // ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau~ (niveau 0 : @11020015 ~d'immuniser %theTarget% contre les sorts de niveau 0~)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_102~ BEGIN
-	LOCAL_SET spellLevel = ~%parameter1%~
-	SPRINT description @11020002 // ~Immunité contre les sorts de %spellLevel% niveau et inférieurs~
+	LOCAL_SET strref = 11020003
+	LPM ~opcode_102_common~
+	SPRINT description (AT strref) // ~Immunise %theTarget% contre les sorts de %spellLevel% niveau~ (niveau 0 : @11020013 ~Immunise %theTarget% contre les sorts de niveau 0~)
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_102~ BEGIN
-	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% contre les sorts de niveau %spellLevel%~
+	LPM ~opcode_self_probability_102~ // ~d'immuniser %theTarget% contre les sorts de %spellLevel% niveau~
+END
+
+DEFINE_PATCH_MACRO ~opcode_102_common~ BEGIN
+	LOCAL_SET levelStrref = 101200 + parameter1
+	PATCH_IF parameter1 == 0 BEGIN
+		SET strref += 10
+	END
+	ELSE BEGIN
+		SPRINT spellLevel (AT levelStrref)
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_102_is_valid~ BEGIN

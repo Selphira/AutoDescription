@@ -4406,8 +4406,8 @@
 // Fake Opcode 509 : Immunité aux sorts (par niveau) (cumulatif) [509]
 
 @15090001 = ~Protects from spells~
-@15090002 = ~to protect from spells~
-@15090003 = ~to protect %theTarget% from spells~
+@15090002 = ~to protect %theTarget% from spells~
+@15090003 = ~Protects %theTarget% from spells~
 
 // Fake Opcode 510: Spell: Restore Lost Spells (cumulative) [510]
 
