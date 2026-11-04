@@ -329,7 +329,9 @@ DEFINE_PATCH_MACRO ad_spell_header_render BEGIN
 		LPM ad_spell_header_value
 	END
 	LPM ad_spell_header_range
+	SET header_scan_subs = 1
 	LPM ad_spell_header_duration
+	SET header_scan_subs = 0
 	LPM ad_spell_header_casting_time
 	LPM ad_spell_header_area
 	SPRINT save_missing ~~
@@ -555,7 +557,16 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 			SET duration_id = $EVAL ~spell_fx_%duration_h%~(~%duration_n%~)
 			SET duration_opcode = $EVAL ~spell_fx_opcode_%duration_h%~(~%duration_n%~)
 			SPRINT duration_resource $fx_resource_lower(~%duration_id%~)
-			PATCH_IF NOT ((duration_opcode == 318 OR duration_opcode == 321 OR duration_opcode == 324) AND ~%duration_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
+			// Un sous-sort qui se protège d'un second lancement, ou un sort qui le lance (SPWI001D : 324 de SPWI001,
+			// 1 seconde ; SPPR304D, lancé par A!CH31 : 324 de SPPR304 ; SPWI523D : 206 de lui-même), ne donne pas
+			// cette durée au sort qui le lance (header_parent, ad_spell_header_sub_duration).
+			SET duration_sub_scan = VARIABLE_IS_SET header_parent AND NOT (~%header_parent%~ STRING_EQUAL ~~)
+			SET duration_protection = duration_opcode == 318 OR duration_opcode == 321 OR duration_opcode == 324 OR (duration_sub_scan AND duration_opcode == 206)
+			SET duration_parent = 0
+			PATCH_IF duration_protection AND duration_sub_scan AND NOT (~%duration_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
+				LPF ad_spell_has_effect STR_VAR resref = ~%duration_resource%~ resource = ~%spell_self%~ RET duration_parent = found END
+			END
+			PATCH_IF NOT (duration_protection AND (~%duration_resource%~ STRING_EQUAL ~%spell_self%~ OR duration_parent)) BEGIN
 				SET duration_timing = $fx_timing(~%duration_id%~)
 				SET duration_seconds = $fx_duration(~%duration_id%~)
 				// Une série prend le dernier délai pour durée (ancien timing 5000 ou 5001).
@@ -588,6 +599,10 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 				END
 				PATCH_IF duration_opcode == 213 BEGIN
 					SET duration_special = 1
+				END
+				// Une durée tirée au sort (ad_group_duration_ranges) est écrite par sa ligne.
+				PATCH_IF $fx_duration_dice(~%duration_id%~) > 0 BEGIN
+					SET duration_valid = 0
 				END
 				PATCH_IF duration_seconds > 0 BEGIN
 					PATCH_IF NOT duration_found BEGIN
@@ -630,6 +645,13 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 				SET header_has_duration = 0
 				PATCH_IF duration_instant == 1 BEGIN
 					SPRINT value @7000014 // ~Instantanée~
+					PATCH_IF VARIABLE_IS_SET header_scan_subs AND header_scan_subs BEGIN
+						LPM ad_spell_header_sub_duration
+						PATCH_IF NOT (~%header_sub_text%~ STRING_EQUAL ~~) BEGIN
+							SPRINT value ~%header_sub_text%~
+							SET header_has_duration = 1
+						END
+					END
 				END
 				ELSE BEGIN
 					SPRINT value @7000013 // ~Permanente~
@@ -650,6 +672,55 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 	END
 	SPRINT name @7000002 // ~Durée~
 	LPM ad_spell_header_value
+END
+
+// Sort aux effets propres instantanés qui lance aussitôt, au niveau du lanceur, des sous-sorts (146,
+// 148) d'une même durée commune (OHTMPS2 : OHTMPS2D et OHTMPS2E, 1 tour) : c'est la durée du sort, que
+// leurs lignes n'écrivent plus. header_sub_text : vide pour tout autre lancement (délai, niveau imposé,
+// EFF, piège, chant), un sous-sort permanent ou sans durée commune, ou des durées différentes.
+DEFINE_PATCH_MACRO ad_spell_header_sub_duration BEGIN
+	SPRINT header_sub_text ~~
+	SET sub_valid = 1
+	FOR (sub_h = 0; sub_h < fx_header_count AND sub_valid; ++sub_h) BEGIN
+		FOR (sub_n = 0; sub_n < $spell_fx_count(~%sub_h%~) AND sub_valid; ++sub_n) BEGIN
+			SET sub_id = $EVAL ~spell_fx_%sub_h%~(~%sub_n%~)
+			SET sub_opcode = $fx_opcode(~%sub_id%~)
+			// Un effet d'EFF (177) porte l'opcode qu'il applique : comme le 177, il ne s'applique qu'aux
+			// créatures visées par sa condition et n'est pas un lancement direct.
+			PATCH_IF $fx_external(~%sub_id%~) OR sub_opcode == 177 OR sub_opcode == 251 OR sub_opcode == 252 BEGIN
+				SET sub_valid = 0
+			END
+			ELSE PATCH_IF sub_opcode == 146 OR sub_opcode == 148 BEGIN
+				SPRINT sub_resref $fx_resource_lower(~%sub_id%~)
+				// Type 1 : lancé au niveau du lanceur quel que soit parameter1 (IESDP).
+				PATCH_IF ($fx_timing(~%sub_id%~) == TIMING_delayed AND $fx_duration(~%sub_id%~) > 0)
+						OR ($fx_parameter1(~%sub_id%~) > 0 AND $fx_parameter2(~%sub_id%~) != 1)
+						OR ~%sub_resref%~ STRING_EQUAL ~%spell_self%~ OR NOT FILE_EXISTS_IN_GAME ~%sub_resref%.spl~ BEGIN
+					SET sub_valid = 0
+				END
+				ELSE BEGIN
+					LPF ad_recursion_delayed_duration STR_VAR resref = ~%sub_resref%~ parent = ~%spell_self%~
+						RET sub_hide = duration_hide sub_text = duration_text sub_missing = duration_missing sub_instant = duration_instant END
+					PATCH_IF NOT sub_hide OR NOT (~%sub_missing%~ STRING_EQUAL ~~) BEGIN
+						SET sub_valid = 0
+					END
+					// Un sous-sort permanent écrit « de manière permanente » dans ses lignes.
+					ELSE PATCH_IF ~%sub_text%~ STRING_EQUAL ~~ BEGIN
+						SET sub_valid = sub_instant == 1
+					END
+					ELSE PATCH_IF ~%header_sub_text%~ STRING_EQUAL ~~ BEGIN
+						SPRINT header_sub_text ~%sub_text%~
+					END
+					ELSE PATCH_IF NOT (~%header_sub_text%~ STRING_EQUAL ~%sub_text%~) BEGIN
+						SET sub_valid = 0
+					END
+				END
+			END
+		END
+	END
+	PATCH_IF NOT sub_valid BEGIN
+		SPRINT header_sub_text ~~
+	END
 END
 
 // Durée des projectiles qui explosent plusieurs fois (ancien get_spell_duration_by_projectile) :

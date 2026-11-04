@@ -19,6 +19,8 @@
 //   cible ne sert pas : l'effet vise la cible (2) ;
 // - ctx_area_phrase (0 sans zone), ctx_area_creatures, ctx_area_range, ctx_area_angle : cibles
 //   nommées d'après la zone du projectile de l'en-tête du sous-sort (ad_recursion_area_strings) ;
+//   ctx_area_varies : zone dont le rayon croît d'un en-tête à l'autre d'un sous-sort décrit par tous
+//   ses en-têtes (ad_recursion_area_levels) ;
 // - ctx_ignore_duration : durées des sous-effets non écrites, hors délais et répétitions (ancien
 //   ignoreDuration hérité de la durée commune d'une potion, ou de la durée de l'en-tête d'un sort) ;
 // - ctx_ignore_save : jets de sauvegarde non écrits (ancien ignoreSavingThrow hérité de l'en-tête
@@ -44,6 +46,7 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_force_keep_self = 0
 	SPRINT ctx_force_only_for ~~
 	SET ctx_area_phrase = 0
+	SET ctx_area_varies = 0
 	SET ctx_ignore_duration = 0
 	SET ctx_ignore_save = 0
 	SET ctx_casting_level = 0
@@ -229,6 +232,11 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			PATCH_IF support_spell AND ~%recursion_kind%~ STRING_EQUAL ~eff~ BEGIN
 				SET recursion_hide = $fx_sub_ignore_duration(~%recursion_fx%~)
 			END
+			// La durée instantanée ou permanente de l'en-tête d'un sort n'est pas celle des effets de ses
+			// sous-sorts : leurs lignes écrivent la leur.
+			PATCH_IF support_spell AND NOT header_has_duration BEGIN
+				SET recursion_hide = $fx_sub_ignore_duration(~%recursion_fx%~)
+			END
 			PATCH_IF item_type == ITM_TYPE_potion AND recursion_h >= 0 BEGIN
 				SET recursion_hide = recursion_hide OR $charged_global_duration(~%recursion_h%~) > 0
 			END
@@ -380,17 +388,24 @@ END
 
 // Durée commune des effets du sort resref lancé après un délai, lue comme celle de l'en-tête d'un sort
 // (ad_spell_header_duration), sur les effets de tous ses en-têtes, dans sa propre portée : duration_hide
-// (sous-lignes sans durée : durée commune, ou aucune), duration_text (« 5 rounds », vide sans durée) ;
-// duration_missing, refus d'un sort que l'en-tête ne sait pas lire.
+// (sous-lignes sans durée : durée commune, ou aucune), duration_text (« 5 rounds », vide sans durée),
+// duration_instant (1 pour des effets instantanés, sans durée) ; duration_missing, refus d'un sort que
+// l'en-tête ne sait pas lire. Les sous-sorts de ce sous-sort ne comptent pas (header_scan_subs), ni ses
+// 318, 321 et 324 qui visent un sort qui le lance quand parent, sort décrit qui le lance, est donné
+// (header_parent), comme ceux qui le visent lui-même.
 DEFINE_PATCH_FUNCTION ad_recursion_delayed_duration
 	STR_VAR
 		resref = ~~
+		parent = ~~
 	RET
 		duration_hide
 		duration_text
+		duration_instant
 		duration_missing
 BEGIN
 	SET duration_hide = 0
+	SET duration_instant = 0
+	SET header_scan_subs = 0
 	SPRINT duration_text ~~
 	SPRINT duration_missing ~~
 	SET support_header_only = 1
@@ -398,6 +413,8 @@ BEGIN
 	// Comme l'ancien CURRENT_SOURCE_RES, le sous-sort est le sort décrit.
 	SPRINT spell_self ~%resref%~
 	TO_LOWER spell_self
+	SPRINT header_parent ~%parent%~
+	TO_LOWER header_parent
 	SPRINT ctx_resource ~%resref%~
 	TO_UPPER ctx_resource
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
@@ -523,6 +540,7 @@ BEGIN
 	SET sub_header = 0 - 1
 	SET sub_all_headers = 0
 	SET ctx_area_phrase = 0
+	SET ctx_area_varies = 0
 	SPRINT sub_resref ~%resref%~
 	TO_UPPER sub_resref
 	SPRINT sub_checked ~~
@@ -614,7 +632,8 @@ END
 
 // Effets de l'en-tête retenu du sort ouvert (sub_header, 0 - 1 si le sort n'a aucun en-tête), ou,
 // sans niveau de lancement, de tous ses en-têtes (sub_all_headers), qui doivent avoir la même cible
-// et le même projectile (refus sinon : la zone des sous-effets en dépend).
+// et le même projectile, ou des zones qui ne diffèrent que par un rayon croissant
+// (ad_recursion_area_levels) ; refus sinon : la zone des sous-effets en dépend.
 DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 	SPRINT sub_signature ~~
 	PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
@@ -652,9 +671,15 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 				READ_BYTE  (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_target)        sub_h_target
 				READ_BYTE  (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_target_number) sub_h_target_count
 				READ_SHORT (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_projectile)    sub_h_projectile
-				PATCH_IF sub_h_target != sub_first_target OR sub_h_target_count != sub_first_target_count OR sub_h_projectile != sub_first_projectile BEGIN
+				PATCH_IF sub_h_target != sub_first_target OR sub_h_target_count != sub_first_target_count BEGIN
 					SET sub_all_headers = 0
 				END
+				ELSE PATCH_IF sub_h_projectile != sub_first_projectile BEGIN
+					SET ctx_area_varies = 1
+				END
+			END
+			PATCH_IF sub_all_headers AND ctx_area_varies BEGIN
+				LPM ad_recursion_area_levels
 			END
 			PATCH_IF NOT sub_all_headers BEGIN
 				SET sub_header = 0 - 1
@@ -792,6 +817,69 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 	END
 END
 
+// Rayon de la zone de chaque en-tête du sort ouvert, dont les projectiles diffèrent (ctx_area_varies),
+// dans area_level_feet(h) et area_level_required(h). sub_all_headers passe à 0 si les zones diffèrent
+// autrement que par un rayon qui croît avec le niveau (forme, créatures visées, centre ignoré), comme
+// l'ancien get_projectile_range_progression qui garde alors la zone du premier en-tête.
+DEFINE_PATCH_MACRO ad_recursion_area_levels BEGIN
+	FOR (sub_h = 0; sub_h < sub_header_count AND sub_all_headers; ++sub_h) BEGIN
+		READ_SHORT (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_projectile)     sub_h_projectile
+		READ_SHORT (sub_headers_offset + sub_h * 0x28 + SPL_HEAD_level_required) sub_h_level
+		LPF ad_projectile_area INT_VAR projectile = sub_h_projectile RET area_h_shape = area_shape
+			area_h_creatures = area_creatures area_h_feet = area_feet area_h_cone = area_cone area_h_ignore = area_ignore_target END
+		SPRINT area_h_signature ~%area_h_shape% %area_h_creatures% %area_h_cone% %area_h_ignore%~
+		PATCH_IF area_h_shape <= 0 OR area_h_cone OR (sub_h > 0 AND (NOT (~%area_h_signature%~ STRING_EQUAL ~%area_first_signature%~)
+				OR area_h_feet < $area_level_feet(~%area_previous%~))) BEGIN
+			SET sub_all_headers = 0
+		END
+		SET area_previous = sub_h
+		PATCH_IF sub_h == 0 BEGIN
+			SPRINT area_first_signature ~%area_h_signature%~
+		END
+		SET $area_level_feet(~%sub_h%~) = area_h_feet
+		SET $area_level_required(~%sub_h%~) = sub_h_level
+	END
+END
+
+// Rayon de la zone du sous-sort pour la ligne de line_fx (area_range_text) : ctx_area_range, ou, pour
+// une zone qui croît avec le niveau (ctx_area_varies), celui du premier en-tête de la section de la
+// ligne, ou, pour un effet de tous les niveaux, sa progression : « 0,5 mètre + 0,5 mètre à partir du
+// niveau 20 » (ancien get_projectile_range_progression).
+DEFINE_PATCH_MACRO ad_recursion_area_range BEGIN
+	LOCAL_SET level = 0
+	LOCAL_SPRINT deltaRange ~~
+	SPRINT area_range_text ~%ctx_area_range%~
+	PATCH_IF ctx_area_varies BEGIN
+		SPRINT area_line_section $fx_line_section(~%line_fx%~)
+		SET area_section_level = 0 - 1
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~level~ ~%area_line_section%~) == 0 BEGIN
+			INNER_PATCH_SAVE area_line_section ~%area_line_section%~ BEGIN
+				DELETE_BYTES 0 5
+			END
+			SET area_section_level = area_line_section / 100 - 100
+		END
+		SET area_previous_feet = 0 - 1
+		FOR (area_h = 0; area_h < fx_header_count; ++area_h) BEGIN
+			SET area_h_feet = $area_level_feet(~%area_h%~)
+			PATCH_IF area_section_level >= 0 BEGIN
+				PATCH_IF $area_level_required(~%area_h%~) <= area_section_level OR area_h == 0 BEGIN
+					LPF ad_distance_text INT_VAR feet = area_h_feet RET area_range_text = text END
+				END
+			END
+			ELSE PATCH_IF area_previous_feet < 0 BEGIN
+				LPF ad_distance_text INT_VAR feet = area_h_feet RET area_range_text = text END
+			END
+			ELSE PATCH_IF area_h_feet > area_previous_feet BEGIN
+				LPF ad_distance_text INT_VAR feet = area_h_feet - area_previous_feet RET deltaRange = text END
+				SPRINT range ~%area_range_text%~
+				SET level = $area_level_required(~%area_h%~)
+				SPRINT area_range_text @7000042 // ~%range% + %deltaRange% à partir du niveau %level%~
+			END
+			SET area_previous_feet = area_h_feet
+		END
+	END
+END
+
 // Zone du projectile de l'en-tête du sous-sort (ancien get_target_by_projectile, appelé pour chaque
 // sous-effet) : selon la forme de la zone et la cible de l'en-tête, « les créatures dans un rayon de
 // 4,5 mètres », « … autour du buveur » (sur soi ou une créature, projectile qui ignore sa cible ou,
@@ -835,7 +923,8 @@ END
 DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 	SPRINT area_saved_range ~%range%~
 	SPRINT area_saved_angle ~%angle%~
-	SPRINT range ~%ctx_area_range%~
+	LPM ad_recursion_area_range
+	SPRINT range ~%area_range_text%~
 	SET angle = ctx_area_angle
 	SPRINT $area_main(~0~) ~%theTarget%~
 	SPRINT $area_main(~1~) ~%ofTheTarget%~

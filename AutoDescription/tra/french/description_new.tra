@@ -304,6 +304,7 @@
 @7000032 = ~Les sorts et capacités affectés sont%AD_COLON%%spellList%~ // reprise de @102130
 @7000040 = ~%deltaRange% par niveau~
 @7000041 = ~%deltaRange% par tranche de %level% niveaux~
+@7000042 = ~%range% + %deltaRange% à partir du niveau %level%~ // reprise de @102168
 
 // Sorts : zones d'effet, 7 001 000 + 10 × forme + créatures visées (formes : 0 rayon, 1 une créature et rayon, 2 le lanceur et rayon, 3 rayon autour, 4 cône ; créatures : 0 toutes, 1 hostiles, 2 alliées), puis cibles d'en-tête (7 001 000-7 001 199)
 @7001000 = ~Rayon de %range%~ // reprise de @102442

@@ -23,6 +23,16 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			SET $fx_recursion(~%cast_id%~) = 0
 			SET $fx_sub_count(~%cast_id%~) = 0
 		END
+		// Niveau imposé qui choisit dans le sort le même en-tête que le niveau du lanceur : lancé au niveau
+		// du lanceur (parameter1 0, IESDP), l'effet est alors semblable d'un en-tête à l'autre.
+		PATCH_IF cast_opcode == 146 AND $fx_opcode(~%cast_id%~) == 146 AND resource_is_spell AND $fx_header(~%cast_id%~) >= 0
+				AND $fx_parameter2(~%cast_id%~) == 0 AND $fx_parameter1(~%cast_id%~) > 0 BEGIN
+			LPF ad_cast_level_is_caster_level INT_VAR header = $fx_header(~%cast_id%~) casting_level = $fx_parameter1(~%cast_id%~)
+				STR_VAR resref = $fx_resource_lower(~%cast_id%~) RET cast_caster_level = is_caster_level END
+			PATCH_IF cast_caster_level BEGIN
+				SET $fx_parameter1(~%cast_id%~) = 0
+			END
+		END
 		// Une répétition est réunie à l'effet de tête de sa série (new-lib/groups.tpp).
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND $fx_series_of(~%cast_id%~) < 0 BEGIN
 			SPRINT cast_resref $fx_resource_lower(~%cast_id%~)
@@ -51,6 +61,70 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			END
 			ELSE PATCH_IF ctx_depth > 0 AND NOT resource_is_spell BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:recursion:nested_cast~ message = ~spell cast by a spell already cast by another effect~ RET render_missing = refusal END
+			END
+		END
+	END
+END
+
+// Le sort resref, lancé au niveau imposé casting_level par un effet de l'en-tête header du sort ouvert,
+// l'est-il au niveau du lanceur (ancien cast_level_is_caster_level, lib/spl/extended_effects.tpp) ?
+// is_caster_level : 1 si ce niveau choisit dans resref le même en-tête que tout niveau de lanceur
+// couvert par cet en-tête (PXM4PROJ : lancé au niveau 14 jusqu'au niveau 14, puis au niveau du lanceur
+// jusqu'au 30, dernier en-tête de PXM4PROA). En-tête choisi pour un niveau : celui du plus haut niveau
+// requis qui ne le dépasse pas, sinon le premier. Le niveau imposé d'un sous-sort à un seul en-tête ne
+// choisit rien mais reste écrit (SPWISH09) : il est aussi celui de ses effets.
+DEFINE_PATCH_FUNCTION ad_cast_level_is_caster_level
+	INT_VAR
+		header = 0
+		casting_level = 0
+	STR_VAR
+		resref = ~~
+	RET
+		is_caster_level
+BEGIN
+	SET is_caster_level = 0
+	READ_LONG  SPL_extended_headers_offset caster_headers_offset
+	READ_SHORT SPL_extended_headers_count  caster_header_count
+	READ_SHORT (caster_headers_offset + header * 0x28 + SPL_HEAD_level_required) caster_first_level
+	// Niveau de l'en-tête suivant du sort ouvert, 0 sans en-tête suivant.
+	SET caster_next_level = 0
+	FOR (caster_h = 0; caster_h < caster_header_count; ++caster_h) BEGIN
+		READ_SHORT (caster_headers_offset + caster_h * 0x28 + SPL_HEAD_level_required) caster_level
+		PATCH_IF caster_level > caster_first_level AND (caster_next_level == 0 OR caster_level < caster_next_level) BEGIN
+			SET caster_next_level = caster_level
+		END
+	END
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG  SPL_extended_headers_offset caster_sub_offset
+				READ_SHORT SPL_extended_headers_count  caster_sub_count
+				SET caster_cast_selected = 0 - 1
+				SET caster_first_selected = 0 - 1
+				SET caster_lowest = 0 - 1
+				SET caster_splits = 0
+				FOR (caster_h = 0; caster_h < caster_sub_count AND caster_sub_offset + caster_h * 0x28 + 0x28 <= BUFFER_LENGTH; ++caster_h) BEGIN
+					READ_SHORT (caster_sub_offset + caster_h * 0x28 + SPL_HEAD_level_required) caster_level
+					PATCH_IF caster_lowest < 0 OR caster_level < caster_lowest BEGIN
+						SET caster_lowest = caster_level
+					END
+					PATCH_IF caster_level <= casting_level AND caster_level > caster_cast_selected BEGIN
+						SET caster_cast_selected = caster_level
+					END
+					PATCH_IF caster_level <= caster_first_level AND caster_level > caster_first_selected BEGIN
+						SET caster_first_selected = caster_level
+					END
+					PATCH_IF caster_level > caster_first_level AND (caster_next_level == 0 OR caster_level < caster_next_level) BEGIN
+						SET caster_splits = 1
+					END
+				END
+				PATCH_IF caster_cast_selected < 0 BEGIN
+					SET caster_cast_selected = caster_lowest
+				END
+				PATCH_IF caster_first_selected < 0 BEGIN
+					SET caster_first_selected = caster_lowest
+				END
+				SET is_caster_level = caster_sub_count > 1 AND caster_lowest >= 0 AND NOT caster_splits AND caster_cast_selected == caster_first_selected
 			END
 		END
 	END

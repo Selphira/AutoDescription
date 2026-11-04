@@ -68,9 +68,7 @@ DEFINE_PATCH_MACRO ad_item_charged_support BEGIN
 END
 
 // Ligne « Utilisation » (ancien uses) d'une potion ou d'une fléchette dont un seul en-tête a des
-// charges, sauf usage unique : charged_uses_id est cet en-tête, -1 sans ligne. L'ancien moteur lit
-// les charges du dernier en-tête du fichier et non de celui qu'il a compté : refusé si ce ne sont
-// pas les mêmes (BUG-047).
+// charges, sauf usage unique : charged_uses_id est cet en-tête, -1 sans ligne.
 DEFINE_PATCH_MACRO ad_item_uses_support BEGIN
 	SET charged_uses_id = 0 - 1
 	PATCH_IF item_type == ITM_TYPE_potion OR item_type == ITM_TYPE_dart BEGIN
@@ -82,10 +80,7 @@ DEFINE_PATCH_MACRO ad_item_uses_support BEGIN
 			END
 		END
 		PATCH_IF charged_with_charges == 1 BEGIN
-			PATCH_IF $charged_header(~%charged_uses_found%~) != charged_header_count - 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = charged_id STR_VAR reason = ~not_implemented:charged:uses_not_last_header~ message = ~uses line for an ability that is not the last one~ RET render_missing = refusal END
-			END
-			ELSE PATCH_IF $charged_charges(~%charged_uses_found%~) != 1 OR $charged_depletion(~%charged_uses_found%~) != 1 BEGIN
+			PATCH_IF $charged_charges(~%charged_uses_found%~) != 1 OR $charged_depletion(~%charged_uses_found%~) != 1 BEGIN
 				SET charged_uses_id = charged_uses_found
 			END
 		END

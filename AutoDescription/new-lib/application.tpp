@@ -341,6 +341,10 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	PATCH_IF app_header >= 0 BEGIN
 		SET app_hide_duration = app_hide_duration OR $charged_global_duration(~%app_header%~) > 0
 	END
+	// Une durée tirée au sort (ad_group_duration_ranges) n'est jamais celle de l'en-tête.
+	PATCH_IF $fx_duration_dice(~%line_fx%~) > 0 BEGIN
+		SET app_hide_duration = 0
+	END
 	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FIXED_DURATION(~%app_opcode%~) BEGIN
 		SET app_timing = TIMING_duration
 		SET app_duration = $AD_OPCODE_FIXED_DURATION(~%app_opcode%~)
@@ -404,6 +408,16 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		END
 		PATCH_IF app_duration > 0 BEGIN
 			LPF ad_duration_text INT_VAR seconds = app_duration RET strDuration = text END
+			// Durée tirée au sort (ad_group_duration_ranges), d'une unité : « 1d2 rounds ».
+			PATCH_IF $fx_duration_dice(~%line_fx%~) > 0 BEGIN
+				SET duration_dice_count = $fx_duration_dice(~%line_fx%~)
+				SPRINT amount ~1d%duration_dice_count%~
+				FOR (duration_unit = 4; duration_unit >= 0; --duration_unit) BEGIN
+					PATCH_IF app_duration == $AD_DURATION_UNITS(~%duration_unit%~) BEGIN
+						LPF ad_tra INT_VAR tra_id = 3010000 + duration_unit * 2 + 1 tra_block_start = 3010000 tra_block_size = 10 RET strDuration = text END // ~%amount% rounds~
+					END
+				END
+			END
 			SPRINT app_duration_text @3000000 // ~pendant %strDuration%~
 			// Timing 3 (IESDP) : l'effet commence après la durée et dure autant.
 			PATCH_IF app_timing == TIMING_delayed_duration BEGIN
@@ -750,7 +764,8 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			PATCH_IF ctx_area_phrase > 0 BEGIN
 				SPRINT app_versus_saved_range ~%range%~
 				SET app_versus_saved_angle = angle
-				SPRINT range ~%ctx_area_range%~
+				LPM ad_recursion_area_range
+				SPRINT range ~%area_range_text%~
 				SET angle = ctx_area_angle
 				SET app_versus_area_phrase = ctx_area_phrase == 2001102 ? 2001102 : 2001100
 				SPRINT target ~%theTarget%~
