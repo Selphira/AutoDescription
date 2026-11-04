@@ -2684,9 +2684,9 @@
 @21020112 = ~to protect %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020006
 @21020113 = ~to protect %theTarget% from spells of %spellLevel% level and below~ // reprise de @11020006
 @21020120 = ~Protects from spells~ // reprise de @15090001
-@21020121 = ~to protect %theTarget% from spells~ // reprise de @15090003
-@21020122 = ~to protect from spells~ // reprise de @15090002
-@21020123 = ~to protect from spells~ // reprise de @15090002
+@21020121 = ~Protects %theTarget% from spells~ // reprise de @15090003
+@21020122 = ~to protect %theTarget% from spells~ // reprise de @15090002
+@21020123 = ~to protect %theTarget% from spells~ // reprise de @15090002
 @21020130 = ~Protects from spells of level 0~ // reprise de @11020011
 @21020131 = ~Protects %theTarget% from spells of level 0~ // reprise de @11020013
 @21020132 = ~to protect %theTarget% from spells of level 0~ // reprise de @11020015

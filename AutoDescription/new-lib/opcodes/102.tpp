@@ -6,10 +6,9 @@
 // « Immunité aux sorts de 5ème niveau et inférieurs », ou « Immunité aux sorts » pour les neuf
 // niveaux.
 
-// Niveau hors de 0-9 : écarté et journalisé. Refus : effet d'un EFF ; 102 non réuni (l'ancien opcode_self_102 écrit le
-// nombre à la place du rang et ses formes « cible » et probables prennent les chaînes d'autres
-// formes, BUG-041) ; 102 de la même portée aux champs différents (l'ancien moteur les réunit tous,
-// avec les champs du dernier lu).
+// Niveau hors de 0-9 : écarté et journalisé. Sans AD_ENABLE_SHRINKAGE, chaque 102 est un masque d'un
+// seul niveau (« de 5ème niveau », « de niveau 0 »). Refus : effet d'un EFF ; 102 de la même portée
+// aux champs différents (l'ancien moteur les réunit tous, avec les champs du dernier lu).
 DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 	PHP_EACH fx_ids_102 AS _ => levels_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%levels_id%~) BEGIN
@@ -25,7 +24,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF NOT AD_ENABLE_SHRINKAGE BEGIN
-				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:single~ message = ~single spell level without AD_ENABLE_SHRINKAGE~ RET render_missing = refusal END
+				SET $fx_spell_levels(~%levels_id%~) = levels_level == 0 ? AD_SPELL_LEVEL_ZERO : 1 << (levels_level - 1)
 			END
 			ELSE BEGIN
 				SET same_id = levels_id
@@ -51,7 +50,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 	END
 END
 
-// Une ligne par effet réuni : niveaux 1 à 9 (« Immunité contre les sorts »), 1 à N (« de 5ème niveau
+// Une ligne par effet réuni (ou, sans AD_ENABLE_SHRINKAGE, par 102 d'un seul niveau) : niveaux 1 à 9 (« Immunité contre les sorts »), 1 à N (« de 5ème niveau
 // et inférieurs »), qui couvrent le niveau 0 s'il est réuni, ou leur liste (« de 1er, 3ème et 5ème
 // niveau », ancien opcode_509_common), y compris le niveau 1 seul ; le niveau 0 est nommé à part
 // (« de niveau 0 », « de niveau 0 et de 1er et 3ème niveau »).
