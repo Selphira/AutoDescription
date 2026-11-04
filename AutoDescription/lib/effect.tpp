@@ -536,7 +536,10 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	END
 	PATCH_IF enable_shrinkage == 1 BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
-			PATCH_IF count > 0 BEGIN
+			PATCH_IF count > 1 BEGIN
+				LPM ~group_duration_range~
+			END
+			PATCH_IF $opcodes(~%opcode%~) > 0 BEGIN
 				LPM ~opcode_group_by_target~
 				LPM ~opcode_group_by_duration~
 				SPRINT dispatch_group ~opcode_%opcode%_group~
@@ -729,6 +732,117 @@ DEFINE_PATCH_MACRO ~group_value_range~ BEGIN
 			END
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ~group_duration_range~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~durationRangePositions~ BEGIN END
+	SET durationRangePass = VARIABLE_IS_SET durationRangePass ? durationRangePass + 1 : 1
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF timingMode == TIMING_duration AND duration > 0 AND probability < 100 AND ~%complex_duration%~ STRING_EQUAL ~~
+				AND NOT (VARIABLE_IS_SET $durationRangeChecked(~%position%~) AND $durationRangeChecked(~%position%~) == durationRangePass) BEGIN
+			SET $durationRangeChecked(~%position%~) = durationRangePass
+			CLEAR_ARRAY durationRangePositions
+			SET $durationRangePositions(~%position%~) = probability
+			SET rangePosition = position
+			SET unitDuration = duration
+			SET maxDuration = duration
+			SET sumDuration = duration
+			SET rangeLow = probability2
+			SET rangeHigh = probability1 > 99 ? 99 : probability1
+			SET rangeTotal = probability
+			SET rangeCount = 1
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF match_duration > 0 AND NOT (VARIABLE_IS_SET $durationRangeChecked(~%match_position%~) AND $durationRangeChecked(~%match_position%~) == durationRangePass) BEGIN
+					LPM ~opcode_match_duration_range~
+					PATCH_IF match == 1 BEGIN
+						SET $durationRangeChecked(~%match_position%~) = durationRangePass
+						SET $durationRangePositions(~%match_position%~) = match_probability
+						SET rangeCount += 1
+						SET unitDuration = match_duration < unitDuration ? match_duration : unitDuration
+						SET maxDuration = match_duration > maxDuration ? match_duration : maxDuration
+						SET sumDuration += match_duration
+						SET rangeLow = match_probability2 < rangeLow ? match_probability2 : rangeLow
+						SET rangeHigh = match_probability1 > rangeHigh ? (match_probability1 > 99 ? 99 : match_probability1) : rangeHigh
+						SET rangeTotal += match_probability
+					END
+				END
+			END
+			SET isDiceDuration = rangeCount > 1 AND rangeTotal == rangeHigh - rangeLow + 1
+				AND maxDuration == unitDuration * rangeCount
+				AND sumDuration == unitDuration * rangeCount * (rangeCount + 1) / 2
+			PATCH_IF isDiceDuration BEGIN
+				PATCH_PHP_EACH durationRangePositions AS _ => slice BEGIN
+					PATCH_IF ABS (slice * rangeCount - rangeTotal) > rangeCount BEGIN
+						SET isDiceDuration = 0
+					END
+				END
+			END
+			PATCH_IF isDiceDuration BEGIN
+				SPRINT durationRangeText ~~
+				PATCH_PHP_EACH durations AS divisor => unitStrref BEGIN
+					PATCH_IF unitDuration MODULO divisor == 0 AND ~%durationRangeText%~ STRING_EQUAL ~~ BEGIN
+						PATCH_IF unitDuration == divisor BEGIN
+							SPRINT amount ~1d%rangeCount%~
+							SET unitStrref += 1
+							SPRINT strDuration (AT unitStrref)
+							SPRINT durationRangeText @100311 // ~pendant %strDuration%~
+						END
+						ELSE BEGIN
+							SPRINT durationRangeText ~-~
+						END
+					END
+				END
+				PATCH_IF NOT ~%durationRangeText%~ STRING_EQUAL ~~ AND NOT ~%durationRangeText%~ STRING_EQUAL ~-~ BEGIN
+					PATCH_PHP_EACH durationRangePositions AS rangeDeleted => _ BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode match_position = rangeDeleted
+							RET $opcodes(~%opcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+						END
+					END
+					// Bug où il reste toujours un item dans le tableau si c'était le dernier
+					PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+						CLEAR_ARRAY ~opcodes_%opcode%~
+					END
+					SET position = rangePosition
+					SET duration = unitDuration
+					SET probability1 = rangeHigh
+					SET probability2 = rangeLow
+					SET probability = rangeTotal
+					SPRINT complex_duration ~%durationRangeText%~
+					LPM ~add_opcode~
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_duration_range~ BEGIN
+	SET match = (
+		    match_isExternal   == isExternal
+		AND match_target       == target
+		AND match_power        == power
+		AND match_parameter1   == parameter1
+		AND match_parameter2   == parameter2
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_diceCount    == diceCount
+		AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND match_custom_int   == custom_int
+		AND ~%match_resref%~     STRING_EQUAL_CASE ~%resref%~
+		AND ~%match_resref2%~    STRING_EQUAL_CASE ~%resref2%~
+		AND ~%match_resref3%~    STRING_EQUAL_CASE ~%resref3%~
+		AND ~%match_custom_str%~ STRING_EQUAL_CASE ~%custom_str%~
+		// Durée complexe de l'effet comparé, que data_to_match_vars ne lit pas.
+		AND ~%data_28%~ STRING_EQUAL ~~
+	)
 END
 
 DEFINE_PATCH_MACRO ~opcode_match_value_range~ BEGIN

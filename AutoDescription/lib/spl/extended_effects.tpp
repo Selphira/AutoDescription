@@ -12,11 +12,16 @@ BEGIN
 	SET projectile = 0
 	SET projectileTarget = 0
 	SET projectileTargetNumber = 0
+	SPRINT rangeProgression ~~
 
 	PATCH_IF isSubSpell AND VARIABLE_IS_SET $level_projectiles(~%projectileLevelIndex%~) BEGIN
 		SET projectile = $level_projectiles(~%projectileLevelIndex%~)
 		SET projectileTarget = $level_targets(~%projectileLevelIndex%~)
 		SET projectileTargetNumber = $level_target_numbers(~%projectileLevelIndex%~)
+	END
+
+	PATCH_IF isSubSpell AND projectileAllLevels BEGIN
+		LPF ~get_projectile_range_progression~ RET rangeProgression = range_progression END
 	END
 
 	PATCH_PHP_EACH opcodes AS opcode => count BEGIN
@@ -116,10 +121,70 @@ BEGIN
 		PATCH_IF count > 0 BEGIN
 		    PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
 		        LPM ~data_to_vars~
+		        PATCH_IF opcode == 146 AND parameter2 == 0 AND parameter1 > 0 BEGIN
+		            LPF ~cast_level_is_caster_level~ INT_VAR headerOffset castingLevel = parameter1 STR_VAR resref RET isCasterLevel = is_caster_level END
+		            PATCH_IF isCasterLevel BEGIN
+		                SET parameter1 = 0
+		            END
+		        END
 		        SET count_leveled_opcodes += 1
 				SET $leveled_opcodes(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~ ~%opcode%~) = opcode
 		    END
 	    END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~cast_level_is_caster_level~
+	INT_VAR
+		headerOffset = 0
+		castingLevel = 0
+	STR_VAR
+		resref = ~~
+	RET
+		is_caster_level
+BEGIN
+	SET is_caster_level = 0
+	READ_SHORT (headerOffset + SPL_HEAD_level_required) firstLevel
+	SET nextLevel = 0
+	GET_OFFSET_ARRAY castHeaders SPL_V10_HEADERS
+	PHP_EACH castHeaders AS _ => castHeader BEGIN
+		READ_SHORT (castHeader + SPL_HEAD_level_required) castHeaderLevel
+		PATCH_IF castHeaderLevel > firstLevel AND (nextLevel == 0 OR castHeaderLevel < nextLevel) BEGIN
+			SET nextLevel = castHeaderLevel
+		END
+	END
+	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+			SET castSelected = 0 - 1
+			SET firstSelected = 0 - 1
+			SET lowestLevel = 0 - 1
+			SET splitsRange = 0
+			SET subHeaderCount = 0
+			GET_OFFSET_ARRAY subHeaders SPL_V10_HEADERS
+			PHP_EACH subHeaders AS _ => subHeader BEGIN
+				SET subHeaderCount += 1
+				READ_SHORT (subHeader + SPL_HEAD_level_required) subLevel
+				PATCH_IF lowestLevel < 0 OR subLevel < lowestLevel BEGIN
+					SET lowestLevel = subLevel
+				END
+				PATCH_IF subLevel <= castingLevel AND subLevel > castSelected BEGIN
+					SET castSelected = subLevel
+				END
+				PATCH_IF subLevel <= firstLevel AND subLevel > firstSelected BEGIN
+					SET firstSelected = subLevel
+				END
+				PATCH_IF subLevel > firstLevel AND (nextLevel == 0 OR subLevel < nextLevel) BEGIN
+					SET splitsRange = 1
+				END
+			END
+			PATCH_IF castSelected < 0 BEGIN
+				SET castSelected = lowestLevel
+			END
+			PATCH_IF firstSelected < 0 BEGIN
+				SET firstSelected = lowestLevel
+			END
+			SET is_caster_level = subHeaderCount > 1 AND NOT splitsRange AND castSelected == firstSelected
+		END
 	END
 END
 
@@ -288,6 +353,11 @@ BEGIN
 	SET totalLines = 0
 	SET depthOfEffect = recursivity
 	SPRINT strDuration ~~
+	// La durée instantanée ou permanente de l'en-tête d'un sort n'est pas celle des effets de ses
+	// sous-sorts.
+	PATCH_IF isSpell AND NOT hasDuration BEGIN
+		SET ignoreDuration = 0
+	END
 	// Nécessité de vider les tableaux pour leur utilisation dans la fonction, afin que les opcodes de l'objet n'interfèrent pas avec ceux du sort.
 	LPM ~clear_opcodes~
 
@@ -697,6 +767,7 @@ BEGIN
 	END
 
 	SET projectileLevelIndex = 0
+	SET projectileAllLevels = 1
 	LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 	SET totalLines += countLines
 
@@ -725,6 +796,7 @@ BEGIN
 				SET projectileLevelIndex = headerIndex
 			END
 		END
+		SET projectileAllLevels = 0
 		LPF ~load_spell_extended_effects~ INT_VAR baseProbability forceTarget ignoreDuration RET countLines RET_ARRAY lines END
 		SET totalLines += countLines
 

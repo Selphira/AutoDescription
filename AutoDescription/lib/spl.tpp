@@ -93,6 +93,7 @@ BEGIN
 	SPRINT ofTheSource @102476 // ~du lanceur~
 	SPRINT toTheSource @102477 // ~au lanceur~
 
+	LPF ~subspells_common_duration~ RET subspellsDuration = subspells_duration END
 	LPM ~load_level_effects~
 
 	READ_LONG  SPL_extended_headers_offset headerOffset
@@ -110,7 +111,7 @@ BEGIN
 	LPF ~appendLine~ RET description END // ~École~
 	LPF ~spell_level~ RET description END
 	LPF ~spell_range~ RET description END
-	LPF ~spell_duration~ RET description ignoreDuration isSpecialDuration = is_special hasDuration = has_duration END
+	LPF ~spell_duration~ STR_VAR subspellsDuration RET description ignoreDuration isSpecialDuration = is_special hasDuration = has_duration END
 	LPF ~spell_casting_time~ RET description END
 	LPF ~spell_target~ RET description globalSpellTarget = spellTarget END
 	LPF ~spell_saving_throw~ RET description ignoreSavingThrow END
