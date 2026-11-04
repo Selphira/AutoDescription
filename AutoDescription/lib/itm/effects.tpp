@@ -98,8 +98,9 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	// durée ou pas, un effet peut avoir un délai avant fonctionnement ; sans délai, le timing 4 est
 	// permanent (get_duration_value) et suit la règle des autres durées.
 	SET hasDelay = timingMode == TIMING_delayed AND duration > 0
+	SET has_dice_duration = ~%complex_duration%~ STRING_CONTAINS_REGEXP ~ 1d[0-9]~ ? 0 : 1
 	PATCH_IF (hasDelay OR timingMode == 5000 OR timingMode == 5001 OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
-			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR hasDelay OR timingMode == 5000 OR timingMode == 5001) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR hasDelay OR timingMode == 5000 OR timingMode == 5001 OR has_dice_duration) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% %complex_duration%~
 		END

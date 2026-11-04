@@ -195,7 +195,7 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuration is_special has_duration BEGIN
+DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET description ignoreDuration strDuration is_special has_duration is_instant BEGIN
 	SET base_duration = ~-1~
 	SET has_duration = 1
 	SET isValid = 1
@@ -215,7 +215,13 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 				// Si plus petit, c'est qu'on a désactivé l'entrée lors d'une précédente opération
 				PATCH_IF opcode >= 0 BEGIN
 				    LPM ~data_to_vars~
-				    PATCH_IF NOT ((opcode == 318 OR opcode == 321 OR opcode == 324) AND ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
+				    SET subScan = VARIABLE_IS_SET subspellsScan AND subspellsScan
+				    SET isProtection = opcode == 318 OR opcode == 321 OR opcode == 324 OR (subScan AND opcode == 206)
+				    SET protectsCaster = 0
+				    PATCH_IF isProtection AND subScan AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
+				        LPF ~spell_refers_to_resource~ STR_VAR spell = ~%resref%~ resource = ~%CURRENT_SOURCE_RES%~ RET protectsCaster = found END
+				    END
+				    PATCH_IF NOT (isProtection AND (~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ OR protectsCaster)) BEGIN
 	                    PATCH_IF VARIABLE_IS_SET itemDuration AND (opcode == 146 OR opcode == 232) BEGIN
 							PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 								INNER_PATCH_FILE ~%resref%.spl~ BEGIN
@@ -266,6 +272,10 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 
 	                    PATCH_IF opcode == 213 BEGIN
 	                        SET is_special = 1
+	                    END
+
+	                    PATCH_IF duration > 0 AND NOT (~%complex_duration%~ STRING_CONTAINS_REGEXP ~ 1d[0-9]~) BEGIN
+	                        SET isValid = 0
 	                    END
 
 	                    PATCH_IF duration > 0 BEGIN
@@ -324,6 +334,11 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 
 		    PATCH_IF is_instant == 1 BEGIN
 			    SPRINT duration @100038 // ~Instantanée~
+			    PATCH_IF NOT ~%subspellsDuration%~ STRING_EQUAL ~~ BEGIN
+				    SPRINT duration ~%subspellsDuration%~
+				    SPRINT strDuration ~%subspellsDuration%~
+				    SET has_duration = 1
+			    END
 		    END
 		    ELSE BEGIN
 			    SPRINT duration @100037 // ~Permanente~
@@ -349,6 +364,84 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ RET description ignoreDuration strDuratio
 	LPF ~appendValue~ INT_VAR strref = 100031 STR_VAR value = ~%duration%~ RET description END // ~Durée~
 END
 
+DEFINE_PATCH_FUNCTION ~spell_refers_to_resource~
+	STR_VAR
+		spell = ~~
+		resource = ~~
+	RET
+		found
+BEGIN
+	SET found = 0
+	PATCH_IF NOT ~%spell%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%spell%.spl~ BEGIN
+		INNER_PATCH_FILE ~%spell%.spl~ BEGIN
+			GET_OFFSET_ARRAY refersHeaders SPL_V10_HEADERS
+			PHP_EACH refersHeaders AS _ => refersHeader BEGIN
+				GET_OFFSET_ARRAY2 refersEffects refersHeader SPL_V10_HEAD_EFFECTS
+				PHP_EACH refersEffects AS _ => offset BEGIN
+					LPM ~read_effect_vars~
+					PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%resource%~ BEGIN
+						SET found = 1
+					END
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~subspells_common_duration~
+	RET
+		subspells_duration
+BEGIN
+	SPRINT subspells_duration ~~
+	SPRINT spellSelf ~%CURRENT_SOURCE_RES%~
+	SET subValid = 1
+	GET_OFFSET_ARRAY subHeaders SPL_V10_HEADERS
+	PHP_EACH subHeaders AS _ => subHeader BEGIN
+		GET_OFFSET_ARRAY2 subEffects subHeader SPL_V10_HEAD_EFFECTS
+		PHP_EACH subEffects AS _ => offset BEGIN
+			PATCH_IF subValid BEGIN
+				LPM ~read_effect_vars~
+				PATCH_IF opcode == 146 OR opcode == 148 BEGIN
+					// Type 1 : lancé au niveau du lanceur quel que soit parameter1 (IESDP).
+					PATCH_IF (timingMode == TIMING_delayed AND duration > 0) OR (parameter1 > 0 AND parameter2 != 1)
+							OR ~%resref%~ STRING_EQUAL_CASE ~%spellSelf%~ OR NOT FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
+						SET subValid = 0
+					END
+					ELSE BEGIN
+						INNER_PATCH_FILE ~%resref%.spl~ BEGIN
+							SPRINT CURRENT_SOURCE_RES ~%resref%~
+							SET isSubSpell = 1
+							SET ignoreDuration = 0
+							SET subspellsScan = 1
+							LPM ~load_level_effects~
+							LPF ~spell_duration~ RET subIgnoreDuration = ignoreDuration subDuration = strDuration subSpecial = is_special subHasDuration = has_duration subInstant = is_instant END
+							LPM ~clear_levels~
+						END
+						PATCH_IF subSpecial OR NOT subIgnoreDuration BEGIN
+							SET subValid = 0
+						END
+						// Un sous-sort permanent écrit « de manière permanente » dans ses lignes.
+						ELSE PATCH_IF NOT subHasDuration BEGIN
+							SET subValid = subInstant == 1
+						END
+						ELSE PATCH_IF ~%subspells_duration%~ STRING_EQUAL ~~ BEGIN
+							SPRINT subspells_duration ~%subDuration%~
+						END
+						ELSE PATCH_IF NOT ~%subspells_duration%~ STRING_EQUAL ~%subDuration%~ BEGIN
+							SET subValid = 0
+						END
+					END
+				END
+				ELSE PATCH_IF opcode == 177 OR opcode == 251 OR opcode == 252 BEGIN
+					SET subValid = 0
+				END
+			END
+		END
+	END
+	PATCH_IF NOT subValid BEGIN
+		SPRINT subspells_duration ~~
+	END
+END
 
 DEFINE_PATCH_FUNCTION ~get_spell_duration_by_projectile~
 	RET
@@ -968,6 +1061,10 @@ BEGIN
                     END
                     LPF ~feets_to_meters~ INT_VAR range = areaOfEffect RET range = rangeToMeter END
 
+					PATCH_IF VARIABLE_IS_SET rangeProgression AND NOT ~%rangeProgression%~ STRING_EQUAL ~~ BEGIN
+						SPRINT range ~%rangeProgression%~
+					END
+
 					PATCH_IF alliesOnly AND enemiesOnly BEGIN
 						SET targetOffset = 2
 					END
@@ -1057,6 +1154,71 @@ BEGIN
                 END
             END
         END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_projectile_area~
+	INT_VAR
+		projectile = 0
+	RET
+		area_feet
+		area_signature
+BEGIN
+	SET area_feet = 0 - 1
+	SPRINT area_signature ~~
+	PATCH_IF projectile > 1 BEGIN
+		SET projectileIndex = projectile - 1
+		LOOKUP_IDS_SYMBOL_OF_INT projectileFile ~projectl~ projectileIndex
+		PATCH_IF !IS_AN_INT projectileFile AND FILE_EXISTS_IN_GAME ~%projectileFile%.pro~ BEGIN
+			INNER_PATCH_FILE ~%projectileFile%.pro~ BEGIN
+				READ_SHORT 0x8 type
+				PATCH_IF type == 3 BEGIN
+					READ_LONG  0xc   sparkingFlags
+					READ_LONG  0x200 areaProjectileFlags
+					READ_SHORT 0x206 areaOfEffect
+					PATCH_IF (areaProjectileFlags BAND BIT11) != BIT11 BEGIN
+						SET area_feet = areaOfEffect / 17
+						SET ignoreTarget = (sparkingFlags BAND BIT4) == BIT4
+						SET enemiesOnly = (areaProjectileFlags BAND BIT6) == BIT6
+						SET alliesOnly = (areaProjectileFlags BAND BIT7) == BIT7
+						SPRINT area_signature ~%ignoreTarget%-%enemiesOnly%-%alliesOnly%~
+					END
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~get_projectile_range_progression~
+	RET
+		range_progression
+BEGIN
+	SPRINT range_progression ~~
+	SET isValid = 1
+	SET hasStep = 0
+	SET prevFeet = 0 - 1
+	SPRINT firstSignature ~~
+	PATCH_PHP_EACH level_effects AS index => level BEGIN
+		PATCH_IF isValid BEGIN
+			LPF ~get_projectile_area~ INT_VAR projectile = $level_projectiles(~%index%~) RET feet = area_feet signature = area_signature END
+			PATCH_IF feet < 0 OR (prevFeet >= 0 AND NOT ~%signature%~ STRING_EQUAL ~%firstSignature%~) OR feet < prevFeet BEGIN
+				SET isValid = 0
+			END
+			ELSE PATCH_IF prevFeet < 0 BEGIN
+				SPRINT firstSignature ~%signature%~
+				LPF ~feets_to_meters~ INT_VAR range = feet RET range_progression = rangeToMeter END
+			END
+			ELSE PATCH_IF feet > prevFeet BEGIN
+				SET hasStep = 1
+				LPF ~feets_to_meters~ INT_VAR range = feet - prevFeet RET deltaRange = rangeToMeter END
+				SPRINT range ~%range_progression%~
+				SPRINT range_progression @102168 // ~%range% + %deltaRange% à partir du niveau %level%~
+			END
+			SET prevFeet = feet
+		END
+	END
+	PATCH_IF NOT isValid OR NOT hasStep BEGIN
+		SPRINT range_progression ~~
 	END
 END
 

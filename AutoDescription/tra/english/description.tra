@@ -173,6 +173,7 @@
 @102165 = ~%value% %valueType%~
 @102166 = ~%damage% %damageType%~
 @102167 = ~%baseValue% up to level %level%~
+@102168 = ~%range% + %deltaRange% from level %level%~
 
 /* Type de dégâts */
 @600170 = ~hit point~
@@ -821,7 +822,7 @@
 @230023 = ~flails~
 @230024 = ~darts~
 @230025 = ~axes~
-@230025 = ~staffs~
+@230026 = ~staffs~
 @230027 = ~crossbows~
 @230028 = ~fists~
 @230029 = ~spears~

@@ -7958,7 +7958,7 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 		ELSE BEGIN
 			// Protection contre les boucles infinies
 			PATCH_IF NOT VARIABLE_IS_SET $recursive_resref(~%resref%~) BEGIN
-	            SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
+	            SET ignoreDurationIfSameForAllEffect = (timingMode == TIMING_delayed AND duration > 0) ? 1 : 0
 				LPM ~opcode_146_get_spell_effects_description~
 
 				// Remplacer les "pendant 1 round" par "chaque round pendant x rounds"
@@ -7994,7 +7994,7 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 	LOCAL_SET castingLevel = ~%parameter1%~
-	LOCAL_SET ignoreDurationIfSameForAllEffect = timingMode == TIMING_delayed ? 1 : 0
+	LOCAL_SET ignoreDurationIfSameForAllEffect = (timingMode == TIMING_delayed AND duration > 0) ? 1 : 0
 	LOCAL_SET type = parameter2
 	LOCAL_SPRINT strDuration ~~
 	TO_UPPER resref
