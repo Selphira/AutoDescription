@@ -136,17 +136,18 @@ END
 // Condition de l'effet apply_id (ancien opcode_326_condition) : $fx_condition_text, vide pour une
 // ligne de splprot.2da sans condition à écrire (« EA >= 0 »). Statistique, valeur (celle de la
 // table, ou parameter1 pour - 1) et relation de la ligne donnent la chaîne de stats.2da, de la clé la
-// plus précise à la plus générale ; une chaîne reprise de l'ancien fichier (@13260000-@13269999 ->
-// @23260000-@23269999) n'utilise que les chaînes de cible et, pour les statistiques d'un fichier IDS
-// (266 à 268, 271, 273), le nom de la valeur (idName), pour la taille, la classe, l'alignement et
-// l'état de sort, le leur (ad_op_326_condition_name) et, pour les phrases génériques, le nom de la
-// statistique (theStatistic) et la valeur (value). Refus : ligne absente ou inutilisée ; aucune
-// clé dans stats.2da (l'ancien moteur garde la condition précédente) ; statistique que l'ancien moteur
-// écrit autrement (263 heure, 270 type précis) ou d'un fichier IDS mal calculé (262) ; valeur sans
-// nom ; statistique sans nom ; chaîne non
-// reprise, qui utilise une autre variable (compétence, élément…). Hors erreur de fichier, le refus attend les
-// lignes (fx_condition_refusal) : l'ancien moteur n'écrit pas de condition sans ligne du sort
-// appliqué (SPWI910).
+// plus précise à la plus générale. Une valeur ou une relation « * » (SOURCE, EVASIONCHECK : aucune
+// valeur à tester) sert de joker dans la clé. Une chaîne reprise de l'ancien fichier
+// (@13260000-@13269999 -> @23260000-@23269999) n'utilise que les chaînes de cible et, pour les
+// statistiques d'un fichier IDS (266 à 268, 271, 273), le nom de la valeur (idName), pour la taille,
+// la classe, l'alignement et l'état de sort, le leur (ad_op_326_condition_name) et, pour les phrases
+// génériques, le nom de la statistique (theStatistic) et la valeur (value).
+// Refus : ligne absente ou inutilisée ; aucune clé dans stats.2da (l'ancien moteur garde la
+// condition précédente) ; statistique que l'ancien moteur écrit autrement (263 heure, 270 type
+// précis) ou d'un fichier IDS mal calculé (262) ; valeur sans nom ; statistique sans nom ; chaîne non
+// reprise, qui utilise une autre variable (compétence, élément…). Hors erreur de fichier, le refus
+// attend les lignes (fx_condition_refusal) : l'ancien moteur n'écrit pas de condition sans ligne du
+// sort appliqué (SPWI910).
 DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 	SPRINT $fx_condition_refusal(~%apply_id%~) ~~
 	SPRINT apply_pending ~~
@@ -160,14 +161,16 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		SPRINT apply_relation $AD_SPLPROT_RELATION(~%apply_row%~)
 	END
 	SPRINT apply_condition ~~
-	PATCH_IF NOT IS_AN_INT apply_stat OR NOT IS_AN_INT apply_value OR NOT IS_AN_INT apply_relation BEGIN
+	PATCH_IF NOT IS_AN_INT apply_stat
+			OR (NOT IS_AN_INT apply_value AND NOT ~%apply_value%~ STRING_EQUAL ~*~)
+			OR (NOT IS_AN_INT apply_relation AND NOT ~%apply_relation%~ STRING_EQUAL ~*~) BEGIN
 		SET drop_id = apply_id
 		SPRINT ignored_reason ~file_error:opcode326:splprot~
 		SPRINT ignored_message ~row %apply_row% of SPLPROT.2DA is missing or unused~
 		LPM ad_application_drop
 	END
 	ELSE BEGIN
-		PATCH_IF apply_value == 0 - 1 BEGIN
+		PATCH_IF IS_AN_INT apply_value AND apply_value == 0 - 1 BEGIN
 			SPRINT apply_value $fx_parameter1(~%apply_id%~)
 		END
 		SPRINT apply_key ~%apply_stat%-%apply_value%-%apply_relation%~
@@ -186,8 +189,11 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		// d'argile », liste @8190000 : 8 190 000 + chaîne de l'ancien fichier - 800 000).
 		SET apply_mod_tra = 0
 		SET apply_mod_value_name = 0
-		SET apply_splstate_tra = 8120000 + apply_value
-		PATCH_IF apply_stat == 274 AND NOT TRA_ENTRY_EXISTS (~%apply_splstate_tra%~) BEGIN
+		SET apply_splstate_tra = 0
+		PATCH_IF apply_stat == 274 AND IS_AN_INT apply_value BEGIN
+			SET apply_splstate_tra = 8120000 + apply_value
+		END
+		PATCH_IF apply_stat == 274 AND apply_splstate_tra > 0 AND NOT TRA_ENTRY_EXISTS (~%apply_splstate_tra%~) BEGIN
 			LOOKUP_IDS_SYMBOL_OF_INT apply_symbol ~SPLSTATE~ apply_value
 			TO_UPPER apply_symbol
 			PATCH_IF VARIABLE_IS_SET $AD_STAT_MOD_CONDITION(~274-%apply_symbol%~) BEGIN
@@ -231,7 +237,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ AND apply_mod_tra == 0 BEGIN
 			SET apply_tra = $AD_STAT_CONDITION(~%apply_key%~) + 10000000
 			SET apply_stat_tra = apply_stat + 8060000
-			PATCH_IF $AD_STAT_CONDITION_ADD_RELATION(~%apply_key%~) BEGIN
+			PATCH_IF $AD_STAT_CONDITION_ADD_RELATION(~%apply_key%~) AND IS_AN_INT apply_relation BEGIN
 				SET apply_tra += apply_relation
 			END
 			PATCH_IF NOT TRA_ENTRY_EXISTS (~%apply_tra%~) BEGIN

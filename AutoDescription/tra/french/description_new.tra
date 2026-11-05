@@ -722,6 +722,7 @@
 @8030332 = ~la modification des dégâts d'un type spécifique~ // reprise de @400332
 @8030333 = ~les effets incantant des sorts à intervalle régulier~ // reprise de @400333
 @8030334 = ~ à la possibilité de repousser des créatures~ // reprise de @400334
+@8030335 = ~l'effet Sept yeux~ // reprise de @400335
 @8030336 = ~~ // reprise de @400336
 @8030337 = ~la dissipation d'effet spécifique~ // reprise de @400337
 @8030338 = ~~ // reprise de @400338
@@ -1283,6 +1284,7 @@
 @8098017 = ~créatures loyales bonnes~ // reprise de @208017
 @8098018 = ~créatures loyales neutres~ // reprise de @208018
 @8098019 = ~créatures loyales mauvaises~ // reprise de @208019
+@8098032 = ~créatures ni loyales ni chaotiques~ // reprise de @208032
 @8098033 = ~créatures neutres bonnes~ // reprise de @208033
 @8098034 = ~créatures neutres strictes~ // reprise de @208034
 @8098035 = ~créatures neutres mauvaises~ // reprise de @208035
@@ -1805,6 +1807,7 @@
 @8160332 = ~les effets modifiant les dégâts d'un type spécifique~ // reprise de @401332
 @8160333 = ~les effets incantant les sorts à intervalle régulier~ // reprise de @401333
 @8160334 = ~les effets permettant de repousser des créatures~ // reprise de @401334
+@8160335 = ~les effets de Sept yeux~ // reprise de @401335
 @8160336 = ~~ // reprise de @401336
 @8160337 = ~les effets dissipant un effet spécifique~ // reprise de @401337
 @8160338 = ~~ // reprise de @401338
@@ -4013,6 +4016,8 @@
 @23269383 = ~Si %theTarget% est de taille supérieure à %sizeName%~ // reprise de @13269383
 @23269384 = ~Si %theTarget% est de taille supérieure ou égale à %sizeName%~ // reprise de @13269384
 @23269385 = ~Si %theTarget% n'est pas de taille %sizeName%~ // reprise de @13269385
+@23269400 = ~Si %theTarget% est à l'origine de l'effet~ // reprise de @13269400
+@23269401 = ~Si %theTarget% n'est pas à l'origine de l'effet~ // reprise de @13269401
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
 // Opcode 329 : Ralentissement des poisons : phrases 0100 (23 290 000-23 290 999)

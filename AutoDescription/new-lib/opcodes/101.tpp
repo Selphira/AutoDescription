@@ -11,7 +11,8 @@
 // 2da/immunity_absorbs.2da) ni celle de l'action libre ; la ligne unique qu'il y forme prend les
 // champs (durée, jet de sauvegarde…) de la dernière immunité de son groupe.
 
-// Refus : opcode sans libellé.
+// Refus : opcode du catalogue sans libellé. Opcode hors du catalogue (ADTIM13 : 999) : erreur de fichier,
+// effet écarté comme dans l'ancien moteur.
 
 DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
@@ -24,6 +25,12 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 					SET drop_id = immunity_id
 					SPRINT ignored_reason ~file_error:opcode101:unknown_opcode~
 					SPRINT ignored_message ~opcode %immunity_opcode% does not exist (expected 0-999)~
+					LPM ad_application_drop
+				END
+				ELSE PATCH_IF NOT VARIABLE_IS_SET $AD_OPCODE_AVAILABLE(~%immunity_opcode%~) BEGIN
+					SET drop_id = immunity_id
+					SPRINT ignored_reason ~file_error:opcode101:unknown_opcode~
+					SPRINT ignored_message ~opcode %immunity_opcode% is not in the opcode catalog (2da/opcodes.2da) and has no name (string %immunity_label_tra%)~
 					LPM ad_application_drop
 				END
 				ELSE BEGIN

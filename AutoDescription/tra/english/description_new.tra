@@ -722,6 +722,7 @@
 @8030332 = ~specific damage modifier~ // reprise de @400332
 @8030333 = ~Static charge~ // reprise de @400333
 @8030334 = ~Turn Undead~ // reprise de @400334
+@8030335 = ~Seven Eyes~ // reprise de @400335
 @8030336 = ~~ // reprise de @400336
 @8030337 = ~remove opcode~ // reprise de @400337
 @8030338 = ~~ // reprise de @400338
@@ -1283,6 +1284,7 @@
 @8098017 = ~lawful good creatures~ // reprise de @208017
 @8098018 = ~lawful neutral creatures~ // reprise de @208018
 @8098019 = ~lawful evil creatures~ // reprise de @208019
+@8098032 = ~creatures neither lawful nor chaotic~ // reprise de @208032
 @8098033 = ~neutral good creatures~ // reprise de @208033
 @8098034 = ~neutral creatures~ // reprise de @208034
 @8098035 = ~neutral evil creatures~ // reprise de @208035
@@ -1805,6 +1807,7 @@
 @8160332 = ~effects modifying specific damage modifier~ // reprise de @401332
 @8160333 = ~Static Charge~ // reprise de @401333
 @8160334 = ~Turn Undead~ // reprise de @401334
+@8160335 = ~Seven Eyes effects~ // reprise de @401335
 @8160336 = ~~ // reprise de @401336
 @8160337 = ~remove Opcode~ // reprise de @401337
 @8160338 = ~~ // reprise de @401338
@@ -3394,10 +3397,10 @@
 @22210101 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210001
 @22210102 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210002
 @22210103 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210002
-@22210110 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
-@22210111 = ~Dissipe tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210003
-@22210112 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
-@22210113 = ~de dissiper tous les sorts de type %spellSecondaryTypeName% sur %theTarget%~ // reprise de @12210004
+@22210110 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210003
+@22210111 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210003
+@22210112 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210004
+@22210113 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~ // reprise de @12210004
 
 // Opcode 222 : Champ de téléportation : phrases 0100 (22 220 000-22 220 999)
 @22220100 = ~Randomly teleports %theTarget% to a radius of %range%~ // reprise de @12220001
@@ -4013,6 +4016,8 @@
 @23269383 = ~Si %theTarget% est de taille supérieure à %sizeName%~ // reprise de @13269383
 @23269384 = ~Si %theTarget% est de taille supérieure ou égale à %sizeName%~ // reprise de @13269384
 @23269385 = ~Si %theTarget% n'est pas de taille %sizeName%~ // reprise de @13269385
+@23269400 = ~If %theTarget% is the source of the effect~ // reprise de @13269400
+@23269401 = ~If %theTarget% is not the source of the effect~ // reprise de @13269401
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
 // Opcode 329 : Ralentissement des poisons : phrases 0100 (23 290 000-23 290 999)

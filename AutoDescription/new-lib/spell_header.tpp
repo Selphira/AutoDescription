@@ -503,9 +503,14 @@ BEGIN
 		ELSE BEGIN
 			SPRINT first_table ~AD_FIRST_CASTER_LEVEL_PRIEST~
 		END
+		// Niveau absent de la table (sort divin de niveau 9) : règle des en-têtes, comme un autre type de sort.
 		PATCH_IF NOT VARIABLE_IS_SET $EVAL ~%first_table%~(~%first_spell_level%~) BEGIN
-			PATCH_FAIL ~New engine: no first caster level for a spell of level %first_spell_level% in %first_table%~
+			LPF ad_refusal STR_VAR reason = ~file_error:spell_first_level:no_table_entry~ message = ~spell type %first_type%, level %first_spell_level%: no first caster level in %first_table% (MXSPL*.2DA), first level taken from the headers~ RET first_event = refusal END
+			LPF ad_log_event STR_VAR event = ~%first_event%~ consequence = ~kept~ RET first_logged = reason END
+			SET first_type = 0
 		END
+	END
+	PATCH_IF first_type == 1 OR first_type == 2 BEGIN
 		SET first_level = $EVAL ~%first_table%~(~%first_spell_level%~)
 	END
 	ELSE BEGIN
