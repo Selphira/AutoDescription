@@ -13,10 +13,13 @@
 // Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
 // opcode_resref_is_valid).
 // Refus : sort d'Item Revision
-// (AD_ITEM_REVISION_SPELLS : l'ancien moteur en écrit un texte propre) ; en-tête à charges d'une
-// fléchette (ses lignes vont aux capacités de combat, où l'ancien moteur les écrit autrement) ; sort
-// nommé lancé par un sous-sort d'un objet (l'ancien moteur y lit le type de capacité de l'objet ; un
-// sort n'en a pas, ancien abilityType négatif) ; refus de ad_cast_spell_recursion_support.
+// (AD_ITEM_REVISION_SPELLS : l'ancien moteur en écrit un texte propre) ; sort nommé lancé par un
+// en-tête à charges d'une fléchette (ses lignes vont aux capacités de combat, où l'ancien moteur les
+// écrit autrement) ; sort nommé lancé par un sous-sort d'un objet (l'ancien moteur y lit le type de
+// capacité de l'objet ; un sort n'en a pas, ancien abilityType négatif) ; refus de
+// ad_cast_spell_recursion_support. Un sort sans nom d'une fléchette est décrit par ses effets, et ne
+// refuse la fléchette que s'il écrit des lignes (recursion_lines_reason) : sans ligne, l'ancien moteur
+// n'écrit rien.
 DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 	FOR (cast_id = 0; cast_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++cast_id) BEGIN
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode BEGIN
@@ -52,7 +55,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			ELSE PATCH_IF VARIABLE_IS_SET $AD_ITEM_REVISION_SPELLS(~%cast_resref%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:item_revision~ message = ~spell %cast_resref% from Item Revisions~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) BEGIN
+			ELSE PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) AND NOT (~%cast_name%~ STRING_EQUAL ~~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:dart~ message = ~dart casting a spell on each charge~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (item_type == ITM_TYPE_potion AND $fx_probability(~%cast_id%~) >= 100) OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
@@ -155,6 +158,12 @@ DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SET recursion_versus_set = 0
 	SPRINT recursion_versus ~~
 	SPRINT recursion_single_reason ~~
+	SPRINT recursion_lines_reason ~~
+	SPRINT recursion_lines_message ~~
+	PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) BEGIN
+		SPRINT recursion_lines_reason ~not_implemented:opcode%cast_opcode%:dart~
+		SPRINT recursion_lines_message ~dart casting a spell on each charge~
+	END
 	SET recursion_delayed = 1
 	SET recursion_probability = 1
 	LPM ad_recursion_support

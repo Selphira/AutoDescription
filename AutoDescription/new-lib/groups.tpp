@@ -588,8 +588,10 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 	PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
 		SPRINT immunity_scope $fx_scope(~%immunity_id%~)
 		// Dans un sort, l'ancien moteur applique aussi les règles des effets d'équipement (abilityType
-		// négatif) ; l'en-tête d'une potion, à charges, les suit aussi (POTX05).
-		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR resource_is_spell OR item_type == ITM_TYPE_potion
+		// négatif) ; l'en-tête d'une potion, à charges, les suit aussi (POTX05). Le sort chargé comme
+		// sous-sort d'un objet (pas l'EFF, à effet unique) a le même type négatif : MO1H64 n'écrit que
+		// l'immunité contre le drain de niveaux, qui absorbe la restauration (224).
+		SET immunity_equipped = (~%immunity_scope%~ STRING_EQUAL ~equipped~) OR resource_is_spell OR item_type == ITM_TYPE_potion OR (ctx_depth > 0 AND NOT ctx_single_effect)
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) BEGIN
 			SET immunity_opcode = $fx_parameter2(~%immunity_id%~)
 			FOR (absorb_row = 0; absorb_row < AD_IMMUNITY_ABSORB_COUNT; ++absorb_row) BEGIN

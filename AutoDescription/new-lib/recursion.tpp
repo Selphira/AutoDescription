@@ -71,6 +71,8 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET recursion_hit_target = 0
 	SPRINT recursion_frequency ~~
 	SET recursion_inherit_dice = 0
+	SPRINT recursion_lines_reason ~~
+	SPRINT recursion_lines_message ~~
 END
 
 // La sous-ressource recursion_resref peut-elle être décrite ? recursion_allowed : 1 si oui ; 0 au-delà
@@ -119,7 +121,9 @@ END
 // vérification ; recursion_depth_reset
 // (sort décrit hors de la limite de profondeur, et ses propres sous-sorts comme ceux d'un premier
 // sous-sort : ancien appel sans recursivity, opcode 326) ; recursion_single_reason et
-// recursion_single_message : refus de plusieurs lignes dans la sous-ressource (vide : acceptées).
+// recursion_single_message : refus de plusieurs lignes dans la sous-ressource (vide : acceptées) ;
+// recursion_lines_reason et recursion_lines_message : refus de la ressource si le sous-sort écrit au
+// moins une ligne (vide : acceptées), remis à vide après la vérification.
 // Au-delà de la
 // profondeur permise, l'ancien moteur n'écrit rien, même pour un effet probable ou différé. Refus :
 // effet probable, sauf pour un opcode de AD_OPCODES_SUB_PROBABILITY ou avec recursion_probability, dont
@@ -163,7 +167,7 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SET line_fx = recursion_fx
 				SPRINT line_the_target ~~
 				LPM ad_application_form
-				LPM ad_application_target_strings
+				LPM ad_recursion_target_strings
 				SPRINT line_only_for ~~
 				PATCH_IF app_target_missing BEGIN
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:target~ message = ~no text for the target of the effect~ RET render_missing = refusal END
@@ -192,6 +196,8 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
 				SPRINT $fx_sub_single_reason(~%recursion_fx%~) ~%recursion_single_reason%~
 				SPRINT $fx_sub_single_message(~%recursion_fx%~) ~%recursion_single_message%~
+				SPRINT $fx_sub_lines_reason(~%recursion_fx%~) ~%recursion_lines_reason%~
+				SPRINT $fx_sub_lines_message(~%recursion_fx%~) ~%recursion_lines_message%~
 				SET $fx_sub_delayed(~%recursion_fx%~) = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
 				SET $fx_sub_probability_lines(~%recursion_fx%~) = recursion_probability
 				SPRINT $fx_sub_frequency(~%recursion_fx%~) ~%recursion_frequency%~
@@ -206,6 +212,18 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SET recursion_hit_target = 0
 	SPRINT recursion_frequency ~~
 	SET recursion_inherit_dice = 0
+	SPRINT recursion_lines_reason ~~
+	SPRINT recursion_lines_message ~~
+END
+
+// Chaînes de cible de l'effet line_fx pour les sous-effets de son sous-sort (ad_recursion_support,
+// ad_recursion_describe_pending) : les refus de ad_application_target_strings (zone, type de créature,
+// restriction de niveau) portent sur la phrase de la ligne, que ad_effect_line prononcera si le sous-sort
+// en écrit une ; sans ligne, l'ancien moteur n'écrit rien et ne refuse rien.
+DEFINE_PATCH_MACRO ad_recursion_target_strings BEGIN
+	SPRINT recursion_probe_late ~%render_late_missing%~
+	LPM ad_application_target_strings
+	SPRINT render_late_missing ~%recursion_probe_late%~
 END
 
 // Description des sous-ressources vérifiées par ad_recursion_support, dans l'ordre de leur
@@ -249,7 +267,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SET line_fx = recursion_fx
 				SPRINT line_the_target ~~
 				LPM ad_application_form
-				LPM ad_application_target_strings
+				LPM ad_recursion_target_strings
 				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
 				PATCH_IF app_versus_count > 0 BEGIN
 					SPRINT $fx_sub_only_for(~%recursion_fx%~) ~%app_versus_only_for%~
@@ -272,7 +290,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SET line_fx = recursion_fx
 				SPRINT line_the_target ~~
 				LPM ad_application_form
-				LPM ad_application_target_strings
+				LPM ad_recursion_target_strings
 				PATCH_IF app_versus_count > 0 BEGIN
 					SET $fx_sub_versus_set(~%recursion_fx%~) = 1
 					SPRINT $fx_sub_versus(~%recursion_fx%~) ~%versus%~
@@ -368,8 +386,13 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			END
 			ELSE BEGIN
 				SPRINT recursion_single_reason $fx_sub_single_reason(~%recursion_fx%~)
+				SPRINT recursion_pending_lines_reason $fx_sub_lines_reason(~%recursion_fx%~)
 				SPRINT recursion_delayed_text $fx_sub_duration_text(~%recursion_fx%~)
-				PATCH_IF recursion_sub_count > 1 AND NOT (~%recursion_single_reason%~ STRING_EQUAL ~~) BEGIN
+				PATCH_IF recursion_sub_count > 0 AND NOT (~%recursion_pending_lines_reason%~ STRING_EQUAL ~~) BEGIN
+					SPRINT recursion_pending_lines_message $fx_sub_lines_message(~%recursion_fx%~)
+					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_pending_lines_reason%~ message = ~%recursion_pending_lines_message%~ RET render_late_missing = refusal END
+				END
+				ELSE PATCH_IF recursion_sub_count > 1 AND NOT (~%recursion_single_reason%~ STRING_EQUAL ~~) BEGIN
 					SPRINT recursion_single_message $fx_sub_single_message(~%recursion_fx%~)
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~%recursion_single_reason%~ message = ~%recursion_single_message%~ RET render_late_missing = refusal END
 				END
