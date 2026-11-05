@@ -1626,6 +1626,23 @@ BEGIN
 	PATCH_IF spellLevel < 1 BEGIN
 		SET spellLevel = 1
 	END
+	// Niveau absent de la table (Ex: un sort divin de niveau 9)
+	PATCH_IF spellType == 1 OR spellType == 2 BEGIN
+		SPRINT firstLevelTable ~wizard~
+		PATCH_IF spellType == 2 BEGIN
+			READ_LONG SPL_exclusion_flags exclusionFlags
+			PATCH_IF (exclusionFlags BAND BIT31) == BIT31 BEGIN
+				SPRINT firstLevelTable ~priest~
+			END
+			ELSE BEGIN
+				SPRINT firstLevelTable ~druid~
+			END
+		END
+		PATCH_IF NOT VARIABLE_IS_SET $EVAL ~first_caster_level_%firstLevelTable%~(~%spellLevel%~) BEGIN
+			LPF ~add_log_warning~ STR_VAR message = ~No first caster level for spell %SOURCE_RES% (type %spellType%, level %spellLevel%) in the table of %firstLevelTable% spells (MXSPL*.2DA): first level taken from the headers.~ END
+			SET spellType = 0
+		END
+	END
 	PATCH_IF spellType == 2 BEGIN
 		READ_LONG SPL_exclusion_flags exclusionFlags
 		SET excludeDruid = (exclusionFlags BAND BIT31) == BIT31

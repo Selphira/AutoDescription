@@ -227,12 +227,21 @@ DEFINE_PATCH_FUNCTION ~can_update_item~
 BEGIN
 	SET canUpdateItem = 1
 	SPRINT ignore_reason ~~
+	SPRINT itemSignature ~~
 
+	PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+		READ_ASCII 0 itemSignature (8)
+	END
 	// Evite un crash sur les objets vides
 	PATCH_IF SOURCE_SIZE <= 0x71 BEGIN
 		SET canUpdateItem = 0
 		SPRINT ignore_reason ~invalid_file~
 		LPF ~add_log_error~ STR_VAR message = ~Invalid file.~ END
+	END
+	ELSE PATCH_IF NOT (~%itemSignature%~ STRING_EQUAL ~ITM V1  ~) BEGIN
+		SET canUpdateItem = 0
+		SPRINT ignore_reason ~invalid_file~
+		LPF ~add_log_error~ STR_VAR message = ~Invalid file: signature "%itemSignature%" (expected "ITM V1  ").~ END
 	END
 	// Si l'utilisateur ne veut pas modifier la description des objets maudits
 	ELSE PATCH_IF NOT include_cursed_items AND (flags BAND BIT4) == BIT4 BEGIN

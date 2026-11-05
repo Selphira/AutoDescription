@@ -86,6 +86,8 @@ STAT    STAT_VALUE    RELATION DESC_REF    STAT_REF    TARGET_REF  COMMENT
 136  *   *   13269020    12760002    *   le score de Détection des illusions
 137  *   *   13269020    12770002    *   le score de Pose de pièges
 
+256  *   *   13269400    *    *   source de l'effet
+257  *   *   13269401    *    *   non source de l'effet
 258  *   *   13269380    *    *   circlesize
 
 261  *   1   13269241    *    *   source and target morale match
