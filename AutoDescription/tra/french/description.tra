@@ -895,6 +895,7 @@
 @208017 = ~créatures loyales bonnes~
 @208018 = ~créatures loyales neutres~
 @208019 = ~créatures loyales mauvaises~
+@208032 = ~créatures ni loyales ni chaotiques~
 @208033 = ~créatures neutres bonnes~
 @208034 = ~créatures neutres strictes~
 @208035 = ~créatures neutres mauvaises~
@@ -1401,7 +1402,7 @@
 @400332 = ~la modification des dégâts d'un type spécifique~
 @400333 = ~les effets incantant des sorts à intervalle régulier~
 @400334 = ~ à la possibilité de repousser des créatures~
-//@400335 = ~~ // TODO
+@400335 = ~l'effet Sept yeux~
 @400336 = ~~ // Opcode visuel
 @400337 = ~la dissipation d'effet spécifique~
 @400338 = ~~ // Non pertinent
@@ -1757,7 +1758,7 @@
 @401332 = ~les effets modifiant les dégâts d'un type spécifique~
 @401333 = ~les effets incantant les sorts à intervalle régulier~
 @401334 = ~les effets permettant de repousser des créatures~
-//@401335 = ~~ // TODO
+@401335 = ~les effets de Sept yeux~
 @401336 = ~~ // Opcode visuel
 @401337 = ~les effets dissipant un effet spécifique~
 @401338 = ~~ // Non pertinent
@@ -4179,7 +4180,7 @@
 //
 @13240574 = ~d'être inefficace contre les créatures mortes~
 @13240575 = ~d'être inefficace contre les créatures vivantes~
-@13240076 = ~~ // @13240610
+@13240576 = ~~ // @13240610
 @13240577 = ~d'être inefficace contre les créatures insensibles aux poisons~
 @13240578 = ~d'être inefficace contre les créatures sensibles aux poisons~
 @13240579 = ~d'être inefficace contre les créatures insensibles à l'acide~
@@ -4463,6 +4464,8 @@
 @13269384 = ~Si %theTarget% est de taille supérieure ou égale à %sizeName%~
 @13269385 = ~Si %theTarget% n'est pas de taille %sizeName%~
 
+@13269400 = ~Si %theTarget% est à l'origine de l'effet~
+@13269401 = ~Si %theTarget% n'est pas à l'origine de l'effet~
 @13269800 = ~Si %theTarget% est sous l'effet d'une potion~
 
 @13260089 = ~Entre 6h et 20h~

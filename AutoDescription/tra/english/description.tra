@@ -736,6 +736,7 @@
 @208017 = ~lawful good creatures~
 @208018 = ~lawful neutral creatures~
 @208019 = ~lawful evil creatures~
+@208032 = ~creatures neither lawful nor chaotic~
 @208033 = ~neutral good creatures~
 @208034 = ~neutral creatures~
 @208035 = ~neutral evil creatures~
@@ -1226,7 +1227,7 @@
 @400332 = ~specific damage modifier~
 @400333 = ~Static charge~
 @400334 = ~Turn Undead~
-//@400335 = ~~ // TODO
+@400335 = ~Seven Eyes~
 @400336 = ~~ // Opcode visuel
 @400337 = ~remove opcode~
 @400338 = ~~ // Non pertinent
@@ -1581,7 +1582,7 @@
 @401332 = ~effects modifying specific damage modifier~
 @401333 = ~Static Charge~
 @401334 = ~Turn Undead~
-//@401335 = ~~ // TODO
+@401335 = ~Seven Eyes effects~
 @401336 = ~~ // Opcode visuel
 @401337 = ~remove Opcode~
 @401338 = ~~ // Non pertinent
@@ -3223,8 +3224,8 @@
 
 @12210001 = ~Dispels all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
 @12210002 = ~to dispel all %spellSecondaryTypeName% spells of level %spellLevel% or lower on %theTarget%~
-@12210001 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~
-@12210002 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~
+@12210003 = ~Dispels all %spellSecondaryTypeName% spells on %theTarget%~
+@12210004 = ~to dispel all %spellSecondaryTypeName% spells on %theTarget%~
 
 // Opcode 222: Spell Effect: Teleport Field [222]
 
@@ -3972,7 +3973,7 @@
 //
 @13240574 = ~to be ineffective against dead creatures~
 @13240575 = ~to be ineffective against living creatures~
-@13240076 = ~~ // @13240610
+@13240576 = ~~ // @13240610
 @13240577 = ~to be ineffective against creatures immune to poison~
 @13240578 = ~to be ineffective against creatures sensitive to poison~
 @13240579 = ~to be ineffective against creatures immune to acid~
@@ -4224,6 +4225,8 @@
 @13261000 = ~If proficiency in %proficiency% is greater than or equal to %value%~
 @13261001 = ~If proficiency in %proficiency% is equal to %value%~
 @13261002 = ~If proficiency in %proficiency% is less than %value%~
+@13269400 = ~If %theTarget% is the source of the effect~
+@13269401 = ~If %theTarget% is not the source of the effect~
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 

@@ -5846,12 +5846,15 @@ DEFINE_PATCH_MACRO ~delete_cure_linked_to_specific_immunity~ BEGIN
 	END
 END
 
-// DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
-// 	PATCH_IF NOT VARIABLE_IS_SET $sort_opcodes(~%parameter2%~) BEGIN
-// 		SET isValid = 0
-// 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Invalid Opcode %parameter2%.~ END
-// 	END
-// END
+DEFINE_PATCH_MACRO ~opcode_101_is_valid~ BEGIN
+	LOCAL_SET missingStrref = 400000 + parameter2
+	PATCH_TRY
+		LPF ~getTranslation~ INT_VAR strref = missingStrref opcode warning = 0 END
+	WITH DEFAULT
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: no name for the protected opcode %parameter2% (string %missingStrref% missing): effect ignored.~ END
+	END
+END
 
 /* -------------------------------------- *
  * Spell: Immunity (by Power Level) [102] *
@@ -9427,7 +9430,7 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
 	SET otherTypes = 0
 
 	PATCH_IF ~%target_type%~ STRING_EQUAL ~~ AND (opcode == 178 OR opcode == 179 OR opcode == 344 OR opcode == 177) BEGIN
-		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET targetType = idName END
+		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ missing_ok = 1 RET targetType = idName END
 		PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 			SET $targetTypes(~%targetType%~) = 1
 			SET kitTypes += parameter2 == 9
@@ -9467,12 +9470,12 @@ DEFINE_PATCH_MACRO ~opcode_set_target_strings~ BEGIN
                 SPRINT idName (AT file)
             END
             ELSE BEGIN
-				LPF ~get_ids_name~ INT_VAR entry file RET idName END
+				LPF ~get_ids_name~ INT_VAR entry file missing_ok = 1 RET idName END
             END
 			WHILE NOT ~%nestedEntries%~ STRING_EQUAL ~~ AND NOT ~%idName%~ STRING_EQUAL ~~ BEGIN
 				LPF return_first_entry STR_VAR list = ~%nestedEntries%~ separator = ~&~ RET nestedEntry = entry nestedEntries = list END
 				LPF return_first_entry STR_VAR list = ~%nestedEntry%~ separator = ~:~ RET nestedFile = entry nestedEntry = list END
-				LPF ~get_ids_name~ INT_VAR entry = nestedEntry file = nestedFile RET innerType = idName END
+				LPF ~get_ids_name~ INT_VAR entry = nestedEntry file = nestedFile missing_ok = 1 RET innerType = idName END
 				PATCH_IF ~%innerType%~ STRING_EQUAL ~~ BEGIN
 					SPRINT idName ~~
 				END
@@ -15327,7 +15330,7 @@ DEFINE_PATCH_MACRO ~opcode_326_condition~ BEGIN
     SPRINT tmpvalue $splprot_values(~%statType%~)
     SPRINT tmprelation $splprot_relations(~%statType%~)
 
-    PATCH_IF tmpvalue != "-1" BEGIN
+    PATCH_IF IS_AN_INT tmpvalue AND tmpvalue != "-1" BEGIN
         SPRINT value ~%tmpvalue%~
     END
 
@@ -15355,7 +15358,7 @@ PATCH_TRY
         SPRINT stat_strref $stats_stat_ref(~%currentKey%~)
         SET strref = $stats_desc_ref(~%currentKey%~)
 
-        PATCH_IF $stats_relation(~%currentKey%~) STRING_EQUAL ~*~ BEGIN
+        PATCH_IF $stats_relation(~%currentKey%~) STRING_EQUAL ~*~ AND IS_AN_INT tmprelation BEGIN
             SET strref += tmprelation
         END
 
@@ -16081,6 +16084,16 @@ END
 DEFINE_PATCH_MACRO ~opcode_target_probability_337~ BEGIN
 	LOCAL_SET strref = 13370004
 	LPM ~opcode_337_common~
+END
+
+DEFINE_PATCH_MACRO ~opcode_337_is_valid~ BEGIN
+	LOCAL_SET missingStrref = 401000 + (parameter2 == 101 AND parameter1 >= 0 ? parameter1 : parameter2)
+	PATCH_TRY
+		LPF ~getTranslation~ INT_VAR strref = missingStrref opcode warning = 0 END
+	WITH DEFAULT
+		SET isValid = 0
+		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: no name for the removed opcode %parameter2% (parameter1 %parameter1%, string %missingStrref% missing): effect ignored.~ END
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_337_common~ BEGIN
@@ -17670,7 +17683,7 @@ DEFINE_PATCH_MACRO ~opcode_self_42_62_get_levelstr~ BEGIN
 	LPF ~implode~ STR_VAR array_name = ~levels~ glue = ~, ~ final_glue = ~ %and% ~ RET levelStr = text END
 END
 
-DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
+DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 missing_ok = 0 RET idName BEGIN
 	SPRINT idName ~~
 
 	PATCH_IF file == 9 BEGIN
@@ -17690,7 +17703,17 @@ DEFINE_PATCH_FUNCTION ~get_ids_name~ INT_VAR entry = 0 file = 0 RET idName BEGIN
 		END
 		// si une entrée n'est pas définie dans le fichier ids, elle peut quand même l'être dans les strrefs
 		LPF ~get_ids_strref~ INT_VAR entry file RET strref END
-		LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
+		PATCH_IF missing_ok BEGIN
+			PATCH_TRY
+				LPF ~getTranslation~ INT_VAR strref opcode warning = 0 RET idName = string END
+			WITH DEFAULT
+				SPRINT idName ~~
+				LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: no name for value %entry% of %idsFile%.ids (string %strref% missing): described without this creature type.~ END
+			END
+		END
+		ELSE BEGIN
+			LPF ~getTranslation~ INT_VAR strref opcode RET idName = string END
+		END
 	END
 	ELSE BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END

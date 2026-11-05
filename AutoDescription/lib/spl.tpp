@@ -193,13 +193,30 @@ DEFINE_PATCH_FUNCTION ~can_update_spell~
 		totalInvalid
 BEGIN
 	SET canUpdateSpell = 1
+	SET spellHeaderCount = 1
 	SPRINT ignore_reason ~~
+	SPRINT spellSignature ~~
 
+	PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+		READ_ASCII 0 spellSignature (8)
+		READ_SHORT SPL_extended_headers_count spellHeaderCount
+	END
 	// Evite un crash sur les sorts vides
 	PATCH_IF SOURCE_SIZE <= 0x71 BEGIN
 		SET canUpdateSpell = 0
 		SPRINT ignore_reason ~invalid_file~
 		LPF ~add_log_error~ STR_VAR message = ~Invalid file.~ END
+	END
+	ELSE PATCH_IF NOT (~%spellSignature%~ STRING_EQUAL ~SPL V1  ~) BEGIN
+		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~invalid_file~
+		LPF ~add_log_error~ STR_VAR message = ~Invalid file: signature "%spellSignature%" (expected "SPL V1  ").~ END
+	END
+	// Un sort sans en-tête étendu n'a ni portée, ni cible, ni projectile à décrire
+	ELSE PATCH_IF spellHeaderCount == 0 BEGIN
+		SET canUpdateSpell = 0
+		SPRINT ignore_reason ~no_ability~
+		LPF ~add_log_warning~ STR_VAR message = ~Spell without extended header (%SOURCE_RES%): ignored.~ END
 	END
 	// Si l'utilisateur ne veut pas inclure les sorts sans description
 	ELSE PATCH_IF NOT include_spells_without_description AND (~%originalDescription%~ STRING_EQUAL ~~ OR originalDescriptionRef <= 0) BEGIN
