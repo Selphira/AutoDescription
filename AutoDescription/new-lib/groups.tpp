@@ -1075,6 +1075,9 @@ DEFINE_PATCH_MACRO ad_group_entangle BEGIN
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
 						SET $fx_consumed(~%group_candidate%~) = 1
+						PATCH_IF $fx_exception_count(~%group_candidate%~) == 0 BEGIN
+							SET $fx_group_anchor(~%group_candidate%~) = group_id
+						END
 						SET group_absorbed = 1
 					END
 				END

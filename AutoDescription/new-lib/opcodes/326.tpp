@@ -15,6 +15,9 @@
 // Refus : effet d'un EFF ; condition refusée (ad_op_326_condition) ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
+		SPRINT $fx_versus_list(~%apply_id%~) ~~
+	END
+	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%apply_id%~) BEGIN
 			SPRINT apply_resref $fx_resource_lower(~%apply_id%~)
 			SET apply_versus_set = 0
@@ -58,6 +61,9 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				SPRINT recursion_kind ~spl~
 				SET recursion_parent_dice = 0
 				SET recursion_versus_set = apply_versus_set
+				PATCH_IF apply_versus_set BEGIN
+					SPRINT $fx_versus_list(~%apply_id%~) ~%apply_versus_list%~
+				END
 				SPRINT recursion_versus ~%apply_versus%~
 				SPRINT recursion_single_reason ~~
 				LPM ad_recursion_support
@@ -107,6 +113,7 @@ DEFINE_PATCH_MACRO ad_op_326_versus_group BEGIN
 		SPRINT apply_and_the @2002001 // ~et les~
 		LPF ad_join STR_VAR array_name = ~apply_versus_names~ glue = EVAL ~, %apply_the% ~ final_glue = EVAL ~ %apply_and_the% ~ RET targetType = text END
 		SPRINT apply_versus @2002020 // ~contre les %targetType%~
+		SPRINT apply_versus_list ~%targetType%~
 		SET apply_versus_set = 1
 	END
 END
@@ -352,6 +359,15 @@ DEFINE_PATCH_MACRO ad_op_326_lines BEGIN
 			END
 			ELSE BEGIN
 				LPM ad_recursion_condition_text
+			END
+			// Types de créature réunis (ad_op_326_versus_group) : l'ancien moteur les donne aussi pour cible aux
+			// sous-effets (« Désintègre les élémentaires et les méphites »), en plus d'un retrait propre
+			// à la ligne ; le nouveau moteur ne les transmet qu'aux phrases qui lisent versus.
+			SPRINT apply_versus_list $fx_versus_list(~%apply_id%~)
+			PATCH_IF NOT (~%apply_versus_list%~ STRING_EQUAL ~~) BEGIN
+				PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%apply_versus_list%~ ~%line_text%~) < 0 BEGIN
+					LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:versus_target~ message = ~lines of a spell applied to a group of creature types that do not name them: the old engine makes them the target of the lines~ RET render_late_missing = refusal END
+				END
 			END
 			SET line_any_form = 1
 			SET line_no_duration = 1

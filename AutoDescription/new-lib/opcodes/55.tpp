@@ -7,8 +7,9 @@
 // ajoute en fin de liste.
 
 // Fichier qui n'est pas un type de créature : écarté et journalisé. Refus : kit.ids sur EE et valeur
-// 100 de ea.ids (l'ancien opcode_modstat_is_valid écarte ces cas) ; valeur sans nom ; effet d'un 177 qui vise un type de
-// créature (l'ancien moteur remplace alors le nom de l'opcode par celui du 177).
+// 100 de ea.ids (l'ancien opcode_modstat_is_valid écarte ces cas) ; valeur sans nom ; effet d'un 177 qui vise
+// un autre type de créature que le sien (l'ancien moteur remplace alors le nom de l'opcode par celui du
+// 177 : avec le même type, le texte est le même).
 DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 	PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -30,8 +31,9 @@ DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 			ELSE PATCH_IF kill_value != 0 AND ~%kill_name%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:ids_name~ message = ~value %kill_value% of IDS file %kill_file% has no name~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF $fx_versus_file(~%kill_id%~) > 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:versus~ message = ~creature type set by opcode 177~ RET render_missing = refusal END
+			ELSE PATCH_IF $fx_versus_file(~%kill_id%~) > 0 AND ($fx_versus_file(~%kill_id%~) != kill_file OR $fx_versus_value(~%kill_id%~) != kill_value
+					OR $fx_versus_inner_file(~%kill_id%~) > 0) BEGIN
+				LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:versus~ message = ~creature type set by opcode 177 (IDS file %kill_file%, value %kill_value% for the effect) differs from the one of the effect~ RET render_missing = refusal END
 			END
 		END
 	END

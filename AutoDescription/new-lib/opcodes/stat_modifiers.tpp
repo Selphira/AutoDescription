@@ -87,6 +87,10 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) AND NOT support_header_only BEGIN
 				SET stat_first = $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) - 1
 				SET $fx_consumed(~%stat_id%~) = 1
+				// Sans exception de cible : l'ancre ferait passer ses exceptions pour celles du doublon.
+				PATCH_IF $fx_exception_count(~%stat_id%~) == 0 BEGIN
+					SET $fx_group_anchor(~%stat_id%~) = stat_first
+				END
 				PATCH_IF NOT $fx_not_cumulative(~%stat_id%~) BEGIN
 					PATCH_IF stat_mode == MOD_TYPE_cumulative OR (stat_mode == 3 AND (~%stat_mode_3%~ STRING_EQUAL ~added~)) BEGIN
 						SET $fx_parameter1(~%stat_first%~) += stat_value

@@ -650,7 +650,8 @@ END
 // BUG-032) ; restriction de niveau. Une valeur sans nom (OHBREW04 : 100 de SPECIFIC.IDS) est décrite
 // sans type de créature, comme dans l'ancien moteur, erreur journalisée. Les classes d'un groupe de AD_VERSUS_CLASS_GROUPS sont réunies sous son nom (ad_application_versus_class_groups). Un kit (kit.ids, AD_KIT_NAMES) est celui du porteur : la cible
 // garde ses chaînes et la ligne finit par « uniquement pour le kit Archer » (« … les kits Bretteur et
-// Maître-lames ») ; refusé à une autre forme que « soi » ou avec un autre type de créature.
+// Maître-lames ») ; refusé à une autre forme que « soi » ; mêlé à d'autres types de créature, un kit est
+// nommé comme eux.
 DEFINE_PATCH_MACRO ad_application_versus BEGIN
 	SET app_versus_count = 0
 	SET app_versus_kits = 0
@@ -707,12 +708,10 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 		LPM ad_application_versus_class_groups
 	END
 	// Sous-effet d'un sort lancé par l'opcode 232 : l'ancien moteur y fixe versus à la cible de l'opcode,
-	// ou à vide pour une condition de distance (BUG-038).
+	// ou à vide pour une condition de distance (BUG-038). Le type de créature propre à l'effet (177) le
+	// remplace plus bas : « Inflige 1d2 points de dégâts de feu contre les morts-vivants ».
 	PATCH_IF ctx_versus_set BEGIN
 		SPRINT versus ~%ctx_versus%~
-		PATCH_IF app_versus_count > 0 BEGIN
-			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:recursion:versus_mixed~ message = ~creature type in a spell cast by opcode 232, whose target the old engine sets~ RET render_late_missing = refusal END
-		END
 	END
 	PATCH_IF app_versus_count > 0 BEGIN
 		PATCH_IF app_versus_plain BEGIN
@@ -725,11 +724,15 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 		ELSE PATCH_IF ($fx_level_max(~%line_fx%~) > 0 OR $fx_level_min(~%line_fx%~) > 1) AND (line_form == 0 OR line_form == 2) BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:level~ message = ~creature type with a level restriction on an effect on oneself~ RET render_late_missing = refusal END
 		END
-		ELSE PATCH_IF app_versus_kits > 0 BEGIN
-			PATCH_IF app_versus_kits < app_versus_count BEGIN
-				LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:kit_mixed~ message = ~kits mixed with other creature types~ RET render_late_missing = refusal END
-			END
-			ELSE PATCH_IF line_form != 0 BEGIN
+		// Un kit sous le type de créature fixé par un sort du 232, ou mêlé à d'autres types à une autre forme
+		// que « soi » : textes de l'ancien moteur non vérifiés.
+		ELSE PATCH_IF app_versus_kits > 0 AND (ctx_versus_set OR (app_versus_kits < app_versus_count AND line_form != 0)) BEGIN
+			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:kit_mixed~ message = ~kit under a creature type set by opcode 232, or mixed with other creature types on the target or probable form~ RET render_late_missing = refusal END
+		END
+		// Des kits seuls sont ceux du porteur ; mêlés à d'autres types à la forme « soi », ils sont nommés
+		// comme eux (« uniquement pour les guerriers / mages et les Maître-lames »).
+		ELSE PATCH_IF app_versus_kits > 0 AND app_versus_kits == app_versus_count BEGIN
+			PATCH_IF line_form != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:versus:kit_form~ message = ~kit restriction on an effect on the target or probable~ RET render_late_missing = refusal END
 			END
 			ELSE BEGIN
