@@ -1072,7 +1072,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
                     SET $opcode_219000_CA_values(~%idName%~) = 1
                 END
                 ELSE BEGIN
-                    LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %file%~ END
+                    LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %parameter2%~ END
                 END
 				LPF ~delete_opcode~
                     INT_VAR opcode = 219000 match_position = position
@@ -1113,9 +1113,9 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				PATCH_IF amount == 2 BEGIN
                     PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
                         INNER_PATCH_SAVE versus ~%versus%~ BEGIN
-                            REPLACE_TEXTUALLY ~ %and% ~ ~ ,~
+                            REPLACE_TEXTUALLY ~ %and% ~ ~, ~
                         END
-                        SPRINT versus ~%versus%, %the% %targetType%~
+                        SPRINT versus ~%versus% %andThe% %targetType%~
                     END
                 END
 				SPRINT value ~%value% %versus%~
@@ -1124,7 +1124,7 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 			PATCH_IF NOT VARIABLE_IS_SET $opcode_0_CA(~-2~) AND NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 				SET value = baseClassArmor - 2
 				SPRINT versus @102387 // ~contre les %targetType%~
-				SPRINT value ~%value% %targetType%~
+				SPRINT value ~%value% %versus%~
 				SET $opcode_0_CA_values(~%value%~) = 1
 			END
 			LPF ~implode~ STR_VAR array_name = ~opcode_0_CA_values~ glue = ~, ~ final_glue = ~, ~ RET classArmorValues = text END
@@ -1150,9 +1150,9 @@ DEFINE_PATCH_MACRO ~opcode_0_group~ BEGIN
 				PATCH_IF amount == 2 BEGIN
 					PATCH_IF NOT ~%targetType%~ STRING_EQUAL ~~ BEGIN
 						INNER_PATCH_SAVE versus ~%versus%~ BEGIN
-							REPLACE_TEXTUALLY ~ %and% ~ ~ ,~
+							REPLACE_TEXTUALLY ~ %and% ~ ~, ~
 						END
-						SPRINT versus ~%versus%, %the% %targetType%~
+						SPRINT versus ~%versus% %andThe% %targetType%~
 					END
 				END
 				PATCH_IF value != 0 BEGIN
@@ -11266,7 +11266,59 @@ DEFINE_PATCH_MACRO ~opcode_219_versus~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_219000_group~ BEGIN
+	LOCAL_SPRINT the @11770200 // ~les~
+	LOCAL_SPRINT andThe @11770201 // ~et les~
+	LOCAL_SET equippedTypes = 0
+	LOCAL_SET equippedAnchor = 0 - 1
 	LPM ~opcode_219_group_versus~
+	PATCH_IF NOT (shrink_class_armor AND VARIABLE_IS_SET $opcodes(~0~) AND $opcodes(~0~) > 0) BEGIN
+		CLEAR_ARRAY targetTypes
+		PATCH_DEFINE_ARRAY targetTypes BEGIN END
+		CLEAR_ARRAY equippedPositions
+		PATCH_DEFINE_ASSOCIATIVE_ARRAY equippedPositions BEGIN END
+
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF timingMode == TIMING_while_equipped AND target == TARGET_FX_self AND ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF VARIABLE_IS_SET $ids_files(~%parameter2%~) BEGIN
+					LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET idName END
+					SET $targetTypes(~%idName%~) = 1
+					SET equippedTypes += 1
+				END
+				ELSE BEGIN
+					LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: Wrong ids file : %parameter2%~ END
+				END
+				SET $equippedPositions(~%position%~) = 1
+				PATCH_IF equippedAnchor < 0 BEGIN
+					SET equippedAnchor = position
+				END
+			END
+		END
+		// Le nouvel effet reprend les champs du premier effet d'équipement réuni.
+		PATCH_IF equippedAnchor >= 0 BEGIN
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				PATCH_IF ~%data_0%~ == equippedAnchor BEGIN
+					LPM ~data_to_vars~
+				END
+			END
+			PATCH_PHP_EACH equippedPositions AS memberPosition => _ BEGIN
+				LPF ~delete_opcode~
+					INT_VAR opcode match_position = memberPosition
+					RET $opcodes(~%opcode%~) = count
+					RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+				END
+			END
+			// Bug où il reste toujours un item dans le tableau si c'était le dernier
+			PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+				CLEAR_ARRAY ~opcodes_%opcode%~
+			END
+			PATCH_IF equippedTypes > 0 BEGIN
+				LPF ~implode~ STR_VAR array_name = ~targetTypes~ glue = ~, %the% ~ final_glue = ~ %andThe% ~ RET targetType = text END
+				SPRINT custom_str @102387 // ~contre les %targetType%~
+				LPM ~add_opcode~
+			END
+		END
+	END
 END
 
 // Hors équipement (sorts, effets à l'impact…), les effets aux mêmes champs hormis le type de créature
