@@ -39,6 +39,13 @@ DEFINE_PATCH_MACRO ~opcode_is_valid~ BEGIN
 		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Timing mode == Instant/Limited and duration == 0~ END
 	END
 
+	// Avec un timing 6 (Limited after duration) appliqué directement, l'effet expire aussitôt (IESDP, eff_v1),
+	// comme une durée limitée de 0 seconde.
+	PATCH_IF timingMode == 6 AND NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~) BEGIN
+		SET isValid = 0
+		LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Timing mode == Limited after duration, the effect expires at once~ END
+	END
+
 	// Restriction de niveau de la cible sans aucun niveau possible (minimum au-dessus du maximum) :
 	// l'effet ne s'applique jamais (mêmes exceptions que add_target_level). Un effet d'équipement vise le
 	// porteur, sans restriction écrite.
@@ -399,13 +406,15 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value strDur
 	PATCH_IF timingMode > TIMING_duration_ticks AND timingMode != TIMING_absolute_duration AND timingMode != 5000 AND timingMode != 5001 BEGIN
 		SET timingMode = TIMING_permanent
 	END
+	// Avec un timing 6 et 7 appliqués directement (IESDP, eff_v1), le 6 expire aussitôt, le 7 devient
+	// permanent aussitôt.
 	ELSE PATCH_IF timingMode == 6 BEGIN
 		SET timingMode = TIMING_duration
-		SET duration = duration * 16 / 15
+		SET duration = 0
 	END
 	ELSE PATCH_IF timingMode == 7 BEGIN
-		SET timingMode = TIMING_delayed
-		SET duration = duration / 15
+		SET timingMode = TIMING_permanent
+		SET duration = 0
 	END
 	// TODO ~ TIMING_while_equipped + delay
 	ELSE PATCH_IF timingMode == 8 BEGIN
@@ -446,7 +455,7 @@ DEFINE_PATCH_FUNCTION ~get_duration_value~ INT_VAR duration = 0 RET value strDur
                     LPF ~get_str_duration~ INT_VAR duration RET strDuration END
 				END
 				ELSE BEGIN
-					SPRINT strDuration ~%duration% ticks~
+					SPRINT strDuration @100318 // ~moins d'une seconde~
 				END
 			END
 			SPRINT value @100311 // ~pendant %strDuration%~
