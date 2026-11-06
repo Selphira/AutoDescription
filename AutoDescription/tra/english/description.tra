@@ -386,6 +386,7 @@
 @100315 = ~%frequency% for %strDuration%~
 @100316 = ~%frequency% for %strDuration% after %afterStrDuration%~
 @100317 = ~Any hit points above the maximum disappear after %strDuration%~
+@100318 = ~less than one second~
 
 @100320 = ~per %strDuration%~
 @100321 = ~every %strDuration%~
