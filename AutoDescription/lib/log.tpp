@@ -42,7 +42,7 @@ DEFINE_ACTION_FUNCTION ~add_log~
 		message = ~~
 		type = ~warning~
 BEGIN
-	APPEND_OUTER ~AutoDescription/log/%log_filename%-%type%.log~ ~%SOURCE_FILE% : %message%~
+	APPEND_OUTER ~%MOD_FOLDER%/log/%log_filename%-%type%.log~ ~%SOURCE_FILE% : %message%~
 END
 
 DEFINE_PATCH_FUNCTION ~add_compare_row~
@@ -57,7 +57,7 @@ BEGIN
 	LPF html_escape STR_VAR text = ~%description%~         RET htmlDescription = text END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_filename%-diff.html~ ~<tr><th class="title">%filename%<br/>%htmlItemName%</th><td class="description before"><pre>%htmlOriginal%</pre></td><td class="description after"><pre>%htmlDescription%</pre></td></tr>~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_filename%-diff.html~ ~<tr><th class="title">%filename%<br/>%htmlItemName%</th><td class="description before"><pre>%htmlOriginal%</pre></td><td class="description after"><pre>%htmlDescription%</pre></td></tr>~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -89,7 +89,7 @@ BEGIN
 	LPF ~escape_dump_text~ STR_VAR text = ~%description%~ RET description = text END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_filename%-dump.txt~ ~%resref%%TAB%%status%%TAB%%description%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_filename%-dump.txt~ ~%resref%%TAB%%status%%TAB%%description%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -172,7 +172,7 @@ BEGIN
 	END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_filename%-compare.txt~ ~%SOURCE_RES%%TAB%%row%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_filename%-compare.txt~ ~%SOURCE_RES%%TAB%%row%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -215,23 +215,23 @@ BEGIN
 	// Initialisation des fichiers de log
 	<<<<<<<< .../AutoDescription/inlined/empty.log
 >>>>>>>>
-	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-warning.log~
-	COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-error.log~
+	COPY ~.../AutoDescription/inlined/empty.log~ ~%MOD_FOLDER%/log/%log_filename%-warning.log~
+	COPY ~.../AutoDescription/inlined/empty.log~ ~%MOD_FOLDER%/log/%log_filename%-error.log~
 	ACTION_IF regression_dump BEGIN
-		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-dump.txt~
+		COPY ~.../AutoDescription/inlined/empty.log~ ~%MOD_FOLDER%/log/%log_filename%-dump.txt~
 	END
 	ACTION_IF description_engine >= 2 BEGIN
-		COPY ~.../AutoDescription/inlined/empty.log~ ~AutoDescription/log/%log_filename%-compare.txt~
+		COPY ~.../AutoDescription/inlined/empty.log~ ~%MOD_FOLDER%/log/%log_filename%-compare.txt~
 	END
 	ACTION_IF description_engine != 0 BEGIN
 		LAF ~ad_init_log~ STR_VAR log_name = ~%log_filename%~ END
 	END
 	LAF ~subspell_cache_init~ END
 	ACTION_IF is_ee BEGIN
-		COPY ~AutoDescription/log/template_ee.html~ ~AutoDescription/log/%log_filename%-diff.html~
+		COPY ~%MOD_FOLDER%/log/template_ee.html~ ~%MOD_FOLDER%/log/%log_filename%-diff.html~
 	END
 	ELSE BEGIN
-		COPY ~AutoDescription/log/template.html~ ~AutoDescription/log/%log_filename%-diff.html~
+		COPY ~%MOD_FOLDER%/log/template.html~ ~%MOD_FOLDER%/log/%log_filename%-diff.html~
 	END
 END
 
