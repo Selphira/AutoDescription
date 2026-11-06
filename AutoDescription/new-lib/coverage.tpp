@@ -48,7 +48,7 @@ DEFINE_PATCH_MACRO ad_set_coverage BEGIN
 		PATCH_IF NOT (~%cov_lines%~ STRING_EQUAL ~~) BEGIN
 			INNER_ACTION BEGIN
 				SILENT
-				APPEND_OUTER ~AutoDescription/log/%log_name%-opcodes.txt~ ~%cov_lines%~ KEEP_CRLF
+				APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~ ~%cov_lines%~ KEEP_CRLF
 				VERBOSE
 			END
 		END

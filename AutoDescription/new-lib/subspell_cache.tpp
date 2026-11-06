@@ -24,7 +24,7 @@ BEGIN
 		MKDIR ~%AD_SUBSPELL_CACHE_FOLDER%~
 	END
 	ACTION_IF AD_SUBSPELL_CACHE == 2 BEGIN
-		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-subspell-cache.txt~
+		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-subspell-cache.txt~
 	END
 END
 
@@ -76,20 +76,20 @@ DEFINE_PATCH_MACRO ad_subspell_cache_read BEGIN
 			END
 		END
 	END
-	SET cache_events_size = SIZE_OF_FILE ~AutoDescription/log/%log_name%-events.txt~
-	SET cache_recursion_size = SIZE_OF_FILE ~AutoDescription/log/%log_name%-recursion.txt~
+	SET cache_events_size = SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-events.txt~
+	SET cache_recursion_size = SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-recursion.txt~
 END
 
 // Après la description : écart avec le texte trouvé (AD_SUBSPELL_CACHE = 2), sinon texte enregistré.
 DEFINE_PATCH_MACRO ad_subspell_cache_store BEGIN
-	SET cache_logged = (SIZE_OF_FILE ~AutoDescription/log/%log_name%-events.txt~ != cache_events_size)
-		OR (SIZE_OF_FILE ~AutoDescription/log/%log_name%-recursion.txt~ != cache_recursion_size)
+	SET cache_logged = (SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-events.txt~ != cache_events_size)
+		OR (SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ != cache_recursion_size)
 	PATCH_IF cache_hit BEGIN
 		PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) OR cache_logged OR sub_count != cache_count
 				OR NOT (~%sub_text%~ STRING_EQUAL ~%cache_text%~) OR NOT (~%sub_checked%~ STRING_EQUAL ~%cache_checked%~) BEGIN
 			INNER_ACTION BEGIN
 				SILENT
-				APPEND_OUTER ~AutoDescription/log/%log_name%-subspell-cache.txt~ ~%SOURCE_FILE%%TAB%%sub_resref%%TAB%%cache_key%%WNL%  cached (%cache_count%, %cache_checked%): %cache_text%%WNL%  computed (%sub_count%, %sub_checked%, logged %cache_logged%): %sub_missing%%sub_text%~ KEEP_CRLF
+				APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-subspell-cache.txt~ ~%SOURCE_FILE%%TAB%%sub_resref%%TAB%%cache_key%%WNL%  cached (%cache_count%, %cache_checked%): %cache_text%%WNL%  computed (%sub_count%, %sub_checked%, logged %cache_logged%): %sub_missing%%sub_text%~ KEEP_CRLF
 				VERBOSE
 			END
 		END

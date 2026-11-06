@@ -7,19 +7,19 @@ DEFINE_ACTION_FUNCTION ad_init_log
 BEGIN
 	<<<<<<<< .../AutoDescription/inlined/ad_empty.txt
 >>>>>>>>
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-opcodes.txt~
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-recursion.txt~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-recursion.txt~
 	// Tableaux markdown de ad_log_event : titre, puis en-tête du tableau.
 	OUTER_SPRINT ad_log_table ~| Resource | Problem | Location | Effect data | Reason | Consequence |%WNL%|---|---|---|---|---|---|~
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-file-errors.md~
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-not-implemented.md~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-file-errors.md~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-not-implemented.md~
 	SILENT
-	APPEND_OUTER ~AutoDescription/log/%log_name%-file-errors.md~ ~# New engine: errors in the game files%WNL%%WNL%%ad_log_table%~ KEEP_CRLF
-	APPEND_OUTER ~AutoDescription/log/%log_name%-not-implemented.md~ ~# New engine: cases not supported%WNL%%WNL%%ad_log_table%~ KEEP_CRLF
+	APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-file-errors.md~ ~# New engine: errors in the game files%WNL%%WNL%%ad_log_table%~ KEEP_CRLF
+	APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-not-implemented.md~ ~# New engine: cases not supported%WNL%%WNL%%ad_log_table%~ KEEP_CRLF
 	VERBOSE
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-events.txt~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-events.txt~
 	ACTION_IF AD_EFFECTS_DUMP BEGIN
-		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-effects.txt~
+		COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-effects.txt~
 	END
 	LAF ad_subspell_cache_init STR_VAR log_name END
 END
@@ -32,7 +32,7 @@ DEFINE_ACTION_FUNCTION ad_close_log
 	STR_VAR
 		log_name = ~~
 BEGIN
-	COPY - ~AutoDescription/log/%log_name%-opcodes.txt~ ~override~
+	COPY - ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~ ~override~
 		REPLACE_EVALUATE ~^\([^%TAB%%MNL%%LNL%]+\)%TAB%\([0-9]+\)%TAB%\([0-9]+\)%TAB%\([a-z]+\)~ BEGIN
 			PATCH_IF NOT VARIABLE_IS_SET $cov_resources(~%MATCH2%~) BEGIN
 				SET $cov_resources(~%MATCH2%~) = 0
@@ -66,17 +66,17 @@ BEGIN
 			END
 			SPRINT cov_summary ~%cov_summary%%cov_opcode%%TAB%%cov_kind_value%%TAB%%cov_occurrence_count%%TAB%%cov_resource_count%%TAB%%cov_example%~
 		END
-	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~AutoDescription/log/%log_name%-opcodes.txt~
+	COPY ~.../AutoDescription/inlined/ad_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~
 	ACTION_IF NOT (~%cov_summary%~ STRING_EQUAL ~~) BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_name%-opcodes.txt~ ~%cov_summary%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~ ~%cov_summary%~ KEEP_CRLF
 		VERBOSE
 	END
 	PRINT "Nouveau moteur : %cov_todo_count% opcodes a prendre en charge, %cov_unknown_count% opcodes inconnus (AutoDescription/log/%log_name%-opcodes.txt)"
 	OUTER_SET event_file_errors = 0
 	OUTER_SET event_not_implemented = 0
 	OUTER_SET event_ignored = 0
-	COPY - ~AutoDescription/log/%log_name%-events.txt~ ~override~
+	COPY - ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~override~
 		REPLACE_EVALUATE ~^[^%TAB%%MNL%%LNL%]+%TAB%\([a-z_]+\)%TAB%[^%TAB%%MNL%%LNL%]*%TAB%\([a-z]+\)~ BEGIN
 			PATCH_IF NOT (~%MATCH2%~ STRING_EQUAL ~refused~) BEGIN
 				SET event_ignored += 1
@@ -368,8 +368,8 @@ BEGIN
 	END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
-		APPEND_OUTER ~AutoDescription/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -380,7 +380,7 @@ END
 DEFINE_PATCH_MACRO ad_log_recursion BEGIN
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -403,7 +403,7 @@ DEFINE_PATCH_MACRO ad_fx_dump BEGIN
 	END
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~AutoDescription/log/%log_name%-effects.txt~ ~%fx_dump%~ KEEP_CRLF
+		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-effects.txt~ ~%fx_dump%~ KEEP_CRLF
 		VERBOSE
 	END
 END
