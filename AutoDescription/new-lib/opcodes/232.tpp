@@ -183,7 +183,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 END
 
 // Une ligne par effet dont le sous-sort en a ; « Lance le sort « … » sur le porteur » pour un sort
-// nommé à plusieurs lignes.
+// nommé à plusieurs lignes (« 11 % de chances de lancer le sort « … » » sous une probabilité).
 DEFINE_PATCH_MACRO ad_op_232_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~232~)
@@ -203,6 +203,12 @@ DEFINE_PATCH_MACRO ad_op_232_lines BEGIN
 					LPM ad_op_232_targets
 				END
 				SPRINT line_text @22320001 // ~Lance le sort « %spellName% » sur %theTarget%~
+				// Effet probable : sa probabilité, passée aux lignes du sort, revient à la ligne qui le nomme
+				// (KZBRAC1 : « 11 % de chances de lancer le sort « Fatalité » sur l'attaquant »).
+				PATCH_IF $fx_probability(~%condition_id%~) < 100 BEGIN
+					SPRINT line_text @22320005 // ~de lancer le sort « %spellName% » sur %theTarget%~
+					SET $fx_probability_in_sub(~%condition_id%~) = 0
+				END
 			END
 			ELSE BEGIN
 				LPM ad_recursion_condition_text

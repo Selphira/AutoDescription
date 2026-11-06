@@ -212,6 +212,7 @@ DEFINE_PATCH_MACRO ad_spell_header_keeps BEGIN
 		AND $fx_probability(~%header_id%~) > 0
 		AND keep_target > 0 AND keep_target <= 9
 		AND NOT ($fx_timing(~%header_id%~) == TIMING_duration AND $fx_duration(~%header_id%~) <= 0 AND NOT (~%keep_duration%~ STRING_EQUAL ~IGNORED~))
+		AND NOT ($fx_timing(~%header_id%~) == 6 AND NOT (~%keep_duration%~ STRING_EQUAL ~IGNORED~))
 		AND NOT (NOT IS_EE AND keep_opcode >= 319 AND keep_opcode <= 367)
 		AND NOT (NOT IS_EE AND (keep_opcode == 4 OR keep_opcode == 43 OR keep_opcode == 47 OR keep_opcode == 56)
 			AND ($fx_parameter1(~%header_id%~) != 0 OR $fx_parameter2(~%header_id%~) != 0))

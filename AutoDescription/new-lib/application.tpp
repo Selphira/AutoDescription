@@ -71,12 +71,15 @@ END
 // fx_series_anchor (1 pour l'effet de tête), fx_series_delta (pas, en secondes), fx_series_last
 // (dernier délai), fx_series_instant (l'effet de tête est immédiat).
 DEFINE_PATCH_MACRO ad_application_series_support BEGIN
-	// Une série compte au moins un effet différé, d'un opcode lu plusieurs fois.
+	// Une série compte au moins un effet différé, d'un opcode lu plusieurs fois. L'ancien moteur écarte
+	// un opcode non décrit (174, son joué) avant de chercher les séries : il n'en forme aucune.
 	SET series_possible = 0
 	FOR (series_id = 0; series_id < fx_count; ++series_id) BEGIN
-		SET $fx_series_compared(~%series_id%~) = 0
 		SET series_opcode = $fx_opcode(~%series_id%~)
-		SET series_possible = series_possible OR ($fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
+		SET render_opcode = series_opcode
+		LPM ad_opcode_is_described
+		SET $fx_series_compared(~%series_id%~) = NOT opcode_described
+		SET series_possible = series_possible OR (opcode_described AND $fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
 	END
 	SET same_ignored = AD_SAME_TIMING
 	FOR (series_id = 0; series_possible AND series_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++series_id) BEGIN
@@ -215,6 +218,31 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
 		SET $fx_delay_ticks(~%app_id%~) = 0
 	END
+	// Timings 6 (Limited after duration) et 7 (Permanent after duration) appliqués directement : dès que
+	// le temps de jeu dépasse la durée lue en ticks, aussitôt pour toute durée réaliste, le 7 devient
+	// permanent (timing 1) et le 6 une durée absolue qui expire à 16 fois cette durée, instant alors
+	// déjà passé (IESDP, eff_v1) :
+	// comme une durée limitée de 0 seconde, qui laisse agir un effet instantané (durée de l'opcode à
+	// IGNORED) et écarte les autres.
+	ELSE PATCH_IF app_timing == 7 BEGIN
+		SET app_timing = TIMING_permanent
+		SET $fx_timing(~%app_id%~) = TIMING_permanent
+		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
+		SET $fx_delay_ticks(~%app_id%~) = 0
+	END
+	ELSE PATCH_IF app_timing == 6 AND (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
+		SET app_timing = TIMING_duration
+		SET app_duration = 0
+		SET $fx_timing(~%app_id%~) = TIMING_duration
+		SET $fx_duration(~%app_id%~) = 0
+		SPRINT $fx_timing_kind(~%app_id%~) ~limited~
+	END
+	ELSE PATCH_IF app_timing == 6 BEGIN
+		SET drop_id = app_id
+		SPRINT ignored_reason ~file_error:application:no_duration~
+		SPRINT ignored_message ~timing 6 (limited after duration) applied directly: the effect expires at once~
+		LPM ad_application_drop
+	END
 	ELSE PATCH_IF app_timing != TIMING_duration AND app_timing != TIMING_duration_ticks AND app_timing != TIMING_permanent
 			AND app_timing != TIMING_permanent_after_death AND app_timing != TIMING_while_equipped AND app_timing != TIMING_delayed
 			AND app_timing != TIMING_delayed_duration BEGIN
@@ -273,16 +301,17 @@ END
 // Effet drop_id que l'ancien moteur écarte dès sa lecture, sans rien écrire (validation d'un opcode) :
 // consommé ; journalisé si l'appelant en a fixé la raison (ignored_reason, ignored_message :
 // ad_log_ignored, new-lib/log.tpp). La durée commune des effets d'une potion est déjà calculée (ad_item_potion_durations,
-// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête que s'il est sans durée (dont une
-// durée limitée de 0 seconde), si la durée de son opcode n'y est jamais comptée (colonne DURATION à
-// IGNORED) ou si un autre effet décrit du même en-tête a la même durée.
+// new-lib/item_charged.tpp) : l'effet n'est accepté dans un en-tête de potion que s'il est sans durée
+// (dont une durée limitée de 0 seconde), si la durée de son opcode n'y est jamais comptée (colonne
+// DURATION à IGNORED) ou si un autre effet décrit du même en-tête a la même durée. L'ancien moteur ne
+// calcule cette durée commune que pour une potion (load_charged_abilities).
 DEFINE_PATCH_MACRO ad_application_drop BEGIN
 	SPRINT drop_scope $fx_scope(~%drop_id%~)
 	SET drop_timing = $fx_timing(~%drop_id%~)
 	SET drop_opcode = $fx_opcode(~%drop_id%~)
 	SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_opcode%~)
 	// L'en-tête d'un sort se lit après l'écart (new-lib/spell_header.tpp).
-	PATCH_IF NOT support_spell AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
+	PATCH_IF NOT support_spell AND item_type == ITM_TYPE_potion AND NOT (~%drop_scope%~ STRING_EQUAL ~equipped~) AND NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~)
 			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) AND $fx_duration(~%drop_id%~) > 0 BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
@@ -398,15 +427,15 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		END
 	END
 	ELSE BEGIN
-		// Les ticks valent 1/15 de seconde ; la division entière est celle de l'ancien moteur. Moins de
-		// 15 ticks : l'ancien moteur écrit « N ticks » sans traduction, refusé quand la durée est écrite.
-		PATCH_IF app_timing == TIMING_duration_ticks AND app_duration > 0 AND app_duration < 15 BEGIN
-			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:ticks~ message = ~duration of %app_duration% ticks, under one second~ RET render_late_missing = refusal END
-		END
+		// Les ticks valent 1/15 de seconde ; la division entière est celle de l'ancien moteur.
+		SET app_under_second = app_timing == TIMING_duration_ticks AND app_duration > 0 AND app_duration < 15
 		PATCH_IF app_timing == TIMING_duration_ticks BEGIN
 			SET app_duration = app_duration / 15
 		END
-		PATCH_IF app_duration > 0 BEGIN
+		PATCH_IF app_under_second BEGIN
+			SPRINT app_duration_text @3000007 // ~pendant moins d'une seconde~
+		END
+		ELSE PATCH_IF app_duration > 0 BEGIN
 			LPF ad_duration_text INT_VAR seconds = app_duration RET strDuration = text END
 			// Durée tirée au sort (ad_group_duration_ranges), d'une unité : « 1d2 rounds ».
 			PATCH_IF $fx_duration_dice(~%line_fx%~) > 0 BEGIN
@@ -617,13 +646,16 @@ END
 // un rayon de 4,5 mètres (de niveau 4 ou inférieur) ». Sur EE, l'ancien moteur n'en écrit pas pour
 // le 127 ni pour le 218 de parameter2 non nul. Une phrase à la forme « soi » ne nomme pas sa cible :
 // app_self_level_text « uniquement à partir du niveau 6 » finit alors la ligne (ad_effect_line), sans
-// nommer la cible, qui peut être celle, au pluriel, que le sort parent impose. Refus (render_late_missing) : cible propre à l'opcode (line_the_target).
+// nommer la cible, qui peut être celle, au pluriel, que le sort parent impose. Une cible propre à
+// l'opcode (line_the_target, déjà dans theTarget) prend le niveau comme une autre, comme dans l'ancien
+// moteur : « les animaux (de niveau 10) » (L#NDGON). Refus (render_late_missing) : cible propre à
+// l'opcode dans une phrase à la forme « soi ».
 DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 	SET levelMin = $fx_level_min(~%line_fx%~)
 	SET levelMax = $fx_level_max(~%line_fx%~)
 	SET app_opcode = $fx_opcode(~%line_fx%~)
 	PATCH_IF (levelMax > 0 OR levelMin > 1) AND NOT (IS_EE AND (app_opcode == 127 OR (app_opcode == 218 AND $fx_parameter2(~%line_fx%~) != 0))) BEGIN
-		PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) BEGIN
+		PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) AND (line_form == 0 OR line_form == 2) BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:level_target~ message = ~level restriction on an opcode-specific target~ RET render_late_missing = refusal END
 		END
 		SET app_level_tra = levelMin == levelMax ? 2003000 : (levelMin <= 1 ? 2003001 : (levelMax == 0 ? 2003002 : 2003003)) // ~%target% (de niveau %levelMin%)~
@@ -966,10 +998,14 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	PATCH_IF NOT (~%line_condition%~ STRING_EQUAL ~~) BEGIN
 		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
 		// placé après la condition : la ligne reste entière, hors des regroupements, tant qu'aucune autre
-		// ligne probable ne partage sa plage (ad_lines_probability_pass).
+		// ligne probable ne partage sa plage (ad_lines_probability_pass). Dans un groupe, elle y entre
+		// précédée de sa condition (line_core) : « - En combat ; de provoquer… » (DSSKSTAF).
 		PATCH_IF app_probability < 100 BEGIN
 			SET line_conditioned = 1
 			SET line_probability = 0
+			SPRINT line_core ~%line_condition%%AD_SEMICOLON%%line_core%~
+			// Ligne maudite ou à sous-lignes : sa forme dans un groupe n'est pas vérifiée (refus).
+			SET line_conditioned_alone = $fx_cursed(~%line_fx%~) OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_core%~) >= 0
 		END
 		// Sous-lignes et sections de niveaux d'un sous-sort : en retrait sous la condition (ancien
 		// add_condition, qui décale tous les sauts de ligne), la première ligne comprise quand elles sont
@@ -1008,6 +1044,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	SET line_sort = app_saved_sort
 	SET line_probability = 0
 	SET line_conditioned = 0
+	SET line_conditioned_alone = 0
 	SET line_sub_probability = 0
 	SPRINT line_section ~%app_saved_section%~
 	SET line_phrase = 0

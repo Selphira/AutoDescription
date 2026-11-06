@@ -15,9 +15,7 @@
 // Refus : sort d'Item Revision
 // (AD_ITEM_REVISION_SPELLS : l'ancien moteur en écrit un texte propre) ; sort nommé lancé par un
 // en-tête à charges d'une fléchette (ses lignes vont aux capacités de combat, où l'ancien moteur les
-// écrit autrement) ; sort nommé lancé par un sous-sort d'un objet (l'ancien moteur y lit le type de
-// capacité de l'objet ; un sort n'en a pas, ancien abilityType négatif) ; refus de
-// ad_cast_spell_recursion_support. Un sort sans nom d'une fléchette est décrit par ses effets, et ne
+// écrit autrement) ; refus de ad_cast_spell_recursion_support. Un sort sans nom d'une fléchette est décrit par ses effets, et ne
 // refuse la fléchette que s'il écrit des lignes (recursion_lines_reason) : sans ligne, l'ancien moteur
 // n'écrit rien.
 DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
@@ -43,7 +41,9 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			SPRINT $fx_spell_name(~%cast_id%~) ~%cast_name%~
 			SET cast_h = $fx_header(~%cast_id%~)
 			SET $fx_cast_charge(~%cast_id%~) = 0
-			PATCH_IF cast_h >= 0 AND NOT resource_is_spell BEGIN
+			// Dans un sous-sort d'un objet, l'en-tête est celui du sort : l'ancien moteur y lit un type de
+			// capacité négatif, jamais une capacité de charge.
+			PATCH_IF cast_h >= 0 AND NOT resource_is_spell AND ctx_depth == 0 BEGIN
 				SET $fx_cast_charge(~%cast_id%~) = NOT $charged_other(~%cast_h%~)
 			END
 			PATCH_IF ~%cast_resref%~ STRING_EQUAL ~~ BEGIN
@@ -61,9 +61,6 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			ELSE PATCH_IF (item_type == ITM_TYPE_potion AND $fx_probability(~%cast_id%~) >= 100) OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
 				SET $fx_recursion(~%cast_id%~) = 1
 				LPM ad_cast_spell_recursion_support
-			END
-			ELSE PATCH_IF ctx_depth > 0 AND NOT resource_is_spell BEGIN
-				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:recursion:nested_cast~ message = ~spell cast by a spell already cast by another effect~ RET render_missing = refusal END
 			END
 		END
 	END

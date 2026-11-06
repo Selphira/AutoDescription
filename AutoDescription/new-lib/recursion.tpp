@@ -300,6 +300,12 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 			// Sections de niveaux d'un sous-sort écrites dans la ligne parente, sauf pour un sort lancé
 			// sous une probabilité ou après un délai (146, 148), dont les lignes ont leur propre préfixe.
 			SET recursion_lift_opcode = $fx_opcode(~%recursion_fx%~)
+			// Sort nommé d'un 232, cité par son nom s'il écrit plusieurs lignes (ad_op_232_lines).
+			SET recursion_named_lines = 0
+			PATCH_IF recursion_lift_opcode == 232 AND VARIABLE_IS_SET $fx_spell_name(~%recursion_fx%~) BEGIN
+				SPRINT recursion_spell_name $fx_spell_name(~%recursion_fx%~)
+				SET recursion_named_lines = NOT (~%recursion_spell_name%~ STRING_EQUAL ~~)
+			END
 			SET recursion_lift_sections = NOT ((recursion_lift_opcode == 146 OR recursion_lift_opcode == 148)
 				AND ($fx_probability(~%recursion_fx%~) < 100 OR $fx_sub_delayed(~%recursion_fx%~)))
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
@@ -350,6 +356,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_lift_sections = recursion_lift_sections
 						ctx_frequency_seconds = recursion_hide ? 0 : $fx_duration(~%recursion_fx%~)
 						ctx_inherit_dice = $fx_sub_inherit_dice(~%recursion_fx%~)
+						ctx_named_lines = recursion_named_lines
 					STR_VAR
 						resref = ~%recursion_resref%~
 						kind = ~%recursion_kind%~
@@ -533,6 +540,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_lift_sections = 0
 		ctx_frequency_seconds = 0
 		ctx_inherit_dice = 0
+		ctx_named_lines = 0
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -1040,7 +1048,10 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	// Lignes probables d'un sort : regroupées par plage comme celles des capacités de combat (ancien
 	// group_probability_effects, appelé aussi pour un sous-sort). Sous la probabilité du parent, une
-	// seule ligne est reprise, sauf avec ctx_base_lines (opcodes 146 et 148).
+	// seule ligne est reprise, sauf avec ctx_base_lines (opcodes 146 et 148) et pour un sort nommé
+	// (ctx_named_lines) que le parent cite par son nom s'il écrit plusieurs lignes (KZBRAC1) : lignes
+	// comptées sans regroupement, refusé seulement s'il n'en écrit qu'une.
+	SET sub_named_probable = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%kind%~ STRING_EQUAL ~spl~ BEGIN
 		SET sub_probable = 0
 		FOR (sub_line = 0; sub_line < line_count; ++sub_line) BEGIN
@@ -1048,12 +1059,13 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 				SET sub_probable = 1
 			END
 		END
-		PATCH_IF sub_probable AND ctx_base_probability < 100 AND NOT ctx_base_lines BEGIN
+		SET sub_named_probable = sub_probable AND ctx_base_probability < 100 AND NOT ctx_base_lines AND ctx_named_lines AND line_count > 1
+		PATCH_IF sub_probable AND ctx_base_probability < 100 AND NOT ctx_base_lines AND NOT sub_named_probable BEGIN
 			PATCH_IF line_count > 1 BEGIN
 				LPF ad_refusal STR_VAR reason = ~not_implemented:probability_lines~ message = ~several lines in a spell cast by a probable effect~ RET render_missing = refusal END
 			END
 		END
-		ELSE PATCH_IF sub_probable BEGIN
+		ELSE PATCH_IF sub_probable AND NOT sub_named_probable BEGIN
 			SPRINT prob_section ~ability%sub_header%~
 			LPM ad_lines_probability_groups
 			SPRINT render_missing ~%render_late_missing%~
@@ -1068,6 +1080,9 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 			INNER_PATCH ~%sub_text%~ BEGIN
 				COUNT_REGEXP_INSTANCES CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ sub_count
 			END
+		END
+		PATCH_IF sub_named_probable AND sub_count <= 1 BEGIN
+			LPF ad_refusal STR_VAR reason = ~not_implemented:probability_lines~ message = ~several lines in a spell cast by a probable effect~ RET render_missing = refusal END
 		END
 		// Sous-sort décrit par tous ses en-têtes, à sections de niveaux : comme l'ancien moteur, ses
 		// lignes communes puis ses sections, titres compris, chacune précédée de deux sauts de ligne

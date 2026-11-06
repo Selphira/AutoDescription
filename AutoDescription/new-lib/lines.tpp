@@ -20,6 +20,7 @@ DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_no_duration = 0
 	SET line_probability = 0
 	SET line_conditioned = 0
+	SET line_conditioned_alone = 0
 	SET line_sub_probability = 0
 	SPRINT line_core ~~
 	SET line_nested = 0
@@ -67,6 +68,7 @@ DEFINE_PATCH_MACRO ad_line_append BEGIN
 	SET $line_probability_high(~%line_count%~) = line_probability > 0 ? line_probability_high : 0
 	SET $line_sub_probability(~%line_count%~) = line_sub_probability
 	SET $line_conditioned(~%line_count%~) = line_conditioned
+	SET $line_conditioned_alone(~%line_count%~) = line_conditioned AND (VARIABLE_IS_SET line_conditioned_alone ? line_conditioned_alone : 0)
 	SET $line_conditioned_low(~%line_count%~) = line_conditioned ? line_probability_low : 0
 	SET $line_conditioned_high(~%line_count%~) = line_conditioned ? line_probability_high : 0
 	PATCH_IF line_probability > 0 OR line_sub_probability > 0 OR line_conditioned BEGIN
@@ -239,15 +241,20 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 	END
 END
 
-// Ligne probable sous une condition (line_conditioned) : hors des regroupements ; une autre ligne
-// probable de même section dont la plage la recouvre la ferait entrer dans un groupe dont l'ancien
-// moteur ne retire pas le préfixe (refus).
+// Ligne probable sous une condition (line_conditioned) : hors des regroupements, sauf si une ligne
+// probable sans condition de même section a exactement sa plage : comme l'ancien moteur, elle entre
+// alors dans leur groupe, sa condition devant sa phrase (line_core, ad_effect_line), et
+// n'y est jamais seule. Refus : ligne maudite ou à sous-lignes (line_conditioned_alone, forme non
+// vérifiée) ; une autre ligne sous une condition de même plage ; avec
+// AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES, toute autre ligne probable dont la plage recouvre une
+// partie de la sienne.
 DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 	FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 		SPRINT prob_line_section $line_section(~%prob_id%~)
 		PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_conditioned(~%prob_id%~) BEGIN
 			SET prob_low = $line_conditioned_low(~%prob_id%~)
 			SET prob_high = $line_conditioned_high(~%prob_id%~)
+			SET prob_joins = 0
 			FOR (prob_other = 0; prob_other < line_count; ++prob_other) BEGIN
 				SPRINT prob_other_section $line_section(~%prob_other%~)
 				PATCH_IF prob_other != prob_id AND (~%prob_other_section%~ STRING_EQUAL ~%prob_section%~)
@@ -255,11 +262,26 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 						AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 					SET prob_other_low = $line_conditioned(~%prob_other%~) ? $line_conditioned_low(~%prob_other%~) : $line_probability_low(~%prob_other%~)
 					SET prob_other_high = $line_conditioned(~%prob_other%~) ? $line_conditioned_high(~%prob_other%~) : $line_probability_high(~%prob_other%~)
-					PATCH_IF prob_other_low <= prob_high AND prob_low <= prob_other_high BEGIN
+					PATCH_IF NOT $line_conditioned(~%prob_other%~) AND prob_other_low == prob_low AND prob_other_high == prob_high BEGIN
+						SET prob_joins = 1
+					END
+					// Regroupement simple : seules des plages identiques sont réunies.
+					ELSE PATCH_IF prob_other_low <= prob_high AND prob_low <= prob_other_high
+							AND (AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES OR (prob_other_low == prob_low AND prob_other_high == prob_high)) BEGIN
 						SET prob_fx = $line_effect(~%prob_id%~)
 						LPF ad_refusal INT_VAR fx_id = prob_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition, whose range another probable line shares~ RET render_late_missing = refusal END
 					END
 				END
+			END
+			PATCH_IF prob_joins AND $line_conditioned_alone(~%prob_id%~) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+				SET prob_fx = $line_effect(~%prob_id%~)
+				LPF ad_refusal INT_VAR fx_id = prob_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition, cursed or with sub-lines, whose range another probable line shares~ RET render_late_missing = refusal END
+			END
+			ELSE PATCH_IF prob_joins AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
+				SET $line_conditioned(~%prob_id%~) = 0
+				SET $line_probability(~%prob_id%~) = prob_high - prob_low + 1
+				SET $line_probability_low(~%prob_id%~) = prob_low
+				SET $line_probability_high(~%prob_id%~) = prob_high
 			END
 		END
 	END

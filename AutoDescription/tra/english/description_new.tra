@@ -153,6 +153,7 @@
 
 // Durées : progressions selon le niveau (en-tête des sorts)
 @3000006 = ~after %strDuration% and for %strDuration%~ // reprise de @100314
+@3000007 = ~for less than one second~
 @3000010 = ~%baseValue% + %value% on level %level%~ // reprise de @102160
 @3000011 = ~%value%/level~ // reprise de @102161
 @3000012 = ~%value%/%level% levels~ // reprise de @102162
@@ -3462,6 +3463,7 @@
 // (0020 chaque round, 0024 distance, 0029-0030 points de vie, 0031 état de sort), 1000 + 10 × forme + parameter1
 // cibles, 1100 + moment de la journée sur un effet d'équipement, 1104 + moment ailleurs (22 320 000-22 329 999)
 @22320001 = ~Cast %spellName% on %theTarget%~ // reprise de @12320001
+@22320005 = ~to cast %spellName% on %theTarget%~ // reprise de @12320005
 @22320010 = ~Each time the wearer is hit~ // reprise de @12320010
 @22320011 = ~When an opponent enters the field of vision~ // reprise de @12320011
 @22320017 = ~Each time the wearer is attacked~ // reprise de @12320017
