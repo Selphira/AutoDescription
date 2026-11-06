@@ -29,7 +29,7 @@ ALWAYS
             from_utf8 = 1
         STR_VAR
             default_language = ~french~
-            tra_path = ~AutoDescription/tra~
+            tra_path = ~%MOD_FOLDER%/tra~
             out_path = ~weidu_external/Lang/AutoDescription~
             convert_array = convert_tra
             reload_array = convert_tra
@@ -42,14 +42,14 @@ ALWAYS
 END
 
 LANGUAGE ~Francais~ ~french~
-         ~AutoDescription/tra/french/setup.tra~
-         ~AutoDescription/tra/french/description.tra~
+         ~%MOD_FOLDER%/tra/french/setup.tra~
+         ~%MOD_FOLDER%/tra/french/description.tra~
 
 LANGUAGE ~English (Beta)~ ~english~
-         ~AutoDescription/tra/french/setup.tra~
-         ~AutoDescription/tra/french/description.tra~
-         ~AutoDescription/tra/english/setup.tra~
-         ~AutoDescription/tra/english/description.tra~
+         ~%MOD_FOLDER%/tra/french/setup.tra~
+         ~%MOD_FOLDER%/tra/french/description.tra~
+         ~%MOD_FOLDER%/tra/english/setup.tra~
+         ~%MOD_FOLDER%/tra/english/description.tra~
 
 BEGIN @10 DESIGNATED 10
 SILENT

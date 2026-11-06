@@ -520,7 +520,7 @@ DEFINE_PATCH_MACRO ~subspell_cache_check~ BEGIN
 	PATCH_IF NOT ~%description%~ STRING_EQUAL ~%subspell_cache_description%~ OR totalLines != subspell_cache_total_lines OR NOT ~%strDuration%~ STRING_EQUAL ~%subspell_cache_duration%~ BEGIN
 		INNER_ACTION BEGIN
 			SILENT
-			APPEND_OUTER ~AutoDescription/log/%log_filename%-cache.txt~ ~%SOURCE_FILE%%TAB%%file%%TAB%%subspell_cache_key%%WNL%  cached (%subspell_cache_total_lines%, %subspell_cache_duration%): %subspell_cache_description%%WNL%  computed (%totalLines%, %strDuration%): %description%~ KEEP_CRLF
+			APPEND_OUTER ~%MOD_FOLDER%/log/%log_filename%-cache.txt~ ~%SOURCE_FILE%%TAB%%file%%TAB%%subspell_cache_key%%WNL%  cached (%subspell_cache_total_lines%, %subspell_cache_duration%): %subspell_cache_description%%WNL%  computed (%totalLines%, %strDuration%): %description%~ KEEP_CRLF
 			VERBOSE
 		END
 	END
@@ -534,7 +534,7 @@ DEFINE_ACTION_FUNCTION ~subspell_cache_init~ BEGIN
 		MKDIR ~%subspell_cache_folder%~
 	END
 	ACTION_IF subspell_cache == 2 BEGIN
-		COPY ~.../AutoDescription/inlined/subspell_cache_empty.txt~ ~AutoDescription/log/%log_filename%-cache.txt~
+		COPY ~.../AutoDescription/inlined/subspell_cache_empty.txt~ ~%MOD_FOLDER%/log/%log_filename%-cache.txt~
 	END
 END
 

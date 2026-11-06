@@ -77,7 +77,7 @@ ACTION_IF FILE_EXISTS_IN_GAME ~splprot.2da~ BEGIN
 		BUT_ONLY_IF_IT_CHANGES
 END
 
-COPY ~AutoDescription/2da/stats.2da~ ~override~
+COPY ~%MOD_FOLDER%/2da/stats.2da~ ~override~
     READ_2DA_ENTRIES_NOW rows 6
     FOR (row = 0; row < rows; ++row) BEGIN
         READ_2DA_ENTRY_FORMER rows row 0 ~stat~
@@ -95,7 +95,7 @@ COPY ~AutoDescription/2da/stats.2da~ ~override~
     END
 BUT_ONLY_IF_IT_CHANGES
 
-COPY ~AutoDescription/2da/stats_mods.2da~ ~override~
+COPY ~%MOD_FOLDER%/2da/stats_mods.2da~ ~override~
     READ_2DA_ENTRIES_NOW rows 5
     FOR (row = 0; row < rows; ++row) BEGIN
         READ_2DA_ENTRY_FORMER rows row 0 ~opcode~
