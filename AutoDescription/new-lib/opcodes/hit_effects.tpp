@@ -12,7 +12,8 @@
 // Ressource vide : effet écarté sans rien écrire, erreur journalisée ; EFF absent : aucune ligne
 // (ad_recursion_support). L'EFF
 // s'applique à la créature touchée : sa propre cible ne sert pas (ctx_hit_target).
-// Refus : effet d'un EFF ; effet probable (l'ancien moteur écrit « par attaque… ») ;
+// Refus : effet d'un EFF ; effet probable dont l'EFF écrit une ligne (l'ancien moteur écrit « par
+// attaque… ») ;
 // réunion avec plusieurs effets possibles ou d'un 248 à mains nues (l'ancien moteur y lirait la forme
 // « cible ») ; plusieurs lignes ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
@@ -28,9 +29,6 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 				SPRINT ignored_reason ~file_error:opcode%hit_opcode%:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
-			END
-			ELSE PATCH_IF $fx_probability(~%hit_id%~) < 100 BEGIN
-				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:probability~ message = ~probable effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
 				PATCH_IF hit_opcode == 248 AND AD_ENABLE_SHRINKAGE BEGIN
@@ -51,6 +49,13 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 					SPRINT recursion_versus ~~
 					SPRINT recursion_single_reason ~not_implemented:opcode%hit_opcode%:lines~
 					SPRINT recursion_single_message ~several lines in the applied EFF file~
+					// Probable : refusé seulement si l'EFF écrit une ligne ; sans ligne (EFF écarté, timing 6 :
+					// TG#BRP1), l'ancien moteur n'écrit rien.
+					PATCH_IF $fx_probability(~%hit_id%~) < 100 BEGIN
+						SET recursion_probability = 1
+						SPRINT recursion_lines_reason ~not_implemented:opcode%hit_opcode%:probability~
+						SPRINT recursion_lines_message ~probable effect whose EFF file writes a line~
+					END
 					LPM ad_recursion_support
 				END
 			END

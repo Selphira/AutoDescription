@@ -7,8 +7,9 @@
 // niveaux.
 
 // Niveau hors de 0-9 : écarté et journalisé. Sans AD_ENABLE_SHRINKAGE, chaque 102 est un masque d'un
-// seul niveau (« de 5ème niveau », « de niveau 0 »). Refus : effet d'un EFF ; 102 de la même portée
-// aux champs différents (l'ancien moteur les réunit tous, avec les champs du dernier lu).
+// seul niveau (« de 5ème niveau », « de niveau 0 »). La résistance à la dissipation, qu'aucun des
+// deux moteurs n'écrit, n'empêche pas la réunion (RR#INV). Refus : effet d'un EFF ; 102 de la même
+// portée aux autres champs différents (l'ancien moteur les réunit tous, avec les champs du dernier lu).
 DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 	PHP_EACH fx_ids_102 AS _ => levels_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%levels_id%~) BEGIN
@@ -28,7 +29,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 			END
 			ELSE BEGIN
 				SET same_id = levels_id
-				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_RESISTANCE
 				SPRINT levels_scope $fx_scope(~%levels_id%~)
 				SET levels_mask = 0
 				PHP_EACH fx_ids_102 AS _ => levels_other BEGIN

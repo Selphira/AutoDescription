@@ -100,7 +100,8 @@ END
 // sous cette condition ou celle d'un moment de la journée sur un effet d'équipement, les durées du
 // sous-sort ne sont pas écrites (recursion_ignore_duration). Points de vie : seuil de 50, 25 ou 10 %
 // (conditions 2 à 4), special % (20) ou special points (19) ; distance : 4, 10 ou special pieds (8,
-// 9, 14).
+// 9, 14) ; porteur impuissant ou empoisonné (5, 6). Refus : condition 15 (état d'une créature
+// quelconque, que l'ancien moteur attribue à la cible du sort) et autres conditions non reprises.
 DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	SPRINT condition_text ~~
 	SET recursion_ignore_duration = 0
@@ -175,6 +176,15 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 			LPF ad_tra INT_VAR tra_id = condition_splstate_tra tra_block_start = 8120000 tra_block_size = 256 RET splstate = text END // ~la folie du berserker~ (@8120104)
 			SPRINT condition_text @22320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
 		END
+	END
+	// États vérifiés sur le porteur quelle que soit la cible du sort (IESDP : StateCheck(Myself, …)) ;
+	// l'ancien moteur les nomme par get_states_str (STATE_HELPLESS 0x20, STATE_POISONED 0x4000).
+	ELSE PATCH_IF condition_type == 5 OR condition_type == 6 BEGIN
+		LPF ad_tra INT_VAR tra_id = condition_type == 5 ? 8110006 : 8110015 RET state = text END // ~rendu impuissant~
+		SPRINT condition_spell_target ~%theTarget%~
+		SPRINT theTarget @22321000 // ~le porteur~
+		SPRINT condition_text @22320025 // ~Lorsque %theTarget% est %state%~
+		SPRINT theTarget ~%condition_spell_target%~
 	END
 	ELSE BEGIN
 		LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:state~ message = ~condition %condition_type% not supported~ RET render_missing = refusal END

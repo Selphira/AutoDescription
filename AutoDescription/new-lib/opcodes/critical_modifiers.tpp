@@ -5,22 +5,35 @@
 // distance », « magique » : « Chance de coup critique avec cette arme à distance : +5 % ». L'opcode
 // fixe critical_opcode et critical_name_base, premier de ses quatre libellés (« soi » puis « la
 // chance… » des phrases « Augmente de… », 1 210 1x0, chacun sans puis avec « avec cette arme ») ;
-// libellés 2301 0011-0013 type d'attaque.
+// libellés 2301 0011-0013 type d'attaque. Effet d'un EFF sur EE : catégorie d'arme parameter3
+// (ITEMCAT.IDS, IESDP), « avec des poings », que l'ancien moteur n'écrit pas avec parameter2 1
+// ($fx_critical_category).
 
-// Type d'attaque hors de 0-3 ou valeur nulle : écartés et journalisés (ancien opcode_301_is_valid).
-// Refus : effet d'un EFF de parameter3 non nul (catégorie d'arme, que l'ancien moteur y lit sur EE).
+// Type d'attaque hors de 0-3, valeur nulle ou catégorie d'arme hors de 0-73 : écartés et journalisés
+// (ancien opcode_301_is_valid). Refus : catégorie d'arme sans nom.
 DEFINE_PATCH_MACRO ad_critical_support BEGIN
 	PHP_EACH ~fx_ids_%critical_opcode%~ AS _ => critical_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
-			SET critical_category = $fx_parameter3(~%critical_id%~)
-			PATCH_IF $fx_external(~%critical_id%~) AND IS_EE AND critical_category != 0 BEGIN
-				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode%critical_opcode%:external~ message = ~effect from an EFF file with weapon category %critical_category% (parameter3)~ RET render_missing = refusal END
+			SET critical_category = ($fx_external(~%critical_id%~) AND IS_EE) ? $fx_parameter3(~%critical_id%~) : 0
+			SET critical_category_tra = 8180000 + critical_category
+			SET $fx_critical_category(~%critical_id%~) = 0
+			PATCH_IF critical_category < 0 OR critical_category > 73 BEGIN
+				SET drop_id = critical_id
+				SPRINT ignored_reason ~file_error:opcode%critical_opcode%:weapon_category~
+				SPRINT ignored_message ~weapon category %critical_category% (parameter3 of an EFF file, expected 0-73)~
+				LPM ad_application_drop
+			END
+			ELSE PATCH_IF critical_category != 0 AND NOT TRA_ENTRY_EXISTS (~%critical_category_tra%~) BEGIN
+				LPF ad_refusal INT_VAR fx_id = critical_id STR_VAR reason = ~not_implemented:opcode%critical_opcode%:weapon_category~ message = ~weapon category %critical_category% (parameter3 of an EFF file) has no name~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF $fx_special(~%critical_id%~) < 0 OR $fx_special(~%critical_id%~) > 3 OR $fx_parameter1(~%critical_id%~) == 0 BEGIN
 				SET drop_id = critical_id
 				SPRINT ignored_reason ~file_error:opcode%critical_opcode%:invalid~
 				SPRINT ignored_message ~invalid weapon type (special, expected 0-3) or modifier of 0~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF $fx_parameter2(~%critical_id%~) == 0 BEGIN
+				SET $fx_critical_category(~%critical_id%~) = critical_category
 			END
 		END
 	END
@@ -40,6 +53,12 @@ DEFINE_PATCH_MACRO ad_critical_lines BEGIN
 			PATCH_IF critical_attack > 0 BEGIN
 				LPF ad_tra INT_VAR tra_id = 23010010 + critical_attack tra_block_start = 23010011 tra_block_size = 3 RET critical_attack_text = text END // ~en mêlée~
 				SPRINT name ~%name% %critical_attack_text%~
+			END
+			SET critical_category = $fx_critical_category(~%critical_id%~)
+			PATCH_IF critical_category != 0 BEGIN
+				LPF ad_tra INT_VAR tra_id = 8180000 + critical_category tra_block_start = 8180000 tra_block_size = 74 RET weaponType = text END // ~poings~ (@8180028)
+				SPRINT critical_category_text @23010020 // ~avec des %weaponType%~
+				SPRINT name ~%name% %critical_category_text%~
 			END
 			PATCH_IF line_form == 0 BEGIN
 				LPF ad_signed_value INT_VAR value = critical_value RET value = text END

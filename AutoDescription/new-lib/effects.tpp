@@ -322,6 +322,10 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_dice_count_raw(~%fx_id%~) = $fx_dice_count(~%fx_id%~)
 	SET $fx_special_raw(~%fx_id%~) = $fx_special(~%fx_id%~)
 	SET $fx_save_type_raw(~%fx_id%~) = $fx_save_type(~%fx_id%~)
+	SET fx_282_converted = 0
+	PATCH_IF $fx_opcode(~%fx_id%~) == 282 AND AD_ENABLE_SHRINKAGE BEGIN
+		LPM ad_op_282_convert
+	END
 	LPM ad_fx_normalize
 	SET $fx_consumed(~%fx_id%~) = 0
 	SET $fx_dropped(~%fx_id%~) = 0
@@ -335,7 +339,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_area_target(~%fx_id%~) = 0
 	SET $fx_area_cone(~%fx_id%~) = 0
 	SPRINT $fx_area_range(~%fx_id%~) ~~
-	SET $fx_late(~%fx_id%~) = 0
+	SET $fx_late(~%fx_id%~) = fx_282_converted
 	SET $fx_series_of(~%fx_id%~) = 0 - 1
 	SET $fx_series_anchor(~%fx_id%~) = 0
 	SPRINT $fx_level_value(~%fx_id%~) ~~

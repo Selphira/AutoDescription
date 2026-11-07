@@ -32,10 +32,8 @@ DEFINE_PATCH_MACRO ad_op_321_support BEGIN
 END
 
 // Sort (new-lib/spell_header.tpp) : l'ancien moteur garde le 321 parmi les effets de l'en-tête, sans
-// rien en écrire, sauf s'il est vide (écarté, opcode_321_is_valid) ou si un 146 de même portée, lu
-// après lui, lance le même sort avec les mêmes cible, timing, durée, résistance, probabilités, jet de
-// sauvegarde et special (ancien opcode_146_group : le 321 disparaît, le 146 passe après les autres
-// effets de son opcode et devient « (non cumulatif) »). Une immunité au même sort le retire après les
+// rien en écrire, sauf s'il est vide (écarté, opcode_321_is_valid) ou s'il est réuni à un 146
+// (ad_op_321_cast_group). Une immunité au même sort le retire après les
 // regroupements (ad_op_321_after_groups).
 DEFINE_PATCH_MACRO ad_op_321_header_support BEGIN
 	PHP_EACH fx_ids_321 AS _ => removal_id BEGIN
@@ -48,29 +46,37 @@ DEFINE_PATCH_MACRO ad_op_321_header_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				SPRINT removal_scope $fx_scope(~%removal_id%~)
-				PHP_EACH fx_ids_146 AS _ => removal_other BEGIN
-					SPRINT removal_other_scope $fx_scope(~%removal_other%~)
-					SPRINT removal_other_resource $fx_resource_lower(~%removal_other%~)
-					PATCH_IF NOT $fx_consumed(~%removal_id%~) AND NOT $fx_consumed(~%removal_other%~)
-							AND (~%removal_other_scope%~ STRING_EQUAL ~%removal_scope%~)
-							AND (~%removal_other_resource%~ STRING_EQUAL ~%removal_resource%~)
-							AND $fx_position(~%removal_other%~) > $fx_position(~%removal_id%~)
-							AND $fx_target(~%removal_other%~) == $fx_target(~%removal_id%~)
-							AND $fx_timing(~%removal_other%~) == $fx_timing(~%removal_id%~)
-							AND $fx_duration(~%removal_other%~) == $fx_duration(~%removal_id%~)
-							AND $fx_resistance(~%removal_other%~) == $fx_resistance(~%removal_id%~)
-							AND $fx_probability1(~%removal_other%~) == $fx_probability1(~%removal_id%~)
-							AND $fx_probability2(~%removal_other%~) == $fx_probability2(~%removal_id%~)
-							AND $fx_save_type(~%removal_other%~) == $fx_save_type(~%removal_id%~)
-							AND $fx_save_bonus(~%removal_other%~) == $fx_save_bonus(~%removal_id%~)
-							AND $fx_special(~%removal_other%~) == $fx_special(~%removal_id%~) BEGIN
-						SET $fx_consumed(~%removal_id%~) = 1
-						SET $fx_late(~%removal_other%~) = 2
-						SET $fx_not_cumulative(~%removal_other%~) = 1
-					END
-				END
+				LPM ad_op_321_cast_group
 			END
+		END
+	END
+END
+
+// Un 146 de même portée, lu après le 321 removal_id, lance le même sort avec les mêmes cible, timing,
+// durée, résistance, probabilités, jet de sauvegarde et special (ancien opcode_146_group) : le 321
+// disparaît, le 146 passe après les autres effets de son opcode et devient « (non cumulatif) ».
+DEFINE_PATCH_MACRO ad_op_321_cast_group BEGIN
+	SPRINT removal_resource $fx_resource_lower(~%removal_id%~)
+	SPRINT removal_scope $fx_scope(~%removal_id%~)
+	PHP_EACH fx_ids_146 AS _ => removal_other BEGIN
+		SPRINT removal_other_scope $fx_scope(~%removal_other%~)
+		SPRINT removal_other_resource $fx_resource_lower(~%removal_other%~)
+		PATCH_IF NOT $fx_consumed(~%removal_id%~) AND NOT $fx_consumed(~%removal_other%~)
+				AND (~%removal_other_scope%~ STRING_EQUAL ~%removal_scope%~)
+				AND (~%removal_other_resource%~ STRING_EQUAL ~%removal_resource%~)
+				AND $fx_position(~%removal_other%~) > $fx_position(~%removal_id%~)
+				AND $fx_target(~%removal_other%~) == $fx_target(~%removal_id%~)
+				AND $fx_timing(~%removal_other%~) == $fx_timing(~%removal_id%~)
+				AND $fx_duration(~%removal_other%~) == $fx_duration(~%removal_id%~)
+				AND $fx_resistance(~%removal_other%~) == $fx_resistance(~%removal_id%~)
+				AND $fx_probability1(~%removal_other%~) == $fx_probability1(~%removal_id%~)
+				AND $fx_probability2(~%removal_other%~) == $fx_probability2(~%removal_id%~)
+				AND $fx_save_type(~%removal_other%~) == $fx_save_type(~%removal_id%~)
+				AND $fx_save_bonus(~%removal_other%~) == $fx_save_bonus(~%removal_id%~)
+				AND $fx_special(~%removal_other%~) == $fx_special(~%removal_id%~) BEGIN
+			SET $fx_consumed(~%removal_id%~) = 1
+			SET $fx_late(~%removal_other%~) = 2
+			SET $fx_not_cumulative(~%removal_other%~) = 1
 		END
 	END
 END
@@ -92,14 +98,19 @@ DEFINE_PATCH_MACRO ad_op_321_after_groups BEGIN
 	END
 END
 
-// Ressource vide : écarté (opcode_321_is_valid) ; les autres sont écartés aussi, l'ancien moteur n'en
-// écrivant rien, y compris l'effet d'un EFF (177), qu'il remplace avant ses regroupements. Refus : un
-// 146 ou un 148 de la même portée lance ce sort.
+// Ressource vide : écarté (opcode_321_is_valid) ; réuni à un 146 qui lance le même sort
+// (ad_op_321_cast_group, BDSW1H08) ; les autres sont écartés aussi, l'ancien moteur n'en écrivant rien,
+// y compris l'effet d'un EFF (177), qu'il remplace avant ses regroupements. Refus : un autre 146 ou
+// un 148 de la même portée lance ce sort.
 DEFINE_PATCH_MACRO ad_op_321_item_support BEGIN
 	PHP_EACH fx_ids_321 AS _ => removal_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%removal_id%~) BEGIN
 			SPRINT removal_resource $fx_resource(~%removal_id%~)
 			PATCH_IF NOT (~%removal_resource%~ STRING_EQUAL ~~) BEGIN
+				LPM ad_op_321_cast_group
+				SPRINT removal_resource $fx_resource(~%removal_id%~)
+			END
+			PATCH_IF NOT (~%removal_resource%~ STRING_EQUAL ~~) AND NOT $fx_consumed(~%removal_id%~) BEGIN
 				SPRINT removal_scope $fx_scope(~%removal_id%~)
 				FOR (removal_other = 0; removal_other < fx_count; ++removal_other) BEGIN
 					SET removal_other_opcode = $fx_opcode(~%removal_other%~)
@@ -111,7 +122,7 @@ DEFINE_PATCH_MACRO ad_op_321_item_support BEGIN
 					END
 				END
 			END
-			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%removal_id%~) BEGIN
 				SET drop_id = removal_id
 				PATCH_IF ~%removal_resource%~ STRING_EQUAL ~~ BEGIN
 					SPRINT ignored_reason ~file_error:opcode321:invalid~

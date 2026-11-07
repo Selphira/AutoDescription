@@ -78,7 +78,10 @@ END
 // immunités d'une même cible et d'une même section (portée, ou plage de niveaux d'un sort à plusieurs
 // en-têtes ; l'ancien moteur décrit chaque bloc à part) à au moins deux sorts de noms différents sont
 // réunies en une ligne
-// (effet dérivé SPELL_IMMUNITIES), noms triés ; les lignes réunies viennent après les autres.
+// (effet dérivé SPELL_IMMUNITIES), noms triés ; les lignes réunies viennent après les autres. Comme
+// l'ancien opcode_206_post_group, le groupe s'ouvre sur un effet, même sans nom ; les autres le
+// rejoignent s'il dure tant que l'objet est porté, et la ligne prend alors sa durée (SOLAK1B), ou s'ils
+// ont même timing et même durée.
 DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 	SPRINT line_section ~equipped~
 	FOR (spell_id = 0; spell_id < fx_count; ++spell_id) BEGIN
@@ -95,12 +98,16 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			PATCH_IF NOT $fx_consumed(~%spell_id%~) AND $spell_group(~%spell_id%~) < 0 BEGIN
 				SET spell_target = $fx_effective_target(~%spell_id%~)
 				SPRINT spell_scope $fx_line_section(~%spell_id%~)
+				SET spell_timing = $fx_timing(~%spell_id%~)
+				SET spell_duration = $fx_duration(~%spell_id%~)
+				SET $spell_group_head(~%spell_group_count%~) = spell_id
 				SET spell_name_count = 0
 				PHP_EACH fx_ids_206 AS _ => spell_other BEGIN
 					SPRINT spell_other_scope $fx_line_section(~%spell_other%~)
 					// Un effet déjà rangé a son groupe : seul l'ordre de fx_ids_206 compte, les effets placés après
 					// les autres (fx_late, 318 devenus des 206) y compris.
-					PATCH_IF NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~) BEGIN
+					PATCH_IF NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~)
+							AND (spell_timing == TIMING_while_equipped OR ($fx_timing(~%spell_other%~) == spell_timing AND $fx_duration(~%spell_other%~) == spell_duration)) BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
 							SET spell_name_new = 1
@@ -154,7 +161,11 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 			SPRINT spell_final_glue @1000006 // ~ » %and% « ~
 			LPF ad_join STR_VAR array_name = ~spell_group_names~ glue = ~%spell_glue%~ final_glue = ~%spell_final_glue%~ RET spellNames = text END
 			SET line_phrase = 30100100 // ~Immunité contre les sorts « %spellNames% »~
-			SET line_fx = spell_first
+			// Les membres ont le timing et la durée de la tête, sauf si elle dure tant que l'objet est porté :
+			// la ligne est alors celle de la tête ; sinon celle du premier sort nommé, qui garde sa plage de
+			// niveaux (TR#DC03 : tête sans nom sur le seul premier en-tête).
+			SET spell_head = $spell_group_head(~%spell_group_id%~)
+			SET line_fx = $fx_timing(~%spell_head%~) == TIMING_while_equipped ? spell_head : spell_first
 			LPM ad_effect_line
 		END
 	END

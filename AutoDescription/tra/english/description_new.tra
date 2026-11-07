@@ -3471,6 +3471,7 @@
 @22320021 = ~When the wearer takes damage~ // reprise de @12320021
 @22320022 = ~When the wearer kills the target~ // reprise de @12320022
 @22320024 = ~When a creature is within %range%~ // reprise de @12320024
+@22320025 = ~When %theTarget% is %state%~ // reprise de @12320025
 @22320026 = ~When the wearer dies~ // reprise de @12320026
 @22320027 = ~When a creature dies~ // reprise de @12320027
 @22320028 = ~When %theTarget% is repelled by a cleric or paladin~ // reprise de @12320028
@@ -3537,6 +3538,22 @@
 @22360131 = ~Creates a simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360004
 @22360132 = ~to create a simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360008
 @22360133 = ~to create a simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360008
+@22360140 = ~Creates %amount% clones %ofTheTarget% with the same number of hit points~ // reprise de @12360011
+@22360141 = ~Creates %amount% clones %ofTheTarget% with the same number of hit points~ // reprise de @12360011
+@22360142 = ~Creates %amount% clones %ofTheTarget% with the same number of hit points~ // reprise de @12360015
+@22360143 = ~Creates %amount% clones %ofTheTarget% with the same number of hit points~ // reprise de @12360015
+@22360150 = ~Creates %amount% images %ofTheTarget% that can neither attack nor cast spells~ // reprise de @12360012
+@22360151 = ~Creates %amount% images %ofTheTarget% that can neither attack nor cast spells~ // reprise de @12360012
+@22360152 = ~to create %amount% images %ofTheTarget% that can neither attack nor cast spells~ // reprise de @12360016
+@22360153 = ~to create %amount% images %ofTheTarget% that can neither attack nor cast spells~ // reprise de @12360016
+@22360160 = ~Creates %amount% projections %ofTheTarget% with the same number of hit points, which can attack but not cast spells~ // reprise de @12360013
+@22360161 = ~Creates %amount% projections %ofTheTarget% with the same number of hit points, which can attack but not cast spells~ // reprise de @12360013
+@22360162 = ~to create %amount% projections %ofTheTarget% possessing the same number of hit points, it can attack but not cast spells~ // reprise de @12360017
+@22360163 = ~to create %amount% projections %ofTheTarget% possessing the same number of hit points, it can attack but not cast spells~ // reprise de @12360017
+@22360170 = ~Creates %amount% simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360014
+@22360171 = ~Creates %amount% simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360014
+@22360172 = ~to create %amount% simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360018
+@22360173 = ~to create %amount% simulacra %ofTheTarget% possessing 60% of its level, it can attack and cast spells~ // reprise de @12360018
 
 // Opcode 238 : Désintégration : phrases 0100 (22 380 000-22 380 999)
 @22380100 = ~Disintegrates %theTarget%~ // reprise de @500011
@@ -3581,6 +3598,11 @@
 @22440112 = ~to drain %amount% wizard spells %ofTheTarget%~ // reprise de @12440004
 @22440113 = ~to drain %amount% wizard spells %ofTheTarget%~ // reprise de @12440004
 
+// Opcode 245 : vérification de la folie du berserker, phrases 0100 (22 450 100-22 450 103)
+@22450100 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~ // reprise de @12450001
+@22450101 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~ // reprise de @12450001
+@22450102 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~ // reprise de @12450002
+@22450103 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~ // reprise de @12450002
 // Opcode 247 : Attaque de la créature la plus proche : 0001 « En combat », phrases 0100 (22 470 000-22 470 999)
 @22470001 = ~In combat~ // reprise de @12470003
 @22470100 = ~Causes %theTarget% to go berserk~ // reprise de @12470001
@@ -3762,6 +3784,7 @@
 @23010011 = ~melee~ // reprise de @13010011
 @23010012 = ~ranged~ // reprise de @13010012
 @23010013 = ~magic~ // reprise de @13010013
+@23010020 = ~with %weaponType%~ // reprise de @13010020
 
 // Opcode 302 : Utilisation de tout objet : phrases 0100 permise, 0110 bloquée (23 020 000-23 020 999)
 @23020100 = ~Allows use of any object (if ability scores are sufficient)~ // reprise de @13020002
@@ -3853,6 +3876,13 @@
 @23240006 = ~creatures %descriptionState%~ // reprise de @13241138
 @23240007 = ~during the iron crisis~ // reprise de @13240401
 @23240008 = ~creatures other than the caster~ // reprise de @13241999
+@23240100 = ~Immunity %againstWho%~ // reprise de @13240901
+@23240101 = ~Immunize %theTarget% %againstWho%~ // reprise de @13240902
+@23240102 = ~to immunize %theTarget% %againstWho%~ // reprise de @13240903
+@23240103 = ~to immunize %theTarget% %againstWho%~ // reprise de @13240903
+@23240110 = ~from %spellName% spell and %itemName% item~ // reprise de @13240911
+@23240111 = ~from %spellName% spell~ // reprise de @13240912
+@23240112 = ~from %itemName% item~ // reprise de @13240913
 @23241003 = ~creatures immune to fire~ // reprise de @13241003
 @23241004 = ~creatures sensitive to fire~ // reprise de @13241004
 @23241013 = ~gigantic creatures~ // reprise de @13241013
@@ -4020,6 +4050,7 @@
 @23269385 = ~Si %theTarget% n'est pas de taille %sizeName%~ // reprise de @13269385
 @23269400 = ~If %theTarget% is the source of the effect~ // reprise de @13269400
 @23269401 = ~If %theTarget% is not the source of the effect~ // reprise de @13269401
+@23269420 = ~If %theTarget% is %descriptionState%~ // reprise de @13269420
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
 // Opcode 329 : Ralentissement des poisons : phrases 0100 (23 290 000-23 290 999)
@@ -4059,6 +4090,8 @@
 @23320008 = ~Piercing Damage~ // reprise de @13320008
 @23320009 = ~Crushing Damage~ // reprise de @13320009
 @23320010 = ~Missile Damage~ // reprise de @13320010
+@23320011 = ~Elemental Damage~ // reprise de @13320011
+@23320012 = ~Physical Damage~ // reprise de @13320012
 @23320100 = ~the damage~ // reprise de @13320100
 @23320101 = ~the fire damage~ // reprise de @13320101
 @23320102 = ~the cold damage~ // reprise de @13320102
@@ -4070,6 +4103,8 @@
 @23320108 = ~the piercing damage~ // reprise de @13320108
 @23320109 = ~the crushing damage~ // reprise de @13320109
 @23320110 = ~the missile damage~ // reprise de @13320110
+@23320111 = ~the elemental damage~ // reprise de @13320111
+@23320112 = ~the physical damage~ // reprise de @13320112
 
 // Opcode 333 : Charge statique : phrases 0100 sort nommé, la fréquence dans la phrase (23 330 000-23 330 999)
 @23330100 = ~Casts the spell "%spellName%" %frequency%~ // reprise de @13330011
@@ -4077,6 +4112,15 @@
 @23330102 = ~to cast the spell "%spellName%" %frequency%~ // reprise de @13330013
 @23330103 = ~to cast the spell "%spellName%" on %theTarget% %frequency%~ // reprise de @13330014
 
+// Opcode 335 : état de sort posé, phrases 0100 (sans sort accordé) et 0110 (avec sort accordé) (23 350 100-23 350 113)
+@23350100 = ~Affects %theTarget% with %splstate%~ // reprise de @13350002
+@23350101 = ~Affects %theTarget% with %splstate%~ // reprise de @13350002
+@23350102 = ~to affect %theTarget% with %splstate%~ // reprise de @13350004
+@23350103 = ~to affect %theTarget% with %splstate%~ // reprise de @13350004
+@23350110 = ~Affects %theTarget% with %splstate% and teaches it the %spellName% spell~
+@23350111 = ~Affects %theTarget% with %splstate% and teaches it the %spellName% spell~
+@23350112 = ~to affect %theTarget% with %splstate% and teach it the %spellName% spell~
+@23350113 = ~to affect %theTarget% with %splstate% and teach it the %spellName% spell~
 // Opcode 337 : Retrait des effets d'un opcode : phrases 0100 (23 370 000-23 370 999)
 @23370100 = ~Dispels %opcodeStr%~ // reprise de @13370001
 @23370101 = ~Dispels %opcodeStr% on %theTarget%~ // reprise de @13370002

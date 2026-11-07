@@ -3471,6 +3471,7 @@
 @22320021 = ~Lorsque le porteur subit des dégâts~ // reprise de @12320021
 @22320022 = ~Lorsque le porteur tue la cible~ // reprise de @12320022
 @22320024 = ~Lorsqu'une créature se trouve à moins de %range%~ // reprise de @12320024
+@22320025 = ~Lorsque %theTarget% est %state%~ // reprise de @12320025
 @22320026 = ~Lorsque le porteur meurt~ // reprise de @12320026
 @22320027 = ~Lorsqu'une créature meurt~ // reprise de @12320027
 @22320028 = ~Lorsque %theTarget% est repoussé par un clerc ou un paladin~ // reprise de @12320028
@@ -3537,6 +3538,22 @@
 @22360131 = ~Crée un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360004
 @22360132 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360008
 @22360133 = ~de créer un simulacre %ofTheTarget% possédant 60% de son niveau, il peut attaquer et lancer des sorts~ // reprise de @12360008
+@22360140 = ~Crée %amount% clones %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360011
+@22360141 = ~Crée %amount% clones %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360011
+@22360142 = ~de créer %amount% clones %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360015
+@22360143 = ~de créer %amount% clones %ofTheTarget% possédant le même nombre de points de vie~ // reprise de @12360015
+@22360150 = ~Crée %amount% images %ofTheTarget% qui ne peuvent ni attaquer ni lancer de sorts~ // reprise de @12360012
+@22360151 = ~Crée %amount% images %ofTheTarget% qui ne peuvent ni attaquer ni lancer de sorts~ // reprise de @12360012
+@22360152 = ~de créer %amount% images %ofTheTarget% qui ne peuvent ni attaquer ni lancer de sorts~ // reprise de @12360016
+@22360153 = ~de créer %amount% images %ofTheTarget% qui ne peuvent ni attaquer ni lancer de sorts~ // reprise de @12360016
+@22360160 = ~Crée %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elles peuvent attaquer mais pas lancer de sorts~ // reprise de @12360013
+@22360161 = ~Crée %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elles peuvent attaquer mais pas lancer de sorts~ // reprise de @12360013
+@22360162 = ~de créer %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elles peuvent attaquer mais pas lancer de sorts~ // reprise de @12360017
+@22360163 = ~de créer %amount% projections %ofTheTarget% possédant le même nombre de points de vie, elles peuvent attaquer mais pas lancer de sorts~ // reprise de @12360017
+@22360170 = ~Crée %amount% simulacres %ofTheTarget% possédant 60% de son niveau, ils peuvent attaquer et lancer des sorts~ // reprise de @12360014
+@22360171 = ~Crée %amount% simulacres %ofTheTarget% possédant 60% de son niveau, ils peuvent attaquer et lancer des sorts~ // reprise de @12360014
+@22360172 = ~de créer %amount% simulacres %ofTheTarget% possédant 60% de son niveau, ils peuvent attaquer et lancer des sorts~ // reprise de @12360018
+@22360173 = ~de créer %amount% simulacres %ofTheTarget% possédant 60% de son niveau, ils peuvent attaquer et lancer des sorts~ // reprise de @12360018
 
 // Opcode 238 : Désintégration : phrases 0100 (22 380 000-22 380 999)
 @22380100 = ~Désintègre %theTarget%~ // reprise de @500011
@@ -3581,6 +3598,11 @@
 @22440112 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
 @22440113 = ~de drainer %amount% sorts profanes de la mémoire %ofTheTarget%~ // reprise de @12440004
 
+// Opcode 245 : vérification de la folie du berserker, phrases 0100 (22 450 100-22 450 103)
+@22450100 = ~Chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~ // reprise de @12450001
+@22450101 = ~Chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~ // reprise de @12450001
+@22450102 = ~que chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~ // reprise de @12450002
+@22450103 = ~que chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~ // reprise de @12450002
 // Opcode 247 : Attaque de la créature la plus proche : 0001 « En combat », phrases 0100 (22 470 000-22 470 999)
 @22470001 = ~En combat~ // reprise de @12470003
 @22470100 = ~Provoque la folie du berserker chez %theTarget%~ // reprise de @12470001
@@ -3762,6 +3784,7 @@
 @23010011 = ~en mêlée~ // reprise de @13010011
 @23010012 = ~à distance~ // reprise de @13010012
 @23010013 = ~magique~ // reprise de @13010013
+@23010020 = ~avec des %weaponType%~ // reprise de @13010020
 
 // Opcode 302 : Utilisation de tout objet : phrases 0100 permise, 0110 bloquée (23 020 000-23 020 999)
 @23020100 = ~Permet d'utiliser n'importe quel objet (si les caractéristiques sont suffisantes)~ // reprise de @13020002
@@ -3853,6 +3876,13 @@
 @23240006 = ~créatures %descriptionState%~ // reprise de @13241138
 @23240007 = ~durant la pénurie de fer~ // reprise de @13240401
 @23240008 = ~créatures autres que le lanceur~ // reprise de @13241999
+@23240100 = ~Immunité %againstWho%~ // reprise de @13240901
+@23240101 = ~Immunise %theTarget% %againstWho%~ // reprise de @13240902
+@23240102 = ~d'immuniser %theTarget% %againstWho%~ // reprise de @13240903
+@23240103 = ~d'immuniser %theTarget% %againstWho%~ // reprise de @13240903
+@23240110 = ~contre le sort « %spellName% » et l'objet « %itemName% »~ // reprise de @13240911
+@23240111 = ~contre le sort « %spellName% »~ // reprise de @13240912
+@23240112 = ~contre l'objet « %itemName% »~ // reprise de @13240913
 @23241003 = ~créatures insensibles au feu~ // reprise de @13241003
 @23241004 = ~créatures sensibles au feu~ // reprise de @13241004
 @23241013 = ~créatures gigantesques~ // reprise de @13241013
@@ -4020,6 +4050,7 @@
 @23269385 = ~Si %theTarget% n'est pas de taille %sizeName%~ // reprise de @13269385
 @23269400 = ~Si %theTarget% est à l'origine de l'effet~ // reprise de @13269400
 @23269401 = ~Si %theTarget% n'est pas à l'origine de l'effet~ // reprise de @13269401
+@23269420 = ~Si %theTarget% est %descriptionState%~ // reprise de @13269420
 @23269800 = ~Si %theTarget% est sous l'effet d'une potion~ // reprise de @13269800
 
 // Opcode 329 : Ralentissement des poisons : phrases 0100 (23 290 000-23 290 999)
@@ -4059,6 +4090,8 @@
 @23320008 = ~Dégâts perforants~ // reprise de @13320008
 @23320009 = ~Dégâts contondants~ // reprise de @13320009
 @23320010 = ~Dégâts de projectiles~ // reprise de @13320010
+@23320011 = ~Dégâts élémentaires~ // reprise de @13320011
+@23320012 = ~Dégâts physiques~ // reprise de @13320012
 @23320100 = ~les dégâts~ // reprise de @13320100
 @23320101 = ~les dégâts de feu~ // reprise de @13320101
 @23320102 = ~les dégâts de froid~ // reprise de @13320102
@@ -4070,6 +4103,8 @@
 @23320108 = ~les dégâts perforants~ // reprise de @13320108
 @23320109 = ~les dégâts contondants~ // reprise de @13320109
 @23320110 = ~les dégâts de projectiles~ // reprise de @13320110
+@23320111 = ~les dégâts élémentaires~ // reprise de @13320111
+@23320112 = ~les dégâts physiques~ // reprise de @13320112
 
 // Opcode 333 : Charge statique : phrases 0100 sort nommé, la fréquence dans la phrase (23 330 000-23 330 999)
 @23330100 = ~Lance le sort « %spellName% » %frequency%~ // reprise de @13330011
@@ -4077,6 +4112,15 @@
 @23330102 = ~de lancer le sort « %spellName% » %frequency%~ // reprise de @13330013
 @23330103 = ~de lancer le sort « %spellName% » sur %theTarget% %frequency%~ // reprise de @13330014
 
+// Opcode 335 : état de sort posé, phrases 0100 (sans sort accordé) et 0110 (avec sort accordé) (23 350 100-23 350 113)
+@23350100 = ~Affecte %theTarget% par %splstate%~ // reprise de @13350002
+@23350101 = ~Affecte %theTarget% par %splstate%~ // reprise de @13350002
+@23350102 = ~d'affecter %theTarget% par %splstate%~ // reprise de @13350004
+@23350103 = ~d'affecter %theTarget% par %splstate%~ // reprise de @13350004
+@23350110 = ~Affecte %theTarget% par %splstate% et lui apprend le sort « %spellName% »~
+@23350111 = ~Affecte %theTarget% par %splstate% et lui apprend le sort « %spellName% »~
+@23350112 = ~d'affecter %theTarget% par %splstate% et de lui apprendre le sort « %spellName% »~
+@23350113 = ~d'affecter %theTarget% par %splstate% et de lui apprendre le sort « %spellName% »~
 // Opcode 337 : Retrait des effets d'un opcode : phrases 0100 (23 370 000-23 370 999)
 @23370100 = ~Dissipe %opcodeStr%~ // reprise de @13370001
 @23370101 = ~Dissipe %opcodeStr% sur %theTarget%~ // reprise de @13370002

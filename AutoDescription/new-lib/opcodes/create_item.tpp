@@ -7,8 +7,9 @@
 // (ancien get_random_treasure_names, liste @8170000) : « trésor aléatoire de qualité exceptionnelle ».
 // Ressource vide (comme l'ancien opcode_resref_is_valid) ou objet absent : effet écarté sans
 // rien écrire, erreur journalisée.
-// Refus : autre trésor aléatoire
-// (l'ancien moteur énumère les objets possibles), objet sans nom (aucune ligne).
+// Un trésor aléatoire de rndtres.2da énumère les objets possibles (ad_random_treasure_names : « Gemme
+// héliotrope », « Gemme pierre de lune » ou « Gemme shandon »).
+// Refus : trésor aléatoire de rndtres.2da sans objet nommé, objet sans nom (aucune ligne).
 DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 	PHP_EACH ~fx_ids_%create_opcode%~ AS _ => create_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -28,7 +29,15 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 					SET $fx_item_amount(~%create_id%~) = 1
 				END
 				ELSE BEGIN
-					LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref% listed in RNDTRES.2DA~ RET render_missing = refusal END
+					LPF ad_random_treasure_names STR_VAR resref = ~%create_resref%~ RET create_names = names END
+					PATCH_IF ~%create_names%~ STRING_EQUAL ~~ BEGIN
+						LPF ad_refusal INT_VAR fx_id = create_id STR_VAR reason = ~not_implemented:opcode%create_opcode%:random_treasure~ message = ~random treasure %create_resref% listed in RNDTRES.2DA without any named item~ RET render_missing = refusal END
+					END
+					ELSE BEGIN
+						SET create_amount = $fx_parameter1(~%create_id%~)
+						SPRINT $fx_item_name(~%create_id%~) ~%create_names%~
+						SET $fx_item_amount(~%create_id%~) = (create_stackable AND create_amount != 0) ? create_amount : 1
+					END
 				END
 			END
 			// En-tête d'un sort seul : seul compte un objet absent, que l'ancien moteur écarte.

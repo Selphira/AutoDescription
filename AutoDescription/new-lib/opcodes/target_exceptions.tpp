@@ -16,6 +16,7 @@
 DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
 	SET $fx_exception(~%fx_id%~) = 0
+	SET $fx_resource_immunity(~%fx_id%~) = 0
 	SET $fx_exception_name_count(~%fx_id%~) = 0
 	SET $fx_no_effect_chance(~%fx_id%~) = 0
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
@@ -100,14 +101,33 @@ END
 // Effets exception_opcode qui ne sont pas déjà écartés : écartés, avec les noms de leur exception.
 // Sur une autre ressource, avec une condition (parameter2), l'ancien moteur n'écrit rien
 // (opcode_common_324) et garde l'effet pour l'en-tête d'un sort ; il écarte un 324 de durée limitée
-// nulle (opcode_324_is_valid). Refus : effet d'un EFF ; 318 d'un jeu classique (Set Stat de ToBEx,
-// pas une protection) ; autre ressource nommée sans condition (l'ancien moteur en fait une immunité au sort
-// ou à l'objet).
+// nulle (opcode_324_is_valid). Sur une autre ressource nommée, sans condition : immunité au sort, à
+// l'objet ou aux deux (fx_resource_immunity, ad_target_exception_resource_lines), comme l'ancien
+// opcode_324_against_who. Refus : effet d'un EFF ; 318 d'un jeu classique (Set Stat de ToBEx, pas une
+// protection).
 DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => exception_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%exception_id%~) AND NOT $fx_no_effect_chance(~%exception_id%~) BEGIN
 			SPRINT exception_resource $fx_resource(~%exception_id%~)
-			PATCH_IF $fx_external(~%exception_id%~) BEGIN
+			SET exception_stat = $fx_parameter2_raw(~%exception_id%~)
+			SET exception_splstate = $fx_parameter1(~%exception_id%~)
+			SET exception_splstate_tra = 8120000 + exception_splstate
+			// État de sort sans nom (ajouté par un mod, SOLASNA1) : l'ancien moteur n'en écrit rien.
+			PATCH_IF $fx_external(~%exception_id%~) AND (exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111)
+					AND NOT TRA_ENTRY_EXISTS (~%exception_splstate_tra%~) BEGIN
+				SET drop_id = exception_id
+				SPRINT ignored_reason ~not_implemented:opcode%exception_opcode%:splstate_no_name~
+				SPRINT ignored_message ~exception for spell state %exception_splstate%, which has no name~
+				LPM ad_application_drop
+			END
+			// Sur la ressource elle-même, parameter1 et parameter2 nuls : l'ancien moteur n'écrit rien (ligne 0
+			// de ses phrases, vide), comme pour un effet lu dans la ressource (PXL2DCFO : SPIN150R.EFF).
+			ELSE PATCH_IF $fx_external(~%exception_id%~) AND (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)
+					AND $fx_parameter1(~%exception_id%~) == 0 AND exception_stat == 0 BEGIN
+				SET $fx_consumed(~%exception_id%~) = 1
+				SET $fx_dropped(~%exception_id%~) = 1
+			END
+			ELSE PATCH_IF $fx_external(~%exception_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF exception_opcode == 318 AND NOT IS_EE BEGIN
@@ -133,7 +153,9 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 					LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
 					LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
 					PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) OR NOT (~%exception_item_name%~ STRING_EQUAL ~~) BEGIN
-						LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:resource~ message = ~exception for another resource than %ctx_resource%~ RET render_missing = refusal END
+						SET $fx_resource_immunity(~%exception_id%~) = 1
+						SPRINT $fx_spell_name(~%exception_id%~) ~%exception_spell_name%~
+						SPRINT $fx_item_name(~%exception_id%~) ~%exception_item_name%~
 					END
 					ELSE PATCH_IF NOT support_header_only BEGIN
 						SET ignored_fx = exception_id
@@ -478,7 +500,34 @@ END
 // représente (fx_level_merged, new-lib/spell_levels.tpp), dont la ligne garde ses exceptions, ou
 // la répétition d'un effet de tête qui a les mêmes exceptions (fx_series_of, SPCL412), ou un effet
 // dont tous ceux de son opcode et de sa portée ont les mêmes exceptions (SPCL920).
+// Immunités à une autre ressource (ancien opcode_common_324, ligne 0 de splprot.2da : toutes les
+// créatures, IESDP) : « Immunité contre l'objet « Baguette de nuage mortel » », « Immunise la cible
+// contre le sort « … » », « … contre le sort « … » et l'objet « … » ».
+DEFINE_PATCH_MACRO ad_target_exception_resource_lines BEGIN
+	SPRINT line_section ~equipped~
+	SET line_sort = $AD_OPCODE_SORT(~%exception_opcode%~)
+	PHP_EACH ~fx_ids_%exception_opcode%~ AS _ => immunity_id BEGIN
+		PATCH_IF $fx_resource_immunity(~%immunity_id%~) AND NOT $fx_consumed(~%immunity_id%~) BEGIN
+			SPRINT spellName $fx_spell_name(~%immunity_id%~)
+			SPRINT itemName $fx_item_name(~%immunity_id%~)
+			PATCH_IF ~%itemName%~ STRING_EQUAL ~~ BEGIN
+				SPRINT againstWho @23240111 // ~contre le sort « %spellName% »~
+			END
+			ELSE PATCH_IF ~%spellName%~ STRING_EQUAL ~~ BEGIN
+				SPRINT againstWho @23240112 // ~contre l'objet « %itemName% »~
+			END
+			ELSE BEGIN
+				SPRINT againstWho @23240110 // ~contre le sort « %spellName% » et l'objet « %itemName% »~
+			END
+			SET line_phrase = 23240100
+			SET line_fx = immunity_id
+			LPM ad_effect_line
+		END
+	END
+END
+
 DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
+	LPM ad_target_exception_resource_lines
 	FOR (exception_id = 0; exception_id < fx_count; ++exception_id) BEGIN
 		SET exception_anchor = $fx_identical_anchor(~%exception_id%~)
 		PATCH_IF exception_anchor == exception_id BEGIN

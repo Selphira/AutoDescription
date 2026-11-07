@@ -246,7 +246,7 @@
 242      1        1        DESCRIBED LEVEL            209    IGNORED         Cure:_Confusion
 243      1        1        DESCRIBED LEVEL            488    IGNORED         Item:_Drain_Item_Charges
 244      1        1        DESCRIBED LEVEL            376    IGNORED         Spell:_Drain_Wizard_Spell
-245      1        1        TODO      LEVEL            432    SHOWN           Check_For_Berserk
+245      1        1        DESCRIBED LEVEL            432    SHOWN           Check_For_Berserk
 246      1        1        TODO      LEVEL            33     SHOWN           Spell_Effect:_Berserking
 247      1        1        DESCRIBED LEVEL            381    SHOWN           Spell_Effect:_Attack_Nearest_Creature
 248      1        1        DESCRIBED LEVEL            474    SHOWN           Item:_Set_Melee_Effect
@@ -336,7 +336,7 @@
 332      0        1        DESCRIBED LEVEL            48     SHOWN           Stat:_Specific_Damage_Modifier
 333      0        1        DESCRIBED DICE             473    SHOWN           Spell_Effect:_Static_Charge
 334      0        1        IGNORED   LEVEL            400    SHOWN           Spell_Effect:_Turn_Undead
-335      0        1        TODO      LEVEL            493    SHOWN           Spell_Effect:_Seven_Eyes
+335      0        1        DESCRIBED LEVEL            493    SHOWN           Spell_Effect:_Seven_Eyes
 336      0        1        IGNORED   LEVEL            400    SHOWN           Graphics:_Display_Eyes_Overlay
 337      0        1        DESCRIBED LEVEL            203    IGNORED         Remove:_Opcode
 338      0        1        IGNORED   LEVEL            400    SHOWN           Disable_Rest

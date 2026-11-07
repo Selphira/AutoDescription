@@ -234,7 +234,17 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			SPRINT apply_pending ~not_implemented:opcode326:condition_stat~
 			SPRINT apply_pending_message ~stat %apply_stat% of SPLPROT.2DA row %apply_row% written differently by the old engine~
 		END
-		ELSE PATCH_IF apply_stat >= 266 AND apply_stat <= 273 AND apply_stat != 269 AND apply_stat != 272 BEGIN
+		// Bits d'état (273, STATE.IDS selon l'IESDP) : leurs noms, « sous l'effet de la panique »
+		// (ancien get_states_str), réunis par « ou » comme la relation 8 (au moins un bit commun).
+		ELSE PATCH_IF apply_stat == 273 BEGIN
+			SET exception_value = apply_value
+			LPM ad_target_exception_state
+			PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
+				SPRINT apply_pending ~not_implemented:opcode326:state_name~
+				SPRINT apply_pending_message ~state %apply_value% of stat 273 has no name~
+			END
+		END
+		ELSE PATCH_IF apply_stat >= 266 AND apply_stat <= 271 AND apply_stat != 269 BEGIN
 			LPF ad_ids_name INT_VAR ids_file = apply_stat - 264 entry = apply_value RET idName = name END
 			PATCH_IF ~%idName%~ STRING_EQUAL ~~ BEGIN
 				SPRINT apply_pending ~not_implemented:opcode326:ids~

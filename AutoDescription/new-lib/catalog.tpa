@@ -114,7 +114,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
 	344 => ALL // enchantement, parameter3 et parameter4
 	248 => ALL
 	272 => TYPE4_PARAMETER4_EE // nombre et fréquence (ancien opcode_272_condition)
-	301 => PARAMETER3_EE       // type d'arme (ancien opcode_301_common)
 	331 => ALL
 	341 => ALL
 	345 => ALL

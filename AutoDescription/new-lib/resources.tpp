@@ -163,6 +163,62 @@ BEGIN
 	SET random = quality > 0 OR listed
 END
 
+// Objets que le trésor aléatoire resref de rndtres.2da peut donner (ancien get_random_treasure_names et
+// strings.tpa) : noms dans l'ordre de la ligne, chacun une fois, jusqu'au premier « * », sans les
+// objets absents ou sans nom ; « « A », « B » ou « C » » à placer entre les guillemets de la phrase ;
+// vide si aucun objet n'a de nom.
+DEFINE_PATCH_FUNCTION ad_random_treasure_names
+	STR_VAR
+		resref = ~~
+	RET
+		names
+BEGIN
+	SPRINT names ~~
+	SET random_count = 0
+	SET random_done = 0
+	CLEAR_ARRAY ad_random_seen
+	PATCH_IF FILE_EXISTS_IN_GAME ~rndtres.2da~ BEGIN
+		INNER_PATCH_FILE ~rndtres.2da~ BEGIN
+			REPLACE_EVALUATE CASE_INSENSITIVE ~^%resref%[ %TAB%]+\([^%MNL%%LNL%]*\)~ BEGIN
+				PATCH_IF NOT random_done BEGIN
+					SET random_done = 1
+					INNER_PATCH ~%MATCH1%~ BEGIN
+						SET random_end = 0
+						REPLACE_EVALUATE ~[^ %TAB%]+~ BEGIN
+							PATCH_IF ~%MATCH0%~ STRING_EQUAL ~*~ BEGIN
+								SET random_end = 1
+							END
+							ELSE PATCH_IF NOT random_end BEGIN
+								LPF ad_item_info STR_VAR resref = ~%MATCH0%~ RET random_name = name END
+								PATCH_IF NOT (~%random_name%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $ad_random_seen(~%random_name%~) BEGIN
+									SET $ad_random_seen(~%random_name%~) = 1
+									SPRINT $ad_random_names(~%random_count%~) ~%random_name%~
+									SET random_count += 1
+								END
+							END
+						END ~%MATCH0%~
+					END
+				END
+			END ~%MATCH0%~
+		END
+	END
+	SPRINT and @1000007 // ~ou~
+	SPRINT random_glue @1000005 // ~ », « ~
+	SPRINT random_final_glue @1000006 // ~ » %and% « ~
+	FOR (random_i = 0; random_i < random_count; ++random_i) BEGIN
+		SPRINT random_name $ad_random_names(~%random_i%~)
+		PATCH_IF random_i == 0 BEGIN
+			SPRINT names ~%random_name%~
+		END
+		ELSE PATCH_IF random_i == random_count - 1 BEGIN
+			SPRINT names ~%names%%random_final_glue%%random_name%~
+		END
+		ELSE BEGIN
+			SPRINT names ~%names%%random_glue%%random_name%~
+		END
+	END
+END
+
 // Créature resref (ancien get_creature_name, get_creature_allegiance) : nom (vide si la créature
 // n'existe pas ou n'a pas de nom), allégeance (ea.ids) et niveau de sa première classe.
 DEFINE_PATCH_FUNCTION ad_creature_info

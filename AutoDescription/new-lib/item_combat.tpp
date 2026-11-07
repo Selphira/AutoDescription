@@ -9,8 +9,10 @@
 // combat_location, combat_charges, combat_depletion, combat_flags, combat_tooltip,
 // combat_section_type (infobulle, ou « au corps à corps » / « à distance » pour une arme en main),
 // combat_tac0, combat_damage (vide : aucun dégât), combat_damage_type, combat_speed,
-// combat_launcher ; variables écrites : combat_count,
-// combat_other_count (en-têtes d'un autre type que l'ancien moteur prend pour des en-têtes de combat).
+// combat_launcher, combat_weapon (0 pour un en-tête d'un autre type, sans attributs d'arme) ; variables
+// écrites : combat_count, combat_other_count (en-têtes d'un autre type que l'ancien moteur prend pour
+// des en-têtes de combat). Sans en-tête d'arme, un seul de ces en-têtes est la capacité de combat
+// (ancien add_combat_abilities, qui ne lit les attributs que des en-têtes d'arme : MOSTA01).
 
 DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 	SET combat_count = 0
@@ -27,6 +29,7 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			SET combat_id = combat_count
 			SET $combat_header(~%combat_id%~) = combat_h
 			SET $combat_attack_type(~%combat_id%~) = combat_attack_type
+			SET $combat_weapon(~%combat_id%~) = 1
 			READ_BYTE   (combat_offset + ITM_HEAD_location)        $combat_location(~%combat_id%~)
 			READ_SHORT  (combat_offset + ITM_HEAD_charges)         $combat_charges(~%combat_id%~)
 			READ_SHORT  (combat_offset + ITM_HEAD_depletion)       $combat_depletion(~%combat_id%~)
@@ -51,9 +54,33 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			READ_BYTE  (combat_offset + ITM_HEAD_location) combat_other_location
 			READ_SHORT (combat_offset + ITM_HEAD_charges)  combat_other_charges
 			PATCH_IF combat_other_charges == 0 AND combat_other_location != 3 BEGIN
+				SET combat_other_header = combat_h
 				SET combat_other_count += 1
 			END
 		END
+	END
+	PATCH_IF combat_count == 0 AND combat_other_count == 1 BEGIN
+		SET combat_id = 0
+		SET combat_h = combat_other_header
+		SET combat_offset = combat_headers_offset + combat_h * 0x38
+		READ_BYTE  (combat_offset + ITM_HEAD_attack_type) combat_attack_type
+		SET $combat_header(~0~) = combat_h
+		SET $combat_attack_type(~0~) = combat_attack_type
+		SET $combat_weapon(~0~) = 0
+		READ_BYTE  (combat_offset + ITM_HEAD_location)  $combat_location(~0~)
+		SET $combat_charges(~0~) = 0
+		READ_SHORT (combat_offset + ITM_HEAD_depletion) $combat_depletion(~0~)
+		READ_LONG  (combat_offset + ITM_HEAD_flags)     $combat_flags(~0~)
+		SET $combat_tac0(~0~) = 0
+		SET $combat_damage_type(~0~) = 0
+		SET $combat_speed(~0~) = 0
+		SET $combat_launcher(~0~) = 0
+		SPRINT $combat_damage(~0~) ~~
+		SPRINT $combat_damage_key(~0~) ~NONE~
+		SPRINT $combat_section(~0~) ~ability%combat_h%~
+		LPM ad_item_combat_tooltip
+		SET combat_count = 1
+		SET combat_other_count = 0
 	END
 END
 
@@ -103,8 +130,9 @@ END
 DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	SET combat_is_ammo = item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	LPM ad_item_combat_load
-	PATCH_IF combat_count == 0 OR combat_other_count > 0 BEGIN
-		LPF ad_refusal STR_VAR reason = ~not_implemented:headers~ message = ~weapon without a combat ability, or with abilities of another type~ RET render_missing = refusal END
+	// Sans aucun en-tête de combat, l'ancien moteur n'écrit pas de section de combat (BDMISCX6).
+	PATCH_IF combat_other_count > 0 BEGIN
+		LPF ad_refusal STR_VAR reason = ~not_implemented:headers~ message = ~weapon with combat abilities of another type than melee or ranged~ RET render_missing = refusal END
 	END
 	FOR (combat_id = 0; combat_id < combat_count AND ~%render_missing%~ STRING_EQUAL ~~; ++combat_id) BEGIN
 		SPRINT combat_section_type $combat_section_type(~%combat_id%~)
@@ -112,7 +140,7 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 			SET combat_value = $combat_damage_type(~%combat_id%~)
 			LPF ad_refusal STR_VAR reason = ~file_error:combat:damage_type~ message = ~damage type %combat_value% of combat ability %combat_id% (expected 0-9)~ RET render_missing = refusal END
 		END
-		ELSE PATCH_IF combat_is_ammo AND ($combat_launcher(~%combat_id%~) < 1 OR $combat_launcher(~%combat_id%~) > 3) BEGIN
+		ELSE PATCH_IF combat_is_ammo AND $combat_weapon(~%combat_id%~) AND ($combat_launcher(~%combat_id%~) < 1 OR $combat_launcher(~%combat_id%~) > 3) BEGIN
 			SET combat_value = $combat_launcher(~%combat_id%~)
 			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:launcher~ message = ~launcher %combat_value% of ammunition ability %combat_id% (expected 1-3)~ RET render_missing = refusal END
 		END
@@ -320,27 +348,33 @@ DEFINE_PATCH_MACRO ad_item_combat_section BEGIN
 	END
 END
 
-// Valeurs distinctes de combat_<group_attr> dans l'ordre des en-têtes : group_counts(group_attr),
-// <group_attr>_group_value(g), <group_attr>_group_size(g), <group_attr>_group_of(combat_id).
+// Valeurs distinctes de combat_<group_attr> dans l'ordre des en-têtes d'arme : group_counts(group_attr),
+// <group_attr>_group_value(g), <group_attr>_group_size(g), <group_attr>_group_of(combat_id) (-1 pour
+// un en-tête d'un autre type).
 DEFINE_PATCH_MACRO ad_combat_groups BEGIN
 	SET group_count = 0
 	FOR (group_c = 0; group_c < combat_count; ++group_c) BEGIN
-		SPRINT group_value $EVAL ~combat_%group_attr%~(~%group_c%~)
-		SET group_found = 0 - 1
-		FOR (group_g = 0; group_g < group_count AND group_found < 0; ++group_g) BEGIN
-			SPRINT group_old_value $EVAL ~%group_attr%_group_value~(~%group_g%~)
-			PATCH_IF ~%group_old_value%~ STRING_EQUAL ~%group_value%~ BEGIN
-				SET group_found = group_g
+		SET $EVAL ~%group_attr%_group_of~(~%group_c%~) = 0 - 1
+	END
+	FOR (group_c = 0; group_c < combat_count; ++group_c) BEGIN
+		PATCH_IF $combat_weapon(~%group_c%~) BEGIN
+			SPRINT group_value $EVAL ~combat_%group_attr%~(~%group_c%~)
+			SET group_found = 0 - 1
+			FOR (group_g = 0; group_g < group_count AND group_found < 0; ++group_g) BEGIN
+				SPRINT group_old_value $EVAL ~%group_attr%_group_value~(~%group_g%~)
+				PATCH_IF ~%group_old_value%~ STRING_EQUAL ~%group_value%~ BEGIN
+					SET group_found = group_g
+				END
 			END
+			PATCH_IF group_found < 0 BEGIN
+				SET group_found = group_count
+				SPRINT $EVAL ~%group_attr%_group_value~(~%group_found%~) ~%group_value%~
+				SET $EVAL ~%group_attr%_group_size~(~%group_found%~) = 0
+				SET group_count += 1
+			END
+			SET $EVAL ~%group_attr%_group_of~(~%group_c%~) = group_found
+			SET $EVAL ~%group_attr%_group_size~(~%group_found%~) += 1
 		END
-		PATCH_IF group_found < 0 BEGIN
-			SET group_found = group_count
-			SPRINT $EVAL ~%group_attr%_group_value~(~%group_found%~) ~%group_value%~
-			SET $EVAL ~%group_attr%_group_size~(~%group_found%~) = 0
-			SET group_count += 1
-		END
-		SET $EVAL ~%group_attr%_group_of~(~%group_c%~) = group_found
-		SET $EVAL ~%group_attr%_group_size~(~%group_found%~) += 1
 	END
 	SET $group_counts(~%group_attr%~) = group_count
 END
@@ -391,9 +425,14 @@ DEFINE_PATCH_MACRO ad_item_weapon_attributes BEGIN
 	SPRINT weapon_text ~~
 	SET group_skip_shown = 0
 	SPRINT group_suffix ~~
-	// L'enchantement est celui de l'objet : souvent égal au TAC0, il ne le répète pas.
+	// L'enchantement est celui de l'objet : souvent égal au TAC0, il ne le répète pas. L'ancien moteur
+	// ne l'écrit qu'avec un en-tête d'arme (ses attributs), pas pour un en-tête d'un autre type (MOSTA01).
+	SET weapon_any = 0
+	FOR (combat_id = 0; combat_id < combat_count; ++combat_id) BEGIN
+		SET weapon_any = weapon_any OR $combat_weapon(~%combat_id%~)
+	END
 	READ_LONG ITM_enchantment weapon_enchantment
-	PATCH_IF weapon_enchantment != 0 AND NOT (AD_SHOW_WEAPON_ENCHANTMENT_IF_DIFFERENT_THAC0 AND weapon_enchantment == $combat_tac0(~0~)) BEGIN
+	PATCH_IF weapon_any AND weapon_enchantment != 0 AND NOT (AD_SHOW_WEAPON_ENCHANTMENT_IF_DIFFERENT_THAC0 AND weapon_enchantment == $combat_tac0(~0~)) BEGIN
 		LPF ad_signed_value INT_VAR value = weapon_enchantment RET weapon_value = text END
 		SET weapon_name_tra = 6100000 // ~Niveau d'enchantement~
 		LPM ad_weapon_attribute_line
