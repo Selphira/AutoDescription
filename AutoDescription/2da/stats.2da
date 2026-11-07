@@ -109,6 +109,7 @@ STAT    STAT_VALUE    RELATION DESC_REF    STAT_REF    TARGET_REF  COMMENT
 272  3   7   13269341    *    *   mauvais
 272  3   11   13269345    *    *   non mauvais
 
+273  *   8   13269420    *    *   STATE.ids : au moins un état commun
 274  *   *   13269080    *    *   SPLSTATE.ids
 275  1   1   13260101    *    *   source et cible alliées
 275  1   5   13260105    *    *   source et cible alliées

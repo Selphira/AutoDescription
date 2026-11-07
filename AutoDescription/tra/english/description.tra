@@ -3421,8 +3421,8 @@
 
 // Opcode 245: Check For Berserk [245]
 
-@12450001 = ~Each successful attack has a 1% chance of causing %theTarget% to go berserk~
-@12450002 = ~Each successful attack has a 1% chance of causing %theTarget% to go berserk~
+@12450001 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~
+@12450002 = ~Each attack has a 1% chance of causing %theTarget% to go berserk~
 
 // Opcode 246: Spell Effect: Berserking [246]
 
@@ -4228,6 +4228,7 @@
 @13261002 = ~If proficiency in %proficiency% is less than %value%~
 @13269400 = ~If %theTarget% is the source of the effect~
 @13269401 = ~If %theTarget% is not the source of the effect~
+@13269420 = ~If %theTarget% is %descriptionState%~
 
 // Opcode 329: Spell Effect: Slow Poison [329]
 
