@@ -12535,11 +12535,11 @@ END
  * Check For Berserk [245] *
  * ----------------------- */
 DEFINE_PATCH_MACRO ~opcode_self_245~ BEGIN
-	SPRINT description @12450001 // ~Chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
+	SPRINT description @12450001 // ~Chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_245~ BEGIN
-	SPRINT description @12450002 // ~que chaque attaque réussie a 1% de chance de provoquer la folie du berserker chez %theTarget%~
+	SPRINT description @12450002 // ~que chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
 END
 
 DEFINE_PATCH_MACRO ~opcode_target_245~ BEGIN
@@ -14763,6 +14763,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 	ELSE BEGIN
 		SET ignoreDuration = 1
 		PATCH_IF ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~ BEGIN
+			SET splstateMissing = 0
 			PATCH_IF statType >= 102 AND statType <= 109 BEGIN // IDS
 				SET idsId = statType - 100
 				SET strref = strref + 301 // ~Inefficace contre les %creatureType%~
@@ -14773,6 +14774,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET oldStrref = strref + statType
 				SET strref = 420000 + parameter1
 				LPF ~get_splstate_name~ INT_VAR strref opcode splstate = parameter1 RET splstateName END
+				SET splstateMissing = (~%splstateName%~ STRING_EQUAL ~~)
 				SET strref = oldStrref
 			END
 			ELSE PATCH_IF statType >= 112 AND statType <= 118 BEGIN // !IDS
@@ -14800,7 +14802,7 @@ DEFINE_PATCH_MACRO ~opcode_common_324~ BEGIN
 				SET strref = strref + statType
 			END
 			LPF ~getTranslation~ INT_VAR strref opcode RET description = string exist END
-			PATCH_IF exist == 0 BEGIN
+			PATCH_IF exist == 0 OR splstateMissing BEGIN
 				SPRINT description ~~
 			END
 		END
@@ -15494,6 +15496,9 @@ PATCH_TRY
             //@13269085 = ~Si %theTarget% n'est pas affectée par %splstateName%~
             // ~À chaque round où %theTarget% est affecté par %splstate%~
         END
+        ELSE PATCH_IF tmpstat == 273 BEGIN // state.ids, bits d'état (IESDP : 0x111)
+            LPF ~get_states_str~ INT_VAR state = value RET descriptionState END
+        END
         ELSE PATCH_IF tmpstat == 262 OR (tmpstat >= 266 AND tmpstat < 274) BEGIN // Les types qui dépendent d'un fichier .ids pour récupérer leur valeur
             SET idsId = tmpstat - 264
             LPF ~get_ids_name~ INT_VAR entry = ~%value%~ file = ~%idsId%~ RET idName END
@@ -15920,6 +15925,9 @@ DEFINE_PATCH_MACRO ~opcode_332_group~ BEGIN
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
 				END
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
 		        SET parameter2 = 11 // @13320011 = ~Dégâts élémentaires~
 		        LPM ~add_opcode~
 			END
@@ -15964,6 +15972,9 @@ DEFINE_PATCH_MACRO ~opcode_332_group~ BEGIN
 						RET $opcodes(~%opcode%~) = count
 						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
 					END
+				END
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
 				END
 		        SET parameter2 = 12 // @13320012 = ~Dégâts physiques~
 		        LPM ~add_opcode~
@@ -16087,14 +16098,19 @@ DEFINE_PATCH_MACRO ~opcode_target_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
 	LPF ~get_splstate_name~ INT_VAR strref = stateRef opcode splstate = parameter1 RET splstate = splstateName END
-	SPRINT description @13350002 // ~Affecte %theTarget% par %splstate%~
-
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-		SPRINT descriptionAdd @13350011 // ~et lui apprend le sort %spellName%~
-		SPRINT description ~%description% %descriptionAdd%~
+	PATCH_IF ~%splstate%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description ~~
 	END
-	LPM ~opcode_not_cumulative~
+	ELSE BEGIN
+		SPRINT description @13350002 // ~Affecte %theTarget% par %splstate%~
+
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+			SPRINT descriptionAdd @13350011 // ~et lui apprend le sort %spellName%~
+			SPRINT description ~%description% %descriptionAdd%~
+		END
+		LPM ~opcode_not_cumulative~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_self_probability_335~ BEGIN
@@ -16105,14 +16121,19 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_335~ BEGIN
 	// Si %theTarget% n'est pas affecté par %splstate%, l'affecte et lui apprend le sort %spellName%
 	SET stateRef = 420000 + parameter1
 	LPF ~get_splstate_name~ INT_VAR strref = stateRef opcode splstate = parameter1 RET splstate = splstateName END
-	SPRINT description @13350004 // ~d'affecter %theTarget% par %splstate%~
-
-	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
-		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
-		SPRINT descriptionAdd @13350012 // ~et de lui apprendre le sort %spellName%~
-		SPRINT description ~%description% %descriptionAdd%~
+	PATCH_IF ~%splstate%~ STRING_EQUAL ~~ BEGIN
+		SPRINT description ~~
 	END
-	LPM ~opcode_not_cumulative~
+	ELSE BEGIN
+		SPRINT description @13350004 // ~d'affecter %theTarget% par %splstate%~
+
+		PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ BEGIN
+			LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
+			SPRINT descriptionAdd @13350012 // ~et de lui apprendre le sort %spellName%~
+			SPRINT description ~%description% %descriptionAdd%~
+		END
+		LPM ~opcode_not_cumulative~
+	END
 END
 
  /* -------------------- *

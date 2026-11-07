@@ -206,9 +206,10 @@ END
 DEFINE_PATCH_FUNCTION ~get_random_treasure_names~ STR_VAR file = ~~ RET randomTreasureNames BEGIN
 	TO_LOWER file
 
-	SPRINT final_glue @100004 //= ~ou~
-	SPRINT final_glue ~" %final_glue% "~
-	LPF ~implode~ STR_VAR array_name = ~random_treasures_%file%~ glue = ~", "~ final_glue RET randomTreasureNames = text END
+	SPRINT and @100004 // ~ou~
+	SPRINT glue @10020 // ~ », « ~
+	SPRINT final_glue @10021 // ~ » %and% « ~
+	LPF ~implode~ STR_VAR array_name = ~random_treasures_%file%~ glue final_glue RET randomTreasureNames = text END
 
 	PATCH_IF ~%randomTreasureNames%~ STRING_EQUAL ~~ BEGIN
 		PATCH_MATCH ~%file%~ WITH
