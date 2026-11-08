@@ -201,7 +201,7 @@ BEGIN
 		        LPM ~data_to_vars~
 
 				PATCH_TIME ~step:get_effect_description:item=%isItem%:subspell=%isSubSpell%~ BEGIN
-					LPF ~get_effect_description~ RET effectDescription = description sort END
+					LPF ~get_effect_description~ INT_VAR omitDefaultTarget = 1 RET effectDescription = description sort END
 				END
 				PATCH_IF NOT ~%effectDescription%~ STRING_EQUAL ~~ BEGIN
 					SET $lines(~%sort%~ ~%countLines%~ ~%probability%~ ~%probability2%~ ~%probability1%~ ~%effectDescription%~) = 1

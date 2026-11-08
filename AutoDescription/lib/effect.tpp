@@ -1124,6 +1124,7 @@ DEFINE_PATCH_FUNCTION ~get_effect_description~
 		projectile = 0
 		projectileTarget = 0
 		projectileTargetNumber = 0
+		omitDefaultTarget = 0
 	RET
 		description
 		sort
@@ -1247,6 +1248,9 @@ BEGIN
 					END
 				END
 			END
+			PATCH_IF omitDefaultTarget AND enable_shrinkage AND target == TARGET_FX_preset BEGIN
+				LPM ~omit_default_target~
+			END
 			SET opcode = thisOpcode
 
 			LPM ~add_condition~
@@ -1256,6 +1260,7 @@ BEGIN
 			LPM ~add_only_for~
 			LPM ~add_self_level~
 			LPM ~add_target_exceptions~
+			LPF ~collapse_spaces~ STR_VAR text = EVAL ~%description%~ RET description = text END
 		END
 		ELSE BEGIN
 			LPF ~add_log_warning~ STR_VAR message = EVAL ~Opcode %opcode%: Unknow target : %target% ~ END
@@ -1269,5 +1274,26 @@ BEGIN
 		DEFAULT
 			LPF ~add_log_warning~ STR_VAR message = ~FAILURE: opcode %opcode%: %ERROR_MESSAGE%~ END
 			PATCH_FAIL ~Opcode %opcode%: %ERROR_MESSAGE%~
+	END
+END
+
+// Retire la cible par défaut « à la cible » de la description d'une ligne de capacités de combat.
+DEFINE_PATCH_MACRO ~omit_default_target~ BEGIN
+	SPRINT defaultToTheTarget @101181 // ~à la cible~
+	SPRINT wearerName @102472 // ~le porteur~
+	SPRINT ofTheWearer @101086 // ~du porteur~
+	SPRINT toTheWearer @101180 // ~au porteur~
+	SPRINT omittedTarget ~ %toTheTarget%~
+	SET omittedStart = STRING_LENGTH ~%description%~ - STRING_LENGTH ~%omittedTarget%~
+	PATCH_IF ~%toTheTarget%~ STRING_EQUAL ~%defaultToTheTarget%~ AND omittedStart > 0 BEGIN
+		PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%omittedTarget%~ ~%description%~ omittedStart) == omittedStart
+				AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%crlf%~ ~%description%~) < 0
+				AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%wearerName%~ ~%description%~) < 0
+				AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%ofTheWearer%~ ~%description%~) < 0
+				AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%toTheWearer%~ ~%description%~) < 0 BEGIN
+			INNER_PATCH_SAVE description ~%description%~ BEGIN
+				DELETE_BYTES omittedStart (STRING_LENGTH ~%omittedTarget%~)
+			END
+		END
 	END
 END

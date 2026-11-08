@@ -203,6 +203,14 @@ DEFINE_PATCH_FUNCTION ~implode~ STR_VAR array_name = ~~ glue = ~, ~ final_glue =
 	END
 END
 
+DEFINE_PATCH_FUNCTION ~collapse_spaces~ STR_VAR text = ~~ RET text BEGIN
+	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~  ~ ~%text%~) >= 0 BEGIN
+		INNER_PATCH_SAVE text ~%text%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~\([^ %crlf%]\)  +~ ~\1 ~
+		END
+	END
+END
+
 DEFINE_PATCH_FUNCTION ~get_random_treasure_names~ STR_VAR file = ~~ RET randomTreasureNames BEGIN
 	TO_LOWER file
 
