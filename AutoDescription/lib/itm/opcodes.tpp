@@ -410,6 +410,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	140 => 0 // Graphics: Casting Glow [140]
 	141 => 0
 	142 => 0
+	144 => 0 // Button: Disable Button
 	147 => 0 // Spell: Learn Spell [147]
 	152 => 0 // Spell Effect: Play Movie [152]
 	155 => 0 // Overlay: Minor Globe [155]
@@ -441,6 +442,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
+	279 => 0 // Button: Enable Button
 	// 282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
