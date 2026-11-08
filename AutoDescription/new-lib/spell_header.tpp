@@ -540,7 +540,7 @@ END
 
 // Durée (ancien spell_duration) : durée commune des effets de chaque en-tête (en secondes ; un effet
 // différé ou permanent compte pour 0, un effet en ticks est converti, l'opcode 217 dure 30
-// secondes), puis leur progression (ad_spell_header_complex_duration) ; si elle varie entre les
+// secondes, une fraction de la durée dans AD_OPCODE_DURATION_DIVISOR), puis leur progression (ad_spell_header_complex_duration) ; si elle varie entre les
 // effets d'un en-tête, la lecture s'arrête après lui et la durée est « Spéciale », sauf si seul le
 // premier en-tête a été lu : celle des projectiles qui explosent plusieurs fois s'applique alors,
 // comme pour un sort à un seul en-tête qui en a un. Sans durée : « Permanente », ou « Instantanée »
@@ -603,6 +603,9 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 				END
 				PATCH_IF duration_opcode == 217 BEGIN
 					SET duration_seconds = 30
+				END
+				PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION_DIVISOR(~%duration_opcode%~) BEGIN
+					SET duration_seconds /= $AD_OPCODE_DURATION_DIVISOR(~%duration_opcode%~)
 				END
 				PATCH_IF duration_opcode == 213 BEGIN
 					SET duration_special = 1
