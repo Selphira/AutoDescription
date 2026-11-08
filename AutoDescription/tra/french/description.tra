@@ -4727,6 +4727,32 @@
 @15250002 = ~de remplacer « %itemName% » par « %itemName2% » dans l'inventaire %ofTheTarget%~
 @15260001 = ~%chanceValue% de chances d'être sans effet~
 
+@15270001 = ~Guérison %cureListOf%~
+@15270002 = ~Guérit %cureList% %ofTheTarget%~
+@15270003 = ~de guérir %cureList% %ofTheTarget%~
+@15270010 = ~de l'étourdissement~
+@15270011 = ~de la paralysie~
+@15270012 = ~de la débilité mentale~
+@15270013 = ~des maladies~
+@15270014 = ~de la cécité~
+@15270015 = ~de la surdité~
+@15270020 = ~l'étourdissement~
+@15270021 = ~la paralysie~
+@15270022 = ~la débilité mentale~
+@15270023 = ~les maladies~
+@15270024 = ~la cécité~
+@15270025 = ~la surdité~
+
+@15280001 = ~Dissipation %cureListOf%~
+@15280002 = ~Dissipe %cureList% %ofTheTarget%~
+@15280003 = ~de dissiper %cureList% %ofTheTarget%~
+@15280010 = ~de la confusion~
+@15280011 = ~de la peur~
+@15280012 = ~de l'état d'ébriété~
+@15280020 = ~la confusion~
+@15280021 = ~la peur~
+@15280022 = ~l'état d'ébriété~
+
 // STATS.ids
 // > A7-GolemConstruction
 @800000 = ~un golem parfait~

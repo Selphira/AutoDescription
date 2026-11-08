@@ -175,7 +175,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
     116 => 218 // Cure: (Remove) Invisibility [116]
     164 => 219 // Cure: Drunkeness [164]
 	 70 => 220 // Cure: Non-Detection [2]
-	 64 => 221 // State: Remove Infravision [64]
+	527 => 221 // Guérisons réunies [527]
+	 64 => 222 // State: Remove Infravision [64]
 	220 => 223 // Removal: Remove School [220]
 	221 => 224 // Removal: Remove Secondary Type [221]
 	511 => 224 // Dissipe toutes les illusions [511]
@@ -183,6 +184,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~sort_opcodes~ BEGIN
 	230 => 226 // Removal: Remove One Secondary Type [230]
 	273 => 227 // Remove: Specific Area Effect(Zone of Sweet Air) [273]
 	266 => 228 // Spell: Remove Protection from Spell [266]
+	528 => 229 // Dissipations réunies [528]
 
 	// Absorption
 
@@ -744,6 +746,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	337 => 0 // Remove: Opcode
 	343 => 0 // HP Swap
 	511 => 0 // Dissipe toutes les illusions
+	527 => 0 // Guérisons réunies
+	528 => 0 // Dissipations réunies
 	526 => 1 // Protection: chance d'être sans effet sous une condition [526]
 END
 
@@ -768,6 +772,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	335 => 1
 	337 => 1
 	518 => 1 // Immunités aux sorts réunies (206)
+	527 => 1 // Guérisons réunies
+	528 => 1 // Dissipations réunies
 END
 
 // opcodes absents de opcodes_ignore_duration mais dont l'effet ne peut être permanent
@@ -5628,10 +5634,11 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 	LOCAL_SET strref = 0
 	PATCH_IF shrink_immunities_single_line == 1 BEGIN
 		LPM ~opcode_101_join_panic~
-		// Immunités certaines d'une même classe de cible (soi, lanceur d'origine ou cible prédéfinie) réunies en
+		// Immunités certaines d'une même classe de cible (soi, lanceur d'origine, cible prédéfinie, chacune des
+		// autres cibles, membres du groupe ou créatures de la zone) réunies en
 		// une ligne, seulement entre immunités aux mêmes champs (parameter2, résistance et puissance mis à part) :
 		// une ligne commune cacherait la durée ou la restriction de niveau des autres.
-		PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+		PATCH_FOR_EACH immunityClass IN 1 2 3 4 5 6 7 8 BEGIN
 			// Marque propre à cet appel : vider un tableau ne défait pas les éléments que VARIABLE_IS_SET teste.
 			SET immunityPass = VARIABLE_IS_SET immunityPass ? immunityPass + 1 : 1
 			CLEAR_ARRAY ~immunityKeys~
@@ -5688,7 +5695,7 @@ DEFINE_PATCH_MACRO ~opcode_101_post_group~ BEGIN
 					SPRINT and @100021 // ~et~
 					LPF ~implode~ STR_VAR array_name = ~immunitiesList~ glue = ~, ~ final_glue = ~ %and% ~ RET immunities = text END
 					SET opcode = 101
-					SET target = (immunityClass == 1) ? TARGET_FX_self : TARGET_FX_preset
+					SET target = (immunityClass == 1) ? TARGET_FX_self : immunityClass
 					SPRINT custom_str ~%immunities%~
 					LPM ~add_opcode~
 				END
@@ -5703,7 +5710,7 @@ DEFINE_PATCH_MACRO ~opcode_101_join_panic~ BEGIN
 	PATCH_IF VARIABLE_IS_SET $opcodes(~106~) AND $opcodes(~106~) > 0 BEGIN
 		// Marque propre à cet appel : vider un tableau ne défait pas les éléments que VARIABLE_IS_SET teste.
 		SET panicPass = VARIABLE_IS_SET panicPass ? panicPass + 1 : 1
-		PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+		PATCH_FOR_EACH immunityClass IN 1 2 3 4 5 6 7 8 BEGIN
 			PATCH_PHP_EACH opcodes_101 AS data => _ BEGIN
 				LPM ~data_to_vars~
 				LPM ~opcode_101_post_group_key~
@@ -5717,7 +5724,7 @@ DEFINE_PATCH_MACRO ~opcode_101_join_panic~ BEGIN
 			LPM ~data_to_vars~
 			PATCH_IF parameter2 == MOD_TYPE_flat AND parameter1 <= 0 BEGIN
 				SET panicJoined = 0
-				PATCH_FOR_EACH immunityClass IN 1 2 BEGIN
+				PATCH_FOR_EACH immunityClass IN 1 2 3 4 5 6 7 8 BEGIN
 					LPM ~opcode_101_post_group_key~
 					PATCH_IF NOT panicJoined AND immunityCandidate AND VARIABLE_IS_SET $panicKeys(~%panicPass% %immunityClass% %immunityKey%~) BEGIN
 						SET panicJoined = 1
@@ -5747,7 +5754,8 @@ END
 DEFINE_PATCH_MACRO ~opcode_101_post_group_key~ BEGIN
 	SET immunityCandidate = probability == 100 AND ~%custom_str%~ STRING_EQUAL ~~
 		AND ((immunityClass == 1 AND (target == TARGET_FX_self OR target == TARGET_FX_original_caster))
-			OR (immunityClass == 2 AND target == TARGET_FX_preset))
+			OR (immunityClass == 2 AND target == TARGET_FX_preset)
+			OR (immunityClass >= 3 AND target == immunityClass))
 	SET keyDuration = (timingMode == TIMING_permanent OR timingMode == TIMING_while_equipped OR timingMode == TIMING_permanent_after_death) ? 0 : duration
 	SET keySaveBonus = (saveType == 0) ? 0 : saveBonus
 	SPRINT immunityKey ~%isExternal% %timingMode% %keyDuration% %probability1% %probability2% %diceCount% %diceSides% %saveType% %keySaveBonus%~
@@ -16858,6 +16866,189 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_target_probability_511~ BEGIN
 	LPM ~opcode_self_probability_511~
+END
+
+/* -------------------------------------------------------- *
+ * Guérisons réunies [527], dissipations réunies [528]      *
+ * -------------------------------------------------------- */
+
+// Opcodes de chaque famille, dans l'ordre de la liste écrite (rang de sort_opcodes)
+ACTION_DEFINE_ARRAY ~cure_family_527~ BEGIN 46 162 77 79 75 81 END
+ACTION_DEFINE_ARRAY ~cure_family_528~ BEGIN 242 161 164 END
+
+DEFINE_PATCH_MACRO ~opcode_46_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_162_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_77_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_79_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_75_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_81_post_group~ BEGIN LPM ~group_cures~ END
+DEFINE_PATCH_MACRO ~opcode_242_post_group~ BEGIN LPM ~group_dispels~ END
+DEFINE_PATCH_MACRO ~opcode_161_post_group~ BEGIN LPM ~group_dispels~ END
+DEFINE_PATCH_MACRO ~opcode_164_post_group~ BEGIN LPM ~group_dispels~ END
+
+DEFINE_PATCH_MACRO ~group_cures~ BEGIN
+	SET cureVirtual = 527
+	LPM ~group_cure_family~
+END
+
+DEFINE_PATCH_MACRO ~group_dispels~ BEGIN
+	SET cureVirtual = 528
+	LPM ~group_cure_family~
+END
+
+DEFINE_PATCH_MACRO ~group_cure_family~ BEGIN
+	LOCAL_SET cureSavedOpcode = opcode
+	LOCAL_SET cureCount = 0
+	LOCAL_SET cureA = 0
+	LOCAL_SET cureB = 0
+	LOCAL_SET cureMask = 0
+	LOCAL_SET cureMembers = 0
+	LOCAL_SET cureAnchorOpcode = 0
+	LOCAL_SET cureMemberOpcode = 0
+	LOCAL_SET cureMemberPosition = 0
+	PATCH_PHP_EACH ~cure_family_%cureVirtual%~ AS cureIndex => cureOpcode BEGIN
+		SET $cureOpcodeAt(~%cureIndex%~) = cureOpcode
+		SET cureCount += 1
+	END
+	FOR (cureA = 0; cureA < cureCount; ++cureA) BEGIN
+		SET cureAnchorOpcode = $cureOpcodeAt(~%cureA%~)
+		PATCH_IF VARIABLE_IS_SET $opcodes(~%cureAnchorOpcode%~) AND $opcodes(~%cureAnchorOpcode%~) > 0 BEGIN
+			PATCH_PHP_EACH ~opcodes_%cureAnchorOpcode%~ AS data => _ BEGIN
+				LPM ~data_to_vars~
+				SET opcode = cureAnchorOpcode
+				LPM ~cure_group_eligible~
+				PATCH_IF match BEGIN
+					SET cureMask = 1 BLSL cureA
+					SET cureMembers = 0
+					FOR (cureB = cureA + 1; cureB < cureCount; ++cureB) BEGIN
+						SET cureMemberOpcode = $cureOpcodeAt(~%cureB%~)
+						LPF ~get_opcode_position~
+							INT_VAR opcode = cureMemberOpcode
+								match_target       = target
+								match_power        = power
+								match_timingMode   = timingMode
+								match_resistance   = resistance
+								match_duration     = duration
+								match_probability1 = probability1
+								match_probability2 = probability2
+								match_diceCount    = diceCount
+								match_diceSides    = diceSides
+								match_saveType     = saveType
+								match_saveBonus    = saveBonus
+								match_special      = special
+							STR_VAR match_macro = ~opcode_match_opcode_cure_group~
+							RET cureMemberPosition = position
+						END
+						PATCH_IF cureMemberPosition >= 0 BEGIN
+							LPF ~delete_opcode~
+								INT_VAR opcode = cureMemberOpcode match_position = cureMemberPosition
+								RET $opcodes(~%cureMemberOpcode%~) = count
+								RET_ARRAY EVAL ~opcodes_%cureMemberOpcode%~ = opcodes_xx
+							END
+							SET cureMask = cureMask BOR (1 BLSL cureB)
+							SET cureMembers += 1
+						END
+					END
+					PATCH_IF cureMembers > 0 BEGIN
+						LPF ~delete_opcode~
+							INT_VAR opcode = cureAnchorOpcode match_position = position
+							RET $opcodes(~%cureAnchorOpcode%~) = count
+							RET_ARRAY EVAL ~opcodes_%cureAnchorOpcode%~ = opcodes_xx
+						END
+						SET custom_int = cureMask
+						SET opcode = cureVirtual
+						LPM ~add_opcode~
+					END
+				END
+			END
+		END
+	END
+	SET opcode = cureSavedOpcode
+END
+
+// L'effet courant peut-il être réuni ?
+DEFINE_PATCH_MACRO ~cure_group_eligible~ BEGIN
+	SET match = isExternal == 0 AND ~%target_exceptions%~ STRING_EQUAL ~~ AND ~%target_type%~ STRING_EQUAL ~~
+		AND NOT (cumulable == 0 AND NOT VARIABLE_IS_SET $opcodes_ignore_not_cumulable(~%opcode%~))
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_cure_group~ BEGIN
+	LPM ~cure_group_eligible~
+	PATCH_IF match BEGIN
+		SET match = (
+				match_target       == target
+			AND match_power        == power
+			AND match_timingMode   == timingMode
+			AND match_resistance   == resistance
+			AND match_duration     == duration
+			AND match_probability1 == probability1
+			AND match_probability2 == probability2
+			AND match_diceCount    == diceCount
+			AND match_diceSides    == diceSides
+			AND match_saveType     == saveType
+			AND match_saveBonus    == saveBonus
+			AND match_special      == special
+		)
+	END
+END
+
+DEFINE_PATCH_MACRO ~cure_group_lists~ BEGIN
+	LOCAL_SET cureStrref = 0
+	LOCAL_SPRINT and @100021 // ~et~
+	CLEAR_ARRAY cureNames
+	CLEAR_ARRAY cureNamesOf
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY cureNames BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY cureNamesOf BEGIN END
+	PATCH_PHP_EACH ~cure_family_%opcode%~ AS cureIndex => _ BEGIN
+		PATCH_IF (custom_int BAND (1 BLSL cureIndex)) != 0 BEGIN
+			SET cureStrref = 10000000 + opcode * 10000 + 20 + cureIndex
+			SPRINT cureName (AT cureStrref)
+			SET $cureNames(~%cureName%~) = 1
+			SET cureStrref = 10000000 + opcode * 10000 + 10 + cureIndex
+			SPRINT cureName (AT cureStrref)
+			SET $cureNamesOf(~%cureName%~) = 1
+		END
+	END
+	LPF ~implode~ STR_VAR array_name = ~cureNames~ final_glue = EVAL ~ %and% ~ RET cureList = text END
+	LPF ~implode~ STR_VAR array_name = ~cureNamesOf~ final_glue = EVAL ~ %and% ~ RET cureListOf = text END
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_527~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15270001 // ~Guérison %cureListOf%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_527~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15270002 // ~Guérit %cureList% %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_527~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15270003 // ~de guérir %cureList% %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_527~ BEGIN
+	LPM ~opcode_self_probability_527~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_528~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15280001 // ~Dissipation %cureListOf%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_528~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15280002 // ~Dissipe %cureList% %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_self_probability_528~ BEGIN
+	LPM ~cure_group_lists~
+	SPRINT description @15280003 // ~de dissiper %cureList% %ofTheTarget%~
+END
+
+DEFINE_PATCH_MACRO ~opcode_target_probability_528~ BEGIN
+	LPM ~opcode_self_probability_528~
 END
 
 /* ------------------------ *

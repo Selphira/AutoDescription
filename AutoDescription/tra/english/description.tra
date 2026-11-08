@@ -48,7 +48,7 @@
 @100008 = ~%name% %versus%~
 @100009 = ~%name%%colon%%value% %versus%~
 @100019 = ~%value% %attribute%~
-@100020 = ~the~
+@100020 = ~~
 @100021 = ~and~
 @100030 = ~School~
 @100031 = ~Duration~
@@ -247,12 +247,12 @@
 @102444 = ~Allies within a radius of %range%~
 @102443 = ~Enemies within a radius of %range%~
 @102442 = ~radius of %range%~
-@102384 = ~the %targetType%~
+@102384 = ~%targetType%~
 @101085 = ~of the target~
 @101086 = ~of the wearer~
 @101088 = ~of party members~
 @101089 = ~of the creatures in the area of effect~
-@102385 = ~of the %targetType%~
+@102385 = ~of %targetType%~
 @101180 = ~to the wearer~
 @101181 = ~to the target~
 @101182 = ~to party members~
@@ -286,7 +286,7 @@
 @102801 = ~%target% within a radius of %range% around %ofTheTarget%~
 @102802 = ~%target% within a %range% cone on a %angle%° arc~
 @102803 = ~%main_target% and %target% within a radius of %range%~
-@102386 = ~to the %targetType%~
+@102386 = ~to %targetType%~
 @102387 = ~vs. %targetType%~
 @101186 = ~%target% (of level %levelMin%)~
 @101187 = ~%target% (of level %levelMax% or lower)~
@@ -2576,9 +2576,9 @@
 
 // Opcode 109: State: Hold [109]
 
-@11090001 = ~Hold the %creatureType%~
+@11090001 = ~Hold %creatureType%~
 @11090002 = ~Hold %theTarget%~
-@11090003 = ~to hold the %creatureType%~
+@11090003 = ~to hold %creatureType%~
 @11090004 = ~to hold %theTarget%~
 
 // Opcode 111: Item: Create Magical Weapon [111]
@@ -2984,8 +2984,8 @@
 @11770003 = ~only for the %targetType% kits~
 @11770100 = ~single and multiclassed mages~
 @11770101 = ~single and multiclassed thieves~
-@11770200 = ~the~
-@11770201 = ~and the~
+@11770200 = ~~
+@11770201 = ~and~
 @11770202 = ~of~
 @11770203 = ~and of~
 @11770204 = ~to~
@@ -4463,6 +4463,32 @@
 @15250001 = ~Replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
 @15250002 = ~to replace "%itemName%" by "%itemName2%" in %theTarget%'s inventory~
 @15260001 = ~%chanceValue% chance to have no effect~
+// Guérisons réunies [527] : phrases (0001 soi, 0002 cible, 0003 probable), états (0010 + indice : « de… », 0020 + indice)
+@15270001 = ~Cures %cureListOf%~
+@15270002 = ~Cures %cureList% on %theTarget%~
+@15270003 = ~to cure %cureList% on %theTarget%~
+@15270010 = ~stun~
+@15270011 = ~paralysis~
+@15270012 = ~feeblemindedness~
+@15270013 = ~diseases~
+@15270014 = ~blindness~
+@15270015 = ~deafness~
+@15270020 = ~stun~
+@15270021 = ~paralysis~
+@15270022 = ~feeblemindedness~
+@15270023 = ~diseases~
+@15270024 = ~blindness~
+@15270025 = ~deafness~
+// Dissipations réunies [528] : phrases (0001 soi, 0002 cible, 0003 probable), états (0010 + indice : « de… », 0020 + indice)
+@15280001 = ~Cures %cureListOf%~
+@15280002 = ~Cures %cureList% on %theTarget%~
+@15280003 = ~to cure %cureList% on %theTarget%~
+@15280010 = ~confusion~
+@15280011 = ~horror~
+@15280012 = ~drunkenness~
+@15280020 = ~confusion~
+@15280021 = ~horror~
+@15280022 = ~drunkenness~
 
 // /!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\/!\ \\
 // Spécifiques à certains mods, ces chaînes disparaitront à terme, lorsque le mod sera plus évolué. ||
