@@ -269,8 +269,10 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET descri
 	                    PATCH_IF opcode == 217 BEGIN
 	                        SET duration = 30
 	                    END
-
-	                    PATCH_IF opcode == 213 BEGIN
+						ELSE PATCH_IF opcode == 231 BEGIN
+	                        SET duration /= 2
+	                    END
+						ELSE PATCH_IF opcode == 213 BEGIN
 	                        SET is_special = 1
 	                    END
 
