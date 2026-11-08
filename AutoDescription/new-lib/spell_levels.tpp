@@ -327,6 +327,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 				SET formula_flat = 0
 				SET formula_dice_sides = 0
 				SET formula_opcode = 0
+				SET formula_signed = 1
 				LPM ad_spell_level_formula
 				PATCH_IF formula_valid OR formula_rank == 2 BEGIN
 					SET level_id = $level_id(~%level_a%~)
@@ -382,6 +383,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				SET formula_flat = level_mode == MOD_TYPE_flat
 				SET formula_dice_sides = 0
 				SET formula_opcode = level_opcode
+				SET formula_signed = 0
 				LPM ad_spell_level_formula
 				// Deux valeurs seulement : la formule de l'ancien moteur, sans dés ni unité ; la classe d'armure
 				// garde ses sections (« -2 + -2 au niveau 15 »).
@@ -418,6 +420,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 			SET formula_percent = 0
 			SET formula_flat = 0
 			SET formula_opcode = level_opcode
+			SET formula_signed = 0
 			SET level_duration_by_timing = 0
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_dice~
@@ -620,8 +623,9 @@ END
 // sans le premier en admettant un niveau de plus ou de moins. formula_valid : 1 si un pas tient ;
 // formula_text : « 1 par niveau du lanceur/20 », « 2 par tranche de 3 niveaux du lanceur/18 »,
 // précédé du reste de la valeur au dernier niveau (« 10 % + 1 % par niveau du lanceur/20 », sans le
-// signe du pas), une valeur constante seule ; formula_base : valeur de départ. formula_percent :
-// valeurs en pourcentage ; formula_dice_sides : valeurs en nombre de dés de ces faces ;
+// signe du pas, sauf avec formula_signed : « -1 - 1 par tranche de 2 niveaux du lanceur/9 » pour un
+// bonus de jet de sauvegarde négatif), une valeur constante seule ; formula_base : valeur de départ.
+// formula_percent : valeurs en pourcentage ; formula_dice_sides : valeurs en nombre de dés de ces faces ;
 // formula_flat : valeur fixée (l'ancien moteur ajoute « niveau + valeur » devant une valeur constante
 // ou un pas négatif) ; formula_opcode : opcode dont l'unité suit la valeur (AD_LEVEL_UNIT_OPCODES),
 // sur l'effet level_id ; formula_unit_used : 1 si elle a été écrite. formula_rank : nombre de valeurs
@@ -764,7 +768,14 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 				END
 				ELSE BEGIN
 					LPF ad_level_unsigned STR_VAR text = ~%formula_text%~ RET formula_text = text END
-					SPRINT formula_text ~%formula_remains_text% + %formula_text%~
+					// Un bonus de jet de sauvegarde n'a pas de verbe pour porter le signe : -1 à -5 des niveaux 1
+					// à 9 donnent « -1 - 1 par tranche de 2 niveaux », et non « 1 + 1 ».
+					PATCH_IF formula_signed AND formula_delta < 0 AND formula_previous < 0 BEGIN
+						SPRINT formula_text ~-%formula_remains_text% - %formula_text%~
+					END
+					ELSE BEGIN
+						SPRINT formula_text ~%formula_remains_text% + %formula_text%~
+					END
 				END
 			END
 		END

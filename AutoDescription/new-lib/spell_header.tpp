@@ -1186,6 +1186,7 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 					SET formula_dice_sides = 0
 					// Un bonus de jet de sauvegarde, sans l'unité de l'opcode (ancien get_complex_value, untyped).
 					SET formula_opcode = 0
+					SET formula_signed = 1
 					SET level_id = $level_id(~%level_a%~)
 					LPM ad_spell_level_formula
 					PATCH_IF formula_rank == 2 BEGIN
