@@ -899,7 +899,12 @@ BEGIN
 	                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^- ~ ~~
 	                        REPLACE_TEXTUALLY EVALUATE_REGEXP ~^-~ ~~
 	                    END
-						SPRINT complex_value ~%remains_value% + %complex_value%~
+						PATCH_IF untyped AND delta_value < 0 AND prev_value < 0 BEGIN
+							SPRINT complex_value ~-%remains_value% - %complex_value%~
+						END
+						ELSE BEGIN
+							SPRINT complex_value ~%remains_value% + %complex_value%~
+						END
 					END
 				END
 			END
