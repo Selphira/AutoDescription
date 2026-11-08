@@ -333,6 +333,8 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_range_min(~%fx_id%~) = 0
 	SET $fx_range_max(~%fx_id%~) = 0
 	SET $fx_level_merged(~%fx_id%~) = 0
+	SET $fx_cure_mask(~%fx_id%~) = 0
+	SET $fx_cure_feeblemind(~%fx_id%~) = 0
 	SET $fx_header_target(~%fx_id%~) = 0
 	SET $fx_header_projectile(~%fx_id%~) = 0
 	SET $fx_potion_drinker(~%fx_id%~) = 0

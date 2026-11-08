@@ -4236,3 +4236,33 @@
 // Effet dérivé 015, BROKEN_ITEM : phrases probables seulement (30 150 102-30 150 103)
 @30150102 = ~de se briser~ // reprise de @15190001
 @30150103 = ~de se briser~ // reprise de @15190001
+
+// Effet dérivé 016, CURES (guérisons ou dissipations réunies) : phrases 0100 + forme, états 0010 + indice (« de… ») et 0020 + indice (30160000-30160999)
+@30160010 = ~de l'étourdissement~ // reprise de @15270010
+@30160011 = ~de la paralysie~ // reprise de @15270011
+@30160012 = ~de la débilité mentale~ // reprise de @15270012
+@30160013 = ~des maladies~ // reprise de @15270013
+@30160014 = ~de la cécité~ // reprise de @15270014
+@30160015 = ~de la surdité~ // reprise de @15270015
+@30160020 = ~l'étourdissement~ // reprise de @15270020
+@30160021 = ~la paralysie~ // reprise de @15270021
+@30160022 = ~la débilité mentale~ // reprise de @15270022
+@30160023 = ~les maladies~ // reprise de @15270023
+@30160024 = ~la cécité~ // reprise de @15270024
+@30160025 = ~la surdité~ // reprise de @15270025
+@30160100 = ~Guérison %cureListOf%~ // reprise de @15270001
+@30160101 = ~Guérit %cureList% %ofTheTarget%~ // reprise de @15270002
+@30160102 = ~de guérir %cureList% %ofTheTarget%~ // reprise de @15270003
+@30160103 = ~de guérir %cureList% %ofTheTarget%~ // reprise de @15270003
+
+// Effet dérivé 017, DISPELS (guérisons ou dissipations réunies) : phrases 0100 + forme, états 0010 + indice (« de… ») et 0020 + indice (30170000-30170999)
+@30170010 = ~de la confusion~ // reprise de @15280010
+@30170011 = ~de la peur~ // reprise de @15280011
+@30170012 = ~de l'état d'ébriété~ // reprise de @15280012
+@30170020 = ~la confusion~ // reprise de @15280020
+@30170021 = ~la peur~ // reprise de @15280021
+@30170022 = ~l'état d'ébriété~ // reprise de @15280022
+@30170100 = ~Dissipation %cureListOf%~ // reprise de @15280001
+@30170101 = ~Dissipe %cureList% %ofTheTarget%~ // reprise de @15280002
+@30170102 = ~de dissiper %cureList% %ofTheTarget%~ // reprise de @15280003
+@30170103 = ~de dissiper %cureList% %ofTheTarget%~ // reprise de @15280003

@@ -16,7 +16,7 @@
 @1000005 = ~, ~ // reprise de @10020
 @1000006 = ~ %and% ~ // reprise de @10021
 @1000007 = ~or~ // reprise de @100004
-@1000008 = ~the~ // reprise de @100020
+@1000008 = ~~ // reprise de @100020
 
 // Mise en forme : distances, 1 100 000 + pluriel + 2 × demi-unité ; le .tra choisit l'unité (%distance_units% mètres entiers, %distance_feet% pieds) (1 100 000-1 100 099)
 @1100000 = ~%distance_feet% feet~
@@ -115,16 +115,16 @@
 @2001103 = ~%main_target% and %target% within a radius of %range%~ // reprise de @102803
 
 // Type de créature visé par un effet d'un 177 : 0000-0005 liaisons de la liste (« les », « et les », « des »…), 0010-0012 cible (« les %targetType% », « des… », « aux… »), 0020 « contre », 0030 « uniquement pour » (2 002 000-2 002 099)
-@2002000 = ~the~ // reprise de @11770200
-@2002001 = ~and the~ // reprise de @11770201
+@2002000 = ~~ // reprise de @11770200
+@2002001 = ~and~ // reprise de @11770201
 @2002002 = ~of~ // reprise de @11770202
 @2002003 = ~and of~ // reprise de @11770203
 @2002004 = ~to~ // reprise de @11770204
 @2002005 = ~and to~ // reprise de @11770205
 @2002006 = ~and~ // reprise de @11770206
-@2002010 = ~the %targetType%~ // reprise de @102384
-@2002011 = ~of the %targetType%~ // reprise de @102385
-@2002012 = ~to the %targetType%~ // reprise de @102386
+@2002010 = ~%targetType%~ // reprise de @102384
+@2002011 = ~of %targetType%~ // reprise de @102385
+@2002012 = ~to %targetType%~ // reprise de @102386
 @2002020 = ~vs. %targetType%~ // reprise de @102387
 @2002030 = ~only for %targetType%~ // reprise de @11770001
 @2002031 = ~only for the %targetType% kit~ // reprise de @11770002
@@ -2744,10 +2744,10 @@
 @21090101 = ~Hold %theTarget%~ // reprise de @11090002
 @21090102 = ~to hold %theTarget%~ // reprise de @11090004
 @21090103 = ~to hold %theTarget%~ // reprise de @11090004
-@21090110 = ~Hold the %creatureType%~ // reprise de @11090001
-@21090111 = ~Hold the %creatureType%~ // reprise de @11090001
-@21090112 = ~to hold the %creatureType%~ // reprise de @11090003
-@21090113 = ~to hold the %creatureType%~ // reprise de @11090003
+@21090110 = ~Hold %creatureType%~ // reprise de @11090001
+@21090111 = ~Hold %creatureType%~ // reprise de @11090001
+@21090112 = ~to hold %creatureType%~ // reprise de @11090003
+@21090113 = ~to hold %creatureType%~ // reprise de @11090003
 
 // Opcode 111 : arme magique créée : 0001-0002 « arme magique », « armes magiques », 0003 nombre et
 // libellé ; phrases 0100 une arme, 0110 plusieurs (21 110 000-21 110 999)
@@ -3155,10 +3155,10 @@
 @21750101 = ~Hold %theTarget%~ // reprise de @11090002
 @21750102 = ~to hold %theTarget%~ // reprise de @11090004
 @21750103 = ~to hold %theTarget%~ // reprise de @11090004
-@21750110 = ~Hold the %creatureType%~ // reprise de @11090001
-@21750111 = ~Hold the %creatureType%~ // reprise de @11090001
-@21750112 = ~to hold the %creatureType%~ // reprise de @11090003
-@21750113 = ~to hold the %creatureType%~ // reprise de @11090003
+@21750110 = ~Hold %creatureType%~ // reprise de @11090001
+@21750111 = ~Hold %creatureType%~ // reprise de @11090001
+@21750112 = ~to hold %creatureType%~ // reprise de @11090003
+@21750113 = ~to hold %creatureType%~ // reprise de @11090003
 
 // Opcode 178 : TAC0 contre un type de créature : 0000 nom de la statistique, 0002 libellé de la forme « cible » (21 780 000-21 780 999)
 @21780000 = ~THAC0~ // reprise de @10540001
@@ -3181,10 +3181,10 @@
 @21850101 = ~Hold %theTarget%~ // reprise de @11090002
 @21850102 = ~to hold %theTarget%~ // reprise de @11090004
 @21850103 = ~to hold %theTarget%~ // reprise de @11090004
-@21850110 = ~Hold the %creatureType%~ // reprise de @11090001
-@21850111 = ~Hold the %creatureType%~ // reprise de @11090001
-@21850112 = ~to hold the %creatureType%~ // reprise de @11090003
-@21850113 = ~to hold the %creatureType%~ // reprise de @11090003
+@21850110 = ~Hold %creatureType%~ // reprise de @11090001
+@21850111 = ~Hold %creatureType%~ // reprise de @11090001
+@21850112 = ~to hold %creatureType%~ // reprise de @11090003
+@21850113 = ~to hold %creatureType%~ // reprise de @11090003
 
 // Opcode 188 : Purification d'aura : phrases 0100 plusieurs sorts par round, 0110 un seul (21 880 000-21 880 999)
 @21880100 = ~Aura cleansing~ // reprise de @11880001
@@ -4236,3 +4236,33 @@
 // Effet dérivé 015, BROKEN_ITEM : phrases probables seulement (30 150 102-30 150 103)
 @30150102 = ~of breaking~ // reprise de @15190001
 @30150103 = ~of breaking~ // reprise de @15190001
+
+// Effet dérivé 016, CURES (guérisons ou dissipations réunies) : phrases 0100 + forme, états 0010 + indice (« de… ») et 0020 + indice (30160000-30160999)
+@30160010 = ~stun~ // reprise de @15270010
+@30160011 = ~paralysis~ // reprise de @15270011
+@30160012 = ~feeblemindedness~ // reprise de @15270012
+@30160013 = ~diseases~ // reprise de @15270013
+@30160014 = ~blindness~ // reprise de @15270014
+@30160015 = ~deafness~ // reprise de @15270015
+@30160020 = ~stun~ // reprise de @15270020
+@30160021 = ~paralysis~ // reprise de @15270021
+@30160022 = ~feeblemindedness~ // reprise de @15270022
+@30160023 = ~diseases~ // reprise de @15270023
+@30160024 = ~blindness~ // reprise de @15270024
+@30160025 = ~deafness~ // reprise de @15270025
+@30160100 = ~Cures %cureListOf%~ // reprise de @15270001
+@30160101 = ~Cures %cureList% on %theTarget%~ // reprise de @15270002
+@30160102 = ~to cure %cureList% on %theTarget%~ // reprise de @15270003
+@30160103 = ~to cure %cureList% on %theTarget%~ // reprise de @15270003
+
+// Effet dérivé 017, DISPELS (guérisons ou dissipations réunies) : phrases 0100 + forme, états 0010 + indice (« de… ») et 0020 + indice (30170000-30170999)
+@30170010 = ~confusion~ // reprise de @15280010
+@30170011 = ~horror~ // reprise de @15280011
+@30170012 = ~drunkenness~ // reprise de @15280012
+@30170020 = ~confusion~ // reprise de @15280020
+@30170021 = ~horror~ // reprise de @15280021
+@30170022 = ~drunkenness~ // reprise de @15280022
+@30170100 = ~Cures %cureListOf%~ // reprise de @15280001
+@30170101 = ~Cures %cureList% on %theTarget%~ // reprise de @15280002
+@30170102 = ~to cure %cureList% on %theTarget%~ // reprise de @15280003
+@30170103 = ~to cure %cureList% on %theTarget%~ // reprise de @15280003

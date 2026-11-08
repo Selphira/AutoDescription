@@ -19,10 +19,6 @@ A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
 A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
 A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
 A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
-A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
-A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
-A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
-A7#SH61.SPL : Opcode 206 : Resource a7#sh61c.spl doesn't exist.
 A7MISTC.SPL : Opcode 17: Unknown type 512.
 A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
 A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
@@ -83,6 +79,12 @@ A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
 A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
 A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
 A7_SP01.SPL : Opcode 214 : File SPWI121.spl not found
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+ADTOS01.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 BALTH03.SPL : Opcode 177: No change detected: Value = Value + 0.
 BALTH03.SPL : Opcode 177: Unknown IDS file 0.
 BALTH07.SPL : Opcode 177: No change detected: Value = Value + 0.
@@ -225,14 +227,18 @@ CB587THL.SPL : Opcode 214 : File CB587TH0.spl not found
 CDAFNOTB.SPL : Opcode 251: Resource key is empty.
 CDAX2H5G.SPL : Priest spell exclude cleric and druid.
 CDAX2H6G.SPL : Priest spell exclude cleric and druid.
+CDDETECT.SPL : Invalid file: signature "ITM V1  " (expected "SPL V1  ").
 CDHLYSY2.SPL : Opcode 206 : Resource cdslhly.spl doesn't exist.
 CDHLYSY2.SPL : Opcode 206 : Resource cdslhly.spl doesn't exist.
 D0PR712.SPL : Opcode 324 : no effect : duration 0
 D2WK7S2.SPL : Opcode 201 : Resource none.spl doesn't exist.
 D2WKBS1S.SPL : Opcode 251: Resource key is empty.
 D2WKBS1S.SPL : Opcode 251: Resource key is empty.
+D2WKBS1S.SPL : Opcode 251: Resource key is empty.
 D2WKBS2S.SPL : Opcode 251: Resource key is empty.
 D2WKBS2S.SPL : Opcode 251: Resource key is empty.
+D2WKBS2S.SPL : Opcode 251: Resource key is empty.
+D2WKBS3S.SPL : Opcode 251: Resource key is empty.
 D2WKBS3S.SPL : Opcode 251: Resource key is empty.
 D2WKBS3S.SPL : Opcode 251: Resource key is empty.
 D2WKBS3S.SPL : Resource .spl doesn't exist.
@@ -240,6 +246,8 @@ D2WKBS3S.SPL : Resource .spl doesn't exist.
 D2WKBS3S.SPL : Resource .spl doesn't exist.
 D2WKBS4S.SPL : Opcode 251: Resource key is empty.
 D2WKBS4S.SPL : Opcode 251: Resource key is empty.
+D2WKBS4S.SPL : Opcode 251: Resource key is empty.
+D2WKZM2V.SPL : Opcode 251: Resource key is empty.
 D2WKZM2V.SPL : Opcode 251: Resource key is empty.
 D2WKZM2V.SPL : Opcode 251: Resource key is empty.
 D5PHANB1.SPL : Opcode 324 : no effect : duration 0
@@ -248,6 +256,13 @@ D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z108I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z116I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
+D5Z116I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 D5Z116I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 D5Z116I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 D5Z128I.SPL : Opcode 324 : no effect : duration 0
@@ -415,9 +430,13 @@ D5Z154I.SPL : Opcode 324 : no effect : duration 0
 D5Z157I.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 D5Z165I.SPL : Opcode 324 : no effect : duration 0
 D5Z176I.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
+D5Z176I.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
+D5Z182I.SPL : Opcode 233: Invalid Type 158 (89-134 expected)
+D5Z182I.SPL : Opcode 233: Invalid Type 158 (89-134 expected)
 D5Z182I.SPL : Opcode 233: Invalid Type 158 (89-134 expected)
 D5Z182I.SPL : Opcode 233: Invalid Type 158 (89-134 expected)
 D5Z189I.SPL : Opcode 324 : no effect : duration 0
+D5Z195I.SPL : Opcode 206 : Resource firau1d2.spl doesn't exist.
 D5Z195I.SPL : Opcode 206 : Resource firau1d2.spl doesn't exist.
 D5Z196I.SPL : Opcode 324 : no effect : duration 0
 D5Z221I.SPL : Opcode 324 : no effect : duration 0
@@ -547,6 +566,26 @@ D5Z265I.SPL : Opcode 324 : no effect : duration 0
 D5Z265I.SPL : Opcode 324 : no effect : duration 0
 D5Z265I.SPL : Opcode 324 : no effect : duration 0
 D5Z267I.SPL : Opcode 324 : no effect : duration 0
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
+D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
 D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
 D5Z285I.SPL : Opcode 177 : Resource dw#hdani.eff doesn't exist.
 D5Z285I.SPL : Opcode 177 : Resource dw#blhda.eff doesn't exist.
@@ -727,13 +766,22 @@ D5Z346I.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 D5Z346I.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 D5Z346I.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 D5Z351I.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
+D5Z351I.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
+D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z356I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z392I.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
+D5Z392I.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
 D5Z395I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z395I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z415I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z415I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
@@ -744,6 +792,16 @@ D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
 D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z421I.SPL : Opcode 233: Invalid Type 4 (89-134 expected)
+D5Z422I.SPL : Opcode 98: Type 4 can only be used in external eff files.
 D5Z422I.SPL : Opcode 98: Type 4 can only be used in external eff files.
 D5Z444I.SPL : Opcode 324 : no effect : duration 0
 D5Z444I.SPL : Opcode 324 : no effect : duration 0
@@ -779,6 +837,20 @@ D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
 D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
 D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
 D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
+D5Z479I.SPL : Opcode 206 : Resource pxl2visi.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
@@ -788,6 +860,27 @@ D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
 D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z480I.SPL : Opcode 206 : Resource pxl2csou.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
+D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
@@ -801,12 +894,24 @@ D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z493I.SPL : Opcode 206 : Resource pxl2prec.spl doesn't exist.
 D5Z501I.SPL : Opcode 206 : Resource pxl2expe.spl doesn't exist.
+D5Z501I.SPL : Opcode 206 : Resource pxl2expe.spl doesn't exist.
 D5Z506I.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 D5Z506I.SPL : Opcode 177 : Resource A^GOLSTP.eff doesn't exist.
 D5Z506I.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
 D5Z506I.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
 D5Z572I.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+D5Z572I.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 D5Z584I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z584I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
@@ -818,6 +923,7 @@ D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z593I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z596I.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 D5Z621I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z621I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
 D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
@@ -828,6 +934,21 @@ D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
 D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
 D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
+D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
+D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
+D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
+D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z641I.SPL : Opcode 233: Invalid Type 163 (89-134 expected)
+D5Z641I.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
+D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
+D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 D5Z647I.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
@@ -838,6 +959,9 @@ D5Z667I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 D5Z667I.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 D5Z678I.SPL : Opcode 100: No change detected: Value = Value + 0.
 D5Z678I.SPL : Opcode 100: Unknown IDS file 0.
+D5Z678I.SPL : Opcode 100: No change detected: Value = Value + 0.
+D5Z678I.SPL : Opcode 100: Unknown IDS file 0.
+D5Z710I.SPL : Opcode 206 : Resource pxl2coup.spl doesn't exist.
 D5Z710I.SPL : Opcode 206 : Resource pxl2coup.spl doesn't exist.
 D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
 D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
@@ -850,6 +974,29 @@ D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
 D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
 D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
 D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z716I.SPL : Opcode 206 : Resource pxl2vent.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
+D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
 D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
 D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
 D5Z717I.SPL : Opcode 206 : Resource pxl2melo.spl doesn't exist.
@@ -871,6 +1018,19 @@ D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z722I.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
+D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
+D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
+D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
 D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
 D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
 D5Z723I.SPL : Opcode 206 : Resource pxl2memo.spl doesn't exist.
@@ -965,6 +1125,7 @@ FINP106.SPL : Opcode 324 : no effect : duration 0
 FINP106.SPL : Opcode 324 : no effect : duration 0
 FINP106.SPL : Opcode 324 : no effect : duration 0
 FINSLOW.SPL : Opcode 324 : no effect : duration 0
+LI#BANI.SPL : New engine failure: Not_found
 LI#FINE.SPL : Opcode 177 : Resource LI#STRI.eff doesn't exist.
 LI#REGE.SPL : Opcode 98: This effect does not work with Timing Mode 9.
 MOCHW03.SPL : Opcode 285: No change detected: Value = Value + 0.
@@ -1050,6 +1211,10 @@ NMRNWR1.SPL : Opcode 177 : Resource CDCA120.eff doesn't exist.
 NMRNWR1.SPL : Opcode 177 : Resource CDCVIS.eff doesn't exist.
 OHBPR608.SPL : Opcode 111: Resource key is empty.
 OHBPR608.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
+OHBWI302.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+OHBWI302.SPL : Opcode 177 : Resource A^GOLSTP.eff doesn't exist.
+OHBWI302.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
+OHBWI302.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
 OHBWI302.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 OHBWI302.SPL : Opcode 177 : Resource A^GOLSTP.eff doesn't exist.
 OHBWI302.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
@@ -1681,8 +1846,6 @@ PXL2RUPT.SPL : Opcode 214 : File 3.spl not found
 PXL2RUPT.SPL : Opcode 214 : File 3.spl not found
 PXL2RUPT.SPL : Opcode 214 : File 3.spl not found
 PXL2SAS1.SPL : Opcode 60: No change detected: Value = Value + 0.
-PXL2TOR1.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
-PXL2TOR2.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
 PXL2W125.SPL : Opcode 324 : no effect : duration 0
 PXL2W125.SPL : Opcode 324 : no effect : duration 0
 PXL2W125.SPL : Opcode 324 : no effect : duration 0
@@ -1733,6 +1896,7 @@ PXPMFLEP.SPL : Opcode 324 : no effect : duration 0
 PXW0M62K.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW0M62K.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW0M62K.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
+PXW0M62K.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW0MIRA.SPL : Opcode 98: This effect does not work with Timing Mode 9.
 PXW0MIRA.SPL : Opcode 98: This effect does not work with Timing Mode 9.
 PXW0MIRA.SPL : Opcode 98: This effect does not work with Timing Mode 9.
@@ -1751,6 +1915,7 @@ PXW4LIBE.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBE.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBE.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBE.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
+PXW4LIBV.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBV.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBV.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
 PXW4LIBV.SPL : Opcode 206 : Resource talongf.spl doesn't exist.
@@ -1770,10 +1935,6 @@ PXW5VISV.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW5VISV.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW5VISV.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW5VISX.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-PXW5VISX.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-PXW5VISX.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-PXW5VISY.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-PXW5VISY.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW5VISY.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 PXW8CORP.SPL : Opcode 206 : Resource pxb4bom1.spl doesn't exist.
 PXW8CORP.SPL : Opcode 206 : Resource pxb4bom2.spl doesn't exist.
@@ -1793,6 +1954,9 @@ PXW8CORP.SPL : Opcode 206 : Resource pxb7sba1.spl doesn't exist.
 PXW8CORP.SPL : Opcode 206 : Resource pxb4bom1.spl doesn't exist.
 PXW8CORP.SPL : Opcode 206 : Resource pxb4bom2.spl doesn't exist.
 PXW8CORP.SPL : Opcode 206 : Resource pxb7sba1.spl doesn't exist.
+PXW8CORV.SPL : Opcode 206 : Resource pxb4bom1.spl doesn't exist.
+PXW8CORV.SPL : Opcode 206 : Resource pxb4bom2.spl doesn't exist.
+PXW8CORV.SPL : Opcode 206 : Resource pxb7sba1.spl doesn't exist.
 PXW8CORV.SPL : Opcode 206 : Resource pxb4bom1.spl doesn't exist.
 PXW8CORV.SPL : Opcode 206 : Resource pxb4bom2.spl doesn't exist.
 PXW8CORV.SPL : Opcode 206 : Resource pxb7sba1.spl doesn't exist.
@@ -1828,6 +1992,8 @@ PXW8COX2.SPL : Opcode 206 : Resource pxb4bom2.spl doesn't exist.
 PXW8COX2.SPL : Opcode 206 : Resource pxb7sba1.spl doesn't exist.
 RACHACHA.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 RACHACHA.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+RACHACHA.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+RADT2.SPL : New engine failure: Not_found
 RR#BHL06.SPL : Opcode 206 : Resource fl#shout.spl doesn't exist.
 RR#BHL06.SPL : Opcode 206 : Resource fl#shout.spl doesn't exist.
 RR#THL03.SPL : Opcode 206 : Resource rr#wi308.spl doesn't exist.
@@ -1836,6 +2002,9 @@ RR#THL03.SPL : Opcode 206 : Resource rr#pflam.spl doesn't exist.
 RR#THL03.SPL : Opcode 206 : Resource rr#wi308.spl doesn't exist.
 RR#THL03.SPL : Opcode 206 : Resource rr#pr302.spl doesn't exist.
 RR#THL03.SPL : Opcode 206 : Resource rr#pflam.spl doesn't exist.
+RR#THL04.SPL : New engine failure: Not_found
+RR#WI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
+RR#WI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 RR#WI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 RR#WI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 RR#WI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
@@ -1865,19 +2034,27 @@ RR#WR302.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
 RR#WR302.SPL : Opcode 177 : Resource A^SDEATH.eff doesn't exist.
 SLAYER2.SPL : Opcode 318 : no *PINHUMS.spl or *PINHUMS.itm found
 SLAYER3.SPL : Opcode 318 : no *PINHUMS.spl or *PINHUMS.itm found
-SLAYER4.SPL : Opcode 318 : no *PINHUMS.spl or *PINHUMS.itm found
 SPCL231.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SPCL231.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+SPCL231.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+SPCL232.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPCL232.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPCL232.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPCL232.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPCL721.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
 SPCL721.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
-SPCL731.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
 SPCL732.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPCL732.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-SPCL732.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-SPDM103.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
+SPCL911.SPL : New engine failure: Not_found
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
+SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
 SPDR201.SPL : Opcode 177 : Resource DVWEB.eff doesn't exist.
@@ -1903,10 +2080,10 @@ SPIN133.SPL : Opcode 324 : no effect : duration 0
 SPIN169.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPIN169.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPIN169.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
+SPIN169.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPIN172.SPL : Opcode 1: No effect with this timing : 0.
 SPIN173.SPL : Opcode 1: No effect with this timing : 0.
 SPIN194.SPL : Opcode 146: Invalid ids entry : gender.ids (20)
-SPIN202.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
 SPIN210.SPL : Opcode 324 : no effect : duration 0
 SPIN210.SPL : Opcode 324 : no effect : duration 0
 SPIN210.SPL : Opcode 324 : no effect : duration 0
@@ -1916,7 +2093,9 @@ SPIN530.SPL : Opcode 173 : No change detected Value = Value + 0.
 SPIN566.SPL : Opcode 1: No effect with this timing : 0.
 SPIN663.SPL : Opcode 318 : no *PINHUMW.spl or *PINHUMW.itm found
 SPIN681.SPL : Opcode 324 : no effect : duration 0
+SPIN681.SPL : Opcode 324 : no effect : duration 0
 SPIN683.SPL : Opcode 1: No effect with this timing : 0.
+SPIN692.SPL : Opcode 324 : no effect : duration 0
 SPIN692.SPL : Opcode 324 : no effect : duration 0
 SPIN703.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SPIN703.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
@@ -1927,13 +2106,20 @@ SPIN704.SPL : Opcode 324 : no effect : duration 0
 SPIN704.SPL : Opcode 324 : no effect : duration 0
 SPIN704.SPL : Opcode 324 : no effect : duration 0
 SPIN704.SPL : Opcode 324 : no effect : duration 0
-SPIN823.SPL : Opcode 318 : no *PINHUMS.spl or *PINHUMS.itm found
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
+SPIN704.SPL : Opcode 324 : no effect : duration 0
 SPIN866.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SPIN866.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SPIN883.SPL : Opcode 318 : no D5VGB10.spl or D5VGB10.itm found
 SPIN883.SPL : Opcode 318 : no D5VGA10.spl or D5VGA10.itm found
 SPIN883.SPL : Opcode 318 : no D5VGB10.spl or D5VGB10.itm found
 SPIN944.SPL : Opcode 324 : no effect : duration 0
+SPIN998.SPL : Opcode 324 : no effect : duration 0
 SPIN998.SPL : Opcode 324 : no effect : duration 0
 SPPR108.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 SPPR108.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
@@ -1946,8 +2132,8 @@ SPPR116.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 SPPR116.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 SPPR250.SPL : Opcode 324 : no effect : duration 0
 SPPR250.SPL : Opcode 324 : no effect : duration 0
-SPPR303.SPL : Priest spell exclude cleric and druid.
 SPPR303.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
+SPPR303.SPL : Priest spell exclude cleric and druid.
 SPPR303.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SPPR306.SPL : Priest spell exclude cleric and druid.
 SPPR322.SPL : Opcode 206 : Resource wand13.spl doesn't exist.
@@ -1960,6 +2146,7 @@ SPPR407.SPL : Priest spell exclude cleric and druid.
 SPPR408.SPL : Priest spell exclude cleric and druid.
 SPPR413.SPL : Priest spell exclude cleric and druid.
 SPPR502.SPL : Priest spell exclude cleric and druid.
+SPPR505.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPPR505.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPPR505.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPPR505.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
@@ -2012,8 +2199,6 @@ SPWI210.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 SPWI210.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 SPWI210.SPL : Opcode 206 : Resource mummydsp.spl doesn't exist.
 SPWI215.SPL : Opcode 1: No effect with this timing : 0.
-SPWI215.SPL : Opcode 1: No effect with this timing : 0.
-SPWI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 SPWI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 SPWI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
 SPWI224.SPL : Opcode 206 : Resource sppr114f.spl doesn't exist.
@@ -2098,7 +2283,6 @@ SPWI606.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 SPWI606.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 SPWI609.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPWI609.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-SPWI609.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 SPWI630.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 SPWI630.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 SPWI630.SPL : Opcode 206 : Resource %current.spl doesn't exist.
@@ -2141,24 +2325,18 @@ SPWI803.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 SPWI819.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 SPWI819.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 SPWI819.SPL : Opcode 206 : Resource %current.spl doesn't exist.
+SPWI819.SPL : Opcode 206 : Resource %current.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
 SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdsw1h58.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdmound.spl doesn't exist.
-SPWI853.SPL : Opcode 206 : Resource cdhgnya1.spl doesn't exist.
+SPWI898.SPL : Opcode 324 : no effect : duration 0
+SPWI898.SPL : Opcode 324 : no effect : duration 0
+SPWI898.SPL : Opcode 324 : no effect : duration 0
+SPWI898.SPL : Opcode 324 : no effect : duration 0
+SPWI898.SPL : Opcode 324 : no effect : duration 0
 SPWI898.SPL : Opcode 324 : no effect : duration 0
 SPWI898.SPL : Opcode 324 : no effect : duration 0
 SPWI898.SPL : Opcode 324 : no effect : duration 0
@@ -2170,9 +2348,12 @@ SPWI904.SPL : Opcode 206 : Resource pxl2expe.spl doesn't exist.
 SPWI907.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 SPWI907.SPL : Opcode 206 : Resource wand03.spl doesn't exist.
 SPWI956.SPL : Opcode 324 : no effect : duration 0
+SPWI956.SPL : Opcode 324 : no effect : duration 0
 SPWI959.SPL : Opcode 324 : no effect : duration 0
 SPWI960.SPL : Opcode 324 : no effect : duration 0
 STAF11.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
+STAF11.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
+STAF11B.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
 STAF11B.SPL : Opcode 233: Invalid Type 164 (89-134 expected)
 SW2H10DM.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 SW2H10DM.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
@@ -2338,21 +2519,11 @@ TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
 TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
 TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
 TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
-TG#MASS.SPL : Opcode 206 : Resource b8spcl.spl doesn't exist.
 TG#RC08.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 TG#RC08.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 TG#RC29.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-TG#RC29.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-TG#RC29.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 TG#RC42.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
 TG#RC42.SPL : Opcode 0: parameter1 equal to 0 for a bonus/malus to the armor class.
-TG#RC44.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
-TG#RC44.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 TG#RC44.SPL : Opcode 206 : Resource clck26.spl doesn't exist.
 TG#RC48.SPL : Opcode 146 : Resource li#difa.spl doesn't exist.
 TG#RC48.SPL : Resource LI#DIFA.spl doesn't exist.
@@ -2430,8 +2601,10 @@ TR#DC03.SPL : Opcode 166: Unknown type 3.
 TR#DC03.SPL : Opcode 166: Unknown type 3.
 TR#DC03.SPL : Opcode 166: Unknown type 3.
 U#HFDTPD.SPL : Opcode 324 : no effect : duration 0
+WWBOO.SPL : Opcode 208: Negative minimum -1: no effect.
 WWBOO.SPL : Opcode 206 : Resource %resourc.spl doesn't exist.
 WWBOO.SPL : Opcode 206 : Resource %resourc.spl doesn't exist.
+WWFBOO.SPL : Opcode 208: Negative minimum -1: no effect.
 WWFBOO.SPL : Opcode 206 : Resource %resourc.spl doesn't exist.
 WWFBOO.SPL : Opcode 206 : Resource %resourc.spl doesn't exist.
 WWNOBOO.SPL : Opcode 206 : Resource %resourc.spl doesn't exist.

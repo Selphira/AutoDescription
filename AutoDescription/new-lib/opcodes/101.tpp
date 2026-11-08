@@ -47,11 +47,11 @@ END
 
 // Lignes (ancien opcode_self_101 et opcode_101_post_group) : avec AD_SHRINK_IMMUNITIES_SINGLE_LINE,
 // les immunités certaines d'un même bloc, d'une même classe de cible (soi ou lanceur d'origine ;
-// cible prédéfinie) et aux mêmes champs écrits (parameter2, résistance et puissance mis à part : une ligne
+// cible prédéfinie ; chacune des autres cibles : membres du groupe, créatures de la zone…) et aux mêmes champs écrits (parameter2, résistance et puissance mis à part : une ligne
 // commune cacherait la durée ou la restriction de niveau des autres, SPPR403) sont réunies en une
 // ligne si elles sont plusieurs, libellés identiques fusionnés ;
-// les lignes réunies viennent après les autres, comme les effets que l'ancien moteur ajoute en fin de
-// liste.
+// les lignes réunies viennent après les autres, classe après classe, comme les effets que l'ancien
+// moteur ajoute en fin de liste.
 DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~101~)
@@ -63,6 +63,7 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 				PATCH_IF NOT VARIABLE_IS_SET $immunity_key_count(~%immunity_key%~) BEGIN
 					SET $immunity_key_count(~%immunity_key%~) = 0
 				END
+				SET $immunity_key_class(~%immunity_key%~) = immunity_class
 				SET $immunity_key_count(~%immunity_key%~) += 1
 			END
 		END
@@ -84,40 +85,43 @@ DEFINE_PATCH_MACRO ad_op_101_lines BEGIN
 			END
 		END
 	END
-	PHP_EACH immunity_key_count AS immunity_merged_key => immunity_merged_count BEGIN
-		PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND immunity_merged_count > 1 BEGIN
-			CLEAR_ARRAY immunity_labels
-			SET immunity_label_count = 0
-			SET immunity_first = 0 - 1
-			FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
-				PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
-					PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
-						LPM ad_immunity_class
-						PATCH_IF immunity_class > 0 AND (~%immunity_key%~ STRING_EQUAL ~%immunity_merged_key%~) BEGIN
-							LPM ad_immunity_label
-							PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
-								SPRINT $immunity_labels(~%immunity_label%~) ~%immunity_label%~
-								SET immunity_label_count += 1
-								PATCH_IF immunity_first < 0 BEGIN
-									SET immunity_first = immunity_id
+	FOR (immunity_pass_class = 1; immunity_pass_class <= 8; ++immunity_pass_class) BEGIN
+		PHP_EACH immunity_key_count AS immunity_merged_key => immunity_merged_count BEGIN
+			PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_IMMUNITIES_SINGLE_LINE AND immunity_merged_count > 1
+					AND $immunity_key_class(~%immunity_merged_key%~) == immunity_pass_class BEGIN
+				CLEAR_ARRAY immunity_labels
+				SET immunity_label_count = 0
+				SET immunity_first = 0 - 1
+				FOR (immunity_late = 0; immunity_late <= 1; ++immunity_late) BEGIN
+					PHP_EACH fx_ids_101 AS _ => immunity_id BEGIN
+						PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND ($fx_immunity_late(~%immunity_id%~) OR $fx_late(~%immunity_id%~)) == immunity_late BEGIN
+							LPM ad_immunity_class
+							PATCH_IF immunity_class > 0 AND (~%immunity_key%~ STRING_EQUAL ~%immunity_merged_key%~) BEGIN
+								LPM ad_immunity_label
+								PATCH_IF NOT ~%immunity_label%~ STRING_EQUAL ~~ BEGIN
+									SPRINT $immunity_labels(~%immunity_label%~) ~%immunity_label%~
+									SET immunity_label_count += 1
+									PATCH_IF immunity_first < 0 BEGIN
+										SET immunity_first = immunity_id
+									END
 								END
 							END
 						END
 					END
 				END
-			END
-			PATCH_IF immunity_label_count > 0 BEGIN
-				LPF ad_join STR_VAR array_name = ~immunity_labels~ RET opcodeStr = text END
-				SET line_phrase = 21010100 // ~Immunité contre %opcodeStr%~
-				SET line_fx = immunity_first
-				LPM ad_effect_line
+				PATCH_IF immunity_label_count > 0 BEGIN
+					LPF ad_join STR_VAR array_name = ~immunity_labels~ RET opcodeStr = text END
+					SET line_phrase = 21010100 // ~Immunité contre %opcodeStr%~
+					SET line_fx = immunity_first
+					LPM ad_effect_line
+				END
 			END
 		END
 	END
 END
 
 // Classe de cible de l'effet immunity_id pour la ligne unique : 1 soi ou lanceur d'origine, 2 cible
-// prédéfinie, 0 jamais réunie (immunité probable hors d'un sous-sort probable, autre cible) ; immunity_key : classe
+// prédéfinie, 3 à 8 la cible de même valeur (membres du groupe, créatures de la zone…), 0 jamais réunie (immunité probable hors d'un sous-sort probable, autre cible) ; immunity_key : classe
 // dans sa portée et champs comparés (une ligne unique par bloc et par jeu de champs).
 DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	SET immunity_target = $fx_effective_target(~%immunity_id%~)
@@ -125,7 +129,8 @@ DEFINE_PATCH_MACRO ad_immunity_class BEGIN
 	// comme des immunités certaines (ancien opcode_101_post_group, qui les lit avant de l'appliquer, POTN21).
 	SET immunity_class = ($fx_probability(~%immunity_id%~) < 100 AND ctx_base_probability >= 100) ? 0
 		: ((immunity_target == TARGET_FX_self OR immunity_target == TARGET_FX_original_caster) ? 1
-		: (immunity_target == TARGET_FX_preset ? 2 : 0))
+		: (immunity_target == TARGET_FX_preset ? 2
+		: ((immunity_target >= TARGET_FX_party AND immunity_target <= TARGET_FX_everyone_except_self) ? immunity_target : 0)))
 	SPRINT immunity_key_scope $fx_scope(~%immunity_id%~)
 	// Seuls les champs que la ligne écrit : parameter1 et special ne servent pas à l'opcode 101 ; la
 	// durée d'un effet permanent ou tant que l'objet est équipé, et le bonus d'un effet sans jet, sont

@@ -635,6 +635,35 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	END
 END
 
+// Capacités de combat d'un objet (section d'un en-tête de combat, item_combat_sections) : « à la
+// cible » y désigne la créature touchée, cible par défaut de la section, et n'est pas écrit à la fin
+// de la phrase de l'opcode, comme dans l'ancien moteur (omit_default_target). Restent écrits : les
+// autres cibles, une zone, une restriction de niveau ou un type de créature (texte de la cible
+// changé), la cible au milieu de la phrase (« Permet à la cible de… »), une phrase qui nomme aussi
+// le porteur (« Transfère 9 points de vie du porteur à la cible »), les lignes à sous-lignes et le
+// texte d'une sous-ressource (ctx_chain autre que « | »), repris par la ligne de l'opcode parent.
+DEFINE_PATCH_MACRO ad_application_default_target BEGIN
+	PATCH_IF NOT resource_is_spell AND app_target == TARGET_FX_preset AND NOT (~%line_section%~ STRING_EQUAL ~~) AND INDEX (CASE_SENSITIVE EXACT_MATCH ~ %line_section% ~ ~%item_combat_sections%~) >= 0 BEGIN
+		SPRINT app_default_to_the_target @2000022 // ~à la cible~
+		SPRINT app_wearer @2000100 // ~le porteur~
+		SPRINT app_of_the_wearer @2000101 // ~du porteur~
+		SPRINT app_to_the_wearer @2000102 // ~au porteur~
+		SPRINT app_omitted_target ~ %toTheTarget%~
+		SET app_omitted_start = STRING_LENGTH ~%line_text%~ - STRING_LENGTH ~%app_omitted_target%~
+		PATCH_IF ~%toTheTarget%~ STRING_EQUAL ~%app_default_to_the_target%~ AND app_omitted_start > 0 BEGIN
+			PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_omitted_target%~ ~%line_text%~ app_omitted_start) == app_omitted_start
+					AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) < 0
+					AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_wearer%~ ~%line_text%~) < 0
+					AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_of_the_wearer%~ ~%line_text%~) < 0
+					AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_to_the_wearer%~ ~%line_text%~) < 0 BEGIN
+				INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+					DELETE_BYTES app_omitted_start (STRING_LENGTH ~%app_omitted_target%~)
+				END
+			END
+		END
+	END
+END
+
 // Premier identifiant (source_tra, puis « de… » et « à… ») des chaînes de la source des effets :
 // le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le porteur d'un autre objet.
 DEFINE_PATCH_MACRO ad_application_source BEGIN
@@ -922,6 +951,9 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		PATCH_IF NOT (~%app_block%~ STRING_EQUAL ~equipped~) BEGIN
 			SPRINT line_section $fx_line_section(~%line_fx%~)
 		END
+		PATCH_IF AD_ENABLE_SHRINKAGE AND (~%ctx_chain%~ STRING_EQUAL ~|~) AND (~%app_block%~ STRING_EQUAL ~ability~) BEGIN
+			LPM ad_application_default_target
+		END
 		LPM ad_application_duration
 		PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) AND NOT line_no_duration BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~
@@ -963,6 +995,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SPRINT line_text ~%line_text% (%app_exceptions_text%)~
 		END
 	END
+	LPF ad_collapse_spaces STR_VAR text = EVAL ~%line_text%~ RET line_text = text END
 	// Effet probable : « 26 % de chances » devant la ligne entière (ancien get_effect_description),
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).
 	SET app_saved_sort = line_sort

@@ -14,6 +14,7 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	SPRINT render_late_missing ~~
 	SET combat_is_ammo = 0
 	SET charged_uses_id = 0 - 1
+	SPRINT item_combat_sections ~~
 	SET item_has_combat = (item_type >= ITM_TYPE_bow AND item_type <= ITM_TYPE_polearm)
 		OR item_type == ITM_TYPE_arrows OR item_type == ITM_TYPE_bullets OR item_type == ITM_TYPE_bolts
 	PATCH_IF item_has_combat BEGIN

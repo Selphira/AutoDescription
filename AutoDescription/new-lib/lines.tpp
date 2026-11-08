@@ -40,6 +40,7 @@ END
 // line_probability et sa plage, line_core). Une ligne de même texte (casse ignorée) et de même plage
 // déjà dans la section n'est pas ajoutée : l'ancien moteur garde la première (get_unique_effects).
 DEFINE_PATCH_MACRO ad_line_add BEGIN
+	LPF ad_collapse_spaces STR_VAR text = EVAL ~%line_text%~ RET line_text = text END
 	SPRINT line_new_text ~%line_text%~
 	TO_LOWER line_new_text
 	SET line_duplicate = 0
@@ -793,6 +794,22 @@ BEGIN
 		TO_UPPER ucfirst_first
 		INNER_PATCH_SAVE text ~%text%~ BEGIN
 			WRITE_ASCIIE 0 ~%ucfirst_first%~
+		END
+	END
+END
+
+// Une espace par séparation dans le texte d'une ligne : une liaison vide (article anglais devant un
+// pluriel générique, « golems » et non « the golems ») en laisserait deux. Le retrait d'une
+// sous-ligne, en début de ligne, est gardé.
+DEFINE_PATCH_FUNCTION ad_collapse_spaces
+	STR_VAR
+		text = ~~
+	RET
+		text
+BEGIN
+	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~  ~ ~%text%~) >= 0 BEGIN
+		INNER_PATCH_SAVE text ~%text%~ BEGIN
+			REPLACE_TEXTUALLY EVALUATE_REGEXP ~\([^ %CRLF%]\)  +~ ~\1 ~
 		END
 	END
 END

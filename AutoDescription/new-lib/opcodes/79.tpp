@@ -44,7 +44,8 @@ DEFINE_PATCH_MACRO ad_op_79_lines BEGIN
 	END
 END
 
-// L'effet disease_id est-il le premier 79 non consommé de son bloc, dans un bloc sans opcode 77 ?
+// L'effet disease_id est-il le premier 79 non consommé de son bloc, dans un bloc sans opcode 77 ? Un 79
+// dont la guérison ajoutée est déjà réunie à d'autres (fx_cure_feeblemind, ad_group_cures) en tient lieu.
 DEFINE_PATCH_MACRO ad_op_79_adds_feeblemind_cure BEGIN
 	SET disease_adds_cure = 0
 	PATCH_IF $fx_opcode(~%disease_id%~) == 79 AND NOT $fx_consumed(~%disease_id%~) BEGIN
@@ -54,7 +55,8 @@ DEFINE_PATCH_MACRO ad_op_79_adds_feeblemind_cure BEGIN
 			SPRINT disease_other_scope $fx_scope(~%disease_other%~)
 			SET disease_other_opcode = $fx_opcode(~%disease_other%~)
 			PATCH_IF (~%disease_other_scope%~ STRING_EQUAL ~%disease_scope%~) AND (disease_other_opcode == 77
-					OR (disease_other_opcode == 79 AND disease_other < disease_id AND NOT $fx_consumed(~%disease_other%~))) BEGIN
+					OR (disease_other_opcode == 79 AND disease_other < disease_id AND NOT $fx_consumed(~%disease_other%~))
+					OR (disease_other_opcode == 79 AND $fx_cure_feeblemind(~%disease_other%~))) BEGIN
 				SET disease_adds_cure = 0
 			END
 		END

@@ -314,6 +314,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
 	~BROKEN_ITEM~           => 4
 	~ALL_ILLUSIONS~         => 224
 	~RESTORED_SPELLS~       => 21
+	~CURES~                 => 222
+	~DISPELS~               => 229
 END
 
 // Opcode virtuel de l'effet que l'ancien moteur crée pour un effet dérivé, ajouté après les autres
@@ -332,6 +334,19 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
 	~BROKEN_ITEM~           => 519
 	~ALL_ILLUSIONS~         => 511
 	~RESTORED_SPELLS~       => 510
+	~CURES~                 => 527
+	~DISPELS~               => 528
+END
+
+// Guérisons et dissipations réunies (ad_group_cures, new-lib/groups.tpp) : opcodes de chaque famille,
+// dans l'ordre de la liste écrite (rang de l'ancien moteur) ; l'indice est le bit du masque des états
+// guéris (fx_cure_mask) et le dernier chiffre des libellés (+ 10 : « de la cécité », + 20 : « la cécité »).
+// Paramètres sans rôle et durées ignorées pour tous ces opcodes (IESDP).
+ACTION_DEFINE_ARRAY AD_CURES_OPCODES BEGIN 46 162 77 79 75 81 END
+ACTION_DEFINE_ARRAY AD_DISPELS_OPCODES BEGIN 242 161 164 END
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_CURE_FAMILY_TRA BEGIN
+	~CURES~   => 30160000
+	~DISPELS~ => 30170000
 END
 
 // Champs qu'ignore la comparaison d'un effet aux effets des autres en-têtes d'un sort (anciennes

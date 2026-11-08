@@ -590,8 +590,9 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 					END
 					// Anciennes listes opcodes_ignore_duration et opcodes_cant_be_permanent (177, et les
 					// opcodes virtuels des effets dérivés, ad_derived_add : 511, illusions dissipées ; 525,
-					// objet remplacé).
-					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 511 OR duration_opcode == 525 BEGIN
+					// objet remplacé ; 527 et 528, guérisons et dissipations réunies).
+					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 511 OR duration_opcode == 525
+							OR duration_opcode == 527 OR duration_opcode == 528 BEGIN
 						PATCH_IF duration_instant < 0 BEGIN
 							SET duration_instant = 1
 						END

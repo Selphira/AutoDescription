@@ -90,7 +90,6 @@ A#KOS09.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 A#OG07.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A#OG07.SPL : Opcode 221: type de sort secondaire non gere (20)
 A#SHA09.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-A#SHA09.SPL : Opcode 324 : Immunité à contre le sort « Confusion » différente de l'objet : spwi401
 A7!IN07.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7!IN09.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7!IN10.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -110,6 +109,7 @@ A7#SLR2.SPL : FAILURE: Failure("Opcode 100: Failure(\"A7#SLR2.SPL : opcode 100: 
 A7#SPP1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7#SPW1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7#SPX1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+A7AFQSMN.SPL : Opcode 67: creature a7afqhlp.cre has no name: described as a creature.
 A7DAOIMP.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7SPIN2A.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 A7SPIN6.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -206,6 +206,7 @@ CA#DSTCA.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#DSTCB.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#DSTCC.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#DSTCJ.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+CA#DSTCJ.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#DSTCL.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#DSWS.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#EBLIN.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -220,7 +221,6 @@ CA#SPWO.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#UOM.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CA#UOMA.SPL : Opcode 230: type de sort secondaire non gere (99)
 CA#WSTR.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-CDDETECT.SPL : FAILURE: Not_found
 CDDKAND.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CDDKLMD.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CDDKVMT.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -251,14 +251,12 @@ D2WK1S2.SPL : Opcode 345 : parameter2 != 0 non gere : 10
 D2WK1S2.SPL : Opcode 345 : parameter2 != 0 non gere : 3
 D2WK3P1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK3P2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-D2WK3P2.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 D2WK3P3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK4S1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK5P1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK5P3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK5P3.SPL : Opcode 324 : Immunité à contre le sort « Toucher Vampirique » différente de l'objet : spwi314
 D2WK5P4.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-D2WK5P4.SPL : Opcode 221: type de sort secondaire non gere (20)
 D2WK6S1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK6S2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D2WK6S2.SPL : Opcode 324 : Immunité à contre le sort « Rayon Divin » différente de l'objet : sppr612
@@ -278,6 +276,9 @@ D2WKDS5.SPL : Opcode 318 : Immunité à contre le sort « Guérison des Maladie
 D2WKES1.SPL : Opcode 87: Timing mode == Instant/Limited and duration == 0
 D5CLSP.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5CLSP.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5CPRF.SPL : Opcode 67: creature d5cprf.cre has no name: described as a creature.
+D5CSM8.SPL : Opcode 67: creature d5csm8.cre has no name: described as a creature.
+D5NPRF.SPL : Opcode 67: creature d5nprf.cre has no name: described as a creature.
 D5PHANB1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5XW305.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5XW312.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -289,6 +290,7 @@ D5Z116I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z136I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z139I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z144I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z146I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z146I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z146I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z154I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -316,6 +318,11 @@ D5Z214I.SPL : Opcode 321: Target is None
 D5Z214I.SPL : Opcode 321: Target is None
 D5Z214I.SPL : Opcode 321: Target is None
 D5Z214I.SPL : Opcode 321: Target is None
+D5Z214I.SPL : Opcode 321: Target is None
+D5Z214I.SPL : Opcode 321: Target is None
+D5Z214I.SPL : Opcode 321: Target is None
+D5Z214I.SPL : Opcode 321: Target is None
+D5Z214I.SPL : Opcode 321: Target is None
 D5Z215I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z220I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z230I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -325,12 +332,24 @@ D5Z234I.SPL : Opcode 321: Target is None
 D5Z234I.SPL : Opcode 321: Target is None
 D5Z234I.SPL : Opcode 321: Target is None
 D5Z234I.SPL : Opcode 321: Target is None
+D5Z234I.SPL : Opcode 321: Target is None
+D5Z234I.SPL : Opcode 321: Target is None
+D5Z234I.SPL : Opcode 321: Target is None
+D5Z234I.SPL : Opcode 321: Target is None
+D5Z234I.SPL : Opcode 321: Target is None
 D5Z242I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z247I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z248I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z254I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z254I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z265I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z266I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z266I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z267I.SPL : Opcode 321: Target is None
+D5Z267I.SPL : Opcode 321: Target is None
+D5Z267I.SPL : Opcode 321: Target is None
+D5Z267I.SPL : Opcode 321: Target is None
+D5Z267I.SPL : Opcode 321: Target is None
 D5Z267I.SPL : Opcode 321: Target is None
 D5Z267I.SPL : Opcode 321: Target is None
 D5Z267I.SPL : Opcode 321: Target is None
@@ -345,14 +364,90 @@ D5Z274I.SPL : Opcode 321: Target is None
 D5Z274I.SPL : Opcode 321: Target is None
 D5Z274I.SPL : Opcode 321: Target is None
 D5Z274I.SPL : Opcode 321: Target is None
+D5Z274I.SPL : Opcode 321: Target is None
+D5Z274I.SPL : Opcode 321: Target is None
+D5Z274I.SPL : Opcode 321: Target is None
+D5Z274I.SPL : Opcode 321: Target is None
+D5Z274I.SPL : Opcode 321: Target is None
 D5Z276I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z277I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z279I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z280I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z280I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z284I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z285I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z286I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z287I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '270'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '282'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '331'
+D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '332'
 D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '25'
 D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '108'
 D5Z292I.SPL : Opcode 83 : Réflection du type de projectile '257'
@@ -436,6 +531,16 @@ D5Z306I.SPL : Opcode 321: Target is None
 D5Z306I.SPL : Opcode 321: Target is None
 D5Z306I.SPL : Opcode 321: Target is None
 D5Z306I.SPL : Opcode 321: Target is None
+D5Z306I.SPL : Opcode 321: Target is None
+D5Z306I.SPL : Opcode 321: Target is None
+D5Z306I.SPL : Opcode 321: Target is None
+D5Z306I.SPL : Opcode 321: Target is None
+D5Z306I.SPL : Opcode 321: Target is None
+D5Z307I.SPL : Opcode 321: Target is None
+D5Z307I.SPL : Opcode 321: Target is None
+D5Z307I.SPL : Opcode 321: Target is None
+D5Z307I.SPL : Opcode 321: Target is None
+D5Z307I.SPL : Opcode 321: Target is None
 D5Z307I.SPL : Opcode 321: Target is None
 D5Z307I.SPL : Opcode 321: Target is None
 D5Z307I.SPL : Opcode 321: Target is None
@@ -453,6 +558,16 @@ D5Z323I.SPL : Opcode 321: Target is None
 D5Z323I.SPL : Opcode 321: Target is None
 D5Z323I.SPL : Opcode 321: Target is None
 D5Z323I.SPL : Opcode 321: Target is None
+D5Z323I.SPL : Opcode 321: Target is None
+D5Z323I.SPL : Opcode 321: Target is None
+D5Z323I.SPL : Opcode 321: Target is None
+D5Z323I.SPL : Opcode 321: Target is None
+D5Z323I.SPL : Opcode 321: Target is None
+D5Z333I.SPL : Opcode 321: Target is None
+D5Z333I.SPL : Opcode 321: Target is None
+D5Z333I.SPL : Opcode 321: Target is None
+D5Z333I.SPL : Opcode 321: Target is None
+D5Z333I.SPL : Opcode 321: Target is None
 D5Z333I.SPL : Opcode 321: Target is None
 D5Z333I.SPL : Opcode 321: Target is None
 D5Z333I.SPL : Opcode 321: Target is None
@@ -461,6 +576,7 @@ D5Z333I.SPL : Opcode 321: Target is None
 D5Z335I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z337I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z338I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z341I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z341I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z345I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z347I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -521,13 +637,37 @@ D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z507I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z508I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z510I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z512I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z515I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z515I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z516I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z517I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z518I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z520I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -558,6 +698,8 @@ D5Z548I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z553I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z556I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z556I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z556I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z556I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z556I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z557I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z560I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -566,6 +708,8 @@ D5Z563I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z565I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z566I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z570I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z570I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z572I.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 D5Z572I.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 D5Z572I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z573I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -625,6 +769,46 @@ D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+D5Z610I.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5Z610I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z612I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z613I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -633,6 +817,14 @@ D5Z618I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z624I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z625I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z626I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z627I.SPL : Opcode 83 : Réflection du type de projectile '257'
@@ -740,6 +932,54 @@ D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
 D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
 D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '210'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '233'
+D5Z700I.SPL : Opcode 83 : Réflection du type de projectile '257'
 D5Z704I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z707I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z708I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -747,9 +987,11 @@ D5Z709I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z713I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z722I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z726I.SPL : Opcode 255: Timing mode == Instant/Limited and duration == 0
+D5Z726I.SPL : Opcode 255: Timing mode == Instant/Limited and duration == 0
 D5Z728I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z730I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z734I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5Z736I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z736I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z743I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z744I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -775,6 +1017,7 @@ D5Z796I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z797I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z798I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 D5Z799I.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+D5_CKIT.SPL : Opcode 67: creature d5_ckit.cre has no name: described as a creature.
 DEMOCHM.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DGINN2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DGS01.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -790,33 +1033,19 @@ DW#ABYFS.SPL : Opcode 324 : Immunité à contre le sort « Colonne de Feu » d
 DW#BRKIN.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#CACOF.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#GATEM.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DW#GATEM.SPL : opcode 146: Traduction 208032 manquante
-DW#GATEM.SPL : FAILURE: opcode 146: Failure("DW#GATEM.SPL : opcode 146: Traduction 208032 manquante")
-DW#GATEM.SPL : FAILURE: Failure("Opcode 146: Failure(\"DW#GATEM.SPL : opcode 146: Traduction 208032 manquante\")")
 DW#GATEP.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#ISSS.SPL : Opcode -1: type de sort secondaire non gere (20)
-DW#MISLD.SPL : FAILURE: opcode 326: Not_found
-DW#MISLD.SPL : FAILURE: Failure("Opcode 326: Not_found")
 DW#MLFSB.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#MLFSR.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#RILTS.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#SFC1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DW#SFC1.SPL : opcode 146: Traduction 208032 manquante
-DW#SFC1.SPL : FAILURE: opcode 146: Failure("DW#SFC1.SPL : opcode 146: Traduction 208032 manquante")
-DW#SFC1.SPL : FAILURE: Failure("Opcode 146: Failure(\"DW#SFC1.SPL : opcode 146: Traduction 208032 manquante\")")
 DW#SFC2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DW#SFC2.SPL : opcode 146: Traduction 208032 manquante
-DW#SFC2.SPL : FAILURE: opcode 146: Failure("DW#SFC2.SPL : opcode 146: Traduction 208032 manquante")
-DW#SFC2.SPL : FAILURE: Failure("Opcode 146: Failure(\"DW#SFC2.SPL : opcode 146: Traduction 208032 manquante\")")
 DW#SILHE.SPL : Opcode 321: Target is None
 DW#SILHE.SPL : Opcode 321: Target is None
 DW#SILHE.SPL : Opcode 321: Target is None
 DW#SILHE.SPL : Opcode 321: Target is None
 DW#SILHE.SPL : Opcode 321: Target is None
 DW#SUMFI.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DW#SUMFI.SPL : opcode 146: Traduction 208032 manquante
-DW#SUMFI.SPL : FAILURE: opcode 146: Failure("DW#SUMFI.SPL : opcode 146: Traduction 208032 manquante")
-DW#SUMFI.SPL : FAILURE: Failure("Opcode 146: Failure(\"DW#SUMFI.SPL : opcode 146: Traduction 208032 manquante\")")
 DW#TRPIN.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#TRPMS.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DW#TRPMS.SPL : Opcode 324 : Immunité à contre le sort « Nuée de Météores » différente de l'objet : spwi911
@@ -899,18 +1128,11 @@ DWSP625.SPL : Opcode 83 : Réflection du type de projectile '282'
 DWSP625.SPL : Opcode 83 : Réflection du type de projectile '331'
 DWSP625.SPL : Opcode 83 : Réflection du type de projectile '332'
 DWSP698.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DWSP730.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-DWSW206.SPL : FAILURE: opcode 326: Not_found
-DWSW206.SPL : FAILURE: Failure("Opcode 326: Not_found")
 DWSW311.SPL : Opcode 83 : Réflection du type de projectile '257'
 DWSW318.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DWSW403.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-DWSW405.SPL : FAILURE: opcode 326: Not_found
-DWSW405.SPL : FAILURE: Failure("Opcode 326: Not_found")
 DWSW418.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DWSW418.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-DWSW505.SPL : FAILURE: opcode 326: Not_found
-DWSW505.SPL : FAILURE: Failure("Opcode 326: Not_found")
 DWSW510.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 DWSW519.SPL : Opcode -1: type de sort secondaire non gere (20)
 DWSW522.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -937,7 +1159,7 @@ IDSP056.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 IDSP901.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 IKDB2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 IKTS5.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-IKTS5.SPL : Opcode 324 : Immunité à contre le sort « Glyphe de Garde » différente de l'objet : sppr304
+IMOSLAY1.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 IMOSLAY1.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 IMOSLAY1.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 IMOSLAY2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -975,21 +1197,70 @@ LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+LI#BANI.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#HERO.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 LI#IMER.SPL : Opcode 232: Timing mode == Instant/Limited and duration == 0
 LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
 LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
 LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
+LI#REVE.SPL : Opcode 115: Timing mode == Instant/Limited and duration == 0
 LI#SCRB.SPL : Opcode 214: Timing mode == Instant/Limited and duration == 0
 LI#SCRT.SPL : Opcode 214: Timing mode == Instant/Limited and duration == 0
+LI#SPII.SPL : Opcode 148: Timing mode == Instant/Limited and duration == 0
+LI#SPII.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 LI#SPII.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 LI#SPII.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#SPII.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#SPII.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 LI#SPII.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 MDK2SUMM.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-MELSPL01.SPL : FAILURE: Not_found
-MELSPL03.SPL : FAILURE: Not_found
+MELSPL01.SPL : No first caster level for spell MELSPL01 (type 2, level 9) in the table of druid spells (MXSPL*.2DA): first level taken from the headers.
+MELSPL03.SPL : No first caster level for spell MELSPL03 (type 2, level 9) in the table of druid spells (MXSPL*.2DA): first level taken from the headers.
 MELSPL07.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOARC02.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOCHA13.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1004,12 +1275,14 @@ MOCHA22.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOCHA23.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOCHA24.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOCHA25.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+MOCHW03.SPL : Opcode 285: has no effect : levelMin (6) > levelMax (2)
 MODRA20.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MODRA21.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MORVR03.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MORVR33.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOTRGT.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOTURN1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+M_SQMENU.SPL : Spell without extended header (M_SQMENU): ignored.
 NMSUN07.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 NMSUN07.SPL : Opcode 324 : Immunité à contre le sort « Emotion : Désespoir » différente de l'objet : spwi411
 OHBCALLL.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1018,6 +1291,7 @@ OHBDEMI3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 OHBPR608.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 OHBPR608.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 OHBQUAKE.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+OHBWI302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 OHBWI302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 OHBWI302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 OHBWI302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
@@ -1033,11 +1307,14 @@ OHNVRD2.SPL : Opcode 321: Target is None
 OHNVRD2.SPL : Opcode 321: Target is None
 OHNVRD2.SPL : Opcode 321: Target is None
 OHNVRD2.SPL : Opcode 321: Target is None
+OHNVRD2.SPL : Opcode 321: Target is None
+OHNVRD2.SPL : Opcode 321: Target is None
+OHNVRD2.SPL : Opcode 321: Target is None
+OHNVRD2.SPL : Opcode 321: Target is None
+OHNVRD2.SPL : Opcode 321: Target is None
 OHNVRD2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 OHNVRD3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PGKMOTE.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXDMIRO6.SPL : FAILURE: opcode 326: Not_found
-PXDMIRO6.SPL : FAILURE: Failure("Opcode 326: Not_found")
 PXF0POI.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXF1DARD.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXF1DARX.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1139,17 +1416,11 @@ PXG1TO9.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXG2HO10.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXG2HO10.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO4.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO4.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO5.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO5.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO6.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO6.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO7.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO7.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO8.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO8.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2HO9.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXG2HO9.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
 PXG2RA10.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXG2RA11.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXG2RA12.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1260,9 +1531,7 @@ PXL2SPHE.SPL : Opcode 83 : Réflection du type de projectile '233'
 PXL2SPHE.SPL : Opcode 83 : Réflection du type de projectile '257'
 PXL2STON.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXL2TOR1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXL2TOR1.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 PXL2TOR2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXL2TOR2.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 PXL2URK1.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXL2W103.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXL2W106.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1308,7 +1577,6 @@ PXO5IM20.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXOTRANS.SPL : Opcode 102: Target is None
 PXPAHFOU.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXPMFLEP.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-PXSBOUR.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 PXW0ANNI.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXW0DERN.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 PXW0FRAP.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1533,6 +1801,70 @@ PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
+PXW5PUIV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5REGV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5RESV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
 PXW5RESV.SPL : Opcode 206: Timing mode == Instant/Limited and duration == 0
@@ -1626,6 +1958,22 @@ RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RAPM3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -1653,10 +2001,6 @@ RR#EHYIS.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#EHYIS.SPL : Opcode 324 : Immunité à contre le sort « Tempête de Glace » différente de l'objet : spwi404
 RR#ERSUG.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#ERSUG.SPL : Opcode 324 : Immunité à contre le sort « Charme-Personne » différente de l'objet : spwi104
-RR#ERSUG.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-RR#ERSUG.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-RR#ERSUG.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-RR#ERSUG.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RR#MOZSC.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#PALCD.SPL : Opcode 318 : Immunité à contre le sort « Guérison des Maladies » différente de l'objet : CA#DS317
 RR#PALCD.SPL : Opcode 318 : Immunité à contre le sort « Guérison des Maladies » différente de l'objet : SPPR317
@@ -1669,10 +2013,9 @@ RR#WI103.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI103.SPL : Opcode 324 : Immunité à contre le sort « Mains Ardentes » différente de l'objet : spwi103
 RR#WI112.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI112.SPL : Opcode 324 : Immunité à contre le sort « Projectile Magique » différente de l'objet : spwi112
-RR#WI206.SPL : FAILURE: opcode 326: Not_found
-RR#WI206.SPL : FAILURE: Failure("Opcode 326: Not_found")
 RR#WI213.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI224.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+RR#WI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1690,14 +2033,9 @@ RR#WI306.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI306.SPL : Opcode 324 : Immunité à contre le sort « Immobilisation des Personnes » différente de l'objet : spwi306
 RR#WI403.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI404.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-RR#WI404.SPL : Opcode 324 : Immunité à contre le sort « Tempête de Glace » différente de l'objet : spwi404
-RR#WI405.SPL : FAILURE: opcode 326: Not_found
-RR#WI405.SPL : FAILURE: Failure("Opcode 326: Not_found")
 RR#WI418.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-RR#WI418.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 RR#WI502.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI502.SPL : Opcode 324 : Immunité à contre le sort « Nuage Mortel » différente de l'objet : SPWI502
-RR#WI502.SPL : Opcode 324 : Immunité à contre le sort « Nuage Mortel » différente de l'objet : spwi502
 RR#WI503.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WI503.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : SPWI503
 RR#WI503.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : spwi503
@@ -1716,8 +2054,8 @@ RR#WI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 RR#WI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 RR#WI604.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WR302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-RR#WR302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 RR#WR302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+RR#WR302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SENSPISU.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SLAYER2.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER2.SPL : Opcode 12: Unknown damage type : 268435456.
@@ -1756,7 +2094,6 @@ SLAYER3.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER3.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SLAYER3.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SLAYER3.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SLAYER4.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER4.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER4.SPL : Opcode 12: Unknown damage type : 268435456.
@@ -1775,11 +2112,11 @@ SLAYER4.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER4.SPL : Opcode 12: Unknown damage type : 268435456.
 SLAYER4.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SLAYER4.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SLAYER4.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPBLUN29.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPCL102.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPCL103.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPCL106.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+SPCL231.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 SPCL231.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 SPCL231.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPCL231.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
@@ -1790,7 +2127,10 @@ SPCL237.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPCL239.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPCL239.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPCL239.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
+SPCL342.SPL : Opcode 67: creature k#famsum.cre has no name: described as a creature.
 SPCL367.SPL : Opcode 102: Target is None
+SPCL412.SPL : Opcode 146: Timing mode == Limited after duration, the effect expires at once
+SPCL414.SPL : Opcode 146: Timing mode == Limited after duration, the effect expires at once
 SPCL611.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL611.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL612.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -1808,10 +2148,10 @@ SPCL643.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL644.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL644.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL722.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPCL731.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPCL742.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPCL920.SPL : Opcode 318 : Immunité à contre le sort « Horreur » différente de l'objet : SPWI205
-SPCL920.SPL : Opcode 318 : Immunité à contre le sort « Horreur » différente de l'objet : SPIN105
+SPCL910.SPL : Opcode 146: Timing mode == Limited after duration, the effect expires at once
+SPCL911.SPL : Opcode 146: Timing mode == Limited after duration, the effect expires at once
+SPCL912.SPL : Opcode 146: Timing mode == Limited after duration, the effect expires at once
 SPCL937.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPCL941.SPL : Opcode 321: Target is None
 SPCL941.SPL : Opcode 321: Target is None
@@ -1823,7 +2163,6 @@ SPCTMD01.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPDD03.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPDD03.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPDM101.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPDM103.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPDR101.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPDR201.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPDR201.SPL : Opcode 324 : Immunité à contre le sort « Toile d'Araignée » différente de l'objet : spdr201
@@ -1844,8 +2183,8 @@ SPIN110.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN111.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN111.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN112.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPIN112.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN112.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPIN112.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN119.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN122.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN122.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -1859,32 +2198,10 @@ SPIN126.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN126.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN127.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN127.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPIN128.SPL : opcode 337: Traduction 401335 manquante
-SPIN128.SPL : FAILURE: opcode 337: Failure("SPIN128.SPL : opcode 337: Traduction 401335 manquante")
-SPIN128.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN128.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN129.SPL : opcode 337: Traduction 401335 manquante
-SPIN129.SPL : FAILURE: opcode 337: Failure("SPIN129.SPL : opcode 337: Traduction 401335 manquante")
-SPIN129.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN129.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN130.SPL : opcode 337: Traduction 401335 manquante
-SPIN130.SPL : FAILURE: opcode 337: Failure("SPIN130.SPL : opcode 337: Traduction 401335 manquante")
-SPIN130.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN130.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN131.SPL : opcode 337: Traduction 401335 manquante
-SPIN131.SPL : FAILURE: opcode 337: Failure("SPIN131.SPL : opcode 337: Traduction 401335 manquante")
-SPIN131.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN131.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN132.SPL : opcode 337: Traduction 401335 manquante
-SPIN132.SPL : FAILURE: opcode 337: Failure("SPIN132.SPL : opcode 337: Traduction 401335 manquante")
-SPIN132.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN132.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN133.SPL : opcode 337: Traduction 401335 manquante
-SPIN133.SPL : FAILURE: opcode 337: Failure("SPIN133.SPL : opcode 337: Traduction 401335 manquante")
-SPIN133.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN133.SPL : opcode 337: Traduction 401335 manquante\")")
-SPIN134.SPL : opcode 337: Traduction 401335 manquante
-SPIN134.SPL : FAILURE: opcode 337: Failure("SPIN134.SPL : opcode 337: Traduction 401335 manquante")
-SPIN134.SPL : FAILURE: Failure("Opcode 337: Failure(\"SPIN134.SPL : opcode 337: Traduction 401335 manquante\")")
 SPIN143.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN144.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN150.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN150.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPIN150.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN151.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN151.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN152.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -1899,12 +2216,10 @@ SPIN156.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN156.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN157.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN157.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPIN159.SPL : FAILURE: Not_found
+SPIN159.SPL : Spell without extended header (SPIN159): ignored.
 SPIN160.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPIN161.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN161.SPL : Opcode 324 : Immunité à contre le sort « Chaîne d'Éclairs » différente de l'objet : spwi615
-SPIN168.SPL : FAILURE: opcode 326: Not_found
-SPIN168.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPIN170.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN170.SPL : Opcode 324 : Immunité à contre le sort « Domination » différente de l'objet : spwi506
 SPIN172.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -1913,14 +2228,10 @@ SPIN173.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN173.SPL : Opcode 324 : Immunité à contre le sort « Toile d'Araignée » différente de l'objet : spwi215
 SPIN174.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN174.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : SPWI503
-SPIN174.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : spwi503
 SPIN178.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN178.SPL : Opcode 324 : Immunité à contre le sort « Influence Maléfique » différente de l'objet : sppr314
 SPIN179.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN179.SPL : Opcode 324 : Immunité à contre le sort « Confusion » différente de l'objet : spwi401
 SPIN180.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN182.SPL : FAILURE: opcode 326: Not_found
-SPIN182.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPIN183.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN184.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN184.SPL : Opcode 324 : Immunité à contre le sort « Lenteur » différente de l'objet : spwi312
@@ -1943,18 +2254,14 @@ SPIN185.SPL : Opcode 324 : Immunité à contre le sort « Charme Néfaste » d
 SPIN189.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN190.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN190.SPL : Opcode 324 : Immunité à contre le sort « Nuage Mortel » différente de l'objet : SPWI502
-SPIN190.SPL : Opcode 324 : Immunité à contre le sort « Nuage Mortel » différente de l'objet : spwi502
 SPIN191.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN191.SPL : Opcode 324 : Immunité à contre le sort « Colonne de Feu » différente de l'objet : sppr503
 SPIN193.SPL : Opcode 321: Target is None
 SPIN193.SPL : Opcode 321: Target is None
 SPIN193.SPL : Opcode 321: Target is None
 SPIN193.SPL : Opcode 321: Target is None
 SPIN193.SPL : Opcode 321: Target is None
 SPIN194.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN194.SPL : opcode 146: Traduction 207020 manquante
-SPIN194.SPL : FAILURE: opcode 146: Failure("SPIN194.SPL : opcode 146: Traduction 207020 manquante")
-SPIN194.SPL : FAILURE: Failure("Opcode 146: Failure(\"SPIN194.SPL : opcode 146: Traduction 207020 manquante\")")
+SPIN194.SPL : Opcode 146: no name for value 20 of gender.ids (string 207020 missing): described without this creature type.
 SPIN196.SPL : Opcode 321: Target is None
 SPIN196.SPL : Opcode 321: Target is None
 SPIN196.SPL : Opcode 321: Target is None
@@ -1962,9 +2269,7 @@ SPIN196.SPL : Opcode 321: Target is None
 SPIN196.SPL : Opcode 321: Target is None
 SPIN199.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN199.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : SPWI503
-SPIN199.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : spwi503
 SPIN202.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN202.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN202.SPL : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
 SPIN203.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN204.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2000,7 +2305,6 @@ SPIN623.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN634.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN647.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN648.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN663.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN667.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN681.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN681.SPL : Opcode 324 : Immunité à contre le sort « Cri de la banshee » différente de l'objet : spin681
@@ -2010,8 +2314,8 @@ SPIN685.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN692.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN702.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN703.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPIN703.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN703.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPIN703.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN704.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN704.SPL : Opcode 324 : Immunité à contre le sort « Confusion » différente de l'objet : spin704
 SPIN714.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2049,15 +2353,14 @@ SPIN823.SPL : Opcode 12: Unknown damage type : 268435456.
 SPIN823.SPL : Opcode 12: Unknown damage type : 268435456.
 SPIN823.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN823.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPIN823.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN824.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN836.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN852.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN852.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPIN853.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN866.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPIN866.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN866.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPIN866.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN883.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN888.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN891.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2094,7 +2397,6 @@ SPIN958.SPL : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
 SPIN974.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPIN998.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPINHUM.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPINHUM.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPJA01.SPL : Opcode 321: Target is None
 SPJA01.SPL : Opcode 321: Target is None
 SPJA01.SPL : Opcode 321: Target is None
@@ -2104,7 +2406,6 @@ SPMDSLAY.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPOGRE01.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR102.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR105.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR105.SPL : Opcode 324 : Immunité à contre le sort « Enchevêtrement » différente de l'objet : sppr105
 SPPR112.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR113.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR116.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2113,12 +2414,7 @@ SPPR120.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR127.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR204.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR204.SPL : Opcode 324 : Immunité à contre le sort « Injonction » différente de l'objet : sppr102
-SPPR204.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPPR204.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPPR204.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPPR204.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPPR208.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR208.SPL : Opcode 324 : Immunité à contre le sort « Immobilisation des Personnes » différente de l'objet : sppr208
 SPPR211.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR216.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR216.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
@@ -2141,10 +2437,9 @@ SPPR250.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR301.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR303.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPPR303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR303.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPPR303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR304.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR304.SPL : Opcode 324 : Immunité à contre le sort « Glyphe de Garde » différente de l'objet : sppr304
 SPPR305.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR305.SPL : Opcode 324 : Immunité à contre le sort « Immobilisation des Personnes ou des Animaux » différente de l'objet : sppr305
 SPPR310.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2152,7 +2447,6 @@ SPPR311.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR313.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR313.SPL : Opcode 324 : Immunité à contre le sort « Sainte Punition » différente de l'objet : sppr313
 SPPR314.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR314.SPL : Opcode 324 : Immunité à contre le sort « Influence Maléfique » différente de l'objet : sppr314
 SPPR316.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR317.SPL : Opcode 318 : Immunité à contre le sort « Guérison des Maladies » différente de l'objet : CA#DS317
 SPPR318.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2166,8 +2460,6 @@ SPPR335.SPL : Opcode 78 : Mold touch à gerer : 4 : %frequency% :
 SPPR335.SPL : Opcode 78 : Mold touch à gerer : 2 : %frequency% : 
 SPPR335.SPL : Opcode 78 : Mold touch à gerer : 1 : %frequency% : 
 SPPR340.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR342.SPL : FAILURE: opcode 326: Not_found
-SPPR342.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPPR405.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR410.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR411.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2192,7 +2484,6 @@ SPPR423.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR428.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR450.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR503.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR503.SPL : Opcode 324 : Immunité à contre le sort « Colonne de Feu » différente de l'objet : sppr503
 SPPR504.SPL : Opcode 321: Target is None
 SPPR504.SPL : Opcode 321: Target is None
 SPPR504.SPL : Opcode 321: Target is None
@@ -2231,9 +2522,7 @@ SPPR612.SPL : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
 SPPR613.SPL : Opcode 83 : Réflection du type de projectile '257'
 SPPR614.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR617.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR617.SPL : opcode 146: Traduction 207020 manquante
-SPPR617.SPL : FAILURE: opcode 146: Failure("SPPR617.SPL : opcode 146: Traduction 207020 manquante")
-SPPR617.SPL : FAILURE: Failure("Opcode 146: Failure(\"SPPR617.SPL : opcode 146: Traduction 207020 manquante\")")
+SPPR617.SPL : Opcode 146: no name for value 20 of gender.ids (string 207020 missing): described without this creature type.
 SPPR619.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR620.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR625.SPL : Opcode 83 : Réflection du type de projectile '25'
@@ -2313,7 +2602,6 @@ SPPR702.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR703.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR704.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR705.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPPR705.SPL : Opcode 324 : Immunité à contre le sort « Tempête de Feu » différente de l'objet : sppr705
 SPPR705.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPPR705.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPPR706.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2344,7 +2632,6 @@ SPPR729.SPL : Opcode 321: Target is None
 SPPR729.SPL : Opcode 321: Target is None
 SPPR729.SPL : Opcode 321: Target is None
 SPPR729.SPL : Opcode 321: Target is None
-SPPR730.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPPR737.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR738.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPPR739.SPL : Opcode 321: Target is None
@@ -2376,10 +2663,6 @@ SPWI103.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI103.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI103.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI104.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI104.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI104.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI104.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI104.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI105.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI106.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI112.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2433,14 +2716,10 @@ SPWI122.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI125.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI130.SPL : Opcode 109: Unknown type 0.
 SPWI205.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI205.SPL : Opcode 324 : Immunité à contre le sort « Horreur » différente de l'objet : spwi205
-SPWI206.SPL : FAILURE: opcode 326: Not_found
-SPWI206.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPWI207.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI211.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI213.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI215.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI215.SPL : Opcode 324 : Immunité à contre le sort « Toile d'Araignée » différente de l'objet : spwi215
 SPWI216.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI217.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI220.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -2456,8 +2735,9 @@ SPWI232.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI233.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI234.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPWI302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI302.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPWI302.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+SPWI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI303.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2473,12 +2753,9 @@ SPWI304.SPL : Opcode 324 : Immunité à contre le sort « Boule de Feu » diff
 SPWI304.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI306.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI306.SPL : Opcode 324 : Immunité à contre le sort « Immobilisation des Personnes » différente de l'objet : spwi306
-SPWI307.SPL : FAILURE: opcode 326: Not_found
-SPWI307.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPWI308.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI311.SPL : Opcode 83 : Réflection du type de projectile '257'
 SPWI312.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI312.SPL : Opcode 324 : Immunité à contre le sort « Lenteur » différente de l'objet : spwi312
 SPWI313.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI314.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI314.SPL : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
@@ -2553,8 +2830,8 @@ SPWI323.SPL : Opcode 83 : Réflection du type de projectile '233'
 SPWI323.SPL : Opcode 83 : Réflection du type de projectile '257'
 SPWI324.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI326.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-SPWI326.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI326.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+SPWI326.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI330.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI330.SPL : Opcode 324 : Immunité à contre le sort « Lance de Glace » différente de l'objet : SPWI330
 SPWI331.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2564,9 +2841,6 @@ SPWI401.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI401.SPL : Opcode 324 : Immunité à contre le sort « Confusion » différente de l'objet : spwi401
 SPWI403.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI404.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI404.SPL : Opcode 324 : Immunité à contre le sort « Tempête de Glace » différente de l'objet : spwi404
-SPWI405.SPL : FAILURE: opcode 326: Not_found
-SPWI405.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPWI409.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI411.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI411.SPL : Opcode 324 : Immunité à contre le sort « Emotion : Désespoir » différente de l'objet : spwi411
@@ -2574,7 +2848,6 @@ SPWI412.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI413.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI415.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI418.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI418.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI419.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI419.SPL : Opcode 221: type de sort secondaire non gere (20)
 SPWI427.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2588,7 +2861,6 @@ SPWI442.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI442.SPL : Opcode 324 : Immunité à contre le sort « Sphère de Vitriol » différente de l'objet : SPWI442
 SPWI444.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI446.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI489.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI489.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI489.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI490.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -2611,13 +2883,9 @@ SPWI499.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI499.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI501.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI502.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI502.SPL : Opcode 324 : Immunité à contre le sort « Nuage Mortel » différente de l'objet : spwi502
 SPWI502.SPL : SPLPROT a gerer (MISSING) : 169 :: 169 260 78 168
 SPWI502.SPL : SPLPROT a gerer (MISSING) : 169 :: 169 260 78 168
 SPWI503.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI503.SPL : Opcode 324 : Immunité à contre le sort « Cône de Froid » différente de l'objet : spwi503
-SPWI505.SPL : FAILURE: opcode 326: Not_found
-SPWI505.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPWI506.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI507.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI507.SPL : Opcode 324 : Immunité à contre le sort « Immobilisation des Monstres » différente de l'objet : spwi507
@@ -2634,17 +2902,6 @@ SPWI522.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI523.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-SPWI523.SPL : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 SPWI524.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI525.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI532.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2655,13 +2912,8 @@ SPWI540.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI590.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI604.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI605.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI605.SPL : opcode 146: Traduction 207020 manquante
-SPWI605.SPL : FAILURE: opcode 146: Failure("SPWI605.SPL : opcode 146: Traduction 207020 manquante")
-SPWI605.SPL : FAILURE: Failure("Opcode 146: Failure(\"SPWI605.SPL : opcode 146: Traduction 207020 manquante\")")
-SPWI607.SPL : FAILURE: opcode 326: Not_found
-SPWI607.SPL : FAILURE: Failure("Opcode 326: Not_found")
+SPWI605.SPL : Opcode 146: no name for value 20 of gender.ids (string 207020 missing): described without this creature type.
 SPWI608.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI608.SPL : Opcode 221: type de sort secondaire non gere (20)
 SPWI612.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI613.SPL : Opcode -1: type de sort secondaire non gere (17)
 SPWI614.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2721,25 +2973,23 @@ SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWI720.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI720.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SPWI721.SPL : FAILURE: opcode 326: Not_found
-SPWI721.SPL : FAILURE: Failure("Opcode 326: Not_found")
 SPWI723.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI724.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWI725.SPL : Opcode 255: Timing mode == Instant/Limited and duration == 0
@@ -2824,6 +3074,7 @@ SPWISH34.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWISH35.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM111.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM113.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+SPWM113.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWM113.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM113.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWM114.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2836,6 +3087,7 @@ SPWM162.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM167.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM178.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM179.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+SPWM183.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWM183.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM183.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 SPWM186.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2843,16 +3095,13 @@ SPWM191.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPWM198.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SPYANC01.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 SRBLIND.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SRSVINV.SPL : FAILURE: opcode 326: Not_found
-SRSVINV.SPL : FAILURE: Failure("Opcode 326: Not_found")
+SW2H10DM.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 SW2H10DM.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 SW2H10DM.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-SW2H10DM.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 TACPR15.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR17.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR18.SPL : Opcode 83 : Réflection du type de projectile '257'
 TACPR19.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-TACPR19.SPL : Opcode 324 : Immunité à contre le sort « Tempête de Feu » différente de l'objet : sppr705
 TACPR22.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR26.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR27.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2862,11 +3111,12 @@ TACPR33.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR33.SPL : Opcode 324 : Immunité à contre le sort « Rayon Divin » différente de l'objet : sppr612
 TACPR34.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TACPR7.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-TACPR7.SPL : Opcode 324 : Immunité à contre le sort « Sainte Punition » différente de l'objet : sppr313
 TG#AEGI.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#BONE.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#COME.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#DRGB.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+TG#DTHF.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
+TG#DTHF.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 TG#DTHF.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 TG#DTHF.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 TG#DTHF.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2878,10 +3128,12 @@ TG#GCR2.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#GCRY.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#GOLE.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#IDOF.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+TG#IDOF.SPL : Opcode 40: Timing mode == Limited after duration, the effect expires at once
 TG#MASS.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
+TG#NPOI.SPL : Opcode 60: Timing mode == Limited after duration, the effect expires at once
+TG#RC08.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 TG#RC08.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 TG#RC08.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
-TG#RC08.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
 TG#RC11.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC19.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC20.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
@@ -2899,8 +3151,8 @@ TG#RC37.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC38.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC39.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC42.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
-TG#RC42.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC42.SPL : Opcode 0: Timing mode == Instant/Limited and duration == 0
+TG#RC42.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC49.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#RC51.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#SAAU.SPL : Opcode -1: type de sort secondaire non gere (30)
@@ -2913,6 +3165,7 @@ TG#SRES.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TR#DC01.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 TR#DC01.SPL : Opcode 177: Timing mode == Instant/Limited and duration == 0
 TR#DC03.SPL : Opcode -1: type de sort secondaire non gere (27)
+TR#DC03.SPL : Opcode 171: spell TR#DC03E.spl has no name: no line.
 TR#DCDCV.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TR#DCGRD.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TRDC015.SPL : Opcode 221: type de sort secondaire non gere (19)
@@ -2967,6 +3220,7 @@ UB#SW4D.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 UB#SW4D.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 UB#SW4D.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 UB#SW4D.SPL : Opcode 135 self : Nom de la créature introuvable : UB#SWYAK
+UBRPETA.SPL : Opcode 67: creature ubrpeta.cre has no name: described as a creature.
 UNLEASH.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 UNLEASH.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0
 VA#OTSPH.SPL : Opcode 146: Timing mode == Instant/Limited and duration == 0

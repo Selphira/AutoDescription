@@ -1,4 +1,5 @@
 
+#SREINE.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 #SREINE.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
 A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
@@ -6,24 +7,51 @@ A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
 A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
 A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
 A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
-A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
-A7#POT1.ITM : SPLPROT a gerer (MISSING) : 162 :: NOTRUBIKON 262 512 9
+A7#SPER1.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 A7RING03.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
+A7SKULL.ITM : Opcode 67: creature a7skull.cre has no name: described as a creature.
+A7SW1H3.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (2)
+A7_DAGG8.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
+A7_DAGG9.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+A7_DAGGA.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+A7_DAGGB.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+A7_DAGGC.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+A7_DAGGD.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+A7_DAGGE.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+A7_DAGGF.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+AX1H12.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 B!JASRNG.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
+BDAX1H03.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BDBLUN05.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BDBLUN09.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 BDBOW01.ITM : Opcode 318 : Immunité à contre l'objet « Hache de Kruntur » différente de l'objet : BDAX1H02
-BDBOW04.ITM : SPLPROT a gerer (MISSING) : 91 :: 91_STATEBITS=STATE_PANIC 273 0x00000004 8
+BDDAGG05.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BDHALB03.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 BDSHLD02.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 BDSHLD02.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
+BDSW1H02.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+BDSW1H08.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BDSW2H01.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+BHBUDSTF.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+BITEME.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+BLUN22.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+BLUN28.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+BLUN29.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+BLUN35.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+BLUN40.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BLUNDTH.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (3)
 BOLT05.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
+BW05SW1.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+BW05WH1.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
 C!AX1.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes » différente de l'objet : AX1H01
 C!AX20.ITM : Opcode 318 : Immunité à contre l'objet « Hache dorée » différente de l'objet : AX1H19
 C!AX22.ITM : Opcode 318 : Immunité à contre l'objet « Hache du seigneur minotaure +4 » différente de l'objet : AXEMINO
 C!AX25.ITM : Opcode 318 : Immunité à contre l'objet « Tueuse de foi +2 » différente de l'objet : FKILLER
-C!AX28.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes électrique +2 » différente de l'objet : U1HAX2A
+C!AX28.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
 C!AX32.ITM : Opcode 318 : Immunité à contre l'objet « Vérité de Benorg » différente de l'objet : U1HAX4B
-C!AX37.ITM : Opcode 318 : Immunité à contre l'objet « Gloire d'Hojar » différente de l'objet : OHRAX1H1
+C!AX37.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 C!AX4.ITM : Opcode 318 : Immunité à contre l'objet « Tueuse de magiciens » différente de l'objet : AX1H07
-C!AX42.ITM : Opcode 318 : Immunité à contre l'objet « Hache du frisson » différente de l'objet : BDAX1H03
+C!AX42.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 C!AX43.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes » différente de l'objet : A7Q3AX1
 C!AX47.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes de qualité supérieure » différente de l'objet : CBTSAX01
 C!AX49.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#AX002
@@ -36,36 +64,36 @@ C!AX55.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHA
 C!AX56.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#AX009
 C!AX57.ITM : Opcode 318 : Immunité à contre l'objet « Enrageuse » différente de l'objet : DSAXE01
 C!AX59.ITM : Opcode 318 : Immunité à contre l'objet « Beau tueur +3 » différente de l'objet : L#NIAX6
-C!AX6.ITM : Opcode 318 : Immunité à contre l'objet « Pierrefeu » différente de l'objet : AX1H12
+C!AX6.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!AX60.ITM : Opcode 318 : Immunité à contre l'objet « Hache Acide +3 » différente de l'objet : L#NSAXE
 C!AX62.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes de la mort Illusk +2 » différente de l'objet : MOAX02
-C!AX63.ITM : Opcode 318 : Immunité à contre l'objet « Mort aux innocents » différente de l'objet : PXL7011
-C!AX65.ITM : Opcode 318 : Immunité à contre l'objet « Hache chargée » différente de l'objet : PXPAHCHA
+C!AX63.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+C!AX65.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 C!AX67.ITM : Opcode 318 : Immunité à contre le sort « Éclair » et l'objet « Hache de la foudre des ténèbres » différente de l'objet : PXPAHFOU
 C!AX69.ITM : Opcode 318 : Immunité à contre l'objet « Hache de la mort rampante » différente de l'objet : PXPAHMOR
 C!AX7.ITM : Opcode 318 : Immunité à contre l'objet « Froide-faucheuse » différente de l'objet : AX1H13
-C!AX71.ITM : Opcode 318 : Immunité à contre l'objet « Hache pyrotechnique » différente de l'objet : PXPAHPYR
+C!AX71.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!AX72.ITM : Opcode 318 : Immunité à contre l'objet « Hache du temps perdu » différente de l'objet : PXPAHTEM
-C!AX74.ITM : Opcode 318 : Immunité à contre l'objet « Hache venimeuse » différente de l'objet : PXPAHVEN
-C!AX76.ITM : Opcode 318 : Immunité à contre le sort « Décharge statique » et l'objet « Hache de Tonnerre +5 » différente de l'objet : RR#SCAX2
+C!AX74.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+C!AX76.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!AX79.ITM : Opcode 318 : Immunité à contre l'objet « Fureur du gel » différente de l'objet : U#AX1H01
 C!AX9.ITM : Opcode 318 : Immunité à contre l'objet « Hache de la garde +5 » différente de l'objet : AX1H15
 C!BS1.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde » différente de l'objet : SW1H01
 C!BS11.ITM : Opcode 318 : Immunité à contre l'objet « Sangplan +3 » différente de l'objet : SW1H62
 C!BS12.ITM : Opcode 318 : Immunité à contre l'objet « Sangplan +5 » différente de l'objet : SW1H63
-C!BS29.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde de feu +1 » différente de l'objet : UBSWD2B
+C!BS29.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
 C!BS35.ITM : Opcode 318 : Immunité à contre l'objet « Épée Bâtarde du Cancer +4 » différente de l'objet : UBSWD5A
-C!BS36.ITM : Opcode 318 : Immunité à contre l'objet « Incinératrice +3 » différente de l'objet : UBSWD5B
+C!BS36.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 C!BS38.ITM : Opcode 318 : Immunité à contre l'objet « Lame de cuivre » différente de l'objet : OHDSW03
 C!BS4.ITM : Opcode 318 : Immunité à contre l'objet « Kondar » différente de l'objet : SW1H03
 C!BS41.ITM : Opcode 318 : Immunité à contre l'objet « Distance » différente de l'objet : SW1DIS
 C!BS5.ITM : Opcode 318 : Immunité à contre l'objet « Épée de Baldurien » différente de l'objet : SW1H18
 C!BS50.ITM : Opcode 318 : Immunité à contre le sort « Drain de vie » et l'objet « Trancheuse » différente de l'objet : BDSW1H22
-C!BS52.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde de Miasmes » différente de l'objet : U#SWDB94
-C!BS53.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde du Courroux » différente de l'objet : U#SWDB95
-C!BS54.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde de Miasmes » différente de l'objet : U#SWDB94
+C!BS52.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+C!BS53.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+C!BS54.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!BS55.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde +3 : "Divine Comédie" » différente de l'objet : #SARTEM
-C!BS58.ITM : Opcode 318 : Immunité à contre l'objet « Voleuse de la Dame des Neiges » différente de l'objet : CBSNWMDN
+C!BS58.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
 C!BS60.ITM : Opcode 318 : Immunité à contre l'objet « Epée de Belvin » différente de l'objet : CBWTNI6A
 C!BS62.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#BS002
 C!BS63.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#BS003
@@ -78,21 +106,21 @@ C!BS69.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHA
 C!BS73.ITM : Opcode 318 : Immunité à contre l'objet « Enfant du soleil +3 » différente de l'objet : L#NISWOM
 C!BS74.ITM : Opcode 318 : Immunité à contre l'objet « Discorde +2 » différente de l'objet : MO1H03
 C!BS75.ITM : Opcode 318 : Immunité à contre l'objet « Sanglante +4 » différente de l'objet : MO1H39
-C!BS77.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde +1 » différente de l'objet : PXFYSKL7
+C!BS77.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!BS78.ITM : Opcode 318 : Immunité à contre l'objet « Lame de dualité » différente de l'objet : PXL2DUAL
 C!BS8.ITM : Opcode 318 : Immunité à contre l'objet « Jhor la sanglante » différente de l'objet : SW1H38
 C!BS80.ITM : Opcode 318 : Immunité à contre l'objet « La terreur bangellienne » différente de l'objet : PXPAETER
 C!BS81.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 C!BS82.ITM : Opcode 318 : Immunité à contre l'objet « Épée de Noober » différente de l'objet : TSON#P
 C!BS83.ITM : Opcode 318 : Immunité à contre l'objet « Rage du Chaos » différente de l'objet : U#SWDBRC
-C!BS9.ITM : Opcode 318 : Immunité à contre l'objet « Lame de brûlure » différente de l'objet : SW1H39
+C!BS9.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!KT1.ITM : Opcode 318 : Immunité à contre l'objet « Katana » différente de l'objet : SW1H43
 C!KT11.ITM : Opcode 318 : Immunité à contre l'objet « Lame de la famille Corthala +2 » différente de l'objet : NPSW04
 C!KT23.ITM : Opcode 318 : Immunité à contre l'objet « Furie céleste » différente de l'objet : SW1H51
 C!KT25.ITM : Opcode 318 : Immunité à contre l'objet « Destin d'Hindo +3 » différente de l'objet : SW1H70
 C!KT26.ITM : Opcode 318 : Immunité à contre l'objet « Destin d'Hindo +4 » différente de l'objet : SW1H71
 C!KT30.ITM : Opcode 318 : Immunité à contre l'objet « Katana +3, « El Tel'lerian » » différente de l'objet : UCMGSW02
-C!KT31.ITM : Opcode 318 : Immunité à contre l'objet « Katana +4, « Toran El Desiade » » différente de l'objet : UCMGSW04
+C!KT31.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
 C!KT32.ITM : Opcode 318 : Immunité à contre l'objet « Katana +4, « Fléau de Mort » » différente de l'objet : UCMGSW11
 C!KT4.ITM : Opcode 318 : Immunité à contre l'objet « Furie Céleste +5 » différente de l'objet : C2SW1H02
 C!KT40.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#KT002
@@ -113,17 +141,14 @@ C!KT55.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHA
 C!KT56.ITM : Opcode 318 : Immunité à contre l'objet « La Résolution de <CHARNAME> » différente de l'objet : CU#WZ009
 C!KT58.ITM : Opcode 318 : Immunité à contre l'objet « La Voie de Maître Li » différente de l'objet : ESLISWO0
 C!KT59.ITM : Opcode 318 : Immunité à contre l'objet « Katana 'Toile du Chaos' » différente de l'objet : ISNFXY6
-C!KT60.ITM : opcode 146: Traduction 207020 manquante
-C!KT60.ITM : FAILURE: opcode 146: Failure("C!KT60.ITM : opcode 146: Traduction 207020 manquante")
-C!KT60.ITM : FAILURE: opcode 341: Failure("Opcode 146: Failure(\"C!KT60.ITM : opcode 146: Traduction 207020 manquante\")")
-C!KT60.ITM : FAILURE: Failure("Opcode 341: Failure(\"Opcode 146: Failure(\\\"C!KT60.ITM : opcode 146: Traduction 207020 manquante\\\")\")")
+C!KT60.ITM : Opcode 146: no name for value 20 of gender.ids (string 207020 missing): described without this creature type.
 C!KT61.ITM : Opcode 318 : Immunité à contre l'objet « Katana draconique +2 » différente de l'objet : MO1H01
 C!KT63.ITM : Opcode 318 : Immunité à contre l'objet « Œil du soleil +3 » différente de l'objet : MO1H05
 C!KT65.ITM : Opcode 318 : Immunité à contre l'objet « Kaga-To +1 » différente de l'objet : MO1H44
-C!KT66.ITM : Opcode 318 : Immunité à contre l'objet « La Voie de Maître Li +2 » différente de l'objet : MO1H55
-C!KT67.ITM : Opcode 318 : Immunité à contre l'objet « Katana du néant +5 » différente de l'objet : MO1H75
-C!KT71.ITM : Opcode 318 : Immunité à contre l'objet « Lamedazur » différente de l'objet : PXPMLDAZ
-C!KT72.ITM : Opcode 318 : Immunité à contre l'objet « Lamedor » différente de l'objet : PXPMLDOR
+C!KT66.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+C!KT67.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+C!KT71.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+C!KT72.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 C!KT75.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 C!KT75.ITM : Opcode 318 : Immunité à contre le sort « Contrecoup Acide » et l'objet « Sanchuudoku +4 » différente de l'objet : SOLAK1
 C!KT76.ITM : Opcode 318 : Immunité à contre l'objet « Wakizashi » différente de l'objet : SW1H46
@@ -138,128 +163,195 @@ C2HD1.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 C2KELD02.ITM : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
 C2PLAT01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 C2SHLD02.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
-CBMALR3A.ITM : Opcode 143 : non-permanent timing mode (1) are permanent (bug).
+CBCWSTFF.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+CBHLYTA2.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+CBHLYTAX.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+CBMALR3A.ITM : Opcode 143 : non-permanent timing mode (0) are permanent (bug).
+CBMALR4A.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 45: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 45: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 45: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 45: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 235: has no effect : levelMin (4) > levelMax (1)
+CBMALR4A.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (5)
+CBMTGTJU.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+CBMTGTJU.ITM : Opcode 179: has no effect : levelMin (6) > levelMax (2)
+CBMTHLCH.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+CBMTHLCH.ITM : Opcode 179: has no effect : levelMin (6) > levelMax (2)
+CBMTHLCH.ITM : Opcode 179: has no effect : levelMin (6) > levelMax (2)
+CBMTHLCH.ITM : Opcode 179: has no effect : levelMin (6) > levelMax (2)
+CBMTHLCH.ITM : Opcode 146: has no effect : levelMin (4) > levelMax (1)
+CBNRTSTF.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+CBSNWMDN.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+CBSPERRG.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDAX20.ITM : Opcode 318 : Immunité à contre l'objet « Hache dorée » différente de l'objet : AX1H19
 CDAX22.ITM : Opcode 318 : Immunité à contre l'objet « Hache du seigneur minotaure +4 » différente de l'objet : AXEMINO
 CDAX25.ITM : Opcode 318 : Immunité à contre l'objet « Tueuse de foi +2 » différente de l'objet : FKILLER
-CDAX28.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes électrique +2 » différente de l'objet : U1HAX2A
+CDAX28.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
 CDAX32.ITM : Opcode 318 : Immunité à contre l'objet « Vérité de Benorg » différente de l'objet : U1HAX4B
-CDAX37.ITM : Opcode 318 : Immunité à contre l'objet « Gloire d'Hojar » différente de l'objet : OHRAX1H1
+CDAX37.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 CDAX4.ITM : Opcode 318 : Immunité à contre l'objet « Tueuse de magiciens » différente de l'objet : AX1H07
-CDAX42.ITM : Opcode 318 : Immunité à contre l'objet « Hache du frisson » différente de l'objet : BDAX1H03
+CDAX42.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 CDAX57.ITM : Opcode 318 : Immunité à contre l'objet « Enrageuse » différente de l'objet : DSAXE01
 CDAX59.ITM : Opcode 318 : Immunité à contre l'objet « Beau tueur +3 » différente de l'objet : L#NIAX6
-CDAX6.ITM : Opcode 318 : Immunité à contre l'objet « Pierrefeu » différente de l'objet : AX1H12
+CDAX6.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDAX60.ITM : Opcode 318 : Immunité à contre l'objet « Hache Acide +3 » différente de l'objet : L#NSAXE
 CDAX62.ITM : Opcode 318 : Immunité à contre l'objet « Hache d'armes de la mort Illusk +2 » différente de l'objet : MOAX02
-CDAX63.ITM : Opcode 318 : Immunité à contre l'objet « Mort aux innocents » différente de l'objet : PXL7011
-CDAX65.ITM : Opcode 318 : Immunité à contre l'objet « Hache chargée » différente de l'objet : PXPAHCHA
+CDAX63.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+CDAX65.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 CDAX67.ITM : Opcode 318 : Immunité à contre le sort « Éclair » et l'objet « Hache de la foudre des ténèbres » différente de l'objet : PXPAHFOU
 CDAX69.ITM : Opcode 318 : Immunité à contre l'objet « Hache de la mort rampante » différente de l'objet : PXPAHMOR
 CDAX7.ITM : Opcode 318 : Immunité à contre l'objet « Froide-faucheuse » différente de l'objet : AX1H13
-CDAX71.ITM : Opcode 318 : Immunité à contre l'objet « Hache pyrotechnique » différente de l'objet : PXPAHPYR
-CDAX74.ITM : Opcode 318 : Immunité à contre l'objet « Hache venimeuse » différente de l'objet : PXPAHVEN
+CDAX71.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+CDAX74.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDBS11.ITM : Opcode 318 : Immunité à contre l'objet « Sangplan +3 » différente de l'objet : SW1H62
-CDBS29.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde de feu +1 » différente de l'objet : UBSWD2B
+CDBS29.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
 CDBS35.ITM : Opcode 318 : Immunité à contre l'objet « Épée Bâtarde du Cancer +4 » différente de l'objet : UBSWD5A
-CDBS36.ITM : Opcode 318 : Immunité à contre l'objet « Incinératrice +3 » différente de l'objet : UBSWD5B
+CDBS36.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 CDBS38.ITM : Opcode 318 : Immunité à contre l'objet « Lame de cuivre » différente de l'objet : OHDSW03
 CDBS4.ITM : Opcode 318 : Immunité à contre l'objet « Kondar » différente de l'objet : SW1H03
 CDBS41.ITM : Opcode 318 : Immunité à contre l'objet « Distance » différente de l'objet : SW1DIS
 CDBS5.ITM : Opcode 318 : Immunité à contre l'objet « Épée de Baldurien » différente de l'objet : SW1H18
 CDBS50.ITM : Opcode 318 : Immunité à contre le sort « Drain de vie » et l'objet « Trancheuse » différente de l'objet : BDSW1H22
-CDBS52.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde de Miasmes » différente de l'objet : U#SWDB94
-CDBS53.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde du Courroux » différente de l'objet : U#SWDB95
-CDBS54.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde de Miasmes » différente de l'objet : U#SWDB94
+CDBS52.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+CDBS53.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+CDBS54.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDBS55.ITM : Opcode 318 : Immunité à contre l'objet « Epée bâtarde +3 : "Divine Comédie" » différente de l'objet : #SARTEM
-CDBS58.ITM : Opcode 318 : Immunité à contre l'objet « Voleuse de la Dame des Neiges » différente de l'objet : CBSNWMDN
+CDBS58.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
 CDBS60.ITM : Opcode 318 : Immunité à contre l'objet « Epée de Belvin » différente de l'objet : CBWTNI6A
 CDBS73.ITM : Opcode 318 : Immunité à contre l'objet « Enfant du soleil +3 » différente de l'objet : L#NISWOM
 CDBS74.ITM : Opcode 318 : Immunité à contre l'objet « Discorde +2 » différente de l'objet : MO1H03
 CDBS75.ITM : Opcode 318 : Immunité à contre l'objet « Sanglante +4 » différente de l'objet : MO1H39
-CDBS77.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde +1 » différente de l'objet : PXFYSKL7
+CDBS77.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDBS78.ITM : Opcode 318 : Immunité à contre l'objet « Lame de dualité » différente de l'objet : PXL2DUAL
 CDBS8.ITM : Opcode 318 : Immunité à contre l'objet « Jhor la sanglante » différente de l'objet : SW1H38
 CDBS80.ITM : Opcode 318 : Immunité à contre l'objet « La terreur bangellienne » différente de l'objet : PXPAETER
 CDBS83.ITM : Opcode 318 : Immunité à contre l'objet « Rage du Chaos » différente de l'objet : U#SWDBRC
-CDBS9.ITM : Opcode 318 : Immunité à contre l'objet « Lame de brûlure » différente de l'objet : SW1H39
+CDBS9.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 CDGORSTF.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
+CDGORSTF.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 CDKT23.ITM : Opcode 318 : Immunité à contre l'objet « Furie céleste » différente de l'objet : SW1H51
 CDKT25.ITM : Opcode 318 : Immunité à contre l'objet « Destin d'Hindo +3 » différente de l'objet : SW1H70
 CDKT30.ITM : Opcode 318 : Immunité à contre l'objet « Katana +3, « El Tel'lerian » » différente de l'objet : UCMGSW02
 CDKT58.ITM : Opcode 318 : Immunité à contre l'objet « La Voie de Maître Li » différente de l'objet : ESLISWO0
 CDKT59.ITM : Opcode 318 : Immunité à contre l'objet « Katana 'Toile du Chaos' » différente de l'objet : ISNFXY6
-CDKT60.ITM : opcode 146: Traduction 207020 manquante
-CDKT60.ITM : FAILURE: opcode 146: Failure("CDKT60.ITM : opcode 146: Traduction 207020 manquante")
-CDKT60.ITM : FAILURE: opcode 341: Failure("Opcode 146: Failure(\"CDKT60.ITM : opcode 146: Traduction 207020 manquante\")")
-CDKT60.ITM : FAILURE: Failure("Opcode 341: Failure(\"Opcode 146: Failure(\\\"CDKT60.ITM : opcode 146: Traduction 207020 manquante\\\")\")")
 CDKT65.ITM : Opcode 318 : Immunité à contre l'objet « Kaga-To +1 » différente de l'objet : MO1H44
-CDKT66.ITM : Opcode 318 : Immunité à contre l'objet « La Voie de Maître Li +2 » différente de l'objet : MO1H55
-CDKT67.ITM : Opcode 318 : Immunité à contre l'objet « Katana du néant +5 » différente de l'objet : MO1H75
+CDKT66.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+CDKT67.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 CDKT85.ITM : Opcode 318 : Immunité à contre l'objet « Wakizashi +4 « Vent Divin » » différente de l'objet : UCMGSW10
 CDPP33.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 CLCK04.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
-CLCK12.ITM : FAILURE: opcode 326: Not_found
-CLCK12.ITM : FAILURE: opcode 232: Failure("Opcode 326: Not_found")
-CLCK12.ITM : FAILURE: Failure("Opcode 232: Failure(\"Opcode 326: Not_found\")")
-CLCK27.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
-CLCK27.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
-CLCK27.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 D5SW1H53.ITM : Opcode 318 : Immunité à contre l'objet « Épée de flamme » différente de l'objet : SW1H53
+DAGG08.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 DAGG08.ITM : Opcode 177: Target is None
 DAGG08.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 DAGG08.ITM : Opcode 12: Target is None
+DAGG12.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
+DSAXE03.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+DSAXE06.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
 DSCDRUID.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 DSCDRUID.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 DSCHAN02.ITM : Opcode 18: Timing mode == Instant/Limited and duration == 0
+DSSPERF.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 DSSTAF07.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 DSSTAF07.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+DSSWD01.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+DSWRLSTF.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 DW#SHFIR.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
-DW#SHSAL.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 FINSAREV.ITM : Opcode 0: Timing mode == Instant/Limited and duration == 0
+FINSAREV.ITM : Opcode 318: has no effect : levelMin (5) > levelMax (1)
+FLAILSK.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+GROMNIR.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+HALB08.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+HALB11.ITM : Opcode 324: has no effect : levelMin (6) > levelMax (3)
+HALB11.ITM : Opcode 324: has no effect : levelMin (6) > levelMax (3)
+HAMM03.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+HAMM05.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+HAMM07.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 HANARM01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 ILLAS01.ITM : Opcode 206: Timing mode == Instant/Limited and duration == 0
 ILLAS02.ITM : Opcode 206: Timing mode == Instant/Limited and duration == 0
 ILLAS03.ITM : Opcode 206: Timing mode == Instant/Limited and duration == 0
 J#JANXBO.ITM : Opcode 1: Timing mode == Instant/Limited and duration == 0
 L#NDDAG.ITM : Opcode 0: Timing mode == Instant/Limited and duration == 0
-L#NDSW1.ITM : opcode 146: Traduction 207020 manquante
-L#NDSW1.ITM : FAILURE: opcode 146: Failure("L#NDSW1.ITM : opcode 146: Traduction 207020 manquante")
-L#NDSW1.ITM : FAILURE: opcode 341: Failure("Opcode 146: Failure(\"L#NDSW1.ITM : opcode 146: Traduction 207020 manquante\")")
-L#NDSW1.ITM : FAILURE: Failure("Opcode 341: Failure(\"Opcode 146: Failure(\\\"L#NDSW1.ITM : opcode 146: Traduction 207020 manquante\\\")\")")
+L#NDMOR.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 L#NSCLU2.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 L#NSCLU2.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 L#WEASE1.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 L#WEASE1.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+MO1H30.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+MO1H55.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+MO1H75.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+MO2H02.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 MOAM05.ITM : Opcode 318 : Immunité à contre l'objet « Anneau de régénération » différente de l'objet : MORNG05
 MOBL06.ITM : Opcode 318 : Immunité à contre l'objet « Anneau de régénération » différente de l'objet : MORNG05
+MOBLN01.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+MOBLN02.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 MOBR03.ITM : Opcode 318 : Immunité à contre l'objet « Anneau de régénération » différente de l'objet : MORNG05
 MOBT10.ITM : Opcode 318 : Immunité à contre l'objet « Anneau de régénération » différente de l'objet : MORNG05
 MOCHK01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 MOCLK06.ITM : Opcode 318 : Immunité à contre l'objet « Anneau de régénération » différente de l'objet : MORNG05
+MODAG02.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 MOEPS01.ITM : Opcode 318 : Immunité à contre l'objet « Épée bâtarde » différente de l'objet : SW1H01
+MOHM02.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 MOMS01.ITM : Opcode 324 : Immunité à contre l'objet « Aiguillon de pixie » différente de l'objet : DAGG13
 MOMS01.ITM : Opcode 324 : Immunité à contre l'objet « Aiguillon de pixie » différente de l'objet : DAGG13
-NPSW03.ITM : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
+MOSP01.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+MOSP02.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 NSSHLD01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 O#BRGLOV.ITM : Opcode 73: Timing mode == Instant/Limited and duration == 0
-PLANETAR.ITM : Opcode 318 : Immunité à contre l'objet « Lame d'Usuno » différente de l'objet : SW1H67
+O#LLSW1.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+OHBWING.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+OHNHAMM1.ITM : Opcode 318: has no effect : levelMin (12) > levelMax (1)
+OHRAX1H1.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+PLANETAR.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
 PLAT17.ITM : Opcode 126: Timing mode == Instant/Limited and duration == 0
-PLYMSTAR.ITM : Opcode 146: Target is None
-POTN10.ITM : FAILURE: opcode 326: Not_found
-POTN10.ITM : FAILURE: Failure("Opcode 326: Not_found")
 PROX01.ITM : SPLPROT a gerer (MISSING) : 171 :: 171 260 84 170
+PXFYSKL5.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+PXFYSKL7.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXFYSKL9.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
 PXL2ARDR.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
 PXL2DCFO.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
+PXL2ETOI.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+PXL2HAB1.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXL2HAB2.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXL2SULS.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
+PXL2VAST.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXL2VRID.ITM : Opcode 318: has no effect : levelMin (10) > levelMax (1)
+PXL7011.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXL705.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXL707.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
 PXPAARBA.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 PXPAARBA.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 PXPAARMS.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 PXPAARMS.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+PXPABELE.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+PXPAEELE.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPAEFEU.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPAEPES.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPAEVEN.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+PXPAHCHA.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXPAHPYR.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPAHVEN.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPAMINF.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+PXPMARGE.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
+PXPMCROC.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPMFEND.ITM : Opcode 318: has no effect : levelMin (12) > levelMax (1)
+PXPMJUGE.ITM : Opcode 318: has no effect : levelMin (12) > levelMax (1)
+PXPMLCHA.ITM : Opcode 318: has no effect : levelMin (10) > levelMax (1)
+PXPMLDAZ.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPMLDOR.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPMMONA.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+PXPMRONG.ITM : Opcode 318: has no effect : levelMin (12) > levelMax (2)
+PXPMSANG.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+PXPMSTEN.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 R#ASGCLK.ITM : Opcode 292: Timing mode == Instant/Limited and duration == 0
 R#ASHALB.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 R#ASHALB.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 R#ASMSTF.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 RITAMUL.ITM : Opcode 28: Timing mode == Instant/Limited and duration == 0
+RODSPEAR.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+RR#SCAX2.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
@@ -276,27 +368,103 @@ S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
 S#DAGG01.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SHLD08P.ITM : FAILURE: opcode 326: Not_found
-SHLD08P.ITM : FAILURE: opcode 232: Failure("Opcode 326: Not_found")
-SHLD08P.ITM : FAILURE: Failure("Opcode 232: Failure(\"Opcode 326: Not_found\")")
+SERRATE.ITM : Opcode 318: has no effect : levelMin (10) > levelMax (1)
+SOAITM15.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+SOAITM27.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+SOAITM28.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+SOAITM30.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
 SOLAK1.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
-SOLAK1B.ITM : SPLPROT a gerer (MISSING) : 164 :: 164 260 4 163
+STAF22.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 STAFCAD.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 STAFCAD.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+SW1H06.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+SW1H39.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 SW1H512.ITM : Opcode 318 : Immunité à contre l'objet « Furie céleste » différente de l'objet : SW1H51
+SW1H60.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+SW1H61.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+SW1H67.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+SW1H68.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+SW1H69.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
 SW2HAV.ITM : Opcode 109: Unknown type 0.
 TG#BFLU.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#BFLU.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 TG#BFLU.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
+TG#BRP1.ITM : Opcode 128: Timing mode == Limited after duration, the effect expires at once
+TG#BRP1.ITM : Opcode 128: Timing mode == Limited after duration, the effect expires at once
+TG#BRP1.ITM : Opcode 128: Timing mode == Limited after duration, the effect expires at once
+TG#BRP1.ITM : Opcode 128: Timing mode == Limited after duration, the effect expires at once
+TG#BRP3.ITM : Opcode 3: Timing mode == Limited after duration, the effect expires at once
+TG#BRP3.ITM : Opcode 3: Timing mode == Limited after duration, the effect expires at once
+TG#BRP3.ITM : Opcode 3: Timing mode == Limited after duration, the effect expires at once
+TG#BRP3.ITM : Opcode 3: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 0: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 54: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 73: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 0: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 54: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 73: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 0: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 54: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 73: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 0: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 54: Timing mode == Limited after duration, the effect expires at once
+TG#BRP4.ITM : Opcode 73: Timing mode == Limited after duration, the effect expires at once
+TG#BRP6.ITM : Opcode 60: Timing mode == Limited after duration, the effect expires at once
+TG#BRP6.ITM : Opcode 60: Timing mode == Limited after duration, the effect expires at once
+TG#BRP6.ITM : Opcode 60: Timing mode == Limited after duration, the effect expires at once
+TG#BRP6.ITM : Opcode 60: Timing mode == Limited after duration, the effect expires at once
+TG#BRP7.ITM : Opcode 126: Timing mode == Limited after duration, the effect expires at once
+TG#BRP7.ITM : Opcode 126: Timing mode == Limited after duration, the effect expires at once
+TG#BRP7.ITM : Opcode 126: Timing mode == Limited after duration, the effect expires at once
+TG#BRP7.ITM : Opcode 126: Timing mode == Limited after duration, the effect expires at once
+TG#BRP8.ITM : Opcode 25: Timing mode == Limited after duration, the effect expires at once
+TG#BRP8.ITM : Opcode 25: Timing mode == Limited after duration, the effect expires at once
+TG#BRP8.ITM : Opcode 25: Timing mode == Limited after duration, the effect expires at once
+TG#BRP8.ITM : Opcode 25: Timing mode == Limited after duration, the effect expires at once
+U#AX2H86.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#AX2H93.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#AX2H94.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#AX2H98.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#AX2H99.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#BLUN02.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
 U#BLUN02.ITM : Opcode 13: Target is None
+U#CLUBBT.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#HALB95.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#HAMM94.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#HAMMBI.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
 U#HFDTPD.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 U#HFDTPD.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
+U#HFHBPB.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#MACE92.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#MACE95.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 U#STAF01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
 U#STAF01.ITM : Opcode 146: Timing mode == Instant/Limited and duration == 0
+U#STAF01.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#SWDB94.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
+U#SWDB95.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+U#SWDS94.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
 U1HAM2A.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 U1HAM2A.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+U1HAM3A.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+U1HAX2A.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+U2HAX3B.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
+UBSWD2B.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
+UBSWD5B.ITM : Opcode 318: has no effect : levelMin (8) > levelMax (1)
+UCMGBL01.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
+UCMGHA01.ITM : Opcode 318: has no effect : levelMin (2) > levelMax (1)
+UCMGSW01.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+UCMGSW04.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+UCMGSW05.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (2)
+UDAGG2A.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
+UFLAL2A.ITM : Opcode 318: has no effect : levelMin (4) > levelMax (1)
+UFLAL4A.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+UFLAL5A.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (2)
+ULSWD2B.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (2)
+UMSTR2B.ITM : Opcode 318: has no effect : levelMin (3) > levelMax (1)
 UMSTR4A.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 UMSTR4A.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 WAND09.ITM : Opcode 177: Timing mode == Instant/Limited and duration == 0
+WAS2H.ITM : Opcode 318: has no effect : levelMin (6) > levelMax (1)
 WASTAFF.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
 WASTAFF.ITM : SPLPROT a gerer (SPLSTATE 151 D5_SEMI_SHAM) : 110 :: 110_SPLSTATE=n 274 151 1
+WQXSWQ1.ITM : Opcode 55: has no effect : levelMin (6) > levelMax (5)

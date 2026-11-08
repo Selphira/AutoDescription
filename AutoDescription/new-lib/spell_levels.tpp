@@ -999,7 +999,8 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	PATCH_IF level_same AND (same_opcode == 200 OR same_opcode == 201) BEGIN
 		SET level_same = $fx_power_mask(~%same_a%~) == $fx_power_mask(~%same_b%~)
 	END
-	PATCH_IF level_same AND same_opcode == 518 BEGIN
+	// Guérisons et dissipations réunies (ad_group_cures) : mêmes opcodes réunis (ancien custom_int).
+	PATCH_IF level_same AND (same_opcode == 518 OR same_opcode == 527 OR same_opcode == 528) BEGIN
 		SET same_derived_a = $level_derived(~%level_a%~)
 		SET same_derived_b = $level_derived(~%level_b%~)
 		SPRINT same_signature_a $derived_signature(~%same_derived_a%~)

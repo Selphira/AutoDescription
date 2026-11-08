@@ -46,6 +46,7 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 			END
 			LPM ad_item_combat_damage
 			LPM ad_item_combat_tooltip
+			LPM ad_item_combat_section_add
 			SET combat_count += 1
 		END
 		// Un en-tête d'un autre type sans charges hors de l'objet est une capacité de combat pour l'ancien
@@ -79,8 +80,18 @@ DEFINE_PATCH_MACRO ad_item_combat_load BEGIN
 		SPRINT $combat_damage_key(~0~) ~NONE~
 		SPRINT $combat_section(~0~) ~ability%combat_h%~
 		LPM ad_item_combat_tooltip
+		LPM ad_item_combat_section_add
 		SET combat_count = 1
 		SET combat_other_count = 0
+	END
+END
+
+// Sections des capacités de combat (en-têtes sans charges, item_combat_sections, « ability0 ability2 ») :
+// leur cible par défaut est la créature touchée (ad_application_default_target).
+DEFINE_PATCH_MACRO ad_item_combat_section_add BEGIN
+	SPRINT combat_section_name $combat_section(~%combat_id%~)
+	PATCH_IF INDEX (EXACT_MATCH ~ability~ ~%combat_section_name%~) == 0 BEGIN
+		SPRINT item_combat_sections ~%item_combat_sections% %combat_section_name% ~
 	END
 END
 

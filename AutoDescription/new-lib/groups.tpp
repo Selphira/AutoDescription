@@ -109,6 +109,11 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~135~) BEGIN
 			LPM ad_group_polymorph
 		END
+		// Après les regroupements qui absorbent des guérisons (immunités, dissipation de la magie, action
+		// libre), comme la seconde passe (opcode_N_post_group) de l'ancien moteur.
+		PATCH_FOR_EACH cure_kind IN ~CURES~ ~DISPELS~ BEGIN
+			LPM ad_group_cures
+		END
 	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
@@ -1415,6 +1420,165 @@ DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 			END
 		END
 	END
+END
+
+// Guérisons réunies (effet dérivé CURES, ancien opcode virtuel 527 : « Guérit la débilité mentale, les
+// maladies et la cécité de la cible ») et dissipations réunies (DISPELS, 528 : « Dissipe la confusion et
+// la peur de la cible »), famille cure_kind (AD_CURES_OPCODES, AD_DISPELS_OPCODES, new-lib/catalog.tpa).
+// Chaque effet de la famille, opcode après opcode dans l'ordre de la liste puis dans l'ordre du fichier,
+// est réuni au premier effet non consommé de chacun des opcodes suivants qui a les mêmes champs
+// (paramètres mis à part, sans rôle pour ces opcodes) ; avec au moins un autre, ils sont consommés au
+// profit de l'effet dérivé, fx_cure_mask gardant les bits des opcodes réunis (indices de la liste).
+// Restent seuls les effets d'un EFF ou maudits, à exceptions de cible, sous un type de créature ou dont
+// la ligne dirait « non cumulatif ». Le 79 qui ajoute la guérison de la débilité mentale
+// (ad_op_79_adds_feeblemind_cure) tient aussi la place du 77, comme l'effet que l'ancien
+// opcode_79_group ajoute aux champs du 79.
+DEFINE_PATCH_MACRO ad_group_cures BEGIN
+	SET cure_count = 0
+	SET cure_present = 0
+	PHP_EACH ~AD_%cure_kind%_OPCODES~ AS cure_index => cure_opcode BEGIN
+		SET $cure_opcode_at(~%cure_index%~) = cure_opcode
+		SET cure_count += 1
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%cure_opcode%~) BEGIN
+			SET cure_present += 1
+		END
+	END
+	CLEAR_ARRAY cure_adds_77
+	SET cure_adds_any = 0
+	PATCH_IF (~%cure_kind%~ STRING_EQUAL ~CURES~) AND VARIABLE_IS_SET $fx_opcode_count(~79~) BEGIN
+		PHP_EACH fx_ids_79 AS _ => disease_id BEGIN
+			LPM ad_op_79_adds_feeblemind_cure
+			PATCH_IF disease_adds_cure BEGIN
+				SET $cure_adds_77(~%disease_id%~) = 1
+				SET cure_adds_any = 1
+			END
+		END
+	END
+	PATCH_IF cure_present >= 2 OR cure_adds_any BEGIN
+		FOR (cure_a = 0; cure_a < cure_count; ++cure_a) BEGIN
+			SET cure_slot = cure_a
+			LPM ad_cure_slot_candidates
+			CLEAR_ARRAY cure_anchor_ids
+			PHP_EACH cure_slot_ids AS cure_key => cure_value BEGIN
+				SET $cure_anchor_ids(~%cure_key%~) = cure_value
+			END
+			PHP_EACH cure_anchor_ids AS _ => group_id BEGIN
+				SET cure_id = group_id
+				LPM ad_cure_eligible
+				PATCH_IF cure_eligible BEGIN
+					LPM ad_group_cure_members
+				END
+			END
+		END
+	END
+END
+
+// Membres de l'effet group_id (place cure_a de la famille) : le premier effet de chaque place suivante,
+// aux mêmes champs ; un 79 compté pour le 77 (cure_pseudo) reste candidat à sa place de 79.
+DEFINE_PATCH_MACRO ad_group_cure_members BEGIN
+	SET cure_mask = 1 BLSL cure_a
+	SET cure_members = 0
+	SET same_id = group_id
+	SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
+	CLEAR_ARRAY cure_found
+	CLEAR_ARRAY cure_pseudo
+	FOR (cure_b = cure_a + 1; cure_b < cure_count; ++cure_b) BEGIN
+		SET cure_slot = cure_b
+		LPM ad_cure_slot_candidates
+		SET cure_hit = 0 - 1
+		PHP_EACH cure_slot_ids AS _ => cure_candidate BEGIN
+			PATCH_IF cure_hit < 0 AND NOT VARIABLE_IS_SET $cure_found(~%cure_candidate%~) BEGIN
+				SET cure_id = cure_candidate
+				LPM ad_cure_eligible
+				PATCH_IF cure_eligible BEGIN
+					SET same_other = cure_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same BEGIN
+						SET cure_hit = cure_candidate
+					END
+				END
+			END
+		END
+		PATCH_IF cure_hit >= 0 BEGIN
+			PATCH_IF $cure_opcode_at(~%cure_b%~) == 77 AND $fx_opcode(~%cure_hit%~) == 79 BEGIN
+				SET $cure_pseudo(~%cure_hit%~) = 1
+			END
+			ELSE BEGIN
+				SET $cure_found(~%cure_hit%~) = 1
+			END
+			SET cure_mask = cure_mask BOR (1 BLSL cure_b)
+			SET cure_members += 1
+		END
+	END
+	PATCH_IF cure_members > 0 BEGIN
+		SET $fx_consumed(~%group_id%~) = 1
+		PHP_EACH cure_found AS cure_member => _ BEGIN
+			SET $fx_consumed(~%cure_member%~) = 1
+		END
+		PHP_EACH cure_pseudo AS cure_member => _ BEGIN
+			SET $fx_consumed(~%cure_member%~) = 1
+			SET $fx_cure_feeblemind(~%cure_member%~) = 1
+		END
+		PATCH_IF $cure_opcode_at(~%cure_a%~) == 77 AND $fx_opcode(~%group_id%~) == 79 BEGIN
+			SET $fx_cure_feeblemind(~%group_id%~) = 1
+		END
+		SET $fx_cure_mask(~%group_id%~) = cure_mask
+		SPRINT derived_kind ~%cure_kind%~
+		SET derived_id = group_id
+		SET derived_other = 0 - 1
+		SPRINT derived_line ~ad_group_cures_line~
+		SPRINT $derived_signature(~%derived_count%~) ~%cure_mask%~
+		LPM ad_derived_add
+	END
+END
+
+// Effets candidats à la place cure_slot de la famille (cure_slot_ids, dans l'ordre du fichier) : ceux
+// de son opcode, et pour le 77 les 79 qui ajoutent sa guérison (cure_adds_77).
+DEFINE_PATCH_MACRO ad_cure_slot_candidates BEGIN
+	CLEAR_ARRAY cure_slot_ids
+	SET cure_slot_count = 0
+	SET cure_slot_opcode = $cure_opcode_at(~%cure_slot%~)
+	PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%cure_slot_opcode%~) BEGIN
+		PHP_EACH ~fx_ids_%cure_slot_opcode%~ AS _ => cure_slot_id BEGIN
+			SET $cure_slot_ids(~%cure_slot_count%~) = cure_slot_id
+			SET cure_slot_count += 1
+		END
+	END
+	PATCH_IF cure_slot_opcode == 77 BEGIN
+		PHP_EACH cure_adds_77 AS cure_slot_id => _ BEGIN
+			SET $cure_slot_ids(~%cure_slot_count%~) = cure_slot_id
+			SET cure_slot_count += 1
+		END
+	END
+END
+
+// L'effet cure_id peut-il être réuni (cure_eligible) ?
+DEFINE_PATCH_MACRO ad_cure_eligible BEGIN
+	SET cure_opcode = $fx_opcode(~%cure_id%~)
+	SET cure_eligible = NOT $fx_consumed(~%cure_id%~) AND NOT $fx_external(~%cure_id%~) AND NOT $fx_cursed(~%cure_id%~)
+		AND $fx_exception_count(~%cure_id%~) == 0 AND $fx_versus_file(~%cure_id%~) == 0
+		AND NOT ($fx_not_cumulative(~%cure_id%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_ALWAYS_CUMULATIVE(~%cure_opcode%~))
+END
+
+// « Guérit la débilité mentale, les maladies et la cécité de la cible » : états des bits de
+// fx_cure_mask, dans l'ordre de la famille ; libellés AD_CURE_FAMILY_TRA + 20 + indice (« la cécité »)
+// et + 10 + indice (« de la cécité », forme « soi » : « Guérison de la cécité et de la surdité »).
+DEFINE_PATCH_MACRO ad_group_cures_line BEGIN
+	SET cure_tra = $AD_CURE_FAMILY_TRA(~%derived_kind%~)
+	SET cure_mask = $fx_cure_mask(~%group_id%~)
+	CLEAR_ARRAY cure_names
+	CLEAR_ARRAY cure_names_of
+	PHP_EACH ~AD_%derived_kind%_OPCODES~ AS cure_index => _ BEGIN
+		PATCH_IF (cure_mask BAND (1 BLSL cure_index)) != 0 BEGIN
+			LPF ad_tra INT_VAR tra_id = cure_tra + 20 + cure_index RET cure_name = text END // ~l'étourdissement~ (@30160020)
+			LPF ad_tra INT_VAR tra_id = cure_tra + 10 + cure_index RET cure_name_of = text END // ~de l'étourdissement~ (@30160010)
+			SPRINT $cure_names(~%cure_index%~) ~%cure_name%~
+			SPRINT $cure_names_of(~%cure_index%~) ~%cure_name_of%~
+		END
+	END
+	LPF ad_join STR_VAR array_name = ~cure_names~ RET cureList = text END
+	LPF ad_join STR_VAR array_name = ~cure_names_of~ RET cureListOf = text END
+	SET line_phrase = cure_tra + 100 // ~Guérison %cureListOf%~ (@30160100, + forme), ~Dissipation %cureListOf%~ (@30170100)
 END
 
 // absorb_same : l'effet absorb_id a la même portée, la même cible, les mêmes probabilités et le même
