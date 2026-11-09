@@ -2,7 +2,8 @@
 // parameter2 0 sorts profanes, 1 divins, 2 innés (3 à 5 : les mêmes, sans retour visuel) ; « Provoque
 // l'échec de 50 % des sorts profanes ». Avec AD_ENABLE_SHRINKAGE, les effets qui ne diffèrent que par
 // le type de sort sont réunis (ad_group_spell_types, new-lib/groups.tpp, fx_spell_types). L'ancien
-// moteur n'a pas de phrase à la forme « soi » probable : l'effet est alors refusé.
+// moteur n'a pas de phrase à la forme « soi » probable : l'effet est alors refusé. Une progression
+// selon le niveau du sort (fx_level_value, new-lib/spell_levels.tpp) remplace le pourcentage.
 
 DEFINE_PATCH_MACRO ad_op_60_support BEGIN
 	PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
@@ -31,6 +32,10 @@ DEFINE_PATCH_MACRO ad_op_60_lines BEGIN
 				END
 				SET value = $fx_parameter1(~%failure_id%~) BAND 255
 				SPRINT percent @1200003 // ~%value%%PERCENT%~
+				SPRINT failure_level_value $fx_level_value(~%failure_id%~)
+				PATCH_IF NOT (~%failure_level_value%~ STRING_EQUAL ~~) BEGIN
+					SPRINT percent ~%failure_level_value%~
+				END
 				SET line_phrase = 20600100 // ~Provoque l'échec de %percent% des sorts~
 				PATCH_IF failure_types != 7 BEGIN
 					LPF ad_spell_types_text INT_VAR types = failure_types RET spellType = text END

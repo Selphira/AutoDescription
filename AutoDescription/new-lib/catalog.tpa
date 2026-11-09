@@ -371,18 +371,25 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_PROGRESSION_OPCODES BEGIN
 	0 => 1 6 => 1 10 => 1 15 => 1 19 => 1 21 => 1 22 => 1 23 => 1 44 => 1 49 => 1 54 => 1 73 => 1 93 => 1
 	94 => 1 95 => 1 96 => 1 97 => 1 104 => 1 108 => 1 126 => 1 132 => 1 178 => 1 179 => 1 189 => 1
 	190 => 1 191 => 1 250 => 1 263 => 1 278 => 1 284 => 1 285 => 1 286 => 1 288 => 1 289 => 1
-	299 => 1 305 => 1 306 => 1 323 => 1 325 => 1
+	299 => 1 305 => 1 306 => 1 323 => 1 325 => 1 167 => 1
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1 166 => 1
 	173 => 1 502 => 1 503 => 1 504 => 1
 	12 => 1 17 => 1 18 => 1 111 => 1 218 => 1
 	33 => 1 34 => 1 35 => 1 36 => 1 37 => 1
+	60 => 1
+END
+
+// Opcodes de AD_LEVEL_PROGRESSION_OPCODES dont parameter2 est un type et non un mode : la valeur
+// s'ajoute toujours (opcode 60 : type de sort, IESDP).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_ADDED_VALUE_OPCODES BEGIN
+	60 => 1
 END
 
 // Opcodes de AD_LEVEL_PROGRESSION_OPCODES dont la progression s'écrit en pourcentage (ancien
 // opcodes_resistance de group_spell_effects_by_parameters).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_PERCENT_OPCODES BEGIN
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1 166 => 1
-	173 => 1 502 => 1 503 => 1 504 => 1
+	173 => 1 502 => 1 503 => 1 504 => 1 60 => 1
 END
 
 // Opcodes dont la progression nomme son unité (anciennes fonctions opcode_<N>_typed_value : « 1d6
@@ -395,7 +402,7 @@ END
 // valeur (fx_level_value) ; une progression d'un autre opcode est refusée tant que ses lignes ne
 // la lisent pas (new-lib/spell_levels.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_VALUE_OPCODES BEGIN
-	0 => 1 12 => 1 15 => 1 17 => 1 18 => 1 22 => 1 33 => 1 34 => 1 35 => 1 36 => 1 37 => 1 44 => 1 54 => 1 73 => 1 278 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1 325 => 1 108 => 1 323 => 1 333 => 1
+	0 => 1 12 => 1 15 => 1 17 => 1 18 => 1 22 => 1 33 => 1 34 => 1 35 => 1 36 => 1 37 => 1 44 => 1 54 => 1 73 => 1 278 => 1 111 => 1 132 => 1 166 => 1 189 => 1 190 => 1 218 => 1 250 => 1 325 => 1 108 => 1 323 => 1 333 => 1 60 => 1 167 => 1
 	27 => 1 28 => 1 29 => 1 30 => 1 31 => 1 84 => 1 85 => 1 86 => 1 87 => 1 88 => 1 89 => 1
 	502 => 1 503 => 1 504 => 1
 END

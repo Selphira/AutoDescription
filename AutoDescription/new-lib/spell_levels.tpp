@@ -353,7 +353,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 END
 
 // Progressions de la valeur (ancien group_spell_effects_by_parameters) : effet d'un opcode de
-// AD_LEVEL_PROGRESSION_OPCODES, de mode 0, 1 ou 2 (mot de poids faible pour l'opcode 12), semblable
+// AD_LEVEL_PROGRESSION_OPCODES, de mode 0, 1 ou 2 (mot de poids faible pour l'opcode 12, ajout pour ceux de
+// AD_LEVEL_ADDED_VALUE_OPCODES), semblable
 // à parameter1 et à la durée près, dont les valeurs suivent une formule ; les dés d'un effet des
 // opcodes 12 et 17 la précèdent (« 2d8 + 1 point de dégâts par niveau »). Des dégâts de l'opcode 12
 // (mode 0) peuvent aussi progresser par le nombre de dés, et à défaut par les dés et parameter1
@@ -372,6 +373,9 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 		// Opcode 0 : parameter2 donne les attaques concernées, un ajout ; seule la CA de base (16) est fixée.
 		ELSE PATCH_IF level_opcode == 0 BEGIN
 			SET level_mode = level_mode == AC_MOD_TYPE_set_base ? MOD_TYPE_flat : MOD_TYPE_cumulative
+		END
+		ELSE PATCH_IF VARIABLE_IS_SET $AD_LEVEL_ADDED_VALUE_OPCODES(~%level_opcode%~) BEGIN
+			SET level_mode = MOD_TYPE_cumulative
 		END
 		PATCH_IF $level_on(~%level_a%~) AND VARIABLE_IS_SET $AD_LEVEL_PROGRESSION_OPCODES(~%level_opcode%~)
 				AND level_mode >= MOD_TYPE_cumulative AND level_mode <= MOD_TYPE_percentage BEGIN
