@@ -106,8 +106,20 @@ DEFINE_PATCH_MACRO ~add_duration~ BEGIN
 	// permanent (get_duration_value) et suit la règle des autres durées.
 	SET hasDelay = timingMode == TIMING_delayed AND duration > 0
 	SET has_dice_duration = ~%complex_duration%~ STRING_CONTAINS_REGEXP ~ 1d[0-9]~ ? 0 : 1
+	// Un opcode que l'en-tête du sort ne compte pas garde sa durée, sauf si c'est la durée commune de l'en-tête.
+	SET headerIgnoredDuration = 0
+	PATCH_IF ignoreDuration AND VARIABLE_IS_SET spellHeaderDuration AND VARIABLE_IS_SET $opcodes_ignored_by_spell_header(~%opcode%~) BEGIN
+		SET lineSeconds = 0
+		PATCH_IF timingMode == TIMING_duration OR timingMode == TIMING_delayed_duration BEGIN
+			SET lineSeconds = duration
+		END
+		ELSE PATCH_IF timingMode == TIMING_duration_ticks BEGIN
+			SET lineSeconds = duration / 15
+		END
+		SET headerIgnoredDuration = NOT (spellHeaderDuration >= 0 AND lineSeconds == spellHeaderDuration)
+	END
 	PATCH_IF (hasDelay OR timingMode == 5000 OR timingMode == 5001 OR NOT VARIABLE_IS_SET $opcodes_ignore_duration(~%opcode%~)) AND
-			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR hasDelay OR timingMode == 5000 OR timingMode == 5001 OR has_dice_duration) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
+			 opcode != 177 AND opcode != 183 AND opcode != 283 AND (ignoreDuration == 0 OR headerIgnoredDuration OR hasDelay OR timingMode == 5000 OR timingMode == 5001 OR has_dice_duration) AND NOT ~%description%~ STRING_EQUAL ~~ BEGIN
 		PATCH_IF NOT ~%complex_duration%~ STRING_EQUAL ~~ BEGIN
 			SPRINT description ~%description% %complex_duration%~
 		END

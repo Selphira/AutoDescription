@@ -410,7 +410,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	140 => 0 // Graphics: Casting Glow [140]
 	141 => 0
 	142 => 0
-	144 => 0 // Button: Disable Button
 	147 => 0 // Spell: Learn Spell [147]
 	152 => 0 // Spell Effect: Play Movie [152]
 	155 => 0 // Overlay: Minor Globe [155]
@@ -442,7 +441,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~ignored_opcodes~ BEGIN
 	267 => 0
 	269 => 0 // Spell Effect: Shake Window [269]
 	271 => 0 // Graphics: Avatar Removal [271]
-	279 => 0 // Button: Enable Button
 	// 282 => 0 // Script: Scripting State Modifier [282]
 	287 => 0 // Graphics: Selection Circle Removal [287]
 	290 => 0 // Text: Change Title [290]
@@ -753,6 +751,12 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_duration~ BEGIN
 	526 => 1 // Protection: chance d'être sans effet sous une condition [526]
 END
 
+// Opcodes que l'en-tête d'un sort ne compte pas.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignored_by_spell_header~ BEGIN
+	144 => 1
+	279 => 1
+END
+
 ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	 11 => 1
 	 12 => 1
@@ -762,7 +766,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	 46 => 1
 	 77 => 1
 	 79 => 1
+	100 => 1
 	101 => 1
+	144 => 1
 	161 => 1
 	177 => 1
 	206 => 1
@@ -771,6 +777,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~opcodes_ignore_not_cumulable~ BEGIN
 	224 => 1
 	235 => 1
 	242 => 1
+	279 => 1
 	335 => 1
 	337 => 1
 	518 => 1 // Immunités aux sorts réunies (206)
@@ -5187,6 +5194,9 @@ DEFINE_PATCH_MACRO ~opcode_100_common~ BEGIN
 	PATCH_IF parameter1 == 0 BEGIN
 		SET strref += 1
 	END
+	ELSE PATCH_IF NOT ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+		SPRINT creatureType ~%custom_str%~
+	END
 	ELSE BEGIN
 		LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
 	END
@@ -5195,6 +5205,79 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_100_is_valid~ BEGIN
 	LPM ~opcode_idscheck8_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_100_group~ BEGIN
+	LOCAL_SPRINT creatureTypes ~~
+
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter1 != 0 AND ~%custom_str%~ STRING_EQUAL ~~ BEGIN
+			LPF ~opcode_100_group_members~ RET creatureTypes RET_ARRAY positions END
+			PATCH_IF NOT ~%creatureTypes%~ STRING_EQUAL ~~ BEGIN
+				PATCH_PHP_EACH positions AS _ => position1 BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position1
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Comme dans opcode_145_group : le tableau garde sinon son dernier élément.
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
+				SPRINT custom_str ~%creatureTypes%~
+				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_100_group_members~
+	RET
+		creatureTypes
+	RET_ARRAY
+		positions
+BEGIN
+	SPRINT creatureTypes ~~
+	SET match_position     = position
+	SET match_isExternal   = isExternal
+	SET match_target       = target
+	SET match_power        = power
+	SET match_timingMode   = timingMode
+	SET match_resistance   = resistance
+	SET match_duration     = duration
+	SET match_probability1 = probability1
+	SET match_probability2 = probability2
+	SET match_diceCount    = diceCount
+	SET match_diceSides    = diceSides
+	SET match_saveType     = saveType
+	SET match_saveBonus    = saveBonus
+	SET match_special      = special
+	SET match_parameter3   = parameter3
+	SET match_parameter4   = parameter4
+	SPRINT match_target_type ~%target_type%~
+	CLEAR_ARRAY positions
+	CLEAR_ARRAY opcode_100_names
+	SET $positions(~%position%~) = position
+	LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+	SPRINT $opcode_100_names(~%creatureType%~) ~~
+	SET members = 0
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		LPM ~opcode_match_opcode_100_group~
+		PATCH_IF match BEGIN
+			SET members += 1
+			SET $positions(~%position%~) = position
+			LPF ~get_ids_name~ INT_VAR entry = ~%parameter1%~ file = ~%parameter2%~ RET creatureType = idName END
+			SPRINT $opcode_100_names(~%creatureType%~) ~~
+		END
+	END
+	PATCH_IF members > 0 BEGIN
+		SPRINT glue @11000010 // ~, des ~
+		SPRINT finalGlue @11000011 // ~ et des ~
+		LPF ~implode~ STR_VAR array_name = ~opcode_100_names~ glue = EVAL ~%glue%~ final_glue = EVAL ~%finalGlue%~ RET creatureTypes = text END
+	END
 END
 
 /* ----------------------------- *
@@ -7807,14 +7890,110 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_144~ BEGIN
 END
 
 DEFINE_PATCH_MACRO ~opcode_144_common~ BEGIN
-	LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche %theTarget% d'utiliser xxx~
+	LOCAL_SET buttons = custom_int
+	LOCAL_SET button = 0
+	LOCAL_SET buttonListStrref = strref >= 11440021 ? 11440121 : 11440101
+	LOCAL_SPRINT buttonName ~~
+	LOCAL_SPRINT buttonList ~~
+	LOCAL_SPRINT and ~~
+	PATCH_IF custom_int > 0 BEGIN
+		PATCH_IF (buttons BAND (1 << 2)) != 0 BEGIN
+			SET buttons = buttons BAND (BNOT ((1 << 3) BOR (1 << 4) BOR (1 << 5)))
+		END
+		PATCH_IF (buttons BAND (1 << 8)) != 0 BEGIN
+			SET buttons = buttons BAND (BNOT ((1 << 9) BOR (1 << 11) BOR (1 << 12)))
+		END
+		CLEAR_ARRAY opcode_144_names
+		FOR (button = 0; button < 16; ++button) BEGIN
+			PATCH_IF (buttons BAND (1 << button)) != 0 BEGIN
+				LPF ~getTranslation~ INT_VAR strref = buttonListStrref + button opcode RET buttonName = string END // ~des sorts~
+				SPRINT $opcode_144_names(~%buttonName%~) ~~
+			END
+		END
+		SPRINT and @100021 // ~et~
+		LPF ~implode~ STR_VAR array_name = ~opcode_144_names~ final_glue = EVAL ~ %and% ~ RET buttonList = text END
+		SET strref = buttonListStrref == 11440121 ? 11440061 : 11440060
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~%action% l'utilisation %buttonList%~
+	END
+	ELSE BEGIN
+		LPF ~getTranslation~ INT_VAR strref opcode RET description = string END // ~Empêche %theTarget% d'utiliser xxx~
+	END
 END
 
+// Le bouton des discussions (7) n'intéresse pas le joueur : l'effet est ignoré.
 DEFINE_PATCH_MACRO ~opcode_144_is_valid~ BEGIN
 	PATCH_IF parameter2 < 0 OR parameter2 > 15 OR
 			 NOT is_ee AND (parameter2 == 15 OR parameter2 == 10) BEGIN
 		SET isValid = 0
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode% : Invalid button %parameter2%.~ END
+	END
+	ELSE PATCH_IF parameter2 == 7 BEGIN
+		SET isValid = 0
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_144_group~ BEGIN
+	LOCAL_SET group = 0
+	LOCAL_SET buttons = 0
+	LOCAL_SET button = 0
+
+	PATCH_PHP_EACH ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF custom_int == 0 BEGIN
+			SET group = 0
+			SET buttons = 1 << parameter2
+			CLEAR_ARRAY positions
+			PATCH_DEFINE_ASSOCIATIVE_ARRAY ~positions~ BEGIN
+				~%parameter2%~ => ~%position%~
+			END
+			FOR (button = 0; button < 16; ++button) BEGIN
+				PATCH_IF button != parameter2 BEGIN
+					LPF ~get_opcode_position~
+						INT_VAR opcode
+							match_position     = position
+							match_custom_int   = 0
+							match_target       = target
+							match_probability1 = probability1
+							match_probability2 = probability2
+							match_parameter1   = parameter1
+							match_parameter2   = button
+							match_parameter3   = parameter3
+							match_parameter4   = parameter4
+							match_timingMode   = timingMode
+							match_resistance   = resistance
+							match_duration     = duration
+							match_power        = power
+							match_diceCount    = diceCount
+							match_diceSides    = diceSides
+							match_saveType     = saveType
+							match_saveBonus    = saveBonus
+							match_special      = special
+						STR_VAR match_macro = ~opcode_match_opcode_60_145_group~ match_target_type = ~%target_type%~
+						RET opcodePosition = position
+					END
+					PATCH_IF opcodePosition >= 0 BEGIN
+						SET group = 1
+						SET buttons |= 1 << button
+						SET $positions(~%button%~) = opcodePosition
+					END
+				END
+			END
+			PATCH_IF group == 1 BEGIN
+				PATCH_PHP_EACH positions AS _ => position1 BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = position1
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Comme dans opcode_145_group : le tableau garde sinon son dernier élément.
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
+				SET custom_int = buttons
+				LPM ~add_opcode~
+			END
+		END
 	END
 END
 
@@ -9291,8 +9470,8 @@ DEFINE_PATCH_MACRO ~opcode_group_by_target~ BEGIN
 				SET $to_delete(~%currentPosition%~) = 1
 				SET position += 1000
 				// Nombre d'effets réunis, sauf pour les opcodes dont custom_int est un masque ou un indicateur
-				// (types de sort des 60, 99 et 145, niveau du 200, durée des 112 et 171).
-				PATCH_IF opcode != 60 AND opcode != 99 AND opcode != 145 AND opcode != 200 AND opcode != 112 AND opcode != 171 BEGIN
+				// (types de sort des 60, 99 et 145, boutons des 144 et 279, niveau du 200, durée des 112 et 171).
+				PATCH_IF opcode != 60 AND opcode != 99 AND opcode != 145 AND opcode != 144 AND opcode != 279 AND opcode != 200 AND opcode != 112 AND opcode != 171 BEGIN
 					SET custom_int = count
 				END
 				PATCH_IF ~%target_type%~ STRING_EQUAL ~0:000~ BEGIN
@@ -13798,6 +13977,10 @@ END
 
 DEFINE_PATCH_MACRO ~opcode_279_is_valid~ BEGIN
 	LPM ~opcode_144_is_valid~
+END
+
+DEFINE_PATCH_MACRO ~opcode_279_group~ BEGIN
+	LPM ~opcode_144_group~
 END
 
 /* ------------------------------ *
@@ -18975,6 +19158,30 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_60_145_group~ BEGIN
 		AND match_special      == special
 		AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
     )
+END
+
+DEFINE_PATCH_MACRO ~opcode_match_opcode_100_group~ BEGIN
+	SET match = (
+		    match_position     != position
+		AND parameter1         != 0
+		AND ~%custom_str%~ STRING_EQUAL ~~
+		AND match_isExternal   == isExternal
+		AND match_target       == target
+		AND match_power        == power
+		AND match_timingMode   == timingMode
+		AND match_resistance   == resistance
+		AND match_duration     == duration
+		AND match_probability1 == probability1
+		AND match_probability2 == probability2
+		AND match_diceCount    == diceCount
+		AND match_diceSides    == diceSides
+		AND match_saveType     == saveType
+		AND match_saveBonus    == saveBonus
+		AND match_special      == special
+		AND match_parameter3   == parameter3
+		AND match_parameter4   == parameter4
+		AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
+	)
 END
 
 DEFINE_PATCH_MACRO ~opcode_match_opcode_219_group~ BEGIN

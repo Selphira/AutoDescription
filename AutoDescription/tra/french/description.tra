@@ -2701,6 +2701,8 @@
 @11000004 = ~Immunise %theTarget% contre les attaques et les sorts de toutes les créatures~
 @11000005 = ~de résister aux attaques et aux sorts des %creatureType%~
 @11000006 = ~de résister aux attaques et aux sorts de toutes les créatures~
+@11000010 = ~, des ~
+@11000011 = ~ et des ~
 
 // Opcode 101: Protection: from Opcode [101]
 
@@ -3024,6 +3026,40 @@
 @11440036 = ~%action% d'utiliser l'inventaire~
 @11440040 = ~Empêche %theTarget%~ // Action
 @11440041 = ~d'empêcher %theTarget%~ // Action
+@11440060 = ~%action% l'utilisation %buttonList%~
+@11440061 = ~%action% d'utiliser %buttonList%~
+@11440101 = ~du camouflage dans l'ombre~
+@11440102 = ~des compétences de roublard~
+@11440103 = ~des sorts~
+@11440104 = ~du premier sort rapide~
+@11440105 = ~du second sort rapide~
+@11440106 = ~du troisième sort rapide~
+@11440107 = ~de Repousser les morts-vivants~
+@11440108 = ~des discussions~
+@11440109 = ~des objets~
+@11440110 = ~du premier objet rapide~
+@11440111 = ~des chants de barde et des danses de shaman~
+@11440112 = ~du second objet rapide~
+@11440113 = ~du troisième objet rapide~
+@11440114 = ~des sorts innés~
+@11440115 = ~de la détection des pièges et des illusions~
+@11440116 = ~de l'inventaire~
+@11440121 = ~le camouflage dans l'ombre~
+@11440122 = ~les compétences de roublard~
+@11440123 = ~les sorts~
+@11440124 = ~le premier sort rapide~
+@11440125 = ~le second sort rapide~
+@11440126 = ~le troisième sort rapide~
+@11440127 = ~Repousser les morts-vivants~
+@11440128 = ~les discussions~
+@11440129 = ~les objets~
+@11440130 = ~le premier objet rapide~
+@11440131 = ~les chants de barde et les danses de shaman~
+@11440132 = ~le second objet rapide~
+@11440133 = ~le troisième objet rapide~
+@11440134 = ~les sorts innés~
+@11440135 = ~la détection des pièges et des illusions~
+@11440136 = ~l'inventaire~
 
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]
