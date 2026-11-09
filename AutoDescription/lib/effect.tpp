@@ -744,10 +744,10 @@ DEFINE_PATCH_MACRO ~group_duration_range~ BEGIN
 			SET $durationRangeChecked(~%position%~) = durationRangePass
 			CLEAR_ARRAY durationRangePositions
 			SET $durationRangePositions(~%position%~) = probability
+			SET $durationRangeSeconds(~%position%~) = duration
 			SET rangePosition = position
-			SET unitDuration = duration
+			SET minDuration = duration
 			SET maxDuration = duration
-			SET sumDuration = duration
 			SET rangeLow = probability2
 			SET rangeHigh = probability1 > 99 ? 99 : probability1
 			SET rangeTotal = probability
@@ -759,32 +759,42 @@ DEFINE_PATCH_MACRO ~group_duration_range~ BEGIN
 					PATCH_IF match == 1 BEGIN
 						SET $durationRangeChecked(~%match_position%~) = durationRangePass
 						SET $durationRangePositions(~%match_position%~) = match_probability
+						SET $durationRangeSeconds(~%match_position%~) = match_duration
 						SET rangeCount += 1
-						SET unitDuration = match_duration < unitDuration ? match_duration : unitDuration
+						SET minDuration = match_duration < minDuration ? match_duration : minDuration
 						SET maxDuration = match_duration > maxDuration ? match_duration : maxDuration
-						SET sumDuration += match_duration
 						SET rangeLow = match_probability2 < rangeLow ? match_probability2 : rangeLow
 						SET rangeHigh = match_probability1 > rangeHigh ? (match_probability1 > 99 ? 99 : match_probability1) : rangeHigh
 						SET rangeTotal += match_probability
 					END
 				END
 			END
-			SET isDiceDuration = rangeCount > 1 AND rangeTotal == rangeHigh - rangeLow + 1
-				AND maxDuration == unitDuration * rangeCount
-				AND sumDuration == unitDuration * rangeCount * (rangeCount + 1) / 2
+			// Durées k, k+1… k+N-1 fois une unité (PXW3CRA1 : 2 à 5 rounds, « 1d4 +1 rounds ») : chaque
+			// durée a son propre rang dans cette suite (masque des rangs, au plus 30 durées).
+			SET isDiceDuration = rangeCount > 1 AND rangeCount <= 30 AND rangeTotal == rangeHigh - rangeLow + 1
+				AND (maxDuration - minDuration) MODULO (rangeCount - 1) == 0
 			PATCH_IF isDiceDuration BEGIN
-				PATCH_PHP_EACH durationRangePositions AS _ => slice BEGIN
-					PATCH_IF ABS (slice * rangeCount - rangeTotal) > rangeCount BEGIN
+				SET stepDuration = (maxDuration - minDuration) / (rangeCount - 1)
+				SET isDiceDuration = stepDuration > 0 AND minDuration MODULO stepDuration == 0
+			END
+			PATCH_IF isDiceDuration BEGIN
+				SET rankMask = 0
+				PATCH_PHP_EACH durationRangePositions AS rangeMember => slice BEGIN
+					SET rankOffset = $durationRangeSeconds(~%rangeMember%~) - minDuration
+					SET rankBit = 1 << (rankOffset / stepDuration)
+					PATCH_IF ABS (slice * rangeCount - rangeTotal) > rangeCount
+							OR rankOffset MODULO stepDuration != 0 OR (rankMask BAND rankBit) != 0 BEGIN
 						SET isDiceDuration = 0
 					END
+					SET rankMask = rankMask BOR rankBit
 				END
 			END
 			PATCH_IF isDiceDuration BEGIN
 				SPRINT durationRangeText ~~
 				PATCH_PHP_EACH durations AS divisor => unitStrref BEGIN
-					PATCH_IF unitDuration MODULO divisor == 0 AND ~%durationRangeText%~ STRING_EQUAL ~~ BEGIN
-						PATCH_IF unitDuration == divisor BEGIN
-							SPRINT amount ~1d%rangeCount%~
+					PATCH_IF stepDuration MODULO divisor == 0 AND ~%durationRangeText%~ STRING_EQUAL ~~ BEGIN
+						PATCH_IF stepDuration == divisor BEGIN
+							LPF ~get_damage_value~ INT_VAR diceCount = 1 diceSides = rangeCount damageAmount = minDuration / stepDuration - 1 RET amount = damage END
 							SET unitStrref += 1
 							SPRINT strDuration (AT unitStrref)
 							SPRINT durationRangeText @100311 // ~pendant %strDuration%~
@@ -807,7 +817,7 @@ DEFINE_PATCH_MACRO ~group_duration_range~ BEGIN
 						CLEAR_ARRAY ~opcodes_%opcode%~
 					END
 					SET position = rangePosition
-					SET duration = unitDuration
+					SET duration = stepDuration
 					SET probability1 = rangeHigh
 					SET probability2 = rangeLow
 					SET probability = rangeTotal
