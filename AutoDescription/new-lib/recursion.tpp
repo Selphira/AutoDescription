@@ -48,6 +48,8 @@ DEFINE_PATCH_MACRO ad_recursion_reset BEGIN
 	SET ctx_area_phrase = 0
 	SET ctx_area_varies = 0
 	SET ctx_ignore_duration = 0
+	// Durée unique de l'en-tête du sort décrit (ad_spell_statistics) ; -1 dans un sous-sort, -2 ailleurs.
+	SET ctx_header_seconds = 0 - 2
 	SET ctx_ignore_save = 0
 	SET ctx_casting_level = 0
 	SET ctx_base_probability = 100
@@ -528,6 +530,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_force_target = 0
 		ctx_force_keep_self = 0
 		ctx_ignore_duration = 0
+		ctx_header_seconds = 0 - 1
 		ctx_versus_set = 0
 		ctx_parent_dice = 0
 		ctx_hit_target = 0

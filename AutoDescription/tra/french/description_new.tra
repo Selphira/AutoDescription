@@ -2661,7 +2661,9 @@
 @20990152 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990026
 @20990153 = ~d'allonger de %duration% la durée des chants de barde %ofTheTarget%~ // reprise de @10990026
 
-// Opcode 100 : Protection contre un type de créature : phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
+// Opcode 100 : Protection contre un type de créature : 0000-0001 liaisons des types réunis, phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
+@21000000 = ~, des ~ // reprise de @11000010
+@21000001 = ~ et des ~ // reprise de @11000011
 @21000100 = ~Immunité contre les attaques et les sorts des %creatureType%~ // reprise de @11000001
 @21000101 = ~Immunise %theTarget% contre les attaques et les sorts des %creatureType%~ // reprise de @11000003
 @21000102 = ~de résister aux attaques et aux sorts des %creatureType%~ // reprise de @11000005
@@ -2952,7 +2954,7 @@
 @21430102 = ~de créer 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~ // reprise de @11430002
 @21430103 = ~de créer 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~ // reprise de @11430002
 
-// Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
+// Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015) ; boutons réunis : phrases 21 441 200-21 441 201, noms 21 441 300 + parameter2 et 21 441 400 + parameter2
 @21440100 = ~Empêche~ // reprise de @11440050
 @21440101 = ~Empêche %theTarget%~ // reprise de @11440040
 @21440102 = ~d'empêcher~ // reprise de @11440051
@@ -2989,6 +2991,40 @@
 @21441113 = ~%action% d'utiliser les sorts innés~ // reprise de @11440034
 @21441114 = ~%action% d'utiliser la détection des pièges et des illusions~ // reprise de @11440035
 @21441115 = ~%action% d'utiliser l'inventaire~ // reprise de @11440036
+@21441200 = ~%action% l'utilisation %buttonList%~ // reprise de @11440060
+@21441201 = ~%action% d'utiliser %buttonList%~ // reprise de @11440061
+@21441300 = ~du camouflage dans l'ombre~ // reprise de @11440101
+@21441301 = ~des compétences de roublard~ // reprise de @11440102
+@21441302 = ~des sorts~ // reprise de @11440103
+@21441303 = ~du premier sort rapide~ // reprise de @11440104
+@21441304 = ~du second sort rapide~ // reprise de @11440105
+@21441305 = ~du troisième sort rapide~ // reprise de @11440106
+@21441306 = ~de Repousser les morts-vivants~ // reprise de @11440107
+@21441307 = ~des discussions~ // reprise de @11440108
+@21441308 = ~des objets~ // reprise de @11440109
+@21441309 = ~du premier objet rapide~ // reprise de @11440110
+@21441310 = ~des chants de barde et des danses de shaman~ // reprise de @11440111
+@21441311 = ~du second objet rapide~ // reprise de @11440112
+@21441312 = ~du troisième objet rapide~ // reprise de @11440113
+@21441313 = ~des sorts innés~ // reprise de @11440114
+@21441314 = ~de la détection des pièges et des illusions~ // reprise de @11440115
+@21441315 = ~de l'inventaire~ // reprise de @11440116
+@21441400 = ~le camouflage dans l'ombre~ // reprise de @11440121
+@21441401 = ~les compétences de roublard~ // reprise de @11440122
+@21441402 = ~les sorts~ // reprise de @11440123
+@21441403 = ~le premier sort rapide~ // reprise de @11440124
+@21441404 = ~le second sort rapide~ // reprise de @11440125
+@21441405 = ~le troisième sort rapide~ // reprise de @11440126
+@21441406 = ~Repousser les morts-vivants~ // reprise de @11440127
+@21441407 = ~les discussions~ // reprise de @11440128
+@21441408 = ~les objets~ // reprise de @11440129
+@21441409 = ~le premier objet rapide~ // reprise de @11440130
+@21441410 = ~les chants de barde et les danses de shaman~ // reprise de @11440131
+@21441411 = ~le second objet rapide~ // reprise de @11440132
+@21441412 = ~le troisième objet rapide~ // reprise de @11440133
+@21441413 = ~les sorts innés~ // reprise de @11440134
+@21441414 = ~la détection des pièges et des illusions~ // reprise de @11440135
+@21441415 = ~l'inventaire~ // reprise de @11440136
 
 // Opcode 145 : phrases 0100 types de sort nommés, 0110 tous les sorts (21 450 000-21 450 999)
 @21450100 = ~Empêche %theTarget% de lancer des sorts %spellType%~ // reprise de @11450000

@@ -130,6 +130,14 @@ END
 
 // Opcodes dont les lignes ne disent jamais « non cumulatif » (ancien opcodes_ignore_not_cumulable,
 // application d'un 321 sur la ressource elle-même, new-lib/opcodes/321.tpp).
+// Opcodes que l'en-tête d'un sort ne compte pas (durée, jet de sauvegarde, dissipation, résistance à
+// la magie) : leurs lignes gardent leur durée, sauf si c'est la durée unique de l'en-tête
+// (ad_application_duration, new-lib/application.tpp ; ancien opcodes_ignored_by_spell_header).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_HEADER_IGNORED BEGIN
+	144 => 1
+	279 => 1
+END
+
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
 	11  => 1
 	12  => 1
@@ -139,7 +147,9 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
 	46  => 1
 	77  => 1
 	79  => 1
+	100 => 1
 	101 => 1
+	144 => 1
 	161 => 1
 	177 => 1
 	206 => 1
@@ -148,6 +158,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
 	224 => 1
 	235 => 1
 	242 => 1
+	279 => 1
 	335 => 1
 	337 => 1
 END

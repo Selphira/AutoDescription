@@ -367,6 +367,18 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	// L'en-tête du sort ne compte pas les effets de lancement : leur durée est toujours écrite.
 	SPRINT app_duration_block $fx_block(~%line_fx%~)
 	SET app_hide_duration = ctx_ignore_duration AND NOT (~%app_duration_block%~ STRING_EQUAL ~casting~)
+	// Un opcode que l'en-tête du sort ne compte pas garde sa durée, sauf si c'est la durée unique de
+	// l'en-tête (ctx_header_seconds, AD_OPCODES_HEADER_IGNORED).
+	PATCH_IF app_hide_duration AND ctx_header_seconds > 0 - 2 AND VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%app_opcode%~) BEGIN
+		SET app_line_seconds = 0
+		PATCH_IF app_timing == TIMING_duration OR app_timing == TIMING_delayed_duration BEGIN
+			SET app_line_seconds = app_duration
+		END
+		ELSE PATCH_IF app_timing == TIMING_duration_ticks BEGIN
+			SET app_line_seconds = app_duration / 15
+		END
+		SET app_hide_duration = ctx_header_seconds >= 0 AND app_line_seconds == ctx_header_seconds
+	END
 	PATCH_IF app_header >= 0 BEGIN
 		SET app_hide_duration = app_hide_duration OR $charged_global_duration(~%app_header%~) > 0
 	END

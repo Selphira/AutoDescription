@@ -16,6 +16,7 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 	// Les lignes, et celles des sous-sorts, taisent la durée et le jet de sauvegarde que l'en-tête
 	// écrit (ancien ignoreDuration et ignoreSavingThrow).
 	SET ctx_ignore_duration = header_hide_duration
+	SET ctx_header_seconds = header_common_seconds
 	SET ctx_ignore_save = header_hide_save
 	SET statistics_sections = 1
 	SPRINT $statistics_section(~0~) ~ability0~

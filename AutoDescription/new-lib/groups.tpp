@@ -78,6 +78,14 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 		PATCH_IF AD_SHRINK_IMMUNITIES_SINGLE_LINE AND VARIABLE_IS_SET $fx_opcode_count(~101~) AND VARIABLE_IS_SET $fx_opcode_count(~106~) BEGIN
 			LPM ad_group_panic_immunity
 		END
+		PATCH_FOR_EACH button_opcode IN 144 279 BEGIN
+			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%button_opcode%~) BEGIN
+				LPM ad_group_buttons
+			END
+		END
+		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~100~) BEGIN
+			LPM ad_group_creature_types
+		END
 		PATCH_FOR_EACH group_spell_opcode IN 60 145 99 BEGIN
 			SET group_spell_max_type = group_spell_opcode == 99 ? 1 : 2
 			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%group_spell_opcode%~) BEGIN

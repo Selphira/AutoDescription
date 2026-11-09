@@ -2661,7 +2661,9 @@
 @20990152 = ~to increase bard song duration %ofTheTarget% by %duration%~ // reprise de @10990026
 @20990153 = ~to increase bard song duration %ofTheTarget% by %duration%~ // reprise de @10990026
 
-// Opcode 100 : Protection contre un type de créature : phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
+// Opcode 100 : Protection contre un type de créature : 0000-0001 liaisons des types réunis, phrases 0100 créatures nommées, 0110 toutes les créatures (21 000 000-21 000 999)
+@21000000 = ~, ~ // reprise de @11000010
+@21000001 = ~ and ~ // reprise de @11000011
 @21000100 = ~Protects from %creatureType% attacks and spells~ // reprise de @11000001
 @21000101 = ~Protects %theTarget% from %creatureType% attacks and spells~ // reprise de @11000003
 @21000102 = ~to protect from %creatureType% attacks and spells~ // reprise de @11000005
@@ -2952,7 +2954,7 @@
 @21430102 = ~to create 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430002
 @21430103 = ~to create 1 "%itemName%" at %slotName% slot %ofTheTarget%~ // reprise de @11430002
 
-// Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015)
+// Opcode 144 : phrases (21 440 100-21 440 999), variantes selon le bouton, 21 441 000 + parameter2 (21 441 000-21 441 015) ; boutons réunis : phrases 21 441 200-21 441 201, noms 21 441 300 + parameter2 et 21 441 400 + parameter2
 @21440100 = ~Prevents~ // reprise de @11440050
 @21440101 = ~Prevents %theTarget%~ // reprise de @11440040
 @21440102 = ~to prevent~ // reprise de @11440051
@@ -2989,6 +2991,40 @@
 @21441113 = ~%action% to use innate spells~ // reprise de @11440034
 @21441114 = ~%action% to use Find traps~ // reprise de @11440035
 @21441115 = ~%action% to use inventory~ // reprise de @11440036
+@21441200 = ~%action% the use of %buttonList%~ // reprise de @11440060
+@21441201 = ~%action% to use %buttonList%~ // reprise de @11440061
+@21441300 = ~Hide in shadows~ // reprise de @11440101
+@21441301 = ~thief skills~ // reprise de @11440102
+@21441302 = ~spells~ // reprise de @11440103
+@21441303 = ~the first quick spell~ // reprise de @11440104
+@21441304 = ~the second quick spell~ // reprise de @11440105
+@21441305 = ~the third quick spell~ // reprise de @11440106
+@21441306 = ~Turn undead~ // reprise de @11440107
+@21441307 = ~talks~ // reprise de @11440108
+@21441308 = ~items~ // reprise de @11440109
+@21441309 = ~the first quick item~ // reprise de @11440110
+@21441310 = ~bard songs and shaman dances~ // reprise de @11440111
+@21441311 = ~the second quick item~ // reprise de @11440112
+@21441312 = ~the third quick item~ // reprise de @11440113
+@21441313 = ~innate spells~ // reprise de @11440114
+@21441314 = ~Find traps~ // reprise de @11440115
+@21441315 = ~the inventory~ // reprise de @11440116
+@21441400 = ~Hide in shadows~ // reprise de @11440121
+@21441401 = ~thief skills~ // reprise de @11440122
+@21441402 = ~spells~ // reprise de @11440123
+@21441403 = ~first quick spell~ // reprise de @11440124
+@21441404 = ~second quick spell~ // reprise de @11440125
+@21441405 = ~third quick spell~ // reprise de @11440126
+@21441406 = ~Turn undead~ // reprise de @11440127
+@21441407 = ~talks~ // reprise de @11440128
+@21441408 = ~items~ // reprise de @11440129
+@21441409 = ~first quick item~ // reprise de @11440130
+@21441410 = ~bard songs and shaman dances~ // reprise de @11440131
+@21441411 = ~second quick item~ // reprise de @11440132
+@21441412 = ~third quick item~ // reprise de @11440133
+@21441413 = ~innate spells~ // reprise de @11440134
+@21441414 = ~Find traps~ // reprise de @11440135
+@21441415 = ~inventory~ // reprise de @11440136
 
 // Opcode 145 : phrases 0100 types de sort nommés, 0110 tous les sorts (21 450 000-21 450 999)
 @21450100 = ~Disables %theTarget% to cast %spellType% spells~ // reprise de @11450000

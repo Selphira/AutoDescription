@@ -41,3 +41,42 @@ DEFINE_PATCH_MACRO ad_op_100_variant BEGIN
 	SET state_variant = $fx_parameter1(~%line_fx%~) == 0 ? 1 : 0
 	SPRINT creatureType $fx_versus_name(~%line_fx%~)
 END
+
+// Protections contre des types de créatures nommés réunies (anciennes lignes séparées) : chaque effet
+// réunit les autres effets de l'opcode contre un type nommé qui ont les mêmes champs, parameter1 et
+// parameter2 mis à part, et le même type de créature (177) ; ses noms, sans doublon et dans l'ordre
+// des effets, deviennent « morts-vivants, des goules et des ombres » (fx_versus_name).
+DEFINE_PATCH_MACRO ad_group_creature_types BEGIN
+	SPRINT creature_glue @21000000 // ~, des ~
+	SPRINT creature_final_glue @21000001 // ~ et des ~
+	PHP_EACH fx_ids_100 AS _ => group_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_parameter1(~%group_id%~) != 0 BEGIN
+			SET group_merged = 0
+			SET same_id = group_id
+			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
+			CLEAR_ARRAY creature_type_names
+			SPRINT creature_type_name $fx_versus_name(~%group_id%~)
+			SPRINT $creature_type_names(~%creature_type_name%~) ~%creature_type_name%~
+			PHP_EACH fx_ids_100 AS _ => group_candidate BEGIN
+				PATCH_IF group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) AND $fx_parameter1(~%group_candidate%~) != 0 BEGIN
+					SET same_other = group_candidate
+					LPM ad_fx_same_fields
+					PATCH_IF fx_same AND $fx_versus_file(~%group_id%~) == $fx_versus_file(~%group_candidate%~)
+							AND $fx_versus_value(~%group_id%~) == $fx_versus_value(~%group_candidate%~)
+							AND $fx_versus_inner_file(~%group_id%~) == $fx_versus_inner_file(~%group_candidate%~)
+							AND $fx_versus_inner_value(~%group_id%~) == $fx_versus_inner_value(~%group_candidate%~) BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
+						SET $fx_group_anchor(~%group_candidate%~) = group_id
+						SPRINT creature_type_name $fx_versus_name(~%group_candidate%~)
+						SPRINT $creature_type_names(~%creature_type_name%~) ~%creature_type_name%~
+						SET group_merged = 1
+					END
+				END
+			END
+			PATCH_IF group_merged BEGIN
+				LPF ad_join STR_VAR array_name = ~creature_type_names~ glue = EVAL ~%creature_glue%~ final_glue = EVAL ~%creature_final_glue%~ RET creature_types = text END
+				SPRINT $fx_versus_name(~%group_id%~) ~%creature_types%~
+			END
+		END
+	END
+END

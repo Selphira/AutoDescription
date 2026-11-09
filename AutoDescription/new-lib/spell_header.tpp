@@ -548,7 +548,9 @@ END
 // qu'aucun autre ne l'a contredit ensuite. L'opcode 213 rend la durée « Spéciale ». Les opcodes 318,
 // 321 et 324 qui visent le sort lui-même ne comptent pas. header_has_duration : 0 si la durée est
 // permanente ou instantanée (ligne « Dissipation ») ; header_hide_duration : 0 si elle est
-// « Spéciale », les lignes écrivant alors leurs durées (ancien ignoreDuration).
+// « Spéciale », les lignes écrivant alors leurs durées (ancien ignoreDuration) ; header_common_seconds :
+// durée de tous les en-têtes quand elle ne varie pas (0 : permanente ou instantanée), sinon -1.
+// Les opcodes de AD_OPCODES_HEADER_IGNORED ne comptent pas.
 DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 	SET header_hide_duration = 1
 	SET duration_valid = 1
@@ -572,7 +574,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 			PATCH_IF duration_protection AND duration_sub_scan AND NOT (~%duration_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
 				LPF ad_spell_has_effect STR_VAR resref = ~%duration_resource%~ resource = ~%spell_self%~ RET duration_parent = found END
 			END
-			PATCH_IF NOT (duration_protection AND (~%duration_resource%~ STRING_EQUAL ~%spell_self%~ OR duration_parent)) BEGIN
+			PATCH_IF NOT (duration_protection AND (~%duration_resource%~ STRING_EQUAL ~%spell_self%~ OR duration_parent)) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%duration_opcode%~) BEGIN
 				SET duration_timing = $fx_timing(~%duration_id%~)
 				SET duration_seconds = $fx_duration(~%duration_id%~)
 				// Une série prend le dernier délai pour durée (ancien timing 5000 ou 5001).
@@ -632,6 +634,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 		END
 	END
 	SET header_has_duration = 1
+	SET header_common_seconds = 0 - 1
 	PATCH_IF duration_special BEGIN
 		SPRINT value @7000011 // ~Spéciale~
 		SET header_hide_duration = 0
@@ -653,6 +656,7 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 			END
 			ELSE PATCH_IF complex_permanent BEGIN
 				SET header_has_duration = 0
+				SET header_common_seconds = projectile_used ? 0 - 1 : 0
 				PATCH_IF duration_instant == 1 BEGIN
 					SPRINT value @7000014 // ~Instantanée~
 					PATCH_IF VARIABLE_IS_SET header_scan_subs AND header_scan_subs BEGIN
@@ -669,6 +673,14 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 			END
 			ELSE BEGIN
 				SPRINT value ~%complex_text%~
+				PATCH_IF NOT projectile_used AND duration_count > 0 BEGIN
+					SET header_common_seconds = $duration_value(~0~)
+					FOR (duration_k = 1; duration_k < duration_count; ++duration_k) BEGIN
+						PATCH_IF $duration_value(~%duration_k%~) != $duration_value(~0~) BEGIN
+							SET header_common_seconds = 0 - 1
+						END
+					END
+				END
 			END
 		END
 		// Durée variable : celle des projectiles est écrite telle quelle, même vide si elle est nulle.
@@ -1017,7 +1029,7 @@ BEGIN
 			SET save_id = $EVAL ~spell_fx_%save_h%~(~%save_n%~)
 			SET save_opcode = $EVAL ~spell_fx_opcode_%save_h%~(~%save_n%~)
 			SPRINT save_resource $fx_resource_lower(~%save_id%~)
-			PATCH_IF save_opcode != 318 AND save_opcode != 321 AND save_opcode != 324 AND NOT (~%save_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
+			PATCH_IF save_opcode != 318 AND save_opcode != 321 AND save_opcode != 324 AND NOT (~%save_resource%~ STRING_EQUAL ~%spell_self%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%save_opcode%~) BEGIN
 				SET save_effect_type = $fx_save_type(~%save_id%~) BAND 0b111111
 				SET save_effect_bonus = $fx_save_bonus(~%save_id%~)
 				SET save_own_type = save_own_type OR save_effect_type > 0
@@ -1161,13 +1173,18 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 	SPRINT save_bonus_text ~~
 	SET save_bonus_valid = 1
 	PATCH_IF fx_header_count == 1 BEGIN
+		SET bonus_first = 1
 		FOR (bonus_n = 0; bonus_n < $spell_fx_count(~0~) AND save_bonus_valid; ++bonus_n) BEGIN
 			SET bonus_id = $spell_fx_0(~%bonus_n%~)
-			LPF ad_signed_value INT_VAR value = $fx_save_bonus(~%bonus_id%~) RET bonus_effect_text = text END
-			PATCH_IF bonus_n == 0 BEGIN
-				SPRINT save_bonus_text ~%bonus_effect_text%~
+			SET bonus_opcode = $spell_fx_opcode_0(~%bonus_n%~)
+			PATCH_IF NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%bonus_opcode%~) BEGIN
+				LPF ad_signed_value INT_VAR value = $fx_save_bonus(~%bonus_id%~) RET bonus_effect_text = text END
+				PATCH_IF bonus_first BEGIN
+					SPRINT save_bonus_text ~%bonus_effect_text%~
+					SET bonus_first = 0
+				END
+				SET save_bonus_valid = ~%bonus_effect_text%~ STRING_EQUAL ~%save_bonus_text%~
 			END
-			SET save_bonus_valid = ~%bonus_effect_text%~ STRING_EQUAL ~%save_bonus_text%~
 		END
 		PATCH_IF NOT save_bonus_valid BEGIN
 			SPRINT save_bonus_text ~~
@@ -1180,7 +1197,11 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 		SPRINT bonus_first_text ~~
 		FOR (bonus_n = 0; bonus_n < $spell_fx_count(~0~) AND save_bonus_valid; ++bonus_n) BEGIN
 			SPRINT level_a ~0 %bonus_n%~
-			LPM ad_spell_level_search
+			SET bonus_opcode = $spell_fx_opcode_0(~%bonus_n%~)
+			SET search_in_all = 0
+			PATCH_IF NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%bonus_opcode%~) BEGIN
+				LPM ad_spell_level_search
+			END
 			PATCH_IF search_in_all BEGIN
 				PATCH_IF search_total > 1 BEGIN
 					SPRINT formula_array ~search_save~
@@ -1233,7 +1254,7 @@ DEFINE_PATCH_MACRO ad_spell_header_resistance BEGIN
 			SET resistance_id = $EVAL ~spell_fx_%resistance_h%~(~%resistance_n%~)
 			SET resistance_opcode = $EVAL ~spell_fx_opcode_%resistance_h%~(~%resistance_n%~)
 			SPRINT resistance_resource $fx_resource_lower(~%resistance_id%~)
-			PATCH_IF resistance_opcode != 318 AND resistance_opcode != 321 AND resistance_opcode != 324 AND NOT (~%resistance_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
+			PATCH_IF resistance_opcode != 318 AND resistance_opcode != 321 AND resistance_opcode != 324 AND NOT (~%resistance_resource%~ STRING_EQUAL ~%spell_self%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%resistance_opcode%~) BEGIN
 				SET resistance_value = $fx_resistance(~%resistance_id%~)
 				SET resistance_effect_ignored = resistance_value == 2 OR resistance_value == 3
 				PATCH_IF resistance_ignored < 0 BEGIN
