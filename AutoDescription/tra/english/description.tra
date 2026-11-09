@@ -2513,6 +2513,8 @@
 @11000004 = ~Protects %theTarget% from attacks and spells of all creatures~
 @11000005 = ~to protect from %creatureType% attacks and spells~
 @11000006 = ~to protect from attacks and spells of all creatures~
+@11000010 = ~, ~
+@11000011 = ~ and ~
 
 // Opcode 101: Protection: from Opcode [101]
 
@@ -2836,6 +2838,40 @@
 @11440036 = ~%action% to use inventory~
 @11440040 = ~Prevents %theTarget%~ // Action
 @11440041 = ~to prevent %theTarget%~ // Action
+@11440060 = ~%action% the use of %buttonList%~
+@11440061 = ~%action% to use %buttonList%~
+@11440101 = ~Hide in shadows~
+@11440102 = ~thief skills~
+@11440103 = ~spells~
+@11440104 = ~the first quick spell~
+@11440105 = ~the second quick spell~
+@11440106 = ~the third quick spell~
+@11440107 = ~Turn undead~
+@11440108 = ~talks~
+@11440109 = ~items~
+@11440110 = ~the first quick item~
+@11440111 = ~bard songs and shaman dances~
+@11440112 = ~the second quick item~
+@11440113 = ~the third quick item~
+@11440114 = ~innate spells~
+@11440115 = ~Find traps~
+@11440116 = ~the inventory~
+@11440121 = ~Hide in shadows~
+@11440122 = ~thief skills~
+@11440123 = ~spells~
+@11440124 = ~first quick spell~
+@11440125 = ~second quick spell~
+@11440126 = ~third quick spell~
+@11440127 = ~Turn undead~
+@11440128 = ~talks~
+@11440129 = ~items~
+@11440130 = ~first quick item~
+@11440131 = ~bard songs and shaman dances~
+@11440132 = ~second quick item~
+@11440133 = ~third quick item~
+@11440134 = ~innate spells~
+@11440135 = ~Find traps~
+@11440136 = ~inventory~
 
 
 // Opcode 145: Spell: Disable Spell Casting Abilities [145]

@@ -353,6 +353,7 @@ BEGIN
 	SET totalLines = 0
 	SET depthOfEffect = recursivity
 	SPRINT strDuration ~~
+	SET spellHeaderDuration = 0 - 1
 	// La durée instantanée ou permanente de l'en-tête d'un sort n'est pas celle des effets de ses
 	// sous-sorts.
 	PATCH_IF isSpell AND NOT hasDuration BEGIN

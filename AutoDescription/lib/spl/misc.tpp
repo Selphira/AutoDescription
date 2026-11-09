@@ -195,8 +195,10 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET description ignoreDuration strDuration is_special has_duration is_instant BEGIN
+DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET description ignoreDuration strDuration is_special has_duration is_instant headerDuration BEGIN
 	SET base_duration = ~-1~
+	SET durationByProjectile = 0
+	SET headerDuration = 0 - 1
 	SET has_duration = 1
 	SET isValid = 1
 	SET is_special = 0
@@ -213,7 +215,7 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET descri
 			SET count_levels += 1
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
 				// Si plus petit, c'est qu'on a désactivé l'entrée lors d'une précédente opération
-				PATCH_IF opcode >= 0 BEGIN
+				PATCH_IF opcode >= 0 AND NOT VARIABLE_IS_SET $opcodes_ignored_by_spell_header(~%opcode%~) BEGIN
 				    LPM ~data_to_vars~
 				    SET subScan = VARIABLE_IS_SET subspellsScan AND subspellsScan
 				    SET isProtection = opcode == 318 OR opcode == 321 OR opcode == 324 OR (subScan AND opcode == 206)
@@ -330,6 +332,14 @@ DEFINE_PATCH_FUNCTION ~spell_duration~ STR_VAR subspellsDuration = ~~ RET descri
 		END
 		ELSE BEGIN
 			SPRINT duration @100033 // ~Spéciale~
+		END
+		PATCH_IF NOT is_special AND NOT durationByProjectile BEGIN
+			SET headerDuration = is_permanent ? 0 : base_duration
+			PATCH_PHP_EACH all_durations AS _ => levelDuration BEGIN
+				PATCH_IF levelDuration != base_duration BEGIN
+					SET headerDuration = 0 - 1
+				END
+			END
 		END
 		PATCH_IF is_permanent BEGIN
 		    SET has_duration = 0
@@ -1405,7 +1415,7 @@ DEFINE_PATCH_FUNCTION ~spell_saving_throw~ RET description ignoreSavingThrow bas
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_IF isSpecial == 0 BEGIN
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
-				PATCH_IF opcode >= 0 BEGIN
+				PATCH_IF opcode >= 0 AND NOT VARIABLE_IS_SET $opcodes_ignored_by_spell_header(~%opcode%~) BEGIN
 				    LPM ~data_to_vars~
 				    PATCH_IF( NOT (opcode == 318 OR opcode == 321 OR opcode == 324) AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
 						SET saveType = (saveType BAND 0b111111)
@@ -1507,7 +1517,7 @@ DEFINE_PATCH_FUNCTION ~spell_resistance~ RET description BEGIN
 	PATCH_PHP_EACH level_effects AS index => requiredLevel BEGIN
 		PATCH_IF isSpecial == 0 BEGIN
 			PATCH_PHP_EACH ~leveled_opcodes_%requiredLevel%~ AS data => opcode BEGIN
-				PATCH_IF opcode >= 0 BEGIN
+				PATCH_IF opcode >= 0 AND NOT VARIABLE_IS_SET $opcodes_ignored_by_spell_header(~%opcode%~) BEGIN
 				    LPM ~data_to_vars~
 				    PATCH_IF( NOT (opcode == 318 OR opcode == 321 OR opcode == 324) AND NOT ~%resref%~ STRING_EQUAL_CASE ~%CURRENT_SOURCE_RES%~) BEGIN
                         SET ignoreResistance = (resistance == 2 OR resistance == 3) ? 1 : 0
@@ -1564,7 +1574,7 @@ DEFINE_PATCH_FUNCTION ~get_spell_effects_by_saving_throw~ RET complex_value is_v
 	SET is_valid = 1
 	PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
 		CLEAR_ARRAY effects_to_disabled
-		PATCH_IF opcode >= 0 AND is_valid == 1 BEGIN
+		PATCH_IF opcode >= 0 AND is_valid == 1 AND NOT VARIABLE_IS_SET $opcodes_ignored_by_spell_header(~%opcode%~) BEGIN
 		    LPM ~data_to_vars~
 		    LPM ~data_to_match_vars~
 
