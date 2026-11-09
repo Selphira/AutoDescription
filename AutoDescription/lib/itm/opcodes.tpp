@@ -3694,6 +3694,10 @@ DEFINE_PATCH_MACRO ~opcode_60_common~ BEGIN
 	SET spellTypes = custom_int > 0 ? custom_int : (1 << parameter2)
 	LPF ~get_spell_type_str~ INT_VAR value = spellTypes RET spellType END
     SPRINT percent @10002 // ~%value% %~
+
+	PATCH_IF NOT ~%complex_value%~ STRING_EQUAL ~~ BEGIN
+		SPRINT percent ~%complex_value%~
+	END
 END
 
 DEFINE_PATCH_MACRO ~opcode_60_is_valid~ BEGIN
