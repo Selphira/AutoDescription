@@ -1177,9 +1177,12 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 			    END
 			END
 		END
-		PATCH_IF opcode == 12 BEGIN
+		PATCH_IF opcode == 12 OR opcode == 17 BEGIN
 			LPM ~data_to_vars~
 			SET mode = parameter2 BAND 65535
+			PATCH_IF opcode == 17 BEGIN
+				SET mode = parameter1 >= 0 ? parameter2 : 0 - 1
+			END
 
 			PATCH_IF mode == 0 BEGIN
 		        LPM ~data_to_match_vars~
@@ -1215,6 +1218,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 							complex_value_int
 					END
 					PATCH_IF is_valid BEGIN
+						PATCH_IF opcode == 17 AND parameter1 > 0 BEGIN
+							SPRINT complex_value ~%parameter1% + %complex_value%~
+						END
 				        SET durationIsValid = 1
 				        PATCH_IF NOT ignoreDuration AND total_durations > 0 BEGIN
 							PATCH_IF level == 1 BEGIN
@@ -1238,7 +1244,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 					END
 		        END
 
-				PATCH_IF is_valid == 0 BEGIN
+				PATCH_IF is_valid == 0 AND opcode == 12 BEGIN
 				    LPF spell_has_same_effects_on_all_levels_except_duration
 						INT_VAR
 							match_opcode match_isExternal match_target match_power match_parameter1 match_parameter2
