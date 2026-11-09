@@ -360,7 +360,8 @@ END
 // (mode 0) peuvent aussi progresser par le nombre de dés, et à défaut par les dés et parameter1
 // (« 1d4 … par niveau + 1 … par niveau ») ; de même, par le nombre de dés seul, ceux d'un opcode 333
 // sans niveau de lancement, que les dégâts de son sort reprennent (« 2d8 + 1d8 par niveau du
-// lanceur/30 »). Une durée écrite par les lignes doit suivre sa formule.
+// lanceur/30 »), et ceux d'un ajout de l'opcode 17 au parameter1 positif ou nul, qui la précède
+// (« 20 + 1d4 points de vie par niveau du lanceur/20 »). Une durée écrite par les lignes doit suivre sa formule.
 DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
@@ -416,7 +417,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				END
 			END
 		END
-		PATCH_IF ((level_opcode == 12 AND level_mode == 0) OR (level_opcode == 333 AND $fx_parameter2(~%level_id%~) == 0))
+		PATCH_IF ((level_opcode == 12 AND level_mode == 0) OR (level_opcode == 333 AND $fx_parameter2(~%level_id%~) == 0)
+				OR (level_opcode == 17 AND level_mode == 0 AND $fx_parameter1(~%level_id%~) >= 0))
 				AND $level_on(~%level_a%~) AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 			SET formula_valid = 0
 			SET level_skip = AD_SAME_DICE BOR AD_SAME_TIMING
@@ -433,6 +435,10 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				LPM ad_spell_level_formula_check
 				PATCH_IF formula_valid BEGIN
 					SPRINT level_value_text ~%formula_text%~
+					SET level_bonus = $fx_parameter1(~%level_id%~)
+					PATCH_IF level_opcode == 17 AND level_bonus > 0 BEGIN
+						SPRINT level_value_text ~%level_bonus% + %formula_text%~
+					END
 					LPM ad_spell_level_duration
 					PATCH_IF level_grouped BEGIN
 						LPM ad_spell_level_group
@@ -713,7 +719,8 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 		SET formula_base = formula_start
 		SET formula_unit_tra = 0
 		PATCH_IF VARIABLE_IS_SET $AD_LEVEL_UNIT_OPCODES(~%formula_opcode%~) BEGIN
-			SET unit_value = formula_delta
+			// Un pas en dés vaut jusqu'à son nombre de faces : « 1d4 points de vie », et non « point de vie ».
+			SET unit_value = formula_dice_sides > 0 ? formula_delta * formula_dice_sides : formula_delta
 			SET unit_fx = level_id
 			LPM ~ad_op_%formula_opcode%_level_unit~
 			SET formula_unit_tra = unit_tra
