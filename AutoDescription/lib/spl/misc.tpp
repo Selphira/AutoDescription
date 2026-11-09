@@ -840,8 +840,9 @@ BEGIN
 	ELSE PATCH_IF is_valid == 1 BEGIN
 		SET strref = 0
 		PATCH_IF NOT untyped BEGIN
+			SET typed_delta = dice_sides > 0 ? delta_value * dice_sides : delta_value
 			SPRINT dispatch_typed_value ~opcode_%opcode%_typed_value~
-			PATCH_TRY LPF ~%dispatch_typed_value%~ INT_VAR value = delta_value RET strref END WITH DEFAULT
+			PATCH_TRY LPF ~%dispatch_typed_value%~ INT_VAR value = typed_delta RET strref END WITH DEFAULT
 				strref = 0
 				PATCH_IF show_swallowed_errors BEGIN LPF ~log_swallowed_error~ STR_VAR name = ~%dispatch_typed_value%~ type = ~function~ error = ~%ERROR_MESSAGE%~ END END
 			END
