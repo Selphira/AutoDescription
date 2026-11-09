@@ -1080,6 +1080,7 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		502 => 1
 		503 => 1
 		504 => 1
+		60 => 1
 	END
 
 	PATCH_PHP_EACH ~leveled_opcodes_%level%~ AS data => opcode BEGIN
@@ -1088,11 +1089,12 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 		 * Uniquement si parameter2 == MOD_TYPE_cumulative ET que parameter1 et duration sont différents
 		 */
 		PATCH_FOR_EACH basicOpcode IN
-			0 6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 190 191 250 263 278 284 285 286 288 289 299 305 306 323 325 // Les basiques
+			0 6 10 15 19 21 22 23 44 49 54 73 93 94 95 96 97 104 108 126 132 178 179 189 190 191 250 263 278 284 285 286 288 289 299 305 306 323 325 167 // Les basiques
 			27 28 29 30 31 84 85 86 87 88 89 166 173 502 503 504 // Les résistances
 			12 17 18 111 218
 			// 25 98
 			33 34 35 36 37 // Les jets de sauvegarde
+			60
 		BEGIN
 			PATCH_IF opcode == basicOpcode BEGIN
 			    LPM ~data_to_vars~
@@ -1103,6 +1105,9 @@ DEFINE_PATCH_MACRO ~group_spell_effects_by_parameters~ BEGIN
 				END
 				ELSE PATCH_IF opcode == 0 BEGIN
 					SET mode = parameter2 == AC_MOD_TYPE_set_base ? MOD_TYPE_flat : MOD_TYPE_cumulative
+				END
+				ELSE PATCH_IF opcode == 60 BEGIN
+					SET mode = MOD_TYPE_cumulative
 				END
 			    PATCH_IF mode == MOD_TYPE_cumulative OR mode == MOD_TYPE_flat OR mode == MOD_TYPE_percentage BEGIN
 			        LPM ~data_to_match_vars~
