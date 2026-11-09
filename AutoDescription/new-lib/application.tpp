@@ -437,10 +437,9 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 		END
 		ELSE PATCH_IF app_duration > 0 BEGIN
 			LPF ad_duration_text INT_VAR seconds = app_duration RET strDuration = text END
-			// Durée tirée au sort (ad_group_duration_ranges), d'une unité : « 1d2 rounds ».
+			// Durée tirée au sort (ad_group_duration_ranges), d'une unité : « 1d2 rounds », « 1d4 +1 rounds ».
 			PATCH_IF $fx_duration_dice(~%line_fx%~) > 0 BEGIN
-				SET duration_dice_count = $fx_duration_dice(~%line_fx%~)
-				SPRINT amount ~1d%duration_dice_count%~
+				LPF ad_dice_text INT_VAR dice_count = 1 dice_sides = $fx_duration_dice(~%line_fx%~) bonus = $fx_duration_dice_bonus(~%line_fx%~) RET amount = text END
 				FOR (duration_unit = 4; duration_unit >= 0; --duration_unit) BEGIN
 					PATCH_IF app_duration == $AD_DURATION_UNITS(~%duration_unit%~) BEGIN
 						LPF ad_tra INT_VAR tra_id = 3010000 + duration_unit * 2 + 1 tra_block_start = 3010000 tra_block_size = 10 RET strDuration = text END // ~%amount% rounds~

@@ -184,18 +184,19 @@ END
 // Durées tirées au sort (ancien group_duration_range, lib/effect.tpp) : comme pour les valeurs
 // (new-lib/opcodes/value_ranges.tpp), des effets d'un même opcode semblables à leur durée et à leur
 // probabilité près, de timing 0, dont les plages sont contiguës, disjointes et de même largeur (à 1
-// près, arrondi des plages : 51 % et 49 %), donnent une seule durée. Si leurs durées sont 1, 2… N fois
-// une unité de durée (round, tour…), ils n'en font qu'un, sur l'union de leurs plages, d'une durée de
-// 1dN unités (fx_duration_dice ; PXM4PROA : étourdi pendant 6 ou 12 secondes, « pendant 1d2 rounds »).
+// près, arrondi des plages : 51 % et 49 %), donnent une seule durée. Si leurs durées sont k, k+1…
+// k+N-1 fois une unité de durée (round, tour…), ils n'en font qu'un, sur l'union de leurs plages, d'une
+// durée de 1dN +(k-1) unités (fx_duration_dice et fx_duration_dice_bonus ; PXM4PROA : étourdi pendant
+// 6 ou 12 secondes, « pendant 1d2 rounds » ; PXW3CRA1 : horrifié pendant 2 à 5 rounds, « pendant 1d4 +1
+// rounds »).
 DEFINE_PATCH_MACRO ad_group_duration_ranges BEGIN
 	SET same_ignored = AD_SAME_TIMING BOR AD_SAME_PROBABILITY
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF NOT $fx_consumed(~%group_id%~) AND $fx_timing(~%group_id%~) == TIMING_duration AND $fx_duration(~%group_id%~) > 0
 				AND $fx_probability(~%group_id%~) < 100 AND $fx_duration_dice(~%group_id%~) == 0 BEGIN
 			SET duration_opcode = $fx_opcode(~%group_id%~)
-			SET duration_unit = $fx_duration(~%group_id%~)
-			SET duration_max = duration_unit
-			SET duration_sum = duration_unit
+			SET duration_min = $fx_duration(~%group_id%~)
+			SET duration_max = duration_min
 			SET duration_low = $fx_probability_low(~%group_id%~)
 			SET duration_high = $fx_probability_high(~%group_id%~)
 			SET duration_total = $fx_probability(~%group_id%~)
@@ -212,30 +213,38 @@ DEFINE_PATCH_MACRO ad_group_duration_ranges BEGIN
 						SET $duration_members(~%duration_other%~) = 1
 						SET duration_count += 1
 						SET duration_other_seconds = $fx_duration(~%duration_other%~)
-						SET duration_unit = duration_other_seconds < duration_unit ? duration_other_seconds : duration_unit
+						SET duration_min = duration_other_seconds < duration_min ? duration_other_seconds : duration_min
 						SET duration_max = duration_other_seconds > duration_max ? duration_other_seconds : duration_max
-						SET duration_sum += duration_other_seconds
 						SET duration_low = $fx_probability_low(~%duration_other%~) < duration_low ? $fx_probability_low(~%duration_other%~) : duration_low
 						SET duration_high = $fx_probability_high(~%duration_other%~) > duration_high ? $fx_probability_high(~%duration_other%~) : duration_high
 						SET duration_total += $fx_probability(~%duration_other%~)
 					END
 				END
 			END
-			// Durées 1, 2… N fois la plus courte : N durées multiples de la plus courte, dont la plus longue
-			// vaut N fois la plus courte et dont la somme est celle de 1 à N (donc toutes différentes).
-			SET duration_dice = duration_count > 1 AND duration_total == duration_high - duration_low + 1
-				AND duration_max == duration_unit * duration_count
-				AND duration_sum == duration_unit * duration_count * (duration_count + 1) / 2
+			// Durées k, k+1… k+N-1 fois un pas : multiples du pas, chacune à son propre rang dans cette suite
+			// (masque des rangs, au plus 30 durées).
+			SET duration_dice = duration_count > 1 AND duration_count <= 30 AND duration_total == duration_high - duration_low + 1
+				AND (duration_max - duration_min) MODULO (duration_count - 1) == 0
 				AND ABS ($fx_probability(~%group_id%~) * duration_count - duration_total) <= duration_count
 			PATCH_IF duration_dice BEGIN
+				SET duration_unit = (duration_max - duration_min) / (duration_count - 1)
+				SET duration_dice = duration_unit > 0 AND duration_min MODULO duration_unit == 0
+			END
+			PATCH_IF duration_dice BEGIN
+				SET duration_offset = $fx_duration(~%group_id%~) - duration_min
+				SET duration_ranks = 1 << (duration_offset / duration_unit)
+				SET duration_dice = duration_offset MODULO duration_unit == 0
 				PHP_EACH duration_members AS duration_other => _ BEGIN
-					PATCH_IF ABS ($fx_probability(~%duration_other%~) * duration_count - duration_total) > duration_count BEGIN
+					SET duration_offset = $fx_duration(~%duration_other%~) - duration_min
+					SET duration_rank = 1 << (duration_offset / duration_unit)
+					PATCH_IF ABS ($fx_probability(~%duration_other%~) * duration_count - duration_total) > duration_count
+							OR duration_offset MODULO duration_unit != 0 OR (duration_ranks BAND duration_rank) != 0 BEGIN
 						SET duration_dice = 0
 					END
+					SET duration_ranks = duration_ranks BOR duration_rank
 				END
 			END
-			// Unité de durée : la plus grande qui divise la durée la plus courte (ad_duration_text), qui doit
-			// en valoir une seule.
+			// Unité de durée : la plus grande qui divise le pas (ad_duration_text), qui doit en valoir une seule.
 			PATCH_IF duration_dice BEGIN
 				SET duration_divisor = 0
 				FOR (duration_unit_index = 4; duration_unit_index >= 0 AND duration_divisor == 0; --duration_unit_index) BEGIN
@@ -251,6 +260,7 @@ DEFINE_PATCH_MACRO ad_group_duration_ranges BEGIN
 				END
 				SET $fx_duration(~%group_id%~) = duration_unit
 				SET $fx_duration_dice(~%group_id%~) = duration_count
+				SET $fx_duration_dice_bonus(~%group_id%~) = duration_min / duration_unit - 1
 				SET $fx_probability_low(~%group_id%~) = duration_low
 				SET $fx_probability_high(~%group_id%~) = duration_high
 				SET $fx_probability(~%group_id%~) = duration_total
@@ -1810,7 +1820,9 @@ DEFINE_PATCH_MACRO ad_fx_same_fields BEGIN
 		AND ((same_ignored BAND AD_SAME_PARAMETER1) != 0 OR $fx_parameter1(~%same_id%~) == $fx_parameter1(~%same_other%~))
 		AND ((same_ignored BAND AD_SAME_PARAMETER2) != 0 OR $fx_parameter2_raw(~%same_id%~) == $fx_parameter2_raw(~%same_other%~))
 		AND ((same_ignored BAND AD_SAME_TIMING) != 0 OR ($fx_timing(~%same_id%~) == $fx_timing(~%same_other%~)
-			AND $fx_duration(~%same_id%~) == $fx_duration(~%same_other%~)))
+			AND $fx_duration(~%same_id%~) == $fx_duration(~%same_other%~)
+			AND $fx_duration_dice(~%same_id%~) == $fx_duration_dice(~%same_other%~)
+			AND $fx_duration_dice_bonus(~%same_id%~) == $fx_duration_dice_bonus(~%same_other%~)))
 		AND ((same_ignored BAND AD_SAME_POWER) != 0 OR $fx_power(~%same_id%~) == $fx_power(~%same_other%~))
 		AND ((same_ignored BAND (AD_SAME_SAVE BOR AD_SAME_RESISTANCE)) != 0 OR $fx_resistance(~%same_id%~) == $fx_resistance(~%same_other%~))
 		AND ((same_ignored BAND AD_SAME_PROBABILITY) != 0 OR ($fx_probability1(~%same_id%~) == $fx_probability1(~%same_other%~)

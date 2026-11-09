@@ -21,6 +21,7 @@
 // de la durée et du bonus du jet de sauvegarde d'un effet présent à tous les niveaux d'un sort, new-lib/spell_levels.tpp) ; fx_level_progression
 // (0 à la lecture, 1 pour un effet qui porte une telle progression) ; fx_duration_dice (0 à la lecture,
 // N pour une durée tirée au sort de 1dN unités, ad_group_duration_ranges, new-lib/groups.tpp) ;
+// fx_duration_dice_bonus (0 à la lecture, unités ajoutées à ce tirage : 1d4 +1 rounds) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
 // pour un effet écarté, ad_application_drop) ; fx_level_merged (1 pour l'effet d'un en-tête que l'effet
@@ -349,6 +350,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET $fx_charge_rewritten(~%fx_id%~) = 0
 	SPRINT $fx_level_duration(~%fx_id%~) ~~
 	SET $fx_duration_dice(~%fx_id%~) = 0
+	SET $fx_duration_dice_bonus(~%fx_id%~) = 0
 	SPRINT $fx_level_save(~%fx_id%~) ~~
 	SET $fx_level_progression(~%fx_id%~) = 0
 	LPM ad_fx_mod_ignored

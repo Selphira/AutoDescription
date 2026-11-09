@@ -980,6 +980,8 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 		AND ((same_ignored BAND AD_SAME_PARAMETER1) != 0 OR same_parameter1_a == same_parameter1_b)
 		AND ((same_ignored BAND AD_SAME_PARAMETER2) != 0 OR $fx_parameter2_raw(~%same_a%~) == $fx_parameter2_raw(~%same_b%~))
 		AND ((same_ignored BAND AD_SAME_TIMING) != 0 OR $fx_duration(~%same_a%~) == $fx_duration(~%same_b%~))
+		AND $fx_duration_dice(~%same_a%~) == $fx_duration_dice(~%same_b%~)
+		AND $fx_duration_dice_bonus(~%same_a%~) == $fx_duration_dice_bonus(~%same_b%~)
 		AND $fx_timing(~%same_a%~) == $fx_timing(~%same_b%~)
 		AND $fx_resistance(~%same_a%~) == $fx_resistance(~%same_b%~)
 		AND $fx_probability1(~%same_a%~) == $fx_probability1(~%same_b%~)
