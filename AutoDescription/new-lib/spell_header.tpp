@@ -713,28 +713,36 @@ DEFINE_PATCH_MACRO ad_spell_header_sub_duration BEGIN
 				SET sub_valid = 0
 			END
 			ELSE PATCH_IF sub_opcode == 146 OR sub_opcode == 148 BEGIN
-				SPRINT sub_resref $fx_resource_lower(~%sub_id%~)
-				// Type 1 : lancé au niveau du lanceur quel que soit parameter1 (IESDP).
-				PATCH_IF ($fx_timing(~%sub_id%~) == TIMING_delayed AND $fx_duration(~%sub_id%~) > 0)
-						OR ($fx_parameter1(~%sub_id%~) > 0 AND $fx_parameter2(~%sub_id%~) != 1)
-						OR ~%sub_resref%~ STRING_EQUAL ~%spell_self%~ OR NOT FILE_EXISTS_IN_GAME ~%sub_resref%.spl~ BEGIN
-					SET sub_valid = 0
-				END
-				ELSE BEGIN
-					LPF ad_recursion_delayed_duration STR_VAR resref = ~%sub_resref%~ parent = ~%spell_self%~
-						RET sub_hide = duration_hide sub_text = duration_text sub_missing = duration_missing sub_instant = duration_instant END
-					PATCH_IF NOT sub_hide OR NOT (~%sub_missing%~ STRING_EQUAL ~~) BEGIN
+				// Sorts tirés au sort réunis en une liste (fx_list_member, new-lib/opcodes/probability_lists.tpp) :
+				// chacun compte, comme dans l'ancien moteur, qui lit les effets du fichier.
+				FOR (sub_k = 0; sub_k <= $fx_list_size(~%sub_id%~) AND sub_valid; ++sub_k) BEGIN
+					SET sub_member = sub_id
+					PATCH_IF sub_k > 0 BEGIN
+						SET sub_member = $fx_list_member(~%sub_id% %sub_k%~)
+					END
+					SPRINT sub_resref $fx_resource_lower(~%sub_member%~)
+					// Type 1 : lancé au niveau du lanceur quel que soit parameter1 (IESDP).
+					PATCH_IF ($fx_timing(~%sub_member%~) == TIMING_delayed AND $fx_duration(~%sub_member%~) > 0)
+							OR ($fx_parameter1(~%sub_member%~) > 0 AND $fx_parameter2(~%sub_member%~) != 1)
+							OR ~%sub_resref%~ STRING_EQUAL ~%spell_self%~ OR NOT FILE_EXISTS_IN_GAME ~%sub_resref%.spl~ BEGIN
 						SET sub_valid = 0
 					END
-					// Un sous-sort permanent écrit « de manière permanente » dans ses lignes.
-					ELSE PATCH_IF ~%sub_text%~ STRING_EQUAL ~~ BEGIN
-						SET sub_valid = sub_instant == 1
-					END
-					ELSE PATCH_IF ~%header_sub_text%~ STRING_EQUAL ~~ BEGIN
-						SPRINT header_sub_text ~%sub_text%~
-					END
-					ELSE PATCH_IF NOT (~%header_sub_text%~ STRING_EQUAL ~%sub_text%~) BEGIN
-						SET sub_valid = 0
+					ELSE BEGIN
+						LPF ad_recursion_delayed_duration STR_VAR resref = ~%sub_resref%~ parent = ~%spell_self%~
+							RET sub_hide = duration_hide sub_text = duration_text sub_missing = duration_missing sub_instant = duration_instant END
+						PATCH_IF NOT sub_hide OR NOT (~%sub_missing%~ STRING_EQUAL ~~) BEGIN
+							SET sub_valid = 0
+						END
+						// Un sous-sort permanent écrit « de manière permanente » dans ses lignes.
+						ELSE PATCH_IF ~%sub_text%~ STRING_EQUAL ~~ BEGIN
+							SET sub_valid = sub_instant == 1
+						END
+						ELSE PATCH_IF ~%header_sub_text%~ STRING_EQUAL ~~ BEGIN
+							SPRINT header_sub_text ~%sub_text%~
+						END
+						ELSE PATCH_IF NOT (~%header_sub_text%~ STRING_EQUAL ~%sub_text%~) BEGIN
+							SET sub_valid = 0
+						END
 					END
 				END
 			END

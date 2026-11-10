@@ -5,7 +5,9 @@
 // 0 : « (comme un lanceur de sorts de niveau N) ». Un sort sans nom, ou lancé à coup sûr par une
 // potion, est décrit par ses effets (new-lib/recursion.tpp) : ses lignes prennent la place de celle du
 // sort. Effet probable : comme l'ancien opcode_target_probability_146, une potion cite aussi le sort
-// par son nom.
+// par son nom. Des sorts nommés tirés au sort sur des plages contiguës sont réunis en une liste
+// (AD_GROUP_UNEQUAL_PROBABILITIES, new-lib/opcodes/probability_lists.tpp) : « Lance instantanément
+// l'un des sorts suivants sur la cible : « Boule de feu », « Cône de froid » ou « Éclair » ».
 // Les macros ad_op_<N>_* fixent cast_opcode (et cast_phrase pour les lignes) puis appellent les
 // macros ci-dessous. Le regroupement avec l'opcode 321 (ancien opcode_146_group, non cumulatif)
 // viendra avec cet opcode.
@@ -63,6 +65,12 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 				LPM ad_cast_spell_recursion_support
 			END
 		END
+	END
+	// Sorts nommés tirés au sort, réunis en une liste (new-lib/opcodes/probability_lists.tpp) ; une
+	// potion décrit le sort lancé à coup sûr par ses effets, comme dans l'ancien moteur.
+	PATCH_IF item_type != ITM_TYPE_potion BEGIN
+		SET list_opcode = cast_opcode
+		LPM ad_probability_list_support
 	END
 END
 
@@ -175,33 +183,45 @@ END
 DEFINE_PATCH_MACRO ad_cast_spell_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%cast_opcode%~)
-	FOR (cast_id = 0; cast_id < fx_count; ++cast_id) BEGIN
-		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND NOT $fx_consumed(~%cast_id%~) AND $fx_recursion(~%cast_id%~) BEGIN
-			PATCH_IF $fx_sub_count(~%cast_id%~) > 0 BEGIN
-				SPRINT line_text $fx_sub_text(~%cast_id%~)
-				PATCH_IF $fx_sub_delayed(~%cast_id%~) AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) >= 0 BEGIN
-					LPM ad_cast_spell_delayed_condition
+	// Sorts tirés au sort réunis (fx_list_size, new-lib/opcodes/probability_lists.tpp) écrits après les
+	// autres, comme l'effet que l'ancien moteur ajoute en fin de liste : à rang égal, leur ligne vient en premier.
+	FOR (cast_pass = 0; cast_pass < 2; ++cast_pass) BEGIN
+		FOR (cast_id = 0; cast_id < fx_count; ++cast_id) BEGIN
+			PATCH_IF ($fx_list_size(~%cast_id%~) > 0) == cast_pass BEGIN
+				PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND NOT $fx_consumed(~%cast_id%~) AND $fx_recursion(~%cast_id%~) BEGIN
+					PATCH_IF $fx_sub_count(~%cast_id%~) > 0 BEGIN
+						SPRINT line_text $fx_sub_text(~%cast_id%~)
+						PATCH_IF $fx_sub_delayed(~%cast_id%~) AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%~ ~%line_text%~) >= 0 BEGIN
+							LPM ad_cast_spell_delayed_condition
+						END
+						PATCH_IF $fx_series_anchor(~%cast_id%~) AND item_type != ITM_TYPE_potion BEGIN
+							LPM ad_cast_spell_series_text
+						END
+						SET line_any_form = 1
+						SET line_fx = cast_id
+						LPM ad_effect_line
+					END
 				END
-				PATCH_IF $fx_series_anchor(~%cast_id%~) AND item_type != ITM_TYPE_potion BEGIN
-					LPM ad_cast_spell_series_text
+				ELSE PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND NOT $fx_consumed(~%cast_id%~) BEGIN
+					SPRINT spellName $fx_spell_name(~%cast_id%~)
+					SPRINT spellNames $fx_name_list(~%cast_id%~)
+					SET cast_type = $fx_parameter2(~%cast_id%~)
+					SET castingLevel = $fx_parameter1(~%cast_id%~)
+					SET cast_variant = ($fx_cast_charge(~%cast_id%~) ? 0 : 2) + (cast_type > 0 ? 1 : 0)
+					PATCH_IF cast_type == 2 OR (castingLevel > 0 AND cast_type == 0) BEGIN
+						LPF ad_tra INT_VAR tra_id = cast_phrase - 100 RET cast_level_text = text END // ~comme un lanceur de sorts de niveau %castingLevel%~
+						SPRINT line_suffix ~(%cast_level_text%)~
+					END
+					// Sorts réunis en une liste (fx_name_list) : phrases 0220/0230, « l'un des sorts suivants »,
+					// capacité de charge comprise (le nom seul d'une liste y serait trop étrange).
+					SET line_phrase = cast_phrase + 10 * cast_variant // ~%spellName%~
+					PATCH_IF NOT (~%spellNames%~ STRING_EQUAL ~~) BEGIN
+						SET line_phrase = cast_phrase + 100 + 10 * (2 + (cast_type > 0 ? 1 : 0)) // ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+					END
+					SET line_fx = cast_id
+					LPM ad_effect_line
 				END
-				SET line_any_form = 1
-				SET line_fx = cast_id
-				LPM ad_effect_line
 			END
-		END
-		ELSE PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND NOT $fx_consumed(~%cast_id%~) BEGIN
-			SPRINT spellName $fx_spell_name(~%cast_id%~)
-			SET cast_type = $fx_parameter2(~%cast_id%~)
-			SET castingLevel = $fx_parameter1(~%cast_id%~)
-			SET cast_variant = ($fx_cast_charge(~%cast_id%~) ? 0 : 2) + (cast_type > 0 ? 1 : 0)
-			PATCH_IF cast_type == 2 OR (castingLevel > 0 AND cast_type == 0) BEGIN
-				LPF ad_tra INT_VAR tra_id = cast_phrase - 100 RET cast_level_text = text END // ~comme un lanceur de sorts de niveau %castingLevel%~
-				SPRINT line_suffix ~(%cast_level_text%)~
-			END
-			SET line_phrase = cast_phrase + 10 * cast_variant // ~%spellName%~
-			SET line_fx = cast_id
-			LPM ad_effect_line
 		END
 	END
 END

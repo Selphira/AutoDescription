@@ -970,7 +970,8 @@ END
 // AD_SAME_PARAMETER1 (parameter1), AD_SAME_DICE (nombre de dés), AD_SAME_SAVE (bonus du jet de
 // sauvegarde), AD_SAME_TIMING (durée).
 // L'ancien moteur compare parameter2 tel que lu, le nombre d'effets identiques réunis et les valeurs
-// tirées au sort réunies (custom_str ; fx_range_min et fx_range_max, new-lib/opcodes/value_ranges.tpp).
+// tirées au sort réunies (custom_str ; fx_range_min et fx_range_max, new-lib/opcodes/value_ranges.tpp)
+// ou les noms réunis (custom_str ; fx_name_list, new-lib/opcodes/probability_lists.tpp).
 DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	SET same_a = $level_id(~%level_a%~)
 	SET same_b = $level_id(~%level_b%~)
@@ -1015,9 +1016,12 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 		SPRINT same_resource2_b $fx_resource2(~%same_b%~)
 		SPRINT same_resource3_a $fx_resource3(~%same_a%~)
 		SPRINT same_resource3_b $fx_resource3(~%same_b%~)
+		SPRINT same_name_list_a $fx_name_list(~%same_a%~)
+		SPRINT same_name_list_b $fx_name_list(~%same_b%~)
 		SET level_same = (~%same_resource_a%~ STRING_EQUAL ~%same_resource_b%~)
 			AND (~%same_resource2_a%~ STRING_EQUAL_CASE ~%same_resource2_b%~)
 			AND (~%same_resource3_a%~ STRING_EQUAL_CASE ~%same_resource3_b%~)
+			AND (~%same_name_list_a%~ STRING_EQUAL ~%same_name_list_b%~)
 	END
 	// Renvois et immunités par niveau de sort réunis dans leur en-tête : même masque des niveaux (ancien
 	// custom_int).

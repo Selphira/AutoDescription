@@ -3040,7 +3040,7 @@
 @21450122 = ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450052
 @21450123 = ~d'empêcher %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~ // reprise de @11450052
 
-// Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 460 000-21 460 999)
+// Opcode 146 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément », 0220-0233 phrases « Lance » et « Lance instantanément » pour des sorts réunis en une liste (« l'un des sorts suivants ») (21 460 000-21 460 999)
 @21460000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
 @21460100 = ~%spellName%~
 @21460101 = ~%spellName%~
@@ -3058,8 +3058,16 @@
 @21460131 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
 @21460132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
 @21460133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21460220 = ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460006
+@21460221 = ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460006
+@21460222 = ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460008
+@21460223 = ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460008
+@21460230 = ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460007
+@21460231 = ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460007
+@21460232 = ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460009
+@21460233 = ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460009
 
-// Opcode 148 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément » (21 480 000-21 480 999)
+// Opcode 148 : Sort lancé, cité par son nom : 0000 niveau du lanceur, phrases 0100 nom seul (capacité de charge), 0110 nom seul instantané, 0120 « Lance », 0130 « Lance instantanément », 0220-0233 phrases « Lance » et « Lance instantanément » pour des sorts réunis en une liste (« l'un des sorts suivants ») (21 480 000-21 480 999)
 @21480000 = ~comme un lanceur de sorts de niveau %castingLevel%~ // reprise de @102095
 @21480100 = ~%spellName%~
 @21480101 = ~%spellName%~
@@ -3077,6 +3085,14 @@
 @21480131 = ~Lance instantanément « %spellName% » sur %theTarget%~ // reprise de @11460002
 @21480132 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
 @21480133 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~ // reprise de @11460004
+@21480220 = ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460006
+@21480221 = ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460006
+@21480222 = ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460008
+@21480223 = ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460008
+@21480230 = ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460007
+@21480231 = ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460007
+@21480232 = ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460009
+@21480233 = ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~ // reprise de @11460009
 
 // Opcode 150 : Détection des pièges : phrases 0100 (21 500 000-21 500 999)
 @21500100 = ~Détection des pièges~ // reprise de @11500001

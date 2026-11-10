@@ -163,6 +163,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
 	337 => 1
 END
 
+// Opcodes dont les effets probables qui ne diffèrent que par la ressource qu'ils nomment sont réunis en
+// une liste de noms (new-lib/opcodes/probability_lists.tpp) : opcode => tableau des noms de ses effets.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_PROBABILITY_LIST_NAMES BEGIN
+	146 => fx_spell_name
+	148 => fx_spell_name
+END
+
 // Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
 // durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN
