@@ -105,9 +105,40 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			END
 		END
 	END
+	LPM ad_stat_modifier_dice_support
 	SPRINT stat_percentage ~valid~
 	SPRINT stat_percent_100 ~~
 	SPRINT stat_forced_mode ~~
+END
+
+// Ajouts probables d'un opcode de AD_STAT_MODIFIER_DICE dont la valeur est tirée au sort, réunis en un
+// dé quand le tirage est exactement le sien (ad_value_range_group, new-lib/opcodes/value_ranges.tpp ;
+// ancien group_value_dice) : OHHDRAI2, constitution réduite de 1, 2, 3 ou 4 à 25 % chacune, « Réduit
+// de 1d4 la constitution ».
+DEFINE_PATCH_MACRO ad_stat_modifier_dice_support BEGIN
+	PATCH_IF AD_ENABLE_SHRINKAGE AND NOT support_header_only AND VARIABLE_IS_SET $AD_STAT_MODIFIER_DICE(~%stat_opcode%~)
+			AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+		SET range_opcode = stat_opcode
+		SET range_exact = 1
+		PHP_EACH ~fx_ids_%range_opcode%~ AS _ => range_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%range_id%~) AND NOT $fx_dropped(~%range_id%~) AND $fx_range_max(~%range_id%~) == 0
+					AND $fx_parameter2(~%range_id%~) == MOD_TYPE_cumulative AND $fx_parameter1(~%range_id%~) != 0
+					AND $fx_probability(~%range_id%~) < 100 BEGIN
+				SET range_sign = $fx_parameter1(~%range_id%~) > 0 ? 1 : 0 - 1
+				LPM ad_value_range_group
+			END
+		END
+	END
+END
+
+// Dé sans signe (stat_dice_text) de la valeur tirée au sort de l'effet stat_id (ad_stat_modifier_dice_support),
+// vide sans regroupement : « 1d4 », « 1d4 +1 ».
+DEFINE_PATCH_MACRO ad_stat_modifier_dice_text BEGIN
+	SPRINT stat_dice_text ~~
+	PATCH_IF $fx_range_max(~%stat_id%~) > 0 BEGIN
+		LPF ad_dice_text INT_VAR dice_count = 1 dice_sides = $fx_range_max(~%stat_id%~) - $fx_range_min(~%stat_id%~) + 1
+			bonus = $fx_range_min(~%stat_id%~) - 1 RET stat_dice_text = text END
+	END
 END
 
 DEFINE_PATCH_MACRO ad_stat_modifier_subject BEGIN
@@ -149,8 +180,18 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 						SPRINT name ~%name% %stat_name_suffix%~
 					END
 					SPRINT stat_level_value $fx_level_value(~%stat_id%~)
+					LPM ad_stat_modifier_dice_text
 					PATCH_IF line_form == 0 BEGIN
 						LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
+						PATCH_IF NOT (~%stat_dice_text%~ STRING_EQUAL ~~) BEGIN
+							SPRINT value ~%stat_dice_text%~
+							PATCH_IF stat_value >= 0 BEGIN
+								SPRINT value @1200001 // ~+%value%~
+							END
+							ELSE BEGIN
+								SPRINT value ~-%value%~
+							END
+						END
 						PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 							SPRINT value ~%stat_level_value%~
 							PATCH_IF stat_mode == MOD_TYPE_flat AND stat_percent BEGIN
@@ -190,6 +231,9 @@ DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 			SPRINT theStatistic ~%theStatistic% %stat_name_suffix%~
 		END
 		LPM ad_stat_modifier_phrase
+		PATCH_IF NOT (~%stat_dice_text%~ STRING_EQUAL ~~) BEGIN
+			SPRINT value ~%stat_dice_text%~
+		END
 		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
 			SPRINT value ~%stat_level_value%~
 			PATCH_IF stat_value < 0 BEGIN

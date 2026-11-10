@@ -488,6 +488,15 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_PERCENT BEGIN
 	277 => 1 // Pose de pièges
 END
 
+// Modificateurs simples d'une statistique dont la valeur tirée au sort est réunie en dés
+// (ad_stat_modifier_dice_support, new-lib/opcodes/stat_modifiers.tpp ; ancien value_dice_opcodes) :
+// ceux dont la ligne est celle de la famille, sans statistique en pourcentage.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_STAT_MODIFIER_DICE BEGIN
+	6 => 1 10 => 1 15 => 1 19 => 1 21 => 1 22 => 1 44 => 1 49 => 1 54 => 1 73 => 1 93 => 1 94 => 1 95 => 1
+	96 => 1 97 => 1 104 => 1 263 => 1 278 => 1 281 => 1 284 => 1 285 => 1 286 => 1 288 => 1 289 => 1 305 => 1
+	306 => 1 323 => 1 325 => 1
+END
+
 // Groupes de classes, en bits d'exclusion des drapeaux d'utilisabilité d'un objet (IESDP) : un
 // objet est utilisable par le groupe si l'un de ces bits est à 0.
 // Clerc, clerc/mage, clerc/voleur, clerc/rôdeur, guerrier/clerc, guerrier/mage/clerc.

@@ -6,16 +6,22 @@
 // (11 %, 10 %… 9 %) sont acceptés, AD_ENABLE_SHRINKAGE à 0 les détaille.
 //
 // Tableaux écrits : fx_range_min et fx_range_max (0 à la lecture, new-lib/effects.tpp), bornes des
-// valeurs réunies, lues par la ligne de l'effet qui les représente.
+// valeurs réunies, lues par la ligne de l'effet qui les représente ; valeurs absolues pour une
+// réduction, que le signe de parameter1 garde.
+//
+// Modificateurs simples d'une statistique (AD_STAT_MODIFIER_DICE, ad_stat_modifier_dice_support) :
+// réunis seulement si le tirage est exactement celui d'un dé (range_exact), écrit « 1dN ».
 
-// Effets semblables à range_id (fx_ids_<range_opcode>), de valeur positive, à la valeur et à la
-// probabilité près. Sortie : range_broken, 1 si de tels effets existent mais que leurs plages se
-// chevauchent ou laissent un trou (rien n'est réuni).
+// Effets semblables à range_id (fx_ids_<range_opcode>), de valeur du signe range_sign (1 ou -1), à la
+// valeur et à la probabilité près. Avec range_exact, réunis seulement en valeurs k… k+N-1, chacune
+// une fois, sur des plages de même largeur (à 1 près) qui couvrent tout le tirage (0 à 99), comme
+// les durées d'ad_group_duration_ranges. Sortie : range_broken, 1 si de tels effets existent mais
+// que leurs plages se chevauchent ou laissent un trou (rien n'est réuni).
 DEFINE_PATCH_MACRO ad_value_range_group BEGIN
 	SET range_broken = 0
 	SET same_id = range_id
 	SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PROBABILITY
-	SET range_min = $fx_parameter1(~%range_id%~)
+	SET range_min = range_sign * $fx_parameter1(~%range_id%~)
 	SET range_max = range_min
 	SET range_low = $fx_probability_low(~%range_id%~)
 	SET range_high = $fx_probability_high(~%range_id%~)
@@ -23,12 +29,12 @@ DEFINE_PATCH_MACRO ad_value_range_group BEGIN
 	SET range_count = 0
 	CLEAR_ARRAY range_members
 	PHP_EACH ~fx_ids_%range_opcode%~ AS _ => range_other BEGIN
-		SET range_other_value = $fx_parameter1(~%range_other%~)
+		SET range_other_value = range_sign * $fx_parameter1(~%range_other%~)
 		PATCH_IF range_other != range_id AND range_other_value > 0 AND NOT $fx_consumed(~%range_other%~) BEGIN
 			SET same_other = range_other
 			LPM ad_fx_same_fields
 			PATCH_IF fx_same BEGIN
-				SET $range_members(~%range_other%~) = 1
+				SET $range_members(~%range_other%~) = range_other_value
 				SET range_count += 1
 				SET range_min = range_other_value < range_min ? range_other_value : range_min
 				SET range_max = range_other_value > range_max ? range_other_value : range_max
@@ -42,7 +48,28 @@ DEFINE_PATCH_MACRO ad_value_range_group BEGIN
 	PATCH_IF range_count > 0 AND range_total != range_high - range_low + 1 BEGIN
 		SET range_broken = 1
 	END
-	ELSE PATCH_IF range_count > 0 BEGIN
+	// Une réduction n'est réunie qu'à partir de 1, comme dans l'ancien moteur (group_value_dice), dont la
+	// phrase « Réduit de… » ne saurait écrire -(1d4 +1).
+	ELSE PATCH_IF range_count > 0 AND range_exact BEGIN
+		SET range_dice_sides = range_count + 1
+		SET range_exact_value = range_sign * $fx_parameter1(~%range_id%~)
+		SET range_ranks = 1 << (range_exact_value - range_min)
+		SET range_dice = range_dice_sides <= 30 AND range_low == 0 AND range_high == 99 AND range_total == 100
+			AND range_max - range_min == range_count AND (range_sign > 0 OR range_min == 1)
+			AND ABS ($fx_probability(~%range_id%~) * range_dice_sides - range_total) <= range_dice_sides
+		PHP_EACH range_members AS range_other => range_exact_value BEGIN
+			SET range_rank = 1 << (range_exact_value - range_min)
+			PATCH_IF ABS ($fx_probability(~%range_other%~) * range_dice_sides - range_total) > range_dice_sides
+					OR (range_ranks BAND range_rank) != 0 BEGIN
+				SET range_dice = 0
+			END
+			SET range_ranks = range_ranks BOR range_rank
+		END
+		PATCH_IF NOT range_dice BEGIN
+			SET range_count = 0
+		END
+	END
+	PATCH_IF range_count > 0 AND NOT range_broken BEGIN
 		PHP_EACH range_members AS range_other => _ BEGIN
 			SET $fx_consumed(~%range_other%~) = 1
 		END
@@ -70,6 +97,8 @@ END
 // Réunit les effets de range_opcode, sauf avec support_header_only ; refus pour le 159
 // (range_broken), que l'ancien moteur réunit aussi quand ses plages se chevauchent.
 DEFINE_PATCH_MACRO ad_value_range_support BEGIN
+	SET range_sign = 1
+	SET range_exact = 0
 	PATCH_IF AD_ENABLE_SHRINKAGE AND NOT support_header_only BEGIN
 		PHP_EACH ~fx_ids_%range_opcode%~ AS _ => range_id BEGIN
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%range_id%~) AND $fx_parameter1(~%range_id%~) > 0 BEGIN
