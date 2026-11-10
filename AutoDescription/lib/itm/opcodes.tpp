@@ -23,6 +23,14 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~merge_duplicate_kinds~ BEGIN
 	108 => PARTY
 END
 
+// Modificateurs simples d'une statistique dont la valeur tirée au sort est réunie en dés par
+// group_value_dice (lignes de opcode_mod, opcode_target et opcode_probability, qui écrivent complex_value).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~value_dice_opcodes~ BEGIN
+	6 => 1 10 => 1 15 => 1 19 => 1 21 => 1 22 => 1 44 => 1 49 => 1 54 => 1 73 => 1 93 => 1 94 => 1 95 => 1
+	96 => 1 97 => 1 104 => 1 263 => 1 278 => 1 281 => 1 284 => 1 285 => 1 286 => 1 288 => 1 289 => 1 305 => 1
+	306 => 1 323 => 1 325 => 1
+END
+
 /*
  * Tableau servant à savoir comment trier le résultat final.
  * Vu qu'ils ne sont généralement pas
