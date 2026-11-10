@@ -2891,6 +2891,10 @@
 @11460003 = ~to cast %spellName% on %theTarget%~
 @11460004 = ~to instantly cast %spellName% on %theTarget%~
 @11460005 = ~%spellName% (instant)~
+@11460006 = ~Casts one of the following spells on %theTarget%: %spellNames%~
+@11460007 = ~Instantly casts one of the following spells on %theTarget%: %spellNames%~
+@11460008 = ~to cast one of the following spells on %theTarget%: %spellNames%~
+@11460009 = ~to instantly cast one of the following spells on %theTarget%: %spellNames%~
 
 // Opcode 147: Spell: Learn Spell [147]
 

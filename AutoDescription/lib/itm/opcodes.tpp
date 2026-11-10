@@ -31,6 +31,11 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY ~value_dice_opcodes~ BEGIN
 	306 => 1 323 => 1 325 => 1
 END
 
+// Opcodes dont les effets probables qui ne diffèrent que par le sort qu'ils nomment sont réunis en une liste de noms.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY ~probability_list_opcodes~ BEGIN
+	146 => 1 148 => 1
+END
+
 /*
  * Tableau servant à savoir comment trier le résultat final.
  * Vu qu'ils ne sont généralement pas
@@ -8153,7 +8158,17 @@ DEFINE_PATCH_MACRO ~opcode_target_146~ BEGIN
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT spellNames ~%custom_str%~
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellNames%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF type > 0 BEGIN
+				SPRINT description @11460007 // ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+			END
+			ELSE BEGIN
+				SPRINT description @11460006 // ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+			END
+			LPM ~opcode_146_common~
+		END
+		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF abilityType == AbilityType_Charge BEGIN
 				PATCH_IF type > 0 BEGIN
 					SPRINT description @11460005 // ~%spellName% (instantané)~
@@ -8222,7 +8237,17 @@ DEFINE_PATCH_MACRO ~opcode_target_probability_146~ BEGIN
 	ELSE BEGIN
 		LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
-		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+		SPRINT spellNames ~%custom_str%~
+		PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND NOT ~%spellNames%~ STRING_EQUAL ~~ BEGIN
+			PATCH_IF type > 0 BEGIN
+				SPRINT description @11460009 // ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+			END
+			ELSE BEGIN
+				SPRINT description @11460008 // ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+			END
+			LPM ~opcode_146_common~
+		END
+		ELSE PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
 			PATCH_IF type > 0 BEGIN
 				SPRINT description @11460004 // ~de lancer instantanément le sort %spellName% sur %theTarget%~
 			END

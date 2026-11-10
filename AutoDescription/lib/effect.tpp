@@ -541,6 +541,13 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 			END
 		END
 	END
+	PATCH_IF enable_shrinkage == 1 AND group_unequal_probabilities == 1 BEGIN
+		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+			PATCH_IF count > 1 AND VARIABLE_IS_SET $probability_list_opcodes(~%opcode%~) BEGIN
+				LPM ~group_probability_list~
+			END
+		END
+	END
 	PATCH_IF enable_shrinkage == 1 BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 1 BEGIN
@@ -820,6 +827,163 @@ DEFINE_PATCH_MACRO ~group_value_dice~ BEGIN
 				LPM ~add_opcode~
 			END
 		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~group_probability_list~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~listByLow~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~listOrder~ BEGIN END
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~listRun~ BEGIN END
+	PATCH_DEFINE_ARRAY ~listJoinedNames~ BEGIN END
+	SET listPass = VARIABLE_IS_SET listPass ? listPass + 1 : 1
+	PATCH_IF NOT (VARIABLE_IS_SET itemType AND itemType == ITM_TYPE_potion) BEGIN
+		PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+			LPM ~data_to_vars~
+			PATCH_IF probability > 0 AND probability < 100 AND ~%custom_str%~ STRING_EQUAL ~~
+					AND NOT (VARIABLE_IS_SET $listChecked(~%position%~) AND $listChecked(~%position%~) == listPass) BEGIN
+				LPF ~probability_list_name~ STR_VAR file = EVAL ~%resref%~ RET listName = spellName END
+				PATCH_IF NOT ~%listName%~ STRING_EQUAL ~~ BEGIN
+					SET listPosition = position
+					SPRINT listComplexDuration ~%complex_duration%~
+					CLEAR_ARRAY listByLow
+					SET listOverlap = 0
+					SET rangeLow = probability2
+					SET listLowPass = VARIABLE_IS_SET listLowPass ? listLowPass + 1 : 1
+					SET $listByLow(~%rangeLow%~) = position
+					SET $listLowSeen(~%rangeLow%~) = listLowPass
+					SET $listLow(~%position%~) = rangeLow
+					SET $listHigh(~%position%~) = probability1 > 99 ? 99 : probability1
+					SET $listProbability(~%position%~) = probability
+					SPRINT $listNames(~%position%~) ~%listName%~
+					PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+						LPM ~data_to_match_vars~
+						PATCH_IF match_position != listPosition AND match_probability > 0 AND match_probability < 100
+								AND NOT (VARIABLE_IS_SET $listChecked(~%match_position%~) AND $listChecked(~%match_position%~) == listPass)
+								AND match_isExternal == isExternal AND match_target == target AND match_power == power
+								AND match_parameter1 == parameter1 AND match_parameter2 == parameter2
+								AND match_timingMode == timingMode AND match_resistance == resistance AND match_duration == duration
+								AND match_diceCount == diceCount AND match_diceSides == diceSides
+								AND match_saveType == saveType AND match_saveBonus == saveBonus AND match_special == special
+								AND match_parameter3 == parameter3 AND match_parameter4 == parameter4 AND match_custom_int == custom_int
+								AND match_cumulable == cumulable
+								AND ~%match_resref2%~ STRING_EQUAL_CASE ~%resref2%~ AND ~%match_resref3%~ STRING_EQUAL_CASE ~%resref3%~
+								AND ~%match_custom_str%~ STRING_EQUAL ~~
+								AND ~%match_target_exceptions%~ STRING_EQUAL ~%target_exceptions%~
+								AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
+								AND ~%match_complex_value%~ STRING_EQUAL ~%complex_value%~
+								AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~
+								AND ~%data_28%~ STRING_EQUAL ~%listComplexDuration%~ BEGIN
+							LPF ~probability_list_name~ STR_VAR file = EVAL ~%match_resref%~ RET listName = spellName END
+							PATCH_IF NOT ~%listName%~ STRING_EQUAL ~~ BEGIN
+								PATCH_IF VARIABLE_IS_SET $listLowSeen(~%match_probability2%~) AND $listLowSeen(~%match_probability2%~) == listLowPass BEGIN
+									SET listOverlap = 1
+								END
+								SET $listByLow(~%match_probability2%~) = match_position
+								SET $listLowSeen(~%match_probability2%~) = listLowPass
+								SET $listLow(~%match_position%~) = match_probability2
+								SET $listHigh(~%match_position%~) = match_probability1 > 99 ? 99 : match_probability1
+								SET $listProbability(~%match_position%~) = match_probability
+								SPRINT $listNames(~%match_position%~) ~%listName%~
+							END
+						END
+					END
+					// Suite de plages contiguë qui contient celle de l'effet courant.
+					CLEAR_ARRAY listRun
+					SET listRunCount = 0
+					PATCH_IF NOT listOverlap BEGIN
+						SORT_ARRAY_INDICES listByLow NUMERICALLY
+						SET listRunHasPosition = 0
+						SET listPreviousHigh = 0 - 2
+						PATCH_PHP_EACH listByLow AS listMemberLow => listMember BEGIN
+							PATCH_IF NOT listRunHasPosition OR listMemberLow == listPreviousHigh + 1 BEGIN
+								PATCH_IF listMemberLow != listPreviousHigh + 1 BEGIN
+									CLEAR_ARRAY listRun
+									SET listRunCount = 0
+								END
+								SET $listRun(~%listRunCount%~) = listMember
+								SET listRunCount += 1
+								SET listRunHasPosition = listRunHasPosition OR listMember == listPosition
+								SET listPreviousHigh = $listHigh(~%listMember%~)
+							END
+							ELSE BEGIN
+								SET listPreviousHigh = 0 - 2
+							END
+						END
+					END
+					PATCH_IF listRunCount > 1 BEGIN
+						CLEAR_ARRAY listOrder
+						SET rangeLow = 100
+						SET rangeHigh = 0
+						SET rangeTotal = 0
+						FOR (listK = 0; listK < listRunCount; ++listK) BEGIN
+							SET listMember = $listRun(~%listK%~)
+							SET $listChecked(~%listMember%~) = listPass
+							SET rangeLow = $listLow(~%listMember%~) < rangeLow ? $listLow(~%listMember%~) : rangeLow
+							SET rangeHigh = $listHigh(~%listMember%~) > rangeHigh ? $listHigh(~%listMember%~) : rangeHigh
+							SET rangeTotal += $listProbability(~%listMember%~)
+							SET listOrderKey = (100 - $listProbability(~%listMember%~)) * 100000 + listMember
+							SET $listOrder(~%listOrderKey%~) = listMember
+							LPF ~delete_opcode~
+								INT_VAR opcode match_position = listMember
+								RET $opcodes(~%opcode%~) = count
+								RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+							END
+						END
+						// Bug où il reste toujours un item dans le tableau si c'était le dernier
+						PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+							CLEAR_ARRAY ~opcodes_%opcode%~
+						END
+						SORT_ARRAY_INDICES listOrder NUMERICALLY
+						CLEAR_ARRAY listJoinedNames
+						SET listNameCount = 0
+						SET listNamePass = VARIABLE_IS_SET listNamePass ? listNamePass + 1 : 1
+						PATCH_PHP_EACH listOrder AS _ => listMember BEGIN
+							SPRINT listName $listNames(~%listMember%~)
+							SPRINT listNameKey ~%listName%~
+							TO_LOWER listNameKey
+							PATCH_IF NOT (VARIABLE_IS_SET $listNameSeen(~%listNameKey%~) AND $listNameSeen(~%listNameKey%~) == listNamePass) BEGIN
+								SET $listNameSeen(~%listNameKey%~) = listNamePass
+								SPRINT $listJoinedNames(~%listNameCount%~) ~%listName%~
+								SET listNameCount += 1
+							END
+						END
+						SPRINT custom_str ~~
+						PATCH_IF listNameCount > 1 BEGIN
+							SPRINT and @100004 // ~ou~
+							SPRINT listGlue @10020 // ~ », « ~
+							SPRINT listFinalGlue @10021 // ~ » %and% « ~
+							FOR (listK = 0; listK < listNameCount; ++listK) BEGIN
+								SPRINT listName $listJoinedNames(~%listK%~)
+								PATCH_IF listK == 0 BEGIN
+									SPRINT custom_str ~%listName%~
+								END
+								ELSE PATCH_IF listK == listNameCount - 1 BEGIN
+									SPRINT custom_str ~%custom_str%%listFinalGlue%%listName%~
+								END
+								ELSE BEGIN
+									SPRINT custom_str ~%custom_str%%listGlue%%listName%~
+								END
+							END
+						END
+						SET position = listPosition
+						SET probability1 = rangeHigh
+						SET probability2 = rangeLow
+						SET probability = rangeTotal
+						LPM ~add_opcode~
+					END
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~probability_list_name~ STR_VAR file = ~~ RET spellName BEGIN
+	SPRINT spellName ~~
+	SPRINT listResref ~%file%~
+	TO_UPPER listResref
+	PATCH_IF NOT VARIABLE_IS_SET $opcode_target_146_item_revision(~%listResref%~)
+			AND NOT VARIABLE_IS_SET $opcode_target_probability_146_item_revision(~%listResref%~) BEGIN
+		LPF ~get_spell_name~ STR_VAR file = EVAL ~%file%~ RET spellName END
 	END
 END
 

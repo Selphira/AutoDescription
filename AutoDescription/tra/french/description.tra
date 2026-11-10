@@ -3079,6 +3079,10 @@
 @11460003 = ~de lancer le sort « %spellName% » sur %theTarget%~
 @11460004 = ~de lancer instantanément le sort « %spellName% » sur %theTarget%~
 @11460005 = ~%spellName% (instantané)~
+@11460006 = ~Lance l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+@11460007 = ~Lance instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+@11460008 = ~de lancer l'un des sorts suivants sur %theTarget% : « %spellNames% »~
+@11460009 = ~de lancer instantanément l'un des sorts suivants sur %theTarget% : « %spellNames% »~
 
 // Opcode 147: Spell: Learn Spell [147]
 
