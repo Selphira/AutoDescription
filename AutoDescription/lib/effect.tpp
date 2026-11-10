@@ -536,6 +536,13 @@ DEFINE_PATCH_MACRO ~group_effects~ BEGIN
 	END
 	PATCH_IF enable_shrinkage == 1 BEGIN
 		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
+			PATCH_IF count > 1 AND VARIABLE_IS_SET $value_dice_opcodes(~%opcode%~) BEGIN
+				LPM ~group_value_dice~
+			END
+		END
+	END
+	PATCH_IF enable_shrinkage == 1 BEGIN
+		PATCH_PHP_EACH opcodes AS opcode => count BEGIN
 			PATCH_IF count > 1 BEGIN
 				LPM ~group_duration_range~
 			END
@@ -725,6 +732,88 @@ DEFINE_PATCH_MACRO ~group_value_range~ BEGIN
 					LPM ~%rangeTextMacro%~
 				END
 				SET position = rangePosition
+				SET probability1 = rangeHigh
+				SET probability2 = rangeLow
+				SET probability = rangeTotal
+				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
+/*
+ * Regroupement seulement si le tirage est exactement celui d'un dé.
+ */
+DEFINE_PATCH_MACRO ~group_value_dice~ BEGIN
+	PATCH_DEFINE_ASSOCIATIVE_ARRAY ~diceValuePositions~ BEGIN END
+	SET diceValuePass = VARIABLE_IS_SET diceValuePass ? diceValuePass + 1 : 1
+	PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+		LPM ~data_to_vars~
+		PATCH_IF parameter2 == MOD_TYPE_cumulative AND parameter1 != 0 AND probability < 100 AND ~%complex_value%~ STRING_EQUAL ~~
+				AND NOT (VARIABLE_IS_SET $diceValueChecked(~%position%~) AND $diceValueChecked(~%position%~) == diceValuePass) BEGIN
+			SET $diceValueChecked(~%position%~) = diceValuePass
+			CLEAR_ARRAY diceValuePositions
+			SET $diceValuePositions(~%position%~) = probability
+			SET $diceValueAmounts(~%position%~) = ABS parameter1
+			SET diceSign = parameter1 > 0 ? 1 : 0 - 1
+			SET dicePosition = position
+			SET amountMin = ABS parameter1
+			SET amountMax = amountMin
+			SET rangeLow = probability2
+			SET rangeHigh = probability1 > 99 ? 99 : probability1
+			SET rangeTotal = probability
+			SET rangeCount = 1
+			PATCH_PHP_EACH EVAL ~opcodes_%opcode%~ AS data => _ BEGIN
+				LPM ~data_to_match_vars~
+				PATCH_IF match_parameter1 * diceSign > 0 AND ~%match_complex_value%~ STRING_EQUAL ~~
+						AND NOT (VARIABLE_IS_SET $diceValueChecked(~%match_position%~) AND $diceValueChecked(~%match_position%~) == diceValuePass) BEGIN
+					LPM ~opcode_match_value_range~
+					PATCH_IF match == 1 AND match_cumulable == cumulable AND ~%match_target_exceptions%~ STRING_EQUAL ~%target_exceptions%~
+							AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~ AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~ BEGIN
+						SET $diceValueChecked(~%match_position%~) = diceValuePass
+						SET $diceValuePositions(~%match_position%~) = match_probability
+						SET $diceValueAmounts(~%match_position%~) = ABS match_parameter1
+						SET rangeCount += 1
+						SET diceAmount = ABS match_parameter1
+						SET amountMin = diceAmount < amountMin ? diceAmount : amountMin
+						SET amountMax = diceAmount > amountMax ? diceAmount : amountMax
+						SET rangeLow = match_probability2 < rangeLow ? match_probability2 : rangeLow
+						SET rangeHigh = match_probability1 > rangeHigh ? (match_probability1 > 99 ? 99 : match_probability1) : rangeHigh
+						SET rangeTotal += match_probability
+					END
+				END
+			END
+			// Valeurs k... k+N-1, chacune à son propre rang (masque des rangs, au plus 30 valeurs).
+			SET isDiceValue = rangeCount > 1 AND rangeCount <= 30 AND rangeLow == 0 AND rangeHigh == 99 AND rangeTotal == 100
+				AND amountMax - amountMin == rangeCount - 1 AND (diceSign > 0 OR amountMin == 1)
+			PATCH_IF isDiceValue BEGIN
+				SET rankMask = 0
+				PATCH_PHP_EACH diceValuePositions AS diceMember => slice BEGIN
+					SET rankBit = 1 << ($diceValueAmounts(~%diceMember%~) - amountMin)
+					PATCH_IF ABS (slice * rangeCount - rangeTotal) > rangeCount OR (rankMask BAND rankBit) != 0 BEGIN
+						SET isDiceValue = 0
+					END
+					SET rankMask = rankMask BOR rankBit
+				END
+			END
+			PATCH_IF isDiceValue BEGIN
+				PATCH_PHP_EACH diceValuePositions AS diceDeleted => _ BEGIN
+					LPF ~delete_opcode~
+						INT_VAR opcode match_position = diceDeleted
+						RET $opcodes(~%opcode%~) = count
+						RET_ARRAY EVAL ~opcodes_%opcode%~ = opcodes_xx
+					END
+				END
+				// Bug où il reste toujours un item dans le tableau si c'était le dernier
+				PATCH_IF $opcodes(~%opcode%~) == 0 BEGIN
+					CLEAR_ARRAY ~opcodes_%opcode%~
+				END
+				LPF ~get_damage_value~ INT_VAR diceCount = 1 diceSides = rangeCount damageAmount = amountMin - 1 RET complex_value = damage END
+				PATCH_IF diceSign < 0 BEGIN
+					SPRINT complex_value ~-%complex_value%~
+				END
+				SET position = dicePosition
+				SET parameter1 = diceSign * amountMin
 				SET probability1 = rangeHigh
 				SET probability2 = rangeLow
 				SET probability = rangeTotal
