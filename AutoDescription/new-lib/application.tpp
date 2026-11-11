@@ -1080,9 +1080,27 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SET app_line_count = line_count
 		LPM ad_line_add
 		// Progression selon le niveau du sort : l'ancien moteur ajoute l'effet qui la porte en fin de
-		// liste ; à rang égal, il vient donc avant les autres lignes (égalités inversées, SPWI603).
-		PATCH_IF line_count > app_line_count AND $fx_level_progression(~%line_fx%~) BEGIN
-			SET $line_order(~%app_line_count%~) = app_line_count + 500
+		// liste ; à rang égal, il vient donc avant les autres lignes (égalités inversées, SPWI603). L'effet
+		// de tous les niveaux trouvé par la passe 3 (fx_level_chained) y est ajouté de même, par
+		// group_spell_effects_by_duration (durée constante). Ces effets y sont ajoutés passe par passe
+		// (durée, jet de sauvegarde, valeur), chacune dans l'ordre de ses effets : les égalités
+		// inversées mettent la dernière passe, puis la dernière ligne écrite, en tête (SPWI613 du jeu
+		// de base, SPWI616, SPCL236).
+		PATCH_IF line_count > app_line_count AND ($fx_level_progression(~%line_fx%~) OR $fx_level_chained(~%line_fx%~)) BEGIN
+			SET line_level_rank = app_line_count
+			PATCH_IF line_level_rank > 99 BEGIN
+				SET line_level_rank = 99
+			END
+			SPRINT line_level_value $fx_level_value(~%line_fx%~)
+			SPRINT line_level_save $fx_level_save(~%line_fx%~)
+			SET line_level_pass = 500
+			PATCH_IF NOT (~%line_level_value%~ STRING_EQUAL ~~) BEGIN
+				SET line_level_pass = 700
+			END
+			ELSE PATCH_IF NOT (~%line_level_save%~ STRING_EQUAL ~~) BEGIN
+				SET line_level_pass = 600
+			END
+			SET $line_order(~%app_line_count%~) = line_level_pass + line_level_rank
 		END
 	END
 	SET line_sort = app_saved_sort

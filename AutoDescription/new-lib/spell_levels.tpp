@@ -193,6 +193,13 @@ DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
 			SET level_id = $EVAL ~spell_fx_%level_h%~(~%level_k%~)
 			SET level_opcode = $EVAL ~spell_fx_opcode_%level_h%~(~%level_k%~)
+			// 248 réuni à un 249 (ad_hit_effect_group) : l'ancien moteur le compare comme son opcode 524
+			// (opcode_248_group), sans les autres 248 (PXF3ARME).
+			PATCH_IF level_opcode == 248 AND VARIABLE_IS_SET $fx_hit_any(~%level_id%~) BEGIN
+				PATCH_IF $fx_hit_any(~%level_id%~) BEGIN
+					SET level_opcode = 524
+				END
+			END
 			SET $level_id(~%level_a%~) = level_id
 			SET $level_header(~%level_a%~) = level_h
 			// Effets identiques réunis (ad_group_identical_effects) : l'ancien moteur garde leur nombre dans
@@ -898,6 +905,21 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					END
 				END
 				SET $level_emitted(~%level_a%~) = 1
+				// Effet de tous les niveaux trouvé ici : l'ancien group_spell_effects_by_duration (durée
+				// constante) l'ajoute aux effets communs avec les progressions de durée (SPWI613 du jeu de
+				// base, ordre des lignes dans new-lib/application.tpp).
+				PATCH_IF level_h == 0 AND level_to == 99 AND fx_header_count > 1 BEGIN
+					SET level_id = $level_id(~%level_a%~)
+					SET $fx_level_chained(~%level_id%~) = 1
+					PATCH_IF level_opcode == 518 BEGIN
+						SET level_derived = $level_derived(~%level_a%~)
+						PHP_EACH fx_ids_206 AS _ => level_member BEGIN
+							PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
+								SET $fx_level_chained(~%level_member%~) = 1
+							END
+						END
+					END
+				END
 				PATCH_IF level_h > 0 OR level_to < 99 BEGIN
 					SET level_key = (level_from + 100) * 100 + level_to
 					SET $level_keys(~%level_key%~) = 1

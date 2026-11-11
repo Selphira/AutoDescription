@@ -25,7 +25,9 @@
 // fx_consumed (0 à la lecture,
 // mis à 1 par new-lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
 // pour un effet écarté, ad_application_drop) ; fx_level_merged (1 pour l'effet d'un en-tête que l'effet
-// égal d'un autre niveau représente, new-lib/spell_levels.tpp) ; fx_group_anchor (l'effet lui-même à
+// égal d'un autre niveau représente, new-lib/spell_levels.tpp) ; fx_level_chained (1 pour l'effet du
+// premier en-tête d'un sort à plusieurs en-têtes que la passe 3 de new-lib/spell_levels.tpp écrit pour
+// tous les niveaux) ; fx_group_anchor (l'effet lui-même à
 // la lecture, celui qui le représente une fois réuni par le regroupement d'un opcode : maladies,
 // invocations, ad_group_same_fields) ; fx_derived_source (1 pour l'effet d'ancrage d'un effet dérivé,
 // dont la ligne lit les champs, new-lib/groups.tpp) ; fx_exception et fx_exception_count (exceptions de
@@ -338,6 +340,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SPRINT $fx_name_list(~%fx_id%~) ~~
 	SET $fx_list_size(~%fx_id%~) = 0
 	SET $fx_level_merged(~%fx_id%~) = 0
+	SET $fx_level_chained(~%fx_id%~) = 0
 	SET $fx_cure_mask(~%fx_id%~) = 0
 	SET $fx_cure_feeblemind(~%fx_id%~) = 0
 	SET $fx_header_target(~%fx_id%~) = 0
