@@ -143,6 +143,12 @@ DEFINE_PATCH_FUNCTION ~appendSubProperty~ INT_VAR strref = 0 STR_VAR name = "" v
 	PATCH_IF NOT "%value%" STRING_EQUAL "" BEGIN
 		SPRINT name @100001 // %name% : %value%
 	END
+    INNER_PATCH_SAVE multiline_name ~%name%~ BEGIN
+        REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~%crlf%- ~ ~%crlf%  - ~
+    END
+    PATCH_IF NOT ~%multiline_name%~ STRING_EQUAL ~%name%~ BEGIN
+        SPRINT name ~- %multiline_name%~
+    END
     SPRINT description "%description%%crlf%  %name%"
 END
 
