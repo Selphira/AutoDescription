@@ -19324,6 +19324,7 @@ DEFINE_PATCH_MACRO ~opcode_match_opcode_219_group~ BEGIN
 		AND ~%match_complex_value%~ STRING_EQUAL ~%complex_value%~
 		AND ~%match_complex_duration%~ STRING_EQUAL ~%complex_duration%~
 		AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~
+		AND ~%match_complex_level%~ STRING_EQUAL ~%complex_level%~
 	)
 END
 

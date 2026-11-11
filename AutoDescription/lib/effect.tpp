@@ -27,6 +27,7 @@ DEFINE_PATCH_MACRO ~read_effect_vars~ BEGIN
 	SPRINT complex_value ~~
 	SPRINT complex_duration ~~
 	SPRINT complex_save ~~
+	SPRINT complex_level ~~
 END
 
 DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
@@ -60,6 +61,7 @@ DEFINE_PATCH_MACRO ~read_external_effect_vars~ BEGIN
 	SPRINT complex_value ~~
 	SPRINT complex_duration ~~
 	SPRINT complex_save ~~
+	SPRINT complex_level ~~
 END
 
 DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
@@ -93,6 +95,7 @@ DEFINE_PATCH_MACRO ~data_to_vars~ BEGIN
 	SPRINT complex_value ~%data_27%~
 	SPRINT complex_duration ~%data_28%~
 	SPRINT complex_save ~%data_29%~
+	SPRINT complex_level ~%data_30%~
 END
 
 DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
@@ -126,6 +129,7 @@ DEFINE_PATCH_MACRO ~data_to_match_vars~ BEGIN
 	SPRINT match_target_type ~%data_26%~
 	SPRINT match_complex_value ~%data_27%~
 	SPRINT match_complex_save ~%data_29%~
+	SPRINT match_complex_level ~%data_30%~
 END
 
 
@@ -596,7 +600,7 @@ DEFINE_PATCH_MACRO ~merge_duplicate_effects~ BEGIN
 			SPRINT mergeMode ~*~
 		END
 		SPRINT mergeKey ~%data_1%|%data_2%|%data_4%|%mergeMode%|%data_6%|%data_8%|%data_9%|%data_10%|%data_11%|%data_12%|%data_13%|%data_14%|%data_15%|%data_16%|%data_17%~
-		SPRINT mergeKey ~%mergeKey%|%data_18%|%data_19%|%data_20%|%data_21%|%data_22%|%data_23%|%data_24%|%data_25%|%data_26%|%data_27%|%data_28%|%data_29%~
+		SPRINT mergeKey ~%mergeKey%|%data_18%|%data_19%|%data_20%|%data_21%|%data_22%|%data_23%|%data_24%|%data_25%|%data_26%|%data_27%|%data_28%|%data_29%|%data_30%~
 		PATCH_IF NOT VARIABLE_IS_SET $mergeFirst(~%mergePass% %mergeKey%~) BEGIN
 			SET $mergeFirst(~%mergePass% %mergeKey%~) = data_0
 			SET $mergeValue(~%mergePass% %data_0%~) = data_4
@@ -650,13 +654,13 @@ DEFINE_PATCH_MACRO ~merge_duplicate_effects~ BEGIN
 				PATCH_IF VARIABLE_IS_SET $mergeValue(~%mergePass% %data_0%~) BEGIN
 					SPRINT data_4 $mergeValue(~%mergePass% %data_0%~)
 				END
-				SET $mergeEffects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~) = 1
+				SET $mergeEffects(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~ ~%data_30%~) = 1
 				SET mergeCount += 1
 			END
 		END
 		CLEAR_ARRAY ~opcodes_%opcode%~
 		PATCH_PHP_EACH ~mergeEffects~ AS data => _ BEGIN
-			SET $EVAL ~opcodes_%opcode%~(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~) = 1
+			SET $EVAL ~opcodes_%opcode%~(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~ ~%data_30%~) = 1
 		END
 		SET $opcodes(~%opcode%~) = mergeCount
 	END
@@ -776,7 +780,7 @@ DEFINE_PATCH_MACRO ~group_value_dice~ BEGIN
 						AND NOT (VARIABLE_IS_SET $diceValueChecked(~%match_position%~) AND $diceValueChecked(~%match_position%~) == diceValuePass) BEGIN
 					LPM ~opcode_match_value_range~
 					PATCH_IF match == 1 AND match_cumulable == cumulable AND ~%match_target_exceptions%~ STRING_EQUAL ~%target_exceptions%~
-							AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~ AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~ BEGIN
+							AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~ AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~ AND ~%match_complex_level%~ STRING_EQUAL ~%complex_level%~ BEGIN
 						SET $diceValueChecked(~%match_position%~) = diceValuePass
 						SET $diceValuePositions(~%match_position%~) = match_probability
 						SET $diceValueAmounts(~%match_position%~) = ABS match_parameter1
@@ -872,6 +876,7 @@ DEFINE_PATCH_MACRO ~group_probability_list~ BEGIN
 								AND ~%match_target_type%~ STRING_EQUAL ~%target_type%~
 								AND ~%match_complex_value%~ STRING_EQUAL ~%complex_value%~
 								AND ~%match_complex_save%~ STRING_EQUAL ~%complex_save%~
+								AND ~%match_complex_level%~ STRING_EQUAL ~%complex_level%~
 								AND ~%data_28%~ STRING_EQUAL ~%listComplexDuration%~ BEGIN
 							LPF ~probability_list_name~ STR_VAR file = EVAL ~%match_resref%~ RET listName = spellName END
 							PATCH_IF NOT ~%listName%~ STRING_EQUAL ~~ BEGIN
@@ -1186,7 +1191,7 @@ DEFINE_PATCH_MACRO ~add_opcode~ BEGIN
 	ELSE BEGIN
 		SET $opcodes(~%opcode%~) += 1
 	END
-	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~) = 1
+	SET $EVAL ~opcodes_%opcode%~(~%position%~ ~%isExternal%~ ~%target%~ ~%power%~ ~%parameter1%~ ~%parameter2%~ ~%timingMode%~ ~%resistance%~ ~%duration%~ ~%probability%~ ~%probability1%~ ~%probability2%~ ~%resref%~ ~%diceCount%~ ~%diceSides%~ ~%saveType%~ ~%saveBonus%~ ~%special%~ ~%parameter3%~ ~%parameter4%~ ~%resref2%~ ~%resref3%~ ~%custom_int%~ ~%custom_str%~ ~%cumulable%~ ~%target_exceptions%~ ~%target_type%~ ~%complex_value%~ ~%complex_duration%~ ~%complex_save%~ ~%complex_level%~) = 1
 END
 
 DEFINE_PATCH_FUNCTION ~delete_opcode~
@@ -1238,7 +1243,7 @@ BEGIN
 			LPM ~%match_macro%~
 			PATCH_IF NOT match BEGIN
 				SET count += 1
-		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~) = 1
+		        SET $opcodes_xx(~%data_0%~ ~%data_1%~ ~%data_2%~ ~%data_3%~ ~%data_4%~ ~%data_5%~ ~%data_6%~ ~%data_7%~ ~%data_8%~ ~%data_9%~ ~%data_10%~ ~%data_11%~ ~%data_12%~ ~%data_13%~ ~%data_14%~ ~%data_15%~ ~%data_16%~ ~%data_17%~ ~%data_18%~ ~%data_19%~ ~%data_20%~ ~%data_21%~ ~%data_22%~ ~%data_23%~ ~%data_24%~ ~%data_25%~ ~%data_26%~ ~%data_27%~ ~%data_28%~ ~%data_29%~ ~%data_30%~) = 1
 	        END
 	    END
 	END

@@ -647,9 +647,14 @@ DEFINE_PATCH_FUNCTION ~get_complex_value~
 		is_valid
 		complex_value
 		complex_value_int
+		delta_value
+		delta_level
+		remains_value
+		prev_level
 BEGIN
 	SPRINT complex_value ~~
 	SET complex_value_int = 0
+	SET remains_value = 0
 
 	SET is_valid = 1
 

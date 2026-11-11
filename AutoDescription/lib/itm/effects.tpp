@@ -290,6 +290,7 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 		LPF ~add_log_error~ STR_VAR message = EVAL ~Opcode %opcode%: has no effect : levelMin (%levelMin%) > levelMax (%levelMax%) ~ END
 	END
 	ELSE PATCH_IF levelKind >= 0 BEGIN
+		LPM ~set_target_level_progression~
 		SET strref = 101186 + levelKind // ~%target% (de niveau %levelMin%)~
 		SET oldTarget = target
 		PATCH_FOR_EACH vTarget IN ~theTarget~ ~ofTheTarget~ ~toTheTarget~ BEGIN
@@ -297,6 +298,13 @@ DEFINE_PATCH_MACRO ~add_target_level~ BEGIN
 			SPRINT EVAL ~%vTarget%~ (AT strref)
 		END
 		SET target = oldTarget
+	END
+END
+
+// Niveau maximal qui progresse avec le niveau du sort.
+DEFINE_PATCH_MACRO ~set_target_level_progression~ BEGIN
+	PATCH_IF levelKind == 1 AND VARIABLE_IS_SET complex_level AND NOT ~%complex_level%~ STRING_EQUAL ~~ BEGIN
+		SPRINT levelMax ~%complex_level%~
 	END
 END
 
@@ -333,6 +341,7 @@ DEFINE_PATCH_MACRO ~set_self_level_text~ BEGIN
 	PATCH_IF ~%opcode_target%~ STRING_EQUAL ~_self~ BEGIN
 		LPM ~get_target_level_kind~
 		PATCH_IF levelKind >= 0 AND levelKind <= 3 BEGIN
+			LPM ~set_target_level_progression~
 			SET strref = 101197 + levelKind // ~uniquement au niveau %levelMin%~
 			SPRINT selfLevelText (AT strref)
 		END
