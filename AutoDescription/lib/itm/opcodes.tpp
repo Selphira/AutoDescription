@@ -10944,6 +10944,7 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 			SET searchTimingMode = timingMode
 			SET searchDuration = duration
 			SPRINT searchTargetType ~%target_type%~
+			SPRINT searchResref ~%resref%~
 			CLEAR_ARRAY opcode_206_positions
 			CLEAR_ARRAY spellList
 			SET $opcode_206_positions(~%position%~) = opcode
@@ -10952,7 +10953,11 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
 				PATCH_IF NOT VARIABLE_IS_SET $opcode_206_positions_already_check(~%position%~) AND searchTarget == target AND ~%searchTargetType%~ STRING_EQUAL ~%target_type%~ AND (searchTimingMode == TIMING_while_equipped OR (searchTimingMode != TIMING_while_equipped AND searchTimingMode == timingMode AND searchDuration == duration)) BEGIN
 					LPF ~get_spell_name~ STR_VAR file = EVAL ~%resref%~ RET spellName END
 
+					SET sameOnAllLevels = 1
 					PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ BEGIN
+						LPF ~opcode_206_same_duration_on_all_levels~ STR_VAR head_resref = ~%searchResref%~ member_resref = ~%resref%~ RET sameOnAllLevels = same END
+					END
+					PATCH_IF NOT ~%spellName%~ STRING_EQUAL ~~ AND sameOnAllLevels BEGIN
 						SET $spellList(~%spellName%~) = 1
 						SET $opcode_206_positions_already_check(~%position%~) = opcode
 						SET $opcode_206_positions(~%position%~) = opcode
@@ -10989,6 +10994,82 @@ DEFINE_PATCH_MACRO ~opcode_206_post_group~ BEGIN
                 SPRINT final_glue @10021 // ~ » %and% « ~
 				LPF ~implode~ STR_VAR array_name = ~spellList~ glue final_glue RET custom_str = text END
 				LPM ~add_opcode~
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_FUNCTION ~opcode_206_same_duration_on_all_levels~
+	STR_VAR
+		head_resref = ~~
+		member_resref = ~~
+	RET
+		same
+BEGIN
+	SET same = 1
+	SET levels_compared = VARIABLE_IS_SET spell_levels_compared AND spell_levels_compared
+	PATCH_IF levels_compared BEGIN
+		SET levels_compared = op206_level_headers > 1
+	END
+	TO_UPPER head_resref
+	TO_UPPER member_resref
+	PATCH_IF levels_compared AND NOT ~%head_resref%~ STRING_EQUAL ~%member_resref%~ BEGIN
+		FOR (header_index = 0; header_index < op206_level_headers AND same; ++header_index) BEGIN
+			SPRINT head_key ~%op206_level_serial% %header_index% %head_resref%~
+			SPRINT member_key ~%op206_level_serial% %header_index% %member_resref%~
+			SET head_found = VARIABLE_IS_SET $op206_level_timing(~%head_key%~)
+			SET member_found = VARIABLE_IS_SET $op206_level_timing(~%member_key%~)
+			PATCH_IF head_found != member_found BEGIN
+				SET same = 0
+			END
+			ELSE PATCH_IF head_found BEGIN
+				SET head_timing = $op206_level_timing(~%head_key%~)
+				PATCH_IF head_timing != TIMING_while_equipped
+						AND (head_timing != $op206_level_timing(~%member_key%~) OR $op206_level_duration(~%head_key%~) != $op206_level_duration(~%member_key%~)) BEGIN
+					SET same = 0
+				END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ~opcode_206_load_level_immunities~ BEGIN
+	PATCH_IF NOT VARIABLE_IS_SET op206_level_serial BEGIN
+		SET op206_level_serial = 0
+	END
+	SET op206_level_serial += 1
+	SET op206_level_headers = 0
+	PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+		READ_SHORT SPL_extended_headers_count       op206_level_headers
+		READ_LONG  SPL_feature_blocks_offset         op206_effects_offset
+		READ_SHORT SPL_casting_feature_blocks_offset op206_casting_index
+		READ_SHORT SPL_casting_feature_blocks_count  op206_casting_count
+		PATCH_IF op206_level_headers > 1 BEGIN
+			SET op206_header_index = 0
+			GET_OFFSET_ARRAY op206_header_offsets SPL_V10_HEADERS
+			PHP_EACH op206_header_offsets AS _ => op206_header_offset BEGIN
+				READ_SHORT (op206_header_offset + SPL_HEAD_feature_blocks_count)  op206_effect_count
+				READ_SHORT (op206_header_offset + SPL_HEAD_feature_blocks_offset) op206_effect_first
+				FOR (op206_effect = 0; op206_effect < op206_effect_count; ++op206_effect) BEGIN
+					SET op206_effect_index = op206_effect_first + op206_effect
+					SET op206_effect_offset = op206_effects_offset + 0x30 * op206_effect_index
+					PATCH_IF (op206_effect_index < op206_casting_index OR op206_effect_index >= op206_casting_index + op206_casting_count)
+							AND op206_effect_offset + 0x30 <= BUFFER_LENGTH BEGIN
+						READ_SHORT op206_effect_offset op206_effect_opcode
+						PATCH_IF op206_effect_opcode == 206 BEGIN
+							READ_ASCII (op206_effect_offset + EFF_resref_key) op206_resref (8) NULL
+							TO_UPPER op206_resref
+							SPRINT op206_key ~%op206_level_serial% %op206_header_index% %op206_resref%~
+							PATCH_IF NOT VARIABLE_IS_SET $op206_level_timing(~%op206_key%~) BEGIN
+								READ_BYTE (op206_effect_offset + EFF_timing_mode) op206_timing
+								READ_LONG (op206_effect_offset + EFF_duration)    op206_duration
+								SET $op206_level_timing(~%op206_key%~) = op206_timing
+								SET $op206_level_duration(~%op206_key%~) = op206_duration
+							END
+						END
+					END
+				END
+				SET op206_header_index += 1
 			END
 		END
 	END

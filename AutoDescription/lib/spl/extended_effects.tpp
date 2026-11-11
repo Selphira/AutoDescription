@@ -582,6 +582,8 @@ DEFINE_PATCH_MACRO ~load_level_effects~ BEGIN
     PATCH_DEFINE_ARRAY level_targets BEGIN END
     PATCH_DEFINE_ARRAY level_target_numbers BEGIN END
 
+	SET spell_levels_compared = 1
+	LPM ~opcode_206_load_level_immunities~
 	GET_OFFSET_ARRAY headerOffsets SPL_V10_HEADERS
 	PHP_EACH headerOffsets AS _ => headerOffset BEGIN
 		READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
@@ -604,6 +606,7 @@ DEFINE_PATCH_MACRO ~load_level_effects~ BEGIN
 				EVAL ~leveled_opcodes_%requiredLevel%~ = leveled_opcodes
 		END
 	END
+	SET spell_levels_compared = 0
 END
 
 DEFINE_PATCH_FUNCTION ~get_spell_effects_description_for_level~
@@ -623,6 +626,7 @@ BEGIN
 
     PATCH_DEFINE_ARRAY level_effects BEGIN END
 
+	SET spell_levels_compared = 0
 	LPF ~get_spell_headeroffset_for_level~ INT_VAR castingLevel RET headerOffset END
 
 	READ_SHORT (headerOffset + SPL_HEAD_level_required) requiredLevel
