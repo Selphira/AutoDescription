@@ -578,7 +578,16 @@ BEGIN
 			SPRINT text ~%text%%CRLF%  %line_prefix%%line_text%~
 		END
 		ELSE BEGIN
-			SPRINT text ~%text%%CRLF%%line_prefix%%line_text%~
+			SPRINT line_text_prefix ~%line_prefix%~
+			// Texte de plusieurs lignes (sous-sort d'un opcode 146) en retrait sous un titre : chacune garde sa
+			// puce, comme l'ancien appendSubProperty.
+			PATCH_IF level == 2 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%line_text%~) >= 0 BEGIN
+				INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+					REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%CRLF%  - ~
+				END
+				SPRINT line_text_prefix ~%line_prefix%- ~
+			END
+			SPRINT text ~%text%%CRLF%%line_text_prefix%%line_text%~
 		END
 		SET count += 1
 	END
