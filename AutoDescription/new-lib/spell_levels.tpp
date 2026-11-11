@@ -170,12 +170,14 @@ DEFINE_PATCH_MACRO ad_spell_levels BEGIN
 	SET level_skip_default = ctx_ignore_duration ? AD_SAME_TIMING : 0
 	SET level_skip = level_skip_default
 	SET level_special_duration = NOT ctx_ignore_duration
+	SET level_search_start = 0
 	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_spell_levels_common
 		LPM ad_spell_levels_chains
 		LPM ad_spell_levels_by_duration
 		LPM ad_spell_levels_by_save
 		LPM ad_spell_levels_by_values
+		LPM ad_spell_levels_by_target_level
 	END
 	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_spell_levels_ranges
@@ -481,7 +483,83 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 	SET level_skip = level_skip_default
 END
 
-// Recherche de l'effet level_a du premier en-tête dans chaque en-tête (ancien
+// Progression du niveau maximal de la cible (ancien group_spell_effects_by_target_level,
+// fx_level_max_text : « de niveau 1 par tranche de 2 niveaux du lanceur/50 ou inférieur ») : effet
+// restreint aux cibles d'un niveau au plus, semblable au nombre de dés près (le niveau maximal) dans
+// chacun des en-têtes depuis le sien jusqu'au dernier, sans semblable dans l'en-tête précédent, de
+// durée constante, dont les niveaux suivent une formule (deux valeurs n'en font pas). Depuis le premier
+// en-tête, il est écrit sans titre de niveau ; depuis un autre (MOTURN1 : la mort n'apparaît qu'au
+// niveau 2), sa section va jusqu'au dernier niveau (fx_level_to_last, ad_spell_levels_ranges), ses
+// semblables étant écartés.
+DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
+	SET level_skip = AD_SAME_DICE
+	FOR (level_h0 = 0; level_h0 < fx_header_count AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_h0) BEGIN
+		FOR (level_k0 = 0; level_k0 < $spell_fx_count(~%level_h0%~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
+			SPRINT level_a ~%level_h0% %level_k0%~
+			SET level_id = $level_id(~%level_a%~)
+			SET level_opcode = $level_opcode(~%level_a%~)
+			SET target_level_min = 0
+			SET target_level_max = 0
+			PATCH_IF VARIABLE_IS_SET $fx_level_max(~%level_id%~) BEGIN
+				SET target_level_min = $fx_level_min(~%level_id%~)
+				SET target_level_max = $fx_level_max(~%level_id%~)
+			END
+			PATCH_IF $level_on(~%level_a%~) AND level_opcode != 518 AND target_level_max > 0 AND target_level_min <= 1 AND target_level_min != target_level_max
+					AND NOT (IS_EE AND (level_opcode == 127 OR (level_opcode == 218 AND $fx_parameter2(~%level_id%~) != 0))) BEGIN
+				SET target_level_previous = 0
+				PATCH_IF level_h0 > 0 BEGIN
+					// Semblable à la durée près, comme l'ancien moteur (opcode_match_except_diceCount_and_duration).
+					SET level_skip = AD_SAME_DICE BOR AD_SAME_TIMING
+					SET target_level_h = level_h0 - 1
+					FOR (level_k = 0; level_k < $spell_fx_count(~%target_level_h%~) AND NOT target_level_previous; ++level_k) BEGIN
+						SPRINT level_b ~%target_level_h% %level_k%~
+						PATCH_IF $level_opcode(~%level_b%~) == level_opcode BEGIN
+							LPM ad_spell_level_same
+							SET target_level_previous = level_same
+						END
+					END
+					SET level_skip = AD_SAME_DICE
+				END
+				SET level_search_start = level_h0
+				LPM ad_spell_level_search
+				SET level_search_start = 0
+				PATCH_IF NOT target_level_previous AND search_in_all AND search_self AND search_total > 1
+						AND search_found_any == fx_header_count - level_h0 AND search_durations == 0 BEGIN
+					SPRINT formula_array ~search_dice~
+					SET formula_percent = 0
+					SET formula_flat = 0
+					SET formula_dice_sides = 0
+					SET formula_opcode = 0 - 1
+					SET formula_signed = 0
+					LPM ad_spell_level_formula
+					LPM ad_spell_level_formula_exact
+					PATCH_IF formula_exact AND NOT (~%formula_text%~ STRING_EQUAL ~%target_level_max%~) BEGIN
+						SPRINT $fx_level_max_text(~%level_id%~) ~%formula_text%~
+						PATCH_IF level_h0 == 0 BEGIN
+							SPRINT level_value_text ~~
+							SPRINT level_duration_text ~~
+							SET level_mode = MOD_TYPE_cumulative
+							LPM ad_spell_level_group
+						END
+						ELSE BEGIN
+							FOR (group_n = 0; group_n < search_total; ++group_n) BEGIN
+								SPRINT level_b $search_match(~%group_n%~)
+								PATCH_IF NOT (~%level_b%~ STRING_EQUAL ~%level_a%~) BEGIN
+									SET $level_on(~%level_b%~) = 0
+								END
+							END
+							SET $fx_level_to_last(~%level_id%~) = 1
+						END
+					END
+				END
+			END
+		END
+	END
+	SET level_skip = level_skip_default
+END
+
+// Recherche de l'effet level_a du premier en-tête (ou de l'en-tête level_search_start) dans chaque
+// en-tête à partir du sien (ancien
 // spell_has_same_effects_on_all_levels_except_duration) : le premier effet de son opcode semblable
 // (ad_spell_level_same, champs level_skip laissés de côté), écarté ou non. search_in_all : 1 si
 // chaque en-tête qui a encore des effets en a un ; les effets non écartés trouvés, dans l'ordre des
@@ -502,7 +580,7 @@ DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 	SET search_found_any = 0
 	SET search_changes_any = 0
 	SET search_self = 0
-	FOR (search_h = 0; search_h < fx_header_count AND search_in_all; ++search_h) BEGIN
+	FOR (search_h = level_search_start; search_h < fx_header_count AND search_in_all; ++search_h) BEGIN
 		SET search_found = 0
 		SET search_has_on = 0
 		FOR (search_k = 0; search_k < $spell_fx_count(~%search_h%~); ++search_k) BEGIN
@@ -658,6 +736,7 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 	SET formula_start = 0
 	SET formula_delta = 0
 	SET formula_delta_level = 0
+	SET formula_remains = 0
 	SET formula_previous = 0
 	SET formula_previous_level = 0
 	SET formula_rank = 0
@@ -804,6 +883,24 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 	END
 END
 
+// La formule de ad_spell_level_formula redonne-t-elle la valeur de chaque en-tête ? formula_exact : 1
+// si oui. Une base négative n'est pas écrite (niveau - 10 donne « 1 par niveau du lanceur ») : une
+// formule qui ne vaut que pour une partie des niveaux est refusée. Progression croissante seulement.
+DEFINE_PATCH_MACRO ad_spell_level_formula_exact BEGIN
+	SET formula_exact = formula_valid AND formula_delta > 0 AND formula_delta_level > 0
+	FOR (formula_n = 0; formula_n < search_total AND formula_exact; ++formula_n) BEGIN
+		LPM ad_spell_level_formula_entry
+		SET formula_capped = formula_level > formula_previous_level ? formula_previous_level : formula_level
+		SET formula_expected = formula_delta * (formula_capped / formula_delta_level)
+		PATCH_IF formula_remains > 0 BEGIN
+			SET formula_expected += formula_remains
+		END
+		PATCH_IF formula_expected != formula_value BEGIN
+			SET formula_exact = 0
+		END
+	END
+END
+
 // Niveau formula_level et valeur formula_value du rang formula_n de ad_spell_level_formula.
 DEFINE_PATCH_MACRO ad_spell_level_formula_entry BEGIN
 	SET formula_level = $search_level(~%formula_n%~)
@@ -889,7 +986,12 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 				SET level_opcode = $level_opcode(~%level_a%~)
 				SET level_from = $spell_level(~%level_h%~)
 				SET level_to = 99
+				// Progression du niveau maximal de la cible (ad_spell_levels_by_target_level) : jusqu'au dernier niveau.
+				SET level_id = $level_id(~%level_a%~)
 				SET level_open = 1
+				PATCH_IF VARIABLE_IS_SET $fx_level_to_last(~%level_id%~) BEGIN
+					SET level_open = NOT $fx_level_to_last(~%level_id%~)
+				END
 				FOR (level_h2 = level_h + 1; level_h2 < fx_header_count AND level_open; ++level_h2) BEGIN
 					SET level_found = 0
 					FOR (level_k2 = 0; level_k2 < $spell_fx_count(~%level_h2%~) AND NOT level_found; ++level_k2) BEGIN

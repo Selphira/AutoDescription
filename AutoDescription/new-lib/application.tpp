@@ -699,6 +699,13 @@ DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:level_target~ message = ~level restriction on an opcode-specific target~ RET render_late_missing = refusal END
 		END
 		SET app_level_tra = levelMin == levelMax ? 2003000 : (levelMin <= 1 ? 2003001 : (levelMax == 0 ? 2003002 : 2003003)) // ~%target% (de niveau %levelMin%)~
+		// Niveau maximal qui progresse avec le niveau du sort (ad_spell_levels_by_target_level).
+		PATCH_IF app_level_tra == 2003001 AND VARIABLE_IS_SET $fx_level_max_text(~%line_fx%~) BEGIN
+			SPRINT app_level_max_text $fx_level_max_text(~%line_fx%~)
+			PATCH_IF NOT (~%app_level_max_text%~ STRING_EQUAL ~~) BEGIN
+				SPRINT levelMax ~%app_level_max_text%~
+			END
+		END
 		SPRINT target ~%theTarget%~
 		PATCH_IF line_form == 0 OR line_form == 2 BEGIN
 			LPF ad_tra INT_VAR tra_id = app_level_tra + 4 tra_block_start = 2003000 tra_block_size = 10 RET app_self_level_text = text END // ~uniquement au niveau %levelMin%~

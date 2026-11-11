@@ -1202,6 +1202,7 @@ DEFINE_PATCH_MACRO ad_spell_header_save_bonus BEGIN
 		LPM ad_spell_levels_entries
 		SET level_special_duration = NOT header_hide_duration
 		SET level_skip = AD_SAME_TIMING BOR AD_SAME_SAVE
+		SET level_search_start = 0
 		SPRINT bonus_first_text ~~
 		FOR (bonus_n = 0; bonus_n < $spell_fx_count(~0~) AND save_bonus_valid; ++bonus_n) BEGIN
 			SPRINT level_a ~0 %bonus_n%~
