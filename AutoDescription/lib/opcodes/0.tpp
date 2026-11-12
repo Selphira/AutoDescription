@@ -19,7 +19,6 @@
 DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 	LOCAL_SET ac_base_count = 0
 	LOCAL_SET ac_modifier_count = 0
-	LOCAL_SET ac_all_count = 0
 	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
 		SET ac_value = $fx_parameter1(~%ac_id%~)
 		SPRINT ac_scope $fx_scope(~%ac_id%~)
@@ -52,9 +51,6 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			END
 			ELSE BEGIN
 				SET ac_modifier_count += ac_equipped
-				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
-					SET ac_all_count += ac_equipped
-				END
 				// Deux effets de même ligne (ad_fx_line_key) : le jeu applique les deux, le second est réuni au
 				// premier, modificateurs additionnés (ancien merge_duplicate_effects ; l'en-tête d'un sort compte
 				// les deux).
@@ -64,7 +60,6 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 						SET $fx_parameter1(~%ac_first%~) += ac_value
 						SET $fx_consumed(~%ac_id%~) = 1
 						SET ac_modifier_count -= ac_equipped
-						SET ac_all_count -= ac_equipped
 					END
 					ELSE BEGIN
 						SET $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) = ac_id + 1
@@ -91,16 +86,9 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 			END
 		END
 	END
-	SET ac_armor_line = item_type == ITM_TYPE_armor AND AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR
-	// Sur une armure sans CA de base, l'ordre que donne l'ancien moteur aux modificateurs contre toutes
-	// les attaques et à la ligne réunie des types d'attaque dépend de la place des effets dans le
-	// fichier, sans règle établie.
-	PATCH_IF ac_armor_line AND ac_base_count == 0 AND ac_all_count > 0 AND ac_all_count < ac_modifier_count BEGIN
-		LPF ad_refusal STR_VAR reason = ~not_implemented:opcode0:armor_order~ message = ~armor without base armor class: line order of the old engine not established~ RET render_missing = refusal END
-	END
 	// Une CA de base et d'autres modificateurs : l'ordre des lignes n'est établi que pour les totaux
 	// (ad_op_0_group_totals).
-	ELSE PATCH_IF ac_base_count > 1 OR (ac_base_count > 0 AND ac_modifier_count > 0 AND NOT (AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR)) BEGIN
+	PATCH_IF ac_base_count > 1 OR (ac_base_count > 0 AND ac_modifier_count > 0 AND NOT (AD_ENABLE_SHRINKAGE AND AD_SHRINK_CLASS_ARMOR)) BEGIN
 		LPF ad_refusal STR_VAR reason = ~not_implemented:opcode0:base_with_other~ message = ~several base armor classes, or one with other armor class modifiers without the totals of the old engine~ RET render_missing = refusal END
 	END
 END
@@ -167,40 +155,6 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			SET $ac_masks(~%ac_key%~) = 0
 		END
 	END
-	// CA de base d'un objet qui n'est pas une armure : elle garde sa propre ligne, que l'ancien moteur
-	// n'ajoute pas à la ligne des totaux. Les lignes de même rang sortent dans l'ordre inverse de leur
-	// ajout : avec la CA de base avant le premier effet réuni dans le fichier (PXL2BOUC), elle sort en
-	// premier, donc après les totaux ; sinon (BDENTANG) elle sort après eux, donc avant. Règle établie
-	// d'après ces deux objets seulement.
-	SET ac_first_base = 0 - 1
-	SET ac_first_total = 0 - 1
-	SET ac_deferred_base = 0 - 1
-	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
-		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_versus_file(~%ac_id%~) == 0 BEGIN
-			PATCH_IF $fx_parameter2(~%ac_id%~) == AC_MOD_TYPE_set_base BEGIN
-				PATCH_IF ac_first_base < 0 BEGIN
-					SET ac_first_base = ac_id
-				END
-			END
-			ELSE PATCH_IF ac_first_total < 0 BEGIN
-				SET ac_first_total = ac_id
-			END
-		END
-	END
-	SET ac_base_after_totals = ac_first_base >= 0 AND ac_first_total >= 0 AND ac_first_base < ac_first_total
-	// Base d'un non-armure avec seulement des lignes sur un type de créature ou un 219 réuni, sans total :
-	// ordre de l'ancien moteur non mesuré.
-	PATCH_IF NOT ac_armor AND ac_first_base >= 0 AND ac_first_total < 0 BEGIN
-		SET ac_other_lines = ac_creature_found
-		PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_versus_file(~%ac_id%~) > 0 BEGIN
-				SET ac_other_lines = 1
-			END
-		END
-		PATCH_IF ac_other_lines BEGIN
-			LPF ad_refusal INT_VAR fx_id = ac_first_base STR_VAR reason = ~not_implemented:opcode0:base_order~ message = ~base armor class with only creature type lines: order of the old engine not established~ RET render_late_missing = refusal END
-		END
-	END
 	SET line_sort = $AD_OPCODE_SORT(~0~)
 	SET ac_line_fx = 0 - 1
 	CLEAR_ARRAY ac_versus_ids
@@ -218,9 +172,8 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 				SET ac_base = ac_value
 				SET ac_has_base = 1
 			END
-			ELSE PATCH_IF ac_type == AC_MOD_TYPE_set_base AND ac_base_after_totals BEGIN
-				SET ac_deferred_base = ac_id
-			END
+			// CA de base d'un objet qui n'est pas une armure : sa propre ligne, hors des totaux, écrite
+			// avant eux.
 			ELSE PATCH_IF ac_type == AC_MOD_TYPE_set_base BEGIN
 				LPM ad_op_0_base_line
 			END
@@ -303,13 +256,6 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		SET line_phrase = 30010100 // ~Ne protège pas %versus%~
 		SET line_fx = ac_line_fx
 		LPM ad_effect_line
-	END
-	PATCH_IF ac_deferred_base >= 0 BEGIN
-		SET ac_id = ac_deferred_base
-		SET ac_value = $fx_parameter1(~%ac_id%~)
-		SET ac_line_fx = ac_id
-		SET line_sort = $AD_OPCODE_SORT(~0~)
-		LPM ad_op_0_base_line
 	END
 END
 

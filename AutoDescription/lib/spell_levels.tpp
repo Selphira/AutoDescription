@@ -673,8 +673,7 @@ END
 // sont écartés. Refus : level_a n'est
 // pas lui-même trouvé (l'ancien moteur écrirait l'effet deux fois) ; progression de la valeur d'un
 // opcode dont les lignes ne l'écrivent pas (AD_LEVEL_VALUE_OPCODES), ou d'un autre mode que l'ajout ou
-// la valeur fixée. La progression d'un opcode dont le premier en-tête a aussi des effets d'un EFF (177)
-// précède leurs lignes à rang égal, comme dans l'ancien moteur (SPCL236, SPPR707).
+// la valeur fixée.
 DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 	SET level_id = $level_id(~%level_a%~)
 	SET level_opcode = $level_opcode(~%level_a%~)

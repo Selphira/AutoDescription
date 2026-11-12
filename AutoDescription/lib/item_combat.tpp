@@ -256,9 +256,6 @@ DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
 			SPRINT combat_special ~%line_text%~
 			LPM ad_line_add
 		END
-		// L'ancien moteur trie ici les lignes de l'en-tête, puis de nouveau au rendu de la section.
-		SPRINT line_pass_section ~%combat_sec%~
-		LPM ad_lines_sort_pass
 		LPF ad_lines_section_text STR_VAR section = ~%combat_sec%~ RET combat_line_text = text combat_lines_now = count END
 		SET $combat_line_count(~%combat_id%~) = combat_lines_now
 	END

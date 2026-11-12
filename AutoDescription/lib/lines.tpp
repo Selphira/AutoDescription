@@ -1,15 +1,13 @@
 // Lignes d'une description, rangées avant le rendu : section, rang de tri, texte. Le texte n'est
-// assemblé qu'au rendu de la section, dans l'ordre des rangs ; à rang égal, la ligne qui vient en
-// dernier dans la section vient en premier, comme dans l'ancien moteur (son tri ne compare que le
-// rang et inverse l'ordre des égalités, V37). L'ordre d'une section est celui des ajouts, sauf après
-// un passage de tri (ad_lines_sort_pass), pour une section que l'ancien moteur trie deux fois. Une
-// ligne d'effet probable garde sa probabilité (line_probability, 0 pour une autre ligne), sa plage
-// (line_probability_low, line_probability_high) et son texte sans « N % de chances » (line_core),
+// assemblé qu'au rendu de la section, dans l'ordre des rangs, puis, à rang égal, dans l'ordre des
+// ajouts. Une ligne d'effet probable garde sa probabilité (line_probability, 0 pour une autre
+// ligne), sa plage (line_probability_low, line_probability_high) et son texte sans « N % de
+// chances » (line_core),
 // pour le regroupement par plage (ad_lines_probability_groups) ; line_nested : ligne en retrait sous
 // le titre de son groupe ; line_effect : effet (line_fx) d'une ligne probable ; line_composite : ligne
 // d'un groupe de probabilité propre réunie sous la probabilité du parent (0, ou rang dans ce groupe).
 //
-// Tableaux écrits : line_section, line_sort, line_text, line_order, line_probability,
+// Tableaux écrits : line_section, line_sort, line_text, line_probability,
 // line_probability_low, line_probability_high, line_core, line_nested, line_effect, line_composite ;
 // variable écrite : line_count.
 
@@ -60,7 +58,6 @@ END
 
 // Ajoute la ligne sans contrôle de doublon (ad_line_add), en retrait si line_nested.
 DEFINE_PATCH_MACRO ad_line_append BEGIN
-	SET $line_order(~%line_count%~) = line_count
 	SPRINT $line_section(~%line_count%~) ~%line_section%~
 	SET $line_sort(~%line_count%~) = line_sort
 	SPRINT $line_text(~%line_count%~) ~%line_text%~
@@ -83,41 +80,13 @@ END
 
 // Regroupement par probabilité des lignes probables de la section prob_section (ancien
 // group_probability_effects, pour les capacités de combat) : ces lignes sont retirées puis
-// réécrites après les autres, segment par segment. Le tri de l'ancien moteur les range par plage
-// (borne basse, puis haute), égalités dans l'ordre inverse de ses lignes (V37), produites opcode par
-// opcode dans l'ordre où chacun apparaît d'abord dans le bloc (ad_lines_opcode_rank), puis dans
-// l'ordre de la section. Segments : une plage
+// réécrites après les autres, segment par segment, rangées par plage (borne basse, puis haute),
+// puis dans l'ordre de la section. Segments : une plage
 // par couple de bornes ; avec AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES, chaque intervalle entre
 // deux bornes consécutives, avec les effets actifs sur tout l'intervalle (un effet peut être dans
 // plusieurs), les segments aux mêmes effets réunis en additionnant leurs probabilités. Un segment
 // d'un effet garde sa ligne (avec la probabilité du segment) ; un segment de plusieurs a un titre
 // « 11 % de chances » suivi de ses effets en retrait.
-// Rang prob_rank de l'opcode de la ligne probable prob_id parmi les opcodes de son bloc, dans l'ordre
-// de leur premier effet lu (ordre du tableau des opcodes de l'ancien moteur).
-DEFINE_PATCH_MACRO ad_lines_opcode_rank BEGIN
-	SET prob_fx = $line_effect(~%prob_id%~)
-	SET prob_opcode = $fx_opcode(~%prob_fx%~)
-	SPRINT prob_scope $fx_scope(~%prob_fx%~)
-	// Marque propre à cet appel : CLEAR_ARRAY ne défait pas les éléments que VARIABLE_IS_SET teste (V36).
-	SET prob_rank_call = VARIABLE_IS_SET prob_rank_call ? prob_rank_call + 1 : 1
-	SET prob_rank = 0
-	FOR (prob_other = 0; prob_other < fx_count AND prob_rank >= 0; ++prob_other) BEGIN
-		SPRINT prob_other_scope $fx_scope(~%prob_other%~)
-		SET prob_other_opcode = $fx_opcode(~%prob_other%~)
-		PATCH_IF ~%prob_other_scope%~ STRING_EQUAL ~%prob_scope%~ BEGIN
-			PATCH_IF prob_other_opcode == prob_opcode BEGIN
-				SET prob_final_rank = prob_rank
-				SET prob_rank = 0 - 1
-			END
-			ELSE PATCH_IF NOT VARIABLE_IS_SET $prob_rank_seen(~%prob_other_opcode%~) OR $prob_rank_seen(~%prob_other_opcode%~) != prob_rank_call BEGIN
-				SET $prob_rank_seen(~%prob_other_opcode%~) = prob_rank_call
-				SET prob_rank += 1
-			END
-		END
-	END
-	SET prob_rank = prob_final_rank > 99 ? 99 : prob_final_rank
-END
-
 // Sous-sort d'un effet probable (146, 148 : ctx_base_lines) : ses effets certains ont la plage du
 // parent (fx_parent_probability), ses effets probables gardent la leur, même égale. Comme l'ancien moteur, ces derniers sont d'abord
 // regroupés entre eux (passe intérieure, prob_inner) ; chaque groupe devient une ligne composée
@@ -157,9 +126,8 @@ END
 // Ligne d'un sort lancé par un effet probable (146, 148), dont les lignes sont déjà réunies sous sa
 // probabilité (line_sub_probability) : comme dans l'ancien moteur, chacune rejoint le regroupement de
 // la section, avec les effets de même plage (C!KT30 : « 11 % de chances » puis la paralysie du sort et
-// la vitesse de l'arme). Une ligne d'une autre forme (sous une condition) reste entière. Les
-// sous-lignes sont ajoutées de la dernière à la première : à rang égal, la dernière ajoutée vient en
-// premier.
+// la vitesse de l'arme). Une ligne d'une autre forme (sous une condition) reste entière. La première
+// sous-ligne prend la place de la ligne, les suivantes sont ajoutées après elle.
 DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 	SET split_line_count = line_count
 	FOR (split_id = 0; split_id < split_line_count; ++split_id) BEGIN
@@ -212,7 +180,7 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 				SET line_nested = 0
 				SPRINT line_section ~%split_section%~
 				SET line_sub_probability = 0
-				FOR (split_k = split_member_count - 1; split_k >= 0; split_k = split_k - 1) BEGIN
+				FOR (split_k = 0; split_k < split_member_count; ++split_k) BEGIN
 					SPRINT line_core $split_members(~%split_k%~)
 					SPRINT line_text ~%split_title% %line_core%~
 					// Groupe intérieur seul sous le titre du sort : il garde ce titre. Plusieurs sous-lignes
@@ -221,7 +189,7 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 					PATCH_IF split_title_form AND split_member_count == 1 BEGIN
 						SET line_composite = 1000000
 					END
-					PATCH_IF split_k == split_member_count - 1 BEGIN
+					PATCH_IF split_k == 0 BEGIN
 						SPRINT $line_text(~%split_id%~) ~%line_text%~
 						SET $line_probability(~%split_id%~) = line_probability
 						SET $line_probability_low(~%split_id%~) = line_probability_low
@@ -290,9 +258,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 	FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 		SPRINT prob_line_section $line_section(~%prob_id%~)
 		PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_probability(~%prob_id%~) > 0 BEGIN
-			LPM ad_lines_opcode_rank
-			SET prob_key = ($line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~)) * 100000
-				+ (99 - prob_rank) * 1000 + 999 - $line_order(~%prob_id%~)
+			SET prob_key = ($line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~)) * 1000 + prob_id
 			SET $prob_keys(~%prob_key%~) = prob_id
 			SPRINT $line_section(~%prob_id%~) ~~
 		END
@@ -388,20 +354,8 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 	END
 
 	// Lignes rangées par probabilité décroissante ; à probabilité égale, un titre suit les lignes
-	// seules (SPWI714). Deux titres de même probabilité : l'ancien moteur les range selon l'opcode du
-	// dernier effet lu, connu seulement de lui, refus ; sous la probabilité d'un parent, il les garde
-	// dans l'ordre de leurs plages (PXW7ENER).
-	CLEAR_ARRAY prob_band_titles
-	FOR (seg_s = 0; seg_s < seg_count; ++seg_s) BEGIN
-		PATCH_IF NOT prob_inner AND NOT $seg_duplicate(~%seg_s%~) AND $seg_size(~%seg_s%~) > 1 BEGIN
-			SET prob_band = 100 - $seg_probability(~%seg_s%~)
-			PATCH_IF VARIABLE_IS_SET $prob_band_titles(~%prob_band%~) BEGIN
-				LPF ad_refusal STR_VAR reason = ~not_implemented:application:probability_order~ message = ~probable titles of the same probability, whose order the old engine sets differently~ RET render_late_missing = refusal END
-			END
-			SET $prob_band_titles(~%prob_band%~) = 1
-		END
-	END
-
+	// seules (SPWI714), et les titres viennent du plus grand au plus petit groupe. Le rang d'un titre
+	// laisse la place, avant la probabilité suivante, à ceux des lignes en retrait sous lui.
 	SPRINT line_section ~%prob_section%~
 	SET line_probability = 0
 	SPRINT line_core ~~
@@ -418,8 +372,8 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 				SPRINT description ~%description_saved%~
 				SET line_sort = $line_sort(~%prob_id%~)
 				SET line_nested = 0
-				// Ligne seule d'un groupe intérieur : sa probabilité, égalités inversées.
-				SET prob_composite = (100 - value) * 1000 + 999 - seg_s
+				// Ligne seule d'un groupe intérieur : sa probabilité, puis l'ordre des plages.
+				SET prob_composite = (100 - value) * 1000 + seg_s
 				LPM ad_lines_probability_emit
 			END
 			ELSE BEGIN
@@ -501,28 +455,6 @@ DEFINE_PATCH_MACRO ad_lines_probability_emit BEGIN
 	END
 END
 
-// Passage de tri de la section line_pass_section : ses lignes prennent l'ordre que leur donne un tri
-// de l'ancien moteur (rang croissant, égalités inversées) ; une ligne ajoutée ensuite vient après
-// elles.
-DEFINE_PATCH_MACRO ad_lines_sort_pass BEGIN
-	CLEAR_ARRAY line_pass_keys
-	SET line_pass_count = 0
-	FOR (line_pass_id = 0; line_pass_id < line_count; ++line_pass_id) BEGIN
-		SPRINT line_pass_line_section $line_section(~%line_pass_id%~)
-		PATCH_IF ~%line_pass_line_section%~ STRING_EQUAL ~%line_pass_section%~ BEGIN
-			SET line_pass_key = ($line_sort(~%line_pass_id%~) + 100) * 1000 + 999 - $line_order(~%line_pass_id%~)
-			SET $line_pass_keys(~%line_pass_key%~) = line_pass_id
-			SET line_pass_count += 1
-		END
-	END
-	SORT_ARRAY_INDICES line_pass_keys NUMERICALLY
-	SET line_pass_order = 0
-	PHP_EACH line_pass_keys AS _ => line_pass_id BEGIN
-		SET $line_order(~%line_pass_id%~) = line_pass_order
-		SET line_pass_order += 1
-	END
-END
-
 // Lignes de la section, chacune précédée d'un saut de ligne et de la marque de son niveau (ancien
 // add_items_section_to_description) : 1 puce, 2 retrait sous un titre, 0 rien ; vide si la section
 // n'a aucune ligne. count : nombre de lignes.
@@ -545,8 +477,7 @@ BEGIN
 	ELSE PATCH_IF level == 2 BEGIN
 		SPRINT line_prefix ~  ~
 	END
-	// Clé numérique unique (rang, ordre d'ajout inversé) ; le décalage rend les rangs négatifs
-	// triables.
+	// Clé numérique unique (rang, ordre d'ajout) ; le décalage rend les rangs négatifs triables.
 	PATCH_IF line_count > 1000 BEGIN
 		PATCH_FAIL ~New engine: more than 1000 lines in a description~
 	END
@@ -558,7 +489,7 @@ BEGIN
 			PATCH_IF line_sort < 0 - 100 OR line_sort > 2000000 BEGIN
 				PATCH_FAIL ~New engine: line sort %line_sort% out of bounds~
 			END
-			SET line_key = (line_sort + 100) * 1000 + 999 - $line_order(~%line_id%~)
+			SET line_key = (line_sort + 100) * 1000 + line_id
 			SET $section_lines(~%line_key%~) = line_id
 		END
 	END
