@@ -22,6 +22,20 @@ OUTER_SET AD_RECURSION_MAX_DEPTH = 1
 // sien à son initialisation.
 OUTER_SPRINT AD_SUBSPELL_CACHE_FOLDER ~%CACHE_FOLDER%/subspell-new~
 
+// Raisons pour lesquelles une ressource n'est pas décrite (new-lib/install.tpp) et leur libellé
+// dans les statistiques de l'installation, dans l'ordre d'affichage.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_IGNORE_LABELS BEGIN
+	~invalid_file~        => ~Fichier invalide~
+	~no_ability~          => ~Sans en-tete~
+	~invalid_strref~      => ~Invalide~
+	~cursed~              => ~Maudits~
+	~without_description~ => ~Sans description~
+	~without_name~        => ~Sans nom~
+	~not_moveable~        => ~Non deplacables~
+	~type~                => ~Type non gere~
+	~not_covered~         => ~Non couverts par le moteur~
+END
+
 // Caractéristiques minimales d'un objet, dans l'ordre d'affichage : valeur de stats.ids => champ
 // de l'en-tête.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN

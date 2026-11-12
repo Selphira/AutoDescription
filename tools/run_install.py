@@ -2,7 +2,7 @@
 
 Outil de développement : il n'est pas utilisé pendant l'installation du mod.
 
-Le mod du dépôt est copié dans <jeu>/AutoDescription (lib, new-lib, tra, sfo, 2da, tp2,
+Le mod du dépôt est copié dans <jeu>/AutoDescription (lib, new-lib, tra, 2da, tp2,
 settings-default.ini, gabarits des journaux). Les options demandées sont imposées dans la copie
 du tp2, après la lecture de settings.ini (qui prime sur settings-default.ini et n'est jamais
 modifié). --only restreint la boucle des objets et des sorts aux ressources voulues, dans la copie
@@ -10,7 +10,7 @@ seulement (jamais dans le dépôt). Les composants 15 et 10 sont d'abord désins
 réinstallation garderait la langue enregistrée dans WeiDU.log (V27).
 
 Usage :
-  python tools/run_install.py --game DOSSIER --component 15 --mode 2 --label essai
+  python tools/run_install.py --game DOSSIER --component 15 --label essai
       [--language 0|1] [--only RESREF ...] [--only-file LISTE] [--dump]
       [--set NOM=VALEUR ...] [--out DOSSIER]
 Le dossier du jeu peut aussi être donné par la variable d'environnement AD_TEST_GAME, le dossier
@@ -30,12 +30,13 @@ from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 MOD = REPOSITORY / "AutoDescription"
-MOD_DIRECTORIES = ("lib", "new-lib", "tra", "sfo", "2da")
+MOD_DIRECTORIES = ("lib", "new-lib", "tra", "2da")
 LOG_PATTERNS = ("*.log", "*-diff.html", "*-dump.txt", "*-compare.txt", "*-effects.txt", "*-opcodes.txt",
                 "*-recursion.txt", "*-events.txt", "*-cache.txt", "*.md")
-LOOPS = {"lib/itm.tpp": "itm", "lib/spl.tpp": "spl"}
+# Fichier des boucles complètes sur les objets et les sorts.
+LOOPS = "new-lib/install.tpp"
 # Ligne du tp2 qui suit la lecture de settings.ini : les options imposées sont insérées avant.
-SETTINGS_END = "\tACTION_IF description_engine < 0 OR description_engine > 3 BEGIN"
+SETTINGS_END = "\tOUTER_SPRINT CACHE_FOLDER"
 
 
 def copy_mod(target):
@@ -62,13 +63,14 @@ def impose_options(tp2, options):
 def restrict_loops(target, resources):
     # re.escape protège aussi « # » (L#NSSEE), que l'expression régulière de WeiDU ne reconnaît plus.
     pattern = "\\(" + "\\|".join(re.sub(r"([.*+?^$\[\]\\])", r"\\\1", resource) for resource in resources) + "\\)"
-    for relative, extension in LOOPS.items():
-        path = target / relative
-        text = path.read_bytes().decode("utf-8")
+    path = target / LOOPS
+    text = path.read_bytes().decode("utf-8")
+    for extension in ("itm", "spl"):
         loop = f"COPY_EXISTING_REGEXP GLOB ~^.+\\.{extension}$~ ~override~"
         if text.count(loop) != 1:
-            raise SystemExit(f"ERREUR : {path} : boucle complète introuvable")
-        path.write_bytes(text.replace(loop, f"COPY_EXISTING_REGEXP GLOB ~^{pattern}\\.{extension}$~ ~override~").encode("utf-8"))
+            raise SystemExit(f"ERREUR : {path} : boucle complète des .{extension} introuvable")
+        text = text.replace(loop, f"COPY_EXISTING_REGEXP GLOB ~^{pattern}\\.{extension}$~ ~override~")
+    path.write_bytes(text.encode("utf-8"))
 
 
 def setup(game, arguments, console):
@@ -83,7 +85,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--game", type=Path, default=os.environ.get("AD_TEST_GAME"))
     parser.add_argument("--component", type=int, choices=(10, 15), required=True)
-    parser.add_argument("--mode", type=int, choices=(0, 1, 2, 3), required=True, help="description_engine")
     parser.add_argument("--label", required=True)
     parser.add_argument("--language", type=int, choices=(0, 1), default=0, help="0 français, 1 anglais")
     parser.add_argument("--only", nargs="+", default=[], help="ressources traitées (sans extension)")
@@ -97,7 +98,7 @@ def main():
     if args.game is None or not (args.game / "setup-autodescription.exe").is_file():
         raise SystemExit("ERREUR : dossier du jeu absent ou sans setup-autodescription.exe (--game ou AD_TEST_GAME)")
 
-    options = {"description_engine": args.mode, "regression_dump": int(args.dump)}
+    options = {"regression_dump": int(args.dump)}
     for pair in args.set:
         name, _, value = pair.partition("=")
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name) or not re.fullmatch(r"-?\d+", value):
@@ -141,10 +142,10 @@ def main():
         + f"duration = {duration:.0f} s\nexit = {code}\n", encoding="utf-8")
 
     text = console.read_bytes().decode("utf-8", errors="replace")
-    print(f"== {args.label} : composant {args.component}, mode {args.mode}, langue {args.language}, "
+    print(f"== {args.label} : composant {args.component}, langue {args.language}, "
           f"{len(resources) or 'toutes les'} ressources, {duration:.0f} s, code {code}")
     for line in text.splitlines():
-        if re.match(r"\s*(Reussis|Echoues|Identiques|Differents|Non couverts|Nouveau moteur :)|ERROR|FATAL", line):
+        if re.match(r"\s*(Reussis|Echoues|Ignores|Non couverts|Nouveau moteur :)|ERROR|FATAL", line):
             print("  " + line.strip())
     print(f"  journaux : {run}")
     return 0 if code == 0 and "SUCCESSFULLY INSTALLED" in text else 1

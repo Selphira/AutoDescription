@@ -1,5 +1,5 @@
-// Nouveau moteur : aucun code commun avec lib/ ni sfo/,
-// ni lecture de leurs variables globales ; tools/static_checks.py vérifie cette séparation.
+// Moteur de description et pilotage de l'installation (install.tpp) ; seules les constantes de
+// lib/bgforge/ sont partagées (tools/static_checks.py).
 ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	OUTER_SET AD_ENGINE_LOADED = 1
 
@@ -297,4 +297,5 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/new-lib/spell_header.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/spell_levels.tpp~
 	INCLUDE ~%MOD_FOLDER%/new-lib/spell.tpp~
+	INCLUDE ~%MOD_FOLDER%/new-lib/install.tpp~
 END

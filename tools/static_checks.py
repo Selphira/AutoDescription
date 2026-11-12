@@ -16,28 +16,24 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = MOD = LIB = NEW_LIB = BGFORGE = SFO = TRA = OPCODES = None
+ROOT = MOD = LIB = NEW_LIB = BGFORGE = TRA = None
 
 
 def set_root(root):
-    global ROOT, MOD, LIB, NEW_LIB, BGFORGE, SFO, TRA, OPCODES
+    global ROOT, MOD, LIB, NEW_LIB, BGFORGE, TRA
     ROOT = root.resolve()
     MOD = ROOT / "AutoDescription"
     LIB = MOD / "lib"
     NEW_LIB = MOD / "new-lib"
     BGFORGE = LIB / "bgforge"
-    SFO = MOD / "sfo"
     TRA = MOD / "tra"
-    OPCODES = LIB / "itm" / "opcodes.tpp"
 
 NEW_TRA = "description_new.tra"
 # Fichiers .tra en UTF-8 convertis en Windows-1252 par HANDLE_CHARSETS sur les jeux classiques ;
 # setup.tra est lu tel quel.
 CONVERTED_TRA = ("description.tra", NEW_TRA)
 NEW_TRA_RANGES = ((1_000_000, 9_999_999), (20_000_000, 39_999_999))
-VARIANTS = ("self", "target", "self_probability", "target_probability")
 DEFINITION = re.compile(r"DEFINE_(PATCH|ACTION)_(MACRO|FUNCTION)\s+[~\"]?([A-Za-z0-9_#-]+)")
-OPCODE_VARIANT = re.compile(r"^opcode_(self|target)(_probability)?_(\d+)$")
 
 
 class Report:
@@ -208,7 +204,7 @@ def check_tra_references(report, ids):
     report.section("Références @n littérales absentes des .tra français")
     old = ids.get(("french", "description.tra"), set()) | ids.get(("french", "setup.tra"), set())
     new = ids.get(("french", NEW_TRA), set())
-    sources = [path for path in weidu_files() if BGFORGE not in path.parents and SFO not in path.parents]
+    sources = [path for path in weidu_files() if BGFORGE not in path.parents]
     references = 0
     for path in sources:
         # Chaque moteur n'utilise que son fichier de chaînes.
@@ -317,88 +313,16 @@ def collect_definitions(paths):
 
 
 def check_duplicate_definitions(report):
-    report.section("Macros et fonctions définies plusieurs fois (lib/, lib/bgforge/, sfo/)")
+    report.section("Macros et fonctions définies plusieurs fois (new-lib/, lib/bgforge/)")
     # WeiDU garde silencieusement la dernière définition (ordre d'inclusion).
     definitions = collect_definitions(weidu_files())
     for (context, kind, name), places in sorted(definitions.items()):
         if len(places) > 1:
-            third_party_only = all(p.startswith(("AutoDescription/lib/bgforge/", "AutoDescription/sfo/")) for p in places)
+            third_party_only = all(p.startswith(relative(BGFORGE) + "/") for p in places)
             # Un doublon interne aux bibliothèques tierces ne concerne le mod que s'il les appelle.
             level = "AVERTISSEMENT" if third_party_only else "ERREUR"
             report.add(level, f"{context}_{kind} {name} : " + ", ".join(places))
     return definitions
-
-
-def check_opcode_variants(report, definitions):
-    report.section("Variantes des macros de description d'opcode")
-    variants = collections.defaultdict(set)
-    for (context, kind, name), places in definitions.items():
-        match = OPCODE_VARIANT.match(name)
-        if context == "PATCH" and kind == "MACRO" and match and not any("lib/bgforge/" in p or "sfo/" in p for p in places):
-            variant = match.group(1) + (match.group(2) or "")
-            variants[int(match.group(3))].add(variant)
-    missing = collections.defaultdict(list)
-    for opcode, present in sorted(variants.items()):
-        for variant in VARIANTS:
-            if variant not in present:
-                missing[variant].append(opcode)
-    # Certaines absences sont sans doute légitimes (effet toujours sur soi…) mais rien ne les
-    # documente : une combinaison non prévue fait échouer get_effect_description (RISK-005).
-    for variant in VARIANTS:
-        if missing[variant]:
-            report.add("AVERTISSEMENT", f"opcode_{variant}_N absente pour {len(missing[variant])} opcodes : "
-                       + " ".join(str(o) for o in missing[variant]))
-    print(f"  {len(variants)} opcodes ont au moins une variante")
-    return variants
-
-
-def parse_ignored_opcodes():
-    text, _ = strip_weidu(read_text(OPCODES))
-    block = re.search(r"ACTION_DEFINE_ASSOCIATIVE_ARRAY\s+~ignored_opcodes~\s+BEGIN(.*?)\bEND\b", text, re.S)
-    if not block:
-        return None
-    return {int(key): int(value) for key, value in re.findall(r"(-?\d+)\s*=>\s*(-?\d+)", block.group(1))}
-
-
-def parse_sort_opcodes():
-    text, _ = strip_weidu(read_text(OPCODES))
-    block = re.search(r"ACTION_DEFINE_ASSOCIATIVE_ARRAY\s+~sort_opcodes~\s+BEGIN(.*?)\bEND\b", text, re.S)
-    if not block:
-        return None
-    return {int(key): int(value) for key, value in re.findall(r"(-?\d+)\s*=>\s*(-?\d+)", block.group(1))}
-
-
-def parse_opcode_table(name):
-    text, _ = strip_weidu(read_text(OPCODES))
-    block = re.search(r"ACTION_DEFINE_ASSOCIATIVE_ARRAY\s+~" + name + r"~\s+BEGIN(.*?)\bEND\b", text, re.S)
-    return {int(key) for key in re.findall(r"(-?\d+)\s*=>", block.group(1))} if block else set()
-
-
-def old_duration_kinds():
-    """Colonne DURATION attendue d'après les listes de l'ancien moteur (la première qui contient l'opcode)."""
-    kinds = {}
-    for opcode in parse_opcode_table("opcodes_cant_be_permanent_after_death"):
-        kinds[opcode] = "NOT_AFTER_DEATH"
-    for opcode in parse_opcode_table("opcodes_cant_be_permanent"):
-        kinds[opcode] = "NOT_PERMANENT"
-    for opcode in OLD_HIDDEN_DURATION:
-        kinds[opcode] = "HIDDEN"
-    for opcode in parse_opcode_table("opcodes_ignore_duration"):
-        kinds[opcode] = "IGNORED"
-    return kinds
-
-
-def check_ignored_described(report, variants):
-    report.section("Opcodes ignorés mais décrits")
-    ignored = parse_ignored_opcodes()
-    if ignored is None:
-        report.add("ERREUR", f"{relative(OPCODES)} : table ignored_opcodes introuvable")
-        return
-    # Un opcode ignoré n'est jamais décrit : ses macros de description sont du code mort.
-    for opcode in sorted(set(ignored) & set(variants)):
-        report.add("AVERTISSEMENT", f"opcode {opcode} : dans ignored_opcodes (valeur {ignored[opcode]}) "
-                   f"et décrit par {', '.join(sorted('opcode_' + v + '_' + str(opcode) for v in variants[opcode]))}")
-    print(f"  {len(ignored)} entrées dans ignored_opcodes")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -407,13 +331,9 @@ def check_ignored_described(report, variants):
 CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 CATALOG_DURATIONS = ("SHOWN", "IGNORED", "HIDDEN", "NOT_PERMANENT", "NOT_AFTER_DEATH")
-# Opcodes dont add_duration n'écrit jamais la durée, sans être dans opcodes_ignore_duration.
-OLD_HIDDEN_DURATION = (177, 183, 283)
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
 # Macros appelées par le rendu pour chaque opcode DESCRIBED (new-lib/item_render.tpp).
 NEW_OPCODE_ROLES = ("support", "lines")
-# Rang par défaut de l'ancien moteur pour un opcode absent de sort_opcodes (set_opcode_sort).
-OLD_DEFAULT_SORT = 400
 
 
 def check_catalog(report, definitions):
@@ -423,8 +343,6 @@ def check_catalog(report, definitions):
     if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "DURATION", "NAME"]:
         report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT DURATION NAME »")
         return
-    old_sort = parse_sort_opcodes() or {}
-    old_duration = old_duration_kinds()
     rows = {}
     previous = -1
     for number, line in enumerate(lines[3:], start=4):
@@ -445,18 +363,10 @@ def check_catalog(report, definitions):
             report.add("ERREUR", f"{where} : statut {fields[3]} inconnu ({', '.join(CATALOG_STATUSES)})")
         if fields[4] not in CATALOG_DICE:
             report.add("ERREUR", f"{where} : DICE {fields[4]} inconnu ({', '.join(CATALOG_DICE)})")
-        # Même ordre d'affichage que l'ancien moteur, tant que la comparaison des moteurs sert de référence.
         if not re.fullmatch(r"-?\d+", fields[5]):
             report.add("ERREUR", f"{where} : SORT {fields[5]} n'est pas un entier")
-        elif int(fields[5]) != old_sort.get(opcode, OLD_DEFAULT_SORT):
-            report.add("ERREUR", f"{where} : SORT {fields[5]} au lieu de {old_sort.get(opcode, OLD_DEFAULT_SORT)} "
-                       "(sort_opcodes de l'ancien moteur)")
-        # Mêmes durées affichées que l'ancien moteur, tant que la comparaison des moteurs sert de référence.
         if fields[6] not in CATALOG_DURATIONS:
             report.add("ERREUR", f"{where} : DURATION {fields[6]} inconnu ({', '.join(CATALOG_DURATIONS)})")
-        elif fields[6] != old_duration.get(opcode, "SHOWN"):
-            report.add("ERREUR", f"{where} : DURATION {fields[6]} au lieu de {old_duration.get(opcode, 'SHOWN')} "
-                       "(listes de durée de l'ancien moteur)")
         rows[opcode] = fields[3]
 
     # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.
@@ -474,13 +384,6 @@ def check_catalog(report, definitions):
                 if f"ad_op_{opcode}_{role}" not in implemented[opcode]:
                     report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_{role} dans new-lib/")
 
-    # Point de départ repris de l'ancien moteur ; les écarts sont des décisions à documenter.
-    ignored_old = set(parse_ignored_opcodes() or {})
-    ignored_new = {o for o, s in rows.items() if s == "IGNORED"}
-    if ignored_old != ignored_new:
-        report.add("INFO", "IGNORED diffère de ignored_opcodes de l'ancien moteur : "
-                   f"seulement dans le catalogue {sorted(ignored_new - ignored_old)}, "
-                   f"seulement dans l'ancien {sorted(ignored_old - ignored_new)}")
     counts = collections.Counter(rows.values())
     print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES))
 
@@ -507,135 +410,32 @@ def check_opcode_includes(report):
 
 
 # ---------------------------------------------------------------------------------------------
-# Séparation des moteurs lib/ et new-lib/ (§7.1, condition 1)
+# Conventions de new-lib/
 
-CALL = re.compile(r"\b(?:LPF|LAF|LPM|LAM|LAUNCH_(?:PATCH|ACTION)_(?:FUNCTION|MACRO))\s+[~\"]?([A-Za-z0-9_#-]+)")
 INCLUDE_PATH = re.compile(r"\b(?:PATCH_)?(?:RE)?INCLUDE\s+(~[^~]*~|\"[^\"]*\")")
-ASSIGNMENT = re.compile(
-    r"\b(?:OUTER_SET|OUTER_SPRINT|OUTER_TEXT_SPRINT|LOCAL_SET|LOCAL_SPRINT|SET|SPRINT|TEXT_SPRINT"
-    r"|(?:ACTION_|PATCH_)?DEFINE_(?:ASSOCIATIVE_)?ARRAY|ACTION_READLN|PATCH_READLN)"
-    r"[ \t]+[~\"]?([A-Za-z_][A-Za-z0-9_]*)")
-# READ_<type> décalage variable ; les READ_2DA_* ont une autre arité (non relevés).
-READ_ASSIGNMENT = re.compile(r"\bREAD_(?!2DA)[A-Z0-9_]+[ \t]+(?:\([^()\n]*\)|\S+)[ \t]+([A-Za-z_][A-Za-z0-9_]*)")
-# Paramètres et valeurs renvoyées, dans les définitions comme dans les appels.
-PARAMETERS = re.compile(r"\b(?:INT_VAR|STR_VAR|RET_ARRAY|RET)\b(.*?)(?=\b(?:BEGIN|END|INT_VAR|STR_VAR|RET_ARRAY|RET)\b)", re.S)
-NAMED = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)\s*=(?![=>])")
-PHP_EACH = re.compile(r"\bPHP_EACH\s+\S+\s+AS\s+([A-Za-z_][A-Za-z0-9_]*)\s*=>\s*([A-Za-z_][A-Za-z0-9_]*)")
-IDENTIFIER = re.compile(r"(?<![A-Za-z0-9_$#-])([A-Za-z_][A-Za-z0-9_]*)(?![A-Za-z0-9_#-])")
-STRING_VARIABLE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
-NON_VARIABLES = {"EVAL", "BEGIN", "END"}
 WEIDU_VARIABLES = {"SOURCE_FILE", "SOURCE_RES", "SOURCE_SIZE", "SOURCE_EXT", "SOURCE_DIRECTORY", "SOURCE_FILESPEC",
                    "DEST_FILE", "DEST_RES", "DEST_EXT", "DEST_DIRECTORY", "DEST_FILESPEC"}
-# Variables du tp2 communes aux deux moteurs, lues seulement (dossier du cache, défini une fois).
-SHARED_VARIABLES = {"CACHE_FOLDER"}
-# Seuls les points d'entrée de la boucle commune appellent le nouveau moteur (initialisation des
-# journaux, boucles des objets et des sorts).
-ENGINE_CALLERS = ("AutoDescription/lib/log.tpp", "AutoDescription/lib/itm.tpp", "AutoDescription/lib/spl.tpp")
-# Options de settings-default.ini réservées au nouveau moteur.
-NEW_OPTION_PREFIX = "AD_"
 
 
-def assigned_variables(code):
-    """Noms de variables affectés ou déclarés (paramètres, RET) dans un code sans commentaires ni chaînes."""
-    names = set(ASSIGNMENT.findall(code)) | set(READ_ASSIGNMENT.findall(code))
-    for segment in PARAMETERS.findall(code):
-        # « nom = expression » ou liste de noms seuls : les expressions ne sont pas des noms affectés.
-        names |= set(NAMED.findall(segment))
-        first = NAMED.search(segment)
-        names |= set(IDENTIFIER.findall(segment[:first.start()] if first else segment))
-    for key, value in PHP_EACH.findall(code):
-        names |= {key, value}
-    return names - NON_VARIABLES
-
-
-def ini_keys():
-    """(options de l'ancien moteur, options du nouveau moteur)."""
-    text = read_text(MOD / "settings-default.ini")
-    keys = set(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=", text, re.M))
-    new = {key for key in keys if key.startswith(NEW_OPTION_PREFIX)}
-    return keys - new, new
-
-
-def check_engine_separation(report, definitions):
-    report.section("Séparation des moteurs lib/ et new-lib/")
+def check_new_lib_conventions(report, definitions):
+    report.section("Conventions de new-lib/ (préfixe ad_, inclusions)")
     new_files = sorted(p for p in weidu_files() if NEW_LIB in p.parents)
     if not new_files:
         report.add("ERREUR", f"{relative(NEW_LIB)} : aucun fichier")
         return
-    old_files = [p for p in weidu_files() if NEW_LIB not in p.parents and BGFORGE not in p.parents]
-
-    def owner(places):
-        return {("new" if p.startswith(relative(NEW_LIB) + "/") else
-                 "bgforge" if p.startswith(relative(BGFORGE) + "/") else "old") for p in places}
-
-    new_names, old_names = set(), set()
+    names = 0
     for (context, kind, name), places in definitions.items():
-        owners = owner(places)
-        if "new" in owners:
-            new_names.add(name)
+        if any(p.startswith(relative(NEW_LIB) + "/") for p in places):
+            names += 1
             if not name.startswith("ad_"):
                 report.add("ERREUR", f"{context}_{kind} {name} ({', '.join(places)}) : nom sans préfixe ad_")
-            if owners != {"new"}:
-                report.add("ERREUR", f"{context}_{kind} {name} défini dans new-lib/ et ailleurs : {', '.join(places)}")
-        if "old" in owners:
-            old_names.add(name)
-
-    # Variables de l'ancien code (lib/, sfo/, tp2, options) : une fonction voit les variables de
-    # son appelant (V7) ; si new-lib/ lit un de ces noms sans l'avoir affecté lui-même, il dépend
-    # de l'ancien moteur. Les constantes BGforge sont partagées en lecture seule.
-    bgforge_variables = set()
-    for path in weidu_files():
-        if BGFORGE in path.parents:
-            bgforge_variables |= assigned_variables(strip_weidu(read_text(path))[1])
-    old_variables, new_options = ini_keys()
-    for path in old_files:
-        old_variables |= assigned_variables(strip_weidu(read_text(path))[1])
-    old_variables -= bgforge_variables
-    # Variables de WeiDU que l'ancien code rétablit après un COPY (cache des sous-sorts).
-    old_variables -= WEIDU_VARIABLES
-    old_variables -= SHARED_VARIABLES
-
-    new_variables, new_globals = set(new_options), set(new_options)
-    parsed = {}
     for path in new_files:
         no_comments, code = strip_weidu(read_text(path))
-        parsed[path] = (no_comments, code)
-        new_variables |= assigned_variables(code)
-        new_globals |= set(re.findall(r"\bOUTER_(?:SET|SPRINT|TEXT_SPRINT)\s+([A-Za-z_][A-Za-z0-9_]*)", code))
-
-    for path, (no_comments, code) in parsed.items():
-        for match in CALL.finditer(no_comments):
-            if match.group(1) in old_names and match.group(1) not in new_names:
-                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : appel de {match.group(1)}, "
-                           "défini dans lib/ ou sfo/")
         for match in INCLUDE_PATH.finditer(no_comments):
             if "/new-lib/" not in match.group(1):
                 report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion hors de new-lib/ "
                            f"{match.group(1)}")
-        reported = set()
-        uses = [(m.start(), m.group(1)) for m in IDENTIFIER.finditer(code)]
-        uses += [(m.start(), m.group(1)) for m in STRING_VARIABLE.finditer(no_comments)]
-        for position, name in sorted(uses):
-            if name in old_variables and name not in new_variables and name not in reported:
-                reported.add(name)
-                report.add("ERREUR", f"{relative(path)}:{line_of(code, position)} : lit la variable {name} "
-                           "de l'ancien code sans l'affecter")
-
-    for path in old_files:
-        no_comments, code = strip_weidu(read_text(path))
-        for match in CALL.finditer(no_comments):
-            if match.group(1) in new_names and relative(path) not in ENGINE_CALLERS:
-                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : appel de {match.group(1)} "
-                           f"(new-lib/) hors de la boucle commune ({', '.join(ENGINE_CALLERS)})")
-        if path.suffix != ".tp2":
-            for match in INCLUDE_PATH.finditer(no_comments):
-                if "/new-lib/" in match.group(1):
-                    report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion de new-lib/")
-        uses = {m.group(1) for m in IDENTIFIER.finditer(code)} | set(STRING_VARIABLE.findall(no_comments))
-        for name in sorted(uses & new_globals):
-            report.add("ERREUR", f"{relative(path)} : lit la variable globale {name} de new-lib/")
-    print(f"  {len(new_files)} fichiers dans new-lib/, {len(new_names)} fonctions ou macros, "
-          f"{len(old_variables)} noms de variables de l'ancien code relevés")
+    print(f"  {len(new_files)} fichiers dans new-lib/, {names} fonctions ou macros")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -686,11 +486,9 @@ def main():
     check_tra_references(report, ids)
     check_new_tra_rules(report)
     definitions = check_duplicate_definitions(report)
-    variants = check_opcode_variants(report, definitions)
-    check_ignored_described(report, variants)
     check_catalog(report, definitions)
     check_opcode_includes(report)
-    check_engine_separation(report, definitions)
+    check_new_lib_conventions(report, definitions)
     if not args.no_parse:
         if weidu.is_file():
             check_parse(report, weidu)

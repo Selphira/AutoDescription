@@ -16,13 +16,6 @@ ALWAYS
 		END
 	END
 
-	ACTION_IF description_engine < 0 OR description_engine > 3 BEGIN
-		FAIL @203 // ~Valeur invalide pour l'option description_engine : "%description_engine%" (valeurs admises : 0, 1, 2 ou 3).~
-	END
-
-	OUTER_SET is_ee    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
-	OUTER_SET has_eeex = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
-
     // Les deux fichiers sont en UTF-8 : convertis en Windows-1252 sur les jeux classiques, laissés
     // tels quels sur EE. convert_array limite la conversion à ces fichiers ; setup.tra (UTF-8)
     // n'est jamais converti.
@@ -42,7 +35,6 @@ ALWAYS
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
 	OUTER_SPRINT CACHE_FOLDER ~weidu_external/AutoDescription/cache~
     INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
-    INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
     INCLUDE ~%MOD_FOLDER%/new-lib/always.tpa~
 END
 
@@ -61,17 +53,15 @@ LANGUAGE ~English (Beta)~ ~english~
 
 BEGIN @10 DESIGNATED 10
 SILENT
-LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~all~ RET log_filename END
-LAM ~init_item_statistics~
-LAM ~update_item_descriptions~
-LAM ~show_item_statistics~
+LAF ad_install_init STR_VAR type = ~items~ mod = ~all~ RET log_name END
+LAM ad_install_all_items
+LAM ad_install_close
 
 BEGIN @15 DESIGNATED 15
 SILENT
-LAF ~init_log_file~ STR_VAR type = ~spells~ mod = ~all~ RET log_filename END
-LAM ~init_spell_statistics~
-LAM ~update_spell_descriptions~
-LAM ~show_spell_statistics~
+LAF ad_install_init STR_VAR type = ~spells~ mod = ~all~ RET log_name END
+LAM ad_install_all_spells
+LAM ad_install_close
 
 BEGIN @20 DESIGNATED 20
 
@@ -84,22 +74,19 @@ OUTER_WHILE NOT(DIRECTORY_EXISTS ~%directory%~) BEGIN
 	PRINT @202
 	ACTION_READLN directory
 END
-ACTION_DEFINE_ARRAY ~itemFiles~ BEGIN END
-LAF getItemsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY itemFiles END
+ACTION_DEFINE_ARRAY mod_files BEGIN END
+LAF ad_mod_files STR_VAR directory = EVAL ~%directory%~ extension = ~itm~ RET_ARRAY mod_files = files END
 SILENT
-LAF ~init_log_file~ STR_VAR type = ~items~ mod = ~%directory%~ RET log_filename END
-LAM ~init_item_statistics~
-LAF ~init_js_file~ END
-OUTER_SET totalItems = 0
-ACTION_PHP_EACH itemFiles AS itemFile => value BEGIN
-	ACTION_IF FILE_EXISTS_IN_GAME ~%itemFile%~ BEGIN
-		COPY_EXISTING ~%itemFile%~ ~override~
-			LPM ~update_item_description~
+LAF ad_install_init STR_VAR type = ~items~ mod = ~%directory%~ RET log_name END
+LAM ad_init_statistics
+ACTION_PHP_EACH mod_files AS mod_file => _ BEGIN
+	ACTION_IF FILE_EXISTS_IN_GAME ~%mod_file%~ BEGIN
+		COPY_EXISTING ~%mod_file%~ ~override~
+			LPM ad_install_item
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
-LAF ~close_js_file~ END
-LAM ~show_item_statistics~
+LAM ad_install_close
 
 BEGIN @25 DESIGNATED 25
 
@@ -112,19 +99,16 @@ OUTER_WHILE NOT(DIRECTORY_EXISTS ~%directory%~) BEGIN
 	PRINT @202
 	ACTION_READLN directory
 END
-ACTION_DEFINE_ARRAY ~splFiles~ BEGIN END
-LAF getSpellsFromOtherMod STR_VAR directory = EVAL ~%directory%~ RET_ARRAY splFiles END
+ACTION_DEFINE_ARRAY mod_files BEGIN END
+LAF ad_mod_files STR_VAR directory = EVAL ~%directory%~ extension = ~spl~ RET_ARRAY mod_files = files END
 SILENT
-LAF ~init_log_file~ STR_VAR type = ~spells~ mod = ~%directory%~ RET log_filename END
-LAM ~init_spell_statistics~
-LAF ~init_js_file~ END
-OUTER_SET totalSpells = 0
-ACTION_PHP_EACH splFiles AS splFile => value BEGIN
-	ACTION_IF FILE_EXISTS_IN_GAME ~%splFile%~ BEGIN
-		COPY_EXISTING ~%splFile%~ ~override~
-			LPM ~update_spell_description~
+LAF ad_install_init STR_VAR type = ~spells~ mod = ~%directory%~ RET log_name END
+LAM ad_init_statistics
+ACTION_PHP_EACH mod_files AS mod_file => _ BEGIN
+	ACTION_IF FILE_EXISTS_IN_GAME ~%mod_file%~ BEGIN
+		COPY_EXISTING ~%mod_file%~ ~override~
+			LPM ad_install_spell
 		BUT_ONLY_IF_IT_CHANGES
 	END
 END
-LAF ~close_js_file~ END
-LAM ~show_spell_statistics~
+LAM ad_install_close
