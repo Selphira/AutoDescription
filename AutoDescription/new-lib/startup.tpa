@@ -18,8 +18,26 @@ OUTER_SPRINT AD_AND       @1000004 // ~et~
 // effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
 OUTER_SET AD_RECURSION_MAX_DEPTH = 1
 
-// Cache des sous-sorts (new-lib/subspell_cache.tpp), à part de celui de l'ancien moteur, qui vide le
-// sien à son initialisation.
+// Options de settings-default.ini et settings.ini, sous leur nom d'origine.
+OUTER_SET AD_ENABLE_SHRINKAGE                            = enable_shrinkage
+OUTER_SET AD_SHRINK_CLASS_ARMOR                          = shrink_class_armor
+OUTER_SET AD_SHRINK_ABILITIES                            = shrink_abilities
+OUTER_SET AD_SHRINK_SAVES_THROWS                         = shrink_saves_throws
+OUTER_SET AD_SHRINK_RESISTANCES                          = shrink_resistances
+OUTER_SET AD_SHRINK_THIEF_SKILLS                         = shrink_thief_skills
+OUTER_SET AD_SHRINK_CURE_WITH_IMMUNITIES                 = shrink_cure_with_immunities
+OUTER_SET AD_SHRINK_IMMUNITIES_SINGLE_LINE               = shrink_immunities_single_line
+OUTER_SET AD_SHRINK_WEAPON_ATTRIBUTES                    = shrink_weapon_attributes
+OUTER_SET AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS            = armor_show_allows_to_cast_spells
+OUTER_SET AD_SHOW_WEAPON_ENCHANTMENT_IF_DIFFERENT_THAC0  = show_weapon_enchantment_if_different_thac0
+OUTER_SET AD_ARMOR_CLASS_SHOW_BONUS_MALUS                = armor_class_show_bonus_malus
+OUTER_SET AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES  = use_complex_grouping_of_probability_ranges
+OUTER_SET AD_GROUP_UNEQUAL_PROBABILITIES                 = group_unequal_probabilities
+OUTER_SET AD_USE_SHORT_EFFECT_DESCRIPTION                = use_short_effect_description
+OUTER_SET AD_ADD_STATISTICS_SECTION_TO_SPELL_DESCRIPTION = add_statistics_section_to_spell_description
+OUTER_SET AD_SUBSPELL_CACHE                              = subspell_cache
+
+// Cache des sous-sorts (new-lib/subspell_cache.tpp).
 OUTER_SPRINT AD_SUBSPELL_CACHE_FOLDER ~%CACHE_FOLDER%/subspell-new~
 
 // Raisons pour lesquelles une ressource n'est pas décrite (new-lib/install.tpp) et leur libellé
