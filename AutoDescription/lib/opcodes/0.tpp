@@ -145,8 +145,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 			SET ac_creature_fx = ac_id
 		END
 	END
-	// Clé opposée au modificateur : les types d'attaque viennent du plus grand bonus au plus petit,
-	// comme dans l'ancien moteur.
+	// Clé opposée au modificateur : les types d'attaque viennent du plus grand bonus au plus petit.
 	CLEAR_ARRAY ac_masks
 	PHP_EACH fx_ids_0 AS _ => ac_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%ac_id%~) AND $ac_equipped(~%ac_id%~) AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_set_base AND $fx_parameter2(~%ac_id%~) != AC_MOD_TYPE_all

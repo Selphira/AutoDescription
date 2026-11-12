@@ -210,7 +210,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_SUB_PROBABILITY BEGIN
 END
 
 // Types de jet de sauvegarde d'un effet (bits 0-4, IESDP) => opcode dont le libellé 2OOO0000 les
-// nomme (« contre les sorts »), dans l'ordre de l'ancien saveType_to_strref.
+// nomme (« contre les sorts »), dans l'ordre des bits.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_TYPES BEGIN
 	1  => 37 // sorts
 	2  => 36 // souffles
@@ -357,7 +357,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
 END
 
 // Guérisons et dissipations réunies (ad_group_cures, lib/groups.tpp) : opcodes de chaque famille,
-// dans l'ordre de la liste écrite (rang de l'ancien moteur) ; l'indice est le bit du masque des états
+// dans l'ordre de la liste écrite ; l'indice est le bit du masque des états
 // guéris (fx_cure_mask) et le dernier chiffre des libellés (+ 10 : « de la cécité », + 20 : « la cécité »).
 // Paramètres sans rôle et durées ignorées pour tous ces opcodes (IESDP).
 ACTION_DEFINE_ARRAY AD_CURES_OPCODES BEGIN 46 162 77 79 75 81 END
@@ -684,8 +684,8 @@ LAF ad_read_mod_ignored
 END
 
 // Groupes de classes (valeurs de class.ids) nommés quand toutes leurs classes sont visées par les
-// types de créature d'un effet (ancien opcode_set_target_strings), dans l'ordre où l'ancien moteur
-// les essaie : une classe réunie ne compte plus pour le groupe suivant.
+// types de créature d'un effet (ancien opcode_set_target_strings), essayés dans cet ordre : une
+// classe réunie ne compte plus pour le groupe suivant.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_VERSUS_CLASS_GROUPS BEGIN
 	~|1|7|10|13|14|17|~ => 2002050 // ~mages monoclassés et multiclassés~
 	~|4|9|10|13|15|~    => 2002051 // ~voleurs monoclassés et multiclassés~

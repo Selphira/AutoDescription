@@ -113,8 +113,8 @@ DEFINE_PATCH_MACRO ad_op_219_anchor BEGIN
 	END
 END
 
-// Noms des types de créature réunis sous l'effet creature_ac_id (targetType), dans l'ordre de l'ancien
-// implode.
+// Noms des types de créature réunis sous l'effet creature_ac_id (targetType), sans doublon, dans
+// l'ordre du fichier.
 DEFINE_PATCH_MACRO ad_op_219_names BEGIN
 	CLEAR_ARRAY creature_ac_names
 	PHP_EACH fx_ids_219 AS _ => creature_ac_member BEGIN
