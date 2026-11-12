@@ -144,8 +144,8 @@ END
 // ligne de splprot.2da sans condition à écrire (« EA >= 0 »). Statistique, valeur (celle de la
 // table, ou parameter1 pour - 1) et relation de la ligne donnent la chaîne de stats.2da, de la clé la
 // plus précise à la plus générale. Une valeur ou une relation « * » (SOURCE, EVASIONCHECK : aucune
-// valeur à tester) sert de joker dans la clé. Une chaîne reprise de l'ancien fichier
-// (@13260000-@13269999 -> @23260000-@23269999) n'utilise que les chaînes de cible et, pour les
+// valeur à tester) sert de joker dans la clé. Une chaîne du bloc @23260000-@23269999 n'utilise
+// que les chaînes de cible et, pour les
 // statistiques d'un fichier IDS (266 à 268, 271, 273), le nom de la valeur (idName), pour la taille,
 // la classe, l'alignement et l'état de sort, le leur (ad_op_326_condition_name) et, pour les phrases
 // génériques, le nom de la statistique (theStatistic) et la valeur (value).

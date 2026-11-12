@@ -9,7 +9,7 @@
 // chances d'infliger… », regroupés par plage dans les capacités de combat, ad_lines_probability_groups,
 // new-lib/lines.tpp). La
 // ligne finit par le jet de sauvegarde de l'effet (ancien add_save). Une forme absente du .tra rend l'objet non couvert après son rendu
-// (render_late_missing), comme une cible sans chaînes (bloc 2 000 000 de description_new.tra).
+// (render_late_missing), comme une cible sans chaînes (bloc 2 000 000 de description.tra).
 
 // Prise en charge commune (passe 2, avant celle des opcodes), pour chaque effet d'un opcode décrit
 // qui n'est pas déjà écarté.

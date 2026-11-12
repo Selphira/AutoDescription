@@ -281,7 +281,7 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DAMAGE_TYPES BEGIN
 END
 
 // Unités de durée en secondes, de la plus petite à la plus grande (ancien tableau durations) ; leurs
-// noms sont dans le bloc 3 010 000 de description_new.tra.
+// noms sont dans le bloc 3 010 000 de description.tra.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DURATION_UNITS BEGIN
 	0 => 1    // seconde
 	1 => 6    // round

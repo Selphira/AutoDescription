@@ -28,10 +28,10 @@ def set_root(root):
     BGFORGE = LIB / "bgforge"
     TRA = MOD / "tra"
 
-NEW_TRA = "description_new.tra"
+NEW_TRA = "description.tra"
 # Fichiers .tra en UTF-8 convertis en Windows-1252 par HANDLE_CHARSETS sur les jeux classiques ;
 # setup.tra est lu tel quel.
-CONVERTED_TRA = ("description.tra", NEW_TRA)
+CONVERTED_TRA = (NEW_TRA,)
 NEW_TRA_RANGES = ((1_000_000, 9_999_999), (20_000_000, 39_999_999))
 DEFINITION = re.compile(r"DEFINE_(PATCH|ACTION)_(MACRO|FUNCTION)\s+[~\"]?([A-Za-z0-9_#-]+)")
 
@@ -202,13 +202,13 @@ def check_tra(report):
 
 def check_tra_references(report, ids):
     report.section("Références @n littérales absentes des .tra français")
-    old = ids.get(("french", "description.tra"), set()) | ids.get(("french", "setup.tra"), set())
+    old = ids.get(("french", "setup.tra"), set())
     new = ids.get(("french", NEW_TRA), set())
     sources = [path for path in weidu_files() if BGFORGE not in path.parents]
     references = 0
     for path in sources:
-        # Chaque moteur n'utilise que son fichier de chaînes.
-        own, name = (new, NEW_TRA) if NEW_LIB in path.parents else (old, "description.tra/setup.tra")
+        # new-lib/ n'utilise que description.tra, le tp2 que setup.tra.
+        own, name = (new, NEW_TRA) if NEW_LIB in path.parents else (old, "setup.tra")
         _, code = strip_weidu(read_text(path))
         for match in re.finditer(r"@(-?\d+)\b", code):
             references += 1
@@ -220,53 +220,30 @@ def check_tra_references(report, ids):
 
 
 NEW_ENTRY = re.compile(r"^@(\d+)\s*=\s*~([^~]*)~([^\n]*)", re.M)
-COPY_MARKER = re.compile(r"//\s*reprise de @(\d+)")
 # Fichiers du nouveau moteur où les globales en majuscules sont fixées.
 NEW_STARTUP_FILES = ("always.tpa", "startup.tpa", "catalog.tpa")
-# Variables de mise en forme de l'ancien moteur et leur équivalent dans le nouveau, pour les
-# chaînes reprises ; l'ancien nom est interdit dans description_new.tra.
-OLD_TO_NEW_VARIABLES = {"crlf": "CRLF", "colon": "AD_COLON", "semicolon": "AD_SEMICOLON", "outer_percent": "PERCENT"}
-OLD_GLOBALS = set(OLD_TO_NEW_VARIABLES) | {"meter", "meters"}
+# Variables de mise en forme de l'ancien moteur (CRLF, AD_COLON, AD_SEMICOLON et PERCENT dans le
+# moteur), interdites dans description.tra.
+OLD_GLOBALS = {"crlf", "colon", "semicolon", "outer_percent", "meter", "meters"}
 
 
 def check_new_tra_rules(report):
     report.section(f"Règles propres à {NEW_TRA} et aux références de new-lib/")
     texts = {}
-    old_french = {}
     for language in ("french", "english"):
         new = (TRA / language / NEW_TRA).read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n")
-        old_path = TRA / language / "description.tra"
-        old = {int(i): t for i, t, _ in NEW_ENTRY.findall(old_path.read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n"))}
-        # Une chaîne absente de l'ancien fichier anglais s'affiche en français (cascade des .tra, TRA-002) :
-        # sa reprise anglaise reprend ce texte.
-        old = {**old_french, **old}
-        if language == "french":
-            old_french = old
         entries = [(int(i), t, rest, line_of(new, m.start())) for m in NEW_ENTRY.finditer(new)
                    for i, t, rest in [m.groups()]]
         order = [i for i, _, _, _ in entries]
         if order != sorted(order):
             report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)} : identifiants non triés")
         texts[language] = ({i: t for i, t, _, _ in entries}, order)
-        copies = 0
         for identifier, text, rest, line in entries:
-            marker = COPY_MARKER.search(rest)
-            if marker:
-                copies += 1
-                source = int(marker.group(1))
-                # Recopie à l'identique, au renommage près des variables de l'ancien moteur ; une
-                # reformulation est un changement distinct, à signaler.
-                expected = old.get(source)
-                for old_name, new_name in OLD_TO_NEW_VARIABLES.items():
-                    expected = expected.replace(f"%{old_name}%", f"%{new_name}%") if expected is not None else None
-                if expected != text:
-                    report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)}:{line} : @{identifier} diffère de "
-                               f"@{source} de description.tra (« reprise de »)")
-            # Le gabarit lirait la variable de l'ancien moteur (une fonction voit celles de son appelant).
+            # Le gabarit lirait une variable que le moteur ne définit pas (une fonction voit celles de son appelant).
             for variable in sorted(set(re.findall(r"%([A-Za-z_][A-Za-z0-9_]*)%", text)) & OLD_GLOBALS):
                 report.add("ERREUR", f"{relative(TRA / language / NEW_TRA)}:{line} : @{identifier} utilise la "
                            f"variable {variable} de l'ancien moteur")
-        print(f"  {relative(TRA / language / NEW_TRA)} : {len(entries)} entrées, dont {copies} reprises")
+        print(f"  {relative(TRA / language / NEW_TRA)} : {len(entries)} entrées")
     if texts.get("french", (None, []))[1] != texts.get("english", (None, []))[1]:
         report.add("ERREUR", f"{NEW_TRA} : identifiants dans un ordre différent en français et en anglais")
 

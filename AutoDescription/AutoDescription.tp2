@@ -16,10 +16,10 @@ ALWAYS
 		END
 	END
 
-    // Les deux fichiers sont en UTF-8 : convertis en Windows-1252 sur les jeux classiques, laissés
-    // tels quels sur EE. convert_array limite la conversion à ces fichiers ; setup.tra (UTF-8)
-    // n'est jamais converti.
-    ACTION_DEFINE_ARRAY convert_tra BEGIN ~description~ ~description_new~ END
+    // description.tra est en UTF-8 : converti en Windows-1252 sur les jeux classiques, laissé tel
+    // quel sur EE. convert_array limite la conversion à ce fichier ; setup.tra (UTF-8) n'est jamais
+    // converti.
+    ACTION_DEFINE_ARRAY convert_tra BEGIN ~description~ END
     LAF HANDLE_CHARSETS
         INT_VAR
             infer_charsets = 1
@@ -41,15 +41,12 @@ END
 LANGUAGE ~Francais~ ~french~
          ~%MOD_FOLDER%/tra/french/setup.tra~
          ~%MOD_FOLDER%/tra/french/description.tra~
-         ~%MOD_FOLDER%/tra/french/description_new.tra~
 
 LANGUAGE ~English (Beta)~ ~english~
          ~%MOD_FOLDER%/tra/french/setup.tra~
          ~%MOD_FOLDER%/tra/french/description.tra~
-         ~%MOD_FOLDER%/tra/french/description_new.tra~
          ~%MOD_FOLDER%/tra/english/setup.tra~
          ~%MOD_FOLDER%/tra/english/description.tra~
-         ~%MOD_FOLDER%/tra/english/description_new.tra~
 
 BEGIN @10 DESIGNATED 10
 SILENT
