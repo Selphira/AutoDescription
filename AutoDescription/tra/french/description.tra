@@ -1,5 +1,5 @@
 /*
- * Chaînes du moteur (new-lib/). Fichier en UTF-8 sans BOM ; uniquement des caractères
+ * Chaînes du moteur (lib/). Fichier en UTF-8 sans BOM ; uniquement des caractères
  * représentables en Windows-1252 (convertis pour les jeux classiques par HANDLE_CHARSETS).
  * Identifiants : 1 000 000-9 999 999 et 20 000 000-39 999 999 uniquement, selon le plan de
  * numérotation (.agents/tra-numbering.md).

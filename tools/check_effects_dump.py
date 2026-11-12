@@ -2,9 +2,9 @@
 
 Outil de développement : il relit lui-même les fichiers .itm/.spl (formats ITM V1 et SPL V1,
 IESDP), produit les lignes attendues et les compare à celles du journal
-AutoDescription/log/*-effects.txt écrit par new-lib/.
+AutoDescription/log/*-effects.txt écrit par lib/.
 
-Les valeurs normalisées sont recalculées ici, indépendamment de new-lib/normalize.tpp, à partir
+Les valeurs normalisées sont recalculées ici, indépendamment de lib/normalize.tpp, à partir
 des règles de l'IESDP (format des effets) et de la colonne DICE de 2da/opcodes.2da.
 
 Usage : python tools/check_effects_dump.py [--classic] JOURNAL DOSSIER [DOSSIER ...]

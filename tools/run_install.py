@@ -2,7 +2,7 @@
 
 Outil de développement : il n'est pas utilisé pendant l'installation du mod.
 
-Le mod du dépôt est copié dans <jeu>/AutoDescription (lib, new-lib, tra, 2da, tp2,
+Le mod du dépôt est copié dans <jeu>/AutoDescription (lib, tra, 2da, tp2,
 settings-default.ini, gabarits des journaux). Les options demandées sont imposées dans la copie
 du tp2, après la lecture de settings.ini (qui prime sur settings-default.ini et n'est jamais
 modifié). --only restreint la boucle des objets et des sorts aux ressources voulues, dans la copie
@@ -30,11 +30,11 @@ from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 MOD = REPOSITORY / "AutoDescription"
-MOD_DIRECTORIES = ("lib", "new-lib", "tra", "2da")
+MOD_DIRECTORIES = ("lib", "tra", "2da")
 LOG_PATTERNS = ("*.log", "*-diff.html", "*-dump.txt", "*-compare.txt", "*-effects.txt", "*-opcodes.txt",
                 "*-recursion.txt", "*-events.txt", "*-cache.txt", "*.md")
 # Fichier des boucles complètes sur les objets et les sorts.
-LOOPS = "new-lib/install.tpp"
+LOOPS = "lib/install.tpp"
 # Ligne du tp2 qui suit la lecture de settings.ini : les options imposées sont insérées avant.
 SETTINGS_END = "\tOUTER_SPRINT CACHE_FOLDER"
 

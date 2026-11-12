@@ -1,0 +1,129 @@
+// Opcode 55 (Death: Kill Creature Type) : tue les créatures de la valeur parameter1 du fichier IDS
+// parameter2 (ad_ids_name, lib/resources.tpp) : « Tue instantanément les rakshasas ». Valeur 0 :
+// la cible de l'effet, sans précision. Le nom remplace la cible, même celle d'une zone, comme dans
+// l'ancien moteur. Avec AD_ENABLE_SHRINKAGE, les effets d'un même bloc qui ne diffèrent que par
+// parameter1 et parameter2 n'en font qu'un (ancien opcode_group_by_target) : noms réunis sans doublon
+// dans l'ordre des effets, ligne écrite après les autres effets 55, comme celle que l'ancien moteur
+// ajoute en fin de liste.
+
+// Fichier qui n'est pas un type de créature : écarté et journalisé. Refus : kit.ids sur EE et valeur
+// 100 de ea.ids (l'ancien opcode_modstat_is_valid écarte ces cas) ; valeur sans nom ; effet d'un 177 qui vise
+// un autre type de créature que le sien (l'ancien moteur remplace alors le nom de l'opcode par celui du
+// 177 : avec le même type, le texte est le même).
+DEFINE_PATCH_MACRO ad_op_55_support BEGIN
+	PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
+			SET kill_file = $fx_parameter2(~%kill_id%~)
+			SET kill_value = $fx_parameter1(~%kill_id%~)
+			LPF ad_ids_name INT_VAR ids_file = kill_file entry = kill_value RET kill_name = name END
+			SPRINT $fx_kill_name(~%kill_id%~) ~%kill_name%~
+			PATCH_IF kill_file < 2 OR kill_file > 8 OR (kill_file == 2 AND kill_value == 100) BEGIN
+				PATCH_IF kill_file < 2 OR kill_file > (IS_EE ? 9 : 8) BEGIN
+					SET drop_id = kill_id
+					SPRINT ignored_reason ~file_error:opcode55:ids_file~
+					SPRINT ignored_message ~IDS file %kill_file% is not a creature type (expected 2-8: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN; 9: KIT on enhanced editions)~
+					LPM ad_application_drop
+				END
+				ELSE BEGIN
+					LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:ids_file~ message = ~kit restriction or value 100 of EA.IDS not supported (IDS file %kill_file%, value %kill_value%)~ RET render_missing = refusal END
+				END
+			END
+			ELSE PATCH_IF kill_value != 0 AND ~%kill_name%~ STRING_EQUAL ~~ BEGIN
+				LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:ids_name~ message = ~value %kill_value% of IDS file %kill_file% has no name~ RET render_missing = refusal END
+			END
+			ELSE PATCH_IF $fx_versus_file(~%kill_id%~) > 0 AND ($fx_versus_file(~%kill_id%~) != kill_file OR $fx_versus_value(~%kill_id%~) != kill_value
+					OR $fx_versus_inner_file(~%kill_id%~) > 0) BEGIN
+				LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:versus~ message = ~creature type set by opcode 177 (IDS file %kill_file%, value %kill_value% for the effect) differs from the one of the effect~ RET render_missing = refusal END
+			END
+		END
+	END
+END
+
+DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
+	SPRINT line_section ~equipped~
+	SET line_sort = $AD_OPCODE_SORT(~55~)
+	SPRINT the @1000008 // ~les~
+	FOR (kill_id = 0; kill_id < fx_count; ++kill_id) BEGIN
+		SET $kill_anchor(~%kill_id%~) = kill_id
+	END
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id BEGIN
+				SET same_id = kill_id
+				SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2
+				PHP_EACH fx_ids_55 AS _ => kill_other BEGIN
+					PATCH_IF kill_other >= kill_id + 1 AND NOT $fx_consumed(~%kill_other%~) BEGIN
+						SET same_other = kill_other
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
+							SET $kill_anchor(~%kill_other%~) = kill_id
+							SET $fx_late(~%kill_id%~) = 2
+						END
+					END
+				END
+			END
+		END
+	END
+	FOR (kill_late = 0; kill_late <= 2; ++kill_late) BEGIN
+		PHP_EACH fx_ids_55 AS _ => kill_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%kill_id%~) AND $kill_anchor(~%kill_id%~) == kill_id AND $fx_late(~%kill_id%~) == kill_late BEGIN
+				LPM ad_op_55_target
+				SET line_phrase = 20550100 // ~Tue instantanément %theTarget%~
+				SET line_fx = kill_id
+				LPM ad_effect_line
+			END
+		END
+	END
+END
+
+// Cible de la ligne de l'effet kill_id et de ceux qu'il réunit (line_the_target). Sous la zone
+// circulaire du projectile, les types réunis sont restreints à la zone (ancien
+// get_target_by_projectile) : « les rakshasas et les ettins dans un rayon de 4,5 mètres ». Refus d'un
+// regroupement : valeur 0 ; zone en cône (l'ancien moteur y écrit la zone sans les types, BUG-032) ;
+// classes que l'ancien moteur réunit sous un seul nom (ancien
+// opcode_set_target_strings : mages, puis voleurs, monoclassés et multiclassés).
+DEFINE_PATCH_MACRO ad_op_55_target BEGIN
+	CLEAR_ARRAY kill_names
+	SET kill_members = 0
+	SET kill_zero = 0
+	SET kill_mages = 0
+	SET kill_thieves = 0
+	PHP_EACH fx_ids_55 AS _ => kill_member BEGIN
+		PATCH_IF kill_member >= kill_id AND NOT $fx_consumed(~%kill_member%~) AND $kill_anchor(~%kill_member%~) == kill_id BEGIN
+			SET kill_members += 1
+			SPRINT kill_name $fx_kill_name(~%kill_member%~)
+			PATCH_IF NOT (~%kill_name%~ STRING_EQUAL ~~) BEGIN
+				SPRINT $kill_names(~%kill_name%~) ~%kill_name%~
+			END
+			SET kill_value = $fx_parameter1(~%kill_member%~)
+			SET kill_zero = kill_zero OR kill_value == 0
+			PATCH_IF $fx_parameter2(~%kill_member%~) == 5 BEGIN
+				SET kill_mages = kill_mages BOR ((kill_value == 1) + 2 * (kill_value == 7) + 4 * (kill_value == 10) + 8 * (kill_value == 13)
+					+ 16 * (kill_value == 14) + 32 * (kill_value == 17))
+				SET kill_thieves = kill_thieves BOR ((kill_value == 4) + 2 * (kill_value == 9) + 4 * (kill_value == 10) + 8 * (kill_value == 13)
+					+ 16 * (kill_value == 15))
+			END
+		END
+	END
+	PATCH_IF kill_members > 1 AND kill_zero BEGIN
+		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:group_value~ message = ~group of slayings with value 0~ RET render_late_missing = refusal END
+	END
+	ELSE PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) AND $fx_area_cone(~%kill_id%~) BEGIN
+		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:area_group~ message = ~group of slayings with a cone-shaped area target~ RET render_late_missing = refusal END
+	END
+	ELSE PATCH_IF kill_members > 1 AND (kill_mages == 63 OR kill_thieves == 31) BEGIN
+		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:class_group~ message = ~slayings covering all mage or thief classes~ RET render_late_missing = refusal END
+	END
+	SPRINT line_the_target ~~
+	PATCH_IF $fx_parameter1(~%kill_id%~) != 0 BEGIN
+		LPF ad_join STR_VAR array_name = ~kill_names~ glue = EVAL ~, %the% ~ final_glue = EVAL ~ %AD_AND% %the% ~ RET kill_target = text END
+		SPRINT line_the_target ~%the% %kill_target%~
+		PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) BEGIN
+			SPRINT kill_saved_range ~%range%~
+			SPRINT range $fx_area_range(~%kill_id%~)
+			SPRINT target ~%line_the_target%~
+			LPF ad_tra INT_VAR tra_id = 2001100 RET line_the_target = text END // ~%target% dans un rayon de %range%~
+			SPRINT range ~%kill_saved_range%~
+		END
+	END
+END

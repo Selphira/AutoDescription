@@ -1,0 +1,93 @@
+// Variables globales du nouveau moteur : fixées ici une fois par exécution, seulement lues
+// ensuite (noms en majuscules ; tools/static_checks.py refuse leur affectation ailleurs).
+
+// Même définition que l'ancien moteur, pour que la comparaison porte sur le même jeu. Les toutes
+// premières versions de BGEE, que HANDLE_CHARSETS traite comme des jeux classiques (pas de
+// bgee.lua), sont ici des jeux EE.
+OUTER_SET IS_EE    = (GAME_IS ~bgee bg2ee eet~) ? 1 : 0
+OUTER_SET HAS_EEEX = (MOD_IS_INSTALLED ~EEex.tp2~ ~0~) ? 1 : 0
+
+// COLON et SEMICOLON sont des mots réservés de WeiDU (V33).
+OUTER_SPRINT CRLF         @1000000 // saut de ligne
+OUTER_SPRINT AD_COLON     @1000001 // ~ : ~
+OUTER_SPRINT AD_SEMICOLON @1000002 // ~ ; ~
+OUTER_SPRINT PERCENT      @1000003 // ~ %~
+OUTER_SPRINT AD_AND       @1000004 // ~et~
+
+// Profondeur maximale des sous-ressources décrites (lib/recursion.tpp) : un sort lancé par un
+// effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
+OUTER_SET AD_RECURSION_MAX_DEPTH = 1
+
+// Options de settings-default.ini et settings.ini, sous leur nom d'origine.
+OUTER_SET AD_ENABLE_SHRINKAGE                            = enable_shrinkage
+OUTER_SET AD_SHRINK_CLASS_ARMOR                          = shrink_class_armor
+OUTER_SET AD_SHRINK_ABILITIES                            = shrink_abilities
+OUTER_SET AD_SHRINK_SAVES_THROWS                         = shrink_saves_throws
+OUTER_SET AD_SHRINK_RESISTANCES                          = shrink_resistances
+OUTER_SET AD_SHRINK_THIEF_SKILLS                         = shrink_thief_skills
+OUTER_SET AD_SHRINK_CURE_WITH_IMMUNITIES                 = shrink_cure_with_immunities
+OUTER_SET AD_SHRINK_IMMUNITIES_SINGLE_LINE               = shrink_immunities_single_line
+OUTER_SET AD_SHRINK_WEAPON_ATTRIBUTES                    = shrink_weapon_attributes
+OUTER_SET AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS            = armor_show_allows_to_cast_spells
+OUTER_SET AD_SHOW_WEAPON_ENCHANTMENT_IF_DIFFERENT_THAC0  = show_weapon_enchantment_if_different_thac0
+OUTER_SET AD_ARMOR_CLASS_SHOW_BONUS_MALUS                = armor_class_show_bonus_malus
+OUTER_SET AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES  = use_complex_grouping_of_probability_ranges
+OUTER_SET AD_GROUP_UNEQUAL_PROBABILITIES                 = group_unequal_probabilities
+OUTER_SET AD_USE_SHORT_EFFECT_DESCRIPTION                = use_short_effect_description
+OUTER_SET AD_ADD_STATISTICS_SECTION_TO_SPELL_DESCRIPTION = add_statistics_section_to_spell_description
+OUTER_SET AD_SUBSPELL_CACHE                              = subspell_cache
+
+// Cache des sous-sorts (lib/subspell_cache.tpp).
+OUTER_SPRINT AD_SUBSPELL_CACHE_FOLDER ~%CACHE_FOLDER%/subspell-new~
+
+// Raisons pour lesquelles une ressource n'est pas décrite (lib/install.tpp) et leur libellé
+// dans les statistiques de l'installation, dans l'ordre d'affichage.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_IGNORE_LABELS BEGIN
+	~invalid_file~        => ~Fichier invalide~
+	~no_ability~          => ~Sans en-tete~
+	~invalid_strref~      => ~Invalide~
+	~cursed~              => ~Maudits~
+	~without_description~ => ~Sans description~
+	~without_name~        => ~Sans nom~
+	~not_moveable~        => ~Non deplacables~
+	~type~                => ~Type non gere~
+	~not_covered~         => ~Non couverts par le moteur~
+END
+
+// Caractéristiques minimales d'un objet, dans l'ordre d'affichage : valeur de stats.ids => champ
+// de l'en-tête.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN
+	34 => ~%ITM_min_level%~
+	36 => ~%ITM_min_strength%~
+	40 => ~%ITM_min_dexterity%~
+	41 => ~%ITM_min_constitution%~
+	38 => ~%ITM_min_intelligence%~
+	39 => ~%ITM_min_wisdom%~
+	42 => ~%ITM_min_charisma%~
+END
+
+// Champs d'un effet du magasin (lib/effects.tpp), dans l'ordre des journaux.
+ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
+	~block~ ~header~ ~position~ ~opcode~ ~target~ ~power~ ~parameter1~ ~parameter2~ ~timing~
+	~resistance~ ~duration~ ~probability1~ ~probability2~ ~resource~ ~dice_count~ ~dice_sides~
+	~save_type~ ~save_bonus~ ~special~
+	// Valeurs normalisées (lib/normalize.tpp).
+	~timing_kind~ ~delay_ticks~ ~duration_ticks~ ~probability_low~ ~probability_high~ ~probability~
+	~save_types~ ~save_flags~ ~level_min~ ~level_max~ ~resource_lower~ ~effective_target~
+END
+
+// Champs que la comparaison de deux effets peut laisser de côté (same_ignored de ad_fx_same_fields,
+// lib/groups.tpp), combinables par BOR.
+OUTER_SET AD_SAME_PARAMETER1  = BIT0
+OUTER_SET AD_SAME_PARAMETER2  = BIT1
+OUTER_SET AD_SAME_SAVE        = BIT2
+OUTER_SET AD_SAME_TIMING      = BIT3
+OUTER_SET AD_SAME_SPECIAL     = BIT4
+OUTER_SET AD_SAME_POWER       = BIT5
+OUTER_SET AD_SAME_DICE        = BIT6
+OUTER_SET AD_SAME_RESISTANCE  = BIT7
+OUTER_SET AD_SAME_PROBABILITY = BIT8
+
+// Niveau de sort 0 dans un masque de niveaux de l'opcode 102 (fx_spell_levels), dont les bits 0 à 8
+// sont les niveaux 1 à 9 : effets de puissance 0 (IESDP).
+OUTER_SET AD_SPELL_LEVEL_ZERO = BIT9

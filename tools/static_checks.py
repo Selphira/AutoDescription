@@ -16,17 +16,26 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = MOD = LIB = NEW_LIB = BGFORGE = TRA = None
+ROOT = MOD = LIB = BGFORGE = TRA = None
 
 
 def set_root(root):
-    global ROOT, MOD, LIB, NEW_LIB, BGFORGE, TRA
+    global ROOT, MOD, LIB, BGFORGE, TRA
     ROOT = root.resolve()
     MOD = ROOT / "AutoDescription"
     LIB = MOD / "lib"
-    NEW_LIB = MOD / "new-lib"
     BGFORGE = LIB / "bgforge"
     TRA = MOD / "tra"
+
+
+def in_engine(path):
+    """Fichier du moteur : lib/ hors de lib/bgforge/ (bibliothèque tierce)."""
+    return LIB in path.parents and BGFORGE not in path.parents
+
+
+def engine_place(place):
+    """Chemin relatif d'une définition du moteur (lib/ hors de lib/bgforge/)."""
+    return place.startswith(relative(LIB) + "/") and not place.startswith(relative(BGFORGE) + "/")
 
 NEW_TRA = "description.tra"
 # Fichiers .tra en UTF-8 convertis en Windows-1252 par HANDLE_CHARSETS sur les jeux classiques ;
@@ -207,8 +216,8 @@ def check_tra_references(report, ids):
     sources = [path for path in weidu_files() if BGFORGE not in path.parents]
     references = 0
     for path in sources:
-        # new-lib/ n'utilise que description.tra, le tp2 que setup.tra.
-        own, name = (new, NEW_TRA) if NEW_LIB in path.parents else (old, "setup.tra")
+        # lib/ n'utilise que description.tra, le tp2 que setup.tra.
+        own, name = (new, NEW_TRA) if in_engine(path) else (old, "setup.tra")
         _, code = strip_weidu(read_text(path))
         for match in re.finditer(r"@(-?\d+)\b", code):
             references += 1
@@ -228,7 +237,7 @@ OLD_GLOBALS = {"crlf", "colon", "semicolon", "outer_percent", "meter", "meters"}
 
 
 def check_new_tra_rules(report):
-    report.section(f"Règles propres à {NEW_TRA} et aux références de new-lib/")
+    report.section(f"Règles propres à {NEW_TRA} et aux références de lib/")
     texts = {}
     for language in ("french", "english"):
         new = (TRA / language / NEW_TRA).read_bytes().decode("utf-8", errors="replace").replace("\r\n", "\n")
@@ -248,7 +257,7 @@ def check_new_tra_rules(report):
         report.add("ERREUR", f"{NEW_TRA} : identifiants dans un ordre différent en français et en anglais")
 
     french = texts.get("french", ({}, []))[0]
-    for path in sorted(p for p in weidu_files() if NEW_LIB in p.parents):
+    for path in sorted(p for p in weidu_files() if in_engine(p)):
         raw = read_text(path)
         _, code = strip_weidu(raw)
         lines = raw.split("\n")
@@ -290,7 +299,7 @@ def collect_definitions(paths):
 
 
 def check_duplicate_definitions(report):
-    report.section("Macros et fonctions définies plusieurs fois (new-lib/, lib/bgforge/)")
+    report.section("Macros et fonctions définies plusieurs fois (lib/, lib/bgforge/)")
     # WeiDU garde silencieusement la dernière définition (ordre d'inclusion).
     definitions = collect_definitions(weidu_files())
     for (context, kind, name), places in sorted(definitions.items()):
@@ -309,7 +318,7 @@ CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 CATALOG_DURATIONS = ("SHOWN", "IGNORED", "HIDDEN", "NOT_PERMANENT", "NOT_AFTER_DEATH")
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
-# Macros appelées par le rendu pour chaque opcode DESCRIBED (new-lib/item_render.tpp).
+# Macros appelées par le rendu pour chaque opcode DESCRIBED (lib/item_render.tpp).
 NEW_OPCODE_ROLES = ("support", "lines")
 
 
@@ -346,11 +355,11 @@ def check_catalog(report, definitions):
             report.add("ERREUR", f"{where} : DURATION {fields[6]} inconnu ({', '.join(CATALOG_DURATIONS)})")
         rows[opcode] = fields[3]
 
-    # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans new-lib/.
+    # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans lib/.
     implemented = collections.defaultdict(list)
     for (_, _, name), places in definitions.items():
         match = NEW_OPCODE_MACRO.match(name)
-        if match and any(p.startswith(relative(NEW_LIB) + "/") for p in places):
+        if match and any(engine_place(p) for p in places):
             implemented[int(match.group(1))].append(name)
     for opcode in sorted(set(implemented) | {o for o, s in rows.items() if s == "DESCRIBED"}):
         if rows.get(opcode) != "DESCRIBED":
@@ -359,18 +368,18 @@ def check_catalog(report, definitions):
         else:
             for role in NEW_OPCODE_ROLES:
                 if f"ad_op_{opcode}_{role}" not in implemented[opcode]:
-                    report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_{role} dans new-lib/")
+                    report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_{role} dans lib/")
 
     counts = collections.Counter(rows.values())
     print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES))
 
 
 def check_opcode_includes(report):
-    """Fichiers de new-lib/opcodes/ : code commun d'abord, puis un fichier par opcode dans l'ordre numérique."""
-    report.section("Inclusions des fichiers d'opcode (new-lib/always.tpa)")
-    path = NEW_LIB / "always.tpa"
+    """Fichiers de lib/opcodes/ : code commun d'abord, puis un fichier par opcode dans l'ordre numérique."""
+    report.section("Inclusions des fichiers d'opcode (lib/always.tpa)")
+    path = LIB / "always.tpa"
     code, _ = strip_weidu(read_text(path))
-    included = re.findall(r"INCLUDE\s+~%MOD_FOLDER%/new-lib/opcodes/([^~]+)~", code)
+    included = re.findall(r"INCLUDE\s+~%MOD_FOLDER%/lib/opcodes/([^~]+)~", code)
     numbers = [int(name[:-4]) for name in included if re.fullmatch(r"\d+\.tpp", name)]
     first_number = next((i for i, name in enumerate(included) if re.fullmatch(r"\d+\.tpp", name)), len(included))
     for name in included[first_number:]:
@@ -378,16 +387,16 @@ def check_opcode_includes(report):
             report.add("ERREUR", f"{relative(path)} : {name} (code commun) inclus après un fichier d'opcode")
     if numbers != sorted(set(numbers)):
         report.add("ERREUR", f"{relative(path)} : fichiers d'opcode hors de l'ordre numérique ou en double")
-    present = sorted(q.name for q in (NEW_LIB / "opcodes").glob("*.tpp"))
+    present = sorted(q.name for q in (LIB / "opcodes").glob("*.tpp"))
     for name in sorted(set(present) - set(included)):
-        report.add("ERREUR", f"{relative(NEW_LIB)}/opcodes/{name} : non inclus par always.tpa")
+        report.add("ERREUR", f"{relative(LIB)}/opcodes/{name} : non inclus par always.tpa")
     for name in sorted(set(included) - set(present)):
-        report.add("ERREUR", f"{relative(path)} : inclut new-lib/opcodes/{name}, absent")
+        report.add("ERREUR", f"{relative(path)} : inclut lib/opcodes/{name}, absent")
     print(f"  {len(included)} fichiers inclus, dont {len(numbers)} fichiers d'opcode")
 
 
 # ---------------------------------------------------------------------------------------------
-# Conventions de new-lib/
+# Conventions de lib/
 
 INCLUDE_PATH = re.compile(r"\b(?:PATCH_)?(?:RE)?INCLUDE\s+(~[^~]*~|\"[^\"]*\")")
 WEIDU_VARIABLES = {"SOURCE_FILE", "SOURCE_RES", "SOURCE_SIZE", "SOURCE_EXT", "SOURCE_DIRECTORY", "SOURCE_FILESPEC",
@@ -395,24 +404,24 @@ WEIDU_VARIABLES = {"SOURCE_FILE", "SOURCE_RES", "SOURCE_SIZE", "SOURCE_EXT", "SO
 
 
 def check_new_lib_conventions(report, definitions):
-    report.section("Conventions de new-lib/ (préfixe ad_, inclusions)")
-    new_files = sorted(p for p in weidu_files() if NEW_LIB in p.parents)
+    report.section("Conventions de lib/ (préfixe ad_, inclusions)")
+    new_files = sorted(p for p in weidu_files() if in_engine(p))
     if not new_files:
-        report.add("ERREUR", f"{relative(NEW_LIB)} : aucun fichier")
+        report.add("ERREUR", f"{relative(LIB)} : aucun fichier")
         return
     names = 0
     for (context, kind, name), places in definitions.items():
-        if any(p.startswith(relative(NEW_LIB) + "/") for p in places):
+        if any(engine_place(p) for p in places):
             names += 1
             if not name.startswith("ad_"):
                 report.add("ERREUR", f"{context}_{kind} {name} ({', '.join(places)}) : nom sans préfixe ad_")
     for path in new_files:
         no_comments, code = strip_weidu(read_text(path))
         for match in INCLUDE_PATH.finditer(no_comments):
-            if "/new-lib/" not in match.group(1):
-                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion hors de new-lib/ "
+            if "/lib/" not in match.group(1):
+                report.add("ERREUR", f"{relative(path)}:{line_of(code, match.start())} : inclusion hors de lib/ "
                            f"{match.group(1)}")
-    print(f"  {len(new_files)} fichiers dans new-lib/, {names} fonctions ou macros")
+    print(f"  {len(new_files)} fichiers dans lib/, {names} fonctions ou macros")
 
 
 # ---------------------------------------------------------------------------------------------
