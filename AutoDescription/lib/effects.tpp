@@ -3,6 +3,13 @@
 // ce fichier s'exécutent dans la portée de ad_describe_item / ad_describe_spell : les tableaux
 // disparaissent avec la fonction (V7), rien ne passe d'une ressource à la suivante.
 //
+// Écriture par nom : un champ est écrit dans la variable qui porte le nom de son élément
+// (SET ~fx_consumed_%fx_id%~ = 0, READ_LONG … ~fx_parameter1_%fx_id%~) et se lit comme un élément
+// ($fx_consumed(~%id%~), VARIABLE_IS_SET $fx_scope(~%id%~)). Écrire dans un tableau coûte un temps
+// qui croît avec sa taille, pas écrire par nom ; mais PHP_EACH, SORT_ARRAY_INDICES, CLEAR_ARRAY et
+// RET_ARRAY ne voient pas un élément écrit par nom. Réservé aux tableaux jamais parcourus :
+// fx_ids_<opcode> et fx_opcode_count restent des tableaux (contrôle de tools/static_checks.py).
+//
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2 (fx_parameter2_raw : valeur lue, qu'une prise en charge ne réécrit
 // pas), fx_parameter3, fx_parameter4, fx_resource2, fx_resource3 (0 ou vides : seul un EFF en a,
@@ -135,11 +142,11 @@ DEFINE_PATCH_MACRO ad_fx_header_fields BEGIN
 	READ_BYTE  (fx_header_offset + ITM_HEAD_target)               fx_header_target
 	READ_SHORT (fx_header_offset + ITM_HEAD_projectile_animation) fx_header_projectile
 	FOR (fx_id = fx_first_id; fx_id < fx_count; ++fx_id) BEGIN
-		SET $fx_header_target(~%fx_id%~) = fx_header_target
-		SET $fx_header_projectile(~%fx_id%~) = fx_header_projectile
-		SET $fx_potion_drinker(~%fx_id%~) = fx_item_type == ITM_TYPE_potion AND fx_header_target == TARGET_HEAD_self
+		SET ~fx_header_target_%fx_id%~ = fx_header_target
+		SET ~fx_header_projectile_%fx_id%~ = fx_header_projectile
+		SET ~fx_potion_drinker_%fx_id%~ = fx_item_type == ITM_TYPE_potion AND fx_header_target == TARGET_HEAD_self
 		PATCH_IF $fx_potion_drinker(~%fx_id%~) BEGIN
-			SET $fx_effective_target(~%fx_id%~) = TARGET_FX_self
+			SET ~fx_effective_target_%fx_id%~ = TARGET_FX_self
 		END
 	END
 END
@@ -239,39 +246,48 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	END
 	ELSE BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
+		// fx_skip_ignored : l'appelant écarterait de toute façon un effet IGNORED sans le lire. Testé sur
+		// l'opcode lu, avant le remplacement d'un 111, 177 ou 283 ; un opcode absent de ce jeu reste lu
+		// pour la synthèse des opcodes.
+		SET fx_skip = 0
+		PATCH_IF fx_skip_ignored AND support_header_only AND NOT AD_EFFECTS_DUMP
+				AND VARIABLE_IS_SET $AD_OPCODE_STATUS(~%fx_pass_opcode%~) BEGIN
+			SPRINT fx_skip_status $AD_OPCODE_STATUS(~%fx_pass_opcode%~)
+			SET fx_skip = $AD_OPCODE_AVAILABLE(~%fx_pass_opcode%~) AND (~%fx_skip_status%~ STRING_EQUAL ~IGNORED~)
+		END
 		PATCH_IF fx_pass_opcode == 177 AND fx_pass == 0 BEGIN
 			SET $fx_deferred(~%fx_deferred_count%~) = fx_p
 			SET $fx_deferred_exceptions(~%fx_deferred_count%~) = fx_block_exceptions
 			SET $fx_deferred_not_cumulative(~%fx_deferred_count%~) = fx_block_not_cumulative
 			SET fx_deferred_count += 1
 		END
-		ELSE BEGIN
+		ELSE PATCH_IF NOT fx_skip BEGIN
 			SET fx_id = fx_count
-			SPRINT $fx_block(~%fx_id%~) ~%fx_block_kind%~
-			SET $fx_header(~%fx_id%~)   = fx_block_header
-			SET $fx_position(~%fx_id%~) = fx_p
-			SET $fx_opcode(~%fx_id%~)   = fx_pass_opcode
-			READ_BYTE  (fx_offset + FX_target)       $fx_target(~%fx_id%~)
-			READ_BYTE  (fx_offset + FX_power)        $fx_power(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_parameter1)   $fx_parameter1(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_parameter2)   $fx_parameter2(~%fx_id%~)
-			SET $fx_parameter2_raw(~%fx_id%~) = $fx_parameter2(~%fx_id%~)
-			READ_BYTE  (fx_offset + FX_timing)       $fx_timing(~%fx_id%~)
-			READ_BYTE  (fx_offset + FX_resistance)   $fx_resistance(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_duration)     $fx_duration(~%fx_id%~)
-			READ_BYTE  (fx_offset + FX_probability1) $fx_probability1(~%fx_id%~)
-			READ_BYTE  (fx_offset + FX_probability2) $fx_probability2(~%fx_id%~)
-			READ_ASCII (fx_offset + FX_resource)     $fx_resource(~%fx_id%~) (8) NULL
-			READ_LONG  (fx_offset + FX_dice_thrown)  $fx_dice_count(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_dice_sides)   $fx_dice_sides(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_save_type)    $fx_save_type(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_save_bonus)   $fx_save_bonus(~%fx_id%~)
-			READ_LONG  (fx_offset + FX_stacking_id_Ex) $fx_special(~%fx_id%~)
-			SET $fx_external(~%fx_id%~) = 0
-			SET $fx_parameter3(~%fx_id%~) = 0
-			SET $fx_parameter4(~%fx_id%~) = 0
-			SPRINT $fx_resource2(~%fx_id%~) ~~
-			SPRINT $fx_resource3(~%fx_id%~) ~~
+			SPRINT ~fx_block_%fx_id%~ ~%fx_block_kind%~
+			SET ~fx_header_%fx_id%~   = fx_block_header
+			SET ~fx_position_%fx_id%~ = fx_p
+			SET ~fx_opcode_%fx_id%~   = fx_pass_opcode
+			READ_BYTE  (fx_offset + FX_target)       ~fx_target_%fx_id%~
+			READ_BYTE  (fx_offset + FX_power)        ~fx_power_%fx_id%~
+			READ_LONG  (fx_offset + FX_parameter1)   ~fx_parameter1_%fx_id%~
+			READ_LONG  (fx_offset + FX_parameter2)   ~fx_parameter2_%fx_id%~
+			SET ~fx_parameter2_raw_%fx_id%~ = $fx_parameter2(~%fx_id%~)
+			READ_BYTE  (fx_offset + FX_timing)       ~fx_timing_%fx_id%~
+			READ_BYTE  (fx_offset + FX_resistance)   ~fx_resistance_%fx_id%~
+			READ_LONG  (fx_offset + FX_duration)     ~fx_duration_%fx_id%~
+			READ_BYTE  (fx_offset + FX_probability1) ~fx_probability1_%fx_id%~
+			READ_BYTE  (fx_offset + FX_probability2) ~fx_probability2_%fx_id%~
+			READ_ASCII (fx_offset + FX_resource)     ~fx_resource_%fx_id%~ (8) NULL
+			READ_LONG  (fx_offset + FX_dice_thrown)  ~fx_dice_count_%fx_id%~
+			READ_LONG  (fx_offset + FX_dice_sides)   ~fx_dice_sides_%fx_id%~
+			READ_LONG  (fx_offset + FX_save_type)    ~fx_save_type_%fx_id%~
+			READ_LONG  (fx_offset + FX_save_bonus)   ~fx_save_bonus_%fx_id%~
+			READ_LONG  (fx_offset + FX_stacking_id_Ex) ~fx_special_%fx_id%~
+			SET ~fx_external_%fx_id%~ = 0
+			SET ~fx_parameter3_%fx_id%~ = 0
+			SET ~fx_parameter4_%fx_id%~ = 0
+			SPRINT ~fx_resource2_%fx_id%~ ~~
+			SPRINT ~fx_resource3_%fx_id%~ ~~
 			LPM ad_fx_add_effect
 		END
 	END
@@ -306,16 +322,16 @@ END
 // compris) : remplacement d'un 177 ou d'un 111, valeurs normalisées, marques des passes, compte de
 // l'opcode.
 DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
-	SET $fx_versus_file(~%fx_id%~) = 0
-	SET $fx_versus_value(~%fx_id%~) = 0
-	SET $fx_versus_inner_file(~%fx_id%~) = 0
-	SET $fx_versus_inner_value(~%fx_id%~) = 0
-	SET $fx_identical_anchor(~%fx_id%~) = fx_id
-	SET $fx_group_anchor(~%fx_id%~) = fx_id
-	SET $fx_derived_source(~%fx_id%~) = 0
-	SET $fx_from_111(~%fx_id%~) = 0
-	SET $fx_probability_in_sub(~%fx_id%~) = 0
-	SET $fx_cursed(~%fx_id%~) = $fx_opcode(~%fx_id%~) == 283
+	SET ~fx_versus_file_%fx_id%~ = 0
+	SET ~fx_versus_value_%fx_id%~ = 0
+	SET ~fx_versus_inner_file_%fx_id%~ = 0
+	SET ~fx_versus_inner_value_%fx_id%~ = 0
+	SET ~fx_identical_anchor_%fx_id%~ = fx_id
+	SET ~fx_group_anchor_%fx_id%~ = fx_id
+	SET ~fx_derived_source_%fx_id%~ = 0
+	SET ~fx_from_111_%fx_id%~ = 0
+	SET ~fx_probability_in_sub_%fx_id%~ = 0
+	SET ~fx_cursed_%fx_id%~ = $fx_opcode(~%fx_id%~) == 283
 	PATCH_IF $fx_opcode(~%fx_id%~) == 177 OR $fx_opcode(~%fx_id%~) == 283 BEGIN
 		LPM ad_fx_substitute_177
 	END
@@ -324,57 +340,57 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	END
 	// Valeurs lues des champs que des passes réécrivent ensuite (regroupements, opcodes 23, 143, 189),
 	// pour les journaux (ad_fx_data, lib/log.tpp), comme fx_parameter2_raw.
-	SET $fx_parameter1_raw(~%fx_id%~) = $fx_parameter1(~%fx_id%~)
-	SET $fx_timing_raw(~%fx_id%~) = $fx_timing(~%fx_id%~)
-	SET $fx_duration_raw(~%fx_id%~) = $fx_duration(~%fx_id%~)
-	SET $fx_dice_count_raw(~%fx_id%~) = $fx_dice_count(~%fx_id%~)
-	SET $fx_special_raw(~%fx_id%~) = $fx_special(~%fx_id%~)
-	SET $fx_save_type_raw(~%fx_id%~) = $fx_save_type(~%fx_id%~)
+	SET ~fx_parameter1_raw_%fx_id%~ = $fx_parameter1(~%fx_id%~)
+	SET ~fx_timing_raw_%fx_id%~ = $fx_timing(~%fx_id%~)
+	SET ~fx_duration_raw_%fx_id%~ = $fx_duration(~%fx_id%~)
+	SET ~fx_dice_count_raw_%fx_id%~ = $fx_dice_count(~%fx_id%~)
+	SET ~fx_special_raw_%fx_id%~ = $fx_special(~%fx_id%~)
+	SET ~fx_save_type_raw_%fx_id%~ = $fx_save_type(~%fx_id%~)
 	SET fx_282_converted = 0
 	PATCH_IF $fx_opcode(~%fx_id%~) == 282 AND AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_op_282_convert
 	END
 	LPM ad_fx_normalize
-	SET $fx_consumed(~%fx_id%~) = 0
-	SET $fx_dropped(~%fx_id%~) = 0
-	SET $fx_parent_probability(~%fx_id%~) = 0
-	SET $fx_range_min(~%fx_id%~) = 0
-	SET $fx_range_max(~%fx_id%~) = 0
-	SPRINT $fx_name_list(~%fx_id%~) ~~
-	SET $fx_list_size(~%fx_id%~) = 0
-	SET $fx_level_merged(~%fx_id%~) = 0
-	SET $fx_level_chained(~%fx_id%~) = 0
-	SET $fx_cure_mask(~%fx_id%~) = 0
-	SET $fx_cure_feeblemind(~%fx_id%~) = 0
-	SET $fx_header_target(~%fx_id%~) = 0
-	SET $fx_header_projectile(~%fx_id%~) = 0
-	SET $fx_potion_drinker(~%fx_id%~) = 0
-	SET $fx_area_target(~%fx_id%~) = 0
-	SET $fx_area_cone(~%fx_id%~) = 0
-	SPRINT $fx_area_range(~%fx_id%~) ~~
-	SET $fx_late(~%fx_id%~) = fx_282_converted
-	SET $fx_series_of(~%fx_id%~) = 0 - 1
-	SET $fx_series_anchor(~%fx_id%~) = 0
-	SPRINT $fx_level_value(~%fx_id%~) ~~
-	SPRINT $fx_dice_text(~%fx_id%~) ~~
-	SET $fx_charge_rewritten(~%fx_id%~) = 0
-	SPRINT $fx_level_duration(~%fx_id%~) ~~
-	SET $fx_duration_dice(~%fx_id%~) = 0
-	SET $fx_duration_dice_bonus(~%fx_id%~) = 0
-	SPRINT $fx_level_save(~%fx_id%~) ~~
-	SPRINT $fx_level_max_text(~%fx_id%~) ~~
-	SET $fx_level_to_last(~%fx_id%~) = 0
-	SET $fx_level_progression(~%fx_id%~) = 0
+	SET ~fx_consumed_%fx_id%~ = 0
+	SET ~fx_dropped_%fx_id%~ = 0
+	SET ~fx_parent_probability_%fx_id%~ = 0
+	SET ~fx_range_min_%fx_id%~ = 0
+	SET ~fx_range_max_%fx_id%~ = 0
+	SPRINT ~fx_name_list_%fx_id%~ ~~
+	SET ~fx_list_size_%fx_id%~ = 0
+	SET ~fx_level_merged_%fx_id%~ = 0
+	SET ~fx_level_chained_%fx_id%~ = 0
+	SET ~fx_cure_mask_%fx_id%~ = 0
+	SET ~fx_cure_feeblemind_%fx_id%~ = 0
+	SET ~fx_header_target_%fx_id%~ = 0
+	SET ~fx_header_projectile_%fx_id%~ = 0
+	SET ~fx_potion_drinker_%fx_id%~ = 0
+	SET ~fx_area_target_%fx_id%~ = 0
+	SET ~fx_area_cone_%fx_id%~ = 0
+	SPRINT ~fx_area_range_%fx_id%~ ~~
+	SET ~fx_late_%fx_id%~ = fx_282_converted
+	SET ~fx_series_of_%fx_id%~ = 0 - 1
+	SET ~fx_series_anchor_%fx_id%~ = 0
+	SPRINT ~fx_level_value_%fx_id%~ ~~
+	SPRINT ~fx_dice_text_%fx_id%~ ~~
+	SET ~fx_charge_rewritten_%fx_id%~ = 0
+	SPRINT ~fx_level_duration_%fx_id%~ ~~
+	SET ~fx_duration_dice_%fx_id%~ = 0
+	SET ~fx_duration_dice_bonus_%fx_id%~ = 0
+	SPRINT ~fx_level_save_%fx_id%~ ~~
+	SPRINT ~fx_level_max_text_%fx_id%~ ~~
+	SET ~fx_level_to_last_%fx_id%~ = 0
+	SET ~fx_level_progression_%fx_id%~ = 0
 	LPM ad_fx_mod_ignored
 	// Écarté comme un effet que l'ancien moteur ne charge pas : sans effet sur son bloc (exceptions de
 	// cible, 321 qui rend la suite non cumulative).
 	PATCH_IF fx_mod_ignored BEGIN
-		SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
-		SET $fx_exception(~%fx_id%~) = 0
-		SET $fx_exception_name_count(~%fx_id%~) = 0
-		SET $fx_not_cumulative(~%fx_id%~) = fx_block_not_cumulative
-		SET $fx_consumed(~%fx_id%~) = 1
-		SET $fx_dropped(~%fx_id%~) = 1
+		SET ~fx_exception_count_%fx_id%~ = fx_block_exceptions
+		SET ~fx_exception_%fx_id%~ = 0
+		SET ~fx_exception_name_count_%fx_id%~ = 0
+		SET ~fx_not_cumulative_%fx_id%~ = fx_block_not_cumulative
+		SET ~fx_consumed_%fx_id%~ = 1
+		SET ~fx_dropped_%fx_id%~ = 1
 	END
 	ELSE BEGIN
 		LPM ad_fx_mark_target_exception

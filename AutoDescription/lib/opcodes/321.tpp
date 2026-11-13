@@ -8,14 +8,14 @@
 // Au chargement (ad_fx_load_block, lib/effects.tpp) : fx_not_cumulative. Un 321 d'un EFF n'en
 // est pas un : l'ancien moteur ne teste que l'opcode lu dans la ressource, avant de remplacer le 177.
 DEFINE_PATCH_MACRO ad_fx_mark_not_cumulative BEGIN
-	SET $fx_not_cumulative(~%fx_id%~) = fx_block_not_cumulative
+	SET ~fx_not_cumulative_%fx_id%~ = fx_block_not_cumulative
 	PATCH_IF $fx_opcode(~%fx_id%~) == 321 AND NOT $fx_external(~%fx_id%~) BEGIN
 		SPRINT removal_resource $fx_resource(~%fx_id%~)
 		PATCH_IF (~%removal_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)
 				AND ($fx_timing(~%fx_id%~) != TIMING_duration OR $fx_duration(~%fx_id%~) != 0) BEGIN
 			SET fx_block_not_cumulative = 1
-			SET $fx_consumed(~%fx_id%~) = 1
-			SET $fx_dropped(~%fx_id%~) = 1
+			SET ~fx_consumed_%fx_id%~ = 1
+			SET ~fx_dropped_%fx_id%~ = 1
 		END
 	END
 END

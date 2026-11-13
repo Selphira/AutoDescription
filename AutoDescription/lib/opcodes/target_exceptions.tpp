@@ -14,11 +14,11 @@
 // phrases, vide), quels que soient ses autres champs ; écarté dès ici (fx_consumed, fx_dropped),
 // sauf le 318 d'un jeu classique, refusé ensuite.
 DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
-	SET $fx_exception_count(~%fx_id%~) = fx_block_exceptions
-	SET $fx_exception(~%fx_id%~) = 0
-	SET $fx_resource_immunity(~%fx_id%~) = 0
-	SET $fx_exception_name_count(~%fx_id%~) = 0
-	SET $fx_no_effect_chance(~%fx_id%~) = 0
+	SET ~fx_exception_count_%fx_id%~ = fx_block_exceptions
+	SET ~fx_exception_%fx_id%~ = 0
+	SET ~fx_resource_immunity_%fx_id%~ = 0
+	SET ~fx_exception_name_count_%fx_id%~ = 0
+	SET ~fx_no_effect_chance_%fx_id%~ = 0
 	SET exception_opcode = $fx_opcode(~%fx_id%~)
 	// 318 sans condition contre un autre sort nommé, qui n'est pas un objet : l'ancien moteur en fait une
 	// immunité au sort (opcode_318_replace), ajoutée après les autres 206 (A7#LEAT1).
@@ -28,8 +28,8 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 			LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
 			LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
 			PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) AND ~%exception_item_name%~ STRING_EQUAL ~~ BEGIN
-				SET $fx_opcode(~%fx_id%~) = 206
-				SET $fx_late(~%fx_id%~) = 1
+				SET ~fx_opcode_%fx_id%~ = 206
+				SET ~fx_late_%fx_id%~ = 1
 				SET exception_opcode = 206
 			END
 		END
@@ -44,15 +44,15 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 			SET exception_splstate_tra = 8120000 + $fx_parameter1(~%fx_id%~)
 			PATCH_IF exception_opcode == 318 AND exception_chance < 100 AND (exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111)
 					AND $fx_parameter1(~%fx_id%~) != 121 AND NOT TRA_ENTRY_EXISTS (~%exception_splstate_tra%~) BEGIN
-				SET $fx_no_effect_chance(~%fx_id%~) = 1
+				SET ~fx_no_effect_chance_%fx_id%~ = 1
 			END
 			ELSE PATCH_IF $fx_parameter1(~%fx_id%~) != 0 OR $fx_parameter2_raw(~%fx_id%~) != 0 BEGIN
-				SET $fx_exception(~%fx_id%~) = 1
+				SET ~fx_exception_%fx_id%~ = 1
 				SET fx_block_exceptions += 1
 			END
 			ELSE PATCH_IF IS_EE OR exception_opcode == 324 BEGIN
-				SET $fx_consumed(~%fx_id%~) = 1
-				SET $fx_dropped(~%fx_id%~) = 1
+				SET ~fx_consumed_%fx_id%~ = 1
+				SET ~fx_dropped_%fx_id%~ = 1
 			END
 		END
 	END
@@ -75,10 +75,10 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 		END
 		// Écarté dès ici, sans compter pour la durée de l'en-tête : l'ancien moteur ne charge pas l'effet.
 		PATCH_IF exception_eff_self BEGIN
-			SET $fx_exception(~%fx_id%~) = 1
+			SET ~fx_exception_%fx_id%~ = 1
 			SET fx_block_exceptions += 1
-			SET $fx_consumed(~%fx_id%~) = 1
-			SET $fx_dropped(~%fx_id%~) = 1
+			SET ~fx_consumed_%fx_id%~ = 1
+			SET ~fx_dropped_%fx_id%~ = 1
 		END
 	END
 END

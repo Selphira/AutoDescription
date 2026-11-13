@@ -69,19 +69,19 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 		DEFAULT
 			SPRINT fx_timing_kind ~unknown~
 	END
-	SPRINT $fx_timing_kind(~%fx_id%~) ~%fx_timing_kind%~
-	SET $fx_delay_ticks(~%fx_id%~)    = fx_delay_ticks
-	SET $fx_duration_ticks(~%fx_id%~) = fx_duration_ticks
+	SPRINT ~fx_timing_kind_%fx_id%~ ~%fx_timing_kind%~
+	SET ~fx_delay_ticks_%fx_id%~    = fx_delay_ticks
+	SET ~fx_duration_ticks_%fx_id%~ = fx_duration_ticks
 
 	// Le moteur tire x dans 0-99 : l'effet a lieu si probabilité 2 <= x <= probabilité 1.
 	SET fx_probability_low  = $fx_probability2(~%fx_id%~)
 	SET fx_probability_high = $fx_probability1(~%fx_id%~) > 99 ? 99 : $fx_probability1(~%fx_id%~)
-	SET $fx_probability_low(~%fx_id%~)  = fx_probability_low
-	SET $fx_probability_high(~%fx_id%~) = fx_probability_high
-	SET $fx_probability(~%fx_id%~) = fx_probability_low <= fx_probability_high ? fx_probability_high - fx_probability_low + 1 : 0
+	SET ~fx_probability_low_%fx_id%~  = fx_probability_low
+	SET ~fx_probability_high_%fx_id%~ = fx_probability_high
+	SET ~fx_probability_%fx_id%~ = fx_probability_low <= fx_probability_high ? fx_probability_high - fx_probability_low + 1 : 0
 
-	SET $fx_save_types(~%fx_id%~) = $fx_save_type(~%fx_id%~) BAND 0b11111
-	SET $fx_save_flags(~%fx_id%~) = $fx_save_type(~%fx_id%~) BAND (BNOT 0b11111)
+	SET ~fx_save_types_%fx_id%~ = $fx_save_type(~%fx_id%~) BAND 0b11111
+	SET ~fx_save_flags_%fx_id%~ = $fx_save_type(~%fx_id%~) BAND (BNOT 0b11111)
 
 	// Les champs « dés » donnent un niveau maximum (dés lancés) et minimum (faces) de la cible,
 	// sauf pour les opcodes qui s'en servent comme de vrais dés.
@@ -97,25 +97,25 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	ELSE PATCH_IF ~%fx_dice_usage%~ STRING_EQUAL ~DICE_IF_P2_1_EE~ BEGIN
 		SET fx_level_restriction = NOT (IS_EE AND $fx_parameter2(~%fx_id%~) == 1)
 	END
-	SET $fx_level_restricted(~%fx_id%~) = fx_level_restriction
-	SET $fx_level_max(~%fx_id%~) = fx_level_restriction ? $fx_dice_count(~%fx_id%~) : 0
-	SET $fx_level_min(~%fx_id%~) = fx_level_restriction ? $fx_dice_sides(~%fx_id%~) : 0
-	SET $fx_eff_levels(~%fx_id%~) = 0
+	SET ~fx_level_restricted_%fx_id%~ = fx_level_restriction
+	SET ~fx_level_max_%fx_id%~ = fx_level_restriction ? $fx_dice_count(~%fx_id%~) : 0
+	SET ~fx_level_min_%fx_id%~ = fx_level_restriction ? $fx_dice_sides(~%fx_id%~) : 0
+	SET ~fx_eff_levels_%fx_id%~ = 0
 
 	// L'effet d'équipement d'un objet touche toujours le porteur : sa cible est sans objet.
-	SET $fx_effective_target(~%fx_id%~) = $fx_target(~%fx_id%~)
+	SET ~fx_effective_target_%fx_id%~ = $fx_target(~%fx_id%~)
 	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~equipped~ BEGIN
-		SET $fx_effective_target(~%fx_id%~) = TARGET_FX_self
+		SET ~fx_effective_target_%fx_id%~ = TARGET_FX_self
 	END
-	SET $fx_group_target(~%fx_id%~) = $fx_effective_target(~%fx_id%~)
+	SET ~fx_group_target_%fx_id%~ = $fx_effective_target(~%fx_id%~)
 
-	SPRINT $fx_scope(~%fx_id%~) ~%fx_block_kind%~
+	SPRINT ~fx_scope_%fx_id%~ ~%fx_block_kind%~
 	PATCH_IF ~%fx_block_kind%~ STRING_EQUAL ~ability~ BEGIN
-		SPRINT $fx_scope(~%fx_id%~) ~ability%fx_block_header%~
+		SPRINT ~fx_scope_%fx_id%~ ~ability%fx_block_header%~
 	END
-	SPRINT $fx_line_section(~%fx_id%~) $fx_scope(~%fx_id%~)
+	SPRINT ~fx_line_section_%fx_id%~ $fx_scope(~%fx_id%~)
 
 	SPRINT fx_resource_lower $fx_resource(~%fx_id%~)
 	TO_LOWER fx_resource_lower
-	SPRINT $fx_resource_lower(~%fx_id%~) ~%fx_resource_lower%~
+	SPRINT ~fx_resource_lower_%fx_id%~ ~%fx_resource_lower%~
 END

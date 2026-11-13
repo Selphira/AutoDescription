@@ -14,12 +14,12 @@
 DEFINE_PATCH_MACRO ad_spell_header_fields BEGIN
 	FOR (header_h = 0; header_h < fx_header_count; ++header_h) BEGIN
 		SET header_offset = fx_headers_offset + header_h * 0x28
-		READ_SHORT (header_offset + SPL_HEAD_level_required) $spell_level(~%header_h%~)
-		READ_BYTE  (header_offset + SPL_HEAD_target)         $spell_target(~%header_h%~)
-		READ_BYTE  (header_offset + SPL_HEAD_target_number)  $spell_target_count(~%header_h%~)
-		READ_SHORT (header_offset + SPL_HEAD_range)          $spell_range(~%header_h%~)
-		READ_SHORT (header_offset + SPL_HEAD_casting_time)   $spell_casting_time(~%header_h%~)
-		READ_SHORT (header_offset + SPL_HEAD_projectile)     $spell_projectile(~%header_h%~)
+		READ_SHORT (header_offset + SPL_HEAD_level_required) ~spell_level_%header_h%~
+		READ_BYTE  (header_offset + SPL_HEAD_target)         ~spell_target_%header_h%~
+		READ_BYTE  (header_offset + SPL_HEAD_target_number)  ~spell_target_count_%header_h%~
+		READ_SHORT (header_offset + SPL_HEAD_range)          ~spell_range_%header_h%~
+		READ_SHORT (header_offset + SPL_HEAD_casting_time)   ~spell_casting_time_%header_h%~
+		READ_SHORT (header_offset + SPL_HEAD_projectile)     ~spell_projectile_%header_h%~
 	END
 END
 
@@ -1148,8 +1148,11 @@ BEGIN
 	SPRINT save_sub_bonus_text ~~
 	SET save_sub_bonus_valid_one = 1
 	// Seuls ses effets comptent, pas leurs phrases ; sous-sort, sans ses effets de lancement.
+	// En-tête seul : ad_spell_header_keeps écarterait ses effets IGNORED, qui ne sont pas lus
+	// (ad_fx_load_block_effect).
 	SET support_header_only = 1
 	SET fx_with_casting = 0
+	SET fx_skip_ignored = 1
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
 		PATCH_TIME ~step:load_save_sub~ BEGIN
 			LPM ad_fx_load_spell

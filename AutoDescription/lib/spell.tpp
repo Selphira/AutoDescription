@@ -19,6 +19,7 @@ BEGIN
 	SET item_type = 0 - 1
 	// Effets de lancement décrits à part (ancien add_casting_features), pas pour les sous-sorts.
 	SET fx_with_casting = 1
+	SET fx_skip_ignored = 0
 	SPRINT description ~~
 	SET covered = 0
 	LPM ad_recursion_reset

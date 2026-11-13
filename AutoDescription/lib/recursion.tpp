@@ -442,6 +442,7 @@ BEGIN
 	SPRINT duration_missing ~~
 	SET support_header_only = 1
 	SET fx_with_casting = 0
+	SET fx_skip_ignored = 0
 	// Comme l'ancien CURRENT_SOURCE_RES, le sous-sort est le sort décrit.
 	SPRINT spell_self ~%resref%~
 	TO_LOWER spell_self
@@ -548,6 +549,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_frequency_seconds = 0
 		ctx_inherit_dice = 0
 		ctx_named_lines = 0
+		fx_skip_ignored = 0
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -797,36 +799,36 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		SET sub_header = 0
 		SET sub_projectile = 0
 		SET fx_id = 0
-		SPRINT $fx_block(~0~) ~ability~
-		SET $fx_header(~0~) = 0
-		SET $fx_position(~0~) = 0
-		READ_SHORT EFF2_opcode            $fx_opcode(~0~)
-		READ_BYTE  EFF2_target            $fx_target(~0~)
+		SPRINT ~fx_block_0~ ~ability~
+		SET ~fx_header_0~ = 0
+		SET ~fx_position_0~ = 0
+		READ_SHORT EFF2_opcode            ~fx_opcode_0~
+		READ_BYTE  EFF2_target            ~fx_target_0~
 		PATCH_IF ctx_hit_target BEGIN
-			SET $fx_target(~0~) = TARGET_FX_preset
+			SET ~fx_target_0~ = TARGET_FX_preset
 		END
-		READ_BYTE  EFF2_power             $fx_power(~0~)
-		READ_LONG  EFF2_parameter1        $fx_parameter1(~0~)
-		READ_LONG  EFF2_parameter2        $fx_parameter2(~0~)
-		SET $fx_parameter2_raw(~0~) = $fx_parameter2(~0~)
-		READ_BYTE  EFF2_timing            $fx_timing(~0~)
-		READ_LONG  EFF2_resistance        $fx_resistance(~0~)
-		READ_LONG  EFF2_duration          $fx_duration(~0~)
-		READ_BYTE  EFF2_probability1      $fx_probability1(~0~)
-		READ_BYTE  EFF2_probability2      $fx_probability2(~0~)
-		READ_ASCII EFF2_resource          $fx_resource(~0~) (8) NULL
-		READ_LONG  EFF2_dice_thrown       $fx_dice_count(~0~)
-		READ_LONG  EFF2_dice_sides        $fx_dice_sides(~0~)
-		READ_LONG  EFF2_save_type         $fx_save_type(~0~)
-		READ_LONG  EFF2_save_bonus        $fx_save_bonus(~0~)
-		READ_LONG  EFF2_stacking_id_tobex $fx_special(~0~)
-		READ_LONG  EFF2_parameter3        $fx_parameter3(~0~)
-		READ_LONG  EFF2_parameter4        $fx_parameter4(~0~)
-		READ_ASCII EFF2_resource2         $fx_resource2(~0~) (8) NULL
-		READ_ASCII EFF2_resource3         $fx_resource3(~0~) (8) NULL
+		READ_BYTE  EFF2_power             ~fx_power_0~
+		READ_LONG  EFF2_parameter1        ~fx_parameter1_0~
+		READ_LONG  EFF2_parameter2        ~fx_parameter2_0~
+		SET ~fx_parameter2_raw_0~ = $fx_parameter2(~0~)
+		READ_BYTE  EFF2_timing            ~fx_timing_0~
+		READ_LONG  EFF2_resistance        ~fx_resistance_0~
+		READ_LONG  EFF2_duration          ~fx_duration_0~
+		READ_BYTE  EFF2_probability1      ~fx_probability1_0~
+		READ_BYTE  EFF2_probability2      ~fx_probability2_0~
+		READ_ASCII EFF2_resource          ~fx_resource_0~ (8) NULL
+		READ_LONG  EFF2_dice_thrown       ~fx_dice_count_0~
+		READ_LONG  EFF2_dice_sides        ~fx_dice_sides_0~
+		READ_LONG  EFF2_save_type         ~fx_save_type_0~
+		READ_LONG  EFF2_save_bonus        ~fx_save_bonus_0~
+		READ_LONG  EFF2_stacking_id_tobex ~fx_special_0~
+		READ_LONG  EFF2_parameter3        ~fx_parameter3_0~
+		READ_LONG  EFF2_parameter4        ~fx_parameter4_0~
+		READ_ASCII EFF2_resource2         ~fx_resource2_0~ (8) NULL
+		READ_ASCII EFF2_resource3         ~fx_resource3_0~ (8) NULL
 		READ_LONG  0x54                   sub_level_min
 		READ_LONG  0x58                   sub_level_max
-		SET $fx_external(~0~) = 1
+		SET ~fx_external_0~ = 1
 		SET sub_opcode = $fx_opcode(~0~)
 		PATCH_IF ctx_parent_dice BEGIN
 			SPRINT sub_dice ~LEVEL~
@@ -835,15 +837,15 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 			END
 			PATCH_IF NOT ((~%sub_dice%~ STRING_EQUAL ~DICE~)
 					OR ((~%sub_dice%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND $fx_parameter2(~0~) != 0)) BEGIN
-				SET $fx_dice_count(~0~) = ctx_dice_count
-				SET $fx_dice_sides(~0~) = ctx_dice_sides
+				SET ~fx_dice_count_0~ = ctx_dice_count
+				SET ~fx_dice_sides_0~ = ctx_dice_sides
 			END
 		END
 		LPM ad_fx_add_effect
 		PATCH_IF $fx_level_restricted(~0~) BEGIN
-			SET $fx_level_min(~0~) = sub_level_min
-			SET $fx_level_max(~0~) = sub_level_max
-			SET $fx_eff_levels(~0~) = 1
+			SET ~fx_level_min_0~ = sub_level_min
+			SET ~fx_level_max_0~ = sub_level_max
+			SET ~fx_eff_levels_0~ = 1
 		END
 		SET sub_opcode = $fx_opcode(~0~)
 		SET eff_fields_opcode = sub_opcode
