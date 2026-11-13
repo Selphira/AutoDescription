@@ -28,6 +28,12 @@ BEGIN
 	END
 END
 
+// Le cache ne sert que pendant un composant : rien n'en reste dans le jeu. Tout CACHE_FOLDER est
+// effacé, avec le cache/subspell des versions précédentes.
+DEFINE_ACTION_FUNCTION ad_subspell_cache_close BEGIN
+	DELETE + ~%CACHE_FOLDER%~
+END
+
 // Avant la description : cache_hit (texte trouvé : cache_text, cache_count, cache_checked) ;
 // cache_events_size et cache_recursion_size, tailles des journaux, pour savoir ensuite si la
 // description y a écrit.

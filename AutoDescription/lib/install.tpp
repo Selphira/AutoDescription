@@ -84,6 +84,9 @@ DEFINE_ACTION_MACRO ad_install_close BEGIN
 	ACTION_TIME ~step:close_log~ BEGIN
 		LAF ad_close_log STR_VAR log_name END
 	END
+	ACTION_TIME ~step:clear_cache~ BEGIN
+		LAF ad_subspell_cache_close END
+	END
 
 	OUTER_SET ad_ignored_total = 0
 	OUTER_SPRINT ad_ignored_lines ~~
