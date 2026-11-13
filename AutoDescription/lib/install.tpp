@@ -75,6 +75,9 @@ DEFINE_ACTION_MACRO ad_init_statistics BEGIN
 END
 
 DEFINE_ACTION_MACRO ad_install_close BEGIN
+	ACTION_TIME ~step:join_logs~ BEGIN
+		LAF ad_join_all_log_parts STR_VAR log_name END
+	END
 	ACTION_TIME ~step:close_js~ BEGIN
 		LAF ad_close_js_file STR_VAR log_name END
 	END
@@ -428,6 +431,87 @@ END
 // ---------------------------------------------------------------------------------------------
 // Journaux de la boucle
 
+// Pendant la boucle, les lignes d'un journal log_file vont dans son tronçon log_part
+// (« <log_file>.<n>.part », n = ad_processed / AD_LOG_PART_SIZE), créé vide au besoin : APPEND_OUTER
+// échoue sur un fichier absent. ad_join_log_parts les réunit à la fermeture. Le COPY qui crée le
+// tronçon remplace les variables SOURCE_* et DEST_* de la ressource en cours, que la ligne écrite
+// ensuite et le reste de sa description lisent : elles sont restaurées à la sortie de la macro.
+DEFINE_PATCH_MACRO ad_log_part BEGIN
+	LOCAL_SPRINT SOURCE_DIRECTORY ~%SOURCE_DIRECTORY%~
+	LOCAL_SPRINT SOURCE_FILESPEC ~%SOURCE_FILESPEC%~
+	LOCAL_SPRINT SOURCE_FILE ~%SOURCE_FILE%~
+	LOCAL_SPRINT SOURCE_RES ~%SOURCE_RES%~
+	LOCAL_SPRINT SOURCE_EXT ~%SOURCE_EXT%~
+	LOCAL_SET SOURCE_SIZE = SOURCE_SIZE
+	LOCAL_SPRINT DEST_DIRECTORY ~%DEST_DIRECTORY%~
+	LOCAL_SPRINT DEST_FILESPEC ~%DEST_FILESPEC%~
+	LOCAL_SPRINT DEST_FILE ~%DEST_FILE%~
+	LOCAL_SPRINT DEST_RES ~%DEST_RES%~
+	LOCAL_SPRINT DEST_EXT ~%DEST_EXT%~
+	SET log_part_index = ad_processed / AD_LOG_PART_SIZE
+	SPRINT log_part ~%log_file%.%log_part_index%.part~
+	PATCH_IF NOT FILE_EXISTS ~%log_part%~ BEGIN
+		INNER_ACTION BEGIN
+			SILENT
+			COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%log_part%~
+			VERBOSE
+		END
+	END
+END
+
+// Ajoute à la fin de file, dans l'ordre, les tronçons écrits par ad_log_part, puis les supprime. Le
+// résultat est celui des APPEND_OUTER faits directement sur file : un APPEND_OUTER écrit « \r\n »
+// avant le texte si le fichier est vide ou ne finit pas par un saut de ligne, puis le texte et
+// « \r\n ». Chaque tronçon, créé vide, commence donc par « \r\n », gardé seulement devant le premier
+// si file en demande un. WRITE_ASCIIE recopie le tronçon lu sans réévaluer les « %…% » de son texte.
+DEFINE_ACTION_FUNCTION ad_join_log_parts
+	STR_VAR
+		file = ~~
+BEGIN
+	OUTER_SET join_last = ad_processed / AD_LOG_PART_SIZE
+	OUTER_SET join_found = 0
+	OUTER_FOR (join_n = 0; join_n <= join_last; ++join_n) BEGIN
+		ACTION_IF SIZE_OF_FILE ~%file%.%join_n%.part~ > 0 BEGIN
+			OUTER_SET join_found = 1
+		END
+	END
+	ACTION_IF join_found BEGIN
+		COPY ~%file%~ ~%file%~
+			SET join_separator = 1
+			PATCH_IF BUFFER_LENGTH > 0 BEGIN
+				SET join_separator = (BYTE_AT (BUFFER_LENGTH - 1) != 10)
+			END
+			FOR (join_n = 0; join_n <= join_last; ++join_n) BEGIN
+				PATCH_IF SIZE_OF_FILE ~%file%.%join_n%.part~ > 0 BEGIN
+					SET join_skip = join_separator ? 0 : 2
+					INNER_PATCH_FILE ~%file%.%join_n%.part~ BEGIN
+						READ_ASCII join_skip join_chunk (BUFFER_LENGTH - join_skip)
+					END
+					SET join_separator = 0
+					SET join_at = BUFFER_LENGTH
+					INSERT_BYTES join_at (STRING_LENGTH ~%join_chunk%~)
+					WRITE_ASCIIE join_at ~%join_chunk%~
+				END
+			END
+	END
+	OUTER_FOR (join_n = 0; join_n <= join_last; ++join_n) BEGIN
+		ACTION_IF FILE_EXISTS ~%file%.%join_n%.part~ BEGIN
+			DELETE + ~%file%.%join_n%.part~
+		END
+	END
+END
+
+// Journaux écrits pendant la boucle, réunis avant que la fermeture ne les complète ou ne les lise.
+DEFINE_ACTION_FUNCTION ad_join_all_log_parts
+	STR_VAR
+		log_name = ~~
+BEGIN
+	ACTION_FOR_EACH join_log IN ~warning.log~ ~error.log~ ~diff.html~ ~dump.txt~ ~events.txt~ ~file-errors.md~ ~not-implemented.md~ ~recursion.txt~ BEGIN
+		LAF ad_join_log_parts STR_VAR file = EVAL ~%MOD_FOLDER%/log/%log_name%-%join_log%~ END
+	END
+	LAF ad_join_log_parts STR_VAR file = EVAL ~docs/data/%log_name%.js~ END
+END
+
 // type : warning ou error (AutoDescription/log/<log_name>-<type>.log).
 DEFINE_PATCH_FUNCTION ad_add_install_log
 	STR_VAR
@@ -436,8 +520,10 @@ DEFINE_PATCH_FUNCTION ad_add_install_log
 		message = ~~
 BEGIN
 	PATCH_TIME ~step:install_log~ BEGIN
+		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-%type%.log~
+		LPM ad_log_part
 		INNER_ACTION BEGIN
-			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%type%.log~ ~%SOURCE_FILE% : %message%~
+			APPEND_OUTER ~%log_part%~ ~%SOURCE_FILE% : %message%~
 		END
 	END
 END
@@ -465,9 +551,11 @@ BEGIN
 	LPF ad_html_escape STR_VAR text = ~%name%~                 RET html_name = text END
 	LPF ad_html_escape STR_VAR text = ~%original_description%~ RET html_original = text END
 	LPF ad_html_escape STR_VAR text = ~%description%~          RET html_description = text END
+	SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-diff.html~
+	LPM ad_log_part
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-diff.html~ ~<tr><th class="title">%SOURCE_RES%<br/>%html_name%</th><td class="description before"><pre>%html_original%</pre></td><td class="description after"><pre>%html_description%</pre></td></tr>~ KEEP_CRLF
+		APPEND_OUTER ~%log_part%~ ~<tr><th class="title">%SOURCE_RES%<br/>%html_name%</th><td class="description before"><pre>%html_original%</pre></td><td class="description after"><pre>%html_description%</pre></td></tr>~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -487,9 +575,11 @@ BEGIN
 		REPLACE_TEXTUALLY ~%LNL%~ ~\\n~
 		REPLACE_TEXTUALLY ~%TAB%~ ~\\t~
 	END
+	SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-dump.txt~
+	LPM ad_log_part
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-dump.txt~ ~%SOURCE_RES%%TAB%%status%%TAB%%description%~ KEEP_CRLF
+		APPEND_OUTER ~%log_part%~ ~%SOURCE_RES%%TAB%%status%%TAB%%description%~ KEEP_CRLF
 		VERBOSE
 	END
 END
@@ -543,9 +633,11 @@ BEGIN
 	LPF ad_js_escape STR_VAR text = ~%name%~     RET name = text END
 	LPF ad_js_escape STR_VAR text = ~%original%~ RET original = text END
 	LPF ad_js_escape STR_VAR text = ~%modded%~   RET modded = text END
+	SPRINT log_file ~docs/data/%log_name%.js~
+	LPM ad_log_part
 	INNER_ACTION BEGIN
 		SILENT
-		APPEND_OUTER ~docs/data/%log_name%.js~ ~{"id":"%id%","name":"%name%","type":%type%,"level":%level%,"original":"%original%","modded":"%modded%"},~ KEEP_CRLF
+		APPEND_OUTER ~%log_part%~ ~{"id":"%id%","name":"%name%","type":%type%,"level":%level%,"original":"%original%","modded":"%modded%"},~ KEEP_CRLF
 		VERBOSE
 	END
 END

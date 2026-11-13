@@ -24,7 +24,7 @@ LINE = re.compile(r"^(.+?)\s+(\d+\.\d{3})\s*$")
 STEP = re.compile(r"^step:([a-z_]+)(?::item=(\d))?(?::subspell=(\d))?$")
 RESOURCE = re.compile(r"\.(ITM|SPL)$", re.I)
 # Étiquettes ACTION_TIME du composant (AutoDescription.tp2, lib/always.tpa, lib/install.tpp).
-COMPONENT_STEPS = ("charsets", "bgforge", "engine", "startup", "catalog", "init", "loop", "close_js", "close_log")
+COMPONENT_STEPS = ("charsets", "bgforge", "engine", "startup", "catalog", "init", "loop", "join_logs", "close_js", "close_log")
 
 
 def read_timings(path):

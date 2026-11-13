@@ -364,10 +364,15 @@ BEGIN
 		PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
 			SPRINT event_file ~file-errors~
 		END
+		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~
+		LPM ad_log_part
+		SPRINT event_table_part ~%log_part%~
+		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-events.txt~
+		LPM ad_log_part
 		INNER_ACTION BEGIN
 			SILENT
-			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
-			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
+			APPEND_OUTER ~%event_table_part%~ ~%event_row%~ KEEP_CRLF
+			APPEND_OUTER ~%log_part%~ ~%event_columns%~ KEEP_CRLF
 			VERBOSE
 		END
 	END
@@ -378,9 +383,11 @@ END
 // loop : déjà dans la chaîne).
 DEFINE_PATCH_MACRO ad_log_recursion BEGIN
 	PATCH_TIME ~step:recursion_log~ BEGIN
+		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-recursion.txt~
+		LPM ad_log_part
 		INNER_ACTION BEGIN
 			SILENT
-			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+			APPEND_OUTER ~%log_part%~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
 			VERBOSE
 		END
 	END

@@ -18,6 +18,11 @@ OUTER_SPRINT AD_AND       @1000004 // ~et~
 // effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
 OUTER_SET AD_RECURSION_MAX_DEPTH = 1
 
+// Ressources par tronçon des journaux écrits pendant la boucle (ad_log_part, lib/install.tpp) :
+// APPEND_OUTER relit et réécrit tout le fichier à chaque ajout, son coût croît avec la taille du
+// tronçon et non plus avec celle du journal.
+OUTER_SET AD_LOG_PART_SIZE = 500
+
 // Options de settings-default.ini et settings.ini, sous leur nom d'origine.
 OUTER_SET AD_ENABLE_SHRINKAGE                            = enable_shrinkage
 OUTER_SET AD_SHRINK_CLASS_ARMOR                          = shrink_class_armor

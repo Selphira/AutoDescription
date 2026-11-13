@@ -76,14 +76,18 @@ DEFINE_PATCH_MACRO ad_subspell_cache_read BEGIN
 			END
 		END
 	END
-	SET cache_events_size = SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-events.txt~
-	SET cache_recursion_size = SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-recursion.txt~
+	// Tronçons en cours des journaux (ad_log_part, lib/install.tpp) ; -1 s'ils n'existent pas encore.
+	SET cache_log_part = ad_processed / AD_LOG_PART_SIZE
+	SPRINT cache_events_part ~%MOD_FOLDER%/log/%log_name%-events.txt.%cache_log_part%.part~
+	SPRINT cache_recursion_part ~%MOD_FOLDER%/log/%log_name%-recursion.txt.%cache_log_part%.part~
+	SET cache_events_size = SIZE_OF_FILE ~%cache_events_part%~
+	SET cache_recursion_size = SIZE_OF_FILE ~%cache_recursion_part%~
 END
 
 // Après la description : écart avec le texte trouvé (AD_SUBSPELL_CACHE = 2), sinon texte enregistré.
 DEFINE_PATCH_MACRO ad_subspell_cache_store BEGIN
-	SET cache_logged = (SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-events.txt~ != cache_events_size)
-		OR (SIZE_OF_FILE ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ != cache_recursion_size)
+	SET cache_logged = (SIZE_OF_FILE ~%cache_events_part%~ != cache_events_size)
+		OR (SIZE_OF_FILE ~%cache_recursion_part%~ != cache_recursion_size)
 	PATCH_IF cache_hit BEGIN
 		PATCH_IF NOT (~%sub_missing%~ STRING_EQUAL ~~) OR cache_logged OR sub_count != cache_count
 				OR NOT (~%sub_text%~ STRING_EQUAL ~%cache_text%~) OR NOT (~%sub_checked%~ STRING_EQUAL ~%cache_checked%~) BEGIN
