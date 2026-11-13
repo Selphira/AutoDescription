@@ -3,8 +3,12 @@
 ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	OUTER_SET AD_ENGINE_LOADED = 1
 
-	INCLUDE ~%MOD_FOLDER%/lib/startup.tpa~
-	INCLUDE ~%MOD_FOLDER%/lib/catalog.tpa~
+	ACTION_TIME ~step:startup~ BEGIN
+		INCLUDE ~%MOD_FOLDER%/lib/startup.tpa~
+	END
+	ACTION_TIME ~step:catalog~ BEGIN
+		INCLUDE ~%MOD_FOLDER%/lib/catalog.tpa~
+	END
 	INCLUDE ~%MOD_FOLDER%/lib/translation.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/resources.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/effects.tpp~

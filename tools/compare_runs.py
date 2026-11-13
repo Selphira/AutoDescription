@@ -31,7 +31,7 @@ from compare_dumps import DumpError, read_dump, show_text_diff
 SYNTHETIC = ("ADT", "ADS")
 KINDS = {"items": "objets", "spells": "sorts"}
 OTHER_LOGS = ("diff.html", "events.txt", "file-errors.md", "not-implemented.md", "opcodes.txt", "recursion.txt",
-              "error.log", "warning.log")
+              "error.log", "warning.log", ".js")
 
 
 def run_folder(name):
@@ -44,7 +44,8 @@ def run_folder(name):
 
 
 def find(run, kind, suffix):
-    matches = sorted(run.glob(f"*-{kind}-{suffix}"))
+    # « .js » : données de docs/data/ (<langue>-<jeu>-<mod>-<type>.js).
+    matches = sorted(run.glob(f"*-{kind}{suffix}" if suffix.startswith(".") else f"*-{kind}-{suffix}"))
     return matches[0] if matches else None
 
 

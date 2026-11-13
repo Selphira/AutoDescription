@@ -21,7 +21,9 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 	SET statistics_sections = 1
 	SPRINT $statistics_section(~0~) ~ability0~
 	PATCH_IF fx_header_count > 1 BEGIN
-		LPM ad_spell_levels
+		PATCH_TIME ~step:spell_levels~ BEGIN
+			LPM ad_spell_levels
+		END
 	END
 	LPM ad_lines_reset
 	LPM ad_recursion_describe_pending
@@ -48,7 +50,9 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 		SET render_opcode = $statistics_order(~%statistics_k%~)
 		LPM ad_opcode_is_described
 		PATCH_IF opcode_described BEGIN
-			LPM ~ad_op_%render_opcode%_lines~
+			PATCH_TIME ~step:lines~ BEGIN
+				LPM ~ad_op_%render_opcode%_lines~
+			END
 		END
 	END
 	SPRINT render_missing ~%render_late_missing%~
@@ -154,7 +158,9 @@ END
 // Refus (render_late_missing) : opcodes 173 et 178, dont l'ancien moteur réécrit les champs avant de
 // les comparer.
 DEFINE_PATCH_MACRO ad_spell_levels BEGIN
-	LPM ad_spell_levels_entries
+	PATCH_TIME ~step:levels_entries~ BEGIN
+		LPM ad_spell_levels_entries
+	END
 	FOR (level_h = 0; level_h < fx_header_count; ++level_h) BEGIN
 		FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~); ++level_k) BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
@@ -172,15 +178,29 @@ DEFINE_PATCH_MACRO ad_spell_levels BEGIN
 	SET level_special_duration = NOT ctx_ignore_duration
 	SET level_search_start = 0
 	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_spell_levels_common
-		LPM ad_spell_levels_chains
-		LPM ad_spell_levels_by_duration
-		LPM ad_spell_levels_by_save
-		LPM ad_spell_levels_by_values
-		LPM ad_spell_levels_by_target_level
+		PATCH_TIME ~step:levels_common~ BEGIN
+			LPM ad_spell_levels_common
+		END
+		PATCH_TIME ~step:levels_chains~ BEGIN
+			LPM ad_spell_levels_chains
+		END
+		PATCH_TIME ~step:levels_by_duration~ BEGIN
+			LPM ad_spell_levels_by_duration
+		END
+		PATCH_TIME ~step:levels_by_save~ BEGIN
+			LPM ad_spell_levels_by_save
+		END
+		PATCH_TIME ~step:levels_by_values~ BEGIN
+			LPM ad_spell_levels_by_values
+		END
+		PATCH_TIME ~step:levels_by_target_level~ BEGIN
+			LPM ad_spell_levels_by_target_level
+		END
 	END
 	PATCH_IF ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_spell_levels_ranges
+		PATCH_TIME ~step:levels_ranges~ BEGIN
+			LPM ad_spell_levels_ranges
+		END
 	END
 END
 

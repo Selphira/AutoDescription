@@ -109,9 +109,11 @@ DEFINE_PATCH_FUNCTION ad_refusal
 	RET
 		refusal
 BEGIN
-	LPF ad_fx_location INT_VAR fx_id RET location END
-	LPF ad_fx_data INT_VAR fx_id RET data END
-	SPRINT refusal ~%reason%%TAB%%location%%TAB%%data%%TAB%%message%~
+	PATCH_TIME ~step:refusal~ BEGIN
+		LPF ad_fx_location INT_VAR fx_id RET location END
+		LPF ad_fx_data INT_VAR fx_id RET data END
+		SPRINT refusal ~%reason%%TAB%%location%%TAB%%data%%TAB%%message%~
+	END
 END
 
 // Emplacement de l'effet fx_id dans son fichier, numéroté à partir de 0 comme dans le fichier :
@@ -336,41 +338,43 @@ DEFINE_PATCH_FUNCTION ad_log_event
 	RET
 		reason
 BEGIN
-	LPF ad_event_fields STR_VAR event RET event_kind event_code event_location event_data event_message END
-	SPRINT reason ~%event_kind%:%event_code%~
-	SPRINT event_consequence ~not described~
-	PATCH_IF ~%consequence%~ STRING_EQUAL ~ignored~ BEGIN
-		SPRINT event_consequence ~effect ignored~
-	END
-	ELSE PATCH_IF ~%consequence%~ STRING_EQUAL ~kept~ BEGIN
-		SPRINT event_consequence ~described anyway~
-	END
-	SPRINT event_columns ~%SOURCE_FILE%%TAB%%event_kind%%TAB%%event_code%%TAB%%consequence%%TAB%%event_location%%TAB%%event_data%%TAB%%event_message%~
-	// Dans le texte de remplacement, \\ désigne une seule barre oblique inverse (V21).
-	INNER_PATCH_SAVE event_message ~%event_message%~ BEGIN
-		REPLACE_TEXTUALLY ~|~ ~\\|~
-	END
-	INNER_PATCH_SAVE event_location ~%event_location%~ BEGIN
-		REPLACE_TEXTUALLY ~|~ ~\\|~
-	END
-	INNER_PATCH_SAVE event_data ~%event_data%~ BEGIN
-		REPLACE_TEXTUALLY ~|~ ~\\|~
-	END
-	// Valeurs des données en gras (« opcode **151**, target **2** ») : dernier mot de chaque champ.
-	INNER_PATCH_SAVE event_data ~%event_data%,~ BEGIN
-		REPLACE_TEXTUALLY ~ \([^ ,]+\),~ ~ **\1**,~
-		REPLACE_TEXTUALLY ~,$~ ~~
-	END
-	SPRINT event_row ~| %SOURCE_FILE% | %event_message% | %event_location% | %event_data% | `%event_code%` | %event_consequence% |~
-	SPRINT event_file ~not-implemented~
-	PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
-		SPRINT event_file ~file-errors~
-	END
-	INNER_ACTION BEGIN
-		SILENT
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
-		VERBOSE
+	PATCH_TIME ~step:log_event~ BEGIN
+		LPF ad_event_fields STR_VAR event RET event_kind event_code event_location event_data event_message END
+		SPRINT reason ~%event_kind%:%event_code%~
+		SPRINT event_consequence ~not described~
+		PATCH_IF ~%consequence%~ STRING_EQUAL ~ignored~ BEGIN
+			SPRINT event_consequence ~effect ignored~
+		END
+		ELSE PATCH_IF ~%consequence%~ STRING_EQUAL ~kept~ BEGIN
+			SPRINT event_consequence ~described anyway~
+		END
+		SPRINT event_columns ~%SOURCE_FILE%%TAB%%event_kind%%TAB%%event_code%%TAB%%consequence%%TAB%%event_location%%TAB%%event_data%%TAB%%event_message%~
+		// Dans le texte de remplacement, \\ désigne une seule barre oblique inverse (V21).
+		INNER_PATCH_SAVE event_message ~%event_message%~ BEGIN
+			REPLACE_TEXTUALLY ~|~ ~\\|~
+		END
+		INNER_PATCH_SAVE event_location ~%event_location%~ BEGIN
+			REPLACE_TEXTUALLY ~|~ ~\\|~
+		END
+		INNER_PATCH_SAVE event_data ~%event_data%~ BEGIN
+			REPLACE_TEXTUALLY ~|~ ~\\|~
+		END
+		// Valeurs des données en gras (« opcode **151**, target **2** ») : dernier mot de chaque champ.
+		INNER_PATCH_SAVE event_data ~%event_data%,~ BEGIN
+			REPLACE_TEXTUALLY ~ \([^ ,]+\),~ ~ **\1**,~
+			REPLACE_TEXTUALLY ~,$~ ~~
+		END
+		SPRINT event_row ~| %SOURCE_FILE% | %event_message% | %event_location% | %event_data% | `%event_code%` | %event_consequence% |~
+		SPRINT event_file ~not-implemented~
+		PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
+			SPRINT event_file ~file-errors~
+		END
+		INNER_ACTION BEGIN
+			SILENT
+			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~ ~%event_row%~ KEEP_CRLF
+			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~%event_columns%~ KEEP_CRLF
+			VERBOSE
+		END
 	END
 END
 
@@ -378,10 +382,12 @@ END
 // chaîne des ressources<TAB>sous-ressource<TAB>raison (depth : au-delà de AD_RECURSION_MAX_DEPTH ;
 // loop : déjà dans la chaîne).
 DEFINE_PATCH_MACRO ad_log_recursion BEGIN
-	INNER_ACTION BEGIN
-		SILENT
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
-		VERBOSE
+	PATCH_TIME ~step:recursion_log~ BEGIN
+		INNER_ACTION BEGIN
+			SILENT
+			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-recursion.txt~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+			VERBOSE
+		END
 	END
 END
 

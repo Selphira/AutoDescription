@@ -39,7 +39,9 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 		END
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_cross_groups
+		PATCH_TIME ~step:cross_groups~ BEGIN
+			LPM ad_cross_groups
+		END
 	END
 END
 
@@ -63,7 +65,9 @@ DEFINE_PATCH_MACRO ad_item_render BEGIN
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 		LPM ad_opcode_is_described
 		PATCH_IF opcode_described BEGIN
-			LPM ~ad_op_%render_opcode%_lines~
+			PATCH_TIME ~step:lines~ BEGIN
+				LPM ~ad_op_%render_opcode%_lines~
+			END
 		END
 	END
 	LPM ad_item_armor_lines

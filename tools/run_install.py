@@ -73,12 +73,71 @@ def restrict_loops(target, resources):
     path.write_bytes(text.encode("utf-8"))
 
 
+def process_cpu_times(process):
+    """Temps CPU utilisateur et noyau (s) d'un processus terminé, None hors Windows.
+
+    Les durées de WeiDU (PATCH_TIME, ACTION_TIME, TOTAL du .DEBUG) sont du temps CPU : l'écart avec
+    la durée réelle est du temps d'attente (disque, antivirus…)."""
+    if os.name != "nt":
+        return None
+    import ctypes
+    from ctypes import wintypes
+    times = [wintypes.FILETIME() for _ in range(4)]
+    handle = wintypes.HANDLE(int(process._handle))
+    if not ctypes.windll.kernel32.GetProcessTimes(handle, *[ctypes.byref(t) for t in times]):
+        return None
+    seconds = [((t.dwHighDateTime << 32) + t.dwLowDateTime) / 1e7 for t in times[2:]]
+    return seconds[1], seconds[0]
+
+
+def process_counters(process):
+    """Compteurs d'entrées-sorties et de mémoire d'un processus terminé (Windows), pour savoir d'où
+    vient le temps CPU noyau : appels de lecture/écriture, ou défauts de page."""
+    if os.name != "nt":
+        return {}
+    import ctypes
+    from ctypes import wintypes
+
+    class IoCounters(ctypes.Structure):
+        _fields_ = [(name, ctypes.c_ulonglong) for name in
+                    ("reads", "writes", "others", "read_bytes", "write_bytes", "other_bytes")]
+
+    class MemoryCounters(ctypes.Structure):
+        _fields_ = [("cb", wintypes.DWORD), ("page_faults", wintypes.DWORD)] + [
+            (name, ctypes.c_size_t) for name in ("peak_working_set", "working_set", "peak_paged", "paged",
+                                                  "peak_nonpaged", "nonpaged", "pagefile", "peak_pagefile")]
+
+    handle = wintypes.HANDLE(int(process._handle))
+    counters = {}
+    io = IoCounters()
+    if ctypes.windll.kernel32.GetProcessIoCounters(handle, ctypes.byref(io)):
+        counters.update(io_reads=io.reads, io_writes=io.writes, io_others=io.others,
+                        io_read_mb=io.read_bytes >> 20, io_write_mb=io.write_bytes >> 20)
+    memory = MemoryCounters()
+    memory.cb = ctypes.sizeof(memory)
+    if ctypes.windll.psapi.GetProcessMemoryInfo(handle, ctypes.byref(memory), memory.cb):
+        counters.update(page_faults=memory.page_faults, peak_working_set_mb=memory.peak_working_set >> 20)
+    return counters
+
+
 def setup(game, arguments, console):
+    """Lance WeiDU ; la console est recopiée telle quelle et horodatée (durée réelle depuis le
+    lancement) dans <console>-times.txt. Renvoie le code de retour et les temps CPU."""
     executable = game / "setup-autodescription.exe"
-    with open(console, "ab") as output:
-        result = subprocess.run([str(executable), "--noautoupdate", "--no-exit-pause"] + arguments,
-                                cwd=game, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT)
-    return result.returncode
+    start = time.monotonic()
+    timed = console.with_name(console.stem + "-times.txt")
+    with open(console, "ab") as output, open(timed, "a", encoding="utf-8") as stamps:
+        process = subprocess.Popen([str(executable), "--noautoupdate", "--no-exit-pause"] + arguments,
+                                   cwd=game, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+        for line in process.stdout:
+            output.write(line)
+            stamps.write(f"{time.monotonic() - start:9.2f}\t{line.decode('utf-8', errors='replace').rstrip()}\n")
+        process.wait()
+        stamps.write(f"{time.monotonic() - start:9.2f}\t(fin du processus)\n")
+        cpu = process_cpu_times(process)
+        counters = process_counters(process)
+    return process.returncode, cpu, counters
 
 
 def main():
@@ -122,24 +181,30 @@ def main():
     run.mkdir(parents=True)
     console = run / "console.txt"
     language = ["--language", str(args.language)]
+    start = time.monotonic()
     setup(args.game, language + ["--force-uninstall", "15", "--force-uninstall", "10"], run / "uninstall.txt")
+    uninstall = time.monotonic() - start
     for pattern in LOG_PATTERNS:
         for path in (target / "log").glob(pattern):
             path.unlink()
     for path in (args.game / "docs" / "data").glob("*-all-*.js"):
         path.unlink()
     start = time.monotonic()
-    code = setup(args.game, language + ["--force-install", str(args.component)], console)
+    code, cpu, counters = setup(args.game, language + ["--force-install", str(args.component)], console)
     duration = time.monotonic() - start
+    cpu_lines = f"cpu_user = {cpu[0]:.1f} s\ncpu_kernel = {cpu[1]:.1f} s\n" if cpu else ""
+    cpu_lines += "".join(f"{name} = {value}\n" for name, value in counters.items())
 
     for pattern in LOG_PATTERNS:
         for path in (target / "log").glob(pattern):
             shutil.copy2(path, run / path.name)
+    for path in (args.game / "docs" / "data").glob("*-all-*.js"):
+        shutil.copy2(path, run / path.name)
     shutil.copy2(args.game / "SETUP-AUTODESCRIPTION.DEBUG", run / "SETUP-AUTODESCRIPTION.DEBUG")
     (run / "options.txt").write_text(
         "".join(f"{name} = {value}\n" for name, value in options.items())
         + f"component = {args.component}\nlanguage = {args.language}\nonly = {' '.join(resources)}\n"
-        + f"duration = {duration:.0f} s\nexit = {code}\n", encoding="utf-8")
+        + f"duration = {duration:.0f} s\n{cpu_lines}uninstall = {uninstall:.0f} s\nexit = {code}\n", encoding="utf-8")
 
     text = console.read_bytes().decode("utf-8", errors="replace")
     print(f"== {args.label} : composant {args.component}, langue {args.language}, "

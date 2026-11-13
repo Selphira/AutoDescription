@@ -450,14 +450,18 @@ BEGIN
 	SPRINT ctx_resource ~%resref%~
 	TO_UPPER ctx_resource
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-		LPM ad_fx_load_spell
+		PATCH_TIME ~step:load_delayed~ BEGIN
+			LPM ad_fx_load_spell
+		END
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:recursion:delayed_%fx_load_error%~ message = ~%resref%.SPL: %fx_load_message%~ RET duration_missing = refusal END
 		END
 		ELSE BEGIN
 			SPRINT header_missing ~~
 			LPM ad_spell_header_fields
-			LPM ad_spell_header_pipeline
+			PATCH_TIME ~step:header_pipeline~ BEGIN
+				LPM ad_spell_header_pipeline
+			END
 			LPM ad_spell_header_effects
 			PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
 				LPM ad_spell_header_duration
@@ -614,13 +618,17 @@ DEFINE_PATCH_MACRO ad_describe_subresource_effects BEGIN
 	END
 	ELSE PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
 		INNER_PATCH_FILE ~%sub_resref%.eff~ BEGIN
-			LPM ad_recursion_load_eff
+			PATCH_TIME ~step:load_subresource~ BEGIN
+				LPM ad_recursion_load_eff
+			END
 		END
 	END
 	ELSE BEGIN
 		SPRINT ctx_resource ~%sub_resref%~
 		INNER_PATCH_FILE ~%sub_resref%.spl~ BEGIN
-			LPM ad_recursion_load_spell
+			PATCH_TIME ~step:load_subresource~ BEGIN
+				LPM ad_recursion_load_spell
+			END
 			// La formule d'une progression lit le premier niveau de lanceur dans le fichier du sort.
 			PATCH_IF sub_all_headers BEGIN
 				LPM ad_recursion_finish
@@ -1022,7 +1030,9 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_cross_groups
+		PATCH_TIME ~step:cross_groups~ BEGIN
+			LPM ad_cross_groups
+		END
 	END
 	// Sans niveau de lancement, les effets de tous les niveaux et les progressions (ancien
 	// get_spell_effects_description) ; les sections de niveaux sont refusées plus bas.
@@ -1033,7 +1043,9 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		LPM ad_spell_header_effects
 		SET statistics_sections = 1
 		SPRINT $statistics_section(~0~) ~ability0~
-		LPM ad_spell_levels
+		PATCH_TIME ~step:spell_levels~ BEGIN
+			LPM ad_spell_levels
+		END
 		SPRINT render_missing ~%render_late_missing%~
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -1044,7 +1056,9 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 			LPM ad_opcode_is_described
 			PATCH_IF opcode_described BEGIN
-				LPM ~ad_op_%render_opcode%_lines~
+				PATCH_TIME ~step:lines~ BEGIN
+					LPM ~ad_op_%render_opcode%_lines~
+				END
 			END
 		END
 		SPRINT render_missing ~%render_late_missing%~

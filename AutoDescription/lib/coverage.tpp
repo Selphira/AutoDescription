@@ -46,10 +46,12 @@ DEFINE_PATCH_MACRO ad_set_coverage BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:missing_opcodes:%cov_todo%~ message = ~opcodes not supported yet: %cov_todo%~ RET uncovered_reason = refusal END
 		END
 		PATCH_IF NOT (~%cov_lines%~ STRING_EQUAL ~~) BEGIN
-			INNER_ACTION BEGIN
-				SILENT
-				APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~ ~%cov_lines%~ KEEP_CRLF
-				VERBOSE
+			PATCH_TIME ~step:opcodes_log~ BEGIN
+				INNER_ACTION BEGIN
+					SILENT
+					APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-opcodes.txt~ ~%cov_lines%~ KEEP_CRLF
+					VERBOSE
+				END
 			END
 		END
 	END

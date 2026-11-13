@@ -44,23 +44,25 @@ DEFINE_ACTION_FUNCTION ad_install_init
 	RET
 		log_name
 BEGIN
-	LAF ad_game_name RET game_name END
-	OUTER_SPRINT log_name ~%LANGUAGE%-%game_name%-%mod%-%type%~
-	<<<<<<<< .../AutoDescription/inlined/ad_install_empty.txt
+	ACTION_TIME ~step:init~ BEGIN
+		LAF ad_game_name RET game_name END
+		OUTER_SPRINT log_name ~%LANGUAGE%-%game_name%-%mod%-%type%~
+		<<<<<<<< .../AutoDescription/inlined/ad_install_empty.txt
 >>>>>>>>
-	COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-warning.log~
-	COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-error.log~
-	ACTION_IF regression_dump BEGIN
-		COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-dump.txt~
+		COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-warning.log~
+		COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-error.log~
+		ACTION_IF regression_dump BEGIN
+			COPY ~.../AutoDescription/inlined/ad_install_empty.txt~ ~%MOD_FOLDER%/log/%log_name%-dump.txt~
+		END
+		ACTION_IF IS_EE BEGIN
+			COPY ~%MOD_FOLDER%/log/template_ee.html~ ~%MOD_FOLDER%/log/%log_name%-diff.html~
+		END
+		ELSE BEGIN
+			COPY ~%MOD_FOLDER%/log/template.html~ ~%MOD_FOLDER%/log/%log_name%-diff.html~
+		END
+		LAF ad_init_log STR_VAR log_name END
+		LAF ad_init_js_file STR_VAR log_name END
 	END
-	ACTION_IF IS_EE BEGIN
-		COPY ~%MOD_FOLDER%/log/template_ee.html~ ~%MOD_FOLDER%/log/%log_name%-diff.html~
-	END
-	ELSE BEGIN
-		COPY ~%MOD_FOLDER%/log/template.html~ ~%MOD_FOLDER%/log/%log_name%-diff.html~
-	END
-	LAF ad_init_log STR_VAR log_name END
-	LAF ad_init_js_file STR_VAR log_name END
 END
 
 // Compteurs du composant, lus par ad_install_close : ressources parcourues, décrites, en échec, et
@@ -73,8 +75,12 @@ DEFINE_ACTION_MACRO ad_init_statistics BEGIN
 END
 
 DEFINE_ACTION_MACRO ad_install_close BEGIN
-	LAF ad_close_js_file STR_VAR log_name END
-	LAF ad_close_log STR_VAR log_name END
+	ACTION_TIME ~step:close_js~ BEGIN
+		LAF ad_close_js_file STR_VAR log_name END
+	END
+	ACTION_TIME ~step:close_log~ BEGIN
+		LAF ad_close_log STR_VAR log_name END
+	END
 
 	OUTER_SET ad_ignored_total = 0
 	OUTER_SPRINT ad_ignored_lines ~~
@@ -97,22 +103,28 @@ END
 // ---------------------------------------------------------------------------------------------
 // Parcours
 
+// step:loop contient aussi la lecture des fichiers et l'écriture de ceux qui changent, hors des
+// PATCH_TIME par ressource.
 DEFINE_ACTION_MACRO ad_install_all_items BEGIN
 	LAM ad_init_statistics
-	COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
-		PATCH_TIME ~%SOURCE_FILE%~ BEGIN
-			LPM ad_install_item
-		END
-	BUT_ONLY_IF_IT_CHANGES
+	ACTION_TIME ~step:loop~ BEGIN
+		COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+			PATCH_TIME ~%SOURCE_FILE%~ BEGIN
+				LPM ad_install_item
+			END
+		BUT_ONLY_IF_IT_CHANGES
+	END
 END
 
 DEFINE_ACTION_MACRO ad_install_all_spells BEGIN
 	LAM ad_init_statistics
-	COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
-		PATCH_TIME ~%SOURCE_FILE%~ BEGIN
-			LPM ad_install_spell
-		END
-	BUT_ONLY_IF_IT_CHANGES
+	ACTION_TIME ~step:loop~ BEGIN
+		COPY_EXISTING_REGEXP GLOB ~^.+\.spl$~ ~override~
+			PATCH_TIME ~%SOURCE_FILE%~ BEGIN
+				LPM ad_install_spell
+			END
+		BUT_ONLY_IF_IT_CHANGES
+	END
 END
 
 // Fichiers <extension> du dossier d'un mod et de ses sous-dossiers : $files(NOM.EXT).
@@ -196,7 +208,9 @@ DEFINE_PATCH_FUNCTION ad_install_item_description
 BEGIN
 	PATCH_SILENT
 	SPRINT status ~ignored~
-	LPF ad_item_ignore_reason STR_VAR log_name RET ignore_reason END
+	PATCH_TIME ~step:filter~ BEGIN
+		LPF ad_item_ignore_reason STR_VAR log_name RET ignore_reason END
+	END
 	PATCH_IF ~%ignore_reason%~ STRING_EQUAL ~~ BEGIN
 		READ_SHORT  ITM_type              item_type
 		READ_SHORT  ITM_enchantment       enchantment
@@ -207,7 +221,9 @@ BEGIN
 		PATCH_IF use_unidentified BEGIN
 			READ_STRREF ITM_unidentified_desc original_description
 		END
-		LPF ad_describe_item STR_VAR original_description log_name RET description covered END
+		PATCH_TIME ~step:describe~ BEGIN
+			LPF ad_describe_item STR_VAR original_description log_name RET description covered END
+		END
 		PATCH_IF covered BEGIN
 			PATCH_IF alter_item_files BEGIN
 				PATCH_IF use_unidentified BEGIN
@@ -217,13 +233,15 @@ BEGIN
 					SAY DESC ~%description%~
 				END
 			END
-			LPF ad_item_name RET item_name END
-			LPF ad_add_compare_row STR_VAR log_name name = ~%item_name%~ original_description description END
-			LPF ad_add_js_row STR_VAR log_name id = ~%SOURCE_RES%~ name = ~%item_name%~ type = ~%item_type%~ level = ~%enchantment%~ original = ~%original_description%~ modded = ~%description%~ END
-			SPRINT status ~ok~
-			// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant.
-			PATCH_IF regression_dump BEGIN
-				LPF ad_add_dump_row STR_VAR log_name description END
+			PATCH_TIME ~step:outputs~ BEGIN
+				LPF ad_item_name RET item_name END
+				LPF ad_add_compare_row STR_VAR log_name name = ~%item_name%~ original_description description END
+				LPF ad_add_js_row STR_VAR log_name id = ~%SOURCE_RES%~ name = ~%item_name%~ type = ~%item_type%~ level = ~%enchantment%~ original = ~%original_description%~ modded = ~%description%~ END
+				SPRINT status ~ok~
+				// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant.
+				PATCH_IF regression_dump BEGIN
+					LPF ad_add_dump_row STR_VAR log_name description END
+				END
 			END
 		END
 		ELSE BEGIN
@@ -231,7 +249,9 @@ BEGIN
 		END
 	END
 	PATCH_IF ~%status%~ STRING_EQUAL ~ignored~ AND regression_dump BEGIN
-		LPF ad_add_dump_row STR_VAR log_name status = ~ignored:%ignore_reason%~ END
+		PATCH_TIME ~step:outputs~ BEGIN
+			LPF ad_add_dump_row STR_VAR log_name status = ~ignored:%ignore_reason%~ END
+		END
 	END
 END
 
@@ -324,23 +344,29 @@ DEFINE_PATCH_FUNCTION ad_install_spell_description
 BEGIN
 	PATCH_SILENT
 	SPRINT status ~ignored~
-	LPF ad_spell_ignore_reason STR_VAR log_name RET ignore_reason END
+	PATCH_TIME ~step:filter~ BEGIN
+		LPF ad_spell_ignore_reason STR_VAR log_name RET ignore_reason END
+	END
 	PATCH_IF ~%ignore_reason%~ STRING_EQUAL ~~ BEGIN
 		READ_STRREF SPL_unidentified_name        spell_name
 		READ_LONG   SPL_level                    spell_level
 		READ_BYTE   SPL_school                   spell_school
 		READ_STRREF SPL_unidentified_description original_description
-		LPF ad_describe_spell STR_VAR original_description log_name RET description covered END
+		PATCH_TIME ~step:describe~ BEGIN
+			LPF ad_describe_spell STR_VAR original_description log_name RET description covered END
+		END
 		PATCH_IF covered BEGIN
 			PATCH_IF alter_spell_files BEGIN
 				SAY SPL_unidentified_description ~%description%~
 			END
-			LPF ad_add_compare_row STR_VAR log_name name = ~%spell_name%~ original_description description END
-			LPF ad_add_js_row STR_VAR log_name id = ~%SOURCE_RES%~ name = ~%spell_name%~ type = ~%spell_school%~ level = ~%spell_level%~ original = ~%original_description%~ modded = ~%description%~ END
-			SPRINT status ~ok~
-			// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant.
-			PATCH_IF regression_dump BEGIN
-				LPF ad_add_dump_row STR_VAR log_name description END
+			PATCH_TIME ~step:outputs~ BEGIN
+				LPF ad_add_compare_row STR_VAR log_name name = ~%spell_name%~ original_description description END
+				LPF ad_add_js_row STR_VAR log_name id = ~%SOURCE_RES%~ name = ~%spell_name%~ type = ~%spell_school%~ level = ~%spell_level%~ original = ~%original_description%~ modded = ~%description%~ END
+				SPRINT status ~ok~
+				// En dernier : une erreur plus haut ne doit laisser que la ligne « failed » de l'appelant.
+				PATCH_IF regression_dump BEGIN
+					LPF ad_add_dump_row STR_VAR log_name description END
+				END
 			END
 		END
 		ELSE BEGIN
@@ -348,7 +374,9 @@ BEGIN
 		END
 	END
 	PATCH_IF ~%status%~ STRING_EQUAL ~ignored~ AND regression_dump BEGIN
-		LPF ad_add_dump_row STR_VAR log_name status = ~ignored:%ignore_reason%~ END
+		PATCH_TIME ~step:outputs~ BEGIN
+			LPF ad_add_dump_row STR_VAR log_name status = ~ignored:%ignore_reason%~ END
+		END
 	END
 END
 
@@ -407,8 +435,10 @@ DEFINE_PATCH_FUNCTION ad_add_install_log
 		type = ~warning~
 		message = ~~
 BEGIN
-	INNER_ACTION BEGIN
-		APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%type%.log~ ~%SOURCE_FILE% : %message%~
+	PATCH_TIME ~step:install_log~ BEGIN
+		INNER_ACTION BEGIN
+			APPEND_OUTER ~%MOD_FOLDER%/log/%log_name%-%type%.log~ ~%SOURCE_FILE% : %message%~
+		END
 	END
 END
 

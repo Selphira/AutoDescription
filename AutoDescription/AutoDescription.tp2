@@ -20,22 +20,30 @@ ALWAYS
     // quel sur EE. convert_array limite la conversion à ce fichier ; setup.tra (UTF-8) n'est jamais
     // converti.
     ACTION_DEFINE_ARRAY convert_tra BEGIN ~description~ END
-    LAF HANDLE_CHARSETS
-        INT_VAR
-            infer_charsets = 1
-            from_utf8 = 1
-        STR_VAR
-            default_language = ~french~
-            tra_path = ~%MOD_FOLDER%/tra~
-            out_path = ~weidu_external/Lang/AutoDescription~
-            convert_array = convert_tra
-            reload_array = convert_tra
+    // Les ACTION_TIME et PATCH_TIME ~step:…~ mesurent du temps CPU, pas la durée réelle
+    // (tools/timing_report.py).
+    ACTION_TIME ~step:charsets~ BEGIN
+        LAF HANDLE_CHARSETS
+            INT_VAR
+                infer_charsets = 1
+                from_utf8 = 1
+            STR_VAR
+                default_language = ~french~
+                tra_path = ~%MOD_FOLDER%/tra~
+                out_path = ~weidu_external/Lang/AutoDescription~
+                convert_array = convert_tra
+                reload_array = convert_tra
+        END
     END
 
     OUTER_SPRINT BGFORGE_LIB_DIR "%MOD_FOLDER%/lib/bgforge"
 	OUTER_SPRINT CACHE_FOLDER ~weidu_external/AutoDescription/cache~
-    INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
-    INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
+    ACTION_TIME ~step:bgforge~ BEGIN
+        INCLUDE ~%BGFORGE_LIB_DIR%/main.tpa~
+    END
+    ACTION_TIME ~step:engine~ BEGIN
+        INCLUDE ~%MOD_FOLDER%/lib/always.tpa~
+    END
 END
 
 LANGUAGE ~Francais~ ~french~

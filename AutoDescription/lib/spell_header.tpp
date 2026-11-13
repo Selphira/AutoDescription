@@ -83,7 +83,9 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 	END
 	SET derived_count = 0
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_cross_groups
+		PATCH_TIME ~step:cross_groups~ BEGIN
+			LPM ad_cross_groups
+		END
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~321~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
 			LPM ad_op_321_after_groups
 		END
@@ -287,7 +289,9 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	END
 	PATCH_IF ~%header_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_spell_self_target
-		LPM ad_spell_header_pipeline
+		PATCH_TIME ~step:header_pipeline~ BEGIN
+			LPM ad_spell_header_pipeline
+		END
 		LPM ad_spell_header_effects
 	END
 END
@@ -1045,9 +1049,11 @@ BEGIN
 					PATCH_IF NOT VARIABLE_IS_SET $save_visited(~%save_resource%~) BEGIN
 						SET $save_visited(~%save_resource%~) = 1
 						PATCH_IF FILE_EXISTS_IN_GAME ~%save_resource%.spl~ BEGIN
-							LPF ad_spell_header_save_sub STR_VAR resref = ~%save_resource%~
-								RET save_effect_type = save_type save_effect_bonus = save_bonus save_half sub_missing = save_missing
-								save_sub_special = sub_special save_sub_bonus_text save_sub_bonus_valid_one END
+							PATCH_TIME ~step:save_sub~ BEGIN
+								LPF ad_spell_header_save_sub STR_VAR resref = ~%save_resource%~
+									RET save_effect_type = save_type save_effect_bonus = save_bonus save_half sub_missing = save_missing
+									save_sub_special = sub_special save_sub_bonus_text save_sub_bonus_valid_one END
+							END
 							PATCH_IF save_effect_type > 0 BEGIN
 								PATCH_IF save_sub_count == 0 BEGIN
 									SPRINT save_sub_bonus_first ~%save_sub_bonus_text%~
@@ -1145,14 +1151,18 @@ BEGIN
 	SET support_header_only = 1
 	SET fx_with_casting = 0
 	INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-		LPM ad_fx_load_spell
+		PATCH_TIME ~step:load_save_sub~ BEGIN
+			LPM ad_fx_load_spell
+		END
 		PATCH_IF NOT (~%fx_load_error%~ STRING_EQUAL ~~) BEGIN
 			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:subspell_%fx_load_error%~ message = ~%resref%.SPL: %fx_load_message%~ RET save_missing = refusal END
 		END
 		ELSE BEGIN
 			SPRINT header_missing ~~
 			LPM ad_spell_header_fields
-			LPM ad_spell_header_pipeline
+			PATCH_TIME ~step:header_pipeline~ BEGIN
+				LPM ad_spell_header_pipeline
+			END
 			LPM ad_spell_header_effects
 			PATCH_IF NOT (~%header_missing%~ STRING_EQUAL ~~) BEGIN
 				SPRINT save_missing ~%header_missing%~

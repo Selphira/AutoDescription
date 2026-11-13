@@ -468,62 +468,64 @@ DEFINE_PATCH_FUNCTION ad_lines_section_text
 		text
 		count
 BEGIN
-	SPRINT text ~~
-	SET count = 0
-	SPRINT line_prefix ~~
-	PATCH_IF level == 1 BEGIN
-		SPRINT line_prefix ~- ~
-	END
-	ELSE PATCH_IF level == 2 BEGIN
-		SPRINT line_prefix ~  ~
-	END
-	// Clé numérique unique (rang, ordre d'ajout) ; le décalage rend les rangs négatifs triables.
-	PATCH_IF line_count > 1000 BEGIN
-		PATCH_FAIL ~New engine: more than 1000 lines in a description~
-	END
-	CLEAR_ARRAY section_lines
-	FOR (line_id = 0; line_id < line_count; ++line_id) BEGIN
-		SPRINT line_section $line_section(~%line_id%~)
-		PATCH_IF ~%line_section%~ STRING_EQUAL ~%section%~ BEGIN
-			SET line_sort = $line_sort(~%line_id%~)
-			PATCH_IF line_sort < 0 - 100 OR line_sort > 2000000 BEGIN
-				PATCH_FAIL ~New engine: line sort %line_sort% out of bounds~
-			END
-			SET line_key = (line_sort + 100) * 1000 + line_id
-			SET $section_lines(~%line_key%~) = line_id
+	PATCH_TIME ~step:section_text~ BEGIN
+		SPRINT text ~~
+		SET count = 0
+		SPRINT line_prefix ~~
+		PATCH_IF level == 1 BEGIN
+			SPRINT line_prefix ~- ~
 		END
-	END
-	SORT_ARRAY_INDICES section_lines NUMERICALLY
-	PHP_EACH section_lines AS _ => line_id BEGIN
-		SPRINT line_text $line_text(~%line_id%~)
-		// Texte qui commence par deux sauts de ligne (sections de niveaux d'un sous-sort) : écrit sans
-		// puce, ces sauts retirés, comme l'ancien add_items_section_to_description ; gardé tel quel dans
-		// le texte d'un sous-sort (strip_sections à 0), qui le transmet à sa ligne parente.
-		PATCH_IF strip_sections AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
-			INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-				DELETE_BYTES 0 2 * STRING_LENGTH ~%CRLF%~
-			END
-			SPRINT text ~%text%%CRLF%%line_text%~
+		ELSE PATCH_IF level == 2 BEGIN
+			SPRINT line_prefix ~  ~
 		END
-		ELSE PATCH_IF $line_nested(~%line_id%~) BEGIN
-			SPRINT text ~%text%%CRLF%  %line_prefix%%line_text%~
+		// Clé numérique unique (rang, ordre d'ajout) ; le décalage rend les rangs négatifs triables.
+		PATCH_IF line_count > 1000 BEGIN
+			PATCH_FAIL ~New engine: more than 1000 lines in a description~
 		END
-		ELSE BEGIN
-			SPRINT line_text_prefix ~%line_prefix%~
-			// Texte de plusieurs lignes (sous-sort d'un opcode 146) en retrait sous un titre : chacune garde sa
-			// puce, comme l'ancien appendSubProperty.
-			PATCH_IF level == 2 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%line_text%~) >= 0 BEGIN
-				INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
-					REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%CRLF%  - ~
+		CLEAR_ARRAY section_lines
+		FOR (line_id = 0; line_id < line_count; ++line_id) BEGIN
+			SPRINT line_section $line_section(~%line_id%~)
+			PATCH_IF ~%line_section%~ STRING_EQUAL ~%section%~ BEGIN
+				SET line_sort = $line_sort(~%line_id%~)
+				PATCH_IF line_sort < 0 - 100 OR line_sort > 2000000 BEGIN
+					PATCH_FAIL ~New engine: line sort %line_sort% out of bounds~
 				END
-				SPRINT line_text_prefix ~%line_prefix%- ~
+				SET line_key = (line_sort + 100) * 1000 + line_id
+				SET $section_lines(~%line_key%~) = line_id
 			END
-			SPRINT text ~%text%%CRLF%%line_text_prefix%%line_text%~
 		END
-		SET count += 1
-	END
-	PATCH_IF level == 1 BEGIN
-		LPF ad_group_condition_lines STR_VAR text RET text END
+		SORT_ARRAY_INDICES section_lines NUMERICALLY
+		PHP_EACH section_lines AS _ => line_id BEGIN
+			SPRINT line_text $line_text(~%line_id%~)
+			// Texte qui commence par deux sauts de ligne (sections de niveaux d'un sous-sort) : écrit sans
+			// puce, ces sauts retirés, comme l'ancien add_items_section_to_description ; gardé tel quel dans
+			// le texte d'un sous-sort (strip_sections à 0), qui le transmet à sa ligne parente.
+			PATCH_IF strip_sections AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%%CRLF%~ ~%line_text%~) == 0 BEGIN
+				INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+					DELETE_BYTES 0 2 * STRING_LENGTH ~%CRLF%~
+				END
+				SPRINT text ~%text%%CRLF%%line_text%~
+			END
+			ELSE PATCH_IF $line_nested(~%line_id%~) BEGIN
+				SPRINT text ~%text%%CRLF%  %line_prefix%%line_text%~
+			END
+			ELSE BEGIN
+				SPRINT line_text_prefix ~%line_prefix%~
+				// Texte de plusieurs lignes (sous-sort d'un opcode 146) en retrait sous un titre : chacune garde sa
+				// puce, comme l'ancien appendSubProperty.
+				PATCH_IF level == 2 AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%line_text%~) >= 0 BEGIN
+					INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
+						REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~%CRLF%- ~ ~%CRLF%  - ~
+					END
+					SPRINT line_text_prefix ~%line_prefix%- ~
+				END
+				SPRINT text ~%text%%CRLF%%line_text_prefix%%line_text%~
+			END
+			SET count += 1
+		END
+		PATCH_IF level == 1 BEGIN
+			LPF ad_group_condition_lines STR_VAR text RET text END
+		END
 	END
 END
 

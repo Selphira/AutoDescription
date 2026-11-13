@@ -16,7 +16,9 @@ BEGIN
 	SET support_spell = 0
 	SET resource_is_spell = 0
 	LPM ad_recursion_reset
-	LPM ad_fx_load_item
+	PATCH_TIME ~step:load~ BEGIN
+		LPM ad_fx_load_item
+	END
 	PATCH_IF AD_EFFECTS_DUMP BEGIN
 		LPM ad_fx_dump
 	END
