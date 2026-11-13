@@ -92,7 +92,7 @@ END
 // de celles qu'admet l'opcode, fichier IDS invalide…), ou not_implemented, choix de l'outil (cas non
 // encore pris en charge, ou volontairement non décrit, dont une valeur sans nom que le jeu
 // applique) ; raison : code stable (« opcode151:missing_creature »), seul repris dans
-// …-compare.txt ; emplacement et données : ceux de l'effet fx_id (ad_fx_location, ad_fx_data),
+// …-compare.txt ; emplacement et données : ceux de l'effet fx_id (ad_event_location, ad_event_data),
 // aucun si fx_id < 0 ; message : ce qui ne va pas, en anglais, pour les moddeurs, avec les valeurs
 // attendues.
 DEFINE_PATCH_FUNCTION ad_refusal
@@ -105,20 +105,15 @@ DEFINE_PATCH_FUNCTION ad_refusal
 		refusal
 BEGIN
 	PATCH_TIME ~step:refusal~ BEGIN
-		LPF ad_fx_location INT_VAR fx_id RET location END
-		LPF ad_fx_data INT_VAR fx_id RET data END
-		SPRINT refusal ~%reason%%TAB%%location%%TAB%%data%%TAB%%message%~
+		SET event_fx = fx_id
+		SET event_with_opcode = 0
+		LPM ad_event_location
+		LPM ad_event_data
+		SPRINT refusal ~%reason%%TAB%%event_location%%TAB%%event_data%%TAB%%message%~
 	END
 END
 
-// Emplacement de l'effet fx_id dans son fichier, numéroté à partir de 0 comme dans le fichier :
-// « ability 1, effect 2 », « equipped effect 0 » ; pour l'effet d'un 177 remplacé par celui de son
-// EFF, « ability 1, effect 2, OHBWHIT.EFF (opcode 177) », de même pour la métamorphose de l'arme
-// d'un 111. Avec with_opcode (effet parent d'une sous-ressource), suivi de son opcode : « equipped
-// effect 0 (opcode 232) », « ability 1, effect 2 (opcode 177 > OHBWHIT.EFF: opcode 146) ». Dans une
-// sous-ressource, précédé de son chemin (ctx_origin, lib/recursion.tpp) : « equipped effect 0
-// (opcode 232) > BDDRAGBL.SPL: ability 0, effect 6 » ; l'effet unique d'un EFF n'y ajoute rien.
-// Aucun emplacement propre si fx_id < 0.
+// Emplacement de l'effet fx_id (ad_event_location), suivi de son opcode si with_opcode vaut 1.
 DEFINE_PATCH_FUNCTION ad_fx_location
 	INT_VAR
 		fx_id = 0 - 1
@@ -126,125 +121,136 @@ DEFINE_PATCH_FUNCTION ad_fx_location
 	RET
 		location
 BEGIN
-	SPRINT location ~~
-	PATCH_IF fx_id >= 0 AND fx_id < fx_count AND NOT ctx_single_effect BEGIN
-		SPRINT location_block $fx_block(~%fx_id%~)
-		SET location_position = $fx_position(~%fx_id%~)
-		SET location_header = $fx_header(~%fx_id%~)
+	SET event_fx = fx_id
+	SET event_with_opcode = with_opcode
+	LPM ad_event_location
+	SPRINT location ~%event_location%~
+END
+
+// event_location : emplacement de l'effet event_fx dans son fichier, numéroté à partir de 0 comme dans
+// le fichier : « ability 1, effect 2 », « equipped effect 0 » ; pour l'effet d'un 177 remplacé par
+// celui de son EFF, « ability 1, effect 2, OHBWHIT.EFF (opcode 177) », de même pour la métamorphose de
+// l'arme d'un 111. Avec event_with_opcode (effet parent d'une sous-ressource), suivi de son opcode :
+// « equipped effect 0 (opcode 232) », « ability 1, effect 2 (opcode 177 > OHBWHIT.EFF: opcode 146) ».
+// Dans une sous-ressource, précédé de son chemin (ctx_origin, lib/recursion.tpp) : « equipped effect 0
+// (opcode 232) > BDDRAGBL.SPL: ability 0, effect 6 » ; l'effet unique d'un EFF n'y ajoute rien.
+// Aucun emplacement propre si event_fx < 0. Macro : ad_log_ignored l'appelle dans la portée de la
+// description, sans le coût d'un LPF ; ses variables location_* ne servent nulle part ailleurs.
+DEFINE_PATCH_MACRO ad_event_location BEGIN
+	SPRINT event_location ~~
+	PATCH_IF event_fx >= 0 AND event_fx < fx_count AND NOT ctx_single_effect BEGIN
+		SPRINT location_block $fx_block(~%event_fx%~)
+		SET location_position = $fx_position(~%event_fx%~)
+		SET location_header = $fx_header(~%event_fx%~)
 		PATCH_IF ~%location_block%~ STRING_EQUAL ~ability~ BEGIN
-			SPRINT location ~ability %location_header%, effect %location_position%~
+			SPRINT event_location ~ability %location_header%, effect %location_position%~
 		END
 		ELSE BEGIN
-			SPRINT location ~%location_block% effect %location_position%~
+			SPRINT event_location ~%location_block% effect %location_position%~
 		END
 	END
-	PATCH_IF fx_id >= 0 AND fx_id < fx_count BEGIN
-		SET location_opcode = $fx_opcode(~%fx_id%~)
+	PATCH_IF event_fx >= 0 AND event_fx < fx_count BEGIN
+		SET location_opcode = $fx_opcode(~%event_fx%~)
 		SPRINT location_parent_text ~~
-		PATCH_IF VARIABLE_IS_SET $fx_parent_resource(~%fx_id%~) BEGIN
-			SPRINT location_parent $fx_parent_resource(~%fx_id%~)
+		PATCH_IF VARIABLE_IS_SET $fx_parent_resource(~%event_fx%~) BEGIN
+			SPRINT location_parent $fx_parent_resource(~%event_fx%~)
 			TO_UPPER location_parent
-			PATCH_IF $fx_from_111(~%fx_id%~) BEGIN
+			PATCH_IF $fx_from_111(~%event_fx%~) BEGIN
 				SPRINT location_parent_text ~%location_parent%.ITM (opcode 111)~
 				SPRINT location_parent_opcode ~opcode 111 > %location_parent%.ITM: ~
 			END
-			ELSE PATCH_IF $fx_external(~%fx_id%~) BEGIN
+			ELSE PATCH_IF $fx_external(~%event_fx%~) BEGIN
 				SPRINT location_parent_text ~%location_parent%.EFF (opcode 177)~
 				SPRINT location_parent_opcode ~opcode 177 > %location_parent%.EFF: ~
 			END
 		END
-		PATCH_IF with_opcode BEGIN
+		PATCH_IF event_with_opcode BEGIN
 			PATCH_IF ~%location_parent_text%~ STRING_EQUAL ~~ BEGIN
 				SPRINT location_parent_opcode ~~
 			END
 			SPRINT location_opcode_text ~(%location_parent_opcode%opcode %location_opcode%)~
-			SPRINT location ~%location% %location_opcode_text%~
+			SPRINT event_location ~%event_location% %location_opcode_text%~
 		END
 		ELSE PATCH_IF NOT (~%location_parent_text%~ STRING_EQUAL ~~) BEGIN
-			SPRINT location ~%location%, %location_parent_text%~
+			SPRINT event_location ~%event_location%, %location_parent_text%~
 		END
-		INNER_PATCH_SAVE location ~%location%~ BEGIN
+		INNER_PATCH_SAVE event_location ~%event_location%~ BEGIN
 			REPLACE_TEXTUALLY ~^[ ,]+~ ~~
 		END
 	END
 	PATCH_IF NOT (~%ctx_origin%~ STRING_EQUAL ~~) BEGIN
-		PATCH_IF ~%location%~ STRING_EQUAL ~~ BEGIN
-			SPRINT location ~%ctx_origin%~
+		PATCH_IF ~%event_location%~ STRING_EQUAL ~~ BEGIN
+			SPRINT event_location ~%ctx_origin%~
 		END
 		ELSE PATCH_IF ctx_single_effect BEGIN
-			SPRINT location ~%ctx_origin% %location%~
+			SPRINT event_location ~%ctx_origin% %event_location%~
 		END
 		ELSE BEGIN
-			SPRINT location ~%ctx_origin%: %location%~
+			SPRINT event_location ~%ctx_origin%: %event_location%~
 		END
 	END
 END
 
-// Champs de l'effet fx_id, tels qu'ils ont été lus (fx_<champ>_raw pour ceux que des passes
-// réécrivent) : toujours opcode, cible, parameter1, parameter2, timing et durée, puis ceux qui ne
-// valent pas leur valeur par défaut (puissance, résistance, probabilités autres que 100 et 0, dés,
+// event_data : champs de l'effet event_fx, tels qu'ils ont été lus (fx_<champ>_raw pour ceux que des
+// passes réécrivent) : toujours opcode, cible, parameter1, parameter2, timing et durée, puis ceux qui
+// ne valent pas leur valeur par défaut (puissance, résistance, probabilités autres que 100 et 0, dés,
 // jet de sauvegarde, special, parameter3 et parameter4 d'un EFF, ressources). Un champ que l'opcode
 // n'utilise pas vaut d'ordinaire sa valeur par défaut et n'apparaît pas ; une valeur inattendue
-// apparaît, ce qui peut expliquer le problème.
-DEFINE_PATCH_FUNCTION ad_fx_data
-	INT_VAR
-		fx_id = 0 - 1
-	RET
-		data
-BEGIN
-	SPRINT data ~~
-	PATCH_IF fx_id >= 0 AND fx_id < fx_count BEGIN
-		SET data_opcode = $fx_opcode(~%fx_id%~)
-		SET data_target = $fx_target(~%fx_id%~)
-		SET data_parameter1 = $fx_parameter1_raw(~%fx_id%~)
-		SET data_parameter2 = $fx_parameter2_raw(~%fx_id%~)
-		SET data_timing = $fx_timing_raw(~%fx_id%~)
-		SET data_duration = $fx_duration_raw(~%fx_id%~)
-		SPRINT data ~opcode %data_opcode%, target %data_target%, parameter1 %data_parameter1%, parameter2 %data_parameter2%, timing %data_timing%, duration %data_duration%~
-		SET data_value = $fx_power(~%fx_id%~)
+// apparaît, ce qui peut expliquer le problème. Macro, comme ad_event_location (variables data_*).
+DEFINE_PATCH_MACRO ad_event_data BEGIN
+	SPRINT event_data ~~
+	PATCH_IF event_fx >= 0 AND event_fx < fx_count BEGIN
+		SET data_opcode = $fx_opcode(~%event_fx%~)
+		SET data_target = $fx_target(~%event_fx%~)
+		SET data_parameter1 = $fx_parameter1_raw(~%event_fx%~)
+		SET data_parameter2 = $fx_parameter2_raw(~%event_fx%~)
+		SET data_timing = $fx_timing_raw(~%event_fx%~)
+		SET data_duration = $fx_duration_raw(~%event_fx%~)
+		SPRINT event_data ~opcode %data_opcode%, target %data_target%, parameter1 %data_parameter1%, parameter2 %data_parameter2%, timing %data_timing%, duration %data_duration%~
+		SET data_value = $fx_power(~%event_fx%~)
 		PATCH_IF data_value != 0 BEGIN
-			SPRINT data ~%data%, power %data_value%~
+			SPRINT event_data ~%event_data%, power %data_value%~
 		END
-		SET data_value = $fx_resistance(~%fx_id%~)
+		SET data_value = $fx_resistance(~%event_fx%~)
 		PATCH_IF data_value != 0 BEGIN
-			SPRINT data ~%data%, resistance %data_value%~
+			SPRINT event_data ~%event_data%, resistance %data_value%~
 		END
-		SET data_probability1 = $fx_probability1(~%fx_id%~)
-		SET data_probability2 = $fx_probability2(~%fx_id%~)
+		SET data_probability1 = $fx_probability1(~%event_fx%~)
+		SET data_probability2 = $fx_probability2(~%event_fx%~)
 		PATCH_IF data_probability1 != 100 OR data_probability2 != 0 BEGIN
-			SPRINT data ~%data%, probability1 %data_probability1%, probability2 %data_probability2%~
+			SPRINT event_data ~%event_data%, probability1 %data_probability1%, probability2 %data_probability2%~
 		END
-		SET data_dice_count = $fx_dice_count_raw(~%fx_id%~)
-		SET data_dice_sides = $fx_dice_sides(~%fx_id%~)
+		SET data_dice_count = $fx_dice_count_raw(~%event_fx%~)
+		SET data_dice_sides = $fx_dice_sides(~%event_fx%~)
 		PATCH_IF data_dice_count != 0 OR data_dice_sides != 0 BEGIN
-			SPRINT data ~%data%, dice %data_dice_count%d%data_dice_sides%~
+			SPRINT event_data ~%event_data%, dice %data_dice_count%d%data_dice_sides%~
 		END
-		SET data_save_type = $fx_save_type_raw(~%fx_id%~)
-		SET data_save_bonus = $fx_save_bonus(~%fx_id%~)
+		SET data_save_type = $fx_save_type_raw(~%event_fx%~)
+		SET data_save_bonus = $fx_save_bonus(~%event_fx%~)
 		PATCH_IF data_save_type != 0 OR data_save_bonus != 0 BEGIN
-			SPRINT data ~%data%, saving throw type %data_save_type%, saving throw bonus %data_save_bonus%~
+			SPRINT event_data ~%event_data%, saving throw type %data_save_type%, saving throw bonus %data_save_bonus%~
 		END
-		SET data_value = $fx_special_raw(~%fx_id%~)
+		SET data_value = $fx_special_raw(~%event_fx%~)
 		PATCH_IF data_value != 0 BEGIN
-			SPRINT data ~%data%, special %data_value%~
+			SPRINT event_data ~%event_data%, special %data_value%~
 		END
-		SET data_value = $fx_parameter3(~%fx_id%~)
+		SET data_value = $fx_parameter3(~%event_fx%~)
 		PATCH_IF data_value != 0 BEGIN
-			SPRINT data ~%data%, parameter3 %data_value%~
+			SPRINT event_data ~%event_data%, parameter3 %data_value%~
 		END
-		SET data_value = $fx_parameter4(~%fx_id%~)
+		SET data_value = $fx_parameter4(~%event_fx%~)
 		PATCH_IF data_value != 0 BEGIN
-			SPRINT data ~%data%, parameter4 %data_value%~
+			SPRINT event_data ~%event_data%, parameter4 %data_value%~
 		END
 		FOR (data_n = 1; data_n <= 3; ++data_n) BEGIN
 			SPRINT data_field ~resource~
 			PATCH_IF data_n > 1 BEGIN
 				SPRINT data_field ~resource%data_n%~
 			END
-			SPRINT data_resource $EVAL ~fx_%data_field%~(~%fx_id%~)
+			SPRINT data_resource $EVAL ~fx_%data_field%~(~%event_fx%~)
 			TO_UPPER data_resource
 			PATCH_IF NOT (~%data_resource%~ STRING_EQUAL ~~) BEGIN
-				SPRINT data ~%data%, %data_field% %data_resource%~
+				SPRINT event_data ~%event_data%, %data_field% %data_resource%~
 			END
 		END
 	END
@@ -262,41 +268,45 @@ DEFINE_PATCH_FUNCTION ad_refusal_nest
 	RET
 		refusal
 BEGIN
-	LPF ad_event_fields STR_VAR event = ~%refusal%~ RET nest_kind = event_kind nest_code = event_code nest_location = event_location nest_data = event_data nest_message = event_message END
-	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~recursion:~ ~%nest_code%~) != 0 BEGIN
-		SPRINT nest_code ~recursion:%nest_code%~
+	SPRINT event ~%refusal%~
+	LPM ad_event_split
+	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~recursion:~ ~%event_code%~) != 0 BEGIN
+		SPRINT event_code ~recursion:%event_code%~
 	END
-	PATCH_IF ~%nest_data%~ STRING_EQUAL ~~ BEGIN
-		LPF ad_fx_data INT_VAR fx_id RET nest_data = data END
+	PATCH_IF ~%event_data%~ STRING_EQUAL ~~ BEGIN
+		SET event_fx = fx_id
+		LPM ad_event_data
 	END
-	SPRINT refusal ~%nest_kind%:%nest_code%%TAB%%nest_location%%TAB%%nest_data%%TAB%%nest_message%~
+	SPRINT refusal ~%event_kind%:%event_code%%TAB%%event_location%%TAB%%event_data%%TAB%%event_message%~
 END
 
 // Effet ignored_fx écarté sans rien écrire alors que la ressource reste décrite : donnée invalide
 // (file_error) ou information perdue (not_implemented), raison ignored_reason (avec sa nature) et
 // message ignored_message ; ignored_consequence : ignored, ou kept pour un effet douteux décrit quand
-// même (« points de dégâts » pour un type inconnu). Les trois sont remis à zéro.
+// même (« points de dégâts » pour un type inconnu). Les trois sont remis à zéro. Mêmes journaux que
+// ad_refusal suivi de ad_log_event, sans assembler l'événement pour le redécouper.
 DEFINE_PATCH_MACRO ad_log_ignored BEGIN
-	LPF ad_refusal INT_VAR fx_id = ignored_fx STR_VAR reason = ~%ignored_reason%~ message = ~%ignored_message%~ RET ignored_event = refusal END
-	LPF ad_log_event STR_VAR event = ~%ignored_event%~ consequence = ~%ignored_consequence%~ RET ignored_logged = reason END
+	PATCH_TIME ~step:refusal~ BEGIN
+		SET event_fx = ignored_fx
+		SET event_with_opcode = 0
+		LPM ad_event_location
+		LPM ad_event_data
+		SPRINT event_message ~%ignored_message%~
+		SPRINT event_reason ~%ignored_reason%~
+		LPM ad_event_kind
+	END
+	PATCH_TIME ~step:log_event~ BEGIN
+		SPRINT event_outcome ~%ignored_consequence%~
+		LPM ad_event_write
+	END
 	SPRINT ignored_reason ~~
 	SPRINT ignored_message ~~
 	SPRINT ignored_consequence ~ignored~
 END
 
-// Champs d'un événement (refus de ad_refusal) : event_kind (file_error, not_implemented), event_code
-// (raison sans la nature), event_location, event_data, event_message. Une raison sans nature
-// reconnue est comptée comme un cas non pris en charge.
-DEFINE_PATCH_FUNCTION ad_event_fields
-	STR_VAR
-		event = ~~
-	RET
-		event_kind
-		event_code
-		event_location
-		event_data
-		event_message
-BEGIN
+// Champs de l'événement event (refus de ad_refusal) : event_location, event_data, event_message, et
+// ceux de ad_event_kind.
+DEFINE_PATCH_MACRO ad_event_split BEGIN
 	SPRINT event_reason ~%event%~
 	SPRINT event_location ~~
 	SPRINT event_data ~~
@@ -309,6 +319,12 @@ BEGIN
 			SPRINT event_message ~%MATCH4%~
 		END ~~
 	END
+	LPM ad_event_kind
+END
+
+// Raison event_reason : event_kind (file_error, not_implemented) et event_code (raison sans la
+// nature). Une raison sans nature reconnue est comptée comme un cas non pris en charge.
+DEFINE_PATCH_MACRO ad_event_kind BEGIN
 	SPRINT event_kind ~not_implemented~
 	SPRINT event_code ~%event_reason%~
 	INNER_PATCH ~%event_reason%~ BEGIN
@@ -319,13 +335,10 @@ BEGIN
 	END
 END
 
-// Écrit l'événement event (refus de ad_refusal) de la ressource en cours : une ligne du tableau
-// markdown de …-file-errors.md ou …-not-implemented.md selon sa nature (ressource, problème,
-// emplacement, données de l'effet, raison, conséquence ; « | » des cellules échappé), et une ligne
-// en colonnes dans …-events.txt : ressource<TAB>nature<TAB>raison<TAB>conséquence<TAB>emplacement
-// <TAB>données<TAB>message. Conséquence : refused (ressource non décrite), ignored (effet écarté, la
-// ressource reste décrite) ou kept (effet douteux décrit quand même). Renvoie la raison avec sa
-// nature, pour …-compare.txt.
+// Écrit l'événement event (refus de ad_refusal) de la ressource en cours (ad_event_write), de
+// conséquence consequence : refused (ressource non décrite), ignored (effet écarté, la ressource reste
+// décrite) ou kept (effet douteux décrit quand même). Renvoie la raison avec sa nature, pour
+// …-compare.txt.
 DEFINE_PATCH_FUNCTION ad_log_event
 	STR_VAR
 		event = ~~
@@ -334,47 +347,58 @@ DEFINE_PATCH_FUNCTION ad_log_event
 		reason
 BEGIN
 	PATCH_TIME ~step:log_event~ BEGIN
-		LPF ad_event_fields STR_VAR event RET event_kind event_code event_location event_data event_message END
+		LPM ad_event_split
 		SPRINT reason ~%event_kind%:%event_code%~
-		SPRINT event_consequence ~not described~
-		PATCH_IF ~%consequence%~ STRING_EQUAL ~ignored~ BEGIN
-			SPRINT event_consequence ~effect ignored~
-		END
-		ELSE PATCH_IF ~%consequence%~ STRING_EQUAL ~kept~ BEGIN
-			SPRINT event_consequence ~described anyway~
-		END
-		SPRINT event_columns ~%SOURCE_FILE%%TAB%%event_kind%%TAB%%event_code%%TAB%%consequence%%TAB%%event_location%%TAB%%event_data%%TAB%%event_message%~
-		// Dans le texte de remplacement, \\ désigne une seule barre oblique inverse (V21).
-		INNER_PATCH_SAVE event_message ~%event_message%~ BEGIN
-			REPLACE_TEXTUALLY ~|~ ~\\|~
-		END
-		INNER_PATCH_SAVE event_location ~%event_location%~ BEGIN
-			REPLACE_TEXTUALLY ~|~ ~\\|~
-		END
-		INNER_PATCH_SAVE event_data ~%event_data%~ BEGIN
-			REPLACE_TEXTUALLY ~|~ ~\\|~
-		END
-		// Valeurs des données en gras (« opcode **151**, target **2** ») : dernier mot de chaque champ.
-		INNER_PATCH_SAVE event_data ~%event_data%,~ BEGIN
-			REPLACE_TEXTUALLY ~ \([^ ,]+\),~ ~ **\1**,~
-			REPLACE_TEXTUALLY ~,$~ ~~
-		END
-		SPRINT event_row ~| %SOURCE_FILE% | %event_message% | %event_location% | %event_data% | `%event_code%` | %event_consequence% |~
-		SPRINT event_file ~not-implemented~
-		PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
-			SPRINT event_file ~file-errors~
-		END
-		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~
-		LPM ad_log_part
-		SPRINT event_table_part ~%log_part%~
-		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-events.txt~
-		LPM ad_log_part
-		INNER_ACTION BEGIN
-			SILENT
-			APPEND_OUTER ~%event_table_part%~ ~%event_row%~ KEEP_CRLF
-			APPEND_OUTER ~%log_part%~ ~%event_columns%~ KEEP_CRLF
-			VERBOSE
-		END
+		SPRINT event_outcome ~%consequence%~
+		LPM ad_event_write
+	END
+END
+
+// Écrit l'événement (event_kind, event_code, event_location, event_data, event_message) de
+// conséquence event_outcome : une ligne du tableau markdown de …-file-errors.md ou …-not-implemented.md
+// selon sa nature (ressource, problème, emplacement, données de l'effet, raison, conséquence ; « | »
+// des cellules échappé), et une ligne en colonnes dans …-events.txt : ressource<TAB>nature<TAB>raison
+// <TAB>conséquence<TAB>emplacement<TAB>données<TAB>message. event_message, event_location et
+// event_data sont échappés sur place.
+DEFINE_PATCH_MACRO ad_event_write BEGIN
+	SPRINT event_consequence ~not described~
+	PATCH_IF ~%event_outcome%~ STRING_EQUAL ~ignored~ BEGIN
+		SPRINT event_consequence ~effect ignored~
+	END
+	ELSE PATCH_IF ~%event_outcome%~ STRING_EQUAL ~kept~ BEGIN
+		SPRINT event_consequence ~described anyway~
+	END
+	SPRINT event_columns ~%SOURCE_FILE%%TAB%%event_kind%%TAB%%event_code%%TAB%%event_outcome%%TAB%%event_location%%TAB%%event_data%%TAB%%event_message%~
+	// Dans le texte de remplacement, \\ désigne une seule barre oblique inverse (V21).
+	INNER_PATCH_SAVE event_message ~%event_message%~ BEGIN
+		REPLACE_TEXTUALLY ~|~ ~\\|~
+	END
+	INNER_PATCH_SAVE event_location ~%event_location%~ BEGIN
+		REPLACE_TEXTUALLY ~|~ ~\\|~
+	END
+	INNER_PATCH_SAVE event_data ~%event_data%~ BEGIN
+		REPLACE_TEXTUALLY ~|~ ~\\|~
+	END
+	// Valeurs des données en gras (« opcode **151**, target **2** ») : dernier mot de chaque champ.
+	INNER_PATCH_SAVE event_data ~%event_data%,~ BEGIN
+		REPLACE_TEXTUALLY ~ \([^ ,]+\),~ ~ **\1**,~
+		REPLACE_TEXTUALLY ~,$~ ~~
+	END
+	SPRINT event_row ~| %SOURCE_FILE% | %event_message% | %event_location% | %event_data% | `%event_code%` | %event_consequence% |~
+	SPRINT event_file ~not-implemented~
+	PATCH_IF ~%event_kind%~ STRING_EQUAL ~file_error~ BEGIN
+		SPRINT event_file ~file-errors~
+	END
+	SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-%event_file%.md~
+	LPM ad_log_part
+	SPRINT event_table_part ~%log_part%~
+	SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-events.txt~
+	LPM ad_log_part
+	INNER_ACTION BEGIN
+		SILENT
+		APPEND_OUTER ~%event_table_part%~ ~%event_row%~ KEEP_CRLF
+		APPEND_OUTER ~%log_part%~ ~%event_columns%~ KEEP_CRLF
+		VERBOSE
 	END
 END
 

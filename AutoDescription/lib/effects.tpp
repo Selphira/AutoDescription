@@ -339,7 +339,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 		LPM ad_fx_substitute_111
 	END
 	// Valeurs lues des champs que des passes réécrivent ensuite (regroupements, opcodes 23, 143, 189),
-	// pour les journaux (ad_fx_data, lib/log.tpp), comme fx_parameter2_raw.
+	// pour les journaux (ad_event_data, lib/log.tpp), comme fx_parameter2_raw.
 	SET ~fx_parameter1_raw_%fx_id%~ = $fx_parameter1(~%fx_id%~)
 	SET ~fx_timing_raw_%fx_id%~ = $fx_timing(~%fx_id%~)
 	SET ~fx_duration_raw_%fx_id%~ = $fx_duration(~%fx_id%~)
