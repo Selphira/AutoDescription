@@ -424,6 +424,44 @@ def check_new_lib_conventions(report, definitions):
     print(f"  {len(new_files)} fichiers dans lib/, {names} fonctions ou macros")
 
 
+# Élément écrit par nom : SET/SPRINT ~t_%k%~, READ_* offset ~t_%k%~ (clé : variable ou nombre).
+WRITTEN_BY_NAME = re.compile(
+    r"\b(?:SET|SPRINT|TEXT_SPRINT|READ_(?:BYTE|SHORT|LONG|ASCII|SBYTE|SSHORT|SLONG)\s+(?:\([^()]*\)|[A-Za-z0-9_]+))"
+    r"\s+~([A-Za-z_][A-Za-z0-9_]*?)_(?:%[A-Za-z0-9_]+%|[0-9]+)~")
+ARRAY_WALK = re.compile(r"\b(PHP_EACH|SORT_ARRAY_INDICES|CLEAR_ARRAY|GET_OFFSET_ARRAY2?)\s+[~\"]?([A-Za-z_][A-Za-z0-9_]*)[~\"]?(?=\s)")
+ARRAY_RETURN = re.compile(r"\bRET_ARRAY\b(.*?)\b(?:BEGIN|END)\b", re.S)
+JOINED_ARRAY = re.compile(r"\barray_name\s*=\s*[~\"]([A-Za-z_][A-Za-z0-9_]*)[~\"]")
+
+
+def check_arrays_written_by_name(report):
+    """G11 : un tableau dont des éléments sont écrits par nom n'est jamais parcouru.
+
+    PHP_EACH, SORT_ARRAY_INDICES, CLEAR_ARRAY et RET_ARRAY ne voient pas ces éléments : un parcours
+    perdrait silencieusement des clés. ad_join (array_name) parcourt son tableau par PHP_EACH.
+    """
+    report.section("Tableaux écrits par nom, jamais parcourus")
+    files = [p for p in weidu_files() if in_engine(p)]
+    written = collections.defaultdict(set)
+    walked = []
+    for path in files:
+        no_comments, _ = strip_weidu(read_text(path))
+        for match in WRITTEN_BY_NAME.finditer(no_comments):
+            written[match.group(1)].add(f"{relative(path)}:{line_of(no_comments, match.start())}")
+        for match in ARRAY_WALK.finditer(no_comments):
+            walked.append((match.group(2), match.group(1), path, match.start(), no_comments))
+        for match in ARRAY_RETURN.finditer(no_comments):
+            for name in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", match.group(1)):
+                walked.append((name, "RET_ARRAY", path, match.start(), no_comments))
+        for match in JOINED_ARRAY.finditer(no_comments):
+            walked.append((match.group(1), "ad_join", path, match.start(), no_comments))
+    for name, command, path, position, text in walked:
+        if name in written:
+            first = sorted(written[name])[0]
+            report.add("ERREUR", f"{relative(path)}:{line_of(text, position)} : {command} sur {name}, "
+                       f"dont des éléments sont écrits par nom ({first})")
+    print(f"  {len(written)} tableaux écrits par nom, {len(walked)} parcours examinés")
+
+
 # ---------------------------------------------------------------------------------------------
 # Analyse syntaxique WeiDU
 
@@ -475,6 +513,7 @@ def main():
     check_catalog(report, definitions)
     check_opcode_includes(report)
     check_new_lib_conventions(report, definitions)
+    check_arrays_written_by_name(report)
     if not args.no_parse:
         if weidu.is_file():
             check_parse(report, weidu)
