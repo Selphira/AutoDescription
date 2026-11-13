@@ -657,16 +657,19 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 					SPRINT absorb_resref $fx_resource(~%absorb_id%~)
 					TO_UPPER absorb_resref
 					LPM ad_immunity_same_fields
-					PATCH_IF NOT VARIABLE_IS_SET $ad_inflicted_states(~%absorb_resref%~) BEGIN
-						LPF ad_spell_inflicted_state STR_VAR file = EVAL ~%absorb_resref%~ RET inflicted_state = state END
-						SET $ad_inflicted_states(~%absorb_resref%~) = inflicted_state
-					END
-					PATCH_IF absorb_same AND immunity_opcode > 0 AND $ad_inflicted_states(~%absorb_resref%~) == immunity_opcode
+					// L'état infligé, qui parcourt le sort et ses sous-sorts, est lu en dernier.
+					PATCH_IF absorb_same AND immunity_opcode > 0
 							AND $fx_dice_count(~%absorb_id%~) == $fx_dice_count(~%immunity_id%~)
 							AND $fx_dice_sides(~%absorb_id%~) == $fx_dice_sides(~%immunity_id%~)
 							AND $fx_power(~%absorb_id%~) == $fx_power(~%immunity_id%~)
 							AND (absorb_opcode == 206 OR $fx_resistance(~%absorb_id%~) == $fx_resistance(~%immunity_id%~)) BEGIN
-						SET $fx_consumed(~%absorb_id%~) = 1
+						PATCH_IF NOT VARIABLE_IS_SET $ad_inflicted_states(~%absorb_resref%~) BEGIN
+							LPF ad_spell_inflicted_state STR_VAR file = EVAL ~%absorb_resref%~ RET inflicted_state = state END
+							SET $ad_inflicted_states(~%absorb_resref%~) = inflicted_state
+						END
+						PATCH_IF $ad_inflicted_states(~%absorb_resref%~) == immunity_opcode BEGIN
+							SET $fx_consumed(~%absorb_id%~) = 1
+						END
 					END
 				END
 			END END
@@ -678,82 +681,90 @@ END
 // dégâts, sans mort, sans autre état (AD_INFLICTED_STATES, AD_INFLICTED_HARMS) ; 0 sinon. Une protection
 // contre ce sort ne protège alors que de cet état. Lu dans le sort, non dans une liste : les mods
 // modifient les sorts du jeu.
+// Parcours en profondeur par une pile : les enfants d'un sort sont empilés à l'envers de leur ordre de
+// première apparition, et un sort est marqué vu quand il est dépilé, s'il n'est pas au-delà de la
+// profondeur 4. Un sort vu d'abord à la profondeur 4 n'est donc pas développé ensuite à une profondeur
+// moindre.
+// inflicted_state : 0 tant qu'aucun état n'est vu, l'état s'il est le seul, -1 dès qu'un dégât, une mort
+// ou un second état est vu ; -1 ne peut plus changer, le parcours s'arrête là.
+// Pile et sorts vus sont écrits par nom (inflicted_stack_*_<n>, inflicted_seen_<sort>) : jamais parcourus.
 DEFINE_PATCH_FUNCTION ad_spell_inflicted_state
 	STR_VAR file = ~~
 	RET state
 BEGIN
-	CLEAR_ARRAY inflicted_opcodes
-	CLEAR_ARRAY inflicted_seen
-	LPF ad_collect_spell_opcodes STR_VAR file ext = ~spl~ RET_ARRAY inflicted_opcodes inflicted_seen END
-	SET state = 0
-	SET harmful = 0
-	PHP_EACH inflicted_opcodes AS inflicted_opcode => _ BEGIN
-		PATCH_IF VARIABLE_IS_SET $AD_INFLICTED_HARMS(~%inflicted_opcode%~) BEGIN
-			SET harmful = 1
-		END
-		ELSE PATCH_IF VARIABLE_IS_SET $AD_INFLICTED_STATES(~%inflicted_opcode%~) BEGIN
-			SET inflicted_state = $AD_INFLICTED_STATES(~%inflicted_opcode%~)
-			SET state = (state == 0 OR state == inflicted_state) ? inflicted_state : 0 - 1
+	SET inflicted_state = 0
+	SPRINT inflicted_stack_file_0 ~%file%~
+	SPRINT inflicted_stack_ext_0 ~spl~
+	SET inflicted_stack_depth_0 = 0
+	SET inflicted_stack_size = 1
+	WHILE inflicted_stack_size > 0 AND inflicted_state >= 0 BEGIN
+		SET inflicted_stack_size -= 1
+		SPRINT node_file $inflicted_stack_file(~%inflicted_stack_size%~)
+		SPRINT node_ext $inflicted_stack_ext(~%inflicted_stack_size%~)
+		SET node_depth = $inflicted_stack_depth(~%inflicted_stack_size%~)
+		TO_LOWER node_file
+		PATCH_IF node_depth <= 4 AND NOT (~%node_file%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $inflicted_seen(~%node_file%.%node_ext%~) AND FILE_EXISTS_IN_GAME ~%node_file%.%node_ext%~ BEGIN
+			SET ~inflicted_seen_%node_file%.%node_ext%~ = 1
+			LPM ad_inflicted_read_node
+			SET child_count = 0
+			PHP_EACH inflicted_children AS child_resref => child_ext BEGIN
+				SPRINT ~inflicted_child_file_%child_count%~ ~%child_resref%~
+				SPRINT ~inflicted_child_ext_%child_count%~ ~%child_ext%~
+				SET child_count += 1
+			END
+			FOR (child_index = child_count - 1; child_index >= 0; --child_index) BEGIN
+				SPRINT ~inflicted_stack_file_%inflicted_stack_size%~ $inflicted_child_file(~%child_index%~)
+				SPRINT ~inflicted_stack_ext_%inflicted_stack_size%~ $inflicted_child_ext(~%child_index%~)
+				SET ~inflicted_stack_depth_%inflicted_stack_size%~ = node_depth + 1
+				SET inflicted_stack_size += 1
+			END
 		END
 	END
-	PATCH_IF harmful OR state < 0 BEGIN
-		SET state = 0
-	END
+	SET state = inflicted_state < 0 ? 0 : inflicted_state
 END
 
-DEFINE_PATCH_FUNCTION ad_collect_spell_opcodes
-	INT_VAR depth = 0
-	STR_VAR file = ~~ ext = ~spl~
-	RET_ARRAY inflicted_opcodes inflicted_seen
-BEGIN
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY inflicted_opcodes BEGIN END
-	PATCH_DEFINE_ASSOCIATIVE_ARRAY inflicted_seen BEGIN END
-	TO_LOWER file
-	PATCH_IF depth <= 4 AND NOT (~%file%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $inflicted_seen(~%file%.%ext%~) AND FILE_EXISTS_IN_GAME ~%file%.%ext%~ BEGIN
-		SET $inflicted_seen(~%file%.%ext%~) = 1
-		CLEAR_ARRAY inflicted_children
-		INNER_PATCH_FILE ~%file%.%ext%~ BEGIN
-			CLEAR_ARRAY inflicted_ranges
-			PATCH_IF ~%ext%~ STRING_EQUAL ~eff~ AND BUFFER_LENGTH >= 0x38 BEGIN
-				READ_LONG 0x10 child_opcode
-				READ_ASCII 0x30 child_resref (8) NULL
-				LPM ad_inflicted_add
-			END
-			ELSE PATCH_IF ~%ext%~ STRING_EQUAL ~spl~ AND BUFFER_LENGTH >= 0x72 BEGIN
-				READ_LONG 0x64 header_offset
-				READ_SHORT 0x68 header_count
-				READ_LONG 0x6a effect_offset
-				READ_SHORT 0x6e range_index
-				READ_SHORT 0x70 range_count
-				SET $inflicted_ranges(~%range_index%~) = range_count
-				FOR (header = 0; header < header_count AND header_offset + header * 0x28 + 0x22 <= BUFFER_LENGTH; ++header) BEGIN
-					READ_SHORT (header_offset + header * 0x28 + 0x1e) range_count
-					READ_SHORT (header_offset + header * 0x28 + 0x20) range_index
-					SET $inflicted_ranges(~%range_index%~) = range_count
-				END
-				PHP_EACH inflicted_ranges AS range_index => range_count BEGIN
-					FOR (inflicted_effect = range_index; inflicted_effect < range_index + range_count AND effect_offset + (inflicted_effect + 1) * 0x30 <= BUFFER_LENGTH; ++inflicted_effect) BEGIN
-						READ_SHORT (effect_offset + inflicted_effect * 0x30) child_opcode
-						READ_ASCII (effect_offset + inflicted_effect * 0x30 + 0x14) child_resref (8) NULL
-						LPM ad_inflicted_add
-					END
-				END
-			END
+// Opcodes et enfants (inflicted_children, dans l'ordre de première apparition) du sort ou de l'EFF
+// node_file.node_ext.
+DEFINE_PATCH_MACRO ad_inflicted_read_node BEGIN
+	CLEAR_ARRAY inflicted_children
+	INNER_PATCH_FILE ~%node_file%.%node_ext%~ BEGIN
+		CLEAR_ARRAY inflicted_ranges
+		PATCH_IF ~%node_ext%~ STRING_EQUAL ~eff~ AND BUFFER_LENGTH >= 0x38 BEGIN
+			READ_LONG 0x10 child_opcode
+			READ_ASCII 0x30 child_resref (8) NULL
+			LPM ad_inflicted_add
 		END
-		PHP_EACH inflicted_children AS child_resref => child_ext BEGIN
-			LPF ad_collect_spell_opcodes INT_VAR depth = depth + 1 STR_VAR file = EVAL ~%child_resref%~ ext = EVAL ~%child_ext%~ RET_ARRAY child_opcodes = inflicted_opcodes child_seen = inflicted_seen END
-			PHP_EACH child_opcodes AS child_key => _ BEGIN
-				SET $inflicted_opcodes(~%child_key%~) = 1
+		ELSE PATCH_IF ~%node_ext%~ STRING_EQUAL ~spl~ AND BUFFER_LENGTH >= 0x72 BEGIN
+			READ_LONG 0x64 header_offset
+			READ_SHORT 0x68 header_count
+			READ_LONG 0x6a effect_offset
+			READ_SHORT 0x6e range_index
+			READ_SHORT 0x70 range_count
+			SET $inflicted_ranges(~%range_index%~) = range_count
+			FOR (header = 0; header < header_count AND header_offset + header * 0x28 + 0x22 <= BUFFER_LENGTH; ++header) BEGIN
+				READ_SHORT (header_offset + header * 0x28 + 0x1e) range_count
+				READ_SHORT (header_offset + header * 0x28 + 0x20) range_index
+				SET $inflicted_ranges(~%range_index%~) = range_count
 			END
-			PHP_EACH child_seen AS child_key => _ BEGIN
-				SET $inflicted_seen(~%child_key%~) = 1
+			PHP_EACH inflicted_ranges AS range_index => range_count BEGIN
+				FOR (inflicted_effect = range_index; inflicted_state >= 0 AND inflicted_effect < range_index + range_count AND effect_offset + (inflicted_effect + 1) * 0x30 <= BUFFER_LENGTH; ++inflicted_effect) BEGIN
+					READ_SHORT (effect_offset + inflicted_effect * 0x30) child_opcode
+					READ_ASCII (effect_offset + inflicted_effect * 0x30 + 0x14) child_resref (8) NULL
+					LPM ad_inflicted_add
+				END
 			END
 		END
 	END
 END
 
 DEFINE_PATCH_MACRO ad_inflicted_add BEGIN
-	SET $inflicted_opcodes(~%child_opcode%~) = 1
+	PATCH_IF VARIABLE_IS_SET $AD_INFLICTED_HARMS(~%child_opcode%~) BEGIN
+		SET inflicted_state = 0 - 1
+	END
+	ELSE PATCH_IF inflicted_state >= 0 AND VARIABLE_IS_SET $AD_INFLICTED_STATES(~%child_opcode%~) BEGIN
+		SET child_state = $AD_INFLICTED_STATES(~%child_opcode%~)
+		SET inflicted_state = (inflicted_state == 0 OR inflicted_state == child_state) ? child_state : 0 - 1
+	END
 	PATCH_IF NOT (~%child_resref%~ STRING_EQUAL ~~) BEGIN
 		PATCH_IF child_opcode == 146 OR child_opcode == 148 OR child_opcode == 326 BEGIN
 			SPRINT $inflicted_children(~%child_resref%~) ~spl~
