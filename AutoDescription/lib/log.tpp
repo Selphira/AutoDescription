@@ -73,21 +73,16 @@ BEGIN
 		VERBOSE
 	END
 	PRINT "Nouveau moteur : %cov_todo_count% opcodes a prendre en charge, %cov_unknown_count% opcodes inconnus (AutoDescription/log/%log_name%-opcodes.txt)"
-	OUTER_SET event_file_errors = 0
-	OUTER_SET event_not_implemented = 0
-	OUTER_SET event_ignored = 0
+	// Les compteurs ne peuvent pas être tenus par ad_log_event : c'est une fonction, appelée depuis
+	// d'autres fonctions, et rien n'en remonte hors de ses RET. COUNT_REGEXP_INSTANCES compte sans
+	// réécrire le fichier, contrairement à un REPLACE_EVALUATE ligne par ligne (6,4 s contre 0,03 s
+	// pour 9 718 lignes).
 	COPY - ~%MOD_FOLDER%/log/%log_name%-events.txt~ ~override~
-		REPLACE_EVALUATE ~^[^%TAB%%MNL%%LNL%]+%TAB%\([a-z_]+\)%TAB%[^%TAB%%MNL%%LNL%]*%TAB%\([a-z]+\)~ BEGIN
-			PATCH_IF NOT (~%MATCH2%~ STRING_EQUAL ~refused~) BEGIN
-				SET event_ignored += 1
-			END
-			ELSE PATCH_IF ~%MATCH1%~ STRING_EQUAL ~file_error~ BEGIN
-				SET event_file_errors += 1
-			END
-			ELSE BEGIN
-				SET event_not_implemented += 1
-			END
-		END ~~
+		COUNT_REGEXP_INSTANCES CASE_SENSITIVE ~^[^%TAB%%MNL%%LNL%]+%TAB%[a-z_]+%TAB%[^%TAB%%MNL%%LNL%]*%TAB%[a-z]+~ event_count
+		COUNT_REGEXP_INSTANCES CASE_SENSITIVE ~^[^%TAB%%MNL%%LNL%]+%TAB%[a-z_]+%TAB%[^%TAB%%MNL%%LNL%]*%TAB%refused%TAB%~ event_refused
+		COUNT_REGEXP_INSTANCES CASE_SENSITIVE ~^[^%TAB%%MNL%%LNL%]+%TAB%file_error%TAB%[^%TAB%%MNL%%LNL%]*%TAB%refused%TAB%~ event_file_errors
+		SET event_ignored = event_count - event_refused
+		SET event_not_implemented = event_refused - event_file_errors
 	PRINT "Nouveau moteur : %event_file_errors% ressources non decrites pour une erreur dans leurs fichiers, %event_ignored% effets invalides ou douteux (AutoDescription/log/%log_name%-file-errors.md), %event_not_implemented% ressources non decrites pour un cas non pris en charge (AutoDescription/log/%log_name%-not-implemented.md)"
 END
 
