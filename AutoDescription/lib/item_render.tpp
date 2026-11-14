@@ -27,17 +27,7 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT IS_EE BEGIN
 		LPF ad_refusal STR_VAR reason = ~not_implemented:usability~ message = ~usability is only written on classic games: not supported yet~ RET render_missing = refusal END
 	END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_application_support
-	END
-	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			LPM ad_opcode_is_described
-			PATCH_IF opcode_described BEGIN
-				LPM ~ad_op_%render_opcode%_support~
-			END
-		END
-	END
+	LPM ad_render_support
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		PATCH_TIME ~step:cross_groups~ BEGIN
 			LPM ad_cross_groups
@@ -45,31 +35,13 @@ DEFINE_PATCH_MACRO ad_item_render_support BEGIN
 	END
 END
 
-// Un opcode inconnu (absent du catalogue ou du jeu courant) n'est jamais décrit.
-DEFINE_PATCH_MACRO ad_opcode_is_described BEGIN
-	SET opcode_described = 0
-	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%render_opcode%~) BEGIN
-		SPRINT opcode_status $AD_OPCODE_STATUS(~%render_opcode%~)
-		SET opcode_described = $AD_OPCODE_AVAILABLE(~%render_opcode%~) AND (~%opcode_status%~ STRING_EQUAL ~DESCRIBED~)
-	END
-END
-
 DEFINE_PATCH_MACRO ad_item_render BEGIN
 	LPF ad_strip_technical_part STR_VAR text = ~%original_description%~ RET description = text END
 	LPM ad_lines_reset
 	LPM ad_item_equipped_lines
-	LPM ad_recursion_describe_pending
-	LPM ad_derived_lines
-	LPM ad_fx_ids_late_order
 	// fx_opcode_count est trié (ad_set_coverage) : l'ordre des ajouts ne dépend pas du fichier.
-	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-		LPM ad_opcode_is_described
-		PATCH_IF opcode_described BEGIN
-			PATCH_TIME ~step:lines~ BEGIN
-				LPM ~ad_op_%render_opcode%_lines~
-			END
-		END
-	END
+	SPRINT render_order ~fx_opcode_count~
+	LPM ad_render_lines
 	LPM ad_item_armor_lines
 	PATCH_IF item_has_combat BEGIN
 		LPM ad_item_combat_lines

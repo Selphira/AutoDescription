@@ -294,6 +294,7 @@ ACTION_IF !VARIABLE_IS_SET AD_ENGINE_LOADED BEGIN
 	INCLUDE ~%MOD_FOLDER%/lib/opcodes/362.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/opcodes/367.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/groups.tpp~
+	INCLUDE ~%MOD_FOLDER%/lib/render.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/item_combat.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/item_charged.tpp~
 	INCLUDE ~%MOD_FOLDER%/lib/item_render.tpp~

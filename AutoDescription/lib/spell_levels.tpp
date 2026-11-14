@@ -26,35 +26,22 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 		END
 	END
 	LPM ad_lines_reset
-	LPM ad_recursion_describe_pending
-	LPM ad_derived_lines
-	SET statistics_opcodes = 0
+	// Clés dans l'ordre de leur premier ajout, que PHP_EACH suit. Les sous-ressources et les effets
+	// dérivés, décrits avant (ad_render_lines), ne changent ni les effets restants ni leurs opcodes.
 	FOR (statistics_n = 0; statistics_n < $spell_fx_count(~0~); ++statistics_n) BEGIN
 		SET statistics_id = $spell_fx_0(~%statistics_n%~)
 		SET statistics_opcode = $fx_opcode(~%statistics_id%~)
-		PATCH_IF NOT VARIABLE_IS_SET $statistics_listed(~%statistics_opcode%~) BEGIN
-			SET $statistics_listed(~%statistics_opcode%~) = 1
-			SET $statistics_order(~%statistics_opcodes%~) = statistics_opcode
-			SET statistics_opcodes += 1
+		PATCH_IF NOT VARIABLE_IS_SET $statistics_order(~%statistics_opcode%~) BEGIN
+			SET $statistics_order(~%statistics_opcode%~) = 1
 		END
 	END
 	PHP_EACH fx_opcode_count AS statistics_opcode => _ BEGIN
-		PATCH_IF NOT VARIABLE_IS_SET $statistics_listed(~%statistics_opcode%~) BEGIN
-			SET $statistics_listed(~%statistics_opcode%~) = 1
-			SET $statistics_order(~%statistics_opcodes%~) = statistics_opcode
-			SET statistics_opcodes += 1
+		PATCH_IF NOT VARIABLE_IS_SET $statistics_order(~%statistics_opcode%~) BEGIN
+			SET $statistics_order(~%statistics_opcode%~) = 1
 		END
 	END
-	LPM ad_fx_ids_late_order
-	FOR (statistics_k = 0; statistics_k < statistics_opcodes; ++statistics_k) BEGIN
-		SET render_opcode = $statistics_order(~%statistics_k%~)
-		LPM ad_opcode_is_described
-		PATCH_IF opcode_described BEGIN
-			PATCH_TIME ~step:lines~ BEGIN
-				LPM ~ad_op_%render_opcode%_lines~
-			END
-		END
-	END
+	SPRINT render_order ~statistics_order~
+	LPM ad_render_lines
 	SPRINT render_missing ~%render_late_missing%~
 	FOR (statistics_s = 0; statistics_s < statistics_sections AND ~%render_missing%~ STRING_EQUAL ~~; ++statistics_s) BEGIN
 		SPRINT prob_section $statistics_section(~%statistics_s%~)

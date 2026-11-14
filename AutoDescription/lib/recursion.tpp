@@ -998,14 +998,14 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
 	SPRINT sub_todo ~~
 	SPRINT sub_versus_opcode ~~
-	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-		PATCH_IF ctx_versus_set AND VARIABLE_IS_SET $AD_OPCODES_READ_VERSUS(~%render_opcode%~) BEGIN
-			SPRINT sub_versus_opcode ~%render_opcode%~
+	PHP_EACH fx_opcode_count AS sub_scan_opcode => _ BEGIN
+		PATCH_IF ctx_versus_set AND VARIABLE_IS_SET $AD_OPCODES_READ_VERSUS(~%sub_scan_opcode%~) BEGIN
+			SPRINT sub_versus_opcode ~%sub_scan_opcode%~
 		END
-		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%render_opcode%~) BEGIN
-			SPRINT sub_status $AD_OPCODE_STATUS(~%render_opcode%~)
-			PATCH_IF $AD_OPCODE_AVAILABLE(~%render_opcode%~) AND (~%sub_status%~ STRING_EQUAL ~TODO~) BEGIN
-				SPRINT sub_todo ~%sub_todo% %render_opcode%~
+		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%sub_scan_opcode%~) BEGIN
+			SPRINT sub_status $AD_OPCODE_STATUS(~%sub_scan_opcode%~)
+			PATCH_IF $AD_OPCODE_AVAILABLE(~%sub_scan_opcode%~) AND (~%sub_status%~ STRING_EQUAL ~TODO~) BEGIN
+				SPRINT sub_todo ~%sub_todo% %sub_scan_opcode%~
 			END
 		END
 	END
@@ -1020,17 +1020,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 		LPF ad_refusal STR_VAR reason = ~not_implemented:missing_opcodes:%sub_todo%~ message = ~opcodes not supported yet: %sub_todo%~ RET render_missing = refusal END
 	END
-	ELSE BEGIN
-		LPM ad_application_support
-	END
-	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			LPM ad_opcode_is_described
-			PATCH_IF opcode_described BEGIN
-				LPM ~ad_op_%render_opcode%_support~
-			END
-		END
-	END
+	LPM ad_render_support
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		PATCH_TIME ~step:cross_groups~ BEGIN
 			LPM ad_cross_groups
@@ -1052,17 +1042,8 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_lines_reset
-		LPM ad_recursion_describe_pending
-		LPM ad_derived_lines
-		LPM ad_fx_ids_late_order
-		PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-			LPM ad_opcode_is_described
-			PATCH_IF opcode_described BEGIN
-				PATCH_TIME ~step:lines~ BEGIN
-					LPM ~ad_op_%render_opcode%_lines~
-				END
-			END
-		END
+		SPRINT render_order ~fx_opcode_count~
+		LPM ad_render_lines
 		SPRINT render_missing ~%render_late_missing%~
 	END
 	// Lignes probables d'un sort : regroupées par plage comme celles des capacités de combat (ancien

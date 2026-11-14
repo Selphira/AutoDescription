@@ -52,10 +52,9 @@ END
 DEFINE_PATCH_MACRO ad_item_charged_support BEGIN
 	LPM ad_item_charged_load
 	FOR (charged_fx = 0; charged_fx < fx_count AND NOT item_has_combat; ++charged_fx) BEGIN
-		SET render_opcode = $fx_opcode(~%charged_fx%~)
+		SET charged_fx_opcode = $fx_opcode(~%charged_fx%~)
 		SET charged_h = $fx_header(~%charged_fx%~)
-		LPM ad_opcode_is_described
-		PATCH_IF opcode_described AND charged_h >= 0 BEGIN
+		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%charged_fx_opcode%~) AND charged_h >= 0 BEGIN
 			PATCH_IF $charged_other(~%charged_h%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = charged_fx STR_VAR reason = ~not_implemented:headers~ message = ~ability %charged_h% is neither a charged ability nor described as one~ RET render_missing = refusal END
 			END
@@ -111,11 +110,10 @@ DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 		SET charged_global_valid = 1
 		SET charged_timing = 0 - 1
 		FOR (charged_fx = 0; charged_fx < fx_count; ++charged_fx) BEGIN
-			SET render_opcode = $fx_opcode(~%charged_fx%~)
+			SET charged_fx_opcode = $fx_opcode(~%charged_fx%~)
 			SPRINT charged_scope $fx_scope(~%charged_fx%~)
-			LPM ad_opcode_is_described
-			PATCH_IF opcode_described AND render_opcode != 146 AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
-				SPRINT charged_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%charged_fx_opcode%~) AND charged_fx_opcode != 146 AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
+				SPRINT charged_duration_kind $AD_OPCODE_DURATION(~%charged_fx_opcode%~)
 				SET charged_fx_timing = $fx_timing(~%charged_fx%~)
 				PATCH_IF NOT (~%charged_duration_kind%~ STRING_EQUAL ~IGNORED~)
 						AND (charged_fx_timing == TIMING_duration OR charged_fx_timing == TIMING_duration_ticks) BEGIN

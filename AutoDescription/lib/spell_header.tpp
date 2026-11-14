@@ -54,17 +54,7 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 			SET $fx_dropped(~%header_id%~) = 1
 		END
 	END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-		LPM ad_application_support
-	END
-	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
-		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			LPM ad_opcode_is_described
-			PATCH_IF opcode_described BEGIN
-				LPM ~ad_op_%render_opcode%_support~
-			END
-		END
-	END
+	LPM ad_render_support
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND spell_self_target BEGIN
 		FOR (header_id = 0; header_id < fx_count; ++header_id) BEGIN
 			PATCH_IF $fx_effective_target(~%header_id%~) == TARGET_FX_preset BEGIN

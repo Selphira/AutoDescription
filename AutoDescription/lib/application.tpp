@@ -18,13 +18,12 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 		LPM ad_application_series_support
 	END
 	FOR (app_id = 0; app_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++app_id) BEGIN
-		SET render_opcode = $fx_opcode(~%app_id%~)
-		LPM ad_opcode_is_described
-		PATCH_IF opcode_described AND NOT $fx_consumed(~%app_id%~) BEGIN
+		SET app_fx_opcode = $fx_opcode(~%app_id%~)
+		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%app_fx_opcode%~) AND NOT $fx_consumed(~%app_id%~) BEGIN
 			SPRINT app_block $fx_block(~%app_id%~)
 			SPRINT app_timing_kind $fx_timing_kind(~%app_id%~)
 			PATCH_IF ~%app_block%~ STRING_EQUAL ~equipped~ BEGIN
-				SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+				SPRINT app_duration_kind $AD_OPCODE_DURATION(~%app_fx_opcode%~)
 				// Effet d'équipement permanent, même après la mort : l'ancien moteur l'écrit comme un effet tant
 				// que l'objet est équipé quand la durée de l'opcode n'est jamais affichée, ou jamais dite
 				// permanente (get_duration_value, opcodes_cant_be_permanent : sort lancé à l'équipement).
@@ -43,7 +42,7 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 				// Autre durée, ou effet probable : l'ancien moteur l'écrit comme un effet d'en-tête, avec sa
 				// probabilité et sa durée (« 1 % de chances de… », « pendant 1 tour », « de manière permanente »).
 				ELSE PATCH_IF NOT app_equipped_timing
-						OR ($fx_probability(~%app_id%~) != 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%render_opcode%~)) BEGIN
+						OR ($fx_probability(~%app_id%~) != 100 AND NOT VARIABLE_IS_SET $AD_OPCODES_SUB_PROBABILITY(~%app_fx_opcode%~)) BEGIN
 					LPM ad_application_ability_support
 				END
 			END
@@ -52,7 +51,7 @@ DEFINE_PATCH_MACRO ad_application_support BEGIN
 				LPM ad_application_ability_support
 			END
 			ELSE BEGIN
-				LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:effect_kind~ message = ~effect of this opcode outside an equipped block or an ability not supported~ RET render_missing = refusal END
+				LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%app_fx_opcode%:effect_kind~ message = ~effect of this opcode outside an equipped block or an ability not supported~ RET render_missing = refusal END
 			END
 		END
 	END
@@ -76,10 +75,9 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 	SET series_possible = 0
 	FOR (series_id = 0; series_id < fx_count; ++series_id) BEGIN
 		SET series_opcode = $fx_opcode(~%series_id%~)
-		SET render_opcode = series_opcode
-		LPM ad_opcode_is_described
-		SET $fx_series_compared(~%series_id%~) = NOT opcode_described
-		SET series_possible = series_possible OR (opcode_described AND $fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
+		SET series_described = VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%series_opcode%~)
+		SET $fx_series_compared(~%series_id%~) = NOT series_described
+		SET series_possible = series_possible OR (series_described AND $fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
 	END
 	SET same_ignored = AD_SAME_TIMING
 	FOR (series_id = 0; series_possible AND series_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++series_id) BEGIN
@@ -157,7 +155,7 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	SET app_effective_target = $fx_effective_target(~%app_id%~)
 	SET app_timing = $fx_timing(~%app_id%~)
 	SET app_duration = $fx_duration(~%app_id%~)
-	SPRINT app_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+	SPRINT app_duration_kind $AD_OPCODE_DURATION(~%app_fx_opcode%~)
 	// En-tête d'un sort seul (lib/spell_header.tpp) : seuls comptent les effets gardés et leurs
 	// champs, pas leur phrase.
 	PATCH_IF support_header_only BEGIN

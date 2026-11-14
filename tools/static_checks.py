@@ -318,7 +318,7 @@ CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 CATALOG_DURATIONS = ("SHOWN", "IGNORED", "HIDDEN", "NOT_PERMANENT", "NOT_AFTER_DEATH")
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
-# Macros appelées par le rendu pour chaque opcode DESCRIBED (lib/item_render.tpp).
+# Macros appelées par le rendu pour chaque opcode DESCRIBED (lib/render.tpp).
 NEW_OPCODE_ROLES = ("support", "lines")
 
 
@@ -473,8 +473,7 @@ CONTEXT_OWNERS = {
     "support_spell": (),
     "support_header_only": (),
     "kind": (),
-    "render_opcode": ("application.tpp", "item_charged.tpp", "item_render.tpp", "recursion.tpp",
-                      "spell_header.tpp", "spell_levels.tpp"),
+    "render_opcode": ("render.tpp",),
     "description": ("application.tpp", "item_charged.tpp", "item_combat.tpp", "item_render.tpp", "lines.tpp",
                     "spell_header.tpp", "spell_levels.tpp"),
     "ctx_": ("recursion.tpp", "spell_levels.tpp"),
