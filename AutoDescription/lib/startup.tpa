@@ -71,7 +71,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ITEM_REQUIREMENTS BEGIN
 	42 => ~%ITM_min_charisma%~
 END
 
-// Champs d'un effet du magasin (lib/effects.tpp), dans l'ordre des journaux.
+// Champs d'un effet du magasin (lib/effects.tpp), dans l'ordre des journaux ; delay_ticks et
+// duration_ticks sont calculés par le journal (ad_fx_ticks, lib/normalize.tpp).
 ACTION_DEFINE_ARRAY AD_FX_FIELDS BEGIN
 	~block~ ~header~ ~position~ ~opcode~ ~target~ ~power~ ~parameter1~ ~parameter2~ ~timing~
 	~resistance~ ~duration~ ~probability1~ ~probability2~ ~resource~ ~dice_count~ ~dice_sides~

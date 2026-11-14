@@ -128,8 +128,6 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_READ_VERSUS BEGIN
 	344 => 1
 END
 
-// Opcodes dont les lignes ne disent jamais « non cumulatif » (ancien opcodes_ignore_not_cumulable,
-// application d'un 321 sur la ressource elle-même, lib/opcodes/321.tpp).
 // Opcodes que l'en-tête d'un sort ne compte pas (durée, jet de sauvegarde, dissipation, résistance à
 // la magie) : leurs lignes gardent leur durée, sauf si c'est la durée unique de l'en-tête
 // (ad_application_duration, lib/application.tpp ; ancien opcodes_ignored_by_spell_header).
@@ -138,6 +136,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_HEADER_IGNORED BEGIN
 	279 => 1
 END
 
+// Opcodes dont les lignes ne disent jamais « non cumulatif » (ancien opcodes_ignore_not_cumulable,
+// application d'un 321 sur la ressource elle-même, lib/opcodes/321.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN
 	11  => 1
 	12  => 1
@@ -186,19 +186,6 @@ END
 // secondes écrites comme une durée limitée (ancien opcode_self_217 : 5 rounds).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_FIXED_DURATION BEGIN
 	217 => 30 // inconscience
-END
-
-// Opcodes dont les lignes réunissent des effets sans tenir compte de leur portée (lib/normalize.tpp,
-// fx_scope) : leurs effets d'en-tête ne sont pas encore pris en charge (ad_application_support).
-ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EQUIPPED_ONLY BEGIN
-END
-
-// Opcodes pas encore pris en charge (TODO) dont l'ancien moteur écarte, remplace ou réunit des effets
-// avant de les décrire (opcode_<N>_is_valid, _replace, _group ou _post_group) : sans leur prise en
-// charge, on ne sait pas quels effets il garde, ni donc l'en-tête d'un sort qui en a
-// (lib/spell_header.tpp). Un opcode qui passe à DESCRIBED sort de cette liste.
-ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_OLD_FILTERED BEGIN
-	183 => 1
 END
 
 // Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien

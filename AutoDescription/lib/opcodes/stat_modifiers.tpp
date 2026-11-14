@@ -41,28 +41,19 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 		SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
 		SET stat_exceptions = $fx_external(~%stat_id%~) ? 0 - 1 : $fx_exception_count(~%stat_id%~)
 		SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
+		// Effets du fichier séparés par une exception de cible : distincts (ancien opcode_group_by_target).
 		SET key_id = stat_id
 		LPM ad_fx_line_key
-		SPRINT stat_versus ~%stat_versus% %stat_exceptions% %fx_line_key%~
-		SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = 0
+		SPRINT stat_key ~%stat_scope%_%stat_value%_%stat_mode%_%stat_subject%_%stat_versus% %stat_exceptions% %fx_line_key%~
+		SPRINT ~fx_stat_key_%stat_id%~ ~%stat_key%~
+		SET $stat_seen(~%stat_key%~) = 0
 	END
 	// Un effet déjà écarté sans rien écrire (fx_dropped) n'est ni validé ni compté.
 	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%stat_id%~) BEGIN
 			SET stat_value = $fx_parameter1(~%stat_id%~)
 			SET stat_mode = $fx_parameter2(~%stat_id%~)
-			SPRINT stat_scope $fx_scope(~%stat_id%~)
-			LPM ad_stat_modifier_subject
-			SET stat_versus_file = $fx_versus_file(~%stat_id%~)
-			SET stat_versus_value = $fx_versus_value(~%stat_id%~)
-			SET stat_versus_inner_file = $fx_versus_inner_file(~%stat_id%~)
-			SET stat_versus_inner_value = $fx_versus_inner_value(~%stat_id%~)
-			SET stat_exceptions = $fx_external(~%stat_id%~) ? 0 - 1 : $fx_exception_count(~%stat_id%~)
-			SPRINT stat_versus ~%stat_versus_file% %stat_versus_value% %stat_versus_inner_file% %stat_versus_inner_value%~
-			// Effets du fichier séparés par une exception de cible : distincts (ancien opcode_group_by_target).
-			SET key_id = stat_id
-			LPM ad_fx_line_key
-			SPRINT stat_versus ~%stat_versus% %stat_exceptions% %fx_line_key%~
+			SPRINT stat_key $fx_stat_key(~%stat_id%~)
 			PATCH_IF stat_mode == 3 AND IS_EE AND (~%stat_mode_3%~ STRING_EQUAL ~unsupported~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode%stat_opcode%:mode3~ message = ~mode 3 not supported for this opcode~ RET render_missing = refusal END
 			END
@@ -84,8 +75,8 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			// elle-même), ne compte qu'une fois (ancien merge_duplicate_effects). Un effet d'un 177 contre
 			// un type de créature n'est pas identique à celui qui vaut pour tous. L'en-tête d'un sort compte
 			// les deux.
-			ELSE PATCH_IF $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) AND NOT support_header_only BEGIN
-				SET stat_first = $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) - 1
+			ELSE PATCH_IF $stat_seen(~%stat_key%~) AND NOT support_header_only BEGIN
+				SET stat_first = $stat_seen(~%stat_key%~) - 1
 				SET $fx_consumed(~%stat_id%~) = 1
 				// Sans exception de cible : l'ancre ferait passer ses exceptions pour celles du doublon.
 				PATCH_IF $fx_exception_count(~%stat_id%~) == 0 BEGIN
@@ -101,7 +92,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SET $stat_seen(~%stat_scope%~ ~%stat_value%~ ~%stat_mode%~ ~%stat_subject%~ ~%stat_versus%~) = stat_id + 1
+				SET $stat_seen(~%stat_key%~) = stat_id + 1
 			END
 		END
 	END

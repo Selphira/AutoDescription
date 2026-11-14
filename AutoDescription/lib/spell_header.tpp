@@ -54,15 +54,6 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 			SET $fx_dropped(~%header_id%~) = 1
 		END
 	END
-	PHP_EACH fx_opcode_count AS header_opcode => _ BEGIN
-		PATCH_IF VARIABLE_IS_SET $AD_OPCODES_OLD_FILTERED(~%header_opcode%~) AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			PHP_EACH ~fx_ids_%header_opcode%~ AS _ => header_id BEGIN
-				PATCH_IF NOT $fx_consumed(~%header_id%~) AND ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-					LPF ad_refusal INT_VAR fx_id = header_id STR_VAR reason = ~not_implemented:spell_header:opcode%header_opcode%~ message = ~opcode %header_opcode% not supported yet, whose effects the old engine may drop or merge before reading the header~ RET render_missing = refusal END
-				END
-			END
-		END
-	END
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		LPM ad_application_support
 	END

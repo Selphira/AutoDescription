@@ -168,9 +168,6 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 			LPM ad_application_drop
 		END
 	END
-	ELSE PATCH_IF VARIABLE_IS_SET $AD_OPCODES_EQUIPPED_ONLY(~%render_opcode%~) BEGIN
-		LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:opcode%render_opcode%:ability~ message = ~opcode %render_opcode% is only described as an equipped effect~ RET render_missing = refusal END
-	END
 	// Plage vide : l'effet n'a jamais lieu.
 	ELSE PATCH_IF $fx_probability(~%app_id%~) <= 0 BEGIN
 		SET drop_id = app_id
@@ -216,7 +213,6 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		SET app_timing = TIMING_permanent
 		SET $fx_timing(~%app_id%~) = TIMING_permanent
 		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
-		SET $fx_delay_ticks(~%app_id%~) = 0
 	END
 	// Timings 6 (Limited after duration) et 7 (Permanent after duration) appliqués directement : dès que
 	// le temps de jeu dépasse la durée lue en ticks, aussitôt pour toute durée réaliste, le 7 devient
@@ -228,7 +224,6 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 		SET app_timing = TIMING_permanent
 		SET $fx_timing(~%app_id%~) = TIMING_permanent
 		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
-		SET $fx_delay_ticks(~%app_id%~) = 0
 	END
 	ELSE PATCH_IF app_timing == 6 AND (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 		SET app_timing = TIMING_duration

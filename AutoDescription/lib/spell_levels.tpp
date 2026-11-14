@@ -714,7 +714,6 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 		END
 		SPRINT $fx_level_value(~%level_id%~) ~%level_value_text%~
 		SPRINT $fx_level_duration(~%level_id%~) ~%level_duration_text%~
-		SET $fx_level_progression(~%level_id%~) = 1
 	END
 END
 
@@ -1026,21 +1025,6 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					END
 				END
 				SET $level_emitted(~%level_a%~) = 1
-				// Effet de tous les niveaux trouvé ici : l'ancien group_spell_effects_by_duration (durée
-				// constante) l'ajoute aux effets communs avec les progressions de durée (SPWI613 du jeu de
-				// base, ordre des lignes dans lib/application.tpp).
-				PATCH_IF level_h == 0 AND level_to == 99 AND fx_header_count > 1 BEGIN
-					SET level_id = $level_id(~%level_a%~)
-					SET $fx_level_chained(~%level_id%~) = 1
-					PATCH_IF level_opcode == 518 BEGIN
-						SET level_derived = $level_derived(~%level_a%~)
-						PHP_EACH fx_ids_206 AS _ => level_member BEGIN
-							PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
-								SET $fx_level_chained(~%level_member%~) = 1
-							END
-						END
-					END
-				END
 				PATCH_IF level_h > 0 OR level_to < 99 BEGIN
 					SET level_key = (level_from + 100) * 100 + level_to
 					SET $level_keys(~%level_key%~) = 1

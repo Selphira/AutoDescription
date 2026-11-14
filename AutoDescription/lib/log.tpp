@@ -427,8 +427,17 @@ DEFINE_PATCH_MACRO ad_fx_dump BEGIN
 	SPRINT fx_dump ~%SOURCE_RES%%TAB%resource%TAB%%fx_header_count%%TAB%%fx_count%%TAB%%fx_load_error%~
 	FOR (fx_id = 0; fx_id < fx_count; ++fx_id) BEGIN
 		SPRINT fx_line ~%SOURCE_RES%%TAB%fx%TAB%%fx_id%~
+		LPM ad_fx_ticks
 		PHP_EACH AD_FX_FIELDS AS fx_i => fx_field BEGIN
-			SPRINT fx_value $EVAL ~fx_%fx_field%~(~%fx_id%~)
+			PATCH_IF ~%fx_field%~ STRING_EQUAL ~delay_ticks~ BEGIN
+				SET fx_value = fx_delay_ticks
+			END
+			ELSE PATCH_IF ~%fx_field%~ STRING_EQUAL ~duration_ticks~ BEGIN
+				SET fx_value = fx_duration_ticks
+			END
+			ELSE BEGIN
+				SPRINT fx_value $EVAL ~fx_%fx_field%~(~%fx_id%~)
+			END
 			SPRINT fx_line ~%fx_line%%TAB%%fx_value%~
 		END
 		SPRINT fx_dump ~%fx_dump%%WNL%%fx_line%~

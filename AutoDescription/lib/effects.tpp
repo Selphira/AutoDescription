@@ -28,16 +28,13 @@
 // de la durée et du bonus du jet de sauvegarde d'un effet présent à tous les niveaux d'un sort, lib/spell_levels.tpp) ;
 // fx_level_max_text (vide à la lecture, progression du niveau maximal de la cible) et fx_level_to_last
 // (0 à la lecture, 1 pour un effet de cette progression dont la section va jusqu'au dernier niveau,
-// lib/spell_levels.tpp) ; fx_level_progression
-// (0 à la lecture, 1 pour un effet qui porte une telle progression) ; fx_duration_dice (0 à la lecture,
+// lib/spell_levels.tpp) ; fx_duration_dice (0 à la lecture,
 // N pour une durée tirée au sort de 1dN unités, ad_group_duration_ranges, lib/groups.tpp) ;
 // fx_duration_dice_bonus (0 à la lecture, unités ajoutées à ce tirage : 1d4 +1 rounds) ;
 // fx_consumed (0 à la lecture,
 // mis à 1 par lib/groups.tpp pour un effet réuni à d'autres) ; fx_dropped (0 à la lecture, 1
 // pour un effet écarté, ad_application_drop) ; fx_level_merged (1 pour l'effet d'un en-tête que l'effet
-// égal d'un autre niveau représente, lib/spell_levels.tpp) ; fx_level_chained (1 pour l'effet du
-// premier en-tête d'un sort à plusieurs en-têtes que la passe 3 de lib/spell_levels.tpp écrit pour
-// tous les niveaux) ; fx_group_anchor (l'effet lui-même à
+// égal d'un autre niveau représente, lib/spell_levels.tpp) ; fx_group_anchor (l'effet lui-même à
 // la lecture, celui qui le représente une fois réuni par le regroupement d'un opcode : maladies,
 // invocations, ad_group_same_fields) ; fx_derived_source (1 pour l'effet d'ancrage d'un effet dérivé,
 // dont la ligne lit les champs, lib/groups.tpp) ; fx_exception et fx_exception_count (exceptions de
@@ -359,7 +356,6 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SPRINT ~fx_name_list_%fx_id%~ ~~
 	SET ~fx_list_size_%fx_id%~ = 0
 	SET ~fx_level_merged_%fx_id%~ = 0
-	SET ~fx_level_chained_%fx_id%~ = 0
 	SET ~fx_cure_mask_%fx_id%~ = 0
 	SET ~fx_cure_feeblemind_%fx_id%~ = 0
 	SET ~fx_header_target_%fx_id%~ = 0
@@ -380,7 +376,6 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SPRINT ~fx_level_save_%fx_id%~ ~~
 	SPRINT ~fx_level_max_text_%fx_id%~ ~~
 	SET ~fx_level_to_last_%fx_id%~ = 0
-	SET ~fx_level_progression_%fx_id%~ = 0
 	LPM ad_fx_mod_ignored
 	// Écarté comme un effet que l'ancien moteur ne charge pas : sans effet sur son bloc (exceptions de
 	// cible, 321 qui rend la suite non cumulative).

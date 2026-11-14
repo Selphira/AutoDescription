@@ -6,7 +6,6 @@
 // - fx_timing_kind : limited, permanent, while_equipped, until_reload, delayed_limited,
 //   delayed_permanent, delayed_while_equipped, game_time_limited, game_time_permanent,
 //   game_time_while_equipped, permanent_after_death, absolute, unknown ;
-// - fx_delay_ticks, fx_duration_ticks : en ticks (1/15 s), 0 s'ils ne s'appliquent pas ;
 // - fx_probability_low, fx_probability_high, fx_probability : bornes du tirage et pourcentage ;
 // - fx_save_types (bits 0-4 : un jet contre le meilleur des types cochés), fx_save_flags (le reste) ;
 // - fx_level_min, fx_level_max : restriction de niveau de la cible (0 = aucune) ;
@@ -22,18 +21,9 @@
 //   pour un effet d'équipement (remplacée à la lecture), la cible du fichier sinon (une potion n'est
 //   corrigée qu'après ses regroupements).
 DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
-	SET fx_timing   = $fx_timing(~%fx_id%~)
-	SET fx_duration = $fx_duration(~%fx_id%~)
-	SET fx_delay_ticks    = 0
-	SET fx_duration_ticks = 0
-	// Timings 0, 3, 4, 5 : durée en secondes ; 6, 7, 8 et 10 : en ticks. 3 attend la durée puis
-	// dure autant ; 6, 7, 8 attendent une heure de jeu absolue (Gametime), indépendante du moment
-	// de l'application : ni délai ni durée ne s'en déduisent.
+	SET fx_timing = $fx_timing(~%fx_id%~)
 	PATCH_MATCH fx_timing WITH
-		0 BEGIN
-			SPRINT fx_timing_kind ~limited~
-			SET fx_duration_ticks = fx_duration * 15
-		END
+		0 BEGIN SPRINT fx_timing_kind ~limited~ END
 		1 BEGIN SPRINT fx_timing_kind ~permanent~ END
 		// Sur un en-tête d'objet ou dans un sort, le timing 2 dure jusqu'au rechargement de la partie.
 		2 BEGIN
@@ -44,34 +34,19 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 				SPRINT fx_timing_kind ~until_reload~
 			END
 		END
-		3 BEGIN
-			SPRINT fx_timing_kind ~delayed_limited~
-			SET fx_delay_ticks    = fx_duration * 15
-			SET fx_duration_ticks = fx_duration * 15
-		END
-		4 BEGIN
-			SPRINT fx_timing_kind ~delayed_permanent~
-			SET fx_delay_ticks = fx_duration * 15
-		END
-		5 BEGIN
-			SPRINT fx_timing_kind ~delayed_while_equipped~
-			SET fx_delay_ticks = fx_duration * 15
-		END
+		3 BEGIN SPRINT fx_timing_kind ~delayed_limited~ END
+		4 BEGIN SPRINT fx_timing_kind ~delayed_permanent~ END
+		5 BEGIN SPRINT fx_timing_kind ~delayed_while_equipped~ END
 		6 BEGIN SPRINT fx_timing_kind ~game_time_limited~ END
 		7 BEGIN SPRINT fx_timing_kind ~game_time_permanent~ END
 		8 BEGIN SPRINT fx_timing_kind ~game_time_while_equipped~ END
 		9 BEGIN SPRINT fx_timing_kind ~permanent_after_death~ END
-		10 BEGIN
-			SPRINT fx_timing_kind ~limited~
-			SET fx_duration_ticks = fx_duration
-		END
+		10 BEGIN SPRINT fx_timing_kind ~limited~ END
 		4096 BEGIN SPRINT fx_timing_kind ~absolute~ END
 		DEFAULT
 			SPRINT fx_timing_kind ~unknown~
 	END
 	SPRINT ~fx_timing_kind_%fx_id%~ ~%fx_timing_kind%~
-	SET ~fx_delay_ticks_%fx_id%~    = fx_delay_ticks
-	SET ~fx_duration_ticks_%fx_id%~ = fx_duration_ticks
 
 	// Le moteur tire x dans 0-99 : l'effet a lieu si probabilité 2 <= x <= probabilité 1.
 	SET fx_probability_low  = $fx_probability2(~%fx_id%~)
@@ -118,4 +93,27 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	SPRINT fx_resource_lower $fx_resource(~%fx_id%~)
 	TO_LOWER fx_resource_lower
 	SPRINT ~fx_resource_lower_%fx_id%~ ~%fx_resource_lower%~
+END
+
+// Délai et durée de l'effet fx_id en ticks (1/15 s), fx_delay_ticks et fx_duration_ticks, 0 s'ils ne
+// s'appliquent pas : seul le journal des effets les écrit (ad_fx_dump, lib/log.tpp). Timings 0, 3, 4,
+// 5 : durée en secondes ; 10 : en ticks. 3 attend la durée puis dure autant ; 6, 7, 8 attendent une
+// heure de jeu absolue (Gametime), indépendante du moment de l'application : ni délai ni durée ne
+// s'en déduisent.
+DEFINE_PATCH_MACRO ad_fx_ticks BEGIN
+	SET fx_timing = $fx_timing(~%fx_id%~)
+	SET fx_duration = $fx_duration(~%fx_id%~)
+	SET fx_delay_ticks = 0
+	SET fx_duration_ticks = 0
+	PATCH_MATCH fx_timing WITH
+		0 BEGIN SET fx_duration_ticks = fx_duration * 15 END
+		3 BEGIN
+			SET fx_delay_ticks = fx_duration * 15
+			SET fx_duration_ticks = fx_duration * 15
+		END
+		4 BEGIN SET fx_delay_ticks = fx_duration * 15 END
+		5 BEGIN SET fx_delay_ticks = fx_duration * 15 END
+		10 BEGIN SET fx_duration_ticks = fx_duration END
+		DEFAULT
+	END
 END
