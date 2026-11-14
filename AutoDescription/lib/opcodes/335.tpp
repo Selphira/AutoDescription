@@ -5,7 +5,8 @@
 // lib/opcodes/states.tpp.
 
 // État de sort hors de 0-255 : écarté (erreur de fichier) ; sans nom (état ajouté par un mod, comme
-// D5_SNAREARROW de BRAC18) : pas de ligne, journalisé, l'ancien moteur n'en écrivant plus rien.
+// D5_SNAREARROW de BRAC18) : pas de ligne, journalisé, l'ancien moteur n'en écrivant plus rien. Sort
+// accordé illisible : écarté (erreur de fichier).
 // Refus : sort accordé sans nom.
 DEFINE_PATCH_MACRO ad_op_335_support BEGIN
 	PHP_EACH fx_ids_335 AS _ => eyes_id BEGIN
@@ -30,10 +31,18 @@ DEFINE_PATCH_MACRO ad_op_335_support BEGIN
 					LPM ad_log_ignored
 				END
 			END
-			ELSE PATCH_IF TRA_ENTRY_EXISTS (~%eyes_tra%~) AND NOT (~%eyes_resref%~ STRING_EQUAL ~~) AND NOT support_header_only BEGIN
+			ELSE PATCH_IF TRA_ENTRY_EXISTS (~%eyes_tra%~) AND NOT (~%eyes_resref%~ STRING_EQUAL ~~) BEGIN
 				SPRINT spell_fact_resref ~%eyes_resref%~ SPRINT spell_fact_out ~eyes_spell_name~ LPM ad_spell_name_to
 				SPRINT ~fx_spell_name_%eyes_id%~ ~%eyes_spell_name%~
-				PATCH_IF ~%eyes_spell_name%~ STRING_EQUAL ~~ BEGIN
+				// Sort illisible : écarté aussi pour l'en-tête d'un sort seul, qui doit compter les mêmes effets.
+				PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+					SET drop_id = eyes_id
+					SPRINT drop_file_error ~%spell_fact_error%~
+					LPM ad_application_drop_file
+				END
+				ELSE PATCH_IF support_header_only BEGIN
+				END
+				ELSE PATCH_IF ~%eyes_spell_name%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = eyes_id STR_VAR reason = ~not_implemented:opcode335:spell_no_name~ message = ~spell %eyes_resref%.SPL granted by the effect has no name~ RET render_missing = refusal END
 				END
 			END

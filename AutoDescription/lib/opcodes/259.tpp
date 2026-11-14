@@ -24,10 +24,18 @@ DEFINE_PATCH_MACRO ad_op_259_support BEGIN
 			SET trap_level = $fx_parameter2(~%trap_id%~)
 			SPRINT trap_resref $fx_resource(~%trap_id%~)
 			SPRINT trap_spell ~%trap_own_spell%~
+			SPRINT trap_file_error ~~
 			PATCH_IF NOT (~%trap_resref%~ STRING_EQUAL ~~) BEGIN
 				SPRINT spell_fact_resref ~%trap_resref%~ SPRINT spell_fact_out ~trap_spell~ LPM ad_spell_name_to
+				SPRINT trap_file_error ~%spell_fact_error%~
 			END
-			PATCH_IF trap_level < 0 OR trap_level > 9 BEGIN
+			// Le sort n'est lancé que sur EE.
+			PATCH_IF IS_EE AND NOT (~%trap_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = trap_id
+				SPRINT drop_file_error ~%trap_file_error%~
+				LPM ad_application_drop_file
+			END
+			ELSE PATCH_IF trap_level < 0 OR trap_level > 9 BEGIN
 				SET drop_id = trap_id
 				SPRINT ignored_reason ~file_error:opcode259:level~
 				SPRINT ignored_message ~spell level %trap_level% (expected 0-9)~

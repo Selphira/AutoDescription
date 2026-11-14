@@ -24,10 +24,18 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 			SET power_level = $fx_parameter2(~%power_id%~)
 			SPRINT power_resref $fx_resource(~%power_id%~)
 			SPRINT power_spell ~%power_own_spell%~
+			SPRINT power_file_error ~~
 			PATCH_IF NOT (~%power_resref%~ STRING_EQUAL ~~) BEGIN
 				SPRINT spell_fact_resref ~%power_resref%~ SPRINT spell_fact_out ~power_spell~ LPM ad_spell_name_to
+				SPRINT power_file_error ~%spell_fact_error%~
 			END
-			PATCH_IF power_level < 0 OR power_level > 9 BEGIN
+			// Le sort n'est lancé que sur EE.
+			PATCH_IF IS_EE AND NOT (~%power_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = power_id
+				SPRINT drop_file_error ~%power_file_error%~
+				LPM ad_application_drop_file
+			END
+			ELSE PATCH_IF power_level < 0 OR power_level > 9 BEGIN
 				SET drop_id = power_id
 				SPRINT ignored_reason ~file_error:opcode%power_opcode%:level~
 				SPRINT ignored_message ~spell level %power_level% (expected 0-9)~

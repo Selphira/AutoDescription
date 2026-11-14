@@ -7,7 +7,8 @@
 // fréquence (ctx_frequency, lib/recursion.tpp) : « Inflige 9d8 points de dégâts d'électricité à la
 // cible chaque tour pendant 7 tours (jet de sauvegarde contre les sorts pour réduire de moitié) ».
 
-// Nombre nul ou négatif : écarté et journalisé (ancien opcode_333_is_valid).
+// Nombre nul ou négatif, sort illisible : écarté et journalisé (ancien opcode_333_is_valid pour le
+// nombre).
 // Refus : effet différé ou de durée limitée (la fin de l'effet et celle des décharges ne sont pas
 // établies) ; jet de sauvegarde (IESDP : tenté à chaque décharge, qui met fin à l'effet) ; sort qui
 // contient lui-même un 333 ; refus de ad_recursion_support.
@@ -43,8 +44,16 @@ DEFINE_PATCH_MACRO ad_op_333_support BEGIN
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_save_type(~%charge_id%~) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = charge_id STR_VAR reason = ~not_implemented:opcode333:save~ message = ~saving throw attempted at each strike~ RET render_missing = refusal END
 			END
-			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 				SPRINT spell_fact_resref ~%charge_resref%~ SPRINT spell_fact_out ~charge_name~ LPM ad_spell_name_to
+				// Sort illisible : écarté aussi pour l'en-tête d'un sort seul, qui doit compter les mêmes effets.
+				PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+					SET drop_id = charge_id
+					SPRINT drop_file_error ~%spell_fact_error%~
+					LPM ad_application_drop_file
+				END
+			END
+			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND NOT $fx_dropped(~%charge_id%~) BEGIN
 				SPRINT ~fx_charge_name_%charge_id%~ ~%charge_name%~
 				LPF ad_duration_text INT_VAR seconds = charge_delay tra_base = 3020000 RET charge_frequency = text END // ~chaque round~
 				SPRINT ~fx_charge_frequency_%charge_id%~ ~%charge_frequency%~
@@ -81,7 +90,7 @@ DEFINE_PATCH_MACRO ad_op_333_nested BEGIN
 		INNER_PATCH_FILE ~%charge_resref%.spl~ BEGIN
 			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
 				READ_LONG SPL_feature_blocks_offset charge_blocks_offset
-				FOR (charge_at = charge_blocks_offset; charge_at + 0x30 <= BUFFER_LENGTH; charge_at += 0x30) BEGIN
+				FOR (charge_at = charge_blocks_offset; charge_at >= 0 AND charge_at + 0x30 <= BUFFER_LENGTH; charge_at += 0x30) BEGIN
 					READ_SHORT charge_at charge_opcode
 					SET charge_nested = charge_nested OR charge_opcode == 333
 				END

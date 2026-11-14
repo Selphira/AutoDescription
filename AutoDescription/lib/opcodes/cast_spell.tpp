@@ -12,8 +12,8 @@
 // macros ci-dessous. Le regroupement avec l'opcode 321 (ancien opcode_146_group, non cumulatif)
 // viendra avec cet opcode.
 
-// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
-// opcode_resref_is_valid).
+// Ressource vide ou sort illisible : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_resref_is_valid pour une ressource vide).
 // Refus : sort d'Item Revision
 // (AD_ITEM_REVISION_SPELLS : l'ancien moteur en écrit un texte propre) ; sort nommé lancé par un
 // en-tête à charges d'une fléchette (ses lignes vont aux capacités de combat, où l'ancien moteur les
@@ -53,6 +53,11 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 				SPRINT ignored_reason ~file_error:opcode%cast_opcode%:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = cast_id
+				SPRINT drop_file_error ~%spell_fact_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF VARIABLE_IS_SET $AD_ITEM_REVISION_SPELLS(~%cast_resref%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:item_revision~ message = ~spell %cast_resref% from Item Revisions~ RET render_missing = refusal END
@@ -111,7 +116,7 @@ BEGIN
 				SET caster_first_selected = 0 - 1
 				SET caster_lowest = 0 - 1
 				SET caster_splits = 0
-				FOR (caster_h = 0; caster_h < caster_sub_count AND caster_sub_offset + caster_h * 0x28 + 0x28 <= BUFFER_LENGTH; ++caster_h) BEGIN
+				FOR (caster_h = 0; caster_sub_offset >= 0 AND caster_h < caster_sub_count AND caster_sub_offset + caster_h * 0x28 + 0x28 <= BUFFER_LENGTH; ++caster_h) BEGIN
 					READ_SHORT (caster_sub_offset + caster_h * 0x28 + SPL_HEAD_level_required) caster_level
 					PATCH_IF caster_lowest < 0 OR caster_level < caster_lowest BEGIN
 						SET caster_lowest = caster_level

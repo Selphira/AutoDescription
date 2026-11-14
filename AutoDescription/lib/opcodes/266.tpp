@@ -1,14 +1,17 @@
 // Opcode 266 (Spell: Remove Protection from Spell) : retire les immunités 206 au sort resource (IESDP) :
 // « Lève l'immunité contre le sort « Brise-Magie » » ; code commun dans lib/opcodes/states.tpp.
 
-// Ressource vide : écartée et journalisée (ancien opcode_resref_is_valid) ; sort sans nom : aucune
-// ligne, comme l'ancien moteur, journalisé ; l'effet compte encore pour l'en-tête.
+// Ressource vide : écartée et journalisée (ancien opcode_resref_is_valid) ; sort sans nom ou
+// illisible : aucune ligne, comme l'ancien moteur pour un sort sans nom, journalisé ; l'effet compte
+// encore pour l'en-tête.
 DEFINE_PATCH_MACRO ad_op_266_support BEGIN
 	PHP_EACH fx_ids_266 AS _ => unprotect_id BEGIN
 		SPRINT unprotect_resref $fx_resource(~%unprotect_id%~)
 		SPRINT unprotect_name ~~
+		SPRINT unprotect_file_error ~~
 		PATCH_IF NOT (~%unprotect_resref%~ STRING_EQUAL ~~) AND NOT support_header_only BEGIN
 			SPRINT spell_fact_resref ~%unprotect_resref%~ SPRINT spell_fact_out ~unprotect_name~ LPM ad_spell_name_to
+			SPRINT unprotect_file_error ~%spell_fact_error%~
 		END
 		SPRINT ~fx_unprotect_name_%unprotect_id%~ ~%unprotect_name%~
 		PATCH_IF NOT $fx_dropped(~%unprotect_id%~) AND ~%unprotect_resref%~ STRING_EQUAL ~~ BEGIN
@@ -21,6 +24,10 @@ DEFINE_PATCH_MACRO ad_op_266_support BEGIN
 			SET ignored_fx = unprotect_id
 			SPRINT ignored_reason ~not_implemented:opcode266:no_name~
 			SPRINT ignored_message ~spell %unprotect_resref%.SPL has no name~
+			PATCH_IF NOT (~%unprotect_file_error%~ STRING_EQUAL ~~) BEGIN
+				SPRINT ignored_reason ~file_error:opcode266:invalid_file~
+				SPRINT ignored_message ~%unprotect_file_error%~
+			END
 			LPM ad_log_ignored
 		END
 	END

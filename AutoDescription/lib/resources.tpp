@@ -2,7 +2,8 @@
 
 // Nom du sort spell_fact_resref, écrit dans la variable nommée par spell_fact_out : nom imposé par
 // AD_SPELL_NAMES (lib/catalog.tpa ; vide : sort à ne pas citer), sinon nom non identifié du fichier ;
-// vide si le sort n'existe pas ou n'a pas de nom.
+// vide si le sort n'existe pas ou n'a pas de nom. spell_fact_error : vide, ou message d'un fichier
+// plus court que l'en-tête de son format (sans nom), dont l'appelant écarte l'effet.
 // Une description cite souvent le même sort (à chaque en-tête, à chaque regroupement) : le strref lu
 // est gardé dans spell_fact_name_ref_<sort>, dans la portée de la description, qui le perd à son
 // retour. On garde le strref, pas le texte : relu par $tableau, un texte verrait ses %…% évalués
@@ -11,6 +12,7 @@ DEFINE_PATCH_MACRO ad_spell_name_to BEGIN
 	SPRINT spell_fact_key ~%spell_fact_resref%~
 	TO_LOWER spell_fact_key
 	SPRINT spell_fact_text ~~
+	SPRINT spell_fact_error ~~
 	PATCH_IF VARIABLE_IS_SET $AD_SPELL_NAMES(~%spell_fact_key%~) BEGIN
 		SET tra_id = $AD_SPELL_NAMES(~%spell_fact_key%~) SPRINT tra_out ~spell_fact_text~ LPM ad_tra_to
 	END
@@ -19,11 +21,19 @@ DEFINE_PATCH_MACRO ad_spell_name_to BEGIN
 			SET spell_fact_ref = 0
 			PATCH_IF NOT ~%spell_fact_resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%spell_fact_resref%.spl~ BEGIN
 				INNER_PATCH_FILE ~%spell_fact_resref%.spl~ BEGIN
-					READ_LONG SPL_unidentified_name spell_fact_ref
+					PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+						READ_LONG SPL_unidentified_name spell_fact_ref
+					END
+					ELSE BEGIN
+						SET spell_fact_length = BUFFER_LENGTH
+						SPRINT spell_fact_error ~spell %spell_fact_resref%.SPL: file of %spell_fact_length% bytes, shorter than the SPL V1 header (114 bytes)~
+					END
 				END
 			END
 			SET ~spell_fact_name_ref_%spell_fact_key%~ = spell_fact_ref
+			SPRINT ~spell_fact_name_error_%spell_fact_key%~ ~%spell_fact_error%~
 		END
+		SPRINT spell_fact_error $spell_fact_name_error(~%spell_fact_key%~)
 		SET spell_fact_ref = $spell_fact_name_ref(~%spell_fact_key%~)
 		PATCH_IF spell_fact_ref > 0 BEGIN
 			GET_STRREF spell_fact_ref spell_fact_text
@@ -39,7 +49,8 @@ END
 // forme de cône (bit 11, rayon s'il n'a pas d'arc) ; area_ignore_target : le projectile ne touche pas
 // sa cible (bit 4 des drapeaux d'étincelles) ; area_size, area_delay, area_triggers : taille de la
 // zone, délai entre deux explosions (100 par round) et nombre d'explosions lus dans le fichier ;
-// area_file_missing : projectl.ids nomme un fichier .pro absent.
+// area_file_missing : projectl.ids nomme un fichier .pro absent ; area_file_error : message d'un
+// fichier illisible (plus court que l'en-tête du format, ou que la zone d'un projectile de type 3).
 DEFINE_PATCH_FUNCTION ad_projectile_area
 	INT_VAR
 		projectile = 0
@@ -54,7 +65,9 @@ DEFINE_PATCH_FUNCTION ad_projectile_area
 		area_delay
 		area_triggers
 		area_file_missing
+		area_file_error
 BEGIN
+	SPRINT area_file_error ~~
 	SET area_shape = 0
 	SET area_creatures = 0
 	SET area_feet = 0
@@ -70,7 +83,15 @@ BEGIN
 		PATCH_IF NOT IS_AN_INT area_file BEGIN
 			PATCH_IF FILE_EXISTS_IN_GAME ~%area_file%.pro~ BEGIN
 				INNER_PATCH_FILE ~%area_file%.pro~ BEGIN
-					READ_SHORT 0x8 area_type
+					SET area_type = 0
+					PATCH_IF BUFFER_LENGTH >= 0x100 BEGIN
+						READ_SHORT 0x8 area_type
+					END
+					ELSE BEGIN
+						SET area_shape = 0 - 1
+						SET file_length = BUFFER_LENGTH
+						SPRINT area_file_error ~projectile %area_file%.PRO: file of %file_length% bytes, shorter than the PRO V1 header (256 bytes)~
+					END
 					PATCH_IF area_type == 3 AND BUFFER_LENGTH >= 0x226 BEGIN
 						READ_LONG  0x200 area_flags
 						READ_LONG  0xc   area_sparking_flags
@@ -96,6 +117,8 @@ BEGIN
 					END
 					ELSE PATCH_IF area_type == 3 BEGIN
 						SET area_shape = 0 - 1
+						SET file_length = BUFFER_LENGTH
+						SPRINT area_file_error ~projectile %area_file%.PRO: area projectile (type 3) of %file_length% bytes, shorter than its area data (550 bytes)~
 					END
 				END
 			END
@@ -108,7 +131,8 @@ END
 
 // Objet resref (ancien get_item_name, item_can_stack) : nom identifié, sinon non identifié (vide si
 // l'objet n'existe pas ou n'a pas de nom), strref du nom identifié, empilable (taille de pile
-// supérieure à 1).
+// supérieure à 1). file_error : vide, ou message d'un fichier plus court que l'en-tête de son format
+// (sans nom), dont l'appelant écarte l'effet.
 DEFINE_PATCH_FUNCTION ad_item_info
 	STR_VAR
 		resref = ~~
@@ -116,22 +140,30 @@ DEFINE_PATCH_FUNCTION ad_item_info
 		name
 		name_ref
 		stackable
+		file_error
 BEGIN
 	SPRINT name ~~
 	SET name_ref = 0
 	SET stackable = 0
+	SPRINT file_error ~~
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.itm~ BEGIN
 		INNER_PATCH_FILE ~%resref%.itm~ BEGIN
-			READ_LONG ITM_identified_name name_ref
-			READ_LONG ITM_unidentified_name item_unidentified_ref
-			READ_BYTE ITM_stack_amount item_stack
-			PATCH_IF name_ref > 0 BEGIN
-				READ_STRREF ITM_identified_name name
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG ITM_identified_name name_ref
+				READ_LONG ITM_unidentified_name item_unidentified_ref
+				READ_BYTE ITM_stack_amount item_stack
+				PATCH_IF name_ref > 0 BEGIN
+					READ_STRREF ITM_identified_name name
+				END
+				ELSE PATCH_IF item_unidentified_ref > 0 BEGIN
+					READ_STRREF ITM_unidentified_name name
+				END
+				SET stackable = item_stack > 1
 			END
-			ELSE PATCH_IF item_unidentified_ref > 0 BEGIN
-				READ_STRREF ITM_unidentified_name name
+			ELSE BEGIN
+				SET file_length = BUFFER_LENGTH
+				SPRINT file_error ~item %resref%.ITM: file of %file_length% bytes, shorter than the ITM V1 header (114 bytes)~
 			END
-			SET stackable = item_stack > 1
 		END
 	END
 END
@@ -227,7 +259,9 @@ BEGIN
 END
 
 // Créature resref (ancien get_creature_name, get_creature_allegiance) : nom (vide si la créature
-// n'existe pas ou n'a pas de nom), allégeance (ea.ids) et niveau de sa première classe.
+// n'existe pas ou n'a pas de nom), allégeance (ea.ids), niveau de sa première classe, puissance
+// (power_level), genre (gender.ids). file_error : vide, ou message d'un fichier plus court que
+// l'en-tête de son format (sans nom), dont l'appelant écarte l'effet.
 DEFINE_PATCH_FUNCTION ad_creature_info
 	STR_VAR
 		resref = ~~
@@ -235,17 +269,31 @@ DEFINE_PATCH_FUNCTION ad_creature_info
 		name
 		allegiance
 		level
+		power_level
+		gender
+		file_error
 BEGIN
 	SPRINT name ~~
 	SET allegiance = 0
 	SET level = 0
+	SET power_level = 0
+	SET gender = 0
+	SPRINT file_error ~~
 	PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.cre~ BEGIN
 		INNER_PATCH_FILE ~%resref%.cre~ BEGIN
-			READ_LONG CRE_name creature_name_ref
-			READ_BYTE CRE_allegiance allegiance
-			READ_BYTE CRE_level_first_class level
-			PATCH_IF creature_name_ref > 0 BEGIN
-				READ_STRREF CRE_name name
+			PATCH_IF BUFFER_LENGTH >= 0x2d4 BEGIN
+				READ_LONG CRE_name creature_name_ref
+				READ_BYTE CRE_allegiance allegiance
+				READ_BYTE CRE_level_first_class level
+				READ_LONG CRE_XP_power_level power_level
+				READ_BYTE CRE_gender gender
+				PATCH_IF creature_name_ref > 0 BEGIN
+					READ_STRREF CRE_name name
+				END
+			END
+			ELSE BEGIN
+				SET file_length = BUFFER_LENGTH
+				SPRINT file_error ~creature %resref%.CRE: file of %file_length% bytes, shorter than the CRE V1 header (724 bytes)~
 			END
 		END
 	END
@@ -265,9 +313,12 @@ BEGIN
 	SET within_distance = 0
 	PATCH_IF FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-			READ_LONG  SPL_extended_headers_offset area_headers_offset
-			READ_SHORT SPL_extended_headers_count  area_header_count
-			READ_LONG  SPL_feature_blocks_offset   area_table_offset
+			SET area_header_count = 0
+			PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+				READ_LONG  SPL_extended_headers_offset area_headers_offset
+				READ_SHORT SPL_extended_headers_count  area_header_count
+				READ_LONG  SPL_feature_blocks_offset   area_table_offset
+			END
 			SET within_distance = area_header_count > 0
 			FOR (area_h = 0; area_h < area_header_count AND within_distance; ++area_h) BEGIN
 				SET area_header_offset = area_headers_offset + area_h * 0x28

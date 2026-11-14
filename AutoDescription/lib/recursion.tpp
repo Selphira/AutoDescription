@@ -933,9 +933,9 @@ END
 DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 	LPF ad_projectile_area INT_VAR projectile = sub_projectile RET sub_area_shape = area_shape
 		ctx_area_creatures = area_creatures sub_area_feet = area_feet ctx_area_angle = area_angle
-		sub_area_cone = area_cone sub_area_ignore = area_ignore_target END
+		sub_area_cone = area_cone sub_area_ignore = area_ignore_target sub_area_error = area_file_error END
 	PATCH_IF sub_area_shape < 0 BEGIN
-		LPF ad_refusal STR_VAR reason = ~file_error:recursion:projectile_target~ message = ~area projectile of the ability has a .PRO file too short to be read~ RET sub_missing = refusal END
+		LPF ad_refusal STR_VAR reason = ~file_error:recursion:projectile_target~ message = ~area projectile of the ability: %sub_area_error%~ RET sub_missing = refusal END
 	END
 	ELSE PATCH_IF sub_area_shape > 0 BEGIN
 		LPF ad_distance_text INT_VAR feet = sub_area_feet RET ctx_area_range = text END

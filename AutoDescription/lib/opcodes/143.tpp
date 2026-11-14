@@ -4,8 +4,8 @@
 // retirer l'objet n'a pas de ressource, IESDP) : le timing de l'effet devient permanent, comme dans
 // l'ancien opcode_143_common.
 
-// Objet absent : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
-// opcode_143_is_valid).
+// Objet absent ou illisible : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_143_is_valid pour un objet absent).
 // Emplacement inconnu : écarté et journalisé. Refus : objet sans nom (écarté par l'ancien
 // opcode_143_is_valid). Avec AD_ENABLE_SHRINKAGE, l'armure, le casque ou le bouclier brisé (MISC57,
 // MISC58, CDDELHLM) s'écrit « de se briser » (ad_group_broken_armor, lib/groups.tpp).
@@ -14,7 +14,7 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT slot_resref $fx_resource(~%slot_id%~)
 			SET slot_index = $fx_parameter1(~%slot_id%~)
-			LPF ad_item_info STR_VAR resref = ~%slot_resref%~ RET slot_item_name = name END
+			LPF ad_item_info STR_VAR resref = ~%slot_resref%~ RET slot_item_name = name slot_file_error = file_error END
 			PATCH_IF ~%slot_item_name%~ STRING_EQUAL ~~ OR slot_index < 0 OR slot_index > 38 BEGIN
 				PATCH_IF slot_index < 0 OR slot_index > 38 BEGIN
 					SET drop_id = slot_id
@@ -27,6 +27,11 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 					SPRINT ignored_reason ~file_error:opcode143:missing_item~
 					SPRINT ignored_message ~item %slot_resref%.ITM does not exist~
 					LPM ad_application_drop
+				END
+				ELSE PATCH_IF NOT (~%slot_file_error%~ STRING_EQUAL ~~) BEGIN
+					SET drop_id = slot_id
+					SPRINT drop_file_error ~%slot_file_error%~
+					LPM ad_application_drop_file
 				END
 				ELSE BEGIN
 					LPF ad_refusal INT_VAR fx_id = slot_id STR_VAR reason = ~not_implemented:opcode143:no_name~ message = ~item %slot_resref%.ITM has no name~ RET render_missing = refusal END

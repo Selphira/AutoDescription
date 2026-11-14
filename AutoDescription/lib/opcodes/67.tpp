@@ -7,7 +7,7 @@
 // Avec AD_ENABLE_SHRINKAGE, une invocation certaine réunit aussi les invocations probables identiques à
 // la probabilité près (ancien opcode_67_group) : chacune compte pour une créature de plus au plus,
 // « Invoque entre 2 et 5 « Rat » » (fx_summon_random).
-// Créature absente : aucune ligne (fx_summon_missing), erreur journalisée ; l'en-tête d'un sort compte
+// Créature absente ou illisible : aucune ligne (fx_summon_missing), erreur journalisée ; l'en-tête d'un sort compte
 // l'effet (sa durée), comme l'ancien moteur. Créature sans nom : invocation décrite sans nom
 // (« Invoque 1 créature »), cas journalisé.
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
@@ -16,9 +16,9 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			SET ~fx_summon_missing_%summon_id%~ = 0
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance
-				summon_level = level END
+				summon_level = level summon_file_error = file_error END
 			SET summon_unnamed = 0
-			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
+			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ AND ~%summon_file_error%~ STRING_EQUAL ~~ BEGIN
 				SET summon_unnamed = 1
 			END
 			SET ~fx_creature_unnamed_%summon_id%~ = summon_unnamed
@@ -35,6 +35,10 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 					SET ignored_fx = summon_id
 					SPRINT ignored_reason ~file_error:opcode67:missing_creature~
 					SPRINT ignored_message ~creature %summon_resref%.CRE does not exist~
+					PATCH_IF NOT (~%summon_file_error%~ STRING_EQUAL ~~) BEGIN
+						SPRINT ignored_reason ~file_error:opcode67:invalid_file~
+						SPRINT ignored_message ~%summon_file_error%~
+					END
 					LPM ad_log_ignored
 				END
 			END

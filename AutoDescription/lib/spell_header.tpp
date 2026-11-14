@@ -745,9 +745,13 @@ DEFINE_PATCH_MACRO ad_spell_header_projectile_duration BEGIN
 	SET projectile_count = 0
 	FOR (projectile_h = 0; projectile_h < fx_header_count; ++projectile_h) BEGIN
 		LPF ad_projectile_area INT_VAR projectile = $spell_projectile(~%projectile_h%~) RET projectile_shape = area_shape
-			projectile_delay = area_delay projectile_triggers = area_triggers projectile_missing = area_file_missing END
+			projectile_delay = area_delay projectile_triggers = area_triggers projectile_missing = area_file_missing projectile_error = area_file_error END
 		PATCH_IF projectile_missing OR projectile_shape < 0 BEGIN
-			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~projectile of ability %projectile_h% missing or too short to be read~ RET header_missing = refusal END
+			SPRINT projectile_message ~projectile of ability %projectile_h% missing or too short to be read~
+			PATCH_IF NOT (~%projectile_error%~ STRING_EQUAL ~~) BEGIN
+				SPRINT projectile_message ~projectile of ability %projectile_h%: %projectile_error%~
+			END
+			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~%projectile_message%~ RET header_missing = refusal END
 		END
 		ELSE PATCH_IF projectile_shape != 0 AND projectile_triggers > 1 BEGIN
 			SET $projectile_level(~%projectile_count%~) = $spell_level(~%projectile_h%~)
@@ -926,9 +930,13 @@ DEFINE_PATCH_MACRO ad_spell_header_ability_area BEGIN
 	SET area_target = $spell_target(~%area_h%~)
 	SET countTarget = $spell_target_count(~%area_h%~)
 	LPF ad_projectile_area INT_VAR projectile = $spell_projectile(~%area_h%~) RET area_shape area_creatures
-		area_angle area_cone area_ignore_target area_size area_file_missing END
+		area_angle area_cone area_ignore_target area_size area_file_missing area_file_error END
 	PATCH_IF area_file_missing OR area_shape < 0 BEGIN
-		LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~projectile of the ability missing or too short to be read~ RET header_missing = refusal END
+		SPRINT area_message ~projectile of the ability missing or too short to be read~
+		PATCH_IF NOT (~%area_file_error%~ STRING_EQUAL ~~) BEGIN
+			SPRINT area_message ~projectile of the ability: %area_file_error%~
+		END
+		LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~%area_message%~ RET header_missing = refusal END
 	END
 	ELSE PATCH_IF area_shape > 0 BEGIN
 		LPF ad_spell_distance_text INT_VAR feet = area_size / 17 RET range = text END

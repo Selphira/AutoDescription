@@ -265,10 +265,10 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 	PATCH_IF $fx_header_target(~%app_id%~) == TARGET_HEAD_area
 			AND $fx_header_projectile(~%app_id%~) > 1 AND item_type != ITM_TYPE_dart AND NOT $charged_other(~%app_header%~) BEGIN
 		LPF ad_projectile_area INT_VAR projectile = $fx_header_projectile(~%app_id%~) RET app_area_shape = area_shape
-			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle END
+			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle app_area_error = area_file_error END
 		PATCH_IF app_area_shape < 0 BEGIN
 			SET app_projectile = $fx_header_projectile(~%app_id%~) - 1
-			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:projectile_target~ message = ~area projectile %app_projectile% of the ability (PROJECTL.IDS) has a .PRO file too short to be read~ RET render_missing = refusal END
+			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:projectile_target~ message = ~area projectile %app_projectile% of the ability (PROJECTL.IDS): %app_area_error%~ RET render_missing = refusal END
 		END
 		ELSE PATCH_IF app_area_shape > 0 BEGIN
 			LPF ad_distance_text INT_VAR feet = app_area_feet RET range = text END
@@ -331,6 +331,17 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 		SET ignored_fx = drop_id
 		LPM ad_log_ignored
 	END
+END
+
+// Effet drop_id qui cite un fichier illisible : écarté comme par ad_application_drop, erreur de
+// fichier journalisée avec le message drop_file_error de la fonction qui l'a lu (ad_spell_name_to,
+// ad_item_info, ad_creature_info, lib/resources.tpp). Lire ce fichier plus loin ferait échouer toute
+// la ressource décrite.
+DEFINE_PATCH_MACRO ad_application_drop_file BEGIN
+	SET drop_file_opcode = $fx_opcode(~%drop_id%~)
+	SPRINT ignored_reason ~file_error:opcode%drop_file_opcode%:invalid_file~
+	SPRINT ignored_message ~%drop_file_error%~
+	LPM ad_application_drop
 END
 
 // Forme de la phrase de l'effet line_fx : 0 soi, 1 cible, 2 soi probable, 3 cible probable.

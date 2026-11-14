@@ -3,18 +3,23 @@
 // L'ancien moteur ne lui applique ni la validation ni les regroupements du 112 : un objet sans nom
 // (MINHP1, la régénération des trolls) ne donne aucune ligne.
 
-// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
-// opcode_123_is_valid).
+// Ressource vide ou objet illisible : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_123_is_valid pour une ressource vide).
 DEFINE_PATCH_MACRO ad_op_123_support BEGIN
 	PHP_EACH fx_ids_123 AS _ => remove_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%remove_id%~) BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
-			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name END
+			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_file_error = file_error END
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = remove_id
 				SPRINT ignored_reason ~file_error:opcode123:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%remove_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = remove_id
+				SPRINT drop_file_error ~%remove_file_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = remove_id

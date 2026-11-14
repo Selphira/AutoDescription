@@ -3,8 +3,8 @@
 // créature est alors invoquée à côté) : « Tue et remplace la cible par Tanar'ri ». Code commun dans
 // lib/opcodes/states.tpp.
 
-// Créature absente (aucun remplacement en jeu) : effet écarté sans rien écrire, erreur
-// journalisée (comme l'ancien opcode_151_is_valid).
+// Créature absente (aucun remplacement en jeu) ou illisible : effet écarté sans rien écrire, erreur
+// journalisée (comme l'ancien opcode_151_is_valid pour une créature absente).
 // Refus : créature sans nom.
 DEFINE_PATCH_MACRO ad_op_151_support BEGIN
 	PHP_EACH fx_ids_151 AS _ => replace_id BEGIN
@@ -17,8 +17,13 @@ DEFINE_PATCH_MACRO ad_op_151_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				LPF ad_creature_info STR_VAR resref = ~%replace_resref%~ RET replace_name = name END
-				PATCH_IF ~%replace_name%~ STRING_EQUAL ~~ BEGIN
+				LPF ad_creature_info STR_VAR resref = ~%replace_resref%~ RET replace_name = name replace_file_error = file_error END
+				PATCH_IF NOT (~%replace_file_error%~ STRING_EQUAL ~~) BEGIN
+					SET drop_id = replace_id
+					SPRINT drop_file_error ~%replace_file_error%~
+					LPM ad_application_drop_file
+				END
+				ELSE PATCH_IF ~%replace_name%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = replace_id STR_VAR reason = ~not_implemented:opcode151:no_name~ message = ~creature %replace_resref%.CRE has no name~ RET render_missing = refusal END
 				END
 				SPRINT ~fx_creature_name_%replace_id%~ ~%replace_name%~

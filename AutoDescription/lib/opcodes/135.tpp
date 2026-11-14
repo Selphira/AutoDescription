@@ -7,7 +7,8 @@
 // lib/groups.tpp).
 
 // Comme l'ancien opcode_111_replace, une métamorphose venue d'un 111 est écartée si sa portée en a
-// déjà une, du fichier ou d'un 111 précédent, de même timing et de même durée.
+// déjà une, du fichier ou d'un 111 précédent, de même timing et de même durée. Créature illisible :
+// effet écarté, erreur journalisée.
 DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 	PHP_EACH fx_ids_135 AS _ => polymorph_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_from_111(~%polymorph_id%~) AND NOT $fx_consumed(~%polymorph_id%~) BEGIN
@@ -27,8 +28,13 @@ DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 	PHP_EACH fx_ids_135 AS _ => polymorph_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%polymorph_id%~) BEGIN
 			SPRINT polymorph_resref $fx_resource(~%polymorph_id%~)
-			LPF ad_creature_info STR_VAR resref = ~%polymorph_resref%~ RET polymorph_name = name END
-			PATCH_IF ~%polymorph_name%~ STRING_EQUAL ~~ BEGIN
+			LPF ad_creature_info STR_VAR resref = ~%polymorph_resref%~ RET polymorph_name = name polymorph_file_error = file_error END
+			PATCH_IF NOT (~%polymorph_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = polymorph_id
+				SPRINT drop_file_error ~%polymorph_file_error%~
+				LPM ad_application_drop_file
+			END
+			ELSE PATCH_IF ~%polymorph_name%~ STRING_EQUAL ~~ BEGIN
 				SPRINT polymorph_name @21350000 // ~créature sans nom~
 			END
 			SPRINT ~fx_creature_name_%polymorph_id%~ ~%polymorph_name%~

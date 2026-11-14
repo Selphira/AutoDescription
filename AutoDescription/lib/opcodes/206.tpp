@@ -22,7 +22,7 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
 			END
-			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur ; sans
+			// Sort absent, illisible ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur ; sans
 			// objet pour l'en-tête d'un sort seul.
 			ELSE PATCH_IF NOT support_header_only BEGIN
 				SPRINT spell_fact_resref ~%spell_resref%~ SPRINT spell_fact_out ~spell_support_name~ LPM ad_spell_name_to
@@ -33,6 +33,10 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 					PATCH_IF NOT FILE_EXISTS_IN_GAME ~%spell_resref%.spl~ BEGIN
 						SPRINT ignored_reason ~file_error:opcode206:missing_spell~
 						SPRINT ignored_message ~spell %spell_resref%.SPL does not exist~
+					END
+					ELSE PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+						SPRINT ignored_reason ~file_error:opcode206:invalid_file~
+						SPRINT ignored_message ~%spell_fact_error%~
 					END
 					LPM ad_log_ignored
 				END

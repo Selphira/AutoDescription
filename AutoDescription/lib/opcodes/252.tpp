@@ -4,8 +4,8 @@
 // leurs propres cibles, sans niveau de lancement (ancien opcode_252_common) ; code commun dans
 // lib/recursion.tpp.
 
-// Ressource vide : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
-// opcode_resref_is_valid).
+// Ressource vide ou sort illisible : effet écarté sans rien écrire, erreur journalisée (comme l'ancien
+// opcode_resref_is_valid pour une ressource vide).
 // Refus : refus de la sous-description (ad_recursion_support).
 DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 	PHP_EACH fx_ids_252 AS _ => heading_id BEGIN
@@ -20,6 +20,11 @@ DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 				SPRINT ignored_reason ~file_error:opcode252:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = heading_id
+				SPRINT drop_file_error ~%spell_fact_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF ~%heading_spell%~ STRING_EQUAL ~~ BEGIN
 				SET recursion_fx = heading_id

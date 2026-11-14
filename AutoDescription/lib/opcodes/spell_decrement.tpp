@@ -28,10 +28,18 @@ DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 			SPRINT ~fx_decrement_name_%decrement_id%~ ~%decrement_kind_name%~
 			SPRINT decrement_resref $fx_resource(~%decrement_id%~)
 			SPRINT decrement_spell ~%decrement_own_spell%~
+			SPRINT decrement_file_error ~~
 			PATCH_IF NOT (~%decrement_resref%~ STRING_EQUAL ~~) BEGIN
 				SPRINT spell_fact_resref ~%decrement_resref%~ SPRINT spell_fact_out ~decrement_spell~ LPM ad_spell_name_to
+				SPRINT decrement_file_error ~%spell_fact_error%~
 			END
-			PATCH_IF $fx_parameter1(~%decrement_id%~) < 1 BEGIN
+			// Le sort n'est lancé que sur EE.
+			PATCH_IF IS_EE AND NOT (~%decrement_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = decrement_id
+				SPRINT drop_file_error ~%decrement_file_error%~
+				LPM ad_application_drop_file
+			END
+			ELSE PATCH_IF $fx_parameter1(~%decrement_id%~) < 1 BEGIN
 				// Sur EE, l'ancien moteur ne l'écarte pas : effet en jeu non établi.
 				PATCH_IF IS_EE BEGIN
 					LPF ad_refusal INT_VAR fx_id = decrement_id STR_VAR reason = ~not_implemented:opcode%decrement_opcode%:amount~ message = ~amount of 0 or less on enhanced editions~ RET render_missing = refusal END

@@ -60,8 +60,8 @@ END
 
 // Comme l'ancien opcode_111_replace, un 111 du fichier est écarté sans ligne quand une métamorphose
 // (135) de sa portée a la même durée et le même timing : l'arme fait partie de la métamorphose.
-// Ressource vide (l'ancien opcode_111_is_valid l'écarte) ou arme absente : effet écarté sans
-// rien écrire, erreur journalisée.
+// Ressource vide (l'ancien opcode_111_is_valid l'écarte), arme absente ou illisible : effet écarté
+// sans rien écrire, erreur journalisée.
 // Refus : cette métamorphose vient d'un EFF (l'ancien moteur ne la voit que selon l'ordre de ses
 // opcodes) ; effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
 // selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; arme sans nom
@@ -74,7 +74,7 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%weapon_id%~) BEGIN
 			SPRINT weapon_resref $fx_resource(~%weapon_id%~)
 			SPRINT weapon_error $fx_substitution_error(~%weapon_id%~)
-			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name END
+			LPF ad_item_info STR_VAR resref = ~%weapon_resref%~ RET weapon_name = name weapon_file_error = file_error END
 			SET weapon_polymorph = 0 - 1
 			PATCH_IF NOT $fx_external(~%weapon_id%~) BEGIN
 				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
@@ -114,6 +114,11 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 				SPRINT ignored_reason ~file_error:opcode111:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%weapon_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = weapon_id
+				SPRINT drop_file_error ~%weapon_file_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF ~%weapon_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%weapon_resref%.itm~ BEGIN

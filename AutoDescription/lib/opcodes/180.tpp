@@ -4,7 +4,7 @@
 // « Empêche d'utiliser « Anneau des arcanes » et « Anneau Ensorceleur » » ; un objet du même nom que
 // l'objet décrit en est un autre exemplaire et n'est pas nommé.
 
-// Ressource vide ou objet absent : effet écarté sans rien écrire, erreur journalisée ; objet sans
+// Ressource vide, objet absent ou illisible : effet écarté sans rien écrire, erreur journalisée ; objet sans
 // nom : effet écarté et journalisé (l'ancien moteur n'écrit rien). Refus : parameter2 non nul.
 DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 	LPF ad_item_info STR_VAR resref = ~%ctx_resource%~ RET forbid_own_name = name END
@@ -13,12 +13,17 @@ DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%forbid_id%~) BEGIN
 			SPRINT forbid_resref $fx_resource(~%forbid_id%~)
 			SET ~fx_forbid_unique_%forbid_id%~ = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
-			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
+			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name forbid_file_error = file_error END
 			PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%forbid_resref%.itm~ BEGIN
 				SET drop_id = forbid_id
 				SPRINT ignored_reason ~file_error:opcode180:invalid~
 				SPRINT ignored_message ~item %forbid_resref%.ITM does not exist~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%forbid_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = forbid_id
+				SPRINT drop_file_error ~%forbid_file_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF $fx_parameter2(~%forbid_id%~) != 0 BEGIN
 				LPF ad_refusal INT_VAR fx_id = forbid_id STR_VAR reason = ~not_implemented:opcode180:invalid~ message = ~parameter2 other than 0 not supported~ RET render_missing = refusal END

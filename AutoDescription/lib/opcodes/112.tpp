@@ -5,18 +5,23 @@
 // Comme l'ancien opcode_112_is_valid, le retrait d'une arme nommée « Attaquer » ou « Morgenstern »
 // (armes des métamorphoses) est écarté sans rien écrire ; un objet sans nom aussi (ancien
 // opcode_self_112, qui n'écrit rien sans nom), journalisé ; de même une ressource vide ou un objet
-// absent, en erreur.
+// absent ou illisible, en erreur.
 DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 	PHP_EACH fx_ids_112 AS _ => remove_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
-			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref END
+			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref remove_file_error = file_error END
 			SET ~fx_item_return_%remove_id%~ = 0
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = remove_id
 				SPRINT ignored_reason ~file_error:opcode112:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			ELSE PATCH_IF NOT (~%remove_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = remove_id
+				SPRINT drop_file_error ~%remove_file_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF remove_name_ref == 25615 OR remove_name_ref == 10966 OR remove_name_ref == 6854 BEGIN
 				SET drop_id = remove_id

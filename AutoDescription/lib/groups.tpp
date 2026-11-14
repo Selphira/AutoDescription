@@ -474,11 +474,14 @@ DEFINE_PATCH_MACRO ad_group_bounce_spells BEGIN
 			PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
 				SET group_spell_match = 0
 				INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
-					READ_LONG  SPL_extended_headers_offset group_headers_offset
-					READ_SHORT SPL_extended_headers_count  group_headers_count
+					SET group_headers_count = 0
+					PATCH_IF BUFFER_LENGTH >= 0x72 BEGIN
+						READ_LONG  SPL_extended_headers_offset group_headers_offset
+						READ_SHORT SPL_extended_headers_count  group_headers_count
+					END
 					FOR (group_header = 0; group_header < group_headers_count; ++group_header) BEGIN
 						SET group_header_offset = group_headers_offset + 0x28 * group_header + SPL_HEAD_projectile
-						PATCH_IF BUFFER_LENGTH >= group_header_offset + 2 BEGIN
+						PATCH_IF group_header_offset >= 0 AND BUFFER_LENGTH >= group_header_offset + 2 BEGIN
 							READ_SHORT group_header_offset group_spell_projectile
 							SET group_spell_match = group_spell_match OR group_spell_projectile == group_projectile
 						END
@@ -688,13 +691,13 @@ DEFINE_PATCH_MACRO ad_inflicted_read_node BEGIN
 			READ_SHORT 0x6e range_index
 			READ_SHORT 0x70 range_count
 			SET $inflicted_ranges(~%range_index%~) = range_count
-			FOR (header = 0; header < header_count AND header_offset + header * 0x28 + 0x22 <= BUFFER_LENGTH; ++header) BEGIN
+			FOR (header = 0; header_offset >= 0 AND header < header_count AND header_offset + header * 0x28 + 0x22 <= BUFFER_LENGTH; ++header) BEGIN
 				READ_SHORT (header_offset + header * 0x28 + 0x1e) range_count
 				READ_SHORT (header_offset + header * 0x28 + 0x20) range_index
 				SET $inflicted_ranges(~%range_index%~) = range_count
 			END
 			PHP_EACH inflicted_ranges AS range_index => range_count BEGIN
-				FOR (inflicted_effect = range_index; inflicted_state >= 0 AND inflicted_effect < range_index + range_count AND effect_offset + (inflicted_effect + 1) * 0x30 <= BUFFER_LENGTH; ++inflicted_effect) BEGIN
+				FOR (inflicted_effect = range_index; effect_offset >= 0 AND inflicted_state >= 0 AND inflicted_effect < range_index + range_count AND effect_offset + (inflicted_effect + 1) * 0x30 <= BUFFER_LENGTH; ++inflicted_effect) BEGIN
 					READ_SHORT (effect_offset + inflicted_effect * 0x30) child_opcode
 					READ_ASCII (effect_offset + inflicted_effect * 0x30 + 0x14) child_resref (8) NULL
 					LPM ad_inflicted_add

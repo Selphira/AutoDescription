@@ -12,7 +12,8 @@
 
 // Comme l'ancien opcode_127_is_valid, un effet dont la table resource est absente (avec un special
 // non nul, la table vide l'est toujours) est écarté ; de même, journalisés, parameter2 hors de 0-9 et
-// parameter1 négatif.
+// parameter1 négatif. Créature illisible de la table : laissée hors de la liste, journalisée ; sans
+// autre créature nommée, effet écarté.
 // Refus : special non nul (niveau du lanceur, nombre de créatures) ; table sans créature, ou dont
 // aucune n'a de nom ; créature de niveau
 // de puissance nul, hors des invocations ordinaires (allégeance au plus 15 sauf familier, genre
@@ -97,6 +98,7 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	SET monster_min = 0
 	SET monster_max = 0
 	CLEAR_ARRAY monster_names
+	SPRINT monster_invalid ~~
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%monster_file%.2da~ BEGIN
 		SET drop_id = monster_id
 		SPRINT ignored_reason ~file_error:opcode127:no_table~
@@ -116,7 +118,9 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	END
 	SPRINT monster_or @1000007 // ~ou~
 	LPF ad_join STR_VAR array_name = ~monster_names~ final_glue = EVAL ~ %monster_or% ~ RET monster_creatures = text END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND (monster_max == 0 OR ~%monster_creatures%~ STRING_EQUAL ~~) BEGIN
+	SPRINT monster_table_name ~%monster_file%~
+	LPM ad_op_127_invalid_creature
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%monster_id%~) AND (monster_max == 0 OR ~%monster_creatures%~ STRING_EQUAL ~~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:no_creature~ message = ~no named creature in table %monster_file%.2DA~ RET render_missing = refusal END
 	END
 	SPRINT ~fx_monster_creatures_%monster_id%~ ~%monster_creatures%~
@@ -128,13 +132,17 @@ END
 // leur nombre (fx_monster_creatures) ; aussi pour l'opcode 331 (monster_opcode).
 DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 	CLEAR_ARRAY monster_names
+	SPRINT monster_invalid ~~
 	INNER_PATCH_FILE ~%monster_resref%.2da~ BEGIN
 		COUNT_2DA_ROWS 2 monster_rows
 		FOR (monster_row = 1; monster_row < monster_rows; ++monster_row) BEGIN
 			READ_2DA_ENTRY monster_row 1 2 monster_creature
 			PATCH_IF FILE_EXISTS_IN_GAME ~%monster_creature%.cre~ BEGIN
-				LPF ad_creature_info STR_VAR resref = ~%monster_creature%~ RET monster_name = name END
-				PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
+				LPF ad_creature_info STR_VAR resref = ~%monster_creature%~ RET monster_name = name monster_file_error = file_error END
+				PATCH_IF NOT (~%monster_file_error%~ STRING_EQUAL ~~) BEGIN
+					SPRINT monster_invalid ~%monster_file_error%~
+				END
+				ELSE PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
 					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 				END
 				ELSE BEGIN
@@ -145,23 +153,25 @@ DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 	END
 	SPRINT monster_or @1000007 // ~ou~
 	LPF ad_join STR_VAR array_name = ~monster_names~ final_glue = EVAL ~ %monster_or% ~ RET monster_creatures = text END
-	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
+	SPRINT monster_table_name ~%monster_resref%~
+	LPM ad_op_127_invalid_creature
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%monster_id%~) AND ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:no_creature~ message = ~no named creature in table %monster_resref%.2DA~ RET render_missing = refusal END
 	END
 	SPRINT ~fx_monster_creatures_%monster_id%~ ~%monster_creatures%~
 	SET ~fx_monster_resource_table_%monster_id%~ = 1
 END
 
-// Créature monster_resref (ligne monster_row) de la table.
+// Créature monster_resref (ligne monster_row) de la table ; illisible, elle est laissée hors de la
+// liste, son message dans monster_invalid.
 DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
-	INNER_PATCH_FILE ~%monster_resref%.cre~ BEGIN
-		READ_LONG CRE_XP_power_level monster_power
-		READ_BYTE CRE_allegiance monster_allegiance
-		READ_BYTE CRE_gender monster_gender
+	LPF ad_creature_info STR_VAR resref = ~%monster_resref%~ RET monster_name = name monster_power = power_level
+		monster_allegiance = allegiance monster_gender = gender monster_file_error = file_error END
+	PATCH_IF NOT (~%monster_file_error%~ STRING_EQUAL ~~) BEGIN
+		SPRINT monster_invalid ~%monster_file_error%~
 	END
-	LPF ad_creature_info STR_VAR resref = ~%monster_resref%~ RET monster_name = name END
 	// Genres SUMMONED (6) et SUMMONED_DEMON (9) de gender.ids, allégeance FAMILIAR (3) de ea.ids.
-	PATCH_IF monster_allegiance > 15 OR monster_allegiance == 3 OR (monster_gender != 6 AND monster_gender != 9) BEGIN
+	ELSE PATCH_IF monster_allegiance > 15 OR monster_allegiance == 3 OR (monster_gender != 6 AND monster_gender != 9) BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:limit~ message = ~creature %monster_resref%.CRE that does not count towards the summoning limit~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF monster_power <= 0 BEGIN
@@ -180,11 +190,32 @@ DEFINE_PATCH_MACRO ad_op_127_creature BEGIN
 		SET monster_min = (monster_min == 0 OR monster_min > monster_count) ? monster_count : monster_min
 		SET monster_max = (monster_max < monster_count) ? monster_count : monster_max
 	END
-	PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
+	PATCH_IF NOT (~%monster_file_error%~ STRING_EQUAL ~~) BEGIN
+	END
+	ELSE PATCH_IF ~%monster_name%~ STRING_CONTAINS_REGEXP ~,~ == 0 BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:name~ message = ~creature name with a comma~ RET render_missing = refusal END
 	END
 	ELSE BEGIN
 		LPM ad_op_127_add_name
+	END
+END
+
+// Créature illisible d'une table (monster_invalid, table monster_table_name) : sans autre créature
+// nommée, effet écarté ; sinon laissée hors de la liste, erreur journalisée.
+DEFINE_PATCH_MACRO ad_op_127_invalid_creature BEGIN
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT (~%monster_invalid%~ STRING_EQUAL ~~) BEGIN
+		PATCH_IF ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
+			SET drop_id = monster_id
+			SPRINT drop_file_error ~%monster_invalid% (table %monster_table_name%.2DA), and no other named creature~
+			LPM ad_application_drop_file
+		END
+		ELSE BEGIN
+			SET ignored_fx = monster_id
+			SPRINT ignored_reason ~file_error:opcode%monster_opcode%:invalid_file~
+			SPRINT ignored_message ~%monster_invalid% (table %monster_table_name%.2DA): left out of the list~
+			SPRINT ignored_consequence ~kept~
+			LPM ad_log_ignored
+		END
 	END
 END
 

@@ -3,7 +3,8 @@
 // sorts » pour un sort profane ou divin (type 1 ou 2). Code commun dans lib/opcodes/states.tpp.
 // Avec AD_ENABLE_SHRINKAGE, une métamorphose peut le retirer (ad_group_polymorph, lib/groups.tpp).
 
-// Sort absent : effet écarté sans rien écrire, erreur journalisée (l'ancien moteur n'écrit rien).
+// Sort absent ou illisible : effet écarté sans rien écrire, erreur journalisée (l'ancien moteur
+// n'écrit rien).
 // Sort sans nom : la capacité ne peut être désignée, effet écarté et journalisé.
 DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 	PHP_EACH fx_ids_171 AS _ => ability_id BEGIN
@@ -23,7 +24,12 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 						READ_SHORT SPL_type ability_type
 					END
 				END
-				PATCH_IF ~%ability_name%~ STRING_EQUAL ~~ BEGIN
+				PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+					SET drop_id = ability_id
+					SPRINT drop_file_error ~%spell_fact_error%~
+					LPM ad_application_drop_file
+				END
+				ELSE PATCH_IF ~%ability_name%~ STRING_EQUAL ~~ BEGIN
 					SET drop_id = ability_id
 					SPRINT ignored_reason ~not_implemented:opcode171:no_name~
 					SPRINT ignored_message ~spell %ability_resref%.SPL has no name: no line~

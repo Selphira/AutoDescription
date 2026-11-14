@@ -5,14 +5,15 @@
 // fx_select_spells : liste écrite des sorts.
 
 // 2DA absent : effet écarté sans rien écrire, erreur journalisée.
-// Sort de la liste absent : sauté, erreur journalisée, comme dans l'ancien moteur ; sans autre sort
-// nommé, effet écarté. Refus : liste sans aucun sort nommé (l'ancien moteur n'écrit rien).
+// Sort de la liste absent ou illisible : sauté, erreur journalisée, comme dans l'ancien moteur pour un
+// sort absent ; sans autre sort nommé, effet écarté. Refus : liste sans aucun sort nommé (l'ancien moteur n'écrit rien).
 DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 	PHP_EACH fx_ids_214 AS _ => select_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_parameter2(~%select_id%~) == 0 BEGIN
 			SPRINT select_table $fx_resource(~%select_id%~)
 			SPRINT select_spells ~~
 			SPRINT select_missing ~~
+			SPRINT select_invalid ~~
 			PATCH_IF NOT FILE_EXISTS_IN_GAME ~%select_table%.2da~ BEGIN
 				SET drop_id = select_id
 				SPRINT ignored_reason ~file_error:opcode214:table~
@@ -26,7 +27,10 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 						READ_2DA_ENTRY select_row 1 3 select_resref
 						PATCH_IF FILE_EXISTS_IN_GAME ~%select_resref%.spl~ BEGIN
 							SPRINT spell_fact_resref ~%select_resref%~ SPRINT spell_fact_out ~select_name~ LPM ad_spell_name_to
-							PATCH_IF NOT (~%select_name%~ STRING_EQUAL ~~) BEGIN
+							PATCH_IF NOT (~%spell_fact_error%~ STRING_EQUAL ~~) BEGIN
+								SPRINT select_invalid ~%spell_fact_error%~
+							END
+							ELSE PATCH_IF NOT (~%select_name%~ STRING_EQUAL ~~) BEGIN
 								SPRINT select_spells ~%select_spells%%CRLF%  * %select_name%~
 							END
 						END
@@ -34,6 +38,13 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 							SPRINT select_missing ~%select_resref%~
 						END
 					END
+				END
+				PATCH_IF NOT (~%select_invalid%~ STRING_EQUAL ~~) AND NOT (~%select_spells%~ STRING_EQUAL ~~) BEGIN
+					SET ignored_fx = select_id
+					SPRINT ignored_reason ~file_error:opcode214:invalid_file~
+					SPRINT ignored_message ~%select_invalid% (table %select_table%.2da): left out of the list~
+					SPRINT ignored_consequence ~kept~
+					LPM ad_log_ignored
 				END
 				PATCH_IF NOT (~%select_missing%~ STRING_EQUAL ~~) AND ~%select_spells%~ STRING_EQUAL ~~ BEGIN
 					SET drop_id = select_id
@@ -47,6 +58,11 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 					SPRINT ignored_message ~spell %select_missing%.spl of table %select_table%.2da not found: left out of the list~
 					SPRINT ignored_consequence ~kept~
 					LPM ad_log_ignored
+				END
+				ELSE PATCH_IF NOT (~%select_invalid%~ STRING_EQUAL ~~) AND ~%select_spells%~ STRING_EQUAL ~~ BEGIN
+					SET drop_id = select_id
+					SPRINT drop_file_error ~%select_invalid% (table %select_table%.2da), and no other named spell~
+					LPM ad_application_drop_file
 				END
 				ELSE PATCH_IF ~%select_spells%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = select_id STR_VAR reason = ~not_implemented:opcode214:no_spells~ message = ~no named spell in table %select_table%.2da~ RET render_missing = refusal END

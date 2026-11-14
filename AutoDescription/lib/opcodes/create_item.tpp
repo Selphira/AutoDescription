@@ -5,8 +5,8 @@
 
 // Un trésor aléatoire RNDTRE01 à RNDTRE05 absent de rndtres.2da est nommé d'après sa qualité
 // (ancien get_random_treasure_names, liste @8170000) : « trésor aléatoire de qualité exceptionnelle ».
-// Ressource vide (comme l'ancien opcode_resref_is_valid) ou objet absent : effet écarté sans
-// rien écrire, erreur journalisée.
+// Ressource vide (comme l'ancien opcode_resref_is_valid), objet absent ou illisible : effet écarté
+// sans rien écrire, erreur journalisée.
 // Un trésor aléatoire de rndtres.2da énumère les objets possibles (ad_random_treasure_names : « Gemme
 // héliotrope », « Gemme pierre de lune » ou « Gemme shandon »).
 // Refus : trésor aléatoire de rndtres.2da sans objet nommé, objet sans nom (aucune ligne).
@@ -15,12 +15,18 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT create_resref $fx_resource(~%create_id%~)
 			LPF ad_item_is_random_treasure STR_VAR resref = ~%create_resref%~ RET create_random = random create_listed = listed create_quality = quality END
-			LPF ad_item_info STR_VAR resref = ~%create_resref%~ RET create_name = name create_stackable = stackable END
+			LPF ad_item_info STR_VAR resref = ~%create_resref%~ RET create_name = name create_stackable = stackable create_file_error = file_error END
 			PATCH_IF ~%create_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = create_id
 				SPRINT ignored_reason ~file_error:opcode%create_opcode%:invalid~
 				SPRINT ignored_message ~empty resource field~
 				LPM ad_application_drop
+			END
+			// Un trésor aléatoire est remplacé par le jeu : son fichier n'est pas lu.
+			ELSE PATCH_IF NOT create_random AND NOT (~%create_file_error%~ STRING_EQUAL ~~) BEGIN
+				SET drop_id = create_id
+				SPRINT drop_file_error ~%create_file_error%~
+				LPM ad_application_drop_file
 			END
 			ELSE PATCH_IF create_random AND NOT support_header_only BEGIN
 				PATCH_IF NOT create_listed BEGIN
