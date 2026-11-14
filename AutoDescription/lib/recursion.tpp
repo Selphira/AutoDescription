@@ -498,7 +498,7 @@ END
 DEFINE_PATCH_MACRO ad_recursion_heading_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%heading_opcode%~)
-	LPF ad_tra INT_VAR tra_id = heading_tra RET heading_name = text END
+	SET tra_id = heading_tra SPRINT tra_out ~heading_name~ LPM ad_tra_to
 	PHP_EACH ~fx_ids_%heading_opcode%~ AS _ => heading_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%heading_id%~) AND $fx_sub_count(~%heading_id%~) > 0 BEGIN
 			SET recursion_fx = heading_id
@@ -974,10 +974,10 @@ DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 	SPRINT $area_main(~1~) ~%ofTheTarget%~
 	SPRINT $area_main(~2~) ~%toTheTarget%~
 	FOR (area_form = 0; area_form < 3; ++area_form) BEGIN
-		LPF ad_tra INT_VAR tra_id = 2001000 + ctx_area_creatures * 10 + area_form
-			tra_block_start = 2001000 tra_block_size = 100 RET target = text END // ~les créatures~
+		SET tra_id = 2001000 + ctx_area_creatures * 10 + area_form
+			SET tra_block_start = 2001000 SET tra_block_size = 100 SPRINT tra_out ~target~ LPM ad_tra_to // ~les créatures~
 		SPRINT main_target $area_main(~%area_form%~)
-		LPF ad_tra INT_VAR tra_id = area_phrase RET area_text = text END
+		SET tra_id = area_phrase SPRINT tra_out ~area_text~ LPM ad_tra_to
 		SPRINT $area_text(~%area_form%~) ~%area_text%~
 	END
 	SPRINT theTarget   $area_text(~0~)

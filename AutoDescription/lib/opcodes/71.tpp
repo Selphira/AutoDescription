@@ -24,7 +24,7 @@ DEFINE_PATCH_MACRO ad_op_71_lines BEGIN
 		SET gender_tra = 8099000 + gender_value
 		PATCH_IF NOT $fx_consumed(~%gender_id%~) AND $fx_parameter2(~%gender_id%~) == MOD_TYPE_flat BEGIN
 			PATCH_IF gender_value >= 0 AND gender_value <= 255 AND TRA_ENTRY_EXISTS (~%gender_tra%~) BEGIN
-				LPF ad_tra INT_VAR tra_id = gender_tra tra_block_start = 8099000 tra_block_size = 256 RET gender_name = text END // ~créature invoquée~ (@8099006)
+				SET tra_id = gender_tra SET tra_block_start = 8099000 SET tra_block_size = 256 SPRINT tra_out ~gender_name~ LPM ad_tra_to // ~créature invoquée~ (@8099006)
 				SPRINT $fx_gender_name(~%gender_id%~) ~%gender_name%~
 			END
 			ELSE BEGIN

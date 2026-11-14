@@ -17,7 +17,7 @@ DEFINE_PATCH_MACRO ad_op_183_support BEGIN
 				SET exception_tra = 8180000 + exception_value
 				SET exception_name_count = 0
 				PATCH_IF exception_value >= 0 AND exception_value < 74 AND TRA_ENTRY_EXISTS (~%exception_tra%~) BEGIN
-					LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 8180000 tra_block_size = 74 RET exception_name = text END // ~robes~ (@8180067)
+					SET tra_id = exception_tra SET tra_block_start = 8180000 SET tra_block_size = 74 SPRINT tra_out ~exception_name~ LPM ad_tra_to // ~robes~ (@8180067)
 					PATCH_IF NOT (~%exception_name%~ STRING_EQUAL ~~) BEGIN
 						SPRINT $fx_exception_name(~%exception_id%~ ~0~) ~%exception_name%~
 						SET exception_name_count = 1

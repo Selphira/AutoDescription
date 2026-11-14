@@ -29,7 +29,7 @@ DEFINE_PATCH_MACRO ad_op_262_line BEGIN
 	// Sans distance (champ de vision fixé à 0) : « 0 mètre », comme l'ancien feets_to_meters.
 	PATCH_IF ~%vision_text%~ STRING_EQUAL ~~ BEGIN
 		SET distance_units = 0
-		LPF ad_tra INT_VAR tra_id = 1100000 RET vision_text = text END // ~%distance_units% mètre~
+		SET tra_id = 1100000 SPRINT tra_out ~vision_text~ LPM ad_tra_to // ~%distance_units% mètre~
 	END
 	PATCH_IF line_form == 0 BEGIN
 		SPRINT value ~%vision_text%~
@@ -42,12 +42,12 @@ DEFINE_PATCH_MACRO ad_op_262_line BEGIN
 		ELSE BEGIN
 			SPRINT value ~-%value%~
 		END
-		LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
+		SET tra_id = stat_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 		LPM ad_effect_line
 	END
 	ELSE BEGIN
-		LPF ad_tra INT_VAR tra_id = stat_name_tra + 60000 RET theStatistic = text END
+		SET tra_id = stat_name_tra + 60000 SPRINT tra_out ~theStatistic~ LPM ad_tra_to
 		LPM ad_stat_modifier_phrase
 		SPRINT value ~%vision_text%~
 		LPM ad_effect_line

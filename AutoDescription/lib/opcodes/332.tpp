@@ -65,7 +65,7 @@ DEFINE_PATCH_MACRO ad_op_332_lines BEGIN
 			SET line_fx = damage_mod_id
 			LPM ad_application_form
 			PATCH_IF line_form == 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = 23320000 + damage_mod_type tra_block_start = 23320000 tra_block_size = 13 RET name = text END // ~Dégâts de feu~ (@23320001)
+				SET tra_id = 23320000 + damage_mod_type SET tra_block_start = 23320000 SET tra_block_size = 13 SPRINT tra_out ~name~ LPM ad_tra_to // ~Dégâts de feu~ (@23320001)
 				LPF ad_signed_value INT_VAR value = damage_mod_value RET value = text END
 				SPRINT value @1200003 // ~%value%%PERCENT%~
 				SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
@@ -73,7 +73,7 @@ DEFINE_PATCH_MACRO ad_op_332_lines BEGIN
 			END
 			ELSE BEGIN
 				// Ancien opcode_target_332 : « Augmente de 10 % les dégâts de feu de la cible ».
-				LPF ad_tra INT_VAR tra_id = 23320100 + damage_mod_type tra_block_start = 23320100 tra_block_size = 13 RET theStatistic = text END // ~les dégâts de feu~ (@23320101)
+				SET tra_id = 23320100 + damage_mod_type SET tra_block_start = 23320100 SET tra_block_size = 13 SPRINT tra_out ~theStatistic~ LPM ad_tra_to // ~les dégâts de feu~ (@23320101)
 				SET stat_value = damage_mod_value
 				SET stat_mode = MOD_TYPE_cumulative
 				SET stat_percent = 1

@@ -198,7 +198,7 @@ DEFINE_PATCH_MACRO ad_op_0_group_totals BEGIN
 		LPM ad_op_0_armor_line
 	END
 	PHP_EACH ac_masks AS ac_key => ac_mask BEGIN
-		LPF ad_tra INT_VAR tra_id = 20001000 + ac_mask tra_block_start = 20001000 tra_block_size = 16 RET versus = text END
+		SET tra_id = 20001000 + ac_mask SET tra_block_start = 20001000 SET tra_block_size = 16 SPRINT tra_out ~versus~ LPM ad_tra_to
 		PATCH_IF ac_creature_found AND ac_key == 0 - 2 BEGIN
 			LPM ad_op_0_versus_with_creatures
 		END
@@ -338,7 +338,7 @@ END
 DEFINE_PATCH_MACRO ad_op_0_armor_line BEGIN
 	LOCAL_SPRINT ac_armor_values ~~
 	PHP_EACH ac_masks AS ac_key => ac_mask BEGIN
-		LPF ad_tra INT_VAR tra_id = 20001000 + ac_mask tra_block_start = 20001000 tra_block_size = 16 RET versus = text END
+		SET tra_id = 20001000 + ac_mask SET tra_block_start = 20001000 SET tra_block_size = 16 SPRINT tra_out ~versus~ LPM ad_tra_to
 		PATCH_IF ac_creature_found AND ac_key == 0 - 2 BEGIN
 			LPM ad_op_0_versus_with_creatures
 		END
@@ -437,7 +437,7 @@ DEFINE_PATCH_MACRO ad_op_0_modifier_line BEGIN
 		SPRINT value @20000003 // ~Malus de %value%~
 	END
 	PATCH_IF ac_mask != AC_MOD_TYPE_all BEGIN
-		LPF ad_tra INT_VAR tra_id = 20001000 + ac_mask tra_block_start = 20001000 tra_block_size = 16 RET versus = text END
+		SET tra_id = 20001000 + ac_mask SET tra_block_start = 20001000 SET tra_block_size = 16 SPRINT tra_out ~versus~ LPM ad_tra_to
 		SPRINT value ~%value% %versus%~
 	END
 	SPRINT name @20000000 // ~Classe d'armure~

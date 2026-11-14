@@ -1067,7 +1067,7 @@ DEFINE_PATCH_MACRO ad_group_restored_spells_line BEGIN
 		CLEAR_ARRAY group_level_names
 		FOR (group_level = 1; group_level <= 9; ++group_level) BEGIN
 			PATCH_IF (group_levels BAND (1 BLSL (group_level - 1))) != 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = 8010000 + group_level tra_block_start = 8010000 tra_block_size = 10 RET group_level_name = text END // ~2ème~ (@8010002)
+				SET tra_id = 8010000 + group_level SET tra_block_start = 8010000 SET tra_block_size = 10 SPRINT tra_out ~group_level_name~ LPM ad_tra_to // ~2ème~ (@8010002)
 				SPRINT $group_level_names(~%group_level%~) ~%group_level_name%~
 			END
 		END
@@ -1351,7 +1351,7 @@ BEGIN
 	SET spell_type_count = 0
 	FOR (spell_type_bit = 0; spell_type_bit < 3; ++spell_type_bit) BEGIN
 		PATCH_IF (types BAND (1 << spell_type_bit)) != 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8020000 + spell_type_bit tra_block_start = 8020000 tra_block_size = 10 RET spell_type_name = text END // ~profanes~
+			SET tra_id = 8020000 + spell_type_bit SET tra_block_start = 8020000 SET tra_block_size = 10 SPRINT tra_out ~spell_type_name~ LPM ad_tra_to // ~profanes~
 			SPRINT $spell_type_names(~%spell_type_count%~) ~%spell_type_name%~
 			SET spell_type_count += 1
 			PATCH_IF spell_type_bit == 1 BEGIN
@@ -1599,8 +1599,8 @@ DEFINE_PATCH_MACRO ad_group_cures_line BEGIN
 	CLEAR_ARRAY cure_names_of
 	PHP_EACH ~AD_%derived_kind%_OPCODES~ AS cure_index => _ BEGIN
 		PATCH_IF (cure_mask BAND (1 BLSL cure_index)) != 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = cure_tra + 20 + cure_index RET cure_name = text END // ~l'étourdissement~ (@30160020)
-			LPF ad_tra INT_VAR tra_id = cure_tra + 10 + cure_index RET cure_name_of = text END // ~de l'étourdissement~ (@30160010)
+			SET tra_id = cure_tra + 20 + cure_index SPRINT tra_out ~cure_name~ LPM ad_tra_to // ~l'étourdissement~ (@30160020)
+			SET tra_id = cure_tra + 10 + cure_index SPRINT tra_out ~cure_name_of~ LPM ad_tra_to // ~de l'étourdissement~ (@30160010)
 			SPRINT $cure_names(~%cure_index%~) ~%cure_name%~
 			SPRINT $cure_names_of(~%cure_index%~) ~%cure_name_of%~
 		END
@@ -1762,7 +1762,7 @@ DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 	SET line_fx = group_id
 	LPM ad_application_form
 	PATCH_IF group_statistic_tra > 0 AND line_form != 0 BEGIN
-		LPF ad_tra INT_VAR tra_id = group_statistic_tra RET theStatistic = text END
+		SET tra_id = group_statistic_tra SPRINT tra_out ~theStatistic~ LPM ad_tra_to
 		SET stat_value = group_value
 		SET stat_mode = group_mode
 		SET stat_percent = group_percent

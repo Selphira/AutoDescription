@@ -74,14 +74,14 @@ DEFINE_PATCH_MACRO ad_op_102_lines BEGIN
 				WHILE (levels_mask >> levels_top) > 0 BEGIN
 					SET levels_top += 1
 				END
-				LPF ad_tra INT_VAR tra_id = 8010000 + levels_top tra_block_start = 8010001 tra_block_size = 9 RET spellLevel = text END // ~5ème~ (@8010005)
+				SET tra_id = 8010000 + levels_top SET tra_block_start = 8010001 SET tra_block_size = 9 SPRINT tra_out ~spellLevel~ LPM ad_tra_to // ~5ème~ (@8010005)
 				SET line_phrase = 21020110 // ~Immunité contre les sorts de %spellLevel% niveau et inférieurs~
 			END
 			ELSE BEGIN
 				CLEAR_ARRAY levels_names
 				FOR (levels_level = 1; levels_level <= 9; ++levels_level) BEGIN
 					PATCH_IF (levels_mask BAND (1 << (levels_level - 1))) != 0 BEGIN
-						LPF ad_tra INT_VAR tra_id = 8010000 + levels_level tra_block_start = 8010001 tra_block_size = 9 RET levels_name = text END // ~5ème~ (@8010005)
+						SET tra_id = 8010000 + levels_level SET tra_block_start = 8010001 SET tra_block_size = 9 SPRINT tra_out ~levels_name~ LPM ad_tra_to // ~5ème~ (@8010005)
 						SPRINT $levels_names(~%levels_level%~) ~%levels_name%~
 					END
 				END

@@ -158,7 +158,7 @@ DEFINE_PATCH_MACRO ad_op_111_lines BEGIN
 		PATCH_IF NOT $fx_consumed(~%weapon_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%weapon_id%~)
 			SET value = $fx_parameter1(~%weapon_id%~) > 0 ? $fx_parameter1(~%weapon_id%~) : 1
-			LPF ad_tra INT_VAR tra_id = value > 1 ? 21110002 : 21110001 RET valueType = text END // ~arme magique~
+			SET tra_id = value > 1 ? 21110002 : 21110001 SPRINT tra_out ~valueType~ LPM ad_tra_to // ~arme magique~
 			SPRINT amount @21110003 // ~%value% %valueType%~
 			SET line_fx = weapon_id
 			SET line_phrase = value > 1 ? 21110110 : 21110100 // ~Équipe %theTarget% d'%amount% (%itemName%)~

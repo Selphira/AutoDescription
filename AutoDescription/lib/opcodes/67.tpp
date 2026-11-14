@@ -90,14 +90,14 @@ DEFINE_PATCH_MACRO ad_op_67_lines BEGIN
 			PATCH_IF summon_random > 0 BEGIN
 				SET amountMin = amount
 				SET amountMax = amount + summon_random
-				LPF ad_tra INT_VAR tra_id = 21270000 RET amount = text END // ~entre %amountMin% et %amountMax%~
+				SET tra_id = 21270000 SPRINT tra_out ~amount~ LPM ad_tra_to // ~entre %amountMin% et %amountMax%~
 			END
 			// L'ancien moteur n'ajoute les dés de vie de la créature (niveau de sa première classe) qu'à la
 			// description d'un sort.
 			SPRINT lifeDice ~~
 			PATCH_IF resource_is_spell BEGIN
 				SET creatureLevel = $fx_creature_level(~%summon_id%~)
-				LPF ad_tra INT_VAR tra_id = creatureLevel == 1 ? 20670020 : 20670021 RET lifeDice = text END // ~ de 1 dé de vie~
+				SET tra_id = creatureLevel == 1 ? 20670020 : 20670021 SPRINT tra_out ~lifeDice~ LPM ad_tra_to // ~ de 1 dé de vie~
 			END
 			SET line_phrase = ($fx_creature_unnamed(~%summon_id%~) ? 20670200 : 20670100) + 10 * ($fx_creature_side(~%summon_id%~) + ((summon_random > 0 OR amount > 1) ? 4 : 0)) // ~Invoque 1 « %creatureName% »%lifeDice%~
 			SET line_fx = summon_id

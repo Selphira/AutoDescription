@@ -58,7 +58,7 @@ DEFINE_PATCH_MACRO ad_event_spell_lines BEGIN
 			SET recursion_fx = event_id
 			LPM ad_recursion_condition_text
 			SET event_condition = event_condition_tra + (event_weapon AND $fx_parameter2(~%event_id%~) != 0 ? 2 : 0)
-			LPF ad_tra INT_VAR tra_id = event_condition RET line_condition = text END // ~À chaque coup critique~
+			SET tra_id = event_condition SPRINT tra_out ~line_condition~ LPM ad_tra_to // ~À chaque coup critique~
 			SET line_any_form = 1
 			SET line_fx = event_id
 			LPM ad_effect_line

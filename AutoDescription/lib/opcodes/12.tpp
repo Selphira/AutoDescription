@@ -80,15 +80,15 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 						PATCH_IF unit_tra == 20120003 AND ~%damage_text%~ STRING_EQUAL ~1~ BEGIN
 							SET unit_tra = 20120002 // ~point de vie~
 						END
-						LPF ad_tra INT_VAR tra_id = unit_tra RET damageType = text END
+						SET tra_id = unit_tra SPRINT tra_out ~damageType~ LPM ad_tra_to
 						SPRINT damage ~%damage_text%~
 						SPRINT damage @20120001 // ~%damage% %damageType%~
 					END
 					SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
 					PATCH_IF damage_transfer BEGIN
 						LPM ad_application_source
-						LPF ad_tra INT_VAR tra_id = source_tra     RET theSource = text END // ~le porteur~ (@2000100)
-						LPF ad_tra INT_VAR tra_id = source_tra + 1 RET ofTheSource = text END // ~du porteur~ (@2000101)
+						SET tra_id = source_tra     SPRINT tra_out ~theSource~ LPM ad_tra_to // ~le porteur~ (@2000100)
+						SET tra_id = source_tra + 1 SPRINT tra_out ~ofTheSource~ LPM ad_tra_to // ~du porteur~ (@2000101)
 					END
 					SET damage_target = $fx_effective_target(~%damage_id%~)
 					PATCH_IF line_phrase == 20120100 AND ($fx_versus_file(~%damage_id%~) > 0 OR ctx_versus_set)

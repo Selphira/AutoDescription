@@ -12,7 +12,7 @@
 DEFINE_PATCH_MACRO ad_saving_throw_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
-	LPF ad_tra INT_VAR tra_id = 20000000 + stat_opcode * 10000 RET versus = text END
+	SET tra_id = 20000000 + stat_opcode * 10000 SPRINT tra_out ~versus~ LPM ad_tra_to
 	SPRINT saves_name @5000000 // ~Jets de sauvegarde~
 	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN

@@ -90,9 +90,9 @@ END
 // Chaînes de la cible parameter1 de l'effet condition_id (theTarget, ofTheTarget, toTheTarget).
 DEFINE_PATCH_MACRO ad_op_232_targets BEGIN
 	SET condition_target = $fx_parameter1(~%condition_id%~)
-	LPF ad_tra INT_VAR tra_id = 22321000 + condition_target RET theTarget = text END // ~le porteur~
-	LPF ad_tra INT_VAR tra_id = 22321010 + condition_target RET ofTheTarget = text END // ~du porteur~
-	LPF ad_tra INT_VAR tra_id = 22321020 + condition_target RET toTheTarget = text END // ~au porteur~
+	SET tra_id = 22321000 + condition_target SPRINT tra_out ~theTarget~ LPM ad_tra_to // ~le porteur~
+	SET tra_id = 22321010 + condition_target SPRINT tra_out ~ofTheTarget~ LPM ad_tra_to // ~du porteur~
+	SET tra_id = 22321020 + condition_target SPRINT tra_out ~toTheTarget~ LPM ad_tra_to // ~au porteur~
 END
 
 // Condition de l'effet condition_id (ancien opcode_232_condition) : $fx_condition_text, vide pour un
@@ -109,7 +109,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	SET condition_equipped = ~%condition_block%~ STRING_EQUAL ~equipped~
 	PATCH_IF condition_type == 0 OR condition_type == 1 OR condition_type == 7 OR condition_type == 10 OR condition_type == 11
 			OR condition_type == 12 OR condition_type == 16 OR condition_type == 17 OR condition_type == 18 BEGIN
-		LPF ad_tra INT_VAR tra_id = 22320010 + condition_type RET condition_text = text END // ~Lorsque le porteur est touché~
+		SET tra_id = 22320010 + condition_type SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~Lorsque le porteur est touché~
 	END
 	ELSE PATCH_IF (condition_type >= 2 AND condition_type <= 4) OR condition_type == 20 BEGIN
 		SET value = condition_type == 2 ? 50 : condition_type == 3 ? 25 : condition_type == 4 ? 10 : condition_special
@@ -156,7 +156,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 		END
 		ELSE BEGIN
 			SET recursion_ignore_duration = condition_equipped
-			LPF ad_tra INT_VAR tra_id = 22321100 + (condition_equipped ? 0 : 4) + condition_special RET condition_text = text END // ~À la nuit tombée~
+			SET tra_id = 22321100 + (condition_equipped ? 0 : 4) + condition_special SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~À la nuit tombée~
 		END
 	END
 	ELSE PATCH_IF condition_type == 21 BEGIN
@@ -173,14 +173,14 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 			END
 		END
 		ELSE BEGIN
-			LPF ad_tra INT_VAR tra_id = condition_splstate_tra tra_block_start = 8120000 tra_block_size = 256 RET splstate = text END // ~la folie du berserker~ (@8120104)
+			SET tra_id = condition_splstate_tra SET tra_block_start = 8120000 SET tra_block_size = 256 SPRINT tra_out ~splstate~ LPM ad_tra_to // ~la folie du berserker~ (@8120104)
 			SPRINT condition_text @22320031 // ~À chaque round où %theTarget% est affecté par %splstate%~
 		END
 	END
 	// États vérifiés sur le porteur quelle que soit la cible du sort (IESDP : StateCheck(Myself, …)) ;
 	// l'ancien moteur les nomme par get_states_str (STATE_HELPLESS 0x20, STATE_POISONED 0x4000).
 	ELSE PATCH_IF condition_type == 5 OR condition_type == 6 BEGIN
-		LPF ad_tra INT_VAR tra_id = condition_type == 5 ? 8110006 : 8110015 RET state = text END // ~rendu impuissant~
+		SET tra_id = condition_type == 5 ? 8110006 : 8110015 SPRINT tra_out ~state~ LPM ad_tra_to // ~rendu impuissant~
 		SPRINT condition_spell_target ~%theTarget%~
 		SPRINT theTarget @22321000 // ~le porteur~
 		SPRINT condition_text @22320025 // ~Lorsque %theTarget% est %state%~

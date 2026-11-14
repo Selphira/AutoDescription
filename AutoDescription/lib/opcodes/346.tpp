@@ -37,7 +37,7 @@ END
 // Forme « soi » comme les jets de sauvegarde (ad_saving_throw_lines) ; forme « cible » : « Augmente de
 // 3 les jets de sauvegarde contre les sorts de l'école de l'Enchantement de la cible ».
 DEFINE_PATCH_MACRO ad_op_346_line BEGIN
-	LPF ad_tra INT_VAR tra_id = 23460010 + $fx_special(~%line_fx%~) tra_block_start = 23460011 tra_block_size = 9 RET versus = text END // ~contre les sorts de l'école de l'Enchantement~ (@23460014)
+	SET tra_id = 23460010 + $fx_special(~%line_fx%~) SET tra_block_start = 23460011 SET tra_block_size = 9 SPRINT tra_out ~versus~ LPM ad_tra_to // ~contre les sorts de l'école de l'Enchantement~ (@23460014)
 	PATCH_IF line_form == 0 BEGIN
 		LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode RET value = text END
 		SPRINT saves_name @23460000 // ~Jets de sauvegarde~

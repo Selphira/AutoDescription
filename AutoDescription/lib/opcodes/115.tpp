@@ -22,5 +22,5 @@ END
 
 // Nom de l'alignement détecté (alignment).
 DEFINE_PATCH_MACRO ad_op_115_variant BEGIN
-	LPF ad_tra INT_VAR tra_id = 21150010 + $fx_parameter2(~%line_fx%~) tra_block_start = 21150010 tra_block_size = 3 RET alignment = text END // ~neutre~ (@21150011)
+	SET tra_id = 21150010 + $fx_parameter2(~%line_fx%~) SET tra_block_start = 21150010 SET tra_block_size = 3 SPRINT tra_out ~alignment~ LPM ad_tra_to // ~neutre~ (@21150011)
 END

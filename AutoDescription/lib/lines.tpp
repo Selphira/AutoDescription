@@ -38,7 +38,7 @@ END
 // line_probability et sa plage, line_core). Une ligne de même texte (casse ignorée) et de même plage
 // déjà dans la section n'est pas ajoutée : l'ancien moteur garde la première (get_unique_effects).
 DEFINE_PATCH_MACRO ad_line_add BEGIN
-	LPF ad_collapse_spaces STR_VAR text = EVAL ~%line_text%~ RET line_text = text END
+	LPM ad_collapse_spaces
 	SPRINT line_new_text ~%line_text%~
 	TO_LOWER line_new_text
 	SET line_duplicate = 0
@@ -705,8 +705,8 @@ BEGIN
 			SET distance_units += 1
 		END
 		SET distance_feet = feet
-		LPF ad_tra INT_VAR tra_id = 1100000 + (distance_units > 1 ? 1 : 0) + 2 * distance_half
-			tra_block_start = 1100000 tra_block_size = 4 RET text END // ~%distance_units% mètre~
+		SET tra_id = 1100000 + (distance_units > 1 ? 1 : 0) + 2 * distance_half
+			SET tra_block_start = 1100000 SET tra_block_size = 4 SPRINT tra_out ~text~ LPM ad_tra_to // ~%distance_units% mètre~
 	END
 END
 
@@ -743,14 +743,12 @@ END
 // Une espace par séparation dans le texte d'une ligne : une liaison vide (article anglais devant un
 // pluriel générique, « golems » et non « the golems ») en laisserait deux. Le retrait d'une
 // sous-ligne, en début de ligne, est gardé.
-DEFINE_PATCH_FUNCTION ad_collapse_spaces
-	STR_VAR
-		text = ~~
-	RET
-		text
-BEGIN
-	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~  ~ ~%text%~) >= 0 BEGIN
-		INNER_PATCH_SAVE text ~%text%~ BEGIN
+DEFINE_PATCH_MACRO ad_collapse_spaces BEGIN
+	// Comme l'ancien passage par STR_VAR text = EVAL : les %variables% restées dans le texte sont
+	// substituées.
+	SPRINT line_text EVAL ~%line_text%~
+	PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~  ~ ~%line_text%~) >= 0 BEGIN
+		INNER_PATCH_SAVE line_text ~%line_text%~ BEGIN
 			REPLACE_TEXTUALLY EVALUATE_REGEXP ~\([^ %CRLF%]\)  +~ ~\1 ~
 		END
 	END

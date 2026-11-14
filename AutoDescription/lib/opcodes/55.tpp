@@ -122,7 +122,7 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 			SPRINT kill_saved_range ~%range%~
 			SPRINT range $fx_area_range(~%kill_id%~)
 			SPRINT target ~%line_the_target%~
-			LPF ad_tra INT_VAR tra_id = 2001100 RET line_the_target = text END // ~%target% dans un rayon de %range%~
+			SET tra_id = 2001100 SPRINT tra_out ~line_the_target~ LPM ad_tra_to // ~%target% dans un rayon de %range%~
 			SPRINT range ~%kill_saved_range%~
 		END
 	END

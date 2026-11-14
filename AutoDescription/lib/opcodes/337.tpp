@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_337_support BEGIN
 			SET remove_tra = 8160000 + remove_opcode
 			SPRINT remove_name ~~
 			PATCH_IF remove_opcode >= 0 AND remove_opcode <= 999 AND TRA_ENTRY_EXISTS (~%remove_tra%~) BEGIN
-				LPF ad_tra INT_VAR tra_id = remove_tra tra_block_start = 8160000 tra_block_size = 1000 RET remove_name = text END // ~les effets de charme~ (@8160005)
+				SET tra_id = remove_tra SET tra_block_start = 8160000 SET tra_block_size = 1000 SPRINT tra_out ~remove_name~ LPM ad_tra_to // ~les effets de charme~ (@8160005)
 			END
 			SPRINT $fx_remove_name(~%remove_id%~) ~%remove_name%~
 			PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN

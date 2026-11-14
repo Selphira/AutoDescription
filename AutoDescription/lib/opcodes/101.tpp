@@ -158,5 +158,5 @@ END
 
 DEFINE_PATCH_MACRO ad_immunity_label BEGIN
 	SET immunity_label_tra = 8030000 + $fx_immunity_label(~%immunity_id%~)
-	LPF ad_tra INT_VAR tra_id = immunity_label_tra RET immunity_label = text END
+	SET tra_id = immunity_label_tra SPRINT tra_out ~immunity_label~ LPM ad_tra_to
 END

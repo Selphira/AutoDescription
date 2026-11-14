@@ -9,7 +9,7 @@ DEFINE_PATCH_MACRO ad_op_204_support BEGIN
 		SET school_value = $fx_parameter2(~%school_id%~)
 		SPRINT $fx_school_name(~%school_id%~) ~~
 		PATCH_IF school_value >= 1 AND school_value <= 10 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8150000 + school_value tra_block_start = 8150000 tra_block_size = 11 RET school_name = text END // ~de l'Illusion~ (@8150005)
+			SET tra_id = 8150000 + school_value SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~school_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			SPRINT $fx_school_name(~%school_id%~) ~%school_name%~
 		END
 	END

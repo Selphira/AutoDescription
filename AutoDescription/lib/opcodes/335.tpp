@@ -61,7 +61,7 @@ END
 // Variante 1 : sort accordé (spellName).
 DEFINE_PATCH_MACRO ad_op_335_variant BEGIN
 	SET eyes_tra = 8120000 + $fx_parameter1(~%line_fx%~)
-	LPF ad_tra INT_VAR tra_id = eyes_tra tra_block_start = 8120000 tra_block_size = 256 RET splstate = text END // ~la folie du berserker~ (@8120104)
+	SET tra_id = eyes_tra SET tra_block_start = 8120000 SET tra_block_size = 256 SPRINT tra_out ~splstate~ LPM ad_tra_to // ~la folie du berserker~ (@8120104)
 	SPRINT spellName $fx_spell_name(~%line_fx%~)
 	SET state_variant = (~%spellName%~ STRING_EQUAL ~~) ? 0 : 1
 	SPRINT line_suffix @4000010 // ~non cumulatif~

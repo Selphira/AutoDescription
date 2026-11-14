@@ -41,7 +41,7 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 	SET stat_statistic_tra = resist_name_tra + 2
 	SET line_phrase = 0
 	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
+		SET tra_id = stat_statistic_tra SPRINT tra_out ~theStatistic~ LPM ad_tra_to
 		SET value = (stat_mode == MOD_TYPE_flat OR stat_mode == MOD_TYPE_percentage) ? stat_value : ABS stat_value
 		SPRINT value @1200003 // ~%value%%PERCENT%~
 		PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
@@ -51,7 +51,7 @@ DEFINE_PATCH_MACRO ad_resistance_target_phrase BEGIN
 			END
 		END
 		PATCH_IF stat_mode == MOD_TYPE_flat AND stat_value == 100 BEGIN
-			LPF ad_tra INT_VAR tra_id = stat_statistic_tra - 1 RET resistName = text END
+			SET tra_id = stat_statistic_tra - 1 SPRINT tra_out ~resistName~ LPM ad_tra_to
 			SET line_phrase = 5000150 // ~Immunise %theTarget% %resistName%~ (+1)
 		END
 		ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
@@ -82,7 +82,7 @@ DEFINE_PATCH_FUNCTION ad_resistance_text
 		text
 BEGIN
 	PATCH_IF mode == MOD_TYPE_flat AND value == 100 BEGIN
-		LPF ad_tra INT_VAR tra_id = name_tra + 1 RET resistName = text END
+		SET tra_id = name_tra + 1 SPRINT tra_out ~resistName~ LPM ad_tra_to
 		SPRINT text @5000001 // ~Immunité %resistName%~
 	END
 	ELSE BEGIN
@@ -90,7 +90,7 @@ BEGIN
 		PATCH_IF NOT (~%level_value%~ STRING_EQUAL ~~) BEGIN
 			SPRINT value ~%level_value%~
 		END
-		LPF ad_tra INT_VAR tra_id = name_tra RET name = text END
+		SET tra_id = name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 		SPRINT text @1200000 // ~%name%%AD_COLON%%value%~
 	END
 END

@@ -120,7 +120,7 @@ DEFINE_PATCH_MACRO ad_spell_slots_line BEGIN
 	CLEAR_ARRAY slots_level_names
 	FOR (slots_level = 1; slots_level <= slots_max_level; ++slots_level) BEGIN
 		PATCH_IF (slots_levels == 0 AND slots_level <= slots_amount) OR (slots_levels BAND (1 << (slots_level - 1))) != 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8010000 + slots_level RET slots_level_name = text END
+			SET tra_id = 8010000 + slots_level SPRINT tra_out ~slots_level_name~ LPM ad_tra_to
 			SPRINT $slots_level_names(~%slots_level%~) ~%slots_level_name%~
 		END
 	END
@@ -128,7 +128,7 @@ DEFINE_PATCH_MACRO ad_spell_slots_line BEGIN
 	SET amount = slots_amount
 	PATCH_IF slots_priest BEGIN
 		SET slots_singular = slots_levels != 0 AND (amount == 1 OR amount == 0 - 1)
-		LPF ad_tra INT_VAR tra_id = 8020000 + slots_priest_type + (slots_singular ? 10 : 0) RET spellType = text END
+		SET tra_id = 8020000 + slots_priest_type + (slots_singular ? 10 : 0) SPRINT tra_out ~spellType~ LPM ad_tra_to
 	END
 	SET slots_phrase = slots_levels == 0 ? 140 : (amount == 1 ? 100 : (amount > 1 ? 110 : (amount == 0 - 1 ? 120 : 130)))
 	PATCH_IF slots_phrase == 130 BEGIN

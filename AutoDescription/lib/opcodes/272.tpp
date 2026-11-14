@@ -100,18 +100,18 @@ DEFINE_PATCH_MACRO ad_op_272_condition BEGIN
 	END
 	ELSE PATCH_IF amount == 1 AND repeat_unit_amount == 1 BEGIN
 		SET repeat_tra = repeat_probable ? 22720020 : 22720010
-		LPF ad_tra INT_VAR tra_id = repeat_tra RET condition_text = text END // ~À chaque %strDuration%~
+		SET tra_id = repeat_tra SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~À chaque %strDuration%~
 	END
 	ELSE PATCH_IF amount == 1 BEGIN
 		SET repeat_tra = (repeat_feminine ? 22720011 : 22720012) + (repeat_probable ? 10 : 0)
-		LPF ad_tra INT_VAR tra_id = repeat_tra RET condition_text = text END // ~Toutes les %strDuration%~
+		SET tra_id = repeat_tra SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~Toutes les %strDuration%~
 	END
 	ELSE PATCH_IF repeat_unit_amount == 1 BEGIN
 		SPRINT condition_text @22720013 // ~%amount% fois par %strDuration%~
 	END
 	ELSE BEGIN
 		SET repeat_tra = repeat_feminine ? 22720014 : 22720015
-		LPF ad_tra INT_VAR tra_id = repeat_tra RET condition_text = text END // ~%amount% fois toutes les %strDuration%~
+		SET tra_id = repeat_tra SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~%amount% fois toutes les %strDuration%~
 	END
 	SPRINT $fx_condition_text(~%repeat_id%~) ~%condition_text%~
 END

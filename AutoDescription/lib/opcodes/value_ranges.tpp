@@ -123,6 +123,6 @@ DEFINE_PATCH_MACRO ad_value_range_text BEGIN
 	PATCH_IF $fx_range_max(~%line_fx%~) > 0 BEGIN
 		SET amountMin = $fx_range_min(~%line_fx%~)
 		SET amountMax = $fx_range_max(~%line_fx%~)
-		LPF ad_tra INT_VAR tra_id = 21270000 RET range_text = text END // ~entre %amountMin% et %amountMax%~
+		SET tra_id = 21270000 SPRINT tra_out ~range_text~ LPM ad_tra_to // ~entre %amountMin% et %amountMax%~
 	END
 END

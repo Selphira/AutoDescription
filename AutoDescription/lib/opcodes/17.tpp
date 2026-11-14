@@ -84,12 +84,12 @@ DEFINE_PATCH_MACRO ad_op_17_phrase BEGIN
 				SET line_phrase = 20170120 // ~Restaure %value% %ofTheTarget%~
 			END
 			ELSE BEGIN
-				LPF ad_tra INT_VAR tra_id = hp_single ? 20170001 : 20170002 RET valueType = text END // ~point de vie~
+				SET tra_id = hp_single ? 20170001 : 20170002 SPRINT tra_out ~valueType~ LPM ad_tra_to // ~point de vie~
 				SET line_phrase = 20170100 // ~Restaure %value% %toTheTarget%~
 			END
 		END
 		ELSE BEGIN
-			LPF ad_tra INT_VAR tra_id = hp_single ? 20170003 : 20170004 RET valueType = text END // ~point de dégât~
+			SET tra_id = hp_single ? 20170003 : 20170004 SPRINT tra_out ~valueType~ LPM ad_tra_to // ~point de dégât~
 			SET line_phrase = 20170110 // ~Inflige %value% %toTheTarget%~
 		END
 		SPRINT value @20170006 // ~%value% %valueType%~

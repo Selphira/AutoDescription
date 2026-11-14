@@ -56,7 +56,7 @@ DEFINE_PATCH_MACRO ad_op_143_lines BEGIN
 	PHP_EACH fx_ids_143 AS _ => slot_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%slot_id%~) BEGIN
 			SPRINT itemName $fx_item_name(~%slot_id%~)
-			LPF ad_tra INT_VAR tra_id = 8080000 + $fx_parameter1(~%slot_id%~) tra_block_start = 8080000 tra_block_size = 39 RET slotName = text END // ~de l'armure~
+			SET tra_id = 8080000 + $fx_parameter1(~%slot_id%~) SET tra_block_start = 8080000 SET tra_block_size = 39 SPRINT tra_out ~slotName~ LPM ad_tra_to // ~de l'armure~
 			SET line_phrase = 21430100 // ~Crée 1 « %itemName% » à l'emplacement %slotName% %ofTheTarget%~
 			SET line_fx = slot_id
 			LPM ad_effect_line

@@ -45,5 +45,5 @@ DEFINE_PATCH_MACRO ad_op_191_lines BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_191_line BEGIN
-	LPF ad_tra INT_VAR tra_id = $fx_stat_subject(~%line_fx%~) tra_block_start = 8020000 tra_block_size = 10 RET spellType = text END // ~divins/druidiques~
+	SET tra_id = $fx_stat_subject(~%line_fx%~) SET tra_block_start = 8020000 SET tra_block_size = 10 SPRINT tra_out ~spellType~ LPM ad_tra_to // ~divins/druidiques~
 END

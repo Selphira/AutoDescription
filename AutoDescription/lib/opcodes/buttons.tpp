@@ -71,12 +71,12 @@ DEFINE_PATCH_MACRO ad_button_lines BEGIN
 			LPM ad_application_form
 			// Les chaînes de la cible de l'effet sont lues avant l'action, qui les contient.
 			LPM ad_application_target_strings
-			LPF ad_tra INT_VAR tra_id = button_action_tra + line_form RET action = text END // ~Empêche~
+			SET tra_id = button_action_tra + line_form SPRINT tra_out ~action~ LPM ad_tra_to // ~Empêche~
 			SET button_target_form = line_form == 1 OR line_form == 3
 			SET button_mask = $fx_buttons(~%button_id%~)
 			PATCH_IF button_mask == 0 BEGIN
 				SET button_list = button_target_form ? 21441100 : 21441000
-				LPF ad_tra INT_VAR tra_id = button_list + button tra_block_start = button_list tra_block_size = 16 RET line_text = text END // ~%action% l'utilisation du camouflage dans l'ombre~
+				SET tra_id = button_list + button SET tra_block_start = button_list SET tra_block_size = 16 SPRINT tra_out ~line_text~ LPM ad_tra_to // ~%action% l'utilisation du camouflage dans l'ombre~
 			END
 			ELSE BEGIN
 				// Sorts (2) et sorts rapides (3 à 5), objets (8) et objets rapides (9, 11, 12).
@@ -90,13 +90,13 @@ DEFINE_PATCH_MACRO ad_button_lines BEGIN
 				CLEAR_ARRAY button_names
 				FOR (button_k = 0; button_k < 16; ++button_k) BEGIN
 					PATCH_IF (button_mask BAND (1 << button_k)) != 0 BEGIN
-						LPF ad_tra INT_VAR tra_id = button_list + button_k tra_block_start = button_list tra_block_size = 16 RET button_name = text END // ~des sorts~
+						SET tra_id = button_list + button_k SET tra_block_start = button_list SET tra_block_size = 16 SPRINT tra_out ~button_name~ LPM ad_tra_to // ~des sorts~
 						SPRINT $button_names(~%button_k%~) ~%button_name%~
 					END
 				END
 				LPF ad_join STR_VAR array_name = ~button_names~ RET buttonList = text END
 				SET button_phrase = button_target_form ? 21441201 : 21441200
-				LPF ad_tra INT_VAR tra_id = button_phrase RET line_text = text END // ~%action% l'utilisation %buttonList%~
+				SET tra_id = button_phrase SPRINT tra_out ~line_text~ LPM ad_tra_to // ~%action% l'utilisation %buttonList%~
 			END
 			SET line_any_form = 1
 			LPM ad_effect_line

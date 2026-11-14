@@ -11,9 +11,9 @@ DEFINE_PATCH_MACRO ad_op_235_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~235~)
 	LPM ad_application_source
-	LPF ad_tra INT_VAR tra_id = source_tra     RET theSource = text END // ~le porteur~ (@2000100)
-	LPF ad_tra INT_VAR tra_id = source_tra + 1 RET ofTheSource = text END // ~du porteur~ (@2000101)
-	LPF ad_tra INT_VAR tra_id = source_tra + 2 RET toTheSource = text END // ~au porteur~ (@2000102)
+	SET tra_id = source_tra     SPRINT tra_out ~theSource~ LPM ad_tra_to // ~le porteur~ (@2000100)
+	SET tra_id = source_tra + 1 SPRINT tra_out ~ofTheSource~ LPM ad_tra_to // ~du porteur~ (@2000101)
+	SET tra_id = source_tra + 2 SPRINT tra_out ~toTheSource~ LPM ad_tra_to // ~au porteur~ (@2000102)
 	PHP_EACH fx_ids_235 AS _ => buffet_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%buffet_id%~) BEGIN
 			SET buffet_direction = $fx_parameter2(~%buffet_id%~)

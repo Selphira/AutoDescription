@@ -223,7 +223,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 				SPRINT apply_pending_message ~no name for value %apply_symbol% of stat %apply_stat% (string %apply_mod_value_name% of STATS_MODS.2DA)~
 			END
 			ELSE PATCH_IF apply_mod_value_name > 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = apply_mod_value_tra tra_block_start = 8190000 tra_block_size = 1000 RET stateValue = text END // ~un golem d'argile~ (@8190004)
+				SET tra_id = apply_mod_value_tra SET tra_block_start = 8190000 SET tra_block_size = 1000 SPRINT tra_out ~stateValue~ LPM ad_tra_to // ~un golem d'argile~ (@8190004)
 			END
 		END
 		ELSE PATCH_IF NOT VARIABLE_IS_SET $AD_STAT_CONDITION(~%apply_key%~) BEGIN
@@ -282,10 +282,10 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			LPM ad_application_target_strings
 			SPRINT line_only_for ~~
 			PATCH_IF ((apply_tra >= 23269000 AND apply_tra <= 23269005) OR (apply_tra >= 23269020 AND apply_tra <= 23269025)) BEGIN
-				LPF ad_tra INT_VAR tra_id = apply_stat_tra tra_block_start = 8060000 tra_block_size = 10000 RET theStatistic = text END // ~la force~ (@8060036)
+				SET tra_id = apply_stat_tra SET tra_block_start = 8060000 SET tra_block_size = 10000 SPRINT tra_out ~theStatistic~ LPM ad_tra_to // ~la force~ (@8060036)
 				SPRINT value ~%apply_value%~
 			END
-			LPF ad_tra INT_VAR tra_id = apply_tra tra_block_start = 23260000 tra_block_size = 10000 RET apply_condition = text END // ~Si l'état %ofTheTarget% est « mort »~ (@23260181)
+			SET tra_id = apply_tra SET tra_block_start = 23260000 SET tra_block_size = 10000 SPRINT tra_out ~apply_condition~ LPM ad_tra_to // ~Si l'état %ofTheTarget% est « mort »~ (@23260181)
 		END
 	END
 	SPRINT $fx_condition_text(~%apply_id%~) ~%apply_condition%~
@@ -335,7 +335,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition_name BEGIN
 		SPRINT apply_pending_message ~value %apply_value% of stat %apply_stat% has no name~
 	END
 	ELSE BEGIN
-		LPF ad_tra INT_VAR tra_id = apply_name_tra tra_block_start = apply_name_block tra_block_size = apply_name_block_size RET apply_name = text END // ~clerc~ (@8095503)
+		SET tra_id = apply_name_tra SET tra_block_start = apply_name_block SET tra_block_size = apply_name_block_size SPRINT tra_out ~apply_name~ LPM ad_tra_to // ~clerc~ (@8095503)
 		PATCH_IF apply_stat == 258 BEGIN
 			SPRINT sizeName ~%apply_name%~
 		END

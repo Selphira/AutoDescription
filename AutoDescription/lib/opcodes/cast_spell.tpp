@@ -205,7 +205,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_lines BEGIN
 			SET castingLevel = $fx_parameter1(~%cast_id%~)
 			SET cast_variant = ($fx_cast_charge(~%cast_id%~) ? 0 : 2) + (cast_type > 0 ? 1 : 0)
 			PATCH_IF cast_type == 2 OR (castingLevel > 0 AND cast_type == 0) BEGIN
-				LPF ad_tra INT_VAR tra_id = cast_phrase - 100 RET cast_level_text = text END // ~comme un lanceur de sorts de niveau %castingLevel%~
+				SET tra_id = cast_phrase - 100 SPRINT tra_out ~cast_level_text~ LPM ad_tra_to // ~comme un lanceur de sorts de niveau %castingLevel%~
 				SPRINT line_suffix ~(%cast_level_text%)~
 			END
 			// Sorts réunis en une liste (fx_name_list) : phrases 0220/0230, « l'un des sorts suivants »,

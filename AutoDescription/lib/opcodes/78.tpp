@@ -64,7 +64,7 @@ DEFINE_PATCH_MACRO ad_op_78_group BEGIN
 		SET disease_type = $fx_parameter2(~%disease_id%~)
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%disease_id%~) AND disease_type >= 4 AND disease_type <= 9 BEGIN
 			CLEAR_ARRAY disease_names
-			LPF ad_tra INT_VAR tra_id = 20780060 + disease_type RET disease_name = text END // ~la force~ (@20780064)
+			SET tra_id = 20780060 + disease_type SPRINT tra_out ~disease_name~ LPM ad_tra_to // ~la force~ (@20780064)
 			SPRINT $disease_names(~0~) ~%disease_name%~
 			SET disease_count = 1
 			SET same_id = disease_id
@@ -87,7 +87,7 @@ DEFINE_PATCH_MACRO ad_op_78_group BEGIN
 					END
 					SET $fx_consumed(~%disease_found%~) = 1
 					SET $fx_group_anchor(~%disease_found%~) = disease_id
-					LPF ad_tra INT_VAR tra_id = 20780060 + disease_attribute RET disease_name = text END
+					SET tra_id = 20780060 + disease_attribute SPRINT tra_out ~disease_name~ LPM ad_tra_to
 					SPRINT $disease_names(~%disease_count%~) ~%disease_name%~
 					SET disease_count += 1
 				END

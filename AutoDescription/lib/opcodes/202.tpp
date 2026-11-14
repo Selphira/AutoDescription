@@ -22,7 +22,7 @@ DEFINE_PATCH_MACRO ad_op_202_support BEGIN
 			LPM ad_log_ignored
 		END
 		ELSE PATCH_IF bounce_school > 0 AND bounce_school <= 10 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8150000 + bounce_school tra_block_start = 8150000 tra_block_size = 11 RET bounce_name = text END // ~de l'Illusion~ (@8150005)
+			SET tra_id = 8150000 + bounce_school SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~bounce_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			SPRINT $fx_school_name(~%bounce_id%~) ~%bounce_name%~
 		END
 	END

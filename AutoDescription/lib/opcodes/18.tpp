@@ -83,7 +83,7 @@ DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 				LPF ad_refusal INT_VAR fx_id = hp_id STR_VAR reason = ~not_implemented:spell:progression_opcode18~ message = ~maximum hit points varying with the level as a percentage~ RET render_late_missing = refusal END
 			END
 			PATCH_IF line_form == 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = hp_name_tra RET name = text END
+				SET tra_id = hp_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 				LPF ad_stat_modifier_value INT_VAR value = hp_value mode = hp_mode RET value = text END
 				PATCH_IF NOT (~%hp_level_value%~ STRING_EQUAL ~~) BEGIN
 					SPRINT value ~%hp_level_value%~
@@ -98,7 +98,7 @@ DEFINE_PATCH_MACRO ad_op_18_lines BEGIN
 			END
 			ELSE BEGIN
 				// Ancien opcode_target_18 : « Augmente de 2 les points de vie maximums de la cible ».
-				LPF ad_tra INT_VAR tra_id = hp_name_tra + 2 RET theStatistic = text END // ~les points de vie maximums~
+				SET tra_id = hp_name_tra + 2 SPRINT tra_out ~theStatistic~ LPM ad_tra_to // ~les points de vie maximums~
 				SET stat_value = hp_value
 				SET stat_mode = hp_mode
 				SET stat_percent = 0

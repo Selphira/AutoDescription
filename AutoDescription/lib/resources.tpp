@@ -13,7 +13,7 @@ BEGIN
 	TO_LOWER spell_key
 	PATCH_IF VARIABLE_IS_SET $AD_SPELL_NAMES(~%spell_key%~) BEGIN
 		SET spell_name_tra = $AD_SPELL_NAMES(~%spell_key%~)
-		LPF ad_tra INT_VAR tra_id = spell_name_tra RET name = text END
+		SET tra_id = spell_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 	END
 	ELSE PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
 		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
@@ -299,7 +299,7 @@ DEFINE_PATCH_FUNCTION ad_projectile_name
 BEGIN
 	SPRINT name ~~
 	PATCH_IF VARIABLE_IS_SET $AD_PROJECTILE_NAMES(~%projectile%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = 8070000 + $AD_PROJECTILE_NAMES(~%projectile%~) tra_block_start = 8070000 tra_block_size = 1000 RET name = text END // ~flèches~
+		SET tra_id = 8070000 + $AD_PROJECTILE_NAMES(~%projectile%~) SET tra_block_start = 8070000 SET tra_block_size = 1000 SPRINT tra_out ~name~ LPM ad_tra_to // ~flèches~
 	END
 END
 
@@ -317,7 +317,7 @@ BEGIN
 	SPRINT name ~~
 	SET ids_name_tra = 8090000 + 1000 * ids_file + entry
 	PATCH_IF ids_file >= 2 AND ids_file <= 8 AND entry >= 0 AND entry <= 255 AND TRA_ENTRY_EXISTS (~%ids_name_tra%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = ids_name_tra tra_block_start = 8090000 tra_block_size = 10000 RET name = text END // ~rakshasas~ (@8094128)
+		SET tra_id = ids_name_tra SET tra_block_start = 8090000 SET tra_block_size = 10000 SPRINT tra_out ~name~ LPM ad_tra_to // ~rakshasas~ (@8094128)
 	END
 END
 
@@ -332,11 +332,11 @@ BEGIN
 	SPRINT name ~~
 	SET sectype_name_tra = 8100000 + secondary_type
 	PATCH_IF secondary_type >= 1 AND secondary_type <= 13 AND TRA_ENTRY_EXISTS (~%sectype_name_tra%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100000 tra_block_size = 14 RET name = text END // ~Dégâts offensifs~ (@8100010)
+		SET tra_id = sectype_name_tra SET tra_block_start = 8100000 SET tra_block_size = 14 SPRINT tra_out ~name~ LPM ad_tra_to // ~Dégâts offensifs~ (@8100010)
 	END
 	ELSE PATCH_IF VARIABLE_IS_SET $AD_SECONDARY_TYPE_MOD_NAME(~%secondary_type%~) BEGIN
 		SET sectype_name_tra = $AD_SECONDARY_TYPE_MOD_NAME(~%secondary_type%~)
-		LPF ad_tra INT_VAR tra_id = sectype_name_tra tra_block_start = 8100100 tra_block_size = 100 RET name = text END // ~Potion~ (@8100100)
+		SET tra_id = sectype_name_tra SET tra_block_start = 8100100 SET tra_block_size = 100 SPRINT tra_out ~name~ LPM ad_tra_to // ~Potion~ (@8100100)
 	END
 END
 
@@ -350,7 +350,7 @@ BEGIN
 	SPRINT name ~~
 	SET item_type_tra = 8180000 + item_type
 	PATCH_IF item_type >= 0 AND item_type <= 73 AND TRA_ENTRY_EXISTS (~%item_type_tra%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = item_type_tra tra_block_start = 8180000 tra_block_size = 74 RET name = text END // ~robes~ (@8180067)
+		SET tra_id = item_type_tra SET tra_block_start = 8180000 SET tra_block_size = 74 SPRINT tra_out ~name~ LPM ad_tra_to // ~robes~ (@8180067)
 	END
 END
 

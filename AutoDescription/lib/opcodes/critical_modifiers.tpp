@@ -48,15 +48,15 @@ DEFINE_PATCH_MACRO ad_critical_lines BEGIN
 			LPM ad_application_form
 			SET critical_value = 5 * $fx_parameter1(~%critical_id%~)
 			SET critical_name_tra = critical_name_base + (line_form == 0 ? 0 : 2) + ($fx_parameter2(~%critical_id%~) != 0 ? 1 : 0)
-			LPF ad_tra INT_VAR tra_id = critical_name_tra RET name = text END // ~Chance de coup critique~ (@23010001)
+			SET tra_id = critical_name_tra SPRINT tra_out ~name~ LPM ad_tra_to // ~Chance de coup critique~ (@23010001)
 			SET critical_attack = $fx_special(~%critical_id%~)
 			PATCH_IF critical_attack > 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = 23010010 + critical_attack tra_block_start = 23010011 tra_block_size = 3 RET critical_attack_text = text END // ~en mêlée~
+				SET tra_id = 23010010 + critical_attack SET tra_block_start = 23010011 SET tra_block_size = 3 SPRINT tra_out ~critical_attack_text~ LPM ad_tra_to // ~en mêlée~
 				SPRINT name ~%name% %critical_attack_text%~
 			END
 			SET critical_category = $fx_critical_category(~%critical_id%~)
 			PATCH_IF critical_category != 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = 8180000 + critical_category tra_block_start = 8180000 tra_block_size = 74 RET weaponType = text END // ~poings~ (@8180028)
+				SET tra_id = 8180000 + critical_category SET tra_block_start = 8180000 SET tra_block_size = 74 SPRINT tra_out ~weaponType~ LPM ad_tra_to // ~poings~ (@8180028)
 				SPRINT critical_category_text @23010020 // ~avec des %weaponType%~
 				SPRINT name ~%name% %critical_category_text%~
 			END

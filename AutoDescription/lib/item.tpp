@@ -16,6 +16,8 @@ BEGIN
 	SET fx_skip_ignored = 0
 	SET support_spell = 0
 	SET resource_is_spell = 0
+	SET tra_block_start = 0
+	SET tra_block_size = 0
 	LPM ad_recursion_reset
 	PATCH_TIME ~step:load~ BEGIN
 		LPM ad_fx_load_item

@@ -40,7 +40,7 @@ END
 // Variante 0 armes enchantées (« +2 et inférieures »), 1 autres types.
 DEFINE_PATCH_MACRO ad_op_120_variant BEGIN
 	SET weapon_type = $fx_parameter2(~%line_fx%~)
-	LPF ad_tra INT_VAR tra_id = 21200010 + weapon_type tra_block_start = 21200010 tra_block_size = 12 RET weaponType = text END // ~armes non-magiques~
+	SET tra_id = 21200010 + weapon_type SET tra_block_start = 21200010 SET tra_block_size = 12 SPRINT tra_out ~weaponType~ LPM ad_tra_to // ~armes non-magiques~
 	SET state_variant = weapon_type == 0 ? 0 : 1
 	PATCH_IF weapon_type == 0 BEGIN
 		LPF ad_signed_value INT_VAR value = $fx_parameter1(~%line_fx%~) RET enchantment = text END

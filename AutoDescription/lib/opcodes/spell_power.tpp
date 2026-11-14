@@ -180,7 +180,7 @@ DEFINE_PATCH_MACRO ad_spell_power_levels BEGIN
 			SET power_bit *= 2
 		END
 		PATCH_IF (power_mask BAND power_bit) != 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8010000 + power_level tra_block_start = 8010000 tra_block_size = 10 RET power_ordinal = text END // ~5ème~ (@8010005)
+			SET tra_id = 8010000 + power_level SET tra_block_start = 8010000 SET tra_block_size = 10 SPRINT tra_out ~power_ordinal~ LPM ad_tra_to // ~5ème~ (@8010005)
 			SPRINT $power_levels(~%power_count%~) ~%power_ordinal%~
 			SET power_count += 1
 			SET power_top = power_level

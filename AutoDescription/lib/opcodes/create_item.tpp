@@ -24,7 +24,7 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 			END
 			ELSE PATCH_IF create_random AND NOT support_header_only BEGIN
 				PATCH_IF NOT create_listed BEGIN
-					LPF ad_tra INT_VAR tra_id = 8170000 + create_quality tra_block_start = 8170000 tra_block_size = 10 RET create_name = text END // ~trésor aléatoire de qualité exceptionnelle~ (@8170005)
+					SET tra_id = 8170000 + create_quality SET tra_block_start = 8170000 SET tra_block_size = 10 SPRINT tra_out ~create_name~ LPM ad_tra_to // ~trésor aléatoire de qualité exceptionnelle~ (@8170005)
 					SPRINT $fx_item_name(~%create_id%~) ~%create_name%~
 					SET $fx_item_amount(~%create_id%~) = 1
 				END

@@ -166,7 +166,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 					LPM ~%stat_line_macro%~
 				END
 				PATCH_IF NOT stat_line_done BEGIN
-					LPF ad_tra INT_VAR tra_id = stat_name_tra RET name = text END
+					SET tra_id = stat_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 					PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
 						SPRINT name ~%name% %stat_name_suffix%~
 					END
@@ -217,7 +217,7 @@ DEFINE_PATCH_MACRO ad_stat_modifier_target_phrase BEGIN
 	SET stat_statistic_tra = stat_name_tra < 9000000 ? stat_name_tra + 60000 : stat_name_tra + 2
 	SET line_phrase = 0
 	PATCH_IF TRA_ENTRY_EXISTS (~%stat_statistic_tra%~) BEGIN
-		LPF ad_tra INT_VAR tra_id = stat_statistic_tra RET theStatistic = text END
+		SET tra_id = stat_statistic_tra SPRINT tra_out ~theStatistic~ LPM ad_tra_to
 		PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
 			SPRINT theStatistic ~%theStatistic% %stat_name_suffix%~
 		END

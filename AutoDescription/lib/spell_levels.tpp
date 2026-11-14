@@ -974,7 +974,7 @@ DEFINE_PATCH_MACRO ad_spell_level_formula_typed BEGIN
 		SPRINT formula_typed @1200003 // ~%value%%PERCENT%~
 	END
 	PATCH_IF formula_unit_tra > 0 BEGIN
-		LPF ad_tra INT_VAR tra_id = formula_unit_tra RET valueType = text END
+		SET tra_id = formula_unit_tra SPRINT tra_out ~valueType~ LPM ad_tra_to
 		SPRINT value ~%formula_typed%~
 		SPRINT formula_typed @7002012 // ~%value% %valueType%~
 		SET formula_unit_used = 1

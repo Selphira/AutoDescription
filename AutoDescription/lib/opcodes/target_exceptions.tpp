@@ -211,7 +211,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 			SET exception_tra = 8120000 + exception_value
 			SPRINT exception_name ~~
 			PATCH_IF exception_value >= 0 AND exception_value <= 255 AND TRA_ENTRY_EXISTS (~%exception_tra%~) BEGIN
-				LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 8120000 tra_block_size = 256 RET splstateName = text END // ~« Bouclier »~ (@8120126)
+				SET tra_id = exception_tra SET tra_block_start = 8120000 SET tra_block_size = 256 SPRINT tra_out ~splstateName~ LPM ad_tra_to // ~« Bouclier »~ (@8120126)
 				SPRINT exception_name @23240005 // ~créatures affectées par %splstateName%~
 			END
 			LPM ad_target_exception_add_name
@@ -252,7 +252,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 			LPM ad_target_exception_add_name
 		END
 		ELSE PATCH_IF exception_tra > 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 23241000 tra_block_size = 1000 RET exception_name = text END // ~créatures insensibles aux poisons~ (@23241077)
+			SET tra_id = exception_tra SET tra_block_start = 23241000 SET tra_block_size = 1000 SPRINT tra_out ~exception_name~ LPM ad_tra_to // ~créatures insensibles aux poisons~ (@23241077)
 			LPM ad_target_exception_add_name
 		END
 		ELSE BEGIN
@@ -306,7 +306,7 @@ DEFINE_PATCH_MACRO ad_target_exception_state BEGIN
 		PATCH_IF (exception_value BAND exception_mask) != 0 BEGIN
 			SET exception_tra = 8110000 + exception_rank
 			PATCH_IF TRA_ENTRY_EXISTS (~%exception_tra%~) BEGIN
-				LPF ad_tra INT_VAR tra_id = exception_tra tra_block_start = 8110000 tra_block_size = 33 RET exception_state_name = text END // ~sous l'effet de « Non-détection »~ (@8110022)
+				SET tra_id = exception_tra SET tra_block_start = 8110000 SET tra_block_size = 33 SPRINT tra_out ~exception_state_name~ LPM ad_tra_to // ~sous l'effet de « Non-détection »~ (@8110022)
 				PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
 					SPRINT descriptionState ~%exception_state_name%~
 				END

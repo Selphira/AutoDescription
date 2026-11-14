@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_220_support BEGIN
 			SET school = $fx_parameter2(~%school_id%~)
 			SPRINT school_name ~~
 			PATCH_IF school >= 0 AND school <= 10 BEGIN
-				LPF ad_tra INT_VAR tra_id = 8150000 + school tra_block_start = 8150000 tra_block_size = 11 RET school_name = text END // ~de l'Illusion~ (@8150005)
+				SET tra_id = 8150000 + school SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~school_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			END
 			SPRINT $fx_school_name(~%school_id%~) ~%school_name%~
 			PATCH_IF ~%school_name%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN

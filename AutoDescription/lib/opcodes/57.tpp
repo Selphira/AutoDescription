@@ -26,5 +26,5 @@ DEFINE_PATCH_MACRO ad_op_57_lines BEGIN
 END
 
 DEFINE_PATCH_MACRO ad_op_57_variant BEGIN
-	LPF ad_tra INT_VAR tra_id = 20570000 + $fx_parameter2(~%line_fx%~) tra_block_start = 20570017 tra_block_size = 35 RET alignment = text END // ~neutre mauvais~ (@20570035)
+	SET tra_id = 20570000 + $fx_parameter2(~%line_fx%~) SET tra_block_start = 20570017 SET tra_block_size = 35 SPRINT tra_out ~alignment~ LPM ad_tra_to // ~neutre mauvais~ (@20570035)
 END

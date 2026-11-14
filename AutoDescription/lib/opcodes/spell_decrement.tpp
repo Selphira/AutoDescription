@@ -23,7 +23,7 @@ DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 				LPF ad_spell_secondary_type_name INT_VAR secondary_type = decrement_kind RET decrement_kind_name = name END
 			END
 			ELSE PATCH_IF decrement_kind >= 1 AND decrement_kind <= 10 BEGIN
-				LPF ad_tra INT_VAR tra_id = 8150000 + decrement_kind tra_block_start = 8150000 tra_block_size = 11 RET decrement_kind_name = text END // ~de l'Illusion~ (@8150005)
+				SET tra_id = 8150000 + decrement_kind SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~decrement_kind_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			END
 			SPRINT $fx_decrement_name(~%decrement_id%~) ~%decrement_kind_name%~
 			SPRINT decrement_resref $fx_resource(~%decrement_id%~)

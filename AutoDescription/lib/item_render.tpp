@@ -156,7 +156,7 @@ DEFINE_PATCH_MACRO ad_item_requirements_section BEGIN
 	PHP_EACH AD_ITEM_REQUIREMENTS AS requirement_stat => requirement_offset BEGIN
 		READ_BYTE requirement_offset value
 		PATCH_IF value > 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = 8000000 + requirement_stat tra_block_start = 8000000 tra_block_size = 10000 RET attribute = text END
+			SET tra_id = 8000000 + requirement_stat SET tra_block_start = 8000000 SET tra_block_size = 10000 SPRINT tra_out ~attribute~ LPM ad_tra_to
 			PATCH_IF requirement_stat == 36 AND value == 18 AND strength_bonus > 0 AND strength_bonus <= 100 BEGIN
 				SPRINT bonus ~%strength_bonus%~
 				PATCH_IF strength_bonus == 100 BEGIN

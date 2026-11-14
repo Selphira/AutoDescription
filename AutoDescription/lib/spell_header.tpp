@@ -370,11 +370,11 @@ END
 // druides est dit « Divin » ou « Druidique »), école si elle n'est pas nulle, type secondaire s'il a
 // un nom (en anglais, le type 0 en a un).
 DEFINE_PATCH_MACRO ad_spell_header_type_line BEGIN
-	LPF ad_tra INT_VAR tra_id = 8130000 + spell_type_name tra_block_start = 8130000 tra_block_size = 8 RET header_type = text END // ~Profane~ (@8130001)
+	SET tra_id = 8130000 + spell_type_name SET tra_block_start = 8130000 SET tra_block_size = 8 SPRINT tra_out ~header_type~ LPM ad_tra_to // ~Profane~ (@8130001)
 	LPF ad_spell_secondary_type_name INT_VAR secondary_type = spell_sectype RET header_sectype = name END
 	SPRINT header_line ~%header_type%~
 	PATCH_IF spell_school > 0 BEGIN
-		LPF ad_tra INT_VAR tra_id = 8140000 + spell_school tra_block_start = 8140000 tra_block_size = 11 RET header_school = text END // ~Évocation~ (@8140006)
+		SET tra_id = 8140000 + spell_school SET tra_block_start = 8140000 SET tra_block_size = 11 SPRINT tra_out ~header_school~ LPM ad_tra_to // ~Évocation~ (@8140006)
 		SPRINT header_line ~%header_line% - %header_school%~
 	END
 	PATCH_IF NOT (~%header_sectype%~ STRING_EQUAL ~~) BEGIN
@@ -396,8 +396,8 @@ BEGIN
 	PATCH_IF ~%text%~ STRING_EQUAL ~~ BEGIN
 		SET distance_feet = feet
 		SET distance_decimeters = feet * 10000 / 3281
-		LPF ad_tra INT_VAR tra_id = 1100010 + (distance_decimeters > 1 ? 1 : 0)
-			tra_block_start = 1100010 tra_block_size = 2 RET text END // ~%distance_decimeters% mètre~
+		SET tra_id = 1100010 + (distance_decimeters > 1 ? 1 : 0)
+			SET tra_block_start = 1100010 SET tra_block_size = 2 SPRINT tra_out ~text~ LPM ad_tra_to // ~%distance_decimeters% mètre~
 	END
 END
 
@@ -972,8 +972,8 @@ DEFINE_PATCH_MACRO ad_spell_header_ability_area BEGIN
 			SET area_form = 0
 		END
 		PATCH_IF area_form >= 0 BEGIN
-			LPF ad_tra INT_VAR tra_id = 7001000 + 10 * area_form + area_creatures
-				tra_block_start = 7001000 tra_block_size = 50 RET area_ability = text END // ~Rayon de %range%~
+			SET tra_id = 7001000 + 10 * area_form + area_creatures
+				SET tra_block_start = 7001000 SET tra_block_size = 50 SPRINT tra_out ~area_ability~ LPM ad_tra_to // ~Rayon de %range%~
 		END
 	END
 	PATCH_IF ~%area_ability%~ STRING_EQUAL ~~ BEGIN
@@ -1100,7 +1100,7 @@ BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:spell_header:save_types~ message = ~saving throw type %save_type% (one of 1, 2, 4, 8, 16 supported)~ RET save_missing = refusal END
 		END
 		ELSE BEGIN
-			LPF ad_tra INT_VAR tra_id = 5000060 + save_type tra_block_start = 5000060 tra_block_size = 17 RET saveType = text END // ~Sorts~ (@5000061)
+			SET tra_id = 5000060 + save_type SET tra_block_start = 5000060 SET tra_block_size = 17 SPRINT tra_out ~saveType~ LPM ad_tra_to // ~Sorts~ (@5000061)
 			SPRINT value ~%save_bonus_text%~
 			PATCH_IF ~%value%~ STRING_EQUAL ~~ OR ~%value%~ STRING_EQUAL ~0~ BEGIN
 				SPRINT save_text @7000020 // ~%saveType% (%savingThrow%)~

@@ -29,7 +29,7 @@ DEFINE_PATCH_MACRO ad_op_105_line BEGIN
 		ELSE PATCH_IF stat_mode == MOD_TYPE_flat AND stat_value < 0 BEGIN
 			SET stat_value = 0
 		END
-		LPF ad_tra INT_VAR tra_id = 21050002 RET theStatistic = text END // ~la quantité de pièces d'or~
+		SET tra_id = 21050002 SPRINT tra_out ~theStatistic~ LPM ad_tra_to // ~la quantité de pièces d'or~
 		LPM ad_stat_modifier_phrase
 		// Phrase de la forme « cible » à la forme « soi » : « … du porteur ».
 		PATCH_IF line_form == 0 BEGIN

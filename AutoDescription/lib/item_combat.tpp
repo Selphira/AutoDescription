@@ -265,7 +265,7 @@ DEFINE_PATCH_MACRO ad_item_combat_lines BEGIN
 			SPRINT combat_sec $combat_section(~0~)
 			SPRINT line_section ~%combat_sec%~
 			SET line_sort = 0
-			LPF ad_tra INT_VAR tra_id = strength_bonus_tra RET line_text = text END
+			SET tra_id = strength_bonus_tra SPRINT tra_out ~line_text~ LPM ad_tra_to
 			LPM ad_line_add
 		END
 	END
@@ -419,7 +419,7 @@ END
 
 // Ligne « nom : valeur » des attributs d'arme, ajoutée à weapon_text.
 DEFINE_PATCH_MACRO ad_weapon_attribute_line BEGIN
-	LPF ad_tra INT_VAR tra_id = weapon_name_tra RET name = text END
+	SET tra_id = weapon_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 	SPRINT name ~%name%%group_suffix%~
 	SPRINT value ~%weapon_value%~
 	SPRINT weapon_line @1200000 // ~%name%%AD_COLON%%value%~
@@ -492,7 +492,7 @@ DEFINE_PATCH_MACRO ad_item_weapon_attributes BEGIN
 		FOR (group_g = 0; group_g < $group_counts(~launcher~); ++group_g) BEGIN
 			LPM ad_combat_suffix
 			SET weapon_launcher = $launcher_group_value(~%group_g%~)
-			LPF ad_tra INT_VAR tra_id = 8050000 + weapon_launcher tra_block_start = 8050000 tra_block_size = 10000 RET weapon_value = text END
+			SET tra_id = 8050000 + weapon_launcher SET tra_block_start = 8050000 SET tra_block_size = 10000 SPRINT tra_out ~weapon_value~ LPM ad_tra_to
 			SET weapon_name_tra = 6100005 // ~Arme de trait~
 			LPM ad_weapon_attribute_line
 		END
@@ -523,7 +523,7 @@ DEFINE_PATCH_MACRO ad_item_weapon_damage_lines BEGIN
 						OR ($damage_type_group_size(~%weapon_type_group%~) == 1 AND $damage_key_group_size(~%group_g%~) == 1)) BEGIN
 					PATCH_IF NOT weapon_type_added BEGIN
 						SET weapon_type = $combat_damage_type(~%combat_id%~)
-						LPF ad_tra INT_VAR tra_id = 8040000 + weapon_type tra_block_start = 8040000 tra_block_size = 10000 RET weapon_type_name = text END
+						SET tra_id = 8040000 + weapon_type SET tra_block_start = 8040000 SET tra_block_size = 10000 SPRINT tra_out ~weapon_type_name~ LPM ad_tra_to
 						SPRINT weapon_value ~%weapon_value% (%weapon_type_name%)~
 						SET weapon_type_added = 1
 					END
@@ -550,7 +550,7 @@ DEFINE_PATCH_MACRO ad_item_weapon_damage_lines BEGIN
 				SET group_skip_shown = 1
 				LPM ad_combat_suffix
 				SET weapon_type = $damage_type_group_value(~%group_g%~)
-				LPF ad_tra INT_VAR tra_id = 8040000 + weapon_type tra_block_start = 8040000 tra_block_size = 10000 RET weapon_value = text END
+				SET tra_id = 8040000 + weapon_type SET tra_block_start = 8040000 SET tra_block_size = 10000 SPRINT tra_out ~weapon_value~ LPM ad_tra_to
 				SET weapon_name_tra = 6100003 // ~Type de dégâts~
 				LPM ad_weapon_attribute_line
 			END

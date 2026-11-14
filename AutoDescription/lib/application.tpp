@@ -280,9 +280,9 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 			ELSE BEGIN
 				SET app_area_phrase = app_area_shape == 2 ? 2001102 : 2001100 // ~%target% dans un rayon de %range%~
 				FOR (app_area_form = 0; app_area_form < 3; ++app_area_form) BEGIN
-					LPF ad_tra INT_VAR tra_id = 2001000 + app_area_creatures * 10 + app_area_form
-						tra_block_start = 2001000 tra_block_size = 100 RET target = text END // ~les créatures~
-					LPF ad_tra INT_VAR tra_id = app_area_phrase RET app_area_text = text END
+					SET tra_id = 2001000 + app_area_creatures * 10 + app_area_form
+						SET tra_block_start = 2001000 SET tra_block_size = 100 SPRINT tra_out ~target~ LPM ad_tra_to // ~les créatures~
+					SET tra_id = app_area_phrase SPRINT tra_out ~app_area_text~ LPM ad_tra_to
 					SPRINT $fx_area_text(~%app_id% %app_area_form%~) ~%app_area_text%~
 				END
 				SET $fx_area_target(~%app_id%~) = 1
@@ -449,7 +449,7 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 				LPF ad_dice_text INT_VAR dice_count = 1 dice_sides = $fx_duration_dice(~%line_fx%~) bonus = $fx_duration_dice_bonus(~%line_fx%~) RET amount = text END
 				FOR (duration_unit = 4; duration_unit >= 0; --duration_unit) BEGIN
 					PATCH_IF app_duration == $AD_DURATION_UNITS(~%duration_unit%~) BEGIN
-						LPF ad_tra INT_VAR tra_id = 3010000 + duration_unit * 2 + 1 tra_block_start = 3010000 tra_block_size = 10 RET strDuration = text END // ~%amount% rounds~
+						SET tra_id = 3010000 + duration_unit * 2 + 1 SET tra_block_start = 3010000 SET tra_block_size = 10 SPRINT tra_out ~strDuration~ LPM ad_tra_to // ~%amount% rounds~
 					END
 				END
 			END
@@ -491,7 +491,7 @@ BEGIN
 		PATCH_IF seconds MODULO duration_divisor == 0 BEGIN
 			SET amount = seconds / duration_divisor
 			SET duration_tra = tra_base + duration_unit * 2 + (amount > 1 ? 1 : 0)
-			LPF ad_tra INT_VAR tra_id = duration_tra tra_block_start = tra_base tra_block_size = 10 RET text END
+			SET tra_id = duration_tra SET tra_block_start = tra_base SET tra_block_size = 10 SPRINT tra_out ~text~ LPM ad_tra_to
 		END
 	END
 END
@@ -518,7 +518,7 @@ DEFINE_PATCH_MACRO ad_application_save BEGIN
 		SPRINT app_or @1000007 // ~ou~
 		PHP_EACH AD_SAVE_TYPES AS app_save_bit => app_save_opcode BEGIN
 			PATCH_IF (app_save_types BAND app_save_bit) != 0 BEGIN
-				LPF ad_tra INT_VAR tra_id = 20000000 + app_save_opcode * 10000 RET app_save_name = text END
+				SET tra_id = 20000000 + app_save_opcode * 10000 SPRINT tra_out ~app_save_name~ LPM ad_tra_to
 				PATCH_IF ~%saveTypeStr%~ STRING_EQUAL ~~ BEGIN
 					SPRINT saveTypeStr ~%app_save_name%~
 				END
@@ -597,9 +597,9 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 	END
 	SET app_target_missing = NOT TRA_ENTRY_EXISTS (~%app_target_tra%~)
 	PATCH_IF NOT app_target_missing BEGIN
-		LPF ad_tra INT_VAR tra_id = app_target_tra     tra_block_start = 2000000 tra_block_size = 1000 RET theTarget = text END
-		LPF ad_tra INT_VAR tra_id = app_target_tra + 1 tra_block_start = 2000000 tra_block_size = 1000 RET ofTheTarget = text END
-		LPF ad_tra INT_VAR tra_id = app_target_tra + 2 tra_block_start = 2000000 tra_block_size = 1000 RET toTheTarget = text END
+		SET tra_id = app_target_tra     SET tra_block_start = 2000000 SET tra_block_size = 1000 SPRINT tra_out ~theTarget~ LPM ad_tra_to
+		SET tra_id = app_target_tra + 1 SET tra_block_start = 2000000 SET tra_block_size = 1000 SPRINT tra_out ~ofTheTarget~ LPM ad_tra_to
+		SET tra_id = app_target_tra + 2 SET tra_block_start = 2000000 SET tra_block_size = 1000 SPRINT tra_out ~toTheTarget~ LPM ad_tra_to
 	END
 	SET app_force_self = ctx_force_target AND ctx_force_keep_self AND (app_target == TARGET_FX_self OR app_target == TARGET_FX_original_caster)
 	PATCH_IF app_force_self AND NOT (~%ctx_force_only_for%~ STRING_EQUAL ~~) BEGIN
@@ -618,7 +618,7 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		PATCH_IF area_phrase == 2001103 BEGIN
 			LPM ad_fx_source_excluded
 			LPM ad_application_source
-			LPF ad_tra INT_VAR tra_id = source_tra tra_block_start = 2000000 tra_block_size = 1000 RET app_source_name = text END // ~le lanceur~ (@2000120)
+			SET tra_id = source_tra SET tra_block_start = 2000000 SET tra_block_size = 1000 SPRINT tra_out ~app_source_name~ LPM ad_tra_to // ~le lanceur~ (@2000120)
 			PATCH_IF source_excluded AND (~%theTarget%~ STRING_EQUAL ~%app_source_name%~) BEGIN
 				SET area_phrase = 2001100 // ~%target% dans un rayon de %range%~
 			END
@@ -703,13 +703,13 @@ DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 		END
 		SPRINT target ~%theTarget%~
 		PATCH_IF line_form == 0 OR line_form == 2 BEGIN
-			LPF ad_tra INT_VAR tra_id = app_level_tra + 4 tra_block_start = 2003000 tra_block_size = 10 RET app_self_level_text = text END // ~uniquement au niveau %levelMin%~
+			SET tra_id = app_level_tra + 4 SET tra_block_start = 2003000 SET tra_block_size = 10 SPRINT tra_out ~app_self_level_text~ LPM ad_tra_to // ~uniquement au niveau %levelMin%~
 		END
-		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET theTarget = text END
+		SET tra_id = app_level_tra SET tra_block_start = 2003000 SET tra_block_size = 10 SPRINT tra_out ~theTarget~ LPM ad_tra_to
 		SPRINT target ~%ofTheTarget%~
-		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET ofTheTarget = text END
+		SET tra_id = app_level_tra SET tra_block_start = 2003000 SET tra_block_size = 10 SPRINT tra_out ~ofTheTarget~ LPM ad_tra_to
 		SPRINT target ~%toTheTarget%~
-		LPF ad_tra INT_VAR tra_id = app_level_tra tra_block_start = 2003000 tra_block_size = 10 RET toTheTarget = text END
+		SET tra_id = app_level_tra SET tra_block_start = 2003000 SET tra_block_size = 10 SPRINT tra_out ~toTheTarget~ LPM ad_tra_to
 	END
 END
 
@@ -817,7 +817,7 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 					SET app_versus_distinct += 1
 				END
 				SET app_versus_kit_tra = app_versus_distinct == 1 ? 2002031 : 2002032
-				LPF ad_tra INT_VAR tra_id = app_versus_kit_tra RET line_only_for = text END // ~uniquement pour le kit %targetType%~
+				SET tra_id = app_versus_kit_tra SPRINT tra_out ~line_only_for~ LPM ad_tra_to // ~uniquement pour le kit %targetType%~
 			END
 		END
 		ELSE BEGIN
@@ -846,11 +846,11 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 				SET angle = ctx_area_angle
 				SET app_versus_area_phrase = ctx_area_phrase == 2001102 ? 2001102 : 2001100
 				SPRINT target ~%theTarget%~
-				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET theTarget = text END // ~%target% dans un rayon de %range%~
+				SET tra_id = app_versus_area_phrase SPRINT tra_out ~theTarget~ LPM ad_tra_to // ~%target% dans un rayon de %range%~
 				SPRINT target ~%ofTheTarget%~
-				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET ofTheTarget = text END
+				SET tra_id = app_versus_area_phrase SPRINT tra_out ~ofTheTarget~ LPM ad_tra_to
 				SPRINT target ~%toTheTarget%~
-				LPF ad_tra INT_VAR tra_id = app_versus_area_phrase RET toTheTarget = text END
+				SET tra_id = app_versus_area_phrase SPRINT tra_out ~toTheTarget~ LPM ad_tra_to
 				SPRINT range ~%app_versus_saved_range%~
 				SET angle = app_versus_saved_angle
 			END
@@ -892,7 +892,7 @@ DEFINE_PATCH_MACRO ad_application_versus_class_groups BEGIN
 					SET $app_versus_class_member(~%app_group_member%~) = 1
 				END ~%MATCH0%~
 			END
-			LPF ad_tra INT_VAR tra_id = app_group_tra RET app_group_name = text END
+			SET tra_id = app_group_tra SPRINT tra_out ~app_group_name~ LPM ad_tra_to
 			SPRINT $app_versus_grouped(~%app_group_name%~) ~%app_group_name%~
 			SET app_versus_group_count += 1
 		END
@@ -939,7 +939,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	PATCH_IF line_phrase > 0 AND app_line_ok BEGIN
 		SET line_phrase_tra = line_phrase + line_form
 		PATCH_IF TRA_ENTRY_EXISTS (~%line_phrase_tra%~) BEGIN
-			LPF ad_tra INT_VAR tra_id = line_phrase_tra RET line_text = text END
+			SET tra_id = line_phrase_tra SPRINT tra_out ~line_text~ LPM ad_tra_to
 		END
 		ELSE BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:phrase%line_phrase%:form%line_form%~ message = ~no sentence %line_phrase_tra% for this form (target or probable effect)~ RET render_late_missing = refusal END
@@ -1008,7 +1008,7 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SPRINT line_text ~%line_text% (%app_exceptions_text%)~
 		END
 	END
-	LPF ad_collapse_spaces STR_VAR text = EVAL ~%line_text%~ RET line_text = text END
+	LPM ad_collapse_spaces
 	// Effet probable : « 26 % de chances » devant la ligne entière (ancien get_effect_description),
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).
 	SET app_saved_sort = line_sort

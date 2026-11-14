@@ -125,12 +125,12 @@ DEFINE_PATCH_MACRO ad_versus_modifier_line BEGIN
 	// Autres formes (ancien opcode_target et opcode_probability) : « Augmente de 5 le TAC0 de la cible
 	// contre les X ».
 	PATCH_IF line_form != 0 BEGIN
-		LPF ad_tra INT_VAR tra_id = versus_name_tra + 2 RET theStatistic = text END // ~le TAC0~
+		SET tra_id = versus_name_tra + 2 SPRINT tra_out ~theStatistic~ LPM ad_tra_to // ~le TAC0~
 		SET value = ABS versus_amount
 		SET line_phrase = versus_amount >= 0 ? 1210110 : 1210120 // ~Augmente de %value% %theStatistic% %ofTheTarget%~ (+1)
 	END
 	ELSE BEGIN
-		LPF ad_tra INT_VAR tra_id = versus_name_tra RET name = text END // ~TAC0~
+		SET tra_id = versus_name_tra SPRINT tra_out ~name~ LPM ad_tra_to // ~TAC0~
 		LPF ad_signed_value INT_VAR value = versus_amount RET value = text END
 		SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 	END

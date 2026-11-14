@@ -127,7 +127,7 @@ DEFINE_PATCH_MACRO ad_hit_effect_lines BEGIN
 			ELSE PATCH_IF hit_opcode == 248 AND IS_EE AND ($fx_parameter2(~%hit_id%~) BAND BIT2) != 0 BEGIN
 				SET hit_condition_tra += 1
 			END
-			LPF ad_tra INT_VAR tra_id = hit_condition_tra RET line_condition = text END // ~À chaque attaque de mêlée réussie~
+			SET tra_id = hit_condition_tra SPRINT tra_out ~line_condition~ LPM ad_tra_to // ~À chaque attaque de mêlée réussie~
 			LPM ad_hit_effect_duration
 			PATCH_IF NOT (~%app_duration_text%~ STRING_EQUAL ~~) BEGIN
 				SPRINT line_condition ~%line_condition% %app_duration_text%~

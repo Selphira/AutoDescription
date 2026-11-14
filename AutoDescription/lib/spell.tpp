@@ -20,6 +20,8 @@ BEGIN
 	// Effets de lancement décrits à part (ancien add_casting_features), pas pour les sous-sorts.
 	SET fx_with_casting = 1
 	SET fx_skip_ignored = 0
+	SET tra_block_start = 0
+	SET tra_block_size = 0
 	SPRINT description ~~
 	SET covered = 0
 	LPM ad_recursion_reset
