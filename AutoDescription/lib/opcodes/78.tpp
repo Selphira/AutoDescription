@@ -107,38 +107,36 @@ END
 DEFINE_PATCH_MACRO ad_op_78_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~78~)
-	FOR (disease_late = 0; disease_late <= 2; ++disease_late) BEGIN
-		PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%disease_id%~) AND $fx_late(~%disease_id%~) == disease_late BEGIN
-				SET disease_type = $fx_parameter2(~%disease_id%~)
-				SET amount = $fx_parameter1(~%disease_id%~)
-				PATCH_IF $fx_disease_group(~%disease_id%~) BEGIN
-					SPRINT theAttributes $fx_disease_attributes(~%disease_id%~)
-					SET disease_offset = amount < 0 ? 50 : 40
-					SET amount = ABS amount
-				END
-				ELSE PATCH_IF disease_type <= 3 BEGIN
-					SET hp_id = disease_id
-					LPM ad_hp_over_time_value
-					SET amount = hp_amount
-					LPF ad_duration_text INT_VAR seconds = hp_frequency tra_base = 3030000 RET strDuration = text END // ~par round~
-					SET disease_offset = (IS_EE ? 30 : 0) + (hp_amount > 1 ? 1 : 0)
-				END
-				ELSE PATCH_IF disease_type <= 9 BEGIN
-					SET disease_offset = disease_type + (amount < 0 ? 10 : 0)
-					SET amount = ABS amount
-				END
-				ELSE PATCH_IF disease_type == 10 BEGIN
-					SET disease_offset = 10
-				END
-				ELSE BEGIN
-					SET disease_offset = amount < 0 ? 13 : 23
-					SET amount = ABS amount
-				END
-				SET line_fx = disease_id
-				SET line_phrase = 20780100 + 10 * disease_offset // ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
-				LPM ad_effect_line
+	PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%disease_id%~) BEGIN
+			SET disease_type = $fx_parameter2(~%disease_id%~)
+			SET amount = $fx_parameter1(~%disease_id%~)
+			PATCH_IF $fx_disease_group(~%disease_id%~) BEGIN
+				SPRINT theAttributes $fx_disease_attributes(~%disease_id%~)
+				SET disease_offset = amount < 0 ? 50 : 40
+				SET amount = ABS amount
 			END
+			ELSE PATCH_IF disease_type <= 3 BEGIN
+				SET hp_id = disease_id
+				LPM ad_hp_over_time_value
+				SET amount = hp_amount
+				LPF ad_duration_text INT_VAR seconds = hp_frequency tra_base = 3030000 RET strDuration = text END // ~par round~
+				SET disease_offset = (IS_EE ? 30 : 0) + (hp_amount > 1 ? 1 : 0)
+			END
+			ELSE PATCH_IF disease_type <= 9 BEGIN
+				SET disease_offset = disease_type + (amount < 0 ? 10 : 0)
+				SET amount = ABS amount
+			END
+			ELSE PATCH_IF disease_type == 10 BEGIN
+				SET disease_offset = 10
+			END
+			ELSE BEGIN
+				SET disease_offset = amount < 0 ? 13 : 23
+				SET amount = ABS amount
+			END
+			SET line_fx = disease_id
+			SET line_phrase = 20780100 + 10 * disease_offset // ~Inocule une maladie qui inflige 1 point de dégâts %strDuration% %toTheTarget%~
+			LPM ad_effect_line
 		END
 	END
 END

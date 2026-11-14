@@ -35,33 +35,31 @@ DEFINE_PATCH_MACRO ad_op_145_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~145~)
 	LPF ad_item_is_robe RET spellcasting_robe = is_robe END
-	FOR (spellcasting_late = 0; spellcasting_late <= 2; ++spellcasting_late) BEGIN
-		PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%spellcasting_id%~) AND $fx_late(~%spellcasting_id%~) == spellcasting_late BEGIN
-				SET spellcasting_types = $fx_spell_types(~%spellcasting_id%~)
-				PATCH_IF spellcasting_types == 0 BEGIN
-					SET spellcasting_types = 1 << $fx_parameter2(~%spellcasting_id%~)
+	PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%spellcasting_id%~) BEGIN
+			SET spellcasting_types = $fx_spell_types(~%spellcasting_id%~)
+			PATCH_IF spellcasting_types == 0 BEGIN
+				SET spellcasting_types = 1 << $fx_parameter2(~%spellcasting_id%~)
+			END
+			// Ancien opcode_self_145 : effet de type profane, ou réuni aux seuls types profanes.
+			SET spellcasting_armor_rule = ($fx_parameter2(~%spellcasting_id%~) == 0 OR spellcasting_types == 1)
+				AND AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS AND item_type == ITM_TYPE_armor AND NOT spellcasting_robe
+			PATCH_IF NOT spellcasting_armor_rule AND $fx_parameter2(~%spellcasting_id%~) == 3 BEGIN
+				PATCH_IF $fx_spell_types(~%spellcasting_id%~) != 0 BEGIN
+					LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:magical_group~ message = ~spell type 3 merged with other spell types~ RET render_late_missing = refusal END
 				END
-				// Ancien opcode_self_145 : effet de type profane, ou réuni aux seuls types profanes.
-				SET spellcasting_armor_rule = ($fx_parameter2(~%spellcasting_id%~) == 0 OR spellcasting_types == 1)
-					AND AD_ARMOR_SHOW_ALLOWS_TO_CAST_SPELLS AND item_type == ITM_TYPE_armor AND NOT spellcasting_robe
-				PATCH_IF NOT spellcasting_armor_rule AND $fx_parameter2(~%spellcasting_id%~) == 3 BEGIN
-					PATCH_IF $fx_spell_types(~%spellcasting_id%~) != 0 BEGIN
-						LPF ad_refusal INT_VAR fx_id = spellcasting_id STR_VAR reason = ~not_implemented:opcode145:magical_group~ message = ~spell type 3 merged with other spell types~ RET render_late_missing = refusal END
-					END
-					SET line_phrase = 21450120 // ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
-					SET line_fx = spellcasting_id
-					LPM ad_effect_line
+				SET line_phrase = 21450120 // ~Empêche %theTarget% de lancer des sorts sensibles aux zones de magie morte et aux hiatus entropiques~
+				SET line_fx = spellcasting_id
+				LPM ad_effect_line
+			END
+			ELSE PATCH_IF NOT spellcasting_armor_rule BEGIN
+				SET line_phrase = 21450110 // ~Empêche %theTarget% de lancer des sorts~
+				PATCH_IF spellcasting_types != 7 BEGIN
+					LPF ad_spell_types_text INT_VAR types = spellcasting_types RET spellType = text END
+					SET line_phrase = 21450100 // ~Empêche %theTarget% de lancer des sorts %spellType%~
 				END
-				ELSE PATCH_IF NOT spellcasting_armor_rule BEGIN
-					SET line_phrase = 21450110 // ~Empêche %theTarget% de lancer des sorts~
-					PATCH_IF spellcasting_types != 7 BEGIN
-						LPF ad_spell_types_text INT_VAR types = spellcasting_types RET spellType = text END
-						SET line_phrase = 21450100 // ~Empêche %theTarget% de lancer des sorts %spellType%~
-					END
-					SET line_fx = spellcasting_id
-					LPM ad_effect_line
-				END
+				SET line_fx = spellcasting_id
+				LPM ad_effect_line
 			END
 		END
 	END

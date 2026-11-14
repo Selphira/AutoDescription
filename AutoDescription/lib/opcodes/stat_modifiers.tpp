@@ -151,57 +151,56 @@ DEFINE_PATCH_MACRO ad_stat_modifier_lines BEGIN
 	SET line_sort = $AD_OPCODE_SORT(~%stat_opcode%~)
 	SET stat_base_name_tra = $AD_STAT_MODIFIER_NAMES(~%stat_opcode%~)
 	SET stat_percent = VARIABLE_IS_SET $AD_STAT_MODIFIER_PERCENT(~%stat_opcode%~)
-	// Effets réunis (fx_late) après les autres, comme ceux que l'ancien moteur ajoute en fin de liste.
-	FOR (stat_late = 0; stat_late <= 2; ++stat_late) BEGIN
-		PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%stat_id%~) AND $fx_late(~%stat_id%~) == stat_late BEGIN
-				SET stat_value = $fx_parameter1(~%stat_id%~)
-				SET stat_mode = $fx_parameter2(~%stat_id%~)
-				SET stat_name_tra = stat_base_name_tra
-				SET line_fx = stat_id
-				LPM ad_application_form
-				SET stat_line_done = 0
-				SPRINT stat_name_suffix ~~
-				PATCH_IF NOT (~%stat_line_macro%~ STRING_EQUAL ~~) BEGIN
-					LPM ~%stat_line_macro%~
+	// Effets réunis (fx_late) après les autres, comme ceux que l'ancien moteur ajoute en fin de liste :
+	// fx_ids_<opcode> est déjà rangé ainsi (ad_fx_ids_late_order, lib/groups.tpp).
+	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%stat_id%~) BEGIN
+			SET stat_value = $fx_parameter1(~%stat_id%~)
+			SET stat_mode = $fx_parameter2(~%stat_id%~)
+			SET stat_name_tra = stat_base_name_tra
+			SET line_fx = stat_id
+			LPM ad_application_form
+			SET stat_line_done = 0
+			SPRINT stat_name_suffix ~~
+			PATCH_IF NOT (~%stat_line_macro%~ STRING_EQUAL ~~) BEGIN
+				LPM ~%stat_line_macro%~
+			END
+			PATCH_IF NOT stat_line_done BEGIN
+				SET tra_id = stat_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
+				PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
+					SPRINT name ~%name% %stat_name_suffix%~
 				END
-				PATCH_IF NOT stat_line_done BEGIN
-					SET tra_id = stat_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
-					PATCH_IF NOT (~%stat_name_suffix%~ STRING_EQUAL ~~) BEGIN
-						SPRINT name ~%name% %stat_name_suffix%~
-					END
-					SPRINT stat_level_value $fx_level_value(~%stat_id%~)
-					LPM ad_stat_modifier_dice_text
-					PATCH_IF line_form == 0 BEGIN
-						LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
-						PATCH_IF NOT (~%stat_dice_text%~ STRING_EQUAL ~~) BEGIN
-							SPRINT value ~%stat_dice_text%~
-							PATCH_IF stat_value >= 0 BEGIN
-								SPRINT value @1200001 // ~+%value%~
-							END
-							ELSE BEGIN
-								SPRINT value ~-%value%~
-							END
+				SPRINT stat_level_value $fx_level_value(~%stat_id%~)
+				LPM ad_stat_modifier_dice_text
+				PATCH_IF line_form == 0 BEGIN
+					LPF ad_stat_modifier_value INT_VAR value = stat_value mode = stat_mode percent = stat_percent RET value = text END
+					PATCH_IF NOT (~%stat_dice_text%~ STRING_EQUAL ~~) BEGIN
+						SPRINT value ~%stat_dice_text%~
+						PATCH_IF stat_value >= 0 BEGIN
+							SPRINT value @1200001 // ~+%value%~
 						END
-						PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
-							SPRINT value ~%stat_level_value%~
-							PATCH_IF stat_mode == MOD_TYPE_flat AND stat_percent BEGIN
-								LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:spell:progression_percent_set~ message = ~percentage set to a value varying with the level~ RET render_late_missing = refusal END
-							END
-							ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
-								SPRINT value @1200002 // ~Passe à %value%~
-							END
-							ELSE PATCH_IF stat_value >= 0 BEGIN
-								SPRINT value @1200001 // ~+%value%~
-							END
+						ELSE BEGIN
+							SPRINT value ~-%value%~
 						END
-						SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 					END
-					ELSE BEGIN
-						LPM ad_stat_modifier_target_phrase
+					PATCH_IF NOT (~%stat_level_value%~ STRING_EQUAL ~~) BEGIN
+						SPRINT value ~%stat_level_value%~
+						PATCH_IF stat_mode == MOD_TYPE_flat AND stat_percent BEGIN
+							LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:spell:progression_percent_set~ message = ~percentage set to a value varying with the level~ RET render_late_missing = refusal END
+						END
+						ELSE PATCH_IF stat_mode == MOD_TYPE_flat BEGIN
+							SPRINT value @1200002 // ~Passe à %value%~
+						END
+						ELSE PATCH_IF stat_value >= 0 BEGIN
+							SPRINT value @1200001 // ~+%value%~
+						END
 					END
-					LPM ad_effect_line
+					SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 				END
+				ELSE BEGIN
+					LPM ad_stat_modifier_target_phrase
+				END
+				LPM ad_effect_line
 			END
 		END
 	END

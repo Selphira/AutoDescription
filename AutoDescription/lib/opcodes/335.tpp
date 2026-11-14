@@ -45,15 +45,13 @@ END
 DEFINE_PATCH_MACRO ad_op_335_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~335~)
-	FOR (eyes_late = 0; eyes_late <= 2; ++eyes_late) BEGIN
-		PHP_EACH fx_ids_335 AS _ => eyes_id BEGIN
-			SET eyes_tra = 8120000 + $fx_parameter1(~%eyes_id%~)
-			PATCH_IF NOT $fx_consumed(~%eyes_id%~) AND $fx_late(~%eyes_id%~) == eyes_late AND TRA_ENTRY_EXISTS (~%eyes_tra%~) BEGIN
-				SET line_fx = eyes_id
-				LPM ad_op_335_variant
-				SET line_phrase = 23350100 + 10 * state_variant
-				LPM ad_effect_line
-			END
+	PHP_EACH fx_ids_335 AS _ => eyes_id BEGIN
+		SET eyes_tra = 8120000 + $fx_parameter1(~%eyes_id%~)
+		PATCH_IF NOT $fx_consumed(~%eyes_id%~) AND TRA_ENTRY_EXISTS (~%eyes_tra%~) BEGIN
+			SET line_fx = eyes_id
+			LPM ad_op_335_variant
+			SET line_phrase = 23350100 + 10 * state_variant
+			LPM ad_effect_line
 		END
 	END
 END

@@ -62,84 +62,82 @@ END
 DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~12~)
-	FOR (damage_late = 0; damage_late <= 2; ++damage_late) BEGIN
-		PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%damage_id%~) AND $fx_late(~%damage_id%~) == damage_late BEGIN
-				LPM ad_op_12_value
-				PATCH_IF $fx_range_max(~%damage_id%~) > 0 BEGIN
-					LPF ad_dice_text INT_VAR dice_count = 1 dice_sides = $fx_range_max(~%damage_id%~) - $fx_range_min(~%damage_id%~) + 1
-						bonus = $fx_range_min(~%damage_id%~) - 1 RET damage_text = text END
+	PHP_EACH fx_ids_12 AS _ => damage_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%damage_id%~) BEGIN
+			LPM ad_op_12_value
+			PATCH_IF $fx_range_max(~%damage_id%~) > 0 BEGIN
+				LPF ad_dice_text INT_VAR dice_count = 1 dice_sides = $fx_range_max(~%damage_id%~) - $fx_range_min(~%damage_id%~) + 1
+					bonus = $fx_range_min(~%damage_id%~) - 1 RET damage_text = text END
+			END
+			SPRINT damage ~%damage_text%~
+			PATCH_IF damage_mode == 0 BEGIN
+				SPRINT damage $fx_level_value(~%damage_id%~)
+				// Une progression selon le niveau du sort (lib/spell_levels.tpp) nomme déjà le type.
+				PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
+					SET unit_fx = damage_id
+					LPM ad_op_12_level_unit
+					PATCH_IF unit_tra == 20120003 AND ~%damage_text%~ STRING_EQUAL ~1~ BEGIN
+						SET unit_tra = 20120002 // ~point de vie~
+					END
+					SET tra_id = unit_tra SPRINT tra_out ~damageType~ LPM ad_tra_to
+					SPRINT damage ~%damage_text%~
+					SPRINT damage @20120001 // ~%damage% %damageType%~
 				END
-				SPRINT damage ~%damage_text%~
-				PATCH_IF damage_mode == 0 BEGIN
-					SPRINT damage $fx_level_value(~%damage_id%~)
-					// Une progression selon le niveau du sort (lib/spell_levels.tpp) nomme déjà le type.
-					PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
-						SET unit_fx = damage_id
-						LPM ad_op_12_level_unit
-						PATCH_IF unit_tra == 20120003 AND ~%damage_text%~ STRING_EQUAL ~1~ BEGIN
-							SET unit_tra = 20120002 // ~point de vie~
-						END
-						SET tra_id = unit_tra SPRINT tra_out ~damageType~ LPM ad_tra_to
-						SPRINT damage ~%damage_text%~
-						SPRINT damage @20120001 // ~%damage% %damageType%~
-					END
-					SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
-					PATCH_IF damage_transfer BEGIN
-						LPM ad_application_source
-						SET tra_id = source_tra     SPRINT tra_out ~theSource~ LPM ad_tra_to // ~le porteur~ (@2000100)
-						SET tra_id = source_tra + 1 SPRINT tra_out ~ofTheSource~ LPM ad_tra_to // ~du porteur~ (@2000101)
-					END
-					SET damage_target = $fx_effective_target(~%damage_id%~)
-					PATCH_IF line_phrase == 20120100 AND ($fx_versus_file(~%damage_id%~) > 0 OR ctx_versus_set)
-							AND damage_target != TARGET_FX_self AND damage_target != TARGET_FX_original_caster BEGIN
-						SET line_phrase = 20120160 // ~Inflige %damage% %versus%~ (+1)
-					END
+				SET line_phrase = damage_drain ? 20120110 : (damage_transfer ? 20120120 : 20120100) // ~Inflige %damage% %toTheTarget%~
+				PATCH_IF damage_transfer BEGIN
+					LPM ad_application_source
+					SET tra_id = source_tra     SPRINT tra_out ~theSource~ LPM ad_tra_to // ~le porteur~ (@2000100)
+					SET tra_id = source_tra + 1 SPRINT tra_out ~ofTheSource~ LPM ad_tra_to // ~du porteur~ (@2000101)
 				END
-				ELSE PATCH_IF damage_mode == 1 BEGIN
-					PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
-						SPRINT damage ~0~
-					END
-					SET line_phrase = 20120130
+				SET damage_target = $fx_effective_target(~%damage_id%~)
+				PATCH_IF line_phrase == 20120100 AND ($fx_versus_file(~%damage_id%~) > 0 OR ctx_versus_set)
+						AND damage_target != TARGET_FX_self AND damage_target != TARGET_FX_original_caster BEGIN
+					SET line_phrase = 20120160 // ~Inflige %damage% %versus%~ (+1)
 				END
-				ELSE PATCH_IF damage_mode == 2 BEGIN
-					SET line_phrase = 20120140
+			END
+			ELSE PATCH_IF damage_mode == 1 BEGIN
+				PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
+					SPRINT damage ~0~
+				END
+				SET line_phrase = 20120130
+			END
+			ELSE PATCH_IF damage_mode == 2 BEGIN
+				SET line_phrase = 20120140
+			END
+			ELSE BEGIN
+				SET line_phrase = 20120150
+			END
+			PATCH_IF damage_max_hp BEGIN
+				LPF ad_duration_text INT_VAR seconds = $fx_duration(~%damage_id%~) RET strDuration = text END
+				SPRINT line_sentence @20120042 // ~Tout point de vie au-delà du maximum disparaît après %strDuration%~
+				SET line_no_duration = 1
+				PATCH_IF (damage_special BAND (BIT3 BOR BIT4)) != 0 AND NOT $fx_not_cumulative(~%damage_id%~) BEGIN
+					SPRINT damage_note @4000010 // ~non cumulatif~
+					SPRINT line_suffix ~(%damage_note%)~
+				END
+			END
+			PATCH_IF damage_dont_wake BEGIN
+				SPRINT damage_note @20120040 // ~ne réveille pas la cible~
+				PATCH_IF ~%line_suffix%~ STRING_EQUAL ~~ BEGIN
+					SPRINT line_suffix ~(%damage_note%)~
 				END
 				ELSE BEGIN
-					SET line_phrase = 20120150
+					SPRINT line_suffix ~%line_suffix% (%damage_note%)~
 				END
-				PATCH_IF damage_max_hp BEGIN
-					LPF ad_duration_text INT_VAR seconds = $fx_duration(~%damage_id%~) RET strDuration = text END
-					SPRINT line_sentence @20120042 // ~Tout point de vie au-delà du maximum disparaît après %strDuration%~
-					SET line_no_duration = 1
-					PATCH_IF (damage_special BAND (BIT3 BOR BIT4)) != 0 AND NOT $fx_not_cumulative(~%damage_id%~) BEGIN
-						SPRINT damage_note @4000010 // ~non cumulatif~
-						SPRINT line_suffix ~(%damage_note%)~
-					END
-				END
-				PATCH_IF damage_dont_wake BEGIN
-					SPRINT damage_note @20120040 // ~ne réveille pas la cible~
-					PATCH_IF ~%line_suffix%~ STRING_EQUAL ~~ BEGIN
-						SPRINT line_suffix ~(%damage_note%)~
-					END
-					ELSE BEGIN
-						SPRINT line_suffix ~%line_suffix% (%damage_note%)~
-					END
-				END
-				PATCH_IF damage_fist BEGIN
-					SPRINT damage_note @20120041 // ~efficace si la source est désarmée~
-					PATCH_IF ~%line_suffix%~ STRING_EQUAL ~~ BEGIN
-						SPRINT line_suffix ~(%damage_note%)~
-					END
-					ELSE BEGIN
-						SPRINT line_suffix ~%line_suffix% (%damage_note%)~
-					END
-				END
-				SET line_save_for_half = damage_save_for_half
-				SET line_fail_for_half = damage_fail_for_half
-				SET line_fx = damage_id
-				LPM ad_effect_line
 			END
+			PATCH_IF damage_fist BEGIN
+				SPRINT damage_note @20120041 // ~efficace si la source est désarmée~
+				PATCH_IF ~%line_suffix%~ STRING_EQUAL ~~ BEGIN
+					SPRINT line_suffix ~(%damage_note%)~
+				END
+				ELSE BEGIN
+					SPRINT line_suffix ~%line_suffix% (%damage_note%)~
+				END
+			END
+			SET line_save_for_half = damage_save_for_half
+			SET line_fail_for_half = damage_fail_for_half
+			SET line_fx = damage_id
+			LPM ad_effect_line
 		END
 	END
 END

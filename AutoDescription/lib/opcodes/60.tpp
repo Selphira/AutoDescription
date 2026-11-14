@@ -22,28 +22,26 @@ END
 DEFINE_PATCH_MACRO ad_op_60_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~60~)
-	FOR (failure_late = 0; failure_late <= 2; ++failure_late) BEGIN
-		PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%failure_id%~) AND $fx_late(~%failure_id%~) == failure_late BEGIN
-				SET failure_types = $fx_spell_types(~%failure_id%~)
-				PATCH_IF failure_types == 0 BEGIN
-					SET failure_type = $fx_parameter2(~%failure_id%~)
-					SET failure_types = 1 << (failure_type > 2 ? failure_type - 3 : failure_type)
-				END
-				SET value = $fx_parameter1(~%failure_id%~) BAND 255
-				SPRINT percent @1200003 // ~%value%%PERCENT%~
-				SPRINT failure_level_value $fx_level_value(~%failure_id%~)
-				PATCH_IF NOT (~%failure_level_value%~ STRING_EQUAL ~~) BEGIN
-					SPRINT percent ~%failure_level_value%~
-				END
-				SET line_phrase = 20600100 // ~Provoque l'échec de %percent% des sorts~
-				PATCH_IF failure_types != 7 BEGIN
-					LPF ad_spell_types_text INT_VAR types = failure_types RET spellType = text END
-					SET line_phrase = 20600110 // ~Provoque l'échec de %percent% des sorts %spellType%~
-				END
-				SET line_fx = failure_id
-				LPM ad_effect_line
+	PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%failure_id%~) BEGIN
+			SET failure_types = $fx_spell_types(~%failure_id%~)
+			PATCH_IF failure_types == 0 BEGIN
+				SET failure_type = $fx_parameter2(~%failure_id%~)
+				SET failure_types = 1 << (failure_type > 2 ? failure_type - 3 : failure_type)
 			END
+			SET value = $fx_parameter1(~%failure_id%~) BAND 255
+			SPRINT percent @1200003 // ~%value%%PERCENT%~
+			SPRINT failure_level_value $fx_level_value(~%failure_id%~)
+			PATCH_IF NOT (~%failure_level_value%~ STRING_EQUAL ~~) BEGIN
+				SPRINT percent ~%failure_level_value%~
+			END
+			SET line_phrase = 20600100 // ~Provoque l'échec de %percent% des sorts~
+			PATCH_IF failure_types != 7 BEGIN
+				LPF ad_spell_types_text INT_VAR types = failure_types RET spellType = text END
+				SET line_phrase = 20600110 // ~Provoque l'échec de %percent% des sorts %spellType%~
+			END
+			SET line_fx = failure_id
+			LPM ad_effect_line
 		END
 	END
 END

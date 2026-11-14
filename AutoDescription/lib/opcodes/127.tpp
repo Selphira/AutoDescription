@@ -295,35 +295,33 @@ END
 DEFINE_PATCH_MACRO ad_op_127_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~127~)
-	FOR (monster_late = 0; monster_late <= 2; ++monster_late) BEGIN
-		PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
-			PATCH_IF NOT $fx_consumed(~%monster_id%~) AND $fx_late(~%monster_id%~) == monster_late BEGIN
-				SET monster_copies = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%monster_id%~) : 1
-				PATCH_IF $fx_monster_resource_table(~%monster_id%~) BEGIN
-					PATCH_IF monster_copies > 1 BEGIN
-						LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:resource_identical~ message = ~identical summonings from a custom table~ RET render_late_missing = refusal END
-					END
-					SET amount = $fx_parameter1(~%monster_id%~)
-					SET line_phrase = 21270180 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+	PHP_EACH fx_ids_127 AS _ => monster_id BEGIN
+		PATCH_IF NOT $fx_consumed(~%monster_id%~) BEGIN
+			SET monster_copies = AD_ENABLE_SHRINKAGE ? $fx_identical_count(~%monster_id%~) : 1
+			PATCH_IF $fx_monster_resource_table(~%monster_id%~) BEGIN
+				PATCH_IF monster_copies > 1 BEGIN
+					LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:resource_identical~ message = ~identical summonings from a custom table~ RET render_late_missing = refusal END
+				END
+				SET amount = $fx_parameter1(~%monster_id%~)
+				SET line_phrase = 21270180 // ~Invoque des créatures pour un total de %amount% niveaux (%creatures%)~
+			END
+			ELSE BEGIN
+				SET monster_grouped = $fx_monster_grouped(~%monster_id%~)
+				SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
+				SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies
+				PATCH_IF amountMin == amountMax AND NOT monster_grouped BEGIN
+					SET amount = amountMax
 				END
 				ELSE BEGIN
-					SET monster_grouped = $fx_monster_grouped(~%monster_id%~)
-					SET amountMin = $fx_monster_min(~%monster_id%~) * monster_copies
-					SET amountMax = $fx_monster_max(~%monster_id%~) * monster_copies
-					PATCH_IF amountMin == amountMax AND NOT monster_grouped BEGIN
-						SET amount = amountMax
-					END
-					ELSE BEGIN
-						SPRINT amount @21270000 // ~entre %amountMin% et %amountMax%~
-					END
-					SET monster_table = $fx_parameter2(~%monster_id%~)
-					SET monster_variant = (amountMax == 1 AND NOT monster_grouped ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
-					SET line_phrase = 21270100 + 10 * monster_variant // ~Invoque 1 monstre (%creatures%)~
+					SPRINT amount @21270000 // ~entre %amountMin% et %amountMax%~
 				END
-				SPRINT creatures $fx_monster_creatures(~%monster_id%~)
-				SET line_fx = monster_id
-				LPM ad_effect_line
+				SET monster_table = $fx_parameter2(~%monster_id%~)
+				SET monster_variant = (amountMax == 1 AND NOT monster_grouped ? 0 : 2) + ((monster_table MODULO 5) >= 3 ? 1 : 0) + (monster_table >= 5 ? 4 : 0)
+				SET line_phrase = 21270100 + 10 * monster_variant // ~Invoque 1 monstre (%creatures%)~
 			END
+			SPRINT creatures $fx_monster_creatures(~%monster_id%~)
+			SET line_fx = monster_id
+			LPM ad_effect_line
 		END
 	END
 END
