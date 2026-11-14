@@ -1,6 +1,6 @@
 // Opcode 59 (Stat: Stealth Modifier) : compétence de voleur, modificateur simple en pourcentage, code
 // commun dans lib/opcodes/stat_modifiers.tpp ; regroupée avec les six autres par
-// ad_group_thief_skills (lib/groups.tpp).
+// ad_group_same_fields (lib/groups.tpp, ligne THIEF_SKILLS de 2da/field_groups.2da).
 
 DEFINE_PATCH_MACRO ad_op_59_support BEGIN
 	SET stat_opcode = 59

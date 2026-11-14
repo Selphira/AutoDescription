@@ -1,0 +1,9 @@
+2DA V1.0
+*
+                        ANCHOR   MEMBERS                        OPTION                  NAME_TRA   STATISTIC_TRA  LINE
+ABILITIES               6        10_15_19_44_49                 AD_SHRINK_ABILITIES     30030000   30030002       ad_group_modifier_line     Caractéristiques / les caractéristiques
+ALL_SAVES               33       34_35_36_37                    AD_SHRINK_SAVES_THROWS  5000000    5000002        ad_group_modifier_line     Jets de sauvegarde / les jets de sauvegarde
+THIEF_SKILLS            59       90_91_92_275_276_277           AD_SHRINK_THIEF_SKILLS  30090000   30090002       ad_group_modifier_line     Compétences de roublard / les compétences de roublard
+ALL_RESISTANCES         84       27_28_29_30_31_85_86_87_88_89  AD_SHRINK_RESISTANCES   30050000   0              ad_group_resistance_line   Résistance aux dégâts
+ELEMENTAL_RESISTANCES   27       28_29_30                       AD_SHRINK_RESISTANCES   30060000   0              ad_group_resistance_line   Résistance aux dégâts élémentaires
+PHYSICAL_RESISTANCES    86       87_88_89                       AD_SHRINK_RESISTANCES   30070000   0              ad_group_resistance_line   Résistance aux dégâts physiques

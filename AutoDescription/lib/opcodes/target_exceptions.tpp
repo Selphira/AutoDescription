@@ -543,9 +543,10 @@ DEFINE_PATCH_MACRO ad_target_exception_lines BEGIN
 		ELSE PATCH_IF $fx_consumed(~%exception_id%~) BEGIN
 			SET exception_same = 1
 			SET exception_own_opcode = $fx_opcode(~%exception_id%~)
-			FOR (exception_other = 0; exception_other < fx_count; ++exception_other) BEGIN
+			// Test sur tous les effets de l'opcode : l'ordre de fx_ids_<opcode>, rangé pour les lignes, est sans effet.
+			PHP_EACH ~fx_ids_%exception_own_opcode%~ AS _ => exception_other BEGIN
 				SPRINT exception_other_scope $fx_scope(~%exception_other%~)
-				PATCH_IF $fx_opcode(~%exception_other%~) == exception_own_opcode AND (~%exception_other_scope%~ STRING_EQUAL ~%exception_scope%~)
+				PATCH_IF (~%exception_other_scope%~ STRING_EQUAL ~%exception_scope%~)
 						AND $fx_exception_count(~%exception_other%~) != exception_count BEGIN
 					SET exception_same = 0
 				END

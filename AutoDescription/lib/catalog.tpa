@@ -548,6 +548,46 @@ LAF ad_read_immunity_absorbs
 		AD_IMMUNITY_ABSORB_EQUIPPED AD_IMMUNITY_ABSORB_WITH
 END
 
+// Regroupements « mêmes champs » (2da/field_groups.2da, ancien group_opcode_with_same_parameters),
+// par effet dérivé (KIND) : opcode d'ancrage (ANCHOR), opcodes membres (MEMBERS, séparés par « _ »,
+// rangés dans AD_FIELD_GROUP_MEMBER(~KIND rang~), leur nombre dans AD_FIELD_GROUP_MEMBER_COUNT), option
+// AD_ qui active la règle (OPTION), chaîne du nom (NAME_TRA), chaîne de la statistique pour la phrase des
+// modificateurs (STATISTIC_TRA, 0 : aucune) et macro de la ligne (LINE). Les textes français des
+// chaînes suivent chaque ligne de la table.
+DEFINE_ACTION_FUNCTION ad_read_field_groups
+	RET_ARRAY AD_FIELD_GROUP_ANCHOR AD_FIELD_GROUP_MEMBER AD_FIELD_GROUP_MEMBER_COUNT AD_FIELD_GROUP_OPTION
+		AD_FIELD_GROUP_NAME_TRA AD_FIELD_GROUP_STATISTIC_TRA AD_FIELD_GROUP_LINE
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/field_groups.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_field_groups 7
+		FOR (ad_row = 0; ad_row < ad_field_groups; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 0 ad_kind
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 1 ad_anchor
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 2 ad_members
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 3 ad_option
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 4 ad_name_tra
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 5 ad_statistic_tra
+			READ_2DA_ENTRY_FORMER ad_field_groups ad_row 6 ad_line
+			SET $AD_FIELD_GROUP_ANCHOR(~%ad_kind%~) = ad_anchor
+			SPRINT $AD_FIELD_GROUP_OPTION(~%ad_kind%~) ~%ad_option%~
+			SET $AD_FIELD_GROUP_NAME_TRA(~%ad_kind%~) = ad_name_tra
+			SET $AD_FIELD_GROUP_STATISTIC_TRA(~%ad_kind%~) = ad_statistic_tra
+			SPRINT $AD_FIELD_GROUP_LINE(~%ad_kind%~) ~%ad_line%~
+			SET ad_member_count = 0
+			INNER_PATCH ~%ad_members%~ BEGIN
+				REPLACE_EVALUATE ~[0-9]+~ BEGIN
+					SET $AD_FIELD_GROUP_MEMBER(~%ad_kind% %ad_member_count%~) = MATCH0
+					SET ad_member_count += 1
+				END ~%MATCH0%~
+			END
+			SET $AD_FIELD_GROUP_MEMBER_COUNT(~%ad_kind%~) = ad_member_count
+		END
+END
+LAF ad_read_field_groups
+	RET_ARRAY AD_FIELD_GROUP_ANCHOR AD_FIELD_GROUP_MEMBER AD_FIELD_GROUP_MEMBER_COUNT AD_FIELD_GROUP_OPTION
+		AD_FIELD_GROUP_NAME_TRA AD_FIELD_GROUP_STATISTIC_TRA AD_FIELD_GROUP_LINE
+END
+
 // Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux
 // opcode_324_effective, _not_effective, _between et _if) : pour une ligne de splprot.2da (parameter2),
 // KIND (EFFECTIVE, NOT_EFFECTIVE, BETWEEN, IF), puis les types de créatures (IDS1-IDS3 : 1 000 ×

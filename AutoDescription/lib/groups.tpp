@@ -17,22 +17,21 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	SET group_statistic_tra = 0
 	SET group_name_tra = 0
 	SET group_anchor = 0
-	SPRINT group_name ~~
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		LPM ad_group_identical_effects
 		LPM ad_group_duration_ranges
 	END
-	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_ABILITIES BEGIN
-		LPM ad_group_abilities
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_SAVES_THROWS BEGIN
-		LPM ad_group_saving_throws
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		PATCH_FOR_EACH group_kind IN ~ABILITIES~ ~ALL_SAVES~ BEGIN
+			LPM ad_group_same_fields
+		END
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE AND VARIABLE_IS_SET $fx_opcode_count(~97~) AND VARIABLE_IS_SET $fx_opcode_count(~44~) BEGIN
 		LPM ad_group_exceptional_strength
 	END
-	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_THIEF_SKILLS BEGIN
-		LPM ad_group_thief_skills
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		SPRINT group_kind ~THIEF_SKILLS~
+		LPM ad_group_same_fields
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~83~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
@@ -125,10 +124,10 @@ DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	END
 	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
 	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
-	PATCH_IF AD_ENABLE_SHRINKAGE AND AD_SHRINK_RESISTANCES BEGIN
-		LPM ad_group_all_resistances
-		LPM ad_group_elemental_resistances
-		LPM ad_group_physical_resistances
+	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+		PATCH_FOR_EACH group_kind IN ~ALL_RESISTANCES~ ~ELEMENTAL_RESISTANCES~ ~PHYSICAL_RESISTANCES~ BEGIN
+			LPM ad_group_same_fields
+		END
 	END
 END
 
@@ -281,82 +280,6 @@ DEFINE_PATCH_MACRO ad_group_duration_ranges BEGIN
 	END
 END
 
-// Six caractéristiques modifiées de la même façon (ancien opcode_6_group, opcode virtuel 501).
-DEFINE_PATCH_MACRO ad_group_abilities BEGIN
-	SET group_anchor = 6
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 10 15 19 44 49 END
-	SPRINT group_derived ~ABILITIES~
-	SPRINT group_name @30030000 // ~Caractéristiques~
-	SET group_statistic_tra = 30030002 // ~les caractéristiques~
-	SPRINT group_line ~ad_group_modifier_line~
-	LPM ad_group_same_fields
-	SET group_statistic_tra = 0
-END
-
-// Cinq jets de sauvegarde modifiés de la même façon (ancien opcode_33_group, qui produit un effet
-// de l'opcode 325 « tous les jets de sauvegarde »).
-DEFINE_PATCH_MACRO ad_group_saving_throws BEGIN
-	SET group_anchor = 33
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 34 35 36 37 END
-	SPRINT group_derived ~ALL_SAVES~
-	SPRINT group_name @5000000 // ~Jets de sauvegarde~
-	SET group_statistic_tra = 5000002 // ~les jets de sauvegarde~
-	SPRINT group_line ~ad_group_modifier_line~
-	LPM ad_group_same_fields
-	SET group_statistic_tra = 0
-END
-
-// Sept compétences de voleur modifiées de la même façon (ancien opcode_59_group, opcode virtuel
-// 500).
-DEFINE_PATCH_MACRO ad_group_thief_skills BEGIN
-	SET group_anchor = 59
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 90 91 92 275 276 277 END
-	SPRINT group_derived ~THIEF_SKILLS~
-	SPRINT group_name @30090000 // ~Compétences de roublard~
-	SET group_statistic_tra = 30090002 // ~les compétences de roublard~
-	SPRINT group_line ~ad_group_modifier_line~
-	LPM ad_group_same_fields
-	SET group_statistic_tra = 0
-END
-
-// Onze résistances modifiées de la même façon (ancien opcode_group_all_resistances, opcode
-// virtuel 502).
-DEFINE_PATCH_MACRO ad_group_all_resistances BEGIN
-	SET group_anchor = 84
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 27 28 29 30 31 85 86 87 88 89 END
-	SPRINT group_derived ~ALL_RESISTANCES~
-	SET group_name_tra = 30050000 // ~Résistance aux dégâts~
-	SPRINT group_line ~ad_group_resistance_line~
-	LPM ad_group_same_fields
-END
-
-// Acide, froid, électricité, feu (ancien opcode_27_group, opcode virtuel 503).
-DEFINE_PATCH_MACRO ad_group_elemental_resistances BEGIN
-	SET group_anchor = 27
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 28 29 30 END
-	SPRINT group_derived ~ELEMENTAL_RESISTANCES~
-	SET group_name_tra = 30060000 // ~Résistance aux dégâts élémentaires~
-	SPRINT group_line ~ad_group_resistance_line~
-	LPM ad_group_same_fields
-END
-
-// Dégâts tranchants, contondants, perforants, de projectiles (ancien opcode_86_group, opcode
-// virtuel 504).
-DEFINE_PATCH_MACRO ad_group_physical_resistances BEGIN
-	SET group_anchor = 86
-	CLEAR_ARRAY group_members
-	PATCH_DEFINE_ARRAY group_members BEGIN 87 88 89 END
-	SPRINT group_derived ~PHYSICAL_RESISTANCES~
-	SET group_name_tra = 30070000 // ~Résistance aux dégâts physiques~
-	SPRINT group_line ~ad_group_resistance_line~
-	LPM ad_group_same_fields
-END
-
 // Force exceptionnelle fixée et Force fixée (ancien opcode_97_group, opcode virtuel 522) :
 // « Force : Passe à 18/50 » (effet dérivé EXCEPTIONAL_STRENGTH). Chaque effet 97 de valeur fixée,
 // dans l'ordre du fichier, est réuni au premier effet 44 de valeur fixée non consommé qui a les
@@ -367,8 +290,8 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1
 			SET group_other = 0 - 1
-			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 44 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+			PHP_EACH fx_ids_44 AS _ => group_candidate BEGIN
+				PATCH_IF group_other < 0 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
@@ -463,22 +386,27 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 			SET $fx_spell_levels(~%group_id%~) = group_mask
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
+			// Chaque candidat ne se compare qu'à group_id : l'ordre des opcodes entre eux est sans effet.
+			PHP_EACH fx_ids_206 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
-					PATCH_IF group_other_opcode == 206 BEGIN
-						SPRINT group_spell $fx_resource(~%group_candidate%~)
-						LPF ad_spell_effects_powers STR_VAR resref = ~%group_spell%~ RET group_spell_powers = mask END
-						PATCH_IF group_spell_powers != 0 AND (group_spell_powers BAND (BNOT group_mask)) == 0 BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
-						END
+					SPRINT group_spell $fx_resource(~%group_candidate%~)
+					LPF ad_spell_effects_powers STR_VAR resref = ~%group_spell%~ RET group_spell_powers = mask END
+					PATCH_IF group_spell_powers != 0 AND (group_spell_powers BAND (BNOT group_mask)) == 0 BEGIN
+						SET $fx_consumed(~%group_candidate%~) = 1
 					END
-					ELSE PATCH_IF (group_mask BAND 0x1FF) == 0x1FF AND (group_other_opcode == 204 OR group_other_opcode == 205) BEGIN
-						SET same_other = group_candidate
-						LPM ad_fx_same_fields
-						PATCH_IF fx_same BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
+				END
+			END
+			PATCH_IF (group_mask BAND 0x1FF) == 0x1FF BEGIN
+				PATCH_FOR_EACH group_other_opcode IN 204 205 BEGIN
+					PHP_EACH ~fx_ids_%group_other_opcode%~ AS _ => group_candidate BEGIN
+						SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+						PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+							SET same_other = group_candidate
+							LPM ad_fx_same_fields
+							PATCH_IF fx_same BEGIN
+								SET $fx_consumed(~%group_candidate%~) = 1
+							END
 						END
 					END
 				END
@@ -907,13 +835,15 @@ DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
 		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
-				PATCH_IF (group_candidate_opcode == 77 OR group_candidate_opcode == 81) AND NOT $fx_consumed(~%group_candidate%~) BEGIN
-					SET same_other = group_candidate
-					LPM ad_fx_same_fields
-					PATCH_IF fx_same BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+			// Chaque candidat ne se compare qu'à group_id : l'ordre des opcodes entre eux est sans effet.
+			PATCH_FOR_EACH group_candidate_opcode IN 77 81 BEGIN
+				PHP_EACH ~fx_ids_%group_candidate_opcode%~ AS _ => group_candidate BEGIN
+					PATCH_IF NOT $fx_consumed(~%group_candidate%~) BEGIN
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
+							SET $fx_consumed(~%group_candidate%~) = 1
+						END
 					END
 				END
 			END
@@ -1141,18 +1071,20 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 					BOR AD_SAME_POWER BOR AD_SAME_DICE BOR AD_SAME_RESISTANCE
 				CLEAR_ARRAY group_needed
 				SET group_restore = 0
-				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-					SET same_other = group_candidate
-					LPM ad_fx_same_fields
-					PATCH_IF fx_same BEGIN
-						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
-						PATCH_IF group_candidate_opcode == 163 OR (group_candidate_opcode == 126 AND $fx_parameter1(~%group_candidate%~) == 100
-								AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_percentage) BEGIN
-							SET group_restore = 1
-						END
-						ELSE PATCH_IF group_candidate_opcode == 101 BEGIN
-							SET group_needed_immunity = $fx_parameter2(~%group_candidate%~)
-							SET $group_needed(~%group_needed_immunity%~) = 1
+				// Recherche et consommation sans effet d'ordre : seuls les opcodes testés sont parcourus.
+				PATCH_FOR_EACH group_candidate_opcode IN 163 126 101 BEGIN
+					PHP_EACH ~fx_ids_%group_candidate_opcode%~ AS _ => group_candidate BEGIN
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
+							PATCH_IF group_candidate_opcode == 163 OR (group_candidate_opcode == 126 AND $fx_parameter1(~%group_candidate%~) == 100
+									AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_percentage) BEGIN
+								SET group_restore = 1
+							END
+							ELSE PATCH_IF group_candidate_opcode == 101 BEGIN
+								SET group_needed_immunity = $fx_parameter2(~%group_candidate%~)
+								SET $group_needed(~%group_needed_immunity%~) = 1
+							END
 						END
 					END
 				END
@@ -1163,17 +1095,18 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 					END
 				END
 				PATCH_IF group_complete BEGIN
-					FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-						SET same_other = group_candidate
-						LPM ad_fx_same_fields
-						SET group_candidate_opcode = $fx_opcode(~%group_candidate%~)
-						SET group_candidate_parameter2 = $fx_parameter2(~%group_candidate%~)
-						PATCH_IF fx_same AND (group_candidate_opcode == 46
-								OR group_candidate_opcode == 126 OR group_candidate_opcode == 162 OR group_candidate_opcode == 163
-								OR (group_candidate_opcode == 101 AND (group_candidate_parameter2 == 16 OR group_candidate_parameter2 == 40
-									OR group_candidate_parameter2 == 109 OR group_candidate_parameter2 == 126 OR group_candidate_parameter2 == 154
-									OR group_candidate_parameter2 == 157 OR group_candidate_parameter2 == 175))) BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
+					PATCH_FOR_EACH group_candidate_opcode IN 46 126 162 163 101 BEGIN
+						PHP_EACH ~fx_ids_%group_candidate_opcode%~ AS _ => group_candidate BEGIN
+							SET same_other = group_candidate
+							LPM ad_fx_same_fields
+							SET group_candidate_parameter2 = $fx_parameter2(~%group_candidate%~)
+							PATCH_IF fx_same AND (group_candidate_opcode == 46
+									OR group_candidate_opcode == 126 OR group_candidate_opcode == 162 OR group_candidate_opcode == 163
+									OR (group_candidate_opcode == 101 AND (group_candidate_parameter2 == 16 OR group_candidate_parameter2 == 40
+										OR group_candidate_parameter2 == 109 OR group_candidate_parameter2 == 126 OR group_candidate_parameter2 == 154
+										OR group_candidate_parameter2 == 157 OR group_candidate_parameter2 == 175))) BEGIN
+								SET $fx_consumed(~%group_candidate%~) = 1
+							END
 						END
 					END
 					SPRINT derived_kind ~FREE_ACTION~
@@ -1388,26 +1321,29 @@ DEFINE_PATCH_MACRO ad_group_polymorph BEGIN
 	PHP_EACH fx_ids_135 AS _ => group_id BEGIN
 		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SPRINT group_scope $fx_scope(~%group_id%~)
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SET group_other_opcode = $fx_opcode(~%group_candidate%~)
-				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				SPRINT group_spell $fx_resource(~%group_candidate%~)
-				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
-					PATCH_IF group_other_opcode == 171 BEGIN
-						LPF ad_spell_has_effect INT_VAR opcode = 215 STR_VAR resref = ~%group_spell%~ resource = ~POLYBACK~ RET group_found = found END
-						SET $fx_consumed(~%group_candidate%~) = group_found
-					END
-					ELSE PATCH_IF group_other_opcode == 146 AND $fx_timing(~%group_candidate%~) == TIMING_delayed BEGIN
-						LPF ad_spell_has_effect STR_VAR resref = ~%group_spell%~ resource = ~SPWI491~ RET group_found = found END
-						PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_duration
-								AND $fx_duration(~%group_id%~) == $fx_duration(~%group_candidate%~) BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
+			// Les 171 ne lisent pas les champs de group_id, que seuls les 146 changent : traiter les 171
+			// avant les 146, chacun dans l'ordre du magasin, ne change rien.
+			PATCH_FOR_EACH group_other_opcode IN 171 146 BEGIN
+				PHP_EACH ~fx_ids_%group_other_opcode%~ AS _ => group_candidate BEGIN
+					SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+					SPRINT group_spell $fx_resource(~%group_candidate%~)
+					PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
+						PATCH_IF group_other_opcode == 171 BEGIN
+							LPF ad_spell_has_effect INT_VAR opcode = 215 STR_VAR resref = ~%group_spell%~ resource = ~POLYBACK~ RET group_found = found END
+							SET $fx_consumed(~%group_candidate%~) = group_found
 						END
-						ELSE PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_permanent BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
-							SET $fx_timing(~%group_id%~) = TIMING_duration
-							SET $fx_duration(~%group_id%~) = $fx_duration(~%group_candidate%~)
-							SET $fx_late(~%group_id%~) = 2
+						ELSE PATCH_IF $fx_timing(~%group_candidate%~) == TIMING_delayed BEGIN
+							LPF ad_spell_has_effect STR_VAR resref = ~%group_spell%~ resource = ~SPWI491~ RET group_found = found END
+							PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_duration
+									AND $fx_duration(~%group_id%~) == $fx_duration(~%group_candidate%~) BEGIN
+								SET $fx_consumed(~%group_candidate%~) = 1
+							END
+							ELSE PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_permanent BEGIN
+								SET $fx_consumed(~%group_candidate%~) = 1
+								SET $fx_timing(~%group_id%~) = TIMING_duration
+								SET $fx_duration(~%group_id%~) = $fx_duration(~%group_candidate%~)
+								SET $fx_late(~%group_id%~) = 2
+							END
 						END
 					END
 				END
@@ -1427,8 +1363,8 @@ DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_SAVE
 			SET group_other = 0 - 1
-			FOR (group_candidate = 0; group_other < 0 AND group_candidate < fx_count; ++group_candidate) BEGIN
-				PATCH_IF group_candidate != group_id AND $fx_opcode(~%group_candidate%~) == 12 AND NOT $fx_consumed(~%group_candidate%~) BEGIN
+			PHP_EACH fx_ids_12 AS _ => group_candidate BEGIN
+				PATCH_IF group_other < 0 AND group_candidate != group_id AND NOT $fx_consumed(~%group_candidate%~) BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					SPRINT group_resource $fx_resource_lower(~%group_id%~)
@@ -1623,49 +1559,67 @@ DEFINE_PATCH_MACRO ad_immunity_same_fields BEGIN
 		AND $fx_save_bonus(~%absorb_id%~) == $fx_save_bonus(~%immunity_id%~)
 END
 
-// Règle générique (ancien group_opcode_with_same_parameters) : chaque effet de l'opcode
-// group_anchor, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
-// opcodes group_members qui a les mêmes champs (ad_fx_same_fields) ; s'ils sont tous trouvés, ils
-// sont consommés au profit de l'effet dérivé group_derived, d'après l'effet d'ancrage group_id, dont
-// la macro group_line écrira la ligne.
+// Règle générique (ancien group_opcode_with_same_parameters), décrite par la ligne group_kind de
+// 2da/field_groups.2da (lib/catalog.tpa) et appliquée si son option AD_ est active : chaque effet de
+// l'opcode d'ancrage, dans l'ordre du fichier, est réuni au premier effet non consommé de chacun des
+// opcodes membres qui a les mêmes champs (ad_fx_same_fields) ; s'ils sont tous trouvés, ils sont
+// consommés au profit de l'effet dérivé group_kind, d'après l'effet d'ancrage group_id, dont la macro
+// de la table écrira la ligne. Les index fx_ids_<opcode> sont dans l'ordre du magasin pendant les
+// regroupements (ad_fx_ids_late_order ne les range qu'avant les lignes).
 DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
+	SET group_anchor = $AD_FIELD_GROUP_ANCHOR(~%group_kind%~)
 	SET group_possible = VARIABLE_IS_SET $fx_opcode_count(~%group_anchor%~)
-	PHP_EACH group_members AS _ => group_opcode BEGIN
+	PATCH_IF group_possible BEGIN
+		SPRINT group_option $AD_FIELD_GROUP_OPTION(~%group_kind%~)
+		SET group_possible = EVAL ~%group_option%~
+	END
+	SET group_member_count = group_possible ? $AD_FIELD_GROUP_MEMBER_COUNT(~%group_kind%~) : 0
+	FOR (group_k = 0; group_k < group_member_count; ++group_k) BEGIN
+		SET group_opcode = $AD_FIELD_GROUP_MEMBER(~%group_kind% %group_k%~)
 		SET group_possible = group_possible AND VARIABLE_IS_SET $fx_opcode_count(~%group_opcode%~)
 	END
-	FOR (group_id = 0; group_possible AND group_id < fx_count; ++group_id) BEGIN
-		PATCH_IF $fx_opcode(~%group_id%~) == group_anchor AND NOT $fx_consumed(~%group_id%~) BEGIN
-			SET same_id = group_id
-			SET same_ignored = 0
-			SET group_found = 1
-			PHP_EACH group_members AS _ => group_opcode BEGIN
-				SET $group_member(~%group_opcode%~) = 0 - 1
-				FOR (group_other = 0; group_found AND group_other < fx_count AND $group_member(~%group_opcode%~) < 0; ++group_other) BEGIN
-					PATCH_IF $fx_opcode(~%group_other%~) == group_opcode AND NOT $fx_consumed(~%group_other%~) BEGIN
-						SET same_other = group_other
-						LPM ad_fx_same_fields
-						PATCH_IF fx_same BEGIN
-							SET $group_member(~%group_opcode%~) = group_other
+	PATCH_IF group_possible BEGIN
+		SET group_name_tra = $AD_FIELD_GROUP_NAME_TRA(~%group_kind%~)
+		SET group_statistic_tra = $AD_FIELD_GROUP_STATISTIC_TRA(~%group_kind%~)
+		SPRINT group_line $AD_FIELD_GROUP_LINE(~%group_kind%~)
+		PHP_EACH ~fx_ids_%group_anchor%~ AS _ => group_id BEGIN
+			PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
+				SET same_id = group_id
+				SET same_ignored = 0
+				SET group_found = 1
+				FOR (group_k = 0; group_k < group_member_count; ++group_k) BEGIN
+					SET group_opcode = $AD_FIELD_GROUP_MEMBER(~%group_kind% %group_k%~)
+					SET $group_member(~%group_opcode%~) = 0 - 1
+					PHP_EACH ~fx_ids_%group_opcode%~ AS _ => group_other BEGIN
+						PATCH_IF group_found AND $group_member(~%group_opcode%~) < 0 AND NOT $fx_consumed(~%group_other%~) BEGIN
+							SET same_other = group_other
+							LPM ad_fx_same_fields
+							PATCH_IF fx_same BEGIN
+								SET $group_member(~%group_opcode%~) = group_other
+							END
 						END
 					END
+					SET group_found = group_found AND $group_member(~%group_opcode%~) >= 0
 				END
-				SET group_found = group_found AND $group_member(~%group_opcode%~) >= 0
-			END
-			PATCH_IF group_found BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
-				SET $fx_derived_source(~%group_id%~) = 1
-				PHP_EACH group_members AS _ => group_opcode BEGIN
-					SET group_other = $group_member(~%group_opcode%~)
-					SET $fx_consumed(~%group_other%~) = 1
-					SET $fx_group_anchor(~%group_other%~) = group_id
+				PATCH_IF group_found BEGIN
+					SET $fx_consumed(~%group_id%~) = 1
+					SET $fx_derived_source(~%group_id%~) = 1
+					FOR (group_k = 0; group_k < group_member_count; ++group_k) BEGIN
+						SET group_opcode = $AD_FIELD_GROUP_MEMBER(~%group_kind% %group_k%~)
+						SET group_other = $group_member(~%group_opcode%~)
+						SET $fx_consumed(~%group_other%~) = 1
+						SET $fx_group_anchor(~%group_other%~) = group_id
+					END
+					SPRINT derived_kind ~%group_kind%~
+					SET derived_id = group_id
+					SET derived_other = 0 - 1
+					SPRINT derived_line ~%group_line%~
+					LPM ad_derived_add
 				END
-				SPRINT derived_kind ~%group_derived%~
-				SET derived_id = group_id
-				SET derived_other = 0 - 1
-				SPRINT derived_line ~%group_line%~
-				LPM ad_derived_add
 			END
 		END
+		SET group_name_tra = 0
+		SET group_statistic_tra = 0
 	END
 END
 
@@ -1679,7 +1633,6 @@ DEFINE_PATCH_MACRO ad_derived_add BEGIN
 	SET $derived_id(~%derived_count%~) = derived_id
 	SET $derived_other(~%derived_count%~) = derived_other
 	SPRINT $derived_line(~%derived_count%~) ~%derived_line%~
-	SPRINT $derived_name(~%derived_count%~) ~%group_name%~
 	SET $derived_name_tra(~%derived_count%~) = group_name_tra
 	SET $derived_statistic_tra(~%derived_count%~) = group_statistic_tra
 	SET $derived_anchor(~%derived_count%~) = group_anchor
@@ -1720,7 +1673,6 @@ DEFINE_PATCH_MACRO ad_derived_lines BEGIN
 			SPRINT derived_kind $derived_kind(~%derived_k%~)
 			SET group_id = $derived_id(~%derived_k%~)
 			SET group_other = $derived_other(~%derived_k%~)
-			SPRINT group_name $derived_name(~%derived_k%~)
 			SET group_name_tra = $derived_name_tra(~%derived_k%~)
 			SET group_statistic_tra = $derived_statistic_tra(~%derived_k%~)
 			SET group_anchor = $derived_anchor(~%derived_k%~)
@@ -1735,7 +1687,7 @@ DEFINE_PATCH_MACRO ad_derived_lines BEGIN
 	END
 END
 
-// « group_name : +1 » (modificateurs simples, lib/opcodes/stat_modifiers.tpp), en pourcentage
+// « nom : +1 » (nom au libellé group_name_tra ; modificateurs simples, lib/opcodes/stat_modifiers.tpp), en pourcentage
 // si l'opcode d'ancrage l'est. À une autre forme que « soi », avec un libellé de la statistique
 // (group_statistic_tra), la phrase des modificateurs (ancien opcode_target et opcode_probability) :
 // « Augmente de 2 les jets de sauvegarde du porteur » ; le mode 3 des jeux EE y est un ajout. Une
@@ -1757,7 +1709,7 @@ DEFINE_PATCH_MACRO ad_group_modifier_line BEGIN
 			SPRINT value @1200001 // ~+%value%~
 		END
 	END
-	SPRINT name ~%group_name%~
+	SET tra_id = group_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
 	SPRINT line_text @1200000 // ~%name%%AD_COLON%%value%~
 	SET line_fx = group_id
 	LPM ad_application_form
