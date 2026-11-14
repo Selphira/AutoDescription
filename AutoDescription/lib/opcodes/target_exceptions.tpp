@@ -124,8 +124,8 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 			// de ses phrases, vide), comme pour un effet lu dans la ressource (PXL2DCFO : SPIN150R.EFF).
 			ELSE PATCH_IF $fx_external(~%exception_id%~) AND (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)
 					AND $fx_parameter1(~%exception_id%~) == 0 AND exception_stat == 0 BEGIN
-				SET $fx_consumed(~%exception_id%~) = 1
-				SET $fx_dropped(~%exception_id%~) = 1
+				SET ~fx_consumed_%exception_id%~ = 1
+				SET ~fx_dropped_%exception_id%~ = 1
 			END
 			ELSE PATCH_IF $fx_external(~%exception_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = exception_id STR_VAR reason = ~not_implemented:opcode%exception_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
@@ -153,9 +153,9 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 					LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
 					LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
 					PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) OR NOT (~%exception_item_name%~ STRING_EQUAL ~~) BEGIN
-						SET $fx_resource_immunity(~%exception_id%~) = 1
-						SPRINT $fx_spell_name(~%exception_id%~) ~%exception_spell_name%~
-						SPRINT $fx_item_name(~%exception_id%~) ~%exception_item_name%~
+						SET ~fx_resource_immunity_%exception_id%~ = 1
+						SPRINT ~fx_spell_name_%exception_id%~ ~%exception_spell_name%~
+						SPRINT ~fx_item_name_%exception_id%~ ~%exception_item_name%~
 					END
 					ELSE PATCH_IF NOT support_header_only BEGIN
 						SET ignored_fx = exception_id
@@ -268,8 +268,8 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		SPRINT exception_ignored_message ~condition %exception_stat% not supported~
 		LPM ad_target_exception_ignored
 	END
-	SPRINT $fx_exception_kind(~%exception_id%~) ~%exception_kind%~
-	SET $fx_exception_name_count(~%exception_id%~) = exception_name_count
+	SPRINT ~fx_exception_kind_%exception_id%~ ~%exception_kind%~
+	SET ~fx_exception_name_count_%exception_id%~ = exception_name_count
 END
 
 // Exception sans nom (état de sort ou ligne de splprot.2da propres à un mod) : l'ancien moteur ne
@@ -290,7 +290,7 @@ DEFINE_PATCH_MACRO ad_target_exception_add_name BEGIN
 		LPM ad_target_exception_ignored
 	END
 	ELSE BEGIN
-		SPRINT $fx_exception_name(~%exception_id%~ ~%exception_name_count%~) ~%exception_name%~
+		SPRINT ~fx_exception_name_%exception_id%_%exception_name_count%~ ~%exception_name%~
 		SET exception_name_count += 1
 	END
 END

@@ -19,7 +19,7 @@ DEFINE_PATCH_MACRO ad_op_183_support BEGIN
 				PATCH_IF exception_value >= 0 AND exception_value < 74 AND TRA_ENTRY_EXISTS (~%exception_tra%~) BEGIN
 					SET tra_id = exception_tra SET tra_block_start = 8180000 SET tra_block_size = 74 SPRINT tra_out ~exception_name~ LPM ad_tra_to // ~robes~ (@8180067)
 					PATCH_IF NOT (~%exception_name%~ STRING_EQUAL ~~) BEGIN
-						SPRINT $fx_exception_name(~%exception_id%~ ~0~) ~%exception_name%~
+						SPRINT ~fx_exception_name_%exception_id%_0~ ~%exception_name%~
 						SET exception_name_count = 1
 					END
 				END
@@ -29,8 +29,8 @@ DEFINE_PATCH_MACRO ad_op_183_support BEGIN
 					SPRINT ignored_message ~item type %exception_value% (parameter2) has no name~
 					LPM ad_log_ignored
 				END
-				SPRINT $fx_exception_kind(~%exception_id%~) ~EQUIPPED~
-				SET $fx_exception_name_count(~%exception_id%~) = exception_name_count
+				SPRINT ~fx_exception_kind_%exception_id%~ ~EQUIPPED~
+				SET ~fx_exception_name_count_%exception_id%~ = exception_name_count
 			END
 		END
 	END

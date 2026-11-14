@@ -76,7 +76,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 	FOR (series_id = 0; series_id < fx_count; ++series_id) BEGIN
 		SET series_opcode = $fx_opcode(~%series_id%~)
 		SET series_described = VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%series_opcode%~)
-		SET $fx_series_compared(~%series_id%~) = NOT series_described
+		SET ~fx_series_compared_%series_id%~ = NOT series_described
 		SET series_possible = series_possible OR (series_described AND $fx_timing(~%series_id%~) == TIMING_delayed AND $fx_opcode_count(~%series_opcode%~) > 1)
 	END
 	SET same_ignored = AD_SAME_TIMING
@@ -116,7 +116,7 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 				SET series_valid = 1
 				FOR (series_k = 0; series_k < series_count; ++series_k) BEGIN
 					SET series_member = $series_members(~%series_k%~)
-					SET $fx_series_compared(~%series_member%~) = 1
+					SET ~fx_series_compared_%series_member%~ = 1
 					SET series_delay = $fx_duration(~%series_member%~)
 					PATCH_IF series_delta == 0 BEGIN
 						SET series_delta = series_delay
@@ -126,19 +126,19 @@ DEFINE_PATCH_MACRO ad_application_series_support BEGIN
 					END
 					SET series_previous = series_delay
 				END
-				SET $fx_series_compared(~%series_id%~) = 1
+				SET ~fx_series_compared_%series_id%~ = 1
 				PATCH_IF series_valid AND (series_delta <= 0 OR series_previous <= 0) AND NOT support_header_only BEGIN
 					LPF ad_refusal INT_VAR fx_id = series_id STR_VAR reason = ~not_implemented:application:series_delay~ message = ~repetitions with a delay of 0~ RET render_missing = refusal END
 				END
 				ELSE PATCH_IF series_valid BEGIN
-					SET $fx_series_anchor(~%series_id%~) = 1
-					SET $fx_series_delta(~%series_id%~) = series_delta
-					SET $fx_series_last(~%series_id%~) = series_previous
-					SET $fx_series_instant(~%series_id%~) = NOT series_delayed OR $fx_duration(~%series_id%~) == 0
+					SET ~fx_series_anchor_%series_id%~ = 1
+					SET ~fx_series_delta_%series_id%~ = series_delta
+					SET ~fx_series_last_%series_id%~ = series_previous
+					SET ~fx_series_instant_%series_id%~ = NOT series_delayed OR $fx_duration(~%series_id%~) == 0
 					FOR (series_k = 0; series_k < series_count; ++series_k) BEGIN
 						SET series_member = $series_members(~%series_k%~)
 						PATCH_IF series_member != series_id BEGIN
-							SET $fx_series_of(~%series_member%~) = series_id
+							SET ~fx_series_of_%series_member%~ = series_id
 						END
 					END
 				END
@@ -209,8 +209,8 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	// get_duration_value lui donne le timing 1.
 	ELSE PATCH_IF app_timing == TIMING_delayed AND app_duration <= 0 AND $fx_series_of(~%app_id%~) < 0 AND NOT $fx_series_anchor(~%app_id%~) BEGIN
 		SET app_timing = TIMING_permanent
-		SET $fx_timing(~%app_id%~) = TIMING_permanent
-		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
+		SET ~fx_timing_%app_id%~ = TIMING_permanent
+		SPRINT ~fx_timing_kind_%app_id%~ ~permanent~
 	END
 	// Timings 6 (Limited after duration) et 7 (Permanent after duration) appliqués directement : dès que
 	// le temps de jeu dépasse la durée lue en ticks, aussitôt pour toute durée réaliste, le 7 devient
@@ -220,15 +220,15 @@ DEFINE_PATCH_MACRO ad_application_ability_support BEGIN
 	// IGNORED) et écarte les autres.
 	ELSE PATCH_IF app_timing == 7 BEGIN
 		SET app_timing = TIMING_permanent
-		SET $fx_timing(~%app_id%~) = TIMING_permanent
-		SPRINT $fx_timing_kind(~%app_id%~) ~permanent~
+		SET ~fx_timing_%app_id%~ = TIMING_permanent
+		SPRINT ~fx_timing_kind_%app_id%~ ~permanent~
 	END
 	ELSE PATCH_IF app_timing == 6 AND (~%app_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 		SET app_timing = TIMING_duration
 		SET app_duration = 0
-		SET $fx_timing(~%app_id%~) = TIMING_duration
-		SET $fx_duration(~%app_id%~) = 0
-		SPRINT $fx_timing_kind(~%app_id%~) ~limited~
+		SET ~fx_timing_%app_id%~ = TIMING_duration
+		SET ~fx_duration_%app_id%~ = 0
+		SPRINT ~fx_timing_kind_%app_id%~ ~limited~
 	END
 	ELSE PATCH_IF app_timing == 6 BEGIN
 		SET drop_id = app_id
@@ -281,11 +281,11 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 					SET tra_id = 2001000 + app_area_creatures * 10 + app_area_form
 						SET tra_block_start = 2001000 SET tra_block_size = 100 SPRINT tra_out ~target~ LPM ad_tra_to // ~les créatures~
 					SET tra_id = app_area_phrase SPRINT tra_out ~app_area_text~ LPM ad_tra_to
-					SPRINT $fx_area_text(~%app_id% %app_area_form%~) ~%app_area_text%~
+					SPRINT ~fx_area_text_%app_id% %app_area_form%~ ~%app_area_text%~
 				END
-				SET $fx_area_target(~%app_id%~) = 1
-				SET $fx_area_cone(~%app_id%~) = app_area_shape == 2
-				SPRINT $fx_area_range(~%app_id%~) ~%range%~
+				SET ~fx_area_target_%app_id%~ = 1
+				SET ~fx_area_cone_%app_id%~ = app_area_shape == 2
+				SPRINT ~fx_area_range_%app_id%~ ~%range%~
 			END
 		END
 	END
@@ -325,8 +325,8 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 			LPF ad_refusal INT_VAR fx_id = drop_id STR_VAR reason = ~not_implemented:opcode%drop_opcode%:dropped_duration~ message = ~ignored effect whose duration the old engine would give to the whole ability~ RET render_missing = refusal END
 		END
 	END
-	SET $fx_consumed(~%drop_id%~) = 1
-	SET $fx_dropped(~%drop_id%~) = 1
+	SET ~fx_consumed_%drop_id%~ = 1
+	SET ~fx_dropped_%drop_id%~ = 1
 	PATCH_IF NOT (~%ignored_reason%~ STRING_EQUAL ~~) BEGIN
 		SET ignored_fx = drop_id
 		LPM ad_log_ignored

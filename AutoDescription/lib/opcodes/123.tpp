@@ -27,7 +27,7 @@ DEFINE_PATCH_MACRO ad_op_123_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				SPRINT $fx_item_name(~%remove_id%~) ~%remove_name%~
+				SPRINT ~fx_item_name_%remove_id%~ ~%remove_name%~
 			END
 		END
 	END

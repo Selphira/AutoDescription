@@ -427,7 +427,7 @@ def check_new_lib_conventions(report, definitions):
 # Élément écrit par nom : SET/SPRINT ~t_%k%~, READ_* offset ~t_%k%~ (clé : variable ou nombre).
 WRITTEN_BY_NAME = re.compile(
     r"\b(?:SET|SPRINT|TEXT_SPRINT|READ_(?:BYTE|SHORT|LONG|ASCII|SBYTE|SSHORT|SLONG)\s+(?:\([^()]*\)|[A-Za-z0-9_]+))"
-    r"\s+~([A-Za-z_][A-Za-z0-9_]*?)_(?:%[A-Za-z0-9_]+%|[0-9]+)~")
+    r"\s+~([A-Za-z_][A-Za-z0-9_]*?)(?:_(?:%[A-Za-z0-9_]+%|[0-9]+))(?:[_ ](?:%[A-Za-z0-9_]+%|[0-9]+))*~")
 ARRAY_WALK = re.compile(r"\b(PHP_EACH|SORT_ARRAY_INDICES|CLEAR_ARRAY|GET_OFFSET_ARRAY2?)\s+[~\"]?([A-Za-z_][A-Za-z0-9_]*)[~\"]?(?=\s)")
 ARRAY_RETURN = re.compile(r"\bRET_ARRAY\b(.*?)\b(?:BEGIN|END)\b", re.S)
 JOINED_ARRAY = re.compile(r"\barray_name\s*=\s*[~\"]([A-Za-z_][A-Za-z0-9_]*)[~\"]")

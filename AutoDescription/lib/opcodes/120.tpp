@@ -23,7 +23,7 @@ DEFINE_PATCH_MACRO ad_op_120_support BEGIN
 				PHP_EACH fx_ids_120 AS _ => weapon_other BEGIN
 					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
 					PATCH_IF $fx_parameter2(~%weapon_other%~) == 0 AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND $fx_parameter1(~%weapon_other%~) > $fx_parameter1(~%weapon_id%~) BEGIN
-						SET $fx_consumed(~%weapon_id%~) = 1
+						SET ~fx_consumed_%weapon_id%~ = 1
 					END
 				END
 			END

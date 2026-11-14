@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_207_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT bounce_spell_resref $fx_resource(~%bounce_spell_id%~)
 			LPF ad_spell_name STR_VAR resref = ~%bounce_spell_resref%~ RET bounce_spell_name = name END
-			SPRINT $fx_spell_name(~%bounce_spell_id%~) ~%bounce_spell_name%~
+			SPRINT ~fx_spell_name_%bounce_spell_id%~ ~%bounce_spell_name%~
 			PATCH_IF ~%bounce_spell_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%bounce_spell_resref%.spl~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = bounce_spell_id STR_VAR reason = ~not_implemented:opcode207:no_name~ message = ~spell %bounce_spell_resref%.SPL has no name~ RET render_missing = refusal END

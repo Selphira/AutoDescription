@@ -52,7 +52,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND NOT $fx_dropped(~%condition_id%~) BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%condition_resref%~ RET condition_name = name END
-				SPRINT $fx_spell_name(~%condition_id%~) ~%condition_name%~
+				SPRINT ~fx_spell_name_%condition_id%~ ~%condition_name%~
 				SET recursion_fx = condition_id
 				SPRINT recursion_resref ~%condition_resref%~
 				SET recursion_casting_level = 0
@@ -189,7 +189,7 @@ DEFINE_PATCH_MACRO ad_op_232_condition BEGIN
 	ELSE BEGIN
 		LPF ad_refusal INT_VAR fx_id = condition_id STR_VAR reason = ~not_implemented:opcode232:state~ message = ~condition %condition_type% not supported~ RET render_missing = refusal END
 	END
-	SPRINT $fx_condition_text(~%condition_id%~) ~%condition_text%~
+	SPRINT ~fx_condition_text_%condition_id%~ ~%condition_text%~
 END
 
 // Une ligne par effet dont le sous-sort en a ; « Lance le sort « … » sur le porteur » pour un sort
@@ -217,7 +217,7 @@ DEFINE_PATCH_MACRO ad_op_232_lines BEGIN
 				// (KZBRAC1 : « 11 % de chances de lancer le sort « Fatalité » sur l'attaquant »).
 				PATCH_IF $fx_probability(~%condition_id%~) < 100 BEGIN
 					SPRINT line_text @22320005 // ~de lancer le sort « %spellName% » sur %theTarget%~
-					SET $fx_probability_in_sub(~%condition_id%~) = 0
+					SET ~fx_probability_in_sub_%condition_id%~ = 0
 				END
 			END
 			ELSE BEGIN

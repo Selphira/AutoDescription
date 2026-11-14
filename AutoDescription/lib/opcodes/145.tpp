@@ -16,7 +16,7 @@
 DEFINE_PATCH_MACRO ad_op_145_support BEGIN
 	PHP_EACH fx_ids_145 AS _ => spellcasting_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_spell_types(~%spellcasting_id%~) = 0
+			SET ~fx_spell_types_%spellcasting_id%~ = 0
 			// En-tête d'un sort seul : l'ancien opcode_145_is_valid n'écarte qu'un type hors de 0-3.
 			PATCH_IF support_header_only BEGIN
 				PATCH_IF $fx_parameter2(~%spellcasting_id%~) < 0 OR $fx_parameter2(~%spellcasting_id%~) > 3 BEGIN

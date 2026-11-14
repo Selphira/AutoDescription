@@ -18,7 +18,7 @@ DEFINE_PATCH_MACRO ad_dispel_type_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				SPRINT $fx_secondary_type_name(~%dispel_id%~) ~%dispel_name%~
+				SPRINT ~fx_secondary_type_name_%dispel_id%~ ~%dispel_name%~
 				PATCH_IF ~%dispel_name%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 					SET ignored_fx = dispel_id
 					SET dispel_type = $fx_parameter2(~%dispel_id%~)

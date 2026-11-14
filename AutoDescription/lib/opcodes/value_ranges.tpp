@@ -71,25 +71,25 @@ DEFINE_PATCH_MACRO ad_value_range_group BEGIN
 	END
 	PATCH_IF range_count > 0 AND NOT range_broken BEGIN
 		PHP_EACH range_members AS range_other => _ BEGIN
-			SET $fx_consumed(~%range_other%~) = 1
+			SET ~fx_consumed_%range_other%~ = 1
 		END
-		SET $fx_range_min(~%range_id%~) = range_min
-		SET $fx_range_max(~%range_id%~) = range_max
-		SET $fx_probability_low(~%range_id%~) = range_low
-		SET $fx_probability_high(~%range_id%~) = range_high
-		SET $fx_probability(~%range_id%~) = range_total
+		SET ~fx_range_min_%range_id%~ = range_min
+		SET ~fx_range_max_%range_id%~ = range_max
+		SET ~fx_probability_low_%range_id%~ = range_low
+		SET ~fx_probability_high_%range_id%~ = range_high
+		SET ~fx_probability_%range_id%~ = range_total
 		// Champs lus aussi à l'union, comme l'effet que l'ancien moteur ajoute : deux niveaux de sort aux
 		// mêmes valeurs réunies se comparent égaux (ad_spell_level_same).
-		SET $fx_probability1(~%range_id%~) = range_high
-		SET $fx_probability2(~%range_id%~) = range_low
-		SET $fx_late(~%range_id%~) = 2
+		SET ~fx_probability1_%range_id%~ = range_high
+		SET ~fx_probability2_%range_id%~ = range_low
+		SET ~fx_late_%range_id%~ = 2
 		// Union de tout le tirage sous un effet probable qui lance le sort : l'effet devient certain et
 		// prend la probabilité du parent, comme un sous-effet certain (ad_recursion_base_probability).
 		PATCH_IF range_total >= 100 AND ctx_base_probability < 100 BEGIN
-			SET $fx_probability(~%range_id%~) = ctx_base_probability
-			SET $fx_probability_low(~%range_id%~) = ctx_base_low
-			SET $fx_probability_high(~%range_id%~) = ctx_base_high
-			SET $fx_parent_probability(~%range_id%~) = 1
+			SET ~fx_probability_%range_id%~ = ctx_base_probability
+			SET ~fx_probability_low_%range_id%~ = ctx_base_low
+			SET ~fx_probability_high_%range_id%~ = ctx_base_high
+			SET ~fx_parent_probability_%range_id%~ = 1
 		END
 	END
 END

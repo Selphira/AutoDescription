@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_335_support BEGIN
 			SET eyes_splstate = $fx_parameter1(~%eyes_id%~)
 			SET eyes_tra = 8120000 + eyes_splstate
 			SPRINT eyes_resref $fx_resource(~%eyes_id%~)
-			SPRINT $fx_spell_name(~%eyes_id%~) ~~
+			SPRINT ~fx_spell_name_%eyes_id%~ ~~
 			PATCH_IF eyes_splstate < 0 OR eyes_splstate > 255 BEGIN
 				SET drop_id = eyes_id
 				SPRINT ignored_reason ~file_error:opcode335:splstate~
@@ -32,7 +32,7 @@ DEFINE_PATCH_MACRO ad_op_335_support BEGIN
 			END
 			ELSE PATCH_IF TRA_ENTRY_EXISTS (~%eyes_tra%~) AND NOT (~%eyes_resref%~ STRING_EQUAL ~~) AND NOT support_header_only BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%eyes_resref%~ RET eyes_spell_name = name END
-				SPRINT $fx_spell_name(~%eyes_id%~) ~%eyes_spell_name%~
+				SPRINT ~fx_spell_name_%eyes_id%~ ~%eyes_spell_name%~
 				PATCH_IF ~%eyes_spell_name%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = eyes_id STR_VAR reason = ~not_implemented:opcode335:spell_no_name~ message = ~spell %eyes_resref%.SPL granted by the effect has no name~ RET render_missing = refusal END
 				END

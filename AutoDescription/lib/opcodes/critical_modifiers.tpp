@@ -16,7 +16,7 @@ DEFINE_PATCH_MACRO ad_critical_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%critical_id%~) BEGIN
 			SET critical_category = ($fx_external(~%critical_id%~) AND IS_EE) ? $fx_parameter3(~%critical_id%~) : 0
 			SET critical_category_tra = 8180000 + critical_category
-			SET $fx_critical_category(~%critical_id%~) = 0
+			SET ~fx_critical_category_%critical_id%~ = 0
 			PATCH_IF critical_category < 0 OR critical_category > 73 BEGIN
 				SET drop_id = critical_id
 				SPRINT ignored_reason ~file_error:opcode%critical_opcode%:weapon_category~
@@ -33,7 +33,7 @@ DEFINE_PATCH_MACRO ad_critical_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF $fx_parameter2(~%critical_id%~) == 0 BEGIN
-				SET $fx_critical_category(~%critical_id%~) = critical_category
+				SET ~fx_critical_category_%critical_id%~ = critical_category
 			END
 		END
 	END

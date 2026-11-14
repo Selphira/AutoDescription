@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 			ELSE PATCH_IF decrement_kind >= 1 AND decrement_kind <= 10 BEGIN
 				SET tra_id = 8150000 + decrement_kind SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~decrement_kind_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			END
-			SPRINT $fx_decrement_name(~%decrement_id%~) ~%decrement_kind_name%~
+			SPRINT ~fx_decrement_name_%decrement_id%~ ~%decrement_kind_name%~
 			SPRINT decrement_resref $fx_resource(~%decrement_id%~)
 			SPRINT decrement_spell ~%decrement_own_spell%~
 			PATCH_IF NOT (~%decrement_resref%~ STRING_EQUAL ~~) BEGIN
@@ -65,7 +65,7 @@ DEFINE_PATCH_MACRO ad_decrement_lines BEGIN
 	PHP_EACH ~fx_ids_%decrement_opcode%~ AS _ => decrement_id BEGIN
 		SPRINT decrement_kind_name $fx_decrement_name(~%decrement_id%~)
 		PATCH_IF ~%decrement_kind_name%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_consumed(~%decrement_id%~) = 1
+			SET ~fx_consumed_%decrement_id%~ = 1
 		END
 	END
 	SET state_opcode = decrement_opcode

@@ -12,7 +12,7 @@ DEFINE_PATCH_MACRO ad_op_220_support BEGIN
 			PATCH_IF school >= 0 AND school <= 10 BEGIN
 				SET tra_id = 8150000 + school SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~school_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
 			END
-			SPRINT $fx_school_name(~%school_id%~) ~%school_name%~
+			SPRINT ~fx_school_name_%school_id%~ ~%school_name%~
 			PATCH_IF ~%school_name%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = school_id STR_VAR reason = ~not_implemented:opcode220:school~ message = ~school %school% has no name (expected 1-10)~ RET render_missing = refusal END
 			END

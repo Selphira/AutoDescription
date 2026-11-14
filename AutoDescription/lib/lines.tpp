@@ -71,23 +71,23 @@ END
 
 // Ajoute la ligne sans contrôle de doublon (ad_line_add), en retrait si line_nested.
 DEFINE_PATCH_MACRO ad_line_append BEGIN
-	SPRINT $line_section(~%line_count%~) ~%line_section%~
-	SET $line_sort(~%line_count%~) = line_sort
-	SPRINT $line_text(~%line_count%~) ~%line_text%~
-	SET $line_probability(~%line_count%~) = line_probability
-	SET $line_probability_low(~%line_count%~) = line_probability > 0 ? line_probability_low : 0
-	SET $line_probability_high(~%line_count%~) = line_probability > 0 ? line_probability_high : 0
-	SET $line_sub_probability(~%line_count%~) = line_sub_probability
-	SET $line_conditioned(~%line_count%~) = line_conditioned
-	SET $line_conditioned_alone(~%line_count%~) = line_conditioned AND (VARIABLE_IS_SET line_conditioned_alone ? line_conditioned_alone : 0)
-	SET $line_conditioned_low(~%line_count%~) = line_conditioned ? line_probability_low : 0
-	SET $line_conditioned_high(~%line_count%~) = line_conditioned ? line_probability_high : 0
+	SPRINT ~line_section_%line_count%~ ~%line_section%~
+	SET ~line_sort_%line_count%~ = line_sort
+	SPRINT ~line_text_%line_count%~ ~%line_text%~
+	SET ~line_probability_%line_count%~ = line_probability
+	SET ~line_probability_low_%line_count%~ = line_probability > 0 ? line_probability_low : 0
+	SET ~line_probability_high_%line_count%~ = line_probability > 0 ? line_probability_high : 0
+	SET ~line_sub_probability_%line_count%~ = line_sub_probability
+	SET ~line_conditioned_%line_count%~ = line_conditioned
+	SET ~line_conditioned_alone_%line_count%~ = line_conditioned AND (VARIABLE_IS_SET line_conditioned_alone ? line_conditioned_alone : 0)
+	SET ~line_conditioned_low_%line_count%~ = line_conditioned ? line_probability_low : 0
+	SET ~line_conditioned_high_%line_count%~ = line_conditioned ? line_probability_high : 0
 	PATCH_IF line_probability > 0 OR line_sub_probability > 0 OR line_conditioned BEGIN
-		SET $line_effect(~%line_count%~) = line_fx
+		SET ~line_effect_%line_count%~ = line_fx
 	END
-	SPRINT $line_core(~%line_count%~) ~%line_core%~
-	SET $line_nested(~%line_count%~) = line_nested
-	SET $line_composite(~%line_count%~) = line_composite
+	SPRINT ~line_core_%line_count%~ ~%line_core%~
+	SET ~line_nested_%line_count%~ = line_nested
+	SET ~line_composite_%line_count%~ = line_composite
 	SET line_register_id = line_count
 	LPM ad_line_register
 	SET line_count += 1
@@ -127,7 +127,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 			PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_probability(~%prob_id%~) > 0 BEGIN
 				SET prob_fx = $line_effect(~%prob_id%~)
 				PATCH_IF $fx_parent_probability(~%prob_fx%~) BEGIN
-					SPRINT $line_section(~%prob_id%~) ~%prob_outer_section%~
+					SPRINT ~line_section_%prob_id%~ ~%prob_outer_section%~
 				END
 				ELSE BEGIN
 					SET prob_inner = 1
@@ -141,7 +141,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_groups BEGIN
 		FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 			SPRINT prob_line_section $line_section(~%prob_id%~)
 			PATCH_IF ~%prob_line_section%~ STRING_EQUAL ~%prob_outer_section%~ BEGIN
-				SPRINT $line_section(~%prob_id%~) ~%prob_section%~
+				SPRINT ~line_section_%prob_id%~ ~%prob_section%~
 			END
 		END
 	END
@@ -215,15 +215,15 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 						SET line_composite = 1000000
 					END
 					PATCH_IF split_k == 0 BEGIN
-						SPRINT $line_text(~%split_id%~) ~%line_text%~
+						SPRINT ~line_text_%split_id%~ ~%line_text%~
 						SET line_register_id = split_id
 						LPM ad_line_register
-						SET $line_probability(~%split_id%~) = line_probability
-						SET $line_probability_low(~%split_id%~) = line_probability_low
-						SET $line_probability_high(~%split_id%~) = line_probability_high
-						SPRINT $line_core(~%split_id%~) ~%line_core%~
-						SET $line_composite(~%split_id%~) = line_composite
-						SET $line_sub_probability(~%split_id%~) = 0
+						SET ~line_probability_%split_id%~ = line_probability
+						SET ~line_probability_low_%split_id%~ = line_probability_low
+						SET ~line_probability_high_%split_id%~ = line_probability_high
+						SPRINT ~line_core_%split_id%~ ~%line_core%~
+						SET ~line_composite_%split_id%~ = line_composite
+						SET ~line_sub_probability_%split_id%~ = 0
 					END
 					ELSE BEGIN
 						LPM ad_line_append
@@ -274,10 +274,10 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 				LPF ad_refusal INT_VAR fx_id = prob_fx STR_VAR reason = ~not_implemented:application:condition_probability~ message = ~probable effect under a condition, cursed or with sub-lines, whose range another probable line shares~ RET render_late_missing = refusal END
 			END
 			ELSE PATCH_IF prob_joins AND ~%render_late_missing%~ STRING_EQUAL ~~ BEGIN
-				SET $line_conditioned(~%prob_id%~) = 0
-				SET $line_probability(~%prob_id%~) = prob_high - prob_low + 1
-				SET $line_probability_low(~%prob_id%~) = prob_low
-				SET $line_probability_high(~%prob_id%~) = prob_high
+				SET ~line_conditioned_%prob_id%~ = 0
+				SET ~line_probability_%prob_id%~ = prob_high - prob_low + 1
+				SET ~line_probability_low_%prob_id%~ = prob_low
+				SET ~line_probability_high_%prob_id%~ = prob_high
 			END
 		END
 	END
@@ -290,7 +290,7 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 			SET prob_key_range = $line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~) + 1000000
 			SET prob_key_order = prob_id + 10000000
 			SET $prob_keys(~%prob_key_range%%prob_key_order%~) = prob_id
-			SPRINT $line_section(~%prob_id%~) ~~
+			SPRINT ~line_section_%prob_id%~ ~~
 		END
 	END
 	SORT_ARRAY_INDICES prob_keys LEXICOGRAPHICALLY
@@ -316,15 +316,15 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 				SET prob_new_segment = prob_low != $seg_low(~%seg_last%~) OR prob_high != $seg_high(~%seg_last%~)
 			END
 			PATCH_IF prob_new_segment BEGIN
-				SET $seg_low(~%seg_count%~) = prob_low
-				SET $seg_high(~%seg_count%~) = prob_high
-				SET $seg_size(~%seg_count%~) = 0
+				SET ~seg_low_%seg_count%~ = prob_low
+				SET ~seg_high_%seg_count%~ = prob_high
+				SET ~seg_size_%seg_count%~ = 0
 				SET seg_count += 1
 			END
 			SET seg_last = seg_count - 1
 			SET seg_k = $seg_size(~%seg_last%~)
-			SET $seg_member(~%seg_last% %seg_k%~) = prob_id
-			SET $seg_size(~%seg_last%~) = seg_k + 1
+			SET ~seg_member_%seg_last% %seg_k%~ = prob_id
+			SET ~seg_size_%seg_last%~ = seg_k + 1
 		END
 	END
 	ELSE BEGIN
@@ -340,17 +340,17 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 		SET prob_previous = 0 - 1
 		PHP_EACH prob_bounds AS prob_bound => _ BEGIN
 			PATCH_IF prob_previous >= 0 BEGIN
-				SET $seg_low(~%seg_count%~) = prob_previous
-				SET $seg_high(~%seg_count%~) = prob_bound - 1
+				SET ~seg_low_%seg_count%~ = prob_previous
+				SET ~seg_high_%seg_count%~ = prob_bound - 1
 				SET seg_k = 0
 				FOR (prob_k = 0; prob_k < prob_count; ++prob_k) BEGIN
 					SET prob_id = $prob_lines(~%prob_k%~)
 					PATCH_IF $line_probability_low(~%prob_id%~) <= prob_previous AND $line_probability_high(~%prob_id%~) >= prob_bound - 1 BEGIN
-						SET $seg_member(~%seg_count% %seg_k%~) = prob_id
+						SET ~seg_member_%seg_count% %seg_k%~ = prob_id
 						SET seg_k += 1
 					END
 				END
-				SET $seg_size(~%seg_count%~) = seg_k
+				SET ~seg_size_%seg_count%~ = seg_k
 				PATCH_IF seg_k > 0 BEGIN
 					SET seg_count += 1
 				END
@@ -359,8 +359,8 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 		END
 	END
 	FOR (seg_s = 0; seg_s < seg_count; ++seg_s) BEGIN
-		SET $seg_probability(~%seg_s%~) = $seg_high(~%seg_s%~) - $seg_low(~%seg_s%~) + 1
-		SET $seg_duplicate(~%seg_s%~) = 0
+		SET ~seg_probability_%seg_s%~ = $seg_high(~%seg_s%~) - $seg_low(~%seg_s%~) + 1
+		SET ~seg_duplicate_%seg_s%~ = 0
 	END
 	// Mode complexe : les segments sont disjoints, ceux aux mêmes effets s'additionnent sans erreur.
 	PATCH_IF AD_USE_COMPLEX_GROUPING_OF_PROBABILITY_RANGES BEGIN
@@ -374,8 +374,8 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 			END
 			PATCH_IF VARIABLE_IS_SET $prob_signatures(~%prob_signature%~) BEGIN
 				SET prob_owner = $prob_signatures(~%prob_signature%~)
-				SET $seg_probability(~%prob_owner%~) = $seg_probability(~%prob_owner%~) + $seg_probability(~%seg_s%~)
-				SET $seg_duplicate(~%seg_s%~) = 1
+				SET ~seg_probability_%prob_owner%~ = $seg_probability(~%prob_owner%~) + $seg_probability(~%seg_s%~)
+				SET ~seg_duplicate_%seg_s%~ = 1
 			END
 			ELSE BEGIN
 				SET $prob_signatures(~%prob_signature%~) = seg_s

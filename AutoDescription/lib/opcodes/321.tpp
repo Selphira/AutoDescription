@@ -74,9 +74,9 @@ DEFINE_PATCH_MACRO ad_op_321_cast_group BEGIN
 				AND $fx_save_type(~%removal_other%~) == $fx_save_type(~%removal_id%~)
 				AND $fx_save_bonus(~%removal_other%~) == $fx_save_bonus(~%removal_id%~)
 				AND $fx_special(~%removal_other%~) == $fx_special(~%removal_id%~) BEGIN
-			SET $fx_consumed(~%removal_id%~) = 1
-			SET $fx_late(~%removal_other%~) = 2
-			SET $fx_not_cumulative(~%removal_other%~) = 1
+			SET ~fx_consumed_%removal_id%~ = 1
+			SET ~fx_late_%removal_other%~ = 2
+			SET ~fx_not_cumulative_%removal_other%~ = 1
 		END
 	END
 END
@@ -92,7 +92,7 @@ DEFINE_PATCH_MACRO ad_op_321_after_groups BEGIN
 			SPRINT removal_other_resource $fx_resource_lower(~%removal_other%~)
 			PATCH_IF NOT $fx_consumed(~%removal_other%~) AND (~%removal_other_scope%~ STRING_EQUAL ~%removal_scope%~)
 					AND (~%removal_other_resource%~ STRING_EQUAL ~%removal_resource%~) BEGIN
-				SET $fx_consumed(~%removal_id%~) = 1
+				SET ~fx_consumed_%removal_id%~ = 1
 			END
 		END
 	END

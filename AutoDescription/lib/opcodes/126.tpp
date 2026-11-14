@@ -7,7 +7,7 @@
 DEFINE_PATCH_MACRO ad_op_126_support BEGIN
 	PHP_EACH fx_ids_126 AS _ => stat_id BEGIN
 		PATCH_IF IS_EE AND $fx_parameter2(~%stat_id%~) == 5 BEGIN
-			SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_percentage
+			SET ~fx_parameter2_%stat_id%~ = MOD_TYPE_percentage
 		END
 	END
 	SET stat_opcode = 126
@@ -33,7 +33,7 @@ DEFINE_PATCH_MACRO ad_op_126_line BEGIN
 	END
 	PATCH_IF line_phrase > 0 BEGIN
 		// L'ancien moteur ne les dit jamais non cumulatives (cumulable remis à 1).
-		SET $fx_not_cumulative(~%line_fx%~) = 0
+		SET ~fx_not_cumulative_%line_fx%~ = 0
 		LPM ad_effect_line
 		SET stat_line_done = 1
 	END

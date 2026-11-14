@@ -19,13 +19,13 @@ END
 
 DEFINE_PATCH_MACRO ad_op_71_lines BEGIN
 	PHP_EACH fx_ids_71 AS _ => gender_id BEGIN
-		SPRINT $fx_gender_name(~%gender_id%~) ~~
+		SPRINT ~fx_gender_name_%gender_id%~ ~~
 		SET gender_value = $fx_parameter1(~%gender_id%~)
 		SET gender_tra = 8099000 + gender_value
 		PATCH_IF NOT $fx_consumed(~%gender_id%~) AND $fx_parameter2(~%gender_id%~) == MOD_TYPE_flat BEGIN
 			PATCH_IF gender_value >= 0 AND gender_value <= 255 AND TRA_ENTRY_EXISTS (~%gender_tra%~) BEGIN
 				SET tra_id = gender_tra SET tra_block_start = 8099000 SET tra_block_size = 256 SPRINT tra_out ~gender_name~ LPM ad_tra_to // ~créature invoquée~ (@8099006)
-				SPRINT $fx_gender_name(~%gender_id%~) ~%gender_name%~
+				SPRINT ~fx_gender_name_%gender_id%~ ~%gender_name%~
 			END
 			ELSE BEGIN
 				LPF ad_refusal INT_VAR fx_id = gender_id STR_VAR reason = ~not_implemented:opcode71:gender_name~ message = ~value %gender_value% of gender.ids has no name~ RET render_late_missing = refusal END

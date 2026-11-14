@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_266_support BEGIN
 		PATCH_IF NOT (~%unprotect_resref%~ STRING_EQUAL ~~) AND NOT support_header_only BEGIN
 			LPF ad_spell_name STR_VAR resref = ~%unprotect_resref%~ RET unprotect_name = name END
 		END
-		SPRINT $fx_unprotect_name(~%unprotect_id%~) ~%unprotect_name%~
+		SPRINT ~fx_unprotect_name_%unprotect_id%~ ~%unprotect_name%~
 		PATCH_IF NOT $fx_dropped(~%unprotect_id%~) AND ~%unprotect_resref%~ STRING_EQUAL ~~ BEGIN
 			SET drop_id = unprotect_id
 			SPRINT ignored_reason ~file_error:opcode266:invalid~
@@ -30,7 +30,7 @@ DEFINE_PATCH_MACRO ad_op_266_lines BEGIN
 	PHP_EACH fx_ids_266 AS _ => unprotect_id BEGIN
 		SPRINT unprotect_name $fx_unprotect_name(~%unprotect_id%~)
 		PATCH_IF ~%unprotect_name%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_consumed(~%unprotect_id%~) = 1
+			SET ~fx_consumed_%unprotect_id%~ = 1
 		END
 	END
 	SET state_opcode = 266

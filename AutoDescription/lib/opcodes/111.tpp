@@ -12,7 +12,7 @@
 // dans fx_substitution_error : plusieurs métamorphoses (l'ancien moteur ajoute un effet par
 // métamorphose).
 DEFINE_PATCH_MACRO ad_fx_substitute_111 BEGIN
-	SPRINT $fx_substitution_error(~%fx_id%~) ~~
+	SPRINT ~fx_substitution_error_%fx_id%~ ~~
 	SPRINT weapon_resref $fx_resource(~%fx_id%~)
 	SET weapon_polymorphs = 0
 	PATCH_IF NOT (~%weapon_resref%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%weapon_resref%.itm~ BEGIN
@@ -41,20 +41,20 @@ DEFINE_PATCH_MACRO ad_fx_substitute_111 BEGIN
 		END
 	END
 	PATCH_IF weapon_polymorphs > 1 BEGIN
-		SPRINT $fx_substitution_error(~%fx_id%~) ~polymorphs~
+		SPRINT ~fx_substitution_error_%fx_id%~ ~polymorphs~
 	END
 	ELSE PATCH_IF weapon_polymorphs == 1 BEGIN
-		SET $fx_opcode(~%fx_id%~)         = 135
-		SET $fx_power(~%fx_id%~)          = weapon_power
-		SET $fx_parameter1(~%fx_id%~)     = weapon_parameter1
-		SET $fx_parameter2(~%fx_id%~)     = weapon_parameter2
-		SET $fx_parameter2_raw(~%fx_id%~) = weapon_parameter2
-		SPRINT $fx_resource(~%fx_id%~)    ~%weapon_resource%~
-		SET $fx_dice_count(~%fx_id%~)     = weapon_dice_count
-		SET $fx_dice_sides(~%fx_id%~)     = weapon_dice_sides
-		SET $fx_special(~%fx_id%~)        = weapon_special
-		SET $fx_from_111(~%fx_id%~)       = 1
-		SPRINT $fx_parent_resource(~%fx_id%~) ~%weapon_resref%~
+		SET ~fx_opcode_%fx_id%~         = 135
+		SET ~fx_power_%fx_id%~          = weapon_power
+		SET ~fx_parameter1_%fx_id%~     = weapon_parameter1
+		SET ~fx_parameter2_%fx_id%~     = weapon_parameter2
+		SET ~fx_parameter2_raw_%fx_id%~ = weapon_parameter2
+		SPRINT ~fx_resource_%fx_id%~    ~%weapon_resource%~
+		SET ~fx_dice_count_%fx_id%~     = weapon_dice_count
+		SET ~fx_dice_sides_%fx_id%~     = weapon_dice_sides
+		SET ~fx_special_%fx_id%~        = weapon_special
+		SET ~fx_from_111_%fx_id%~       = 1
+		SPRINT ~fx_parent_resource_%fx_id%~ ~%weapon_resref%~
 	END
 END
 
@@ -127,7 +127,7 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SPRINT $fx_item_name(~%weapon_id%~) ~%weapon_name%~
+				SPRINT ~fx_item_name_%weapon_id%~ ~%weapon_name%~
 				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
 				PHP_EACH fx_ids_112 AS _ => weapon_other BEGIN
 					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)

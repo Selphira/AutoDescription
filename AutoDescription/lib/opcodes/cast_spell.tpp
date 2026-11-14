@@ -23,8 +23,8 @@
 DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 	FOR (cast_id = 0; cast_id < fx_count AND ~%render_missing%~ STRING_EQUAL ~~; ++cast_id) BEGIN
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode BEGIN
-			SET $fx_recursion(~%cast_id%~) = 0
-			SET $fx_sub_count(~%cast_id%~) = 0
+			SET ~fx_recursion_%cast_id%~ = 0
+			SET ~fx_sub_count_%cast_id%~ = 0
 		END
 		// Niveau imposé qui choisit dans le sort le même en-tête que le niveau du lanceur : lancé au niveau
 		// du lanceur (parameter1 0, IESDP), l'effet est alors semblable d'un en-tête à l'autre.
@@ -33,20 +33,20 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 			LPF ad_cast_level_is_caster_level INT_VAR header = $fx_header(~%cast_id%~) casting_level = $fx_parameter1(~%cast_id%~)
 				STR_VAR resref = $fx_resource_lower(~%cast_id%~) RET cast_caster_level = is_caster_level END
 			PATCH_IF cast_caster_level BEGIN
-				SET $fx_parameter1(~%cast_id%~) = 0
+				SET ~fx_parameter1_%cast_id%~ = 0
 			END
 		END
 		// Une répétition est réunie à l'effet de tête de sa série (lib/groups.tpp).
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND $fx_series_of(~%cast_id%~) < 0 BEGIN
 			SPRINT cast_resref $fx_resource_lower(~%cast_id%~)
 			LPF ad_spell_name STR_VAR resref = ~%cast_resref%~ RET cast_name = name END
-			SPRINT $fx_spell_name(~%cast_id%~) ~%cast_name%~
+			SPRINT ~fx_spell_name_%cast_id%~ ~%cast_name%~
 			SET cast_h = $fx_header(~%cast_id%~)
-			SET $fx_cast_charge(~%cast_id%~) = 0
+			SET ~fx_cast_charge_%cast_id%~ = 0
 			// Dans un sous-sort d'un objet, l'en-tête est celui du sort : l'ancien moteur y lit un type de
 			// capacité négatif, jamais une capacité de charge.
 			PATCH_IF cast_h >= 0 AND NOT resource_is_spell AND ctx_depth == 0 BEGIN
-				SET $fx_cast_charge(~%cast_id%~) = NOT $charged_other(~%cast_h%~)
+				SET ~fx_cast_charge_%cast_id%~ = NOT $charged_other(~%cast_h%~)
 			END
 			PATCH_IF ~%cast_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = cast_id
@@ -61,7 +61,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = cast_id STR_VAR reason = ~not_implemented:opcode%cast_opcode%:dart~ message = ~dart casting a spell on each charge~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF (item_type == ITM_TYPE_potion AND $fx_probability(~%cast_id%~) >= 100) OR ~%cast_name%~ STRING_EQUAL ~~ BEGIN
-				SET $fx_recursion(~%cast_id%~) = 1
+				SET ~fx_recursion_%cast_id%~ = 1
 				LPM ad_cast_spell_recursion_support
 			END
 		END

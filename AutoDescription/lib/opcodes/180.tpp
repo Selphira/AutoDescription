@@ -9,10 +9,10 @@
 DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 	LPF ad_item_info STR_VAR resref = ~%ctx_resource%~ RET forbid_own_name = name END
 	PHP_EACH fx_ids_180 AS _ => forbid_id BEGIN
-		SPRINT $fx_item_name(~%forbid_id%~) ~~
+		SPRINT ~fx_item_name_%forbid_id%~ ~~
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%forbid_id%~) BEGIN
 			SPRINT forbid_resref $fx_resource(~%forbid_id%~)
-			SET $fx_forbid_unique(~%forbid_id%~) = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
+			SET ~fx_forbid_unique_%forbid_id%~ = ~%forbid_resref%~ STRING_EQUAL_CASE ~%ctx_resource%~
 			LPF ad_item_info STR_VAR resref = ~%forbid_resref%~ RET forbid_name = name END
 			PATCH_IF ~%forbid_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%forbid_resref%.itm~ BEGIN
 				SET drop_id = forbid_id
@@ -31,7 +31,7 @@ DEFINE_PATCH_MACRO ad_op_180_support BEGIN
 					LPM ad_application_drop
 				END
 				ELSE PATCH_IF NOT (~%forbid_name%~ STRING_EQUAL ~%forbid_own_name%~) BEGIN
-					SPRINT $fx_item_name(~%forbid_id%~) ~%forbid_name%~
+					SPRINT ~fx_item_name_%forbid_id%~ ~%forbid_name%~
 				END
 			END
 		END
@@ -60,7 +60,7 @@ DEFINE_PATCH_MACRO ad_op_180_lines BEGIN
 				PATCH_IF forbid_other >= forbid_id AND NOT $fx_consumed(~%forbid_other%~) AND NOT $fx_dropped(~%forbid_other%~)
 						AND NOT (~%forbid_other_name%~ STRING_EQUAL ~~) AND (~%forbid_other_scope%~ STRING_EQUAL ~%forbid_scope%~) BEGIN
 					SPRINT $forbid_names(~%forbid_other_name%~) ~%forbid_other_name%~
-					SET $fx_consumed(~%forbid_other%~) = forbid_other != forbid_id
+					SET ~fx_consumed_%forbid_other%~ = forbid_other != forbid_id
 				END
 			END
 			SPRINT and ~%AD_AND%~

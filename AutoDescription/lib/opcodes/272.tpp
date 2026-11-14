@@ -113,7 +113,7 @@ DEFINE_PATCH_MACRO ad_op_272_condition BEGIN
 		SET repeat_tra = repeat_feminine ? 22720014 : 22720015
 		SET tra_id = repeat_tra SPRINT tra_out ~condition_text~ LPM ad_tra_to // ~%amount% fois toutes les %strDuration%~
 	END
-	SPRINT $fx_condition_text(~%repeat_id%~) ~%condition_text%~
+	SPRINT ~fx_condition_text_%repeat_id%~ ~%condition_text%~
 END
 
 DEFINE_PATCH_MACRO ad_op_272_lines BEGIN

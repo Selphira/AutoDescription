@@ -11,7 +11,7 @@
 // que l'ancien moteur n'écrit pas ; caractéristique inchangée ; refus de ad_op_78_group.
 DEFINE_PATCH_MACRO ad_op_78_support BEGIN
 	PHP_EACH fx_ids_78 AS _ => disease_id BEGIN
-		SET $fx_disease_group(~%disease_id%~) = 0
+		SET ~fx_disease_group_%disease_id%~ = 0
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%disease_id%~) BEGIN
 			SET disease_type = $fx_parameter2(~%disease_id%~)
 			SET disease_amount = $fx_parameter1(~%disease_id%~)
@@ -85,8 +85,8 @@ DEFINE_PATCH_MACRO ad_op_78_group BEGIN
 					PATCH_IF disease_attribute == disease_type BEGIN
 						LPF ad_refusal INT_VAR fx_id = disease_found STR_VAR reason = ~not_implemented:opcode78:group_same_attribute~ message = ~identical diseases of the same ability~ RET render_missing = refusal END
 					END
-					SET $fx_consumed(~%disease_found%~) = 1
-					SET $fx_group_anchor(~%disease_found%~) = disease_id
+					SET ~fx_consumed_%disease_found%~ = 1
+					SET ~fx_group_anchor_%disease_found%~ = disease_id
 					SET tra_id = 20780060 + disease_attribute SPRINT tra_out ~disease_name~ LPM ad_tra_to
 					SPRINT $disease_names(~%disease_count%~) ~%disease_name%~
 					SET disease_count += 1
@@ -96,9 +96,9 @@ DEFINE_PATCH_MACRO ad_op_78_group BEGIN
 			PATCH_IF disease_count > 1 BEGIN
 				SPRINT disease_and @20780001 // ~et~
 				LPF ad_join STR_VAR array_name = ~disease_names~ glue = ~, ~ final_glue = EVAL ~ %disease_and% ~ RET disease_attributes = text END
-				SPRINT $fx_disease_attributes(~%disease_id%~) ~%disease_attributes%~
-				SET $fx_disease_group(~%disease_id%~) = 1
-				SET $fx_late(~%disease_id%~) = 2
+				SPRINT ~fx_disease_attributes_%disease_id%~ ~%disease_attributes%~
+				SET ~fx_disease_group_%disease_id%~ = 1
+				SET ~fx_late_%disease_id%~ = 2
 			END
 		END
 	END

@@ -18,7 +18,7 @@ DEFINE_PATCH_MACRO ad_op_346_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode346:school~ message = ~school %save_school% has no name~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SET $fx_stat_subject(~%stat_id%~) = save_school
+				SET ~fx_stat_subject_%stat_id%~ = save_school
 			END
 		END
 	END

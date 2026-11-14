@@ -24,9 +24,9 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			PATCH_IF versus_opcode != 344 AND versus_amount == 0 AND IS_EE BEGIN
 				SET versus_amount = $fx_special(~%versus_id%~)
 			END
-			SET $fx_versus_amount(~%versus_id%~) = versus_amount
+			SET ~fx_versus_amount_%versus_id%~ = versus_amount
 			LPF ad_ids_name INT_VAR ids_file = versus_file entry = versus_value RET versus_name = name END
-			SPRINT $fx_versus_name(~%versus_id%~) ~%versus_name%~
+			SPRINT ~fx_versus_name_%versus_id%~ ~%versus_name%~
 			SET versus_target = $fx_effective_target(~%versus_id%~)
 			PATCH_IF versus_opcode != 344 AND versus_amount == 0 BEGIN
 				SET drop_id = versus_id
@@ -79,7 +79,7 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
 							SET $versus_anchor(~%versus_other%~) = versus_id
-							SET $fx_late(~%versus_id%~) = 1
+							SET ~fx_late_%versus_id%~ = 1
 						END
 					END
 				END

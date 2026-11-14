@@ -16,7 +16,7 @@ DEFINE_PATCH_MACRO ad_op_55_support BEGIN
 			SET kill_file = $fx_parameter2(~%kill_id%~)
 			SET kill_value = $fx_parameter1(~%kill_id%~)
 			LPF ad_ids_name INT_VAR ids_file = kill_file entry = kill_value RET kill_name = name END
-			SPRINT $fx_kill_name(~%kill_id%~) ~%kill_name%~
+			SPRINT ~fx_kill_name_%kill_id%~ ~%kill_name%~
 			PATCH_IF kill_file < 2 OR kill_file > 8 OR (kill_file == 2 AND kill_value == 100) BEGIN
 				PATCH_IF kill_file < 2 OR kill_file > (IS_EE ? 9 : 8) BEGIN
 					SET drop_id = kill_id
@@ -57,7 +57,7 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
 							SET $kill_anchor(~%kill_other%~) = kill_id
-							SET $fx_late(~%kill_id%~) = 2
+							SET ~fx_late_%kill_id%~ = 2
 						END
 					END
 				END

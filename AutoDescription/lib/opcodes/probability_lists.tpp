@@ -122,10 +122,10 @@ DEFINE_PATCH_MACRO ad_probability_list_merge BEGIN
 		SET $list_order(~%list_order_key%~) = list_member
 		// Membres gardés pour la durée de l'en-tête du sort (ad_spell_header_sub_duration).
 		PATCH_IF list_member != list_id BEGIN
-			SET $fx_consumed(~%list_member%~) = 1
+			SET ~fx_consumed_%list_member%~ = 1
 			SET list_size = $fx_list_size(~%list_id%~) + 1
-			SET $fx_list_member(~%list_id% %list_size%~) = list_member
-			SET $fx_list_size(~%list_id%~) = list_size
+			SET ~fx_list_member_%list_id% %list_size%~ = list_member
+			SET ~fx_list_size_%list_id%~ = list_size
 		END
 	END
 	SORT_ARRAY_INDICES list_order NUMERICALLY
@@ -148,22 +148,22 @@ DEFINE_PATCH_MACRO ad_probability_list_merge BEGIN
 		SPRINT list_glue @1000005 // ~ », « ~
 		SPRINT list_final_glue @1000006 // ~ » %and% « ~
 		LPF ad_join STR_VAR array_name = ~list_joined_names~ glue = EVAL ~%list_glue%~ final_glue = EVAL ~%list_final_glue%~ RET list_joined = text END
-		SPRINT $fx_name_list(~%list_id%~) ~%list_joined%~
+		SPRINT ~fx_name_list_%list_id%~ ~%list_joined%~
 	END
-	SET $fx_probability_low(~%list_id%~) = list_low
-	SET $fx_probability_high(~%list_id%~) = list_high
-	SET $fx_probability(~%list_id%~) = list_total
+	SET ~fx_probability_low_%list_id%~ = list_low
+	SET ~fx_probability_high_%list_id%~ = list_high
+	SET ~fx_probability_%list_id%~ = list_total
 	// Champs lus aussi à l'union, comme l'effet que l'ancien moteur ajoute : deux niveaux de sort aux
 	// mêmes effets réunis se comparent égaux (ad_spell_level_same).
-	SET $fx_probability1(~%list_id%~) = list_high
-	SET $fx_probability2(~%list_id%~) = list_low
-	SET $fx_late(~%list_id%~) = 2
+	SET ~fx_probability1_%list_id%~ = list_high
+	SET ~fx_probability2_%list_id%~ = list_low
+	SET ~fx_late_%list_id%~ = 2
 	// Union de tout le tirage sous un effet probable qui lance le sort : l'effet devient certain et prend
 	// la probabilité du parent, comme un sous-effet certain (ad_recursion_base_probability).
 	PATCH_IF list_total >= 100 AND ctx_base_probability < 100 BEGIN
-		SET $fx_probability(~%list_id%~) = ctx_base_probability
-		SET $fx_probability_low(~%list_id%~) = ctx_base_low
-		SET $fx_probability_high(~%list_id%~) = ctx_base_high
-		SET $fx_parent_probability(~%list_id%~) = 1
+		SET ~fx_probability_%list_id%~ = ctx_base_probability
+		SET ~fx_probability_low_%list_id%~ = ctx_base_low
+		SET ~fx_probability_high_%list_id%~ = ctx_base_high
+		SET ~fx_parent_probability_%list_id%~ = 1
 	END
 END

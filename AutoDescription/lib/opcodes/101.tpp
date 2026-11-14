@@ -38,8 +38,8 @@ DEFINE_PATCH_MACRO ad_op_101_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SET $fx_immunity_label(~%immunity_id%~) = immunity_opcode
-				SET $fx_immunity_late(~%immunity_id%~) = 0
+				SET ~fx_immunity_label_%immunity_id%~ = immunity_opcode
+				SET ~fx_immunity_late_%immunity_id%~ = 0
 			END
 		END
 	END

@@ -20,9 +20,9 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 	PHP_EACH fx_ids_219 AS _ => creature_ac_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%creature_ac_id%~) BEGIN
 			SET creature_ac_file = $fx_parameter2(~%creature_ac_id%~)
-			SET $fx_ac_merged(~%creature_ac_id%~) = 0
+			SET ~fx_ac_merged_%creature_ac_id%~ = 0
 			SET $creature_ac_is_equipped(~%creature_ac_id%~) = 0
-			SET $fx_creature_anchor(~%creature_ac_id%~) = creature_ac_id
+			SET ~fx_creature_anchor_%creature_ac_id%~ = creature_ac_id
 			LPF ad_ids_name INT_VAR ids_file = creature_ac_file entry = $fx_parameter1(~%creature_ac_id%~) RET creature_ac_name = name END
 			SPRINT creature_ac_scope $fx_scope(~%creature_ac_id%~)
 			PATCH_IF creature_ac_file < 2 OR creature_ac_file > 8 OR (creature_ac_file == 2 AND $fx_parameter1(~%creature_ac_id%~) == 100) BEGIN
@@ -44,7 +44,7 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:probability~ message = ~probable effect~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SPRINT $fx_creature_type(~%creature_ac_id%~) ~%creature_ac_name%~
+				SPRINT ~fx_creature_type_%creature_ac_id%~ ~%creature_ac_name%~
 				SET creature_ac_all = 0
 				SET creature_ac_zero = 0
 				SET creature_ac_others = 0
@@ -73,7 +73,7 @@ DEFINE_PATCH_MACRO ad_op_219_support BEGIN
 						LPF ad_refusal INT_VAR fx_id = creature_ac_id STR_VAR reason = ~not_implemented:opcode219:class_armor~ message = ~armor class modifiers against all attacks cancel the bonus: the old engine writes a protection exception~ RET render_missing = refusal END
 					END
 					ELSE BEGIN
-						SET $fx_ac_merged(~%creature_ac_id%~) = 1
+						SET ~fx_ac_merged_%creature_ac_id%~ = 1
 					END
 				END
 			END
@@ -107,7 +107,7 @@ DEFINE_PATCH_MACRO ad_op_219_anchor BEGIN
 			SET same_other = creature_ac_other
 			LPM ad_fx_same_fields
 			PATCH_IF fx_same BEGIN
-				SET $fx_creature_anchor(~%creature_ac_id%~) = creature_ac_other
+				SET ~fx_creature_anchor_%creature_ac_id%~ = creature_ac_other
 			END
 		END
 	END

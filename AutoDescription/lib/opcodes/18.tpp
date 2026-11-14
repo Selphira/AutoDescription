@@ -51,12 +51,12 @@ DEFINE_PATCH_MACRO ad_op_18_support BEGIN
 			// compte les deux).
 			ELSE PATCH_IF $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) AND NOT support_header_only BEGIN
 				SET hp_first = $hp_seen(~%hp_scope%~ ~%hp_value%~ ~%hp_type%~ ~%fx_line_key%~) - 1
-				SET $fx_consumed(~%hp_id%~) = 1
+				SET ~fx_consumed_%hp_id%~ = 1
 				PATCH_IF hp_type == 0 OR hp_type == 3 BEGIN
-					SET $fx_parameter1(~%hp_first%~) += hp_value
+					SET ~fx_parameter1_%hp_first%~ += hp_value
 				END
 				ELSE PATCH_IF hp_type == 2 OR hp_type == 5 BEGIN
-					SET $fx_parameter1(~%hp_first%~) = $fx_parameter1(~%hp_first%~) * hp_value / 100
+					SET ~fx_parameter1_%hp_first%~ = $fx_parameter1(~%hp_first%~) * hp_value / 100
 				END
 			END
 			ELSE BEGIN

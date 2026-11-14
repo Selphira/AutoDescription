@@ -20,7 +20,7 @@ DEFINE_PATCH_MACRO ad_op_300_lines BEGIN
 	PHP_EACH fx_ids_300 AS _ => bump_id BEGIN
 		SET bump_value = $fx_parameter2(~%bump_id%~)
 		PATCH_IF bump_value < 1 OR bump_value > 3 BEGIN
-			SET $fx_consumed(~%bump_id%~) = 1
+			SET ~fx_consumed_%bump_id%~ = 1
 		END
 	END
 	SET state_opcode = 300

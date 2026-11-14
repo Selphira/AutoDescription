@@ -9,6 +9,9 @@
 // qui croît avec sa taille, pas écrire par nom ; mais PHP_EACH, SORT_ARRAY_INDICES, CLEAR_ARRAY et
 // RET_ARRAY ne voient pas un élément écrit par nom. Réservé aux tableaux jamais parcourus :
 // fx_ids_<opcode> et fx_opcode_count restent des tableaux (contrôle de tools/static_checks.py).
+// Même règle pour les autres magasins d'une description (spell_fx_<h>, level_*, line_*, search_*,
+// seg_*) ; level_keys, parcouru, reste un tableau. Un élément à plusieurs clés porte le nom
+// joint par « _ » : $level_rank(~%h%~ ~%n%~) est la variable level_rank_<h>_<n>.
 //
 // Tableaux écrits : fx_block, fx_header, fx_position, fx_opcode, fx_target, fx_power,
 // fx_parameter1, fx_parameter2 (fx_parameter2_raw : valeur lue, qu'une prise en charge ne réécrit
@@ -253,9 +256,9 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 			SET fx_skip = $AD_OPCODE_AVAILABLE(~%fx_pass_opcode%~) AND (~%fx_skip_status%~ STRING_EQUAL ~IGNORED~)
 		END
 		PATCH_IF fx_pass_opcode == 177 AND fx_pass == 0 BEGIN
-			SET $fx_deferred(~%fx_deferred_count%~) = fx_p
-			SET $fx_deferred_exceptions(~%fx_deferred_count%~) = fx_block_exceptions
-			SET $fx_deferred_not_cumulative(~%fx_deferred_count%~) = fx_block_not_cumulative
+			SET ~fx_deferred_%fx_deferred_count%~ = fx_p
+			SET ~fx_deferred_exceptions_%fx_deferred_count%~ = fx_block_exceptions
+			SET ~fx_deferred_not_cumulative_%fx_deferred_count%~ = fx_block_not_cumulative
 			SET fx_deferred_count += 1
 		END
 		ELSE PATCH_IF NOT fx_skip BEGIN

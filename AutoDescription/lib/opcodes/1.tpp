@@ -52,8 +52,8 @@ DEFINE_PATCH_MACRO ad_op_1_support BEGIN
 				ELSE PATCH_IF apr_mode == MOD_TYPE_percentage BEGIN
 					SET apr_merged = apr_merged * apr_parameter1 / 100
 				END
-				SET $fx_parameter1(~%apr_first%~) = apr_merged
-				SET $fx_consumed(~%apr_id%~) = 1
+				SET ~fx_parameter1_%apr_first%~ = apr_merged
+				SET ~fx_consumed_%apr_id%~ = 1
 			END
 			ELSE BEGIN
 				SET $apr_seen(~%apr_scope% %apr_parameter1% %apr_mode% %fx_line_key%~) = apr_id + 1

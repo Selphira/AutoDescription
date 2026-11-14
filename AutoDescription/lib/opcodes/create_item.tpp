@@ -25,8 +25,8 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 			ELSE PATCH_IF create_random AND NOT support_header_only BEGIN
 				PATCH_IF NOT create_listed BEGIN
 					SET tra_id = 8170000 + create_quality SET tra_block_start = 8170000 SET tra_block_size = 10 SPRINT tra_out ~create_name~ LPM ad_tra_to // ~trésor aléatoire de qualité exceptionnelle~ (@8170005)
-					SPRINT $fx_item_name(~%create_id%~) ~%create_name%~
-					SET $fx_item_amount(~%create_id%~) = 1
+					SPRINT ~fx_item_name_%create_id%~ ~%create_name%~
+					SET ~fx_item_amount_%create_id%~ = 1
 				END
 				ELSE BEGIN
 					LPF ad_random_treasure_names STR_VAR resref = ~%create_resref%~ RET create_names = names END
@@ -35,8 +35,8 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 					END
 					ELSE BEGIN
 						SET create_amount = $fx_parameter1(~%create_id%~)
-						SPRINT $fx_item_name(~%create_id%~) ~%create_names%~
-						SET $fx_item_amount(~%create_id%~) = (create_stackable AND create_amount != 0) ? create_amount : 1
+						SPRINT ~fx_item_name_%create_id%~ ~%create_names%~
+						SET ~fx_item_amount_%create_id%~ = (create_stackable AND create_amount != 0) ? create_amount : 1
 					END
 				END
 			END
@@ -54,8 +54,8 @@ DEFINE_PATCH_MACRO ad_create_item_support BEGIN
 			END
 			ELSE BEGIN
 				SET create_amount = $fx_parameter1(~%create_id%~)
-				SPRINT $fx_item_name(~%create_id%~) ~%create_name%~
-				SET $fx_item_amount(~%create_id%~) = (create_stackable AND create_amount != 0) ? create_amount : 1
+				SPRINT ~fx_item_name_%create_id%~ ~%create_name%~
+				SET ~fx_item_amount_%create_id%~ = (create_stackable AND create_amount != 0) ? create_amount : 1
 			END
 		END
 	END

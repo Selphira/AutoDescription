@@ -133,10 +133,10 @@ END
 // effet d'un 177 contre un type de créature ;
 // cible sans chaînes ; refus de la sous-description.
 DEFINE_PATCH_MACRO ad_recursion_support BEGIN
-	SET $fx_sub_count(~%recursion_fx%~) = 0
-	SPRINT $fx_sub_text(~%recursion_fx%~) ~~
-	SET $fx_sub_delayed(~%recursion_fx%~) = 0
-	SET $fx_sub_probability_lines(~%recursion_fx%~) = 0
+	SET ~fx_sub_count_%recursion_fx%~ = 0
+	SPRINT ~fx_sub_text_%recursion_fx%~ ~~
+	SET ~fx_sub_delayed_%recursion_fx%~ = 0
+	SET ~fx_sub_probability_lines_%recursion_fx%~ = 0
 	// Le sous-sort ne compte que pour les lignes, pas pour l'en-tête d'un sort seul.
 	SET recursion_allowed = 0
 	PATCH_IF NOT support_header_only BEGIN
@@ -180,30 +180,30 @@ DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_fx_location INT_VAR fx_id = recursion_fx with_opcode = 1 RET recursion_origin = location END
-				SPRINT $fx_sub_resref(~%recursion_fx%~) ~%recursion_resref%~
-				SPRINT $fx_sub_kind(~%recursion_fx%~) ~%recursion_kind%~
-				SET $fx_sub_depth(~%recursion_fx%~) = recursion_depth_reset ? 1 : ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
-				SET $fx_sub_casting_level(~%recursion_fx%~) = recursion_casting_level
-				SET $fx_sub_parent_dice(~%recursion_fx%~) = recursion_parent_dice
-				SET $fx_sub_hit_target(~%recursion_fx%~) = recursion_hit_target
-				SET $fx_sub_force_target(~%recursion_fx%~) = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
-				SET $fx_sub_effect_targets(~%recursion_fx%~) = ~%recursion_targets%~ STRING_EQUAL ~effect~
-				SET $fx_sub_ignore_duration(~%recursion_fx%~) = recursion_ignore_duration
-				SET $fx_sub_versus_set(~%recursion_fx%~) = recursion_versus_set
-				SPRINT $fx_sub_versus(~%recursion_fx%~) ~%recursion_versus%~
-				SPRINT $fx_sub_origin(~%recursion_fx%~) ~%recursion_origin%~
-				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%recursion_the_target%~
-				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%recursion_of_the_target%~
-				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%recursion_to_the_target%~
-				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
-				SPRINT $fx_sub_single_reason(~%recursion_fx%~) ~%recursion_single_reason%~
-				SPRINT $fx_sub_single_message(~%recursion_fx%~) ~%recursion_single_message%~
-				SPRINT $fx_sub_lines_reason(~%recursion_fx%~) ~%recursion_lines_reason%~
-				SPRINT $fx_sub_lines_message(~%recursion_fx%~) ~%recursion_lines_message%~
-				SET $fx_sub_delayed(~%recursion_fx%~) = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
-				SET $fx_sub_probability_lines(~%recursion_fx%~) = recursion_probability
-				SPRINT $fx_sub_frequency(~%recursion_fx%~) ~%recursion_frequency%~
-				SET $fx_sub_inherit_dice(~%recursion_fx%~) = recursion_inherit_dice
+				SPRINT ~fx_sub_resref_%recursion_fx%~ ~%recursion_resref%~
+				SPRINT ~fx_sub_kind_%recursion_fx%~ ~%recursion_kind%~
+				SET ~fx_sub_depth_%recursion_fx%~ = recursion_depth_reset ? 1 : ctx_depth + (~%recursion_kind%~ STRING_EQUAL ~spl~ ? 1 : 0)
+				SET ~fx_sub_casting_level_%recursion_fx%~ = recursion_casting_level
+				SET ~fx_sub_parent_dice_%recursion_fx%~ = recursion_parent_dice
+				SET ~fx_sub_hit_target_%recursion_fx%~ = recursion_hit_target
+				SET ~fx_sub_force_target_%recursion_fx%~ = NOT (~%recursion_targets%~ STRING_EQUAL ~own~)
+				SET ~fx_sub_effect_targets_%recursion_fx%~ = ~%recursion_targets%~ STRING_EQUAL ~effect~
+				SET ~fx_sub_ignore_duration_%recursion_fx%~ = recursion_ignore_duration
+				SET ~fx_sub_versus_set_%recursion_fx%~ = recursion_versus_set
+				SPRINT ~fx_sub_versus_%recursion_fx%~ ~%recursion_versus%~
+				SPRINT ~fx_sub_origin_%recursion_fx%~ ~%recursion_origin%~
+				SPRINT ~fx_sub_the_target_%recursion_fx%~ ~%recursion_the_target%~
+				SPRINT ~fx_sub_of_the_target_%recursion_fx%~ ~%recursion_of_the_target%~
+				SPRINT ~fx_sub_to_the_target_%recursion_fx%~ ~%recursion_to_the_target%~
+				SPRINT ~fx_sub_only_for_%recursion_fx%~ ~~
+				SPRINT ~fx_sub_single_reason_%recursion_fx%~ ~%recursion_single_reason%~
+				SPRINT ~fx_sub_single_message_%recursion_fx%~ ~%recursion_single_message%~
+				SPRINT ~fx_sub_lines_reason_%recursion_fx%~ ~%recursion_lines_reason%~
+				SPRINT ~fx_sub_lines_message_%recursion_fx%~ ~%recursion_lines_message%~
+				SET ~fx_sub_delayed_%recursion_fx%~ = $fx_timing(~%recursion_fx%~) == TIMING_delayed AND NOT $fx_series_anchor(~%recursion_fx%~)
+				SET ~fx_sub_probability_lines_%recursion_fx%~ = recursion_probability
+				SPRINT ~fx_sub_frequency_%recursion_fx%~ ~%recursion_frequency%~
+				SET ~fx_sub_inherit_dice_%recursion_fx%~ = recursion_inherit_dice
 				SET $recursion_pending(~%recursion_pending_count%~) = recursion_fx
 				SET recursion_pending_count += 1
 			END
@@ -270,20 +270,20 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT line_the_target ~~
 				LPM ad_application_form
 				LPM ad_recursion_target_strings
-				SPRINT $fx_sub_only_for(~%recursion_fx%~) ~~
+				SPRINT ~fx_sub_only_for_%recursion_fx%~ ~~
 				PATCH_IF app_versus_count > 0 BEGIN
-					SPRINT $fx_sub_only_for(~%recursion_fx%~) ~%app_versus_only_for%~
+					SPRINT ~fx_sub_only_for_%recursion_fx%~ ~%app_versus_only_for%~
 					// Comme pour l'opcode 232, l'ancien moteur garde le versus du 177 (« contre les trolls »),
 					// que les dégâts du sous-sort écrivent à la place de leur cible (AROW04).
 					PATCH_IF NOT $fx_sub_versus_set(~%recursion_fx%~) BEGIN
-						SET $fx_sub_versus_set(~%recursion_fx%~) = 1
-						SPRINT $fx_sub_versus(~%recursion_fx%~) ~%versus%~
+						SET ~fx_sub_versus_set_%recursion_fx%~ = 1
+						SPRINT ~fx_sub_versus_%recursion_fx%~ ~%versus%~
 					END
 				END
 				SPRINT line_only_for ~~
-				SPRINT $fx_sub_the_target(~%recursion_fx%~) ~%theTarget%~
-				SPRINT $fx_sub_of_the_target(~%recursion_fx%~) ~%ofTheTarget%~
-				SPRINT $fx_sub_to_the_target(~%recursion_fx%~) ~%toTheTarget%~
+				SPRINT ~fx_sub_the_target_%recursion_fx%~ ~%theTarget%~
+				SPRINT ~fx_sub_of_the_target_%recursion_fx%~ ~%ofTheTarget%~
+				SPRINT ~fx_sub_to_the_target_%recursion_fx%~ ~%toTheTarget%~
 			END
 			// Sous-effets à leurs propres cibles (272 d'un EFF) : le type de créature du 177 qui remplace
 			// l'effet passe aussi à leurs dégâts (A7#INTA2 : « contre les animaux, les humanoïdes et les
@@ -294,8 +294,8 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				LPM ad_application_form
 				LPM ad_recursion_target_strings
 				PATCH_IF app_versus_count > 0 BEGIN
-					SET $fx_sub_versus_set(~%recursion_fx%~) = 1
-					SPRINT $fx_sub_versus(~%recursion_fx%~) ~%versus%~
+					SET ~fx_sub_versus_set_%recursion_fx%~ = 1
+					SPRINT ~fx_sub_versus_%recursion_fx%~ ~%versus%~
 				END
 				SPRINT line_only_for ~~
 			END
@@ -312,7 +312,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				AND ($fx_probability(~%recursion_fx%~) < 100 OR $fx_sub_delayed(~%recursion_fx%~)))
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
 			TO_UPPER recursion_origin_resource
-			SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
+			SPRINT ~fx_sub_duration_text_%recursion_fx%~ ~~
 			SPRINT recursion_delayed_missing ~~
 			SET recursion_delayed_hide = 0
 			SET recursion_hide_base = recursion_hide
@@ -320,7 +320,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				LPF ad_recursion_delayed_duration STR_VAR resref = ~%recursion_resref%~
 					RET recursion_delayed_hide = duration_hide recursion_delayed_text = duration_text recursion_delayed_missing = duration_missing END
 				SET recursion_hide = recursion_hide OR recursion_delayed_hide
-				SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~%recursion_delayed_text%~
+				SPRINT ~fx_sub_duration_text_%recursion_fx%~ ~%recursion_delayed_text%~
 			END
 			PATCH_IF NOT (~%recursion_delayed_missing%~ STRING_EQUAL ~~) BEGIN
 				SET recursion_sub_count = 0
@@ -381,7 +381,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				PATCH_IF recursion_pass == 0 AND recursion_sub_count == 1 AND recursion_delayed_hide AND NOT recursion_hide_base
 						AND ~%recursion_sub_missing%~ STRING_EQUAL ~~ BEGIN
 					SET recursion_hide = recursion_hide_base
-					SPRINT $fx_sub_duration_text(~%recursion_fx%~) ~~
+					SPRINT ~fx_sub_duration_text_%recursion_fx%~ ~~
 				END
 				ELSE BEGIN
 					SET recursion_pass = 2
@@ -410,10 +410,10 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 					LPF ad_refusal INT_VAR fx_id = recursion_fx STR_VAR reason = ~not_implemented:recursion:delayed_single_duration~ message = ~single line of a spell cast after a delay, whose common duration (%recursion_delayed_text%) the old engine drops~ RET render_late_missing = refusal END
 				END
 			END
-			SET $fx_sub_count(~%recursion_fx%~) = recursion_sub_count
-			SPRINT $fx_sub_text(~%recursion_fx%~) ~%recursion_sub_text%~
-			SET $fx_sub_opcode(~%recursion_fx%~) = recursion_sub_opcode
-			SET $fx_probability_in_sub(~%recursion_fx%~) = $fx_probability(~%recursion_fx%~) < 100
+			SET ~fx_sub_count_%recursion_fx%~ = recursion_sub_count
+			SPRINT ~fx_sub_text_%recursion_fx%~ ~%recursion_sub_text%~
+			SET ~fx_sub_opcode_%recursion_fx%~ = recursion_sub_opcode
+			SET ~fx_probability_in_sub_%recursion_fx%~ = $fx_probability(~%recursion_fx%~) < 100
 		END
 	END
 END
@@ -666,10 +666,10 @@ DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 			END
 		END
 		ELSE BEGIN
-			SET $fx_probability(~%sub_fx%~) = ctx_base_probability
-			SET $fx_probability_low(~%sub_fx%~) = ctx_base_low
-			SET $fx_probability_high(~%sub_fx%~) = ctx_base_high
-			SET $fx_parent_probability(~%sub_fx%~) = 1
+			SET ~fx_probability_%sub_fx%~ = ctx_base_probability
+			SET ~fx_probability_low_%sub_fx%~ = ctx_base_low
+			SET ~fx_probability_high_%sub_fx%~ = ctx_base_high
+			SET ~fx_parent_probability_%sub_fx%~ = 1
 		END
 	END
 END
@@ -763,9 +763,9 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		PATCH_IF ctx_inherit_dice AND ~%fx_load_error%~ STRING_EQUAL ~~ BEGIN
 			FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
 				PATCH_IF $fx_opcode(~%sub_fx%~) == 12 AND $fx_dice_count(~%sub_fx%~) == 0 BEGIN
-					SET $fx_dice_count(~%sub_fx%~) = ctx_dice_count
-					SET $fx_dice_sides(~%sub_fx%~) = ctx_dice_sides
-					SPRINT $fx_dice_text(~%sub_fx%~) ~%ctx_dice_text%~
+					SET ~fx_dice_count_%sub_fx%~ = ctx_dice_count
+					SET ~fx_dice_sides_%sub_fx%~ = ctx_dice_sides
+					SPRINT ~fx_dice_text_%sub_fx%~ ~%ctx_dice_text%~
 				END
 			END
 		END
@@ -1030,7 +1030,7 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	// get_spell_effects_description) ; les sections de niveaux sont refusées plus bas.
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND sub_all_headers BEGIN
 		FOR (sub_id = 0; sub_id < fx_count; ++sub_id) BEGIN
-			SET $fx_header_hidden(~%sub_id%~) = 0
+			SET ~fx_header_hidden_%sub_id%~ = 0
 		END
 		LPM ad_spell_header_effects
 		SET statistics_sections = 1

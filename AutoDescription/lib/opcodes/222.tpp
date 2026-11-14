@@ -7,7 +7,7 @@ DEFINE_PATCH_MACRO ad_op_222_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET field_range = $fx_parameter1(~%field_id%~)
 			LPF ad_distance_text INT_VAR feet = field_range / 16 RET field_text = text END
-			SPRINT $fx_field_range(~%field_id%~) ~%field_text%~
+			SPRINT ~fx_field_range_%field_id%~ ~%field_text%~
 			PATCH_IF ~%field_text%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = field_id STR_VAR reason = ~not_implemented:opcode222:range~ message = ~range %field_range% (16 per foot) of one meter or less~ RET render_missing = refusal END
 			END

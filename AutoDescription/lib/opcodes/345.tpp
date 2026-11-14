@@ -23,7 +23,7 @@ DEFINE_PATCH_MACRO ad_op_345_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode345:slot~ message = ~weapon slot %enchantment_slot% (only 0, current weapon, 3, both hands, and 1 for a launcher are described)~ RET render_missing = refusal END
 			END
 			ELSE BEGIN
-				SET $fx_stat_subject(~%stat_id%~) = enchantment_slot
+				SET ~fx_stat_subject_%stat_id%~ = enchantment_slot
 			END
 		END
 	END

@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ad_op_100_support BEGIN
 			SET versus_file = $fx_parameter2(~%versus_id%~)
 			SET versus_value = $fx_parameter1(~%versus_id%~)
 			LPF ad_ids_name INT_VAR ids_file = versus_file entry = versus_value RET versus_name = name END
-			SPRINT $fx_versus_name(~%versus_id%~) ~%versus_name%~
+			SPRINT ~fx_versus_name_%versus_id%~ ~%versus_name%~
 			PATCH_IF versus_file < 2 OR versus_file > 8 OR (versus_file == 2 AND versus_value == 100) BEGIN
 				PATCH_IF versus_file < 2 OR versus_file > (IS_EE ? 9 : 8) BEGIN
 					SET drop_id = versus_id
@@ -65,8 +65,8 @@ DEFINE_PATCH_MACRO ad_group_creature_types BEGIN
 							AND $fx_versus_value(~%group_id%~) == $fx_versus_value(~%group_candidate%~)
 							AND $fx_versus_inner_file(~%group_id%~) == $fx_versus_inner_file(~%group_candidate%~)
 							AND $fx_versus_inner_value(~%group_id%~) == $fx_versus_inner_value(~%group_candidate%~) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-						SET $fx_group_anchor(~%group_candidate%~) = group_id
+						SET ~fx_consumed_%group_candidate%~ = 1
+						SET ~fx_group_anchor_%group_candidate%~ = group_id
 						SPRINT creature_type_name $fx_versus_name(~%group_candidate%~)
 						SPRINT $creature_type_names(~%creature_type_name%~) ~%creature_type_name%~
 						SET group_merged = 1
@@ -75,7 +75,7 @@ DEFINE_PATCH_MACRO ad_group_creature_types BEGIN
 			END
 			PATCH_IF group_merged BEGIN
 				LPF ad_join STR_VAR array_name = ~creature_type_names~ glue = EVAL ~%creature_glue%~ final_glue = EVAL ~%creature_final_glue%~ RET creature_types = text END
-				SPRINT $fx_versus_name(~%group_id%~) ~%creature_types%~
+				SPRINT ~fx_versus_name_%group_id%~ ~%creature_types%~
 			END
 		END
 	END

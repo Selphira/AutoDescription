@@ -9,7 +9,7 @@
 // ou de 100, sans effet.
 DEFINE_PATCH_MACRO ad_op_99_support BEGIN
 	PHP_EACH fx_ids_99 AS _ => duration_id BEGIN
-		SET $fx_spell_types(~%duration_id%~) = 0
+		SET ~fx_spell_types_%duration_id%~ = 0
 		SET duration_type = $fx_parameter2(~%duration_id%~)
 		SET duration_percent = $fx_parameter1(~%duration_id%~)
 		PATCH_IF NOT $fx_dropped(~%duration_id%~) AND (duration_type < 0 OR duration_type > (IS_EE ? 2 : 1)) BEGIN

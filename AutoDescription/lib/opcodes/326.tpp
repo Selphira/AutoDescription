@@ -15,7 +15,7 @@
 // Refus : effet d'un EFF ; condition refusée (ad_op_326_condition) ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
-		SPRINT $fx_versus_list(~%apply_id%~) ~~
+		SPRINT ~fx_versus_list_%apply_id%~ ~~
 	END
 	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%apply_id%~) BEGIN
@@ -33,8 +33,8 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 			END
 			ELSE PATCH_IF apply_versus_set BEGIN
 				SPRINT apply_condition ~~
-				SPRINT $fx_condition_text(~%apply_id%~) ~~
-				SPRINT $fx_condition_refusal(~%apply_id%~) ~~
+				SPRINT ~fx_condition_text_%apply_id%~ ~~
+				SPRINT ~fx_condition_refusal_%apply_id%~ ~~
 			END
 			// Effet différé : l'ancien moteur n'écrit rien quand le sort appliqué n'a pas de ligne
 			// (SPWI910) ; sinon refus, avec les lignes.
@@ -42,8 +42,8 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 			PATCH_IF apply_delayed AND ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%apply_id%~) BEGIN
 				SPRINT apply_pending $fx_condition_refusal(~%apply_id%~)
 				PATCH_IF ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
-					SPRINT $fx_condition_refusal(~%apply_id%~) ~not_implemented:opcode326:delayed~
-					SPRINT $fx_condition_refusal_message(~%apply_id%~) ~delayed effect~
+					SPRINT ~fx_condition_refusal_%apply_id%~ ~not_implemented:opcode326:delayed~
+					SPRINT ~fx_condition_refusal_message_%apply_id%~ ~delayed effect~
 				END
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%apply_id%~) BEGIN
@@ -62,7 +62,7 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				SET recursion_parent_dice = 0
 				SET recursion_versus_set = apply_versus_set
 				PATCH_IF apply_versus_set BEGIN
-					SPRINT $fx_versus_list(~%apply_id%~) ~%apply_versus_list%~
+					SPRINT ~fx_versus_list_%apply_id%~ ~%apply_versus_list%~
 				END
 				SPRINT recursion_versus ~%apply_versus%~
 				SPRINT recursion_single_reason ~~
@@ -106,7 +106,7 @@ DEFINE_PATCH_MACRO ad_op_326_versus_group BEGIN
 	PATCH_IF apply_members > 1 BEGIN
 		PHP_EACH apply_versus_members AS apply_other => _ BEGIN
 			PATCH_IF apply_other != apply_id BEGIN
-				SET $fx_consumed(~%apply_other%~) = 1
+				SET ~fx_consumed_%apply_other%~ = 1
 			END
 		END
 		SPRINT apply_the @2002000 // ~les~
@@ -156,7 +156,7 @@ END
 // attend les lignes (fx_condition_refusal) : l'ancien moteur n'écrit pas de condition sans ligne du
 // sort appliqué (SPWI910).
 DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
-	SPRINT $fx_condition_refusal(~%apply_id%~) ~~
+	SPRINT ~fx_condition_refusal_%apply_id%~ ~~
 	SPRINT apply_pending ~~
 	SET apply_row = $fx_parameter2_raw(~%apply_id%~)
 	SPRINT apply_stat ~*~
@@ -272,8 +272,8 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			END
 		END
 		PATCH_IF NOT ~%apply_pending%~ STRING_EQUAL ~~ BEGIN
-			SPRINT $fx_condition_refusal(~%apply_id%~) ~%apply_pending%~
-			SPRINT $fx_condition_refusal_message(~%apply_id%~) ~%apply_pending_message%~
+			SPRINT ~fx_condition_refusal_%apply_id%~ ~%apply_pending%~
+			SPRINT ~fx_condition_refusal_message_%apply_id%~ ~%apply_pending_message%~
 		END
 		ELSE PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET line_fx = apply_id
@@ -288,7 +288,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			SET tra_id = apply_tra SET tra_block_start = 23260000 SET tra_block_size = 10000 SPRINT tra_out ~apply_condition~ LPM ad_tra_to // ~Si l'état %ofTheTarget% est « mort »~ (@23260181)
 		END
 	END
-	SPRINT $fx_condition_text(~%apply_id%~) ~%apply_condition%~
+	SPRINT ~fx_condition_text_%apply_id%~ ~%apply_condition%~
 END
 
 // Nom de la valeur des statistiques dont l'ancien moteur écrit la condition avec sa propre variable :

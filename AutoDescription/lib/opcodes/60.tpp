@@ -8,7 +8,7 @@
 DEFINE_PATCH_MACRO ad_op_60_support BEGIN
 	PHP_EACH fx_ids_60 AS _ => failure_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_spell_types(~%failure_id%~) = 0
+			SET ~fx_spell_types_%failure_id%~ = 0
 			PATCH_IF ($fx_parameter1(~%failure_id%~) BAND 255) == 0 OR $fx_parameter2(~%failure_id%~) < 0 OR $fx_parameter2(~%failure_id%~) > 5 BEGIN
 				SET drop_id = failure_id
 				SPRINT ignored_reason ~file_error:opcode60:invalid~

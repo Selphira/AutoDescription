@@ -29,7 +29,7 @@
 DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN
 		PATCH_IF IS_AN_INT ~%stat_forced_mode%~ BEGIN
-			SET $fx_parameter2(~%stat_id%~) = stat_forced_mode
+			SET ~fx_parameter2_%stat_id%~ = stat_forced_mode
 		END
 		SET stat_value = $fx_parameter1(~%stat_id%~)
 		SET stat_mode = $fx_parameter2(~%stat_id%~)
@@ -77,17 +77,17 @@ DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 			// les deux.
 			ELSE PATCH_IF $stat_seen(~%stat_key%~) AND NOT support_header_only BEGIN
 				SET stat_first = $stat_seen(~%stat_key%~) - 1
-				SET $fx_consumed(~%stat_id%~) = 1
+				SET ~fx_consumed_%stat_id%~ = 1
 				// Sans exception de cible : l'ancre ferait passer ses exceptions pour celles du doublon.
 				PATCH_IF $fx_exception_count(~%stat_id%~) == 0 BEGIN
-					SET $fx_group_anchor(~%stat_id%~) = stat_first
+					SET ~fx_group_anchor_%stat_id%~ = stat_first
 				END
 				PATCH_IF NOT $fx_not_cumulative(~%stat_id%~) BEGIN
 					PATCH_IF stat_mode == MOD_TYPE_cumulative OR (stat_mode == 3 AND (~%stat_mode_3%~ STRING_EQUAL ~added~)) BEGIN
-						SET $fx_parameter1(~%stat_first%~) += stat_value
+						SET ~fx_parameter1_%stat_first%~ += stat_value
 					END
 					ELSE PATCH_IF stat_mode == MOD_TYPE_percentage BEGIN
-						SET $fx_parameter1(~%stat_first%~) = $fx_parameter1(~%stat_first%~) * stat_value / 100
+						SET ~fx_parameter1_%stat_first%~ = $fx_parameter1(~%stat_first%~) * stat_value / 100
 					END
 				END
 			END
@@ -279,7 +279,7 @@ END
 DEFINE_PATCH_MACRO ad_stat_modifier_not_cumulative_line BEGIN
 	SPRINT stat_not_cumulative @4000010 // ~non cumulatif~
 	SPRINT line_suffix ~(%stat_not_cumulative%)~
-	SET $fx_not_cumulative(~%line_fx%~) = 0
+	SET ~fx_not_cumulative_%line_fx%~ = 0
 END
 
 // « +2 », « Passe à 18 » ou « -30 % » (mode 2 : valeur exprimée en pourcentage de la statistique).

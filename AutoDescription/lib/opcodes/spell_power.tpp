@@ -19,7 +19,7 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET power_own_spell = name END
 	END
 	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
-		SET $fx_power_mask(~%power_id%~) = 0
+		SET ~fx_power_mask_%power_id%~ = 0
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET power_level = $fx_parameter2(~%power_id%~)
 			SPRINT power_resref $fx_resource(~%power_id%~)
@@ -107,11 +107,11 @@ DEFINE_PATCH_MACRO ad_spell_power_header_groups BEGIN
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
 						SET power_mask = power_mask BOR (1 << ($fx_parameter2(~%power_other%~) - 1))
-						SET $fx_consumed(~%power_other%~) = 1
+						SET ~fx_consumed_%power_other%~ = 1
 					END
 				END
 			END
-			SET $fx_power_mask(~%power_id%~) = power_mask
+			SET ~fx_power_mask_%power_id%~ = power_mask
 		END
 	END
 END

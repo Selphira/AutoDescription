@@ -23,16 +23,16 @@ DEFINE_PATCH_MACRO ad_op_233_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF NOT VARIABLE_IS_SET $AD_PROFICIENCY_NAMES(~%proficiency_stat%~) BEGIN
-				SET $fx_stat_subject(~%stat_id%~) = proficiency_stat
+				SET ~fx_stat_subject_%stat_id%~ = proficiency_stat
 				SET drop_id = stat_id
 				SPRINT ignored_reason ~not_implemented:opcode233:no_name~
 				SPRINT ignored_message ~proficiency %proficiency_stat% has no name~
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				SET $fx_stat_subject(~%stat_id%~) = proficiency_stat
+				SET ~fx_stat_subject_%stat_id%~ = proficiency_stat
 				SET proficiency_delta = proficiency_mode == 1 AND $fx_special(~%stat_id%~) != 0 AND proficiency_stat == 90
-				SET $fx_parameter2(~%stat_id%~) = (proficiency_mode == 1 AND NOT proficiency_delta) ? MOD_TYPE_cumulative : MOD_TYPE_flat
+				SET ~fx_parameter2_%stat_id%~ = (proficiency_mode == 1 AND NOT proficiency_delta) ? MOD_TYPE_cumulative : MOD_TYPE_flat
 			END
 		END
 	END

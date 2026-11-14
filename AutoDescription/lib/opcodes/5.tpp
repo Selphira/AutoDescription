@@ -15,7 +15,7 @@ DEFINE_PATCH_MACRO ad_op_5_support BEGIN
 			SET charm_value = $fx_parameter1(~%charm_id%~)
 			SET charm_target = $fx_effective_target(~%charm_id%~)
 			LPF ad_ids_name INT_VAR ids_file = 3 entry = charm_value RET charm_name = name END
-			SPRINT $fx_charm_name(~%charm_id%~) ~%charm_name%~
+			SPRINT ~fx_charm_name_%charm_id%~ ~%charm_name%~
 			PATCH_IF NOT ((charm_type >= 0 AND charm_type <= 5) OR (charm_type >= 1000 AND charm_type <= 1005)) BEGIN
 				SET drop_id = charm_id
 				SPRINT ignored_reason ~file_error:opcode5:invalid~

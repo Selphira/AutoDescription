@@ -30,7 +30,7 @@ DEFINE_PATCH_MACRO ad_op_129_lines BEGIN
 			SPRINT aid_not_cumulative @4000010 // ~non cumulatif~
 			SPRINT line_suffix ~(%aid_not_cumulative%)~
 			SET line_fx = aid_id
-			SET $fx_not_cumulative(~%aid_id%~) = 0
+			SET ~fx_not_cumulative_%aid_id%~ = 0
 			SET line_phrase = 21290100 // ~Aide (%value%)~
 			LPM ad_effect_line
 		END

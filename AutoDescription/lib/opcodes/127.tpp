@@ -28,8 +28,8 @@ DEFINE_PATCH_MACRO ad_op_127_support BEGIN
 			SET monster_table = $fx_parameter2(~%monster_id%~)
 			SPRINT monster_resref $fx_resource(~%monster_id%~)
 			SET monster_custom = $fx_special(~%monster_id%~) != 0 OR NOT (~%monster_resref%~ STRING_EQUAL ~~)
-			SET $fx_monster_resource_table(~%monster_id%~) = 0
-			SET $fx_monster_grouped(~%monster_id%~) = 0
+			SET ~fx_monster_resource_table_%monster_id%~ = 0
+			SET ~fx_monster_grouped_%monster_id%~ = 0
 			PATCH_IF monster_custom AND NOT FILE_EXISTS_IN_GAME ~%monster_resref%.2da~ BEGIN
 				SET drop_id = monster_id
 				SPRINT ignored_reason ~file_error:opcode127:no_table~
@@ -119,9 +119,9 @@ DEFINE_PATCH_MACRO ad_op_127_table BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND (monster_max == 0 OR ~%monster_creatures%~ STRING_EQUAL ~~) BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode127:no_creature~ message = ~no named creature in table %monster_file%.2DA~ RET render_missing = refusal END
 	END
-	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
-	SET $fx_monster_min(~%monster_id%~) = monster_min
-	SET $fx_monster_max(~%monster_id%~) = monster_max
+	SPRINT ~fx_monster_creatures_%monster_id%~ ~%monster_creatures%~
+	SET ~fx_monster_min_%monster_id%~ = monster_min
+	SET ~fx_monster_max_%monster_id%~ = monster_max
 END
 
 // Créatures nommées de la table resource de l'effet monster_id (ancien get_creatures_names), sans
@@ -148,8 +148,8 @@ DEFINE_PATCH_MACRO ad_op_127_resource_table BEGIN
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND ~%monster_creatures%~ STRING_EQUAL ~~ BEGIN
 		LPF ad_refusal INT_VAR fx_id = monster_id STR_VAR reason = ~not_implemented:opcode%monster_opcode%:no_creature~ message = ~no named creature in table %monster_resref%.2DA~ RET render_missing = refusal END
 	END
-	SPRINT $fx_monster_creatures(~%monster_id%~) ~%monster_creatures%~
-	SET $fx_monster_resource_table(~%monster_id%~) = 1
+	SPRINT ~fx_monster_creatures_%monster_id%~ ~%monster_creatures%~
+	SET ~fx_monster_resource_table_%monster_id%~ = 1
 END
 
 // Créature monster_resref (ligne monster_row) de la table.
@@ -213,8 +213,8 @@ DEFINE_PATCH_MACRO ad_op_127_header_group BEGIN
 			SET same_other = monster_other
 			LPM ad_fx_same_fields
 			PATCH_IF fx_same BEGIN
-				SET $fx_consumed(~%monster_other%~) = 1
-				SET $fx_late(~%monster_id%~) = 2
+				SET ~fx_consumed_%monster_other%~ = 1
+				SET ~fx_late_%monster_id%~ = 2
 			END
 		END
 	END
@@ -268,19 +268,19 @@ DEFINE_PATCH_MACRO ad_op_127_similar_group BEGIN
 				END
 				PHP_EACH monster_members AS monster_member => _ BEGIN
 					PATCH_IF monster_member != monster_id BEGIN
-						SET $fx_consumed(~%monster_member%~) = 1
-						SET $fx_group_anchor(~%monster_member%~) = monster_id
+						SET ~fx_consumed_%monster_member%~ = 1
+						SET ~fx_group_anchor_%monster_member%~ = monster_id
 					END
 				END
-				SET $fx_monster_min(~%monster_id%~) = monster_group_min
-				SET $fx_monster_max(~%monster_id%~) = monster_group_max
-				SET $fx_monster_grouped(~%monster_id%~) = 1
-				SET $fx_late(~%monster_id%~) = 2
-				SET $fx_probability1(~%monster_id%~) = 100
-				SET $fx_probability2(~%monster_id%~) = 0
-				SET $fx_probability_low(~%monster_id%~) = 0
-				SET $fx_probability_high(~%monster_id%~) = 99
-				SET $fx_probability(~%monster_id%~) = 100
+				SET ~fx_monster_min_%monster_id%~ = monster_group_min
+				SET ~fx_monster_max_%monster_id%~ = monster_group_max
+				SET ~fx_monster_grouped_%monster_id%~ = 1
+				SET ~fx_late_%monster_id%~ = 2
+				SET ~fx_probability1_%monster_id%~ = 100
+				SET ~fx_probability2_%monster_id%~ = 0
+				SET ~fx_probability_low_%monster_id%~ = 0
+				SET ~fx_probability_high_%monster_id%~ = 99
+				SET ~fx_probability_%monster_id%~ = 100
 			END
 		END
 	END

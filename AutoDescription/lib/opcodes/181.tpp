@@ -10,7 +10,7 @@ DEFINE_PATCH_MACRO ad_op_181_support BEGIN
 	PHP_EACH fx_ids_181 AS _ => item_type_id BEGIN
 		SET forbidden_type = IS_EE ? $fx_parameter1(~%item_type_id%~) : $fx_parameter2(~%item_type_id%~)
 		LPF ad_item_type_name INT_VAR item_type = forbidden_type RET item_type_name = name END
-		SPRINT $fx_item_type_name(~%item_type_id%~) ~%item_type_name%~
+		SPRINT ~fx_item_type_name_%item_type_id%~ ~%item_type_name%~
 		PATCH_IF NOT $fx_dropped(~%item_type_id%~) AND (forbidden_type < 0 OR forbidden_type > 73) BEGIN
 			SET drop_id = item_type_id
 			SPRINT ignored_reason ~file_error:opcode181:type~
@@ -30,7 +30,7 @@ DEFINE_PATCH_MACRO ad_op_181_lines BEGIN
 	PHP_EACH fx_ids_181 AS _ => item_type_id BEGIN
 		SPRINT item_type_name $fx_item_type_name(~%item_type_id%~)
 		PATCH_IF ~%item_type_name%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_consumed(~%item_type_id%~) = 1
+			SET ~fx_consumed_%item_type_id%~ = 1
 		END
 	END
 	SET state_opcode = 181

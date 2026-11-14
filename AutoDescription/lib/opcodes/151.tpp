@@ -21,7 +21,7 @@ DEFINE_PATCH_MACRO ad_op_151_support BEGIN
 				PATCH_IF ~%replace_name%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = replace_id STR_VAR reason = ~not_implemented:opcode151:no_name~ message = ~creature %replace_resref%.CRE has no name~ RET render_missing = refusal END
 				END
-				SPRINT $fx_creature_name(~%replace_id%~) ~%replace_name%~
+				SPRINT ~fx_creature_name_%replace_id%~ ~%replace_name%~
 			END
 		END
 	END

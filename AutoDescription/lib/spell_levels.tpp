@@ -214,8 +214,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
 					SET level_opcode = 524
 				END
 			END
-			SET $level_id(~%level_a%~) = level_id
-			SET $level_header(~%level_a%~) = level_h
+			SET ~level_id_%level_a%~ = level_id
+			SET ~level_header_%level_a%~ = level_h
 			// Effets identiques réunis (ad_group_identical_effects) : l'ancien moteur garde leur nombre dans
 			// custom_int, qu'il compare, et décale de 1000 la position de l'effet qui les représente.
 			SET level_identical = 0
@@ -224,14 +224,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
 					SET level_identical = $fx_identical_count(~%level_id%~)
 				END
 			END
-			SET $level_identical(~%level_a%~) = level_identical
-			SET $level_position(~%level_a%~) = $fx_position(~%level_id%~) + (level_identical > 0 ? 1000 : 0)
-			SET $level_opcode(~%level_a%~) = level_opcode
-			SET $level_derived(~%level_a%~) = $EVAL ~spell_fx_derived_%level_h%~(~%level_k%~)
-			SET $level_on(~%level_a%~) = 1
-			SET $level_emitted(~%level_a%~) = 0
+			SET ~level_identical_%level_a%~ = level_identical
+			SET ~level_position_%level_a%~ = $fx_position(~%level_id%~) + (level_identical > 0 ? 1000 : 0)
+			SET ~level_opcode_%level_a%~ = level_opcode
+			SET ~level_derived_%level_a%~ = $EVAL ~spell_fx_derived_%level_h%~(~%level_k%~)
+			SET ~level_on_%level_a%~ = 1
+			SET ~level_emitted_%level_a%~ = 0
 			SET level_position = $level_position(~%level_a%~)
-			SET $level_mark(~%level_h% %level_position%~) = 0
+			SET ~level_mark_%level_h% %level_position%~ = 0
 			SET rank_h = level_h
 			SET rank_opcode = level_opcode
 			LPM ad_spell_level_rank
@@ -273,7 +273,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_common BEGIN
 				SPRINT level_b ~%level_h% %level_k%~
 				LPM ad_spell_level_same
 				PATCH_IF level_same BEGIN
-					SPRINT $level_similar_list(~%level_similar%~) ~%level_b%~
+					SPRINT ~level_similar_list_%level_similar%~ ~%level_b%~
 					SET level_similar += 1
 				END
 				ELSE BEGIN
@@ -285,16 +285,16 @@ DEFINE_PATCH_MACRO ad_spell_levels_common BEGIN
 			END
 		END
 		PATCH_IF level_in_all BEGIN
-			SPRINT $level_common_list(~%level_common_count%~) ~%level_a%~
+			SPRINT ~level_common_list_%level_common_count%~ ~%level_a%~
 			SET level_common_count += 1
-			SET $level_emitted(~%level_a%~) = 1
+			SET ~level_emitted_%level_a%~ = 1
 			SET level_position = $level_position(~%level_a%~)
-			SET $level_mark(~0 %level_position%~) = 1
+			SET ~level_mark_0 %level_position%~ = 1
 			FOR (level_n = 0; level_n < level_similar; ++level_n) BEGIN
 				SPRINT level_b $level_similar_list(~%level_n%~)
 				SET level_b_h = $level_header(~%level_b%~)
 				SET level_b_position = $level_position(~%level_b%~)
-				SET $level_mark(~%level_b_h% %level_b_position%~) = 1
+				SET ~level_mark_%level_b_h% %level_b_position%~ = 1
 			END
 		END
 	END
@@ -321,7 +321,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_chains BEGIN
 					PATCH_IF $level_on(~%level_b%~) AND NOT $level_mark(~%level_next% %level_b_position%~) BEGIN
 						LPM ad_spell_level_same
 						PATCH_IF level_same BEGIN
-							SET $level_mark(~%level_next% %level_b_position%~) = 1
+							SET ~level_mark_%level_next% %level_b_position%~ = 1
 							SET level_found = 1
 						END
 					END
@@ -380,10 +380,10 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 						LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:save_progression_two_values~ message = ~saving throw bonus taking only two values between the abilities, written in the line~ RET render_late_missing = refusal END
 					END
 					ELSE PATCH_IF NOT ctx_ignore_save BEGIN
-						SPRINT $fx_level_save(~%level_id%~) ~%formula_text%~
+						SPRINT ~fx_level_save_%level_id%~ ~%formula_text%~
 						PATCH_IF formula_base > 0 BEGIN
 							SPRINT value ~%formula_text%~
-							SPRINT $fx_level_save(~%level_id%~) @1200001 // ~+%value%~
+							SPRINT ~fx_level_save_%level_id%~ @1200001 // ~+%value%~
 						END
 					END
 					SPRINT level_value_text ~~
@@ -571,7 +571,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 					LPM ad_spell_level_formula
 					LPM ad_spell_level_formula_exact
 					PATCH_IF formula_exact AND NOT (~%formula_text%~ STRING_EQUAL ~%target_level_max%~) BEGIN
-						SPRINT $fx_level_max_text(~%level_id%~) ~%formula_text%~
+						SPRINT ~fx_level_max_text_%level_id%~ ~%formula_text%~
 						PATCH_IF level_h0 == 0 BEGIN
 							SPRINT level_value_text ~~
 							SPRINT level_duration_text ~~
@@ -582,10 +582,10 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 							FOR (group_n = 0; group_n < search_total; ++group_n) BEGIN
 								SPRINT level_b $search_match(~%group_n%~)
 								PATCH_IF NOT (~%level_b%~ STRING_EQUAL ~%level_a%~) BEGIN
-									SET $level_on(~%level_b%~) = 0
+									SET ~level_on_%level_b%~ = 0
 								END
 							END
-							SET $fx_level_to_last(~%level_id%~) = 1
+							SET ~fx_level_to_last_%level_id%~ = 1
 						END
 					END
 				END
@@ -636,23 +636,23 @@ DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 				END
 				PATCH_IF $level_on(~%level_b%~) BEGIN
 					SET search_id = $level_id(~%level_b%~)
-					SPRINT $search_match(~%search_total%~) ~%level_b%~
-					SET $search_level(~%search_total%~) = $spell_level(~%search_h%~)
+					SPRINT ~search_match_%search_total%~ ~%level_b%~
+					SET ~search_level_%search_total%~ = $spell_level(~%search_h%~)
 					SET search_parameter1 = $fx_parameter1(~%search_id%~)
 					PATCH_IF search_opcode == 111 AND search_parameter1 < 1 BEGIN
 						SET search_parameter1 = 1
 					END
-					SET $search_parameter1(~%search_total%~) = search_parameter1
-					SET $search_dice(~%search_total%~) = $fx_dice_count(~%search_id%~)
-					SET $search_save(~%search_total%~) = $fx_save_bonus(~%search_id%~)
+					SET ~search_parameter1_%search_total%~ = search_parameter1
+					SET ~search_dice_%search_total%~ = $fx_dice_count(~%search_id%~)
+					SET ~search_save_%search_total%~ = $fx_save_bonus(~%search_id%~)
 					SET search_total += 1
 					PATCH_IF ~%level_b%~ STRING_EQUAL ~%level_a%~ BEGIN
 						SET search_self = 1
 					END
 					PATCH_IF $fx_duration(~%search_id%~) != search_previous_duration BEGIN
 						SET search_previous_duration = $fx_duration(~%search_id%~)
-						SET $search_duration_level(~%search_durations%~) = $spell_level(~%search_h%~)
-						SET $search_duration_value(~%search_durations%~) = search_previous_duration
+						SET ~search_duration_level_%search_durations%~ = $spell_level(~%search_h%~)
+						SET ~search_duration_value_%search_durations%~ = search_previous_duration
 						SET search_durations += 1
 					END
 				END
@@ -729,13 +729,13 @@ DEFINE_PATCH_MACRO ad_spell_level_group BEGIN
 		LPF ad_refusal INT_VAR fx_id = level_id STR_VAR reason = ~not_implemented:spell:progression_mode~ message = ~value varying with the level in mode %level_mode%~ RET render_late_missing = refusal END
 	END
 	ELSE BEGIN
-		SET $level_emitted(~%level_a%~) = 1
+		SET ~level_emitted_%level_a%~ = 1
 		FOR (group_n = 0; group_n < search_total; ++group_n) BEGIN
 			SPRINT level_b $search_match(~%group_n%~)
-			SET $level_on(~%level_b%~) = 0
+			SET ~level_on_%level_b%~ = 0
 		END
-		SPRINT $fx_level_value(~%level_id%~) ~%level_value_text%~
-		SPRINT $fx_level_duration(~%level_id%~) ~%level_duration_text%~
+		SPRINT ~fx_level_value_%level_id%~ ~%level_value_text%~
+		SPRINT ~fx_level_duration_%level_id%~ ~%level_duration_text%~
 	END
 END
 
@@ -1048,18 +1048,18 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 						SET level_open = 0
 					END
 				END
-				SET $level_emitted(~%level_a%~) = 1
+				SET ~level_emitted_%level_a%~ = 1
 				PATCH_IF level_h > 0 OR level_to < 99 BEGIN
 					SET level_key = (level_from + 100) * 100 + level_to
 					SET $level_keys(~%level_key%~) = 1
 					SET level_keys_count += 1
 					SET level_id = $level_id(~%level_a%~)
-					SPRINT $fx_line_section(~%level_id%~) ~level%level_key%~
+					SPRINT ~fx_line_section_%level_id%~ ~level%level_key%~
 					SET level_derived = $level_derived(~%level_a%~)
 					PATCH_IF level_opcode == 518 BEGIN
 						PHP_EACH fx_ids_206 AS _ => level_member BEGIN
 							PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
-								SPRINT $fx_line_section(~%level_member%~) ~level%level_key%~
+								SPRINT ~fx_line_section_%level_member%~ ~level%level_key%~
 							END
 						END
 					END
@@ -1075,8 +1075,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 				PATCH_IF $level_opcode(~%level_a%~) == 518 BEGIN
 					PHP_EACH fx_ids_206 AS _ => level_member BEGIN
 						PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
-							SET $fx_consumed(~%level_member%~) = 1
-							SET $fx_level_merged(~%level_member%~) = 1
+							SET ~fx_consumed_%level_member%~ = 1
+							SET ~fx_level_merged_%level_member%~ = 1
 						END
 					END
 				END
@@ -1085,8 +1085,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 				END
 				ELSE BEGIN
 					SET level_id = $level_id(~%level_a%~)
-					SET $fx_consumed(~%level_id%~) = 1
-					SET $fx_level_merged(~%level_id%~) = 1
+					SET ~fx_consumed_%level_id%~ = 1
+					SET ~fx_level_merged_%level_id%~ = 1
 				END
 			END
 		END
@@ -1109,7 +1109,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_disable_marked BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
 			SET level_position = $level_position(~%level_a%~)
 			PATCH_IF $level_mark(~%level_h% %level_position%~) BEGIN
-				SET $level_on(~%level_a%~) = 0
+				SET ~level_on_%level_a%~ = 0
 			END
 		END
 	END

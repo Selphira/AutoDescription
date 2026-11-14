@@ -14,7 +14,7 @@
 DEFINE_PATCH_MACRO ad_button_support BEGIN
 	PHP_EACH ~fx_ids_%button_opcode%~ AS _ => button_id BEGIN
 		SET button = $fx_parameter2(~%button_id%~)
-		SET $fx_buttons(~%button_id%~) = 0
+		SET ~fx_buttons_%button_id%~ = 0
 		PATCH_IF NOT $fx_dropped(~%button_id%~) AND (button < 0 OR button > 15 OR (NOT IS_EE AND (button == 10 OR button == 15))) BEGIN
 			SET drop_id = button_id
 			SPRINT ignored_reason ~file_error:opcode%button_opcode%:invalid~
@@ -47,15 +47,15 @@ DEFINE_PATCH_MACRO ad_group_buttons BEGIN
 							AND $fx_versus_value(~%group_id%~) == $fx_versus_value(~%group_candidate%~)
 							AND $fx_versus_inner_file(~%group_id%~) == $fx_versus_inner_file(~%group_candidate%~)
 							AND $fx_versus_inner_value(~%group_id%~) == $fx_versus_inner_value(~%group_candidate%~) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-						SET $fx_group_anchor(~%group_candidate%~) = group_id
+						SET ~fx_consumed_%group_candidate%~ = 1
+						SET ~fx_group_anchor_%group_candidate%~ = group_id
 						SET group_buttons = group_buttons BOR (1 << $fx_parameter2(~%group_candidate%~))
 						SET group_merged = 1
 					END
 				END
 			END
 			PATCH_IF group_merged BEGIN
-				SET $fx_buttons(~%group_id%~) = group_buttons
+				SET ~fx_buttons_%group_id%~ = group_buttons
 			END
 		END
 	END

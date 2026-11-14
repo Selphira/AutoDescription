@@ -7,8 +7,8 @@
 DEFINE_PATCH_MACRO ad_op_23_support BEGIN
 	PHP_EACH fx_ids_23 AS _ => stat_id BEGIN
 		PATCH_IF (NOT IS_EE OR $fx_special(~%stat_id%~) == 0) BEGIN
-			SET $fx_parameter1(~%stat_id%~) = 10
-			SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_flat
+			SET ~fx_parameter1_%stat_id%~ = 10
+			SET ~fx_parameter2_%stat_id%~ = MOD_TYPE_flat
 		END
 	END
 	SET stat_opcode = 23

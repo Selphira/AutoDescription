@@ -15,7 +15,7 @@ DEFINE_PATCH_MACRO ad_op_337_support BEGIN
 			PATCH_IF remove_opcode >= 0 AND remove_opcode <= 999 AND TRA_ENTRY_EXISTS (~%remove_tra%~) BEGIN
 				SET tra_id = remove_tra SET tra_block_start = 8160000 SET tra_block_size = 1000 SPRINT tra_out ~remove_name~ LPM ad_tra_to // ~les effets de charme~ (@8160005)
 			END
-			SPRINT $fx_remove_name(~%remove_id%~) ~%remove_name%~
+			SPRINT ~fx_remove_name_%remove_id%~ ~%remove_name%~
 			PATCH_IF ~%remove_name%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 				LPF ad_refusal INT_VAR fx_id = remove_id STR_VAR reason = ~not_implemented:opcode337:name~ message = ~effects of opcode %remove_opcode% have no name~ RET render_missing = refusal END
 			END

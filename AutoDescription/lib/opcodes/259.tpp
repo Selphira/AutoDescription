@@ -16,8 +16,8 @@ DEFINE_PATCH_MACRO ad_op_259_support BEGIN
 		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET trap_own_spell = name END
 	END
 	PHP_EACH fx_ids_259 AS _ => trap_id BEGIN
-		SET $fx_trap_anchor(~%trap_id%~) = trap_id
-		SET $fx_trap_level(~%trap_id%~) = $fx_parameter2(~%trap_id%~)
+		SET ~fx_trap_anchor_%trap_id%~ = trap_id
+		SET ~fx_trap_level_%trap_id%~ = $fx_parameter2(~%trap_id%~)
 	END
 	PHP_EACH fx_ids_259 AS _ => trap_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -74,14 +74,14 @@ DEFINE_PATCH_MACRO ad_op_259_group BEGIN
 				SET same_other = trap_other
 				LPM ad_fx_same_fields
 				PATCH_IF fx_same BEGIN
-					SET $fx_trap_anchor(~%trap_other%~) = trap_id
+					SET ~fx_trap_anchor_%trap_other%~ = trap_id
 					SET trap_levels = trap_levels BOR (1 BLSL (trap_other_level - 1))
 					SET trap_max = trap_other_level > trap_max ? trap_other_level : trap_max
 				END
 			END
 		END
 	END
-	SET $fx_trap_level(~%trap_id%~) = trap_max
+	SET ~fx_trap_level_%trap_id%~ = trap_max
 	PATCH_IF trap_levels != (1 BLSL trap_max) - 1 BEGIN
 		LPF ad_refusal INT_VAR fx_id = trap_id STR_VAR reason = ~not_implemented:opcode259:levels~ message = ~spell levels other than 1 to %trap_max% (mask %trap_levels%)~ RET render_missing = refusal END
 	END

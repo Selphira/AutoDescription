@@ -31,7 +31,7 @@ DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 			PATCH_IF ~%polymorph_name%~ STRING_EQUAL ~~ BEGIN
 				SPRINT polymorph_name @21350000 // ~créature sans nom~
 			END
-			SPRINT $fx_creature_name(~%polymorph_id%~) ~%polymorph_name%~
+			SPRINT ~fx_creature_name_%polymorph_id%~ ~%polymorph_name%~
 		END
 	END
 END

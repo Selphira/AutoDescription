@@ -8,7 +8,7 @@ DEFINE_PATCH_MACRO ad_op_189_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET cast_value = $fx_parameter1(~%stat_id%~)
 			SET cast_mode = $fx_parameter2(~%stat_id%~)
-			SET $fx_cast_maximum(~%stat_id%~) = 0
+			SET ~fx_cast_maximum_%stat_id%~ = 0
 			// Sans changement : écarté par l'ancien moteur.
 			PATCH_IF (cast_value BAND 255) == 0 AND cast_mode == 0 BEGIN
 				SET drop_id = stat_id
@@ -28,10 +28,10 @@ DEFINE_PATCH_MACRO ad_op_189_support BEGIN
 				END
 				PATCH_IF cast_mode == 2 BEGIN
 					SET cast_mode = MOD_TYPE_flat
-					SET $fx_cast_maximum(~%stat_id%~) = 1
+					SET ~fx_cast_maximum_%stat_id%~ = 1
 				END
-				SET $fx_parameter1(~%stat_id%~) = cast_value
-				SET $fx_parameter2(~%stat_id%~) = cast_mode
+				SET ~fx_parameter1_%stat_id%~ = cast_value
+				SET ~fx_parameter2_%stat_id%~ = cast_mode
 			END
 		END
 	END

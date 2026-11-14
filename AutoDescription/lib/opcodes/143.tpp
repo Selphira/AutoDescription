@@ -33,12 +33,12 @@ DEFINE_PATCH_MACRO ad_op_143_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SPRINT $fx_item_name(~%slot_id%~) ~%slot_item_name%~
+				SPRINT ~fx_item_name_%slot_id%~ ~%slot_item_name%~
 				SET slot_timing = $fx_timing(~%slot_id%~)
 				PATCH_IF slot_timing == TIMING_duration OR slot_timing == TIMING_while_equipped OR slot_timing == TIMING_delayed_duration
 						OR slot_timing == 5 OR slot_timing == 6 OR slot_timing == 8 OR slot_timing == TIMING_duration_ticks
 						OR slot_timing == TIMING_absolute_duration BEGIN
-					SET $fx_timing(~%slot_id%~) = TIMING_permanent
+					SET ~fx_timing_%slot_id%~ = TIMING_permanent
 					SET ignored_fx = slot_id
 					SPRINT ignored_reason ~file_error:opcode143:timing~
 					SPRINT ignored_message ~timing %slot_timing% with a limited duration: the game never removes the item, described as permanent~

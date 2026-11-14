@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_130_lines BEGIN
 			SPRINT bless_not_cumulative @4000010 // ~non cumulatif~
 			SPRINT line_suffix ~(%bless_not_cumulative%)~
 			SET line_fx = bless_id
-			SET $fx_not_cumulative(~%bless_id%~) = 0
+			SET ~fx_not_cumulative_%bless_id%~ = 0
 			SET line_phrase = 21300100 // ~Bénédiction (%value%)~
 			LPM ad_effect_line
 		END

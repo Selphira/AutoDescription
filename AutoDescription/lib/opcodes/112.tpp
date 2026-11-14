@@ -11,7 +11,7 @@ DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT remove_resref $fx_resource(~%remove_id%~)
 			LPF ad_item_info STR_VAR resref = ~%remove_resref%~ RET remove_name = name remove_name_ref = name_ref END
-			SET $fx_item_return(~%remove_id%~) = 0
+			SET ~fx_item_return_%remove_id%~ = 0
 			PATCH_IF ~%remove_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = remove_id
 				SPRINT ignored_reason ~file_error:opcode112:invalid~
@@ -38,7 +38,7 @@ DEFINE_PATCH_MACRO ad_op_112_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SPRINT $fx_item_name(~%remove_id%~) ~%remove_name%~
+				SPRINT ~fx_item_name_%remove_id%~ ~%remove_name%~
 			END
 		END
 	END

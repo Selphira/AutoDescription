@@ -52,7 +52,7 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 					LPF ad_refusal INT_VAR fx_id = select_id STR_VAR reason = ~not_implemented:opcode214:no_spells~ message = ~no named spell in table %select_table%.2da~ RET render_missing = refusal END
 				END
 			END
-			SPRINT $fx_select_spells(~%select_id%~) ~%select_spells%~
+			SPRINT ~fx_select_spells_%select_id%~ ~%select_spells%~
 		END
 	END
 END

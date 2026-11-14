@@ -4,7 +4,7 @@
 
 DEFINE_PATCH_MACRO ad_op_167_support BEGIN
 	PHP_EACH fx_ids_167 AS _ => stat_id BEGIN
-		SET $fx_parameter2(~%stat_id%~) = $fx_parameter2(~%stat_id%~) BAND 65535
+		SET ~fx_parameter2_%stat_id%~ = $fx_parameter2(~%stat_id%~) BAND 65535
 	END
 	SET stat_opcode = 167
 	SPRINT stat_mode_3 ~invalid~

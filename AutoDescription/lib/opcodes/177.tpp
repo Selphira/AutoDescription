@@ -24,8 +24,8 @@
 // ceux du dernier EFF lu) ; probabilités incertaines des deux côtés (l'ancien moteur multiplie l'une
 // et garde les bornes de l'autre).
 DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
-	SPRINT $fx_substitution_error(~%fx_id%~) ~~
-	SPRINT $fx_substitution_message(~%fx_id%~) ~~
+	SPRINT ~fx_substitution_error_%fx_id%~ ~~
+	SPRINT ~fx_substitution_message_%fx_id%~ ~~
 	SPRINT substitute_resref $fx_resource(~%fx_id%~)
 	SET substitute_ok = 0
 	SET substitute_file = $fx_parameter2(~%fx_id%~)
@@ -34,19 +34,19 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 	SET substitute_inner_versus = 0
 	PATCH_IF substitute_file < 2 OR substitute_file > (IS_EE ? 9 : 8) OR (substitute_file == 2 AND $fx_parameter1(~%fx_id%~) == 100)
 			OR ~%substitute_resref%~ STRING_EQUAL ~~ OR NOT FILE_EXISTS_IN_GAME ~%substitute_resref%.eff~ BEGIN
-		SPRINT $fx_substitution_error(~%fx_id%~) ~drop~
+		SPRINT ~fx_substitution_error_%fx_id%~ ~drop~
 		LPF ad_fx_substitute_drop_message INT_VAR ids_file = substitute_file ids_value = substitute_versus STR_VAR resref = ~%substitute_resref%~
 			RET substitute_drop_message = message substitute_drop_kind = kind END
-		SPRINT $fx_substitution_message(~%fx_id%~) ~%substitute_drop_message%~
-		SPRINT $fx_substitution_drop_kind(~%fx_id%~) ~%substitute_drop_kind%~
+		SPRINT ~fx_substitution_message_%fx_id%~ ~%substitute_drop_message%~
+		SPRINT ~fx_substitution_drop_kind_%fx_id%~ ~%substitute_drop_kind%~
 	END
 	ELSE BEGIN
 		INNER_PATCH_FILE ~%substitute_resref%.eff~ BEGIN
 			LPM ad_fx_read_substitute
 		END
 		PATCH_IF NOT substitute_ok BEGIN
-			SPRINT $fx_substitution_error(~%fx_id%~) ~format~
-			SPRINT $fx_substitution_message(~%fx_id%~) ~%substitute_resref%.EFF is not an EFF V2.0 file~
+			SPRINT ~fx_substitution_error_%fx_id%~ ~format~
+			SPRINT ~fx_substitution_message_%fx_id%~ ~%substitute_resref%.EFF is not an EFF V2.0 file~
 		END
 		ELSE BEGIN
 			LPM ad_fx_substitute_nested
@@ -66,16 +66,16 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 		SPRINT eff_fields_resource3 ~%substitute_resource3%~
 		LPM ad_eff_fields_differ
 		PATCH_IF eff_fields_differ AND NOT support_header_only BEGIN
-			SPRINT $fx_substitution_error(~%fx_id%~) ~eff_fields~
-			SPRINT $fx_substitution_message(~%fx_id%~) ~opcode %substitute_opcode% of %substitute_resref%.EFF, which the old engine describes differently~
+			SPRINT ~fx_substitution_error_%fx_id%~ ~eff_fields~
+			SPRINT ~fx_substitution_message_%fx_id%~ ~opcode %substitute_opcode% of %substitute_resref%.EFF, which the old engine describes differently~
 		END
 		ELSE PATCH_IF substitute_level_min != 0 OR substitute_level_max != 0 BEGIN
-			SPRINT $fx_substitution_error(~%fx_id%~) ~eff_level~
-			SPRINT $fx_substitution_message(~%fx_id%~) ~level restriction in %substitute_resref%.EFF~
+			SPRINT ~fx_substitution_error_%fx_id%~ ~eff_level~
+			SPRINT ~fx_substitution_message_%fx_id%~ ~level restriction in %substitute_resref%.EFF~
 		END
 		ELSE PATCH_IF substitute_chance < 100 AND parent_chance < 100 BEGIN
-			SPRINT $fx_substitution_error(~%fx_id%~) ~probability~
-			SPRINT $fx_substitution_message(~%fx_id%~) ~probabilities both in the effect and in %substitute_resref%.EFF~
+			SPRINT ~fx_substitution_error_%fx_id%~ ~probability~
+			SPRINT ~fx_substitution_message_%fx_id%~ ~probabilities both in the effect and in %substitute_resref%.EFF~
 		END
 		ELSE BEGIN
 			SPRINT substitute_dice ~LEVEL~
@@ -84,8 +84,8 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 			END
 			PATCH_IF (~%substitute_dice%~ STRING_EQUAL ~DICE~)
 					OR ((~%substitute_dice%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND substitute_parameter2 != 0) BEGIN
-				SET $fx_dice_count(~%fx_id%~) = substitute_dice_count
-				SET $fx_dice_sides(~%fx_id%~) = substitute_dice_sides
+				SET ~fx_dice_count_%fx_id%~ = substitute_dice_count
+				SET ~fx_dice_sides_%fx_id%~ = substitute_dice_sides
 			END
 			PATCH_IF substitute_save_type == 0 AND $fx_save_type(~%fx_id%~) != 0 BEGIN
 				SET substitute_save_type = $fx_save_type(~%fx_id%~)
@@ -95,38 +95,38 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 				SET substitute_save_type = substitute_save_type BOR $fx_save_type(~%fx_id%~)
 			END
 			PATCH_IF substitute_chance < 100 BEGIN
-				SET $fx_probability1(~%fx_id%~) = substitute_probability1
-				SET $fx_probability2(~%fx_id%~) = substitute_probability2
+				SET ~fx_probability1_%fx_id%~ = substitute_probability1
+				SET ~fx_probability2_%fx_id%~ = substitute_probability2
 			END
-			SET $fx_opcode(~%fx_id%~)         = substitute_opcode
-			SET $fx_power(~%fx_id%~)          = substitute_power
-			SET $fx_parameter1(~%fx_id%~)     = substitute_parameter1
-			SET $fx_parameter2(~%fx_id%~)     = substitute_parameter2
-			SET $fx_parameter2_raw(~%fx_id%~) = substitute_parameter2
-			SPRINT $fx_resource(~%fx_id%~)    ~%substitute_resource%~
-			SET $fx_save_type(~%fx_id%~)      = substitute_save_type
-			SET $fx_save_bonus(~%fx_id%~)     = substitute_save_bonus
-			SET $fx_special(~%fx_id%~)        = substitute_special
+			SET ~fx_opcode_%fx_id%~         = substitute_opcode
+			SET ~fx_power_%fx_id%~          = substitute_power
+			SET ~fx_parameter1_%fx_id%~     = substitute_parameter1
+			SET ~fx_parameter2_%fx_id%~     = substitute_parameter2
+			SET ~fx_parameter2_raw_%fx_id%~ = substitute_parameter2
+			SPRINT ~fx_resource_%fx_id%~    ~%substitute_resource%~
+			SET ~fx_save_type_%fx_id%~      = substitute_save_type
+			SET ~fx_save_bonus_%fx_id%~     = substitute_save_bonus
+			SET ~fx_special_%fx_id%~        = substitute_special
 			// L'ancien moteur ne remplace pas un 283 : l'en-tête d'un sort lit la résistance de l'effet.
 			PATCH_IF NOT $fx_cursed(~%fx_id%~) BEGIN
-				SET $fx_resistance(~%fx_id%~) = substitute_resistance
+				SET ~fx_resistance_%fx_id%~ = substitute_resistance
 			END
-			SET $fx_external(~%fx_id%~)       = 1
-			SET $fx_parameter3(~%fx_id%~)     = substitute_parameter3
-			SET $fx_parameter4(~%fx_id%~)     = substitute_parameter4
-			SPRINT $fx_resource2(~%fx_id%~)   ~%substitute_resource2%~
-			SPRINT $fx_resource3(~%fx_id%~)   ~%substitute_resource3%~
+			SET ~fx_external_%fx_id%~       = 1
+			SET ~fx_parameter3_%fx_id%~     = substitute_parameter3
+			SET ~fx_parameter4_%fx_id%~     = substitute_parameter4
+			SPRINT ~fx_resource2_%fx_id%~   ~%substitute_resource2%~
+			SPRINT ~fx_resource3_%fx_id%~   ~%substitute_resource3%~
 			PATCH_IF substitute_versus != 0 BEGIN
-				SET $fx_versus_file(~%fx_id%~)  = substitute_file
-				SET $fx_versus_value(~%fx_id%~) = substitute_versus
-				SET $fx_versus_inner_file(~%fx_id%~)  = substitute_inner_file
-				SET $fx_versus_inner_value(~%fx_id%~) = substitute_inner_versus
+				SET ~fx_versus_file_%fx_id%~  = substitute_file
+				SET ~fx_versus_value_%fx_id%~ = substitute_versus
+				SET ~fx_versus_inner_file_%fx_id%~  = substitute_inner_file
+				SET ~fx_versus_inner_value_%fx_id%~ = substitute_inner_versus
 			END
 			ELSE PATCH_IF substitute_inner_file > 0 BEGIN
-				SET $fx_versus_file(~%fx_id%~)  = substitute_inner_file
-				SET $fx_versus_value(~%fx_id%~) = substitute_inner_versus
+				SET ~fx_versus_file_%fx_id%~  = substitute_inner_file
+				SET ~fx_versus_value_%fx_id%~ = substitute_inner_versus
 			END
-			SPRINT $fx_parent_resource(~%fx_id%~) ~%substitute_resref%~
+			SPRINT ~fx_parent_resource_%fx_id%~ ~%substitute_resref%~
 		END
 	END
 END
@@ -246,9 +246,9 @@ DEFINE_PATCH_MACRO ad_fx_substitute_nested BEGIN
 		END
 	END
 	PATCH_IF NOT (~%substitute_nested_error%~ STRING_EQUAL ~~) BEGIN
-		SPRINT $fx_substitution_error(~%fx_id%~) ~%substitute_nested_error%~
-		SPRINT $fx_substitution_message(~%fx_id%~) ~%substitute_nested_message%~
-		SPRINT $fx_substitution_drop_kind(~%fx_id%~) ~%substitute_nested_kind%~
+		SPRINT ~fx_substitution_error_%fx_id%~ ~%substitute_nested_error%~
+		SPRINT ~fx_substitution_message_%fx_id%~ ~%substitute_nested_message%~
+		SPRINT ~fx_substitution_drop_kind_%fx_id%~ ~%substitute_nested_kind%~
 		SET substitute_ok = 0
 	END
 END

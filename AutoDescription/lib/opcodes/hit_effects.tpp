@@ -20,7 +20,7 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 	PHP_EACH ~fx_ids_%hit_opcode%~ AS _ => hit_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%hit_id%~) BEGIN
 			SPRINT hit_resref $fx_resource_lower(~%hit_id%~)
-			SET $fx_hit_any(~%hit_id%~) = 0
+			SET ~fx_hit_any_%hit_id%~ = 0
 			PATCH_IF $fx_external(~%hit_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode%hit_opcode%:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
@@ -92,8 +92,8 @@ DEFINE_PATCH_MACRO ad_hit_effect_group BEGIN
 		LPF ad_refusal INT_VAR fx_id = hit_id STR_VAR reason = ~not_implemented:opcode248:group_fist~ message = ~on-hit effect of fists grouped with another one~ RET render_missing = refusal END
 	END
 	ELSE PATCH_IF hit_matches == 1 BEGIN
-		SET $fx_consumed(~%hit_match%~) = 1
-		SET $fx_hit_any(~%hit_id%~) = 1
+		SET ~fx_consumed_%hit_match%~ = 1
+		SET ~fx_hit_any_%hit_id%~ = 1
 	END
 END
 

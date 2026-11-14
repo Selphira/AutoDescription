@@ -9,12 +9,12 @@
 // Refus : refus de la sous-description (ad_recursion_support).
 DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 	PHP_EACH fx_ids_252 AS _ => heading_id BEGIN
-		SET $fx_sub_count(~%heading_id%~) = 0
-		SPRINT $fx_trap_spell(~%heading_id%~) ~~
+		SET ~fx_sub_count_%heading_id%~ = 0
+		SPRINT ~fx_trap_spell_%heading_id%~ ~~
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%heading_id%~) BEGIN
 			SPRINT heading_resref $fx_resource_lower(~%heading_id%~)
 			LPF ad_spell_name STR_VAR resref = ~%heading_resref%~ RET heading_spell = name END
-			SPRINT $fx_trap_spell(~%heading_id%~) ~%heading_spell%~
+			SPRINT ~fx_trap_spell_%heading_id%~ ~%heading_spell%~
 			PATCH_IF ~%heading_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = heading_id
 				SPRINT ignored_reason ~file_error:opcode252:invalid~

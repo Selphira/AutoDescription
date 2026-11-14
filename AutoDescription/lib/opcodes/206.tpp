@@ -190,7 +190,7 @@ END
 DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 	SET immunity_serial = 0
 	PHP_EACH fx_ids_206 AS _ => immunity_id BEGIN
-		SET $fx_immunity_derived(~%immunity_id%~) = 0 - 1
+		SET ~fx_immunity_derived_%immunity_id%~ = 0 - 1
 	END
 	FOR (immunity_h = 0; immunity_h < fx_header_count; ++immunity_h) BEGIN
 		SET $immunity_header_loaded(~%immunity_h%~) = 0
@@ -282,8 +282,8 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 					FOR (immunity_m = 0; immunity_m < immunity_member_count; ++immunity_m) BEGIN
 						SET immunity_member = $immunity_members(~%immunity_m%~)
 						SET immunity_member_id = $immunity_order(~%immunity_member%~)
-						SET $fx_header_hidden(~%immunity_member_id%~) = 1
-						SET $fx_immunity_derived(~%immunity_member_id%~) = derived_count
+						SET ~fx_header_hidden_%immunity_member_id%~ = 1
+						SET ~fx_immunity_derived_%immunity_member_id%~ = derived_count
 						SPRINT immunity_name $immunity_names(~%immunity_member%~)
 						SPRINT $immunity_signature_names(~%immunity_name%~) ~%immunity_name%~
 					END

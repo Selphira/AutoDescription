@@ -7,7 +7,7 @@
 // Type autre que 0 ou 1 et niveau négatif : écartés et journalisés (ancien opcode_261_is_valid).
 DEFINE_PATCH_MACRO ad_op_261_support BEGIN
 	PHP_EACH fx_ids_261 AS _ => restore_id BEGIN
-		SET $fx_restore_both(~%restore_id%~) = 0
+		SET ~fx_restore_both_%restore_id%~ = 0
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET restore_type = $fx_parameter2(~%restore_id%~)
 			PATCH_IF (restore_type != 0 AND restore_type != 1) OR $fx_parameter1(~%restore_id%~) < 0 BEGIN

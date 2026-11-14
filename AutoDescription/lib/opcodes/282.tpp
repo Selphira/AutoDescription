@@ -48,9 +48,9 @@ DEFINE_PATCH_MACRO ad_op_282_convert BEGIN
 	PATCH_IF script_opcode > 0 AND VARIABLE_IS_SET $AD_OPCODE_STATUS(~%script_opcode%~) BEGIN
 		SPRINT script_status $AD_OPCODE_STATUS(~%script_opcode%~)
 		PATCH_IF ~%script_status%~ STRING_EQUAL ~DESCRIBED~ OR ~%script_status%~ STRING_EQUAL ~IGNORED~ BEGIN
-			SET $fx_opcode(~%fx_id%~) = script_opcode
-			SET $fx_parameter2(~%fx_id%~) = script_parameter2
-			SET $fx_parameter2_raw(~%fx_id%~) = script_parameter2
+			SET ~fx_opcode_%fx_id%~ = script_opcode
+			SET ~fx_parameter2_%fx_id%~ = script_parameter2
+			SET ~fx_parameter2_raw_%fx_id%~ = script_parameter2
 			SET fx_282_converted = 1
 		END
 	END

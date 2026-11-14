@@ -30,8 +30,8 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 					LPM ad_application_drop
 				END
 				ELSE BEGIN
-					SPRINT $fx_spell_name(~%ability_id%~) ~%ability_name%~
-					SET $fx_spell_book(~%ability_id%~) = ability_type == 1 OR ability_type == 2
+					SPRINT ~fx_spell_name_%ability_id%~ ~%ability_name%~
+					SET ~fx_spell_book_%ability_id%~ = ability_type == 1 OR ability_type == 2
 				END
 			END
 		END

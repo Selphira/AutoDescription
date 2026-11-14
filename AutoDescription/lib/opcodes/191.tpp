@@ -19,15 +19,15 @@ DEFINE_PATCH_MACRO ad_op_191_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				SET $fx_stat_subject(~%stat_id%~) = 8020000
+				SET ~fx_stat_subject_%stat_id%~ = 8020000
 				PATCH_IF caster_type == 1 BEGIN
 					LPM ad_spell_slots_priest_type
 					PATCH_IF slots_priest_type < 0 BEGIN
 						LPF ad_refusal INT_VAR fx_id = stat_id STR_VAR reason = ~not_implemented:opcode191:no_priest~ message = ~no priest class in this game~ RET render_missing = refusal END
 					END
-					SET $fx_stat_subject(~%stat_id%~) = 8020000 + slots_priest_type
+					SET ~fx_stat_subject_%stat_id%~ = 8020000 + slots_priest_type
 				END
-				SET $fx_parameter2(~%stat_id%~) = MOD_TYPE_cumulative
+				SET ~fx_parameter2_%stat_id%~ = MOD_TYPE_cumulative
 			END
 		END
 	END

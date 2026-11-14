@@ -57,8 +57,8 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 				PATCH_IF ac_type == AC_MOD_TYPE_all BEGIN
 					PATCH_IF $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) AND NOT support_header_only BEGIN
 						SET ac_first = $ac_seen_all(~%ac_scope% %ac_value% %fx_line_key%~) - 1
-						SET $fx_parameter1(~%ac_first%~) += ac_value
-						SET $fx_consumed(~%ac_id%~) = 1
+						SET ~fx_parameter1_%ac_first%~ += ac_value
+						SET ~fx_consumed_%ac_id%~ = 1
 						SET ac_modifier_count -= ac_equipped
 					END
 					ELSE BEGIN
@@ -69,8 +69,8 @@ DEFINE_PATCH_MACRO ad_op_0_support BEGIN
 					SET ac_mask = $ac_seen_types(~%ac_scope% %ac_value% %fx_line_key%~)
 					PATCH_IF (ac_mask BAND ac_type) != 0 AND NOT support_header_only BEGIN
 						SET ac_first = $ac_seen_type_id(~%ac_scope% %ac_value% %fx_line_key% %ac_type%~)
-						SET $fx_parameter1(~%ac_first%~) += ac_value
-						SET $fx_consumed(~%ac_id%~) = 1
+						SET ~fx_parameter1_%ac_first%~ += ac_value
+						SET ~fx_consumed_%ac_id%~ = 1
 						SET ac_modifier_count -= ac_equipped
 					END
 					ELSE BEGIN

@@ -5,14 +5,14 @@
 DEFINE_PATCH_MACRO ad_op_108_support BEGIN
 	PHP_EACH fx_ids_108 AS _ => stat_id BEGIN
 		SET reputation_mode = $fx_parameter2_raw(~%stat_id%~)
-		SET $fx_reputation_party(~%stat_id%~) = IS_EE AND reputation_mode >= 3 AND reputation_mode <= 5
+		SET ~fx_reputation_party_%stat_id%~ = IS_EE AND reputation_mode >= 3 AND reputation_mode <= 5
 		PATCH_IF $fx_reputation_party(~%stat_id%~) BEGIN
 			SET reputation_mode -= 3
-			SET $fx_parameter2(~%stat_id%~) = reputation_mode
-			SPRINT $fx_stat_subject(~%stat_id%~) ~party~
+			SET ~fx_parameter2_%stat_id%~ = reputation_mode
+			SPRINT ~fx_stat_subject_%stat_id%~ ~party~
 		END
 		PATCH_IF reputation_mode == MOD_TYPE_flat AND $fx_parameter1(~%stat_id%~) < 10 BEGIN
-			SET $fx_parameter1(~%stat_id%~) = 10
+			SET ~fx_parameter1_%stat_id%~ = 10
 		END
 	END
 	SET stat_opcode = 108

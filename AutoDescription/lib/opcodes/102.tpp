@@ -14,7 +14,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 	PHP_EACH fx_ids_102 AS _ => levels_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%levels_id%~) BEGIN
 			SET levels_level = $fx_parameter1(~%levels_id%~)
-			SET $fx_spell_levels(~%levels_id%~) = 0
+			SET ~fx_spell_levels_%levels_id%~ = 0
 			PATCH_IF $fx_external(~%levels_id%~) BEGIN
 				LPF ad_refusal INT_VAR fx_id = levels_id STR_VAR reason = ~not_implemented:opcode102:external~ message = ~effect from an EFF file~ RET render_missing = refusal END
 			END
@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_op_102_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE PATCH_IF NOT AD_ENABLE_SHRINKAGE BEGIN
-				SET $fx_spell_levels(~%levels_id%~) = levels_level == 0 ? AD_SPELL_LEVEL_ZERO : 1 << (levels_level - 1)
+				SET ~fx_spell_levels_%levels_id%~ = levels_level == 0 ? AD_SPELL_LEVEL_ZERO : 1 << (levels_level - 1)
 			END
 			ELSE BEGIN
 				SET same_id = levels_id

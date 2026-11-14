@@ -8,7 +8,7 @@
 // types 11 et 12 : $fx_damage_mod_type).
 DEFINE_PATCH_MACRO ad_op_332_support BEGIN
 	PHP_EACH fx_ids_332 AS _ => damage_mod_id BEGIN
-		SET $fx_damage_mod_type(~%damage_mod_id%~) = $fx_parameter2(~%damage_mod_id%~)
+		SET ~fx_damage_mod_type_%damage_mod_id%~ = $fx_parameter2(~%damage_mod_id%~)
 	END
 	PHP_EACH fx_ids_332 AS _ => damage_mod_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%damage_mod_id%~) BEGIN
@@ -46,11 +46,11 @@ DEFINE_PATCH_MACRO ad_op_332_group_support BEGIN
 	PATCH_IF damage_mod_found == 7 BEGIN
 		FOR (damage_mod_offset = 1; damage_mod_offset <= 3; ++damage_mod_offset) BEGIN
 			SET damage_mod_other = $damage_mod_members(~%damage_mod_offset%~)
-			SET $fx_consumed(~%damage_mod_other%~) = 1
+			SET ~fx_consumed_%damage_mod_other%~ = 1
 		END
-		SET $fx_damage_mod_type(~%damage_mod_id%~) = damage_mod_type == 1 ? 11 : 12
+		SET ~fx_damage_mod_type_%damage_mod_id%~ = damage_mod_type == 1 ? 11 : 12
 		// Ajouté en fin de liste par l'ancien add_opcode.
-		SET $fx_late(~%damage_mod_id%~) = 1
+		SET ~fx_late_%damage_mod_id%~ = 1
 	END
 END
 

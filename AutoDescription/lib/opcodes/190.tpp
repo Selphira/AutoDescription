@@ -19,7 +19,7 @@ END
 // Forme « soi » : « Bonus de 1 » ou « Malus de 1 » (ancien opcode_self_190) ; aux autres formes, un
 // bonus réduit le facteur de vitesse (« Réduit de 1 le facteur de vitesse de la cible »).
 DEFINE_PATCH_MACRO ad_op_190_line BEGIN
-	SET $fx_not_cumulative(~%line_fx%~) = 1
+	SET ~fx_not_cumulative_%line_fx%~ = 1
 	PATCH_IF line_form == 0 BEGIN
 		SET value = ABS stat_value
 		SPRINT stat_level_value $fx_level_value(~%line_fx%~)

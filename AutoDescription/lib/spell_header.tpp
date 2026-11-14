@@ -48,17 +48,17 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 		LPM ad_spell_header_keeps
 		// Une exception de cible est écartée après la lecture de ses noms, que les lignes écrivent
 		// (ad_target_exception_support) : seul l'en-tête l'ignore.
-		SET $fx_header_hidden(~%header_id%~) = NOT keep_effect
+		SET ~fx_header_hidden_%header_id%~ = NOT keep_effect
 		PATCH_IF NOT keep_effect AND (support_header_only OR NOT $fx_exception(~%header_id%~)) BEGIN
-			SET $fx_consumed(~%header_id%~) = 1
-			SET $fx_dropped(~%header_id%~) = 1
+			SET ~fx_consumed_%header_id%~ = 1
+			SET ~fx_dropped_%header_id%~ = 1
 		END
 	END
 	LPM ad_render_support
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND spell_self_target BEGIN
 		FOR (header_id = 0; header_id < fx_count; ++header_id) BEGIN
 			PATCH_IF $fx_effective_target(~%header_id%~) == TARGET_FX_preset BEGIN
-				SET $fx_effective_target(~%header_id%~) = TARGET_FX_self
+				SET ~fx_effective_target_%header_id%~ = TARGET_FX_self
 			END
 		END
 	END
@@ -143,15 +143,15 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 		FOR (header_k = 0; header_k < header_opcodes; ++header_k) BEGIN
 			SET header_opcode = $header_opcode_order(~%header_k%~)
 			FOR (header_n = 0; header_n < $header_opcode_size(~%header_k%~); ++header_n) BEGIN
-				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = $EVAL ~header_opcode_%header_k%~(~%header_n%~)
-				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = header_opcode
-				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = 0 - 1
+				SET ~spell_fx_%header_h%_%header_kept%~ = $EVAL ~header_opcode_%header_k%~(~%header_n%~)
+				SET ~spell_fx_opcode_%header_h%_%header_kept%~ = header_opcode
+				SET ~spell_fx_derived_%header_h%_%header_kept%~ = 0 - 1
 				SET header_kept += 1
 			END
 			FOR (header_n = 0; header_n < $header_opcode_late(~%header_k%~); ++header_n) BEGIN
-				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = $EVAL ~header_late_%header_k%~(~%header_n%~)
-				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = header_opcode
-				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = 0 - 1
+				SET ~spell_fx_%header_h%_%header_kept%~ = $EVAL ~header_late_%header_k%~(~%header_n%~)
+				SET ~spell_fx_opcode_%header_h%_%header_kept%~ = header_opcode
+				SET ~spell_fx_derived_%header_h%_%header_kept%~ = 0 - 1
 				SET header_kept += 1
 			END
 		END
@@ -159,13 +159,13 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 			SET header_id = $derived_id(~%header_k%~)
 			PATCH_IF $fx_header(~%header_id%~) == header_h BEGIN
 				SPRINT header_derived_kind $derived_kind(~%header_k%~)
-				SET $EVAL ~spell_fx_%header_h%~(~%header_kept%~) = header_id
-				SET $EVAL ~spell_fx_opcode_%header_h%~(~%header_kept%~) = $AD_DERIVED_OLD_OPCODE(~%header_derived_kind%~)
-				SET $EVAL ~spell_fx_derived_%header_h%~(~%header_kept%~) = header_k
+				SET ~spell_fx_%header_h%_%header_kept%~ = header_id
+				SET ~spell_fx_opcode_%header_h%_%header_kept%~ = $AD_DERIVED_OLD_OPCODE(~%header_derived_kind%~)
+				SET ~spell_fx_derived_%header_h%_%header_kept%~ = header_k
 				SET header_kept += 1
 			END
 		END
-		SET $spell_fx_count(~%header_h%~) = header_kept
+		SET ~spell_fx_count_%header_h%~ = header_kept
 	END
 END
 

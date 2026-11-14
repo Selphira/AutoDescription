@@ -7,7 +7,7 @@
 DEFINE_PATCH_MACRO ad_op_262_support BEGIN
 	PHP_EACH fx_ids_262 AS _ => stat_id BEGIN
 		PATCH_IF $fx_parameter2(~%stat_id%~) == MOD_TYPE_flat AND $fx_parameter1(~%stat_id%~) < 0 BEGIN
-			SET $fx_parameter1(~%stat_id%~) = 0
+			SET ~fx_parameter1_%stat_id%~ = 0
 		END
 	END
 	SET stat_opcode = 262

@@ -8,7 +8,7 @@
 DEFINE_PATCH_MACRO ad_op_202_support BEGIN
 	PHP_EACH fx_ids_202 AS _ => bounce_id BEGIN
 		SET bounce_school = $fx_parameter2(~%bounce_id%~)
-		SPRINT $fx_school_name(~%bounce_id%~) ~~
+		SPRINT ~fx_school_name_%bounce_id%~ ~~
 		PATCH_IF NOT $fx_dropped(~%bounce_id%~) AND (bounce_school < 0 OR bounce_school > 10) BEGIN
 			SET drop_id = bounce_id
 			SPRINT ignored_reason ~file_error:opcode202:invalid~
@@ -23,7 +23,7 @@ DEFINE_PATCH_MACRO ad_op_202_support BEGIN
 		END
 		ELSE PATCH_IF bounce_school > 0 AND bounce_school <= 10 BEGIN
 			SET tra_id = 8150000 + bounce_school SET tra_block_start = 8150000 SET tra_block_size = 11 SPRINT tra_out ~bounce_name~ LPM ad_tra_to // ~de l'Illusion~ (@8150005)
-			SPRINT $fx_school_name(~%bounce_id%~) ~%bounce_name%~
+			SPRINT ~fx_school_name_%bounce_id%~ ~%bounce_name%~
 		END
 	END
 END
@@ -31,7 +31,7 @@ END
 DEFINE_PATCH_MACRO ad_op_202_lines BEGIN
 	PHP_EACH fx_ids_202 AS _ => bounce_id BEGIN
 		PATCH_IF $fx_parameter2(~%bounce_id%~) == 0 BEGIN
-			SET $fx_consumed(~%bounce_id%~) = 1
+			SET ~fx_consumed_%bounce_id%~ = 1
 		END
 	END
 	SET state_opcode = 202

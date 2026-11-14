@@ -35,9 +35,9 @@ DEFINE_PATCH_MACRO ad_op_333_support BEGIN
 					LPF ad_refusal INT_VAR fx_id = charge_id STR_VAR reason = ~not_implemented:opcode333:timing~ message = ~timing %charge_timing%, duration %charge_duration% (only permanent or delayed by 0 seconds)~ RET render_missing = refusal END
 				END
 				ELSE BEGIN
-					SET $fx_timing(~%charge_id%~) = TIMING_duration
-					SET $fx_duration(~%charge_id%~) = charge_count * charge_delay
-					SET $fx_charge_rewritten(~%charge_id%~) = 1
+					SET ~fx_timing_%charge_id%~ = TIMING_duration
+					SET ~fx_duration_%charge_id%~ = charge_count * charge_delay
+					SET ~fx_charge_rewritten_%charge_id%~ = 1
 				END
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND $fx_save_type(~%charge_id%~) != 0 BEGIN
@@ -45,9 +45,9 @@ DEFINE_PATCH_MACRO ad_op_333_support BEGIN
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
 				LPF ad_spell_name STR_VAR resref = ~%charge_resref%~ RET charge_name = name END
-				SPRINT $fx_charge_name(~%charge_id%~) ~%charge_name%~
+				SPRINT ~fx_charge_name_%charge_id%~ ~%charge_name%~
 				LPF ad_duration_text INT_VAR seconds = charge_delay tra_base = 3020000 RET charge_frequency = text END // ~chaque round~
-				SPRINT $fx_charge_frequency(~%charge_id%~) ~%charge_frequency%~
+				SPRINT ~fx_charge_frequency_%charge_id%~ ~%charge_frequency%~
 				PATCH_IF ~%charge_name%~ STRING_EQUAL ~~ BEGIN
 					LPM ad_op_333_nested
 					PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN

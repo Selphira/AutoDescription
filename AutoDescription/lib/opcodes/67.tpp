@@ -13,7 +13,7 @@
 DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 	PHP_EACH fx_ids_67 AS _ => summon_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
-			SET $fx_summon_missing(~%summon_id%~) = 0
+			SET ~fx_summon_missing_%summon_id%~ = 0
 			SPRINT summon_resref $fx_resource(~%summon_id%~)
 			LPF ad_creature_info STR_VAR resref = ~%summon_resref%~ RET summon_name = name summon_allegiance = allegiance
 				summon_level = level END
@@ -21,7 +21,7 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%summon_resref%.cre~ BEGIN
 				SET summon_unnamed = 1
 			END
-			SET $fx_creature_unnamed(~%summon_id%~) = summon_unnamed
+			SET ~fx_creature_unnamed_%summon_id%~ = summon_unnamed
 			PATCH_IF summon_unnamed AND NOT support_header_only BEGIN
 				SET ignored_fx = summon_id
 				SPRINT ignored_reason ~file_error:opcode67:no_name~
@@ -31,7 +31,7 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 			END
 			PATCH_IF ~%summon_name%~ STRING_EQUAL ~~ AND NOT summon_unnamed BEGIN
 				PATCH_IF NOT support_header_only BEGIN
-					SET $fx_summon_missing(~%summon_id%~) = 1
+					SET ~fx_summon_missing_%summon_id%~ = 1
 					SET ignored_fx = summon_id
 					SPRINT ignored_reason ~file_error:opcode67:missing_creature~
 					SPRINT ignored_message ~creature %summon_resref%.CRE does not exist~
@@ -39,13 +39,13 @@ DEFINE_PATCH_MACRO ad_op_67_support BEGIN
 				END
 			END
 			ELSE BEGIN
-				SPRINT $fx_creature_name(~%summon_id%~) ~%summon_name%~
-				SET $fx_creature_level(~%summon_id%~) = summon_level
+				SPRINT ~fx_creature_name_%summon_id%~ ~%summon_name%~
+				SET ~fx_creature_level_%summon_id%~ = summon_level
 				SET summon_mode = $fx_parameter2(~%summon_id%~)
 				// Seuils GOODCUTOFF (30) et EVILCUTOFF (200) de ea.ids.
-				SET $fx_creature_side(~%summon_id%~) = (summon_mode == 0 OR summon_mode == 1 OR summon_mode == 3 OR summon_mode == 5) ? 0
+				SET ~fx_creature_side_%summon_id%~ = (summon_mode == 0 OR summon_mode == 1 OR summon_mode == 3 OR summon_mode == 5) ? 0
 					: (summon_allegiance >= 200 ? 1 : (summon_allegiance <= 30 ? 2 : 3))
-				SET $fx_summon_random(~%summon_id%~) = 0
+				SET ~fx_summon_random_%summon_id%~ = 0
 				PATCH_IF AD_ENABLE_SHRINKAGE AND $fx_probability(~%summon_id%~) == 100 AND NOT support_header_only BEGIN
 					LPM ad_op_67_random_support
 				END
@@ -63,8 +63,8 @@ DEFINE_PATCH_MACRO ad_op_67_random_support BEGIN
 			LPM ad_fx_same_fields
 			SPRINT summon_other_resref $fx_resource(~%summon_other%~)
 			PATCH_IF fx_same AND (~%summon_other_resref%~ STRING_EQUAL_CASE ~%summon_resref%~) BEGIN
-				SET $fx_consumed(~%summon_other%~) = 1
-				SET $fx_summon_random(~%summon_id%~) += 1
+				SET ~fx_consumed_%summon_other%~ = 1
+				SET ~fx_summon_random_%summon_id%~ += 1
 			END
 		END
 	END

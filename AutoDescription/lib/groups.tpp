@@ -166,7 +166,7 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 	END
 	SET same_ignored = 0
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
-		SET $fx_identical_count(~%group_id%~) = 1
+		SET ~fx_identical_count_%group_id%~ = 1
 		PATCH_IF NOT $fx_consumed(~%group_id%~) BEGIN
 			SET same_id = group_id
 			FOR (group_candidate = $identical_next(~%group_id%~); group_candidate >= 0; group_candidate = $identical_next(~%group_candidate%~)) BEGIN
@@ -177,10 +177,10 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 					// distincts, comme dans l'ancien opcode_group_by_target (SPCL920) ; pas pour ceux d'EFF
 					// (177, SPPR612).
 					PATCH_IF fx_same AND ($fx_external(~%group_id%~) OR $fx_exception_count(~%group_candidate%~) == $fx_exception_count(~%group_id%~)) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-						SET $fx_identical_anchor(~%group_candidate%~) = group_id
-						SET $fx_identical_count(~%group_id%~) = $fx_identical_count(~%group_id%~) + 1
-						SET $fx_late(~%group_id%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
+						SET ~fx_identical_anchor_%group_candidate%~ = group_id
+						SET ~fx_identical_count_%group_id%~ = $fx_identical_count(~%group_id%~) + 1
+						SET ~fx_late_%group_id%~ = 1
 					END
 				END
 			END
@@ -263,18 +263,18 @@ DEFINE_PATCH_MACRO ad_group_duration_ranges BEGIN
 			END
 			PATCH_IF duration_dice BEGIN
 				PHP_EACH duration_members AS duration_other => _ BEGIN
-					SET $fx_consumed(~%duration_other%~) = 1
+					SET ~fx_consumed_%duration_other%~ = 1
 				END
-				SET $fx_duration(~%group_id%~) = duration_unit
-				SET $fx_duration_dice(~%group_id%~) = duration_count
-				SET $fx_duration_dice_bonus(~%group_id%~) = duration_min / duration_unit - 1
-				SET $fx_probability_low(~%group_id%~) = duration_low
-				SET $fx_probability_high(~%group_id%~) = duration_high
-				SET $fx_probability(~%group_id%~) = duration_total
+				SET ~fx_duration_%group_id%~ = duration_unit
+				SET ~fx_duration_dice_%group_id%~ = duration_count
+				SET ~fx_duration_dice_bonus_%group_id%~ = duration_min / duration_unit - 1
+				SET ~fx_probability_low_%group_id%~ = duration_low
+				SET ~fx_probability_high_%group_id%~ = duration_high
+				SET ~fx_probability_%group_id%~ = duration_total
 				// Champs lus aussi à l'union, comme l'effet que l'ancien moteur ajoute : deux niveaux de sort aux
 				// mêmes durées réunies se comparent égaux (ad_spell_level_same).
-				SET $fx_probability1(~%group_id%~) = duration_high
-				SET $fx_probability2(~%group_id%~) = duration_low
+				SET ~fx_probability1_%group_id%~ = duration_high
+				SET ~fx_probability2_%group_id%~ = duration_low
 			END
 		END
 	END
@@ -300,8 +300,8 @@ DEFINE_PATCH_MACRO ad_group_exceptional_strength BEGIN
 				END
 			END
 			PATCH_IF group_other >= 0 BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
-				SET $fx_consumed(~%group_other%~) = 1
+				SET ~fx_consumed_%group_id%~ = 1
+				SET ~fx_consumed_%group_other%~ = 1
 				SPRINT derived_kind ~EXCEPTIONAL_STRENGTH~
 				SET derived_id = group_id
 				SET derived_other = group_other
@@ -357,7 +357,7 @@ DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
 					END
 				END
 				PATCH_IF group_spell_projectile == group_projectile BEGIN
-					SET $fx_consumed(~%group_candidate%~) = 1
+					SET ~fx_consumed_%group_candidate%~ = 1
 				END
 			END
 		END
@@ -380,10 +380,10 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 				PATCH_IF group_candidate >= group_id AND NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
 					SET group_level = $fx_parameter1(~%group_candidate%~)
 					SET group_mask = group_mask BOR (group_level == 0 ? AD_SPELL_LEVEL_ZERO : 1 << (group_level - 1))
-					SET $fx_consumed(~%group_candidate%~) = group_candidate != group_id
+					SET ~fx_consumed_%group_candidate%~ = group_candidate != group_id
 				END
 			END
-			SET $fx_spell_levels(~%group_id%~) = group_mask
+			SET ~fx_spell_levels_%group_id%~ = group_mask
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_TIMING BOR AD_SAME_SPECIAL
 			// Chaque candidat ne se compare qu'à group_id : l'ordre des opcodes entre eux est sans effet.
@@ -393,7 +393,7 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 					SPRINT group_spell $fx_resource(~%group_candidate%~)
 					LPF ad_spell_effects_powers STR_VAR resref = ~%group_spell%~ RET group_spell_powers = mask END
 					PATCH_IF group_spell_powers != 0 AND (group_spell_powers BAND (BNOT group_mask)) == 0 BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 					END
 				END
 			END
@@ -405,7 +405,7 @@ DEFINE_PATCH_MACRO ad_group_spell_levels BEGIN
 							SET same_other = group_candidate
 							LPM ad_fx_same_fields
 							PATCH_IF fx_same BEGIN
-								SET $fx_consumed(~%group_candidate%~) = 1
+								SET ~fx_consumed_%group_candidate%~ = 1
 							END
 						END
 					END
@@ -434,7 +434,7 @@ DEFINE_PATCH_MACRO ad_group_secondary_type_spells BEGIN
 						END
 					END
 					PATCH_IF group_spell_sectype == group_sectype BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 					END
 				END
 			END
@@ -466,7 +466,7 @@ DEFINE_PATCH_MACRO ad_group_bounce_spells BEGIN
 					END
 				END
 				PATCH_IF group_spell_match BEGIN
-					SET $fx_consumed(~%group_candidate%~) = 1
+					SET ~fx_consumed_%group_candidate%~ = 1
 				END
 			END
 		END
@@ -508,12 +508,12 @@ DEFINE_PATCH_MACRO ad_group_morale BEGIN
 				END
 			END
 			PATCH_IF morale_found == 3 BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
-				SET $fx_consumed(~%morale_immunity%~) = 1
+				SET ~fx_consumed_%group_id%~ = 1
+				SET ~fx_consumed_%morale_immunity%~ = 1
 				PHP_EACH fx_ids_106 AS _ => group_candidate BEGIN
 					SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 					PATCH_IF (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_parameter1(~%group_candidate%~) == 1 AND $fx_parameter2(~%group_candidate%~) == MOD_TYPE_flat BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 					END
 				END
 			END
@@ -568,14 +568,14 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 							PATCH_IF absorb_same AND absorb_parameter1 >= $AD_IMMUNITY_ABSORB_P1_MIN(~%absorb_row%~)
 									AND absorb_parameter1 <= $AD_IMMUNITY_ABSORB_P1_MAX(~%absorb_row%~)
 									AND ($AD_IMMUNITY_ABSORB_ANY_P2(~%absorb_row%~) OR $fx_parameter2_raw(~%absorb_id%~) == $AD_IMMUNITY_ABSORB_P2(~%absorb_row%~)) BEGIN
-								SET $fx_consumed(~%absorb_id%~) = 1
+								SET ~fx_consumed_%absorb_id%~ = 1
 								SET absorb_found = 1
 							END
 						END
 					END
 					PATCH_IF absorb_found AND $AD_IMMUNITY_ABSORB_RELABEL(~%absorb_row%~) >= 0 BEGIN
-						SET $fx_immunity_label(~%immunity_id%~) = $AD_IMMUNITY_ABSORB_RELABEL(~%absorb_row%~)
-						SET $fx_immunity_late(~%immunity_id%~) = 1
+						SET ~fx_immunity_label_%immunity_id%~ = $AD_IMMUNITY_ABSORB_RELABEL(~%absorb_row%~)
+						SET ~fx_immunity_late_%immunity_id%~ = 1
 					END
 				END
 			END
@@ -596,7 +596,7 @@ DEFINE_PATCH_MACRO ad_group_immunities BEGIN
 							SET $ad_inflicted_states(~%absorb_resref%~) = inflicted_state
 						END
 						PATCH_IF $ad_inflicted_states(~%absorb_resref%~) == immunity_opcode BEGIN
-							SET $fx_consumed(~%absorb_id%~) = 1
+							SET ~fx_consumed_%absorb_id%~ = 1
 						END
 					END
 				END
@@ -734,15 +734,15 @@ DEFINE_PATCH_MACRO ad_group_psionic_immunity BEGIN
 					SPRINT psionic_other_scope $fx_scope(~%psionic_id%~)
 					LPM ad_psionic_protection
 					PATCH_IF psionic_protection AND (~%psionic_other_scope%~ STRING_EQUAL ~%psionic_scope%~) BEGIN
-						SET $fx_consumed(~%psionic_id%~) = 1
+						SET ~fx_consumed_%psionic_id%~ = 1
 					END
 				END
-				SET $fx_opcode(~%psionic_fifth%~) = 101
-				SET $fx_parameter2(~%psionic_fifth%~) = 505
-				SET $fx_parameter2_raw(~%psionic_fifth%~) = 505
-				SET $fx_immunity_label(~%psionic_fifth%~) = 505
-				SET $fx_immunity_late(~%psionic_fifth%~) = 1
-				SET $fx_consumed(~%psionic_fifth%~) = 0
+				SET ~fx_opcode_%psionic_fifth%~ = 101
+				SET ~fx_parameter2_%psionic_fifth%~ = 505
+				SET ~fx_parameter2_raw_%psionic_fifth%~ = 505
+				SET ~fx_immunity_label_%psionic_fifth%~ = 505
+				SET ~fx_immunity_late_%psionic_fifth%~ = 1
+				SET ~fx_consumed_%psionic_fifth%~ = 0
 				SET $fx_opcode_count(~101~) = VARIABLE_IS_SET $fx_opcode_count(~101~) ? $fx_opcode_count(~101~) + 1 : 1
 				PATCH_FOR_EACH index_opcode IN 101 206 BEGIN
 					LPM ad_fx_index_opcode
@@ -787,11 +787,11 @@ DEFINE_PATCH_MACRO ad_group_panic_immunity BEGIN
 		PATCH_IF NOT $fx_consumed(~%immunity_id%~) AND $fx_parameter2(~%immunity_id%~) == MOD_TYPE_flat AND $fx_parameter1(~%immunity_id%~) <= 0 BEGIN
 			LPM ad_immunity_class
 			PATCH_IF immunity_class > 0 AND VARIABLE_IS_SET $panic_keys(~%immunity_key%~) AND $panic_keys(~%immunity_key%~) BEGIN
-				SET $fx_opcode(~%immunity_id%~) = 101
-				SET $fx_parameter2(~%immunity_id%~) = 106
-				SET $fx_parameter2_raw(~%immunity_id%~) = 106
-				SET $fx_immunity_label(~%immunity_id%~) = 106
-				SET $fx_immunity_late(~%immunity_id%~) = 1
+				SET ~fx_opcode_%immunity_id%~ = 101
+				SET ~fx_parameter2_%immunity_id%~ = 106
+				SET ~fx_parameter2_raw_%immunity_id%~ = 106
+				SET ~fx_immunity_label_%immunity_id%~ = 106
+				SET ~fx_immunity_late_%immunity_id%~ = 1
 				SET $fx_opcode_count(~101~) += 1
 				SET panic_joined = 1
 			END
@@ -818,7 +818,7 @@ DEFINE_PATCH_MACRO ad_group_improved_invisibility BEGIN
 					LPM ad_fx_same_fields
 					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
 					PATCH_IF fx_same AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 					END
 				END
 			END
@@ -842,7 +842,7 @@ DEFINE_PATCH_MACRO ad_group_dispel_cures BEGIN
 						SET same_other = group_candidate
 						LPM ad_fx_same_fields
 						PATCH_IF fx_same BEGIN
-							SET $fx_consumed(~%group_candidate%~) = 1
+							SET ~fx_consumed_%group_candidate%~ = 1
 						END
 					END
 				END
@@ -861,8 +861,8 @@ DEFINE_PATCH_MACRO ad_group_imprisonment BEGIN
 		PHP_EACH fx_ids_71 AS _ => group_candidate BEGIN
 			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 			PATCH_IF (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_parameter1(~%group_candidate%~) == 66 AND $fx_parameter2(~%group_candidate%~) == 1 BEGIN
-				SET $fx_consumed(~%group_candidate%~) = 1
-				SET $fx_dropped(~%group_candidate%~) = 1
+				SET ~fx_consumed_%group_candidate%~ = 1
+				SET ~fx_dropped_%group_candidate%~ = 1
 			END
 		END
 	END
@@ -884,12 +884,12 @@ DEFINE_PATCH_MACRO ad_group_all_illusions BEGIN
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
 						SET group_found = 1
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 					END
 				END
 			END
 			PATCH_IF group_found BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
+				SET ~fx_consumed_%group_id%~ = 1
 				SPRINT derived_kind ~ALL_ILLUSIONS~
 				SET derived_id = group_id
 				SET derived_other = 0 - 1
@@ -929,15 +929,15 @@ DEFINE_PATCH_MACRO ad_group_restored_spells BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 						SET group_levels = group_levels BOR (1 BLSL (group_level - 1))
 						SET group_members += 1
 					END
 				END
 			END
 			PATCH_IF group_members > 1 BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
-				SET $fx_restore_levels(~%group_id%~) = group_levels
+				SET ~fx_consumed_%group_id%~ = 1
+				SET ~fx_restore_levels_%group_id%~ = group_levels
 				SPRINT derived_kind ~RESTORED_SPELLS~
 				SET derived_id = group_id
 				SET derived_other = 0 - 1
@@ -961,7 +961,7 @@ DEFINE_PATCH_MACRO ad_group_restored_spells BEGIN
 					PATCH_IF fx_same BEGIN
 						SET group_merged = 1
 						SPRINT $derived_line(~%group_k%~) ~~
-						SET $fx_restore_both(~%same_other%~) = 1
+						SET ~fx_restore_both_%same_other%~ = 1
 					END
 				END
 			END
@@ -976,8 +976,8 @@ DEFINE_PATCH_MACRO ad_group_restored_spells BEGIN
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
 						SET group_merged = 1
-						SET $fx_consumed(~%same_other%~) = 1
-						SET $fx_restore_both(~%same_id%~) = 1
+						SET ~fx_consumed_%same_other%~ = 1
+						SET ~fx_restore_both_%same_id%~ = 1
 					END
 				END
 			END
@@ -1015,7 +1015,7 @@ DEFINE_PATCH_MACRO ad_group_movement_restored BEGIN
 			PHP_EACH fx_ids_163 AS _ => group_candidate BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND $fx_probability1(~%group_candidate%~) == $fx_probability1(~%group_id%~) AND $fx_probability2(~%group_candidate%~) == $fx_probability2(~%group_id%~) BEGIN
-					SET $fx_consumed(~%group_candidate%~) = 1
+					SET ~fx_consumed_%group_candidate%~ = 1
 				END
 			END
 		END
@@ -1038,16 +1038,16 @@ DEFINE_PATCH_MACRO ad_group_entangle BEGIN
 					SET same_other = group_candidate
 					LPM ad_fx_same_fields
 					PATCH_IF fx_same BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
+						SET ~fx_consumed_%group_candidate%~ = 1
 						PATCH_IF $fx_exception_count(~%group_candidate%~) == 0 BEGIN
-							SET $fx_group_anchor(~%group_candidate%~) = group_id
+							SET ~fx_group_anchor_%group_candidate%~ = group_id
 						END
 						SET group_absorbed = 1
 					END
 				END
 			END
 			PATCH_IF NOT group_absorbed BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
+				SET ~fx_consumed_%group_id%~ = 1
 			END
 		END
 	END
@@ -1105,7 +1105,7 @@ DEFINE_PATCH_MACRO ad_group_free_action BEGIN
 									OR (group_candidate_opcode == 101 AND (group_candidate_parameter2 == 16 OR group_candidate_parameter2 == 40
 										OR group_candidate_parameter2 == 109 OR group_candidate_parameter2 == 126 OR group_candidate_parameter2 == 154
 										OR group_candidate_parameter2 == 157 OR group_candidate_parameter2 == 175))) BEGIN
-								SET $fx_consumed(~%group_candidate%~) = 1
+								SET ~fx_consumed_%group_candidate%~ = 1
 							END
 						END
 					END
@@ -1142,8 +1142,8 @@ DEFINE_PATCH_MACRO ad_group_item_return BEGIN
 						AND $fx_timing(~%group_candidate%~) == TIMING_delayed AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
 						AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
 					SET group_returns += 1
-					SET $fx_consumed(~%group_candidate%~) = 1
-					SET $fx_item_return(~%group_id%~) = $fx_duration(~%group_candidate%~)
+					SET ~fx_consumed_%group_candidate%~ = 1
+					SET ~fx_item_return_%group_id%~ = $fx_duration(~%group_candidate%~)
 				END
 			END
 			PATCH_IF group_returns > 1 BEGIN
@@ -1179,8 +1179,8 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 				END
 			END
 			PATCH_IF group_removal >= 0 BEGIN
-				SET $fx_consumed(~%group_id%~) = 1
-				SET $fx_consumed(~%group_removal%~) = 1
+				SET ~fx_consumed_%group_id%~ = 1
+				SET ~fx_consumed_%group_removal%~ = 1
 				SET derived_id = group_id
 				SET derived_other = group_removal
 				PATCH_IF group_broken BEGIN
@@ -1204,7 +1204,7 @@ DEFINE_PATCH_MACRO ad_group_broken_armor BEGIN
 		SPRINT group_resource $fx_resource(~%group_id%~)
 		PATCH_IF NOT $fx_consumed(~%group_id%~) AND ((~%group_resource%~ STRING_EQUAL_CASE ~MISC57~)
 				OR (~%group_resource%~ STRING_EQUAL_CASE ~MISC58~) OR (~%group_resource%~ STRING_EQUAL_CASE ~CDDELHLM~)) BEGIN
-			SET $fx_consumed(~%group_id%~) = 1
+			SET ~fx_consumed_%group_id%~ = 1
 			SPRINT derived_kind ~BROKEN_ITEM~
 			SET derived_id = group_id
 			SET derived_other = 0 - 1
@@ -1257,16 +1257,16 @@ DEFINE_PATCH_MACRO ad_group_spell_types BEGIN
 							AND $fx_versus_value(~%group_id%~) == $fx_versus_value(~%group_candidate%~)
 							AND $fx_versus_inner_file(~%group_id%~) == $fx_versus_inner_file(~%group_candidate%~)
 							AND $fx_versus_inner_value(~%group_id%~) == $fx_versus_inner_value(~%group_candidate%~) BEGIN
-						SET $fx_consumed(~%group_candidate%~) = 1
-						SET $fx_group_anchor(~%group_candidate%~) = group_id
+						SET ~fx_consumed_%group_candidate%~ = 1
+						SET ~fx_group_anchor_%group_candidate%~ = group_id
 						SET group_types = group_types BOR (1 << group_other_type)
 						SET group_merged = 1
 					END
 				END
 			END
 			PATCH_IF group_merged BEGIN
-				SET $fx_spell_types(~%group_id%~) = group_types
-				SET $fx_late(~%group_id%~) = 2
+				SET ~fx_spell_types_%group_id%~ = group_types
+				SET ~fx_late_%group_id%~ = 2
 			END
 		END
 	END
@@ -1303,10 +1303,10 @@ END
 DEFINE_PATCH_MACRO ad_group_delayed_series BEGIN
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
 		PATCH_IF $fx_series_of(~%group_id%~) >= 0 BEGIN
-			SET $fx_consumed(~%group_id%~) = 1
+			SET ~fx_consumed_%group_id%~ = 1
 		END
 		PATCH_IF $fx_series_anchor(~%group_id%~) BEGIN
-			SET $fx_late(~%group_id%~) = 2
+			SET ~fx_late_%group_id%~ = 2
 		END
 	END
 END
@@ -1330,19 +1330,19 @@ DEFINE_PATCH_MACRO ad_group_polymorph BEGIN
 					PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) BEGIN
 						PATCH_IF group_other_opcode == 171 BEGIN
 							LPF ad_spell_has_effect INT_VAR opcode = 215 STR_VAR resref = ~%group_spell%~ resource = ~POLYBACK~ RET group_found = found END
-							SET $fx_consumed(~%group_candidate%~) = group_found
+							SET ~fx_consumed_%group_candidate%~ = group_found
 						END
 						ELSE PATCH_IF $fx_timing(~%group_candidate%~) == TIMING_delayed BEGIN
 							LPF ad_spell_has_effect STR_VAR resref = ~%group_spell%~ resource = ~SPWI491~ RET group_found = found END
 							PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_duration
 									AND $fx_duration(~%group_id%~) == $fx_duration(~%group_candidate%~) BEGIN
-								SET $fx_consumed(~%group_candidate%~) = 1
+								SET ~fx_consumed_%group_candidate%~ = 1
 							END
 							ELSE PATCH_IF group_found AND $fx_timing(~%group_id%~) == TIMING_permanent BEGIN
-								SET $fx_consumed(~%group_candidate%~) = 1
-								SET $fx_timing(~%group_id%~) = TIMING_duration
-								SET $fx_duration(~%group_id%~) = $fx_duration(~%group_candidate%~)
-								SET $fx_late(~%group_id%~) = 2
+								SET ~fx_consumed_%group_candidate%~ = 1
+								SET ~fx_timing_%group_id%~ = TIMING_duration
+								SET ~fx_duration_%group_id%~ = $fx_duration(~%group_candidate%~)
+								SET ~fx_late_%group_id%~ = 2
 							END
 						END
 					END
@@ -1375,13 +1375,13 @@ DEFINE_PATCH_MACRO ad_group_damage_halves BEGIN
 				END
 			END
 			PATCH_IF group_other >= 0 BEGIN
-				SET $fx_consumed(~%group_other%~) = 1
-				SET $fx_dice_count(~%group_id%~) = $fx_dice_count(~%group_id%~) + $fx_dice_count(~%group_other%~)
-				SET $fx_special(~%group_id%~) = $fx_special(~%group_id%~) BOR BIT8
-				SET $fx_save_type(~%group_id%~) = $fx_save_type(~%group_other%~)
-				SET $fx_save_types(~%group_id%~) = $fx_save_types(~%group_other%~)
-				SET $fx_save_flags(~%group_id%~) = $fx_save_flags(~%group_other%~)
-				SET $fx_late(~%group_id%~) = 2
+				SET ~fx_consumed_%group_other%~ = 1
+				SET ~fx_dice_count_%group_id%~ = $fx_dice_count(~%group_id%~) + $fx_dice_count(~%group_other%~)
+				SET ~fx_special_%group_id%~ = $fx_special(~%group_id%~) BOR BIT8
+				SET ~fx_save_type_%group_id%~ = $fx_save_type(~%group_other%~)
+				SET ~fx_save_types_%group_id%~ = $fx_save_types(~%group_other%~)
+				SET ~fx_save_flags_%group_id%~ = $fx_save_flags(~%group_other%~)
+				SET ~fx_late_%group_id%~ = 2
 			END
 		END
 	END
@@ -1476,18 +1476,18 @@ DEFINE_PATCH_MACRO ad_group_cure_members BEGIN
 		END
 	END
 	PATCH_IF cure_members > 0 BEGIN
-		SET $fx_consumed(~%group_id%~) = 1
+		SET ~fx_consumed_%group_id%~ = 1
 		PHP_EACH cure_found AS cure_member => _ BEGIN
-			SET $fx_consumed(~%cure_member%~) = 1
+			SET ~fx_consumed_%cure_member%~ = 1
 		END
 		PHP_EACH cure_pseudo AS cure_member => _ BEGIN
-			SET $fx_consumed(~%cure_member%~) = 1
-			SET $fx_cure_feeblemind(~%cure_member%~) = 1
+			SET ~fx_consumed_%cure_member%~ = 1
+			SET ~fx_cure_feeblemind_%cure_member%~ = 1
 		END
 		PATCH_IF $cure_opcode_at(~%cure_a%~) == 77 AND $fx_opcode(~%group_id%~) == 79 BEGIN
-			SET $fx_cure_feeblemind(~%group_id%~) = 1
+			SET ~fx_cure_feeblemind_%group_id%~ = 1
 		END
-		SET $fx_cure_mask(~%group_id%~) = cure_mask
+		SET ~fx_cure_mask_%group_id%~ = cure_mask
 		SPRINT derived_kind ~%cure_kind%~
 		SET derived_id = group_id
 		SET derived_other = 0 - 1
@@ -1602,13 +1602,13 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 					SET group_found = group_found AND $group_member(~%group_opcode%~) >= 0
 				END
 				PATCH_IF group_found BEGIN
-					SET $fx_consumed(~%group_id%~) = 1
-					SET $fx_derived_source(~%group_id%~) = 1
+					SET ~fx_consumed_%group_id%~ = 1
+					SET ~fx_derived_source_%group_id%~ = 1
 					FOR (group_k = 0; group_k < group_member_count; ++group_k) BEGIN
 						SET group_opcode = $AD_FIELD_GROUP_MEMBER(~%group_kind% %group_k%~)
 						SET group_other = $group_member(~%group_opcode%~)
-						SET $fx_consumed(~%group_other%~) = 1
-						SET $fx_group_anchor(~%group_other%~) = group_id
+						SET ~fx_consumed_%group_other%~ = 1
+						SET ~fx_group_anchor_%group_other%~ = group_id
 					END
 					SPRINT derived_kind ~%group_kind%~
 					SET derived_id = group_id

@@ -46,9 +46,9 @@ DEFINE_PATCH_MACRO ad_hold_support BEGIN
 			SET hold_ids = $fx_parameter2(~%hold_id%~)
 			SET hold_value = $fx_parameter1(~%hold_id%~)
 			SET hold_invalid = hold_ids < 2 OR hold_ids > 9 OR (hold_ids == 9 AND NOT IS_EE)
-			SET $fx_hold_plain(~%hold_id%~) = hold_value == 0
+			SET ~fx_hold_plain_%hold_id%~ = hold_value == 0
 				OR (hold_opcode == 109 AND (hold_invalid OR (IS_EE AND $fx_special(~%hold_id%~) != 0)))
-			SPRINT $fx_hold_name(~%hold_id%~) ~~
+			SPRINT ~fx_hold_name_%hold_id%~ ~~
 			PATCH_IF hold_opcode != 109 AND (hold_invalid OR (hold_ids == 2 AND hold_value == 100)) BEGIN
 				SET drop_id = hold_id
 				SPRINT ignored_reason ~file_error:opcode%hold_opcode%:invalid~
@@ -57,7 +57,7 @@ DEFINE_PATCH_MACRO ad_hold_support BEGIN
 			END
 			ELSE PATCH_IF NOT $fx_hold_plain(~%hold_id%~) AND NOT support_header_only BEGIN
 				LPF ad_ids_name INT_VAR ids_file = hold_ids entry = hold_value RET hold_name = name END
-				SPRINT $fx_hold_name(~%hold_id%~) ~%hold_name%~
+				SPRINT ~fx_hold_name_%hold_id%~ ~%hold_name%~
 				PATCH_IF ~%hold_name%~ STRING_EQUAL ~~ BEGIN
 					LPF ad_refusal INT_VAR fx_id = hold_id STR_VAR reason = ~not_implemented:opcode%hold_opcode%:ids_name~ message = ~value %hold_value% of IDS file %hold_ids% has no name~ RET render_missing = refusal END
 				END
