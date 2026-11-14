@@ -9,10 +9,19 @@
 //
 // Tableaux écrits : line_section, line_sort, line_text, line_probability,
 // line_probability_low, line_probability_high, line_core, line_nested, line_effect, line_composite ;
-// variable écrite : line_count.
+// variables écrites : line_count, line_generation ; écrits par nom (jamais parcourus) : line_bucket,
+// line_bucket_size.
+//
+// Recherche des doublons (ad_line_add) : chaque ligne est rangée dans le compartiment de la longueur
+// de son texte (line_bucket_<génération>_<longueur>_<n>), deux textes égaux à la casse près ayant la
+// même longueur ; le nom ne contient pas le texte, dont les % seraient évalués. La génération, changée
+// à chaque remise à zéro, écarte les compartiments d'une description précédente, ou de la description
+// parente que voit une sous-description. Une ligne dont le texte change est rangée de nouveau
+// (ad_line_register) ; ses anciennes places restent, d'où la comparaison complète de chaque candidate.
 
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
+	SET line_generation = VARIABLE_IS_SET line_generation ? line_generation + 1 : 1
 	SET line_phrase = 0
 	SET line_any_form = 0
 	SET line_no_duration = 0
@@ -41,8 +50,12 @@ DEFINE_PATCH_MACRO ad_line_add BEGIN
 	LPM ad_collapse_spaces
 	SPRINT line_new_text ~%line_text%~
 	TO_LOWER line_new_text
+	SET line_length = STRING_LENGTH ~%line_text%~
+	SPRINT line_bucket ~%line_generation%_%line_length%~
+	SET line_bucket_size = VARIABLE_IS_SET $line_bucket_size(~%line_bucket%~) ? $line_bucket_size(~%line_bucket%~) : 0
 	SET line_duplicate = 0
-	FOR (line_id = 0; line_id < line_count AND NOT line_duplicate; ++line_id) BEGIN
+	FOR (line_k = 0; line_k < line_bucket_size AND NOT line_duplicate; ++line_k) BEGIN
+		SET line_id = $line_bucket(~%line_bucket%_%line_k%~)
 		SPRINT line_old_section $line_section(~%line_id%~)
 		SPRINT line_old_text $line_text(~%line_id%~)
 		TO_LOWER line_old_text
@@ -75,7 +88,19 @@ DEFINE_PATCH_MACRO ad_line_append BEGIN
 	SPRINT $line_core(~%line_count%~) ~%line_core%~
 	SET $line_nested(~%line_count%~) = line_nested
 	SET $line_composite(~%line_count%~) = line_composite
+	SET line_register_id = line_count
+	LPM ad_line_register
 	SET line_count += 1
+END
+
+// Range la ligne line_register_id dans le compartiment de la longueur de son texte (ad_line_add).
+DEFINE_PATCH_MACRO ad_line_register BEGIN
+	SPRINT line_register_text $line_text(~%line_register_id%~)
+	SET line_register_length = STRING_LENGTH ~%line_register_text%~
+	SPRINT line_register_bucket ~%line_generation%_%line_register_length%~
+	SET line_register_size = VARIABLE_IS_SET $line_bucket_size(~%line_register_bucket%~) ? $line_bucket_size(~%line_register_bucket%~) : 0
+	SET ~line_bucket_%line_register_bucket%_%line_register_size%~ = line_register_id
+	SET ~line_bucket_size_%line_register_bucket%~ = line_register_size + 1
 END
 
 // Regroupement par probabilité des lignes probables de la section prob_section (ancien
@@ -191,6 +216,8 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 					END
 					PATCH_IF split_k == 0 BEGIN
 						SPRINT $line_text(~%split_id%~) ~%line_text%~
+						SET line_register_id = split_id
+						LPM ad_line_register
 						SET $line_probability(~%split_id%~) = line_probability
 						SET $line_probability_low(~%split_id%~) = line_probability_low
 						SET $line_probability_high(~%split_id%~) = line_probability_high
@@ -258,12 +285,15 @@ DEFINE_PATCH_MACRO ad_lines_probability_pass BEGIN
 	FOR (prob_id = 0; prob_id < line_count; ++prob_id) BEGIN
 		SPRINT prob_line_section $line_section(~%prob_id%~)
 		PATCH_IF (~%prob_line_section%~ STRING_EQUAL ~%prob_section%~) AND $line_probability(~%prob_id%~) > 0 BEGIN
-			SET prob_key = ($line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~)) * 1000 + prob_id
-			SET $prob_keys(~%prob_key%~) = prob_id
+			// Clé de largeur fixe (plage, puis ordre d'ajout), triée comme texte : aucun nombre de lignes
+			// ne la fait déborder.
+			SET prob_key_range = $line_probability_low(~%prob_id%~) * 100 + $line_probability_high(~%prob_id%~) + 1000000
+			SET prob_key_order = prob_id + 10000000
+			SET $prob_keys(~%prob_key_range%%prob_key_order%~) = prob_id
 			SPRINT $line_section(~%prob_id%~) ~~
 		END
 	END
-	SORT_ARRAY_INDICES prob_keys NUMERICALLY
+	SORT_ARRAY_INDICES prob_keys LEXICOGRAPHICALLY
 	CLEAR_ARRAY prob_lines
 	SET prob_count = 0
 	PHP_EACH prob_keys AS _ => prob_id BEGIN
@@ -478,10 +508,9 @@ BEGIN
 		ELSE PATCH_IF level == 2 BEGIN
 			SPRINT line_prefix ~  ~
 		END
-		// Clé numérique unique (rang, ordre d'ajout) ; le décalage rend les rangs négatifs triables.
-		PATCH_IF line_count > 1000 BEGIN
-			PATCH_FAIL ~New engine: more than 1000 lines in a description~
-		END
+		// Clé unique de largeur fixe (rang, ordre d'ajout), triée comme texte : les décalages rendent
+		// les rangs négatifs triables et gardent le même nombre de chiffres, quel que soit le nombre
+		// de lignes.
 		CLEAR_ARRAY section_lines
 		FOR (line_id = 0; line_id < line_count; ++line_id) BEGIN
 			SPRINT line_section $line_section(~%line_id%~)
@@ -490,11 +519,12 @@ BEGIN
 				PATCH_IF line_sort < 0 - 100 OR line_sort > 2000000 BEGIN
 					PATCH_FAIL ~New engine: line sort %line_sort% out of bounds~
 				END
-				SET line_key = (line_sort + 100) * 1000 + line_id
-				SET $section_lines(~%line_key%~) = line_id
+				SET line_key_sort = line_sort + 100 + 10000000
+				SET line_key_order = line_id + 10000000
+				SET $section_lines(~%line_key_sort%%line_key_order%~) = line_id
 			END
 		END
-		SORT_ARRAY_INDICES section_lines NUMERICALLY
+		SORT_ARRAY_INDICES section_lines LEXICOGRAPHICALLY
 		PHP_EACH section_lines AS _ => line_id BEGIN
 			SPRINT line_text $line_text(~%line_id%~)
 			// Texte qui commence par deux sauts de ligne (sections de niveaux d'un sous-sort) : écrit sans
