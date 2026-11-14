@@ -195,8 +195,13 @@ END
 // dérivés compris) : level_id, level_header, level_identical, level_position, level_opcode,
 // level_derived, level_on (1 : pas encore écarté), level_emitted (1 : écrit), level_mark (position
 // marquée). level_first : premier niveau de lanceur, calculé à la première progression.
+// Index des rangs par en-tête et opcode (comparé : 524 pour un 248 réuni à un 249), dans l'ordre
+// croissant, écrit par nom (jamais parcouru) : level_rank_<en-tête>_<opcode>_<n>, leur nombre
+// level_rank_size_<en-tête>_<opcode>, valable si level_rank_stamp_<en-tête>_<opcode> vaut
+// level_rank_generation (ad_spell_level_rank).
 DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
 	SET level_first = 0 - 1
+	SET level_rank_generation = VARIABLE_IS_SET level_rank_generation ? level_rank_generation + 1 : 1
 	FOR (level_h = 0; level_h < fx_header_count; ++level_h) BEGIN
 		FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~); ++level_k) BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
@@ -227,6 +232,24 @@ DEFINE_PATCH_MACRO ad_spell_levels_entries BEGIN
 			SET $level_emitted(~%level_a%~) = 0
 			SET level_position = $level_position(~%level_a%~)
 			SET $level_mark(~%level_h% %level_position%~) = 0
+			SET rank_h = level_h
+			SET rank_opcode = level_opcode
+			LPM ad_spell_level_rank
+			SET ~level_rank_%level_rank_key%_%level_rank_size%~ = level_k
+			SET ~level_rank_size_%level_rank_key%~ = level_rank_size + 1
+			SET ~level_rank_stamp_%level_rank_key%~ = level_rank_generation
+		END
+	END
+END
+
+// Rangs des effets restants de l'en-tête rank_h dont l'opcode comparé est rank_opcode
+// (ad_spell_levels_entries) : level_rank_<level_rank_key>_<n>, n < level_rank_size.
+DEFINE_PATCH_MACRO ad_spell_level_rank BEGIN
+	SPRINT level_rank_key ~%rank_h%_%rank_opcode%~
+	SET level_rank_size = 0
+	PATCH_IF VARIABLE_IS_SET $level_rank_stamp(~%level_rank_key%~) BEGIN
+		PATCH_IF $level_rank_stamp(~%level_rank_key%~) == level_rank_generation BEGIN
+			SET level_rank_size = $level_rank_size(~%level_rank_key%~)
 		END
 	END
 END
@@ -241,19 +264,20 @@ DEFINE_PATCH_MACRO ad_spell_levels_common BEGIN
 		SET level_in_all = 1
 		SET level_similar = 0
 		FOR (level_h = 1; level_h < fx_header_count AND level_in_all; ++level_h) BEGIN
-			SET level_has_opcode = 0
-			FOR (level_k = 0; level_k < $spell_fx_count(~%level_h%~) AND level_in_all; ++level_k) BEGIN
+			SET rank_h = level_h
+			SET rank_opcode = level_opcode
+			LPM ad_spell_level_rank
+			SET level_has_opcode = level_rank_size > 0
+			FOR (level_n = 0; level_n < level_rank_size AND level_in_all; ++level_n) BEGIN
+				SET level_k = $level_rank(~%level_rank_key%_%level_n%~)
 				SPRINT level_b ~%level_h% %level_k%~
-				PATCH_IF $level_opcode(~%level_b%~) == level_opcode BEGIN
-					SET level_has_opcode = 1
-					LPM ad_spell_level_same
-					PATCH_IF level_same BEGIN
-						SPRINT $level_similar_list(~%level_similar%~) ~%level_b%~
-						SET level_similar += 1
-					END
-					ELSE BEGIN
-						SET level_in_all = 0
-					END
+				LPM ad_spell_level_same
+				PATCH_IF level_same BEGIN
+					SPRINT $level_similar_list(~%level_similar%~) ~%level_b%~
+					SET level_similar += 1
+				END
+				ELSE BEGIN
+					SET level_in_all = 0
 				END
 			END
 			PATCH_IF NOT level_has_opcode BEGIN
@@ -287,10 +311,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_chains BEGIN
 				SET level_opcode = $level_opcode(~%level_a%~)
 				SET level_next = level_h + 1
 				SET level_found = 0
-				FOR (level_k2 = 0; level_k2 < $spell_fx_count(~%level_next%~) AND NOT level_found; ++level_k2) BEGIN
+				SET rank_h = level_next
+				SET rank_opcode = level_opcode
+				LPM ad_spell_level_rank
+				FOR (level_n = 0; level_n < level_rank_size AND NOT level_found; ++level_n) BEGIN
+					SET level_k2 = $level_rank(~%level_rank_key%_%level_n%~)
 					SPRINT level_b ~%level_next% %level_k2%~
 					SET level_b_position = $level_position(~%level_b%~)
-					PATCH_IF $level_on(~%level_b%~) AND $level_opcode(~%level_b%~) == level_opcode AND NOT $level_mark(~%level_next% %level_b_position%~) BEGIN
+					PATCH_IF $level_on(~%level_b%~) AND NOT $level_mark(~%level_next% %level_b_position%~) BEGIN
 						LPM ad_spell_level_same
 						PATCH_IF level_same BEGIN
 							SET $level_mark(~%level_next% %level_b_position%~) = 1
@@ -518,12 +546,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 					// Semblable à la durée près, comme l'ancien moteur (opcode_match_except_diceCount_and_duration).
 					SET level_skip = AD_SAME_DICE BOR AD_SAME_TIMING
 					SET target_level_h = level_h0 - 1
-					FOR (level_k = 0; level_k < $spell_fx_count(~%target_level_h%~) AND NOT target_level_previous; ++level_k) BEGIN
+					SET rank_h = target_level_h
+					SET rank_opcode = level_opcode
+					LPM ad_spell_level_rank
+					FOR (level_n = 0; level_n < level_rank_size AND NOT target_level_previous; ++level_n) BEGIN
+						SET level_k = $level_rank(~%level_rank_key%_%level_n%~)
 						SPRINT level_b ~%target_level_h% %level_k%~
-						PATCH_IF $level_opcode(~%level_b%~) == level_opcode BEGIN
-							LPM ad_spell_level_same
-							SET target_level_previous = level_same
-						END
+						LPM ad_spell_level_same
+						SET target_level_previous = level_same
 					END
 					SET level_skip = AD_SAME_DICE
 				END
@@ -589,49 +619,54 @@ DEFINE_PATCH_MACRO ad_spell_level_search BEGIN
 	SET search_self = 0
 	FOR (search_h = level_search_start; search_h < fx_header_count AND search_in_all; ++search_h) BEGIN
 		SET search_found = 0
-		SET search_has_on = 0
-		FOR (search_k = 0; search_k < $spell_fx_count(~%search_h%~); ++search_k) BEGIN
+		SET rank_h = search_h
+		SET rank_opcode = search_opcode
+		LPM ad_spell_level_rank
+		FOR (search_n = 0; search_n < level_rank_size AND NOT search_found; ++search_n) BEGIN
+			SET search_k = $level_rank(~%level_rank_key%_%search_n%~)
 			SPRINT level_b ~%search_h% %search_k%~
-			PATCH_IF $level_on(~%level_b%~) BEGIN
-				SET search_has_on = 1
-			END
-			PATCH_IF NOT search_found AND $level_opcode(~%level_b%~) == search_opcode BEGIN
-				LPM ad_spell_level_same
-				PATCH_IF level_same BEGIN
-					SET search_found = 1
-					SET search_found_any += 1
-					SET search_any_id = $level_id(~%level_b%~)
-					PATCH_IF $fx_duration(~%search_any_id%~) != search_previous_any BEGIN
-						SET search_previous_any = $fx_duration(~%search_any_id%~)
-						SET search_changes_any += 1
+			LPM ad_spell_level_same
+			PATCH_IF level_same BEGIN
+				SET search_found = 1
+				SET search_found_any += 1
+				SET search_any_id = $level_id(~%level_b%~)
+				PATCH_IF $fx_duration(~%search_any_id%~) != search_previous_any BEGIN
+					SET search_previous_any = $fx_duration(~%search_any_id%~)
+					SET search_changes_any += 1
+				END
+				PATCH_IF $level_on(~%level_b%~) BEGIN
+					SET search_id = $level_id(~%level_b%~)
+					SPRINT $search_match(~%search_total%~) ~%level_b%~
+					SET $search_level(~%search_total%~) = $spell_level(~%search_h%~)
+					SET search_parameter1 = $fx_parameter1(~%search_id%~)
+					PATCH_IF search_opcode == 111 AND search_parameter1 < 1 BEGIN
+						SET search_parameter1 = 1
 					END
-					PATCH_IF $level_on(~%level_b%~) BEGIN
-						SET search_id = $level_id(~%level_b%~)
-						SPRINT $search_match(~%search_total%~) ~%level_b%~
-						SET $search_level(~%search_total%~) = $spell_level(~%search_h%~)
-						SET search_parameter1 = $fx_parameter1(~%search_id%~)
-						PATCH_IF search_opcode == 111 AND search_parameter1 < 1 BEGIN
-							SET search_parameter1 = 1
-						END
-						SET $search_parameter1(~%search_total%~) = search_parameter1
-						SET $search_dice(~%search_total%~) = $fx_dice_count(~%search_id%~)
-						SET $search_save(~%search_total%~) = $fx_save_bonus(~%search_id%~)
-						SET search_total += 1
-						PATCH_IF ~%level_b%~ STRING_EQUAL ~%level_a%~ BEGIN
-							SET search_self = 1
-						END
-						PATCH_IF $fx_duration(~%search_id%~) != search_previous_duration BEGIN
-							SET search_previous_duration = $fx_duration(~%search_id%~)
-							SET $search_duration_level(~%search_durations%~) = $spell_level(~%search_h%~)
-							SET $search_duration_value(~%search_durations%~) = search_previous_duration
-							SET search_durations += 1
-						END
+					SET $search_parameter1(~%search_total%~) = search_parameter1
+					SET $search_dice(~%search_total%~) = $fx_dice_count(~%search_id%~)
+					SET $search_save(~%search_total%~) = $fx_save_bonus(~%search_id%~)
+					SET search_total += 1
+					PATCH_IF ~%level_b%~ STRING_EQUAL ~%level_a%~ BEGIN
+						SET search_self = 1
+					END
+					PATCH_IF $fx_duration(~%search_id%~) != search_previous_duration BEGIN
+						SET search_previous_duration = $fx_duration(~%search_id%~)
+						SET $search_duration_level(~%search_durations%~) = $spell_level(~%search_h%~)
+						SET $search_duration_value(~%search_durations%~) = search_previous_duration
+						SET search_durations += 1
 					END
 				END
 			END
 		END
-		PATCH_IF NOT search_found AND search_has_on BEGIN
-			SET search_in_all = 0
+		// Un en-tête dont tous les effets sont écartés ne compte pas.
+		PATCH_IF NOT search_found BEGIN
+			SET search_has_on = 0
+			FOR (search_k = 0; search_k < $spell_fx_count(~%search_h%~) AND NOT search_has_on; ++search_k) BEGIN
+				SET search_has_on = $level_on(~%search_h% %search_k%~)
+			END
+			PATCH_IF search_has_on BEGIN
+				SET search_in_all = 0
+			END
 		END
 	END
 	PATCH_IF level_special_duration AND search_changes_any > 0 AND search_found_any - 1 != search_changes_any BEGIN
@@ -999,12 +1034,14 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 				END
 				FOR (level_h2 = level_h + 1; level_h2 < fx_header_count AND level_open; ++level_h2) BEGIN
 					SET level_found = 0
-					FOR (level_k2 = 0; level_k2 < $spell_fx_count(~%level_h2%~) AND NOT level_found; ++level_k2) BEGIN
+					SET rank_h = level_h2
+					SET rank_opcode = level_opcode
+					LPM ad_spell_level_rank
+					FOR (level_n = 0; level_n < level_rank_size AND NOT level_found; ++level_n) BEGIN
+						SET level_k2 = $level_rank(~%level_rank_key%_%level_n%~)
 						SPRINT level_b ~%level_h2% %level_k2%~
-						PATCH_IF $level_opcode(~%level_b%~) == level_opcode BEGIN
-							LPM ad_spell_level_same
-							SET level_found = level_same
-						END
+						LPM ad_spell_level_same
+						SET level_found = level_same
 					END
 					PATCH_IF NOT level_found BEGIN
 						SET level_to = $spell_level(~%level_h2%~) - 1
