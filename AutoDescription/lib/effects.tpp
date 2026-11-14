@@ -413,18 +413,10 @@ DEFINE_PATCH_MACRO ad_fx_mod_ignored BEGIN
 	SPRINT mod_resource $fx_resource_lower(~%fx_id%~)
 	SET fx_mod_ignored = VARIABLE_IS_SET $AD_MOD_IGNORED_EXACT(~%mod_opcode%~ ~%mod_resource%~)
 	PATCH_IF NOT fx_mod_ignored AND VARIABLE_IS_SET $AD_MOD_IGNORED_PARTIAL_COUNT(~%mod_opcode%~) BEGIN
-		FOR (mod_rank = 0; mod_rank < $AD_MOD_IGNORED_PARTIAL_COUNT(~%mod_opcode%~); ++mod_rank) BEGIN
-			SPRINT mod_rule $AD_MOD_IGNORED_PARTIAL(~%mod_opcode%~ ~%mod_rank%~)
-			PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~PREFIX ~ ~%mod_rule%~) == 0 BEGIN
-				SPRINT mod_value ~%mod_rule%~
-				INNER_PATCH_SAVE mod_value ~%mod_value%~ BEGIN DELETE_BYTES 0 7 END
-				SET fx_mod_ignored = fx_mod_ignored OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%mod_value%~ ~%mod_resource%~) == 0
-			END
-			ELSE BEGIN
-				SPRINT mod_value ~%mod_rule%~
-				INNER_PATCH_SAVE mod_value ~%mod_value%~ BEGIN DELETE_BYTES 0 9 END
-				SET fx_mod_ignored = fx_mod_ignored OR INDEX (CASE_SENSITIVE EXACT_MATCH ~%mod_value%~ ~%mod_resource%~) >= 0
-			END
+		FOR (mod_rank = 0; NOT fx_mod_ignored AND mod_rank < $AD_MOD_IGNORED_PARTIAL_COUNT(~%mod_opcode%~); ++mod_rank) BEGIN
+			SPRINT mod_value $AD_MOD_IGNORED_PARTIAL_VALUE(~%mod_opcode%~ ~%mod_rank%~)
+			SET mod_position = INDEX (CASE_SENSITIVE EXACT_MATCH ~%mod_value%~ ~%mod_resource%~)
+			SET fx_mod_ignored = $AD_MOD_IGNORED_PARTIAL_PREFIX(~%mod_opcode%~ ~%mod_rank%~) ? (mod_position == 0) : (mod_position >= 0)
 		END
 	END
 	PATCH_IF NOT fx_mod_ignored AND mod_opcode == 326 BEGIN

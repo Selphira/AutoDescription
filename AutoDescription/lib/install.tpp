@@ -531,17 +531,15 @@ BEGIN
 	END
 END
 
-DEFINE_PATCH_FUNCTION ad_html_escape
-	STR_VAR
-		text = ~~
-	RET
-		text
-BEGIN
-	INNER_PATCH_SAVE text ~%text%~ BEGIN
+// Échappe escape_in et range le résultat dans la variable nommée par escape_out (macro : un LPF par
+// texte copierait chaque fois toutes les variables).
+DEFINE_PATCH_MACRO ad_html_escape_to BEGIN
+	INNER_PATCH_SAVE escape_text ~%escape_in%~ BEGIN
 		REPLACE_TEXTUALLY EXACT_MATCH ~&~ ~&amp;~
 		REPLACE_TEXTUALLY EXACT_MATCH ~<~ ~&lt;~
 		REPLACE_TEXTUALLY EXACT_MATCH ~>~ ~&gt;~
 	END
+	SPRINT ~%escape_out%~ ~%escape_text%~
 END
 
 DEFINE_PATCH_FUNCTION ad_add_compare_row
@@ -551,9 +549,9 @@ DEFINE_PATCH_FUNCTION ad_add_compare_row
 		original_description = ~~
 		description = ~~
 BEGIN
-	LPF ad_html_escape STR_VAR text = ~%name%~                 RET html_name = text END
-	LPF ad_html_escape STR_VAR text = ~%original_description%~ RET html_original = text END
-	LPF ad_html_escape STR_VAR text = ~%description%~          RET html_description = text END
+	SPRINT escape_in ~%name%~                 SPRINT escape_out ~html_name~        LPM ad_html_escape_to
+	SPRINT escape_in ~%original_description%~ SPRINT escape_out ~html_original~    LPM ad_html_escape_to
+	SPRINT escape_in ~%description%~          SPRINT escape_out ~html_description~ LPM ad_html_escape_to
 	SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-diff.html~
 	LPM ad_log_part
 	INNER_ACTION BEGIN
@@ -606,13 +604,9 @@ window.loadedData = window.loadedData || {};
 	VERBOSE
 END
 
-DEFINE_PATCH_FUNCTION ad_js_escape
-	STR_VAR
-		text = ~~
-	RET
-		text
-BEGIN
-	INNER_PATCH_SAVE text ~%text%~ BEGIN
+// Comme ad_html_escape_to.
+DEFINE_PATCH_MACRO ad_js_escape_to BEGIN
+	INNER_PATCH_SAVE escape_text ~%escape_in%~ BEGIN
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~\\~ ~\\\\~
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%WNL%~ ~\n~
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%LNL%~ ~\n~
@@ -620,6 +614,7 @@ BEGIN
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~%TAB%~ ~\t~
 		REPLACE_TEXTUALLY EVALUATE_REGEXP ~"~ ~\"~
 	END
+	SPRINT ~%escape_out%~ ~%escape_text%~
 END
 
 DEFINE_PATCH_FUNCTION ad_add_js_row
@@ -632,10 +627,10 @@ DEFINE_PATCH_FUNCTION ad_add_js_row
 		original = ~~
 		modded = ~~
 BEGIN
-	LPF ad_js_escape STR_VAR text = ~%id%~       RET id = text END
-	LPF ad_js_escape STR_VAR text = ~%name%~     RET name = text END
-	LPF ad_js_escape STR_VAR text = ~%original%~ RET original = text END
-	LPF ad_js_escape STR_VAR text = ~%modded%~   RET modded = text END
+	SPRINT escape_in ~%id%~       SPRINT escape_out ~id~       LPM ad_js_escape_to
+	SPRINT escape_in ~%name%~     SPRINT escape_out ~name~     LPM ad_js_escape_to
+	SPRINT escape_in ~%original%~ SPRINT escape_out ~original~ LPM ad_js_escape_to
+	SPRINT escape_in ~%modded%~   SPRINT escape_out ~modded~   LPM ad_js_escape_to
 	SPRINT log_file ~docs/data/%log_name%.js~
 	LPM ad_log_part
 	INNER_ACTION BEGIN

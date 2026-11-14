@@ -144,7 +144,9 @@ END
 // 699 opcodes 146 vers des sorts tous différents) demandait sinon des centaines de milliers de
 // comparaisons.
 // identical_generation distingue les clés d'un appel de celles des appels précédents dans la même
-// portée (CLEAR_ARRAY les laisse lisibles par VARIABLE_IS_SET).
+// portée (CLEAR_ARRAY les laisse lisibles par VARIABLE_IS_SET) : une clé n'est valable que si
+// identical_last_generation y vaut l'appel en cours, ce qui réutilise les clés au lieu d'en créer une
+// série par appel.
 DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 	SET identical_generation = VARIABLE_IS_SET identical_generation ? identical_generation + 1 : 0
 	SET identical_run = 0
@@ -156,13 +158,16 @@ DEFINE_PATCH_MACRO ad_group_identical_effects BEGIN
 		SET identical_header = $fx_header(~%group_id%~)
 		SET identical_opcode = $fx_opcode(~%group_id%~)
 		SPRINT identical_resource $fx_resource_lower(~%group_id%~)
-		SPRINT identical_key ~%identical_generation% %identical_run% %identical_opcode% %identical_resource%~
+		SPRINT identical_key ~%identical_run%_%identical_opcode%_%identical_resource%~
 		SET $identical_next(~%group_id%~) = 0 - 1
-		PATCH_IF VARIABLE_IS_SET $identical_last(~%identical_key%~) BEGIN
-			SET identical_previous = $identical_last(~%identical_key%~)
-			SET $identical_next(~%identical_previous%~) = group_id
+		PATCH_IF VARIABLE_IS_SET $identical_last_generation(~%identical_key%~) BEGIN
+			PATCH_IF $identical_last_generation(~%identical_key%~) == identical_generation BEGIN
+				SET identical_previous = $identical_last(~%identical_key%~)
+				SET $identical_next(~%identical_previous%~) = group_id
+			END
 		END
-		SET $identical_last(~%identical_key%~) = group_id
+		SET ~identical_last_%identical_key%~ = group_id
+		SET ~identical_last_generation_%identical_key%~ = identical_generation
 	END
 	SET same_ignored = 0
 	FOR (group_id = 0; group_id < fx_count; ++group_id) BEGIN
