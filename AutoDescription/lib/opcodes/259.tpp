@@ -13,7 +13,7 @@
 DEFINE_PATCH_MACRO ad_op_259_support BEGIN
 	SPRINT trap_own_spell ~~
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
-		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET trap_own_spell = name END
+		SPRINT spell_fact_resref ~%ctx_resource%B~ SPRINT spell_fact_out ~trap_own_spell~ LPM ad_spell_name_to
 	END
 	PHP_EACH fx_ids_259 AS _ => trap_id BEGIN
 		SET ~fx_trap_anchor_%trap_id%~ = trap_id
@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_op_259_support BEGIN
 			SPRINT trap_resref $fx_resource(~%trap_id%~)
 			SPRINT trap_spell ~%trap_own_spell%~
 			PATCH_IF NOT (~%trap_resref%~ STRING_EQUAL ~~) BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%trap_resref%~ RET trap_spell = name END
+				SPRINT spell_fact_resref ~%trap_resref%~ SPRINT spell_fact_out ~trap_spell~ LPM ad_spell_name_to
 			END
 			PATCH_IF trap_level < 0 OR trap_level > 9 BEGIN
 				SET drop_id = trap_id

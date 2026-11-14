@@ -16,7 +16,7 @@
 DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 	SPRINT power_own_spell ~~
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
-		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET power_own_spell = name END
+		SPRINT spell_fact_resref ~%ctx_resource%B~ SPRINT spell_fact_out ~power_own_spell~ LPM ad_spell_name_to
 	END
 	PHP_EACH ~fx_ids_%power_opcode%~ AS _ => power_id BEGIN
 		SET ~fx_power_mask_%power_id%~ = 0
@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_spell_power_support BEGIN
 			SPRINT power_resref $fx_resource(~%power_id%~)
 			SPRINT power_spell ~%power_own_spell%~
 			PATCH_IF NOT (~%power_resref%~ STRING_EQUAL ~~) BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%power_resref%~ RET power_spell = name END
+				SPRINT spell_fact_resref ~%power_resref%~ SPRINT spell_fact_out ~power_spell~ LPM ad_spell_name_to
 			END
 			PATCH_IF power_level < 0 OR power_level > 9 BEGIN
 				SET drop_id = power_id

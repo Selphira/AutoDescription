@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 					FOR (select_row = 0; select_row < select_rows; ++select_row) BEGIN
 						READ_2DA_ENTRY select_row 1 3 select_resref
 						PATCH_IF FILE_EXISTS_IN_GAME ~%select_resref%.spl~ BEGIN
-							LPF ad_spell_name STR_VAR resref = ~%select_resref%~ RET select_name = name END
+							SPRINT spell_fact_resref ~%select_resref%~ SPRINT spell_fact_out ~select_name~ LPM ad_spell_name_to
 							PATCH_IF NOT (~%select_name%~ STRING_EQUAL ~~) BEGIN
 								SPRINT select_spells ~%select_spells%%CRLF%  * %select_name%~
 							END

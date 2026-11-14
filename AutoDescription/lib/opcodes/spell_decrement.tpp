@@ -13,7 +13,7 @@
 DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 	SPRINT decrement_own_spell ~~
 	PATCH_IF IS_EE AND STRING_LENGTH ~%ctx_resource%~ <= 7 BEGIN
-		LPF ad_spell_name STR_VAR resref = EVAL ~%ctx_resource%B~ RET decrement_own_spell = name END
+		SPRINT spell_fact_resref ~%ctx_resource%B~ SPRINT spell_fact_out ~decrement_own_spell~ LPM ad_spell_name_to
 	END
 	PHP_EACH ~fx_ids_%decrement_opcode%~ AS _ => decrement_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
@@ -29,7 +29,7 @@ DEFINE_PATCH_MACRO ad_decrement_support BEGIN
 			SPRINT decrement_resref $fx_resource(~%decrement_id%~)
 			SPRINT decrement_spell ~%decrement_own_spell%~
 			PATCH_IF NOT (~%decrement_resref%~ STRING_EQUAL ~~) BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%decrement_resref%~ RET decrement_spell = name END
+				SPRINT spell_fact_resref ~%decrement_resref%~ SPRINT spell_fact_out ~decrement_spell~ LPM ad_spell_name_to
 			END
 			PATCH_IF $fx_parameter1(~%decrement_id%~) < 1 BEGIN
 				// Sur EE, l'ancien moteur ne l'écarte pas : effet en jeu non établi.

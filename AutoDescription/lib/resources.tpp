@@ -1,28 +1,35 @@
 // Noms des ressources citées par les effets.
 
-// Nom d'un sort : nom imposé par AD_SPELL_NAMES (lib/catalog.tpa ; vide : sort à ne pas citer),
-// sinon nom non identifié du fichier ; vide si le sort n'existe pas ou n'a pas de nom.
-DEFINE_PATCH_FUNCTION ad_spell_name
-	STR_VAR
-		resref = ~~
-	RET
-		name
-BEGIN
-	SPRINT name ~~
-	SPRINT spell_key ~%resref%~
-	TO_LOWER spell_key
-	PATCH_IF VARIABLE_IS_SET $AD_SPELL_NAMES(~%spell_key%~) BEGIN
-		SET spell_name_tra = $AD_SPELL_NAMES(~%spell_key%~)
-		SET tra_id = spell_name_tra SPRINT tra_out ~name~ LPM ad_tra_to
+// Nom du sort spell_fact_resref, écrit dans la variable nommée par spell_fact_out : nom imposé par
+// AD_SPELL_NAMES (lib/catalog.tpa ; vide : sort à ne pas citer), sinon nom non identifié du fichier ;
+// vide si le sort n'existe pas ou n'a pas de nom.
+// Une description cite souvent le même sort (à chaque en-tête, à chaque regroupement) : le strref lu
+// est gardé dans spell_fact_name_ref_<sort>, dans la portée de la description, qui le perd à son
+// retour. On garde le strref, pas le texte : relu par $tableau, un texte verrait ses %…% évalués
+// (AUTO_EVAL_STRINGS), ce que GET_STRREF ne fait pas.
+DEFINE_PATCH_MACRO ad_spell_name_to BEGIN
+	SPRINT spell_fact_key ~%spell_fact_resref%~
+	TO_LOWER spell_fact_key
+	SPRINT spell_fact_text ~~
+	PATCH_IF VARIABLE_IS_SET $AD_SPELL_NAMES(~%spell_fact_key%~) BEGIN
+		SET tra_id = $AD_SPELL_NAMES(~%spell_fact_key%~) SPRINT tra_out ~spell_fact_text~ LPM ad_tra_to
 	END
-	ELSE PATCH_IF NOT ~%resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%resref%.spl~ BEGIN
-		INNER_PATCH_FILE ~%resref%.spl~ BEGIN
-			READ_LONG SPL_unidentified_name spell_name_ref
-			PATCH_IF spell_name_ref > 0 BEGIN
-				READ_STRREF SPL_unidentified_name name
+	ELSE BEGIN
+		PATCH_IF NOT VARIABLE_IS_SET $spell_fact_name_ref(~%spell_fact_key%~) BEGIN
+			SET spell_fact_ref = 0
+			PATCH_IF NOT ~%spell_fact_resref%~ STRING_EQUAL ~~ AND FILE_EXISTS_IN_GAME ~%spell_fact_resref%.spl~ BEGIN
+				INNER_PATCH_FILE ~%spell_fact_resref%.spl~ BEGIN
+					READ_LONG SPL_unidentified_name spell_fact_ref
+				END
 			END
+			SET ~spell_fact_name_ref_%spell_fact_key%~ = spell_fact_ref
+		END
+		SET spell_fact_ref = $spell_fact_name_ref(~%spell_fact_key%~)
+		PATCH_IF spell_fact_ref > 0 BEGIN
+			GET_STRREF spell_fact_ref spell_fact_text
 		END
 	END
+	SPRINT ~%spell_fact_out%~ ~%spell_fact_text%~
 END
 
 // Zone du projectile projectile (index du champ d'un en-tête, 1 : aucun) d'un projectile de zone

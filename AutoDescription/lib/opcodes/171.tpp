@@ -16,7 +16,7 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 				LPM ad_application_drop
 			END
 			ELSE BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%ability_resref%~ RET ability_name = name END
+				SPRINT spell_fact_resref ~%ability_resref%~ SPRINT spell_fact_out ~ability_name~ LPM ad_spell_name_to
 				SET ability_type = 0
 				INNER_PATCH_FILE ~%ability_resref%.spl~ BEGIN
 					PATCH_IF BUFFER_LENGTH >= SPL_type + 2 BEGIN

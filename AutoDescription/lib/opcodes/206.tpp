@@ -1,5 +1,5 @@
 // Opcode 206 (Spell: Protection from Spell) : immunité au sort resource, « Immunité au sort
-// « Lent » » ; nom du sort par ad_spell_name (lib/resources.tpp), sans ligne si le nom est
+// « Lent » » ; nom du sort par ad_spell_name_to (lib/resources.tpp), sans ligne si le nom est
 // vide. Une immunité à l'opcode que le sort inflige peut l'absorber (ad_group_immunities,
 // lib/groups.tpp).
 //
@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_op_206_support BEGIN
 			// Sort absent ou sans nom : pas de ligne (ad_op_206_lines), comme dans l'ancien moteur ; sans
 			// objet pour l'en-tête d'un sort seul.
 			ELSE PATCH_IF NOT support_header_only BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%spell_resref%~ RET spell_support_name = name END
+				SPRINT spell_fact_resref ~%spell_resref%~ SPRINT spell_fact_out ~spell_support_name~ LPM ad_spell_name_to
 				PATCH_IF ~%spell_support_name%~ STRING_EQUAL ~~ BEGIN
 					SET ignored_fx = spell_id
 					SPRINT ignored_reason ~not_implemented:opcode206:no_name~
@@ -90,7 +90,7 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 		SET $spell_group(~%spell_id%~) = 0 - 1
 		PATCH_IF $fx_opcode(~%spell_id%~) == 206 AND NOT $fx_consumed(~%spell_id%~) BEGIN
 			SPRINT spell_resref $fx_resource(~%spell_id%~)
-			LPF ad_spell_name STR_VAR resref = ~%spell_resref%~ RET spell_name = name END
+			SPRINT spell_fact_resref ~%spell_resref%~ SPRINT spell_fact_out ~spell_name~ LPM ad_spell_name_to
 			SPRINT $spell_name(~%spell_id%~) ~%spell_name%~
 		END
 	END
@@ -228,7 +228,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 					SET $immunity_order(~%immunity_size%~) = immunity_id
 					SET $immunity_checked(~%immunity_size%~) = 0
 					SPRINT immunity_resref $fx_resource(~%immunity_id%~)
-					LPF ad_spell_name STR_VAR resref = ~%immunity_resref%~ RET immunity_name = name END
+					SPRINT spell_fact_resref ~%immunity_resref%~ SPRINT spell_fact_out ~immunity_name~ LPM ad_spell_name_to
 					SPRINT $immunity_names(~%immunity_size%~) ~%immunity_name%~
 					SET immunity_size += 1
 				END

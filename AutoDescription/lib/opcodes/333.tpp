@@ -44,7 +44,7 @@ DEFINE_PATCH_MACRO ad_op_333_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = charge_id STR_VAR reason = ~not_implemented:opcode333:save~ message = ~saving throw attempted at each strike~ RET render_missing = refusal END
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%charge_resref%~ RET charge_name = name END
+				SPRINT spell_fact_resref ~%charge_resref%~ SPRINT spell_fact_out ~charge_name~ LPM ad_spell_name_to
 				SPRINT ~fx_charge_name_%charge_id%~ ~%charge_name%~
 				LPF ad_duration_text INT_VAR seconds = charge_delay tra_base = 3020000 RET charge_frequency = text END // ~chaque round~
 				SPRINT ~fx_charge_frequency_%charge_id%~ ~%charge_frequency%~

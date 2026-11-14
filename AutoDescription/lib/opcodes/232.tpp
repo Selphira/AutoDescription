@@ -51,7 +51,7 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				LPM ad_op_232_condition
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND NOT $fx_dropped(~%condition_id%~) BEGIN
-				LPF ad_spell_name STR_VAR resref = ~%condition_resref%~ RET condition_name = name END
+				SPRINT spell_fact_resref ~%condition_resref%~ SPRINT spell_fact_out ~condition_name~ LPM ad_spell_name_to
 				SPRINT ~fx_spell_name_%condition_id%~ ~%condition_name%~
 				SET recursion_fx = condition_id
 				SPRINT recursion_resref ~%condition_resref%~

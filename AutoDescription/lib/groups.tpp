@@ -346,7 +346,8 @@ END
 // Immunités aux projectiles (ancien opcode_83_group) : une immunité au projectile P (83) absorbe
 // les immunités à un sort (206) de son bloc dont le premier en-tête utilise P ; l'ancien moteur lit
 // cet en-tête juste après celui du fichier (0x72), et la valeur du .spl vaut celle de projectl.ids
-// plus 1.
+// plus 1. Chaque 206 est comparé à chaque 83, dans chaque passe : le projectile lu est gardé par sort
+// (spell_fact_projectile0_<sort>) dans la portée de la description, comme ad_spell_name_to.
 DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
 	PHP_EACH fx_ids_83 AS _ => group_id BEGIN
 		SPRINT group_scope $fx_scope(~%group_id%~)
@@ -355,12 +356,18 @@ DEFINE_PATCH_MACRO ad_group_projectile_spells BEGIN
 			SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 			SPRINT group_spell $fx_resource(~%group_candidate%~)
 			PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
-				SET group_spell_projectile = 0 - 1
-				INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
-					PATCH_IF BUFFER_LENGTH >= 0x72 + SPL_HEAD_projectile + 2 BEGIN
-						READ_SHORT (0x72 + SPL_HEAD_projectile) group_spell_projectile
+				SPRINT group_spell_key ~%group_spell%~
+				TO_LOWER group_spell_key
+				PATCH_IF NOT VARIABLE_IS_SET $spell_fact_projectile0(~%group_spell_key%~) BEGIN
+					SET group_spell_projectile = 0 - 1
+					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+						PATCH_IF BUFFER_LENGTH >= 0x72 + SPL_HEAD_projectile + 2 BEGIN
+							READ_SHORT (0x72 + SPL_HEAD_projectile) group_spell_projectile
+						END
 					END
+					SET ~spell_fact_projectile0_%group_spell_key%~ = group_spell_projectile
 				END
+				SET group_spell_projectile = $spell_fact_projectile0(~%group_spell_key%~)
 				PATCH_IF group_spell_projectile == group_projectile BEGIN
 					SET ~fx_consumed_%group_candidate%~ = 1
 				END
@@ -422,7 +429,8 @@ END
 
 // Immunités à un type secondaire de sort (ancien opcode_205_group) : une immunité au type T (205)
 // absorbe les immunités à un sort (206) de son bloc dont le sort est de type T ; l'ancien moteur lit
-// le type sur quatre octets.
+// le type sur quatre octets, gardé par sort (spell_fact_sectype_<sort>) comme le projectile
+// d'ad_group_projectile_spells.
 DEFINE_PATCH_MACRO ad_group_secondary_type_spells BEGIN
 	PHP_EACH fx_ids_205 AS _ => group_id BEGIN
 		SET group_sectype = $fx_parameter2(~%group_id%~)
@@ -432,12 +440,18 @@ DEFINE_PATCH_MACRO ad_group_secondary_type_spells BEGIN
 				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
 				SPRINT group_spell $fx_resource(~%group_candidate%~)
 				PATCH_IF NOT $fx_consumed(~%group_candidate%~) AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~) AND NOT (~%group_spell%~ STRING_EQUAL ~~) AND FILE_EXISTS_IN_GAME ~%group_spell%.spl~ BEGIN
-					SET group_spell_sectype = 0 - 1
-					INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
-						PATCH_IF BUFFER_LENGTH >= SPL_sectype + 4 BEGIN
-							READ_LONG SPL_sectype group_spell_sectype
+					SPRINT group_spell_key ~%group_spell%~
+					TO_LOWER group_spell_key
+					PATCH_IF NOT VARIABLE_IS_SET $spell_fact_sectype(~%group_spell_key%~) BEGIN
+						SET group_spell_sectype = 0 - 1
+						INNER_PATCH_FILE ~%group_spell%.spl~ BEGIN
+							PATCH_IF BUFFER_LENGTH >= SPL_sectype + 4 BEGIN
+								READ_LONG SPL_sectype group_spell_sectype
+							END
 						END
+						SET ~spell_fact_sectype_%group_spell_key%~ = group_spell_sectype
 					END
+					SET group_spell_sectype = $spell_fact_sectype(~%group_spell_key%~)
 					PATCH_IF group_spell_sectype == group_sectype BEGIN
 						SET ~fx_consumed_%group_candidate%~ = 1
 					END

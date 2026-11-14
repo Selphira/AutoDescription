@@ -25,7 +25,7 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 	PATCH_IF exception_opcode == 318 AND IS_EE AND $fx_parameter2_raw(~%fx_id%~) == 0 BEGIN
 		SPRINT exception_resource $fx_resource(~%fx_id%~)
 		PATCH_IF NOT (~%exception_resource%~ STRING_EQUAL ~~) AND NOT (~%exception_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~) BEGIN
-			LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
+			SPRINT spell_fact_resref ~%exception_resource%~ SPRINT spell_fact_out ~exception_spell_name~ LPM ad_spell_name_to
 			LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
 			PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) AND ~%exception_item_name%~ STRING_EQUAL ~~ BEGIN
 				SET ~fx_opcode_%fx_id%~ = 206
@@ -150,7 +150,7 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 					END
 				END
 				ELSE BEGIN
-					LPF ad_spell_name STR_VAR resref = ~%exception_resource%~ RET exception_spell_name = name END
+					SPRINT spell_fact_resref ~%exception_resource%~ SPRINT spell_fact_out ~exception_spell_name~ LPM ad_spell_name_to
 					LPF ad_item_info STR_VAR resref = ~%exception_resource%~ RET exception_item_name = name END
 					PATCH_IF NOT (~%exception_spell_name%~ STRING_EQUAL ~~) OR NOT (~%exception_item_name%~ STRING_EQUAL ~~) BEGIN
 						SET ~fx_resource_immunity_%exception_id%~ = 1

@@ -13,7 +13,7 @@ DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 		SPRINT ~fx_trap_spell_%heading_id%~ ~~
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%heading_id%~) BEGIN
 			SPRINT heading_resref $fx_resource_lower(~%heading_id%~)
-			LPF ad_spell_name STR_VAR resref = ~%heading_resref%~ RET heading_spell = name END
+			SPRINT spell_fact_resref ~%heading_resref%~ SPRINT spell_fact_out ~heading_spell~ LPM ad_spell_name_to
 			SPRINT ~fx_trap_spell_%heading_id%~ ~%heading_spell%~
 			PATCH_IF ~%heading_resref%~ STRING_EQUAL ~~ BEGIN
 				SET drop_id = heading_id

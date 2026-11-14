@@ -9,7 +9,7 @@ DEFINE_PATCH_MACRO ad_op_207_support BEGIN
 	PHP_EACH fx_ids_207 AS _ => bounce_spell_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SPRINT bounce_spell_resref $fx_resource(~%bounce_spell_id%~)
-			LPF ad_spell_name STR_VAR resref = ~%bounce_spell_resref%~ RET bounce_spell_name = name END
+			SPRINT spell_fact_resref ~%bounce_spell_resref%~ SPRINT spell_fact_out ~bounce_spell_name~ LPM ad_spell_name_to
 			SPRINT ~fx_spell_name_%bounce_spell_id%~ ~%bounce_spell_name%~
 			PATCH_IF ~%bounce_spell_name%~ STRING_EQUAL ~~ BEGIN
 				PATCH_IF FILE_EXISTS_IN_GAME ~%bounce_spell_resref%.spl~ BEGIN

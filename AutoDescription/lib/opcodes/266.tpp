@@ -8,7 +8,7 @@ DEFINE_PATCH_MACRO ad_op_266_support BEGIN
 		SPRINT unprotect_resref $fx_resource(~%unprotect_id%~)
 		SPRINT unprotect_name ~~
 		PATCH_IF NOT (~%unprotect_resref%~ STRING_EQUAL ~~) AND NOT support_header_only BEGIN
-			LPF ad_spell_name STR_VAR resref = ~%unprotect_resref%~ RET unprotect_name = name END
+			SPRINT spell_fact_resref ~%unprotect_resref%~ SPRINT spell_fact_out ~unprotect_name~ LPM ad_spell_name_to
 		END
 		SPRINT ~fx_unprotect_name_%unprotect_id%~ ~%unprotect_name%~
 		PATCH_IF NOT $fx_dropped(~%unprotect_id%~) AND ~%unprotect_resref%~ STRING_EQUAL ~~ BEGIN

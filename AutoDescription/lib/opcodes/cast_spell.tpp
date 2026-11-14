@@ -39,7 +39,7 @@ DEFINE_PATCH_MACRO ad_cast_spell_support BEGIN
 		// Une répétition est réunie à l'effet de tête de sa série (lib/groups.tpp).
 		PATCH_IF $fx_opcode(~%cast_id%~) == cast_opcode AND $fx_series_of(~%cast_id%~) < 0 BEGIN
 			SPRINT cast_resref $fx_resource_lower(~%cast_id%~)
-			LPF ad_spell_name STR_VAR resref = ~%cast_resref%~ RET cast_name = name END
+			SPRINT spell_fact_resref ~%cast_resref%~ SPRINT spell_fact_out ~cast_name~ LPM ad_spell_name_to
 			SPRINT ~fx_spell_name_%cast_id%~ ~%cast_name%~
 			SET cast_h = $fx_header(~%cast_id%~)
 			SET ~fx_cast_charge_%cast_id%~ = 0
