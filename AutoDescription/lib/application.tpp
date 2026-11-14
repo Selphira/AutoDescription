@@ -265,12 +265,11 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 	PATCH_IF $fx_header_target(~%app_id%~) == TARGET_HEAD_area
 			AND $fx_header_projectile(~%app_id%~) > 1 AND item_type != ITM_TYPE_dart AND NOT $charged_other(~%app_header%~) BEGIN
 		LPF ad_projectile_area INT_VAR projectile = $fx_header_projectile(~%app_id%~) RET app_area_shape = area_shape
-			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle app_area_error = area_file_error END
-		PATCH_IF app_area_shape < 0 BEGIN
-			SET app_projectile = $fx_header_projectile(~%app_id%~) - 1
-			LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~file_error:application:projectile_target~ message = ~area projectile %app_projectile% of the ability (PROJECTL.IDS): %app_area_error%~ RET render_missing = refusal END
-		END
-		ELSE PATCH_IF app_area_shape > 0 BEGIN
+			app_area_creatures = area_creatures app_area_feet = area_feet angle = area_angle projectile_error = area_file_error END
+		SET projectile_value = $fx_header_projectile(~%app_id%~)
+		SPRINT projectile_reason ~file_error:application:projectile_target~
+		LPM ad_log_projectile_error
+		PATCH_IF app_area_shape > 0 BEGIN
 			LPF ad_distance_text INT_VAR feet = app_area_feet RET range = text END
 			PATCH_IF ~%range%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = app_id STR_VAR reason = ~not_implemented:application:area_range~ message = ~no text for an area radius of %app_area_feet% feet~ RET render_missing = refusal END

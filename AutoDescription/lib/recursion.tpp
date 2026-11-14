@@ -613,10 +613,15 @@ DEFINE_PATCH_MACRO ad_describe_subresource_effects BEGIN
 		SPRINT ctx_eff_chain ~%ctx_eff_chain%%sub_resref%|~
 	END
 	SET ctx_single_effect = ~%kind%~ STRING_EQUAL ~eff~
+	// Sous-ressource absente (déjà écartée par ad_recursion_support) : le jeu n'applique rien, aucune
+	// ligne.
 	PATCH_IF NOT FILE_EXISTS_IN_GAME ~%sub_resref%.%kind%~ BEGIN
 		SPRINT sub_file ~%sub_resref%.%kind%~
 		TO_UPPER sub_file
-		LPF ad_refusal STR_VAR reason = ~file_error:recursion:missing_file~ message = ~%sub_file% does not exist~ RET sub_missing = refusal END
+		SET ignored_fx = 0 - 1
+		SPRINT ignored_reason ~file_error:recursion:missing_file~
+		SPRINT ignored_message ~%sub_file% does not exist~
+		LPM ad_log_ignored
 	END
 	ELSE PATCH_IF ~%kind%~ STRING_EQUAL ~eff~ BEGIN
 		INNER_PATCH_FILE ~%sub_resref%.eff~ BEGIN
@@ -690,7 +695,8 @@ DEFINE_PATCH_MACRO ad_recursion_load_spell BEGIN
 		READ_LONG  SPL_extended_headers_offset     sub_headers_offset
 		READ_SHORT SPL_extended_headers_count      sub_header_count
 		PATCH_IF sub_headers_offset < 0 OR sub_headers_offset + sub_header_count * 0x28 > BUFFER_LENGTH BEGIN
-			LPF ad_refusal STR_VAR reason = ~file_error:recursion:invalid_header~ message = ~abilities at offset %sub_headers_offset% lie outside the file (%BUFFER_LENGTH% bytes)~ RET sub_missing = refusal END
+			SET sub_file_length = BUFFER_LENGTH
+			LPF ad_refusal STR_VAR reason = ~file_error:recursion:invalid_header~ message = ~abilities at offset %sub_headers_offset% lie outside the file (%sub_file_length% bytes)~ RET sub_missing = refusal END
 		END
 		ELSE PATCH_IF ctx_casting_level > 0 BEGIN
 			SET sub_header_level = 0 - 1
@@ -927,17 +933,17 @@ END
 // Zone du projectile de l'en-tête du sous-sort (ancien get_target_by_projectile, appelé pour chaque
 // sous-effet) : selon la forme de la zone et la cible de l'en-tête, « les créatures dans un rayon de
 // 4,5 mètres », « … autour du buveur » (sur soi ou une créature, projectile qui ignore sa cible ou,
-// sur soi, ne vise que les hostiles), « la cible et les créatures dans un rayon de… ». Refus : fichier
-// illisible, distance trop courte, plusieurs cibles, autre cible d'en-tête (l'ancien moteur garde
-// alors les chaînes de cible).
+// sur soi, ne vise que les hostiles), « la cible et les créatures dans un rayon de… ». Un projectile
+// illisible n'a pas de zone (journalisé). Refus : distance trop courte, plusieurs cibles, autre cible
+// d'en-tête (l'ancien moteur garde alors les chaînes de cible).
 DEFINE_PATCH_MACRO ad_recursion_area BEGIN
 	LPF ad_projectile_area INT_VAR projectile = sub_projectile RET sub_area_shape = area_shape
 		ctx_area_creatures = area_creatures sub_area_feet = area_feet ctx_area_angle = area_angle
-		sub_area_cone = area_cone sub_area_ignore = area_ignore_target sub_area_error = area_file_error END
-	PATCH_IF sub_area_shape < 0 BEGIN
-		LPF ad_refusal STR_VAR reason = ~file_error:recursion:projectile_target~ message = ~area projectile of the ability: %sub_area_error%~ RET sub_missing = refusal END
-	END
-	ELSE PATCH_IF sub_area_shape > 0 BEGIN
+		sub_area_cone = area_cone sub_area_ignore = area_ignore_target projectile_error = area_file_error END
+	SET projectile_value = sub_projectile
+	SPRINT projectile_reason ~file_error:recursion:projectile_target~
+	LPM ad_log_projectile_error
+	PATCH_IF sub_area_shape > 0 BEGIN
 		LPF ad_distance_text INT_VAR feet = sub_area_feet RET ctx_area_range = text END
 		PATCH_IF ~%ctx_area_range%~ STRING_EQUAL ~~ BEGIN
 			LPF ad_refusal STR_VAR reason = ~not_implemented:recursion:area_range~ message = ~no text for the area radius of the projectile~ RET sub_missing = refusal END

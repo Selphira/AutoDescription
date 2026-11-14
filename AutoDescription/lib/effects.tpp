@@ -98,13 +98,15 @@ END
 DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
 	LPM ad_fx_reset
 	READ_ASCII ITM_signature fx_signature (8)
+	// BUFFER_LENGTH n'est pas une variable : %BUFFER_LENGTH% ne serait pas remplacé dans un texte.
+	SET fx_file_length = BUFFER_LENGTH
 	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~ITM V1  ~) BEGIN
 		SPRINT fx_load_error ~unsupported_format~
 		SPRINT fx_load_message ~signature "%fx_signature%" (expected "ITM V1  ")~
 	END
 	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
 		SPRINT fx_load_error ~invalid_file~
-		SPRINT fx_load_message ~file of %BUFFER_LENGTH% bytes, shorter than the ITM V1 header (114 bytes)~
+		SPRINT fx_load_message ~file of %fx_file_length% bytes, shorter than the ITM V1 header (114 bytes)~
 	END
 	ELSE BEGIN
 		READ_LONG  ITM_feature_blocks_offset   fx_table_offset
@@ -119,7 +121,7 @@ DEFINE_PATCH_MACRO ad_fx_load_item BEGIN
 			SET fx_header_offset = fx_headers_offset + fx_h * 0x38
 			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x38 > BUFFER_LENGTH BEGIN
 				SPRINT fx_load_error ~invalid_header~
-				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
+				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%fx_file_length% bytes)~
 			END
 			ELSE BEGIN
 				READ_SHORT (fx_header_offset + ITM_HEAD_feature_block_count) fx_block_count
@@ -154,13 +156,15 @@ END
 DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 	LPM ad_fx_reset
 	READ_ASCII SPL_signature fx_signature (8)
+	// BUFFER_LENGTH n'est pas une variable : %BUFFER_LENGTH% ne serait pas remplacé dans un texte.
+	SET fx_file_length = BUFFER_LENGTH
 	PATCH_IF NOT (~%fx_signature%~ STRING_EQUAL ~SPL V1  ~) BEGIN
 		SPRINT fx_load_error ~unsupported_format~
 		SPRINT fx_load_message ~signature "%fx_signature%" (expected "SPL V1  ")~
 	END
 	ELSE PATCH_IF BUFFER_LENGTH < 0x72 BEGIN
 		SPRINT fx_load_error ~invalid_file~
-		SPRINT fx_load_message ~file of %BUFFER_LENGTH% bytes, shorter than the SPL V1 header (114 bytes)~
+		SPRINT fx_load_message ~file of %fx_file_length% bytes, shorter than the SPL V1 header (114 bytes)~
 	END
 	ELSE BEGIN
 		READ_LONG  SPL_feature_blocks_offset         fx_table_offset
@@ -179,7 +183,7 @@ DEFINE_PATCH_MACRO ad_fx_load_spell BEGIN
 			SET fx_header_offset = fx_headers_offset + fx_h * 0x28
 			PATCH_IF fx_header_offset < 0 OR fx_header_offset + 0x28 > BUFFER_LENGTH BEGIN
 				SPRINT fx_load_error ~invalid_header~
-				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
+				SPRINT fx_load_message ~ability %fx_h% at offset %fx_header_offset% lies outside the file (%fx_file_length% bytes)~
 			END
 			ELSE BEGIN
 				READ_SHORT (fx_header_offset + SPL_HEAD_feature_blocks_count)  fx_block_count
@@ -238,11 +242,12 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	END
 	ELSE PATCH_IF fx_offset < 0 OR fx_offset + 0x30 > BUFFER_LENGTH BEGIN
 		SPRINT fx_load_error ~invalid_effect~
+		SET fx_file_length = BUFFER_LENGTH
 		SPRINT fx_load_message ~%fx_block_kind% effect %fx_p%~
 		PATCH_IF fx_block_header >= 0 BEGIN
 			SPRINT fx_load_message ~ability %fx_block_header%, effect %fx_p%~
 		END
-		SPRINT fx_load_message ~%fx_load_message% at offset %fx_offset% lies outside the file (%BUFFER_LENGTH% bytes)~
+		SPRINT fx_load_message ~%fx_load_message% at offset %fx_offset% lies outside the file (%fx_file_length% bytes)~
 	END
 	ELSE BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode

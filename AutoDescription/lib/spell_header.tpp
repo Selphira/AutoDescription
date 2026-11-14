@@ -210,8 +210,8 @@ END
 
 // Refus des cas que ce rendu ne sait pas reproduire (header_missing, vide sinon), avant le rendu :
 // sort sans en-tête, plusieurs en-têtes dont les niveaux ne croissent pas (absents du jeu de base),
-// types et écoles sans nom, refus de la chaîne des effets. Un type secondaire sans nom n'est pas
-// écrit (journalisé).
+// refus de la chaîne des effets. Un type (0 - 1 dans spell_type_name), une école (spell_school) ou un
+// type secondaire sans nom n'est pas écrit (journalisé).
 DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 	SPRINT header_missing ~~
 	SPRINT spell_self ~%SOURCE_RES%~
@@ -250,15 +250,22 @@ DEFINE_PATCH_MACRO ad_spell_header_support BEGIN
 				SET spell_type_name = 7
 			END
 		END
-		PATCH_IF spell_type_name < 0 OR spell_type_name > 7 BEGIN
-			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:type~ message = ~spell type %spell_type% (expected 0-5)~ RET header_missing = refusal END
+		PATCH_IF spell_type > 5 BEGIN
+			SET spell_type_name = 0 - 1
+			SET ignored_fx = 0 - 1
+			SPRINT ignored_reason ~file_error:spell_header:type~
+			SPRINT ignored_message ~spell type %spell_type% (expected 0-5): not written~
+			LPM ad_log_ignored
 		END
-		ELSE PATCH_IF spell_school > 10 BEGIN
-			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:school~ message = ~spell school %spell_school% (expected 0-10)~ RET header_missing = refusal END
+		PATCH_IF spell_school > 10 BEGIN
+			SET ignored_fx = 0 - 1
+			SPRINT ignored_reason ~file_error:spell_header:school~
+			SPRINT ignored_message ~spell school %spell_school% (expected 0-10): not written~
+			LPM ad_log_ignored
 		END
 		// Type secondaire sans nom (ajouté par un mod hors de AD_SECONDARY_TYPE_MODS, ou invalide) : pas
 		// écrit, comme dans l'ancien moteur.
-		ELSE PATCH_IF spell_sectype != 0 BEGIN
+		PATCH_IF spell_sectype != 0 BEGIN
 			LPF ad_spell_secondary_type_name INT_VAR secondary_type = spell_sectype RET header_sectype = name END
 			PATCH_IF ~%header_sectype%~ STRING_EQUAL ~~ BEGIN
 				SET ignored_fx = 0 - 1
@@ -358,19 +365,34 @@ END
 
 // « (Profane - Évocation, Dégâts offensifs) » : type (un sort divin réservé aux prêtres ou aux
 // druides est dit « Divin » ou « Druidique »), école si elle n'est pas nulle, type secondaire s'il a
-// un nom (en anglais, le type 0 en a un).
+// un nom (en anglais, le type 0 en a un). Un type ou une école invalide n'est pas écrit
+// (ad_spell_header_support) ; sans rien à écrire, pas de ligne.
 DEFINE_PATCH_MACRO ad_spell_header_type_line BEGIN
-	SET tra_id = 8130000 + spell_type_name SET tra_block_start = 8130000 SET tra_block_size = 8 SPRINT tra_out ~header_type~ LPM ad_tra_to // ~Profane~ (@8130001)
+	SPRINT header_line ~~
+	PATCH_IF spell_type_name >= 0 BEGIN
+		SET tra_id = 8130000 + spell_type_name SET tra_block_start = 8130000 SET tra_block_size = 8 SPRINT tra_out ~header_line~ LPM ad_tra_to // ~Profane~ (@8130001)
+	END
 	LPF ad_spell_secondary_type_name INT_VAR secondary_type = spell_sectype RET header_sectype = name END
-	SPRINT header_line ~%header_type%~
-	PATCH_IF spell_school > 0 BEGIN
+	PATCH_IF spell_school > 0 AND spell_school <= 10 BEGIN
 		SET tra_id = 8140000 + spell_school SET tra_block_start = 8140000 SET tra_block_size = 11 SPRINT tra_out ~header_school~ LPM ad_tra_to // ~Évocation~ (@8140006)
-		SPRINT header_line ~%header_line% - %header_school%~
+		PATCH_IF ~%header_line%~ STRING_EQUAL ~~ BEGIN
+			SPRINT header_line ~%header_school%~
+		END
+		ELSE BEGIN
+			SPRINT header_line ~%header_line% - %header_school%~
+		END
 	END
 	PATCH_IF NOT (~%header_sectype%~ STRING_EQUAL ~~) BEGIN
-		SPRINT header_line ~%header_line%, %header_sectype%~
+		PATCH_IF ~%header_line%~ STRING_EQUAL ~~ BEGIN
+			SPRINT header_line ~%header_sectype%~
+		END
+		ELSE BEGIN
+			SPRINT header_line ~%header_line%, %header_sectype%~
+		END
 	END
-	SPRINT description ~%description%%CRLF%(%header_line%)~
+	PATCH_IF NOT (~%header_line%~ STRING_EQUAL ~~) BEGIN
+		SPRINT description ~%description%%CRLF%(%header_line%)~
+	END
 END
 
 // Distance d'un en-tête de sort, donnée en pieds, comme l'ancien feets_to_meters : à partir de 0,3
@@ -744,16 +766,10 @@ END
 DEFINE_PATCH_MACRO ad_spell_header_projectile_duration BEGIN
 	SET projectile_count = 0
 	FOR (projectile_h = 0; projectile_h < fx_header_count; ++projectile_h) BEGIN
+		// Un projectile illisible n'a pas de zone : journalisé par la zone d'effet (ad_spell_header_ability_area).
 		LPF ad_projectile_area INT_VAR projectile = $spell_projectile(~%projectile_h%~) RET projectile_shape = area_shape
-			projectile_delay = area_delay projectile_triggers = area_triggers projectile_missing = area_file_missing projectile_error = area_file_error END
-		PATCH_IF projectile_missing OR projectile_shape < 0 BEGIN
-			SPRINT projectile_message ~projectile of ability %projectile_h% missing or too short to be read~
-			PATCH_IF NOT (~%projectile_error%~ STRING_EQUAL ~~) BEGIN
-				SPRINT projectile_message ~projectile of ability %projectile_h%: %projectile_error%~
-			END
-			LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~%projectile_message%~ RET header_missing = refusal END
-		END
-		ELSE PATCH_IF projectile_shape != 0 AND projectile_triggers > 1 BEGIN
+			projectile_delay = area_delay projectile_triggers = area_triggers END
+		PATCH_IF projectile_shape != 0 AND projectile_triggers > 1 BEGIN
 			SET $projectile_level(~%projectile_count%~) = $spell_level(~%projectile_h%~)
 			SET $projectile_value(~%projectile_count%~) = 6 * projectile_delay * projectile_triggers / 100
 			SET projectile_count += 1
@@ -930,15 +946,11 @@ DEFINE_PATCH_MACRO ad_spell_header_ability_area BEGIN
 	SET area_target = $spell_target(~%area_h%~)
 	SET countTarget = $spell_target_count(~%area_h%~)
 	LPF ad_projectile_area INT_VAR projectile = $spell_projectile(~%area_h%~) RET area_shape area_creatures
-		area_angle area_cone area_ignore_target area_size area_file_missing area_file_error END
-	PATCH_IF area_file_missing OR area_shape < 0 BEGIN
-		SPRINT area_message ~projectile of the ability missing or too short to be read~
-		PATCH_IF NOT (~%area_file_error%~ STRING_EQUAL ~~) BEGIN
-			SPRINT area_message ~projectile of the ability: %area_file_error%~
-		END
-		LPF ad_refusal STR_VAR reason = ~file_error:spell_header:projectile~ message = ~%area_message%~ RET header_missing = refusal END
-	END
-	ELSE PATCH_IF area_shape > 0 BEGIN
+		area_angle area_cone area_ignore_target area_size projectile_error = area_file_error END
+	SET projectile_value = $spell_projectile(~%area_h%~)
+	SPRINT projectile_reason ~file_error:spell_header:projectile~
+	LPM ad_log_projectile_error
+	PATCH_IF area_shape > 0 BEGIN
 		LPF ad_spell_distance_text INT_VAR feet = area_size / 17 RET range = text END
 		SET angle = area_angle
 		SET area_form = 0 - 1

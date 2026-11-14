@@ -43,14 +43,14 @@ DEFINE_PATCH_MACRO ad_spell_name_to BEGIN
 END
 
 // Zone du projectile projectile (index du champ d'un en-tête, 1 : aucun) d'un projectile de zone
-// (.pro de type 3), comme l'ancien get_target_by_projectile : area_shape 1 rayon, 2 cône (0 sans
-// zone, 0 - 1 fichier illisible) ; area_creatures 0 toutes, 1 hostiles, 2 drapeaux « hostiles » et
+// (.pro de type 3), comme l'ancien get_target_by_projectile : area_shape 1 rayon, 2 cône, 0 sans
+// zone ; area_creatures 0 toutes, 1 hostiles, 2 drapeaux « hostiles » et
 // « alliées » ensemble (bits 6 et 7) ; area_feet rayon en pieds ; area_angle arc du cône ; area_cone
 // forme de cône (bit 11, rayon s'il n'a pas d'arc) ; area_ignore_target : le projectile ne touche pas
 // sa cible (bit 4 des drapeaux d'étincelles) ; area_size, area_delay, area_triggers : taille de la
 // zone, délai entre deux explosions (100 par round) et nombre d'explosions lus dans le fichier ;
-// area_file_missing : projectl.ids nomme un fichier .pro absent ; area_file_error : message d'un
-// fichier illisible (plus court que l'en-tête du format, ou que la zone d'un projectile de type 3).
+// area_file_error : message d'un fichier .pro nommé par projectl.ids absent ou illisible (plus court
+// que l'en-tête du format, ou que la zone d'un projectile de type 3), dont la zone est alors nulle.
 DEFINE_PATCH_FUNCTION ad_projectile_area
 	INT_VAR
 		projectile = 0
@@ -64,7 +64,6 @@ DEFINE_PATCH_FUNCTION ad_projectile_area
 		area_size
 		area_delay
 		area_triggers
-		area_file_missing
 		area_file_error
 BEGIN
 	SPRINT area_file_error ~~
@@ -77,10 +76,11 @@ BEGIN
 	SET area_size = 0
 	SET area_delay = 0
 	SET area_triggers = 0
-	SET area_file_missing = 0
 	PATCH_IF projectile > 1 BEGIN
 		LOOKUP_IDS_SYMBOL_OF_INT area_file ~projectl~ (projectile - 1)
 		PATCH_IF NOT IS_AN_INT area_file BEGIN
+			SET area_ids = projectile - 1
+			SPRINT area_file_text ~projectile %area_file%.PRO (value %area_ids% of PROJECTL.IDS)~
 			PATCH_IF FILE_EXISTS_IN_GAME ~%area_file%.pro~ BEGIN
 				INNER_PATCH_FILE ~%area_file%.pro~ BEGIN
 					SET area_type = 0
@@ -88,9 +88,8 @@ BEGIN
 						READ_SHORT 0x8 area_type
 					END
 					ELSE BEGIN
-						SET area_shape = 0 - 1
 						SET file_length = BUFFER_LENGTH
-						SPRINT area_file_error ~projectile %area_file%.PRO: file of %file_length% bytes, shorter than the PRO V1 header (256 bytes)~
+						SPRINT area_file_error ~%area_file_text%: file of %file_length% bytes, shorter than the PRO V1 header (256 bytes)~
 					END
 					PATCH_IF area_type == 3 AND BUFFER_LENGTH >= 0x226 BEGIN
 						READ_LONG  0x200 area_flags
@@ -116,16 +115,30 @@ BEGIN
 						END
 					END
 					ELSE PATCH_IF area_type == 3 BEGIN
-						SET area_shape = 0 - 1
 						SET file_length = BUFFER_LENGTH
-						SPRINT area_file_error ~projectile %area_file%.PRO: area projectile (type 3) of %file_length% bytes, shorter than its area data (550 bytes)~
+						SPRINT area_file_error ~%area_file_text%: area projectile (type 3) of %file_length% bytes, shorter than its area data (550 bytes)~
 					END
 				END
 			END
 			ELSE BEGIN
-				SET area_file_missing = 1
+				SPRINT area_file_error ~%area_file_text% does not exist~
 			END
 		END
+	END
+END
+
+// Projectile projectile_value (champ d'un en-tête) dont ad_projectile_area n'a pas lu la zone
+// (message projectile_error, vide sinon) : les effets sont décrits sans elle. Erreur de fichier de
+// raison projectile_reason, journalisée une fois par projectile dans la portée de la description en
+// cours (ressource décrite ou sous-description), où ses en-têtes et ses effets la redemandent.
+DEFINE_PATCH_MACRO ad_log_projectile_error BEGIN
+	PATCH_IF NOT (~%projectile_error%~ STRING_EQUAL ~~) AND NOT VARIABLE_IS_SET $projectile_error_logged(~%projectile_value%~) BEGIN
+		SET $projectile_error_logged(~%projectile_value%~) = 1
+		SET ignored_fx = 0 - 1
+		SPRINT ignored_reason ~%projectile_reason%~
+		SPRINT ignored_message ~%projectile_error%: described without its area~
+		SPRINT ignored_consequence ~kept~
+		LPM ad_log_ignored
 	END
 END
 

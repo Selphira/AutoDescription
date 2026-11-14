@@ -147,11 +147,18 @@ DEFINE_PATCH_MACRO ad_item_combat_support BEGIN
 	END
 	FOR (combat_id = 0; combat_id < combat_count AND ~%render_missing%~ STRING_EQUAL ~~; ++combat_id) BEGIN
 		SPRINT combat_section_type $combat_section_type(~%combat_id%~)
+		// Le jeu traite un type de dégâts au-delà de 9 comme le type 0 (IESDP) : décrit comme lui.
 		PATCH_IF $combat_damage_type(~%combat_id%~) > 9 BEGIN
 			SET combat_value = $combat_damage_type(~%combat_id%~)
-			LPF ad_refusal STR_VAR reason = ~file_error:combat:damage_type~ message = ~damage type %combat_value% of combat ability %combat_id% (expected 0-9)~ RET render_missing = refusal END
+			SET combat_value_header = $combat_header(~%combat_id%~)
+			SET $combat_damage_type(~%combat_id%~) = 0
+			SET ignored_fx = 0 - 1
+			SPRINT ignored_reason ~file_error:combat:damage_type~
+			SPRINT ignored_message ~damage type %combat_value% of ability %combat_value_header% (expected 0-9): described as damage type 0, as the game does~
+			SPRINT ignored_consequence ~kept~
+			LPM ad_log_ignored
 		END
-		ELSE PATCH_IF combat_is_ammo AND $combat_weapon(~%combat_id%~) AND ($combat_launcher(~%combat_id%~) < 1 OR $combat_launcher(~%combat_id%~) > 3) BEGIN
+		PATCH_IF combat_is_ammo AND $combat_weapon(~%combat_id%~) AND ($combat_launcher(~%combat_id%~) < 1 OR $combat_launcher(~%combat_id%~) > 3) BEGIN
 			SET combat_value = $combat_launcher(~%combat_id%~)
 			LPF ad_refusal STR_VAR reason = ~not_implemented:combat:launcher~ message = ~launcher %combat_value% of ammunition ability %combat_id% (expected 1-3)~ RET render_missing = refusal END
 		END
