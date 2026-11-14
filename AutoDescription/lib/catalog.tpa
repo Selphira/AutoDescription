@@ -12,13 +12,15 @@
 //   un effet qui persiste après la mort est seulement dit permanent).
 // Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
 // décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
+// AD_OPCODE_DESCRIBED ne contient que les opcodes décrits dans le jeu courant (DESCRIBED et
+// disponibles) : le tester par VARIABLE_IS_SET, sans écrire de variable de contexte.
 //
 // Chaque table 2DA de ce fichier est lue dans une fonction, qui ne rend que ses tableaux AD_*
 // (RET_ARRAY) : READ_2DA_ENTRIES_NOW laisse une variable par cellule, qui disparaît au retour de
 // la fonction (V7). Chaque variable restante renchérit tous les LPF de l'installation, qui copient
 // toutes les variables.
 DEFINE_ACTION_FUNCTION ad_read_opcode_catalog
-	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DESCRIBED AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
 BEGIN
 	OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
 	COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
@@ -32,13 +34,16 @@ BEGIN
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row 6 ad_duration
 			SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
 			SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
+			PATCH_IF ad_available AND (~%ad_status%~ STRING_EQUAL ~DESCRIBED~) BEGIN
+				SET $AD_OPCODE_DESCRIBED(~%ad_opcode%~) = 1
+			END
 			SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
 			SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
 			SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
 		END
 END
 LAF ad_read_opcode_catalog
-	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DESCRIBED AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
 END
 
 // Sorts d'Item Revision que l'ancien moteur décrit par un texte propre au lieu de les citer (anciens

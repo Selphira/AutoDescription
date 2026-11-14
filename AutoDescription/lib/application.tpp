@@ -310,14 +310,14 @@ DEFINE_PATCH_MACRO ad_application_drop BEGIN
 			AND (drop_timing == TIMING_duration OR drop_timing == TIMING_duration_ticks) AND $fx_duration(~%drop_id%~) > 0 BEGIN
 		SET drop_twin = 0
 		FOR (drop_other = 0; drop_other < fx_count; ++drop_other) BEGIN
-			SET render_opcode = $fx_opcode(~%drop_other%~)
+			// Appelée pendant la prise en charge d'un opcode : render_opcode, l'opcode en cours, n'est pas réécrit.
+			SET drop_other_opcode = $fx_opcode(~%drop_other%~)
 			SPRINT drop_other_scope $fx_scope(~%drop_other%~)
-			LPM ad_opcode_is_described
-			PATCH_IF drop_other != drop_id AND opcode_described AND NOT $fx_consumed(~%drop_other%~)
+			PATCH_IF drop_other != drop_id AND VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%drop_other_opcode%~) AND NOT $fx_consumed(~%drop_other%~)
 					AND (~%drop_other_scope%~ STRING_EQUAL ~%drop_scope%~)
 					AND $fx_timing(~%drop_other%~) == drop_timing
 					AND $fx_duration(~%drop_other%~) == $fx_duration(~%drop_id%~) BEGIN
-				SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%render_opcode%~)
+				SPRINT drop_duration_kind $AD_OPCODE_DURATION(~%drop_other_opcode%~)
 				PATCH_IF NOT (~%drop_duration_kind%~ STRING_EQUAL ~IGNORED~) BEGIN
 					SET drop_twin = 1
 				END

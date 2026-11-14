@@ -462,6 +462,57 @@ def check_arrays_written_by_name(report):
     print(f"  {len(written)} tableaux écrits par nom, {len(walked)} parcours examinés")
 
 
+# Variables de contexte d'une description (type de l'objet, sort ou objet, opcode rendu, texte,
+# contexte d'une sous-ressource) et fichiers de lib/ dont les macros peuvent les écrire. Une macro
+# partage la portée de son appelant : écrite ailleurs, la variable change pour tout ce qui suit
+# (exemple : l'opcode 181 qui rangeait le type interdit dans item_type). Les fonctions ont leur
+# propre portée : elles ne sont pas contrôlées.
+CONTEXT_OWNERS = {
+    "item_type": ("item_render.tpp",),
+    "resource_is_spell": (),
+    "support_spell": (),
+    "support_header_only": (),
+    "kind": (),
+    "render_opcode": ("application.tpp", "item_charged.tpp", "item_render.tpp", "recursion.tpp",
+                      "spell_header.tpp", "spell_levels.tpp"),
+    "description": ("application.tpp", "item_charged.tpp", "item_combat.tpp", "item_render.tpp", "lines.tpp",
+                    "spell_header.tpp", "spell_levels.tpp"),
+    "ctx_": ("recursion.tpp", "spell_levels.tpp"),
+}
+CONTEXT_NAME = r"(?:" + "|".join(sorted(n for n in CONTEXT_OWNERS if n != "ctx_")) + r"|ctx_[a-z0-9_]+)"
+CONTEXT_ASSIGNMENT = re.compile(
+    r"(?:\b(?:SET|SPRINT|TEXT_SPRINT|AS|READ_(?:BYTE|SHORT|LONG|ASCII|SBYTE|SSHORT|SLONG)\s+(?:\([^()]*\)|[A-Za-z0-9_]+))|=>)"
+    r"\s+(" + CONTEXT_NAME + r")\b(?!\s*\()")
+CALL_RETURN = re.compile(r"\bRET\b(.*?)\bEND\b", re.S)
+RETURNED_CONTEXT = re.compile(r"\b(" + CONTEXT_NAME + r")\s*=")
+
+
+def check_context_variables(report):
+    """Variables de contexte écrites dans une macro hors de leurs fichiers propriétaires.
+
+    Jamais dans lib/opcodes/ : une macro d'opcode range ses valeurs dans ses propres variables.
+    """
+    report.section("Variables de contexte écrites hors de leurs fichiers")
+    checked = 0
+    for path in (p for p in weidu_files() if in_engine(p)):
+        no_comments, _ = strip_weidu(read_text(path))
+        starts = [(m.start(), m.group(2)) for m in DEFINITION.finditer(no_comments)]
+        writes = [(m.start(), m.group(1)) for m in CONTEXT_ASSIGNMENT.finditer(no_comments)]
+        for match in CALL_RETURN.finditer(no_comments):
+            writes += [(match.start(1) + m.start(), m.group(1)) for m in RETURNED_CONTEXT.finditer(match.group(1))]
+        in_opcodes = path.parent.name == "opcodes"
+        for position, name in sorted(writes):
+            enclosing = [kind for start, kind in starts if start < position]
+            if enclosing and enclosing[-1] == "FUNCTION":
+                continue
+            checked += 1
+            owners = CONTEXT_OWNERS["ctx_" if name.startswith("ctx_") else name]
+            if in_opcodes or path.name not in owners:
+                report.add("ERREUR", f"{relative(path)}:{line_of(no_comments, position)} : {name} écrite par une macro "
+                           f"hors de ses fichiers ({', '.join(owners) or 'aucune macro'})")
+    print(f"  {checked} écritures de variables de contexte examinées")
+
+
 # ---------------------------------------------------------------------------------------------
 # Analyse syntaxique WeiDU
 
@@ -514,6 +565,7 @@ def main():
     check_opcode_includes(report)
     check_new_lib_conventions(report, definitions)
     check_arrays_written_by_name(report)
+    check_context_variables(report)
     if not args.no_parse:
         if weidu.is_file():
             check_parse(report, weidu)
