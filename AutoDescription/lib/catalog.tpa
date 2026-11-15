@@ -141,6 +141,18 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_HEADER_IGNORED BEGIN
 	279 => 1
 END
 
+// Opcodes qui protègent une ressource d'un second lancement (ad_fx_self_protection, lib/spell_header.tpp) :
+// l'en-tête d'un sort ne compte pas leur durée, leur jet, leur dissipation ni leur résistance à la magie.
+// Valeur : règle de l'ancien moteur pour un effet qui vise le sort lui-même. PARAMETERS : gardé seulement
+// à paramètres 1 et 2 nuls ; DURATION : gardé seulement d'une durée limitée nulle ; SUB_ONLY : protection
+// seulement dans la durée d'un sous-sort (SPWI523D, 206 de lui-même), effet gardé sinon.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_RESOURCE_PROTECTION BEGIN
+	206 => SUB_ONLY
+	318 => PARAMETERS
+	321 => DURATION
+	324 => PARAMETERS
+END
+
 // Opcodes dont les lignes ne disent jamais « non cumulatif » (ancien opcodes_ignore_not_cumulable,
 // application d'un 321 sur la ressource elle-même, lib/opcodes/321.tpp).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_ALWAYS_CUMULATIVE BEGIN

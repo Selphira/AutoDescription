@@ -169,6 +169,22 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 	END
 END
 
+// L'effet self_protection_id, d'opcode self_protection_opcode (celui de spell_fx_opcode_<h> pour un
+// dérivé), protège-t-il une ressource d'un second lancement (AD_OPCODES_RESOURCE_PROTECTION) ?
+// self_protection : 1 si oui, un opcode SUB_ONLY seulement si self_protection_sub_scan ;
+// self_protection_rule : valeur de la table (vide hors table) ; self_protection_self : 1 si la
+// ressource de l'effet est le sort décrit (spell_self), quel que soit l'opcode.
+DEFINE_PATCH_MACRO ad_fx_self_protection BEGIN
+	SPRINT self_protection_rule ~~
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODES_RESOURCE_PROTECTION(~%self_protection_opcode%~) BEGIN
+		SPRINT self_protection_rule $AD_OPCODES_RESOURCE_PROTECTION(~%self_protection_opcode%~)
+	END
+	SET self_protection = NOT (~%self_protection_rule%~ STRING_EQUAL ~~)
+		AND (self_protection_sub_scan OR NOT (~%self_protection_rule%~ STRING_EQUAL ~SUB_ONLY~))
+	SPRINT self_protection_resource $fx_resource_lower(~%self_protection_id%~)
+	SET self_protection_self = ~%self_protection_resource%~ STRING_EQUAL ~%spell_self%~
+END
+
 // L'ancien moteur garde-t-il l'effet header_id à sa lecture (load_opcode, partie commune de
 // opcode_is_valid, opcode_177_replace) ? keep_effect : 1 si oui. Il écarte les opcodes ignorés, les
 // effets sans probabilité, de cible absente ou invalide, d'une durée limitée nulle (sauf pour un
@@ -187,8 +203,11 @@ DEFINE_PATCH_MACRO ad_spell_header_keeps BEGIN
 	PATCH_IF $fx_external(~%header_id%~) OR keep_opcode == 177 BEGIN
 		SPRINT keep_error $fx_substitution_error(~%header_id%~)
 	END
-	SPRINT keep_resource $fx_resource_lower(~%header_id%~)
-	SET keep_self = ~%keep_resource%~ STRING_EQUAL ~%spell_self%~
+	SET self_protection_id = header_id
+	SET self_protection_opcode = keep_opcode
+	SET self_protection_sub_scan = 0
+	LPM ad_fx_self_protection
+	SET keep_self_protection = self_protection AND self_protection_self
 	SET keep_target = $fx_target(~%header_id%~)
 	SET keep_effect = NOT (~%keep_status%~ STRING_EQUAL ~IGNORED~)
 		AND (~%keep_error%~ STRING_EQUAL ~~)
@@ -199,8 +218,8 @@ DEFINE_PATCH_MACRO ad_spell_header_keeps BEGIN
 		AND NOT (NOT IS_EE AND keep_opcode >= 319 AND keep_opcode <= 367)
 		AND NOT (NOT IS_EE AND (keep_opcode == 4 OR keep_opcode == 43 OR keep_opcode == 47 OR keep_opcode == 56)
 			AND ($fx_parameter1(~%header_id%~) != 0 OR $fx_parameter2(~%header_id%~) != 0))
-		AND NOT (keep_opcode == 321 AND keep_self AND ($fx_timing(~%header_id%~) != TIMING_duration OR $fx_duration(~%header_id%~) != 0))
-		AND NOT ((keep_opcode == 318 OR keep_opcode == 324) AND keep_self AND ($fx_parameter1(~%header_id%~) != 0 OR $fx_parameter2(~%header_id%~) != 0))
+		AND NOT (keep_self_protection AND ~%self_protection_rule%~ STRING_EQUAL ~DURATION~ AND ($fx_timing(~%header_id%~) != TIMING_duration OR $fx_duration(~%header_id%~) != 0))
+		AND NOT (keep_self_protection AND ~%self_protection_rule%~ STRING_EQUAL ~PARAMETERS~ AND ($fx_parameter1(~%header_id%~) != 0 OR $fx_parameter2(~%header_id%~) != 0))
 	// Un 177 dont l'EFF est écarté (drop) disparaît ; une autre erreur de remplacement laisse un
 	// effet que l'ancien moteur décrit autrement.
 	PATCH_IF NOT (~%keep_error%~ STRING_EQUAL ~~) AND NOT (~%keep_error%~ STRING_EQUAL ~drop~) AND ~%header_missing%~ STRING_EQUAL ~~ BEGIN
@@ -571,17 +590,18 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 		FOR (duration_n = 0; duration_n < $spell_fx_count(~%duration_h%~); ++duration_n) BEGIN
 			SET duration_id = $EVAL ~spell_fx_%duration_h%~(~%duration_n%~)
 			SET duration_opcode = $EVAL ~spell_fx_opcode_%duration_h%~(~%duration_n%~)
-			SPRINT duration_resource $fx_resource_lower(~%duration_id%~)
 			// Un sous-sort qui se protège d'un second lancement, ou un sort qui le lance (SPWI001D : 324 de SPWI001,
 			// 1 seconde ; SPPR304D, lancé par A!CH31 : 324 de SPPR304 ; SPWI523D : 206 de lui-même), ne donne pas
 			// cette durée au sort qui le lance (header_parent, ad_spell_header_sub_duration).
-			SET duration_sub_scan = VARIABLE_IS_SET header_parent AND NOT (~%header_parent%~ STRING_EQUAL ~~)
-			SET duration_protection = duration_opcode == 318 OR duration_opcode == 321 OR duration_opcode == 324 OR (duration_sub_scan AND duration_opcode == 206)
+			SET self_protection_id = duration_id
+			SET self_protection_opcode = duration_opcode
+			SET self_protection_sub_scan = VARIABLE_IS_SET header_parent AND NOT (~%header_parent%~ STRING_EQUAL ~~)
+			LPM ad_fx_self_protection
 			SET duration_parent = 0
-			PATCH_IF duration_protection AND duration_sub_scan AND NOT (~%duration_resource%~ STRING_EQUAL ~%spell_self%~) BEGIN
-				LPF ad_spell_has_effect STR_VAR resref = ~%duration_resource%~ resource = ~%spell_self%~ RET duration_parent = found END
+			PATCH_IF self_protection AND self_protection_sub_scan AND NOT self_protection_self BEGIN
+				LPF ad_spell_has_effect STR_VAR resref = ~%self_protection_resource%~ resource = ~%spell_self%~ RET duration_parent = found END
 			END
-			PATCH_IF NOT (duration_protection AND (~%duration_resource%~ STRING_EQUAL ~%spell_self%~ OR duration_parent)) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%duration_opcode%~) BEGIN
+			PATCH_IF NOT (self_protection AND (self_protection_self OR duration_parent)) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%duration_opcode%~) BEGIN
 				SET duration_timing = $fx_timing(~%duration_id%~)
 				SET duration_seconds = $fx_duration(~%duration_id%~)
 				// Une série prend le dernier délai pour durée (ancien timing 5000 ou 5001).
@@ -1042,7 +1062,11 @@ BEGIN
 			SET save_id = $EVAL ~spell_fx_%save_h%~(~%save_n%~)
 			SET save_opcode = $EVAL ~spell_fx_opcode_%save_h%~(~%save_n%~)
 			SPRINT save_resource $fx_resource_lower(~%save_id%~)
-			PATCH_IF save_opcode != 318 AND save_opcode != 321 AND save_opcode != 324 AND NOT (~%save_resource%~ STRING_EQUAL ~%spell_self%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%save_opcode%~) BEGIN
+			SET self_protection_id = save_id
+			SET self_protection_opcode = save_opcode
+			SET self_protection_sub_scan = 0
+			LPM ad_fx_self_protection
+			PATCH_IF NOT self_protection AND NOT self_protection_self AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%save_opcode%~) BEGIN
 				SET save_effect_type = $fx_save_type(~%save_id%~) BAND 0b111111
 				SET save_effect_bonus = $fx_save_bonus(~%save_id%~)
 				SET save_own_type = save_own_type OR save_effect_type > 0
@@ -1276,8 +1300,11 @@ DEFINE_PATCH_MACRO ad_spell_header_resistance BEGIN
 		FOR (resistance_n = 0; resistance_n < $spell_fx_count(~%resistance_h%~); ++resistance_n) BEGIN
 			SET resistance_id = $EVAL ~spell_fx_%resistance_h%~(~%resistance_n%~)
 			SET resistance_opcode = $EVAL ~spell_fx_opcode_%resistance_h%~(~%resistance_n%~)
-			SPRINT resistance_resource $fx_resource_lower(~%resistance_id%~)
-			PATCH_IF resistance_opcode != 318 AND resistance_opcode != 321 AND resistance_opcode != 324 AND NOT (~%resistance_resource%~ STRING_EQUAL ~%spell_self%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%resistance_opcode%~) BEGIN
+			SET self_protection_id = resistance_id
+			SET self_protection_opcode = resistance_opcode
+			SET self_protection_sub_scan = 0
+			LPM ad_fx_self_protection
+			PATCH_IF NOT self_protection AND NOT self_protection_self AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%resistance_opcode%~) BEGIN
 				SET resistance_value = $fx_resistance(~%resistance_id%~)
 				SET resistance_effect_ignored = resistance_value == 2 OR resistance_value == 3
 				PATCH_IF resistance_ignored < 0 BEGIN
