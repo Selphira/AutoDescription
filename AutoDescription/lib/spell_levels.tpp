@@ -84,7 +84,7 @@ DEFINE_PATCH_MACRO ad_spell_statistics BEGIN
 			PATCH_IF statistics_count > 0 BEGIN
 				SET minRequiredLevel = $statistics_level_min(~%statistics_s%~)
 				SET maxRequiredLevel = $statistics_level_max(~%statistics_s%~)
-				PATCH_IF maxRequiredLevel == 99 BEGIN
+				PATCH_IF $statistics_level_open(~%statistics_s%~) BEGIN
 					SPRINT statistics_title @7002000 // ~À partir du niveau %minRequiredLevel%~
 				END
 				ELSE PATCH_IF minRequiredLevel == maxRequiredLevel BEGIN
@@ -137,7 +137,8 @@ END
 // avec la progression de sa valeur (ad_spell_levels_by_duration, _by_save, _by_values).
 // Un effet est écarté par son opcode (fx_consumed) ou, pour un effet dérivé, par sa ligne
 // (derived_line) ; il est rangé dans sa section par fx_line_section. Sections : statistics_section,
-// statistics_level_min, statistics_level_max, triées par niveaux (clé (min + 100) × 100 + max).
+// statistics_level_min, statistics_level_max, statistics_level_open (jusqu'au dernier niveau), triées
+// par niveaux.
 // Comme l'ancien moteur, une position marquée écarte tout effet de cette position dans l'en-tête.
 // Les immunités aux sorts réunies pour l'en-tête (518, ad_op_206_header_groups) se comparent aussi
 // par leurs noms ; leurs immunités, cachées aux listes, suivent leur effet dérivé : écartées avec lui,
@@ -1025,7 +1026,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 			PATCH_IF $level_on(~%level_a%~) BEGIN
 				SET level_opcode = $level_opcode(~%level_a%~)
 				SET level_from = $spell_level(~%level_h%~)
-				SET level_to = 99
+				SET level_to = 0
+				SET level_bounded = 0
 				// Progression du niveau maximal de la cible (ad_spell_levels_by_target_level) : jusqu'au dernier niveau.
 				SET level_id = $level_id(~%level_a%~)
 				SET level_open = 1
@@ -1046,11 +1048,20 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					PATCH_IF NOT level_found BEGIN
 						SET level_to = $spell_level(~%level_h2%~) - 1
 						SET level_open = 0
+						SET level_bounded = 1
 					END
 				END
 				SET ~level_emitted_%level_a%~ = 1
-				PATCH_IF level_h > 0 OR level_to < 99 BEGIN
-					SET level_key = (level_from + 100) * 100 + level_to
+				PATCH_IF level_h > 0 OR level_bounded BEGIN
+					// Clé unique de largeur fixe (niveau minimal, niveau maximal), triée comme texte : les
+					// niveaux exigés sont des mots croissants d'un en-tête à l'autre, une plage ouverte
+					// vient après les plages fermées de même début.
+					SET level_key_from = level_from + 100000
+					SET level_key_to = level_bounded ? level_to + 100000 : 199999
+					SPRINT level_key ~%level_key_from%%level_key_to%~
+					SET ~level_range_min_%level_key%~ = level_from
+					SET ~level_range_max_%level_key%~ = level_to
+					SET ~level_range_open_%level_key%~ = NOT level_bounded
 					SET $level_keys(~%level_key%~) = 1
 					SET level_keys_count += 1
 					SET level_id = $level_id(~%level_a%~)
@@ -1092,12 +1103,13 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 		END
 	END
 	PATCH_IF level_keys_count > 0 BEGIN
-		SORT_ARRAY_INDICES level_keys NUMERICALLY
+		SORT_ARRAY_INDICES level_keys LEXICOGRAPHICALLY
 	END
 	PHP_EACH level_keys AS level_key => _ BEGIN
 		SPRINT $statistics_section(~%statistics_sections%~) ~level%level_key%~
-		SET $statistics_level_max(~%statistics_sections%~) = level_key MODULO 100
-		SET $statistics_level_min(~%statistics_sections%~) = level_key / 100 - 100
+		SET $statistics_level_max(~%statistics_sections%~) = $level_range_max(~%level_key%~)
+		SET $statistics_level_min(~%statistics_sections%~) = $level_range_min(~%level_key%~)
+		SET $statistics_level_open(~%statistics_sections%~) = $level_range_open(~%level_key%~)
 		SET statistics_sections += 1
 	END
 END

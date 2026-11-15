@@ -906,7 +906,7 @@ DEFINE_PATCH_MACRO ad_recursion_area_range BEGIN
 			INNER_PATCH_SAVE area_line_section ~%area_line_section%~ BEGIN
 				DELETE_BYTES 0 5
 			END
-			SET area_section_level = area_line_section / 100 - 100
+			SET area_section_level = $level_range_min(~%area_line_section%~)
 		END
 		SET area_previous_feet = 0 - 1
 		FOR (area_h = 0; area_h < fx_header_count; ++area_h) BEGIN
@@ -1136,7 +1136,7 @@ DEFINE_PATCH_MACRO ad_recursion_level_sections_text BEGIN
 		PATCH_IF sub_section_count > 0 BEGIN
 			SET minRequiredLevel = $statistics_level_min(~%sub_s%~)
 			SET maxRequiredLevel = $statistics_level_max(~%sub_s%~)
-			PATCH_IF maxRequiredLevel == 99 BEGIN
+			PATCH_IF $statistics_level_open(~%sub_s%~) BEGIN
 				SPRINT sub_section_title @7002000 // ~À partir du niveau %minRequiredLevel%~
 			END
 			ELSE PATCH_IF minRequiredLevel == maxRequiredLevel BEGIN
