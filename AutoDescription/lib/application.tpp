@@ -588,7 +588,9 @@ END
 // get_effect_description) : le lanceur d'un sort et de ses sous-sorts, le buveur d'une potion, le
 // porteur d'un autre objet. Un sous-effet qui
 // hérite de la cible du parent prend ses chaînes (ctx_force_target, lib/recursion.tpp), sauf un
-// effet sur soi d'un sort lancé par la source du parent (ctx_force_keep_self). La zone
+// effet sur soi d'un sort lancé par la source du parent (ctx_force_keep_self). Une cible que l'opcode
+// nomme à ses trois formes (fx_named_target : types de créature d'un 326 réuni, lib/opcodes/326.tpp)
+// remplace l'une et l'autre, comme l'ancien opcode_set_target_strings. La zone
 // d'un projectile (ad_application_area_target, ou celle d'un sous-sort, ad_recursion_area_strings)
 // remplace l'une et l'autre ; line_the_target, la cible que nomme l'opcode (« les rakshasas »),
 // remplace le tout à la forme sujet ; puis le type de créature d'un effet d'un 177
@@ -616,6 +618,12 @@ DEFINE_PATCH_MACRO ad_application_target_strings BEGIN
 		SPRINT theTarget   ~%ctx_the_target%~
 		SPRINT ofTheTarget ~%ctx_of_the_target%~
 		SPRINT toTheTarget ~%ctx_to_the_target%~
+	END
+	PATCH_IF $fx_named_target(~%line_fx%~) BEGIN
+		SET app_target_missing = 0
+		SPRINT theTarget   $fx_named_the_target(~%line_fx%~)
+		SPRINT ofTheTarget $fx_named_of_the_target(~%line_fx%~)
+		SPRINT toTheTarget $fx_named_to_the_target(~%line_fx%~)
 	END
 	PATCH_IF ctx_area_phrase > 0 AND NOT app_target_missing BEGIN
 		// Cible principale qui est la source, que l'effet excepte (ligne 43 de splprot.2da) : seules
@@ -827,21 +835,15 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			END
 		END
 		ELSE BEGIN
-			SPRINT app_versus_the    @2002000 // ~les~
-			SPRINT app_versus_and_the @2002001 // ~et les~
-			SPRINT app_versus_of     @2002002 // ~des~
-			SPRINT app_versus_and_of @2002003 // ~et des~
-			SPRINT app_versus_to     @2002004 // ~aux~
-			SPRINT app_versus_and_to @2002005 // ~et aux~
-			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_the% ~ final_glue = EVAL ~ %app_versus_and_the% ~ RET targetType = text END
-			SPRINT versus @2002020 // ~contre les %targetType%~
+			SPRINT target_names_array ~app_versus_names~
+			LPM ad_target_names_forms
+			SPRINT versus ~%target_names_versus%~
+			SPRINT targetType ~%target_names_list%~
 			SPRINT app_versus_only_for @2002030 // ~uniquement pour les %targetType%~
-			SPRINT theTarget @2002010 // ~les %targetType%~
+			SPRINT theTarget ~%target_names_the%~
 			SPRINT app_versus_the_target ~%theTarget%~
-			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_of% ~ final_glue = EVAL ~ %app_versus_and_of% ~ RET targetType = text END
-			SPRINT ofTheTarget @2002011 // ~des %targetType%~
-			LPF ad_join STR_VAR array_name = ~app_versus_names~ glue = EVAL ~, %app_versus_to% ~ final_glue = EVAL ~ %app_versus_and_to% ~ RET targetType = text END
-			SPRINT toTheTarget @2002012 // ~aux %targetType%~
+			SPRINT ofTheTarget ~%target_names_of%~
+			SPRINT toTheTarget ~%target_names_to%~
 			// Sous-effet d'un sort à zone : la zone restreint les types (SPPR515 : « les morts-vivants
 			// dans un rayon de 2,5 mètres »), comme l'ancien get_target_by_projectile corrigé.
 			PATCH_IF ctx_area_phrase > 0 BEGIN
@@ -866,6 +868,26 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			END
 		END
 	END
+END
+
+// Noms des types de créature du tableau target_names_array aux formes de la cible et en versus :
+// target_names_the « les X, les Y et les Z », target_names_of « des… », target_names_to « aux… »,
+// target_names_versus « contre les X… » ; target_names_list « X, les Y et les Z », sans l'article de tête.
+DEFINE_PATCH_MACRO ad_target_names_forms BEGIN
+	SPRINT target_names_glue     @2002000 // ~les~
+	SPRINT target_names_glue_end @2002001 // ~et les~
+	LPF ad_join STR_VAR array_name = ~%target_names_array%~ glue = EVAL ~, %target_names_glue% ~ final_glue = EVAL ~ %target_names_glue_end% ~ RET targetType = text END
+	SPRINT target_names_list ~%targetType%~
+	SPRINT target_names_versus @2002020 // ~contre les %targetType%~
+	SPRINT target_names_the @2002010 // ~les %targetType%~
+	SPRINT target_names_glue     @2002002 // ~des~
+	SPRINT target_names_glue_end @2002003 // ~et des~
+	LPF ad_join STR_VAR array_name = ~%target_names_array%~ glue = EVAL ~, %target_names_glue% ~ final_glue = EVAL ~ %target_names_glue_end% ~ RET targetType = text END
+	SPRINT target_names_of @2002011 // ~des %targetType%~
+	SPRINT target_names_glue     @2002004 // ~aux~
+	SPRINT target_names_glue_end @2002005 // ~et aux~
+	LPF ad_join STR_VAR array_name = ~%target_names_array%~ glue = EVAL ~, %target_names_glue% ~ final_glue = EVAL ~ %target_names_glue_end% ~ RET targetType = text END
+	SPRINT target_names_to @2002012 // ~aux %targetType%~
 END
 
 // Groupes de classes (AD_VERSUS_CLASS_GROUPS) : quand toutes leurs classes sont visées, leur nom les

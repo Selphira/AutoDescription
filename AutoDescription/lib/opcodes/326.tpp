@@ -7,16 +7,13 @@
 
 // Avec AD_ENABLE_SHRINKAGE, les 326 de même portée vers le même sort dont la condition est un type
 // de créature n'en font qu'un (ancien opcode_326_group, ad_op_326_versus_group) : le premier les
-// réunit sans condition et ses sous-effets les visent (ctx_versus) : « Inflige 1d4 points de dégâts
-// magiques contre les fées, les ombres et les esprits » ; les autres sont écartés. Sans condition à
+// réunit sans condition et ses sous-effets les visent (ctx_versus, chaînes de cible) : « Inflige 1d4
+// points de dégâts magiques contre les fées, les ombres et les esprits » ; les autres sont écartés. Sans condition à
 // écrire (« EA >= 0 »), les lignes du sort suivent celles de l'objet, comme celles d'un sort lancé
 // (D2WKBS3S).
 
 // Refus : effet d'un EFF ; condition refusée (ad_op_326_condition) ; refus de ad_recursion_support.
 DEFINE_PATCH_MACRO ad_op_326_support BEGIN
-	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
-		SPRINT ~fx_versus_list_%apply_id%~ ~~
-	END
 	PHP_EACH fx_ids_326 AS _ => apply_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%apply_id%~) BEGIN
 			SPRINT apply_resref $fx_resource_lower(~%apply_id%~)
@@ -56,9 +53,6 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 				// un sort (ancien opcode_self_probability_326, baseProbability).
 				SET recursion_probability = 1
 				SET recursion_versus_set = apply_versus_set
-				PATCH_IF apply_versus_set BEGIN
-					SPRINT ~fx_versus_list_%apply_id%~ ~%apply_versus_list%~
-				END
 				SPRINT recursion_versus ~%apply_versus%~
 				LPM ad_recursion_support
 			END
@@ -70,6 +64,8 @@ END
 // dont les champs que la ligne écrit sont les siens (la puissance et la résistance ne s'écrivent
 // pas, C2STAF01) : réunis à lui s'ils sont plusieurs (apply_versus_set, apply_versus) ; les autres
 // gardent leur propre ligne, comme dans l'ancien moteur, qui ne réunit que les conditions de sa table.
+// Les types deviennent la cible de apply_id (fx_named_target), que ses sous-effets reprennent :
+// « Désintègre les élémentaires et les méphites » (BDSW1H03).
 DEFINE_PATCH_MACRO ad_op_326_versus_group BEGIN
 	SPRINT apply_scope $fx_scope(~%apply_id%~)
 	SET apply_members = 0
@@ -103,11 +99,13 @@ DEFINE_PATCH_MACRO ad_op_326_versus_group BEGIN
 				SET ~fx_consumed_%apply_other%~ = 1
 			END
 		END
-		SPRINT apply_the @2002000 // ~les~
-		SPRINT apply_and_the @2002001 // ~et les~
-		LPF ad_join STR_VAR array_name = ~apply_versus_names~ glue = EVAL ~, %apply_the% ~ final_glue = EVAL ~ %apply_and_the% ~ RET targetType = text END
-		SPRINT apply_versus @2002020 // ~contre les %targetType%~
-		SPRINT apply_versus_list ~%targetType%~
+		SPRINT target_names_array ~apply_versus_names~
+		LPM ad_target_names_forms
+		SPRINT apply_versus ~%target_names_versus%~
+		SET ~fx_named_target_%apply_id%~ = 1
+		SPRINT ~fx_named_the_target_%apply_id%~ ~%target_names_the%~
+		SPRINT ~fx_named_of_the_target_%apply_id%~ ~%target_names_of%~
+		SPRINT ~fx_named_to_the_target_%apply_id%~ ~%target_names_to%~
 		SET apply_versus_set = 1
 	END
 END
@@ -349,13 +347,17 @@ DEFINE_PATCH_MACRO ad_op_326_lines BEGIN
 			ELSE BEGIN
 				LPM ad_recursion_condition_text
 			END
-			// Types de créature réunis (ad_op_326_versus_group) : l'ancien moteur les donne aussi pour cible aux
-			// sous-effets (« Désintègre les élémentaires et les méphites »), en plus d'un retrait propre
-			// à la ligne ; le nouveau moteur ne les transmet qu'aux phrases qui lisent versus.
-			SPRINT apply_versus_list $fx_versus_list(~%apply_id%~)
-			PATCH_IF NOT (~%apply_versus_list%~ STRING_EQUAL ~~) BEGIN
-				PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%apply_versus_list%~ ~%line_text%~) < 0 BEGIN
-					LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:versus_target~ message = ~lines of a spell applied to a group of creature types that do not name them: the old engine makes them the target of the lines~ RET render_late_missing = refusal END
+			// Types de créature réunis (ad_op_326_versus_group), cible des sous-effets : des lignes qui ne les
+			// nomment sous aucune forme (phrase à la forme « soi », zone d'un projectile) perdraient la
+			// condition.
+			PATCH_IF $fx_named_target(~%apply_id%~) BEGIN
+				SPRINT apply_named_the $fx_named_the_target(~%apply_id%~)
+				SPRINT apply_named_of $fx_named_of_the_target(~%apply_id%~)
+				SPRINT apply_named_to $fx_named_to_the_target(~%apply_id%~)
+				PATCH_IF INDEX (CASE_SENSITIVE EXACT_MATCH ~%apply_named_the%~ ~%line_text%~) < 0
+						AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%apply_named_of%~ ~%line_text%~) < 0
+						AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%apply_named_to%~ ~%line_text%~) < 0 BEGIN
+					LPF ad_refusal INT_VAR fx_id = apply_id STR_VAR reason = ~not_implemented:opcode326:versus_target~ message = ~lines of a spell applied to a group of creature types that do not name them~ RET render_late_missing = refusal END
 				END
 			END
 			SET line_any_form = 1
