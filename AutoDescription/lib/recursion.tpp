@@ -98,6 +98,7 @@ DEFINE_PATCH_MACRO ad_recursion_allowed BEGIN
 		SPRINT recursion_reason ~loop~
 	END
 	PATCH_IF NOT recursion_allowed BEGIN
+		SPRINT recursion_chain ~%ctx_chain%~
 		LPM ad_log_recursion
 	END
 END
@@ -618,9 +619,7 @@ BEGIN
 		LPM ad_subspell_cache_read
 	END
 	PATCH_IF cache_hit AND AD_SUBSPELL_CACHE == 1 BEGIN
-		SET sub_count = cache_count
-		SPRINT sub_text ~%cache_text%~
-		SPRINT sub_checked ~%cache_checked%~
+		LPM ad_subspell_cache_use
 	END
 	ELSE BEGIN
 		LPM ad_describe_subresource_effects

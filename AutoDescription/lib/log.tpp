@@ -403,15 +403,15 @@ DEFINE_PATCH_MACRO ad_event_write BEGIN
 END
 
 // Sous-ressource que la récursion ne décrit pas (ad_recursion_allowed, lib/recursion.tpp) :
-// chaîne des ressources<TAB>sous-ressource<TAB>raison (depth : au-delà de AD_RECURSION_MAX_DEPTH ;
-// loop : déjà dans la chaîne).
+// chaîne des ressources recursion_chain<TAB>sous-ressource recursion_upper<TAB>raison recursion_reason
+// (depth : au-delà de AD_RECURSION_MAX_DEPTH ; loop : déjà dans la chaîne).
 DEFINE_PATCH_MACRO ad_log_recursion BEGIN
 	PATCH_TIME ~step:recursion_log~ BEGIN
 		SPRINT log_file ~%MOD_FOLDER%/log/%log_name%-recursion.txt~
 		LPM ad_log_part
 		INNER_ACTION BEGIN
 			SILENT
-			APPEND_OUTER ~%log_part%~ ~%ctx_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
+			APPEND_OUTER ~%log_part%~ ~%recursion_chain%%TAB%%recursion_upper%%TAB%%recursion_reason%~ KEEP_CRLF
 			VERBOSE
 		END
 	END
