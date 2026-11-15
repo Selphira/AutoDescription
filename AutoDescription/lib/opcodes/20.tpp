@@ -12,12 +12,6 @@ DEFINE_PATCH_MACRO ad_op_20_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_20_lines BEGIN
-	SET state_opcode = 20
-	SPRINT state_variant_macro ~ad_op_20_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_20_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~)
 END

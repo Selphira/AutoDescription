@@ -23,12 +23,6 @@ DEFINE_PATCH_MACRO ad_op_337_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_337_lines BEGIN
-	SET state_opcode = 337
-	SPRINT state_variant_macro ~ad_op_337_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_337_variant BEGIN
 	SPRINT opcodeStr $fx_remove_name(~%line_fx%~)
 END

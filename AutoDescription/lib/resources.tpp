@@ -375,9 +375,8 @@ BEGIN
 END
 
 // Nom au pluriel d'une valeur d'un fichier IDS de types de créatures (parameter2 des opcodes 55,
-// 177… : 2 ea.ids, 3 general.ids, 4 race.ids, 5 class.ids, 6 specific.ids, 7 gender.ids,
-// 8 align.ids) : liste @8090000 (8 090 000 + 1 000 × fichier + valeur) ; vide pour un autre fichier,
-// une valeur hors de 0-255 ou sans nom.
+// 177… : fichiers de AD_IDS_NAMED_FILES, lib/catalog.tpa) : liste @8090000 (8 090 000 + 1 000 × fichier +
+// valeur) ; vide pour un autre fichier, une valeur hors de 0-255 ou sans nom.
 DEFINE_PATCH_FUNCTION ad_ids_name
 	INT_VAR
 		ids_file = 0
@@ -387,7 +386,7 @@ DEFINE_PATCH_FUNCTION ad_ids_name
 BEGIN
 	SPRINT name ~~
 	SET ids_name_tra = 8090000 + 1000 * ids_file + entry
-	PATCH_IF ids_file >= 2 AND ids_file <= 8 AND entry >= 0 AND entry <= 255 AND TRA_ENTRY_EXISTS (~%ids_name_tra%~) BEGIN
+	PATCH_IF VARIABLE_IS_SET $AD_IDS_NAMED_FILES(~%ids_file%~) AND entry >= 0 AND entry <= 255 AND TRA_ENTRY_EXISTS (~%ids_name_tra%~) BEGIN
 		SET tra_id = ids_name_tra SET tra_block_start = 8090000 SET tra_block_size = 10000 SPRINT tra_out ~name~ LPM ad_tra_to // ~rakshasas~ (@8094128)
 	END
 END

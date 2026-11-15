@@ -5,18 +5,6 @@
 // l'ancien moteur, un ajout négatif s'écrit « Déleste le porteur de tout son or », un ajout positif
 // comme une réduction, une valeur fixée négative comme 0.
 
-DEFINE_PATCH_MACRO ad_op_105_support BEGIN
-	SET stat_opcode = 105
-	SPRINT stat_mode_3 ~invalid~
-	LPM ad_stat_modifier_support
-END
-
-DEFINE_PATCH_MACRO ad_op_105_lines BEGIN
-	SET stat_opcode = 105
-	SPRINT stat_line_macro ~ad_op_105_line~
-	LPM ad_stat_modifier_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_105_line BEGIN
 	LPM ad_application_target_strings
 	PATCH_IF stat_mode == MOD_TYPE_cumulative AND stat_value < 0 BEGIN

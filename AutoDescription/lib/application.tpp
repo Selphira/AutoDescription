@@ -352,6 +352,19 @@ DEFINE_PATCH_MACRO ad_application_form BEGIN
 	END
 END
 
+// Secondes de la durée limitée de l'effet duration_fx (timing 1 ou 4, ou 10 en ticks), 0 pour un
+// autre timing, avant toute règle d'opcode (durée fixe, unité, fraction) ; duration_fx_timing : son timing.
+DEFINE_PATCH_MACRO ad_fx_duration_seconds BEGIN
+	SET duration_fx_timing = $fx_timing(~%duration_fx%~)
+	SET duration_fx_seconds = 0
+	PATCH_IF duration_fx_timing == TIMING_duration OR duration_fx_timing == TIMING_delayed_duration BEGIN
+		SET duration_fx_seconds = $fx_duration(~%duration_fx%~)
+	END
+	ELSE PATCH_IF duration_fx_timing == TIMING_duration_ticks BEGIN
+		SET duration_fx_seconds = $fx_duration(~%duration_fx%~) / 15
+	END
+END
+
 // Durée de l'effet line_fx d'un en-tête (ancien add_duration et get_duration_value), vide si elle
 // n'est pas affichée : colonne DURATION du catalogue, ou durée commune de la potion
 // (charged_global_duration, lib/item_charged.tpp), qui remplace toutes celles de l'en-tête, et
@@ -373,14 +386,9 @@ DEFINE_PATCH_MACRO ad_application_duration BEGIN
 	// Un opcode que l'en-tête du sort ne compte pas garde sa durée, sauf si c'est la durée unique de
 	// l'en-tête (ctx_header_seconds, AD_OPCODES_HEADER_IGNORED).
 	PATCH_IF app_hide_duration AND ctx_header_seconds > 0 - 2 AND VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%app_opcode%~) BEGIN
-		SET app_line_seconds = 0
-		PATCH_IF app_timing == TIMING_duration OR app_timing == TIMING_delayed_duration BEGIN
-			SET app_line_seconds = app_duration
-		END
-		ELSE PATCH_IF app_timing == TIMING_duration_ticks BEGIN
-			SET app_line_seconds = app_duration / 15
-		END
-		SET app_hide_duration = ctx_header_seconds >= 0 AND app_line_seconds == ctx_header_seconds
+		SET duration_fx = line_fx
+		LPM ad_fx_duration_seconds
+		SET app_hide_duration = ctx_header_seconds >= 0 AND duration_fx_seconds == ctx_header_seconds
 	END
 	PATCH_IF app_header >= 0 BEGIN
 		SET app_hide_duration = app_hide_duration OR $charged_global_duration(~%app_header%~) > 0
@@ -507,7 +515,7 @@ END
 // Jet de sauvegarde de l'effet line_fx (ancien add_save), vide sans type de jet : « (jet de
 // sauvegarde contre les sorts ou contre les souffles pour annuler) », avec son bonus, et sur EE
 // les cibles qu'un projectile de ligne ignore, les images miroir et la difficulté
-// (AD_SAVE_MIRROR_OPCODES, AD_SAVE_DIFFICULTY_OPCODES). Moitié des dégâts, fixée par l'opcode
+// (AD_SAVE_FLAG_TEXTS, AD_SAVE_FLAG_OPCODES). Moitié des dégâts, fixée par l'opcode
 // (line_save_for_half : jet réussi ; line_fail_for_half : jet raté) : « pour réduire de moitié »,
 // « pour annuler et pour moitié en cas d'échec », ou « (réduits de moitié) » sans jet possible.
 // Rien quand l'en-tête du sort l'écrit (ctx_ignore_save, lib/spell.tpp).
@@ -543,43 +551,33 @@ DEFINE_PATCH_MACRO ad_application_save BEGIN
 			SET app_save_bonus = 1
 			SPRINT saveBonus ~%app_level_save%~
 		END
-		PATCH_IF app_save_bonus != 0 AND line_save_for_half BEGIN
-			SPRINT app_save_text @5000032 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~
-		END
-		ELSE PATCH_IF app_save_bonus != 0 AND line_fail_for_half BEGIN
-			SPRINT app_save_text @5000042 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~
-		END
-		ELSE PATCH_IF app_save_bonus != 0 BEGIN
-			SPRINT app_save_text @5000012 // ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~
-		END
-		ELSE PATCH_IF line_save_for_half BEGIN
-			SPRINT app_save_text @5000030 // ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~
-		END
-		ELSE PATCH_IF line_fail_for_half BEGIN
-			SPRINT app_save_text @5000040 // ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~
-		END
-		ELSE BEGIN
-			SPRINT app_save_text @5000010 // ~jet de sauvegarde %saveTypeStr% pour annuler~
-		END
-		SET app_save_flags = $fx_save_type(~%line_fx%~)
-		PATCH_IF IS_EE AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_primary_target_EE) != 0 BEGIN
-			SPRINT app_save_extra @5000020 // ~ignore la cible principale~
-			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
-		END
-		PATCH_IF IS_EE AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_secondary_target_EE) != 0 BEGIN
-			SPRINT app_save_extra @5000021 // ~ignore la cible secondaire~
-			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
-		END
-		SET app_opcode = $fx_opcode(~%line_fx%~)
-		PATCH_IF IS_EE AND VARIABLE_IS_SET $AD_SAVE_MIRROR_OPCODES(~%app_opcode%~)
-				AND (app_save_flags BAND FLAG_SAVINGTHROW_bypass_mirror_image_EE) != 0 BEGIN
-			SPRINT app_save_extra @5000022 // ~ignore les images miroir~
-			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
-		END
-		PATCH_IF IS_EE AND VARIABLE_IS_SET $AD_SAVE_DIFFICULTY_OPCODES(~%app_opcode%~)
-				AND (app_save_flags BAND FLAG_SAVINGTHROW_ignore_difficulty_EE) != 0 BEGIN
-			SPRINT app_save_extra @5000023 // ~ignore la difficulté~
-			SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+		// 5 000 010 + 20 pour réduire de moitié, + 30 pour annuler et pour moitié en cas d'échec, + 2 avec bonus :
+		// ~jet de sauvegarde %saveTypeStr% pour annuler~ (5000010) ;
+		// ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler~ (5000012) ;
+		// ~jet de sauvegarde %saveTypeStr% pour réduire de moitié~ (5000030) ;
+		// ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour réduire de moitié~ (5000032) ;
+		// ~jet de sauvegarde %saveTypeStr% pour annuler et pour moitié en cas d'échec~ (5000040) ;
+		// ~jet de sauvegarde à %saveBonus% %saveTypeStr% pour annuler et pour moitié en cas d'échec~ (5000042).
+		SET tra_id = 5000010 + (line_save_for_half ? 20 : (line_fail_for_half ? 30 : 0)) + (app_save_bonus != 0 ? 2 : 0)
+		SPRINT tra_out ~app_save_text~ LPM ad_tra_to
+		// Drapeaux du jet (EE, AD_SAVE_FLAG_TEXTS), dans l'ordre des bits ; un drapeau de AD_SAVE_FLAG_OPCODES
+		// n'est écrit que pour les opcodes de sa liste.
+		PATCH_IF IS_EE BEGIN
+			SET app_save_flags = $fx_save_type(~%line_fx%~)
+			SET app_opcode = $fx_opcode(~%line_fx%~)
+			PHP_EACH AD_SAVE_FLAG_TEXTS AS app_save_flag => app_save_flag_tra BEGIN
+				PATCH_IF (app_save_flags BAND app_save_flag) != 0 BEGIN
+					SET app_save_flag_shown = 1
+					PATCH_IF VARIABLE_IS_SET $AD_SAVE_FLAG_OPCODES(~%app_save_flag%~) BEGIN
+						SPRINT app_save_flag_opcodes $AD_SAVE_FLAG_OPCODES(~%app_save_flag%~)
+						SET app_save_flag_shown = VARIABLE_IS_SET $EVAL ~%app_save_flag_opcodes%~(~%app_opcode%~)
+					END
+					PATCH_IF app_save_flag_shown BEGIN
+						SET tra_id = app_save_flag_tra SPRINT tra_out ~app_save_extra~ LPM ad_tra_to
+						SPRINT app_save_text ~%app_save_text%, %app_save_extra%~
+					END
+				END
+			END
 		END
 		SPRINT app_save_text ~(%app_save_text%)~
 	END
@@ -937,6 +935,24 @@ END
 // après la ligne. Forme ou cible sans
 // texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
+	LPM ad_line_compose_text
+	LPM ad_line_append_duration
+	LPM ad_line_append_save
+	LPM ad_line_append_modifiers
+	LPM ad_collapse_spaces
+	LPM ad_line_probability_prefix
+	LPM ad_line_condition_prefix
+	PATCH_IF app_line_ok BEGIN
+		LPM ad_line_add
+	END
+	SET line_sort = app_saved_sort
+	SPRINT line_section ~%app_saved_section%~
+	LPM ad_line_fields_reset
+END
+
+// Texte de la ligne de line_fx (ad_effect_line) : forme et cible, phrase, line_sentence, line_suffix ;
+// app_line_ok à 0 (et render_late_missing) quand la forme ou la cible n'a pas de texte.
+DEFINE_PATCH_MACRO ad_line_compose_text BEGIN
 	LPM ad_application_form
 	SET app_line_ok = 1
 	LPM ad_application_target_strings
@@ -965,6 +981,11 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	PATCH_IF NOT (~%line_suffix%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% %line_suffix%~
 	END
+END
+
+// Section d'un effet d'en-tête, puis sa durée (ad_effect_line) ; app_saved_section garde la section
+// de l'appelant.
+DEFINE_PATCH_MACRO ad_line_append_duration BEGIN
 	SPRINT app_saved_section ~%line_section%~
 	SPRINT app_block $fx_block(~%line_fx%~)
 	// Effet d'équipement : sa durée n'est écrite que hors du timing « tant que l'objet est équipé ».
@@ -980,10 +1001,18 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SPRINT line_text ~%line_text% %app_duration_text%~
 		END
 	END
+END
+
+DEFINE_PATCH_MACRO ad_line_append_save BEGIN
 	LPM ad_application_save
 	PATCH_IF NOT (~%app_save_text%~ STRING_EQUAL ~~) BEGIN
 		SPRINT line_text ~%line_text% %app_save_text%~
 	END
+END
+
+// Précisions de fin de ligne (ad_effect_line) : non cumulatif, « uniquement pour », restriction de
+// niveau de la cible, exceptions de cible.
+DEFINE_PATCH_MACRO ad_line_append_modifiers BEGIN
 	SET app_opcode = $fx_opcode(~%line_fx%~)
 	PATCH_IF $fx_not_cumulative(~%line_fx%~) AND NOT VARIABLE_IS_SET $AD_OPCODES_ALWAYS_CUMULATIVE(~%app_opcode%~) BEGIN
 		SPRINT app_not_cumulative @4000010 // ~non cumulatif~
@@ -1016,7 +1045,9 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 			SPRINT line_text ~%line_text% (%app_exceptions_text%)~
 		END
 	END
-	LPM ad_collapse_spaces
+END
+
+DEFINE_PATCH_MACRO ad_line_probability_prefix BEGIN
 	// Effet probable : « 26 % de chances » devant la ligne entière (ancien get_effect_description),
 	// rang abaissé d'autant que la probabilité est faible (ancien set_opcode_sort).
 	SET app_saved_sort = line_sort
@@ -1049,6 +1080,10 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		SPRINT line_text ~%app_curse%%AD_COLON%%line_text%~
 		SET line_probability = 0
 	END
+END
+
+// Condition de la ligne (line_condition, « En combat ») devant toute la ligne (ad_effect_line).
+DEFINE_PATCH_MACRO ad_line_condition_prefix BEGIN
 	PATCH_IF NOT (~%line_condition%~ STRING_EQUAL ~~) BEGIN
 		// Le regroupement par probabilité de l'ancien moteur ne retire plus le préfixe « N % de chances »
 		// placé après la condition : la ligne reste entière, hors des regroupements, tant qu'aucune autre
@@ -1086,23 +1121,4 @@ DEFINE_PATCH_MACRO ad_effect_line BEGIN
 		END
 		SPRINT line_text ~%line_condition%%AD_SEMICOLON%%line_text%~
 	END
-	PATCH_IF app_line_ok BEGIN
-		LPM ad_line_add
-	END
-	SET line_sort = app_saved_sort
-	SET line_probability = 0
-	SET line_conditioned = 0
-	SET line_conditioned_alone = 0
-	SET line_sub_probability = 0
-	SPRINT line_section ~%app_saved_section%~
-	SET line_phrase = 0
-	SET line_any_form = 0
-	SET line_no_duration = 0
-	SPRINT line_suffix ~~
-	SPRINT line_sentence ~~
-	SPRINT line_condition ~~
-	SPRINT line_the_target ~~
-	SPRINT line_only_for ~~
-	SET line_save_for_half = 0
-	SET line_fail_for_half = 0
 END

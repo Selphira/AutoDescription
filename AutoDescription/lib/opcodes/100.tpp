@@ -30,12 +30,6 @@ DEFINE_PATCH_MACRO ad_op_100_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_100_lines BEGIN
-	SET state_opcode = 100
-	SPRINT state_variant_macro ~ad_op_100_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : créatures nommées, 1 : toutes les créatures.
 DEFINE_PATCH_MACRO ad_op_100_variant BEGIN
 	SET state_variant = $fx_parameter1(~%line_fx%~) == 0 ? 1 : 0

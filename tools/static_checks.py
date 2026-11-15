@@ -317,6 +317,16 @@ def check_duplicate_definitions(report):
 CATALOG_STATUSES = ("DESCRIBED", "IGNORED", "TODO")
 CATALOG_DICE = ("LEVEL", "DICE", "DICE_IF_P2_1_EE")
 CATALOG_DURATIONS = ("SHOWN", "IGNORED", "HIDDEN", "NOT_PERMANENT", "NOT_AFTER_DEATH")
+# Autres tables du moteur dont une colonne nomme une macro de lib/ (2da/<table> : colonnes).
+MACRO_TABLES = {
+    "group_rules.2da": ("MACRO",),
+    "opcode_hooks.2da": ("MACRO",),
+}
+# Familles de la colonne FAMILY : table des paramètres et colonnes qui nomment une macro de l'opcode.
+CATALOG_FAMILIES = {
+    "STATE": ("states.2da", ("SUPPORT", "VARIANT")),
+    "STAT": ("stat_modifiers.2da", ("LINE",)),
+}
 NEW_OPCODE_MACRO = re.compile(r"^ad_op_(\d+)_")
 # Macros appelées par le rendu pour chaque opcode DESCRIBED (lib/render.tpp).
 NEW_OPCODE_ROLES = ("support", "lines")
@@ -326,18 +336,19 @@ def check_catalog(report, definitions):
     report.section("Catalogue des opcodes (2da/opcodes.2da)")
     path = MOD / "2da" / "opcodes.2da"
     lines = read_text(path).replace("\r\n", "\n").split("\n")
-    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "DURATION", "NAME"]:
-        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT DURATION NAME »")
+    if lines[:2] != ["2DA V1.0", "*"] or lines[2].split() != ["BG2", "EE", "STATUS", "DICE", "SORT", "DURATION", "FAMILY", "NAME"]:
+        report.add("ERREUR", f"{relative(path)} : en-tête attendu « 2DA V1.0 », « * », « BG2 EE STATUS DICE SORT DURATION FAMILY NAME »")
         return
     rows = {}
+    families = {}
     previous = -1
     for number, line in enumerate(lines[3:], start=4):
         fields = line.split()
         if not fields:
             continue
         where = f"{relative(path)}:{number}"
-        if len(fields) != 8 or not fields[0].isdigit():
-            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE SORT DURATION NAME)")
+        if len(fields) != 9 or not fields[0].isdigit():
+            report.add("ERREUR", f"{where} : ligne mal formée (opcode BG2 EE STATUS DICE SORT DURATION FAMILY NAME)")
             continue
         opcode = int(fields[0])
         if opcode <= previous:
@@ -353,7 +364,39 @@ def check_catalog(report, definitions):
             report.add("ERREUR", f"{where} : SORT {fields[5]} n'est pas un entier")
         if fields[6] not in CATALOG_DURATIONS:
             report.add("ERREUR", f"{where} : DURATION {fields[6]} inconnu ({', '.join(CATALOG_DURATIONS)})")
+        if fields[7] != "*" and fields[7] not in CATALOG_FAMILIES:
+            report.add("ERREUR", f"{where} : FAMILY {fields[7]} inconnue (*, {', '.join(CATALOG_FAMILIES)})")
+        elif fields[7] != "*":
+            if fields[3] != "DESCRIBED":
+                report.add("ERREUR", f"{where} : un opcode de la famille {fields[7]} doit être DESCRIBED")
+            families[opcode] = fields[7]
         rows[opcode] = fields[3]
+
+    # Tables des familles : une ligne par opcode de la famille, macros nommées définies dans lib/.
+    defined = {name for (_, _, name), places in definitions.items() if any(engine_place(p) for p in places)}
+    for family, (table, hooks) in CATALOG_FAMILIES.items():
+        table_path = MOD / "2da" / table
+        table_lines = read_text(table_path).replace("\r\n", "\n").split("\n")
+        header = table_lines[2].split() if len(table_lines) > 2 else []
+        listed = set()
+        for number, line in enumerate(table_lines[3:], start=4):
+            fields = line.split()
+            if not fields:
+                continue
+            where = f"{relative(table_path)}:{number}"
+            if len(fields) != len(header) + 1 or not fields[0].isdigit():
+                report.add("ERREUR", f"{where} : ligne mal formée ({len(header) + 1} colonnes attendues)")
+                continue
+            opcode = int(fields[0])
+            listed.add(opcode)
+            if families.get(opcode) != family:
+                report.add("ERREUR", f"{where} : opcode {opcode} absent de la famille {family} dans le catalogue")
+            for column in hooks:
+                macro = fields[header.index(column) + 1]
+                if macro != "*" and macro not in defined:
+                    report.add("ERREUR", f"{where} : macro {macro} ({column}) non définie dans lib/")
+        for opcode in sorted(o for o, f in families.items() if f == family and o not in listed):
+            report.add("ERREUR", f"opcode {opcode} : famille {family} sans ligne dans {relative(table_path)}")
 
     # Registre : le statut DESCRIBED doit correspondre au code réellement présent dans lib/.
     implemented = collections.defaultdict(list)
@@ -365,13 +408,34 @@ def check_catalog(report, definitions):
         if rows.get(opcode) != "DESCRIBED":
             report.add("ERREUR", f"opcode {opcode} : {', '.join(implemented[opcode])} défini mais statut "
                        f"{rows.get(opcode, 'absent du catalogue')} au lieu de DESCRIBED")
+        elif opcode in families:
+            if f"ad_op_{opcode}_lines" in implemented[opcode]:
+                report.add("ERREUR", f"opcode {opcode} : famille {families[opcode]}, mais ad_op_{opcode}_lines est définie")
         else:
             for role in NEW_OPCODE_ROLES:
                 if f"ad_op_{opcode}_{role}" not in implemented[opcode]:
                     report.add("ERREUR", f"opcode {opcode} : statut DESCRIBED sans macro ad_op_{opcode}_{role} dans lib/")
 
+    for table, columns in MACRO_TABLES.items():
+        table_path = MOD / "2da" / table
+        table_lines = read_text(table_path).replace("\r\n", "\n").split("\n")
+        header = table_lines[2].split() if len(table_lines) > 2 else []
+        for number, line in enumerate(table_lines[3:], start=4):
+            fields = line.split()
+            if not fields:
+                continue
+            where = f"{relative(table_path)}:{number}"
+            if len(fields) != len(header) + 1:
+                report.add("ERREUR", f"{where} : ligne mal formée ({len(header) + 1} colonnes attendues)")
+                continue
+            for column in columns:
+                macro = fields[header.index(column) + 1]
+                if macro != "*" and macro not in defined:
+                    report.add("ERREUR", f"{where} : macro {macro} ({column}) non définie dans lib/")
+
     counts = collections.Counter(rows.values())
-    print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES))
+    print(f"  {len(rows)} opcodes : " + ", ".join(f"{counts[s]} {s}" for s in CATALOG_STATUSES)
+          + " ; familles : " + ", ".join(f"{sum(1 for f in families.values() if f == k)} {k}" for k in CATALOG_FAMILIES))
 
 
 def check_opcode_includes(report):

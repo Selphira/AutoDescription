@@ -21,12 +21,6 @@ DEFINE_PATCH_MACRO ad_op_208_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_208_lines BEGIN
-	SET state_opcode = 208
-	SPRINT state_variant_macro ~ad_op_208_variant~
-	LPM ad_state_lines
-END
-
 // Variante 1 : points de vie plus protégés.
 DEFINE_PATCH_MACRO ad_op_208_variant BEGIN
 	SET value = $fx_parameter1(~%line_fx%~)

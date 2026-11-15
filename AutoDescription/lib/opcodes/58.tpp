@@ -5,14 +5,6 @@
 // guérisons de la débilité mentale et de la surdité qu'elle implique (ad_group_dispel_cures,
 // lib/groups.tpp). Code commun dans lib/opcodes/states.tpp.
 
-DEFINE_PATCH_MACRO ad_op_58_support BEGIN END
-
-DEFINE_PATCH_MACRO ad_op_58_lines BEGIN
-	SET state_opcode = 58
-	SPRINT state_variant_macro ~ad_op_58_variant~
-	LPM ad_state_lines
-END
-
 // Précisions de l'ancien opcode_58_common, entre parenthèses après la phrase.
 DEFINE_PATCH_MACRO ad_op_58_variant BEGIN
 	SET dispel_type = $fx_parameter2(~%line_fx%~) BAND 255

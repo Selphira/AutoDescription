@@ -44,12 +44,6 @@ DEFINE_PATCH_MACRO ad_op_171_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_171_lines BEGIN
-	SET state_opcode = 171
-	SPRINT state_variant_macro ~ad_op_171_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : capacité, 1 : sort du livre de sorts.
 DEFINE_PATCH_MACRO ad_op_171_variant BEGIN
 	SET state_variant = $fx_spell_book(~%line_fx%~)

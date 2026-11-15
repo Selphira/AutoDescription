@@ -1,34 +1,36 @@
 // Code commun des modificateurs contre un type de créature (opcodes 178, 179, 344) : valeur
 // contre les créatures de la valeur parameter1 du fichier IDS parameter2 (ad_ids_name,
 // lib/resources.tpp) : « TAC0 : +2 contre les lycanthropes », à la forme « cible » « Augmente de 5
-// le TAC0 de la cible contre les planétaires déchus ». Valeur : parameter3 d'un effet
-// d'un EFF (178, 179), sinon special sur EE (ancien opcode_178_common) ; special pour le 344. Avec
+// le TAC0 de la cible contre les planétaires déchus ». Valeur (AD_VERSUS_AMOUNT) : PARAMETER3, parameter3
+// d'un effet d'un EFF (178, 179), sinon special sur EE (ancien opcode_178_common) ; SPECIAL (344). Avec
 // AD_ENABLE_SHRINKAGE, les effets d'un même bloc qui ne diffèrent que par parameter1 et parameter2
 // n'en font qu'un (ancien opcode_group_by_target) : noms réunis sans doublon dans l'ordre des effets,
 // ligne écrite après les autres effets de l'opcode, comme celle que l'ancien moteur ajoute. Les
 // macros ad_op_<N>_* fixent versus_opcode et versus_name_tra puis appellent les macros ci-dessous.
 
-// Un 178 ou un 179 sans valeur : l'ancien moteur l'écarte (opcode_178_is_valid). Fichier qui
+// Un effet sans valeur lue dans parameter3 (178, 179) : l'ancien moteur l'écarte (opcode_178_is_valid). Fichier qui
 // n'est pas un type de créature : écarté et journalisé. Refus : kit.ids et valeur 100 de ea.ids
 // (opcode_idscheck8_is_valid du 344) ;
-// valeur sans nom ; forme « cible » et effet probable du 344 (l'ancien moteur n'en a pas) ;
+// valeur sans nom ; forme « cible » et effet probable d'une valeur lue dans special (344 : l'ancien moteur n'en a pas) ;
 // effet d'un 177 qui vise un autre type de créature que le sien (l'ancien moteur écrit alors celui du
 // 177 à la place de celui de l'opcode : L#NDSW2). Avec le même type, la cible et l'adversaire sont les
 // mêmes : « Augmente de 3 le TAC0 des dragons contre les dragons ».
 DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
+	SPRINT versus_amount_field $AD_VERSUS_AMOUNT(~%versus_opcode%~)
+	SET versus_amount_special = ~%versus_amount_field%~ STRING_EQUAL ~SPECIAL~
 	PHP_EACH ~fx_ids_%versus_opcode%~ AS _ => versus_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 			SET versus_file = $fx_parameter2(~%versus_id%~)
 			SET versus_value = $fx_parameter1(~%versus_id%~)
-			SET versus_amount = versus_opcode == 344 ? $fx_special(~%versus_id%~) : $fx_parameter3(~%versus_id%~)
-			PATCH_IF versus_opcode != 344 AND versus_amount == 0 AND IS_EE BEGIN
+			SET versus_amount = versus_amount_special ? $fx_special(~%versus_id%~) : $fx_parameter3(~%versus_id%~)
+			PATCH_IF NOT versus_amount_special AND versus_amount == 0 AND IS_EE BEGIN
 				SET versus_amount = $fx_special(~%versus_id%~)
 			END
 			SET ~fx_versus_amount_%versus_id%~ = versus_amount
 			LPF ad_ids_name INT_VAR ids_file = versus_file entry = versus_value RET versus_name = name END
 			SPRINT ~fx_versus_name_%versus_id%~ ~%versus_name%~
 			SET versus_target = $fx_effective_target(~%versus_id%~)
-			PATCH_IF versus_opcode != 344 AND versus_amount == 0 BEGIN
+			PATCH_IF NOT versus_amount_special AND versus_amount == 0 BEGIN
 				SET drop_id = versus_id
 				SPRINT ignored_reason ~file_error:opcode%versus_opcode%:no_change~
 				SPRINT ignored_message ~modifier of 0~
@@ -48,7 +50,7 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 			ELSE PATCH_IF ~%versus_name%~ STRING_EQUAL ~~ BEGIN
 				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:ids_name~ message = ~value %versus_value% of IDS file %versus_file% has no name~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF versus_opcode == 344 AND ((versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
+			ELSE PATCH_IF versus_amount_special AND ((versus_target != TARGET_FX_self AND versus_target != TARGET_FX_original_caster)
 					OR $fx_probability(~%versus_id%~) < 100) BEGIN
 				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:form~ message = ~effect on another target, or probable~ RET render_missing = refusal END
 			END

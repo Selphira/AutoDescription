@@ -32,7 +32,7 @@ REPOSITORY = Path(__file__).resolve().parent.parent
 MOD = REPOSITORY / "AutoDescription"
 MOD_DIRECTORIES = ("lib", "tra", "2da")
 LOG_PATTERNS = ("*.log", "*-diff.html", "*-dump.txt", "*-compare.txt", "*-effects.txt", "*-opcodes.txt",
-                "*-recursion.txt", "*-events.txt", "*-cache.txt", "*.md")
+                "*-recursion.txt", "*-events.txt", "*-cache.txt", "*.md", "*.part")
 # Fichier des boucles complètes sur les objets et les sorts.
 LOOPS = "lib/install.tpp"
 # Ligne du tp2 qui suit la lecture de settings.ini : les options imposées sont insérées avant.
@@ -187,8 +187,9 @@ def main():
     for pattern in LOG_PATTERNS:
         for path in (target / "log").glob(pattern):
             path.unlink()
-    for path in (args.game / "docs" / "data").glob("*-all-*.js"):
-        path.unlink()
+    for pattern in ("*-all-*.js", "*-all-*.js.*.part"):
+        for path in (args.game / "docs" / "data").glob(pattern):
+            path.unlink()
     start = time.monotonic()
     code, cpu, counters = setup(args.game, language + ["--force-install", str(args.component)], console)
     duration = time.monotonic() - start

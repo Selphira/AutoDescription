@@ -1,7 +1,9 @@
 // Flux de rendu commun aux trois contextes : objet décrit (lib/item_render.tpp), sous-ressource
 // (lib/recursion.tpp), en-tête et section « PARAMÈTRES » d'un sort (lib/spell_header.tpp,
 // lib/spell_levels.tpp). Chaque opcode décrit dans le jeu courant (AD_OPCODE_DESCRIBED,
-// lib/catalog.tpa) est appelé par son nom, ad_op_<N>_support puis ad_op_<N>_lines ; un opcode
+// lib/catalog.tpa) est appelé par son nom, ad_op_<N>_support puis ad_op_<N>_lines, ou, s'il est d'une
+// famille (AD_OPCODE_FAMILY), par les macros de sa famille, ad_family_<famille>_support puis
+// ad_family_<famille>_lines, qui lisent ses paramètres dans la table de la famille ; un opcode
 // inconnu (absent du catalogue ou du jeu courant) n'est jamais décrit. render_opcode est l'opcode
 // en cours : seules ces boucles l'écrivent.
 
@@ -15,7 +17,13 @@ DEFINE_PATCH_MACRO ad_render_support BEGIN
 	END
 	PHP_EACH fx_opcode_count AS render_opcode => _ BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%render_opcode%~) BEGIN
-			LPM ~ad_op_%render_opcode%_support~
+			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FAMILY(~%render_opcode%~) BEGIN
+				SPRINT render_family $AD_OPCODE_FAMILY(~%render_opcode%~)
+				LPM ~ad_family_%render_family%_support~
+			END
+			ELSE BEGIN
+				LPM ~ad_op_%render_opcode%_support~
+			END
 		END
 	END
 END
@@ -31,7 +39,13 @@ DEFINE_PATCH_MACRO ad_render_lines BEGIN
 	PHP_EACH ~%render_order%~ AS render_opcode => _ BEGIN
 		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%render_opcode%~) BEGIN
 			PATCH_TIME ~step:lines~ BEGIN
-				LPM ~ad_op_%render_opcode%_lines~
+				PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FAMILY(~%render_opcode%~) BEGIN
+					SPRINT render_family $AD_OPCODE_FAMILY(~%render_opcode%~)
+					LPM ~ad_family_%render_family%_lines~
+				END
+				ELSE BEGIN
+					LPM ~ad_op_%render_opcode%_lines~
+				END
 			END
 		END
 	END

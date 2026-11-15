@@ -31,12 +31,6 @@ DEFINE_PATCH_MACRO ad_op_120_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_120_lines BEGIN
-	SET state_opcode = 120
-	SPRINT state_variant_macro ~ad_op_120_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 armes enchantées (« +2 et inférieures »), 1 autres types.
 DEFINE_PATCH_MACRO ad_op_120_variant BEGIN
 	SET weapon_type = $fx_parameter2(~%line_fx%~)

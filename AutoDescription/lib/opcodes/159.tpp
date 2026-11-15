@@ -21,12 +21,6 @@ DEFINE_PATCH_MACRO ad_op_159_support BEGIN
 	LPM ad_value_range_support
 END
 
-DEFINE_PATCH_MACRO ad_op_159_lines BEGIN
-	SET state_opcode = 159
-	SPRINT state_variant_macro ~ad_op_159_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : une image, 1 : plusieurs, 2 : images dissipées.
 DEFINE_PATCH_MACRO ad_op_159_variant BEGIN
 	SET amount = $fx_parameter1(~%line_fx%~)

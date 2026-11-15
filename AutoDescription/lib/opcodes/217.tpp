@@ -4,14 +4,6 @@
 // opcode_self_217 lit alors un timing limité, seul parameter2 1 sur EE donne le sommeil profond. Code
 // commun dans lib/opcodes/states.tpp.
 
-DEFINE_PATCH_MACRO ad_op_217_support BEGIN END
-
-DEFINE_PATCH_MACRO ad_op_217_lines BEGIN
-	SET state_opcode = 217
-	SPRINT state_variant_macro ~ad_op_217_variant~
-	LPM ad_state_lines
-END
-
 // Variante 1 : sommeil profond.
 DEFINE_PATCH_MACRO ad_op_217_variant BEGIN
 	SET state_variant = IS_EE AND $fx_parameter2(~%line_fx%~) == 1

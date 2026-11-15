@@ -28,17 +28,9 @@ DEFINE_PATCH_MACRO ad_op_252_support BEGIN
 			END
 			ELSE PATCH_IF ~%heading_spell%~ STRING_EQUAL ~~ BEGIN
 				SET recursion_fx = heading_id
+				LPM ad_recursion_params
 				SPRINT recursion_resref ~%heading_resref%~
-				SET recursion_casting_level = 0
-				SPRINT recursion_targets ~own~
 				SET recursion_ignore_duration = 0
-				SET recursion_series = 0
-				SET recursion_depth_reset = 0
-				SPRINT recursion_kind ~spl~
-				SET recursion_parent_dice = 0
-				SET recursion_versus_set = 0
-				SPRINT recursion_versus ~~
-				SPRINT recursion_single_reason ~~
 				LPM ad_recursion_support
 			END
 		END

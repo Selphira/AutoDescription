@@ -324,8 +324,8 @@ DEFINE_PATCH_MACRO ad_eff_fields_differ BEGIN
 END
 
 // Fin de la lecture de l'effet fx_id, dont les champs bruts sont lus (fx_external et fx_parameter3
-// compris) : remplacement d'un 177 ou d'un 111, valeurs normalisées, marques des passes, compte de
-// l'opcode.
+// compris) : crochets de son opcode (2da/opcode_hooks.2da : remplacement d'un 177 ou d'un 111,
+// conversion d'un 282), valeurs normalisées, marques des passes, compte de l'opcode.
 DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET ~fx_versus_file_%fx_id%~ = 0
 	SET ~fx_versus_value_%fx_id%~ = 0
@@ -337,11 +337,10 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET ~fx_from_111_%fx_id%~ = 0
 	SET ~fx_probability_in_sub_%fx_id%~ = 0
 	SET ~fx_cursed_%fx_id%~ = $fx_opcode(~%fx_id%~) == 283
-	PATCH_IF $fx_opcode(~%fx_id%~) == 177 OR $fx_opcode(~%fx_id%~) == 283 BEGIN
-		LPM ad_fx_substitute_177
-	END
-	ELSE PATCH_IF $fx_opcode(~%fx_id%~) == 111 BEGIN
-		LPM ad_fx_substitute_111
+	SET fx_hook_opcode = $fx_opcode(~%fx_id%~)
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_HOOK(~SUBSTITUTE~ ~%fx_hook_opcode%~) BEGIN
+		SPRINT fx_hook_macro $AD_OPCODE_HOOK(~SUBSTITUTE~ ~%fx_hook_opcode%~)
+		LPM ~%fx_hook_macro%~
 	END
 	// Valeurs lues des champs que des passes réécrivent ensuite (regroupements, opcodes 23, 143, 189),
 	// pour les journaux (ad_event_data, lib/log.tpp), comme fx_parameter2_raw.
@@ -352,8 +351,12 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET ~fx_special_raw_%fx_id%~ = $fx_special(~%fx_id%~)
 	SET ~fx_save_type_raw_%fx_id%~ = $fx_save_type(~%fx_id%~)
 	SET fx_282_converted = 0
-	PATCH_IF $fx_opcode(~%fx_id%~) == 282 AND AD_ENABLE_SHRINKAGE BEGIN
-		LPM ad_op_282_convert
+	SET fx_hook_opcode = $fx_opcode(~%fx_id%~)
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_HOOK(~CONVERT~ ~%fx_hook_opcode%~) BEGIN
+		PATCH_IF AD_ENABLE_SHRINKAGE OR NOT $AD_OPCODE_HOOK_SHRINK(~CONVERT~ ~%fx_hook_opcode%~) BEGIN
+			SPRINT fx_hook_macro $AD_OPCODE_HOOK(~CONVERT~ ~%fx_hook_opcode%~)
+			LPM ~%fx_hook_macro%~
+		END
 	END
 	LPM ad_fx_normalize
 	SET ~fx_consumed_%fx_id%~ = 0

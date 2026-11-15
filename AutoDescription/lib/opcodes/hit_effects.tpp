@@ -36,17 +36,9 @@ DEFINE_PATCH_MACRO ad_hit_effect_support BEGIN
 				END
 				PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 					SET recursion_fx = hit_id
+					LPM ad_recursion_params
 					SPRINT recursion_resref ~%hit_resref%~
-					SPRINT recursion_kind ~eff~
-					SET recursion_parent_dice = 1
-					SET recursion_hit_target = 1
-					SET recursion_casting_level = 0
-					SPRINT recursion_targets ~own~
 					SET recursion_ignore_duration = 0
-					SET recursion_series = 0
-					SET recursion_depth_reset = 0
-					SET recursion_versus_set = 0
-					SPRINT recursion_versus ~~
 					SPRINT recursion_single_reason ~not_implemented:opcode%hit_opcode%:lines~
 					SPRINT recursion_single_message ~several lines in the applied EFF file~
 					// Probable : refusé seulement si l'EFF écrit une ligne ; sans ligne (EFF écarté, timing 6 :

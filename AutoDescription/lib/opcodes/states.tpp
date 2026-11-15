@@ -9,15 +9,33 @@
 // choix d'un sort (214), projection d'image (236), vision lointaine (239), charges drainées (243),
 // métamorphose (135), remplacement d'une créature (151), peau de pierre (218), téléportation auprès
 // d'un ennemi (274) ; une phrase par variante de l'opcode, « Réduit la cible au silence ».
-// Chaque fichier d'opcode fixe state_opcode et state_variant_macro (vide si l'opcode n'a qu'une
-// variante) ; cette macro choisit state_variant pour l'effet line_fx et peut fixer line_condition,
-// line_suffix ou line_no_duration.
+// Un opcode de la famille STATE (colonne FAMILY de 2da/opcodes.2da) a sa ligne dans 2da/states.2da :
+// sa macro de prise en charge éventuelle et sa macro de variante (state_variant_macro, vide si l'opcode
+// n'a qu'une variante), toutes deux dans son fichier ; la macro de variante choisit state_variant pour
+// l'effet line_fx et peut fixer line_condition, line_suffix ou line_no_duration. Un autre code qui
+// appelle ad_state_lines fixe lui-même state_opcode et state_variant_macro.
 // Phrase : 20 000 000 + opcode × 10 000 + 100 + 10 × variante, plus la forme (ad_effect_line,
 // lib/application.tpp).
 
 // Une ligne par effet non consommé, dans l'ordre du fichier (ancien opcode_<self|target>[_probability]_N),
 // les effets réunis (fx_late) après les autres, comme ceux que l'ancien moteur ajoute en fin de liste :
 // fx_ids_<opcode> est déjà rangé ainsi (ad_fx_ids_late_order, lib/groups.tpp).
+DEFINE_PATCH_MACRO ad_family_state_support BEGIN
+	PATCH_IF VARIABLE_IS_SET $AD_STATE_SUPPORT(~%render_opcode%~) BEGIN
+		SPRINT state_support_macro $AD_STATE_SUPPORT(~%render_opcode%~)
+		LPM ~%state_support_macro%~
+	END
+END
+
+DEFINE_PATCH_MACRO ad_family_state_lines BEGIN
+	SET state_opcode = render_opcode
+	SPRINT state_variant_macro ~~
+	PATCH_IF VARIABLE_IS_SET $AD_STATE_VARIANT(~%render_opcode%~) BEGIN
+		SPRINT state_variant_macro $AD_STATE_VARIANT(~%render_opcode%~)
+	END
+	LPM ad_state_lines
+END
+
 DEFINE_PATCH_MACRO ad_state_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%state_opcode%~)
@@ -36,20 +54,22 @@ END
 
 // Paralysies (opcodes 109, 175, 185 : hold_opcode) : parameter1 non nul paralyse un type de créature,
 // valeur du fichier IDS parameter2, nommé (ancien opcode_self_109 : « Paralyse les morts-vivants »).
-// L'ancien moteur décrit le 109 comme une paralysie simple quand ce fichier est inhabituel ou, sur EE,
-// quand special n'est pas nul (opcode_109_common) ; il écarte un 175 ou un 185 de fichier hors de 2-9
-// (9 sur EE seulement) ou de valeur 100 d'ea.ids (opcode_idscheck9_is_valid) : écartés et journalisés.
+// L'ancien moteur décrit un opcode de AD_HOLD_PLAIN_IF_INVALID (109) comme une paralysie simple quand ce
+// fichier est inhabituel ou, sur EE, quand special n'est pas nul (opcode_109_common) ; il écarte un autre
+// (175, 185) de fichier hors de 2-9 (9 sur EE seulement) ou de valeur 100 d'ea.ids
+// (opcode_idscheck9_is_valid) : écartés et journalisés.
 // Refus : type de créature sans nom (dont kit.ids).
 DEFINE_PATCH_MACRO ad_hold_support BEGIN
+	SET hold_plain_if_invalid = VARIABLE_IS_SET $AD_HOLD_PLAIN_IF_INVALID(~%hold_opcode%~)
 	PHP_EACH ~fx_ids_%hold_opcode%~ AS _ => hold_id BEGIN
 		PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%hold_id%~) BEGIN
 			SET hold_ids = $fx_parameter2(~%hold_id%~)
 			SET hold_value = $fx_parameter1(~%hold_id%~)
 			SET hold_invalid = hold_ids < 2 OR hold_ids > 9 OR (hold_ids == 9 AND NOT IS_EE)
 			SET ~fx_hold_plain_%hold_id%~ = hold_value == 0
-				OR (hold_opcode == 109 AND (hold_invalid OR (IS_EE AND $fx_special(~%hold_id%~) != 0)))
+				OR (hold_plain_if_invalid AND (hold_invalid OR (IS_EE AND $fx_special(~%hold_id%~) != 0)))
 			SPRINT ~fx_hold_name_%hold_id%~ ~~
-			PATCH_IF hold_opcode != 109 AND (hold_invalid OR (hold_ids == 2 AND hold_value == 100)) BEGIN
+			PATCH_IF NOT hold_plain_if_invalid AND (hold_invalid OR (hold_ids == 2 AND hold_value == 100)) BEGIN
 				SET drop_id = hold_id
 				SPRINT ignored_reason ~file_error:opcode%hold_opcode%:invalid~
 				SPRINT ignored_message ~IDS file %hold_ids% is not a creature type (expected 2-9: EA, GENERAL, RACE, CLASS, SPECIFIC, GENDER, ALIGN, KIT (enhanced editions))~

@@ -152,24 +152,10 @@ END
 // ressource (ad_lines_split_sub_probability, lib/lines.tpp).
 DEFINE_PATCH_MACRO ad_cast_spell_recursion_support BEGIN
 	SET recursion_fx = cast_id
+	LPM ad_recursion_params
 	SPRINT recursion_resref ~%cast_resref%~
 	SET recursion_casting_level = ($fx_parameter2(~%cast_id%~) == 1 AND NOT resource_is_spell) ? 0 : $fx_parameter1(~%cast_id%~)
-	PATCH_IF cast_opcode == 146 BEGIN
-		SPRINT recursion_targets ~effect~
-	END
-	ELSE BEGIN
-		SPRINT recursion_targets ~own~
-	END
 	SET recursion_ignore_duration = 0
-	SET recursion_series = 1
-	SET recursion_depth_reset = 0
-	SPRINT recursion_kind ~spl~
-	SET recursion_parent_dice = 0
-	SET recursion_versus_set = 0
-	SPRINT recursion_versus ~~
-	SPRINT recursion_single_reason ~~
-	SPRINT recursion_lines_reason ~~
-	SPRINT recursion_lines_message ~~
 	PATCH_IF item_type == ITM_TYPE_dart AND $fx_cast_charge(~%cast_id%~) BEGIN
 		SPRINT recursion_lines_reason ~not_implemented:opcode%cast_opcode%:dart~
 		SPRINT recursion_lines_message ~dart casting a spell on each charge~

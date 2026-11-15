@@ -112,7 +112,7 @@ DEFINE_PATCH_MACRO ad_item_potion_durations BEGIN
 		FOR (charged_fx = 0; charged_fx < fx_count; ++charged_fx) BEGIN
 			SET charged_fx_opcode = $fx_opcode(~%charged_fx%~)
 			SPRINT charged_scope $fx_scope(~%charged_fx%~)
-			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%charged_fx_opcode%~) AND charged_fx_opcode != 146 AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
+			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%charged_fx_opcode%~) AND NOT VARIABLE_IS_SET $AD_SUBRESOURCE_CHARGED_IGNORED(~%charged_fx_opcode%~) AND (~%charged_scope%~ STRING_EQUAL ~ability%charged_h%~) BEGIN
 				SPRINT charged_duration_kind $AD_OPCODE_DURATION(~%charged_fx_opcode%~)
 				SET charged_fx_timing = $fx_timing(~%charged_fx%~)
 				PATCH_IF NOT (~%charged_duration_kind%~ STRING_EQUAL ~IGNORED~)

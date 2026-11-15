@@ -20,12 +20,6 @@ DEFINE_PATCH_MACRO ad_op_220_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_220_lines BEGIN
-	SET state_opcode = 220
-	SPRINT state_variant_macro ~ad_op_220_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : jusqu'au niveau parameter1, 1 : tous les niveaux (9 ou plus).
 DEFINE_PATCH_MACRO ad_op_220_variant BEGIN
 	SET spellLevel = $fx_parameter1(~%line_fx%~)

@@ -3,19 +3,6 @@
 // ignoré et l'effet ne se cumule pas (« (non cumulatif) » après la durée, ancien cumulable à 0).
 // Modificateur simple, code commun dans lib/opcodes/stat_modifiers.tpp.
 
-DEFINE_PATCH_MACRO ad_op_190_support BEGIN
-	SET stat_opcode = 190
-	SET stat_forced_mode = MOD_TYPE_cumulative
-	SPRINT stat_mode_3 ~invalid~
-	LPM ad_stat_modifier_support
-END
-
-DEFINE_PATCH_MACRO ad_op_190_lines BEGIN
-	SET stat_opcode = 190
-	SPRINT stat_line_macro ~ad_op_190_line~
-	LPM ad_stat_modifier_lines
-END
-
 // Forme « soi » : « Bonus de 1 » ou « Malus de 1 » (ancien opcode_self_190) ; aux autres formes, un
 // bonus réduit le facteur de vitesse (« Réduit de 1 le facteur de vitesse de la cible »).
 DEFINE_PATCH_MACRO ad_op_190_line BEGIN

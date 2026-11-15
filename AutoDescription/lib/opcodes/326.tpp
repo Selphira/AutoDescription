@@ -48,24 +48,18 @@ DEFINE_PATCH_MACRO ad_op_326_support BEGIN
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_dropped(~%apply_id%~) BEGIN
 				SET recursion_fx = apply_id
+				LPM ad_recursion_params
 				SPRINT recursion_resref ~%apply_resref%~
-				SET recursion_casting_level = 0
-				SPRINT recursion_targets ~effect~
 				SET recursion_ignore_duration = 0
-				SET recursion_series = 0
-				SET recursion_depth_reset = 1
 				SET recursion_delayed = apply_delayed
 				// Effet probable : sa probabilité passe aux sous-effets, regroupés par probabilité, dans un objet comme dans
 				// un sort (ancien opcode_self_probability_326, baseProbability).
 				SET recursion_probability = 1
-				SPRINT recursion_kind ~spl~
-				SET recursion_parent_dice = 0
 				SET recursion_versus_set = apply_versus_set
 				PATCH_IF apply_versus_set BEGIN
 					SPRINT ~fx_versus_list_%apply_id%~ ~%apply_versus_list%~
 				END
 				SPRINT recursion_versus ~%apply_versus%~
-				SPRINT recursion_single_reason ~~
 				LPM ad_recursion_support
 			END
 		END
@@ -194,6 +188,10 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 		// État de sort sans nom, propre à un mod (2da/stats_mods.2da, comme l'ancien moteur qui ne lit cette table
 		// que pour un état sans nom) : sa phrase, avec le nom de la valeur s'il en a un (« un golem
 		// d'argile », liste @8190000 : 8 190 000 + chaîne de l'ancien fichier - 800 000).
+		SPRINT apply_stat_kind ~~
+		PATCH_IF VARIABLE_IS_SET $AD_SPLPROT_STAT_KIND(~%apply_stat%~) BEGIN
+			SPRINT apply_stat_kind $AD_SPLPROT_STAT_KIND(~%apply_stat%~)
+		END
 		SET apply_mod_tra = 0
 		SET apply_mod_value_name = 0
 		SET apply_splstate_tra = 0
@@ -230,13 +228,13 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 			SPRINT apply_pending ~not_implemented:opcode326:condition~
 			SPRINT apply_pending_message ~no condition text for SPLPROT.2DA row %apply_row% (stat %apply_stat%, value %apply_value%, relation %apply_relation%)~
 		END
-		ELSE PATCH_IF apply_stat == 262 OR apply_stat == 263 OR apply_stat == 270 BEGIN
+		ELSE PATCH_IF ~%apply_stat_kind%~ STRING_EQUAL ~OLD_DIFFERENT~ BEGIN
 			SPRINT apply_pending ~not_implemented:opcode326:condition_stat~
 			SPRINT apply_pending_message ~stat %apply_stat% of SPLPROT.2DA row %apply_row% written differently by the old engine~
 		END
 		// Bits d'état (273, STATE.IDS selon l'IESDP) : leurs noms, « sous l'effet de la panique »
 		// (ancien get_states_str), réunis par « ou » comme la relation 8 (au moins un bit commun).
-		ELSE PATCH_IF apply_stat == 273 BEGIN
+		ELSE PATCH_IF ~%apply_stat_kind%~ STRING_EQUAL ~STATE~ BEGIN
 			SET exception_value = apply_value
 			LPM ad_target_exception_state
 			PATCH_IF ~%descriptionState%~ STRING_EQUAL ~~ BEGIN
@@ -244,8 +242,8 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 				SPRINT apply_pending_message ~state %apply_value% of stat 273 has no name~
 			END
 		END
-		ELSE PATCH_IF apply_stat >= 266 AND apply_stat <= 271 AND apply_stat != 269 BEGIN
-			LPF ad_ids_name INT_VAR ids_file = apply_stat - 264 entry = apply_value RET idName = name END
+		ELSE PATCH_IF ~%apply_stat_kind%~ STRING_EQUAL ~IDS~ BEGIN
+			LPF ad_ids_name INT_VAR ids_file = $AD_SPLPROT_STAT_IDS(~%apply_stat%~) entry = apply_value RET idName = name END
 			PATCH_IF ~%idName%~ STRING_EQUAL ~~ BEGIN
 				SPRINT apply_pending ~not_implemented:opcode326:ids~
 				SPRINT apply_pending_message ~value %apply_value% of stat %apply_stat% has no name~
@@ -267,7 +265,7 @@ DEFINE_PATCH_MACRO ad_op_326_condition BEGIN
 				SPRINT apply_pending ~not_implemented:opcode326:statistic_name~
 				SPRINT apply_pending_message ~stat %apply_stat% has no name~
 			END
-			ELSE PATCH_IF apply_stat == 258 OR apply_stat == 269 OR apply_stat == 272 OR apply_stat == 274 BEGIN
+			ELSE PATCH_IF ~%apply_stat_kind%~ STRING_EQUAL ~NAMED~ BEGIN
 				LPM ad_op_326_condition_name
 			END
 		END
@@ -298,9 +296,8 @@ END
 // (« inférieure ou égale à grande » : « inférieure à gigantesque »), « supérieure à grande » devient
 // « gigantesque ». Valeur sans nom : refus.
 DEFINE_PATCH_MACRO ad_op_326_condition_name BEGIN
-	SET apply_name_min = 0
-	SET apply_name_max = 255
-	PATCH_IF apply_stat == 258 BEGIN
+	SPRINT apply_name_rule $AD_SPLPROT_STAT_RULE(~%apply_stat%~)
+	PATCH_IF ~%apply_name_rule%~ STRING_EQUAL ~SIZE~ BEGIN
 		PATCH_IF apply_relation == 0 AND apply_value < 4 BEGIN
 			SET apply_tra = 23269382 // ~Si %theTarget% est de taille inférieure à %sizeName%~
 			SET apply_value += 1
@@ -313,41 +310,23 @@ DEFINE_PATCH_MACRO ad_op_326_condition_name BEGIN
 			SET apply_tra = 23269383 // ~Si %theTarget% est de taille supérieure à %sizeName%~
 			SET apply_value -= 1
 		END
-		SET apply_name_min = 1
-		SET apply_name_max = 4
-		SET apply_name_base = 23268010
-		SET apply_name_block = 23260000
-		SET apply_name_block_size = 10000
 	END
-	ELSE PATCH_IF apply_stat == 274 BEGIN
-		SET apply_name_base = 8120000
-		SET apply_name_block = 8120000
-		SET apply_name_block_size = 256
-	END
-	ELSE BEGIN
-		SET apply_name_base = (apply_stat == 269) ? 8095500 : 8098500
-		SET apply_name_block = 8090000
-		SET apply_name_block_size = 10000
-	END
+	SET apply_name_min = $AD_SPLPROT_STAT_NAME_MIN(~%apply_stat%~)
+	SET apply_name_max = $AD_SPLPROT_STAT_NAME_MAX(~%apply_stat%~)
+	SET apply_name_base = $AD_SPLPROT_STAT_NAME_BASE(~%apply_stat%~)
+	SET apply_name_block = $AD_SPLPROT_STAT_NAME_BLOCK(~%apply_stat%~)
+	SET apply_name_block_size = $AD_SPLPROT_STAT_NAME_SIZE(~%apply_stat%~)
 	SET apply_name_tra = apply_name_base + apply_value
 	PATCH_IF apply_value < apply_name_min OR apply_value > apply_name_max OR NOT TRA_ENTRY_EXISTS (~%apply_name_tra%~) BEGIN
 		SPRINT apply_pending ~not_implemented:opcode326:value_name~
 		SPRINT apply_pending_message ~value %apply_value% of stat %apply_stat% has no name~
 	END
 	ELSE BEGIN
-		SET tra_id = apply_name_tra SET tra_block_start = apply_name_block SET tra_block_size = apply_name_block_size SPRINT tra_out ~apply_name~ LPM ad_tra_to // ~clerc~ (@8095503)
-		PATCH_IF apply_stat == 258 BEGIN
-			SPRINT sizeName ~%apply_name%~
-		END
-		ELSE PATCH_IF apply_stat == 269 BEGIN
-			SPRINT className ~%apply_name%~
-		END
-		ELSE PATCH_IF apply_stat == 272 BEGIN
-			SPRINT alignName ~%apply_name%~
-		END
-		ELSE BEGIN
-			SPRINT splstateName ~%apply_name%~
-		END
+		// Noms de la valeur selon la statistique (2da/splprot_stats.2da) : ~minuscule~ (@23268011), ~clerc~ (@8095503),
+		// ~loyal bon~ (@8098517), ~« Bouclier »~ (@8120126).
+		SET tra_id = apply_name_tra SET tra_block_start = apply_name_block SET tra_block_size = apply_name_block_size SPRINT tra_out ~apply_name~ LPM ad_tra_to
+		SPRINT apply_name_variable $AD_SPLPROT_STAT_VARIABLE(~%apply_stat%~)
+		SPRINT ~%apply_name_variable%~ ~%apply_name%~
 	END
 END
 

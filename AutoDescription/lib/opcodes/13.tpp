@@ -11,12 +11,6 @@ DEFINE_PATCH_MACRO ad_op_13_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_13_lines BEGIN
-	SET state_opcode = 13
-	SPRINT state_variant_macro ~ad_op_13_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_13_variant BEGIN
 	SET state_death_type = $fx_parameter2(~%line_fx%~)
 	SET state_variant = $AD_DEATH_TYPES(~%state_death_type%~)

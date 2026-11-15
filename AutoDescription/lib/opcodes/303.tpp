@@ -12,12 +12,6 @@ DEFINE_PATCH_MACRO ad_op_303_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_303_lines BEGIN
-	SET state_opcode = 303
-	SPRINT state_variant_macro ~ad_op_303_variant~
-	LPM ad_state_lines
-END
-
 // Variante 1 : capacité bloquée.
 DEFINE_PATCH_MACRO ad_op_303_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~) == 0

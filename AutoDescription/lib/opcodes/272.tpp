@@ -40,18 +40,11 @@ DEFINE_PATCH_MACRO ad_op_272_support BEGIN
 				LPF ad_refusal INT_VAR fx_id = repeat_id STR_VAR reason = ~not_implemented:opcode272:probability~ message = ~probable equipped effect repeated each round, whose frequency is not written~ RET render_missing = refusal END
 			END
 			ELSE PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT $fx_consumed(~%repeat_id%~) BEGIN
-				SET recursion_probability = repeat_probable
 				SET recursion_fx = repeat_id
+				LPM ad_recursion_params
+				SET recursion_probability = repeat_probable
 				SPRINT recursion_resref ~%repeat_resref%~
-				SPRINT recursion_kind ~eff~
-				SET recursion_parent_dice = 0
-				SET recursion_casting_level = 0
-				SPRINT recursion_targets ~own~
 				SET recursion_ignore_duration = repeat_hide
-				SET recursion_series = 0
-				SET recursion_depth_reset = 0
-				SET recursion_versus_set = 0
-				SPRINT recursion_versus ~~
 				SPRINT recursion_single_reason ~not_implemented:opcode272:lines~
 				SPRINT recursion_single_message ~several lines in the applied EFF file~
 				LPM ad_recursion_support

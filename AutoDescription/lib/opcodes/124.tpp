@@ -12,12 +12,6 @@ DEFINE_PATCH_MACRO ad_op_124_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_124_lines BEGIN
-	SET state_opcode = 124
-	SPRINT state_variant_macro ~ad_op_124_variant~
-	LPM ad_state_lines
-END
-
 // Variante : destination parameter2.
 DEFINE_PATCH_MACRO ad_op_124_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~)

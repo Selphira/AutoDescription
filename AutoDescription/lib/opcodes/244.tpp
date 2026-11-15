@@ -18,12 +18,6 @@ DEFINE_PATCH_MACRO ad_op_244_support BEGIN
 	LPM ad_value_range_support
 END
 
-DEFINE_PATCH_MACRO ad_op_244_lines BEGIN
-	SET state_opcode = 244
-	SPRINT state_variant_macro ~ad_op_244_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : un sort, 1 : plusieurs.
 DEFINE_PATCH_MACRO ad_op_244_variant BEGIN
 	SET amount = $fx_parameter1(~%line_fx%~)

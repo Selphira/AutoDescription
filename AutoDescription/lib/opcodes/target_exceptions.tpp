@@ -42,7 +42,12 @@ DEFINE_PATCH_MACRO ad_fx_mark_target_exception BEGIN
 			// peut pas être nommée ; une ligne sous la condition du 326 (ad_op_318_lines, ancien opcode virtuel 526).
 			SET exception_stat = $fx_parameter2_raw(~%fx_id%~)
 			SET exception_splstate_tra = 8120000 + $fx_parameter1(~%fx_id%~)
-			PATCH_IF exception_opcode == 318 AND exception_chance < 100 AND (exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111)
+			SET exception_on_splstate = VARIABLE_IS_SET $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~)
+			PATCH_IF exception_on_splstate BEGIN
+				SPRINT exception_stat_source $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~)
+				SET exception_on_splstate = ~%exception_stat_source%~ STRING_EQUAL ~SPLSTATE~
+			END
+			PATCH_IF exception_opcode == 318 AND exception_chance < 100 AND exception_on_splstate
 					AND $fx_parameter1(~%fx_id%~) != 121 AND NOT TRA_ENTRY_EXISTS (~%exception_splstate_tra%~) BEGIN
 				SET ~fx_no_effect_chance_%fx_id%~ = 1
 			END
@@ -113,7 +118,12 @@ DEFINE_PATCH_MACRO ad_target_exception_support BEGIN
 			SET exception_splstate = $fx_parameter1(~%exception_id%~)
 			SET exception_splstate_tra = 8120000 + exception_splstate
 			// État de sort sans nom (ajouté par un mod, SOLASNA1) : l'ancien moteur n'en écrit rien.
-			PATCH_IF $fx_external(~%exception_id%~) AND (exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111)
+			SET exception_on_splstate = VARIABLE_IS_SET $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~)
+			PATCH_IF exception_on_splstate BEGIN
+				SPRINT exception_stat_source $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~)
+				SET exception_on_splstate = ~%exception_stat_source%~ STRING_EQUAL ~SPLSTATE~
+			END
+			PATCH_IF $fx_external(~%exception_id%~) AND exception_on_splstate
 					AND NOT TRA_ENTRY_EXISTS (~%exception_splstate_tra%~) BEGIN
 				SET drop_id = exception_id
 				SPRINT ignored_reason ~not_implemented:opcode%exception_opcode%:splstate_no_name~
@@ -180,9 +190,10 @@ END
 
 // Noms de l'exception exception_id : fx_exception_kind (EFFECTIVE, NOT_EFFECTIVE, BETWEEN, IF,
 // EFFECTIVE_IF), fx_exception_name(id n) et fx_exception_name_count. Ligne parameter2 de
-// splprot.2da, dans l'ordre de l'ancien moteur : valeur parameter1 d'un fichier IDS (102-109
-// inefficace, 112-118 effectif) ; état de sort (76 et 110 inefficace, 111 effectif ; 121, Manteau,
-// ignoré comme dans l'ancien moteur) ; état (138 inefficace, 139 effectif) ; sinon la table, où
+// splprot.2da, dans l'ordre de l'ancien moteur : lignes de AD_EXCEPTION_STAT_SOURCE (lib/catalog.tpa),
+// valeur parameter1 d'un fichier IDS (102-109 inefficace, 112-118 effectif), état de sort (76 et 110
+// inefficace, 111 effectif ; 121, Manteau, ignoré comme dans l'ancien moteur), état (138 inefficace, 139
+// effectif) ; sinon la table, où
 // « chapitre 6 » (136) est la pénurie de fer ; le lanceur (43) n'est pas nommé, l'ancien moteur
 // l'écartant de sa liste (opcode_324_target_exceptions). Type de créature, état ou état de sort sans
 // nom, ligne des EE au-delà de 145 ou absente de la table : l'ancien moteur n'écrit rien, exception
@@ -192,21 +203,17 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 	SET exception_value = $fx_parameter1(~%exception_id%~)
 	SET exception_name_count = 0
 	SPRINT exception_kind ~~
-	PATCH_IF (exception_stat >= 102 AND exception_stat <= 109) OR (exception_stat >= 112 AND exception_stat <= 118) BEGIN
-		SPRINT exception_kind ~EFFECTIVE~
-		SET exception_ids_file = exception_stat - 110
-		PATCH_IF exception_stat <= 109 BEGIN
-			SPRINT exception_kind ~NOT_EFFECTIVE~
-			SET exception_ids_file = exception_stat - 100
-		END
+	SPRINT exception_source ~~
+	PATCH_IF VARIABLE_IS_SET $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~) BEGIN
+		SPRINT exception_source $AD_EXCEPTION_STAT_SOURCE(~%exception_stat%~)
+		SPRINT exception_kind $AD_EXCEPTION_STAT_KIND(~%exception_stat%~)
+	END
+	PATCH_IF ~%exception_source%~ STRING_EQUAL ~IDS~ BEGIN
+		SET exception_ids_file = $AD_EXCEPTION_STAT_IDS(~%exception_stat%~)
 		LPF ad_ids_name INT_VAR ids_file = exception_ids_file entry = exception_value RET exception_name = name END
 		LPM ad_target_exception_add_name
 	END
-	ELSE PATCH_IF exception_stat == 76 OR exception_stat == 110 OR exception_stat == 111 BEGIN
-		SPRINT exception_kind ~NOT_EFFECTIVE~
-		PATCH_IF exception_stat == 111 BEGIN
-			SPRINT exception_kind ~EFFECTIVE~
-		END
+	ELSE PATCH_IF ~%exception_source%~ STRING_EQUAL ~SPLSTATE~ BEGIN
 		PATCH_IF exception_value != 121 BEGIN
 			SET exception_tra = 8120000 + exception_value
 			SPRINT exception_name ~~
@@ -217,11 +224,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 			LPM ad_target_exception_add_name
 		END
 	END
-	ELSE PATCH_IF exception_stat == 138 OR exception_stat == 139 BEGIN
-		SPRINT exception_kind ~NOT_EFFECTIVE~
-		PATCH_IF exception_stat == 139 BEGIN
-			SPRINT exception_kind ~EFFECTIVE~
-		END
+	ELSE PATCH_IF ~%exception_source%~ STRING_EQUAL ~STATE~ BEGIN
 		LPM ad_target_exception_state
 		SPRINT exception_name ~~
 		PATCH_IF NOT (~%descriptionState%~ STRING_EQUAL ~~) BEGIN
@@ -229,8 +232,7 @@ DEFINE_PATCH_MACRO ad_target_exception_names BEGIN
 		END
 		LPM ad_target_exception_add_name
 	END
-	ELSE PATCH_IF exception_stat == 43 BEGIN
-		SPRINT exception_kind ~NOT_EFFECTIVE~
+	ELSE PATCH_IF ~%exception_source%~ STRING_EQUAL ~CASTER~ BEGIN
 	END
 	ELSE PATCH_IF IS_EE AND exception_stat > 145 BEGIN
 		SPRINT exception_ignored_reason ~condition~

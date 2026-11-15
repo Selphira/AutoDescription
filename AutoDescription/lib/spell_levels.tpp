@@ -341,7 +341,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_duration BEGIN
 	SET level_duration_by_timing = 1
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
-		PATCH_IF $level_on(~%level_a%~) AND $level_opcode(~%level_a%~) != 518 BEGIN
+		SET level_virtual_opcode = $level_opcode(~%level_a%~)
+		PATCH_IF $level_on(~%level_a%~) AND NOT VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_virtual_opcode%~) BEGIN
 			LPM ad_spell_level_search
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT level_value_text ~~
@@ -365,7 +366,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 	SET level_skip = AD_SAME_SAVE
 	FOR (level_k0 = 0; level_k0 < $spell_fx_count(~0~) AND ~%render_late_missing%~ STRING_EQUAL ~~; ++level_k0) BEGIN
 		SPRINT level_a ~0 %level_k0%~
-		PATCH_IF $level_on(~%level_a%~) AND $level_opcode(~%level_a%~) != 518 BEGIN
+		SET level_virtual_opcode = $level_opcode(~%level_a%~)
+		PATCH_IF $level_on(~%level_a%~) AND NOT VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_virtual_opcode%~) BEGIN
 			LPM ad_spell_level_search
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_save~
@@ -540,7 +542,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 				SET target_level_min = $fx_level_min(~%level_id%~)
 				SET target_level_max = $fx_level_max(~%level_id%~)
 			END
-			PATCH_IF $level_on(~%level_a%~) AND level_opcode != 518 AND target_level_max > 0 AND target_level_min <= 1 AND target_level_min != target_level_max
+			PATCH_IF $level_on(~%level_a%~) AND NOT VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_opcode%~) AND target_level_max > 0 AND target_level_min <= 1 AND target_level_min != target_level_max
 					AND NOT (IS_EE AND (level_opcode == 127 OR (level_opcode == 218 AND $fx_parameter2(~%level_id%~) != 0))) BEGIN
 				SET target_level_previous = 0
 				PATCH_IF level_h0 > 0 BEGIN
@@ -1067,8 +1069,9 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 					SET level_id = $level_id(~%level_a%~)
 					SPRINT ~fx_line_section_%level_id%~ ~level%level_key%~
 					SET level_derived = $level_derived(~%level_a%~)
-					PATCH_IF level_opcode == 518 BEGIN
-						PHP_EACH fx_ids_206 AS _ => level_member BEGIN
+					PATCH_IF VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_opcode%~) BEGIN
+						SET level_members_opcode = $AD_VIRTUAL_LEVEL_MEMBERS(~%level_opcode%~)
+						PHP_EACH ~fx_ids_%level_members_opcode%~ AS _ => level_member BEGIN
 							PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
 								SPRINT ~fx_line_section_%level_member%~ ~level%level_key%~
 							END
@@ -1083,8 +1086,10 @@ DEFINE_PATCH_MACRO ad_spell_levels_ranges BEGIN
 			SPRINT level_a ~%level_h% %level_k%~
 			PATCH_IF NOT $level_emitted(~%level_a%~) BEGIN
 				SET level_derived = $level_derived(~%level_a%~)
-				PATCH_IF $level_opcode(~%level_a%~) == 518 BEGIN
-					PHP_EACH fx_ids_206 AS _ => level_member BEGIN
+				SET level_virtual_opcode = $level_opcode(~%level_a%~)
+				PATCH_IF VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_virtual_opcode%~) BEGIN
+					SET level_members_opcode = $AD_VIRTUAL_LEVEL_MEMBERS(~%level_virtual_opcode%~)
+					PHP_EACH ~fx_ids_%level_members_opcode%~ AS _ => level_member BEGIN
 						PATCH_IF $fx_immunity_derived(~%level_member%~) == level_derived BEGIN
 							SET ~fx_consumed_%level_member%~ = 1
 							SET ~fx_level_merged_%level_member%~ = 1
@@ -1188,11 +1193,18 @@ DEFINE_PATCH_MACRO ad_spell_level_same BEGIN
 	END
 	// Renvois et immunités par niveau de sort réunis dans leur en-tête : même masque des niveaux (ancien
 	// custom_int).
-	PATCH_IF level_same AND (same_opcode == 200 OR same_opcode == 201) BEGIN
+	SPRINT same_compare ~~
+	PATCH_IF VARIABLE_IS_SET $AD_LEVEL_COMPARE(~%same_opcode%~) BEGIN
+		SPRINT same_compare $AD_LEVEL_COMPARE(~%same_opcode%~)
+	END
+	ELSE PATCH_IF VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_COMPARE(~%same_opcode%~) BEGIN
+		SPRINT same_compare $AD_VIRTUAL_LEVEL_COMPARE(~%same_opcode%~)
+	END
+	PATCH_IF level_same AND ~%same_compare%~ STRING_EQUAL ~POWER_MASK~ BEGIN
 		SET level_same = $fx_power_mask(~%same_a%~) == $fx_power_mask(~%same_b%~)
 	END
 	// Guérisons et dissipations réunies (ad_group_cures) : mêmes opcodes réunis (ancien custom_int).
-	PATCH_IF level_same AND (same_opcode == 518 OR same_opcode == 527 OR same_opcode == 528) BEGIN
+	PATCH_IF level_same AND ~%same_compare%~ STRING_EQUAL ~SIGNATURE~ BEGIN
 		SET same_derived_a = $level_derived(~%level_a%~)
 		SET same_derived_b = $level_derived(~%level_b%~)
 		SPRINT same_signature_a $derived_signature(~%same_derived_a%~)

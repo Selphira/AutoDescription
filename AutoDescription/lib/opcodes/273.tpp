@@ -10,9 +10,3 @@ DEFINE_PATCH_MACRO ad_op_273_support BEGIN
 		END
 	END
 END
-
-DEFINE_PATCH_MACRO ad_op_273_lines BEGIN
-	SET state_opcode = 273
-	SPRINT state_variant_macro ~~
-	LPM ad_state_lines
-END

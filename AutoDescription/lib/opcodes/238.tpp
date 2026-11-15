@@ -21,9 +21,3 @@ DEFINE_PATCH_MACRO ad_op_238_support BEGIN
 		END
 	END
 END
-
-DEFINE_PATCH_MACRO ad_op_238_lines BEGIN
-	SET state_opcode = 238
-	SPRINT state_variant_macro ~~
-	LPM ad_state_lines
-END

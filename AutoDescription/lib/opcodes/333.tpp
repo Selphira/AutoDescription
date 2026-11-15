@@ -61,18 +61,11 @@ DEFINE_PATCH_MACRO ad_op_333_support BEGIN
 					LPM ad_op_333_nested
 					PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 						SET recursion_fx = charge_id
+						LPM ad_recursion_params
 						SPRINT recursion_resref ~%charge_resref%~
 						SET recursion_casting_level = $fx_parameter2(~%charge_id%~) > 0 ? $fx_parameter2(~%charge_id%~) : 1
 						// Le sort part de la cible de l'effet (IESDP) : ses effets en reprennent les chaînes.
-						SPRINT recursion_targets ~effect~
 						SET recursion_ignore_duration = 0
-						SET recursion_series = 0
-						SET recursion_depth_reset = 0
-						SPRINT recursion_kind ~spl~
-						SET recursion_parent_dice = 0
-						SET recursion_versus_set = 0
-						SPRINT recursion_versus ~~
-						SPRINT recursion_single_reason ~~
 						SPRINT recursion_frequency ~%charge_frequency%~
 						SET recursion_inherit_dice = $fx_parameter2(~%charge_id%~) == 0
 						LPM ad_recursion_support

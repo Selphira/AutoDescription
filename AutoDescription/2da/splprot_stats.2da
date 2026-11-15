@@ -1,0 +1,15 @@
+2DA V1.0
+*
+         KIND           IDS  NAME_BASE  NAME_BLOCK SIZE   MIN   MAX   VARIABLE      RULE
+258      NAMED          *    23268010   23260000   10000  1     4     sizeName      SIZE
+262      OLD_DIFFERENT  *    *          *          *      *     *     *             *
+263      OLD_DIFFERENT  *    *          *          *      *     *     *             *
+266      IDS            2    *          *          *      *     *     *             *
+267      IDS            3    *          *          *      *     *     *             *
+268      IDS            4    *          *          *      *     *     *             *
+269      NAMED          *    8095500    8090000    10000  0     255   className     *
+270      OLD_DIFFERENT  *    *          *          *      *     *     *             *
+271      IDS            7    *          *          *      *     *     *             *
+272      NAMED          *    8098500    8090000    10000  0     255   alignName     *
+273      STATE          *    *          *          *      *     *     *             *
+274      NAMED          *    8120000    8120000    256    0     255   splstateName  *

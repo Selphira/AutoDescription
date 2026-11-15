@@ -19,12 +19,6 @@ DEFINE_PATCH_MACRO ad_op_57_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_57_lines BEGIN
-	SET state_opcode = 57
-	SPRINT state_variant_macro ~ad_op_57_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_57_variant BEGIN
 	SET tra_id = 20570000 + $fx_parameter2(~%line_fx%~) SET tra_block_start = 20570017 SET tra_block_size = 35 SPRINT tra_out ~alignment~ LPM ad_tra_to // ~neutre mauvais~ (@20570035)
 END

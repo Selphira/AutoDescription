@@ -1,8 +1,10 @@
 // Code commun de la famille des modificateurs simples d'une statistique (IESDP) : parameter1 =
 // valeur, parameter2 = mode (0 ajoute la valeur, 1 fixe la statistique à la valeur, 2 la multiplie
 // par valeur %). Un opcode de la famille a une entrée dans AD_STAT_MODIFIER_NAMES
-// (lib/catalog.tpa) et son fichier lib/opcodes/<N>.tpp, dont les deux macros ad_op_<N>_*
-// fixent stat_opcode et stat_mode_3 puis appellent les macros ci-dessous ; un opcode dont la
+// (lib/catalog.tpa) et son fichier lib/opcodes/<N>.tpp. Un opcode de la famille STAT (colonne FAMILY de
+// 2da/opcodes.2da) a ses paramètres dans 2da/stat_modifiers.2da (ad_family_stat_support,
+// ad_family_stat_lines) ; un opcode au code propre, dont les deux macros ad_op_<N>_* fixent
+// stat_opcode et stat_mode_3 puis appellent les macros ci-dessous, fixe les autres lui-même ; un opcode dont la
 // statistique est un pourcentage (compétences de voleur…) est listé dans AD_STAT_MODIFIER_PERCENT ;
 // un opcode sans mode
 // pourcentage fixe aussi stat_percentage à invalid, remis à valid après la prise en charge ; un
@@ -25,6 +27,34 @@
 
 // ---------------------------------------------------------------------------------------------
 // Prise en charge (ancien opcode_modstat2_is_valid / opcode_modstat3_is_valid)
+
+DEFINE_PATCH_MACRO ad_family_stat_support BEGIN
+	SET stat_opcode = render_opcode
+	SPRINT stat_mode_3 $AD_STAT_MODE_3(~%render_opcode%~)
+	SPRINT stat_percentage ~valid~
+	PATCH_IF VARIABLE_IS_SET $AD_STAT_PERCENTAGE(~%render_opcode%~) BEGIN
+		SPRINT stat_percentage $AD_STAT_PERCENTAGE(~%render_opcode%~)
+	END
+	SPRINT stat_percent_100 ~~
+	PATCH_IF VARIABLE_IS_SET $AD_STAT_PERCENT_100(~%render_opcode%~) BEGIN
+		SPRINT stat_percent_100 $AD_STAT_PERCENT_100(~%render_opcode%~)
+	END
+	SPRINT stat_forced_mode ~~
+	PATCH_IF VARIABLE_IS_SET $AD_STAT_FORCED_MODE(~%render_opcode%~) BEGIN
+		SET stat_forced_mode = $AD_STAT_FORCED_MODE(~%render_opcode%~)
+	END
+	LPM ad_stat_modifier_support
+END
+
+DEFINE_PATCH_MACRO ad_family_stat_lines BEGIN
+	SET stat_opcode = render_opcode
+	SPRINT stat_line_macro ~~
+	PATCH_IF VARIABLE_IS_SET $AD_STAT_LINE(~%render_opcode%~) BEGIN
+		SPRINT stat_line_macro $AD_STAT_LINE(~%render_opcode%~)
+	END
+	SPRINT stat_lines_macro $AD_STAT_LINES(~%render_opcode%~)
+	LPM ~%stat_lines_macro%~
+END
 
 DEFINE_PATCH_MACRO ad_stat_modifier_support BEGIN
 	PHP_EACH ~fx_ids_%stat_opcode%~ AS _ => stat_id BEGIN

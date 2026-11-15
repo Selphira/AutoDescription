@@ -2,131 +2,59 @@
 // leurs lignes. Un effet réuni à d'autres est marqué consommé (fx_consumed) : la macro
 // ad_op_<N>_lines de son opcode le saute, et la ligne est celle d'un effet dérivé (ad_derived_add),
 // écrite avec les autres lignes (ad_derived_lines) : les regroupements n'écrivent rien, l'en-tête d'un
-// sort se lit entre eux et les lignes. Les règles s'appliquent dans l'ordre ci-dessous,
-// indépendamment de l'ordre des opcodes. Une règle fixe l'opcode d'ancrage, les opcodes membres,
+// sort se lit entre eux et les lignes. Les règles s'appliquent dans l'ordre de 2da/group_rules.2da
+// (ad_read_group_rules, lib/catalog.tpa), indépendamment de l'ordre des opcodes. Une règle fixe l'opcode d'ancrage, les opcodes membres,
 // l'effet dérivé, le nom de la ligne et la macro qui écrit la ligne (group_line), puis appelle
 // ad_group_same_fields.
 //
 // Tableaux écrits : fx_consumed (initialisé à 0 à la lecture, lib/effects.tpp), derived_*.
 //
 // Une règle n'est appliquée que si l'objet a les opcodes sans lesquels elle ne réunit rien
-// (fx_opcode_count) : chacune parcourt tous les effets, souvent plusieurs fois.
+// (REQUIRE_ALL, REQUIRE_ANY de la table, lus dans fx_opcode_count au moment de la règle) : chacune
+// parcourt tous les effets, souvent plusieurs fois.
 
 DEFINE_PATCH_MACRO ad_cross_groups BEGIN
 	SET derived_count = 0
 	SET group_statistic_tra = 0
 	SET group_name_tra = 0
 	SET group_anchor = 0
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		LPM ad_group_identical_effects
-		LPM ad_group_duration_ranges
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		PATCH_FOR_EACH group_kind IN ~ABILITIES~ ~ALL_SAVES~ BEGIN
-			LPM ad_group_same_fields
+	SPRINT group_rule_point ~CROSS~
+	LPM ad_group_rules_apply
+END
+
+// Règles du point group_rule_point de 2da/group_rules.2da (ad_read_group_rules, lib/catalog.tpa), dans
+// l'ordre de la table : chaque règle dont l'option est active pose ses paramètres, puis est appliquée si
+// les opcodes qu'elle demande sont présents à ce moment (fx_opcode_count, qu'une règle précédente peut
+// compléter).
+DEFINE_PATCH_MACRO ad_group_rules_apply BEGIN
+	SET group_rule_count = VARIABLE_IS_SET $AD_GROUP_RULE_COUNT(~%group_rule_point%~) ? $AD_GROUP_RULE_COUNT(~%group_rule_point%~) : 0
+	FOR (group_rule = 0; group_rule < group_rule_count; ++group_rule) BEGIN
+		SET group_rule_active = (AD_ENABLE_SHRINKAGE OR NOT $AD_GROUP_RULE_SHRINK(~%group_rule_point%~ ~%group_rule%~))
+			AND (AD_SHRINK_IMMUNITIES_SINGLE_LINE OR NOT $AD_GROUP_RULE_SINGLE_LINE(~%group_rule_point%~ ~%group_rule%~))
+		PATCH_IF group_rule_active AND $AD_GROUP_RULE_MULTI_HEADER(~%group_rule_point%~ ~%group_rule%~) BEGIN
+			SET group_rule_active = fx_header_count > 1
 		END
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE AND VARIABLE_IS_SET $fx_opcode_count(~97~) AND VARIABLE_IS_SET $fx_opcode_count(~44~) BEGIN
-		LPM ad_group_exceptional_strength
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		SPRINT group_kind ~THIEF_SKILLS~
-		LPM ad_group_same_fields
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~83~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
-			LPM ad_group_projectile_spells
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~102~) BEGIN
-			LPM ad_group_spell_levels
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~205~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
-			LPM ad_group_secondary_type_spells
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~197~) AND VARIABLE_IS_SET $fx_opcode_count(~207~) BEGIN
-			LPM ad_group_bounce_spells
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~23~) AND VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
-			LPM ad_group_morale
-		END
-		// Avant les immunités, qui absorbent la vitesse rétablie : l'action libre en est retirée quand
-		// le 126 précède le 101 dans le bloc (ancien ordre des opcodes), cas du jeu de base (SPPR403).
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~126~) AND VARIABLE_IS_SET $fx_opcode_count(~163~) BEGIN
-			LPM ad_group_movement_restored
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
-			LPM ad_group_immunities
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
-			LPM ad_group_psionic_immunity
-		END
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~20~) BEGIN
-			LPM ad_group_improved_invisibility
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~58~) AND (VARIABLE_IS_SET $fx_opcode_count(~77~) OR VARIABLE_IS_SET $fx_opcode_count(~81~)) BEGIN
-			LPM ad_group_dispel_cures
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~154~) BEGIN
-			LPM ad_group_entangle
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~101~) BEGIN
-			LPM ad_group_free_action
-		END
-		PATCH_IF AD_SHRINK_IMMUNITIES_SINGLE_LINE AND VARIABLE_IS_SET $fx_opcode_count(~101~) AND VARIABLE_IS_SET $fx_opcode_count(~106~) BEGIN
-			LPM ad_group_panic_immunity
-		END
-		PATCH_FOR_EACH button_opcode IN 144 279 BEGIN
-			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%button_opcode%~) BEGIN
-				LPM ad_group_buttons
+		PATCH_IF group_rule_active BEGIN
+			FOR (group_rule_n = 0; group_rule_n < $AD_GROUP_RULE_PARAMETER_COUNT(~%group_rule_point%~ ~%group_rule%~); ++group_rule_n) BEGIN
+				SPRINT group_rule_parameter $AD_GROUP_RULE_PARAMETER(~%group_rule_point%~ ~%group_rule%~ ~%group_rule_n%~)
+				SPRINT ~%group_rule_parameter%~ $AD_GROUP_RULE_VALUE(~%group_rule_point%~ ~%group_rule%~ ~%group_rule_n%~)
 			END
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~100~) BEGIN
-			LPM ad_group_creature_types
-		END
-		PATCH_FOR_EACH group_spell_opcode IN 60 145 99 BEGIN
-			SET group_spell_max_type = group_spell_opcode == 99 ? 1 : 2
-			PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%group_spell_opcode%~) BEGIN
-				LPM ad_group_spell_types
+			SET group_rule_met = 1
+			FOR (group_rule_n = 0; group_rule_n < $AD_GROUP_RULE_ALL_COUNT(~%group_rule_point%~ ~%group_rule%~) AND group_rule_met; ++group_rule_n) BEGIN
+				SET group_rule_opcode = $AD_GROUP_RULE_ALL(~%group_rule_point%~ ~%group_rule%~ ~%group_rule_n%~)
+				SET group_rule_met = VARIABLE_IS_SET $fx_opcode_count(~%group_rule_opcode%~)
 			END
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~112~) AND VARIABLE_IS_SET $fx_opcode_count(~122~) BEGIN
-			LPM ad_group_item_return
-			LPM ad_group_replace_item
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~143~) BEGIN
-			LPM ad_group_broken_armor
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~211~) AND VARIABLE_IS_SET $fx_opcode_count(~71~) BEGIN
-			LPM ad_group_imprisonment
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~220~) AND VARIABLE_IS_SET $fx_opcode_count(~221~) BEGIN
-			LPM ad_group_all_illusions
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~261~) BEGIN
-			LPM ad_group_restored_spells
-		END
-	END
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		LPM ad_group_delayed_series
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~12~) BEGIN
-			LPM ad_group_damage_halves
-		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~135~) BEGIN
-			LPM ad_group_polymorph
-		END
-		// Après les regroupements qui absorbent des guérisons (immunités, dissipation de la magie, action
-		// libre), comme la seconde passe (opcode_N_post_group) de l'ancien moteur.
-		PATCH_FOR_EACH cure_kind IN ~CURES~ ~DISPELS~ BEGIN
-			LPM ad_group_cures
-		END
-	END
-	// L'ancien moteur tente toujours le regroupement de toutes les résistances avant ceux des
-	// éléments et des dégâts physiques, qui n'ont aucun opcode commun.
-	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-		PATCH_FOR_EACH group_kind IN ~ALL_RESISTANCES~ ~ELEMENTAL_RESISTANCES~ ~PHYSICAL_RESISTANCES~ BEGIN
-			LPM ad_group_same_fields
+			PATCH_IF group_rule_met AND $AD_GROUP_RULE_ANY_COUNT(~%group_rule_point%~ ~%group_rule%~) > 0 BEGIN
+				SET group_rule_met = 0
+				FOR (group_rule_n = 0; group_rule_n < $AD_GROUP_RULE_ANY_COUNT(~%group_rule_point%~ ~%group_rule%~) AND NOT group_rule_met; ++group_rule_n) BEGIN
+					SET group_rule_opcode = $AD_GROUP_RULE_ANY(~%group_rule_point%~ ~%group_rule%~ ~%group_rule_n%~)
+					SET group_rule_met = VARIABLE_IS_SET $fx_opcode_count(~%group_rule_opcode%~)
+				END
+			END
+			PATCH_IF group_rule_met BEGIN
+				SPRINT group_rule_macro $AD_GROUP_RULE_MACRO(~%group_rule_point%~ ~%group_rule%~)
+				LPM ~%group_rule_macro%~
+			END
 		END
 	END
 END
@@ -716,11 +644,8 @@ DEFINE_PATCH_MACRO ad_inflicted_add BEGIN
 		SET inflicted_state = (inflicted_state == 0 OR inflicted_state == child_state) ? child_state : 0 - 1
 	END
 	PATCH_IF NOT (~%child_resref%~ STRING_EQUAL ~~) BEGIN
-		PATCH_IF child_opcode == 146 OR child_opcode == 148 OR child_opcode == 326 BEGIN
-			SPRINT $inflicted_children(~%child_resref%~) ~spl~
-		END
-		ELSE PATCH_IF child_opcode == 177 OR child_opcode == 183 OR child_opcode == 283 BEGIN
-			SPRINT $inflicted_children(~%child_resref%~) ~eff~
+		PATCH_IF VARIABLE_IS_SET $AD_SUBRESOURCE_INFLICTED(~%child_opcode%~) BEGIN
+			SPRINT $inflicted_children(~%child_resref%~) $AD_SUBRESOURCE_INFLICTED(~%child_opcode%~)
 		END
 	END
 END
@@ -1645,7 +1570,7 @@ DEFINE_PATCH_MACRO ad_group_same_fields BEGIN
 	END
 END
 
-// Effet dérivé derived_kind (ancien opcode virtuel AD_DERIVED_OLD_OPCODE, ajouté après les autres
+// Effet dérivé derived_kind (ancien opcode virtuel AD_DERIVED_VIRTUAL, ajouté après les autres
 // effets : il compte pour l'en-tête d'un sort, ad_spell_header_effects), aux champs de l'effet
 // derived_id ; derived_other : second effet que lit sa ligne ; derived_line : macro qui rédige sa
 // ligne (line_text ou line_phrase), vide s'il n'en a pas. Les paramètres de la règle

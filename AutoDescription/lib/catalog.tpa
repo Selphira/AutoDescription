@@ -9,7 +9,11 @@
 //   opcodes_cant_be_permanent, opcodes_cant_be_permanent_after_death) : SHOWN (affichée), IGNORED
 //   (jamais affichée, ni comptée dans la durée commune d'une potion), HIDDEN (jamais affichée mais
 //   comptée), NOT_PERMANENT (affichée, sauf « de manière permanente »), NOT_AFTER_DEATH (affichée ;
-//   un effet qui persiste après la mort est seulement dit permanent).
+//   un effet qui persiste après la mort est seulement dit permanent) ;
+// - FAMILY : famille de l'opcode, dont le code commun décrit ses effets à partir des paramètres d'une
+//   table (STATE : 2da/states.2da, lib/opcodes/states.tpp ; STAT : 2da/stat_modifiers.2da,
+//   lib/opcodes/stat_modifiers.tpp) ; * : l'opcode a ses propres macros ad_op_<N>_support et
+//   ad_op_<N>_lines. AD_OPCODE_FAMILY ne contient que les opcodes d'une famille, en minuscules.
 // Un opcode absent du catalogue ou inexistant dans le jeu courant est « inconnu » : il n'est pas
 // décrit et il est journalisé, comme l'effet qu'ignore le moteur du jeu.
 // AD_OPCODE_DESCRIBED ne contient que les opcodes décrits dans le jeu courant (DESCRIBED et
@@ -21,10 +25,11 @@
 // toutes les variables.
 DEFINE_ACTION_FUNCTION ad_read_opcode_catalog
 	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DESCRIBED AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+		AD_OPCODE_FAMILY
 BEGIN
 	OUTER_SET ad_catalog_column = IS_EE ? 2 : 1
 	COPY - ~%MOD_FOLDER%/2da/opcodes.2da~ ~override~
-		READ_2DA_ENTRIES_NOW ad_catalog 8
+		READ_2DA_ENTRIES_NOW ad_catalog 9
 		FOR (ad_row = 0; ad_row < ad_catalog; ++ad_row) BEGIN
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row 0 ad_opcode
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row ad_catalog_column ad_available
@@ -32,6 +37,7 @@ BEGIN
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row 4 ad_dice
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row 5 ad_sort
 			READ_2DA_ENTRY_FORMER ad_catalog ad_row 6 ad_duration
+			READ_2DA_ENTRY_FORMER ad_catalog ad_row 7 ad_family
 			SET $AD_OPCODE_AVAILABLE(~%ad_opcode%~) = ad_available
 			SPRINT $AD_OPCODE_STATUS(~%ad_opcode%~) ~%ad_status%~
 			PATCH_IF ad_available AND (~%ad_status%~ STRING_EQUAL ~DESCRIBED~) BEGIN
@@ -40,10 +46,87 @@ BEGIN
 			SPRINT $AD_OPCODE_DICE(~%ad_opcode%~) ~%ad_dice%~
 			SET $AD_OPCODE_SORT(~%ad_opcode%~) = ad_sort
 			SPRINT $AD_OPCODE_DURATION(~%ad_opcode%~) ~%ad_duration%~
+			PATCH_IF NOT (~%ad_family%~ STRING_EQUAL ~*~) BEGIN
+				TO_LOWER ad_family
+				SPRINT $AD_OPCODE_FAMILY(~%ad_opcode%~) ~%ad_family%~
+			END
 		END
 END
 LAF ad_read_opcode_catalog
 	RET_ARRAY AD_OPCODE_AVAILABLE AD_OPCODE_STATUS AD_OPCODE_DESCRIBED AD_OPCODE_DICE AD_OPCODE_SORT AD_OPCODE_DURATION
+		AD_OPCODE_FAMILY
+END
+
+// Paramètres des opcodes de la famille STATE (2da/states.2da, lib/opcodes/states.tpp) : SUPPORT, macro de
+// prise en charge propre à l'opcode (dans son fichier) ; VARIANT, macro qui choisit la variante de la
+// phrase (state_variant_macro) ; * : aucune. Seules les valeurs renseignées sont gardées.
+DEFINE_ACTION_FUNCTION ad_read_states
+	RET_ARRAY AD_STATE_SUPPORT AD_STATE_VARIANT
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/states.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_states 3
+		FOR (ad_row = 0; ad_row < ad_states; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_states ad_row 0 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_states ad_row 1 ad_support
+			READ_2DA_ENTRY_FORMER ad_states ad_row 2 ad_variant
+			PATCH_IF NOT (~%ad_support%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_STATE_SUPPORT(~%ad_opcode%~) ~%ad_support%~
+			END
+			PATCH_IF NOT (~%ad_variant%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_STATE_VARIANT(~%ad_opcode%~) ~%ad_variant%~
+			END
+		END
+END
+LAF ad_read_states
+	RET_ARRAY AD_STATE_SUPPORT AD_STATE_VARIANT
+END
+
+// Paramètres des opcodes de la famille STAT (2da/stat_modifiers.2da, lib/opcodes/stat_modifiers.tpp) :
+// LINES, macro des lignes (STAT : ad_stat_modifier_lines ; RESIST : ad_resistance_lines ; SAVE :
+// ad_saving_throw_lines) ; MODE_3, PERCENTAGE, PERCENT_100 : stat_mode_3, stat_percentage, stat_percent_100 ;
+// FORCED_BG2, FORCED_EE : mode que le jeu applique quel que soit parameter2 (stat_forced_mode), selon le
+// jeu ; LINE : macro d'une ligne (stat_line_macro, dans le fichier de l'opcode) ; * : sans valeur. Seules
+// les valeurs renseignées sont gardées, sauf LINES et MODE_3.
+DEFINE_ACTION_FUNCTION ad_read_stat_modifiers
+	RET_ARRAY AD_STAT_LINES AD_STAT_MODE_3 AD_STAT_PERCENTAGE AD_STAT_PERCENT_100 AD_STAT_FORCED_MODE AD_STAT_LINE
+BEGIN
+	OUTER_SET ad_forced_column = IS_EE ? 6 : 5
+	COPY - ~%MOD_FOLDER%/2da/stat_modifiers.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_stats 8
+		FOR (ad_row = 0; ad_row < ad_stats; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 0 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 1 ad_lines
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 2 ad_mode_3
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 3 ad_percentage
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 4 ad_percent_100
+			READ_2DA_ENTRY_FORMER ad_stats ad_row ad_forced_column ad_forced
+			READ_2DA_ENTRY_FORMER ad_stats ad_row 7 ad_line
+			PATCH_IF ~%ad_lines%~ STRING_EQUAL ~RESIST~ BEGIN
+				SPRINT $AD_STAT_LINES(~%ad_opcode%~) ~ad_resistance_lines~
+			END
+			ELSE PATCH_IF ~%ad_lines%~ STRING_EQUAL ~SAVE~ BEGIN
+				SPRINT $AD_STAT_LINES(~%ad_opcode%~) ~ad_saving_throw_lines~
+			END
+			ELSE BEGIN
+				SPRINT $AD_STAT_LINES(~%ad_opcode%~) ~ad_stat_modifier_lines~
+			END
+			SPRINT $AD_STAT_MODE_3(~%ad_opcode%~) ~%ad_mode_3%~
+			PATCH_IF NOT (~%ad_percentage%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_STAT_PERCENTAGE(~%ad_opcode%~) ~%ad_percentage%~
+			END
+			PATCH_IF NOT (~%ad_percent_100%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_STAT_PERCENT_100(~%ad_opcode%~) ~%ad_percent_100%~
+			END
+			PATCH_IF IS_AN_INT ad_forced BEGIN
+				SET $AD_STAT_FORCED_MODE(~%ad_opcode%~) = ad_forced
+			END
+			PATCH_IF NOT (~%ad_line%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_STAT_LINE(~%ad_opcode%~) ~%ad_line%~
+			END
+		END
+END
+LAF ad_read_stat_modifiers
+	RET_ARRAY AD_STAT_LINES AD_STAT_MODE_3 AD_STAT_PERCENTAGE AD_STAT_PERCENT_100 AD_STAT_FORCED_MODE AD_STAT_LINE
 END
 
 // Sorts d'Item Revision que l'ancien moteur décrit par un texte propre au lieu de les citer (anciens
@@ -124,6 +207,22 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_EFF_FIELDS BEGIN
 	345 => ALL
 END
 
+// Modificateurs contre un type de créature (lib/opcodes/versus_modifiers.tpp) : champ de la valeur.
+// PARAMETER3 : parameter3 (effet d'un EFF), sinon special sur EE ; une valeur nulle est écartée.
+// SPECIAL : special ; une valeur nulle est décrite, la forme « cible » et un effet probable sont refusés.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_VERSUS_AMOUNT BEGIN
+	178 => PARAMETER3 // TAC0
+	179 => PARAMETER3 // dégâts
+	344 => SPECIAL    // enchantement
+END
+
+// Paralysies d'un type de créature (ad_hold_support, lib/opcodes/states.tpp) décrites comme une paralysie
+// simple quand le fichier IDS est inhabituel ou, sur EE, quand special n'est pas nul ; les autres (175,
+// 185) écartent un fichier inhabituel.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_HOLD_PLAIN_IF_INVALID BEGIN
+	109 => 1
+END
+
 // Opcodes dont l'ancien moteur écrit autrement les lignes quand versus est fixé (sous-effets d'un sort
 // lancé par l'opcode 232, lib/recursion.tpp) ; l'opcode 12 le prend en charge.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODES_READ_VERSUS BEGIN
@@ -188,7 +287,8 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_PROBABILITY_LIST_NAMES BEGIN
 END
 
 // Opcodes dont la durée ne se compte pas en secondes (IESDP) : nombre de secondes d'une unité de la
-// durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »).
+// durée, appliqué à l'affichage (ancien opcode_self_255 : « SET duration *= 7200 »). La durée de
+// l'en-tête d'un sort ne l'applique pas, comme l'ancien moteur.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_SCALE BEGIN
 	255 => 7200 // jours
 END
@@ -200,9 +300,20 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_DURATION_DIVISOR BEGIN
 END
 
 // Opcodes dont l'effet dure toujours autant, quels que soient son timing et sa durée (IESDP) :
-// secondes écrites comme une durée limitée (ancien opcode_self_217 : 5 rounds).
+// secondes écrites comme une durée limitée (ancien opcode_self_217 : 5 rounds), dans les lignes et
+// dans la durée de l'en-tête d'un sort.
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_FIXED_DURATION BEGIN
 	217 => 30 // inconscience
+END
+
+// Rôle d'un opcode dans la durée de l'en-tête d'un sort (ad_spell_header_duration, lib/spell_header.tpp),
+// en plus de la colonne DURATION : SPECIAL rend la durée « Spéciale » ; INSTANT rend « Instantanée » la
+// durée d'un en-tête sans durée limitée, comme les durées IGNORED et NOT_PERMANENT (anciennes listes
+// opcodes_ignore_duration et opcodes_cant_be_permanent). Celui des opcodes virtuels des effets dérivés est
+// dans 2da/derived.2da (AD_VIRTUAL_HEADER_DURATION).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_HEADER_DURATION BEGIN
+	177 => INSTANT // EFF appliqué
+	213 => SPECIAL // labyrinthe
 END
 
 // Opcodes d'équipement dont la probabilité passe aux lignes du sort lancé, comme l'ancien
@@ -237,6 +348,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_ATTACKS_PER_ROUND BEGIN
 	8 => 25
 	9 => 35
 	10 => 45
+END
+
+// Drapeaux du jet de sauvegarde d'un effet écrits après lui (EE, IESDP), dans l'ordre des bits : bit => texte.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_FLAG_TEXTS BEGIN
+	1024     => 5000020 // ~ignore la cible principale~ (bit 10)
+	2048     => 5000021 // ~ignore la cible secondaire~ (bit 11)
+	16777216 => 5000022 // ~ignore les images miroir~ (bit 24)
+	33554432 => 5000023 // ~ignore la difficulté~ (bit 25)
+END
+
+// Drapeaux de AD_SAVE_FLAG_TEXTS écrits seulement pour certains opcodes (ancien add_save) : bit => tableau
+// de ces opcodes.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_SAVE_FLAG_OPCODES BEGIN
+	16777216 => AD_SAVE_MIRROR_OPCODES
+	33554432 => AD_SAVE_DIFFICULTY_OPCODES
 END
 
 // Opcodes dont le jet de sauvegarde peut ignorer les images miroir (bit 24, EE), ou la difficulté
@@ -315,49 +441,52 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_PROJECTILE_NAMES BEGIN
 	226 => 227 227 => 227 229 => 227 232 => 227 // ~nuées d'insectes~
 END
 
-// Rang d'affichage des effets dérivés (lignes produites par un regroupement d'effets, sans
-// opcode propre), comparable à la colonne SORT.
-ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_SORT BEGIN
-	~AC_NO_PROTECTION~  => 37
-	~AC_BY_ATTACK_TYPE~ => 35
-	~ABILITIES~         => 100
-	~ALL_SAVES~         => 70
-	~ALL_RESISTANCES~       => 300
-	~ELEMENTAL_RESISTANCES~ => 301
-	~PHYSICAL_RESISTANCES~  => 302
-	~EXCEPTIONAL_STRENGTH~  => 400
-	~THIEF_SKILLS~          => 120
-	~SPELL_LEVELS~          => 249
-	~AC_VS_CREATURE~        => 36
-	~SAVES_VS_CREATURE~     => 71
-	~SPELL_IMMUNITIES~      => 256
-	~FREE_ACTION~           => 285
-	~REPLACE_ITEM~          => 400
-	~BROKEN_ITEM~           => 4
-	~ALL_ILLUSIONS~         => 224
-	~RESTORED_SPELLS~       => 21
-	~CURES~                 => 222
-	~DISPELS~               => 229
+// Effets dérivés (lignes produites par un regroupement d'effets, sans opcode propre ; 2da/derived.2da),
+// par genre : SORT, rang d'affichage, comparable à la colonne SORT du catalogue ; VIRTUAL, opcode virtuel
+// de l'effet que l'ancien moteur crée pour lui, ajouté après les autres effets de l'en-tête : il compte
+// pour l'en-tête d'un sort (lib/spell_header.tpp) ; puis, par opcode virtuel : HEADER_DURATION, rôle dans
+// la durée de l'en-tête (comme AD_OPCODE_HEADER_DURATION) ; LEVEL_COMPARE, comparaison d'un en-tête à
+// l'autre (SIGNATURE : mêmes effets réunis, derived_signature ; lib/spell_levels.tpp) ; LEVEL_MEMBERS,
+// opcode des effets réunis (fx_immunity_derived) qui suivent la section de la ligne dérivée, l'effet
+// dérivé restant hors des passes par durée, par jet et par niveau de la cible. * : sans valeur.
+DEFINE_ACTION_FUNCTION ad_read_derived
+	RET_ARRAY AD_DERIVED_SORT AD_DERIVED_VIRTUAL AD_VIRTUAL_HEADER_DURATION AD_VIRTUAL_LEVEL_COMPARE
+		AD_VIRTUAL_LEVEL_MEMBERS
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/derived.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_derived 6
+		FOR (ad_row = 0; ad_row < ad_derived; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 0 ad_kind
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 1 ad_sort
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 2 ad_virtual
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 3 ad_header_duration
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 4 ad_level_compare
+			READ_2DA_ENTRY_FORMER ad_derived ad_row 5 ad_level_members
+			SET $AD_DERIVED_SORT(~%ad_kind%~) = ad_sort
+			PATCH_IF IS_AN_INT ad_virtual BEGIN
+				SET $AD_DERIVED_VIRTUAL(~%ad_kind%~) = ad_virtual
+				PATCH_IF NOT (~%ad_header_duration%~ STRING_EQUAL ~*~) BEGIN
+					SPRINT $AD_VIRTUAL_HEADER_DURATION(~%ad_virtual%~) ~%ad_header_duration%~
+				END
+				PATCH_IF NOT (~%ad_level_compare%~ STRING_EQUAL ~*~) BEGIN
+					SPRINT $AD_VIRTUAL_LEVEL_COMPARE(~%ad_virtual%~) ~%ad_level_compare%~
+				END
+				PATCH_IF IS_AN_INT ad_level_members BEGIN
+					SET $AD_VIRTUAL_LEVEL_MEMBERS(~%ad_virtual%~) = ad_level_members
+				END
+			END
+		END
+END
+LAF ad_read_derived
+	RET_ARRAY AD_DERIVED_SORT AD_DERIVED_VIRTUAL AD_VIRTUAL_HEADER_DURATION AD_VIRTUAL_LEVEL_COMPARE
+		AD_VIRTUAL_LEVEL_MEMBERS
 END
 
-// Opcode virtuel de l'effet que l'ancien moteur crée pour un effet dérivé, ajouté après les autres
-// effets de l'en-tête : il compte pour l'en-tête d'un sort (lib/spell_header.tpp).
-ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_DERIVED_OLD_OPCODE BEGIN
-	~ABILITIES~             => 501
-	~ALL_SAVES~             => 325
-	~THIEF_SKILLS~          => 500
-	~ALL_RESISTANCES~       => 502
-	~ELEMENTAL_RESISTANCES~ => 503
-	~PHYSICAL_RESISTANCES~  => 504
-	~SPELL_IMMUNITIES~      => 518
-	~EXCEPTIONAL_STRENGTH~  => 522
-	~FREE_ACTION~           => 520
-	~REPLACE_ITEM~          => 525
-	~BROKEN_ITEM~           => 519
-	~ALL_ILLUSIONS~         => 511
-	~RESTORED_SPELLS~       => 510
-	~CURES~                 => 527
-	~DISPELS~               => 528
+// Opcodes que la comparaison d'un en-tête à l'autre d'un sort compare par une règle propre (lib/spell_levels.tpp),
+// en plus des opcodes virtuels de 2da/derived.2da : POWER_MASK, même masque des niveaux de sort (ancien custom_int).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_LEVEL_COMPARE BEGIN
+	200 => POWER_MASK // renvoi des sorts par niveau
+	201 => POWER_MASK // immunité aux sorts par niveau
 END
 
 // Guérisons et dissipations réunies (ad_group_cures, lib/groups.tpp) : opcodes de chaque famille,
@@ -598,6 +727,256 @@ END
 LAF ad_read_field_groups
 	RET_ARRAY AD_FIELD_GROUP_ANCHOR AD_FIELD_GROUP_MEMBER AD_FIELD_GROUP_MEMBER_COUNT AD_FIELD_GROUP_OPTION
 		AD_FIELD_GROUP_NAME_TRA AD_FIELD_GROUP_STATISTIC_TRA AD_FIELD_GROUP_LINE
+END
+
+// Regroupements d'effets (2da/group_rules.2da, ad_group_rules_apply, lib/groups.tpp), dans l'ordre où
+// ils s'appliquent à chaque point du flux (POINT) : CROSS, regroupements entre opcodes (ad_cross_groups) ;
+// HEADER, regroupements de l'en-tête d'un sort, après ceux-ci (lib/spell_header.tpp). MACRO du
+// regroupement ; OPTION : * (toujours), SHRINK (AD_ENABLE_SHRINKAGE), SHRINK_SINGLE_LINE (et
+// AD_SHRINK_IMMUNITIES_SINGLE_LINE), SHRINK_MULTI_HEADER (et un sort à plusieurs en-têtes) ; REQUIRE_ALL,
+// opcodes tous présents ; REQUIRE_ANY, opcodes dont un au moins est présent (listes séparées par des
+// virgules) ; PARAMETERS, variables posées avant l'appel (nom=valeur, séparés par des virgules) ; * : aucun.
+// L'ordre compte : la vitesse rétablie (126 et 163) avant les immunités (101), qui l'absorbent, comme
+// l'ancien ordre des opcodes (SPPR403) ; les guérisons après les regroupements qui en absorbent
+// (immunités, dissipation de la magie, action libre), comme la seconde passe (opcode_N_post_group) de
+// l'ancien moteur ; toutes les résistances avant celles des éléments et des dégâts physiques, que
+// l'ancien moteur tente toujours dans cet ordre.
+DEFINE_ACTION_FUNCTION ad_read_group_rules
+	RET_ARRAY AD_GROUP_RULE_COUNT AD_GROUP_RULE_MACRO AD_GROUP_RULE_SHRINK AD_GROUP_RULE_SINGLE_LINE
+		AD_GROUP_RULE_MULTI_HEADER AD_GROUP_RULE_ALL AD_GROUP_RULE_ALL_COUNT AD_GROUP_RULE_ANY AD_GROUP_RULE_ANY_COUNT
+		AD_GROUP_RULE_PARAMETER AD_GROUP_RULE_VALUE AD_GROUP_RULE_PARAMETER_COUNT
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/group_rules.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_rules 7
+		FOR (ad_row = 0; ad_row < ad_rules; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 1 ad_point
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 2 ad_macro
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 3 ad_option
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 4 ad_all
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 5 ad_any
+			READ_2DA_ENTRY_FORMER ad_rules ad_row 6 ad_parameters
+			SET ad_rule = VARIABLE_IS_SET $AD_GROUP_RULE_COUNT(~%ad_point%~) ? $AD_GROUP_RULE_COUNT(~%ad_point%~) : 0
+			SET $AD_GROUP_RULE_COUNT(~%ad_point%~) = ad_rule + 1
+			SPRINT $AD_GROUP_RULE_MACRO(~%ad_point%~ ~%ad_rule%~) ~%ad_macro%~
+			SET $AD_GROUP_RULE_SHRINK(~%ad_point%~ ~%ad_rule%~) = NOT (~%ad_option%~ STRING_EQUAL ~*~)
+			SET $AD_GROUP_RULE_SINGLE_LINE(~%ad_point%~ ~%ad_rule%~) = ~%ad_option%~ STRING_EQUAL ~SHRINK_SINGLE_LINE~
+			SET $AD_GROUP_RULE_MULTI_HEADER(~%ad_point%~ ~%ad_rule%~) = ~%ad_option%~ STRING_EQUAL ~SHRINK_MULTI_HEADER~
+			SET ad_count = 0
+			INNER_PATCH ~%ad_all%~ BEGIN
+				REPLACE_EVALUATE ~[0-9]+~ BEGIN
+					SET $AD_GROUP_RULE_ALL(~%ad_point%~ ~%ad_rule%~ ~%ad_count%~) = MATCH0
+					SET ad_count += 1
+				END ~%MATCH0%~
+			END
+			SET $AD_GROUP_RULE_ALL_COUNT(~%ad_point%~ ~%ad_rule%~) = ad_count
+			SET ad_count = 0
+			INNER_PATCH ~%ad_any%~ BEGIN
+				REPLACE_EVALUATE ~[0-9]+~ BEGIN
+					SET $AD_GROUP_RULE_ANY(~%ad_point%~ ~%ad_rule%~ ~%ad_count%~) = MATCH0
+					SET ad_count += 1
+				END ~%MATCH0%~
+			END
+			SET $AD_GROUP_RULE_ANY_COUNT(~%ad_point%~ ~%ad_rule%~) = ad_count
+			SET ad_count = 0
+			INNER_PATCH ~%ad_parameters%~ BEGIN
+				REPLACE_EVALUATE ~\([a-z_0-9]+\)=\([A-Za-z_0-9]+\)~ BEGIN
+					SPRINT $AD_GROUP_RULE_PARAMETER(~%ad_point%~ ~%ad_rule%~ ~%ad_count%~) ~%MATCH1%~
+					SPRINT $AD_GROUP_RULE_VALUE(~%ad_point%~ ~%ad_rule%~ ~%ad_count%~) ~%MATCH2%~
+					SET ad_count += 1
+				END ~%MATCH0%~
+			END
+			SET $AD_GROUP_RULE_PARAMETER_COUNT(~%ad_point%~ ~%ad_rule%~) = ad_count
+		END
+END
+LAF ad_read_group_rules
+	RET_ARRAY AD_GROUP_RULE_COUNT AD_GROUP_RULE_MACRO AD_GROUP_RULE_SHRINK AD_GROUP_RULE_SINGLE_LINE
+		AD_GROUP_RULE_MULTI_HEADER AD_GROUP_RULE_ALL AD_GROUP_RULE_ALL_COUNT AD_GROUP_RULE_ANY AD_GROUP_RULE_ANY_COUNT
+		AD_GROUP_RULE_PARAMETER AD_GROUP_RULE_VALUE AD_GROUP_RULE_PARAMETER_COUNT
+END
+
+// Crochets d'opcode de la lecture d'un effet (2da/opcode_hooks.2da, ad_fx_add_effect, lib/effects.tpp) :
+// macro appelée pour un effet de l'opcode (ligne) à chaque point (POINT) : SUBSTITUTE, remplacement de
+// l'effet par un autre avant les valeurs lues (177 et 283 par l'effet de leur EFF, 111) ; CONVERT,
+// conversion de l'effet, éventuellement remplacé, avant sa normalisation. OPTION : * (toujours), SHRINK
+// (AD_ENABLE_SHRINKAGE).
+DEFINE_ACTION_FUNCTION ad_read_opcode_hooks
+	RET_ARRAY AD_OPCODE_HOOK AD_OPCODE_HOOK_SHRINK
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/opcode_hooks.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_hooks 4
+		FOR (ad_row = 0; ad_row < ad_hooks; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_hooks ad_row 0 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_hooks ad_row 1 ad_point
+			READ_2DA_ENTRY_FORMER ad_hooks ad_row 2 ad_macro
+			READ_2DA_ENTRY_FORMER ad_hooks ad_row 3 ad_option
+			SPRINT $AD_OPCODE_HOOK(~%ad_point%~ ~%ad_opcode%~) ~%ad_macro%~
+			SET $AD_OPCODE_HOOK_SHRINK(~%ad_point%~ ~%ad_opcode%~) = ~%ad_option%~ STRING_EQUAL ~SHRINK~
+		END
+END
+LAF ad_read_opcode_hooks
+	RET_ARRAY AD_OPCODE_HOOK AD_OPCODE_HOOK_SHRINK
+END
+
+// Opcodes qui lancent un sort ou appliquent un EFF (2da/subresources.2da), une colonne par usage :
+// - paramètres de ad_recursion_support (ad_recursion_params, lib/recursion.tpp) : KIND (spl, eff), TARGETS
+//   (effect, given, own), SERIES, DEPTH_RESET, PARENT_DICE, HIT_TARGET ;
+// - INFLICTED : sous-ressource suivie par l'état infligé (ad_spell_inflicted_state, lib/groups.tpp), spl ou eff ;
+// - HEADER_DURATION : durée de l'en-tête d'un sort lanceur (ad_spell_header_sub_duration,
+//   lib/spell_header.tpp) : BREAK, l'effet n'est pas un lancement direct ; LIST, sorts lus dans la liste ;
+// - HEADER_SAVE : sous-sort lu par le jet de sauvegarde de l'en-tête (ad_spell_header_save), qui n'écrit
+//   donc pas ses jets (lib/recursion.tpp) ;
+// - KEEP_SELF : sous-effets sur soi gardés à la source du parent (ctx_force_keep_self) ;
+// - PREFIXED : lignes d'un sort lancé sous une probabilité ou après un délai précédées de leur propre
+//   préfixe : sections de niveaux non remontées (lib/recursion.tpp), titre de probabilité (lib/lines.tpp) ;
+// - NAMED : sort nommé cité par son nom s'il écrit plusieurs lignes (ad_op_232_lines) ;
+// - CHARGED_IGNORED : durée qui ne compte pas dans la durée commune d'une potion (lib/item_charged.tpp).
+// * : sans valeur (paramètre fixé par l'appelant, usage absent). Seules les valeurs renseignées et non
+// nulles des usages sont gardées.
+DEFINE_ACTION_FUNCTION ad_read_subresources
+	RET_ARRAY AD_SUBRESOURCE_KIND AD_SUBRESOURCE_TARGETS AD_SUBRESOURCE_SERIES AD_SUBRESOURCE_DEPTH_RESET
+		AD_SUBRESOURCE_PARENT_DICE AD_SUBRESOURCE_HIT_TARGET AD_SUBRESOURCE_INFLICTED AD_SUBRESOURCE_HEADER_DURATION
+		AD_SUBRESOURCE_HEADER_SAVE AD_SUBRESOURCE_KEEP_SELF AD_SUBRESOURCE_PREFIXED AD_SUBRESOURCE_NAMED
+		AD_SUBRESOURCE_CHARGED_IGNORED
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/subresources.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_subresources 14
+		FOR (ad_row = 0; ad_row < ad_subresources; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 0 ad_opcode
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 1 ad_kind
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 2 ad_targets
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 3 ad_series
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 4 ad_depth_reset
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 5 ad_parent_dice
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 6 ad_hit_target
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 7 ad_inflicted
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 8 ad_header_duration
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 9 ad_header_save
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 10 ad_keep_self
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 11 ad_prefixed
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 12 ad_named
+			READ_2DA_ENTRY_FORMER ad_subresources ad_row 13 ad_charged_ignored
+			PATCH_IF NOT (~%ad_kind%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_SUBRESOURCE_KIND(~%ad_opcode%~) ~%ad_kind%~
+				SPRINT $AD_SUBRESOURCE_TARGETS(~%ad_opcode%~) ~%ad_targets%~
+				SET $AD_SUBRESOURCE_SERIES(~%ad_opcode%~) = ad_series
+				SET $AD_SUBRESOURCE_DEPTH_RESET(~%ad_opcode%~) = ad_depth_reset
+				SET $AD_SUBRESOURCE_PARENT_DICE(~%ad_opcode%~) = ad_parent_dice
+				SET $AD_SUBRESOURCE_HIT_TARGET(~%ad_opcode%~) = ad_hit_target
+			END
+			PATCH_IF NOT (~%ad_inflicted%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_SUBRESOURCE_INFLICTED(~%ad_opcode%~) ~%ad_inflicted%~
+			END
+			PATCH_IF NOT (~%ad_header_duration%~ STRING_EQUAL ~*~) BEGIN
+				SPRINT $AD_SUBRESOURCE_HEADER_DURATION(~%ad_opcode%~) ~%ad_header_duration%~
+			END
+			PATCH_IF ad_header_save BEGIN
+				SET $AD_SUBRESOURCE_HEADER_SAVE(~%ad_opcode%~) = 1
+			END
+			PATCH_IF ad_keep_self BEGIN
+				SET $AD_SUBRESOURCE_KEEP_SELF(~%ad_opcode%~) = 1
+			END
+			PATCH_IF ad_prefixed BEGIN
+				SET $AD_SUBRESOURCE_PREFIXED(~%ad_opcode%~) = 1
+			END
+			PATCH_IF ad_named BEGIN
+				SET $AD_SUBRESOURCE_NAMED(~%ad_opcode%~) = 1
+			END
+			PATCH_IF ad_charged_ignored BEGIN
+				SET $AD_SUBRESOURCE_CHARGED_IGNORED(~%ad_opcode%~) = 1
+			END
+		END
+END
+LAF ad_read_subresources
+	RET_ARRAY AD_SUBRESOURCE_KIND AD_SUBRESOURCE_TARGETS AD_SUBRESOURCE_SERIES AD_SUBRESOURCE_DEPTH_RESET
+		AD_SUBRESOURCE_PARENT_DICE AD_SUBRESOURCE_HIT_TARGET AD_SUBRESOURCE_INFLICTED AD_SUBRESOURCE_HEADER_DURATION
+		AD_SUBRESOURCE_HEADER_SAVE AD_SUBRESOURCE_KEEP_SELF AD_SUBRESOURCE_PREFIXED AD_SUBRESOURCE_NAMED
+		AD_SUBRESOURCE_CHARGED_IGNORED
+END
+
+// Statistiques d'une ligne de splprot.2da dont la condition de l'opcode 326 nomme la valeur
+// (2da/splprot_stats.2da, lib/opcodes/326.tpp) : KIND, NAMED (nom de la liste NAME_BASE + valeur, bloc
+// NAME_BLOCK de SIZE chaînes, valeurs de MIN à MAX, rangé dans la variable VARIABLE du gabarit ; RULE SIZE :
+// relations de la taille, valeur décalée de 1), IDS (nom de la valeur du fichier IDS, ad_ids_name),
+// STATE (bits d'état, ad_target_exception_state), OLD_DIFFERENT (écrite autrement par l'ancien moteur :
+// refus). Une statistique absente n'a pas de nom de valeur.
+DEFINE_ACTION_FUNCTION ad_read_splprot_stats
+	RET_ARRAY AD_SPLPROT_STAT_KIND AD_SPLPROT_STAT_IDS AD_SPLPROT_STAT_NAME_BASE AD_SPLPROT_STAT_NAME_BLOCK
+		AD_SPLPROT_STAT_NAME_SIZE AD_SPLPROT_STAT_NAME_MIN AD_SPLPROT_STAT_NAME_MAX AD_SPLPROT_STAT_VARIABLE
+		AD_SPLPROT_STAT_RULE
+BEGIN
+	COPY - ~%MOD_FOLDER%/2da/splprot_stats.2da~ ~override~
+		READ_2DA_ENTRIES_NOW ad_splprot_stats 10
+		FOR (ad_row = 0; ad_row < ad_splprot_stats; ++ad_row) BEGIN
+			READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 0 ad_stat
+			READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 1 ad_kind
+			SPRINT $AD_SPLPROT_STAT_KIND(~%ad_stat%~) ~%ad_kind%~
+			PATCH_IF ~%ad_kind%~ STRING_EQUAL ~IDS~ BEGIN
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 2 ad_ids
+				SET $AD_SPLPROT_STAT_IDS(~%ad_stat%~) = ad_ids
+			END
+			PATCH_IF ~%ad_kind%~ STRING_EQUAL ~NAMED~ BEGIN
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 3 ad_value
+				SET $AD_SPLPROT_STAT_NAME_BASE(~%ad_stat%~) = ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 4 ad_value
+				SET $AD_SPLPROT_STAT_NAME_BLOCK(~%ad_stat%~) = ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 5 ad_value
+				SET $AD_SPLPROT_STAT_NAME_SIZE(~%ad_stat%~) = ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 6 ad_value
+				SET $AD_SPLPROT_STAT_NAME_MIN(~%ad_stat%~) = ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 7 ad_value
+				SET $AD_SPLPROT_STAT_NAME_MAX(~%ad_stat%~) = ad_value
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 8 ad_value
+				SPRINT $AD_SPLPROT_STAT_VARIABLE(~%ad_stat%~) ~%ad_value%~
+				READ_2DA_ENTRY_FORMER ad_splprot_stats ad_row 9 ad_value
+				SPRINT $AD_SPLPROT_STAT_RULE(~%ad_stat%~) ~%ad_value%~
+			END
+		END
+END
+LAF ad_read_splprot_stats
+	RET_ARRAY AD_SPLPROT_STAT_KIND AD_SPLPROT_STAT_IDS AD_SPLPROT_STAT_NAME_BASE AD_SPLPROT_STAT_NAME_BLOCK
+		AD_SPLPROT_STAT_NAME_SIZE AD_SPLPROT_STAT_NAME_MIN AD_SPLPROT_STAT_NAME_MAX AD_SPLPROT_STAT_VARIABLE
+		AD_SPLPROT_STAT_RULE
+END
+
+// Fichiers IDS de types de créatures dont les valeurs sont nommées (ad_ids_name, lib/resources.tpp) :
+// numéro (parameter2 des opcodes 55, 109, 177…, IESDP) => fichier ; liste @8090000 (8 090 000 +
+// 1 000 × numéro + valeur). kit.ids (9, EE) n'y est pas : ses noms sont ceux de AD_KIT_NAMES.
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_IDS_NAMED_FILES BEGIN
+	2 => EA
+	3 => GENERAL
+	4 => RACE
+	5 => CLASS
+	6 => SPECIFIC
+	7 => GENDER
+	8 => ALIGN
+END
+
+// Lignes de splprot.2da des exceptions de cible des opcodes 318 et 324 traitées avant la table
+// 2da/target_exceptions.2da (ad_target_exception_names, lib/opcodes/target_exceptions.tpp) : ligne =>
+// sens (NOT_EFFECTIVE, EFFECTIVE) ; AD_EXCEPTION_STAT_SOURCE : ce qu'elle nomme (IDS : valeur du fichier
+// AD_EXCEPTION_STAT_IDS ; SPLSTATE : état de sort ; STATE : état ; CASTER : le lanceur, non nommé).
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_EXCEPTION_STAT_KIND BEGIN
+	43 => NOT_EFFECTIVE
+	76 => NOT_EFFECTIVE
+	102 => NOT_EFFECTIVE 103 => NOT_EFFECTIVE 104 => NOT_EFFECTIVE 105 => NOT_EFFECTIVE
+	106 => NOT_EFFECTIVE 107 => NOT_EFFECTIVE 108 => NOT_EFFECTIVE 109 => NOT_EFFECTIVE
+	110 => NOT_EFFECTIVE
+	111 => EFFECTIVE
+	112 => EFFECTIVE 113 => EFFECTIVE 114 => EFFECTIVE 115 => EFFECTIVE 116 => EFFECTIVE 117 => EFFECTIVE
+	118 => EFFECTIVE
+	138 => NOT_EFFECTIVE
+	139 => EFFECTIVE
+END
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_EXCEPTION_STAT_SOURCE BEGIN
+	43 => CASTER
+	76 => SPLSTATE 110 => SPLSTATE 111 => SPLSTATE
+	102 => IDS 103 => IDS 104 => IDS 105 => IDS 106 => IDS 107 => IDS 108 => IDS 109 => IDS
+	112 => IDS 113 => IDS 114 => IDS 115 => IDS 116 => IDS 117 => IDS 118 => IDS
+	138 => STATE 139 => STATE
+END
+ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_EXCEPTION_STAT_IDS BEGIN
+	102 => 2 103 => 3 104 => 4 105 => 5 106 => 6 107 => 7 108 => 8 109 => 9
+	112 => 2 113 => 3 114 => 4 115 => 5 116 => 6 117 => 7 118 => 8
 END
 
 // Exceptions de cible des opcodes 318 et 324 (2da/target_exceptions.2da, anciens tableaux

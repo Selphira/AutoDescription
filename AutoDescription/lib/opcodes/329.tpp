@@ -14,12 +14,6 @@ DEFINE_PATCH_MACRO ad_op_329_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_329_lines BEGIN
-	SET state_opcode = 329
-	SPRINT state_variant_macro ~ad_op_329_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_329_variant BEGIN
 	SET amount = $fx_parameter1(~%line_fx%~)
 END

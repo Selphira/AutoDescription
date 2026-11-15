@@ -17,12 +17,6 @@ DEFINE_PATCH_MACRO ad_op_205_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_205_lines BEGIN
-	SET state_opcode = 205
-	SPRINT state_variant_macro ~ad_op_205_name~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_205_name BEGIN
 	SPRINT spellSecondaryTypeName $fx_sectype_name(~%line_fx%~)
 END

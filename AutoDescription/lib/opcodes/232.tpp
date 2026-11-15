@@ -62,9 +62,8 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 			END
 			PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND NOT support_header_only AND NOT $fx_dropped(~%condition_id%~) BEGIN
 				SET recursion_fx = condition_id
+				LPM ad_recursion_params
 				SPRINT recursion_resref ~%condition_resref%~
-				SET recursion_casting_level = 0
-				SPRINT recursion_targets ~given~
 				SET recursion_versus_set = 1
 				SPRINT recursion_versus ~%toTheTarget%~
 				// Condition de distance : les sous-effets gardent leurs cibles, ou celles de l'effet pour un
@@ -80,11 +79,6 @@ DEFINE_PATCH_MACRO ad_op_232_support BEGIN
 				SPRINT recursion_the_target ~%theTarget%~
 				SPRINT recursion_of_the_target ~%ofTheTarget%~
 				SPRINT recursion_to_the_target ~%toTheTarget%~
-				SET recursion_series = 0
-				SET recursion_depth_reset = 1
-				SPRINT recursion_kind ~spl~
-				SET recursion_parent_dice = 0
-				SPRINT recursion_single_reason ~~
 				PATCH_IF ~%condition_name%~ STRING_EQUAL ~~ AND ~%condition_text%~ STRING_EQUAL ~~ BEGIN
 					SPRINT recursion_single_reason ~not_implemented:opcode232:no_condition~
 					SPRINT recursion_single_message ~several lines without a condition text~

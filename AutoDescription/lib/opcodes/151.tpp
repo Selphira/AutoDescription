@@ -32,12 +32,6 @@ DEFINE_PATCH_MACRO ad_op_151_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_151_lines BEGIN
-	SET state_opcode = 151
-	SPRINT state_variant_macro ~ad_op_151_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : remplacement, 1 : la cible est tuée, 2 : invocation sur la cible.
 DEFINE_PATCH_MACRO ad_op_151_variant BEGIN
 	SET replace_mode = $fx_parameter2(~%line_fx%~)

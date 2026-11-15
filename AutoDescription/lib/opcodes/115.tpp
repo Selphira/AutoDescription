@@ -14,12 +14,6 @@ DEFINE_PATCH_MACRO ad_op_115_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_115_lines BEGIN
-	SET state_opcode = 115
-	SPRINT state_variant_macro ~ad_op_115_variant~
-	LPM ad_state_lines
-END
-
 // Nom de l'alignement détecté (alignment).
 DEFINE_PATCH_MACRO ad_op_115_variant BEGIN
 	SET tra_id = 21150010 + $fx_parameter2(~%line_fx%~) SET tra_block_start = 21150010 SET tra_block_size = 3 SPRINT tra_out ~alignment~ LPM ad_tra_to // ~neutre~ (@21150011)

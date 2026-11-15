@@ -25,12 +25,6 @@ DEFINE_PATCH_MACRO ad_op_243_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_243_lines BEGIN
-	SET state_opcode = 243
-	SPRINT state_variant_macro ~ad_op_243_variant~
-	LPM ad_state_lines
-END
-
 // Variante 1 : plusieurs charges.
 DEFINE_PATCH_MACRO ad_op_243_variant BEGIN
 	SET amount = $fx_parameter1(~%line_fx%~)

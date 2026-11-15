@@ -42,12 +42,6 @@ DEFINE_PATCH_MACRO ad_op_236_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_236_lines BEGIN
-	SET state_opcode = 236
-	SPRINT state_variant_macro ~ad_op_236_variant~
-	LPM ad_state_lines
-END
-
 // Variante : type (0-3), ou type + 4 pour des images réunies, au nombre de amount.
 DEFINE_PATCH_MACRO ad_op_236_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~)

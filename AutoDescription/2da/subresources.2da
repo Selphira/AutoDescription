@@ -1,0 +1,19 @@
+2DA V1.0
+*
+         KIND  TARGETS  SERIES  DEPTH_RESET  PARENT_DICE  HIT_TARGET  INFLICTED  HEADER_DURATION  HEADER_SAVE  KEEP_SELF  PREFIXED  NAMED  CHARGED_IGNORED
+146      spl   effect   1       0            0            0           spl        LIST             1            1          1         0      1
+148      spl   own      1       0            0            0           spl        LIST             1            0          1         0      0
+177      *     *        *       *            *            *           eff        BREAK            0            0          0         0      0
+183      *     *        *       *            *            *           eff        *                0            0          0         0      0
+232      spl   given    0       1            0            0           *          *                1            1          0         1      0
+248      eff   own      0       0            1            1           *          *                0            0          0         0      0
+249      eff   own      0       0            1            1           *          *                0            0          0         0      0
+251      spl   own      0       1            0            0           *          BREAK            0            0          0         0      0
+252      spl   own      0       0            0            0           *          BREAK            0            0          0         0      0
+272      eff   own      0       0            0            0           *          *                0            0          0         0      0
+283      *     *        *       *            *            *           eff        *                0            0          0         0      0
+326      spl   effect   0       1            0            0           spl        *                0            0          0         0      0
+333      spl   effect   0       0            0            0           *          *                0            0          0         0      0
+340      spl   own      0       1            0            0           *          *                0            0          0         0      0
+341      spl   own      0       1            0            0           *          *                0            0          0         0      0
+361      spl   own      0       1            0            0           *          *                0            0          0         0      0

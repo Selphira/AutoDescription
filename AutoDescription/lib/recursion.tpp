@@ -132,6 +132,31 @@ END
 // la probabilité passe aux sous-effets (ctx_base_probability) ; effet différé non accepté (l'ancien moteur en fait une condition) ; répétitions non acceptées ;
 // effet d'un 177 contre un type de créature ;
 // cible sans chaînes ; refus de la sous-description.
+// Paramètres de ad_recursion_support pour l'effet recursion_fx, posés par l'appelant juste après
+// recursion_fx : valeurs par défaut, puis celles de l'opcode de l'effet (2da/subresources.2da : KIND,
+// TARGETS, SERIES, DEPTH_RESET, PARENT_DICE, HIT_TARGET) ; l'appelant fixe ensuite les autres
+// (recursion_resref, recursion_ignore_duration, valeurs propres à l'effet).
+DEFINE_PATCH_MACRO ad_recursion_params BEGIN
+	SET recursion_params_opcode = $fx_opcode(~%recursion_fx%~)
+	SET recursion_casting_level = 0
+	SET recursion_versus_set = 0
+	SPRINT recursion_versus ~~
+	SPRINT recursion_single_reason ~~
+	SPRINT recursion_single_message ~~
+	SPRINT recursion_lines_reason ~~
+	SPRINT recursion_lines_message ~~
+	SET recursion_delayed = 0
+	SET recursion_probability = 0
+	SPRINT recursion_frequency ~~
+	SET recursion_inherit_dice = 0
+	SPRINT recursion_kind $AD_SUBRESOURCE_KIND(~%recursion_params_opcode%~)
+	SPRINT recursion_targets $AD_SUBRESOURCE_TARGETS(~%recursion_params_opcode%~)
+	SET recursion_series = $AD_SUBRESOURCE_SERIES(~%recursion_params_opcode%~)
+	SET recursion_depth_reset = $AD_SUBRESOURCE_DEPTH_RESET(~%recursion_params_opcode%~)
+	SET recursion_parent_dice = $AD_SUBRESOURCE_PARENT_DICE(~%recursion_params_opcode%~)
+	SET recursion_hit_target = $AD_SUBRESOURCE_HIT_TARGET(~%recursion_params_opcode%~)
+END
+
 DEFINE_PATCH_MACRO ad_recursion_support BEGIN
 	SET ~fx_sub_count_%recursion_fx%~ = 0
 	SPRINT ~fx_sub_text_%recursion_fx%~ ~~
@@ -300,15 +325,16 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT line_only_for ~~
 			END
 			// Sections de niveaux d'un sous-sort écrites dans la ligne parente, sauf pour un sort lancé
-			// sous une probabilité ou après un délai (146, 148), dont les lignes ont leur propre préfixe.
+			// sous une probabilité ou après un délai (AD_SUBRESOURCE_PREFIXED : 146, 148), dont les lignes ont
+			// leur propre préfixe.
 			SET recursion_lift_opcode = $fx_opcode(~%recursion_fx%~)
-			// Sort nommé d'un 232, cité par son nom s'il écrit plusieurs lignes (ad_op_232_lines).
+			// Sort nommé (AD_SUBRESOURCE_NAMED : 232), cité par son nom s'il écrit plusieurs lignes (ad_op_232_lines).
 			SET recursion_named_lines = 0
-			PATCH_IF recursion_lift_opcode == 232 AND VARIABLE_IS_SET $fx_spell_name(~%recursion_fx%~) BEGIN
+			PATCH_IF VARIABLE_IS_SET $AD_SUBRESOURCE_NAMED(~%recursion_lift_opcode%~) AND VARIABLE_IS_SET $fx_spell_name(~%recursion_fx%~) BEGIN
 				SPRINT recursion_spell_name $fx_spell_name(~%recursion_fx%~)
 				SET recursion_named_lines = NOT (~%recursion_spell_name%~ STRING_EQUAL ~~)
 			END
-			SET recursion_lift_sections = NOT ((recursion_lift_opcode == 146 OR recursion_lift_opcode == 148)
+			SET recursion_lift_sections = NOT (VARIABLE_IS_SET $AD_SUBRESOURCE_PREFIXED(~%recursion_lift_opcode%~)
 				AND ($fx_probability(~%recursion_fx%~) < 100 OR $fx_sub_delayed(~%recursion_fx%~)))
 			SPRINT recursion_origin_resource ~%recursion_resref%.%recursion_kind%~
 			TO_UPPER recursion_origin_resource
@@ -329,10 +355,10 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 				SPRINT recursion_sub_missing ~%recursion_delayed_missing%~
 			END
 			ELSE BEGIN
-				// L'en-tête d'un sort ne lit que les sous-sorts des opcodes 146, 148 et 232
-				// (ad_spell_header_save) : ceux des autres écrivent leurs jets de sauvegarde.
+				// L'en-tête d'un sort ne lit que les sous-sorts des opcodes de AD_SUBRESOURCE_HEADER_SAVE (146, 148
+				// et 232, ad_spell_header_save) : ceux des autres écrivent leurs jets de sauvegarde.
 				SET recursion_saved_ignore_save = ctx_ignore_save
-				PATCH_IF recursion_lift_opcode != 146 AND recursion_lift_opcode != 148 AND recursion_lift_opcode != 232 BEGIN
+				PATCH_IF NOT VARIABLE_IS_SET $AD_SUBRESOURCE_HEADER_SAVE(~%recursion_lift_opcode%~) BEGIN
 					SET ctx_ignore_save = 0
 				END
 				// La durée commune tue n'est écrite que devant plusieurs lignes : une ligne seule est
@@ -348,7 +374,7 @@ DEFINE_PATCH_MACRO ad_recursion_describe_pending BEGIN
 						ctx_dice_count = $fx_dice_count(~%recursion_fx%~)
 						ctx_dice_sides = $fx_dice_sides(~%recursion_fx%~)
 						ctx_force_target = $fx_sub_force_target(~%recursion_fx%~)
-						ctx_force_keep_self = recursion_lift_opcode == 146 OR recursion_lift_opcode == 232
+						ctx_force_keep_self = VARIABLE_IS_SET $AD_SUBRESOURCE_KEEP_SELF(~%recursion_lift_opcode%~)
 						ctx_ignore_duration = recursion_hide
 						ctx_versus_set = $fx_sub_versus_set(~%recursion_fx%~)
 						ctx_base_probability = $fx_probability(~%recursion_fx%~)

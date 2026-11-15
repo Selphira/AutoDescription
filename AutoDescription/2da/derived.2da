@@ -1,0 +1,23 @@
+2DA V1.0
+*
+                        SORT  VIRTUAL  HEADER_DURATION  LEVEL_COMPARE  LEVEL_MEMBERS
+AC_NO_PROTECTION        37    *        *                *              *
+AC_BY_ATTACK_TYPE       35    *        *                *              *
+ABILITIES               100   501      *                *              *
+ALL_SAVES               70    325      *                *              *
+ALL_RESISTANCES         300   502      *                *              *
+ELEMENTAL_RESISTANCES   301   503      *                *              *
+PHYSICAL_RESISTANCES    302   504      *                *              *
+EXCEPTIONAL_STRENGTH    400   522      *                *              *
+THIEF_SKILLS            120   500      *                *              *
+SPELL_LEVELS            249   *        *                *              *
+AC_VS_CREATURE          36    *        *                *              *
+SAVES_VS_CREATURE       71    *        *                *              *
+SPELL_IMMUNITIES        256   518      *                SIGNATURE      206
+FREE_ACTION             285   520      *                *              *
+REPLACE_ITEM            400   525      INSTANT          *              *
+BROKEN_ITEM             4     519      *                *              *
+ALL_ILLUSIONS           224   511      INSTANT          *              *
+RESTORED_SPELLS         21    510      *                *              *
+CURES                   222   527      INSTANT          SIGNATURE      *
+DISPELS                 229   528      INSTANT          SIGNATURE      *

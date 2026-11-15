@@ -22,23 +22,29 @@
 DEFINE_PATCH_MACRO ad_lines_reset BEGIN
 	SET line_count = 0
 	SET line_generation = VARIABLE_IS_SET line_generation ? line_generation + 1 : 1
-	SET line_phrase = 0
-	SET line_any_form = 0
-	SET line_no_duration = 0
+	LPM ad_line_fields_reset
+	SPRINT line_core ~~
+	SET line_nested = 0
+	SET line_composite = 0
+	SPRINT stat_line_macro ~~
+	SPRINT stat_percent_100 ~~
+END
+
+// Champs d'une ligne d'effet que fixe un opcode avant ad_effect_line (lib/application.tpp), remis à zéro
+// après chaque ligne et à chaque remise à zéro des lignes : tout nouveau champ de ce genre est ajouté ici.
+DEFINE_PATCH_MACRO ad_line_fields_reset BEGIN
 	SET line_probability = 0
 	SET line_conditioned = 0
 	SET line_conditioned_alone = 0
 	SET line_sub_probability = 0
-	SPRINT line_core ~~
-	SET line_nested = 0
-	SET line_composite = 0
+	SET line_phrase = 0
+	SET line_any_form = 0
+	SET line_no_duration = 0
 	SPRINT line_suffix ~~
 	SPRINT line_sentence ~~
 	SPRINT line_condition ~~
 	SPRINT line_the_target ~~
 	SPRINT line_only_for ~~
-	SPRINT stat_line_macro ~~
-	SPRINT stat_percent_100 ~~
 	SET line_save_for_half = 0
 	SET line_fail_for_half = 0
 END
@@ -162,7 +168,7 @@ DEFINE_PATCH_MACRO ad_lines_split_sub_probability BEGIN
 			SET split_fx = $line_effect(~%split_id%~)
 			SET split_opcode = $fx_opcode(~%split_fx%~)
 		END
-		PATCH_IF (~%split_section%~ STRING_EQUAL ~%prob_section%~) AND (split_opcode == 146 OR split_opcode == 148) BEGIN
+		PATCH_IF (~%split_section%~ STRING_EQUAL ~%prob_section%~) AND VARIABLE_IS_SET $AD_SUBRESOURCE_PREFIXED(~%split_opcode%~) BEGIN
 			SET value = $line_sub_probability(~%split_id%~)
 			SPRINT probability @1200003 // ~%value%%PERCENT%~
 			SPRINT split_title @4000001 // ~%probability% de chances~

@@ -27,12 +27,6 @@ DEFINE_PATCH_MACRO ad_op_99_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_99_lines BEGIN
-	SET state_opcode = 99
-	SPRINT state_variant_macro ~ad_op_99_variant~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_99_variant BEGIN
 	SET duration_percent = $fx_parameter1(~%line_fx%~)
 	SET duration_type = $fx_parameter2(~%line_fx%~)

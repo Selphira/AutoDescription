@@ -15,12 +15,6 @@ DEFINE_PATCH_MACRO ad_op_222_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_222_lines BEGIN
-	SET state_opcode = 222
-	SPRINT state_variant_macro ~ad_op_222_variant~
-	LPM ad_state_lines
-END
-
 // Portée (range).
 DEFINE_PATCH_MACRO ad_op_222_variant BEGIN
 	SPRINT range $fx_field_range(~%line_fx%~)

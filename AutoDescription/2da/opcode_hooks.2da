@@ -1,0 +1,7 @@
+2DA V1.0
+*
+         POINT       MACRO                    OPTION
+111      SUBSTITUTE  ad_fx_substitute_111     *
+177      SUBSTITUTE  ad_fx_substitute_177     *
+282      CONVERT     ad_op_282_convert        SHRINK
+283      SUBSTITUTE  ad_fx_substitute_177     *

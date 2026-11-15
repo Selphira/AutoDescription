@@ -30,12 +30,6 @@ DEFINE_PATCH_MACRO ad_op_261_range_eligible BEGIN
 	SET range_eligible = (range_type == 0 AND $fx_parameter1(~%range_id%~) <= 9) OR (range_type == 1 AND $fx_parameter1(~%range_id%~) <= 7)
 END
 
-DEFINE_PATCH_MACRO ad_op_261_lines BEGIN
-	SET state_opcode = 261
-	SPRINT state_variant_macro ~ad_op_261_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : jusqu'à un niveau, 1 : premier niveau.
 DEFINE_PATCH_MACRO ad_op_261_variant BEGIN
 	SET spellLevel = $fx_parameter1(~%line_fx%~)

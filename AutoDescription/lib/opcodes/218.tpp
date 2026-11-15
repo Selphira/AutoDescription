@@ -19,12 +19,6 @@ DEFINE_PATCH_MACRO ad_op_218_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_218_lines BEGIN
-	SET state_opcode = 218
-	SPRINT state_variant_macro ~ad_op_218_amount~
-	LPM ad_state_lines
-END
-
 DEFINE_PATCH_MACRO ad_op_218_amount BEGIN
 	SET value = $fx_parameter1(~%line_fx%~)
 	PATCH_IF value == 1 BEGIN

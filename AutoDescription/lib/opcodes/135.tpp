@@ -42,12 +42,6 @@ DEFINE_PATCH_MACRO ad_op_135_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_135_lines BEGIN
-	SET state_opcode = 135
-	SPRINT state_variant_macro ~ad_op_135_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : métamorphose, 1 : déguisement, 2 : retour à la forme naturelle.
 DEFINE_PATCH_MACRO ad_op_135_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~) == 0 ? 0 : 1

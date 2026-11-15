@@ -73,12 +73,6 @@ DEFINE_PATCH_MACRO ad_op_214_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_214_lines BEGIN
-	SET state_opcode = 214
-	SPRINT state_variant_macro ~ad_op_214_variant~
-	LPM ad_state_lines
-END
-
 // Variante 1 : sorts de la liste (spells).
 DEFINE_PATCH_MACRO ad_op_214_variant BEGIN
 	SET state_variant = $fx_parameter2(~%line_fx%~) == 0

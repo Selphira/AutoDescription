@@ -26,12 +26,6 @@ DEFINE_PATCH_MACRO ad_op_241_support BEGIN
 	END
 END
 
-DEFINE_PATCH_MACRO ad_op_241_lines BEGIN
-	SET state_opcode = 241
-	SPRINT state_variant_macro ~ad_op_241_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : charme, 1 : sans restriction, sur une autre cible que soi.
 DEFINE_PATCH_MACRO ad_op_241_variant BEGIN
 	SET control_target = $fx_effective_target(~%line_fx%~)

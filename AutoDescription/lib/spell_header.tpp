@@ -67,19 +67,8 @@ DEFINE_PATCH_MACRO ad_spell_header_pipeline BEGIN
 		PATCH_TIME ~step:cross_groups~ BEGIN
 			LPM ad_cross_groups
 		END
-		PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~321~) AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
-			LPM ad_op_321_after_groups
-		END
-		PATCH_IF AD_ENABLE_SHRINKAGE AND VARIABLE_IS_SET $fx_opcode_count(~206~) BEGIN
-			LPM ad_op_206_header_groups
-		END
-		PATCH_IF AD_ENABLE_SHRINKAGE AND fx_header_count > 1 BEGIN
-			PATCH_FOR_EACH power_opcode IN 200 201 BEGIN
-				PATCH_IF VARIABLE_IS_SET $fx_opcode_count(~%power_opcode%~) BEGIN
-					LPM ad_spell_power_header_groups
-				END
-			END
-		END
+		SPRINT group_rule_point ~HEADER~
+		LPM ad_group_rules_apply
 	END
 	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) AND ~%header_missing%~ STRING_EQUAL ~~ BEGIN
 		SPRINT header_missing ~%render_missing%~
@@ -160,7 +149,7 @@ DEFINE_PATCH_MACRO ad_spell_header_effects BEGIN
 			PATCH_IF $fx_header(~%header_id%~) == header_h BEGIN
 				SPRINT header_derived_kind $derived_kind(~%header_k%~)
 				SET ~spell_fx_%header_h%_%header_kept%~ = header_id
-				SET ~spell_fx_opcode_%header_h%_%header_kept%~ = $AD_DERIVED_OLD_OPCODE(~%header_derived_kind%~)
+				SET ~spell_fx_opcode_%header_h%_%header_kept%~ = $AD_DERIVED_VIRTUAL(~%header_derived_kind%~)
 				SET ~spell_fx_derived_%header_h%_%header_kept%~ = header_k
 				SET header_kept += 1
 			END
@@ -565,13 +554,15 @@ BEGIN
 END
 
 // Durée (ancien spell_duration) : durée commune des effets de chaque en-tête (en secondes ; un effet
-// différé ou permanent compte pour 0, un effet en ticks est converti, l'opcode 217 dure 30
-// secondes, une fraction de la durée dans AD_OPCODE_DURATION_DIVISOR), puis leur progression (ad_spell_header_complex_duration) ; si elle varie entre les
+// différé ou permanent compte pour 0, un effet en ticks est converti, durée fixe dans
+// AD_OPCODE_FIXED_DURATION, fraction de la durée dans AD_OPCODE_DURATION_DIVISOR ; l'unité de
+// AD_OPCODE_DURATION_SCALE n'est pas appliquée, comme dans l'ancien moteur), puis leur progression (ad_spell_header_complex_duration) ; si elle varie entre les
 // effets d'un en-tête, la lecture s'arrête après lui et la durée est « Spéciale », sauf si seul le
 // premier en-tête a été lu : celle des projectiles qui explosent plusieurs fois s'applique alors,
 // comme pour un sort à un seul en-tête qui en a un. Sans durée : « Permanente », ou « Instantanée »
 // si le premier effet différé ou permanent lu est d'un opcode dont la durée ne compte pas et
-// qu'aucun autre ne l'a contredit ensuite. L'opcode 213 rend la durée « Spéciale ». Les opcodes 318,
+// qu'aucun autre ne l'a contredit ensuite (AD_OPCODE_HEADER_DURATION : INSTANT, ou durée IGNORED ou
+// NOT_PERMANENT). Un opcode SPECIAL de AD_OPCODE_HEADER_DURATION rend la durée « Spéciale ». Les opcodes 318,
 // 321 et 324 qui visent le sort lui-même ne comptent pas. header_has_duration : 0 si la durée est
 // permanente ou instantanée (ligne « Dissipation ») ; header_hide_duration : 0 si elle est
 // « Spéciale », les lignes écrivant alors leurs durées (ancien ignoreDuration) ; header_common_seconds :
@@ -602,26 +593,28 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 				LPF ad_spell_has_effect STR_VAR resref = ~%self_protection_resource%~ resource = ~%spell_self%~ RET duration_parent = found END
 			END
 			PATCH_IF NOT (self_protection AND (self_protection_self OR duration_parent)) AND NOT VARIABLE_IS_SET $AD_OPCODES_HEADER_IGNORED(~%duration_opcode%~) BEGIN
-				SET duration_timing = $fx_timing(~%duration_id%~)
-				SET duration_seconds = $fx_duration(~%duration_id%~)
+				SET duration_fx = duration_id
+				LPM ad_fx_duration_seconds
+				SET duration_seconds = duration_fx_seconds
+				SPRINT duration_header_kind ~~
+				PATCH_IF VARIABLE_IS_SET $AD_OPCODE_HEADER_DURATION(~%duration_opcode%~) BEGIN
+					SPRINT duration_header_kind $AD_OPCODE_HEADER_DURATION(~%duration_opcode%~)
+				END
+				ELSE PATCH_IF VARIABLE_IS_SET $AD_VIRTUAL_HEADER_DURATION(~%duration_opcode%~) BEGIN
+					SPRINT duration_header_kind $AD_VIRTUAL_HEADER_DURATION(~%duration_opcode%~)
+				END
 				// Une série prend le dernier délai pour durée (ancien timing 5000 ou 5001).
 				PATCH_IF $fx_series_anchor(~%duration_id%~) BEGIN
 					SET duration_seconds = $fx_series_last(~%duration_id%~)
 				END
-				ELSE PATCH_IF duration_timing == TIMING_duration_ticks BEGIN
-					SET duration_seconds = duration_seconds / 15
-				END
-				ELSE PATCH_IF duration_timing != TIMING_duration AND duration_timing != TIMING_delayed_duration BEGIN
-					SET duration_seconds = 0
+				ELSE PATCH_IF duration_fx_timing != TIMING_duration AND duration_fx_timing != TIMING_delayed_duration
+						AND duration_fx_timing != TIMING_duration_ticks BEGIN
 					SPRINT duration_kind ~~
 					PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION(~%duration_opcode%~) BEGIN
 						SPRINT duration_kind $AD_OPCODE_DURATION(~%duration_opcode%~)
 					END
-					// Anciennes listes opcodes_ignore_duration et opcodes_cant_be_permanent (177, et les
-					// opcodes virtuels des effets dérivés, ad_derived_add : 511, illusions dissipées ; 525,
-					// objet remplacé ; 527 et 528, guérisons et dissipations réunies).
-					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~ OR duration_opcode == 177 OR duration_opcode == 511 OR duration_opcode == 525
-							OR duration_opcode == 527 OR duration_opcode == 528 BEGIN
+					PATCH_IF ~%duration_kind%~ STRING_EQUAL ~IGNORED~ OR ~%duration_kind%~ STRING_EQUAL ~NOT_PERMANENT~
+							OR ~%duration_header_kind%~ STRING_EQUAL ~INSTANT~ BEGIN
 						PATCH_IF duration_instant < 0 BEGIN
 							SET duration_instant = 1
 						END
@@ -630,13 +623,13 @@ DEFINE_PATCH_MACRO ad_spell_header_duration BEGIN
 						SET duration_instant = 0
 					END
 				END
-				PATCH_IF duration_opcode == 217 BEGIN
-					SET duration_seconds = 30
+				PATCH_IF VARIABLE_IS_SET $AD_OPCODE_FIXED_DURATION(~%duration_opcode%~) BEGIN
+					SET duration_seconds = $AD_OPCODE_FIXED_DURATION(~%duration_opcode%~)
 				END
 				PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DURATION_DIVISOR(~%duration_opcode%~) BEGIN
 					SET duration_seconds /= $AD_OPCODE_DURATION_DIVISOR(~%duration_opcode%~)
 				END
-				PATCH_IF duration_opcode == 213 BEGIN
+				PATCH_IF ~%duration_header_kind%~ STRING_EQUAL ~SPECIAL~ BEGIN
 					SET duration_special = 1
 				END
 				// Une durée tirée au sort (ad_group_duration_ranges) est écrite par sa ligne.
@@ -736,10 +729,14 @@ DEFINE_PATCH_MACRO ad_spell_header_sub_duration BEGIN
 			SET sub_opcode = $fx_opcode(~%sub_id%~)
 			// Un effet d'EFF (177) porte l'opcode qu'il applique : comme le 177, il ne s'applique qu'aux
 			// créatures visées par sa condition et n'est pas un lancement direct.
-			PATCH_IF $fx_external(~%sub_id%~) OR sub_opcode == 177 OR sub_opcode == 251 OR sub_opcode == 252 BEGIN
+			SPRINT sub_header_duration ~~
+			PATCH_IF VARIABLE_IS_SET $AD_SUBRESOURCE_HEADER_DURATION(~%sub_opcode%~) BEGIN
+				SPRINT sub_header_duration $AD_SUBRESOURCE_HEADER_DURATION(~%sub_opcode%~)
+			END
+			PATCH_IF $fx_external(~%sub_id%~) OR ~%sub_header_duration%~ STRING_EQUAL ~BREAK~ BEGIN
 				SET sub_valid = 0
 			END
-			ELSE PATCH_IF sub_opcode == 146 OR sub_opcode == 148 BEGIN
+			ELSE PATCH_IF ~%sub_header_duration%~ STRING_EQUAL ~LIST~ BEGIN
 				// Sorts tirés au sort réunis en une liste (fx_list_member, lib/opcodes/probability_lists.tpp) :
 				// chacun compte, comme dans l'ancien moteur, qui lit les effets du fichier.
 				FOR (sub_k = 0; sub_k <= $fx_list_size(~%sub_id%~) AND sub_valid; ++sub_k) BEGIN
@@ -1070,7 +1067,7 @@ BEGIN
 				SET save_effect_type = $fx_save_type(~%save_id%~) BAND 0b111111
 				SET save_effect_bonus = $fx_save_bonus(~%save_id%~)
 				SET save_own_type = save_own_type OR save_effect_type > 0
-				PATCH_IF save_effect_type == 0 AND (save_opcode == 146 OR save_opcode == 148 OR save_opcode == 232) BEGIN
+				PATCH_IF save_effect_type == 0 AND VARIABLE_IS_SET $AD_SUBRESOURCE_HEADER_SAVE(~%save_opcode%~) BEGIN
 					PATCH_IF NOT VARIABLE_IS_SET $save_visited(~%save_resource%~) BEGIN
 						SET $save_visited(~%save_resource%~) = 1
 						PATCH_IF FILE_EXISTS_IN_GAME ~%save_resource%.spl~ BEGIN

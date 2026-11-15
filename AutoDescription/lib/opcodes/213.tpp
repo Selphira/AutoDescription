@@ -3,14 +3,6 @@
 // varie selon l'Intelligence », sans la durée de l'effet ; son délai reste écrit (ancien
 // opcode_target_213 et add_duration). Code commun dans lib/opcodes/states.tpp.
 
-DEFINE_PATCH_MACRO ad_op_213_support BEGIN END
-
-DEFINE_PATCH_MACRO ad_op_213_lines BEGIN
-	SET state_opcode = 213
-	SPRINT state_variant_macro ~ad_op_213_variant~
-	LPM ad_state_lines
-END
-
 // Variante 0 : durée selon l'Intelligence, 1 : durée de l'effet.
 DEFINE_PATCH_MACRO ad_op_213_variant BEGIN
 	SET state_variant = IS_EE AND $fx_parameter2(~%line_fx%~) != 0
