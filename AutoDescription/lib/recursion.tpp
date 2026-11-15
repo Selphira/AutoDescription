@@ -1016,7 +1016,8 @@ DEFINE_PATCH_MACRO ad_recursion_area_strings BEGIN
 	SPRINT angle ~%area_saved_angle%~
 END
 
-// Passes du moteur sur les effets du sous-sort, puis texte de ses lignes. L'en-tête du sous-sort
+// Refus des opcodes que le flux ne sait pas lire dans le sous-sort, puis passes du moteur et texte de
+// ses lignes (ad_recursion_render_passes), sautées s'il ne peut rien écrire. L'en-tête du sous-sort
 // n'est ni une capacité de charge d'objet ni l'en-tête d'une potion.
 DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SET sub_last_header = sub_all_headers ? fx_header_count - 1 : sub_header
@@ -1027,9 +1028,13 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 	SORT_ARRAY_INDICES fx_opcode_count NUMERICALLY
 	SPRINT sub_todo ~~
 	SPRINT sub_versus_opcode ~~
+	SET sub_described = 0
 	PHP_EACH fx_opcode_count AS sub_scan_opcode => _ BEGIN
 		PATCH_IF ctx_versus_set AND VARIABLE_IS_SET $AD_OPCODES_READ_VERSUS(~%sub_scan_opcode%~) BEGIN
 			SPRINT sub_versus_opcode ~%sub_scan_opcode%~
+		END
+		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DESCRIBED(~%sub_scan_opcode%~) BEGIN
+			SET sub_described = 1
 		END
 		PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%sub_scan_opcode%~) BEGIN
 			SPRINT sub_status $AD_OPCODE_STATUS(~%sub_scan_opcode%~)
@@ -1049,6 +1054,24 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 		END
 		LPF ad_refusal STR_VAR reason = ~not_implemented:missing_opcodes:%sub_todo%~ message = ~opcodes not supported yet: %sub_todo%~ RET render_missing = refusal END
 	END
+	// Sous-ressource sans effet d'un opcode décrit dans ce jeu (AD_OPCODE_DESCRIBED : IGNORED, inconnus ou
+	// absents de ce jeu ; les TODO sont refusés ci-dessus) : la prise en charge, les regroupements (dont
+	// les règles qui écrivent une ligne exigent un opcode décrit), les effets dérivés et les lignes ne
+	// lisent que ceux-là ; elle n'écrirait ni ligne, ni refus, ni journal. Sauf sous tous ses en-têtes :
+	// ad_spell_levels compare aussi les effets non décrits et peut les refuser.
+	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND (sub_described OR sub_all_headers) BEGIN
+		LPM ad_recursion_render_passes
+	END
+	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) BEGIN
+		SPRINT sub_missing ~%render_missing%~
+		SET sub_count = 0
+		SPRINT sub_text ~~
+	END
+END
+
+// Passes du moteur sur les effets du sous-sort (ad_recursion_render), puis texte de ses lignes
+// (sub_text, sub_count) ; refus dans render_missing.
+DEFINE_PATCH_MACRO ad_recursion_render_passes BEGIN
 	LPM ad_render_support
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ BEGIN
 		PATCH_TIME ~step:cross_groups~ BEGIN
@@ -1139,11 +1162,6 @@ DEFINE_PATCH_MACRO ad_recursion_render BEGIN
 				DELETE_BYTES 0 STRING_LENGTH ~%sub_bullet%~
 			END
 		END
-	END
-	PATCH_IF NOT (~%render_missing%~ STRING_EQUAL ~~) BEGIN
-		SPRINT sub_missing ~%render_missing%~
-		SET sub_count = 0
-		SPRINT sub_text ~~
 	END
 END
 
