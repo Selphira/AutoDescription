@@ -78,12 +78,10 @@ DEFINE_PATCH_MACRO ad_fx_substitute_177 BEGIN
 			SPRINT ~fx_substitution_message_%fx_id%~ ~probabilities both in the effect and in %substitute_resref%.EFF~
 		END
 		ELSE BEGIN
-			SPRINT substitute_dice ~LEVEL~
-			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DICE(~%substitute_opcode%~) BEGIN
-				SPRINT substitute_dice $AD_OPCODE_DICE(~%substitute_opcode%~)
-			END
-			PATCH_IF (~%substitute_dice%~ STRING_EQUAL ~DICE~)
-					OR ((~%substitute_dice%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND substitute_parameter2 != 0) BEGIN
+			SET dice_opcode = substitute_opcode
+			SET dice_parameter2 = substitute_parameter2
+			LPM ad_fx_dice_real
+			PATCH_IF dice_real BEGIN
 				SET ~fx_dice_count_%fx_id%~ = substitute_dice_count
 				SET ~fx_dice_sides_%fx_id%~ = substitute_dice_sides
 			END

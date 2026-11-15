@@ -684,8 +684,9 @@ END
 
 // Restriction de niveau de l'effet line_fx (ancien add_target_level), après la zone du projectile
 // qui remplace les chaînes de la cible (l'ancien moteur la perdait, BUG-045) : « les créatures dans
-// un rayon de 4,5 mètres (de niveau 4 ou inférieur) ». Sur EE, l'ancien moteur n'en écrit pas pour
-// le 127 ni pour le 218 de parameter2 non nul. Une phrase à la forme « soi » ne nomme pas sa cible :
+// un rayon de 4,5 mètres (de niveau 4 ou inférieur) ». Sur EE, l'ancien moteur n'en écrivait pas pour
+// le 127 ni pour le 218 de parameter2 non nul, que l'IESDP restreint pourtant (sauf le 218 de
+// parameter2 = 1, dont les dés sont de vrais dés : ad_fx_dice_real). Une phrase à la forme « soi » ne nomme pas sa cible :
 // app_self_level_text « uniquement à partir du niveau 6 » finit alors la ligne (ad_effect_line), sans
 // nommer la cible, qui peut être celle, au pluriel, que le sort parent impose. Une cible propre à
 // l'opcode (line_the_target, déjà dans theTarget) prend le niveau comme une autre, comme dans l'ancien
@@ -694,8 +695,7 @@ END
 DEFINE_PATCH_MACRO ad_application_target_level BEGIN
 	SET levelMin = $fx_level_min(~%line_fx%~)
 	SET levelMax = $fx_level_max(~%line_fx%~)
-	SET app_opcode = $fx_opcode(~%line_fx%~)
-	PATCH_IF (levelMax > 0 OR levelMin > 1) AND NOT (IS_EE AND (app_opcode == 127 OR (app_opcode == 218 AND $fx_parameter2(~%line_fx%~) != 0))) BEGIN
+	PATCH_IF levelMax > 0 OR levelMin > 1 BEGIN
 		PATCH_IF NOT (~%line_the_target%~ STRING_EQUAL ~~) AND (line_form == 0 OR line_form == 2) BEGIN
 			LPF ad_refusal INT_VAR fx_id = line_fx STR_VAR reason = ~not_implemented:application:level_target~ message = ~level restriction on an opcode-specific target~ RET render_late_missing = refusal END
 		END

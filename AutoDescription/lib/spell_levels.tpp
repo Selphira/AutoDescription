@@ -542,8 +542,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 				SET target_level_min = $fx_level_min(~%level_id%~)
 				SET target_level_max = $fx_level_max(~%level_id%~)
 			END
-			PATCH_IF $level_on(~%level_a%~) AND NOT VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_opcode%~) AND target_level_max > 0 AND target_level_min <= 1 AND target_level_min != target_level_max
-					AND NOT (IS_EE AND (level_opcode == 127 OR (level_opcode == 218 AND $fx_parameter2(~%level_id%~) != 0))) BEGIN
+			PATCH_IF $level_on(~%level_a%~) AND NOT VARIABLE_IS_SET $AD_VIRTUAL_LEVEL_MEMBERS(~%level_opcode%~) AND target_level_max > 0 AND target_level_min <= 1 AND target_level_min != target_level_max BEGIN
 				SET target_level_previous = 0
 				PATCH_IF level_h0 > 0 BEGIN
 					// Semblable à la durée près, comme l'ancien moteur (opcode_match_except_diceCount_and_duration).

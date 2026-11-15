@@ -20,6 +20,19 @@
 // - fx_group_target : cible comparée par les regroupements, celle que l'ancien moteur compare : « soi »
 //   pour un effet d'équipement (remplacée à la lecture), la cible du fichier sinon (une potion n'est
 //   corrigée qu'après ses regroupements).
+// Sens des champs « dés » d'un effet d'opcode dice_opcode et de parameter2 dice_parameter2 (colonne
+// DICE de 2da/opcodes.2da, IESDP eff_v1 0x1C et 0x20) : dice_real = 1 pour de vrais dés, 0 pour une
+// restriction de niveau de la cible. Sur EE, tous les opcodes sauf 12, 17, 18, 331, 333 et 218 de
+// parameter2 = 1 lisent une restriction de niveau, y compris le 127 et le 218 de parameter2 = 0 ou 2.
+DEFINE_PATCH_MACRO ad_fx_dice_real BEGIN
+	SPRINT dice_usage ~LEVEL~
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DICE(~%dice_opcode%~) BEGIN
+		SPRINT dice_usage $AD_OPCODE_DICE(~%dice_opcode%~)
+	END
+	SET dice_real = (~%dice_usage%~ STRING_EQUAL ~DICE~)
+		OR ((~%dice_usage%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND dice_parameter2 == 1)
+END
+
 DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 	SET fx_timing = $fx_timing(~%fx_id%~)
 	PATCH_MATCH fx_timing WITH
@@ -60,18 +73,10 @@ DEFINE_PATCH_MACRO ad_fx_normalize BEGIN
 
 	// Les champs « dés » donnent un niveau maximum (dés lancés) et minimum (faces) de la cible,
 	// sauf pour les opcodes qui s'en servent comme de vrais dés.
-	SET fx_opcode = $fx_opcode(~%fx_id%~)
-	SPRINT fx_dice_usage ~LEVEL~
-	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DICE(~%fx_opcode%~) BEGIN
-		SPRINT fx_dice_usage $AD_OPCODE_DICE(~%fx_opcode%~)
-	END
-	SET fx_level_restriction = 0
-	PATCH_IF ~%fx_dice_usage%~ STRING_EQUAL ~LEVEL~ BEGIN
-		SET fx_level_restriction = 1
-	END
-	ELSE PATCH_IF ~%fx_dice_usage%~ STRING_EQUAL ~DICE_IF_P2_1_EE~ BEGIN
-		SET fx_level_restriction = NOT (IS_EE AND $fx_parameter2(~%fx_id%~) == 1)
-	END
+	SET dice_opcode = $fx_opcode(~%fx_id%~)
+	SET dice_parameter2 = $fx_parameter2(~%fx_id%~)
+	LPM ad_fx_dice_real
+	SET fx_level_restriction = NOT dice_real
 	SET ~fx_level_restricted_%fx_id%~ = fx_level_restriction
 	SET ~fx_level_max_%fx_id%~ = fx_level_restriction ? $fx_dice_count(~%fx_id%~) : 0
 	SET ~fx_level_min_%fx_id%~ = fx_level_restriction ? $fx_dice_sides(~%fx_id%~) : 0

@@ -863,12 +863,10 @@ DEFINE_PATCH_MACRO ad_recursion_load_eff BEGIN
 		SET ~fx_external_0~ = 1
 		SET sub_opcode = $fx_opcode(~0~)
 		PATCH_IF ctx_parent_dice BEGIN
-			SPRINT sub_dice ~LEVEL~
-			PATCH_IF VARIABLE_IS_SET $AD_OPCODE_DICE(~%sub_opcode%~) BEGIN
-				SPRINT sub_dice $AD_OPCODE_DICE(~%sub_opcode%~)
-			END
-			PATCH_IF NOT ((~%sub_dice%~ STRING_EQUAL ~DICE~)
-					OR ((~%sub_dice%~ STRING_EQUAL ~DICE_IF_P2_1_EE~) AND IS_EE AND $fx_parameter2(~0~) != 0)) BEGIN
+			SET dice_opcode = sub_opcode
+			SET dice_parameter2 = $fx_parameter2(~0~)
+			LPM ad_fx_dice_real
+			PATCH_IF NOT dice_real BEGIN
 				SET ~fx_dice_count_0~ = ctx_dice_count
 				SET ~fx_dice_sides_0~ = ctx_dice_sides
 			END
