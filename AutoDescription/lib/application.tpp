@@ -848,7 +848,7 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 			// dans un rayon de 2,5 mètres »), comme l'ancien get_target_by_projectile corrigé.
 			PATCH_IF ctx_area_phrase > 0 BEGIN
 				SPRINT app_versus_saved_range ~%range%~
-				SET app_versus_saved_angle = angle
+				SPRINT app_versus_saved_angle ~%angle%~
 				LPM ad_recursion_area_range
 				SPRINT range ~%area_range_text%~
 				SET angle = ctx_area_angle
@@ -860,7 +860,7 @@ DEFINE_PATCH_MACRO ad_application_versus BEGIN
 				SPRINT target ~%toTheTarget%~
 				SET tra_id = app_versus_area_phrase SPRINT tra_out ~toTheTarget~ LPM ad_tra_to
 				SPRINT range ~%app_versus_saved_range%~
-				SET angle = app_versus_saved_angle
+				SPRINT angle ~%app_versus_saved_angle%~
 			END
 			SET app_target_missing = 0
 			PATCH_IF line_form == 0 OR line_form == 2 BEGIN

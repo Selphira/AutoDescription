@@ -629,10 +629,24 @@ BEGIN
 	END
 END
 
+// Chaîne de l'appelant chain_in (ctx_chain ou ctx_spell_chain), « |RES1|RES2| », dans chain_out : la
+// ressource décrite (ctx_resource) n'y est ajoutée qu'à la première sous-description ; plus bas, la
+// chaîne finit déjà par la sous-ressource qui appelle.
+DEFINE_PATCH_MACRO ad_recursion_caller_chain BEGIN
+	PATCH_IF ~%chain_in%~ STRING_EQUAL ~|~ BEGIN
+		SPRINT chain_out ~|%ctx_resource%|~
+	END
+	ELSE BEGIN
+		SPRINT chain_out ~%chain_in%~
+	END
+END
+
 DEFINE_PATCH_MACRO ad_describe_subresource_effects BEGIN
-	SPRINT ctx_chain ~%ctx_chain%%ctx_resource%|%sub_resref%|~
+	SPRINT chain_in ~%ctx_chain%~ LPM ad_recursion_caller_chain
+	SPRINT ctx_chain ~%chain_out%%sub_resref%|~
 	PATCH_IF ~%kind%~ STRING_EQUAL ~spl~ BEGIN
-		SPRINT ctx_spell_chain ~%ctx_spell_chain%%ctx_resource%|%sub_resref%|~
+		SPRINT chain_in ~%ctx_spell_chain%~ LPM ad_recursion_caller_chain
+		SPRINT ctx_spell_chain ~%chain_out%%sub_resref%|~
 	END
 	ELSE BEGIN
 		SPRINT ctx_eff_chain ~%ctx_eff_chain%%sub_resref%|~

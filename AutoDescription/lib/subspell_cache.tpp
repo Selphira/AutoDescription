@@ -50,7 +50,8 @@ DEFINE_PATCH_MACRO ad_subspell_cache_read BEGIN
 		SPRINT cache_projectiles ~%cache_projectiles%%cache_projectile%,~
 	END
 	SPRINT cache_key ~%ctx_depth%|%ctx_casting_level%|%ctx_force_target%|%ctx_force_keep_self%|%ctx_ignore_duration%|%ctx_ignore_save%|%ctx_versus_set%|%ctx_base_probability%|%ctx_base_low%|%ctx_base_high%|%ctx_base_lines%|%ctx_lift_sections%|%item_type%|%resource_is_spell%|%support_header_only%|%fx_with_casting%|%ctx_the_target%|%ctx_of_the_target%|%ctx_to_the_target%|%ctx_force_only_for%|%ctx_versus%|%ctx_named_lines%|%cache_projectiles%~
-	SPRINT cache_caller_chain ~%ctx_chain%%ctx_resource%|~
+	SPRINT chain_in ~%ctx_chain%~ LPM ad_recursion_caller_chain
+	SPRINT cache_caller_chain ~%chain_out%~
 	SPRINT cache_index ~%AD_SUBSPELL_CACHE_FOLDER%/%sub_resref%.txt~
 	SET cache_at = 0 - 1
 	PATCH_IF FILE_EXISTS ~%cache_index%~ BEGIN

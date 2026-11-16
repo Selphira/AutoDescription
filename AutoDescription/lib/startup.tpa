@@ -14,9 +14,9 @@ OUTER_SPRINT AD_SEMICOLON @1000002 // ~ ; ~
 OUTER_SPRINT PERCENT      @1000003 // ~ %~
 OUTER_SPRINT AD_AND       @1000004 // ~et~
 
-// Profondeur maximale des sous-ressources décrites (lib/recursion.tpp) : un sort lancé par un
-// effet de l'objet ou du sort décrit, pas au-delà, comme l'ancien moteur.
-OUTER_SET AD_RECURSION_MAX_DEPTH = 1
+// Profondeur maximale des sous-sorts décrits (lib/recursion.tpp), option AD_RECURSION_MAX_DEPTH de
+// settings-default.ini : au moins 1, un sort lancé par un effet de l'objet ou du sort décrit.
+OUTER_SET AD_RECURSION_MAX_DEPTH = AD_RECURSION_MAX_DEPTH < 1 ? 1 : AD_RECURSION_MAX_DEPTH
 
 // Ressources par tronçon des journaux écrits pendant la boucle (ad_log_part, lib/install.tpp) :
 // APPEND_OUTER relit et réécrit tout le fichier à chaque ajout, son coût croît avec la taille du
