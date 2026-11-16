@@ -469,7 +469,9 @@ BEGIN
 	SPRINT duration_missing ~~
 	SET support_header_only = 1
 	SET fx_with_casting = 0
-	SET fx_skip_ignored = 0
+	// En-tête seul : ad_spell_header_keeps écarterait ses effets IGNORED, qui ne sont pas lus
+	// (ad_fx_load_block_effect).
+	SET fx_skip_ignored = 1
 	// Comme l'ancien CURRENT_SOURCE_RES, le sous-sort est le sort décrit.
 	SPRINT spell_self ~%resref%~
 	TO_LOWER spell_self
