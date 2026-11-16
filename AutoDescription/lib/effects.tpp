@@ -253,11 +253,11 @@ DEFINE_PATCH_MACRO ad_fx_load_block_effect BEGIN
 	END
 	ELSE BEGIN
 		READ_SHORT (fx_offset + FX_opcode) fx_pass_opcode
-		// fx_skip_ignored : l'appelant écarterait de toute façon un effet IGNORED sans le lire. Testé sur
-		// l'opcode lu, avant le remplacement d'un 111, 177 ou 283 ; un opcode absent de ce jeu reste lu
-		// pour la synthèse des opcodes.
+		// fx_skip_ignored : un effet IGNORED n'écrit rien, il n'est pas lu (sauf pour le dump des
+		// effets). Testé sur l'opcode lu, avant le remplacement d'un 111, 177 ou 283 ; un opcode absent
+		// de ce jeu reste lu pour la synthèse des opcodes.
 		SET fx_skip = 0
-		PATCH_IF fx_skip_ignored AND support_header_only AND NOT AD_EFFECTS_DUMP
+		PATCH_IF fx_skip_ignored AND NOT AD_EFFECTS_DUMP
 				AND VARIABLE_IS_SET $AD_OPCODE_STATUS(~%fx_pass_opcode%~) BEGIN
 			SPRINT fx_skip_status $AD_OPCODE_STATUS(~%fx_pass_opcode%~)
 			SET fx_skip = $AD_OPCODE_AVAILABLE(~%fx_pass_opcode%~) AND (~%fx_skip_status%~ STRING_EQUAL ~IGNORED~)

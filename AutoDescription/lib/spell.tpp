@@ -19,10 +19,9 @@ BEGIN
 	SET item_type = 0 - 1
 	// Effets de lancement décrits à part (ancien add_casting_features), pas pour les sous-sorts.
 	SET fx_with_casting = 1
-	// En-tête seul : ad_spell_header_keeps écarterait ses effets IGNORED, qui ne sont pas lus
-	// (ad_fx_load_block_effect) ; la couverture ne compte que les opcodes TODO, absents ou
-	// indisponibles, toujours lus.
-	SET fx_skip_ignored = support_header_only
+	// Un effet IGNORED n'écrit rien : il n'est pas lu (ad_fx_load_block_effect) ; la couverture ne
+	// compte que les opcodes TODO, absents ou indisponibles, toujours lus.
+	SET fx_skip_ignored = 1
 	SET tra_block_start = 0
 	SET tra_block_size = 0
 	SPRINT description ~~

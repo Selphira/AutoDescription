@@ -13,7 +13,8 @@ BEGIN
 	SPRINT description ~~
 	SET covered = 0
 	SET support_header_only = 0
-	SET fx_skip_ignored = 0
+	// Un effet IGNORED n'écrit rien : il n'est pas lu (ad_fx_load_block_effect).
+	SET fx_skip_ignored = 1
 	SET support_spell = 0
 	SET resource_is_spell = 0
 	SET tra_block_start = 0

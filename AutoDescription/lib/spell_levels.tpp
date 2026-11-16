@@ -879,11 +879,40 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 			SPRINT formula_typed ~%formula_step%~
 			LPM ad_spell_level_formula_typed
 			SPRINT value ~%formula_typed%~
-			// Valeur fixée qui décroît : la valeur au niveau 0, d'après la dernière et le pas (« Passe à 21 -1
-			// par niveau », « Passe à 6 -1 par tranche de 4 niveaux »).
+			// Valeur fixée, ou valeur positive en points, qui décroît : la valeur au niveau 0, d'après la
+			// dernière et le pas (« Passe à 21 -1 par niveau », « Passe à 6 -1 par tranche de 4 niveaux »,
+			// RR#PNP36 : 5, 4, 3, 2 aux niveaux 1, 4, 7, 10 donnent « 5 -1 par tranche de 3 niveaux »), sans
+			// reste. Une valeur en points perd un pas par tranche entière de niveaux (2 + 1 × (10 / 3) = 5),
+			// seulement si cette formule redonne la valeur de chaque en-tête, le premier pris au premier
+			// niveau de lanceur (PXW3TORN, profane de niveau 3 : 50 % au niveau 5 donnent « 60 % -10 % par
+			// tranche de 4 niveaux ») ; sinon le texte reste sans base. Une base en pourcentage porte son
+			// signe « % », comme le pas.
+			SPRINT formula_base_text ~~
 			PATCH_IF formula_flat AND formula_delta < 0 BEGIN
 				SET formula_flat_value = formula_last + (ABS formula_delta) * formula_previous_level / formula_delta_level
-				SPRINT value ~%formula_flat_value% %value%~
+				SPRINT formula_base_text ~%formula_flat_value%~
+			END
+			ELSE PATCH_IF formula_delta < 0 AND formula_last > 0 AND formula_dice_sides == 0 BEGIN
+				SET formula_base_value = formula_last + (ABS formula_delta) * (formula_previous_level / formula_delta_level)
+				SET formula_base_exact = 1
+				FOR (formula_n = 0; formula_n < search_total AND formula_base_exact; ++formula_n) BEGIN
+					LPM ad_spell_level_formula_entry
+					SET formula_capped = formula_level > formula_previous_level ? formula_previous_level : formula_level
+					SET formula_base_exact = formula_value == formula_base_value + formula_delta * (formula_capped / formula_delta_level)
+				END
+				PATCH_IF formula_base_exact BEGIN
+					SPRINT formula_base_text ~%formula_base_value%~
+					SET formula_remains = 0
+				END
+			END
+			PATCH_IF NOT (~%formula_base_text%~ STRING_EQUAL ~~) BEGIN
+				PATCH_IF formula_percent BEGIN
+					SPRINT formula_step_text ~%value%~
+					SPRINT value ~%formula_base_text%~
+					SPRINT formula_base_text @1200003 // ~%value%%PERCENT%~
+					SPRINT value ~%formula_step_text%~
+				END
+				SPRINT value ~%formula_base_text% %value%~
 			END
 			PATCH_IF ABS formula_delta_level == 1 BEGIN
 				SPRINT formula_text @7002010 // ~%value% par niveau du lanceur/%levelMax%~

@@ -578,7 +578,7 @@ DEFINE_PATCH_FUNCTION ad_describe_subresource
 		ctx_frequency_seconds = 0
 		ctx_inherit_dice = 0
 		ctx_named_lines = 0
-		fx_skip_ignored = 0
+		fx_skip_ignored = 1
 	STR_VAR
 		resref = ~~
 		kind = ~spl~
@@ -703,11 +703,12 @@ END
 // Probabilité du parent (ctx_base_probability, sa plage ctx_base_low-ctx_base_high) donnée aux
 // sous-effets certains (ancien baseProbability). Un sous-effet probable garde la sienne, écrite sous
 // celle du parent (ad_lines_probability_groups) : seulement avec ctx_base_lines (opcodes 146 et 148),
-// refus sinon.
+// refus sinon. Un sous-effet IGNORED n'écrit rien : sa probabilité ne refuse pas le sous-sort.
 DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 	FOR (sub_fx = 0; sub_fx < fx_count; ++sub_fx) BEGIN
+		LPF ad_recursion_ignored_opcode INT_VAR opcode = $fx_opcode(~%sub_fx%~) RET sub_fx_ignored = ignored END
 		PATCH_IF $fx_probability(~%sub_fx%~) < 100 BEGIN
-			PATCH_IF NOT ctx_base_lines BEGIN
+			PATCH_IF NOT ctx_base_lines AND NOT sub_fx_ignored BEGIN
 				LPF ad_refusal INT_VAR fx_id = sub_fx STR_VAR reason = ~not_implemented:recursion:probability_product~ message = ~probable effect under a probable parent effect~ RET sub_missing = refusal END
 			END
 		END
@@ -717,6 +718,20 @@ DEFINE_PATCH_MACRO ad_recursion_base_probability BEGIN
 			SET ~fx_probability_high_%sub_fx%~ = ctx_base_high
 			SET ~fx_parent_probability_%sub_fx%~ = 1
 		END
+	END
+END
+
+// ignored : 1 si l'opcode est IGNORED (il n'écrit rien) et disponible dans ce jeu.
+DEFINE_PATCH_FUNCTION ad_recursion_ignored_opcode
+	INT_VAR
+		opcode = 0
+	RET
+		ignored
+BEGIN
+	SET ignored = 0
+	PATCH_IF VARIABLE_IS_SET $AD_OPCODE_STATUS(~%opcode%~) BEGIN
+		SPRINT ignored_status $AD_OPCODE_STATUS(~%opcode%~)
+		SET ignored = (~%ignored_status%~ STRING_EQUAL ~IGNORED~) AND $AD_OPCODE_AVAILABLE(~%opcode%~)
 	END
 END
 
@@ -1095,10 +1110,14 @@ DEFINE_PATCH_MACRO ad_recursion_render_passes BEGIN
 		END
 	END
 	// Sans niveau de lancement, les effets de tous les niveaux et les progressions (ancien
-	// get_spell_effects_description) ; les sections de niveaux sont refusées plus bas.
+	// get_spell_effects_description) ; les sections de niveaux sont refusées plus bas. Un effet IGNORED
+	// n'écrit rien : comme dans l'en-tête d'un sort (ad_spell_header_keeps), il n'est pas comparé, et un
+	// en-tête qui n'a que de tels effets ne compte pas parmi les niveaux (RR#PNP36, lancé par POTN36 :
+	// un texte affiché seul au niveau 13).
 	PATCH_IF ~%render_missing%~ STRING_EQUAL ~~ AND sub_all_headers BEGIN
 		FOR (sub_id = 0; sub_id < fx_count; ++sub_id) BEGIN
-			SET ~fx_header_hidden_%sub_id%~ = 0
+			LPF ad_recursion_ignored_opcode INT_VAR opcode = $fx_opcode(~%sub_id%~) RET sub_hidden = ignored END
+			SET ~fx_header_hidden_%sub_id%~ = sub_hidden
 		END
 		LPM ad_spell_header_effects
 		SET statistics_sections = 1
