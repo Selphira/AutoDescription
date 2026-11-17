@@ -168,9 +168,8 @@ END
 // Phrase : cast_phrase + 10 × variante + forme ; variante 0 nom seul (capacité de charge), 1 nom
 // seul instantané, 2 « Lance », 3 « Lance instantanément » ; les formes probables ne distinguent
 // pas les capacités de charge, comme dans l'ancien moteur. Un sort décrit par ses effets a pour ligne
-// celles de ses effets (aucune s'il n'en a pas), suivie de la durée, du jet de sauvegarde et des
-// exceptions de cible de l'effet qui le lance : avec plusieurs sous-lignes, ils ne suivent que la
-// dernière (BUG-036).
+// celles de ses effets (aucune s'il n'en a pas), chacune suivie de la durée, du jet de sauvegarde et
+// des exceptions de cible de l'effet qui le lance (ad_line_append_each_leaf, lib/application.tpp).
 DEFINE_PATCH_MACRO ad_cast_spell_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%cast_opcode%~)

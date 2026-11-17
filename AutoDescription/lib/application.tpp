@@ -943,7 +943,8 @@ END
 // que les autres) : phrase line_phrase (identifiant de base de la série, la forme y est ajoutée),
 // ou line_text déjà rédigé à la forme « soi » (à toute forme avec line_any_form : lignes d'un
 // sous-sort, qui nomment déjà leurs cibles) ; line_section et line_sort comme pour ad_line_add ;
-// line_no_duration : durée de l'effet non écrite (déjà dans la condition).
+// line_no_duration : durée de l'effet non écrite (déjà dans la condition). Texte à toute forme :
+// précisions de fin après chacune de ses lignes terminales (ad_line_append_each_leaf).
 // Un opcode qui a une phrase à la forme « cible » lit line_form (ad_application_form) pour choisir
 // entre les deux. Un effet d'en-tête va dans la section de son en-tête (fx_line_section : sa portée,
 // ou sa plage de niveaux dans un sort à plusieurs en-têtes, lib/spell_levels.tpp), suivi de sa
@@ -959,9 +960,15 @@ END
 // texte : render_late_missing, et pas de ligne.
 DEFINE_PATCH_MACRO ad_effect_line BEGIN
 	LPM ad_line_compose_text
-	LPM ad_line_append_duration
-	LPM ad_line_append_save
-	LPM ad_line_append_modifiers
+	SET app_leaf_mode = line_any_form
+	PATCH_IF line_any_form BEGIN
+		LPM ad_line_append_each_leaf
+	END
+	ELSE BEGIN
+		LPM ad_line_append_duration
+		LPM ad_line_append_save
+		LPM ad_line_append_modifiers
+	END
 	LPM ad_collapse_spaces
 	LPM ad_line_probability_prefix
 	LPM ad_line_condition_prefix
@@ -1026,6 +1033,90 @@ DEFINE_PATCH_MACRO ad_line_append_duration BEGIN
 	END
 END
 
+// Texte line_text à toute forme (line_any_form : lignes d'un sous-sort, qui peuvent être plusieurs) :
+// le jet de sauvegarde et les précisions de l'effet parent valent pour chacun des effets décrits, et
+// suivent donc chaque ligne terminale, non la seule dernière (BUG-036) ; de même pour sa durée quand
+// elle est un délai, une répétition ou une fréquence (« après 1 round », « chaque round pendant
+// 3 rounds »). Une simple durée du parent n'est pas celle de ses sous-effets (opcode 146 instantané,
+// durée de la contingence d'un 232, IESDP) : elle reste après la dernière ligne terminale. Lignes
+// terminales : la première ligne du texte (sa puce a été retirée) et les lignes à puce, sauf celles
+// suivies d'une ligne à puce plus en retrait (titre d'un groupe de probabilité, condition, en-tête
+// d'un 251) ; un titre de section de niveaux, sans puce, n'en est pas une. Une durée, une restriction
+// « uniquement pour » ou des exceptions de cible déjà écrites par la ligne ne sont pas répétées
+// (DGI017 : « pendant 1 tour pendant 1 tour ») ; deux jets de sauvegarde sont deux jets.
+DEFINE_PATCH_MACRO ad_line_append_each_leaf BEGIN
+	// Durée lue une seule fois, sans l'écrire : ad_line_append_duration fixe aussi la section de la
+	// ligne et peut taire sa cible par défaut (ad_application_default_target).
+	SET app_leaf_no_duration = line_no_duration
+	SET line_no_duration = 1
+	LPM ad_line_append_duration
+	SET line_no_duration = app_leaf_no_duration
+	SPRINT app_leaf_source ~%line_text%~
+	SPRINT app_leaf_duration ~~
+	PATCH_IF NOT line_no_duration AND ((~%app_block%~ STRING_EQUAL ~ability~) OR (~%app_block%~ STRING_EQUAL ~casting~) OR (~%app_block%~ STRING_EQUAL ~equipped~)) BEGIN
+		SPRINT app_leaf_duration ~%app_duration_text%~
+	END
+	SET app_leaf_duration_each = $fx_series_anchor(~%line_fx%~) OR app_timing == TIMING_delayed
+		OR app_timing == TIMING_delayed_duration OR NOT (~%ctx_frequency%~ STRING_EQUAL ~~)
+	// Le texte n'est jamais relu dans un tableau ($tableau(~i~) réévalue les %…% qu'il contient,
+	// EDGE-005) : un premier parcours range le retrait et la puce de chaque ligne, le second réécrit
+	// les lignes depuis MATCH1, sans chaîne de remplacement.
+	CLEAR_ARRAY app_leaf_indents
+	CLEAR_ARRAY app_leaf_bullets
+	SET app_leaf_count = 0
+	INNER_PATCH ~%app_leaf_source%%CRLF%~ BEGIN
+		REPLACE_EVALUATE CASE_SENSITIVE ~\([^%CRLF%]*\)%CRLF%~ BEGIN
+			SET app_leaf_indent = INDEX (CASE_SENSITIVE EVALUATE_REGEXP ~[^ ]~ ~%MATCH1%~)
+			SET $app_leaf_indents(~%app_leaf_count%~) = app_leaf_indent
+			SET $app_leaf_bullets(~%app_leaf_count%~) = app_leaf_indent >= 0
+				AND INDEX (CASE_SENSITIVE EXACT_MATCH ~- ~ ~%MATCH1%~ app_leaf_indent) == app_leaf_indent
+			SET app_leaf_count += 1
+		END ~~
+	END
+	CLEAR_ARRAY app_leaf_flags
+	SET app_leaf_last = 0 - 1
+	FOR (app_leaf_i = 0; app_leaf_i < app_leaf_count; ++app_leaf_i) BEGIN
+		SET app_leaf_indent = $app_leaf_indents(~%app_leaf_i%~)
+		SET app_leaf = app_leaf_indent >= 0 AND (app_leaf_i == 0 OR $app_leaf_bullets(~%app_leaf_i%~))
+		PATCH_IF app_leaf AND app_leaf_i + 1 < app_leaf_count BEGIN
+			SET app_leaf_next = app_leaf_i + 1
+			PATCH_IF $app_leaf_bullets(~%app_leaf_next%~) AND $app_leaf_indents(~%app_leaf_next%~) > app_leaf_indent BEGIN
+				SET app_leaf = 0
+			END
+		END
+		SET $app_leaf_flags(~%app_leaf_i%~) = app_leaf
+		PATCH_IF app_leaf BEGIN
+			SET app_leaf_last = app_leaf_i
+		END
+	END
+	// Sans ligne terminale (texte vide) : précisions à la fin, comme pour une ligne simple.
+	PATCH_IF app_leaf_last < 0 BEGIN
+		SET $app_leaf_flags(~0~) = 1
+		SET app_leaf_last = 0
+	END
+	SET app_leaf_i = 0
+	SPRINT app_leaf_text ~~
+	INNER_PATCH ~%app_leaf_source%%CRLF%~ BEGIN
+		REPLACE_EVALUATE CASE_SENSITIVE ~\([^%CRLF%]*\)%CRLF%~ BEGIN
+			SPRINT line_text ~%MATCH1%~
+			PATCH_IF $app_leaf_flags(~%app_leaf_i%~) BEGIN
+				PATCH_IF NOT (~%app_leaf_duration%~ STRING_EQUAL ~~) AND (app_leaf_duration_each OR app_leaf_i == app_leaf_last)
+						AND INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_leaf_duration%~ ~%line_text%~) < 0 BEGIN
+					SPRINT line_text ~%line_text% %app_leaf_duration%~
+				END
+				LPM ad_line_append_save
+				LPM ad_line_append_modifiers
+			END
+			// Remplacement vide : la chaîne de remplacement serait réévaluée.
+			SPRINT app_leaf_text ~%app_leaf_text%%line_text%%CRLF%~
+			SET app_leaf_i += 1
+		END ~~
+	END
+	INNER_PATCH_SAVE line_text ~%app_leaf_text%~ BEGIN
+		DELETE_BYTES (BUFFER_LENGTH - STRING_LENGTH ~%CRLF%~) STRING_LENGTH ~%CRLF%~
+	END
+END
+
 DEFINE_PATCH_MACRO ad_line_append_save BEGIN
 	LPM ad_application_save
 	PATCH_IF NOT (~%app_save_text%~ STRING_EQUAL ~~) BEGIN
@@ -1051,6 +1142,10 @@ DEFINE_PATCH_MACRO ad_line_append_modifiers BEGIN
 	PATCH_IF app_only_for_named BEGIN
 		SET app_only_for_named = INDEX (CASE_SENSITIVE EXACT_MATCH ~%app_versus_the_target%~ ~%line_text%~) >= 0
 	END
+	// Ligne d'un sous-sort qui l'écrit déjà (ad_line_append_each_leaf).
+	PATCH_IF app_leaf_mode AND NOT app_only_for_named AND NOT (~%line_only_for%~ STRING_EQUAL ~~) BEGIN
+		SET app_only_for_named = INDEX (CASE_SENSITIVE EXACT_MATCH ~(%line_only_for%)~ ~%line_text%~) >= 0
+	END
 	PATCH_IF NOT (~%line_only_for%~ STRING_EQUAL ~~) AND NOT app_only_for_named BEGIN
 		SPRINT line_text ~%line_text% (%line_only_for%)~
 	END
@@ -1064,7 +1159,9 @@ DEFINE_PATCH_MACRO ad_line_append_modifiers BEGIN
 	END
 	PATCH_IF $fx_exception_count(~%line_fx%~) > 0 BEGIN
 		LPM ad_application_target_exceptions
-		PATCH_IF NOT (~%app_exceptions_text%~ STRING_EQUAL ~~) BEGIN
+		// Ligne d'un sous-sort qui les écrit déjà (ad_line_append_each_leaf, RAIS2).
+		PATCH_IF NOT (~%app_exceptions_text%~ STRING_EQUAL ~~)
+				AND NOT (app_leaf_mode AND INDEX (CASE_SENSITIVE EXACT_MATCH ~(%app_exceptions_text%)~ ~%line_text%~) >= 0) BEGIN
 			SPRINT line_text ~%line_text% (%app_exceptions_text%)~
 		END
 	END
