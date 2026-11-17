@@ -66,7 +66,7 @@ END
 // opcodes) ; effet d'un EFF avec un autre 111 dans la ressource (l'ancien moteur le remplacerait alors
 // selon l'ordre de ses opcodes) ; arme à plusieurs métamorphoses (ad_fx_substitute_111) ; arme sans nom
 // (l'ancien moteur n'écrit rien) ; retrait
-// différé de la même arme (112) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
+// différé de la même arme (112 ou 123) : avec AD_ENABLE_SHRINKAGE, il fixe la durée du 111 (ancien
 // opcode_112_group) ; sans, son texte n'est pas établi (le seul cas connu, SPWM113, est une arme
 // écartée par sa métamorphose).
 DEFINE_PATCH_MACRO ad_op_111_support BEGIN
@@ -134,15 +134,17 @@ DEFINE_PATCH_MACRO ad_op_111_support BEGIN
 			ELSE BEGIN
 				SPRINT ~fx_item_name_%weapon_id%~ ~%weapon_name%~
 				SPRINT weapon_scope $fx_scope(~%weapon_id%~)
-				PHP_EACH fx_ids_112 AS _ => weapon_other BEGIN
-					SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
-					SPRINT weapon_other_resref $fx_resource(~%weapon_other%~)
-					PATCH_IF $fx_timing(~%weapon_other%~) == TIMING_delayed AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
-						SPRINT weapon_reason ~removed_later~
-						PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-							SPRINT weapon_reason ~remove_group~
+				PATCH_FOR_EACH weapon_remove_opcode IN 112 123 BEGIN
+					PHP_EACH ~fx_ids_%weapon_remove_opcode%~ AS _ => weapon_other BEGIN
+						SPRINT weapon_other_scope $fx_scope(~%weapon_other%~)
+						SPRINT weapon_other_resref $fx_resource(~%weapon_other%~)
+						PATCH_IF $fx_timing(~%weapon_other%~) == TIMING_delayed AND (~%weapon_other_scope%~ STRING_EQUAL ~%weapon_scope%~) AND (~%weapon_other_resref%~ STRING_EQUAL_CASE ~%weapon_resref%~) BEGIN
+							SPRINT weapon_reason ~removed_later~
+							PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
+								SPRINT weapon_reason ~remove_group~
+							END
+							LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:%weapon_reason%~ message = ~weapon removed later by opcode %weapon_remove_opcode%~ RET render_missing = refusal END
 						END
-						LPF ad_refusal INT_VAR fx_id = weapon_other STR_VAR reason = ~not_implemented:opcode111:%weapon_reason%~ message = ~weapon removed later by opcode 112~ RET render_missing = refusal END
 					END
 				END
 			END

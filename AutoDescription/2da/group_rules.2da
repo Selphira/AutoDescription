@@ -26,8 +26,8 @@
 23       CROSS    ad_group_spell_types            SHRINK               60           *            group_spell_opcode=60,group_spell_max_type=2
 24       CROSS    ad_group_spell_types            SHRINK               145          *            group_spell_opcode=145,group_spell_max_type=2
 25       CROSS    ad_group_spell_types            SHRINK               99           *            group_spell_opcode=99,group_spell_max_type=1
-26       CROSS    ad_group_item_return            SHRINK               112,122      *            *
-27       CROSS    ad_group_replace_item           SHRINK               112,122      *            *
+26       CROSS    ad_group_item_return            SHRINK               122          112,123      *
+27       CROSS    ad_group_replace_item           SHRINK               122          112,123      *
 28       CROSS    ad_group_broken_armor           SHRINK               143          *            *
 29       CROSS    ad_group_imprisonment           SHRINK               211,71       *            *
 30       CROSS    ad_group_all_illusions          SHRINK               220,221      *            *

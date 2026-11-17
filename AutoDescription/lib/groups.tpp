@@ -1071,37 +1071,39 @@ DEFINE_PATCH_MACRO ad_group_free_action_line BEGIN
 	SET line_phrase = 30110100 // ~Action libre~
 END
 
-// Objet rendu (ancien opcode_112_group, second cas) : un retrait d'objet (112) sans délai ni durée
-// limitée suivi de la création du même objet après un délai (122, timing 4) dans le même bloc
+// Objet rendu (ancien opcode_112_group, second cas) : un retrait d'objet (112 ou 123) sans délai ni
+// durée limitée suivi de la création du même objet après un délai (122, timing 4) dans le même bloc
 // devient un retrait pour la durée de ce délai ; la création est consommée. L'ancien moteur ne
 // prévoit qu'une création par retrait : plusieurs sont refusées.
 DEFINE_PATCH_MACRO ad_group_item_return BEGIN
-	PHP_EACH fx_ids_112 AS _ => group_id BEGIN
-		SET group_timing = $fx_timing(~%group_id%~)
-		PATCH_IF NOT $fx_consumed(~%group_id%~) AND (group_timing <= TIMING_while_equipped OR group_timing >= TIMING_permanent_after_death) BEGIN
-			SPRINT group_scope $fx_scope(~%group_id%~)
-			SPRINT group_resource $fx_resource_lower(~%group_id%~)
-			SET group_returns = 0
-			FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
-				SPRINT group_other_scope $fx_scope(~%group_candidate%~)
-				SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
-				PATCH_IF $fx_opcode(~%group_candidate%~) == 122 AND NOT $fx_consumed(~%group_candidate%~)
-						AND $fx_timing(~%group_candidate%~) == TIMING_delayed AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
-						AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
-					SET group_returns += 1
-					SET ~fx_consumed_%group_candidate%~ = 1
-					SET ~fx_item_return_%group_id%~ = $fx_duration(~%group_candidate%~)
+	PATCH_FOR_EACH group_remove_opcode IN 112 123 BEGIN
+		PHP_EACH ~fx_ids_%group_remove_opcode%~ AS _ => group_id BEGIN
+			SET group_timing = $fx_timing(~%group_id%~)
+			PATCH_IF NOT $fx_consumed(~%group_id%~) AND (group_timing <= TIMING_while_equipped OR group_timing >= TIMING_permanent_after_death) BEGIN
+				SPRINT group_scope $fx_scope(~%group_id%~)
+				SPRINT group_resource $fx_resource_lower(~%group_id%~)
+				SET group_returns = 0
+				FOR (group_candidate = 0; group_candidate < fx_count; ++group_candidate) BEGIN
+					SPRINT group_other_scope $fx_scope(~%group_candidate%~)
+					SPRINT group_other_resource $fx_resource_lower(~%group_candidate%~)
+					PATCH_IF $fx_opcode(~%group_candidate%~) == 122 AND NOT $fx_consumed(~%group_candidate%~)
+							AND $fx_timing(~%group_candidate%~) == TIMING_delayed AND (~%group_other_scope%~ STRING_EQUAL ~%group_scope%~)
+							AND (~%group_other_resource%~ STRING_EQUAL ~%group_resource%~) BEGIN
+						SET group_returns += 1
+						SET ~fx_consumed_%group_candidate%~ = 1
+						SET ~fx_item_return_%group_id%~ = $fx_duration(~%group_candidate%~)
+					END
 				END
-			END
-			PATCH_IF group_returns > 1 BEGIN
-				LPF ad_refusal INT_VAR fx_id = group_candidate STR_VAR reason = ~not_implemented:opcode112:several_returns~ message = ~several items returned by opcode 112 in one block~ RET render_late_missing = refusal END
+				PATCH_IF group_returns > 1 BEGIN
+					LPF ad_refusal INT_VAR fx_id = group_candidate STR_VAR reason = ~not_implemented:opcode%group_remove_opcode%:several_returns~ message = ~several items returned by opcode %group_remove_opcode% in one block~ RET render_late_missing = refusal END
+				END
 			END
 		END
 	END
 END
 
 // Objet remplacé (ancien opcode_122_group, opcode virtuel 525) : chaque création d'objet (122) est
-// réunie au premier retrait d'objet (112) du même bloc qui a les mêmes cible, timing, durée,
+// réunie au premier retrait d'objet (112 ou 123) du même bloc qui a les mêmes cible, timing, durée,
 // probabilités, jet de sauvegarde, résistance à la dissipation et special : « Remplace « Lance +3 »
 // par « Sceptre de puissance altière » » (effet dérivé REPLACE_ITEM). L'arme brisée (MISC56) qui
 // remplace la ressource décrite : « de se briser » (effet dérivé BROKEN_ITEM, opcode virtuel 519) ;
@@ -1114,14 +1116,16 @@ DEFINE_PATCH_MACRO ad_group_replace_item BEGIN
 			SET same_id = group_id
 			SET same_ignored = AD_SAME_PARAMETER1 BOR AD_SAME_PARAMETER2 BOR AD_SAME_POWER BOR AD_SAME_DICE
 			SET group_removal = 0 - 1
-			PHP_EACH fx_ids_112 AS _ => group_candidate BEGIN
-				SPRINT group_other_resource $fx_resource(~%group_candidate%~)
-				PATCH_IF group_removal < 0 AND NOT $fx_consumed(~%group_candidate%~)
-						AND (NOT group_broken OR (~%group_other_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)) BEGIN
-					SET same_other = group_candidate
-					LPM ad_fx_same_fields
-					PATCH_IF fx_same BEGIN
-						SET group_removal = group_candidate
+			PATCH_FOR_EACH group_remove_opcode IN 112 123 BEGIN
+				PHP_EACH ~fx_ids_%group_remove_opcode%~ AS _ => group_candidate BEGIN
+					SPRINT group_other_resource $fx_resource(~%group_candidate%~)
+					PATCH_IF (group_removal < 0 OR group_candidate < group_removal) AND NOT $fx_consumed(~%group_candidate%~)
+							AND (NOT group_broken OR (~%group_other_resource%~ STRING_EQUAL_CASE ~%ctx_resource%~)) BEGIN
+						SET same_other = group_candidate
+						LPM ad_fx_same_fields
+						PATCH_IF fx_same BEGIN
+							SET group_removal = group_candidate
+						END
 					END
 				END
 			END
@@ -1170,7 +1174,7 @@ DEFINE_PATCH_MACRO ad_group_broken_item_line BEGIN
 	SET line_no_duration = group_timing == TIMING_permanent OR group_timing == TIMING_permanent_after_death
 END
 
-// Objet retiré par l'effet 112 group_other, créé par l'effet 122 group_id.
+// Objet retiré par l'effet 112 ou 123 group_other, créé par l'effet 122 group_id.
 DEFINE_PATCH_MACRO ad_group_replace_item_line BEGIN
 	SPRINT itemName $fx_item_name(~%group_other%~)
 	SPRINT itemName2 $fx_item_name(~%group_id%~)

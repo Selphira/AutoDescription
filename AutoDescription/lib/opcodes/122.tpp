@@ -1,5 +1,5 @@
 // Opcode 122 (Item: Create Inventory Item) : objet créé dans l'inventaire, code commun dans
-// lib/opcodes/create_item.tpp. Avec AD_ENABLE_SHRINKAGE, l'objet qu'un effet 112 retire dans les
+// lib/opcodes/create_item.tpp. Avec AD_ENABLE_SHRINKAGE, l'objet qu'un effet 112 ou 123 retire dans les
 // mêmes conditions s'écrit « Remplace « A » par « B » » (ad_group_replace_item), et l'objet que le
 // porteur retrouve après un délai prolonge son retrait (ad_group_item_return, lib/groups.tpp) ;
 // l'arme brisée (MISC56) qui remplace la ressource décrite s'écrit « de se briser ».
