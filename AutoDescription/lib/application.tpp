@@ -284,6 +284,7 @@ DEFINE_PATCH_MACRO ad_application_area_target BEGIN
 				END
 				SET ~fx_area_target_%app_id%~ = 1
 				SET ~fx_area_cone_%app_id%~ = app_area_shape == 2
+				SET ~fx_area_angle_%app_id%~ = angle
 				SPRINT ~fx_area_range_%app_id%~ ~%range%~
 			END
 		END

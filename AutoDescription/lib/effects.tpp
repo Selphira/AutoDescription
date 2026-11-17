@@ -21,9 +21,9 @@
 // fx_special, et les valeurs normalisées de lib/normalize.tpp ; fx_header_target,
 // fx_header_projectile et fx_potion_drinker (ad_fx_header_fields, 0 hors
 // d'un en-tête d'objet) ; fx_area_target (0 à la lecture, 1 pour un effet dont les cibles sont
-// nommées d'après la zone du projectile, lib/application.tpp, qui fixe alors fx_area_cone et
-// fx_area_range, texte du rayon) ; fx_named_target (0 à la lecture, 1 pour un effet dont l'opcode
-// nomme la cible, fx_named_the_target, fx_named_of_the_target et fx_named_to_the_target,
+// nommées d'après la zone du projectile, lib/application.tpp, qui fixe alors fx_area_cone,
+// fx_area_angle, arc du cône, et fx_area_range, texte du rayon) ; fx_named_target (0 à la lecture,
+// 1 pour un effet dont l'opcode nomme la cible, fx_named_the_target, fx_named_of_the_target et fx_named_to_the_target,
 // lib/application.tpp) ; fx_late (0 à la lecture, 1 pour
 // un effet réuni que l'ancien moteur ajoute en fin de liste par son premier regroupement, les effets
 // identiques, 2 par un regroupement suivant, qui l'y ajoute après : chaque opcode écrit ses lignes
@@ -377,6 +377,7 @@ DEFINE_PATCH_MACRO ad_fx_add_effect BEGIN
 	SET ~fx_area_target_%fx_id%~ = 0
 	SET ~fx_named_target_%fx_id%~ = 0
 	SET ~fx_area_cone_%fx_id%~ = 0
+	SET ~fx_area_angle_%fx_id%~ = 0
 	SPRINT ~fx_area_range_%fx_id%~ ~~
 	SET ~fx_late_%fx_id%~ = fx_282_converted
 	SET ~fx_series_of_%fx_id%~ = 0 - 1

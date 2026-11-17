@@ -1,7 +1,7 @@
 // Opcode 55 (Death: Kill Creature Type) : tue les créatures de la valeur parameter1 du fichier IDS
 // parameter2 (ad_ids_name, lib/resources.tpp) : « Tue instantanément les rakshasas ». Valeur 0 :
-// la cible de l'effet, sans précision. Le nom remplace la cible, même celle d'une zone, comme dans
-// l'ancien moteur. Avec AD_ENABLE_SHRINKAGE, les effets d'un même bloc qui ne diffèrent que par
+// la cible de l'effet, sans précision. Le nom remplace la cible ; sous une zone, il est restreint à la
+// zone (ad_op_55_target). Avec AD_ENABLE_SHRINKAGE, les effets d'un même bloc qui ne diffèrent que par
 // parameter1 et parameter2 n'en font qu'un (ancien opcode_group_by_target) : noms réunis sans doublon
 // dans l'ordre des effets, ligne écrite après les autres effets 55, comme celle que l'ancien moteur
 // ajoute en fin de liste.
@@ -76,11 +76,12 @@ DEFINE_PATCH_MACRO ad_op_55_lines BEGIN
 	END
 END
 
-// Cible de la ligne de l'effet kill_id et de ceux qu'il réunit (line_the_target). Sous la zone
-// circulaire du projectile, les types réunis sont restreints à la zone (ancien
-// get_target_by_projectile) : « les rakshasas et les ettins dans un rayon de 4,5 mètres ». Refus d'un
-// regroupement : valeur 0 ; zone en cône (l'ancien moteur y écrit la zone sans les types, BUG-032) ;
-// classes que l'ancien moteur réunit sous un seul nom (ancien
+// Cible de la ligne de l'effet kill_id et de ceux qu'il réunit (line_the_target). Sous la zone du
+// projectile, le type, ou les types réunis, sont restreints à la zone (ancien get_target_by_projectile) :
+// « les rakshasas et les ettins dans un rayon de 4,5 mètres », « … dans un cône de 11 mètres sur un arc
+// de 60° ». L'ancien moteur écrit la zone en cône sans les types réunis (BUG-032) et un type seul sans
+// la zone : l'effet ne tue que les créatures de ce type qui sont dans la zone. Refus d'un regroupement :
+// valeur 0 ; classes que l'ancien moteur réunit sous un seul nom (ancien
 // opcode_set_target_strings : mages, puis voleurs, monoclassés et multiclassés).
 DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	CLEAR_ARRAY kill_names
@@ -108,9 +109,6 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	PATCH_IF kill_members > 1 AND kill_zero BEGIN
 		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:group_value~ message = ~group of slayings with value 0~ RET render_late_missing = refusal END
 	END
-	ELSE PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) AND $fx_area_cone(~%kill_id%~) BEGIN
-		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:area_group~ message = ~group of slayings with a cone-shaped area target~ RET render_late_missing = refusal END
-	END
 	ELSE PATCH_IF kill_members > 1 AND (kill_mages == 63 OR kill_thieves == 31) BEGIN
 		LPF ad_refusal INT_VAR fx_id = kill_id STR_VAR reason = ~not_implemented:opcode55:class_group~ message = ~slayings covering all mage or thief classes~ RET render_late_missing = refusal END
 	END
@@ -118,12 +116,17 @@ DEFINE_PATCH_MACRO ad_op_55_target BEGIN
 	PATCH_IF $fx_parameter1(~%kill_id%~) != 0 BEGIN
 		LPF ad_join STR_VAR array_name = ~kill_names~ glue = EVAL ~, %the% ~ final_glue = EVAL ~ %AD_AND% %the% ~ RET kill_target = text END
 		SPRINT line_the_target ~%the% %kill_target%~
-		PATCH_IF kill_members > 1 AND $fx_area_target(~%kill_id%~) BEGIN
+		PATCH_IF $fx_area_target(~%kill_id%~) BEGIN
 			SPRINT kill_saved_range ~%range%~
+			SPRINT kill_saved_angle ~%angle%~
 			SPRINT range $fx_area_range(~%kill_id%~)
+			SET angle = $fx_area_angle(~%kill_id%~)
 			SPRINT target ~%line_the_target%~
-			SET tra_id = 2001100 SPRINT tra_out ~line_the_target~ LPM ad_tra_to // ~%target% dans un rayon de %range%~
+			// @2001102 ~%target% dans un cône de %range% sur un arc de %angle%°~
+			SET tra_id = $fx_area_cone(~%kill_id%~) ? 2001102 : 2001100 // ~%target% dans un rayon de %range%~
+			SPRINT tra_out ~line_the_target~ LPM ad_tra_to
 			SPRINT range ~%kill_saved_range%~
+			SPRINT angle ~%kill_saved_angle%~
 		END
 	END
 END
