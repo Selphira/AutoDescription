@@ -2000,7 +2000,7 @@
 @20110102 = ~of neutralizing poisons infecting %theTarget%~
 @20110103 = ~of neutralizing poisons infecting %theTarget%~
 
-// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions, 0050 et 0060-0072 type inconnu et types de dégâts au singulier (+ 40)
 @20120001 = ~%damage% %damageType%~
 @20120002 = ~hit point~
 @20120003 = ~hit points~
@@ -2021,6 +2021,20 @@
 @20120040 = ~does not wake up the target~
 @20120041 = ~effective if the source is disarmed~
 @20120042 = ~Any hit points above the maximum disappear after %strDuration%~
+@20120050 = ~damage~
+@20120060 = ~crushing damage~
+@20120061 = ~acid damage~
+@20120062 = ~cold damage~
+@20120063 = ~electrical damage~
+@20120064 = ~fire damage~
+@20120065 = ~piercing damage~
+@20120066 = ~poison damage~
+@20120067 = ~magic damage~
+@20120068 = ~missile damage~
+@20120069 = ~slashing damage~
+@20120070 = ~magic fire damage~
+@20120071 = ~magic cold damage~
+@20120072 = ~stunning damage~
 
 // Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums, 0160 dégâts contre un type de créature (formes « cible » seulement)
 @20120100 = ~Inflicts %damage% %toTheTarget%~

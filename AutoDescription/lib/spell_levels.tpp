@@ -376,6 +376,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_save BEGIN
 				SET formula_dice_sides = 0
 				SET formula_opcode = 0
 				SET formula_signed = 1
+				SET formula_prefixed = 0
 				LPM ad_spell_level_formula
 				PATCH_IF formula_valid OR formula_rank == 2 BEGIN
 					SET level_id = $level_id(~%level_a%~)
@@ -437,6 +438,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				SET formula_dice_sides = 0
 				SET formula_opcode = level_opcode
 				SET formula_signed = 0
+				// Les dés de l'effet sont écrits devant la formule (plus bas).
+				SET formula_prefixed = (level_opcode == 12 OR level_opcode == 17) AND $fx_dice_count(~%level_id%~) > 0
 				LPM ad_spell_level_formula
 				// Deux valeurs seulement : la formule de l'ancien moteur, sans dés ni unité ; la classe d'armure
 				// garde ses sections (« -2 + -2 au niveau 15 »).
@@ -479,6 +482,8 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 			PATCH_IF search_in_all AND search_total > 1 BEGIN
 				SPRINT formula_array ~search_dice~
 				SET formula_dice_sides = $fx_dice_sides(~%level_id%~)
+				// Le bonus d'un 17 est écrit devant la formule (plus bas).
+				SET formula_prefixed = level_opcode == 17 AND $fx_parameter1(~%level_id%~) > 0
 				LPM ad_spell_level_formula
 				LPM ad_spell_level_formula_check
 				PATCH_IF formula_valid BEGIN
@@ -499,12 +504,15 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_values BEGIN
 				PATCH_IF search_in_all AND search_total > 1 BEGIN
 					SPRINT formula_array ~search_dice~
 					SET formula_dice_sides = $fx_dice_sides(~%level_id%~)
+					SET formula_prefixed = 0
 					LPM ad_spell_level_formula
 					LPM ad_spell_level_formula_check
 					SET level_dice_valid = formula_valid
 					SPRINT level_dice_text ~%formula_text%~
 					SPRINT formula_array ~search_parameter1~
 					SET formula_dice_sides = 0
+					// La formule des dés est écrite devant celle-ci (plus bas).
+					SET formula_prefixed = 1
 					LPM ad_spell_level_formula
 					LPM ad_spell_level_formula_check
 					PATCH_IF level_dice_valid AND formula_valid BEGIN
@@ -570,6 +578,7 @@ DEFINE_PATCH_MACRO ad_spell_levels_by_target_level BEGIN
 					SET formula_dice_sides = 0
 					SET formula_opcode = 0 - 1
 					SET formula_signed = 0
+					SET formula_prefixed = 0
 					LPM ad_spell_level_formula
 					LPM ad_spell_level_formula_exact
 					PATCH_IF formula_exact AND NOT (~%formula_text%~ STRING_EQUAL ~%target_level_max%~) BEGIN
@@ -766,7 +775,8 @@ END
 // formula_percent : valeurs en pourcentage ; formula_dice_sides : valeurs en nombre de dés de ces faces ;
 // formula_flat : valeur fixée (l'ancien moteur ajoute « niveau + valeur » devant une valeur constante
 // ou un pas négatif) ; formula_opcode : opcode dont l'unité suit la valeur (AD_LEVEL_UNIT_OPCODES),
-// sur l'effet level_id ; formula_unit_used : 1 si elle a été écrite. formula_rank : nombre de valeurs
+// sur l'effet level_id, au pluriel avec formula_prefixed (l'appelant écrit une valeur devant la
+// formule) ; formula_unit_used : 1 si elle a été écrite. formula_rank : nombre de valeurs
 // distinctes successives ; avec deux, formula_valid vaut 0 (ad_spell_level_formula_check) et, sans
 // dés, formula_two_text est la formule de l'ancien get_complex_value (« 1 + 1 au niveau 20 »,
 // « 2 jusqu'au niveau 9 » quand la seconde valeur est nulle), sans unité.
@@ -850,6 +860,11 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 		PATCH_IF VARIABLE_IS_SET $AD_LEVEL_UNIT_OPCODES(~%formula_opcode%~) BEGIN
 			// Un pas en dés vaut jusqu'à son nombre de faces : « 1d4 points de vie », et non « point de vie ».
 			SET unit_value = formula_dice_sides > 0 ? formula_delta * formula_dice_sides : formula_delta
+			// Une valeur écrite devant la formule compte dans l'accord de l'unité : « 1d8 + 1 points de
+			// dégâts magiques par niveau », mais « 1 point de dégâts magiques par niveau ».
+			PATCH_IF formula_prefixed BEGIN
+				SET unit_value += unit_value < 0 ? 0 - 1 : 1
+			END
 			SET unit_fx = level_id
 			LPM ~ad_op_%formula_opcode%_level_unit~
 			SET formula_unit_tra = unit_tra
@@ -876,6 +891,13 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 			// Reste au niveau du dernier changement (levelMax) : un dernier en-tête à la même valeur ne le
 			// change pas.
 			SET formula_remains = (ABS formula_previous) - (ABS formula_delta * formula_previous_level / formula_delta_level)
+			// Le reste écrit devant le pas compte aussi dans l'accord de l'unité (« 1 + 1 peaux de pierre »).
+			PATCH_IF formula_unit_tra > 0 AND formula_remains > 0 BEGIN
+				SET unit_value += unit_value < 0 ? 0 - formula_remains : formula_remains
+				SET unit_fx = level_id
+				LPM ~ad_op_%formula_opcode%_level_unit~
+				SET formula_unit_tra = unit_tra
+			END
 			SPRINT formula_typed ~%formula_step%~
 			LPM ad_spell_level_formula_typed
 			SPRINT value ~%formula_typed%~

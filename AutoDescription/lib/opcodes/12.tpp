@@ -75,10 +75,8 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 				// Une progression selon le niveau du sort (lib/spell_levels.tpp) nomme déjà le type.
 				PATCH_IF ~%damage%~ STRING_EQUAL ~~ BEGIN
 					SET unit_fx = damage_id
+					SET unit_value = ~%damage_text%~ STRING_EQUAL ~1~ ? 1 : 0
 					LPM ad_op_12_level_unit
-					PATCH_IF unit_tra == 20120003 AND ~%damage_text%~ STRING_EQUAL ~1~ BEGIN
-						SET unit_tra = 20120002 // ~point de vie~
-					END
 					SET tra_id = unit_tra SPRINT tra_out ~damageType~ LPM ad_tra_to
 					SPRINT damage ~%damage_text%~
 					SPRINT damage @20120001 // ~%damage% %damageType%~
@@ -143,18 +141,22 @@ DEFINE_PATCH_MACRO ad_op_12_lines BEGIN
 END
 
 // Unité des dégâts de l'effet unit_fx (ancien opcode_12_typed_value) : unit_tra, nom de son type de
-// dégâts, ou points de vie transférés.
+// dégâts, ou points de vie transférés ; au singulier pour une valeur ou un pas unit_value de 1
+// (« 1 point de dégâts magiques par niveau »), le libellé au singulier étant celui du pluriel + 40.
 DEFINE_PATCH_MACRO ad_op_12_level_unit BEGIN
 	SET unit_type = $fx_parameter2(~%unit_fx%~) - ($fx_parameter2(~%unit_fx%~) BAND 65535)
 	SET unit_tra = 20120010 // ~points de dégâts~
 	PATCH_IF VARIABLE_IS_SET $AD_DAMAGE_TYPES(~%unit_type%~) BEGIN
 		SET unit_tra = $AD_DAMAGE_TYPES(~%unit_type%~)
 	END
+	PATCH_IF unit_value == 1 BEGIN
+		SET unit_tra += 40 // ~point de dégâts~ (@20120050), ~point de dégâts contondants~ (@20120060)…
+	END
 	// Un transfert (bits 1 ou 4 de special, l'inverse du drain selon l'IESDP) fait passer des points de
 	// vie de la source à la cible : ce ne sont plus des dégâts d'un type.
 	SET unit_special = IS_EE ? $fx_special(~%unit_fx%~) BAND 0b11011 : 0
 	PATCH_IF unit_special == BIT1 OR unit_special == BIT4 BEGIN
-		SET unit_tra = 20120003 // ~points de vie~
+		SET unit_tra = unit_value == 1 ? 20120002 : 20120003 // ~point de vie~, ~points de vie~
 	END
 END
 

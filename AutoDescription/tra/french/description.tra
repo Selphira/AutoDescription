@@ -2000,7 +2000,7 @@
 @20110102 = ~de neutraliser les poisons infectant %theTarget%~
 @20110103 = ~de neutraliser les poisons infectant %theTarget%~
 
-// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions
+// Opcode 12 : libellés (20 120 000-20 120 099) : 0001 dégâts et leur type, 0002-0003 points de vie transférés, 0010 type inconnu, 0020-0032 types de dégâts (AD_DAMAGE_TYPES), 0040-0041 précisions, 0050 et 0060-0072 type inconnu et types de dégâts au singulier (+ 40)
 @20120001 = ~%damage% %damageType%~
 @20120002 = ~point de vie~
 @20120003 = ~points de vie~
@@ -2021,6 +2021,20 @@
 @20120040 = ~ne réveille pas la cible~
 @20120041 = ~efficace si la source est désarmée~
 @20120042 = ~Tout point de vie au-delà du maximum disparaît après %strDuration%~
+@20120050 = ~point de dégâts~
+@20120060 = ~point de dégâts contondants~
+@20120061 = ~point de dégâts d'acide~
+@20120062 = ~point de dégâts de froid~
+@20120063 = ~point de dégâts d'électricité~
+@20120064 = ~point de dégâts de feu~
+@20120065 = ~point de dégâts perforants~
+@20120066 = ~point de dégâts de poison~
+@20120067 = ~point de dégâts magiques~
+@20120068 = ~point de dégâts de projectiles~
+@20120069 = ~point de dégâts tranchants~
+@20120070 = ~point de dégâts de feu magique~
+@20120071 = ~point de dégâts de froid magique~
+@20120072 = ~point de dégâts non létal~
 
 // Opcode 12 : phrases (20 120 100-20 120 999) : 0100 dégâts, 0110 drain, 0120 transfert, 0130 points de vie fixés, 0140 en pourcentage, 0150 pourcentage des points de vie maximums, 0160 dégâts contre un type de créature (formes « cible » seulement)
 @20120100 = ~Inflige %damage% %toTheTarget%~
