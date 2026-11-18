@@ -11,10 +11,10 @@
 // Un effet sans valeur lue dans parameter3 (178, 179) : l'ancien moteur l'écarte (opcode_178_is_valid). Fichier qui
 // n'est pas un type de créature : écarté et journalisé. Refus : kit.ids et valeur 100 de ea.ids
 // (opcode_idscheck8_is_valid du 344) ;
-// valeur sans nom ; forme « cible » et effet probable d'une valeur lue dans special (344 : l'ancien moteur n'en a pas) ;
-// effet d'un 177 qui vise un autre type de créature que le sien (l'ancien moteur écrit alors celui du
-// 177 à la place de celui de l'opcode : L#NDSW2). Avec le même type, la cible et l'adversaire sont les
-// mêmes : « Augmente de 3 le TAC0 des dragons contre les dragons ».
+// valeur sans nom ; forme « cible » et effet probable d'une valeur lue dans special (344 : l'ancien moteur n'en a pas).
+// Le type de créature d'un 177 qui filtre l'effet est celui du porteur, celui de l'opcode celui de
+// l'adversaire : « TAC0 : +2 contre les créatures charmées (uniquement pour les compagnons) » (L#NDSW2),
+// « Augmente de 3 le TAC0 des dragons contre les dragons » (ad_application_versus, lib/application.tpp).
 DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 	SPRINT versus_amount_field $AD_VERSUS_AMOUNT(~%versus_opcode%~)
 	SET versus_amount_special = ~%versus_amount_field%~ STRING_EQUAL ~SPECIAL~
@@ -54,10 +54,6 @@ DEFINE_PATCH_MACRO ad_versus_modifier_support BEGIN
 					OR $fx_probability(~%versus_id%~) < 100) BEGIN
 				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:form~ message = ~effect on another target, or probable~ RET render_missing = refusal END
 			END
-			ELSE PATCH_IF $fx_versus_file(~%versus_id%~) > 0 AND ($fx_versus_file(~%versus_id%~) != versus_file OR $fx_versus_value(~%versus_id%~) != versus_value
-					OR $fx_versus_inner_file(~%versus_id%~) > 0) BEGIN
-				LPF ad_refusal INT_VAR fx_id = versus_id STR_VAR reason = ~not_implemented:opcode%versus_opcode%:double_versus~ message = ~creature type set by opcode 177 (IDS file %versus_file%, value %versus_value% for the effect) differs from the one of the effect~ RET render_missing = refusal END
-			END
 		END
 	END
 END
@@ -79,7 +75,10 @@ DEFINE_PATCH_MACRO ad_versus_modifier_lines BEGIN
 					PATCH_IF versus_other >= versus_id + 1 AND NOT $fx_consumed(~%versus_other%~) AND $fx_parameter3(~%versus_other%~) == $fx_parameter3(~%versus_id%~) BEGIN
 						SET same_other = versus_other
 						LPM ad_fx_same_fields
-						PATCH_IF fx_same BEGIN
+						PATCH_IF fx_same AND $fx_versus_file(~%versus_id%~) == $fx_versus_file(~%versus_other%~)
+								AND $fx_versus_value(~%versus_id%~) == $fx_versus_value(~%versus_other%~)
+								AND $fx_versus_inner_file(~%versus_id%~) == $fx_versus_inner_file(~%versus_other%~)
+								AND $fx_versus_inner_value(~%versus_id%~) == $fx_versus_inner_value(~%versus_other%~) BEGIN
 							SET $versus_anchor(~%versus_other%~) = versus_id
 							SET ~fx_late_%versus_id%~ = 1
 						END
