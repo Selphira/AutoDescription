@@ -882,17 +882,13 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 			// Valeur fixée, ou valeur positive en points, qui décroît : la valeur au niveau 0, d'après la
 			// dernière et le pas (« Passe à 21 -1 par niveau », « Passe à 6 -1 par tranche de 4 niveaux »,
 			// RR#PNP36 : 5, 4, 3, 2 aux niveaux 1, 4, 7, 10 donnent « 5 -1 par tranche de 3 niveaux »), sans
-			// reste. Une valeur en points perd un pas par tranche entière de niveaux (2 + 1 × (10 / 3) = 5),
-			// seulement si cette formule redonne la valeur de chaque en-tête, le premier pris au premier
-			// niveau de lanceur (PXW3TORN, profane de niveau 3 : 50 % au niveau 5 donnent « 60 % -10 % par
-			// tranche de 4 niveaux ») ; sinon le texte reste sans base. Une base en pourcentage porte son
-			// signe « % », comme le pas.
+			// reste. La valeur perd un pas par tranche entière de niveaux (2 + 1 × (10 / 3) = 5), seulement
+			// si cette formule redonne la valeur de chaque en-tête, le premier pris au premier niveau de
+			// lanceur (PXW3TORN, profane de niveau 3 : 50 % au niveau 5 donnent « 60 % -10 % par tranche de
+			// 4 niveaux ») ; sinon une valeur en points reste sans base, et une valeur fixée garde ses
+			// sections de niveaux. Une base en pourcentage porte son signe « % », comme le pas.
 			SPRINT formula_base_text ~~
-			PATCH_IF formula_flat AND formula_delta < 0 BEGIN
-				SET formula_flat_value = formula_last + (ABS formula_delta) * formula_previous_level / formula_delta_level
-				SPRINT formula_base_text ~%formula_flat_value%~
-			END
-			ELSE PATCH_IF formula_delta < 0 AND formula_last > 0 AND formula_dice_sides == 0 BEGIN
+			PATCH_IF formula_delta < 0 AND formula_dice_sides == 0 AND (formula_flat OR formula_last > 0) BEGIN
 				SET formula_base_value = formula_last + (ABS formula_delta) * (formula_previous_level / formula_delta_level)
 				SET formula_base_exact = 1
 				FOR (formula_n = 0; formula_n < search_total AND formula_base_exact; ++formula_n) BEGIN
@@ -903,6 +899,9 @@ DEFINE_PATCH_MACRO ad_spell_level_formula BEGIN
 				PATCH_IF formula_base_exact BEGIN
 					SPRINT formula_base_text ~%formula_base_value%~
 					SET formula_remains = 0
+				END
+				ELSE PATCH_IF formula_flat BEGIN
+					SET formula_valid = 0
 				END
 			END
 			PATCH_IF NOT (~%formula_base_text%~ STRING_EQUAL ~~) BEGIN
