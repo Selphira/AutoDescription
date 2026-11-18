@@ -67,10 +67,14 @@ END
 // ---------------------------------------------------------------------------------------------
 // Lignes (ancien opcode_self_42_62 et opcode_42_group)
 
-// Avec AD_ENABLE_SHRINKAGE, les effets d'un même nombre d'emplacements, de même portée et de même
-// probabilité, sont réunis en une ligne (niveaux réunis) ; un effet dont un niveau est déjà réuni garde
-// sa ligne, ses emplacements se cumulent à ceux de la ligne ; l'ancien moteur range les effets réunis après les doublements, d'où leurs
-// lignes ajoutées après celles-ci.
+// Un effet écarté ou réuni à un effet identique (fx_consumed) n'a pas de ligne. Avec
+// AD_ENABLE_SHRINKAGE, les doublements viennent d'abord ; puis les ajouts de même portée et de même
+// ligne (ad_fx_line_key : probabilité, durée, origine…) sont additionnés niveau par niveau (le jeu
+// cumule les emplacements de tous les effets, effets identiques compris), et les niveaux de même
+// total forment une ligne, dans l'ordre des niveaux : PXPMAESL, sept 62 de 1 emplacement aux masques
+// 1 à 7, « 4 emplacements de 1er, 2ème et 3ème niveau ». Réunir des effets de masques disjoints puis
+// écrire chacun des autres à part donnait deux lignes de même texte, dont ad_line_add ne gardait
+// qu'une.
 DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 	SPRINT line_section ~equipped~
 	SET line_sort = $AD_OPCODE_SORT(~%slots_opcode%~)
@@ -78,11 +82,11 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 		LPM ad_spell_slots_priest_type
 	END
 	FOR (slots_id = 0; slots_id < fx_count; ++slots_id) BEGIN
-		SET $slots_done(~%slots_id%~) = 0
+		SET $slots_done(~%slots_id%~) = $fx_consumed(~%slots_id%~)
 	END
 	PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
 		PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
-			PATCH_IF $fx_parameter2(~%slots_id%~) == 0 BEGIN
+			PATCH_IF NOT $slots_done(~%slots_id%~) AND $fx_parameter2(~%slots_id%~) == 0 BEGIN
 				SET $slots_done(~%slots_id%~) = 1
 				SET slots_amount = $fx_parameter1(~%slots_id%~)
 				SET slots_levels = 0
@@ -93,20 +97,55 @@ DEFINE_PATCH_MACRO ad_spell_slots_lines BEGIN
 	PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_id BEGIN
 		PATCH_IF NOT $slots_done(~%slots_id%~) BEGIN
 			SET $slots_done(~%slots_id%~) = 1
-			SET slots_amount = $fx_parameter1(~%slots_id%~)
-			SET slots_levels = $fx_parameter2(~%slots_id%~)
-			SPRINT slots_scope $fx_scope(~%slots_id%~)
 			PATCH_IF AD_ENABLE_SHRINKAGE BEGIN
-				PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_other BEGIN
-					SPRINT slots_other_scope $fx_scope(~%slots_other%~)
-					PATCH_IF slots_other >= slots_id + 1 AND NOT $slots_done(~%slots_other%~) AND $fx_parameter1(~%slots_other%~) == slots_amount
-							AND (~%slots_other_scope%~ STRING_EQUAL ~%slots_scope%~)
-							AND $fx_probability1(~%slots_other%~) == $fx_probability1(~%slots_id%~)
-							AND $fx_probability2(~%slots_other%~) == $fx_probability2(~%slots_id%~)
-							AND ($fx_parameter2(~%slots_other%~) BAND slots_levels) == 0 BEGIN
-						SET $slots_done(~%slots_other%~) = 1
-						SET slots_levels = slots_levels BOR $fx_parameter2(~%slots_other%~)
+				LPM ad_spell_slots_total_lines
+			END
+			ELSE BEGIN
+				SET slots_amount = $fx_parameter1(~%slots_id%~)
+				SET slots_levels = $fx_parameter2(~%slots_id%~)
+				LPM ad_spell_slots_line
+			END
+		END
+	END
+END
+
+// Lignes des ajouts de slots_id et des effets restants de même portée et de même ligne : total de
+// chaque niveau (slots_total), puis une ligne par total non nul, sur les niveaux qui l'ont. Un niveau
+// dont les ajouts et retraits s'annulent n'est pas écrit.
+DEFINE_PATCH_MACRO ad_spell_slots_total_lines BEGIN
+	SET key_id = slots_id
+	LPM ad_fx_line_key
+	SPRINT slots_key ~%fx_line_key%~
+	SPRINT slots_scope $fx_scope(~%slots_id%~)
+	FOR (slots_total_level = 1; slots_total_level <= slots_max_level; ++slots_total_level) BEGIN
+		SET $slots_total(~%slots_total_level%~) = 0
+	END
+	PHP_EACH ~fx_ids_%slots_opcode%~ AS _ => slots_other BEGIN
+		PATCH_IF slots_other == slots_id OR NOT $slots_done(~%slots_other%~) BEGIN
+			SET key_id = slots_other
+			LPM ad_fx_line_key
+			SPRINT slots_other_scope $fx_scope(~%slots_other%~)
+			PATCH_IF (~%slots_other_scope%~ STRING_EQUAL ~%slots_scope%~) AND (~%fx_line_key%~ STRING_EQUAL ~%slots_key%~) BEGIN
+				SET $slots_done(~%slots_other%~) = 1
+				SET slots_copies = VARIABLE_IS_SET $fx_identical_count(~%slots_other%~) ? $fx_identical_count(~%slots_other%~) : 1
+				SET slots_other_amount = $fx_parameter1(~%slots_other%~) * slots_copies
+				SET slots_other_levels = $fx_parameter2(~%slots_other%~)
+				FOR (slots_total_level = 1; slots_total_level <= slots_max_level; ++slots_total_level) BEGIN
+					PATCH_IF (slots_other_levels BAND (1 << (slots_total_level - 1))) != 0 BEGIN
+						SET $slots_total(~%slots_total_level%~) = $slots_total(~%slots_total_level%~) + slots_other_amount
 					END
+				END
+			END
+		END
+	END
+	FOR (slots_total_level = 1; slots_total_level <= slots_max_level; ++slots_total_level) BEGIN
+		SET slots_amount = $slots_total(~%slots_total_level%~)
+		PATCH_IF slots_amount != 0 BEGIN
+			SET slots_levels = 0
+			FOR (slots_match_level = slots_total_level; slots_match_level <= slots_max_level; ++slots_match_level) BEGIN
+				PATCH_IF $slots_total(~%slots_match_level%~) == slots_amount BEGIN
+					SET slots_levels = slots_levels BOR (1 << (slots_match_level - 1))
+					SET $slots_total(~%slots_match_level%~) = 0
 				END
 			END
 			LPM ad_spell_slots_line
