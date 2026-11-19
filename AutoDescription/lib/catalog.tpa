@@ -313,6 +313,8 @@ END
 // dans 2da/derived.2da (AD_VIRTUAL_HEADER_DURATION).
 ACTION_DEFINE_ASSOCIATIVE_ARRAY AD_OPCODE_HEADER_DURATION BEGIN
 	177 => INSTANT // EFF appliqué
+	// IESDP : sort appliqué aussitôt (seuls les timings 0 à durée nulle, 1 et 4 ont un sens).
+	326 => INSTANT // sort appliqué
 	213 => SPECIAL // labyrinthe
 END
 

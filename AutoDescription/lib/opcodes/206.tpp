@@ -79,7 +79,9 @@ DEFINE_PATCH_MACRO ad_op_206_psionic_support BEGIN
 END
 
 // Lignes (ancien opcode_self_206 et opcode_206_post_group) : avec AD_ENABLE_SHRINKAGE, les
-// immunités d'une même cible et d'une même section (portée, ou plage de niveaux d'un sort à plusieurs
+// immunités d'une même cible, d'une même restriction de niveau de la cible (la ligne écrit celle d'un
+// seul membre : SPWI815, immunités de tous niveaux et du niveau 6 ou plus) et d'une même section
+// (portée, ou plage de niveaux d'un sort à plusieurs
 // en-têtes ; l'ancien moteur décrit chaque bloc à part) à au moins deux sorts de noms différents sont
 // réunies en une ligne
 // (effet dérivé SPELL_IMMUNITIES), noms triés ; les lignes réunies viennent après les autres. Comme
@@ -107,6 +109,8 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 				SET spell_timing = $fx_timing(~%spell_id%~)
 				SET spell_duration = $fx_duration(~%spell_id%~)
 				SPRINT spell_level_duration $fx_level_duration(~%spell_id%~)
+				SET spell_level_min = $fx_level_min(~%spell_id%~)
+				SET spell_level_max = $fx_level_max(~%spell_id%~)
 				SET $spell_group_head(~%spell_group_count%~) = spell_id
 				SET spell_name_count = 0
 				PHP_EACH fx_ids_206 AS _ => spell_other BEGIN
@@ -116,7 +120,8 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 					// les autres (fx_late, 318 devenus des 206) y compris.
 					PATCH_IF NOT $fx_consumed(~%spell_other%~) AND $spell_group(~%spell_other%~) < 0 AND $fx_effective_target(~%spell_other%~) == spell_target AND (~%spell_other_scope%~ STRING_EQUAL ~%spell_scope%~)
 							AND (spell_timing == TIMING_while_equipped OR ($fx_timing(~%spell_other%~) == spell_timing AND $fx_duration(~%spell_other%~) == spell_duration))
-							AND (~%spell_other_level_duration%~ STRING_EQUAL ~%spell_level_duration%~) BEGIN
+							AND (~%spell_other_level_duration%~ STRING_EQUAL ~%spell_level_duration%~)
+							AND $fx_level_min(~%spell_other%~) == spell_level_min AND $fx_level_max(~%spell_other%~) == spell_level_max BEGIN
 						SPRINT spell_name $spell_name(~%spell_other%~)
 						PATCH_IF NOT ~%spell_name%~ STRING_EQUAL ~~ BEGIN
 							SET spell_name_new = 1
@@ -181,7 +186,8 @@ DEFINE_PATCH_MACRO ad_op_206_lines BEGIN
 END
 
 // En-tête d'un sort seul (lib/spell_header.tpp), après les regroupements (ancien
-// opcode_206_post_group, seconde partie) : dans chaque en-tête, les immunités de même cible et, sauf
+// opcode_206_post_group, seconde partie) : dans chaque en-tête, les immunités de même cible, de même
+// restriction de niveau de la cible et, sauf
 // si la première dure tant que l'objet est porté, de même timing et même durée, à au moins deux sorts
 // de noms différents disparaissent (avec la première, même sans nom) au profit d'un effet 518. Comme
 // dans l'ancien moteur, celui-ci prend les champs de la dernière immunité qui reste dans l'en-tête,
@@ -244,6 +250,8 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 				SET immunity_target = $fx_target(~%immunity_id%~)
 				SET immunity_timing = $fx_timing(~%immunity_id%~)
 				SET immunity_duration = $fx_duration(~%immunity_id%~)
+				SET immunity_level_min = $fx_level_min(~%immunity_id%~)
+				SET immunity_level_max = $fx_level_max(~%immunity_id%~)
 				// Noms déjà vus du groupe : clé préfixée par son numéro, CLEAR_ARRAY ne les oubliant pas (V36).
 				SET immunity_serial += 1
 				SET immunity_name_count = 0
@@ -259,6 +267,7 @@ DEFINE_PATCH_MACRO ad_op_206_header_groups BEGIN
 						SET immunity_last = immunity_other
 						SET immunity_last_unstable = 0
 						PATCH_IF NOT $immunity_checked(~%immunity_j%~) AND $fx_target(~%immunity_other%~) == immunity_target
+								AND $fx_level_min(~%immunity_other%~) == immunity_level_min AND $fx_level_max(~%immunity_other%~) == immunity_level_max
 								AND (immunity_timing == TIMING_while_equipped OR ($fx_timing(~%immunity_other%~) == immunity_timing AND $fx_duration(~%immunity_other%~) == immunity_duration)) BEGIN
 							SPRINT immunity_name $immunity_names(~%immunity_j%~)
 							SET immunity_stable = 1

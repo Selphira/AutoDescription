@@ -3666,8 +3666,8 @@
 // Opcode 245 : vérification de la folie du berserker, phrases 0100 (22 450 100-22 450 103)
 @22450100 = ~Chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
 @22450101 = ~Chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
-@22450102 = ~que chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
-@22450103 = ~que chaque attaque a 1 % de chances de provoquer la folie du berserker chez %theTarget%~
+@22450102 = ~que chaque attaque ait 1 % de chances de provoquer la folie du berserker chez %theTarget%~
+@22450103 = ~que chaque attaque ait 1 % de chances de provoquer la folie du berserker chez %theTarget%~
 // Opcode 247 : Attaque de la créature la plus proche : 0001 « En combat », phrases 0100 (22 470 000-22 470 999)
 @22470001 = ~En combat~
 @22470100 = ~Provoque la folie du berserker chez %theTarget%~
